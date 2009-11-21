@@ -7,6 +7,7 @@ from django.db.backends import BaseDatabaseOperations
 
 class DatabaseOperations(BaseDatabaseOperations):
     def __init__(self, connection):
+        super(DatabaseOperations, self).__init__()
         self._postgres_version = None
         self.connection = connection
 

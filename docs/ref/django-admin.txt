@@ -765,6 +765,14 @@ with an appropriate extension (e.g. ``json`` or ``xml``). See the
 documentation for ``loaddata`` for details on the specification of fixture
 data files.
 
+--database
+~~~~~~~~~~
+
+The alias for the database install the tables for.  By default uses the
+``'default'`` alias.
+
+--noinput
+~~~~~~~~~
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 

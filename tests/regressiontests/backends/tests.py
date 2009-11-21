@@ -18,13 +18,13 @@ class Callproc(unittest.TestCase):
             return True
         else:
             return True
-            
+
 class LongString(unittest.TestCase):
 
     def test_long_string(self):
         # If the backend is Oracle, test that we can save a text longer
         # than 4000 chars and read it properly
-        if settings.DATABASE_ENGINE == 'oracle':
+        if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == 'oracle':
             c = connection.cursor()
             c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
             long_str = ''.join([unicode(x) for x in xrange(4000)])

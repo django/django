@@ -145,15 +145,18 @@ class RelatedField(object):
                     v = v[0]
             return v
 
+        if hasattr(value, 'get_compiler'):
+            value = value.get_compiler(connection=connection)
+
         if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
             # If the value has a relabel_aliases method, it will need to
             # be invoked before the final SQL is evaluated
             if hasattr(value, 'relabel_aliases'):
                 return value
             if hasattr(value, 'as_sql'):
-                sql, params = value.as_sql(connection)
+                sql, params = value.as_sql()
             else:
-                sql, params = value._as_sql(connection)
+                sql, params = value._as_sql(connection=connection)
             return QueryWrapper(('(%s)' % sql), params)
 
         # FIXME: lt and gt are explicitally allowed to make

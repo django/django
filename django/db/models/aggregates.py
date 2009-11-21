@@ -43,9 +43,6 @@ class Aggregate(object):
         """
         klass = getattr(query.aggregates_module, self.name)
         aggregate = klass(col, source=source, is_summary=is_summary, **self.extra)
-        # Validate that the backend has a fully supported, correct
-        # implementation of this aggregate
-        query.connection.ops.check_aggregate_support(aggregate)
         query.aggregates[alias] = aggregate
 
 class Avg(Aggregate):

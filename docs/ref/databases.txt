@@ -256,6 +256,7 @@ Here's a sample configuration which uses a MySQL option file::
         }
     }
 
+
     # my.cnf
     [client]
     database = DATABASE_NAME

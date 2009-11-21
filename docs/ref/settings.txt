@@ -144,8 +144,6 @@ Default: ``600``
 The default number of seconds to cache a page when the caching middleware or
 ``cache_page()`` decorator is used.
 
-.. setting:: DATABASES
-
 .. setting:: CSRF_COOKIE_NAME
 
 CSRF_COOKIE_NAME
@@ -191,6 +189,9 @@ where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
 :ref:`ref-contrib-csrf`.
 
+
+
+.. setting:: DATABASES
 
 DATABASES
 ---------

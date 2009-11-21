@@ -250,10 +250,10 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 >>> out = pickle.dumps(qs)
 
 # Then check that the round trip works.
->>> query = qs.query.as_sql()[0]
+>>> query = qs.query.get_compiler(qs._using).as_sql()[0]
 >>> select_fields = qs.query.select_fields
 >>> query2 = pickle.loads(pickle.dumps(qs))
->>> query2.query.as_sql()[0] == query
+>>> query2.query.get_compiler(query2._using).as_sql()[0] == query
 True
 >>> query2.query.select_fields = select_fields
 
@@ -379,6 +379,5 @@ if run_stddev_tests():
 
 >>> Book.objects.aggregate(Variance('price', sample=True))
 {'price__variance': 700.53...}
-
 
 """

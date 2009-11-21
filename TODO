@@ -1,0 +1,43 @@
+Django Multiple Database TODO List
+==================================
+
+Required for v1.2
+~~~~~~~~~~~~~~~~~
+
+ * Finalize the sql.Query internals
+   * Clean up the use of db.backend.query_class()
+   * Verify it still works with GeoDjango
+ * Resolve internal uses of multidb interface
+   * Update database backend for session store to use Multidb
+   * Check default Site creation behavior
+ * Resolve the public facing UI issues around using multi-db
+   * Should we take the opportunity to modify DB backends to use fully qualified paths?
+   * Meta.using? Is is still required/desirable?
+   * syncdb
+     * Add --exclude/--include argument? (not sure this approach will work due to flush)
+   * Flush - which models are flushed?
+   * Fixture loading over multiple DBs
+ * Testing infrastructure
+    * Most tests don't need multidb. Some absolutely require it, but only to prove you
+      can write to a different db. Second DB could be a SQLite temp file. Need to have
+      test infrastructure to allow creation of the temp database.
+ * Cleanup of new API entry points
+    * validate() on a field
+        * name/purpose clash with Honza?
+        * any overlap with existing methods?
+    * Accessing _using in BaseModelFormSet.
+
+Optional for v1.2
+~~~~~~~~~~~~~~~~~
+
+These are the next layer of UI. We can deliver for v1.2 without these if neccessary.
+
+ * Technique for determining using() at runtime (by callback?)
+ * Sticky models
+   * Related objects
+   * saving and deleting
+   * default or an option
+ * Sample docs for how to do:
+   * master/slave
+   * Sharding
+ * Test protection against cross-database joins.

@@ -78,7 +78,7 @@ class GeoWhereNode(WhereNode):
             annotation = GeoAnnotation(field, value, where)
             return super(WhereNode, self).add(((obj.alias, col, field.db_type()), lookup_type, annotation, params), connector)
 
-    def make_atom(self, child, qn):
+    def make_atom(self, child, qn, connection):
         obj, lookup_type, value_annot, params = child
 
         if isinstance(value_annot, GeoAnnotation):
@@ -94,7 +94,7 @@ class GeoWhereNode(WhereNode):
         else:
             # If not a GeometryField, call the `make_atom` from the 
             # base class.
-            return super(GeoWhereNode, self).make_atom(child, qn)
+            return super(GeoWhereNode, self).make_atom(child, qn, connection)
 
     @classmethod
     def _check_geo_field(cls, opts, lookup):

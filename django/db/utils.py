@@ -10,6 +10,7 @@ def load_backend(backend_name):
         # backends that ships with Django, so look there first.
         return import_module('.base', 'django.db.backends.%s' % backend_name)
     except ImportError, e:
+        raise
         # If the import failed, we might be looking for a database backend
         # distributed external to Django. So we'll try that next.
         try:
@@ -17,7 +18,7 @@ def load_backend(backend_name):
         except ImportError, e_user:
             # The database backend wasn't found. Display a helpful error message
             # listing all possible (built-in) database backends.
-            backend_dir = os.path.join(__path__[0], 'backends')
+            backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
             try:
                 available_backends = [f for f in os.listdir(backend_dir)
                         if os.path.isdir(os.path.join(backend_dir, f))

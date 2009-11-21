@@ -316,7 +316,7 @@ class BaseDatabaseCreation(object):
                 output.append(ds)
         return output
 
-    def create_test_db(self, verbosity=1, autoclobber=False, alias=''):
+    def create_test_db(self, verbosity=1, autoclobber=False, alias=None):
         """
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.

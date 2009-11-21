@@ -18,12 +18,14 @@ except ImportError:
 
 from django.db.backends import util
 from django.utils import datetime_safe
+from django.utils.importlib import import_module
 
 class BaseDatabaseWrapper(local):
     """
     Represents a database connection.
     """
     ops = None
+
     def __init__(self, settings_dict):
         # `settings_dict` should be a dictionary containing keys such as
         # DATABASE_NAME, DATABASE_USER, etc. It's called `settings_dict`
@@ -114,8 +116,9 @@ class BaseDatabaseOperations(object):
     a backend performs ordering or calculates the ID of a recently-inserted
     row.
     """
+    compiler_module = "django.db.models.sql.compiler"
+    
     def __init__(self):
-        # this cache is used for backends that provide custom Queyr classes
         self._cache = {}
 
     def autoinc_sql(self, table, column):
@@ -280,15 +283,17 @@ class BaseDatabaseOperations(object):
         """
         pass
 
-    def query_class(self, DefaultQueryClass, subclass=None):
+    def compiler(self, compiler_name):
         """
         Given the default Query class, returns a custom Query class
         to use for this backend. Returns the Query class unmodified if the
         backend doesn't need a custom Query clsas.
         """
-        if subclass is not None:
-            return subclass
-        return DefaultQueryClass
+        if compiler_name not in self._cache:
+            self._cache[compiler_name] = getattr(
+                import_module(self.compiler_module), compiler_name
+            )
+        return self._cache[compiler_name]
 
     def quote_name(self, name):
         """

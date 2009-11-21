@@ -162,6 +162,11 @@ class WhereNode(tree.Node):
         else:
             extra = ''
 
+        if (len(params) == 1 and params[0] == '' and lookup_type == 'exact'
+            and connection.features.interprets_empty_strings_as_nulls):
+            lookup_type = 'isnull'
+            value_annot = True
+
         if lookup_type in connection.operators:
             format = "%s %%s %%s" % (connection.ops.lookup_cast(lookup_type),)
             return (format % (field_sql,

@@ -71,8 +71,6 @@ class PickleQuerySetTestCase(TestCase):
     def test_pickling(self):
         for db in connections:
             qs = Book.objects.all()
-            self.assertEqual(qs.query.connection,
-                pickle.loads(pickle.dumps(qs)).query.connection)
             self.assertEqual(qs._using, pickle.loads(pickle.dumps(qs))._using)
 
 

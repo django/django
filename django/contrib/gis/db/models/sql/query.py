@@ -98,7 +98,7 @@ class GeoQuery(sql.Query):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    result.append(col.as_sql(quote_func=qn))
+                    result.append(col.as_sql(qn=qn))
 
                     if hasattr(col, 'alias'):
                         aliases.add(col.alias)
@@ -112,7 +112,7 @@ class GeoQuery(sql.Query):
 
         result.extend([
                 '%s%s' % (
-                    self.get_extra_select_format(alias) % aggregate.as_sql(quote_func=qn),
+                    self.get_extra_select_format(alias) % aggregate.as_sql(qn=qn, connection=self.connection),
                     alias is not None and ' AS %s' % alias or ''
                     )
                 for alias, aggregate in self.aggregate_select.items()

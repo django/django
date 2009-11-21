@@ -26,7 +26,6 @@ except ImportError, e:
 
 from django.db.backends import *
 from django.db.backends.signals import connection_created
-from django.db.backends.oracle import query
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
@@ -47,13 +46,13 @@ else:
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
     needs_datetime_string_cast = False
-    uses_custom_query_class = True
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
     can_return_id_from_insert = True
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "django.db.backends.oracle.compiler"
 
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
@@ -102,6 +101,54 @@ WHEN (new.%(col_name)s IS NULL)
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type)
         return sql
 
+    def convert_values(self, value, field):
+        if isinstance(value, Database.LOB):
+            value = value.read()
+            if field and field.get_internal_type() == 'TextField':
+                value = force_unicode(value)
+
+        # Oracle stores empty strings as null. We need to undo this in
+        # order to adhere to the Django convention of using the empty
+        # string instead of null, but only if the field accepts the
+        # empty string.
+        if value is None and field and field.empty_strings_allowed:
+            value = u''
+        # Convert 1 or 0 to True or False
+        elif value in (1, 0) and field and field.get_internal_type() in ('BooleanField', 'NullBooleanField'):
+            value = bool(value)
+        # Force floats to the correct type
+        elif value is not None and field and field.get_internal_type() == 'FloatField':
+            value = float(value)
+        # Convert floats to decimals
+        elif value is not None and field and field.get_internal_type() == 'DecimalField':
+            value = util.typecast_decimal(field.format_number(value))
+        # cx_Oracle always returns datetime.datetime objects for
+        # DATE and TIMESTAMP columns, but Django wants to see a
+        # python datetime.date, .time, or .datetime.  We use the type
+        # of the Field to determine which to cast to, but it's not
+        # always available.
+        # As a workaround, we cast to date if all the time-related
+        # values are 0, or to time if the date is 1/1/1900.
+        # This could be cleaned a bit by adding a method to the Field
+        # classes to normalize values from the database (the to_python
+        # method is used for validation and isn't what we want here).
+        elif isinstance(value, Database.Timestamp):
+            # In Python 2.3, the cx_Oracle driver returns its own
+            # Timestamp object that we must convert to a datetime class.
+            if not isinstance(value, datetime.datetime):
+                value = datetime.datetime(value.year, value.month,
+                        value.day, value.hour, value.minute, value.second,
+                        value.fsecond)
+            if field and field.get_internal_type() == 'DateTimeField':
+                pass
+            elif field and field.get_internal_type() == 'DateField':
+                value = value.date()
+            elif field and field.get_internal_type() == 'TimeField' or (value.year == 1900 and value.month == value.day == 1):
+                value = value.time()
+            elif value.hour == value.minute == value.second == value.microsecond == 0:
+                value = value.date()
+        return value
+
     def datetime_cast_sql(self):
         return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
 
@@ -140,15 +187,6 @@ WHEN (new.%(col_name)s IS NULL)
         if value is None:
             return u''
         return force_unicode(value.read())
-
-    def query_class(self, DefaultQueryClass, subclass=None):
-        if (DefaultQueryClass, subclass) in self._cache:
-            return self._cache[DefaultQueryClass, subclass]
-        Query = query.query_class(DefaultQueryClass, Database)
-        if subclass is not None:
-            Query = type('Query', (subclass, Query), {})
-        self._cache[DefaultQueryClass, subclass] = Query
-        return Query
 
     def quote_name(self, name):
         # SQL92 requires delimited (quoted) names to be case-sensitive.  When

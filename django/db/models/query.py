@@ -34,12 +34,11 @@ class QuerySet(object):
             using = None
         using = using or DEFAULT_DB_ALIAS
         connection = connections[using]
-        self.query = query or connection.ops.query_class(sql.Query)(self.model, connection)
+        self.query = query or sql.Query(self.model)
         self._result_cache = None
         self._iter = None
         self._sticky_filter = False
-        self._using = (query and
-            connections.alias_for_connection(self.query.connection) or using)
+        self._using = using
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -237,8 +236,9 @@ class QuerySet(object):
                 else:
                     init_list.append(field.attname)
             model_cls = deferred_class_factory(self.model, skip)
-
-        for row in self.query.results_iter():
+        
+        compiler = self.query.get_compiler(using=self._using)
+        for row in compiler.results_iter():
             if fill_cache:
                 obj, _ = get_cached_row(self.model, row,
                             index_start, max_depth,
@@ -279,7 +279,7 @@ class QuerySet(object):
             query.add_aggregate(aggregate_expr, self.model, alias,
                 is_summary=True)
 
-        return query.get_aggregation()
+        return query.get_aggregation(using=self._using)
 
     def count(self):
         """
@@ -292,7 +292,7 @@ class QuerySet(object):
         if self._result_cache is not None and not self._iter:
             return len(self._result_cache)
 
-        return self.query.get_count()
+        return self.query.get_count(using=self._using)
 
     def get(self, *args, **kwargs):
         """
@@ -420,7 +420,7 @@ class QuerySet(object):
         else:
             forced_managed = False
         try:
-            rows = query.execute_sql(None)
+            rows = query.get_compiler(self._using).execute_sql(None)
             if forced_managed:
                 transaction.commit(using=self._using)
             else:
@@ -444,12 +444,12 @@ class QuerySet(object):
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_fields(values)
         self._result_cache = None
-        return query.execute_sql(None)
+        return query.get_compiler(self._using).execute_sql(None)
     _update.alters_data = True
 
     def exists(self):
         if self._result_cache is None:
-            return self.query.has_results()
+            return self.query.has_results(using=self._using)
         return bool(self._result_cache)
 
     ##################################################
@@ -662,16 +662,6 @@ class QuerySet(object):
         """
         clone = self._clone()
         clone._using = alias
-        connection = connections[alias]
-        clone.query.set_connection(connection)
-        cls = clone.query.get_query_class()
-        if cls is sql.Query:
-            subclass = None
-        else:
-            subclass = cls
-        clone.query.__class__ = connection.ops.query_class(
-            sql.Query, subclass
-        )
         return clone
 
     ###################################
@@ -757,8 +747,8 @@ class QuerySet(object):
         Returns the internal query's SQL and parameters (as a tuple).
         """
         obj = self.values("pk")
-        if connection == obj.query.connection:
-            return obj.query.as_nested_sql()
+        if connection == connections[obj._using]:
+            return obj.query.get_compiler(connection=connection).as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
 
     def _validate(self):
@@ -789,7 +779,7 @@ class ValuesQuerySet(QuerySet):
 
         names = extra_names + field_names + aggregate_names
 
-        for row in self.query.results_iter():
+        for row in self.query.get_compiler(self._using).results_iter():
             yield dict(zip(names, row))
 
     def _setup_query(self):
@@ -886,8 +876,8 @@ class ValuesQuerySet(QuerySet):
                     % self.__class__.__name__)
 
         obj = self._clone()
-        if connection == obj.query.connection:
-            return obj.query.as_nested_sql()
+        if connection == connections[obj._using]:
+            return obj.query.get_compiler(connection=connection).as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
 
     def _validate(self):
@@ -904,10 +894,10 @@ class ValuesQuerySet(QuerySet):
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
         if self.flat and len(self._fields) == 1:
-            for row in self.query.results_iter():
+            for row in self.query.get_compiler(self._using).results_iter():
                 yield row[0]
         elif not self.query.extra_select and not self.query.aggregate_select:
-            for row in self.query.results_iter():
+            for row in self.query.get_compiler(self._using).results_iter():
                 yield tuple(row)
         else:
             # When extra(select=...) or an annotation is involved, the extra
@@ -926,7 +916,7 @@ class ValuesListQuerySet(ValuesQuerySet):
             else:
                 fields = names
 
-            for row in self.query.results_iter():
+            for row in self.query.get_compiler(self._using).results_iter():
                 data = dict(zip(names, row))
                 yield tuple([data[f] for f in fields])
 
@@ -938,7 +928,7 @@ class ValuesListQuerySet(ValuesQuerySet):
 
 class DateQuerySet(QuerySet):
     def iterator(self):
-        return self.query.results_iter()
+        return self.query.get_compiler(self._using).results_iter()
 
     def _setup_query(self):
         """
@@ -948,10 +938,7 @@ class DateQuerySet(QuerySet):
         instance.
         """
         self.query.clear_deferred_loading()
-        self.query = self.query.clone(
-            klass=self.query.connection.ops.query_class(sql.Query, sql.DateQuery),
-            setup=True
-        )
+        self.query = self.query.clone(klass=sql.DateQuery, setup=True)
         self.query.select = []
         field = self.model._meta.get_field(self._field_name, many_to_many=False)
         assert isinstance(field, DateField), "%r isn't a DateField." \
@@ -1089,19 +1076,18 @@ def delete_objects(seen_objs, using):
                     signals.pre_delete.send(sender=cls, instance=instance)
 
             pk_list = [pk for pk,instance in items]
-            del_query = connection.ops.query_class(sql.Query, sql.DeleteQuery)(cls, connection)
-            del_query.delete_batch_related(pk_list)
+            del_query = sql.DeleteQuery(cls)
+            del_query.delete_batch_related(pk_list, using=using)
 
-            update_query = connection.ops.query_class(sql.Query, sql.UpdateQuery)(cls, connection)
+            update_query = sql.UpdateQuery(cls)
             for field, model in cls._meta.get_fields_with_model():
                 if (field.rel and field.null and field.rel.to in seen_objs and
                         filter(lambda f: f.column == field.rel.get_related_field().column,
                         field.rel.to._meta.fields)):
                     if model:
-                        connection.ops.query_class(sql.Query, sql.UpdateQuery)(model, connection).clear_related(field,
-                                pk_list)
+                        sql.UpdateQuery(model).clear_related(field, pk_list, using=using)
                     else:
-                        update_query.clear_related(field, pk_list)
+                        update_query.clear_related(field, pk_list, using=using)
 
         # Now delete the actual data.
         for cls in ordered_classes:
@@ -1109,8 +1095,8 @@ def delete_objects(seen_objs, using):
             items.reverse()
 
             pk_list = [pk for pk,instance in items]
-            del_query = connection.ops.query_class(sql.Query, sql.DeleteQuery)(cls, connection)
-            del_query.delete_batch(pk_list)
+            del_query = sql.DeleteQuery(cls)
+            del_query.delete_batch(pk_list, using=using)
 
             # Last cleanup; set NULLs where there once was a reference to the
             # object, NULL the primary key of the found objects, and perform
@@ -1139,7 +1125,7 @@ def insert_query(model, values, return_id=False, raw_values=False, using=None):
     the InsertQuery class and is how Model.save() is implemented. It is not
     part of the public API.
     """
-    connection = connections[using]
-    query = connection.ops.query_class(sql.Query, sql.InsertQuery)(model, connection)
+    query = sql.InsertQuery(model)
     query.insert_values(values, raw_values)
-    return query.execute_sql(return_id)
+    compiler = query.get_compiler(using=using)
+    return compiler.execute_sql(return_id)
