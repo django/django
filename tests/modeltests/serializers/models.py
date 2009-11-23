@@ -149,8 +149,8 @@ __test__ = {'API_TESTS':"""
 # database since the data was serialized (we'll simulate that below).
 >>> for obj in serializers.deserialize("xml", xml):
 ...     print obj
-<DeserializedObject: Poker has no place on ESPN>
-<DeserializedObject: Time to reform copyright>
+<DeserializedObject: serializers.Article(pk=1)>
+<DeserializedObject: serializers.Article(pk=2)>
 
 # Deserializing data with different field values doesn't change anything in the
 # database until we call save():
@@ -183,8 +183,8 @@ __test__ = {'API_TESTS':"""
 >>> json = serializers.serialize("json", Article.objects.all())
 >>> for obj in serializers.deserialize("json", json):
 ...     print obj
-<DeserializedObject: Poker has no place on television>
-<DeserializedObject: Time to reform copyright>
+<DeserializedObject: serializers.Article(pk=1)>
+<DeserializedObject: serializers.Article(pk=2)>
 
 >>> json = json.replace("Poker has no place on television", "Just kidding; I love TV poker")
 >>> for obj in serializers.deserialize("json", json):
@@ -205,7 +205,7 @@ __test__ = {'API_TESTS':"""
 
 >>> for obj in serializers.deserialize("json", json):
 ...     print obj
-<DeserializedObject: Profile of Joe>
+<DeserializedObject: serializers.AuthorProfile(pk=1)>
 
 # Objects ids can be referenced before they are defined in the serialization data
 # However, the deserialization process will need to be contained within a transaction
@@ -275,7 +275,7 @@ None
 
 >>> obj = list(serializers.deserialize("json", serialized))[0]
 >>> print obj
-<DeserializedObject: Soslan Djanaev (1) playing for Spartak Moskva>
+<DeserializedObject: serializers.Player(pk=1)>
 
 """}
 
@@ -310,8 +310,8 @@ try:
 >>> obs = list(serializers.deserialize("yaml", serialized))
 >>> for i in obs:
 ...     print i
-<DeserializedObject: Just kidding; I love TV poker>
-<DeserializedObject: Time to reform copyright>
+<DeserializedObject: serializers.Article(pk=1)>
+<DeserializedObject: serializers.Article(pk=2)>
 
 # Custom field with non trivial to string convertion value with YAML serializer
 
@@ -324,7 +324,7 @@ try:
 >>> serialized = serializers.serialize("yaml", Player.objects.all())
 >>> obj = list(serializers.deserialize("yaml", serialized))[0]
 >>> print obj
-<DeserializedObject: Soslan Djanaev (1) playing for Spartak Moskva>
+<DeserializedObject: serializers.Player(pk=1)>
 
 
 """
