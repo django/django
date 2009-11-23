@@ -13,10 +13,6 @@ Required for v1.2
  * Resolve the public facing UI issues around using multi-db
    * Should we take the opportunity to modify DB backends to use fully qualified paths?
    * Meta.using? Is is still required/desirable?
- * Testing infrastructure
-    * Most tests don't need multidb. Some absolutely require it, but only to prove you
-      can write to a different db. Second DB could be a SQLite temp file. Need to have
-      test infrastructure to allow creation of the temp database.
  * Cleanup of new API entry points
     * validate() on a field
         * name/purpose clash with Honza?

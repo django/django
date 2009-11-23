@@ -26,7 +26,7 @@ class BaseDatabaseWrapper(local):
     """
     ops = None
 
-    def __init__(self, settings_dict):
+    def __init__(self, settings_dict, alias='default'):
         # `settings_dict` should be a dictionary containing keys such as
         # DATABASE_NAME, DATABASE_USER, etc. It's called `settings_dict`
         # instead of `settings` to disambiguate it from Django settings
@@ -34,6 +34,7 @@ class BaseDatabaseWrapper(local):
         self.connection = None
         self.queries = []
         self.settings_dict = settings_dict
+        self.alias = alias
 
     def __eq__(self, other):
         return self.settings_dict == other.settings_dict
@@ -117,7 +118,7 @@ class BaseDatabaseOperations(object):
     row.
     """
     compiler_module = "django.db.models.sql.compiler"
-    
+
     def __init__(self):
         self._cache = {}
 

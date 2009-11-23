@@ -316,13 +316,13 @@ class BaseDatabaseCreation(object):
                 output.append(ds)
         return output
 
-    def create_test_db(self, verbosity=1, autoclobber=False, alias=None):
+    def create_test_db(self, verbosity=1, autoclobber=False):
         """
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
         """
         if verbosity >= 1:
-            print "Creating test database..."
+            print "Creating test database '%s'..." % self.connection.alias
 
         test_database_name = self._create_test_db(verbosity, autoclobber)
 
@@ -334,7 +334,7 @@ class BaseDatabaseCreation(object):
         # FIXME we end up loading the same fixture into the default DB for each
         # DB we have, this causes various test failures, but can't really be
         # fixed until we have an API for saving to a specific DB
-        call_command('syncdb', verbosity=verbosity, interactive=False, database=alias)
+        call_command('syncdb', verbosity=verbosity, interactive=False, database=self.connection.alias)
 
         if settings.CACHE_BACKEND.startswith('db://'):
             from django.core.cache import parse_backend_uri
@@ -404,7 +404,7 @@ class BaseDatabaseCreation(object):
         database already exists. Returns the name of the test database created.
         """
         if verbosity >= 1:
-            print "Destroying test database..."
+            print "Destroying test database '%s'..." % self.connection.alias
         self.connection.close()
         test_database_name = self.connection.settings_dict['DATABASE_NAME']
         self.connection.settings_dict['DATABASE_NAME'] = old_database_name

@@ -202,11 +202,11 @@ Django.  It is a nested dictionary who's contents maps aliases to a dictionary
 containing the options for an individual database.  The following inner options
 are used:
 
-.. admonition:: Note
+.. deprecated: 1.2
 
-    In versions of Django prior to 1.2 each of the following were individual
-    settings, the usage of those has been deprecated but will be supported
-    until Django 1.4.
+    In versions of Django prior to 1.2 each of the following were
+    individual settings. The usage of the standalone database settings
+    has been deprecated, and will be removed in Django 1.4.
 
 .. setting:: DATABASE_ENGINE
 

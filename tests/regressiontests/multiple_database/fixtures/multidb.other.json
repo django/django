@@ -1,0 +1,10 @@
+[
+    {
+        "pk": 2,
+        "model": "multiple_database.book",
+        "fields": {
+            "title": "Pro Django",
+            "published": "2008-12-16"
+        }
+    }
+]

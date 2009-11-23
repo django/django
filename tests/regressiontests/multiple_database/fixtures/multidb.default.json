@@ -1,0 +1,10 @@
+[
+    {
+        "pk": 2,
+        "model": "multiple_database.book",
+        "fields": {
+            "title": "Dive into Python",
+            "published": "2009-5-4"
+        }
+    }
+]

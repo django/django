@@ -67,7 +67,7 @@ class ConnectionHandler(object):
         self.ensure_defaults(alias)
         db = self.databases[alias]
         backend = load_backend(db['DATABASE_ENGINE'])
-        conn = backend.DatabaseWrapper(db)
+        conn = backend.DatabaseWrapper(db, alias)
         self._connections[alias] = conn
         return conn
 
@@ -76,19 +76,3 @@ class ConnectionHandler(object):
 
     def all(self):
         return [self[alias] for alias in self]
-
-    def alias_for_connection(self, connection):
-        """
-        Returns the alias for the given connection object.
-        """
-        return self.alias_for_settings(connection.settings_dict)
-
-    def alias_for_settings(self, settings_dict):
-        """
-        Returns the alias for the given settings dictionary.
-        """
-        for alias in self:
-            conn_settings = self.databases[alias]
-            if conn_settings == settings_dict:
-                return alias
-        return None

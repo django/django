@@ -14,19 +14,7 @@ class Book(models.Model):
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
+    favourite_book = models.ForeignKey(Book, null=True, related_name='favourite_of')
 
     def __unicode__(self):
         return self.name
-
-if len(settings.DATABASES) > 1:
-    article_using = filter(lambda o: o != DEFAULT_DB_ALIAS, settings.DATABASES.keys())[0]
-    class Article(models.Model):
-        title = models.CharField(max_length=100)
-        author = models.ForeignKey(Author)
-
-        def __unicode__(self):
-            return self.title
-
-        class Meta:
-            ordering = ('title',)
-            using = article_using
