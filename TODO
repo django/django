@@ -7,12 +7,13 @@ Required for v1.2
  * Finalize the sql.Query internals
    * Clean up the use of db.backend.query_class()
    * Verify it still works with GeoDjango
- * Resolve internal uses of multidb interface
-   * Update database backend for session store to use Multidb
-   * Check default Site creation behavior
  * Resolve the public facing UI issues around using multi-db
    * Should we take the opportunity to modify DB backends to use fully qualified paths?
+   * Should we clean up DATABASES['DATABASE_NAME'] to DATABASES['NAME'] etc?
    * Meta.using? Is is still required/desirable?
+ * Fix the regressiontests/multiple_database test failures
+    * Give instances knowledge of the database from which they were loaded.
+    * Cascade instance using to m2m queries
  * Cleanup of new API entry points
     * validate() on a field
         * name/purpose clash with Honza?

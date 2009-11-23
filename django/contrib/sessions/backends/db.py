@@ -1,4 +1,5 @@
 import datetime
+from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
@@ -9,6 +10,10 @@ class SessionStore(SessionBase):
     """
     Implements database session store.
     """
+    def __init__(self, session_key=None):
+        self.using = getattr(settings, "SESSION_DB_ALIAS", DEFAULT_DB_ALIAS)
+        super(SessionStore, self).__init__(session_key)
+
     def load(self):
         try:
             s = Session.objects.get(
@@ -54,12 +59,12 @@ class SessionStore(SessionBase):
             expire_date = self.get_expiry_date()
         )
         # TODO update for multidb
-        sid = transaction.savepoint(using=DEFAULT_DB_ALIAS)
+        sid = transaction.savepoint(using=self.using)
         try:
             obj.save(force_insert=must_create)
         except IntegrityError:
             if must_create:
-                transaction.savepoint_rollback(sid, using=DEFAULT_DB_ALIAS)
+                transaction.savepoint_rollback(sid, using=self.using)
                 raise CreateError
             raise
 
