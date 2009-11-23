@@ -51,7 +51,7 @@ comment
 
 Ignore everything between ``{% comment %}`` and ``{% endcomment %}``
 
-.. templatetag:: cycle
+.. templatetag:: csrf_token
 
 csrf_token
 ~~~~~~~~~~
@@ -61,6 +61,8 @@ csrf_token
 In the Django 1.1.X series, this is a no-op tag that returns an empty string.
 It exists to ease the transition to Django 1.2, in which it is used for CSRF
 protection.
+
+.. templatetag:: cycle
 
 cycle
 ~~~~~
