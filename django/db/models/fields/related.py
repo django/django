@@ -195,7 +195,7 @@ class SingleRelatedObjectDescriptor(object):
             return getattr(instance, self.cache_name)
         except AttributeError:
             params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
-            rel_obj = self.related.model._base_manager.get(**params)
+            rel_obj = self.related.model._base_manager.using(instance._state.db).get(**params)
             setattr(instance, self.cache_name, rel_obj)
             return rel_obj
 
@@ -259,9 +259,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
             # related fields, respect that.
             rel_mgr = self.field.rel.to._default_manager
             if getattr(rel_mgr, 'use_for_related_fields', False):
-                rel_obj = rel_mgr.get(**params)
+                rel_obj = rel_mgr.using(instance._state.db).get(**params)
             else:
-                rel_obj = QuerySet(self.field.rel.to).get(**params)
+                rel_obj = QuerySet(self.field.rel.to).using(instance._state.db).get(**params)
             setattr(instance, cache_name, rel_obj)
             return rel_obj
 
@@ -359,14 +359,14 @@ class ForeignRelatedObjectsDescriptor(object):
 
         class RelatedManager(superclass):
             def get_query_set(self):
-                return superclass.get_query_set(self).filter(**(self.core_filters))
+                return superclass.get_query_set(self).using(instance._state.db).filter(**(self.core_filters))
 
             def add(self, *objs):
                 for obj in objs:
                     if not isinstance(obj, self.model):
                         raise TypeError, "'%s' instance expected" % self.model._meta.object_name
                     setattr(obj, rel_field.name, instance)
-                    obj.save()
+                    obj.save(using=instance._state.db)
             add.alters_data = True
 
             def create(self, **kwargs):
@@ -378,7 +378,7 @@ class ForeignRelatedObjectsDescriptor(object):
                 # Update kwargs with the related object that this
                 # ForeignRelatedObjectsDescriptor knows about.
                 kwargs.update({rel_field.name: instance})
-                return super(RelatedManager, self).get_or_create(**kwargs)
+                return super(RelatedManager, self).using(instance._state.db).get_or_create(**kwargs)
             get_or_create.alters_data = True
 
             # remove() and clear() are only provided if the ForeignKey can have a value of null.
@@ -389,7 +389,7 @@ class ForeignRelatedObjectsDescriptor(object):
                         # Is obj actually part of this descriptor set?
                         if getattr(obj, rel_field.attname) == val:
                             setattr(obj, rel_field.name, None)
-                            obj.save()
+                            obj.save(using=instance._state.db)
                         else:
                             raise rel_field.rel.to.DoesNotExist, "%r is not related to %r." % (obj, instance)
                 remove.alters_data = True
@@ -397,7 +397,7 @@ class ForeignRelatedObjectsDescriptor(object):
                 def clear(self):
                     for obj in self.all():
                         setattr(obj, rel_field.name, None)
-                        obj.save()
+                        obj.save(using=instance._state.db)
                 clear.alters_data = True
 
         manager = RelatedManager()
@@ -463,14 +463,14 @@ def create_many_related_manager(superclass, rel=False):
             if not rel.through._meta.auto_created:
                 opts = through._meta
                 raise AttributeError, "Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
-            new_obj = super(ManyRelatedManager, self).create(**kwargs)
+            new_obj = super(ManyRelatedManager, self).using(self.instance._state.db).create(**kwargs)
             self.add(new_obj)
             return new_obj
         create.alters_data = True
 
         def get_or_create(self, **kwargs):
             obj, created = \
-                    super(ManyRelatedManager, self).get_or_create(**kwargs)
+                    super(ManyRelatedManager, self).using(self.instance._state.db).get_or_create(**kwargs)
             # We only need to add() if created because if we got an object back
             # from get() then the relationship already exists.
             if created:
@@ -495,7 +495,7 @@ def create_many_related_manager(superclass, rel=False):
                         raise TypeError, "'%s' instance expected" % self.model._meta.object_name
                     else:
                         new_ids.add(obj)
-                vals = self.through._default_manager.values_list(target_field_name, flat=True)
+                vals = self.through._default_manager.using(self.instance._state.db).values_list(target_field_name, flat=True)
                 vals = vals.filter(**{
                     source_field_name: self._pk_val,
                     '%s__in' % target_field_name: new_ids,
@@ -504,7 +504,7 @@ def create_many_related_manager(superclass, rel=False):
 
                 # Add the ones that aren't there already
                 for obj_id in (new_ids - vals):
-                    self.through._default_manager.create(**{
+                    self.through._default_manager.using(self.instance._state.db).create(**{
                         '%s_id' % source_field_name: self._pk_val,
                         '%s_id' % target_field_name: obj_id,
                     })
@@ -524,14 +524,14 @@ def create_many_related_manager(superclass, rel=False):
                     else:
                         old_ids.add(obj)
                 # Remove the specified objects from the join table
-                self.through._default_manager.filter(**{
+                self.through._default_manager.using(self.instance._state.db).filter(**{
                     source_field_name: self._pk_val,
                     '%s__in' % target_field_name: old_ids
                 }).delete()
 
         def _clear_items(self, source_field_name):
             # source_col_name: the PK colname in join_table for the source object
-            self.through._default_manager.filter(**{
+            self.through._default_manager.using(self.instance._state.db).filter(**{
                 source_field_name: self._pk_val
             }).delete()
 

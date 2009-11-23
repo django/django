@@ -230,12 +230,22 @@ class ModelBase(type):
 
         signals.class_prepared.send(sender=cls)
 
+class ModelState(object):
+    """
+    A class for storing instance state
+    """
+    def __init__(self, db=None):
+        self.db = db
+
 class Model(object):
     __metaclass__ = ModelBase
     _deferred = False
 
     def __init__(self, *args, **kwargs):
         signals.pre_init.send(sender=self.__class__, args=args, kwargs=kwargs)
+
+        # Set up the storage for instane state
+        self._state = ModelState()
 
         # There is a rather weird disparity here; if kwargs, it's set, then args
         # overrides it. It should be one or the other; don't duplicate the work
@@ -428,7 +438,7 @@ class Model(object):
         need for overrides of save() to pass around internal-only parameters
         ('raw', 'cls', and 'origin').
         """
-        using = using or self._meta.using or DEFAULT_DB_ALIAS
+        using = using or self._state.db or self._meta.using or DEFAULT_DB_ALIAS
         connection = connections[using]
         assert not (force_insert and force_update)
         if cls is None:
@@ -514,6 +524,10 @@ class Model(object):
                     setattr(self, meta.pk.attname, result)
             transaction.commit_unless_managed(using=using)
 
+        # Store the database on which the object was saved
+        self._state.db = using
+
+        # Signal that the save is complete
         if origin and not meta.auto_created:
             signals.post_save.send(sender=origin, instance=self,
                 created=(not record_exists), raw=raw)
@@ -577,7 +591,7 @@ class Model(object):
             parent_obj._collect_sub_objects(seen_objs)
 
     def delete(self, using=None):
-        using = using or self._meta.using or DEFAULT_DB_ALIAS
+        using = using or self._state.db or self._meta.using or DEFAULT_DB_ALIAS
         connection = connections[using]
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 

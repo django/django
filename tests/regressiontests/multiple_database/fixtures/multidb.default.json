@@ -3,8 +3,8 @@
         "pk": 2,
         "model": "multiple_database.book",
         "fields": {
-            "title": "Dive into Python",
-            "published": "2009-5-4"
+            "title": "Pro Django",
+            "published": "2008-12-16"
         }
     }
 ]

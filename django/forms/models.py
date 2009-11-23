@@ -472,7 +472,7 @@ class BaseModelFormSet(BaseFormSet):
             pk = self.data[pk_key]
             pk_field = self.model._meta.pk
             pk = pk_field.get_db_prep_lookup('exact', pk,
-                connection=connections[self.get_queryset()._using])
+                connection=connections[self.get_queryset().db])
             if isinstance(pk, list):
                 pk = pk[0]
             kwargs['instance'] = self._existing_object(pk)

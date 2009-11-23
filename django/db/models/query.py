@@ -38,7 +38,7 @@ class QuerySet(object):
         self._result_cache = None
         self._iter = None
         self._sticky_filter = False
-        self._using = using
+        self.db = using
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -236,8 +236,8 @@ class QuerySet(object):
                 else:
                     init_list.append(field.attname)
             model_cls = deferred_class_factory(self.model, skip)
-        
-        compiler = self.query.get_compiler(using=self._using)
+
+        compiler = self.query.get_compiler(using=self.db)
         for row in compiler.results_iter():
             if fill_cache:
                 obj, _ = get_cached_row(self.model, row,
@@ -260,6 +260,9 @@ class QuerySet(object):
             for i, aggregate in enumerate(aggregate_select):
                 setattr(obj, aggregate, row[i+aggregate_start])
 
+            # Store the source database of the object
+            obj._state.db = self.db
+
             yield obj
 
     def aggregate(self, *args, **kwargs):
@@ -279,7 +282,7 @@ class QuerySet(object):
             query.add_aggregate(aggregate_expr, self.model, alias,
                 is_summary=True)
 
-        return query.get_aggregation(using=self._using)
+        return query.get_aggregation(using=self.db)
 
     def count(self):
         """
@@ -292,7 +295,7 @@ class QuerySet(object):
         if self._result_cache is not None and not self._iter:
             return len(self._result_cache)
 
-        return self.query.get_count(using=self._using)
+        return self.query.get_count(using=self.db)
 
     def get(self, *args, **kwargs):
         """
@@ -315,7 +318,7 @@ class QuerySet(object):
         and returning the created object.
         """
         obj = self.model(**kwargs)
-        obj.save(force_insert=True, using=self._using)
+        obj.save(force_insert=True, using=self.db)
         return obj
 
     def get_or_create(self, **kwargs):
@@ -334,12 +337,12 @@ class QuerySet(object):
                 params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
                 params.update(defaults)
                 obj = self.model(**params)
-                sid = transaction.savepoint(using=self._using)
-                obj.save(force_insert=True, using=self._using)
-                transaction.savepoint_commit(sid, using=self._using)
+                sid = transaction.savepoint(using=self.db)
+                obj.save(force_insert=True, using=self.db)
+                transaction.savepoint_commit(sid, using=self.db)
                 return obj, True
             except IntegrityError, e:
-                transaction.savepoint_rollback(sid, using=self._using)
+                transaction.savepoint_rollback(sid, using=self.db)
                 try:
                     return self.get(**kwargs), False
                 except self.model.DoesNotExist:
@@ -399,7 +402,7 @@ class QuerySet(object):
 
             if not seen_objs:
                 break
-            delete_objects(seen_objs, del_query._using)
+            delete_objects(seen_objs, del_query.db)
 
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
@@ -414,20 +417,20 @@ class QuerySet(object):
                 "Cannot update a query once a slice has been taken."
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
-        if not transaction.is_managed(using=self._using):
-            transaction.enter_transaction_management(using=self._using)
+        if not transaction.is_managed(using=self.db):
+            transaction.enter_transaction_management(using=self.db)
             forced_managed = True
         else:
             forced_managed = False
         try:
-            rows = query.get_compiler(self._using).execute_sql(None)
+            rows = query.get_compiler(self.db).execute_sql(None)
             if forced_managed:
-                transaction.commit(using=self._using)
+                transaction.commit(using=self.db)
             else:
-                transaction.commit_unless_managed(using=self._using)
+                transaction.commit_unless_managed(using=self.db)
         finally:
             if forced_managed:
-                transaction.leave_transaction_management(using=self._using)
+                transaction.leave_transaction_management(using=self.db)
         self._result_cache = None
         return rows
     update.alters_data = True
@@ -444,12 +447,12 @@ class QuerySet(object):
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_fields(values)
         self._result_cache = None
-        return query.get_compiler(self._using).execute_sql(None)
+        return query.get_compiler(self.db).execute_sql(None)
     _update.alters_data = True
 
     def exists(self):
         if self._result_cache is None:
-            return self.query.has_results(using=self._using)
+            return self.query.has_results(using=self.db)
         return bool(self._result_cache)
 
     ##################################################
@@ -661,7 +664,7 @@ class QuerySet(object):
         Selects which database this QuerySet should excecute it's query against.
         """
         clone = self._clone()
-        clone._using = alias
+        clone.db = alias
         return clone
 
     ###################################
@@ -692,7 +695,7 @@ class QuerySet(object):
         if self._sticky_filter:
             query.filter_is_sticky = True
         c = klass(model=self.model, query=query)
-        c._using = self._using
+        c.db = self.db
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
@@ -747,7 +750,7 @@ class QuerySet(object):
         Returns the internal query's SQL and parameters (as a tuple).
         """
         obj = self.values("pk")
-        if connection == connections[obj._using]:
+        if connection == connections[obj.db]:
             return obj.query.get_compiler(connection=connection).as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
 
@@ -779,7 +782,7 @@ class ValuesQuerySet(QuerySet):
 
         names = extra_names + field_names + aggregate_names
 
-        for row in self.query.get_compiler(self._using).results_iter():
+        for row in self.query.get_compiler(self.db).results_iter():
             yield dict(zip(names, row))
 
     def _setup_query(self):
@@ -876,7 +879,7 @@ class ValuesQuerySet(QuerySet):
                     % self.__class__.__name__)
 
         obj = self._clone()
-        if connection == connections[obj._using]:
+        if connection == connections[obj.db]:
             return obj.query.get_compiler(connection=connection).as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
 
@@ -894,10 +897,10 @@ class ValuesQuerySet(QuerySet):
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
         if self.flat and len(self._fields) == 1:
-            for row in self.query.get_compiler(self._using).results_iter():
+            for row in self.query.get_compiler(self.db).results_iter():
                 yield row[0]
         elif not self.query.extra_select and not self.query.aggregate_select:
-            for row in self.query.get_compiler(self._using).results_iter():
+            for row in self.query.get_compiler(self.db).results_iter():
                 yield tuple(row)
         else:
             # When extra(select=...) or an annotation is involved, the extra
@@ -916,7 +919,7 @@ class ValuesListQuerySet(ValuesQuerySet):
             else:
                 fields = names
 
-            for row in self.query.get_compiler(self._using).results_iter():
+            for row in self.query.get_compiler(self.db).results_iter():
                 data = dict(zip(names, row))
                 yield tuple([data[f] for f in fields])
 
@@ -928,7 +931,7 @@ class ValuesListQuerySet(ValuesQuerySet):
 
 class DateQuerySet(QuerySet):
     def iterator(self):
-        return self.query.get_compiler(self._using).results_iter()
+        return self.query.get_compiler(self.db).results_iter()
 
     def _setup_query(self):
         """

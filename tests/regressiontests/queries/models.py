@@ -822,8 +822,8 @@ We can do slicing beyond what is currently in the result cache, too.
 
 Bug #7045 -- extra tables used to crash SQL construction on the second use.
 >>> qs = Ranking.objects.extra(tables=['django_site'])
->>> s = qs.query.get_compiler(qs._using).as_sql()
->>> s = qs.query.get_compiler(qs._using).as_sql()   # test passes if this doesn't raise an exception.
+>>> s = qs.query.get_compiler(qs.db).as_sql()
+>>> s = qs.query.get_compiler(qs.db).as_sql()   # test passes if this doesn't raise an exception.
 
 Bug #7098 -- Make sure semi-deprecated ordering by related models syntax still
 works.
@@ -912,9 +912,9 @@ We should also be able to pickle things that use select_related(). The only
 tricky thing here is to ensure that we do the related selections properly after
 unpickling.
 >>> qs = Item.objects.select_related()
->>> query = qs.query.get_compiler(qs._using).as_sql()[0]
+>>> query = qs.query.get_compiler(qs.db).as_sql()[0]
 >>> query2 = pickle.loads(pickle.dumps(qs.query))
->>> query2.get_compiler(qs._using).as_sql()[0] == query
+>>> query2.get_compiler(qs.db).as_sql()[0] == query
 True
 
 Check pickling of deferred-loading querysets
@@ -1051,7 +1051,7 @@ sufficient that this query runs without error.
 Calling order_by() with no parameters removes any existing ordering on the
 model. But it should still be possible to add new ordering after that.
 >>> qs = Author.objects.order_by().order_by('name')
->>> 'ORDER BY' in qs.query.get_compiler(qs._using).as_sql()[0]
+>>> 'ORDER BY' in qs.query.get_compiler(qs.db).as_sql()[0]
 True
 
 Incorrect SQL was being generated for certain types of exclude() queries that
@@ -1086,7 +1086,7 @@ performance problems on backends like MySQL.
 Nested queries should not evaluate the inner query as part of constructing the
 SQL (so we should see a nested query here, indicated by two "SELECT" calls).
 >>> qs = Annotation.objects.filter(notes__in=Note.objects.filter(note="xyzzy"))
->>> qs.query.get_compiler(qs._using).as_sql()[0].count('SELECT')
+>>> qs.query.get_compiler(qs.db).as_sql()[0].count('SELECT')
 2
 
 Bug #10181 -- Avoid raising an EmptyResultSet if an inner query is provably
