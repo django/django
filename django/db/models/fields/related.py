@@ -258,10 +258,11 @@ class ReverseSingleRelatedObjectDescriptor(object):
             # If the related manager indicates that it should be used for
             # related fields, respect that.
             rel_mgr = self.field.rel.to._default_manager
+            using = instance._state.db or DEFAULT_DB_ALIAS
             if getattr(rel_mgr, 'use_for_related_fields', False):
-                rel_obj = rel_mgr.using(instance._state.db).get(**params)
+                rel_obj = rel_mgr.using(using).get(**params)
             else:
-                rel_obj = QuerySet(self.field.rel.to).using(instance._state.db).get(**params)
+                rel_obj = QuerySet(self.field.rel.to).using(using).get(**params)
             setattr(instance, cache_name, rel_obj)
             return rel_obj
 
@@ -278,6 +279,12 @@ class ReverseSingleRelatedObjectDescriptor(object):
             raise ValueError('Cannot assign "%r": "%s.%s" must be a "%s" instance.' %
                                 (value, instance._meta.object_name,
                                  self.field.name, self.field.rel.to._meta.object_name))
+        elif value is not None and value._state.db != instance._state.db:
+            if instance._state.db is None:
+                instance._state.db = value._state.db
+            else:
+                raise ValueError('Cannot assign "%r": instance is on database "%s", value is is on database "%s"' %
+                                    (value, instance._state.db, value._state.db))
 
         # If we're setting the value of a OneToOneField to None, we need to clear
         # out the cache on any old related object. Otherwise, deleting the
@@ -359,7 +366,8 @@ class ForeignRelatedObjectsDescriptor(object):
 
         class RelatedManager(superclass):
             def get_query_set(self):
-                return superclass.get_query_set(self).using(instance._state.db).filter(**(self.core_filters))
+                using = instance._state.db or DEFAULT_DB_ALIAS
+                return superclass.get_query_set(self).using(using).filter(**(self.core_filters))
 
             def add(self, *objs):
                 for obj in objs:
@@ -378,7 +386,8 @@ class ForeignRelatedObjectsDescriptor(object):
                 # Update kwargs with the related object that this
                 # ForeignRelatedObjectsDescriptor knows about.
                 kwargs.update({rel_field.name: instance})
-                return super(RelatedManager, self).using(instance._state.db).get_or_create(**kwargs)
+                using = instance._state.db or DEFAULT_DB_ALIAS
+                return super(RelatedManager, self).using(using).get_or_create(**kwargs)
             get_or_create.alters_data = True
 
             # remove() and clear() are only provided if the ForeignKey can have a value of null.
@@ -490,6 +499,9 @@ def create_many_related_manager(superclass, rel=False):
                 new_ids = set()
                 for obj in objs:
                     if isinstance(obj, self.model):
+                        if obj._state.db != self.instance._state.db:
+                            raise ValueError('Cannot add "%r": instance is on database "%s", value is is on database "%s"' %
+                                                (obj, self.instance._state.db, obj._state.db))
                         new_ids.add(obj.pk)
                     elif isinstance(obj, Model):
                         raise TypeError, "'%s' instance expected" % self.model._meta.object_name
