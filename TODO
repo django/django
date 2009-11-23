@@ -10,7 +10,6 @@ Required for v1.2
  * Resolve the public facing UI issues around using multi-db
    * Should we take the opportunity to modify DB backends to use fully qualified paths?
    * Should we clean up DATABASES['DATABASE_NAME'] to DATABASES['NAME'] etc?
-   * Meta.using? Is is still required/desirable?
  * Cleanup of new API entry points
     * validate() on a field
         * name/purpose clash with Honza?

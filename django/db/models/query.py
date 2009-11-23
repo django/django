@@ -25,20 +25,14 @@ class QuerySet(object):
     """
     Represents a lazy database lookup for a set of objects.
     """
-    def __init__(self, model=None, query=None):
+    def __init__(self, model=None, query=None, using=None):
         self.model = model
         # EmptyQuerySet instantiates QuerySet with model as None
-        if model:
-            using = model._meta.using
-        else:
-            using = None
-        using = using or DEFAULT_DB_ALIAS
-        connection = connections[using]
+        self.db = using or DEFAULT_DB_ALIAS
         self.query = query or sql.Query(self.model)
         self._result_cache = None
         self._iter = None
         self._sticky_filter = False
-        self.db = using
 
     ########################
     # PYTHON MAGIC METHODS #

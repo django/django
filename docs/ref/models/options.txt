@@ -4,8 +4,9 @@
 Model ``Meta`` options
 ======================
 
-This document explains all the possible :ref:`metadata options <meta-options>`  that you can give your model in its internal
-``class Meta``.
+This document explains all the possible :ref:`metadata options
+<meta-options>` that you can give your model in its internal ``class
+Meta``.
 
 Available ``Meta`` options
 ==========================
@@ -219,17 +220,6 @@ For convenience, unique_together can be a single list when dealing with a single
 set of fields::
 
     unique_together = ("driver", "restaurant")
-
-``using``
----------
-
-.. attribute:: Options.using
-
-The alias for the default database to be used for this model.  If this is not
-provided the default is ``'default'``.  If it is porvided it can be overidden
-at the ``QuerySet`` level with the ``using()`` method.
-
-.. versionadded:: 1.2
 
 ``verbose_name``
 ----------------
