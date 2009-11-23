@@ -16,6 +16,7 @@ except ImportError:
     # Python 2.3 fallback
     from django.utils import _decimal as decimal
 
+from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import util
 from django.utils import datetime_safe
 from django.utils.importlib import import_module
@@ -26,7 +27,7 @@ class BaseDatabaseWrapper(local):
     """
     ops = None
 
-    def __init__(self, settings_dict, alias='default'):
+    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         # `settings_dict` should be a dictionary containing keys such as
         # DATABASE_NAME, DATABASE_USER, etc. It's called `settings_dict`
         # instead of `settings` to disambiguate it from Django settings

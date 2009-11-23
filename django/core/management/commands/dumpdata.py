@@ -31,10 +31,10 @@ class Command(BaseCommand):
         exclude = options.get('exclude',[])
         show_traceback = options.get('traceback', False)
 
-        excluded_apps = [get_app(app_label) for app_label in exclude]
+        excluded_apps = set(get_app(app_label) for app_label in exclude)
 
         if len(app_labels) == 0:
-            app_list = SortedDict([(app, None) for app in get_apps() if app not in excluded_apps])
+            app_list = SortedDict((app, None) for app in get_apps() if app not in excluded_apps)
         else:
             app_list = SortedDict()
             for label in app_labels:

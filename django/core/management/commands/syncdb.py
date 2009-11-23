@@ -59,11 +59,11 @@ class Command(NoArgsCommand):
         created_models = set()
         pending_references = {}
 
-        excluded_apps = [models.get_app(app_label) for app_label in exclude]
-        app_list = [app for app in models.get_apps() if app not in excluded_apps]
+        excluded_apps = set(models.get_app(app_label) for app_label in exclude)
+        included_apps = set(app for app in models.get_apps() if app not in excluded_apps)
 
         # Create the tables for each model
-        for app in app_list:
+        for app in included_apps:
             app_name = app.__name__.split('.')[-2]
             model_list = models.get_models(app, include_auto_created=True)
             for model in model_list:
@@ -101,7 +101,7 @@ class Command(NoArgsCommand):
 
         # Install custom SQL for the app (but only if this
         # is a model we've just created)
-        for app in app_list:
+        for app in included_apps:
             app_name = app.__name__.split('.')[-2]
             for model in models.get_models(app):
                 if model in created_models:
@@ -126,7 +126,7 @@ class Command(NoArgsCommand):
                             print "No custom SQL for %s.%s model" % (app_name, model._meta.object_name)
 
         # Install SQL indicies for all newly created models
-        for app in app_list:
+        for app in included_apps:
             app_name = app.__name__.split('.')[-2]
             for model in models.get_models(app):
                 if model in created_models:
