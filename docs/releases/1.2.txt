@@ -189,4 +189,3 @@ Django 1.2 adds the ability to use :ref:`more than one database
 issued at a specific database with the `using()` method on
 querysets; individual objects can be saved to a specific database
 by providing a ``using`` argument when you save the instance.
-

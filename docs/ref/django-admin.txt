@@ -498,11 +498,6 @@ prompts.
 The :djadminopt:`--database` option can be used to specify the alias
 of the database to reset.
 
-Executes the equivalent of ``sqlreset`` for the given app name(s).
-
-The :djadminopt:`--noinput` option may be provided to suppress all user
-prompts.
-
 runfcgi [options]
 -----------------
 
