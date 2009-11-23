@@ -190,7 +190,6 @@ end users) indicating the reason the request was rejected.  See
 :ref:`ref-contrib-csrf`.
 
 
-
 .. setting:: DATABASES
 
 DATABASES

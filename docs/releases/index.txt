@@ -1,5 +1,6 @@
 .. _releases-index:
 
+=============
 Release notes
 =============
 
@@ -7,37 +8,60 @@ Release notes for the official Django releases. Each release note will tell you
 what's new in each version, and will also describe any backwards-incompatible
 changes made in that version.
 
+For those upgrading to a new version of Django, you will need to check
+all the backwards-incompatible changes and deprecated features for
+each 'final' release from the one after your current Django version,
+up to and including the new version.
+
+Final releases
+==============
+
+1.2 release
+-----------
 .. toctree::
    :maxdepth: 1
 
-   0.95
-   0.96
-   1.0-alpha-1
-   1.0-alpha-2
-   1.0-beta
-   1.0-beta-2
-   1.0
-   1.0.1
-   1.0.2
-   1.1-alpha-1
-   1.1-beta-1
-   1.1-rc-1
+   1.2
+
+1.1 release
+-----------
+.. toctree::
+   :maxdepth: 1
+
+   1.1.2
    1.1
 
-Upgrading
-=========
+1.0 release
+-----------
+.. toctree::
+   :maxdepth: 1
 
-For those upgrading to a new version of Django, you will need to check all the
-backwards-incompatible changes and deprecated features for each 'final' release
-from the one after your old version up to and including your new version.  The
-relevant sections of the release notes are linked below below for your
-convenience.
+   1.0.2
+   1.0.1
+   1.0
 
-For those following trunk, the tentative release notes for the next version to
-be released are also included at the bottom.  This is kept up to date with new
-features and changes that you need to be aware of.
+Pre-1.0 releases
+----------------
+.. toctree::
+   :maxdepth: 1
 
- * :ref:`backwards-incompatible-changes-1.1`
- * :ref:`deprecated-features-1.1`
- * :ref:`backwards-incompatible-changes-1.2`
- * :ref:`deprecated-features-1.2`
+   0.96
+   0.95
+
+Development releases
+====================
+
+These notes are retained for historical purposes. If you are upgrading
+between formal Django releases, you don't need to worry about these
+notes.
+
+.. toctree::
+   :maxdepth: 1
+
+   1.1-rc-1
+   1.1-beta-1
+   1.1-alpha-1
+   1.0-beta-2
+   1.0-beta
+   1.0-alpha-2
+   1.0-alpha-1

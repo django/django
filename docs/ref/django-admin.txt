@@ -470,6 +470,11 @@ prompts.
 
 The alias for the database to reset.  By default resets all databases.
 
+Executes the equivalent of ``sqlreset`` for the given app name(s).
+
+The :djadminopt:`--noinput` option may be provided to suppress all user
+prompts.
+
 runfcgi [options]
 -----------------
 
