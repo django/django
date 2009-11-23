@@ -229,7 +229,7 @@ The alias for the default database to be used for this model.  If this is not
 provided the default is ``'default'``.  If it is porvided it can be overidden
 at the ``QuerySet`` level with the ``using()`` method.
 
-.. versionadded:: TODO
+.. versionadded:: 1.2
 
 ``verbose_name``
 ----------------

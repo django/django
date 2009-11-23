@@ -4,7 +4,7 @@
 Multiple Databases
 ==================
 
-.. versionadded:: TODO
+.. versionadded:: 1.2
 
 This topic guide describes Django's support for interacting with multiple
 databases.  Most of the rest of Django's documentation assumes you are
@@ -17,14 +17,14 @@ Defining Your Databases
 
 The first step to using more than one database with Django is to tell Django
 about the database servers you'll be using.  This is done using the
-:settings:`DATABASES` setting.  This setting maps database aliases, which are
+:setting:`DATABASES` setting.  This setting maps database aliases, which are
 a way to refer to a specific database throughout Django, to a dictionary of
 settings for that specific connection.  The settings in the inner dictionaries
-are described fully in the :settings:`DATABASES` documentation.  The important
+are described fully in the :setting:`DATABASES` documentation.  The important
 thing to note is that your primary database should have the alias
 ``'default'``, and any additional databases you have can have whatever alias
 you choose.  If at any time you attempt to access a database that isn't defined
-in your :settings:`DATABASES` setting then Django will raise a
+in your :setting:`DATABASES` setting then Django will raise a
 ``django.db.utils.ConnectionDoesNotExist`` exception.
 
 Selecting a Database for a ``Model``
@@ -56,7 +56,7 @@ wanted to save to the ``'legacy_users'`` database you would do::
 To save the user.
 
 Select a Database to Delete a Model From
-=======================================
+========================================
 
 To select which database to delete a model from you also use a ``using``
 keyword argument to the ``Model.delete()`` method, analogous to the ``using``
