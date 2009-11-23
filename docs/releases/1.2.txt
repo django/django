@@ -8,6 +8,11 @@ This page documents release notes for the as-yet-unreleased Django 1.2.  As such
 it is tentative and subject to change.  It provides up-to-date information for
 those who are following trunk.
 
+Django 1.2 includes a number of nifty `new features`_, lots of bug
+fixes, and an easy upgrade path from Django 1.1.
+
+.. _new features: `What's new in Django 1.2`_
+
 .. _backwards-incompatible-changes-1.2:
 
 Backwards-incompatible changes in 1.2
@@ -68,3 +73,37 @@ Features deprecated in 1.2
 ==========================
 
 None.
+
+What's new in Django 1.2
+========================
+
+CSRF support
+------------
+
+Django now has much improved protection against :ref:`Cross-Site
+Request Forgery (CSRF) attacks<ref-contrib-csrf>`. This type of attack
+occurs when a malicious Web site contains a link, a form button or
+some javascript that is intended to perform some action on your Web
+site, using the credentials of a logged-in user who visits the
+malicious site in their browser. A related type of attack, 'login
+CSRF', where an attacking site tricks a user's browser into logging
+into a site with someone else's credentials, is also covered.
+
+Email Backends
+--------------
+
+You can now :ref:`configure the way that Django sends email
+<topic-email-backends>`. Instead of using SMTP to send all email, you
+can now choose a configurable email backend to send messages. If your
+hosting provider uses a sandbox or some other non-SMTP technique for
+sending mail, you can now construct an email backend that will allow
+Django's standard :ref:`mail sending methods<topics-email>` to use
+those facilities.
+
+This also makes it easier to debug mail sending - Django ships with
+backend implementations that allow you to send email to a
+:ref:`file<topic-email-file-backend>`, to the
+:ref:`console<topic-email-console-backend>`, or to
+:ref:`memory<topic-email-memory-backend>` - you can even configure all
+email to be :ref:`thrown away<topic-email-console-backend>`.
+

@@ -201,5 +201,5 @@ The Django open-source project
 
     * **Django over time:**
       :ref:`API stability <misc-api-stability>` |
-      :ref:`Release notes <releases-index>` |
+      :ref:`Release notes and upgrading instructions <releases-index>` |
       :ref:`Deprecation Timeline <internals-deprecation>`
