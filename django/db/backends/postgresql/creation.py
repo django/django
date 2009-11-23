@@ -29,7 +29,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     }
 
     def sql_table_creation_suffix(self):
-        assert self.connection.settings_dict['TEST_DATABASE_COLLATION'] is None, "PostgreSQL does not support collation setting at database creation time."
-        if self.connection.settings_dict['TEST_DATABASE_CHARSET']:
-            return "WITH ENCODING '%s'" % self.connection.settings_dict['TEST_DATABASE_CHARSET']
+        assert self.connection.settings_dict['TEST_COLLATION'] is None, "PostgreSQL does not support collation setting at database creation time."
+        if self.connection.settings_dict['TEST_CHARSET']:
+            return "WITH ENCODING '%s'" % self.connection.settings_dict['TEST_CHARSET']
         return ''

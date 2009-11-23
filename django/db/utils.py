@@ -6,13 +6,15 @@ from django.utils.importlib import import_module
 
 def load_backend(backend_name):
     try:
-        # Most of the time, the database backend will be one of the official
-        # backends that ships with Django, so look there first.
-        return import_module('.base', 'django.db.backends.%s' % backend_name)
+        module = import_module('.base', 'django.db.backends.%s' % backend_name)
+        import warnings
+        warnings.warn(
+            "Short names for DATABASE_ENGINE are deprecated; prepend with 'django.db.backends.'",
+            PendingDeprecationWarning
+        )
+        return module
     except ImportError, e:
-        raise
-        # If the import failed, we might be looking for a database backend
-        # distributed external to Django. So we'll try that next.
+        # Look for a fully qualified database backend name
         try:
             return import_module('.base', backend_name)
         except ImportError, e_user:
@@ -50,14 +52,13 @@ class ConnectionHandler(object):
             conn = self.databases[alias]
         except KeyError:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
-        conn.setdefault('DATABASE_ENGINE', 'dummy')
-        conn.setdefault('DATABASE_OPTIONS', {})
-        conn.setdefault('TEST_DATABASE_CHARSET', None)
-        conn.setdefault('TEST_DATABASE_COLLATION', None)
-        conn.setdefault('TEST_DATABASE_NAME', None)
+        conn.setdefault('ENGINE', 'dummy')
+        conn.setdefault('OPTIONS', {})
+        conn.setdefault('TEST_CHARSET', None)
+        conn.setdefault('TEST_COLLATION', None)
+        conn.setdefault('TEST_NAME', None)
         conn.setdefault('TIME_ZONE', settings.TIME_ZONE)
-        for setting in ('DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD',
-            'DATABASE_HOST', 'DATABASE_PORT'):
+        for setting in ('NAME', 'USER', 'PASSWORD', 'HOST', 'PORT'):
             conn.setdefault(setting, '')
 
     def __getitem__(self, alias):
@@ -66,7 +67,7 @@ class ConnectionHandler(object):
 
         self.ensure_defaults(alias)
         db = self.databases[alias]
-        backend = load_backend(db['DATABASE_ENGINE'])
+        backend = load_backend(db['ENGINE'])
         conn = backend.DatabaseWrapper(db, alias)
         self._connections[alias] = conn
         return conn

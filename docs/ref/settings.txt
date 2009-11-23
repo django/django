@@ -195,41 +195,60 @@ end users) indicating the reason the request was rejected.  See
 DATABASES
 ---------
 
+.. versionadded: 1.2
+
 Default: ``{}`` (Empty dictionary)
 
-This is a dictionary containg the settings for all databases to be used with
-Django.  It is a nested dictionary who's contents maps aliases to a dictionary
-containing the options for an individual database.  The following inner options
-are used:
+A dictionary containing the settings for all databases to be used with
+Django. It is a nested dictionary who's contents maps database aliases
+to a dictionary containing the options for an individual database.
 
-.. deprecated: 1.2
+The :setting:`DATABASES` setting must configure a ``default`` database;
+any number of additional databases may also be specified.
 
-    In versions of Django prior to 1.2 each of the following were
-    individual settings. The usage of the standalone database settings
-    has been deprecated, and will be removed in Django 1.4.
+The simplest possible settings file is for a single-database setup using
+SQLite. This can be configured using the following::
+    DATABASES = {
+        'default': {
+            'BACKEND': 'django.db.backends.sqlite3',
+            'NAME': 'mydatabase'
+        }
+    }
 
-.. setting:: DATABASE_ENGINE
+For other database backends, or more complex SQLite configurations, other options
+will be required. The following inner options are available.
 
-DATABASE_ENGINE
-~~~~~~~~~~~~~~~
+.. setting:: ENGINE
+
+ENGINE
+~~~~~~
 
 Default: ``''`` (Empty string)
 
-The database backend to use. The built-in database backends are
-``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'sqlite3'``, and
-``'oracle'``.
+The database backend to use. The built-in database backends are:
+
+    * ``'django.db.backends.postgresql_psycopg2'``
+    * ``'django.db.backends.postgresql'``
+    * ``'django.db.backends.mysql'``
+    * ``'django.db.backends.sqlite3'``
+    * ``'django.db.backends.oracle'``
 
 You can use a database backend that doesn't ship with Django by setting
-``DATABASE_ENGINE`` to a fully-qualified path (i.e.
+``ENGINE`` to a fully-qualified path (i.e.
 ``mypackage.backends.whatever``). Writing a whole new database backend from
 scratch is left as an exercise to the reader; see the other backends for
 examples.
 
-.. versionadded:: 1.0
-    Support for external database backends is new in 1.0.
+.. note::
+    Prior to Django 1.2, you could use a short version of the backend name
+    to reference the built-in database backends (e.g., you could use
+    ``'sqlite3'`` to refer to the SQLite backend). This format has been
+    deprecated, and will be removed in Django 1.4.
 
-DATABASE_HOST
-~~~~~~~~~~~~~
+.. setting:: HOST
+
+HOST
+~~~~
 
 Default: ``''`` (Empty string)
 
@@ -239,7 +258,7 @@ localhost. Not used with SQLite.
 If this value starts with a forward slash (``'/'``) and you're using MySQL,
 MySQL will connect via a Unix socket to the specified socket. For example::
 
-    "DATABASE_HOST": '/var/run/mysql'
+    "HOST": '/var/run/mysql'
 
 If you're using MySQL and this value *doesn't* start with a forward slash, then
 this value is assumed to be the host.
@@ -249,8 +268,10 @@ for the connection, rather than a network connection to localhost. If you
 explicitly need to use a TCP/IP connection on the local machine with
 PostgreSQL, specify ``localhost`` here.
 
-DATABASE_NAME
-~~~~~~~~~~~~~
+.. setting:: NAME
+
+NAME
+~~~~
 
 Default: ``''`` (Empty string)
 
@@ -258,41 +279,48 @@ The name of the database to use. For SQLite, it's the full path to the database
 file. When specifying the path, always use forward slashes, even on Windows
 (e.g. ``C:/homes/user/mysite/sqlite3.db``).
 
-DATABASE_OPTIONS
-~~~~~~~~~~~~~~~~
+.. setting:: OPTIONS
+
+OPTIONS
+~~~~~~~
 
 Default: ``{}`` (Empty dictionary)
 
 Extra parameters to use when connecting to the database. Consult backend
 module's document for available keywords.
 
-DATABASE_PASSWORD
-~~~~~~~~~~~~~~~~~
+.. setting:: PASSWORD
+
+PASSWORD
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
 The password to use when connecting to the database. Not used with SQLite.
 
-DATABASE_PORT
-~~~~~~~~~~~~~
+.. setting:: PORT
+
+PORT
+~~~~
 
 Default: ``''`` (Empty string)
 
 The port to use when connecting to the database. An empty string means the
 default port. Not used with SQLite.
 
-DATABASE_USER
-~~~~~~~~~~~~~
+.. setting:: USER
+
+USER
+~~~~
 
 Default: ``''`` (Empty string)
 
 The username to use when connecting to the database. Not used with SQLite.
 
+.. setting:: TEST_CHARSET
 
-TEST_DATABASE_CHARSET
-~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
+TEST_CHARSET
+~~~~~~~~~~~~
 
 Default: ``None``
 
@@ -306,11 +334,10 @@ MySQL_ (``mysql``) backends.
 .. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
 .. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
 
+.. setting:: TEST_COLLATION
 
-TEST_DATABASE_COLLATION
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
+TEST_COLLATION
+~~~~~~~~~~~~~~
 
 Default: ``None``
 
@@ -322,8 +349,10 @@ manual for details).
 
 .. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
 
-TEST_DATABASE_NAME
-~~~~~~~~~~~~~~~~~~
+.. setting:: TEST_NAME
+
+TEST_NAME
+~~~~~~~~~
 
 Default: ``None``
 
@@ -1292,3 +1321,79 @@ Different locales have different formats. For example, U.S. English would say
 
 See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
 ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``MONTH_DAY_FORMAT``.
+
+Deprecated settings
+===================
+
+.. setting:: DATABASE_ENGINE
+
+DATABASE_ENGINE
+---------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`ENGINE` in
+   :setting:`DATABASES`.
+
+DATABASE_HOST
+-------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`HOST` in
+   :setting:`DATABASES`.
+
+DATABASE_NAME
+-------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`NAME` in
+   :setting:`DATABASES`.
+
+DATABASE_OPTIONS
+----------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`OPTIONS` in
+   :setting:`DATABASES`.
+
+DATABASE_PASSWORD
+-----------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`PASSWORD` in
+   :setting:`DATABASES`.
+
+DATABASE_PORT
+-------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`PORT` in
+   :setting:`DATABASES`.
+
+DATABASE_USER
+-------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`USER` in
+   :setting:`DATABASES`.
+
+TEST_DATABASE_CHARSET
+---------------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`TEST_CHARSET` in
+   :setting:`DATABASES`.
+
+TEST_DATABASE_COLLATION
+-----------------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`TEST_COLLATION` in
+   :setting:`DATABASES`.
+
+TEST_DATABASE_NAME
+------------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`TEST_NAME` in
+   :setting:`DATABASES`.
+

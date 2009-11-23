@@ -29,9 +29,8 @@ class BaseDatabaseWrapper(local):
 
     def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         # `settings_dict` should be a dictionary containing keys such as
-        # DATABASE_NAME, DATABASE_USER, etc. It's called `settings_dict`
-        # instead of `settings` to disambiguate it from Django settings
-        # modules.
+        # NAME, USER, etc. It's called `settings_dict` instead of `settings`
+        # to disambiguate it from Django settings modules.
         self.connection = None
         self.queries = []
         self.settings_dict = settings_dict

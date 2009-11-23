@@ -327,7 +327,7 @@ def run_stddev_tests():
     Stddev and Variance are not guaranteed to be available for SQLite, and
     are not available for PostgreSQL before 8.2.
     """
-    if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == 'sqlite3':
+    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.sqlite3':
         return False
 
     class StdDevPop(object):

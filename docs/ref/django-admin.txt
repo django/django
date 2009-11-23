@@ -160,8 +160,8 @@ dbshell
 .. django-admin:: dbshell
 
 Runs the command-line client for the database engine specified in your
-``DATABASE_ENGINE`` setting, with the connection parameters specified in your
-``DATABASE_USER``, ``DATABASE_PASSWORD``, etc., settings.
+``ENGINE`` setting, with the connection parameters specified in your
+``USER``, ``PASSWORD``, etc., settings.
 
     * For PostgreSQL, this runs the ``psql`` command-line client.
     * For MySQL, this runs the ``mysql`` command-line client.
@@ -265,7 +265,7 @@ inspectdb
 .. django-admin:: inspectdb
 
 Introspects the database tables in the database pointed-to by the
-``DATABASE_NAME`` setting and outputs a Django model module (a ``models.py``
+``NAME`` setting and outputs a Django model module (a ``models.py``
 file) to standard output.
 
 Use this if you have a legacy database with which you'd like to use Django.

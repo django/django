@@ -290,13 +290,13 @@ If you aim to build a database-agnostic application, you should account for
 differences in database column types. For example, the date/time column type
 in PostgreSQL is called ``timestamp``, while the same column in MySQL is called
 ``datetime``. The simplest way to handle this in a ``db_type()`` method is to
-check the ``connection.settings_dict['DATABASE_ENGINE']`` attribute.
+check the ``connection.settings_dict['ENGINE']`` attribute.
 
 For example::
 
     class MyDateField(models.Field):
         def db_type(self, connection):
-            if connection.settings_dict['DATABASE_ENGINE'] == 'mysql':
+            if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
                 return 'datetime'
             else:
                 return 'timestamp'

@@ -326,7 +326,7 @@ The end."""),
 # Because Oracle treats the empty string as NULL, Oracle is expected to fail
 # when field.empty_strings_allowed is True and the value is None; skip these
 # tests.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == 'oracle':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
     test_data = [data for data in test_data
                  if not (data[0] == data_obj and
                          data[2]._meta.get_field('data').empty_strings_allowed and
@@ -335,7 +335,7 @@ if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == 'oracle':
 # Regression test for #8651 -- a FK to an object iwth PK of 0
 # This won't work on MySQL since it won't let you create an object
 # with a primary key of 0,
-if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] != 'mysql':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
     test_data.extend([
         (data_obj, 0, Anchor, "Anchor 0"),
         (fk_obj, 465, FKData, 0),

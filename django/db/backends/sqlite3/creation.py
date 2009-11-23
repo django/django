@@ -38,7 +38,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         return []
 
     def _create_test_db(self, verbosity, autoclobber):
-        test_database_name = self.connection.settings_dict['TEST_DATABASE_NAME']
+        test_database_name = self.connection.settings_dict['TEST_NAME']
         if test_database_name and test_database_name != ":memory:":
             # Erase the old test database
             if verbosity >= 1:

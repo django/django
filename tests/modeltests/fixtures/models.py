@@ -100,7 +100,7 @@ __test__ = {'API_TESTS': """
 
 # Database flushing does not work on MySQL with the default storage engine
 # because it requires transaction support.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] != 'mysql':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
     __test__['API_TESTS'] += \
 """
 # Reset the database representation of this app. This will delete all data.

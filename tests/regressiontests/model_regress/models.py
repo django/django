@@ -149,7 +149,9 @@ datetime.datetime(2000, 1, 1, 6, 1, 1)
 
 """}
 
-if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] not in ("mysql", "oracle"):
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] not in (
+        "django.db.backends.mysql",
+        "django.db.backends.oracle"):
     __test__["timezone-tests"] = """
 # Saving an updating with timezone-aware datetime Python objects. Regression
 # test for #10443.

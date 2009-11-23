@@ -121,7 +121,7 @@ Complex expressions of different connection types are possible.
 """}
 
 # Oracle doesn't support the Bitwise OR operator.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] != 'oracle':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.oracle':
     __test__['API_TESTS'] += """
 
 >>> _ = Number.objects.filter(pk=n.pk).update(integer=42, float=15.5)

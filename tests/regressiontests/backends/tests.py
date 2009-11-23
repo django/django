@@ -10,7 +10,7 @@ class Callproc(unittest.TestCase):
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
-        if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == 'oracle':
+        if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
             convert_unicode = backend.convert_unicode
             cursor = connection.cursor()
             cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
@@ -39,7 +39,7 @@ class LongString(unittest.TestCase):
     def test_long_string(self):
         # If the backend is Oracle, test that we can save a text longer
         # than 4000 chars and read it properly
-        if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == 'oracle':
+        if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
             c = connection.cursor()
             c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
             long_str = ''.join([unicode(x) for x in xrange(4000)])
@@ -79,7 +79,7 @@ __test__ = {'API_TESTS': """
 # Unfortunately with sqlite3 the in-memory test database cannot be
 # closed, and so it cannot be re-opened during testing, and so we
 # sadly disable this test for now.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] != 'sqlite3':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.sqlite3':
     __test__['API_TESTS'] += """
 >>> connection_created.connect(connection_created_test)
 >>> connection.close() # Ensure the connection is closed

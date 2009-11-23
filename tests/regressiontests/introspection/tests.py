@@ -80,7 +80,7 @@ class IntrospectionTests(TestCase):
                           ['IntegerField', 'CharField', 'CharField', 'CharField'])
 
     # Regression test for #9991 - 'real' types in postgres
-    if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'].startswith('postgresql'):
+    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].startswith('django.db.backends.postgresql'):
         def test_postgresql_real_type(self):
             cursor = connection.cursor()
             cursor.execute("CREATE TABLE django_ixn_real_test_table (number REAL);")

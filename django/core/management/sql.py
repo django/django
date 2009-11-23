@@ -17,12 +17,13 @@ except NameError:
 def sql_create(app, style, connection):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
 
-    if connection.settings_dict['DATABASE_ENGINE'] == 'dummy':
+    if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
         # This must be the "dummy" database backend, which means the user
-        # hasn't set DATABASE_ENGINE.
+        # hasn't set ENGINE for the databse.
         raise CommandError("Django doesn't know which syntax to use for your SQL statements,\n" +
-            "because you haven't specified the DATABASE_ENGINE setting.\n" +
-            "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.")
+            "because you haven't specified the ENGINE setting for the database.\n" +
+            "Edit your settings file and change DATBASES['default']['ENGINE'] to something like\n" +
+            "'django.db.backends.postgresql' or 'django.db.backends.mysql'")
 
     # Get installed models, so we generate REFERENCES right.
     # We trim models from the current app so that the sqlreset command does not
@@ -162,7 +163,8 @@ def custom_sql_for_model(model, style, connection):
     statements = re.compile(r";[ \t]*$", re.M)
 
     # Find custom SQL, if it's available.
-    sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), connection.settings_dict['DATABASE_ENGINE'])),
+    backend_name = connection.settings_dict['ENGINE'].split('.')[-1]
+    sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), backend_name)),
                  os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
     for sql_file in sql_files:
         if os.path.exists(sql_file):

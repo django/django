@@ -5,7 +5,7 @@ class USStateField(Field):
         return "USStateField"
 
     def db_type(self, connection):
-        if connection.settings_dict['DATABASE_ENGINE'] == 'oracle':
+        if connection.settings_dict['ENGINE'] == 'django.db.backends.oracle':
             return 'CHAR(2)'
         else:
             return 'varchar(2)'
@@ -21,7 +21,7 @@ class PhoneNumberField(Field):
         return "PhoneNumberField"
 
     def db_type(self, connection):
-        if connection.settings_dict['DATABASE_ENGINE'] == 'oracle':
+        if connection.settings_dict['ENGINE'] == 'django.db.backends.oracle':
             return 'VARCHAR2(20)'
         else:
             return 'varchar(20)'

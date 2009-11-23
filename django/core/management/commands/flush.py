@@ -49,7 +49,7 @@ class Command(NoArgsCommand):
     and return each table to the state it was in after syncdb.
     Are you sure you want to do this?
 
-        Type 'yes' to continue, or 'no' to cancel: """ % connection.settings_dict['DATABASE_NAME'])
+        Type 'yes' to continue, or 'no' to cancel: """ % connection.settings_dict['NAME'])
             else:
                 confirm = 'yes'
 
@@ -65,7 +65,7 @@ class Command(NoArgsCommand):
           * At least one of the expected database tables doesn't exist.
           * The SQL was invalid.
         Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.
-        The full error: %s""" % (connection.settings_dict.DATABASE_NAME, e))
+        The full error: %s""" % (connection.settings_dict['NAME'], e))
                 transaction.commit_unless_managed(using=db)
 
                 # Emit the post sync signal. This allows individual

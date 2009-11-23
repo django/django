@@ -35,7 +35,7 @@ This will IRREVERSIBLY DESTROY any data for
 the "%s" application in the database "%s".
 Are you sure you want to do this?
 
-Type 'yes' to continue, or 'no' to cancel: """ % (app_name, connection.settings_dict['DATABASE_NAME']))
+Type 'yes' to continue, or 'no' to cancel: """ % (app_name, connection.settings_dict['NAME']))
         else:
             confirm = 'yes'
 

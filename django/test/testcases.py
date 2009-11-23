@@ -446,7 +446,7 @@ def connections_support_transactions():
     Returns True if all connections support transactions.  This is messy
     because 2.4 doesn't support any or all.
     """
-    return all(conn.settings_dict['DATABASE_SUPPORTS_TRANSACTIONS']
+    return all(conn.settings_dict['SUPPORTS_TRANSACTIONS']
         for conn in connections.all())
 
 class TestCase(TransactionTestCase):

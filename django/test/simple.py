@@ -190,7 +190,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     from django.db import connections
     for alias in connections:
         connection = connections[alias]
-        old_names.append((connection, connection.settings_dict['DATABASE_NAME']))
+        old_names.append((connection, connection.settings_dict['NAME']))
         connection.creation.create_test_db(verbosity, autoclobber=not interactive)
     result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
     for connection, old_name in old_names:

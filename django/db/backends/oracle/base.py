@@ -342,22 +342,22 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _connect_string(self):
         settings_dict = self.settings_dict
-        if len(settings_dict['DATABASE_HOST'].strip()) == 0:
-            settings_dict['DATABASE_HOST'] = 'localhost'
-        if len(settings_dict['DATABASE_PORT'].strip()) != 0:
-            dsn = Database.makedsn(settings_dict['DATABASE_HOST'],
-                                   int(settings_dict['DATABASE_PORT']),
-                                   settings_dict['DATABASE_NAME'])
+        if len(settings_dict['HOST'].strip()) == 0:
+            settings_dict['HOST'] = 'localhost'
+        if len(settings_dict['PORT'].strip()) != 0:
+            dsn = Database.makedsn(settings_dict['HOST'],
+                                   int(settings_dict['PORT']),
+                                   settings_dict['NAME'])
         else:
-            dsn = settings_dict['DATABASE_NAME']
-        return "%s/%s@%s" % (settings_dict['DATABASE_USER'],
-                             settings_dict['DATABASE_PASSWORD'], dsn)
+            dsn = settings_dict['NAME']
+        return "%s/%s@%s" % (settings_dict['USER'],
+                             settings_dict['PASSWORD'], dsn)
 
     def _cursor(self):
         cursor = None
         if not self._valid_connection():
             conn_string = convert_unicode(self._connect_string())
-            self.connection = Database.connect(conn_string, **self.settings_dict['DATABASE_OPTIONS'])
+            self.connection = Database.connect(conn_string, **self.settings_dict['OPTIONS'])
             cursor = FormatStylePlaceholderCursor(self.connection)
             # Set oracle date to ansi date format.  This only needs to execute
             # once when we create a new connection. We also set the Territory

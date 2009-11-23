@@ -1223,13 +1223,13 @@ FieldError: Infinite loop caused by ordering.
 
 
 # In Oracle, we expect a null CharField to return u'' instead of None.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == "oracle":
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == "django.db.backends.oracle":
     __test__["API_TESTS"] = __test__["API_TESTS"].replace("<NONE_OR_EMPTY_UNICODE>", "u''")
 else:
     __test__["API_TESTS"] = __test__["API_TESTS"].replace("<NONE_OR_EMPTY_UNICODE>", "None")
 
 
-if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == "mysql":
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == "django.db.backends.mysql":
     __test__["API_TESTS"] += """
 When grouping without specifying ordering, we add an explicit "ORDER BY NULL"
 portion in MySQL to prevent unnecessary sorting.

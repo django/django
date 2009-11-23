@@ -41,22 +41,22 @@ class DatabaseCreation(BaseDatabaseCreation):
     remember = {}
 
     def _create_test_db(self, verbosity=1, autoclobber=False):
-        TEST_DATABASE_NAME = self._test_database_name()
-        TEST_DATABASE_USER = self._test_database_user()
-        TEST_DATABASE_PASSWD = self._test_database_passwd()
-        TEST_DATABASE_TBLSPACE = self._test_database_tblspace()
-        TEST_DATABASE_TBLSPACE_TMP = self._test_database_tblspace_tmp()
+        TEST_NAME = self._test_database_name()
+        TEST_USER = self._test_database_user()
+        TEST_PASSWD = self._test_database_passwd()
+        TEST_TBLSPACE = self._test_database_tblspace()
+        TEST_TBLSPACE_TMP = self._test_database_tblspace_tmp()
 
         parameters = {
-            'dbname': TEST_DATABASE_NAME,
-            'user': TEST_DATABASE_USER,
-            'password': TEST_DATABASE_PASSWD,
-            'tblspace': TEST_DATABASE_TBLSPACE,
-            'tblspace_temp': TEST_DATABASE_TBLSPACE_TMP,
+            'dbname': TEST_NAME,
+            'user': TEST_USER,
+            'password': TEST_PASSWD,
+            'tblspace': TEST_TBLSPACE,
+            'tblspace_temp': TEST_TBLSPACE_TMP,
         }
 
-        self.remember['user'] = self.connection.settings_dict['DATABASE_USER']
-        self.remember['passwd'] = self.connection.settings_dict['DATABASE_PASSWORD']
+        self.remember['user'] = self.connection.settings_dict['USER']
+        self.remember['passwd'] = self.connection.settings_dict['PASSWORD']
 
         cursor = self.connection.cursor()
         if self._test_database_create():
@@ -67,7 +67,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             except Exception, e:
                 sys.stderr.write("Got an error creating the test database: %s\n" % e)
                 if not autoclobber:
-                    confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_NAME)
+                    confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_NAME)
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
@@ -91,7 +91,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             except Exception, e:
                 sys.stderr.write("Got an error creating the test user: %s\n" % e)
                 if not autoclobber:
-                    confirm = raw_input("It appears the test user, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_USER)
+                    confirm = raw_input("It appears the test user, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_USER)
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
@@ -107,35 +107,35 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print "Tests cancelled."
                     sys.exit(1)
 
-        self.connection.settings_dict['TEST_DATABASE_USER'] = self.connection.settings_dict["DATABASE_USER"] = TEST_DATABASE_USER
-        self.connection.settings_dict["DATABASE_PASSWORD"] = TEST_DATABASE_PASSWD
+        self.connection.settings_dict['TEST_USER'] = self.connection.settings_dict["USER"] = TEST_USER
+        self.connection.settings_dict["PASSWORD"] = TEST_PASSWD
 
-        return self.connection.settings_dict['DATABASE_NAME']
+        return self.connection.settings_dict['NAME']
 
     def _destroy_test_db(self, test_database_name, verbosity=1):
         """
         Destroy a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
         """
-        TEST_DATABASE_NAME = self._test_database_name()
-        TEST_DATABASE_USER = self._test_database_user()
-        TEST_DATABASE_PASSWD = self._test_database_passwd()
-        TEST_DATABASE_TBLSPACE = self._test_database_tblspace()
-        TEST_DATABASE_TBLSPACE_TMP = self._test_database_tblspace_tmp()
+        TEST_NAME = self._test_database_name()
+        TEST_USER = self._test_database_user()
+        TEST_PASSWD = self._test_database_passwd()
+        TEST_TBLSPACE = self._test_database_tblspace()
+        TEST_TBLSPACE_TMP = self._test_database_tblspace_tmp()
 
-        self.connection.settings_dict["DATABASE_USER"] = self.remember['user']
-        self.connection.settings_dict["DATABASE_PASSWORD"] = self.remember['passwd']
+        self.connection.settings_dict["USER"] = self.remember['user']
+        self.connection.settings_dict["PASSWORD"] = self.remember['passwd']
 
         parameters = {
-            'dbname': TEST_DATABASE_NAME,
-            'user': TEST_DATABASE_USER,
-            'password': TEST_DATABASE_PASSWD,
-            'tblspace': TEST_DATABASE_TBLSPACE,
-            'tblspace_temp': TEST_DATABASE_TBLSPACE_TMP,
+            'dbname': TEST_NAME,
+            'user': TEST_USER,
+            'password': TEST_PASSWD,
+            'tblspace': TEST_TBLSPACE,
+            'tblspace_temp': TEST_TBLSPACE_TMP,
         }
 
-        self.remember['user'] = self.connection.settings_dict['DATABASE_USER']
-        self.remember['passwd'] = self.connection.settings_dict['DATABASE_PASSWORD']
+        self.remember['user'] = self.connection.settings_dict['USER']
+        self.remember['passwd'] = self.connection.settings_dict['PASSWORD']
 
         cursor = self.connection.cursor()
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
@@ -207,10 +207,10 @@ class DatabaseCreation(BaseDatabaseCreation):
                 raise
 
     def _test_database_name(self):
-        name = TEST_DATABASE_PREFIX + self.connection.settings_dict['DATABASE_NAME']
+        name = TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
         try:
-            if self.connection.settings_dict['TEST_DATABASE_NAME']:
-                name = self.connection.settings_dict['TEST_DATABASE_NAME']
+            if self.connection.settings_dict['TEST_NAME']:
+                name = self.connection.settings_dict['TEST_NAME']
         except AttributeError:
             pass
         except:
@@ -220,7 +220,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _test_database_create(self):
         name = True
         try:
-            if self.connection.settings_dict['TEST_DATABASE_CREATE']:
+            if self.connection.settings_dict['TEST_CREATE']:
                 name = True
             else:
                 name = False
@@ -244,10 +244,10 @@ class DatabaseCreation(BaseDatabaseCreation):
         return name
 
     def _test_database_user(self):
-        name = TEST_DATABASE_PREFIX + self.connection.settings_dict['DATABASE_USER']
+        name = TEST_DATABASE_PREFIX + self.connection.settings_dict['USER']
         try:
-            if self.connection.settings_dict['TEST_DATABASE_USER']:
-                name = self.connection.settings_dict['TEST_DATABASE_USER']
+            if self.connection.settings_dict['TEST_USER']:
+                name = self.connection.settings_dict['TEST_USER']
         except KeyError:
             pass
         except:
@@ -257,8 +257,8 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _test_database_passwd(self):
         name = PASSWORD
         try:
-            if self.connection.settings_dict['TEST_DATABASE_PASSWD']:
-                name = self.connection.settings_dict['TEST_DATABASE_PASSWD']
+            if self.connection.settings_dict['TEST_PASSWD']:
+                name = self.connection.settings_dict['TEST_PASSWD']
         except KeyError:
             pass
         except:
@@ -266,10 +266,10 @@ class DatabaseCreation(BaseDatabaseCreation):
         return name
 
     def _test_database_tblspace(self):
-        name = TEST_DATABASE_PREFIX + self.connection.settings_dict['DATABASE_NAME']
+        name = TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
         try:
-            if self.connection.settings_dict['TEST_DATABASE_TBLSPACE']:
-                name = self.connection.settings_dict['TEST_DATABASE_TBLSPACE']
+            if self.connection.settings_dict['TEST_TBLSPACE']:
+                name = self.connection.settings_dict['TEST_TBLSPACE']
         except KeyError:
             pass
         except:
@@ -277,10 +277,10 @@ class DatabaseCreation(BaseDatabaseCreation):
         return name
 
     def _test_database_tblspace_tmp(self):
-        name = TEST_DATABASE_PREFIX + self.connection.settings_dict['DATABASE_NAME'] + '_temp'
+        name = TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME'] + '_temp'
         try:
-            if self.connection.settings_dict['TEST_DATABASE_TBLSPACE_TMP']:
-                name = self.connection.settings_dict['TEST_DATABASE_TBLSPACE_TMP']
+            if self.connection.settings_dict['TEST_TBLSPACE_TMP']:
+                name = self.connection.settings_dict['TEST_TBLSPACE_TMP']
         except KeyError:
             pass
         except:

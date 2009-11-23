@@ -9,21 +9,30 @@ __all__ = ('backend', 'connection', 'connections', 'DatabaseError',
 
 DEFAULT_DB_ALIAS = 'default'
 
-if not settings.DATABASES or DEFAULT_DB_ALIAS not in settings.DATABASES:
-    settings.DATABASES[DEFAULT_DB_ALIAS] = {
-        'DATABASE_ENGINE': settings.DATABASE_ENGINE,
-        'DATABASE_HOST': settings.DATABASE_HOST,
-        'DATABASE_NAME': settings.DATABASE_NAME,
-        'DATABASE_OPTIONS': settings.DATABASE_OPTIONS,
-        'DATABASE_PASSWORD': settings.DATABASE_PASSWORD,
-        'DATABASE_PORT': settings.DATABASE_PORT,
-        'DATABASE_USER': settings.DATABASE_USER,
-        'TIME_ZONE': settings.TIME_ZONE,
+# For backwards compatibility - Port any old database settings over to
+# the new values.
+if not settings.DATABASES:
+    import warnings
+    warnings.warn(
+        "settings.DATABASE_* is deprecated; use settings.DATABASES instead.",
+        PendingDeprecationWarning
+    )
 
-        'TEST_DATABASE_CHARSET': settings.TEST_DATABASE_CHARSET,
-        'TEST_DATABASE_COLLATION': settings.TEST_DATABASE_COLLATION,
-        'TEST_DATABASE_NAME': settings.TEST_DATABASE_NAME,
+    settings.DATABASES[DEFAULT_DB_ALIAS] = {
+        'ENGINE': settings.DATABASE_ENGINE,
+        'HOST': settings.DATABASE_HOST,
+        'NAME': settings.DATABASE_NAME,
+        'OPTIONS': settings.DATABASE_OPTIONS,
+        'PASSWORD': settings.DATABASE_PASSWORD,
+        'PORT': settings.DATABASE_PORT,
+        'USER': settings.DATABASE_USER,
+        'TEST_CHARSET': settings.TEST_DATABASE_CHARSET,
+        'TEST_COLLATION': settings.TEST_DATABASE_COLLATION,
+        'TEST_NAME': settings.TEST_DATABASE_NAME,
     }
+
+if DEFAULT_DB_ALIAS not in settings.DATABASES:
+    raise ImproperlyConfigured("You must default a '%s' database" % DEFAULT_DB_ALIAS)
 
 connections = ConnectionHandler(settings.DATABASES)
 
@@ -38,7 +47,7 @@ connections = ConnectionHandler(settings.DATABASES)
 # we load all these up for backwards compatibility, you should use
 # connections['default'] instead.
 connection = connections[DEFAULT_DB_ALIAS]
-backend = load_backend(connection.settings_dict['DATABASE_ENGINE'])
+backend = load_backend(connection.settings_dict['ENGINE'])
 DatabaseError = backend.DatabaseError
 IntegrityError = backend.IntegrityError
 

@@ -96,7 +96,7 @@ support:
     * The ``sqlinitialdata`` command has been renamed to ``sqlcustom`` to
       emphasize that ``loaddata`` should be used for data (and ``sqlcustom`` for
       other custom SQL -- views, stored procedures, etc.).
-      
+
     * The vestigial ``install`` command has been removed. Use ``syncdb``.
 
 Backslash escaping changed
@@ -179,20 +179,20 @@ strings that referred to callables were allowed). This allows a much more
 natural use of URLconfs. For example, this URLconf::
 
     from django.conf.urls.defaults import *
-    
-    urlpatterns = patterns('', 
+
+    urlpatterns = patterns('',
         ('^myview/$', 'mysite.myapp.views.myview')
     )
-    
+
 can now be rewritten as::
 
     from django.conf.urls.defaults import *
     from mysite.myapp.views import myview
-    
-    urlpatterns = patterns('', 
+
+    urlpatterns = patterns('',
         ('^myview/$', myview)
     )
-        
+
 One useful application of this can be seen when using decorators; this
 change allows you to apply decorators to views *in your
 URLconf*. Thus, you can make a generic view require login very
@@ -202,17 +202,17 @@ easily::
     from django.contrib.auth.decorators import login_required
     from django.views.generic.list_detail import object_list
     from mysite.myapp.models import MyModel
-    
+
     info = {
         "queryset" : MyModel.objects.all(),
     }
-    
-    urlpatterns = patterns('', 
+
+    urlpatterns = patterns('',
         ('^myview/$', login_required(object_list), info)
     )
 
 Note that both syntaxes (strings and callables) are valid, and will continue to
-be valid for the foreseeable future.  
+be valid for the foreseeable future.
 
 The test framework
 ------------------
@@ -248,19 +248,19 @@ all their hard work:
 
     * Russell Keith-Magee and Malcolm Tredinnick for their major code
       contributions. This release wouldn't have been possible without them.
-      
+
     * Our new release manager, James Bennett, for his work in getting out
       0.95.1, 0.96, and (hopefully) future release.
-      
+
     * Our ticket managers Chris Beaven (aka SmileyChris), Simon Greenhill,
       Michael Radziej, and Gary Wilson. They agreed to take on the monumental
       task of wrangling our tickets into nicely cataloged submission. Figuring
       out what to work on is now about a million times easier; thanks again,
       guys.
-            
+
     * Everyone who submitted a bug report, patch or ticket comment. We can't
       possibly thank everyone by name -- over 200 developers submitted patches
       that went into 0.96 -- but everyone who's contributed to Django is listed
       in AUTHORS_.
-      
+
 .. _AUTHORS: http://code.djangoproject.com/browser/django/trunk/AUTHORS

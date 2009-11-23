@@ -93,7 +93,7 @@ u'Outstanding'
 
 # Regression test for #8354: the MySQL backend should raise an error if given
 # a timezone-aware datetime object.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['DATABASE_ENGINE'] == 'mysql':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.mysql':
     __test__['API_TESTS'] += """
 >>> from django.utils import tzinfo
 >>> dt = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=tzinfo.FixedOffset(0))

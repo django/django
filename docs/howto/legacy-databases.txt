@@ -19,15 +19,15 @@ Give Django your database parameters
 
 You'll need to tell Django what your database connection parameters are, and
 what the name of the database is. Do that by editing the :setting:`DATABASES`
-setting and assigning values to the following keys in the ``'default'``
-dictionary:
+setting and assigning values to the following keys for the ``'default'``
+connection:
 
-    * ``DATABASE_NAME``
-    * ``DATABASE_ENGINE``
-    * ``DATABASE_USER``
-    * ``DATABASE_PASSWORD``
-    * ``DATABASE_HOST``
-    * ``DATABASE_PORT``
+    * :setting:`NAME`
+    * :setting:`ENGINE`
+    * :setting:`USER`
+    * :setting:`PASSWORD`
+    * :setting:`HOST`
+    * :setting:`PORT`
 
 Auto-generate the models
 ========================
