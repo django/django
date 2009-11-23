@@ -159,6 +159,43 @@ Multiple fixtures named 'fixture2' in '...fixtures'. Aborting.
 >>> management.call_command('loaddata', 'fixture5', verbosity=0) # doctest: +ELLIPSIS
 Multiple fixtures named 'fixture5' in '...fixtures'. Aborting.
 
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Load fixtures 6 and 7. These will load using the 'default' database identifier implicitly
+>>> management.call_command('loaddata', 'fixture6', verbosity=0)
+>>> management.call_command('loaddata', 'fixture7', verbosity=0)
+>>> Article.objects.all()
+[<Article: Who needs more than one database?>, <Article: Who needs to use compressed data?>, <Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Load fixtures 6 and 7. These will load using the 'default' database identifier explicitly
+>>> management.call_command('loaddata', 'fixture6', verbosity=0, using='default')
+>>> management.call_command('loaddata', 'fixture7', verbosity=0, using='default')
+>>> Article.objects.all()
+[<Article: Who needs more than one database?>, <Article: Who needs to use compressed data?>, <Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Try to load fixture 8. This won't load because the database identifier doesn't match
+>>> management.call_command('loaddata', 'fixture8', verbosity=0)
+>>> Article.objects.all()
+[<Article: Python program becomes self aware>]
+
+>>> management.call_command('loaddata', 'fixture8', verbosity=0, using='default')
+>>> Article.objects.all()
+[<Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Try to load fixture 1, but this time, exclude the 'fixtures' app.
+>>> management.call_command('loaddata', 'fixture1', verbosity=0, exclude='fixtures')
+>>> Article.objects.all()
+[<Article: Python program becomes self aware>]
+
+>>> Category.objects.all()
+[]
+
 """
 
 from django.test import TestCase

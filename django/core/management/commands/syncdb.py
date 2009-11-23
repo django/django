@@ -14,8 +14,10 @@ class Command(NoArgsCommand):
         make_option('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
         make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to sync.  '
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
                 'Defaults to the "default" database.'),
+        make_option('-e', '--exclude', dest='exclude',action='append', default=[],
+            help='App to exclude (use multiple --exclude to exclude multiple apps).'),
     )
     help = "Create the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
 
@@ -24,6 +26,7 @@ class Command(NoArgsCommand):
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive')
         show_traceback = options.get('traceback', False)
+        exclude = options.get('exclude', [])
 
         self.style = no_style()
 
@@ -56,8 +59,11 @@ class Command(NoArgsCommand):
         created_models = set()
         pending_references = {}
 
+        excluded_apps = [models.get_app(app_label) for app_label in exclude]
+        app_list = [app for app in models.get_apps() if app not in excluded_apps]
+
         # Create the tables for each model
-        for app in models.get_apps():
+        for app in app_list:
             app_name = app.__name__.split('.')[-2]
             model_list = models.get_models(app, include_auto_created=True)
             for model in model_list:
@@ -95,7 +101,7 @@ class Command(NoArgsCommand):
 
         # Install custom SQL for the app (but only if this
         # is a model we've just created)
-        for app in models.get_apps():
+        for app in app_list:
             app_name = app.__name__.split('.')[-2]
             for model in models.get_models(app):
                 if model in created_models:
@@ -118,8 +124,9 @@ class Command(NoArgsCommand):
                     else:
                         if verbosity >= 2:
                             print "No custom SQL for %s.%s model" % (app_name, model._meta.object_name)
+
         # Install SQL indicies for all newly created models
-        for app in models.get_apps():
+        for app in app_list:
             app_name = app.__name__.split('.')[-2]
             for model in models.get_models(app):
                 if model in created_models:
@@ -138,4 +145,4 @@ class Command(NoArgsCommand):
                             transaction.commit_unless_managed(using=db)
 
         from django.core.management import call_command
-        call_command('loaddata', 'initial_data', verbosity=verbosity, database=db)
+        call_command('loaddata', 'initial_data', verbosity=verbosity, exclude=exclude, database=db)
