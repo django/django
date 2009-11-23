@@ -21,7 +21,7 @@ class QueryTestCase(TestCase):
         "Objects created on the default database don't leak onto other databases"
         # Create a book on the default database using create()
         Book.objects.create(title="Pro Django",
-            published=datetime.date(2008, 12, 16))
+                            published=datetime.date(2008, 12, 16))
 
         # Create a book on the default database using a save
         dive = Book()
@@ -57,7 +57,7 @@ class QueryTestCase(TestCase):
         "Objects created on another database don't leak onto the default database"
         # Create a book on the second database
         Book.objects.using('other').create(title="Pro Django",
-            published=datetime.date(2008, 12, 16))
+                                           published=datetime.date(2008, 12, 16))
 
         # Create a book on the default database using a save
         dive = Book()
@@ -130,13 +130,13 @@ class QueryTestCase(TestCase):
         "M2M fields are constrained to a single database"
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django",
-                                       published=datetime.date(2008, 12, 16))
+                                  published=datetime.date(2008, 12, 16))
 
         marty = Author.objects.create(name="Marty Alchin")
 
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python",
-                                                       published=datetime.date(2009, 5, 4))
+                                                  published=datetime.date(2009, 5, 4))
 
         mark = Author.objects.using('other').create(name="Mark Pilgrim")
 
@@ -164,7 +164,7 @@ class QueryTestCase(TestCase):
         "M2M forward manipulations are all constrained to a single DB"
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python",
-                                                       published=datetime.date(2009, 5, 4))
+                                                  published=datetime.date(2009, 5, 4))
 
         mark = Author.objects.using('other').create(name="Mark Pilgrim")
 
@@ -208,7 +208,7 @@ class QueryTestCase(TestCase):
         "M2M reverse manipulations are all constrained to a single DB"
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python",
-                                                       published=datetime.date(2009, 5, 4))
+                                                  published=datetime.date(2009, 5, 4))
 
         mark = Author.objects.using('other').create(name="Mark Pilgrim")
 
@@ -252,13 +252,13 @@ class QueryTestCase(TestCase):
         "FK fields are constrained to a single database"
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django",
-                                       published=datetime.date(2008, 12, 16))
+                                  published=datetime.date(2008, 12, 16))
 
         marty = Author.objects.create(name="Marty Alchin")
 
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python",
-                                                       published=datetime.date(2009, 5, 4))
+                                                  published=datetime.date(2009, 5, 4))
 
         mark = Author.objects.using('other').create(name="Mark Pilgrim")
 
@@ -274,12 +274,6 @@ class QueryTestCase(TestCase):
 
         mark = Author.objects.using('other').get(name='Mark Pilgrim')
         self.assertEquals(mark.favourite_book.title, "Dive into Python")
-
-        try:
-            marty.favourite_book = mark
-            self.fail("Shouldn't be able to assign across databases")
-        except Exception: # FIXME - this should be more explicit
-            pass
 
         # Check that queries work across foreign key joins
         self.assertEquals(list(Book.objects.using('default').filter(favourite_of__name='Marty Alchin').values_list('title', flat=True)),
@@ -335,6 +329,125 @@ class QueryTestCase(TestCase):
                           [])
         self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='Jane Brown').values_list('title', flat=True)),
                           [u'Dive into Python'])
+
+    def test_m2m_cross_database_protection(self):
+        "Operations that involve sharing M2M objects across databases raise an error"
+        # Create a book and author on the default database
+        pro = Book.objects.create(title="Pro Django",
+                                  published=datetime.date(2008, 12, 16))
+
+        marty = Author.objects.create(name="Marty Alchin")
+
+        # Create a book and author on the other database
+        dive = Book.objects.using('other').create(title="Dive into Python",
+                                                  published=datetime.date(2009, 5, 4))
+
+        mark = Author.objects.using('other').create(name="Mark Pilgrim")
+        # Set a foreign key set with an object from a different database
+        try:
+            marty.book_set = [pro, dive]
+            self.fail("Shouldn't be able to assign across databases")
+        except ValueError:
+            pass
+
+        # Add to an m2m with an object from a different database
+        try:
+            marty.book_set.add(dive)
+            self.fail("Shouldn't be able to assign across databases")
+        except ValueError:
+            pass
+
+        # Set a m2m with an object from a different database
+        try:
+            marty.book_set = [pro, dive]
+            self.fail("Shouldn't be able to assign across databases")
+        except ValueError:
+            pass
+
+        # Add to a reverse m2m with an object from a different database
+        try:
+            dive.authors.add(marty)
+            self.fail("Shouldn't be able to assign across databases")
+        except ValueError:
+            pass
+
+        # Set a reverse m2m with an object from a different database
+        try:
+            dive.authors = [mark, marty]
+            self.fail("Shouldn't be able to assign across databases")
+        except ValueError:
+            pass
+
+    def test_foreign_key_cross_database_protection(self):
+        "Operations that involve sharing FK objects across databases raise an error"
+        # Create a book and author on the default database
+        pro = Book.objects.create(title="Pro Django",
+                                  published=datetime.date(2008, 12, 16))
+
+        marty = Author.objects.create(name="Marty Alchin")
+
+        # Create a book and author on the other database
+        dive = Book.objects.using('other').create(title="Dive into Python",
+                                                  published=datetime.date(2009, 5, 4))
+
+        mark = Author.objects.using('other').create(name="Mark Pilgrim")
+
+        # Set a foreign key with an object from a different database
+        try:
+            marty.favourite_book = dive
+            self.fail("Shouldn't be able to assign across databases")
+        except ValueError:
+            pass
+
+        # Set a foreign key set with an object from a different database
+        try:
+            dive.favourite_of = [mark, marty]
+            self.fail("Shouldn't be able to assign across databases")
+        except ValueError:
+            pass
+
+        # Add to a foreign key set with an object from a different database
+        try:
+            dive.favourite_of.add(marty)
+            self.fail("Shouldn't be able to assign across databases")
+        except ValueError:
+            pass
+
+        # BUT! if you assign a FK object when the base object hasn't
+        # been saved yet, you implicitly assign the database for the
+        # base object.
+        john = Author(name="John Smith")
+        # initially, no db assigned
+        self.assertEquals(john._state.db, None)
+
+        # Dive comes from 'other', so john is set to use 'other'...
+        john.favourite_book = dive
+        self.assertEquals(john._state.db, 'other')
+        # ... but it isn't saved yet
+        self.assertEquals(list(Author.objects.using('other').values_list('name',flat=True)),
+                          [u'Mark Pilgrim'])
+
+        # When saved, John goes to 'other'
+        john.save()
+        self.assertEquals(list(Author.objects.using('default').values_list('name',flat=True)),
+                          [u'Marty Alchin'])
+        self.assertEquals(list(Author.objects.using('other').values_list('name',flat=True)),
+                          [u'John Smith', u'Mark Pilgrim'])
+
+        # This also works if you assign the FK in the constructor
+        jane = Author(name='Jane Brown', favourite_book=dive)
+        self.assertEquals(jane._state.db, 'other')
+        # ... but it isn't saved yet
+        self.assertEquals(list(Author.objects.using('other').values_list('name',flat=True)),
+                          [u'John Smith', u'Mark Pilgrim'])
+
+        # When saved, Jane goes to 'other'
+        jane.save()
+        self.assertEquals(list(Author.objects.using('default').values_list('name',flat=True)),
+                          [u'Marty Alchin'])
+        self.assertEquals(list(Author.objects.using('other').values_list('name',flat=True)),
+                          [u'Jane Brown', u'John Smith', u'Mark Pilgrim'])
+
 
 class FixtureTestCase(TestCase):
     multi_db = True
