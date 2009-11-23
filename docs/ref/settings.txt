@@ -208,6 +208,7 @@ any number of additional databases may also be specified.
 
 The simplest possible settings file is for a single-database setup using
 SQLite. This can be configured using the following::
+
     DATABASES = {
         'default': {
             'BACKEND': 'django.db.backends.sqlite3',
@@ -1334,12 +1335,16 @@ DATABASE_ENGINE
    This setting has been replaced by :setting:`ENGINE` in
    :setting:`DATABASES`.
 
+.. setting:: DATABASE_HOST
+
 DATABASE_HOST
 -------------
 
 .. deprecated:: 1.2
    This setting has been replaced by :setting:`HOST` in
    :setting:`DATABASES`.
+
+.. setting:: DATABASE_NAME
 
 DATABASE_NAME
 -------------
@@ -1348,12 +1353,16 @@ DATABASE_NAME
    This setting has been replaced by :setting:`NAME` in
    :setting:`DATABASES`.
 
+.. setting:: DATABASE_OPTIONS
+
 DATABASE_OPTIONS
 ----------------
 
 .. deprecated:: 1.2
    This setting has been replaced by :setting:`OPTIONS` in
    :setting:`DATABASES`.
+
+.. setting:: DATABASE_PASSWORD
 
 DATABASE_PASSWORD
 -----------------
@@ -1362,12 +1371,16 @@ DATABASE_PASSWORD
    This setting has been replaced by :setting:`PASSWORD` in
    :setting:`DATABASES`.
 
+.. setting:: DATABASE_PORT
+
 DATABASE_PORT
 -------------
 
 .. deprecated:: 1.2
    This setting has been replaced by :setting:`PORT` in
    :setting:`DATABASES`.
+
+.. setting:: DATABASE_USER
 
 DATABASE_USER
 -------------
@@ -1376,6 +1389,8 @@ DATABASE_USER
    This setting has been replaced by :setting:`USER` in
    :setting:`DATABASES`.
 
+.. setting:: TEST_DATABASE_CHARSET
+
 TEST_DATABASE_CHARSET
 ---------------------
 
@@ -1383,12 +1398,16 @@ TEST_DATABASE_CHARSET
    This setting has been replaced by :setting:`TEST_CHARSET` in
    :setting:`DATABASES`.
 
+.. setting:: TEST_DATABASE_COLLATION
+
 TEST_DATABASE_COLLATION
 -----------------------
 
 .. deprecated:: 1.2
    This setting has been replaced by :setting:`TEST_COLLATION` in
    :setting:`DATABASES`.
+
+.. setting:: TEST_DATABASE_NAME
 
 TEST_DATABASE_NAME
 ------------------

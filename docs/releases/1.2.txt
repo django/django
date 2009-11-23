@@ -74,8 +74,13 @@ Prior to Django 1.1, Django used a number of settings to control access to a
 single database. Django 1.2 introduces support for multiple databases, and as
 a result, the way you define database settings has changed.
 
-Previously, there were a number of ``DATABASE_`` settings at the top level of
-your settings file. For example::
+Any existing Django settings file will continue to work as expected until
+Django 1.4. Old-style database settings will be automatically translated to
+the new-style format.
+
+In the old-style (pre 1.2) format, there were a number of
+``DATABASE_`` settings at the top level of your settings file. For
+example::
 
     DATABASE_NAME = 'test_db'
     DATABASE_BACKEND = 'postgresl_psycopg2'
@@ -83,11 +88,11 @@ your settings file. For example::
     DATABASE_PASSWORD = 's3krit'
 
 These settings are now contained inside a dictionary named
-``DATABASES``. Each item in the dictionary corresponds to a single
-database connection, with the name ``default`` describing the default
-database connection. The setting names have also been shortened to
-reflect the fact that they are stored in a dictionary. The sample
-settings given previously would now be stored using::
+:setting:`DATABASES`. Each item in the dictionary corresponds to a
+single database connection, with the name ``'default'`` describing the
+default database connection. The setting names have also been
+shortened to reflect the fact that they are stored in a dictionary.
+The sample settings given previously would now be stored using::
 
     DATABASES = {
         'default': {
@@ -95,31 +100,34 @@ settings given previously would now be stored using::
             'BACKEND': 'django.db.backends.postgresl_psycopg2',
             'USER': 'myusername',
             'PASSWORD': 's3krit',
+        }
     }
 
 This affects the following settings:
 
-    Old setting                                New Setting
-    =========================================  ===========
-    :setting:`DATABASE_ENGINE`                 ENGINE
-    :setting:`DATABASE_HOST`                   HOST
-    :setting:`DATABASE_NAME`                   NAME
-    :setting:`DATABASE_OPTIONS`                OPTIONS
-    :setting:`DATABASE_PASSWORD`               PASSWORD
-    :setting:`DATABASE_PORT`                   PORT
-    :setting:`DATABASE_USER`                   USER
-    :setting:`TEST_DATABASE_CHARSET`           TEST_CHARSET
-    :setting:`TEST_DATABASE_COLLATION`         TEST_COLLATION
-    :setting:`TEST_DATABASE_NAME`              TEST_NAME
+    =========================================  ==========================
+     Old setting                                New Setting
+    =========================================  ==========================
+    :setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
+    :setting:`DATABASE_HOST`                   :setting:`HOST`
+    :setting:`DATABASE_NAME`                   :setting:`NAME`
+    :setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
+    :setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
+    :setting:`DATABASE_PORT`                   :setting:`PORT`
+    :setting:`DATABASE_USER`                   :setting:`USER`
+    :setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
+    :setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
+    :setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+    =========================================  ==========================
 
 These changes are also required if you have manually created a database
-connection using
+connection using ``DatabaseWrapper()`` from your database backend of choice.
 
 In addition to the change in structure, Django 1.2 removes the special
 handling for the built-in database backends. All database backends
-must now be specified by a fully qualified class name (i.e.,
+must now be specified by a fully qualified module name (i.e.,
 ``django.db.backends.postgresl_psycopg2``, rather than just
-``postgresql_psycopg2``)
+``postgresql_psycopg2``).
 
 ``__dict__`` on Model instances
 -------------------------------
@@ -177,7 +185,7 @@ Support for multiple databases
 ------------------------------
 
 Django 1.2 adds the ability to use :ref:`more than one database
-<topics-db-multi-db>`in your Django project. Queries can be
+<topics-db-multi-db>` in your Django project. Queries can be
 issued at a specific database with the `using()` method on
 querysets; individual objects can be saved to a specific database
 by providing a ``using`` argument when you save the instance.
