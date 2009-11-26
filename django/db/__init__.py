@@ -17,19 +17,9 @@ if not settings.DATABASES:
         "settings.DATABASE_* is deprecated; use settings.DATABASES instead.",
         PendingDeprecationWarning
     )
-    
-    if settings.DATABASE_ENGINE in ("postgresql", "postgresql_psycopg2",
-        "sqlite3", "mysql", "oracle"):
-        engine = "django.db.backends.%s" % settings.DATABASE_ENGINE
-        warnings.warn(
-            "Short names for DATABASE_ENGINE are deprecated; prepend with 'django.db.backends.'",
-            PendingDeprecationWarning
-        )
-    else:
-        engine = settings.DATABASE_ENGINE
 
     settings.DATABASES[DEFAULT_DB_ALIAS] = {
-        'ENGINE': engine,
+        'ENGINE': settings.DATABASE_ENGINE,
         'HOST': settings.DATABASE_HOST,
         'NAME': settings.DATABASE_NAME,
         'OPTIONS': settings.DATABASE_OPTIONS,
@@ -43,6 +33,15 @@ if not settings.DATABASES:
 
 if DEFAULT_DB_ALIAS not in settings.DATABASES:
     raise ImproperlyConfigured("You must default a '%s' database" % DEFAULT_DB_ALIAS)
+
+for database in settings.DATABASES.values():
+    if database['ENGINE'] in ("postgresql", "postgresql_psycopg2", "sqlite3", "mysql", "oracle"):
+        database['ENGINE'] = "django.db.backends.%s" % database['ENGINE']
+        import warnings
+        warnings.warn(
+            "Short names for DATABASE_ENGINE are deprecated; prepend with 'django.db.backends.'",
+            PendingDeprecationWarning
+        )
 
 connections = ConnectionHandler(settings.DATABASES)
 

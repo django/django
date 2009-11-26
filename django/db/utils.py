@@ -6,7 +6,13 @@ from django.utils.importlib import import_module
 
 def load_backend(backend_name):
     try:
-        return import_module('.base', 'django.db.backends.%s' % backend_name)
+        module = import_module('.base', 'django.db.backends.%s' % backend_name)
+        import warnings
+        warnings.warn(
+            "Short names for DATABASE_ENGINE are deprecated; prepend with 'django.db.backends.'",
+            PendingDeprecationWarning
+        )
+        return module
     except ImportError, e:
         # Look for a fully qualified database backend name
         try:
