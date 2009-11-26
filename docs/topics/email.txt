@@ -401,7 +401,7 @@ SMTP backend
 
 This is the default backend. E-mail will be sent through a SMTP server.
 The server address and authentication credentials are set in the
-:setting:`EMAIL_HOST`, :setting:`EMAIL_POST`, :setting:`EMAIL_HOST_USER`,
+:setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
 :setting:`EMAIL_HOST_PASSWORD` and :setting:`EMAIL_USE_TLS` settings in your
 settings file.
 
