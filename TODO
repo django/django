@@ -11,6 +11,15 @@ Required for v1.2
     * validate() on a field
         * name/purpose clash with Honza?
         * any overlap with existing methods?
+ * Check test failures with old-style (non-multi-db) settings file
+    * custom_pk
+    * backends
+ * Check test failures with MySQL MyISAM
+    * serializers_regress
+    * fixtures
+    * lookup
+    * transactions
+    * model_regress
 
 Optional for v1.2
 ~~~~~~~~~~~~~~~~~
