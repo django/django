@@ -1,20 +1,17 @@
-# translation of django.po to Hrvatski jezik
-# This file is distributed under the same license as the Django package.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-08 18:09+0200\n"
-"PO-Revision-Date: 2009-05-08 18:19+0200\n"
-"Last-Translator: Aljosa Mohorovic <aljosa.mohorovic@gmail.com>\n"
+"POT-Creation-Date: 2009-11-23 22:06+0100\n"
+"PO-Revision-Date: 2009-11-10 15:27+0100\n"
+"Last-Translator: Davor Lučić <r.dav.lc@gmail.com>\n"
 "Language-Team: Hrvatski Jezik <Django-i18n <django-i18n@googlegroups.com>>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3);\n"
-"X-Generator: Vim 7.2\n"
+"X-Generator: Lokalize 1.0\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -220,16 +217,16 @@ msgstr "Pojednostavljeni kineski"
 msgid "Traditional Chinese"
 msgstr "Tradicionalni kineski"
 
-#: contrib/admin/actions.py:56
+#: contrib/admin/actions.py:60
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Uspješno izbrisano %(count)d %(items)s."
 
-#: contrib/admin/actions.py:63 contrib/admin/options.py:1025
+#: contrib/admin/actions.py:67 contrib/admin/options.py:1033
 msgid "Are you sure?"
 msgstr "Jeste li sigurni?"
 
-#: contrib/admin/actions.py:81
+#: contrib/admin/actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Izbrišite odabrane %(verbose_name_plural)s"
@@ -268,15 +265,15 @@ msgstr "Ovaj mjesec"
 msgid "This year"
 msgstr "Ova godina"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:434
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:435
 msgid "Yes"
 msgstr "Da"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:434
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:435
 msgid "No"
 msgstr "Ne"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:434
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:435
 msgid "Unknown"
 msgstr "Nepoznat pojam"
 
@@ -312,86 +309,86 @@ msgstr "zapis"
 msgid "log entries"
 msgstr "zapisi"
 
-#: contrib/admin/options.py:133 contrib/admin/options.py:147
+#: contrib/admin/options.py:134 contrib/admin/options.py:148
 msgid "None"
 msgstr "Nijedan"
 
-#: contrib/admin/options.py:519
+#: contrib/admin/options.py:521
 #, python-format
 msgid "Changed %s."
 msgstr "Promijenjeno %s."
 
-#: contrib/admin/options.py:519 contrib/admin/options.py:529
+#: contrib/admin/options.py:521 contrib/admin/options.py:531
 #: contrib/comments/templates/comments/preview.html:16 forms/models.py:384
+#: forms/models.py:596
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/options.py:524
+#: contrib/admin/options.py:526
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:528
+#: contrib/admin/options.py:530
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Promijeni %(list)s za %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:533
+#: contrib/admin/options.py:535
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Izbrisani %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:537
+#: contrib/admin/options.py:539
 msgid "No fields changed."
 msgstr "Nije bilo promjena polja."
 
-#: contrib/admin/options.py:598 contrib/auth/admin.py:67
+#: contrib/admin/options.py:601 contrib/auth/admin.py:67
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno je dodano."
 
-#: contrib/admin/options.py:602 contrib/admin/options.py:635
+#: contrib/admin/options.py:605 contrib/admin/options.py:638
 #: contrib/auth/admin.py:75
 msgid "You may edit it again below."
 msgstr "Možete ponovo urediti unos dolje."
 
-#: contrib/admin/options.py:612 contrib/admin/options.py:645
+#: contrib/admin/options.py:615 contrib/admin/options.py:648
 #, python-format
 msgid "You may add another %s below."
 msgstr "Možete dodati još jedan %s ispod."
 
-#: contrib/admin/options.py:633
+#: contrib/admin/options.py:636
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno promijenjeno."
 
-#: contrib/admin/options.py:641
+#: contrib/admin/options.py:644
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"%(name)s \"%(obj)s\" uspješno dodan. Možete ponovo urediti unos dolje."
+msgstr "%(name)s \"%(obj)s\" uspješno dodan. Možete ponovo urediti unos dolje."
 
-#: contrib/admin/options.py:772
+#: contrib/admin/options.py:777
 #, python-format
 msgid "Add %s"
 msgstr "Novi unos (%s)"
 
-#: contrib/admin/options.py:803 contrib/admin/options.py:1003
+#: contrib/admin/options.py:809 contrib/admin/options.py:1011
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Unos %(name)s sa primarnim ključem %(key)r ne postoji."
 
-#: contrib/admin/options.py:860
+#: contrib/admin/options.py:866
 #, python-format
 msgid "Change %s"
 msgstr "Promijeni %s"
 
-#: contrib/admin/options.py:904
+#: contrib/admin/options.py:910
 msgid "Database error"
 msgstr "Pogreška u bazi"
 
-#: contrib/admin/options.py:940
+#: contrib/admin/options.py:946
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -400,17 +397,17 @@ msgstr[1] "%(count)s %(name)s uspješno promijenjeno."
 msgstr[2] "%(count)s %(name)s uspješno promijenjeno."
 msgstr[3] "%(count)s %(name)s uspješno promijenjeno."
 
-#: contrib/admin/options.py:1018
+#: contrib/admin/options.py:1026
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno izbrisan."
 
-#: contrib/admin/options.py:1054
+#: contrib/admin/options.py:1063
 #, python-format
 msgid "Change history: %s"
 msgstr "Promijeni povijest: %s"
 
-#: contrib/admin/sites.py:20 contrib/admin/views/decorators.py:14
+#: contrib/admin/sites.py:22 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -419,11 +416,11 @@ msgstr ""
 "Molim unesite ispravno korisničko ime i lozinku. Uzmite u obzir da oba polja "
 "razlikuju velika/mala slova."
 
-#: contrib/admin/sites.py:278 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:292 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Molim prijavite se ponovo jer je vaš session istekao."
 
-#: contrib/admin/sites.py:285 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:299 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -431,27 +428,27 @@ msgstr ""
 "Izgleda da vaš browser nije podešen da prihvaća kolačiće (cookies). Molimo "
 "promijenite postavke, ponovno učitajte stranicu i pokušajte ponovo."
 
-#: contrib/admin/sites.py:301 contrib/admin/sites.py:307
+#: contrib/admin/sites.py:315 contrib/admin/sites.py:321
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Korisnička imena ne mogu sadržavati '@' znak."
 
-#: contrib/admin/sites.py:304 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:318 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Vaša e-mail adresa nije vaše korisničko ime. Pokušajte sa '%s'"
 
-#: contrib/admin/sites.py:360
+#: contrib/admin/sites.py:374
 msgid "Site administration"
 msgstr "Administracija stranica"
 
-#: contrib/admin/sites.py:373 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:388 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Prijavi se"
 
-#: contrib/admin/sites.py:417
+#: contrib/admin/sites.py:433
 #, python-format
 msgid "%s administration"
 msgstr "%s administracija"
@@ -466,27 +463,27 @@ msgstr "Jedan ili više %(fieldname)s u %(name)s: %(obj)s"
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Jedan ili više %(fieldname)s u %(name)s:"
 
-#: contrib/admin/widgets.py:71
+#: contrib/admin/widgets.py:72
 msgid "Date:"
 msgstr "Datum:"
 
-#: contrib/admin/widgets.py:71
+#: contrib/admin/widgets.py:72
 msgid "Time:"
 msgstr "Vrijeme:"
 
-#: contrib/admin/widgets.py:95
+#: contrib/admin/widgets.py:96
 msgid "Currently:"
 msgstr "Trenutno:"
 
-#: contrib/admin/widgets.py:95
+#: contrib/admin/widgets.py:96
 msgid "Change:"
 msgstr "Promijeni:"
 
-#: contrib/admin/widgets.py:124
+#: contrib/admin/widgets.py:125
 msgid "Lookup"
 msgstr "Potraži"
 
-#: contrib/admin/widgets.py:236
+#: contrib/admin/widgets.py:237
 msgid "Add Another"
 msgstr "Unesi još"
 
@@ -501,7 +498,7 @@ msgstr "Ispričavamo se, ali tražena stranica nije pronađena."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:31
+#: contrib/admin/templates/admin/base.html:54
 #: contrib/admin/templates/admin/change_form.html:17
 #: contrib/admin/templates/admin/change_list.html:25
 #: contrib/admin/templates/admin/delete_confirmation.html:6
@@ -554,18 +551,18 @@ msgstr "Idi"
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:27
 msgid "Welcome,"
 msgstr "Dobrodošli,"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:32
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Dokumentacija"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:40
 #: contrib/admin/templates/admin/auth/user/change_password.html:14
 #: contrib/admin/templates/admin/auth/user/change_password.html:47
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -573,7 +570,7 @@ msgstr "Dokumentacija"
 msgid "Change password"
 msgstr "Promijeni lozinku"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:47
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -599,7 +596,7 @@ msgstr "Povijest"
 
 #: contrib/admin/templates/admin/change_form.html:28
 #: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:27
+#: contrib/admin/templates/admin/edit_inline/tabular.html:28
 msgid "View on site"
 msgstr "Pogledaj na stranicama"
 
@@ -669,9 +666,9 @@ msgstr ""
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and it's related items will be deleted:"
+"the following objects and their related items will be deleted:"
 msgstr ""
-"Jeste li sigurni da želite izbrisati %(object_name)s? Svi navedeni objekti i "
+"Jeste li sigurni da želite izbrisati odabrane %(object_name)s? Svi navedeni objekti i "
 "povezani unosi biti će izbrisani:"
 
 #: contrib/admin/templates/admin/filter.html:2
@@ -734,14 +731,13 @@ msgid "User"
 msgstr "Korisnik"
 
 #: contrib/admin/templates/admin/object_history.html:24
-#: contrib/comments/templates/comments/moderation_queue.html:33
 msgid "Action"
 msgstr "Akcija"
 
 #: contrib/admin/templates/admin/object_history.html:30
 #: utils/translation/trans_real.py:400
 msgid "DATETIME_FORMAT"
-msgstr "DATETIME_FORMAT"
+msgstr "j. N Y. G:i T"
 
 #: contrib/admin/templates/admin/object_history.html:38
 msgid ""
@@ -754,6 +750,11 @@ msgstr ""
 #: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Prikaži sve"
+
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Spremi"
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Search"
@@ -770,10 +771,6 @@ msgstr[1] "%(counter)s rezultata"
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s ukupno"
-
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Save"
-msgstr "Spremi"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save as new"
@@ -978,7 +975,7 @@ msgstr "E-mail adresa:"
 msgid "Reset my password"
 msgstr "Resetiraj moju lozinku"
 
-#: contrib/admin/templatetags/admin_list.py:299
+#: contrib/admin/templatetags/admin_list.py:304
 msgid "All dates"
 msgstr "Svi datumi"
 
@@ -1000,144 +997,144 @@ msgstr "stranica"
 msgid "template"
 msgstr "template"
 
-#: contrib/admindocs/views.py:58 contrib/admindocs/views.py:60
-#: contrib/admindocs/views.py:62
+#: contrib/admindocs/views.py:61 contrib/admindocs/views.py:63
+#: contrib/admindocs/views.py:65
 msgid "tag:"
 msgstr "tag:"
 
-#: contrib/admindocs/views.py:91 contrib/admindocs/views.py:93
-#: contrib/admindocs/views.py:95
+#: contrib/admindocs/views.py:94 contrib/admindocs/views.py:96
+#: contrib/admindocs/views.py:98
 msgid "filter:"
 msgstr "filter:"
 
-#: contrib/admindocs/views.py:155 contrib/admindocs/views.py:157
-#: contrib/admindocs/views.py:159
+#: contrib/admindocs/views.py:158 contrib/admindocs/views.py:160
+#: contrib/admindocs/views.py:162
 msgid "view:"
 msgstr "prikaz:"
 
-#: contrib/admindocs/views.py:187
+#: contrib/admindocs/views.py:190
 #, python-format
 msgid "App %r not found"
 msgstr "Aplikacija %r nije pronađena"
 
-#: contrib/admindocs/views.py:194
+#: contrib/admindocs/views.py:197
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Model %(model_name)r nije pronađen u aplikaciji %(app_label)r"
 
-#: contrib/admindocs/views.py:206
+#: contrib/admindocs/views.py:209
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "povezani `%(app_label)s.%(data_type)s` objekt"
 
-#: contrib/admindocs/views.py:206 contrib/admindocs/views.py:228
-#: contrib/admindocs/views.py:242 contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:209 contrib/admindocs/views.py:228
+#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:261 contrib/admindocs/views.py:266
 msgid "model:"
 msgstr "model:"
 
-#: contrib/admindocs/views.py:237
+#: contrib/admindocs/views.py:224 contrib/admindocs/views.py:256
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "povezani `%(app_label)s.%(object_name)s` objekti"
 
-#: contrib/admindocs/views.py:242
+#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:261
 #, python-format
 msgid "all %s"
 msgstr "svi %s"
 
-#: contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:266
 #, python-format
 msgid "number of %s"
 msgstr "broj %s"
 
-#: contrib/admindocs/views.py:252
+#: contrib/admindocs/views.py:271
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Polja na %s objektima"
 
-#: contrib/admindocs/views.py:315 contrib/admindocs/views.py:326
-#: contrib/admindocs/views.py:328 contrib/admindocs/views.py:334
-#: contrib/admindocs/views.py:335 contrib/admindocs/views.py:337
+#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:345
+#: contrib/admindocs/views.py:347 contrib/admindocs/views.py:353
+#: contrib/admindocs/views.py:354 contrib/admindocs/views.py:356
 msgid "Integer"
 msgstr "Cijeli broj"
 
-#: contrib/admindocs/views.py:316
+#: contrib/admindocs/views.py:335
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (True ili False)"
 
-#: contrib/admindocs/views.py:317 contrib/admindocs/views.py:336
+#: contrib/admindocs/views.py:336 contrib/admindocs/views.py:355
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Slova (do %(max_length)s)"
 
-#: contrib/admindocs/views.py:318
+#: contrib/admindocs/views.py:337
 msgid "Comma-separated integers"
 msgstr "Cijeli brojevi odvojeni zarezom"
 
-#: contrib/admindocs/views.py:319
+#: contrib/admindocs/views.py:338
 msgid "Date (without time)"
 msgstr "Datum (bez vremena/sati)"
 
-#: contrib/admindocs/views.py:320
+#: contrib/admindocs/views.py:339
 msgid "Date (with time)"
 msgstr "Datum (sa vremenom/satima)"
 
-#: contrib/admindocs/views.py:321
+#: contrib/admindocs/views.py:340
 msgid "Decimal number"
 msgstr "Decimalni broj"
 
-#: contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:341
 msgid "E-mail address"
 msgstr "E-mail adresa"
 
-#: contrib/admindocs/views.py:323 contrib/admindocs/views.py:324
-#: contrib/admindocs/views.py:327
+#: contrib/admindocs/views.py:342 contrib/admindocs/views.py:343
+#: contrib/admindocs/views.py:346
 msgid "File path"
 msgstr "Put do datoteke"
 
-#: contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:344
 msgid "Floating point number"
 msgstr "Broj s pomičnim zarezom (floating point number)"
 
-#: contrib/admindocs/views.py:329 contrib/comments/models.py:60
+#: contrib/admindocs/views.py:348 contrib/comments/models.py:60
 msgid "IP address"
 msgstr "IP adresa"
 
-#: contrib/admindocs/views.py:331
+#: contrib/admindocs/views.py:350
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (True, False ili None)"
 
-#: contrib/admindocs/views.py:332
+#: contrib/admindocs/views.py:351
 msgid "Relation to parent model"
 msgstr "Relacija na roditeljski model (parent model)"
 
-#: contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:352
 msgid "Phone number"
 msgstr "Telefonski broj"
 
-#: contrib/admindocs/views.py:338
+#: contrib/admindocs/views.py:357
 msgid "Text"
 msgstr "Tekst"
 
-#: contrib/admindocs/views.py:339
+#: contrib/admindocs/views.py:358
 msgid "Time"
 msgstr "Vrijeme"
 
-#: contrib/admindocs/views.py:340 contrib/comments/forms.py:95
-#: contrib/comments/templates/comments/moderation_queue.html:37
+#: contrib/admindocs/views.py:359 contrib/comments/forms.py:95
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admindocs/views.py:341
+#: contrib/admindocs/views.py:360
 msgid "U.S. state (two uppercase letters)"
 msgstr "Država S.A.D.-a (dva velika slova)"
 
-#: contrib/admindocs/views.py:342
+#: contrib/admindocs/views.py:361
 msgid "XML text"
 msgstr "XML tekst"
 
-#: contrib/admindocs/views.py:368
+#: contrib/admindocs/views.py:387
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "izgleda da %s nije urlpattern objekt"
@@ -1429,21 +1426,54 @@ msgstr "korisnici"
 msgid "message"
 msgstr "poruka"
 
-#: contrib/auth/views.py:56
+#: contrib/auth/views.py:60
 msgid "Logged out"
 msgstr "Niste logirani"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:429
+#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Unesite ispravnu e-mail adresu."
 
-#: contrib/comments/admin.py:11
+#: contrib/comments/admin.py:12
 msgid "Content"
 msgstr "Sadržaj"
 
-#: contrib/comments/admin.py:14
+#: contrib/comments/admin.py:15
 msgid "Metadata"
 msgstr "Metadata"
+
+#: contrib/comments/admin.py:39
+msgid "flagged"
+msgstr "oznaka"
+
+#: contrib/comments/admin.py:40
+msgid "Flag selected comments"
+msgstr "Označi ovaj komentar"
+
+#: contrib/comments/admin.py:43
+msgid "approved"
+msgstr "odobreno"
+
+#: contrib/comments/admin.py:44
+msgid "Approve selected comments"
+msgstr "Odobri odabrane komentare"
+
+#: contrib/comments/admin.py:47
+msgid "removed"
+msgstr "uklonjeno"
+
+#: contrib/comments/admin.py:48
+msgid "Remove selected comments"
+msgstr "Ukloni odabrane komentare"
+
+#: contrib/comments/admin.py:60
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: contrib/comments/feeds.py:13
 #, python-format
@@ -1456,7 +1486,6 @@ msgid "Latest comments on %(site_name)s"
 msgstr "Najnoviji komentari na %(site_name)s"
 
 #: contrib/comments/forms.py:93
-#: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
 msgstr "Ime"
 
@@ -1465,7 +1494,6 @@ msgid "Email address"
 msgstr "E-mail adresa"
 
 #: contrib/comments/forms.py:96
-#: contrib/comments/templates/comments/moderation_queue.html:35
 msgid "Comment"
 msgstr "Komentar"
 
@@ -1594,7 +1622,6 @@ msgid "Really make this comment public?"
 msgstr "Učini komentar javno dostupnim?"
 
 #: contrib/comments/templates/comments/approve.html:12
-#: contrib/comments/templates/comments/moderation_queue.html:49
 msgid "Approve"
 msgstr "Odobri"
 
@@ -1620,7 +1647,6 @@ msgid "Really remove this comment?"
 msgstr "Stvarno ukloni ovaj komentar?"
 
 #: contrib/comments/templates/comments/delete.html:12
-#: contrib/comments/templates/comments/moderation_queue.html:53
 msgid "Remove"
 msgstr "Ukloni"
 
@@ -1653,39 +1679,6 @@ msgstr "Unos"
 #: contrib/comments/templates/comments/preview.html:33
 msgid "Preview"
 msgstr "Prikaz"
-
-#: contrib/comments/templates/comments/moderation_queue.html:4
-#: contrib/comments/templates/comments/moderation_queue.html:19
-msgid "Comment moderation queue"
-msgstr "Komentari koji zahtjevaju moderiranje"
-
-#: contrib/comments/templates/comments/moderation_queue.html:26
-msgid "No comments to moderate"
-msgstr "Nema komentara koji zahtjevaju moderiranje"
-
-#: contrib/comments/templates/comments/moderation_queue.html:36
-msgid "Email"
-msgstr "Email"
-
-#: contrib/comments/templates/comments/moderation_queue.html:38
-msgid "Authenticated?"
-msgstr "Ovjeren (authenticated)?"
-
-#: contrib/comments/templates/comments/moderation_queue.html:39
-msgid "IP Address"
-msgstr "IP adresa"
-
-#: contrib/comments/templates/comments/moderation_queue.html:40
-msgid "Date posted"
-msgstr "Datum unosa"
-
-#: contrib/comments/templates/comments/moderation_queue.html:63
-msgid "yes"
-msgstr "da"
-
-#: contrib/comments/templates/comments/moderation_queue.html:63
-msgid "no"
-msgstr "ne"
 
 #: contrib/comments/templates/comments/posted.html:4
 msgid "Thanks for commenting"
@@ -1783,7 +1776,7 @@ msgstr "statična stranica"
 msgid "flat pages"
 msgstr "statične stranice"
 
-#: contrib/formtools/wizard.py:130
+#: contrib/formtools/wizard.py:132
 msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."
@@ -1808,7 +1801,8 @@ msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
-"Došlo je do greške pri transformaciji geometrije na SRID geometrijskog polja forme."
+"Došlo je do greške pri transformaciji geometrije na SRID geometrijskog polja "
+"forme."
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
@@ -2597,6 +2591,10 @@ msgstr "Neispravan checksum za broj bankovnog računa."
 #: contrib/localflavor/fi/forms.py:28
 msgid "Enter a valid Finnish social security number."
 msgstr "Unesite ispravan broj finskog socijalnog osiguranja."
+
+#: contrib/localflavor/fr/forms.py:30
+msgid "Phone numbers must be in 0X XX XX XX XX format."
+msgstr "Telefonski brojevi moraju biti formata 0X XX XX XX XX."
 
 #: contrib/localflavor/in_/forms.py:14
 msgid "Enter a zip code in the format XXXXXXX."
@@ -3926,14 +3924,14 @@ msgstr "Vrijednost mora biti None, True ili False."
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Unesite ispravno vrijeme formata HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:792
+#: db/models/fields/related.py:869
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Držite \"Control\", ili \"Command\" na Mac-u, da bi odabrali više od jednog "
 "objekta."
 
-#: db/models/fields/related.py:870
+#: db/models/fields/related.py:930
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3943,86 +3941,86 @@ msgstr[0] ""
 msgstr[1] ""
 "Molim unesite ispravan %(self)s ID-eve. Vrijednosti %(value)r su neispravne."
 
-#: forms/fields.py:54
+#: forms/fields.py:53
 msgid "This field is required."
 msgstr "Unos za ovo polje je obavezan."
 
-#: forms/fields.py:55
+#: forms/fields.py:54
 msgid "Enter a valid value."
 msgstr "Unesite ispravnu vrijednost."
 
-#: forms/fields.py:138
+#: forms/fields.py:137
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Osigurajte da ova vrijednost ima najviše %(max)d znakova (ima %(length)d)."
 
-#: forms/fields.py:139
+#: forms/fields.py:138
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Osigurajte da ova vrijednost ima najmanje %(min)d znakova (ima %(length)d)."
 
-#: forms/fields.py:166
+#: forms/fields.py:165
 msgid "Enter a whole number."
 msgstr "Unesite cijeli broj."
 
-#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
+#: forms/fields.py:166 forms/fields.py:195 forms/fields.py:224
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Osigurajte da je ova vrijednost manja ili jednaka %s."
 
-#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
+#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Osigurajte da je ova vrijednost veća ili jednaka %s."
 
-#: forms/fields.py:195 forms/fields.py:224
+#: forms/fields.py:194 forms/fields.py:223
 msgid "Enter a number."
 msgstr "Unesite broj."
 
-#: forms/fields.py:227
+#: forms/fields.py:226
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Osigurajte da ukupno nema više od %s numeričkih znakova."
 
-#: forms/fields.py:228
+#: forms/fields.py:227
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Osigurajte da ukupno nema više od %s decimalnih mjesta."
 
-#: forms/fields.py:229
+#: forms/fields.py:228
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr ""
 "Osigurajte da ukupno nema više od %s numeričkih znakova prije decimalne "
 "točke."
 
-#: forms/fields.py:288 forms/fields.py:863
+#: forms/fields.py:287 forms/fields.py:862
 msgid "Enter a valid date."
 msgstr "Unesite ispravan datum."
 
-#: forms/fields.py:322 forms/fields.py:864
+#: forms/fields.py:321 forms/fields.py:863
 msgid "Enter a valid time."
 msgstr "Unesite ispravno vrijeme."
 
-#: forms/fields.py:361
+#: forms/fields.py:360
 msgid "Enter a valid date/time."
 msgstr "Unesite ispravan datum/vrijeme."
 
-#: forms/fields.py:447
+#: forms/fields.py:446
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Datoteka nije poslana. Provjerite 'encoding type' forme."
 
-#: forms/fields.py:448
+#: forms/fields.py:447
 msgid "No file was submitted."
 msgstr "Datoteka nije poslana."
 
-#: forms/fields.py:449
+#: forms/fields.py:448
 msgid "The submitted file is empty."
 msgstr "Poslana datoteka je prazna."
 
-#: forms/fields.py:450
+#: forms/fields.py:449
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -4030,7 +4028,7 @@ msgstr ""
 "Osigurajte da ova datoteka ima najviše %(max)d znakova (trenutno ima %"
 "(length)d)."
 
-#: forms/fields.py:483
+#: forms/fields.py:482
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -4038,28 +4036,28 @@ msgstr ""
 "Upload-ajte ispravnu sliku. Datoteka koju ste upload-ali ili nije slika ili "
 "je oštečena."
 
-#: forms/fields.py:544
+#: forms/fields.py:543
 msgid "Enter a valid URL."
 msgstr "Unesite ispravan URL."
 
-#: forms/fields.py:545
+#: forms/fields.py:544
 msgid "This URL appears to be a broken link."
 msgstr "Izgleda da je URL neispravan."
 
-#: forms/fields.py:625 forms/fields.py:703
+#: forms/fields.py:624 forms/fields.py:702
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %(value)s nije ponuđen kao opcija."
 
-#: forms/fields.py:704 forms/fields.py:765 forms/models.py:863
+#: forms/fields.py:703 forms/fields.py:764 forms/models.py:999
 msgid "Enter a list of values."
 msgstr "Unesite listu vrijednosti."
 
-#: forms/fields.py:892
+#: forms/fields.py:891
 msgid "Enter a valid IPv4 address."
 msgstr "Unesite ispravnu IPv4 adresu."
 
-#: forms/fields.py:902
+#: forms/fields.py:901
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -4073,27 +4071,49 @@ msgstr "Redoslijed:"
 #: forms/models.py:363
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
-msgstr "%(field_name)s mora biti jedinstven pojam za %(date_field)s %(lookup)s."
+msgstr ""
+"%(field_name)s mora biti jedinstven pojam za %(date_field)s %(lookup)s."
 
 #: forms/models.py:377 forms/models.py:385
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s sa navedenim %(field_label)s već postoji."
 
-#: forms/models.py:738
+#: forms/models.py:590
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Ispravite duplicirane podatke za %(field)s."
+
+#: forms/models.py:594
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: forms/models.py:600
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: forms/models.py:608
+msgid "Please correct the duplicate values below."
+msgstr "Molimo ispravite duplicirane vrijednosti ispod."
+
+#: forms/models.py:863
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "The inline foreign key did not match the parent instance primary key."
 
-#: forms/models.py:793
+#: forms/models.py:926
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Izaberite ispravnu opciju. Ta opcija nije jedna od dostupnih opcija."
 
-#: forms/models.py:864
+#: forms/models.py:1000
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %s nije ponuđen kao opcija."
 
-#: forms/models.py:866
+#: forms/models.py:1002
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" nije ispravna vrijednost za primarni kluč."
@@ -4124,27 +4144,27 @@ msgstr "%.1f MB"
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: utils/dateformat.py:41
+#: utils/dateformat.py:42
 msgid "p.m."
 msgstr "popodne"
 
-#: utils/dateformat.py:42
+#: utils/dateformat.py:43
 msgid "a.m."
 msgstr "ujutro"
 
-#: utils/dateformat.py:47
+#: utils/dateformat.py:48
 msgid "PM"
 msgstr "popodne"
 
-#: utils/dateformat.py:48
+#: utils/dateformat.py:49
 msgid "AM"
 msgstr "ujutro"
 
-#: utils/dateformat.py:97
+#: utils/dateformat.py:98
 msgid "midnight"
 msgstr "ponoć"
 
-#: utils/dateformat.py:99
+#: utils/dateformat.py:100
 msgid "noon"
 msgstr "podne"
 
@@ -4384,19 +4404,19 @@ msgstr ", %(number)d %(type)s"
 
 #: utils/translation/trans_real.py:399
 msgid "DATE_FORMAT"
-msgstr "DATE_FORMAT"
+msgstr "j. N Y."
 
 #: utils/translation/trans_real.py:401
 msgid "TIME_FORMAT"
-msgstr "TIME_FORMAT"
+msgstr "G:i"
 
 #: utils/translation/trans_real.py:417
 msgid "YEAR_MONTH_FORMAT"
-msgstr "YEAR_MONTH_FORMAT"
+msgstr "F Y."
 
 #: utils/translation/trans_real.py:418
 msgid "MONTH_DAY_FORMAT"
-msgstr "MONTH_DAY_FORMAT"
+msgstr "j. F"
 
 #: views/generic/create_update.py:114
 #, python-format
@@ -4412,406 +4432,3 @@ msgstr "%(verbose_name)s je uspješno promijenjeno."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s je izbrisano."
-
-#~ msgid "Gaeilge"
-#~ msgstr "Gaeilge"
-
-#~ msgid "Brazilian"
-#~ msgstr "Brazilski"
-
-#~ msgid "Ordering"
-#~ msgstr "Redoslijed"
-
-#~ msgid "DATE_WITH_TIME_FULL"
-#~ msgstr "DATE_WITH_TIME_FULL"
-
-#~ msgid "Your new password is: %(new_password)s"
-#~ msgstr "Vaša nova lozinka je: %(new_password)s"
-
-#~ msgid "Feel free to change this password by going to this page:"
-#~ msgstr "Slobodno promijenite lozinku odlaskom na ovu stranicu:"
-
-#~ msgid "Added %s."
-#~ msgstr "Dodano %s"
-
-#~ msgid "Deleted %s."
-#~ msgstr "Izbrisano %s."
-
-#~ msgid "The two 'new password' fields didn't match."
-#~ msgstr "Dva polja 'nova lozinka' nisu jednaka."
-
-#~ msgid "headline"
-#~ msgstr "naslov"
-
-#~ msgid "rating #1"
-#~ msgstr "ocjena #1"
-
-#~ msgid "rating #2"
-#~ msgstr "ocjena #2"
-
-#~ msgid "rating #3"
-#~ msgstr "ocjena #3"
-
-#~ msgid "rating #4"
-#~ msgstr "ocjena #4"
-
-#~ msgid "rating #5"
-#~ msgstr "ocjena #5"
-
-#~ msgid "rating #6"
-#~ msgstr "ocjena #6"
-
-#~ msgid "rating #7"
-#~ msgstr "ocjena #7"
-
-#~ msgid "rating #8"
-#~ msgstr "ocjena #8"
-
-#~ msgid "is valid rating"
-#~ msgstr "ocjena je ispravana"
-
-#~ msgid "Content object"
-#~ msgstr "Objekt sadržaja"
-
-#~ msgid "person's name"
-#~ msgstr "ime osobe"
-
-#~ msgid "ip address"
-#~ msgstr "ip adresa"
-
-#~ msgid "approved by staff"
-#~ msgstr "odobreno od strane osoblja"
-
-#~ msgid "free comments"
-#~ msgstr "slobodni komentari"
-
-#~ msgid "score"
-#~ msgstr "rezultat"
-
-#~ msgid "score date"
-#~ msgstr "datum rezultata"
-
-#~ msgid "karma score"
-#~ msgstr "karma rezultat"
-
-#~ msgid "karma scores"
-#~ msgstr "karma rezultati"
-
-#~ msgid "%(score)d rating by %(user)s"
-#~ msgstr "%(score)d ocjena po %(user)s"
-
-#~ msgid ""
-#~ "This comment was flagged by %(user)s:\n"
-#~ "\n"
-#~ "%(text)s"
-#~ msgstr ""
-#~ "Ovaj komentar je označio %(user)s:\n"
-#~ "\n"
-#~ "%(text)s"
-
-#~ msgid "flag date"
-#~ msgstr "označeno datuma"
-
-#~ msgid "user flag"
-#~ msgstr "korisnička oznaka"
-
-#~ msgid "user flags"
-#~ msgstr "korisničke oznake"
-
-#~ msgid "Flag by %r"
-#~ msgstr "Oznaka po %r"
-
-#~ msgid "deletion date"
-#~ msgstr "datum brisanja"
-
-#~ msgid "moderator deletion"
-#~ msgstr "brisanje moderatora"
-
-#~ msgid "moderator deletions"
-#~ msgstr "brisanja moderatora"
-
-#~ msgid "Moderator deletion by %r"
-#~ msgstr "Brisanje moderatora po %r"
-
-#~ msgid "Forgotten your password?"
-#~ msgstr "Zaboravili ste lozinku?"
-
-#~ msgid "Ratings"
-#~ msgstr "Ocjene"
-
-#~ msgid "Required"
-#~ msgstr "Obavezno"
-
-#~ msgid "Optional"
-#~ msgstr "Izborno, nije obavezno"
-
-#~ msgid "Post a photo"
-#~ msgstr "Pošalji sliku"
-
-#~ msgid "Your name:"
-#~ msgstr "Vaše ime:"
-
-#~ msgid ""
-#~ "This rating is required because you've entered at least one other rating."
-#~ msgstr "Ova ocjena je obavezna jer ste bar jednom već ocjenjivali"
-
-#~ msgid ""
-#~ "This comment was posted by a user who has posted fewer than %(count)s "
-#~ "comment:\n"
-#~ "\n"
-#~ "%(text)s"
-#~ msgid_plural ""
-#~ "This comment was posted by a user who has posted fewer than %(count)s "
-#~ "comments:\n"
-#~ "\n"
-#~ "%(text)s"
-#~ msgstr[0] ""
-#~ "Ovaj komentar je napisao korisnik koji je napisao manje od %(count)s "
-#~ "komentara:\n"
-#~ "\n"
-#~ "%(text)s"
-#~ msgstr[1] ""
-#~ "Ovaj komentar je napisao korisnik koji je napisao manje od %(count)s "
-#~ "komentara:\n"
-#~ "\n"
-#~ "%(text)s"
-
-#~ msgid "Only POSTs are allowed"
-#~ msgstr "Samo POST dopušten."
-
-#~ msgid "One or more of the required fields wasn't submitted"
-#~ msgstr "Jedno ili više obaveznih polja nisu poslana"
-
-#~ msgid "Somebody tampered with the comment form (security violation)"
-#~ msgstr "Netko je mijenjao formu komentara (sigurnosni propust)"
-
-#~ msgid ""
-#~ "The comment form had an invalid 'target' parameter -- the object ID was "
-#~ "invalid"
-#~ msgstr ""
-#~ "Forma komentara ima nepravilni 'target' parametar -- ID objekta je bio "
-#~ "nepravilan"
-
-#~ msgid "The comment form didn't provide either 'preview' or 'post'"
-#~ msgstr "Forma komentara nije imala ni 'preview' ni 'post'"
-
-#~ msgid "Anonymous users cannot vote"
-#~ msgstr "Anonimni korisnici ne mogu glasati"
-
-#~ msgid "No voting for yourself"
-#~ msgstr "Ne možete glasati za sebe"
-
-#~ msgid "Uppercase letters are not allowed here."
-#~ msgstr "Velika slova ovdje nisu dopuštena."
-
-#~ msgid "Lowercase letters are not allowed here."
-#~ msgstr "Mala slova ovdje nisu dopuštena"
-
-#~ msgid "Enter valid e-mail addresses separated by commas."
-#~ msgstr "Unesite ispravne e-mail adrese odvojene zarezom."
-
-#~ msgid "Please enter a valid IP address."
-#~ msgstr "Unesite ispravnu IP adresu."
-
-#~ msgid "Empty values are not allowed here."
-#~ msgstr "Prazne vrijednosti nisu dopuštene ovdje."
-
-#~ msgid "Non-numeric characters aren't allowed here."
-#~ msgstr "Dozvoljeni su samo numerički znakovi."
-
-#~ msgid "This value can't be comprised solely of digits."
-#~ msgstr "Ova vrijednost ne može sadržavati samo brojeve."
-
-#~ msgid "Only alphabetical characters are allowed here."
-#~ msgstr "Dozvoljena su samo slova abecede."
-
-#~ msgid "Year must be 1900 or later."
-#~ msgstr "Godina mora biti 1900 ili poslije."
-
-#~ msgid "The URL %s does not point to a valid image."
-#~ msgstr "URL %s ne vodi na ispravnu sliku."
-
-#~ msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-#~ msgstr ""
-#~ "Telefonski brojevi moraju biti u formatu XXX-XXX-XXXX. \"%s\" nije "
-#~ "ispravan format."
-
-#~ msgid "The URL %s does not point to a valid QuickTime video."
-#~ msgstr "URL %s ne vodi na ispravan QuickTime video."
-
-#~ msgid "A valid URL is required."
-#~ msgstr "Ispravan URL je obavezan."
-
-#~ msgid ""
-#~ "Valid HTML is required. Specific errors are:\n"
-#~ "%s"
-#~ msgstr "Ispravan HTML je obavezan. Pogreške:<br> %s"
-
-#~ msgid "Badly formed XML: %s"
-#~ msgstr "Loše formatiran XML: %s"
-
-#~ msgid "Invalid URL: %s"
-#~ msgstr "Neispravan URL: %s"
-
-#~ msgid "The URL %s is a broken link."
-#~ msgstr "URL %s je neispravan (broken) link."
-
-#~ msgid "Enter a valid U.S. state abbreviation."
-#~ msgstr "Unesite ispravanu kraticu za državu S.A.D.-a."
-
-#~ msgid "This field must match the '%s' field."
-#~ msgstr "Ovo polje mora biti jednako %s polju."
-
-#~ msgid "Please enter something for at least one field."
-#~ msgstr "Molim unesite nešto bar za jedno polje."
-
-#~ msgid "Please enter both fields or leave them both empty."
-#~ msgstr ""
-#~ "Molim unesite vrijednosti za oba polja ili ostavite oba polja prazna."
-
-#~ msgid "This field must be given if %(field)s is not %(value)s"
-#~ msgstr "Ovo polje je obavezno ako je %(field)s različito od %(value)s"
-
-#~ msgid "Duplicate values are not allowed."
-#~ msgstr "Duplicirane vrijednosti nisu dopuštene."
-
-#~ msgid "This value must be between %(lower)s and %(upper)s."
-#~ msgstr "Vrijednost mora biti između %(lower)s i %(upper)s."
-
-#~ msgid "This value must be no more than %s."
-#~ msgstr "Vrijednost ne može biti veća od %s."
-
-#~ msgid "This value must be a power of %s."
-#~ msgstr "Ova vrijednost mora biti %s na kvadrat."
-
-#~ msgid "Please enter a valid decimal number."
-#~ msgstr "Molim unesite ispravan decimalni broj."
-
-#~ msgid "Please enter a valid decimal number with at most %s total digit."
-#~ msgid_plural ""
-#~ "Please enter a valid decimal number with at most %s total digits."
-#~ msgstr[0] ""
-#~ "Molim unesite ispravan decimalni broj sa najviše %s numerička znaka."
-#~ msgstr[1] ""
-#~ "Molim unesite ispravan decimalni broj sa najviše %s numeričkih znakova."
-
-#~ msgid ""
-#~ "Please enter a valid decimal number with a whole part of at most %s digit."
-#~ msgid_plural ""
-#~ "Please enter a valid decimal number with a whole part of at most %s "
-#~ "digits."
-#~ msgstr[0] ""
-#~ "Molim unesite ispravan decimalni broj sa najviše %s numerička znaka u "
-#~ "cijelom dijelu."
-#~ msgstr[1] ""
-#~ "Molim unesite ispravan decimalni broj sa najviše %s numeričkih znakova u "
-#~ "cijelom dijelu."
-
-#~ msgid "Please enter a valid decimal number with at most %s decimal place."
-#~ msgid_plural ""
-#~ "Please enter a valid decimal number with at most %s decimal places."
-#~ msgstr[0] ""
-#~ "Molim unesite ispravan decimalni broj sa najviše %s decimalna mjesta."
-#~ msgstr[1] ""
-#~ "Molim unesite ispravan decimalni broj sa najviše %s decimalnih mjesta."
-
-#~ msgid "Please enter a valid floating point number."
-#~ msgstr ""
-#~ "Molim unesite ispravan broj sa pomičnim zarezom (floating point number)."
-
-#~ msgid "Make sure your uploaded file is at least %s bytes big."
-#~ msgstr "Provjerite je li Vaša upload-ana datoteka bar %s byte-ova velika."
-
-#~ msgid "Make sure your uploaded file is at most %s bytes big."
-#~ msgstr ""
-#~ "Provjerite je li Vaša upload-ana datoteka najviše %s byte-ova velika."
-
-#~ msgid "The format for this field is wrong."
-#~ msgstr "Format za ovo polje je pogrešno."
-
-#~ msgid "This field is invalid."
-#~ msgstr "Ovo polje je neispravno."
-
-#~ msgid "Could not retrieve anything from %s."
-#~ msgstr "Ništa nije izvučeno iz %s."
-
-#~ msgid ""
-#~ "The URL %(url)s returned the invalid Content-Type header '%(contenttype)"
-#~ "s'."
-#~ msgstr ""
-#~ "URL %(url)s je vratio neispravan Content-Type header '%(contenttype)s'."
-
-#~ msgid ""
-#~ "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts "
-#~ "with \"%(start)s\".)"
-#~ msgstr ""
-#~ "Molim zatvorite %(tag)s na liniji %(line)s. (Linija počinje sa \"%(start)s"
-#~ "\".)"
-
-#~ msgid ""
-#~ "Some text starting on line %(line)s is not allowed in that context. (Line "
-#~ "starts with \"%(start)s\".)"
-#~ msgstr ""
-#~ "Neki tekst koji počinje na liniji %(line)s nije dopušten u tom kontekstu. "
-#~ "(Linija počinje sa \"%(start)s\".)"
-
-#~ msgid ""
-#~ "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with "
-#~ "\"%(start)s\".)"
-#~ msgstr ""
-#~ "\"%(attr)s\" na liniji %(line)s je neispravan atribut. (Linija počinje sa "
-#~ "\"%(start)s\".)"
-
-#~ msgid ""
-#~ "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-#~ "(start)s\".)"
-#~ msgstr ""
-#~ "\"<%(tag)s>\" na liniji %(line)s je neispravan tag. (Linija počinje sa \"%"
-#~ "(start)s\".)"
-
-#~ msgid ""
-#~ "A tag on line %(line)s is missing one or more required attributes. (Line "
-#~ "starts with \"%(start)s\".)"
-#~ msgstr ""
-#~ "Tagu na liniji %(line)s nedostaje jedan ili više obaveznih atributa. "
-#~ "(Linija počinje sa \"%(start)s\".)"
-
-#~ msgid ""
-#~ "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-#~ "starts with \"%(start)s\".)"
-#~ msgstr ""
-#~ "\"%(attr)s\" atribut na liniji %(line)s ima neispravnu vrijednost. "
-#~ "(Linija počinje sa \"%(start)s\".)"
-
-#~ msgid ""
-#~ "%(object)s with this %(type)s already exists for the given %(field)s."
-#~ msgstr "%(object)s sa %(type)s već postoji za navedeno %(field)s."
-
-#~ msgid "Enter a valid filename."
-#~ msgstr "Unesite ime datoteke koja postoji."
-
-#~ msgid "Please enter a valid %s."
-#~ msgstr "Molim unesite ispravan %s."
-
-#~ msgid "Separate multiple IDs with commas."
-#~ msgstr "Odvojite više ID-a zarezom."
-
-#~ msgid "Ensure your text is less than %s character."
-#~ msgid_plural "Ensure your text is less than %s characters."
-#~ msgstr[0] "Osigurajte da tekst sadrži manje od %s znaka."
-#~ msgstr[1] "Osigurajte da tekst sadrži manje od %s znakova."
-
-#~ msgid "Line breaks are not allowed here."
-#~ msgstr "Novi redovi ovdje nisu dozvoljeni."
-
-#~ msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-#~ msgstr "Odaberite iz ponuđenog; '%(data)s' nije u %(choices)s."
-
-#~ msgid "Enter a whole number between -32,768 and 32,767."
-#~ msgstr "Unesite cijeli broj između -32,768 i 32,767."
-
-#~ msgid "Enter a positive number."
-#~ msgstr "Unesite pozitivan broj."
-
-#~ msgid "Enter a whole number between 0 and 32,767."
-#~ msgstr "Unesite cijeli broj između 0 i 32,767."
