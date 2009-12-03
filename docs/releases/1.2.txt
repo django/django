@@ -26,13 +26,13 @@ There have been large changes to the way that CSRF protection works, detailed in
 changes that developers must be aware of:
 
  * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
-   will be removed completely in Django 1.4, in favour of a template tag that
+   will be removed completely in Django 1.4, in favor of a template tag that
    should be inserted into forms.
 
  * All contrib apps use a ``csrf_protect`` decorator to protect the view.  This
    requires the use of the csrf_token template tag in the template, so if you
-   have used custom templates for contrib views, you MUST READ THE UPGRADE
-   INSTRUCTIONS to fix those templates.
+   have used custom templates for contrib views, you MUST READ THE :ref:`UPGRADE
+   INSTRUCTIONS <ref-csrf-upgrading-notes>` to fix those templates.
 
  * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
    default. This turns on CSRF protection by default, so that views that accept
@@ -72,7 +72,23 @@ changes:
 Features deprecated in 1.2
 ==========================
 
-None.
+CSRF response rewriting middleware
+----------------------------------
+
+``CsrfResponseMiddleware``, the middleware that automatically inserted CSRF
+tokens into POST forms in outgoing pages, has been deprecated in favor of a
+template tag method (see above), and will be removed completely in Django
+1.4. ``CsrfMiddleware``, which includes the functionality of
+``CsrfResponseMiddleware`` and ``CsrfViewMiddleware`` has likewise been
+deprecated.
+
+Also, the CSRF module has moved from contrib to core, and the old imports are
+deprecated, as described in the :ref:`upgrading notes <ref-csrf-upgrading-notes>`.
+
+``SMTPConnection``
+------------------
+
+This class has been deprecated in favor of the new generic e-mail backends.
 
 What's new in Django 1.2
 ========================
