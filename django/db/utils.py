@@ -2,6 +2,7 @@ import inspect
 import os
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
 def load_backend(backend_name):
@@ -29,7 +30,9 @@ def load_backend(backend_name):
                 available_backends = []
             available_backends.sort()
             if backend_name not in available_backends:
-                error_msg = "%r isn't an available database backend. Available options are: %s\nError was: %s" % \
+                error_msg = ("%r isn't an available database backend. \n" +
+                    "Try using django.db.backends.XXX, where XXX is one of:\n    %s\n" +
+                    "Error was: %s") % \
                     (backend_name, ", ".join(map(repr, available_backends)), e_user)
                 raise ImproperlyConfigured(error_msg)
             else:
