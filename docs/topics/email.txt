@@ -10,7 +10,7 @@ Sending e-mail
 Although Python makes sending e-mail relatively easy via the `smtplib
 library`_, Django provides a couple of light wrappers over it. These wrappers
 are provided to make sending e-mail extra quick, to make it easy to test
-email sending during development, and to provide support for platforms that
+e-mail sending during development, and to provide support for platforms that
 can't use SMTP.
 
 The code lives in the ``django.core.mail`` module.
@@ -64,7 +64,7 @@ are required.
     * ``auth_password``: The optional password to use to authenticate to the
       SMTP server. If this isn't provided, Django will use the value of the
       ``EMAIL_HOST_PASSWORD`` setting.
-    * ``connection``: The optional email backend to use to send the mail.
+    * ``connection``: The optional e-mail backend to use to send the mail.
       If unspecified, an instance of the default backend will be used.
       See the documentation on :ref:`E-mail backends <topic-email-backends>`
       for more details.
@@ -215,8 +215,8 @@ message itself. The :ref:`e-mail backend <topic-email-backends>` is then
 responsible for sending the e-mail.
 
 For convenience, :class:`~django.core.mail.EmailMessage` provides a simple
-``send()`` method for sending a single email. If you need to send multiple
-messages, the email backend API :ref:`provides an alternative
+``send()`` method for sending a single e-mail. If you need to send multiple
+messages, the e-mail backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
 
 EmailMessage Objects
@@ -264,7 +264,7 @@ For example::
 The class has the following methods:
 
     * ``send(fail_silently=False)`` sends the message. If a connection was
-      specified when the email was constructed, that connection will be used.
+      specified when the e-mail was constructed, that connection will be used.
       Otherwise, an instance of the default backend will be instantiated and
       used. If the keyword argument ``fail_silently`` is ``True``, exceptions
       raised while sending the message will be quashed.
@@ -358,9 +358,9 @@ The actual sending of an e-mail is handled by the e-mail backend.
 
 The e-mail backend class has the following methods:
 
-    * ``open()`` instantiates an long-lived email-sending connection.
+    * ``open()`` instantiates an long-lived e-mail-sending connection.
 
-    * ``close()`` closes the current email-sending connection.
+    * ``close()`` closes the current e-mail-sending connection.
 
     * ``send_messages(email_messages)`` sends a list of
       :class:`~django.core.mail.EmailMessage` objects. If the connection is
@@ -379,11 +379,11 @@ instance of the e-mail backend that you can use.
 .. function:: get_connection(backend=None, fail_silently=False, *args, **kwargs)
 
 By default, a call to ``get_connection()`` will return an instance of the
-email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
+e-mail backend specified in :setting:`EMAIL_BACKEND`. If you specify the
 ``backend`` argument, an instance of that backend will be instantiated.
 
 The ``fail_silently`` argument controls how the backend should handle errors.
-If ``fail_silently`` is True, exceptions during the email sending process
+If ``fail_silently`` is True, exceptions during the e-mail sending process
 will be silently ignored.
 
 All other arguments are passed directly to the constructor of the
@@ -391,8 +391,8 @@ e-mail backend.
 
 Django ships with several e-mail sending backends. With the exception of the
 SMTP backend (which is the default), these backends are only useful during
-testing and development. If you have special email sending requirements, you
-can :ref:`write your own email backend <topic-custom-email-backend>`.
+testing and development. If you have special e-mail sending requirements, you
+can :ref:`write your own e-mail backend <topic-custom-email-backend>`.
 
 .. _topic-email-smtp-backend:
 
@@ -414,8 +414,8 @@ want to specify it explicitly, put the following in your settings::
 
     Prior to version 1.2, Django provided a
     :class:`~django.core.mail.SMTPConnection` class. This class provided a way
-    to directly control the use of SMTP to send email. This class has been
-    deprecated in favor of the generic email backend API.
+    to directly control the use of SMTP to send e-mail. This class has been
+    deprecated in favor of the generic e-mail backend API.
 
     For backwards compatibility :class:`~django.core.mail.SMTPConnection` is
     still available in ``django.core.mail`` as an alias for the SMTP backend.
@@ -508,15 +508,15 @@ implementation.
 
 .. _topics-sending-multiple-emails:
 
-Sending multiple emails
------------------------
+Sending multiple e-mails
+------------------------
 
 Establishing and closing an SMTP connection (or any other network connection,
-for that matter) is an expensive process. If you have a lot of emails to send,
+for that matter) is an expensive process. If you have a lot of e-mails to send,
 it makes sense to reuse an SMTP connection, rather than creating and
-destroying a connection every time you want to send an email.
+destroying a connection every time you want to send an e-mail.
 
-There are two ways you tell an email backend to reuse a connection.
+There are two ways you tell an e-mail backend to reuse a connection.
 
 Firstly, you can use the ``send_messages()`` method. ``send_messages()`` takes
 a list of :class:`~django.core.mail.EmailMessage` instances (or subclasses),
@@ -524,11 +524,11 @@ and sends them all using a single connection.
 
 For example, if you have a function called ``get_notification_email()`` that
 returns a list of :class:`~django.core.mail.EmailMessage` objects representing
-some periodic e-mail you wish to send out, you could send these emails using
+some periodic e-mail you wish to send out, you could send these e-mails using
 a single call to send_messages::
 
     from django.core import mail
-    connection = mail.get_connection()   # Use default email connection
+    connection = mail.get_connection()   # Use default e-mail connection
     messages = get_notification_email()
     connection.send_messages(messages)
 
@@ -536,7 +536,7 @@ In this example, the call to ``send_messages()`` opens a connection on the
 backend, sends the list of messages, and then closes the connection again.
 
 The second approach is to use the ``open()`` and ``close()`` methods on the
-email backend to manually control the connection. ``send_messages()`` will not
+e-mail backend to manually control the connection. ``send_messages()`` will not
 manually open or close the connection if it is already open, so if you
 manually open the connection, you can control when it is closed. For example::
 
@@ -546,10 +546,10 @@ manually open the connection, you can control when it is closed. For example::
     # Manually open the connection
     connection.open()
 
-    # Construct an email message that uses the connection
+    # Construct an e-mail message that uses the connection
     email1 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
                               ['to1@example.com'], connection=connection)
-    email1.send() # Send the email
+    email1.send() # Send the e-mail
 
     # Construct two more messages
     email2 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
@@ -557,7 +557,7 @@ manually open the connection, you can control when it is closed. For example::
     email3 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
                               ['to3@example.com'])
 
-    # Send the two emails in a single call -
+    # Send the two e-mails in a single call -
     connection.send_messages([email2, email3])
     # The connection was already open so send_messages() doesn't close it.
     # We need to manually close the connection.
@@ -574,10 +574,10 @@ people under the right conditions, and that those e-mails will contain the
 correct content.
 
 The easiest way to test your project's use of e-mail is to use the ``console``
-email backend. This backend redirects all email to stdout, allowing you to
+e-mail backend. This backend redirects all e-mail to stdout, allowing you to
 inspect the content of mail.
 
-The ``file`` email backend can also be useful during development -- this backend
+The ``file`` e-mail backend can also be useful during development -- this backend
 dumps the contents of every SMTP connection to a file that can be inspected
 at your leisure.
 
@@ -604,7 +604,7 @@ SMTPConnection
 
 .. deprecated:: 1.2
 
-The ``SMTPConnection`` class has been deprecated in favor of the generic email
+The ``SMTPConnection`` class has been deprecated in favor of the generic e-mail
 backend API.
 
 For backwards compatibility ``SMTPConnection`` is still available in

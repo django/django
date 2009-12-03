@@ -105,21 +105,21 @@ malicious site in their browser. A related type of attack, 'login
 CSRF', where an attacking site tricks a user's browser into logging
 into a site with someone else's credentials, is also covered.
 
-Email Backends
---------------
+E-mail Backends
+---------------
 
-You can now :ref:`configure the way that Django sends email
-<topic-email-backends>`. Instead of using SMTP to send all email, you
-can now choose a configurable email backend to send messages. If your
+You can now :ref:`configure the way that Django sends e-mail
+<topic-email-backends>`. Instead of using SMTP to send all e-mail, you
+can now choose a configurable e-mail backend to send messages. If your
 hosting provider uses a sandbox or some other non-SMTP technique for
-sending mail, you can now construct an email backend that will allow
+sending mail, you can now construct an e-mail backend that will allow
 Django's standard :ref:`mail sending methods<topics-email>` to use
 those facilities.
 
 This also makes it easier to debug mail sending - Django ships with
-backend implementations that allow you to send email to a
+backend implementations that allow you to send e-mail to a
 :ref:`file<topic-email-file-backend>`, to the
 :ref:`console<topic-email-console-backend>`, or to
 :ref:`memory<topic-email-memory-backend>` - you can even configure all
-email to be :ref:`thrown away<topic-email-console-backend>`.
+e-mail to be :ref:`thrown away<topic-email-dummy-backend>`.
 
