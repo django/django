@@ -62,8 +62,8 @@ class WhereNode(tree.Node):
         else:
             annotation = bool(value)
 
-        if hasattr(obj, "process"):
-            obj.validate(lookup_type, value)
+        if hasattr(obj, "prepare"):
+            value = obj.prepare(lookup_type, value)
             super(WhereNode, self).add((obj, lookup_type, annotation, value),
                 connector)
             return
@@ -143,7 +143,7 @@ class WhereNode(tree.Node):
                 raise EmptyResultSet
         else:
             params = Field().get_db_prep_lookup(lookup_type, params_or_value,
-                connection=connection)
+                connection=connection, prepared=True)
         if isinstance(lvalue, tuple):
             # A direct database column lookup.
             field_sql = self.sql_for_columns(lvalue, qn, connection)
@@ -262,6 +262,11 @@ class Constraint(object):
     def __init__(self, alias, col, field):
         self.alias, self.col, self.field = alias, col, field
 
+    def prepare(self, lookup_type, value):
+        if self.field:
+            return self.field.get_prep_lookup(lookup_type, value)
+        return value
+
     def process(self, lookup_type, value, connection):
         """
         Returns a tuple of data suitable for inclusion in a WhereNode
@@ -272,14 +277,14 @@ class Constraint(object):
         try:
             if self.field:
                 params = self.field.get_db_prep_lookup(lookup_type, value,
-                    connection=connection)
+                    connection=connection, prepared=True)
                 db_type = self.field.db_type(connection=connection)
             else:
                 # This branch is used at times when we add a comparison to NULL
                 # (we don't really want to waste time looking up the associated
                 # field object at the calling location).
                 params = Field().get_db_prep_lookup(lookup_type, value,
-                    connection=connection)
+                    connection=connection, prepared=True)
                 db_type = None
         except ObjectDoesNotExist:
             raise EmptyShortCircuit
@@ -289,7 +294,3 @@ class Constraint(object):
     def relabel_aliases(self, change_map):
         if self.alias in change_map:
             self.alias = change_map[self.alias]
-
-    def validate(self, lookup_type, value):
-        if hasattr(self.field, 'validate'):
-            self.field.validate(lookup_type, value)

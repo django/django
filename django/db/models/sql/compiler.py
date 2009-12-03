@@ -837,7 +837,7 @@ class SQLUpdateCompiler(SQLCompiler):
             self.query.related_ids = idents
         else:
             # The fast path. Filters and updates in one query.
-            self.query.add_filter(('pk__in', query.get_compiler(self.using)))
+            self.query.add_filter(('pk__in', query))
         for alias in self.query.tables[1:]:
             self.query.alias_refcount[alias] = 0
 

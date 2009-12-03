@@ -11,6 +11,9 @@ class SQLEvaluator(object):
         self.contains_aggregate = False
         self.expression.prepare(self, query, allow_joins)
 
+    def prepare(self):
+        return self
+
     def as_sql(self, qn, connection):
         return self.expression.evaluate(self, qn, connection)
 

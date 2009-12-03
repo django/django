@@ -141,6 +141,74 @@ appear in ``__dict__`` for a model instance. If your code relies on
 iterating over __dict__ to obtain a list of fields, you must now
 filter out ``_state`` attribute of out ``__dict__``.
 
+``get_db_prep_*()`` methods on Field
+------------------------------------
+
+Prior to v1.2, a custom field had the option of defining several
+functions to support conversion of Python values into
+database-compatible values. A custom field might look something like::
+
+    class CustomModelField(models.Field):
+        # ...
+
+        def get_db_prep_save(self, value):
+            # ...
+
+        def get_db_prep_value(self, value):
+            # ...
+
+        def get_db_prep_lookup(self, lookup_type, value):
+            # ...
+
+In 1.2, these three methods have undergone a change in prototype, and
+two extra methods have been introduced::
+
+    class CustomModelField(models.Field):
+        # ...
+
+        def get_prep_value(self, value):
+            # ...
+
+        def get_prep_lookup(self, lookup_type, value):
+            # ...
+
+        def get_db_prep_save(self, value, connection):
+            # ...
+
+        def get_db_prep_value(self, value, connection, prepared=False):
+            # ...
+
+        def get_prep_lookup(self, lookup_type, value, connection, prepared=False):
+            # ...
+
+These changes are required to support multiple databases -
+``get_db_prep_*`` can no longer make any assumptions regarding the
+database for which it is preparing. The ``connection`` argument now
+provides the preparation methods with the specific connection for
+which the value is being prepared.
+
+The two new methods exist to differentiate general data preparation
+requirements, and requirements that are database-specific. The
+``prepared`` argument is used to indicate to the database preparation
+methods whether generic value preparation has been performed. If
+an unprepared (i.e., ``prepared=False``) value is provided to the
+``get_db_prep_*()`` calls, they should invoke the corresponding
+``get_prep_*()`` calls to perform generic data preparation.
+
+Conversion functions has been provided which will transparently
+convert functions adhering to the old prototype into functions
+compatible with the new prototype. However, this conversion function
+will be removed in Django 1.4, so you should upgrade your Field
+definitions to use the new prototype.
+
+If your ``get_db_prep_*()`` methods made no use of the database
+connection, you should be able to upgrade by renaming
+``get_db_prep_value()`` to ``get_prep_value()`` and
+``get_db_prep_lookup()`` to ``get_prep_lookup()`. If you require
+database specific conversions, then you will need to provide an
+implementation ``get_db_prep_*`` that uses the ``connection``
+argument to resolve database-specific values.
+
 .. _deprecated-features-1.2:
 
 Features deprecated in 1.2

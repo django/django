@@ -7,10 +7,6 @@ Required for v1.2
  * Finalize the sql.Query internals
    * Clean up the use of db.backend.query_class()
    * Verify it still works with GeoDjango
- * Cleanup of new API entry points
-    * validate() on a field
-        * name/purpose clash with Honza?
-        * any overlap with existing methods?
 
 Optional for v1.2
 ~~~~~~~~~~~~~~~~~

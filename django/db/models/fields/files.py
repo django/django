@@ -232,13 +232,12 @@ class FileField(Field):
     def get_internal_type(self):
         return "FileField"
 
-    def get_db_prep_lookup(self, lookup_type, value, connection):
+    def get_prep_lookup(self, lookup_type, value):
         if hasattr(value, 'name'):
             value = value.name
-        return super(FileField, self).get_db_prep_lookup(lookup_type, value,
-            connection=connection)
+        return super(FileField, self).get_prep_lookup(lookup_type, value)
 
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
         "Returns field's value prepared for saving into a database."
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:

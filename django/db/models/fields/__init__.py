@@ -180,21 +180,56 @@ class Field(object):
         "Returns field's value just before saving."
         return getattr(model_instance, self.attname)
 
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
+        "Perform preliminary non-db specific value checks and conversions."
+        return value
+
+    def get_db_prep_value(self, value, connection, prepared=False):
         """Returns field's value prepared for interacting with the database
         backend.
 
         Used by the default implementations of ``get_db_prep_save``and
         `get_db_prep_lookup```
         """
+        if not prepared:
+            value = self.get_prep_value(value)
         return value
 
     def get_db_prep_save(self, value, connection):
         "Returns field's value prepared for saving into a database."
-        return self.get_db_prep_value(value, connection=connection)
+        return self.get_db_prep_value(value, connection=connection, prepared=False)
 
-    def get_db_prep_lookup(self, lookup_type, value, connection):
+    def get_prep_lookup(self, lookup_type, value):
+        "Perform preliminary non-db specific lookup checks and conversions"
+        if hasattr(value, 'prepare'):
+            return value.prepare()
+        if hasattr(value, '_prepare'):
+            return value._prepare()
+
+        if lookup_type in (
+                'regex', 'iregex', 'month', 'day', 'week_day', 'search',
+                'contains', 'icontains', 'iexact', 'startswith', 'istartswith',
+                'endswith', 'iendswith', 'isnull'
+            ):
+            return value
+        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
+            return self.get_prep_value(value)
+        elif lookup_type in ('range', 'in'):
+            return [self.get_prep_value(v) for v in value]
+        elif lookup_type == 'year':
+            try:
+                return int(value)
+            except ValueError:
+                raise ValueError("The __year lookup type requires an integer argument")
+
+        raise TypeError("Field has invalid lookup: %s" % lookup_type)
+
+    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
         "Returns field's value prepared for database lookup."
+        if not prepared:
+            value = self.get_prep_lookup(lookup_type, value)
+        if hasattr(value, 'get_compiler'):
+            value = value.get_compiler(connection=connection)
         if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
             # If the value has a relabel_aliases method, it will need to
             # be invoked before the final SQL is evaluated
@@ -206,13 +241,12 @@ class Field(object):
                 sql, params = value._as_sql(connection=connection)
             return QueryWrapper(('(%s)' % sql), params)
 
-
         if lookup_type in ('regex', 'iregex', 'month', 'day', 'week_day', 'search'):
             return [value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
-            return [self.get_db_prep_value(value, connection=connection)]
+            return [self.get_db_prep_value(value, connection=connection, prepared=prepared)]
         elif lookup_type in ('range', 'in'):
-            return [self.get_db_prep_value(v, connection=connection) for v in value]
+            return [self.get_db_prep_value(v, connection=connection, prepared=prepared) for v in value]
         elif lookup_type in ('contains', 'icontains'):
             return ["%%%s%%" % connection.ops.prep_for_like_query(value)]
         elif lookup_type == 'iexact':
@@ -224,35 +258,10 @@ class Field(object):
         elif lookup_type == 'isnull':
             return []
         elif lookup_type == 'year':
-            try:
-                value = int(value)
-            except ValueError:
-                raise ValueError("The __year lookup type requires an integer argument")
-
             if self.get_internal_type() == 'DateField':
                 return connection.ops.year_lookup_bounds_for_date_field(value)
             else:
                 return connection.ops.year_lookup_bounds(value)
-
-        raise TypeError("Field has invalid lookup: %s" % lookup_type)
-
-    def validate(self, lookup_type, value):
-        """
-        Validate that the data is valid, as much so as possible without knowing
-        what connection we are using.  Returns True if the value was
-        successfully validated and false if the value wasn't validated (this
-        doesn't consider whether the value was actually valid, an exception is
-        raised in those circumstances).
-        """
-        if hasattr(value, 'validate') or hasattr(value, '_validate'):
-            if hasattr(value, 'validate'):
-                value.validate()
-            else:
-                value._validate()
-            return True
-        if lookup_type == 'isnull':
-            return True
-        return False
 
     def has_default(self):
         "Returns a boolean of whether this field has a default value."
@@ -376,21 +385,10 @@ class AutoField(Field):
             raise exceptions.ValidationError(
                 _("This value must be an integer."))
 
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
         if value is None:
             return None
         return int(value)
-
-    def validate(self, lookup_type, value):
-        if super(AutoField, self).validate(lookup_type, value):
-            return
-        if value is None or hasattr(value, 'as_sql'):
-            return
-        if lookup_type in ('range', 'in'):
-            for val in value:
-                int(val)
-        else:
-            int(value)
 
     def contribute_to_class(self, cls, name):
         assert not cls._meta.has_auto_field, "A model can't have more than one AutoField."
@@ -419,24 +417,16 @@ class BooleanField(Field):
         raise exceptions.ValidationError(
             _("This value must be either True or False."))
 
-    def get_db_prep_lookup(self, lookup_type, value, connection):
+    def get_prep_lookup(self, lookup_type, value):
         # Special-case handling for filters coming from a web request (e.g. the
         # admin interface). Only works for scalar values (not lists). If you're
         # passing in a list, you might as well make things the right type when
         # constructing the list.
         if value in ('1', '0'):
             value = bool(int(value))
-        return super(BooleanField, self).get_db_prep_lookup(lookup_type, value,
-            connection=connection)
+        return super(BooleanField, self).get_prep_lookup(lookup_type, value)
 
-    def validate(self, lookup_type, value):
-        if super(BooleanField, self).validate(lookup_type, value):
-            return
-        if value in ('1', '0'):
-            value = int(value)
-        bool(value)
-
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
         if value is None:
             return None
         return bool(value)
@@ -539,31 +529,21 @@ class DateField(Field):
             setattr(cls, 'get_previous_by_%s' % self.name,
                 curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False))
 
-    def get_db_prep_lookup(self, lookup_type, value, connection):
+    def get_prep_lookup(self, lookup_type, value):
         # For "__month", "__day", and "__week_day" lookups, convert the value
         # to an int so the database backend always sees a consistent type.
         if lookup_type in ('month', 'day', 'week_day'):
-            return [int(value)]
-        return super(DateField, self).get_db_prep_lookup(lookup_type, value,
-            connection=connection)
+            return int(value)
+        return super(DateField, self).get_prep_lookup(lookup_type, value)
 
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
+        return self.to_python(value)
+
+    def get_db_prep_value(self, value, connection, prepared=False):
         # Casts dates into the format expected by the backend
-        return connection.ops.value_to_db_date(self.to_python(value))
-
-    def validate(self, lookup_type, value):
-        if super(DateField, self).validate(lookup_type, value):
-            return
-        if value is None:
-            return
-        if lookup_type in ('month', 'day', 'year', 'week_day'):
-            int(value)
-            return
-        if lookup_type in ('in', 'range'):
-            for val in value:
-                self.to_python(val)
-            return
-        self.to_python(value)
+        if not prepared:
+            value = self.get_prep_value(value)
+        return connection.ops.value_to_db_date(value)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
@@ -619,9 +599,14 @@ class DateTimeField(DateField):
                     raise exceptions.ValidationError(
                         _('Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format.'))
 
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
+        return self.to_python(value)
+
+    def get_db_prep_value(self, value, connection, prepared=False):
         # Casts dates into the format expected by the backend
-        return connection.ops.value_to_db_datetime(self.to_python(value))
+        if not prepared:
+            value = self.get_prep_value(value)
+        return connection.ops.value_to_db_datetime(value)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
@@ -679,7 +664,7 @@ class DecimalField(Field):
         return connection.ops.value_to_db_decimal(self.to_python(value),
                 self.max_digits, self.decimal_places)
 
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
         return self.to_python(value)
 
     def formfield(self, **kwargs):
@@ -723,7 +708,7 @@ class FilePathField(Field):
 class FloatField(Field):
     empty_strings_allowed = False
 
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
         if value is None:
             return None
         return float(value)
@@ -747,7 +732,7 @@ class FloatField(Field):
 
 class IntegerField(Field):
     empty_strings_allowed = False
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
         if value is None:
             return None
         return int(value)
@@ -800,22 +785,16 @@ class NullBooleanField(Field):
         raise exceptions.ValidationError(
             _("This value must be either None, True or False."))
 
-    def get_db_prep_lookup(self, lookup_type, value, connection):
+    def get_prep_lookup(self, lookup_type, value):
         # Special-case handling for filters coming from a web request (e.g. the
         # admin interface). Only works for scalar values (not lists). If you're
         # passing in a list, you might as well make things the right type when
         # constructing the list.
         if value in ('1', '0'):
             value = bool(int(value))
-        return super(NullBooleanField, self).get_db_prep_lookup(lookup_type,
-            value, connection=connection)
+        return super(NullBooleanField, self).get_prep_lookup(lookup_type, value)
 
-    def validate(self, lookup_type, value):
-        if value in ('1', '0'):
-            value = int(value)
-        bool(value)
-
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
         if value is None:
             return None
         return bool(value)
@@ -931,9 +910,14 @@ class TimeField(Field):
         else:
             return super(TimeField, self).pre_save(model_instance, add)
 
-    def get_db_prep_value(self, value, connection):
+    def get_prep_value(self, value):
+        return self.to_python(value)
+
+    def get_db_prep_value(self, value, connection, prepared=False):
         # Casts times into the format expected by the backend
-        return connection.ops.value_to_db_time(self.to_python(value))
+        if not prepared:
+            value = self.get_prep_value(value)
+        return connection.ops.value_to_db_time(value)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)

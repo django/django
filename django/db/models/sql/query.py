@@ -141,6 +141,9 @@ class Query(object):
 
         self.__dict__.update(obj_dict)
 
+    def prepare(self):
+        return self
+
     def get_compiler(self, using=None, connection=None):
         if using is None and connection is None:
             raise ValueError("Need either using or connection")

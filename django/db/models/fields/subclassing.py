@@ -11,22 +11,50 @@ from warnings import warn
 
 def call_with_connection(func):
     arg_names, varargs, varkwargs, defaults = getargspec(func)
-    takes_connection = 'connection' in arg_names or varkwargs
-    if not takes_connection:
-        warn("A Field class whose %s method doesn't take connection has been "
-            "defined. Please add a connection argument" % func.__name__,
+    updated = ('connection' in arg_names or varkwargs)
+    if not updated:
+        warn("A Field class whose %s method hasn't been updated to take a "
+            "`connection` argument." % func.__name__,
             PendingDeprecationWarning, stacklevel=2)
+
     def inner(*args, **kwargs):
         if 'connection' not in kwargs:
             from django.db import connection
             kwargs['connection'] = connection
-            warn("%s has been called without providing a connection argument. "
-                "Please provide one" % func.__name__, PendingDeprecationWarning,
+            warn("%s has been called without providing a connection argument. " %
+                func.__name__, PendingDeprecationWarning,
                 stacklevel=1)
-        if takes_connection:
+        if updated:
             return func(*args, **kwargs)
         if 'connection' in kwargs:
             del kwargs['connection']
+        return func(*args, **kwargs)
+    return inner
+
+def call_with_connection_and_prepared(func):
+    arg_names, varargs, varkwargs, defaults = getargspec(func)
+    updated = (
+        ('connection' in arg_names or varkwargs) and
+        ('prepared' in arg_names or varkwargs)
+    )
+    if not updated:
+        warn("A Field class whose %s method hasn't been updated to take "
+            "`connection` and `prepared` arguments." % func.__name__,
+            PendingDeprecationWarning, stacklevel=2)
+
+    def inner(*args, **kwargs):
+        if 'connection' not in kwargs:
+            from django.db import connection
+            kwargs['connection'] = connection
+            warn("%s has been called without providing a connection argument. " %
+                func.__name__, PendingDeprecationWarning,
+                stacklevel=1)
+        if updated:
+            return func(*args, **kwargs)
+        if 'connection' in kwargs:
+            del kwargs['connection']
+        if 'prepared' in kwargs:
+            del kwargs['prepared']
         return func(*args, **kwargs)
     return inner
 
@@ -37,9 +65,10 @@ class LegacyConnection(type):
     """
     def __new__(cls, names, bases, attrs):
         new_cls = super(LegacyConnection, cls).__new__(cls, names, bases, attrs)
-        for attr in ('db_type', 'get_db_prep_save', 'get_db_prep_lookup',
-            'get_db_prep_value'):
+        for attr in ('db_type', 'get_db_prep_save'):
             setattr(new_cls, attr, call_with_connection(getattr(new_cls, attr)))
+        for attr in ('get_db_prep_lookup', 'get_db_prep_value'):
+            setattr(new_cls, attr, call_with_connection_and_prepared(getattr(new_cls, attr)))
         return new_cls
 
 class SubfieldBase(LegacyConnection):

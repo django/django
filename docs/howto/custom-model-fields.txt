@@ -396,36 +396,58 @@ Python object type we want to store in the model's attribute.
 called when it is created, you should be using `The SubfieldBase metaclass`_
 mentioned earlier. Otherwise :meth:`to_python` won't be called automatically.
 
-Converting Python objects to database values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Converting Python objects to query values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: get_db_prep_value(self, value, connection)
+.. method:: get_prep_value(self, value)
 
-This is the reverse of :meth:`to_python` when working with the database backends
-(as opposed to serialization). The ``value`` parameter is the current value of
-the model's attribute (a field has no reference to its containing model, so it
-cannot retrieve the value itself), and the method should return data in a format
-that can be used as a parameter in a query for the database backend.  The
-specific connection that will be used for the query is passed as the
-``connection`` parameter, this allows you to generate the value in a backend
-specific mannner if necessary.
+This is the reverse of :meth:`to_python` when working with the
+database backends (as opposed to serialization). The ``value``
+parameter is the current value of the model's attribute (a field has
+no reference to its containing model, so it cannot retrieve the value
+itself), and the method should return data in a format that has been
+prepared for use as a parameter in a query.
+
+This conversion should *not* include any database-specific
+conversions. If database-specific conversions are required, they
+should be made in the call to :meth:`get_db_prep_value`.
 
 For example::
 
     class HandField(models.Field):
         # ...
 
-        def get_db_prep_value(self, value, connection):
+        def get_prep_value(self, value):
             return ''.join([''.join(l) for l in (value.north,
                     value.east, value.south, value.west)])
 
+Converting query values to database values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: get_db_prep_value(self, value, connection, prepared=False)
+
+Some data types (for example, dates) need to be in a specific format
+before they can be used by a database backend.
+:meth:`get_db_prep_value` is the method where those conversions should
+be made. The specific connection that will be used for the query is
+passed as the ``connection`` parameter. This allows you to use
+backend-specific conversion logic if it is required.
+
+The ``prepared`` argument describes whether or not the value has
+already been passed through :meth:`get_prep_value` conversions. When
+``prepared`` is False, the default implementation of
+:meth:`get_db_prep_value` will call :meth:`get_prep_value` to do
+initial data conversions before performing any database-specific
+processing.
+
 .. method:: get_db_prep_save(self, value, connection)
 
-Same as the above, but called when the Field value must be *saved* to the
-database. As the default implementation just calls ``get_db_prep_value``, you
-shouldn't need to implement this method unless your custom field needs a
-special conversion when being saved that is not the same as the conversion used
-for normal query parameters (which is implemented by ``get_db_prep_value``).
+Same as the above, but called when the Field value must be *saved* to
+the database. As the default implementation just calls
+``get_db_prep_value``, you shouldn't need to implement this method
+unless your custom field needs a special conversion when being saved
+that is not the same as the conversion used for normal query
+parameters (which is implemented by ``get_db_prep_value``).
 
 Preprocessing values before saving
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -453,7 +475,13 @@ correct value.
 Preparing values for use in database lookups
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: get_db_prep_lookup(self, lookup_type, value, connection)
+As with value conversions, preparing a value for database lookups is a
+two phase process.
+
+.. method:: get_prep_lookup(self, lookup_type, value)
+
+:meth:`get_prep_lookup` performs the first phase of lookup preparation,
+performing generic data validity checks
 
 Prepares the ``value`` for passing to the database when used in a lookup (a
 ``WHERE`` constraint in SQL). The ``lookup_type`` will be one of the valid
@@ -470,33 +498,41 @@ by with handling the lookup types that need special handling for your field
 and pass the rest to the :meth:`get_db_prep_lookup` method of the parent class.
 
 If you needed to implement ``get_db_prep_save()``, you will usually need to
-implement ``get_db_prep_lookup()``. If you don't, ``get_db_prep_value`` will be
+implement ``get_prep_lookup()``. If you don't, ``get_prep_value`` will be
 called by the default implementation, to manage ``exact``, ``gt``, ``gte``,
 ``lt``, ``lte``, ``in`` and ``range`` lookups.
 
 You may also want to implement this method to limit the lookup types that could
 be used with your custom field type.
 
-Note that, for ``range`` and ``in`` lookups, ``get_db_prep_lookup`` will receive
+Note that, for ``range`` and ``in`` lookups, ``get_prep_lookup`` will receive
 a list of objects (presumably of the right type) and will need to convert them
 to a list of things of the right type for passing to the database. Most of the
-time, you can reuse ``get_db_prep_value()``, or at least factor out some common
+time, you can reuse ``get_prep_value()``, or at least factor out some common
 pieces.
 
-For example, the following code implements ``get_db_prep_lookup`` to limit the
+For example, the following code implements ``get_prep_lookup`` to limit the
 accepted lookup types to ``exact`` and ``in``::
 
     class HandField(models.Field):
         # ...
 
-        def get_db_prep_lookup(self, lookup_type, value):
+        def get_prep_lookup(self, lookup_type, value):
             # We only handle 'exact' and 'in'. All others are errors.
             if lookup_type == 'exact':
-                return [self.get_db_prep_value(value)]
+                return [self.get_prep_value(value)]
             elif lookup_type == 'in':
-                return [self.get_db_prep_value(v) for v in value]
+                return [self.get_prep_value(v) for v in value]
             else:
                 raise TypeError('Lookup type %r not supported.' % lookup_type)
+
+.. method:: get_db_prep_lookup(self, lookup_type, value, connection, prepared=False)
+
+Performs any database-specific data conversions required by a lookup.
+As with :meth:`get_db_prep_value`, the specific connection that will
+be used for the query is passed as the ``connection`` parameter.
+The ``prepared`` argument describes whether the value has already been
+prepared with :meth:`get_prep_lookup`.
 
 Specifying the form field for a model field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -120,7 +120,7 @@ class RelatedField(object):
         if not cls._meta.abstract:
             self.contribute_to_related_class(other, self.related)
 
-    def get_db_prep_lookup(self, lookup_type, value, connection):
+    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
         # If we are doing a lookup on a Related Field, we must be
         # comparing object instances. The value should be the PK of value,
         # not value itself.
@@ -140,14 +140,16 @@ class RelatedField(object):
             if field:
                 if lookup_type in ('range', 'in'):
                     v = [v]
-                v = field.get_db_prep_lookup(lookup_type, v, connection=connection)
+                v = field.get_db_prep_lookup(lookup_type, v,
+                        connection=connection, prepared=prepared)
                 if isinstance(v, list):
                     v = v[0]
             return v
 
+        if not prepared:
+            value = self.get_prep_lookup(lookup_type, value)
         if hasattr(value, 'get_compiler'):
             value = value.get_compiler(connection=connection)
-
         if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
             # If the value has a relabel_aliases method, it will need to
             # be invoked before the final SQL is evaluated

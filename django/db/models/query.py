@@ -739,6 +739,9 @@ class QuerySet(object):
             self.query.add_fields(field_names, False)
             self.query.set_group_by()
 
+    def _prepare(self):
+        return self
+
     def _as_sql(self, connection):
         """
         Returns the internal query's SQL and parameters (as a tuple).
@@ -747,13 +750,6 @@ class QuerySet(object):
         if connection == connections[obj.db]:
             return obj.query.get_compiler(connection=connection).as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
-
-    def _validate(self):
-        """
-        A normal QuerySet is always valid when used as the RHS of a filter,
-        since it automatically gets filtered down to 1 field.
-        """
-        pass
 
     # When used as part of a nested query, a queryset will never be an "always
     # empty" result.
@@ -877,7 +873,7 @@ class ValuesQuerySet(QuerySet):
             return obj.query.get_compiler(connection=connection).as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
 
-    def _validate(self):
+    def _prepare(self):
         """
         Validates that we aren't trying to do a query like
         value__in=qs.values('value1', 'value2'), which isn't valid.
@@ -886,7 +882,7 @@ class ValuesQuerySet(QuerySet):
                 (not self._fields and len(self.model._meta.fields) > 1)):
             raise TypeError('Cannot use a multi-field %s as a filter value.'
                     % self.__class__.__name__)
-
+        return self
 
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
