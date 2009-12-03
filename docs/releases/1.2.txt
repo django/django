@@ -42,8 +42,8 @@ changes that developers must be aware of:
  * All of the CSRF has moved from contrib to core (with backwards compatible
    imports in the old locations, which are deprecated).
 
-LazyObject
-----------
+``LazyObject``
+--------------
 
 ``LazyObject`` is an undocumented utility class used for lazily wrapping other
 objects of unknown type.  In Django 1.1 and earlier, it handled introspection in
@@ -67,6 +67,7 @@ changes:
 
        __members__ = property(lambda self: self.__dir__())
 
+
 .. _deprecated-features-1.2:
 
 Features deprecated in 1.2
@@ -88,7 +89,38 @@ deprecated, as described in the :ref:`upgrading notes <ref-csrf-upgrading-notes>
 ``SMTPConnection``
 ------------------
 
-This class has been deprecated in favor of the new generic e-mail backends.
+The ``SMTPConnection`` class has been deprecated in favor of a generic
+E-mail backend API. Old code that explicitly instantiated an instance
+of an SMTPConnection::
+
+    from django.core.mail import SMTPConnection
+    connection = SMTPConnection()
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
+should now call :meth:`~django.core.mail.get_connection()` to
+instantiate a generic e-mail connection::
+
+    from django.core.mail import get_connection
+    connection = get_connection()
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
+Depending on the value of the :setting:`EMAIL_BACKEND` setting, this
+may not return an SMTP connection. If you explicitly require an SMTP
+connection with which to send e-mail, you can explicitly request an
+SMTP connection::
+
+    from django.core.mail import get_connection
+    connection = get_connection('django.core.mail.backends.smtp')
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
+If your call to construct an instance of ``SMTPConnection`` required
+additional arguments, those arguments can be passed to the
+:meth:`~django.core.mail.get_connection()` call::
+
+    connection = get_connection('django.core.mail.backends.smtp', hostname='localhost', port=1234)
 
 What's new in Django 1.2
 ========================
