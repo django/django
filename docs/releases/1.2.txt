@@ -178,7 +178,7 @@ two extra methods have been introduced::
         def get_db_prep_value(self, value, connection, prepared=False):
             # ...
 
-        def get_prep_lookup(self, lookup_type, value, connection, prepared=False):
+        def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
             # ...
 
 These changes are required to support multiple databases -
