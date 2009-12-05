@@ -741,12 +741,10 @@ class ModelAdmin(BaseModelAdmin):
         
         for bit in query.split():
             or_queries = [models.Q(**{construct_search(
-                smart_str(field_name)): smart_str(bit)})
+                smart_str(field_name)): bit})
                     for field_name in search_fields]
-            other_qs = QuerySet(rel_model)
-            other_qs.dup_select_related(queryset)
-            other_qs = other_qs.filter(reduce(operator.or_, or_queries))
-            queryset = queryset & other_qs
+
+            queryset = queryset.filter(reduce(operator.or_, or_queries))
         
         data = [{"id": f.pk, "name": unicode(f)} for f in queryset]
         
