@@ -1,12 +1,9 @@
 {% load i18n %}
-
 <a href="{{ related_url }}{{ url }}" class="related-lookup" id="lookup_id_{{ name }}" onclick="return showRelatedObjectLookupPopup(this);">
   <img src="{{ admin_media_prefix }}img/admin/selector-search.gif" width="16" height="16" alt="{% trans "Lookup" %}" />
 </a>
 <script type="text/javascript">
 $(document).ready(function() {
-    // Show lookup input
-    
     $('#id_{{ name }}').tokenInput("{{ search_path }}", {
         noResultsText: "No results found.",
         searchingText: "Searching..."

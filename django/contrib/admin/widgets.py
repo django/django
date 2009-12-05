@@ -246,8 +246,12 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
+        
+        if value and value[-1] == ',':
+            value = value[0:-1] # truncate trailing comma
+        
         if value and ',' in value:
-            return data[name].split(',')
+            return value.split(',')
         if value:
             return [value]
         return None
