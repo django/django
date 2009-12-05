@@ -274,13 +274,11 @@ class ManyToManySearchInput(ManyToManyRawIdWidget):
  
     class Media:
         css = {
-            'all': (settings.ADMIN_MEDIA_PREFIX + 'css/jquery.autocomplete.css',)
+            'all': (settings.ADMIN_MEDIA_PREFIX + 'css/jquery.token.input.css',)
         }
         js = (
             settings.ADMIN_MEDIA_PREFIX + 'js/jquery.js',
-            settings.ADMIN_MEDIA_PREFIX + 'js/jquery.bgiframe.min.js',
-            settings.ADMIN_MEDIA_PREFIX + 'js/jquery.ajaxQueue.js',
-            settings.ADMIN_MEDIA_PREFIX + 'js/jquery.autocomplete.js',
+            settings.ADMIN_MEDIA_PREFIX + 'js/jquery.tokeninput.js',
         )
     
     def __init__(self, rel, search_fields, attrs=None):

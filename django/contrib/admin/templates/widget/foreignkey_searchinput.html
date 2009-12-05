@@ -7,30 +7,25 @@
 $(document).ready(function() {
     // Show lookup input
     $("#lookup_{{ name }}").show();
-    function reset() {
-        $('#id_{{ name }}').val('');
-        $('#lookup_{{ name }}').val('');
-    };
-
-    $('#lookup_{{ name }}').autocomplete('{{ search_path }}').result(
+    
+    $('#lookup_{{ name }}').autocomplete('{{ search_path }}', {
+      dataType: 'json',
+      parse: function(data) {
+        var rows = new Array();
+        for(var i=0; i<data.length; i++){
+            rows[i] = { data:data[i], value:data[i].id, result:data[i].name };
+        }
+        return rows;
+      },
+      formatItem: function(row, i, n) {
+        return row.name;
+      },
+      cacheLength: 0,
+    }).result(
         function(event, data, formatted) {
             if (data) {
-                $('#id_{{ name }}').val(data[1]);
+                $('#id_{{ name }}').val(data.id);
         }
-    }).keyup(function(event){
-        if (event.keyCode == 27) {
-            reset();
-        };
     });
-    var {{ name }}_value = $('#id_{{ name }}').val();
-    function check() {
-        {{ name }}_check = $('#id_{{ name }}').val();
-        if ({{ name }}_check) {
-            if ({{ name }}_check != {{ name }}_value) {
-                lookup({{ name }}_check);
-            }
-        }
-    }
-    timeout = window.setInterval(check, 300);
 });
 </script>

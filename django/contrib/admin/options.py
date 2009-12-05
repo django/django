@@ -13,6 +13,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 from django.db.models.query import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
+from django.utils import simplejson
 from django.utils.datastructures import SortedDict
 from django.utils.functional import update_wrapper
 from django.utils.html import escape
@@ -747,7 +748,9 @@ class ModelAdmin(BaseModelAdmin):
             other_qs = other_qs.filter(reduce(operator.or_, or_queries))
             queryset = queryset & other_qs
         
-        return HttpResponse(''.join([u'%s|%s\n' % (unicode(f), f.pk) for f in queryset]))
+        data = [{"id": f.pk, "name": unicode(f)} for f in queryset]
+        
+        return HttpResponse(simplejson.dumps(data))
     
     def add_view(self, request, form_url='', extra_context=None):
         "The 'add' admin view for this model."

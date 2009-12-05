@@ -1,26 +1,18 @@
 {% load i18n %}
-<textarea id="lookup_{{ name }}" style="display:none;">{{ label }}</textarea>
+
 <a href="{{ related_url }}{{ url }}" class="related-lookup" id="lookup_id_{{ name }}" onclick="return showRelatedObjectLookupPopup(this);">
   <img src="{{ admin_media_prefix }}img/admin/selector-search.gif" width="16" height="16" alt="{% trans "Lookup" %}" />
 </a>
 <script type="text/javascript">
 $(document).ready(function() {
     // Show lookup input
-    $("#lookup_{{ name }}").show();
     
-    $('#lookup_{{ name }}').autocomplete('{{ search_path }}', {
-        multiple: true,
-        mustMatch: true
-    }).result(function(event, data, formatted) {
-        if (data) {
-            if ($('#id_{{ name }}').val()) {
-                $('#id_{{ name }}').val($('#id_{{ name }}').val() + "," + data[1]);
-            }
-            else {
-                $('#id_{{ name }}').val(data[1]);
-            }
-            
-        }
+    $('#id_{{ name }}').tokenInput("{{ search_path }}", {
+        noResultsText: "No results found.",
+        searchingText: "Searching..."
     });
+    
+    $('#add_id_{{ name }}').hide();
+    $('#lookup_id_{{ name }}').hide();
 });
 </script>
