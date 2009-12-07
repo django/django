@@ -78,17 +78,17 @@ Examples of output::
 Displaying debug output
 -----------------------
 
-.. django-admin-option:: --verbosity <amount>
-
-Use ``--verbosity`` to specify the amount of notification and debug information
+Use :djadminopt:`--verbosity` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console. For more details, see the
-documentation for the :ref:`default options for django-admin.py <django-admin-verbosity>`.
+documentation for the :djadminopt:`--verbosity` option.
 
 Available subcommands
 =====================
 
 cleanup
 -------
+
+.. django-admin:: cleanup
 
 .. versionadded:: 1.0
 
@@ -98,17 +98,16 @@ Can be run as a cronjob or directly to clean out old data from the database
 compilemessages
 ---------------
 
+.. django-admin:: compilemessages
+
 .. versionchanged:: 1.0
    Before 1.0 this was the "bin/compile-messages.py" command.
 
 Compiles .po files created with ``makemessages`` to .mo files for use with
 the builtin gettext support. See :ref:`topics-i18n`.
 
---locale
-~~~~~~~~
-
-Use the ``--locale`` or ``-l`` option to specify the locale to process.
-If not provided all locales are processed.
+Use the :djadminopt:`--locale`` option to specify the locale to process.
+If not provided, all locales are processed.
 
 Example usage::
 
@@ -117,7 +116,7 @@ Example usage::
 createcachetable
 ----------------
 
-.. django-admin:: createcachetable <tablename>
+.. django-admin:: createcachetable
 
 Creates a cache table named ``tablename`` for use with the database cache
 backend. See :ref:`topics-cache` for more information.
@@ -183,10 +182,10 @@ example, the default settings don't define ``ROOT_URLCONF``, so
 Note that Django's default settings live in ``django/conf/global_settings.py``,
 if you're ever curious to see the full list of defaults.
 
-dumpdata
---------
+dumpdata <appname appname appname.Model ...>
+--------------------------------------------
 
-.. django-admin:: dumpdata <appname appname appname.Model ...>
+.. django-admin:: dumpdata
 
 Outputs to standard output all data in the database associated with the named
 application(s).
@@ -215,18 +214,17 @@ directives::
 
     django-admin.py dumpdata --exclude=auth --exclude=contenttypes
 
-
 .. django-admin-option:: --format <fmt>
 
-    By default, ``dumpdata`` will format its output in JSON, but you can use the
-    ``--format`` option to specify another format. Currently supported formats
-    are listed in :ref:`serialization-formats`.
+By default, ``dumpdata`` will format its output in JSON, but you can use the
+``--format`` option to specify another format. Currently supported formats
+are listed in :ref:`serialization-formats`.
 
 .. django-admin-option:: --indent <num>
 
-    By default, ``dumpdata`` will output all data on a single line. This isn't
-    easy for humans to read, so you can use the ``--indent`` option to
-    pretty-print the output with a number of indentation spaces.
+By default, ``dumpdata`` will output all data on a single line. This isn't
+easy for humans to read, so you can use the ``--indent`` option to
+pretty-print the output with a number of indentation spaces.
 
 .. versionadded:: 1.1
 
@@ -239,21 +237,20 @@ model names.
 flush
 -----
 
-.. django-admin: flush
+.. django-admin:: flush
 
 Returns the database to the state it was in immediately after syncdb was
 executed. This means that all data will be removed from the database, any
 post-synchronization handlers will be re-executed, and the ``initial_data``
 fixture will be re-installed.
 
-.. django-admin-option:: --noinput
-
-    Use the ``--noinput`` option to suppress all user prompting, such as "Are
-    you sure?" confirmation messages. This is useful if ``django-admin.py`` is
-    being executed as an unattended, automated script.
+The :djadminopt:`--noinput` option may be provided to suppress all user
+prompts.
 
 inspectdb
 ---------
+
+.. django-admin:: inspectdb
 
 Introspects the database tables in the database pointed-to by the
 ``DATABASE_NAME`` setting and outputs a Django model module (a ``models.py``
@@ -295,6 +292,8 @@ only works in PostgreSQL and with certain types of MySQL tables.
 
 loaddata <fixture fixture ...>
 ------------------------------
+
+.. django-admin:: loaddata
 
 Searches for and loads the contents of the named fixture into the database.
 
@@ -382,6 +381,8 @@ installation will be aborted, and any data installed in the call to
 makemessages
 ------------
 
+.. django-admin:: makemessages
+
 .. versionchanged:: 1.0
    Before 1.0 this was the ``bin/make-messages.py`` command.
 
@@ -392,8 +393,7 @@ directory. After making changes to the messages files you need to compile them
 with ``compilemessages`` for use with the builtin gettext support. See the
 :ref:`i18n documentation <how-to-create-language-files>` for details.
 
---all
-~~~~~
+.. django-admin-option:: --all
 
 Use the ``--all`` or ``-a`` option to update the message files for all
 available languages.
@@ -402,8 +402,7 @@ Example usage::
 
     django-admin.py makemessages --all
 
---extension
-~~~~~~~~~~~
+.. django-admin-option:: --extension
 
 Use the ``--extension`` or ``-e`` option to specify a list of file extensions
 to examine (default: ".html").
@@ -416,17 +415,13 @@ Separate multiple extensions with commas or use -e or --extension multiple times
 
     django-admin.py makemessages --locale=de --extension=html,txt --extension xml
 
---locale
-~~~~~~~~
-
-Use the ``--locale`` or ``-l`` option to specify the locale to process.
+Use the :djadminopt:`--locale` option to specify the locale to process.
 
 Example usage::
 
     django-admin.py makemessages --locale=br_PT
 
---domain
-~~~~~~~~
+.. django-admin-option:: --domain
 
 Use the ``--domain`` or ``-d`` option to change the domain of the messages files.
 Currently supported:
@@ -434,22 +429,20 @@ Currently supported:
 	* ``django`` for all ``*.py`` and ``*.html`` files (default)
 	* ``djangojs`` for ``*.js`` files
 
-.. _django-admin-reset:
-
 reset <appname appname ...>
 ---------------------------
 
+.. django-admin:: reset
+
 Executes the equivalent of ``sqlreset`` for the given app name(s).
 
---noinput
-~~~~~~~~~
-
-Use the ``--noinput`` option to suppress all user prompting, such as
-"Are you sure?" confirmation messages. This is useful if ``django-admin.py``
-is being executed as an unattended, automated script.
+The :djadminopt:`--noinput` option may be provided to suppress all user
+prompts.
 
 runfcgi [options]
 -----------------
+
+.. django-admin:: runfcgi
 
 Starts a set of FastCGI processes suitable for use with any Web server that
 supports the FastCGI protocol. See the :ref:`FastCGI deployment documentation
@@ -458,10 +451,10 @@ supports the FastCGI protocol. See the :ref:`FastCGI deployment documentation
 
 .. _flup: http://www.saddi.com/software/flup/
 
-runserver
----------
+runserver [port or ipaddr:port]
+-------------------------------
 
-.. django-admin:: runserver [port or ipaddr:port]
+.. django-admin:: runserver
 
 Starts a lightweight development Web server on the local machine. By default,
 the server runs on port 8000 on the IP address 127.0.0.1. You can pass in an
@@ -544,6 +537,8 @@ you want to configure Django to serve static media, read :ref:`howto-static-file
 shell
 -----
 
+.. django-admin:: shell
+
 Starts the Python interactive interpreter.
 
 Django will use IPython_, if it's installed. If you have IPython installed and
@@ -557,10 +552,14 @@ option, like so::
 sql <appname appname ...>
 -------------------------
 
+.. django-admin:: sql
+
 Prints the CREATE TABLE SQL statements for the given app name(s).
 
 sqlall <appname appname ...>
 ----------------------------
+
+.. django-admin:: sqlall
 
 Prints the CREATE TABLE and initial-data SQL statements for the given app name(s).
 
@@ -570,10 +569,14 @@ specify initial data.
 sqlclear <appname appname ...>
 ------------------------------
 
+.. django-admin:: sqlclear
+
 Prints the DROP TABLE SQL statements for the given app name(s).
 
 sqlcustom <appname appname ...>
 -------------------------------
+
+.. django-admin:: sqlcustom
 
 Prints the custom SQL statements for the given app name(s).
 
@@ -594,20 +597,29 @@ Note that the order in which the SQL files are processed is undefined.
 sqlflush
 --------
 
-Prints the SQL statements that would be executed for the `flush`_ command.
+.. django-admin:: sqlflush
+
+Prints the SQL statements that would be executed for the :djadmin:`flush`
+command.
 
 sqlindexes <appname appname ...>
 --------------------------------
+
+.. django-admin:: sqlindexes
 
 Prints the CREATE INDEX SQL statements for the given app name(s).
 
 sqlreset <appname appname ...>
 ------------------------------
 
+.. django-admin:: sqlreset
+
 Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app name(s).
 
 sqlsequencereset <appname appname ...>
 --------------------------------------
+
+.. django-admin:: sqlsequencereset
 
 Prints the SQL statements for resetting sequences for the given app name(s).
 
@@ -620,11 +632,15 @@ of sync with its automatically incremented field data.
 startapp <appname>
 ------------------
 
+.. django-admin:: startapp
+
 Creates a Django app directory structure for the given app name in the current
 directory.
 
 startproject <projectname>
 --------------------------
+
+.. django-admin:: startproject
 
 Creates a Django project directory structure for the given project name in the
 current directory.
@@ -635,10 +651,10 @@ This command is disabled when the ``--settings`` option to
 situations, either omit the ``--settings`` option or unset
 ``DJANGO_SETTINGS_MODULE``.
 
-.. _django-admin-syncdb:
-
 syncdb
 ------
+
+.. django-admin:: syncdb
 
 Creates the database tables for all apps in ``INSTALLED_APPS`` whose tables
 have not already been created.
@@ -669,28 +685,21 @@ with an appropriate extension (e.g. ``json`` or ``xml``). See the
 documentation for ``loaddata`` for details on the specification of fixture
 data files.
 
---noinput
-~~~~~~~~~
+The :djadminopt:`--noinput` option may be provided to suppress all user
+prompts.
 
-Use the ``--noinput`` option to suppress all user prompting, such as
-"Are you sure?" confirmation messages. This is useful if ``django-admin.py``
-is being executed as an unattended, automated script.
+test <app or test identifier>
+-----------------------------
 
-test
-----
+.. django-admin:: test
 
 Runs tests for all installed models. See :ref:`topics-testing` for more
 information.
 
---noinput
-~~~~~~~~~
-
-Use the ``--noinput`` option to suppress all user prompting, such as
-"Are you sure?" confirmation messages. This is useful if ``django-admin.py``
-is being executed as an unattended, automated script.
-
 testserver <fixture fixture ...>
 --------------------------------
+
+.. django-admin:: testserver
 
 .. versionadded:: 1.0
 
@@ -727,8 +736,7 @@ Note that this server does *not* automatically detect changes to your Python
 source code (as ``runserver`` does). It does, however, detect changes to
 templates.
 
---addrport [port number or ipaddr:port]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. django-admin-option:: --addrport [port number or ipaddr:port]
 
 Use ``--addrport`` to specify a different port, or IP address and port, from
 the default of 127.0.0.1:8000. This value follows exactly the same format and
@@ -752,6 +760,8 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 validate
 --------
 
+.. django-admin:: validate
+
 Validates all installed models (according to the ``INSTALLED_APPS`` setting)
 and prints validation errors to standard output.
 
@@ -761,8 +771,7 @@ Default options
 Although some subcommands may allow their own custom options, every subcommand
 allows for the following options:
 
---pythonpath
-------------
+.. django-admin-option:: --pythonpath
 
 Example usage::
 
@@ -777,8 +786,7 @@ setting the Python path for you.
 
 .. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 
---settings
-----------
+.. django-admin-option:: --settings
 
 Example usage::
 
@@ -792,8 +800,7 @@ variable.
 Note that this option is unnecessary in ``manage.py``, because it uses
 ``settings.py`` from the current project by default.
 
---traceback
------------
+.. django-admin-option:: --traceback
 
 Example usage::
 
@@ -803,10 +810,7 @@ By default, ``django-admin.py`` will show a simple error message whenever an
 error occurs. If you specify ``--traceback``, ``django-admin.py``  will
 output a full stack trace whenever an exception is raised.
 
-.. _django-admin-verbosity:
-
---verbosity
------------
+.. django-admin-option:: --verbosity
 
 Example usage::
 
@@ -818,6 +822,23 @@ that ``django-admin.py`` should print to the console.
     * ``0`` means no output.
     * ``1`` means normal output (default).
     * ``2`` means verbose output.
+
+Common options
+==============
+
+The following options are not available on every commands, but they are
+common to a number of commands.
+
+.. django-admin-option:: --locale
+
+Use the ``--locale`` or ``-l`` option to specify the locale to process.
+If not provided all locales are processed.
+
+.. django-admin-option:: --noinput
+
+Use the ``--noinput`` option to suppress all user prompting, such as "Are
+you sure?" confirmation messages. This is useful if ``django-admin.py`` is
+being executed as an unattended, automated script.
 
 Extra niceties
 ==============
@@ -842,7 +863,6 @@ distribution. It enables tab-completion of ``django-admin.py`` and
     * Press [TAB] to see all available options.
     * Type ``sql``, then [TAB], to see all available options whose names start
       with ``sql``.
-
 
 
 See :ref:`howto-custom-management-commands` for how to add customized actions.

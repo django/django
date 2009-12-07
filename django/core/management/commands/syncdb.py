@@ -65,7 +65,7 @@ class Command(NoArgsCommand):
                 opts = model._meta
                 if (connection.introspection.table_name_converter(opts.db_table) in tables or
                     (opts.auto_created and
-                    connection.introspection.table_name_converter(opts.auto_created._meta.db_table in tables))):
+                    connection.introspection.table_name_converter(opts.auto_created._meta.db_table) in tables)):
                     continue
                 sql, references = connection.creation.sql_create_model(model, self.style, seen_models)
                 seen_models.add(model)

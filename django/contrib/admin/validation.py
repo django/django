@@ -149,7 +149,7 @@ def validate(cls, model):
             validate_inline(inline, cls, model)
 
 def validate_inline(cls, parent, parent_model):
-    
+
     # model is already verified to exist and be a Model
     if cls.fk_name: # default value is None
         f = get_field(cls, cls.model, cls.model._meta, 'fk_name', cls.fk_name)
@@ -196,6 +196,11 @@ def validate_base(cls, model):
         check_isseq(cls, 'fields', cls.fields)
         for field in cls.fields:
             check_formfield(cls, model, opts, 'fields', field)
+            f = get_field(cls, model, opts, 'fields', field)
+            if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
+                raise ImproperlyConfigured("'%s.fields' can't include the ManyToManyField "
+                    "field '%s' because '%s' manually specifies "
+                    "a 'through' model." % (cls.__name__, field, field))
         if cls.fieldsets:
             raise ImproperlyConfigured('Both fieldsets and fields are specified in %s.' % cls.__name__)
         if len(cls.fields) > len(set(cls.fields)):
@@ -214,11 +219,28 @@ def validate_base(cls, model):
                 raise ImproperlyConfigured("'fields' key is required in "
                         "%s.fieldsets[%d][1] field options dict."
                         % (cls.__name__, idx))
+            for fields in fieldset[1]['fields']:
+                # The entry in fields might be a tuple. If it is a standalone
+                # field, make it into a tuple to make processing easier.
+                if type(fields) != tuple:
+                    fields = (fields,)
+                for field in fields:
+                    check_formfield(cls, model, opts, "fieldsets[%d][1]['fields']" % idx, field)
+                    try:
+                        f = opts.get_field(field)
+                        if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
+                            raise ImproperlyConfigured("'%s.fieldsets[%d][1]['fields']' "
+                                "can't include the ManyToManyField field '%s' because "
+                                "'%s' manually specifies a 'through' model." % (
+                                    cls.__name__, idx, field, field))
+                    except models.FieldDoesNotExist:
+                        # If we can't find a field on the model that matches,
+                        # it could be an extra field on the form.
+                        pass
         flattened_fieldsets = flatten_fieldsets(cls.fieldsets)
         if len(flattened_fieldsets) > len(set(flattened_fieldsets)):
             raise ImproperlyConfigured('There are duplicate field(s) in %s.fieldsets' % cls.__name__)
-        for field in flattened_fieldsets:
-            check_formfield(cls, model, opts, "fieldsets[%d][1]['fields']" % idx, field)
+
 
     # form
     if hasattr(cls, 'form') and not issubclass(cls.form, BaseModelForm):

@@ -4,7 +4,7 @@
 
  Please note that MySQL only supports bounding box queries, also
  known as MBRs (Minimum Bounding Rectangles).  Moreover, spatial
- indices may only be used on MyISAM tables -- if you need 
+ indices may only be used on MyISAM tables -- if you need
  transactions, take a look at PostGIS.
 """
 from django.db import connection
@@ -38,7 +38,7 @@ MISC_TERMS = ['isnull']
 # Assacceptable lookup types for Oracle spatial.
 MYSQL_GIS_TERMS  = MYSQL_GIS_FUNCTIONS.keys()
 MYSQL_GIS_TERMS += MISC_TERMS
-MYSQL_GIS_TERMS = dict((term, None) for term in MYSQL_GIS_TERMS) # Making dictionary 
+MYSQL_GIS_TERMS = dict((term, None) for term in MYSQL_GIS_TERMS) # Making dictionary
 
 def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
     "Returns the SQL WHERE clause for use in MySQL spatial SQL construction."
@@ -49,7 +49,7 @@ def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
     lookup_info = MYSQL_GIS_FUNCTIONS.get(lookup_type, False)
     if lookup_info:
         return "%s(%s, %%s)" % (lookup_info, geo_col)
-    
+
     # Handling 'isnull' lookup type
     # TODO: Is this needed because MySQL cannot handle NULL
     # geometries in its spatial indices.

@@ -1,4 +1,13 @@
-"""
+from django.db import models
+
+class Advertisment(models.Model):
+    customer = models.CharField(max_length=100)
+    publications = models.ManyToManyField("model_package.Publication", null=True, blank=True)
+
+    class Meta:
+        app_label = 'model_package'
+
+__test__ = {'API_TESTS': """
 >>> from models.publication import Publication
 >>> from models.article import Article
 >>> from django.contrib.auth.views import Site
@@ -19,7 +28,6 @@
 >>> a.save()
 >>> a.publications.add(p)
 >>> a.sites.add(current_site)
->>> a.save()
 
 >>> a = Article.objects.get(id=1)
 >>> a
@@ -29,6 +37,19 @@
 >>> a.sites.count()
 1
 
-"""
+# Regression for #12248 - Models can exist in the test package, too
+
+>>> ad = Advertisment(customer="Lawrence Journal-World")
+>>> ad.save()
+>>> ad.publications.add(p)
+
+>>> ad = Advertisment.objects.get(id=1)
+>>> ad
+<Advertisment: Advertisment object>
+
+>>> ad.publications.count()
+1
+
+"""}
 
 

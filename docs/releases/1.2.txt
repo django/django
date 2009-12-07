@@ -1,0 +1,157 @@
+.. _releases-1.2:
+
+============================================
+Django 1.2 release notes — UNDER DEVELOPMENT
+============================================
+
+This page documents release notes for the as-yet-unreleased Django 1.2.  As such
+it is tentative and subject to change.  It provides up-to-date information for
+those who are following trunk.
+
+Django 1.2 includes a number of nifty `new features`_, lots of bug
+fixes, and an easy upgrade path from Django 1.1.
+
+.. _new features: `What's new in Django 1.2`_
+
+.. _backwards-incompatible-changes-1.2:
+
+Backwards-incompatible changes in 1.2
+=====================================
+
+CSRF Protection
+---------------
+
+There have been large changes to the way that CSRF protection works, detailed in
+:ref:`the CSRF documentaton <ref-contrib-csrf>`.  The following are the major
+changes that developers must be aware of:
+
+ * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
+   will be removed completely in Django 1.4, in favor of a template tag that
+   should be inserted into forms.
+
+ * All contrib apps use a ``csrf_protect`` decorator to protect the view.  This
+   requires the use of the csrf_token template tag in the template, so if you
+   have used custom templates for contrib views, you MUST READ THE :ref:`UPGRADE
+   INSTRUCTIONS <ref-csrf-upgrading-notes>` to fix those templates.
+
+ * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
+   default. This turns on CSRF protection by default, so that views that accept
+   POST requests need to be written to work with the middleware.  Instructions
+   on how to do this are found in the CSRF docs.
+
+ * All of the CSRF has moved from contrib to core (with backwards compatible
+   imports in the old locations, which are deprecated).
+
+``LazyObject``
+--------------
+
+``LazyObject`` is an undocumented utility class used for lazily wrapping other
+objects of unknown type.  In Django 1.1 and earlier, it handled introspection in
+a non-standard way, depending on wrapped objects implementing a public method
+``get_all_members()``. Since this could easily lead to name clashes, it has been
+changed to use the standard method, involving ``__members__`` and ``__dir__()``.
+If you used ``LazyObject`` in your own code, and implemented the
+``get_all_members()`` method for wrapped objects, you need to make the following
+changes:
+
+ * If your class does not have special requirements for introspection (i.e. you
+   have not implemented ``__getattr__()`` or other methods that allow for
+   attributes not discoverable by normal mechanisms), you can simply remove the
+   ``get_all_members()`` method.  The default implementation on ``LazyObject``
+   will do the right thing.
+
+ * If you have more complex requirements for introspection, first rename the
+   ``get_all_members()`` method to ``__dir__()``.  This is the standard method,
+   from Python 2.6 onwards, for supporting introspection.  If you are require
+   support for Python < 2.6, add the following code to the class::
+
+       __members__ = property(lambda self: self.__dir__())
+
+
+.. _deprecated-features-1.2:
+
+Features deprecated in 1.2
+==========================
+
+CSRF response rewriting middleware
+----------------------------------
+
+``CsrfResponseMiddleware``, the middleware that automatically inserted CSRF
+tokens into POST forms in outgoing pages, has been deprecated in favor of a
+template tag method (see above), and will be removed completely in Django
+1.4. ``CsrfMiddleware``, which includes the functionality of
+``CsrfResponseMiddleware`` and ``CsrfViewMiddleware`` has likewise been
+deprecated.
+
+Also, the CSRF module has moved from contrib to core, and the old imports are
+deprecated, as described in the :ref:`upgrading notes <ref-csrf-upgrading-notes>`.
+
+``SMTPConnection``
+------------------
+
+The ``SMTPConnection`` class has been deprecated in favor of a generic
+E-mail backend API. Old code that explicitly instantiated an instance
+of an SMTPConnection::
+
+    from django.core.mail import SMTPConnection
+    connection = SMTPConnection()
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
+should now call :meth:`~django.core.mail.get_connection()` to
+instantiate a generic e-mail connection::
+
+    from django.core.mail import get_connection
+    connection = get_connection()
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
+Depending on the value of the :setting:`EMAIL_BACKEND` setting, this
+may not return an SMTP connection. If you explicitly require an SMTP
+connection with which to send e-mail, you can explicitly request an
+SMTP connection::
+
+    from django.core.mail import get_connection
+    connection = get_connection('django.core.mail.backends.smtp')
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
+If your call to construct an instance of ``SMTPConnection`` required
+additional arguments, those arguments can be passed to the
+:meth:`~django.core.mail.get_connection()` call::
+
+    connection = get_connection('django.core.mail.backends.smtp', hostname='localhost', port=1234)
+
+What's new in Django 1.2
+========================
+
+CSRF support
+------------
+
+Django now has much improved protection against :ref:`Cross-Site
+Request Forgery (CSRF) attacks<ref-contrib-csrf>`. This type of attack
+occurs when a malicious Web site contains a link, a form button or
+some javascript that is intended to perform some action on your Web
+site, using the credentials of a logged-in user who visits the
+malicious site in their browser. A related type of attack, 'login
+CSRF', where an attacking site tricks a user's browser into logging
+into a site with someone else's credentials, is also covered.
+
+E-mail Backends
+---------------
+
+You can now :ref:`configure the way that Django sends e-mail
+<topic-email-backends>`. Instead of using SMTP to send all e-mail, you
+can now choose a configurable e-mail backend to send messages. If your
+hosting provider uses a sandbox or some other non-SMTP technique for
+sending mail, you can now construct an e-mail backend that will allow
+Django's standard :ref:`mail sending methods<topics-email>` to use
+those facilities.
+
+This also makes it easier to debug mail sending - Django ships with
+backend implementations that allow you to send e-mail to a
+:ref:`file<topic-email-file-backend>`, to the
+:ref:`console<topic-email-console-backend>`, or to
+:ref:`memory<topic-email-memory-backend>` - you can even configure all
+e-mail to be :ref:`thrown away<topic-email-dummy-backend>`.
+

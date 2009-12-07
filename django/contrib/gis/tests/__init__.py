@@ -9,9 +9,10 @@ def geo_suite():
     some backends).
     """
     from django.conf import settings
+    from django.contrib.gis.geos import GEOS_PREPARE
     from django.contrib.gis.gdal import HAS_GDAL
     from django.contrib.gis.utils import HAS_GEOIP
-    from django.contrib.gis.tests.utils import mysql
+    from django.contrib.gis.tests.utils import postgis, mysql
 
     # The test suite.
     s = unittest.TestSuite()
@@ -31,6 +32,10 @@ def geo_suite():
     # Tests applications that require a test spatial db.
     if not mysql:
         test_apps.append('distapp')
+
+    # Only PostGIS using GEOS 3.1+ can support 3D so far.
+    if postgis and GEOS_PREPARE:
+        test_apps.append('geo3d')
 
     if HAS_GDAL:
         # These tests require GDAL.
@@ -164,20 +169,3 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=
 
     # Returning the total failures and errors
     return len(result.failures) + len(result.errors)
-
-# Class for creating a fake module with a run method.  This is for the
-# GEOS and GDAL tests that were moved to their respective modules.
-class _DeprecatedTestModule(object):
-    def __init__(self, mod_name):
-        self.mod_name = mod_name
-
-    def run(self):
-        from warnings import warn
-        warn('This test module is deprecated because it has moved to ' \
-             '`django.contrib.gis.%s.tests` and will disappear in 1.2.' %
-             self.mod_name, DeprecationWarning)
-        tests = import_module('django.contrib.gis.%s.tests' % self.mod_name)
-        tests.run()
-
-test_geos = _DeprecatedTestModule('geos')
-test_gdal = _DeprecatedTestModule('gdal')

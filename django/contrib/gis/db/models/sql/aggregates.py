@@ -11,6 +11,9 @@ geo_template = '%(function)s(%(field)s)'
 def convert_extent(box):
     raise NotImplementedError('Aggregate extent not implemented for this spatial backend.')
 
+def convert_extent3d(box):
+    raise NotImplementedError('Aggregate 3D extent not implemented for this spatial backend.')
+
 def convert_geom(wkt, geo_field):
     raise NotImplementedError('Aggregate method not implemented for this spatial backend.')
 
@@ -22,6 +25,14 @@ if SpatialBackend.postgis:
         xmin, ymin = map(float, ll.split())
         xmax, ymax = map(float, ur.split())
         return (xmin, ymin, xmax, ymax)
+
+    def convert_extent3d(box3d):
+        # Box text will be something like "BOX3D(-90.0 30.0 1, -85.0 40.0 2)";
+        # parsing out and returning as a 4-tuple.
+        ll, ur = box3d[6:-1].split(',')
+        xmin, ymin, zmin = map(float, ll.split())
+        xmax, ymax, zmax = map(float, ur.split())
+        return (xmin, ymin, zmin, xmax, ymax, zmax)
 
     def convert_geom(hex, geo_field):
         if hex: return SpatialBackend.Geometry(hex)
@@ -94,13 +105,17 @@ class Collect(GeoAggregate):
     sql_function = SpatialBackend.collect
 
 class Extent(GeoAggregate):
-    is_extent = True
+    is_extent = '2D'
     sql_function = SpatialBackend.extent
 
 if SpatialBackend.oracle:
     # Have to change Extent's attributes here for Oracle.
     Extent.conversion_class = GeomField
     Extent.sql_template = '%(function)s(%(field)s)'
+
+class Extent3D(GeoAggregate):
+    is_extent = '3D'
+    sql_function = SpatialBackend.extent3d
 
 class MakeLine(GeoAggregate):
     conversion_class = GeomField

@@ -3,7 +3,7 @@
  related data structures. OGR_Dr_*, OGR_DS_*, OGR_L_*, OGR_F_*, 
  OGR_Fld_* routines are relevant here.
 """
-from ctypes import c_char_p, c_int, c_long, c_void_p, POINTER
+from ctypes import c_char_p, c_double, c_int, c_long, c_void_p, POINTER
 from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.prototypes.generation import \
@@ -38,6 +38,9 @@ get_layer_srs = srs_output(lgdal.OGR_L_GetSpatialRef, [c_void_p])
 get_next_feature = voidptr_output(lgdal.OGR_L_GetNextFeature, [c_void_p])
 reset_reading = void_output(lgdal.OGR_L_ResetReading, [c_void_p], errcheck=False)
 test_capability = int_output(lgdal.OGR_L_TestCapability, [c_void_p, c_char_p])
+get_spatial_filter = geom_output(lgdal.OGR_L_GetSpatialFilter, [c_void_p])
+set_spatial_filter = void_output(lgdal.OGR_L_SetSpatialFilter, [c_void_p, c_void_p], errcheck=False)
+set_spatial_filter_rect = void_output(lgdal.OGR_L_SetSpatialFilterRect, [c_void_p, c_double, c_double, c_double, c_double], errcheck=False)
 
 ### Feature Definition Routines ###
 get_fd_geom_type = int_output(lgdal.OGR_FD_GetGeomType, [c_void_p])

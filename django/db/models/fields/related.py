@@ -586,9 +586,13 @@ class ReverseManyRelatedObjectsDescriptor(object):
     # ReverseManyRelatedObjectsDescriptor instance.
     def __init__(self, m2m_field):
         self.field = m2m_field
+
+    def _through(self):
         # through is provided so that you have easy access to the through
-        # model (Book.authors.through) for inlines, etc.
-        self.through = m2m_field.rel.through
+        # model (Book.authors.through) for inlines, etc. This is done as
+        # a property to ensure that the fully resolved value is returned.
+        return self.field.rel.through
+    through = property(_through)
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -698,6 +702,10 @@ class ForeignKey(RelatedField, Field):
             assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
+            # For backwards compatibility purposes, we need to *try* and set
+            # the to_field during FK construction. It won't be guaranteed to
+            # be correct until contribute_to_class is called. Refs #12190.
+            to_field = to_field or (to._meta.pk and to._meta.pk.name)
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
 
         kwargs['rel'] = rel_class(to, to_field,
@@ -849,20 +857,13 @@ def create_many_to_many_intermediary_model(field, klass):
         'db_table': field._get_m2m_db_table(klass._meta),
         'managed': managed,
         'auto_created': klass,
+        'app_label': klass._meta.app_label,
         'unique_together': (from_, to)
     })
-    # If the models have been split into subpackages, klass.__module__
-    # will be the subpackge, not the models module for the app. (See #12168)
-    # Compose the actual models module name by stripping the trailing parts
-    # of the namespace until we find .models
-    parts = klass.__module__.split('.')
-    while parts[-1] != 'models':
-        parts.pop()
-    module = '.'.join(parts)
     # Construct and return the new class.
     return type(name, (models.Model,), {
         'Meta': meta,
-        '__module__': module,
+        '__module__': klass.__module__,
         from_: models.ForeignKey(klass, related_name='%s+' % name),
         to: models.ForeignKey(to_model, related_name='%s+' % name)
     })

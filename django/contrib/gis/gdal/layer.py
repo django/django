@@ -1,5 +1,5 @@
 # Needed ctypes routines
-from ctypes import byref
+from ctypes import c_double, byref
 
 # Other GDAL imports.
 from django.contrib.gis.gdal.base import GDALBase
@@ -7,11 +7,12 @@ from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.feature import Feature
 from django.contrib.gis.gdal.field import OGRFieldTypes
-from django.contrib.gis.gdal.geometries import OGRGeomType
+from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.geometries import OGRGeometry
 from django.contrib.gis.gdal.srs import SpatialReference
 
 # GDAL ctypes function prototypes.
-from django.contrib.gis.gdal.prototypes import ds as capi, srs as srs_api
+from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api, srs as srs_api
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -155,6 +156,29 @@ class Layer(GDALBase):
         "Returns the field precisions for the features."
         return [capi.get_field_precision(capi.get_field_defn(self._ldefn, i))
                 for i in xrange(self.num_fields)]
+
+    def _get_spatial_filter(self):
+        try:
+            return OGRGeometry(geom_api.clone_geom(capi.get_spatial_filter(self.ptr)))
+        except OGRException:
+            return None
+
+    def _set_spatial_filter(self, filter):
+        if isinstance(filter, OGRGeometry):
+            capi.set_spatial_filter(self.ptr, filter.ptr)
+        elif isinstance(filter, (tuple, list)):
+            if not len(filter) == 4:
+                raise ValueError('Spatial filter list/tuple must have 4 elements.')
+            # Map c_double onto params -- if a bad type is passed in it
+            # will be caught here.
+            xmin, ymin, xmax, ymax = map(c_double, filter)
+            capi.set_spatial_filter_rect(self.ptr, xmin, ymin, xmax, ymax)
+        elif filter is None:
+            capi.set_spatial_filter(self.ptr, None)
+        else:
+            raise TypeError('Spatial filter must be either an OGRGeometry instance, a 4-tuple, or None.')
+
+    spatial_filter = property(_get_spatial_filter, _set_spatial_filter)
 
     #### Layer Methods ####
     def get_fields(self, field_name):

@@ -1,0 +1,36 @@
+.. _releases-1.1.2:
+
+==============================================
+Django 1.1.2 release notes — UNDER DEVELOPMENT
+==============================================
+
+This page documents release notes for the as-yet-unreleased Django
+1.1.2. As such it is tentative and subject to change. It provides
+up-to-date information for those who are following the 1.1.X branch.
+
+This is the second "bugfix" release in the Django 1.1 series,
+improving the stability and performance of the Django 1.1 codebase.
+
+Django 1.1.2 maintains backwards compatibility with Django
+1.1.0, but contain a number of fixes and other
+improvements. Django 1.1.2 is a recommended upgrade for any
+development or deployment currently using or targeting Django 1.1.
+
+For full details on the new features, backwards incompatibilities, and
+deprecated features in the 1.1 branch, see the :ref:`releases-1.1`.
+
+One new feature
+---------------
+
+Ordinarily, a point release would not include new features, but in the
+case of Django 1.1.2, we have made an exception to this rule. Django
+1.2 (the next major release of Django) will contain a feature that
+will improve protection against Cross-Site Request Forgery (CSRF)
+attacks. This feature requires the use of a new :ttag:`csrf_token`
+template tag in all forms that Django renders.
+
+To make it easier to support both 1.1.X and 1.2.X versions of Django with
+the same templates, we have decided to introduce the :ttag:`csrf_token` template
+tag to the 1.1.X branch. In the 1.1.X branch, :ttag:`csrf_token` does nothing -
+it has no effect on templates or form processing. However, it means that the
+same template will work with Django 1.2.

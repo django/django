@@ -452,7 +452,7 @@ class AdminSite(object):
         import warnings
         warnings.warn(
             "AdminSite.root() is deprecated; use include(admin.site.urls) instead.",
-            PendingDeprecationWarning
+            DeprecationWarning
         )
 
         #

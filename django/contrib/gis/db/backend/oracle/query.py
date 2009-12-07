@@ -3,8 +3,8 @@
  routine for Oracle Spatial.
 
  Please note that WKT support is broken on the XE version, and thus
- this backend will not work on such platforms.  Specifically, XE lacks 
- support for an internal JVM, and Java libraries are required to use 
+ this backend will not work on such platforms.  Specifically, XE lacks
+ support for an internal JVM, and Java libraries are required to use
  the WKT constructors.
 """
 import re
@@ -31,10 +31,10 @@ TRANSFORM = 'SDO_CS.TRANSFORM'
 UNION = 'SDO_GEOM.SDO_UNION'
 UNIONAGG = 'SDO_AGGR_UNION'
 
-# We want to get SDO Geometries as WKT because it is much easier to 
-# instantiate GEOS proxies from WKT than SDO_GEOMETRY(...) strings.  
-# However, this adversely affects performance (i.e., Java is called 
-# to convert to WKT on every query).  If someone wishes to write a 
+# We want to get SDO Geometries as WKT because it is much easier to
+# instantiate GEOS proxies from WKT than SDO_GEOMETRY(...) strings.
+# However, this adversely affects performance (i.e., Java is called
+# to convert to WKT on every query).  If someone wishes to write a
 # SDO_GEOMETRY(...) parser in Python, let me know =)
 GEOM_SELECT = 'SDO_UTIL.TO_WKTGEOMETRY(%s)'
 
@@ -50,7 +50,7 @@ class SDOOperation(SpatialFunction):
 class SDODistance(SpatialFunction):
     "Class for Distance queries."
     def __init__(self, op, tolerance=0.05):
-        super(SDODistance, self).__init__(DISTANCE, end_subst=', %s) %%s %%s' % tolerance, 
+        super(SDODistance, self).__init__(DISTANCE, end_subst=', %s) %%s %%s' % tolerance,
                                           operator=op, result='%%s')
 
 class SDOGeomRelate(SpatialFunction):
@@ -59,7 +59,7 @@ class SDOGeomRelate(SpatialFunction):
         # SDO_GEOM.RELATE(...) has a peculiar argument order: column, mask, geom, tolerance.
         # Moreover, the runction result is the mask (e.g., 'DISJOINT' instead of 'TRUE').
         end_subst = "%s%s) %s '%s'" % (', %%s, ', tolerance, '=', mask)
-        beg_subst = "%%s(%%s, '%s'" % mask 
+        beg_subst = "%%s(%%s, '%s'" % mask
         super(SDOGeomRelate, self).__init__('SDO_GEOM.RELATE', beg_subst=beg_subst, end_subst=end_subst)
 
 class SDORelate(SpatialFunction):
@@ -81,7 +81,7 @@ DISTANCE_FUNCTIONS = {
     'distance_gte' : (SDODistance('>='), dtypes),
     'distance_lt' : (SDODistance('<'), dtypes),
     'distance_lte' : (SDODistance('<='), dtypes),
-    'dwithin' : (SDOOperation('SDO_WITHIN_DISTANCE', 
+    'dwithin' : (SDOOperation('SDO_WITHIN_DISTANCE',
                               beg_subst="%s(%s, %%s, 'distance=%%s'"), dtypes),
     }
 
@@ -118,7 +118,7 @@ def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
     # See if a Oracle Geometry function matches the lookup type next
     lookup_info = ORACLE_GEOMETRY_FUNCTIONS.get(lookup_type, False)
     if lookup_info:
-        # Lookup types that are tuples take tuple arguments, e.g., 'relate' and 
+        # Lookup types that are tuples take tuple arguments, e.g., 'relate' and
         # 'dwithin' lookup types.
         if isinstance(lookup_info, tuple):
             # First element of tuple is lookup type, second element is the type
@@ -128,15 +128,15 @@ def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
             # Ensuring that a tuple _value_ was passed in from the user
             if not isinstance(geo_annot.value, tuple):
                 raise TypeError('Tuple required for `%s` lookup type.' % lookup_type)
-            if len(geo_annot.value) != 2: 
+            if len(geo_annot.value) != 2:
                 raise ValueError('2-element tuple required for %s lookup type.' % lookup_type)
-            
+
             # Ensuring the argument type matches what we expect.
             if not isinstance(geo_annot.value[1], arg_type):
                 raise TypeError('Argument type should be %s, got %s instead.' % (arg_type, type(geo_annot.value[1])))
 
             if lookup_type == 'relate':
-                # The SDORelate class handles construction for these queries, 
+                # The SDORelate class handles construction for these queries,
                 # and verifies the mask argument.
                 return sdo_op(geo_annot.value[1]).as_sql(geo_col)
             else:
@@ -144,7 +144,7 @@ def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
                 return sdo_op.as_sql(geo_col)
         else:
             # Lookup info is a SDOOperation instance, whose `as_sql` method returns
-            # the SQL necessary for the geometry function call. For example:  
+            # the SQL necessary for the geometry function call. For example:
             #  SDO_CONTAINS("geoapp_country"."poly", SDO_GEOMTRY('POINT(5 23)', 4326)) = 'TRUE'
             return lookup_info.as_sql(geo_col)
     elif lookup_type == 'isnull':
