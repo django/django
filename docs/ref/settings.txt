@@ -812,6 +812,43 @@ Bad: ``"http://www.example.com/static"``
 
 .. setting:: MIDDLEWARE_CLASSES
 
+MESSAGE_LEVEL
+-------------
+
+.. versionadded:: 1.2
+
+Default: `messages.INFO`
+
+Sets the minimum message level that will be recorded by the messages 
+framework. See the :ref:`messages documentation <ref-contrib-messages>` for
+more details.
+
+MESSAGE_STORAGE
+---------------
+
+.. versionadded:: 1.2
+
+Default: ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
+
+Controls where Django stores message data.  See the
+:ref:`messages documentation <ref-contrib-messages>` for more details.
+
+MESSAGE_TAGS
+------------
+
+.. versionadded:: 1.2
+
+Default::
+
+        {messages.DEBUG: 'debug',
+        messages.INFO: 'info',
+        messages.SUCCESS: 'success',
+        messages.WARNING: 'warning',
+        messages.ERROR: 'error',}
+
+Sets the mapping of message levels to message tags. See the
+:ref:`messages documentation <ref-contrib-messages>` for more details.
+
 MIDDLEWARE_CLASSES
 ------------------
 
@@ -820,9 +857,15 @@ Default::
     ('django.middleware.common.CommonMiddleware',
      'django.contrib.sessions.middleware.SessionMiddleware',
      'django.middleware.csrf.CsrfViewMiddleware',
-     'django.contrib.auth.middleware.AuthenticationMiddleware',)
+     'django.contrib.auth.middleware.AuthenticationMiddleware',
+     'django.contrib.messages.middleware.MessageMiddleware',)
 
 A tuple of middleware classes to use. See :ref:`topics-http-middleware`.
+
+.. versionchanged:: 1.2
+   ``'django.contrib.messages.middleware.MessageMiddleware'`` was added to the
+   default.  For more information, see the :ref:`messages documentation
+   <ref-contrib-messages>`.
 
 .. setting:: MONTH_DAY_FORMAT
 
@@ -1059,11 +1102,17 @@ Default::
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
-    "django.core.context_processors.media")
+    "django.core.context_processors.media",
+    "django.contrib.messages.context_processors.messages")
 
 A tuple of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
 of items to be merged into the context.
+
+.. versionchanged:: 1.2
+   ``"django.contrib.messages.context_processors.messages"`` was added to the
+   default.  For more information, see the :ref:`messages documentation
+   <ref-contrib-messages>`.
 
 .. setting:: TEMPLATE_DEBUG
 

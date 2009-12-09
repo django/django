@@ -121,6 +121,38 @@ additional arguments, those arguments can be passed to the
 :meth:`~django.core.mail.get_connection()` call::
 
     connection = get_connection('django.core.mail.backends.smtp', hostname='localhost', port=1234)
+    
+User Messages API
+-----------------
+
+The API for storing messages in the user ``Message`` model (via 
+``user.message_set.create``) is now deprecated and will be removed in Django
+1.4 according to the standard :ref:`release process <internals-release-process>`.
+
+To upgrade your code, you need to replace any instances of::
+
+    user.message_set.create('a message')
+
+with the following::
+
+    from django.contrib import messages
+    messages.add_message(request, messages.INFO, 'a message')
+
+Additionally, if you make use of the method, you need to replace the 
+following::
+
+    for message in user.get_and_delete_messages():
+        ...
+    
+with::
+
+    from django.contrib import messages
+    for message in messages.get_messages(request):
+        ...
+    
+For more information, see the full 
+:ref:`messages documentation <ref-contrib-messages>`. You should begin to 
+update your code to use the new API immediately.
 
 What's new in Django 1.2
 ========================
@@ -155,3 +187,12 @@ backend implementations that allow you to send e-mail to a
 :ref:`memory<topic-email-memory-backend>` - you can even configure all
 e-mail to be :ref:`thrown away<topic-email-dummy-backend>`.
 
+Messages Framework
+------------------
+
+Django now includes a robust and configurable :ref:`messages framework
+<ref-contrib-messages>` with built-in support for cookie- and session-based
+messaging, for both anonymous and authenticated clients. The messages framework
+replaces the deprecated user message API and allows you to temporarily store
+messages in one request and retrieve them for display in a subsequent request
+(usually the next one).

@@ -172,6 +172,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
 #    'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
 )
 
 # Output to use in template system for invalid (e.g. misspelled) variables.
@@ -308,6 +309,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 #     'django.middleware.http.ConditionalGetMiddleware',
 #     'django.middleware.gzip.GZipMiddleware',
 )
@@ -392,6 +394,16 @@ CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 # Name and domain for CSRF cookie.
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_COOKIE_DOMAIN = None
+
+############
+# MESSAGES #
+############
+
+# Class to use as messges backend
+MESSAGE_STORAGE = 'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'
+
+# Default values of MESSAGE_LEVEL and MESSAGE_TAGS are defined within
+# django.contrib.messages to avoid imports in this settings file.
 
 ###########
 # TESTING #

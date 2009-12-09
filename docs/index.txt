@@ -170,6 +170,7 @@ Other batteries included
     * :ref:`Internationalization <topics-i18n>`
     * :ref:`Jython support <howto-jython>`
     * :ref:`"Local flavor" <ref-contrib-localflavor>`
+    * :ref:`Messages <ref-contrib-messages>`
     * :ref:`Pagination <topics-pagination>`
     * :ref:`Redirects <ref-contrib-redirects>`
     * :ref:`Serialization <topics-serialization>`

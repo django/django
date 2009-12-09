@@ -28,6 +28,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.flatpages',
     'django.contrib.redirects',
     'django.contrib.sessions',
+    'django.contrib.messages',
     'django.contrib.comments',
     'django.contrib.admin',
 ]
@@ -107,6 +108,7 @@ def django_tests(verbosity, interactive, test_labels):
     settings.MIDDLEWARE_CLASSES = (
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.common.CommonMiddleware',
     )
     settings.SITE_ID = 1

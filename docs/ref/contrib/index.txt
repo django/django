@@ -34,6 +34,7 @@ those packages have.
    formtools/index
    humanize
    localflavor
+   messages
    redirects
    sitemaps
    sites
@@ -149,6 +150,17 @@ read the source code in django/contrib/markup/templatetags/markup.py.
 .. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
 .. _Markdown: http://en.wikipedia.org/wiki/Markdown
 .. _ReST (ReStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
+
+messages
+========
+
+.. versionchanged:: 1.2
+    The messages framework was added.
+
+A framework for storing and retrieving temporary cookie- or session-based
+messages
+
+See the :ref:`messages documentation <ref-contrib-messages>`.
 
 redirects
 =========
