@@ -187,8 +187,8 @@ tags:
                 <li>{{ athlete.name }}</li>
             {% endfor %}
             </ul>
-        
-    :ttag:`if` and :ttag:`else`
+
+    :ttag:`if` and ``else``
         Evaluates a variable, and if that variable is "true" the contents of the
         block are displayed::
 
@@ -200,20 +200,15 @@ tags:
 
         In the above, if ``athlete_list`` is not empty, the number of athletes
         will be displayed by the ``{{ athlete_list|length }}`` variable.
-        
-    :ttag:`ifequal` and :ttag:`ifnotequal`
-        Display some contents if two arguments are or are not equal. For example::
 
-            {% ifequal athlete.name coach.name %}
-                ...
-            {% endifequal %}
+        You can also use filters and various operators in the ``if`` tag::
 
-        Or::
+            {% if athlete_list|length > 1 %}
+               Team: {% for athlete in athlete_list %} ... {% endfor %}
+            {% else %}
+               Athlete: {{ athlete_list.0.name }}
+            {% endif %}
 
-            {% ifnotequal athlete.name "Joe" %}
-                ...
-            {% endifnotequal %}
-    
     :ttag:`block` and :ttag:`extends`
         Set up `template inheritance`_ (see below), a powerful way
         of cutting down on "boilerplate" in templates.

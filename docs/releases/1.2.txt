@@ -42,6 +42,15 @@ changes that developers must be aware of:
  * All of the CSRF has moved from contrib to core (with backwards compatible
    imports in the old locations, which are deprecated).
 
+:ttag:`if` tag changes
+----------------------
+
+Due to new features in the :ttag:`if` template tag, it no longer accepts 'and',
+'or' and 'not' as valid **variable** names.  Previously that worked in some
+cases even though these strings were normally treated as keywords.  Now, the
+keyword status is always enforced, and template code like ``{% if not %}`` or
+``{% if and %}`` will throw a TemplateSyntaxError.
+
 ``LazyObject``
 --------------
 
@@ -196,3 +205,37 @@ messaging, for both anonymous and authenticated clients. The messages framework
 replaces the deprecated user message API and allows you to temporarily store
 messages in one request and retrieve them for display in a subsequent request
 (usually the next one).
+
+'Smart' if tag
+--------------
+
+The :ttag:`if` tag has been upgraded to be much more powerful.  First, support
+for comparison operators has been added. No longer will you have to type:
+
+.. code-block:: html+django
+
+    {% ifnotequal a b %}
+     ...
+    {% endifnotequal %}
+
+...as you can now do:
+
+.. code-block:: html+django
+
+    {% if a != b %}
+     ...
+    {% endif %}
+
+The operators supported are ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=`` and
+``in``, all of which work like the Python operators, in addition to ``and``,
+``or`` and ``not`` which were already supported.
+
+Also, filters may now be used in the ``if`` expression. For example:
+
+.. code-block:: html+django
+
+      <div
+        {% if user.email|lower == message.recipient|lower %}
+          class="highlight"
+        {% endif %}
+      >{{ message }}</div>
