@@ -81,6 +81,11 @@ class GenericAdminViewTest(TestCase):
         inline_formset = generic_inlineformset_factory(Media,
             exclude=('url',))
 
+        # Regression test for #12340.
+        e = Episode.objects.get(name='This Week in Django')
+        formset = inline_formset(instance=e)
+        self.failUnless(formset.get_queryset().ordered)
+
 class GenericInlineAdminParametersTest(TestCase):
     fixtures = ['users.xml']
 
