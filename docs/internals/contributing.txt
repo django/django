@@ -426,6 +426,47 @@ translated, here's what to do:
 
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
 
+Django conventions
+==================
+
+Various Django-specific code issues are detailed in this section.
+
+Use of ``django.conf.settings``
+-------------------------------
+
+Modules should not in general use settings stored in ``django.conf.settings`` at
+the top level (i.e. evaluated when the module is imported). The explanation for
+this is as follows:
+
+Manual configuration of settings (i.e. not relying on the
+``DJANGO_SETTINGS_MODULE`` environment variable) is allowed and possible as
+follows::
+
+    from django.conf import settings
+
+    settings.configure({}, SOME_SETTING='foo')
+
+However, if any setting is accessed before the ``settings.configure`` line, this
+will not work. (Internally, ``setttings`` is a ``LazyObject`` which configures
+itself automatically when the settings are accessed if it has not already been
+configured).
+
+So, if there is a module containg some code as follows::
+
+    from django.conf import settings
+    from django.core.urlresolvers import get_callable
+
+    default_foo_view = get_callable(settings.FOO_VIEW)
+
+...then importing this module will cause the settings object to be configured.
+That means that the ability for third parties to import the module at the top
+level is incompatible with the ability to configure the settings object
+manually, or makes it very difficult in some circumstances.
+
+Instead of the above code, a level of laziness or indirection must be used, such
+as :class:`django.utils.functional.LazyObject`, :func:`django.utils.functional.lazy` or
+``lambda``.
+
 Coding style
 ============
 
