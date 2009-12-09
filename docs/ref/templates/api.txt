@@ -311,7 +311,8 @@ and return a dictionary of items to be merged into the context. By default,
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
-    "django.core.context_processors.media")
+    "django.core.context_processors.media",
+    "django.contrib.messages.context_processors.messages")
 
 .. versionadded:: 1.2
    In addition to these, ``RequestContext`` always uses
@@ -319,6 +320,10 @@ and return a dictionary of items to be merged into the context. By default,
    related context processor required by the admin and other contrib apps, and,
    in case of accidental misconfiguration, it is deliberately hardcoded in and
    cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+
+.. versionadded:: 1.2
+   The ``'messages'`` context processor was added.  For more information, see 
+   the :ref:`messages documentation <ref-contrib-messages>`.
 
 Each processor is applied in order. That means, if one processor adds a
 variable to the context and a second processor adds a variable with the same
@@ -365,16 +370,17 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
       logged-in user (or an ``AnonymousUser`` instance, if the client isn't
       logged in).
 
-    * ``messages`` -- A list of messages (as strings) for the currently
-      logged-in user. Behind the scenes, this calls
-      ``request.user.get_and_delete_messages()`` for every request. That method
-      collects the user's messages and deletes them from the database.
-
-      Note that messages are set with ``user.message_set.create``.
+    * ``messages`` -- A list of messages (as strings) that have been set
+      via the :ref:`messages framework <ref-contrib-messages>`.
 
     * ``perms`` -- An instance of
       ``django.core.context_processors.PermWrapper``, representing the
       permissions that the currently logged-in user has.
+
+.. versionchanged:: 1.2
+   Prior to version 1.2, the ``messages`` variable was a lazy accessor for
+   ``user.get_and_delete_messages()``. It has been changed to include any 
+   messages added via the :ref:`messages framework <ref-contrib-messages`.
 
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -426,6 +432,25 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``request``, which is the current
 :class:`~django.http.HttpRequest`. Note that this processor is not enabled by default;
 you'll have to activate it.
+
+django.contrib.messages.context_processors.messages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
+``RequestContext`` will contain a single additional variable:
+
+    * ``messages`` -- A list of messages (as strings) that have been set
+      via the user model (using ``user.message_set.create``) or through
+      the :ref:`messages framework <ref-contrib-messages>`.
+
+.. versionadded:: 1.2
+   This template context variable was previously supplied by the ``'auth'``
+   context processor.  For backwards compatibility the ``'auth'`` context
+   processor will continue to supply the ``messages`` variable until Django
+   1.4.  If you use the ``messages`` variable, your project will work with
+   either (or both) context processors, but it is recommended to add 
+   ``django.contrib.messages.context_processors.messages`` so your project
+   will be prepared for the future upgrade.
 
 Writing your own context processors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

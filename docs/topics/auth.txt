@@ -23,6 +23,9 @@ The auth system consists of:
       user.
     * Messages: A simple way to queue messages for given users.
 
+.. deprecated:: 1.2
+   The Messages component of the auth system will be removed in Django 1.4.
+ 
 Installation
 ============
 
@@ -1289,6 +1292,11 @@ messages.
 Messages
 ========
 
+.. deprecated:: 1.2
+   This functionality will be removed in Django 1.4.  You should use the
+   :ref:`messages framework <ref-contrib-messages>` for all new projects and
+   begin to update your existing code immediately.
+
 The message system is a lightweight way to queue messages for given users.
 
 A message is associated with a :class:`~django.contrib.auth.models.User`.
@@ -1334,13 +1342,16 @@ logged-in user and his/her messages are made available in the
     </ul>
     {% endif %}
 
-Note that :class:`~django.template.context.RequestContext` calls
-:meth:`~django.contrib.auth.models.User.get_and_delete_messages` behind the
-scenes, so any messages will be deleted even if you don't display them.
+.. versionchanged:: 1.2
+   The ``messages`` template variable uses a backwards compatible method in the
+   :ref:`messages framework <ref-contrib-messages>` to retrieve messages from
+   both the user ``Message`` model and from the new framework.  Unlike in
+   previous revisions, the messages will not be erased unless they are actually
+   displayed.
 
 Finally, note that this messages framework only works with users in the user
 database. To send messages to anonymous users, use the
-:ref:`session framework <topics-http-sessions>`.
+:ref:`messages framework <ref-contrib-messages>`.
 
 .. _authentication-backends:
 

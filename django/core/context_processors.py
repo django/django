@@ -10,6 +10,7 @@ RequestContext.
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.utils.functional import lazy, memoize, SimpleLazyObject
+from django.contrib import messages
 
 def auth(request):
     """
@@ -37,8 +38,8 @@ def auth(request):
 
     return {
         'user': SimpleLazyObject(get_user),
-        'messages': lazy(memoize(lambda: get_user().get_and_delete_messages(), {}, 0), list)(),
-        'perms':  lazy(lambda: PermWrapper(get_user()), PermWrapper)(),
+        'messages': messages.get_messages(request),
+        'perms': lazy(lambda: PermWrapper(get_user()), PermWrapper)(),
     }
 
 def csrf(request):

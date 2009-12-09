@@ -153,6 +153,8 @@ launch a CSRF attack on your site against that user.  The
 ``@csrf_response_exempt`` decorator can be used to fix this, but only if the
 page doesn't also contain internal forms that require the token.
 
+.. _ref-csrf-upgrading-notes:
+
 Upgrading notes
 ---------------
 

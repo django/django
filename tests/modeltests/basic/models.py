@@ -211,6 +211,14 @@ True
 >>> Article.objects.get(id__exact=8) == Article.objects.get(id__exact=7)
 False
 
+# You can use 'in' to test for membership...
+>>> a8 in Article.objects.all()
+True
+
+# ... but there will often be more efficient ways if that is all you need:
+>>> Article.objects.filter(id=a8.id).exists()
+True
+
 # dates() returns a list of available dates of the given scope for the given field.
 >>> Article.objects.dates('pub_date', 'year')
 [datetime.datetime(2005, 1, 1, 0, 0)]

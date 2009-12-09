@@ -18,7 +18,7 @@ class Callproc(unittest.TestCase):
             return True
         else:
             return True
-
+            
 class LongString(unittest.TestCase):
 
     def test_long_string(self):

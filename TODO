@@ -7,6 +7,7 @@ Required for v1.2
  * Finalize the sql.Query internals
    * Clean up the use of db.backend.query_class()
    * Verify it still works with GeoDjango
+ * Modify the admin interface to support multiple databases (doh).
 
 Optional for v1.2
 ~~~~~~~~~~~~~~~~~

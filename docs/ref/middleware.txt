@@ -139,6 +139,20 @@ Enables language selection based on data from the request. It customizes
 content for each user. See the :ref:`internationalization documentation
 <topics-i18n>`.
 
+Message middleware
+------------------
+
+.. module:: django.contrib.messages.middleware
+   :synopsis: Message middleware.
+
+.. class:: django.contrib.messages.middleware.MessageMiddleware
+
+.. versionadded:: 1.2
+   ``MessageMiddleware`` was added.
+   
+Enables cookie- and session-based message support. See the 
+:ref:`messages documentation <ref-contrib-messages>`.
+
 Session middleware
 ------------------
 

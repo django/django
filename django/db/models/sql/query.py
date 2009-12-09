@@ -22,6 +22,7 @@ from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import WhereNode, Constraint, EverythingNode, AND, OR
 from django.core.exceptions import FieldError
 
+
 __all__ = ['Query']
 
 class Query(object):

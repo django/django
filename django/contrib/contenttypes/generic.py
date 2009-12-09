@@ -317,10 +317,13 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
         from django.contrib.contenttypes.models import ContentType
         if self.instance is None or self.instance.pk is None:
             return self.model._default_manager.none()
-        return self.model._default_manager.filter(**{
+        qs = self.model._default_manager.filter(**{
             self.ct_field.name: ContentType.objects.get_for_model(self.instance),
             self.ct_fk_field.name: self.instance.pk,
         })
+        if not qs.ordered:
+            qs = qs.order_by(self.model._meta.pk.name)
+        return qs
 
     def save_new(self, form, commit=True):
         # Avoid a circular import.

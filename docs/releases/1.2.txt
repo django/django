@@ -26,13 +26,13 @@ There have been large changes to the way that CSRF protection works, detailed in
 changes that developers must be aware of:
 
  * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
-   will be removed completely in Django 1.4, in favour of a template tag that
+   will be removed completely in Django 1.4, in favor of a template tag that
    should be inserted into forms.
 
  * All contrib apps use a ``csrf_protect`` decorator to protect the view.  This
    requires the use of the csrf_token template tag in the template, so if you
-   have used custom templates for contrib views, you MUST READ THE UPGRADE
-   INSTRUCTIONS to fix those templates.
+   have used custom templates for contrib views, you MUST READ THE :ref:`UPGRADE
+   INSTRUCTIONS <ref-csrf-upgrading-notes>` to fix those templates.
 
  * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
    default. This turns on CSRF protection by default, so that views that accept
@@ -42,8 +42,8 @@ changes that developers must be aware of:
  * All of the CSRF has moved from contrib to core (with backwards compatible
    imports in the old locations, which are deprecated).
 
-LazyObject
-----------
+``LazyObject``
+--------------
 
 ``LazyObject`` is an undocumented utility class used for lazily wrapping other
 objects of unknown type.  In Django 1.1 and earlier, it handled introspection in
@@ -214,7 +214,86 @@ argument to resolve database-specific values.
 Features deprecated in 1.2
 ==========================
 
-None.
+CSRF response rewriting middleware
+----------------------------------
+
+``CsrfResponseMiddleware``, the middleware that automatically inserted CSRF
+tokens into POST forms in outgoing pages, has been deprecated in favor of a
+template tag method (see above), and will be removed completely in Django
+1.4. ``CsrfMiddleware``, which includes the functionality of
+``CsrfResponseMiddleware`` and ``CsrfViewMiddleware`` has likewise been
+deprecated.
+
+Also, the CSRF module has moved from contrib to core, and the old imports are
+deprecated, as described in the :ref:`upgrading notes <ref-csrf-upgrading-notes>`.
+
+``SMTPConnection``
+------------------
+
+The ``SMTPConnection`` class has been deprecated in favor of a generic
+E-mail backend API. Old code that explicitly instantiated an instance
+of an SMTPConnection::
+
+    from django.core.mail import SMTPConnection
+    connection = SMTPConnection()
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
+should now call :meth:`~django.core.mail.get_connection()` to
+instantiate a generic e-mail connection::
+
+    from django.core.mail import get_connection
+    connection = get_connection()
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
+Depending on the value of the :setting:`EMAIL_BACKEND` setting, this
+may not return an SMTP connection. If you explicitly require an SMTP
+connection with which to send e-mail, you can explicitly request an
+SMTP connection::
+
+    from django.core.mail import get_connection
+    connection = get_connection('django.core.mail.backends.smtp')
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
+If your call to construct an instance of ``SMTPConnection`` required
+additional arguments, those arguments can be passed to the
+:meth:`~django.core.mail.get_connection()` call::
+
+    connection = get_connection('django.core.mail.backends.smtp', hostname='localhost', port=1234)
+    
+User Messages API
+-----------------
+
+The API for storing messages in the user ``Message`` model (via 
+``user.message_set.create``) is now deprecated and will be removed in Django
+1.4 according to the standard :ref:`release process <internals-release-process>`.
+
+To upgrade your code, you need to replace any instances of::
+
+    user.message_set.create('a message')
+
+with the following::
+
+    from django.contrib import messages
+    messages.add_message(request, messages.INFO, 'a message')
+
+Additionally, if you make use of the method, you need to replace the 
+following::
+
+    for message in user.get_and_delete_messages():
+        ...
+    
+with::
+
+    from django.contrib import messages
+    for message in messages.get_messages(request):
+        ...
+    
+For more information, see the full 
+:ref:`messages documentation <ref-contrib-messages>`. You should begin to 
+update your code to use the new API immediately.
 
 What's new in Django 1.2
 ========================
@@ -231,23 +310,33 @@ malicious site in their browser. A related type of attack, 'login
 CSRF', where an attacking site tricks a user's browser into logging
 into a site with someone else's credentials, is also covered.
 
-Email Backends
---------------
+E-mail Backends
+---------------
 
-You can now :ref:`configure the way that Django sends email
-<topic-email-backends>`. Instead of using SMTP to send all email, you
-can now choose a configurable email backend to send messages. If your
+You can now :ref:`configure the way that Django sends e-mail
+<topic-email-backends>`. Instead of using SMTP to send all e-mail, you
+can now choose a configurable e-mail backend to send messages. If your
 hosting provider uses a sandbox or some other non-SMTP technique for
-sending mail, you can now construct an email backend that will allow
+sending mail, you can now construct an e-mail backend that will allow
 Django's standard :ref:`mail sending methods<topics-email>` to use
 those facilities.
 
 This also makes it easier to debug mail sending - Django ships with
-backend implementations that allow you to send email to a
+backend implementations that allow you to send e-mail to a
 :ref:`file<topic-email-file-backend>`, to the
 :ref:`console<topic-email-console-backend>`, or to
 :ref:`memory<topic-email-memory-backend>` - you can even configure all
-email to be :ref:`thrown away<topic-email-console-backend>`.
+e-mail to be :ref:`thrown away<topic-email-dummy-backend>`.
+
+Messages Framework
+------------------
+
+Django now includes a robust and configurable :ref:`messages framework
+<ref-contrib-messages>` with built-in support for cookie- and session-based
+messaging, for both anonymous and authenticated clients. The messages framework
+replaces the deprecated user message API and allows you to temporarily store
+messages in one request and retrieve them for display in a subsequent request
+(usually the next one).
 
 Support for multiple databases
 ------------------------------

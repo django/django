@@ -288,6 +288,14 @@ class User(models.Model):
                 raise SiteProfileNotAvailable
         return self._profile_cache
 
+    def _get_message_set(self):
+        import warnings
+        warnings.warn('The user messaging API is deprecated. Please update'
+                      ' your code to use the new messages framework.',
+                      category=PendingDeprecationWarning)
+        return self._message_set
+    message_set = property(_get_message_set)
+
 class Message(models.Model):
     """
     The message system is a lightweight way to queue messages for given
@@ -297,7 +305,7 @@ class Message(models.Model):
     actions. For example, "The poll Foo was created successfully." is a
     message.
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name='_message_set')
     message = models.TextField(_('message'))
 
     def __unicode__(self):
