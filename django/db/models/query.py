@@ -107,6 +107,36 @@ class QuerySet(object):
             return False
         return True
 
+    def __contains__(self, val):
+        # The 'in' operator works without this method, due to __iter__. This
+        # implementation exists only to shortcut the creation of Model
+        # instances, by bailing out early if we find a matching element.
+        pos = 0
+        if self._result_cache is not None:
+            if val in self._result_cache:
+                return True
+            elif self._iter is None:
+                # iterator is exhausted, so we have our answer
+                return False
+            # remember not to check these again:
+            pos = len(self._result_cache)
+        else:
+            # We need to start filling the result cache out. The following
+            # ensures that self._iter is not None and self._result_cache is not
+            # None
+            it = iter(self)
+
+        # Carry on, one result at a time.
+        while True:
+            if len(self._result_cache) <= pos:
+                self._fill_cache(num=1)
+            if self._iter is None:
+                # we ran out of items
+                return False
+            if self._result_cache[pos] == val:
+                return True
+            pos += 1
+
     def __getitem__(self, k):
         """
         Retrieves an item or slice from the set of results.
