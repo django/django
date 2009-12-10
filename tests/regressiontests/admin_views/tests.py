@@ -610,6 +610,12 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def tearDown(self):
         self.client.logout()
 
+    def test_get_history_view(self):
+        "Retrieving the history for the object using urlencoded form of primary key should work"
+        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/history/' % quote(self.pk))
+        self.assertContains(response, escape(self.pk))
+        self.failUnlessEqual(response.status_code, 200)
+ 
     def test_get_change_view(self):
         "Retrieving the object using urlencoded form of primary key should work"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(self.pk))
