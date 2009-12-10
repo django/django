@@ -1,4 +1,5 @@
 import datetime
+from warnings import warn
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
@@ -19,6 +20,12 @@ def load_backend(path):
         cls = getattr(mod, attr)
     except AttributeError:
         raise ImproperlyConfigured, 'Module "%s" does not define a "%s" authentication backend' % (module, attr)
+    try:
+        getattr(cls, 'supports_object_permissions')
+    except AttributeError:
+        warn("Authentication backends without a `supports_object_permissions` attribute are deprecated. Please define it in %s." % cls,
+             PendingDeprecationWarning)
+        cls.supports_object_permissions = False
     return cls()
 
 def get_backends():

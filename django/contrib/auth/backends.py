@@ -11,6 +11,8 @@ class ModelBackend(object):
     """
     Authenticates against django.contrib.auth.models.User.
     """
+    supports_object_permissions = False
+
     # TODO: Model, login attribute name and password attribute name should be
     # configurable.
     def authenticate(self, username=None, password=None):
