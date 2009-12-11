@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-25 20:56+0100\n"
+"POT-Creation-Date: 2009-12-11 10:11+0100\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -223,7 +223,7 @@ msgstr "chiński tradycyjny"
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Usunięto %(count)d %(items)s."
 
-#: contrib/admin/actions.py:67 contrib/admin/options.py:1027
+#: contrib/admin/actions.py:67 contrib/admin/options.py:1034
 msgid "Are you sure?"
 msgstr "Jesteś pewien?"
 
@@ -310,87 +310,87 @@ msgstr "log"
 msgid "log entries"
 msgstr "logi"
 
-#: contrib/admin/options.py:133 contrib/admin/options.py:147
+#: contrib/admin/options.py:135 contrib/admin/options.py:149
 msgid "None"
 msgstr "brak"
 
-#: contrib/admin/options.py:519
+#: contrib/admin/options.py:522
 #, python-format
 msgid "Changed %s."
 msgstr "Zmieniono %s"
 
-#: contrib/admin/options.py:519 contrib/admin/options.py:529
+#: contrib/admin/options.py:522 contrib/admin/options.py:532
 #: contrib/comments/templates/comments/preview.html:16 forms/models.py:384
 #: forms/models.py:596
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/options.py:524
+#: contrib/admin/options.py:527
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:528
+#: contrib/admin/options.py:531
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Zmieniono %(list)s w %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:533
+#: contrib/admin/options.py:536
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Usunięto %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:537
+#: contrib/admin/options.py:540
 msgid "No fields changed."
 msgstr "Żadne pole nie zmienione."
 
-#: contrib/admin/options.py:599 contrib/auth/admin.py:67
+#: contrib/admin/options.py:602 contrib/auth/admin.py:68
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
 
-#: contrib/admin/options.py:603 contrib/admin/options.py:636
-#: contrib/auth/admin.py:75
+#: contrib/admin/options.py:606 contrib/admin/options.py:639
+#: contrib/auth/admin.py:77
 msgid "You may edit it again below."
 msgstr "Możesz ponownie edytować wpis poniżej."
 
-#: contrib/admin/options.py:613 contrib/admin/options.py:646
+#: contrib/admin/options.py:616 contrib/admin/options.py:649
 #, python-format
 msgid "You may add another %s below."
 msgstr "Możesz dodać nowy wpis %s poniżej."
 
-#: contrib/admin/options.py:634
+#: contrib/admin/options.py:637
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
 
-#: contrib/admin/options.py:642
+#: contrib/admin/options.py:645
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" dodane pomyślnie. Możesz edytować ponownie wpis poniżej."
 
-#: contrib/admin/options.py:773
+#: contrib/admin/options.py:778
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj %s"
 
-#: contrib/admin/options.py:804 contrib/admin/options.py:1005
+#: contrib/admin/options.py:810 contrib/admin/options.py:1012
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
 
-#: contrib/admin/options.py:861
+#: contrib/admin/options.py:867
 #, python-format
 msgid "Change %s"
 msgstr "Zmień %s"
 
-#: contrib/admin/options.py:905
+#: contrib/admin/options.py:911
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
-#: contrib/admin/options.py:941
+#: contrib/admin/options.py:947
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -398,17 +398,17 @@ msgstr[0] "%(count)s %(name)s został pomyślnie zmieniony."
 msgstr[1] "%(count)s %(name)s zostały pomyślnie zmienione."
 msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
 
-#: contrib/admin/options.py:1020
+#: contrib/admin/options.py:1027
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" usunięty pomyślnie."
 
-#: contrib/admin/options.py:1057
+#: contrib/admin/options.py:1064
 #, python-format
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
 
-#: contrib/admin/sites.py:21 contrib/admin/views/decorators.py:14
+#: contrib/admin/sites.py:22 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -417,11 +417,11 @@ msgstr ""
 "Proszę wpisać poprawną nazwę użytkownika i hasło. Uwaga: wielkość liter ma "
 "znaczenie."
 
-#: contrib/admin/sites.py:288 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:292 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Twoja sesja wygasła, zaloguj się ponownie."
 
-#: contrib/admin/sites.py:295 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:299 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -429,27 +429,27 @@ msgstr ""
 "Twoja przeglądarka nie chce akceptować ciasteczek. Zmień jej ustawienia i "
 "spróbuj ponownie."
 
-#: contrib/admin/sites.py:311 contrib/admin/sites.py:317
+#: contrib/admin/sites.py:315 contrib/admin/sites.py:321
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Nazwy użytkowników nie mogą zawierać znaku '@'."
 
-#: contrib/admin/sites.py:314 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:318 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Podany adres e-mail nie jest Twoją nazwą użytkownika. Spróbuj '%s'."
 
-#: contrib/admin/sites.py:370
+#: contrib/admin/sites.py:374
 msgid "Site administration"
 msgstr "Administracja stroną"
 
-#: contrib/admin/sites.py:384 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:388 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Zaloguj się"
 
-#: contrib/admin/sites.py:429
+#: contrib/admin/sites.py:433
 #, python-format
 msgid "%s administration"
 msgstr "%s - administracja"
@@ -670,8 +670,8 @@ msgid ""
 "Are you sure you want to delete the selected %(object_name)s objects? All of "
 "the following objects and their related items will be deleted:"
 msgstr ""
-"Czy chcesz skasować wybrane %(object_name)s? Następujące obiekty i zależne od "
-"nich zostaną skasowane:"
+"Czy chcesz skasować wybrane %(object_name)s? Następujące obiekty i zależne "
+"od nich zostaną skasowane:"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -977,7 +977,7 @@ msgstr "Adres e-mail:"
 msgid "Reset my password"
 msgstr "Zresetuj moje hasło"
 
-#: contrib/admin/templatetags/admin_list.py:299
+#: contrib/admin/templatetags/admin_list.py:304
 msgid "All dates"
 msgstr "Wszystkie daty"
 
@@ -991,11 +991,11 @@ msgstr "Zaznacz %s"
 msgid "Select %s to change"
 msgstr "Zaznacz %s aby zmienić"
 
-#: contrib/admin/views/template.py:37 contrib/sites/models.py:38
+#: contrib/admin/views/template.py:38 contrib/sites/models.py:38
 msgid "site"
 msgstr "strona"
 
-#: contrib/admin/views/template.py:39
+#: contrib/admin/views/template.py:40
 msgid "template"
 msgstr "szablon"
 
@@ -1209,37 +1209,37 @@ msgstr "Edytuj ten obiekt (nowe okno)"
 msgid "As above, but opens the admin page in a new window."
 msgstr "Jak wyżej, tyle że otwiera nowe okno."
 
-#: contrib/auth/admin.py:21
+#: contrib/auth/admin.py:22
 msgid "Personal info"
 msgstr "Dane osobowe"
 
-#: contrib/auth/admin.py:22
+#: contrib/auth/admin.py:23
 msgid "Permissions"
 msgstr "Uprawnienia"
 
-#: contrib/auth/admin.py:23
+#: contrib/auth/admin.py:24
 msgid "Important dates"
 msgstr "Ważne daty"
 
-#: contrib/auth/admin.py:24
+#: contrib/auth/admin.py:25
 msgid "Groups"
 msgstr "Grupy"
 
-#: contrib/auth/admin.py:80
+#: contrib/auth/admin.py:82
 msgid "Add user"
 msgstr "Dodaj użytkownika"
 
-#: contrib/auth/admin.py:106
+#: contrib/auth/admin.py:108
 msgid "Password changed successfully."
 msgstr "Hasło zostało zmienione pomyślnie."
 
-#: contrib/auth/admin.py:112
+#: contrib/auth/admin.py:114
 #, python-format
 msgid "Change password: %s"
 msgstr "Zmień hasło: %s"
 
 #: contrib/auth/forms.py:15 contrib/auth/forms.py:48
-#: contrib/auth/models.py:128
+#: contrib/auth/models.py:129
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
@@ -1329,31 +1329,31 @@ msgstr "uprawnienia"
 msgid "group"
 msgstr "grupa"
 
-#: contrib/auth/models.py:91 contrib/auth/models.py:138
+#: contrib/auth/models.py:91 contrib/auth/models.py:139
 msgid "groups"
 msgstr "grupy"
 
-#: contrib/auth/models.py:128
+#: contrib/auth/models.py:129
 msgid "username"
 msgstr "użytkownik"
 
-#: contrib/auth/models.py:129
+#: contrib/auth/models.py:130
 msgid "first name"
 msgstr "imię"
 
-#: contrib/auth/models.py:130
+#: contrib/auth/models.py:131
 msgid "last name"
 msgstr "nazwisko"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:132
 msgid "e-mail address"
 msgstr "adres e-mail"
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:133
 msgid "password"
 msgstr "hasło"
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:133
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1361,19 +1361,19 @@ msgstr ""
 "Użyj '[algo]$[salt]$[hexdigest]' lub <a href=\"password/\">formularza zmiany "
 "hasła</a>."
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:134
 msgid "staff status"
 msgstr "w zespole"
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:134
 msgid "Designates whether the user can log into this admin site."
 msgstr "Oznacza czy użytkownik może zalogować się do panelu admina."
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:135
 msgid "active"
 msgstr "aktywny"
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:135
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -1381,11 +1381,11 @@ msgstr ""
 "Oznacza czy użytkownika należy uważać za aktywnego. Odznacz to, zamiast "
 "usuwać konta."
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:136
 msgid "superuser status"
 msgstr "status administratora"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:136
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -1393,15 +1393,15 @@ msgstr ""
 "Oznacza, że ten użytkownik ma wszystkie uprawnienia bez jawnego "
 "przypisywania ich."
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:137
 msgid "last login"
 msgstr "ostatnio zalogowany"
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:138
 msgid "date joined"
 msgstr "data przyłączenia"
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:140
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1409,24 +1409,24 @@ msgstr ""
 "Oprócz uprawnień przypisanych bezpośrednio użytkownikowi otrzyma on "
 "uprawnienia grup, do których należy."
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:141
 msgid "user permissions"
 msgstr "uprawnienia użytkownika"
 
-#: contrib/auth/models.py:144 contrib/comments/models.py:50
+#: contrib/auth/models.py:145 contrib/comments/models.py:50
 #: contrib/comments/models.py:168
 msgid "user"
 msgstr "użytkownik"
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:146
 msgid "users"
 msgstr "użytkownicy"
 
-#: contrib/auth/models.py:301
+#: contrib/auth/models.py:334
 msgid "message"
 msgstr "wiadomość"
 
-#: contrib/auth/views.py:58
+#: contrib/auth/views.py:60
 msgid "Logged out"
 msgstr "Wylogowany"
 
@@ -1774,7 +1774,7 @@ msgstr "strona statyczna"
 msgid "flat pages"
 msgstr "strony statyczne"
 
-#: contrib/formtools/wizard.py:130
+#: contrib/formtools/wizard.py:132
 msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."
@@ -3811,6 +3811,10 @@ msgstr "Prowincja Północno-Zachodnia"
 msgid "Western Cape"
 msgstr "Prowincja Przylądkowa Zachodnia"
 
+#: contrib/messages/tests/base.py:97
+msgid "lazy message"
+msgstr "testowa wiadomość z opóźnioną ewaluacją"
+
 #: contrib/redirects/models.py:7
 msgid "redirect from"
 msgstr "przekieruj z"
@@ -3919,14 +3923,14 @@ msgstr ""
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Proszę wpisać poprawną godzinę w formacie HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/related.py:816
+#: db/models/fields/related.py:869
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Przytrzymaj wciśnięty klawisz \"Ctrl\" lub \"Command\" na Mac'u aby "
 "zaznaczyć więcej niż jeden wybór."
 
-#: db/models/fields/related.py:894
+#: db/models/fields/related.py:930
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4427,17 +4431,17 @@ msgstr "Y-m"
 msgid "MONTH_DAY_FORMAT"
 msgstr "m-d"
 
-#: views/generic/create_update.py:114
+#: views/generic/create_update.py:115
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s zostało pomyślnie utworzone."
 
-#: views/generic/create_update.py:156
+#: views/generic/create_update.py:158
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s zostało pomyślnie zmienione."
 
-#: views/generic/create_update.py:198
+#: views/generic/create_update.py:201
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s zostało usunięte."
