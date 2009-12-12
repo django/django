@@ -1,7 +1,7 @@
 import hmac
 
 from django.conf import settings
-from django.utils.hashcompat import sha_constructor
+from django.utils.hashcompat import sha_hmac
 from django.contrib.messages import constants
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.utils import simplejson as json
@@ -40,7 +40,6 @@ class MessageDecoder(json.JSONDecoder):
     def decode(self, s, **kwargs):
         decoded = super(MessageDecoder, self).decode(s, **kwargs)
         return self.process_messages(decoded)
-
 
 class CookieStorage(BaseStorage):
     """
@@ -103,7 +102,7 @@ class CookieStorage(BaseStorage):
         SECRET_KEY, modified to make it unique for the present purpose.
         """
         key = 'django.contrib.messages' + settings.SECRET_KEY
-        return hmac.new(key, value, sha_constructor).hexdigest()
+        return hmac.new(key, value, sha_hmac).hexdigest()
 
     def _encode(self, messages, encode_empty=False):
         """
