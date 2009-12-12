@@ -682,6 +682,8 @@ class ManyToManyRel(object):
         return self.to._meta.pk
 
 class ForeignKey(RelatedField, Field):
+    """Foreign Key (type determined by related field)"""
+    
     empty_strings_allowed = False
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel, **kwargs):
         try:
@@ -771,12 +773,13 @@ class ForeignKey(RelatedField, Field):
         return rel_field.db_type()
 
 class OneToOneField(ForeignKey):
-    """
+    """One-to-one relationship
+    
     A OneToOneField is essentially the same as a ForeignKey, with the exception
     that always carries a "unique" constraint with it and the reverse relation
     always returns the object pointed to (since there will only ever be one),
-    rather than returning a list.
-    """
+    rather than returning a list."""
+
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True
         super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)
@@ -791,6 +794,8 @@ class OneToOneField(ForeignKey):
         return super(OneToOneField, self).formfield(**kwargs)
 
 class ManyToManyField(RelatedField, Field):
+    """Many-to-many relationship"""
+    
     def __init__(self, to, **kwargs):
         try:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
