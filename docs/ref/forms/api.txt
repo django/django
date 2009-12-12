@@ -366,6 +366,36 @@ calls its ``as_table()`` method behind the scenes::
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
 
+Styling required or erroneous form rows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.2
+
+It's pretty common to style form rows and fields that are required or have
+errors. For example, you might want to present required form rows in bold and
+highlight errors in red.
+
+The :class:`Form` class has a couple of hooks you can use to add ``class``
+attributes to required rows or to rows with errors: simple set the
+:attr:`Form.error_css_class` and/or :attr:`Form.required_css_class`
+attributes::
+
+    class ContactForm(Form):
+        error_css_class = 'error'
+        required_css_class = 'required'
+        
+        # ... and the rest of your fields here
+        
+Once you've done that, rows will be given ``"error"`` and/or ``"required"``
+classes, as needed. The HTML will look something like::
+
+    >>> f = ContactForm(data)
+    >>> print f.as_table()
+    <tr class="required"><th><label for="id_subject">Subject:</label>    ...
+    <tr class="required"><th><label for="id_message">Message:</label>    ...
+    <tr class="required error"><th><label for="id_sender">Sender:</label>      ...
+    <tr><th><label for="id_cc_myself">Cc myself:<label> ...
+
 .. _ref-forms-api-configuring-label:
 
 Configuring HTML ``<label>`` tags

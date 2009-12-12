@@ -1814,4 +1814,36 @@ True
 >>> print MyForm()
 <tr><th><label for="id_field1">Field1:</label></th><td><input id="id_field1" type="text" name="field1" maxlength="50" /><input type="hidden" name="initial-field1" id="initial-id_field1" /></td></tr>
 
+# The error_html_class and required_html_class attributes ####################
+
+>>> p = Person({})
+>>> p.error_css_class = 'error'
+>>> p.required_css_class = 'required'
+
+>>> print p.as_ul()
+<li class="required error"><ul class="errorlist"><li>This field is required.</li></ul><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
+<li class="required"><label for="id_is_cool">Is cool:</label> <select name="is_cool" id="id_is_cool">
+<option value="1" selected="selected">Unknown</option>
+<option value="2">Yes</option>
+<option value="3">No</option>
+</select></li>
+
+>>> print p.as_p()
+<ul class="errorlist"><li>This field is required.</li></ul>
+<p class="required error"><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
+<p class="required"><label for="id_is_cool">Is cool:</label> <select name="is_cool" id="id_is_cool">
+<option value="1" selected="selected">Unknown</option>
+<option value="2">Yes</option>
+<option value="3">No</option>
+</select></p>
+
+>>> print p.as_table()
+<tr class="required error"><th><label for="id_name">Name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="name" id="id_name" /></td></tr>
+<tr class="required"><th><label for="id_is_cool">Is cool:</label></th><td><select name="is_cool" id="id_is_cool">
+<option value="1" selected="selected">Unknown</option>
+<option value="2">Yes</option>
+<option value="3">No</option>
+</select></td></tr>
+
+
 """

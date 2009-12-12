@@ -138,6 +138,8 @@ class BaseForm(StrAndUnicode):
         "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
         top_errors = self.non_field_errors() # Errors that should be displayed above all fields.
         output, hidden_fields = [], []
+        html_class_attr = ''
+
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
             bf_errors = self.error_class([conditional_escape(error) for error in bf.errors]) # Escape and cache in local variable.
@@ -146,8 +148,15 @@ class BaseForm(StrAndUnicode):
                     top_errors.extend([u'(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
                 hidden_fields.append(unicode(bf))
             else:
+                # Create a 'class="..."' atribute if the row should have any
+                # CSS classes applied.
+                css_classes = bf.css_classes()
+                if css_classes:
+                    html_class_attr = ' class="%s"' % css_classes
+
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % force_unicode(bf_errors))
+
                 if bf.label:
                     label = conditional_escape(force_unicode(bf.label))
                     # Only add the suffix if the label does not end in
@@ -158,13 +167,23 @@ class BaseForm(StrAndUnicode):
                     label = bf.label_tag(label) or ''
                 else:
                     label = ''
+
                 if field.help_text:
                     help_text = help_text_html % force_unicode(field.help_text)
                 else:
                     help_text = u''
-                output.append(normal_row % {'errors': force_unicode(bf_errors), 'label': force_unicode(label), 'field': unicode(bf), 'help_text': help_text})
+
+                output.append(normal_row % {
+                    'errors': force_unicode(bf_errors),
+                    'label': force_unicode(label),
+                    'field': unicode(bf),
+                    'help_text': help_text,
+                    'html_class_attr': html_class_attr
+                })
+
         if top_errors:
             output.insert(0, error_row % force_unicode(top_errors))
+
         if hidden_fields: # Insert any hidden fields in the last row.
             str_hidden = u''.join(hidden_fields)
             if output:
@@ -176,7 +195,9 @@ class BaseForm(StrAndUnicode):
                     # that users write): if there are only top errors, we may
                     # not be able to conscript the last row for our purposes,
                     # so insert a new, empty row.
-                    last_row = normal_row % {'errors': '', 'label': '', 'field': '', 'help_text': ''}
+                    last_row = (normal_row % {'errors': '', 'label': '',
+                                              'field': '', 'help_text':'',
+                                              'html_class_attr': html_class_attr})
                     output.append(last_row)
                 output[-1] = last_row[:-len(row_ender)] + str_hidden + row_ender
             else:
@@ -187,15 +208,30 @@ class BaseForm(StrAndUnicode):
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
-        return self._html_output(u'<tr><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', u'<br />%s', False)
+        return self._html_output(
+            normal_row = u'<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
+            error_row = u'<tr><td colspan="2">%s</td></tr>',
+            row_ender = u'</td></tr>',
+            help_text_html = u'<br />%s',
+            errors_on_separate_row = False)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
-        return self._html_output(u'<li>%(errors)s%(label)s %(field)s%(help_text)s</li>', u'<li>%s</li>', '</li>', u' %s', False)
+        return self._html_output(
+            normal_row = u'<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
+            error_row = u'<li>%s</li>',
+            row_ender = '</li>',
+            help_text_html = u' %s',
+            errors_on_separate_row = False)
 
     def as_p(self):
         "Returns this form rendered as HTML <p>s."
-        return self._html_output(u'<p>%(label)s %(field)s%(help_text)s</p>', u'%s', '</p>', u' %s', True)
+        return self._html_output(
+            normal_row = u'<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
+            error_row = u'%s',
+            row_ender = '</p>',
+            help_text_html = u' %s',
+            errors_on_separate_row = True)
 
     def non_field_errors(self):
         """
@@ -432,6 +468,19 @@ class BoundField(StrAndUnicode):
             attrs = attrs and flatatt(attrs) or ''
             contents = u'<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, unicode(contents))
         return mark_safe(contents)
+
+    def css_classes(self, extra_classes=None):
+        """
+        Returns a string of space-separated CSS classes for this field.
+        """
+        if hasattr(extra_classes, 'split'):
+            extra_classes = extra_classes.split()
+        extra_classes = set(extra_classes or [])
+        if self.errors and hasattr(self.form, 'error_css_class'):
+            extra_classes.add(self.form.error_css_class)
+        if self.field.required and hasattr(self.form, 'required_css_class'):
+            extra_classes.add(self.form.required_css_class)
+        return ' '.join(extra_classes)
 
     def _is_hidden(self):
         "Returns True if this BoundField's widget is hidden."
