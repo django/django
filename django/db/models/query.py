@@ -3,12 +3,8 @@ The main QuerySet implementation. This provides the public API for the ORM.
 """
 
 from copy import deepcopy
-<<<<<<< HEAD:django/db/models/query.py
 
 from django.db import connections, transaction, IntegrityError, DEFAULT_DB_ALIAS
-=======
-from django.db import connection, transaction, IntegrityError
->>>>>>> master:django/db/models/query.py
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
 from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory
@@ -480,11 +476,7 @@ class QuerySet(object):
 
     def exists(self):
         if self._result_cache is None:
-<<<<<<< HEAD:django/db/models/query.py
             return self.query.has_results(using=self.db)
-=======
-            return self.query.has_results()
->>>>>>> master:django/db/models/query.py
         return bool(self._result_cache)
 
     ##################################################
@@ -1157,6 +1149,6 @@ def insert_query(model, values, return_id=False, raw_values=False, using=None):
     part of the public API.
     """
     query = sql.InsertQuery(model)
-    query.insert_values(values, raw_values)
     compiler = query.get_compiler(using=using)
+    query.insert_values(values, compiler.connection, raw_values)
     return compiler.execute_sql(return_id)

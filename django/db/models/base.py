@@ -230,7 +230,6 @@ class ModelBase(type):
 
         signals.class_prepared.send(sender=cls)
 
-<<<<<<< HEAD:django/db/models/base.py
 class ModelState(object):
     """
     A class for storing instance state
@@ -238,8 +237,6 @@ class ModelState(object):
     def __init__(self, db=None):
         self.db = db
 
-=======
->>>>>>> master:django/db/models/base.py
 class Model(object):
     __metaclass__ = ModelBase
     _deferred = False
@@ -491,11 +488,7 @@ class Model(object):
             if pk_set:
                 # Determine whether a record with the primary key already exists.
                 if (force_update or (not force_insert and
-<<<<<<< HEAD:django/db/models/base.py
                         manager.using(using).filter(pk=pk_val).exists())):
-=======
-                        manager.filter(pk=pk_val).exists())):
->>>>>>> master:django/db/models/base.py
                     # It does already exist, so do an UPDATE.
                     if force_update or non_pks:
                         values = [(f, None, (raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]
@@ -534,10 +527,7 @@ class Model(object):
         # Store the database on which the object was saved
         self._state.db = using
 
-<<<<<<< HEAD:django/db/models/base.py
         # Signal that the save is complete
-=======
->>>>>>> master:django/db/models/base.py
         if origin and not meta.auto_created:
             signals.post_save.send(sender=origin, instance=self,
                 created=(not record_exists), raw=raw)

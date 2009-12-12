@@ -29,10 +29,6 @@ except ImportError, exc:
         module = 'either pysqlite2 or sqlite3 modules (tried in that order)'
     raise ImproperlyConfigured, "Error loading %s: %s" % (module, exc)
 
-try:
-    import decimal
-except ImportError:
-    from django.utils import _decimal as decimal # for Python 2.3
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError

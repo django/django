@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
 import unittest
-<<<<<<< HEAD:tests/regressiontests/backends/tests.py
 from django.db import backend, connection, DEFAULT_DB_ALIAS
-=======
-from django.db import backend, connection
->>>>>>> master:tests/regressiontests/backends/tests.py
 from django.db.backends.signals import connection_created
 from django.conf import settings
 
@@ -14,11 +10,7 @@ class Callproc(unittest.TestCase):
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
-<<<<<<< HEAD:tests/regressiontests/backends/tests.py
         if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
-=======
-        if settings.DATABASE_ENGINE == 'oracle':
->>>>>>> master:tests/regressiontests/backends/tests.py
             convert_unicode = backend.convert_unicode
             cursor = connection.cursor()
             cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
@@ -26,17 +18,13 @@ class Callproc(unittest.TestCase):
             return True
         else:
             return True
-            
+
 class LongString(unittest.TestCase):
 
     def test_long_string(self):
         # If the backend is Oracle, test that we can save a text longer
         # than 4000 chars and read it properly
-<<<<<<< HEAD:tests/regressiontests/backends/tests.py
         if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
-=======
-        if settings.DATABASE_ENGINE == 'oracle':
->>>>>>> master:tests/regressiontests/backends/tests.py
             c = connection.cursor()
             c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
             long_str = ''.join([unicode(x) for x in xrange(4000)])

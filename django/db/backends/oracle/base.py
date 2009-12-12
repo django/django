@@ -357,11 +357,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor = None
         if not self._valid_connection():
             conn_string = convert_unicode(self._connect_string())
-<<<<<<< HEAD:django/db/backends/oracle/base.py
             self.connection = Database.connect(conn_string, **self.settings_dict['OPTIONS'])
-=======
-            self.connection = Database.connect(conn_string, **self.settings_dict['DATABASE_OPTIONS'])
->>>>>>> master:django/db/backends/oracle/base.py
             cursor = FormatStylePlaceholderCursor(self.connection)
             # Set oracle date to ansi date format.  This only needs to execute
             # once when we create a new connection. We also set the Territory

@@ -1,20 +1,5 @@
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
-try:
-    set
-except NameError:
-    # Python 2.3 compat
-    from sets import Set as set
-
-try:
-    import decimal
-except ImportError:
-    # Python 2.3 fallback
-    from django.utils import _decimal as decimal
+import decimal
+from threading import local
 
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import util
@@ -286,9 +271,9 @@ class BaseDatabaseOperations(object):
 
     def compiler(self, compiler_name):
         """
-        Given the default Query class, returns a custom Query class
-        to use for this backend. Returns the Query class unmodified if the
-        backend doesn't need a custom Query clsas.
+        Returns the SQLCompiler class corresponding to the given name,
+        in the namespace corresponding to the `compiler_module` attribute
+        on this backend.
         """
         if compiler_name not in self._cache:
             self._cache[compiler_name] = getattr(

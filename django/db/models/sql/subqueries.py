@@ -191,7 +191,7 @@ class InsertQuery(Query):
         extras.update(kwargs)
         return super(InsertQuery, self).clone(klass, **extras)
 
-    def insert_values(self, insert_values, raw_values=False):
+    def insert_values(self, insert_values, connection, raw_values=False):
         """
         Set up the insert query from the 'insert_values' dictionary. The
         dictionary gives the model field names and their target values.
@@ -206,7 +206,7 @@ class InsertQuery(Query):
             if hasattr(field, 'get_placeholder'):
                 # Some fields (e.g. geo fields) need special munging before
                 # they can be inserted.
-                placeholders.append(field.get_placeholder(val))
+                placeholders.append(field.get_placeholder(val, connection))
             else:
                 placeholders.append('%s')
 

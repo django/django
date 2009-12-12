@@ -755,7 +755,7 @@ class SQLUpdateCompiler(SQLCompiler):
 
             # Getting the placeholder for the field.
             if hasattr(field, 'get_placeholder'):
-                placeholder = field.get_placeholder(val)
+                placeholder = field.get_placeholder(val, self.connection)
             else:
                 placeholder = '%s'
 

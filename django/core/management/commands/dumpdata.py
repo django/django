@@ -82,14 +82,9 @@ class Command(BaseCommand):
                 model_list = get_models(app)
 
             for model in model_list:
-<<<<<<< HEAD:django/core/management/commands/dumpdata.py
                 # Don't serialize proxy models, or models that haven't been synchronized
                 if not model._meta.proxy and model._meta.db_table in tables:
                     objects.extend(model._default_manager.using(using).all())
-=======
-                if not model._meta.proxy:
-                    objects.extend(model._default_manager.all())
->>>>>>> master:django/core/management/commands/dumpdata.py
 
         try:
             return serializers.serialize(format, objects, indent=indent)

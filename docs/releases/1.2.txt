@@ -42,8 +42,6 @@ changes that developers must be aware of:
  * All of the CSRF has moved from contrib to core (with backwards compatible
    imports in the old locations, which are deprecated).
 
-<<<<<<< HEAD:docs/releases/1.2.txt
-=======
 :ttag:`if` tag changes
 ----------------------
 
@@ -53,7 +51,6 @@ cases even though these strings were normally treated as keywords.  Now, the
 keyword status is always enforced, and template code like ``{% if not %}`` or
 ``{% if and %}`` will throw a TemplateSyntaxError.
 
->>>>>>> master:docs/releases/1.2.txt
 ``LazyObject``
 --------------
 
@@ -79,7 +76,6 @@ changes:
 
        __members__ = property(lambda self: self.__dir__())
 
-<<<<<<< HEAD:docs/releases/1.2.txt
 Specifying databases
 --------------------
 
@@ -221,8 +217,6 @@ connection, you should be able to upgrade by renaming
 database specific conversions, then you will need to provide an
 implementation ``get_db_prep_*`` that uses the ``connection``
 argument to resolve database-specific values.
-=======
->>>>>>> master:docs/releases/1.2.txt
 
 .. _deprecated-features-1.2:
 
@@ -353,7 +347,6 @@ replaces the deprecated user message API and allows you to temporarily store
 messages in one request and retrieve them for display in a subsequent request
 (usually the next one).
 
-<<<<<<< HEAD:docs/releases/1.2.txt
 Support for multiple databases
 ------------------------------
 
@@ -362,7 +355,7 @@ Django 1.2 adds the ability to use :ref:`more than one database
 issued at a specific database with the `using()` method on
 querysets; individual objects can be saved to a specific database
 by providing a ``using`` argument when you save the instance.
-=======
+
 'Smart' if tag
 --------------
 
@@ -396,4 +389,3 @@ Also, filters may now be used in the ``if`` expression. For example:
           class="highlight"
         {% endif %}
       >{{ message }}</div>
->>>>>>> master:docs/releases/1.2.txt

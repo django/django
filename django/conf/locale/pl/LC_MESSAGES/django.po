@@ -5,11 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-"POT-Creation-Date: 2009-10-25 20:56+0100\n"
-=======
 "POT-Creation-Date: 2009-12-11 10:11+0100\n"
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -227,11 +223,7 @@ msgstr "chiński tradycyjny"
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Usunięto %(count)d %(items)s."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/actions.py:67 contrib/admin/options.py:1027
-=======
 #: contrib/admin/actions.py:67 contrib/admin/options.py:1034
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 msgid "Are you sure?"
 msgstr "Jesteś pewien?"
 
@@ -327,11 +319,7 @@ msgstr "brak"
 msgid "Changed %s."
 msgstr "Zmieniono %s"
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:519 contrib/admin/options.py:529
-=======
 #: contrib/admin/options.py:522 contrib/admin/options.py:532
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #: contrib/comments/templates/comments/preview.html:16 forms/models.py:384
 #: forms/models.py:596
 msgid "and"
@@ -356,94 +344,53 @@ msgstr "Usunięto %(name)s \"%(object)s\"."
 msgid "No fields changed."
 msgstr "Żadne pole nie zmienione."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:599 contrib/auth/admin.py:67
-=======
 #: contrib/admin/options.py:602 contrib/auth/admin.py:68
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:603 contrib/admin/options.py:636
-#: contrib/auth/admin.py:75
-msgid "You may edit it again below."
-msgstr "Możesz ponownie edytować wpis poniżej."
-
-#: contrib/admin/options.py:613 contrib/admin/options.py:646
-=======
 #: contrib/admin/options.py:606 contrib/admin/options.py:639
 #: contrib/auth/admin.py:77
 msgid "You may edit it again below."
 msgstr "Możesz ponownie edytować wpis poniżej."
 
 #: contrib/admin/options.py:616 contrib/admin/options.py:649
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "You may add another %s below."
 msgstr "Możesz dodać nowy wpis %s poniżej."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:634
-=======
 #: contrib/admin/options.py:637
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:642
-=======
 #: contrib/admin/options.py:645
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" dodane pomyślnie. Możesz edytować ponownie wpis poniżej."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:773
-=======
 #: contrib/admin/options.py:778
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj %s"
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:804 contrib/admin/options.py:1005
-=======
 #: contrib/admin/options.py:810 contrib/admin/options.py:1012
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:861
-=======
 #: contrib/admin/options.py:867
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "Change %s"
 msgstr "Zmień %s"
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:905
-msgid "Database error"
-msgstr "Błąd bazy danych"
-
-#: contrib/admin/options.py:941
-=======
 #: contrib/admin/options.py:911
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
 #: contrib/admin/options.py:947
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -451,29 +398,17 @@ msgstr[0] "%(count)s %(name)s został pomyślnie zmieniony."
 msgstr[1] "%(count)s %(name)s zostały pomyślnie zmienione."
 msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:1020
-=======
 #: contrib/admin/options.py:1027
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" usunięty pomyślnie."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/options.py:1057
-=======
 #: contrib/admin/options.py:1064
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/sites.py:21 contrib/admin/views/decorators.py:14
-=======
 #: contrib/admin/sites.py:22 contrib/admin/views/decorators.py:14
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -482,19 +417,11 @@ msgstr ""
 "Proszę wpisać poprawną nazwę użytkownika i hasło. Uwaga: wielkość liter ma "
 "znaczenie."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/sites.py:288 contrib/admin/views/decorators.py:40
-msgid "Please log in again, because your session has expired."
-msgstr "Twoja sesja wygasła, zaloguj się ponownie."
-
-#: contrib/admin/sites.py:295 contrib/admin/views/decorators.py:47
-=======
 #: contrib/admin/sites.py:292 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Twoja sesja wygasła, zaloguj się ponownie."
 
 #: contrib/admin/sites.py:299 contrib/admin/views/decorators.py:47
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -502,47 +429,27 @@ msgstr ""
 "Twoja przeglądarka nie chce akceptować ciasteczek. Zmień jej ustawienia i "
 "spróbuj ponownie."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/sites.py:311 contrib/admin/sites.py:317
-=======
 #: contrib/admin/sites.py:315 contrib/admin/sites.py:321
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Nazwy użytkowników nie mogą zawierać znaku '@'."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/sites.py:314 contrib/admin/views/decorators.py:62
-=======
 #: contrib/admin/sites.py:318 contrib/admin/views/decorators.py:62
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Podany adres e-mail nie jest Twoją nazwą użytkownika. Spróbuj '%s'."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/sites.py:370
-msgid "Site administration"
-msgstr "Administracja stroną"
-
-#: contrib/admin/sites.py:384 contrib/admin/templates/admin/login.html:26
-=======
 #: contrib/admin/sites.py:374
 msgid "Site administration"
 msgstr "Administracja stroną"
 
 #: contrib/admin/sites.py:388 contrib/admin/templates/admin/login.html:26
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Zaloguj się"
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/admin/sites.py:429
-=======
 #: contrib/admin/sites.py:433
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "%s administration"
 msgstr "%s - administracja"
@@ -763,13 +670,8 @@ msgid ""
 "Are you sure you want to delete the selected %(object_name)s objects? All of "
 "the following objects and their related items will be deleted:"
 msgstr ""
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-"Czy chcesz skasować wybrane %(object_name)s? Następujące obiekty i zależne od "
-"nich zostaną skasowane:"
-=======
 "Czy chcesz skasować wybrane %(object_name)s? Następujące obiekty i zależne "
 "od nich zostaną skasowane:"
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -1524,11 +1426,7 @@ msgstr "użytkownicy"
 msgid "message"
 msgstr "wiadomość"
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: contrib/auth/views.py:58
-=======
 #: contrib/auth/views.py:60
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 msgid "Logged out"
 msgstr "Wylogowany"
 
@@ -4025,22 +3923,14 @@ msgstr ""
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Proszę wpisać poprawną godzinę w formacie HH:MM[:ss[.uuuuuu]]."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: db/models/fields/related.py:816
-=======
 #: db/models/fields/related.py:869
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Przytrzymaj wciśnięty klawisz \"Ctrl\" lub \"Command\" na Mac'u aby "
 "zaznaczyć więcej niż jeden wybór."
 
-<<<<<<< HEAD:django/conf/locale/pl/LC_MESSAGES/django.po
-#: db/models/fields/related.py:894
-=======
 #: db/models/fields/related.py:930
->>>>>>> master:django/conf/locale/pl/LC_MESSAGES/django.po
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
