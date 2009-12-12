@@ -1807,4 +1807,11 @@ True
 >>> [f.name for f in form.visible_fields()]
 ['artist', 'name']
 
+# Hidden initial input gets its own unique id ################################
+
+>>> class MyForm(Form):
+...     field1 = CharField(max_length=50, show_hidden_initial=True)
+>>> print MyForm()
+<tr><th><label for="id_field1">Field1:</label></th><td><input id="id_field1" type="text" name="field1" maxlength="50" /><input type="hidden" name="initial-field1" id="initial-id_field1" /></td></tr>
+
 """
