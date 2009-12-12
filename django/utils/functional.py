@@ -277,6 +277,13 @@ class LazyObject(object):
                 self._setup()
             setattr(self._wrapped, name, value)
 
+    def __delattr__(self, name):
+        if name == "_wrapped":
+            raise TypeError("can't delete _wrapped.")
+        if self._wrapped is None:
+            self._setup()
+        delattr(self._wrapped, name)
+
     def _setup(self):
         """
         Must be implemented by subclasses to initialise the wrapped object.
