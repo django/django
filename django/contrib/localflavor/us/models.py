@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db.models.fields import Field
 
 class USStateField(Field): 
+    """U.S. state (two uppercase letters)"""
     def get_internal_type(self): 
         return "USStateField" 
         
@@ -18,6 +19,7 @@ class USStateField(Field):
         return super(USStateField, self).formfield(**defaults)
 
 class PhoneNumberField(Field):
+    """Phone number"""
     def get_internal_type(self):
         return "PhoneNumberField"
 
