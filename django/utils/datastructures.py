@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 class MergeDict(object):
     """
     A simple class for creating new "virtual" dictionaries that actually look
@@ -72,22 +75,20 @@ class SortedDict(dict):
                     self.keyOrder.append(key)
 
     def __deepcopy__(self, memo):
-        from copy import deepcopy
         return self.__class__([(key, deepcopy(value, memo))
                                for key, value in self.iteritems()])
 
     def __setitem__(self, key, value):
-        super(SortedDict, self).__setitem__(key, value)
-        if key not in self.keyOrder:
+        if key not in self:
             self.keyOrder.append(key)
+        super(SortedDict, self).__setitem__(key, value)
 
     def __delitem__(self, key):
         super(SortedDict, self).__delitem__(key)
         self.keyOrder.remove(key)
 
     def __iter__(self):
-        for k in self.keyOrder:
-            yield k
+        return iter(self.keyOrder)
 
     def pop(self, k, *args):
         result = super(SortedDict, self).pop(k, *args)
@@ -108,7 +109,7 @@ class SortedDict(dict):
 
     def iteritems(self):
         for key in self.keyOrder:
-            yield key, super(SortedDict, self).__getitem__(key)
+            yield key, self[key]
 
     def keys(self):
         return self.keyOrder[:]
@@ -117,18 +118,18 @@ class SortedDict(dict):
         return iter(self.keyOrder)
 
     def values(self):
-        return map(super(SortedDict, self).__getitem__, self.keyOrder)
+        return map(self.__getitem__, self.keyOrder)
 
     def itervalues(self):
         for key in self.keyOrder:
-            yield super(SortedDict, self).__getitem__(key)
+            yield self[key]
 
     def update(self, dict_):
-        for k, v in dict_.items():
-            self.__setitem__(k, v)
+        for k, v in dict_.iteritems():
+            self[k] = v
 
     def setdefault(self, key, default):
-        if key not in self.keyOrder:
+        if key not in self:
             self.keyOrder.append(key)
         return super(SortedDict, self).setdefault(key, default)
 
@@ -222,18 +223,18 @@ class MultiValueDict(dict):
             dict.__setitem__(result, copy.deepcopy(key, memo),
                              copy.deepcopy(value, memo))
         return result
-    
+
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
         obj_dict['_data'] = dict([(k, self.getlist(k)) for k in self])
         return obj_dict
-    
+
     def __setstate__(self, obj_dict):
         data = obj_dict.pop('_data', {})
         for k, v in data.items():
             self.setlist(k, v)
         self.__dict__.update(obj_dict)
-        
+
     def get(self, key, default=None):
         """
         Returns the last data value for the passed key. If key doesn't exist
@@ -301,12 +302,12 @@ class MultiValueDict(dict):
     def values(self):
         """Returns a list of the last value on every key list."""
         return [self[key] for key in self.keys()]
-        
+
     def itervalues(self):
         """Yield the last value on every key list."""
         for key in self.iterkeys():
             yield self[key]
-    
+
     def copy(self):
         """Returns a copy of this object."""
         return self.__deepcopy__()
