@@ -172,9 +172,12 @@ class Manager(object):
     def only(self, *args, **kwargs):
         return self.get_query_set().only(*args, **kwargs)
 
+<<<<<<< HEAD:django/db/models/manager.py
     def using(self, *args, **kwargs):
         return self.get_query_set().using(*args, **kwargs)
 
+=======
+>>>>>>> master:django/db/models/manager.py
     def exists(self, *args, **kwargs):
         return self.get_query_set().exists(*args, **kwargs)
 

@@ -471,8 +471,12 @@ class BaseModelFormSet(BaseFormSet):
             pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
             pk = self.data[pk_key]
             pk_field = self.model._meta.pk
+<<<<<<< HEAD:django/forms/models.py
             pk = pk_field.get_db_prep_lookup('exact', pk,
                 connection=connections[self.get_queryset().db])
+=======
+            pk = pk_field.get_db_prep_lookup('exact', pk)
+>>>>>>> master:django/forms/models.py
             if isinstance(pk, list):
                 pk = pk[0]
             kwargs['instance'] = self._existing_object(pk)

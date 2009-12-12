@@ -11,6 +11,7 @@ except NameError:
 from django.template import Node, NodeList, Template, Context, Variable
 from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
+from django.template.smartif import IfParser, Literal
 from django.conf import settings
 from django.utils.encoding import smart_str, smart_unicode
 from django.utils.itercompat import groupby
@@ -227,10 +228,9 @@ class IfEqualNode(Node):
         return self.nodelist_false.render(context)
 
 class IfNode(Node):
-    def __init__(self, bool_exprs, nodelist_true, nodelist_false, link_type):
-        self.bool_exprs = bool_exprs
+    def __init__(self, var, nodelist_true, nodelist_false=None):
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
-        self.link_type = link_type
+        self.var = var
 
     def __repr__(self):
         return "<If node>"
@@ -250,28 +250,10 @@ class IfNode(Node):
         return nodes
 
     def render(self, context):
-        if self.link_type == IfNode.LinkTypes.or_:
-            for ifnot, bool_expr in self.bool_exprs:
-                try:
-                    value = bool_expr.resolve(context, True)
-                except VariableDoesNotExist:
-                    value = None
-                if (value and not ifnot) or (ifnot and not value):
-                    return self.nodelist_true.render(context)
-            return self.nodelist_false.render(context)
-        else:
-            for ifnot, bool_expr in self.bool_exprs:
-                try:
-                    value = bool_expr.resolve(context, True)
-                except VariableDoesNotExist:
-                    value = None
-                if not ((value and not ifnot) or (ifnot and not value)):
-                    return self.nodelist_false.render(context)
+        if self.var.eval(context):
             return self.nodelist_true.render(context)
-
-    class LinkTypes:
-        and_ = 0,
-        or_ = 1
+        else:
+            return self.nodelist_false.render(context)
 
 class RegroupNode(Node):
     def __init__(self, target, expression, var_name):
@@ -761,6 +743,27 @@ def ifnotequal(parser, token):
     return do_ifequal(parser, token, True)
 ifnotequal = register.tag(ifnotequal)
 
+class TemplateLiteral(Literal):
+    def __init__(self, value, text):
+        self.value = value
+        self.text = text # for better error messages
+
+    def display(self):
+        return self.text
+
+    def eval(self, context):
+        return self.value.resolve(context, ignore_failures=True)
+
+class TemplateIfParser(IfParser):
+    error_class = TemplateSyntaxError
+
+    def __init__(self, parser, *args, **kwargs):
+        self.template_parser = parser
+        return super(TemplateIfParser, self).__init__(*args, **kwargs)
+
+    def create_var(self, value):
+        return TemplateLiteral(self.template_parser.compile_filter(value), value)
+
 #@register.tag(name="if")
 def do_if(parser, token):
     """
@@ -805,47 +808,21 @@ def do_if(parser, token):
             There are some athletes and absolutely no coaches.
         {% endif %}
 
-    ``if`` tags do not allow ``and`` and ``or`` clauses with the same tag,
-    because the order of logic would be ambigous. For example, this is
-    invalid::
+    Comparison operators are also available, and the use of filters is also
+    allowed, for example:
 
-        {% if athlete_list and coach_list or cheerleader_list %}
+        {% if articles|length >= 5 %}...{% endif %}
 
-    If you need to combine ``and`` and ``or`` to do advanced logic, just use
-    nested if tags. For example::
+    Arguments and operators _must_ have a space between them, so
+    ``{% if 1>2 %}`` is not a valid if tag.
 
-        {% if athlete_list %}
-            {% if coach_list or cheerleader_list %}
-                We have athletes, and either coaches or cheerleaders!
-            {% endif %}
-        {% endif %}
+    All supported operators are: ``or``, ``and``, ``in``, ``==`` (or ``=``),
+    ``!=``, ``>``, ``>=``, ``<`` and ``<=``.
+
+    Operator precedence follows Python.
     """
-    bits = token.contents.split()
-    del bits[0]
-    if not bits:
-        raise TemplateSyntaxError("'if' statement requires at least one argument")
-    # Bits now looks something like this: ['a', 'or', 'not', 'b', 'or', 'c.d']
-    bitstr = ' '.join(bits)
-    boolpairs = bitstr.split(' and ')
-    boolvars = []
-    if len(boolpairs) == 1:
-        link_type = IfNode.LinkTypes.or_
-        boolpairs = bitstr.split(' or ')
-    else:
-        link_type = IfNode.LinkTypes.and_
-        if ' or ' in bitstr:
-            raise TemplateSyntaxError, "'if' tags can't mix 'and' and 'or'"
-    for boolpair in boolpairs:
-        if ' ' in boolpair:
-            try:
-                not_, boolvar = boolpair.split()
-            except ValueError:
-                raise TemplateSyntaxError, "'if' statement improperly formatted"
-            if not_ != 'not':
-                raise TemplateSyntaxError, "Expected 'not' in if statement"
-            boolvars.append((True, parser.compile_filter(boolvar)))
-        else:
-            boolvars.append((False, parser.compile_filter(boolpair)))
+    bits = token.split_contents()[1:]
+    var = TemplateIfParser(parser, bits).parse()
     nodelist_true = parser.parse(('else', 'endif'))
     token = parser.next_token()
     if token.contents == 'else':
@@ -853,7 +830,7 @@ def do_if(parser, token):
         parser.delete_first_token()
     else:
         nodelist_false = NodeList()
-    return IfNode(boolvars, nodelist_true, nodelist_false, link_type)
+    return IfNode(var, nodelist_true, nodelist_false)
 do_if = register.tag("if", do_if)
 
 #@register.tag

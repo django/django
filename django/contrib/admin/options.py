@@ -1059,7 +1059,7 @@ class ModelAdmin(BaseModelAdmin):
             content_type__id__exact = ContentType.objects.get_for_model(model).id
         ).select_related().order_by('action_time')
         # If no history was found, see whether this object even exists.
-        obj = get_object_or_404(model, pk=object_id)
+        obj = get_object_or_404(model, pk=unquote(object_id))
         context = {
             'title': _('Change history: %s') % force_unicode(obj),
             'action_list': action_list,

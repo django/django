@@ -474,7 +474,11 @@ def create_many_related_manager(superclass, rel=False):
             if not rel.through._meta.auto_created:
                 opts = through._meta
                 raise AttributeError, "Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
+<<<<<<< HEAD:django/db/models/fields/related.py
             new_obj = super(ManyRelatedManager, self).using(self.instance._state.db).create(**kwargs)
+=======
+            new_obj = super(ManyRelatedManager, self).create(**kwargs)
+>>>>>>> master:django/db/models/fields/related.py
             self.add(new_obj)
             return new_obj
         create.alters_data = True
@@ -501,15 +505,22 @@ def create_many_related_manager(superclass, rel=False):
                 new_ids = set()
                 for obj in objs:
                     if isinstance(obj, self.model):
+<<<<<<< HEAD:django/db/models/fields/related.py
                         if obj._state.db != self.instance._state.db:
                             raise ValueError('Cannot add "%r": instance is on database "%s", value is is on database "%s"' %
                                                 (obj, self.instance._state.db, obj._state.db))
+=======
+>>>>>>> master:django/db/models/fields/related.py
                         new_ids.add(obj.pk)
                     elif isinstance(obj, Model):
                         raise TypeError, "'%s' instance expected" % self.model._meta.object_name
                     else:
                         new_ids.add(obj)
+<<<<<<< HEAD:django/db/models/fields/related.py
                 vals = self.through._default_manager.using(self.instance._state.db).values_list(target_field_name, flat=True)
+=======
+                vals = self.through._default_manager.values_list(target_field_name, flat=True)
+>>>>>>> master:django/db/models/fields/related.py
                 vals = vals.filter(**{
                     source_field_name: self._pk_val,
                     '%s__in' % target_field_name: new_ids,
@@ -518,7 +529,11 @@ def create_many_related_manager(superclass, rel=False):
 
                 # Add the ones that aren't there already
                 for obj_id in (new_ids - vals):
+<<<<<<< HEAD:django/db/models/fields/related.py
                     self.through._default_manager.using(self.instance._state.db).create(**{
+=======
+                    self.through._default_manager.create(**{
+>>>>>>> master:django/db/models/fields/related.py
                         '%s_id' % source_field_name: self._pk_val,
                         '%s_id' % target_field_name: obj_id,
                     })
@@ -538,14 +553,22 @@ def create_many_related_manager(superclass, rel=False):
                     else:
                         old_ids.add(obj)
                 # Remove the specified objects from the join table
+<<<<<<< HEAD:django/db/models/fields/related.py
                 self.through._default_manager.using(self.instance._state.db).filter(**{
+=======
+                self.through._default_manager.filter(**{
+>>>>>>> master:django/db/models/fields/related.py
                     source_field_name: self._pk_val,
                     '%s__in' % target_field_name: old_ids
                 }).delete()
 
         def _clear_items(self, source_field_name):
             # source_col_name: the PK colname in join_table for the source object
+<<<<<<< HEAD:django/db/models/fields/related.py
             self.through._default_manager.using(self.instance._state.db).filter(**{
+=======
+            self.through._default_manager.filter(**{
+>>>>>>> master:django/db/models/fields/related.py
                 source_field_name: self._pk_val
             }).delete()
 

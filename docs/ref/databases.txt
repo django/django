@@ -257,7 +257,10 @@ Here's a sample configuration which uses a MySQL option file::
         }
     }
 
+<<<<<<< HEAD:docs/ref/databases.txt
 
+=======
+>>>>>>> master:docs/ref/databases.txt
     # my.cnf
     [client]
     database = NAME

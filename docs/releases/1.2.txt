@@ -42,6 +42,18 @@ changes that developers must be aware of:
  * All of the CSRF has moved from contrib to core (with backwards compatible
    imports in the old locations, which are deprecated).
 
+<<<<<<< HEAD:docs/releases/1.2.txt
+=======
+:ttag:`if` tag changes
+----------------------
+
+Due to new features in the :ttag:`if` template tag, it no longer accepts 'and',
+'or' and 'not' as valid **variable** names.  Previously that worked in some
+cases even though these strings were normally treated as keywords.  Now, the
+keyword status is always enforced, and template code like ``{% if not %}`` or
+``{% if and %}`` will throw a TemplateSyntaxError.
+
+>>>>>>> master:docs/releases/1.2.txt
 ``LazyObject``
 --------------
 
@@ -67,6 +79,7 @@ changes:
 
        __members__ = property(lambda self: self.__dir__())
 
+<<<<<<< HEAD:docs/releases/1.2.txt
 Specifying databases
 --------------------
 
@@ -208,6 +221,8 @@ connection, you should be able to upgrade by renaming
 database specific conversions, then you will need to provide an
 implementation ``get_db_prep_*`` that uses the ``connection``
 argument to resolve database-specific values.
+=======
+>>>>>>> master:docs/releases/1.2.txt
 
 .. _deprecated-features-1.2:
 
@@ -338,6 +353,7 @@ replaces the deprecated user message API and allows you to temporarily store
 messages in one request and retrieve them for display in a subsequent request
 (usually the next one).
 
+<<<<<<< HEAD:docs/releases/1.2.txt
 Support for multiple databases
 ------------------------------
 
@@ -346,3 +362,38 @@ Django 1.2 adds the ability to use :ref:`more than one database
 issued at a specific database with the `using()` method on
 querysets; individual objects can be saved to a specific database
 by providing a ``using`` argument when you save the instance.
+=======
+'Smart' if tag
+--------------
+
+The :ttag:`if` tag has been upgraded to be much more powerful.  First, support
+for comparison operators has been added. No longer will you have to type:
+
+.. code-block:: html+django
+
+    {% ifnotequal a b %}
+     ...
+    {% endifnotequal %}
+
+...as you can now do:
+
+.. code-block:: html+django
+
+    {% if a != b %}
+     ...
+    {% endif %}
+
+The operators supported are ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=`` and
+``in``, all of which work like the Python operators, in addition to ``and``,
+``or`` and ``not`` which were already supported.
+
+Also, filters may now be used in the ``if`` expression. For example:
+
+.. code-block:: html+django
+
+      <div
+        {% if user.email|lower == message.recipient|lower %}
+          class="highlight"
+        {% endif %}
+      >{{ message }}</div>
+>>>>>>> master:docs/releases/1.2.txt

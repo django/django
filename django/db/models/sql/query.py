@@ -22,8 +22,12 @@ from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import WhereNode, Constraint, EverythingNode, AND, OR
 from django.core.exceptions import FieldError
 
+<<<<<<< HEAD:django/db/models/sql/query.py
 
 __all__ = ['Query']
+=======
+__all__ = ['Query', 'BaseQuery']
+>>>>>>> master:django/db/models/sql/query.py
 
 class Query(object):
     """
@@ -337,7 +341,11 @@ class Query(object):
 
         return number
 
+<<<<<<< HEAD:django/db/models/sql/query.py
     def has_results(self, using):
+=======
+    def has_results(self):
+>>>>>>> master:django/db/models/sql/query.py
         q = self.clone()
         q.add_extra({'a': 1}, None, None, None, None, None)
         q.add_fields(())
@@ -345,8 +353,104 @@ class Query(object):
         q.set_aggregate_mask(())
         q.clear_ordering()
         q.set_limits(high=1)
+<<<<<<< HEAD:django/db/models/sql/query.py
         compiler = q.get_compiler(using=using)
         return bool(compiler.execute_sql(SINGLE))
+=======
+        return bool(q.execute_sql(SINGLE))
+
+    def as_sql(self, with_limits=True, with_col_aliases=False):
+        """
+        Creates the SQL for this query. Returns the SQL string and list of
+        parameters.
+
+        If 'with_limits' is False, any limit/offset information is not included
+        in the query.
+        """
+        self.pre_sql_setup()
+        out_cols = self.get_columns(with_col_aliases)
+        ordering, ordering_group_by = self.get_ordering()
+
+        # This must come after 'select' and 'ordering' -- see docstring of
+        # get_from_clause() for details.
+        from_, f_params = self.get_from_clause()
+
+        qn = self.quote_name_unless_alias
+        where, w_params = self.where.as_sql(qn=qn)
+        having, h_params = self.having.as_sql(qn=qn)
+        params = []
+        for val in self.extra_select.itervalues():
+            params.extend(val[1])
+
+        result = ['SELECT']
+        if self.distinct:
+            result.append('DISTINCT')
+        result.append(', '.join(out_cols + self.ordering_aliases))
+
+        result.append('FROM')
+        result.extend(from_)
+        params.extend(f_params)
+
+        if where:
+            result.append('WHERE %s' % where)
+            params.extend(w_params)
+        if self.extra_where:
+            if not where:
+                result.append('WHERE')
+            else:
+                result.append('AND')
+            result.append(' AND '.join(self.extra_where))
+
+        grouping, gb_params = self.get_grouping()
+        if grouping:
+            if ordering:
+                # If the backend can't group by PK (i.e., any database
+                # other than MySQL), then any fields mentioned in the
+                # ordering clause needs to be in the group by clause.
+                if not self.connection.features.allows_group_by_pk:
+                    for col, col_params in ordering_group_by:
+                        if col not in grouping:
+                            grouping.append(str(col))
+                            gb_params.extend(col_params)
+            else:
+                ordering = self.connection.ops.force_no_ordering()
+            result.append('GROUP BY %s' % ', '.join(grouping))
+            params.extend(gb_params)
+
+        if having:
+            result.append('HAVING %s' % having)
+            params.extend(h_params)
+
+        if ordering:
+            result.append('ORDER BY %s' % ', '.join(ordering))
+
+        if with_limits:
+            if self.high_mark is not None:
+                result.append('LIMIT %d' % (self.high_mark - self.low_mark))
+            if self.low_mark:
+                if self.high_mark is None:
+                    val = self.connection.ops.no_limit_value()
+                    if val:
+                        result.append('LIMIT %d' % val)
+                result.append('OFFSET %d' % self.low_mark)
+
+        params.extend(self.extra_params)
+        return ' '.join(result), tuple(params)
+
+    def as_nested_sql(self):
+        """
+        Perform the same functionality as the as_sql() method, returning an
+        SQL string and parameters. However, the alias prefixes are bumped
+        beforehand (in a copy -- the current query isn't changed) and any
+        ordering is removed.
+
+        Used when nesting this query inside another.
+        """
+        obj = self.clone()
+        obj.clear_ordering(True)
+        obj.bump_prefix()
+        return obj.as_sql()
+>>>>>>> master:django/db/models/sql/query.py
 
     def combine(self, rhs, connector):
         """

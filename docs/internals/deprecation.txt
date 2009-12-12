@@ -13,6 +13,13 @@ their deprecation, as per the :ref:`Django deprecation policy
           hooking up admin URLs.  This has been deprecated since the 1.1
           release.
 
+<<<<<<< HEAD:docs/internals/deprecation.txt
+=======
+        * Authentication backends need to define the boolean attribute
+          ``supports_object_permissions``. The old backend style is deprecated
+          since the 1.2 release.
+
+>>>>>>> master:docs/internals/deprecation.txt
     * 1.4
         * ``CsrfResponseMiddleware``.  This has been deprecated since the 1.2
           release, in favour of the template tag method for inserting the CSRF
@@ -26,6 +33,7 @@ their deprecation, as per the :ref:`Django deprecation policy
           class in favor of a generic E-mail backend API.
 
         * The many to many SQL generation functions on the database backends
+<<<<<<< HEAD:docs/internals/deprecation.txt
           will be removed.
 
         * The ability to use the ``DATABASE_*`` family of top-level settings to
@@ -39,6 +47,9 @@ their deprecation, as per the :ref:`Django deprecation policy
           ``get_db_prep_lookup`` methods on Field were modified in 1.2 to support
           multiple databases. In 1.4, the support functions that allow methods
           with the old prototype to continue working will be removed.
+=======
+          will be removed.  These have been deprecated since the 1.2 release.
+>>>>>>> master:docs/internals/deprecation.txt
 
         * The ``Message`` model (in ``django.contrib.auth``), its related
           manager in the ``User`` model (``user.message_set``), and the
@@ -48,6 +59,13 @@ their deprecation, as per the :ref:`Django deprecation policy
           :ref:`messages framework <ref-contrib-messages>` should be used 
           instead.
 
+<<<<<<< HEAD:docs/internals/deprecation.txt
+=======
+        * Authentication backends need to support the ``obj`` parameter for
+          permission checking. The ``supports_object_permissions`` variable
+          is not checked any longer and can be removed.
+
+>>>>>>> master:docs/internals/deprecation.txt
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the

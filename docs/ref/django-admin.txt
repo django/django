@@ -210,6 +210,24 @@ records to dump. If you're using a :ref:`custom manager <custom-managers>` as
 the default manager and it filters some of the available records, not all of the
 objects will be dumped.
 
+<<<<<<< HEAD:docs/ref/django-admin.txt
+=======
+.. django-admin-option:: --exclude
+
+.. versionadded:: 1.0
+
+Exclude a specific application from the applications whose contents is
+output. For example, to specifically exclude the `auth` application from
+the output, you would call::
+
+    django-admin.py dumpdata --exclude=auth
+
+If you want to exclude multiple applications, use multiple ``--exclude``
+directives::
+
+    django-admin.py dumpdata --exclude=auth --exclude=contenttypes
+
+>>>>>>> master:docs/ref/django-admin.txt
 .. django-admin-option:: --format <fmt>
 
 By default, ``dumpdata`` will format its output in JSON, but you can use the
@@ -221,11 +239,14 @@ are listed in :ref:`serialization-formats`.
 By default, ``dumpdata`` will output all data on a single line. This isn't
 easy for humans to read, so you can use the ``--indent`` option to
 pretty-print the output with a number of indentation spaces.
+<<<<<<< HEAD:docs/ref/django-admin.txt
 
 .. versionadded:: 1.0
 
 The :djadminopt:`--exclude` option may be provided to prevent specific
 applications from being dumped.
+=======
+>>>>>>> master:docs/ref/django-admin.txt
 
 .. versionadded:: 1.1
 
@@ -252,12 +273,15 @@ fixture will be re-installed.
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
+<<<<<<< HEAD:docs/ref/django-admin.txt
 
 .. versionadded:: 1.2
 
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
 
+=======
+>>>>>>> master:docs/ref/django-admin.txt
 
 inspectdb
 ---------
@@ -487,6 +511,7 @@ reset <appname appname ...>
 ---------------------------
 
 .. django-admin:: reset
+<<<<<<< HEAD:docs/ref/django-admin.txt
 
 Executes the equivalent of ``sqlreset`` for the given app name(s).
 
@@ -497,6 +522,13 @@ prompts.
 
 The :djadminopt:`--database` option can be used to specify the alias
 of the database to reset.
+=======
+
+Executes the equivalent of ``sqlreset`` for the given app name(s).
+
+The :djadminopt:`--noinput` option may be provided to suppress all user
+prompts.
+>>>>>>> master:docs/ref/django-admin.txt
 
 runfcgi [options]
 -----------------
@@ -680,11 +712,14 @@ sqlflush
 
 Prints the SQL statements that would be executed for the :djadmin:`flush`
 command.
+<<<<<<< HEAD:docs/ref/django-admin.txt
 
 .. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
+=======
+>>>>>>> master:docs/ref/django-admin.txt
 
 sqlindexes <appname appname ...>
 --------------------------------
@@ -784,6 +819,7 @@ with an appropriate extension (e.g. ``json`` or ``xml``). See the
 documentation for ``loaddata`` for details on the specification of fixture
 data files.
 
+<<<<<<< HEAD:docs/ref/django-admin.txt
 --noinput
 ~~~~~~~~~
 The :djadminopt:`--noinput` option may be provided to suppress all user
@@ -793,15 +829,27 @@ prompts.
 
 The :djadminopt:`--database` option can be used to specify the database to
 synchronize.
+=======
+The :djadminopt:`--noinput` option may be provided to suppress all user
+prompts.
 
 test <app or test identifier>
 -----------------------------
 
 .. django-admin:: test
+>>>>>>> master:docs/ref/django-admin.txt
+
+test <app or test identifier>
+-----------------------------
+
+<<<<<<< HEAD:docs/ref/django-admin.txt
+.. django-admin:: test
 
 Runs tests for all installed models. See :ref:`topics-testing` for more
 information.
 
+=======
+>>>>>>> master:docs/ref/django-admin.txt
 testserver <fixture fixture ...>
 --------------------------------
 
@@ -935,6 +983,7 @@ Common options
 The following options are not available on every commands, but they are
 common to a number of commands.
 
+<<<<<<< HEAD:docs/ref/django-admin.txt
 .. django-admin-option:: --database
 
 .. versionadded:: 1.2
@@ -959,6 +1008,8 @@ directives::
 
     django-admin.py dumpdata --exclude=auth --exclude=contenttypes
 
+=======
+>>>>>>> master:docs/ref/django-admin.txt
 .. django-admin-option:: --locale
 
 Use the ``--locale`` or ``-l`` option to specify the locale to process.
