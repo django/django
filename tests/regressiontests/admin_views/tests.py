@@ -1157,7 +1157,6 @@ class AdminActionsTest(TestCase):
         self.assert_('action-checkbox-column' in response.content,
             "Expected an action-checkbox-column in response")
 
-
     def test_multiple_actions_form(self):
         """
         Test that actions come from the form whose submit button was pressed (#10618).
@@ -1174,6 +1173,35 @@ class AdminActionsTest(TestCase):
         # Send mail, don't delete.
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, 'Greetings from a function action')
+
+    def test_user_message_on_none_selected(self):
+        """
+        User should see a warning when 'Go' is pressed and no items are selected.
+        """
+        action_data = {
+            ACTION_CHECKBOX_NAME: [],
+            'action' : 'delete_selected',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
+        msg = """Items must be selected in order to perform actions on them. No items have been changed."""
+        self.assertContains(response, msg)
+        self.failUnlessEqual(Subscriber.objects.count(), 2)
+
+    def test_user_message_on_no_action(self):
+        """
+        User should see a warning when 'Go' is pressed and no action is selected.
+        """
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1, 2],
+            'action' : '',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
+        msg = """No action selected."""
+        self.assertContains(response, msg)
+        self.failUnlessEqual(Subscriber.objects.count(), 2)
+
 
 class TestInlineNotEditable(TestCase):
     fixtures = ['admin-views-users.xml']
