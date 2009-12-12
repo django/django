@@ -120,13 +120,19 @@ def get_filter_tests():
 
         # Notice that escaping is applied *after* any filters, so the string
         # formatting here only needs to deal with pre-escaped characters.
-        'filter-stringformat01': ('{% autoescape off %}.{{ a|stringformat:"5s" }}. .{{ b|stringformat:"5s" }}.{% endautoescape %}', {"a": "a<b", "b": mark_safe("a<b")}, u".  a<b. .  a<b."),
-        'filter-stringformat02': ('.{{ a|stringformat:"5s" }}. .{{ b|stringformat:"5s" }}.', {"a": "a<b", "b": mark_safe("a<b")}, u".  a&lt;b. .  a<b."),
+        'filter-stringformat01': ('{% autoescape off %}.{{ a|stringformat:"5s" }}. .{{ b|stringformat:"5s" }}.{% endautoescape %}',
+            {"a": "a<b", "b": mark_safe("a<b")}, u".  a<b. .  a<b."),
+        'filter-stringformat02': ('.{{ a|stringformat:"5s" }}. .{{ b|stringformat:"5s" }}.', {"a": "a<b", "b": mark_safe("a<b")},
+            u".  a&lt;b. .  a<b."),
 
-        # XXX No test for "title" filter; needs an actual object.
+        # Test the title filter
+        'filter-title1' : ('{{ a|title }}', {'a' : 'JOE\'S CRAB SHACK'}, u'Joe&#39;s Crab Shack'),
+        'filter-title2' : ('{{ a|title }}', {'a' : '555 WEST 53RD STREET'}, u'555 West 53rd Street'),
 
-        'filter-truncatewords01': ('{% autoescape off %}{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}{% endautoescape %}', {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, u"alpha & ... alpha &amp; ..."),
-        'filter-truncatewords02': ('{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}', {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, u"alpha &amp; ... alpha &amp; ..."),
+        'filter-truncatewords01': ('{% autoescape off %}{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}{% endautoescape %}',
+            {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, u"alpha & ... alpha &amp; ..."),
+        'filter-truncatewords02': ('{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}',
+            {"a": "alpha & bravo", "b": mark_safe("alpha &amp; bravo")}, u"alpha &amp; ... alpha &amp; ..."),
 
         # The "upper" filter messes up entities (which are case-sensitive),
         # so it's not safe for non-escaping purposes.
