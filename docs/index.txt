@@ -28,7 +28,7 @@ Having trouble? We'd like to help!
 .. _archives of the django-users mailing list: http://groups.google.com/group/django-users/
 .. _post a question: http://groups.google.com/group/django-users/
 .. _#django IRC channel: irc://irc.freenode.net/django
-.. _IRC logs: http://oebfare.com/logger/django/
+.. _IRC logs: http://botland.oebfare.com/logger/django/
 .. _ticket tracker: http://code.djangoproject.com/
 
 First steps
