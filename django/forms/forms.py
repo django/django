@@ -343,6 +343,7 @@ class BoundField(StrAndUnicode):
         self.name = name
         self.html_name = form.add_prefix(name)
         self.html_initial_name = form.add_initial_prefix(name)
+        self.html_initial_id = form.add_initial_prefix(self.auto_id)
         if self.field.label is None:
             self.label = pretty_name(name)
         else:
@@ -374,7 +375,10 @@ class BoundField(StrAndUnicode):
         attrs = attrs or {}
         auto_id = self.auto_id
         if auto_id and 'id' not in attrs and 'id' not in widget.attrs:
-            attrs['id'] = auto_id
+            if not only_initial:
+                attrs['id'] = auto_id
+            else:
+                attrs['id'] = self.html_initial_id
         if not self.form.is_bound:
             data = self.form.initial.get(self.name, self.field.initial)
             if callable(data):
