@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from extra import tests as extra_tests
-from fields import tests as fields_tests
 from forms import tests as form_tests
 from error_messages import tests as custom_error_message_tests
 from localflavor.ar import tests as localflavor_ar_tests
@@ -32,9 +31,10 @@ from widgets import tests as widgets_tests
 from formsets import tests as formset_tests
 from media import media_tests
 
+from fields import FieldsTests
+
 __test__ = {
     'extra_tests': extra_tests,
-    'fields_tests': fields_tests,
     'form_tests': form_tests,
     'custom_error_message_tests': custom_error_message_tests,
     'localflavor_ar_tests': localflavor_ar_tests,
