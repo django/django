@@ -244,7 +244,6 @@ class NamespaceTests(TestCase):
         self.assertEquals('/other1/inner/37/42/', reverse('nodefault:urlobject-view', args=[37,42], current_app='other-ns1'))
         self.assertEquals('/other1/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1':42, 'arg2':37}, current_app='other-ns1'))
 
-
 class RequestURLconfTests(TestCase):
     def setUp(self):
         self.root_urlconf = settings.ROOT_URLCONF
@@ -276,3 +275,25 @@ class RequestURLconfTests(TestCase):
         response = self.client.get('/second_test/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, 'outer:,inner:/second_test/')
+
+class ErrorHandlerResolutionTests(TestCase):
+    """Tests for handler404 and handler500"""
+    
+    def setUp(self):
+        from django.core.urlresolvers import RegexURLResolver
+        urlconf = 'regressiontests.urlpatterns_reverse.urls_error_handlers'
+        urlconf_callables = 'regressiontests.urlpatterns_reverse.urls_error_handlers_callables'
+        self.resolver = RegexURLResolver(r'^$', urlconf)
+        self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
+    
+    def test_named_handlers(self):
+        from views import empty_view
+        handler = (empty_view, {})
+        self.assertEqual(self.resolver.resolve404(), handler)
+        self.assertEqual(self.resolver.resolve500(), handler)
+
+    def test_callable_handers(self):
+        from views import empty_view
+        handler = (empty_view, {})
+        self.assertEqual(self.callable_resolver.resolve404(), handler)
+        self.assertEqual(self.callable_resolver.resolve500(), handler)

@@ -257,9 +257,8 @@ class RegexURLResolver(object):
 
     def _resolve_special(self, view_type):
         callback = getattr(self.urlconf_module, 'handler%s' % view_type)
-        mod_name, func_name = get_mod_func(callback)
         try:
-            return getattr(import_module(mod_name), func_name), {}
+            return get_callable(callback), {}
         except (ImportError, AttributeError), e:
             raise ViewDoesNotExist, "Tried %s. Error was: %s" % (callback, str(e))
 
