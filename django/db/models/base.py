@@ -678,6 +678,10 @@ class Model(object):
                 f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
                 if f.null and lookup_value is None:
+                    # no value, skip the lookup
+                    continue
+                if f.primary_key and not getattr(self, '_adding', False):
+                    # no need to check for unique primary key when editting 
                     continue
                 lookup_kwargs[str(field_name)] = lookup_value
 

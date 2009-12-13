@@ -1,6 +1,9 @@
 import unittest
 
-from models import CustomPKModel, UniqueTogetherModel, UniqueFieldsModel, UniqueForDateModel
+from django.conf import settings
+from django.db import connection
+
+from models import CustomPKModel, UniqueTogetherModel, UniqueFieldsModel, UniqueForDateModel, ModelToValidate
 
 class GetUniqueCheckTests(unittest.TestCase):
     def test_unique_fields_get_collected(self):
@@ -24,4 +27,26 @@ class GetUniqueCheckTests(unittest.TestCase):
         )
 
 
+class PerformUniqueChecksTest(unittest.TestCase):
+    def setUp(self):
+        self._old_debug, settings.DEBUG = settings.DEBUG, True
+        super(PerformUniqueChecksTest, self).setUp()
 
+    def tearDown(self):
+        settings.DEBUG = self._old_debug
+        super(PerformUniqueChecksTest, self).tearDown()
+
+    def test_primary_key_unique_check_performed_when_adding(self):
+        "Check#12132"
+        l = len(connection.queries)
+        mtv = ModelToValidate(number=10, name='Some Name')
+        setattr(mtv, '_adding', True)
+        mtv.clean()
+        self.assertEqual(l+1, len(connection.queries))
+
+    def test_primary_key_unique_check_not_performed_when_not_adding(self):
+        "Check#12132"
+        l = len(connection.queries)
+        mtv = ModelToValidate(number=10, name='Some Name')
+        mtv.clean()
+        self.assertEqual(l, len(connection.queries))

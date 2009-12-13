@@ -5,7 +5,7 @@ from modeltests.validation import ValidationTestCase
 from models import *
 
 from validators import TestModelsWithValidators
-from test_unique import GetUniqueCheckTests
+from test_unique import GetUniqueCheckTests, PerformUniqueChecksTest
 from test_custom_messages import CustomMessagesTest
 
 class BaseModelValidationTests(ValidationTestCase):
