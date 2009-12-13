@@ -46,7 +46,28 @@ class CacheClass(BaseCache):
         self._cache.disconnect_all()
 
     def incr(self, key, delta=1):
-        return self._cache.incr(key, delta)
+        try:
+            val = self._cache.incr(key, delta)
+
+        # python-memcache responds to incr on non-existent keys by
+        # raising a ValueError. Cmemcache returns None. In both
+        # cases, we should raise a ValueError though.
+        except ValueError:
+            val = None
+        if val is None:
+            raise ValueError("Key '%s' not found" % key)
+
+        return val
 
     def decr(self, key, delta=1):
-        return self._cache.decr(key, delta)
+        try:
+            val = self._cache.decr(key, delta)
+
+        # python-memcache responds to decr on non-existent keys by
+        # raising a ValueError. Cmemcache returns None. In both
+        # cases, we should raise a ValueError though.
+        except ValueError:
+            val = None
+        if val is None:
+            raise ValueError("Key '%s' not found" % key)
+        return val
