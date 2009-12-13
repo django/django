@@ -209,6 +209,8 @@ class FileDescriptor(object):
         instance.__dict__[self.field.name] = value
 
 class FileField(Field):
+    """File path"""
+    
     # The class to wrap instance attributes in. Accessing the file object off
     # the instance will always return an instance of attr_class.
     attr_class = FieldFile
@@ -323,6 +325,8 @@ class ImageFieldFile(ImageFile, FieldFile):
         super(ImageFieldFile, self).delete(save)
 
 class ImageField(FileField):
+    """File path"""
+    
     attr_class = ImageFieldFile
     descriptor_class = ImageFileDescriptor
 

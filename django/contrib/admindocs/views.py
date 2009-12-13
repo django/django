@@ -326,43 +326,20 @@ def get_return_data_type(func_name):
             return 'Integer'
     return ''
 
-# Maps Field objects to their human-readable data types, as strings.
-# Column-type strings can contain format strings; they'll be interpolated
-# against the values of Field.__dict__ before being output.
-# If a column type is set to None, it won't be included in the output.
-DATA_TYPE_MAPPING = {
-    'AutoField'                 : _('Integer'),
-    'BooleanField'              : _('Boolean (Either True or False)'),
-    'CharField'                 : _('String (up to %(max_length)s)'),
-    'CommaSeparatedIntegerField': _('Comma-separated integers'),
-    'DateField'                 : _('Date (without time)'),
-    'DateTimeField'             : _('Date (with time)'),
-    'DecimalField'              : _('Decimal number'),
-    'EmailField'                : _('E-mail address'),
-    'FileField'                 : _('File path'),
-    'FilePathField'             : _('File path'),
-    'FloatField'                : _('Floating point number'),
-    'ForeignKey'                : _('Integer'),
-    'ImageField'                : _('File path'),
-    'IntegerField'              : _('Integer'),
-    'IPAddressField'            : _('IP address'),
-    'ManyToManyField'           : '',
-    'NullBooleanField'          : _('Boolean (Either True, False or None)'),
-    'OneToOneField'             : _('Relation to parent model'),
-    'PhoneNumberField'          : _('Phone number'),
-    'PositiveIntegerField'      : _('Integer'),
-    'PositiveSmallIntegerField' : _('Integer'),
-    'SlugField'                 : _('String (up to %(max_length)s)'),
-    'SmallIntegerField'         : _('Integer'),
-    'TextField'                 : _('Text'),
-    'TimeField'                 : _('Time'),
-    'URLField'                  : _('URL'),
-    'USStateField'              : _('U.S. state (two uppercase letters)'),
-    'XMLField'                  : _('XML text'),
-}
-
 def get_readable_field_data_type(field):
-    return DATA_TYPE_MAPPING[field.get_internal_type()] % field.__dict__
+    """Returns the first line of a doc string for a given field type, if it 
+    exists.  Fields' docstrings can contain format strings, which will be 
+    interpolated against the values of Field.__dict__ before being output.  
+    If no docstring is given, a sensible value will be auto-generated from 
+    the field's class name."""
+
+    if field.__doc__:
+        doc = field.__doc__.split('\n')[0]
+        return _(doc) % field.__dict__
+    else:
+        return _(u'Field of type: %(field_type)s') % {
+            'field_type': field.__class__.__name__
+        } 
 
 def extract_views_from_urlpatterns(urlpatterns, base=''):
     """

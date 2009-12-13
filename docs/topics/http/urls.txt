@@ -253,23 +253,29 @@ handler404
 
 .. data:: handler404
 
-A string representing the full Python import path to the view that should be
-called if none of the URL patterns match.
+A callable, or a string representing the full Python import path to the view
+that should be called if none of the URL patterns match.
 
 By default, this is ``'django.views.defaults.page_not_found'``. That default
 value should suffice.
+
+.. versionchanged:: 1.2
+    Previous versions of Django only accepted strings representing import paths.
 
 handler500
 ----------
 
 .. data:: handler500
 
-A string representing the full Python import path to the view that should be
-called in case of server errors. Server errors happen when you have runtime
-errors in view code.
+A callable, or a string representing the full Python import path to the view
+that should be called in case of server errors. Server errors happen when you
+have runtime errors in view code.
 
 By default, this is ``'django.views.defaults.server_error'``. That default
 value should suffice.
+
+.. versionchanged:: 1.2
+    Previous versions of Django only accepted strings representing import paths.
 
 include
 -------

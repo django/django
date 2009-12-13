@@ -39,6 +39,8 @@ are traditionally called *north*, *east*, *south* and *west*.  Our class looks
 something like this::
 
     class Hand(object):
+        """A hand of cards (bridge style)"""
+
         def __init__(self, north, east, south, west):
             # Input parameters are lists of cards ('Ah', '9s', etc)
             self.north = north
@@ -163,6 +165,8 @@ behave like any existing field, so we'll subclass directly from
     from django.db import models
 
     class HandField(models.Field):
+        """A hand of cards (bridge style)"""
+
         def __init__(self, *args, **kwargs):
             kwargs['max_length'] = 104
             super(HandField, self).__init__(*args, **kwargs)
@@ -244,6 +248,8 @@ simple: make sure your field subclass uses a special metaclass:
 For example::
 
     class HandField(models.Field):
+        """A hand of cards (bridge style)"""
+
         __metaclass__ = models.SubfieldBase
 
         def __init__(self, *args, **kwargs):
@@ -251,6 +257,21 @@ For example::
 
 This ensures that the :meth:`to_python` method, documented below, will always be
 called when the attribute is initialized.
+
+
+Documenting your Custom Field
+-----------------------------
+
+As always, you should document your field type, so users will know what it is.
+The best way to do this is to simply provide a docstring for it.  This will 
+automatically be picked up by ``django.contrib.admindocs``, if you have it
+installed, and the first line of it will show up as the field type in the 
+documentation for any model that uses your field.  In the above examples, it 
+will show up as 'A hand of cards (bridge style)'.  Note that if you provide a 
+more verbose docstring, only the first line will show up in 
+``django.contrib.admindocs``.  The full docstring will, of course, still be
+available through ``pydoc`` or the interactive interpreter's ``help()`` 
+function.
 
 Useful methods
 --------------

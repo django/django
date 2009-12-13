@@ -218,9 +218,9 @@ class BaseTest(TestCase):
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
             self.assertTrue('messages' in response.context)
-            self.assertEqual(list(response.context['messages']),
-                             data['messages'])
+            context_messages = list(response.context['messages'])
             for msg in data['messages']:
+                self.assertTrue(msg in context_messages)
                 self.assertContains(response, msg)
 
     def test_middleware_disabled_anon_user(self):

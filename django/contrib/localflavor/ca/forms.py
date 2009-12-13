@@ -12,13 +12,20 @@ phone_digits_re = re.compile(r'^(?:1-?)?(\d{3})[-\.]?(\d{3})[-\.]?(\d{4})$')
 sin_re = re.compile(r"^(\d{3})-(\d{3})-(\d{3})$")
 
 class CAPostalCodeField(RegexField):
-    """Canadian postal code field."""
+    """
+    Canadian postal code field.
+
+    Validates against known invalid characters: D, F, I, O, Q, U
+    Additionally the first character cannot be Z or W.
+    For more info see:
+    http://www.canadapost.ca/tools/pg/manual/PGaddress-e.asp#1402170
+    """
     default_error_messages = {
         'invalid': _(u'Enter a postal code in the format XXX XXX.'),
     }
 
     def __init__(self, *args, **kwargs):
-        super(CAPostalCodeField, self).__init__(r'^[ABCEGHJKLMNPRSTVXYZ]\d[A-Z] \d[A-Z]\d$',
+        super(CAPostalCodeField, self).__init__(r'^[ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ] \d[ABCEGHJKLMNPRSTVWXYZ]\d$',
             max_length=None, min_length=None, *args, **kwargs)
 
 class CAPhoneNumberField(Field):

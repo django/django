@@ -40,8 +40,8 @@ def get_srid_info(srid, connection):
 
     return _srid_cache[name][srid]
 
-class GeometryField(Field):
-    "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+class GeometryField(SpatialBackend.Field):
+    """The base GIS field -- maps to the OpenGIS Specification Geometry type."""
 
     # The OpenGIS Geometry name.
     geom_type = 'GEOMETRY'
@@ -285,22 +285,29 @@ class GeometryField(Field):
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
+    """Point"""
     geom_type = 'POINT'
 
 class LineStringField(GeometryField):
+    """Line string"""
     geom_type = 'LINESTRING'
 
 class PolygonField(GeometryField):
+    """Polygon"""
     geom_type = 'POLYGON'
 
 class MultiPointField(GeometryField):
+    """Multi-point"""
     geom_type = 'MULTIPOINT'
 
 class MultiLineStringField(GeometryField):
+    """Multi-line string"""
     geom_type = 'MULTILINESTRING'
 
 class MultiPolygonField(GeometryField):
+    """Multi polygon"""
     geom_type = 'MULTIPOLYGON'
 
 class GeometryCollectionField(GeometryField):
+    """Geometry collection"""
     geom_type = 'GEOMETRYCOLLECTION'
