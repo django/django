@@ -101,3 +101,15 @@ class CustomFieldSaveTests(TestCase):
         # generate an AssertionError if it is called more than once during save.
         form = CFFForm(data = {'f': None})
         form.save()
+
+class ModelChoiceIteratorTests(TestCase):
+    def test_len(self):
+        class Form(forms.ModelForm):
+            class Meta:
+                model = Article
+                fields = ["publications"]
+        
+        Publication.objects.create(title="Pravda",
+            date_published=date(1991, 8, 22))
+        f = Form()
+        self.assertEqual(len(f.fields["publications"].choices), 1)

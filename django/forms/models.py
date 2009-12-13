@@ -910,6 +910,9 @@ class ModelChoiceIterator(object):
             for obj in self.queryset.all():
                 yield self.choice(obj)
 
+    def __len__(self):
+        return len(self.queryset)
+
     def choice(self, obj):
         if self.field.to_field_name:
             key = obj.serializable_value(self.field.to_field_name)
