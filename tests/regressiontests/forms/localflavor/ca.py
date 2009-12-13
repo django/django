@@ -60,6 +60,50 @@ ValidationError: [u'Enter a postal code in the format XXX XXX.']
 u''
 >>> f.clean('')
 u''
+>>> f.clean('W2S 2H3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('T2W 2H7')
+u'T2W 2H7'
+>>> f.clean('T2S 2W7')
+u'T2S 2W7'
+>>> f.clean('Z2S 2H3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('T2Z 2H7')
+u'T2Z 2H7'
+>>> f.clean('T2S 2Z7')
+u'T2S 2Z7'
+>>> f.clean('F2S 2H3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('A2S 2D3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('A2I 2R3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('A2I 2R3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('A2Q 2R3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('U2B 2R3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('O2B 2R3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
 
 # CAPhoneNumberField ##########################################################
 
