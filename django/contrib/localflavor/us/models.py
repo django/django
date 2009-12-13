@@ -1,23 +1,14 @@
 from django.conf import settings
-from django.db.models.fields import Field
-
-class USStateField(Field): 
+from django.db.models.fields import Field, CharField
+from django.contrib.localflavor.us.us_states import STATE_CHOICES
+  
+class USStateField(CharField):
     """U.S. state (two uppercase letters)"""
-    def get_internal_type(self): 
-        return "USStateField" 
-        
-    def db_type(self):
-        if settings.DATABASE_ENGINE == 'oracle':
-            return 'CHAR(2)'
-        else:
-            return 'varchar(2)'
-    
-    def formfield(self, **kwargs): 
-        from django.contrib.localflavor.us.forms import USStateSelect 
-        defaults = {'widget': USStateSelect} 
-        defaults.update(kwargs) 
-        return super(USStateField, self).formfield(**defaults)
-
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = STATE_CHOICES
+        kwargs['max_length'] = 2
+        super(USStateField, self).__init__(*args, **kwargs)
+  
 class PhoneNumberField(Field):
     """Phone number"""
     def get_internal_type(self):
