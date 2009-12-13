@@ -86,7 +86,7 @@ class InvalidModelTestCase(unittest.TestCase):
         self.assert_(not unexpected, "Unexpected Errors: " + '\n'.join(unexpected))
         self.assert_(not missing, "Missing Errors: " + '\n'.join(missing))
 
-def django_tests(verbosity, interactive, test_labels):
+def django_tests(verbosity, interactive, failfast, test_labels):
     from django.conf import settings
 
     old_installed_apps = settings.INSTALLED_APPS
@@ -160,7 +160,8 @@ def django_tests(verbosity, interactive, test_labels):
         settings.TEST_RUNNER = 'django.test.simple.run_tests'
     test_runner = get_runner(settings)
 
-    failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
+    failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, failfast=failfast,
+                           extra_tests=extra_tests)
     if failures:
         sys.exit(failures)
 
@@ -182,6 +183,8 @@ if __name__ == "__main__":
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
     parser.add_option('--noinput', action='store_false', dest='interactive', default=True,
         help='Tells Django to NOT prompt the user for input of any kind.')
+    parser.add_option('--failfast', action='store_true', dest='failfast', default=False,
+        help='Tells Django to stop running the test suite after first failed test.')
     parser.add_option('--settings',
         help='Python path to settings module, e.g. "myproject.settings". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
     options, args = parser.parse_args()
@@ -190,4 +193,4 @@ if __name__ == "__main__":
     elif "DJANGO_SETTINGS_MODULE" not in os.environ:
         parser.error("DJANGO_SETTINGS_MODULE is not set in the environment. "
                       "Set it or use --settings.")
-    django_tests(int(options.verbosity), options.interactive, args)
+    django_tests(int(options.verbosity), options.interactive, options.failfast, args)

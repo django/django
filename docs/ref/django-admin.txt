@@ -696,6 +696,12 @@ test <app or test identifier>
 Runs tests for all installed models. See :ref:`topics-testing` for more
 information.
 
+--failfast
+~~~~~~~~
+
+Use the ``--failfast`` option to stop running tests and report the failure 
+immediately after a test fails.
+
 testserver <fixture fixture ...>
 --------------------------------
 
