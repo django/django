@@ -158,9 +158,9 @@ TEMPLATE_DIRS = ()
 # See the comments in django/core/template/loader.py for interface
 # documentation.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+#     'django.template.loaders.eggs.Loader',
 )
 
 # List of processors used by RequestContext to populate the context.

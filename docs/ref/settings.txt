@@ -819,7 +819,7 @@ MESSAGE_LEVEL
 
 Default: `messages.INFO`
 
-Sets the minimum message level that will be recorded by the messages 
+Sets the minimum message level that will be recorded by the messages
 framework. See the :ref:`messages documentation <ref-contrib-messages>` for
 more details.
 
@@ -1150,11 +1150,14 @@ TEMPLATE_LOADERS
 
 Default::
 
-     ('django.template.loaders.filesystem.load_template_source',
-      'django.template.loaders.app_directories.load_template_source')
+     ('django.template.loaders.filesystem.Loader',
+      'django.template.loaders.app_directories.Loader')
 
-A tuple of callables (as strings) that know how to import templates from
-various sources. See :ref:`ref-templates-api`.
+A tuple of template loader classes, specified as strings. Each ``Loader`` class
+knows how to import templates from a particular sources. Optionally, a tuple can be
+used instead of a string. The first item in the tuple should be the ``Loader``'s
+module, subsequent items are passed to the ``Loader`` during initialization. See
+:ref:`ref-templates-api`.
 
 .. setting:: TEMPLATE_STRING_IF_INVALID
 

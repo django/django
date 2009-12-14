@@ -36,13 +36,19 @@ their deprecation, as per the :ref:`Django deprecation policy
           manager in the ``User`` model (``user.message_set``), and the
           associated methods (``user.message_set.create()`` and
           ``user.get_and_delete_messages()``), which have
-          been deprecated since the 1.2 release, will be removed.  The 
-          :ref:`messages framework <ref-contrib-messages>` should be used 
+          been deprecated since the 1.2 release, will be removed.  The
+          :ref:`messages framework <ref-contrib-messages>` should be used
           instead.
 
         * Authentication backends need to support the ``obj`` parameter for
           permission checking. The ``supports_object_permissions`` variable
           is not checked any longer and can be removed.
+
+        * The ability to specify a callable template loader rather than a
+          ``Loader`` class will be removed, as will the ``load_template_source``
+          functions that are included with the built in template loaders for
+          backwards compatibility. These have been deprecated since the 1.2
+          release.
 
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved

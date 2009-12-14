@@ -76,6 +76,19 @@ changes:
 
        __members__ = property(lambda self: self.__dir__())
 
+Stateful template tags
+----------------------
+
+Template tags that store rendering state on the node itself may experience
+problems if they are used with the new :ref:`cached
+template loader<template-loaders>`.
+
+All of the built-in Django template tags are safe to use with the cached
+loader, but if you're using custom template tags that come from third
+party packages, or that you wrote yourself, you should ensure that the
+``Node`` implementation for each tag is thread-safe. For more
+information, see
+:ref:`template tag thread safety considerations<template_tag_thread_safety>`.
 
 .. _deprecated-features-1.2:
 
@@ -130,11 +143,11 @@ additional arguments, those arguments can be passed to the
 :meth:`~django.core.mail.get_connection()` call::
 
     connection = get_connection('django.core.mail.backends.smtp', hostname='localhost', port=1234)
-    
+
 User Messages API
 -----------------
 
-The API for storing messages in the user ``Message`` model (via 
+The API for storing messages in the user ``Message`` model (via
 ``user.message_set.create``) is now deprecated and will be removed in Django
 1.4 according to the standard :ref:`release process <internals-release-process>`.
 
@@ -147,20 +160,20 @@ with the following::
     from django.contrib import messages
     messages.add_message(request, messages.INFO, 'a message')
 
-Additionally, if you make use of the method, you need to replace the 
+Additionally, if you make use of the method, you need to replace the
 following::
 
     for message in user.get_and_delete_messages():
         ...
-    
+
 with::
 
     from django.contrib import messages
     for message in messages.get_messages(request):
         ...
-    
-For more information, see the full 
-:ref:`messages documentation <ref-contrib-messages>`. You should begin to 
+
+For more information, see the full
+:ref:`messages documentation <ref-contrib-messages>`. You should begin to
 update your code to use the new API immediately.
 
 What's new in Django 1.2
@@ -239,3 +252,18 @@ Also, filters may now be used in the ``if`` expression. For example:
           class="highlight"
         {% endif %}
       >{{ message }}</div>
+
+Template caching
+----------------
+
+In previous versions of Django, every time you rendered a template it
+would be reloaded from disk. In Django 1.2, you can use a :ref:`cached
+template loader <template-loaders>` to load templates once, then use a
+cached the result for every subsequent render. This can lead to a
+significant performance improvement if your templates are broken into
+lots of smaller subtemplates (using the ``{% extends %}`` or ``{%
+include %}`` tags).
+
+As a side effect, it is now much easier to support non-Django template
+languages. For more details, see the :ref:`notes on supporting
+non-Django template languages<topic-template-alternate-language>`.

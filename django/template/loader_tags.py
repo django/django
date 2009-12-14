@@ -1,13 +1,42 @@
 from django.template import TemplateSyntaxError, TemplateDoesNotExist, Variable
 from django.template import Library, Node, TextNode
-from django.template.loader import get_template, get_template_from_string, find_template_source
+from django.template.loader import get_template
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
 register = Library()
 
+BLOCK_CONTEXT_KEY = 'block_context'
+
 class ExtendsError(Exception):
     pass
+
+class BlockContext(object):
+    def __init__(self):
+        # Dictionary of FIFO queues.
+        self.blocks = {}
+
+    def add_blocks(self, blocks):
+        for name, block in blocks.iteritems():
+            if name in self.blocks:
+                self.blocks[name].insert(0, block)
+            else:
+                self.blocks[name] = [block]
+
+    def pop(self, name):
+        try:
+            return self.blocks[name].pop()
+        except (IndexError, KeyError):
+            return None
+
+    def push(self, name, block):
+        self.blocks[name].append(block)
+
+    def get_block(self, name):
+        try:
+            return self.blocks[name][-1]
+        except (IndexError, KeyError):
+            return None
 
 class BlockNode(Node):
     def __init__(self, name, nodelist, parent=None):
@@ -17,24 +46,31 @@ class BlockNode(Node):
         return "<Block Node: %s. Contents: %r>" % (self.name, self.nodelist)
 
     def render(self, context):
+        block_context = context.render_context.get(BLOCK_CONTEXT_KEY)
         context.push()
-        # Save context in case of block.super().
-        self.context = context
-        context['block'] = self
-        result = self.nodelist.render(context)
+        if block_context is None:
+            context['block'] = self
+            result = self.nodelist.render(context)
+        else:
+            push = block = block_context.pop(self.name)
+            if block is None:
+                block = self
+            # Create new block so we can store context without thread-safety issues.
+            block = BlockNode(block.name, block.nodelist)
+            block.context = context
+            context['block'] = block
+            result = block.nodelist.render(context)
+            if push is not None:
+                block_context.push(self.name, push)
         context.pop()
         return result
 
     def super(self):
-        if self.parent:
-            return mark_safe(self.parent.render(self.context))
+        render_context = self.context.render_context
+        if (BLOCK_CONTEXT_KEY in render_context and
+            render_context[BLOCK_CONTEXT_KEY].get_block(self.name) is not None):
+            return mark_safe(self.render(self.context))
         return ''
-
-    def add_parent(self, nodelist):
-        if self.parent:
-            self.parent.add_parent(nodelist)
-        else:
-            self.parent = BlockNode(self.name, nodelist)
 
 class ExtendsNode(Node):
     must_be_first = True
@@ -43,6 +79,7 @@ class ExtendsNode(Node):
         self.nodelist = nodelist
         self.parent_name, self.parent_name_expr = parent_name, parent_name_expr
         self.template_dirs = template_dirs
+        self.blocks = dict([(n.name, n) for n in nodelist.get_nodes_by_type(BlockNode)])
 
     def __repr__(self):
         if self.parent_name_expr:
@@ -61,40 +98,34 @@ class ExtendsNode(Node):
         if hasattr(parent, 'render'):
             return parent # parent is a Template object
         try:
-            source, origin = find_template_source(parent, self.template_dirs)
+            return get_template(parent)
         except TemplateDoesNotExist:
             raise TemplateSyntaxError, "Template %r cannot be extended, because it doesn't exist" % parent
-        else:
-            return get_template_from_string(source, origin, parent)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
-        parent_blocks = dict([(n.name, n) for n in compiled_parent.nodelist.get_nodes_by_type(BlockNode)])
-        for block_node in self.nodelist.get_nodes_by_type(BlockNode):
-            # Check for a BlockNode with this node's name, and replace it if found.
-            try:
-                parent_block = parent_blocks[block_node.name]
-            except KeyError:
-                # This BlockNode wasn't found in the parent template, but the
-                # parent block might be defined in the parent's *parent*, so we
-                # add this BlockNode to the parent's ExtendsNode nodelist, so
-                # it'll be checked when the parent node's render() is called.
 
-                # Find out if the parent template has a parent itself
-                for node in compiled_parent.nodelist:
-                    if not isinstance(node, TextNode):
-                        # If the first non-text node is an extends, handle it.
-                        if isinstance(node, ExtendsNode):
-                            node.nodelist.append(block_node)
-                        # Extends must be the first non-text node, so once you find
-                        # the first non-text node you can stop looking. 
-                        break
-            else:
-                # Keep any existing parents and add a new one. Used by BlockNode.
-                parent_block.parent = block_node.parent
-                parent_block.add_parent(parent_block.nodelist)
-                parent_block.nodelist = block_node.nodelist
-        return compiled_parent.render(context)
+        if BLOCK_CONTEXT_KEY not in context.render_context:
+            context.render_context[BLOCK_CONTEXT_KEY] = BlockContext()
+        block_context = context.render_context[BLOCK_CONTEXT_KEY]
+
+        # Add the block nodes from this node to the block context
+        block_context.add_blocks(self.blocks)
+
+        # If this block's parent doesn't have an extends node it is the root,
+        # and its block nodes also need to be added to the block context.
+        for node in compiled_parent.nodelist:
+            # The ExtendsNode has to be the first non-text node.
+            if not isinstance(node, TextNode):
+                if not isinstance(node, ExtendsNode):
+                    blocks = dict([(n.name, n) for n in
+                                   compiled_parent.nodelist.get_nodes_by_type(BlockNode)])
+                    block_context.add_blocks(blocks)
+                break
+
+        # Call Template._render explicitly so the parser context stays
+        # the same.
+        return compiled_parent._render(context)
 
 class ConstantIncludeNode(Node):
     def __init__(self, template_path):
