@@ -57,11 +57,14 @@ class CsrfTokenNode(Node):
 
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None):
-        self.cycle_iter = itertools_cycle(cyclevars)
+        self.cyclevars = cyclevars
         self.variable_name = variable_name
 
     def render(self, context):
-        value = self.cycle_iter.next().resolve(context)
+        if self not in context.render_context:
+            context.render_context[self] = itertools_cycle(self.cyclevars)
+        cycle_iter = context.render_context[self]
+        value = cycle_iter.next().resolve(context)
         if self.variable_name:
             context[self.variable_name] = value
         return value

@@ -26,9 +26,9 @@ class Serializer(PythonSerializer):
     """
     Convert a queryset to YAML.
     """
-    
+
     internal_use_only = False
-    
+
     def handle_field(self, obj, field):
         # A nasty special case: base YAML doesn't support serialization of time
         # types (as opposed to dates or datetimes, which it does support). Since
@@ -40,10 +40,11 @@ class Serializer(PythonSerializer):
             self._current[field.name] = str(getattr(obj, field.name))
         else:
             super(Serializer, self).handle_field(obj, field)
-    
+
     def end_serialization(self):
         self.options.pop('stream', None)
         self.options.pop('fields', None)
+        self.options.pop('use_natural_keys', None)
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):

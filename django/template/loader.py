@@ -27,6 +27,36 @@ from django.conf import settings
 
 template_source_loaders = None
 
+class BaseLoader(object):
+    is_usable = False
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, template_name, template_dirs=None):
+        return self.load_template(template_name, template_dirs)
+
+    def load_template(self, template_name, template_dirs=None):
+        source, origin = self.load_template_source(template_name, template_dirs)
+        template = get_template_from_string(source, name=template_name)
+        return template, origin
+
+    def load_template_source(self, template_name, template_dirs=None):
+        """
+        Returns a tuple containing the source and origin for the given template
+        name.
+
+        """
+        raise NotImplementedError
+
+    def reset(self):
+        """
+        Resets any state maintained by the loader instance (e.g., cached
+        templates or cached loader modules).
+
+        """
+        pass
+
 class LoaderOrigin(Origin):
     def __init__(self, display_name, loader, name, dirs):
         super(LoaderOrigin, self).__init__(display_name)
@@ -41,29 +71,50 @@ def make_origin(display_name, loader, name, dirs):
     else:
         return None
 
-def find_template_source(name, dirs=None):
+def find_template_loader(loader):
+    if hasattr(loader, '__iter__'):
+        loader, args = loader[0], loader[1:]
+    else:
+        args = []
+    if isinstance(loader, basestring):
+        module, attr = loader.rsplit('.', 1)
+        try:
+            mod = import_module(module)
+        except ImportError:
+            raise ImproperlyConfigured('Error importing template source loader %s: "%s"' % (loader, e))
+        try:
+            TemplateLoader = getattr(mod, attr)
+        except AttributeError, e:
+            raise ImproperlyConfigured('Error importing template source loader %s: "%s"' % (loader, e))
+
+        if hasattr(TemplateLoader, 'load_template_source'):
+            func = TemplateLoader(*args)
+        else:
+            # Try loading module the old way - string is full path to callable
+            if args:
+                raise ImproperlyConfigured("Error importing template source loader %s - can't pass arguments to function-based loader." % loader)
+            func = TemplateLoader
+
+        if not func.is_usable:
+            import warnings
+            warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your Python installation doesn't support that type of template loading. Consider removing that line from TEMPLATE_LOADERS." % loader)
+            return None
+        else:
+            return func
+    else:
+        raise ImproperlyConfigured('Loader does not define a "load_template" callable template source loader')
+
+def find_template(name, dirs=None):
     # Calculate template_source_loaders the first time the function is executed
     # because putting this logic in the module-level namespace may cause
     # circular import errors. See Django ticket #1292.
     global template_source_loaders
     if template_source_loaders is None:
         loaders = []
-        for path in settings.TEMPLATE_LOADERS:
-            i = path.rfind('.')
-            module, attr = path[:i], path[i+1:]
-            try:
-                mod = import_module(module)
-            except ImportError, e:
-                raise ImproperlyConfigured, 'Error importing template source loader %s: "%s"' % (module, e)
-            try:
-                func = getattr(mod, attr)
-            except AttributeError:
-                raise ImproperlyConfigured, 'Module "%s" does not define a "%s" callable template source loader' % (module, attr)
-            if not func.is_usable:
-                import warnings
-                warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your Python installation doesn't support that type of template loading. Consider removing that line from TEMPLATE_LOADERS." % path)
-            else:
-                loaders.append(func)
+        for loader_name in settings.TEMPLATE_LOADERS:
+            loader = find_template_loader(loader_name)
+            if loader is not None:
+                loaders.append(loader)
         template_source_loaders = tuple(loaders)
     for loader in template_source_loaders:
         try:
@@ -73,13 +124,27 @@ def find_template_source(name, dirs=None):
             pass
     raise TemplateDoesNotExist, name
 
+def find_template_source(name, dirs=None):
+    # For backward compatibility
+    import warnings
+    warnings.warn(
+        "`django.template.loaders.find_template_source` is deprecated; use `django.template.loaders.find_template` instead.",
+        PendingDeprecationWarning
+    )
+    template, origin = find_template(name, dirs)
+    if hasattr(template, 'render'):
+        raise Exception("Found a compiled template that is incompatible with the deprecated `django.template.loaders.find_template_source` function.")
+    return template, origin
+
 def get_template(template_name):
     """
     Returns a compiled Template object for the given template name,
     handling template inheritance recursively.
     """
-    source, origin = find_template_source(template_name)
-    template = get_template_from_string(source, origin, template_name)
+    template, origin = find_template(template_name)
+    if not hasattr(template, 'render'):
+        # template needs to be compiled
+        template = get_template_from_string(template, origin, template_name)
     return template
 
 def get_template_from_string(source, origin=None, name=None):

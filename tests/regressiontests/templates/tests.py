@@ -15,7 +15,7 @@ import unittest
 from django import template
 from django.core import urlresolvers
 from django.template import loader
-from django.template.loaders import app_directories, filesystem
+from django.template.loaders import app_directories, filesystem, cached
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
@@ -101,13 +101,15 @@ class UTF8Class:
 
 class Templates(unittest.TestCase):
     def test_loaders_security(self):
+        ad_loader = app_directories.Loader()
+        fs_loader = filesystem.Loader()
         def test_template_sources(path, template_dirs, expected_sources):
             if isinstance(expected_sources, list):
                 # Fix expected sources so they are normcased and abspathed
                 expected_sources = [os.path.normcase(os.path.abspath(s)) for s in expected_sources]
             # Test the two loaders (app_directores and filesystem).
-            func1 = lambda p, t: list(app_directories.get_template_sources(p, t))
-            func2 = lambda p, t: list(filesystem.get_template_sources(p, t))
+            func1 = lambda p, t: list(ad_loader.get_template_sources(p, t))
+            func2 = lambda p, t: list(fs_loader.get_template_sources(p, t))
             for func in (func1, func2):
                 if isinstance(expected_sources, list):
                     self.assertEqual(func(path, template_dirs), expected_sources)
@@ -198,8 +200,11 @@ class Templates(unittest.TestCase):
             except KeyError:
                 raise template.TemplateDoesNotExist, template_name
 
+        cache_loader = cached.Loader(('test_template_loader',))
+        cache_loader._cached_loaders = (test_template_loader,)
+
         old_template_loaders = loader.template_source_loaders
-        loader.template_source_loaders = [test_template_loader]
+        loader.template_source_loaders = [cache_loader]
 
         failures = []
         tests = template_tests.items()
@@ -232,20 +237,22 @@ class Templates(unittest.TestCase):
             for invalid_str, result in [('', normal_string_result),
                                         (expected_invalid_str, invalid_string_result)]:
                 settings.TEMPLATE_STRING_IF_INVALID = invalid_str
-                try:
-                    test_template = loader.get_template(name)
-                    output = self.render(test_template, vals)
-                except ContextStackException:
-                    failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Context stack was left imbalanced" % (invalid_str, name))
-                    continue
-                except Exception:
-                    exc_type, exc_value, exc_tb = sys.exc_info()
-                    if exc_type != result:
-                        tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
-                        failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Got %s, exception: %s\n%s" % (invalid_str, name, exc_type, exc_value, tb))
-                    continue
-                if output != result:
-                    failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Expected %r, got %r" % (invalid_str, name, result, output))
+                for is_cached in (False, True):
+                    try:
+                        test_template = loader.get_template(name)
+                        output = self.render(test_template, vals)
+                    except ContextStackException:
+                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Context stack was left imbalanced" % (is_cached, invalid_str, name))
+                        continue
+                    except Exception:
+                        exc_type, exc_value, exc_tb = sys.exc_info()
+                        if exc_type != result:
+                            tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
+                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Got %s, exception: %s\n%s" % (is_cached, invalid_str, name, exc_type, exc_value, tb))
+                        continue
+                    if output != result:
+                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, name, result, output))
+                cache_loader.reset()
 
             if 'LANGUAGE_CODE' in vals[1]:
                 deactivate()

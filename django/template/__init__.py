@@ -173,9 +173,16 @@ class Template(object):
             for subnode in node:
                 yield subnode
 
+    def _render(self, context):
+        return self.nodelist.render(context)
+
     def render(self, context):
         "Display stage -- can be called many times"
-        return self.nodelist.render(context)
+        context.render_context.push()
+        try:
+            return self._render(context)
+        finally:
+            context.render_context.pop()
 
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"

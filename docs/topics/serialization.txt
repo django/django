@@ -154,10 +154,10 @@ to install third-party Python modules:
 .. _PyYAML: http://www.pyyaml.org/
 
 Notes for specific serialization formats
-----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 json
-~~~~
+^^^^
 
 If you're using UTF-8 (or any other non-ASCII encoding) data with the JSON
 serializer, you must pass ``ensure_ascii=False`` as a parameter to the
@@ -191,3 +191,191 @@ them. Something like this will work::
 
 .. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html
 
+.. _topics-serialization-natural-keys:
+
+Natural keys
+------------
+
+The default serialization strategy for foreign keys and many-to-many
+relations is to serialize the value of the primary key(s) of the
+objects in the relation. This strategy works well for most types of
+object, but it can cause difficulty in some circumstances.
+
+Consider the case of a list of objects that have foreign key on
+:class:`ContentType`. If you're going to serialize an object that
+refers to a content type, you need to have a way to refer to that
+content type. Content Types are automatically created by Django as
+part of the database synchronization process, so you don't need to
+include content types in a fixture or other serialized data. As a
+result, the primary key of any given content type isn't easy to
+predict - it will depend on how and when :djadmin:`syncdb` was
+executed to create the content types.
+
+There is also the matter of convenience. An integer id isn't always
+the most convenient way to refer to an object; sometimes, a
+more natural reference would be helpful.
+
+Deserialization of natural keys
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is for these reasons that Django provides `natural keys`. A natural
+key is a tuple of values that can be used to uniquely identify an
+object instance without using the primary key value.
+
+Consider the following two models::
+
+    from django.db import models
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=100)
+        last_name = models.CharField(max_length=100)
+
+        birthdate = models.DateField()
+
+    class Book(models.Model):
+        name = models.CharField(max_length=100)
+        author = models.ForeignKey(Person)
+
+Ordinarily, serialized data for ``Book`` would use an integer to refer to
+the author. For example, in JSON, a Book might be serialized as::
+
+    ...
+    {
+        "pk": 1,
+        "model": "store.book",
+        "fields": {
+            "name": "Mostly Harmless",
+            "author": 42
+        }
+    }
+    ...
+
+This isn't a particularly natural way to refer to an author. It
+requires that you know the primary key value for the author; it also
+requires that this primary key value is stable and predictable.
+
+However, if we add natural key handling to Person, the fixture becomes
+much more humane. To add natural key handling, you define a default
+Manager for Person with a ``get_by_natural_key()`` method. In the case
+of a Person, a good natural key might be the pair of first and last
+name::
+
+    from django.db import models
+
+    class PersonManager(models.Manager):
+        def get_by_natural_key(self, first_name, last_name):
+            return self.filter(first_name=first_name, last_name=last_name)
+
+    class Person(models.Model):
+        objects = PersonManager()
+
+        first_name = models.CharField(max_length=100)
+        last_name = models.CharField(max_length=100)
+
+        birthdate = models.DateField()
+
+Now books can use that natural key to refer to ``Person`` objects::
+
+    ...
+    {
+        "pk": 1,
+        "model": "store.book",
+        "fields": {
+            "name": "Mostly Harmless",
+            "author": ["Douglas", "Adams"]
+        }
+    }
+    ...
+
+When you try to load this serialized data, Django will use the
+``get_by_natural_key()`` method to resolve ``["Douglas", "Adams"]``
+into the primary key of an actual ``Person`` object.
+
+Serialization of natural keys
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+So how do you get Django to emit a natural key when serializing an object?
+Firstly, you need to add another method -- this time to the model itself::
+
+    class Person(models.Model):
+        objects = PersonManager()
+
+        first_name = models.CharField(max_length=100)
+        last_name = models.CharField(max_length=100)
+
+        birthdate = models.DateField()
+
+        def natural_key(self):
+            return (self.first_name, self.last_name)
+
+Then, when you call ``serializers.serialize()``, you provide a
+``use_natural_keys=True`` argument::
+
+    >>> serializers.serialize([book1, book2], format='json', indent=2, use_natural_keys=True)
+
+When ``use_natural_keys=True`` is specified, Django will use the
+``natural_key()`` method to serialize any reference to objects of the
+type that defines the method.
+
+If you are using :djadmin:`dumpdata` to generate serialized data, you
+use the `--natural` command line flag to generate natural keys.
+
+.. note::
+
+    You don't need to define both ``natural_key()`` and
+    ``get_by_natural_key()``. If you don't want Django to output
+    natural keys during serialization, but you want to retain the
+    ability to load natural keys, then you can opt to not implement
+    the ``natural_key()`` method.
+
+    Conversely, if (for some strange reason) you want Django to output
+    natural keys during serialization, but *not* be able to load those
+    key values, just don't define the ``get_by_natural_key()`` method.
+
+Dependencies during serialization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since natural keys rely on database lookups to resolve references, it
+is important that data exists before it is referenced. You can't make
+a `forward reference` with natural keys - the data you are referencing
+must exist before you include a natural key reference to that data.
+
+To accommodate this limitation, calls to :djadmin:`dumpdata` that use
+the :djadminopt:`--natural` optionwill serialize any model with a
+``natural_key()`` method before it serializes normal key objects.
+
+However, this may not always be enough. If your natural key refers to
+another object (by using a foreign key or natural key to another object
+as part of a natural key), then you need to be able to ensure that
+the objects on which a natural key depends occur in the serialized data
+before the natural key requires them.
+
+To control this ordering, you can define dependencies on your
+``natural_key()`` methods. You do this by setting a ``dependencies``
+attribute on the ``natural_key()`` method itself.
+
+For example, consider the ``Permission`` model in ``contrib.auth``.
+The following is a simplified version of the ``Permission`` model::
+
+    class Permission(models.Model):
+        name = models.CharField(max_length=50)
+        content_type = models.ForeignKey(ContentType)
+        codename = models.CharField(max_length=100)
+        # ...
+        def natural_key(self):
+            return (self.codename,) + self.content_type.natural_key()
+
+The natural key for a ``Permission`` is a combination of the codename for the
+``Permission``, and the ``ContentType`` to which the ``Permission`` applies. This means
+that ``ContentType`` must be serialized before ``Permission``. To define this
+dependency, we add one extra line::
+
+    class Permission(models.Model):
+        # ...
+        def natural_key(self):
+            return (self.codename,) + self.content_type.natural_key()
+        natural_key.dependencies = ['contenttypes.contenttype']
+
+This definition ensures that ``ContentType`` models are serialized before
+``Permission`` models. In turn, any object referencing ``Permission`` will
+be serialized after both ``ContentType`` and ``Permission``.

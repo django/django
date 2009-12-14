@@ -24,6 +24,7 @@ class Serializer(PythonSerializer):
     def end_serialization(self):
         self.options.pop('stream', None)
         self.options.pop('fields', None)
+        self.options.pop('use_natural_keys', None)
         simplejson.dump(self.objects, self.stream, cls=DjangoJSONEncoder, **self.options)
 
     def getvalue(self):

@@ -8,6 +8,13 @@ class ContentTypeManager(models.Manager):
     # This cache is shared by all the get_for_* methods.
     _cache = {}
 
+    def get_by_natural_key(self, app_label, model):
+        try:
+            ct = self.__class__._cache[(app_label, model)]
+        except KeyError:
+            ct = self.get(app_label=app_label, model=model)
+        return ct
+
     def get_for_model(self, model):
         """
         Returns the ContentType object for a given model, creating the
@@ -93,3 +100,6 @@ class ContentType(models.Model):
         so code that calls this method should catch it.
         """
         return self.model_class()._default_manager.get(**kwargs)
+
+    def natural_key(self):
+        return (self.app_label, self.model)

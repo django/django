@@ -47,6 +47,13 @@ def check_password(raw_password, enc_password):
 class SiteProfileNotAvailable(Exception):
     pass
 
+class PermissionManager(models.Manager):
+    def get_by_natural_key(self, codename, app_label, model):
+        return self.get(
+            codename=codename,
+            content_type=ContentType.objects.get_by_natural_key(app_label, model)
+        )
+
 class Permission(models.Model):
     """The permissions system provides a way to assign permissions to specific users and groups of users.
 
@@ -63,6 +70,7 @@ class Permission(models.Model):
     name = models.CharField(_('name'), max_length=50)
     content_type = models.ForeignKey(ContentType)
     codename = models.CharField(_('codename'), max_length=100)
+    objects = PermissionManager()
 
     class Meta:
         verbose_name = _('permission')
@@ -75,6 +83,10 @@ class Permission(models.Model):
             unicode(self.content_type.app_label),
             unicode(self.content_type),
             unicode(self.name))
+
+    def natural_key(self):
+        return (self.codename,) + self.content_type.natural_key()
+    natural_key.dependencies = ['contenttypes.contenttype']
 
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.

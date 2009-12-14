@@ -76,8 +76,12 @@ class ExceptionReporter:
                         for t in source_list_func(str(self.exc_value))]
                 except (ImportError, AttributeError):
                     template_list = []
+                if hasattr(loader, '__class__'):
+                    loader_name = loader.__module__ + '.' + loader.__class__.__name__
+                else:
+                    loader_name = loader.__module__ + '.' + loader.__name__
                 self.loader_debug_info.append({
-                    'loader': loader.__module__ + '.' + loader.__name__,
+                    'loader': loader_name,
                     'templates': template_list,
                 })
         if settings.TEMPLATE_DEBUG and hasattr(self.exc_value, 'source'):

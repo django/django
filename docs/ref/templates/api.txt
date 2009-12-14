@@ -322,7 +322,7 @@ and return a dictionary of items to be merged into the context. By default,
    cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
 .. versionadded:: 1.2
-   The ``'messages'`` context processor was added.  For more information, see 
+   The ``'messages'`` context processor was added.  For more information, see
    the :ref:`messages documentation <ref-contrib-messages>`.
 
 Each processor is applied in order. That means, if one processor adds a
@@ -379,7 +379,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 
 .. versionchanged:: 1.2
    Prior to version 1.2, the ``messages`` variable was a lazy accessor for
-   ``user.get_and_delete_messages()``. It has been changed to include any 
+   ``user.get_and_delete_messages()``. It has been changed to include any
    messages added via the :ref:`messages framework <ref-contrib-messages`.
 
 django.core.context_processors.debug
@@ -448,7 +448,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
    context processor.  For backwards compatibility the ``'auth'`` context
    processor will continue to supply the ``messages`` variable until Django
    1.4.  If you use the ``messages`` variable, your project will work with
-   either (or both) context processors, but it is recommended to add 
+   either (or both) context processors, but it is recommended to add
    ``django.contrib.messages.context_processors.messages`` so your project
    will be prepared for the future upgrade.
 
@@ -571,11 +571,11 @@ by editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
 should be a tuple of strings, where each string represents a template loader.
 Here are the template loaders that come with Django:
 
-``django.template.loaders.filesystem.load_template_source``
+``django.template.loaders.filesystem.Loader``
     Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.
     This loader is enabled by default.
 
-``django.template.loaders.app_directories.load_template_source``
+``django.template.loaders.app_directories.Loader``
     Loads templates from Django apps on the filesystem. For each app in
     :setting:`INSTALLED_APPS`, the loader looks for a ``templates``
     subdirectory. If the directory exists, Django looks for templates in there.
@@ -599,9 +599,40 @@ Here are the template loaders that come with Django:
 
     This loader is enabled by default.
 
-``django.template.loaders.eggs.load_template_source``
+``django.template.loaders.eggs.Loader``
     Just like ``app_directories`` above, but it loads templates from Python
     eggs rather than from the filesystem.
+
+    This loader is disabled by default.
+
+``django.template.loaders.cached.Loader``
+    By default, the templating system will read and compile your templates every
+    time they need to be rendered. While the Django templating system is quite
+    fast, the overhead from reading and compiling templates can add up.
+
+    The cached template loader is a class-based loader that you configure with
+    a list of other loaders that it should wrap. The wrapped loaders are used to
+    locate unknown templates when they are first encountered. The cached loader
+    then stores the compiled ``Template`` in memory. The cached ``Template``
+    instance is returned for subsequent requests to load the same template.
+
+    For example, to enable template caching with the ``filesystem`` and
+    ``app_directories`` template loaders you might use the following settings::
+
+        TEMPLATE_LOADERS = (
+            ('django.template.loaders.cached.Loader', (
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            )),
+        )
+
+    .. note::
+        All of the built-in Django template tags are safe to use with the cached
+        loader, but if you're using custom template tags that come from third
+        party packages, or that you wrote yourself, you should ensure that the
+        ``Node`` implementation for each tag is thread-safe. For more
+        information, see
+        :ref:`template tag thread safety considerations<template_tag_thread_safety>`.
 
     This loader is disabled by default.
 
@@ -667,3 +698,68 @@ settings you wish to specify. You might want to consider setting at least
 and :setting:`TEMPLATE_DEBUG`. All available settings are described in the
 :ref:`settings documentation <ref-settings>`, and any setting starting with
 ``TEMPLATE_`` is of obvious interest.
+
+.. _topic-template-alternate-language:
+
+Using an alternative template language
+======================================
+
+.. versionadded 1.2
+
+The Django ``Template`` and ``Loader`` classes implement a simple API for
+loading and rendering templates. By providing some simple wrapper classes that
+implement this API we can use third party template systems like `Jinja2
+<http://jinja.pocoo.org/2/>`_ or `Cheetah <http://www.cheetahtemplate.org/>`_. This
+allows us to use third-party template libraries without giving up useful Django
+features like the Django ``Context`` object and handy shortcuts like
+``render_to_response()``.
+
+The core component of the Django templating system is the ``Template`` class.
+This class has a very simple interface: it has a constructor that takes a single
+positional argument specifying the template string, and a ``render()`` method
+that takes a ``django.template.context.Context`` object and returns a string
+containing the rendered response.
+
+Suppose we're using a template language that defines a ``Template`` object with
+a ``render()`` method that takes a dictionary rather than a ``Context`` object.
+We can write a simple wrapper that implements the Django ``Template`` interface::
+
+    import some_template_language
+    class Template(some_template_language.Template):
+        def render(self, context):
+            # flatten the Django Context into a single dictionary.
+            context_dict = {}
+            for d in context.dicts:
+                context_dict.update(d)
+            return super(Template, self).render(context_dict)
+
+That's all that's required to make our fictional ``Template`` class compatible
+with the Django loading and rendering system!
+
+The next step is to write a ``Loader`` class that returns instances of our custom
+template class instead of the default ``django.template.Template``. Custom ``Loader``
+classes should inherit from ``django.template.loader.BaseLoader`` and override
+the ``load_template_source()`` method, which takes a ``template_name`` argument,
+loads the template from disk (or elsewhere), and returns a tuple:
+``(template_string, template_origin)``.
+
+The ``load_template()`` method of the ``Loader`` class retrieves the template
+string by calling ``load_template_source()``, instantiates a ``Template`` from
+the template source, and returns a tuple: ``(template, template_origin)``. Since
+this is the method that actually instantiates the ``Template``, we'll need to
+override it to use our custom template class instead. We can inherit from the
+builtin ``django.template.loaders.app_directories.Loader`` to take advantage of
+the ``load_template_source()`` method implemented there::
+
+    from django.template.loaders import app_directories
+    class Loader(app_directories.Loader):
+        is_usable = True
+
+        def load_template(self, template_name, template_dirs=None):
+            source, origin = self.load_template_source(template_name, template_dirs)
+            template = Template(source)
+            return template, origin
+
+Finally, we need to modify our project settings, telling Django to use our custom
+loader. Now we can write all of our templates in our alternative template
+language while continuing to use the rest of the Django templating system.
