@@ -690,8 +690,8 @@ class ModelAdmin(BaseModelAdmin):
             selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
             if not selected:
                 # Reminder that something needs to be selected or nothing will happen
-                msg = "Items must be selected in order to perform actions on them. No items have been changed."
-                self.message_user(request, _(msg))
+                msg = _("Items must be selected in order to perform actions on them. No items have been changed.")
+                self.message_user(request, msg)
                 return None
 
             response = func(self, request, queryset.filter(pk__in=selected))
@@ -704,8 +704,8 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 return HttpResponseRedirect(".")
         else:
-            msg = "No action selected."
-            self.message_user(request, _(msg))
+            msg = _("No action selected.")
+            self.message_user(request, msg)
 
     def add_view(self, request, form_url='', extra_context=None):
         "The 'add' admin view for this model."
