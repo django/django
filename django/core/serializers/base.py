@@ -33,6 +33,7 @@ class Serializer(object):
 
         self.stream = options.get("stream", StringIO())
         self.selected_fields = options.get("fields")
+        self.use_natural_keys = options.get("use_natural_keys", False)
 
         self.start_serialization()
         for obj in queryset:

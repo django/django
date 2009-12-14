@@ -81,13 +81,22 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related = getattr(obj, field.name)
         if related is not None:
-            if field.rel.field_name == related._meta.pk.name:
-                # Related to remote object via primary key
-                related = related._get_pk_val()
+            if self.use_natural_keys and hasattr(related, 'natural_key'):
+                # If related object has a natural key, use it
+                related = related.natural_key()
+                # Iterable natural keys are rolled out as subelements
+                for key_value in related:
+                    self.xml.startElement("natural", {})
+                    self.xml.characters(smart_unicode(key_value))
+                    self.xml.endElement("natural")
             else:
-                # Related to remote object via other field
-                related = getattr(related, field.rel.field_name)
-            self.xml.characters(smart_unicode(related))
+                if field.rel.field_name == related._meta.pk.name:
+                    # Related to remote object via primary key
+                    related = related._get_pk_val()
+                else:
+                    # Related to remote object via other field
+                    related = getattr(related, field.rel.field_name)
+                self.xml.characters(smart_unicode(related))
         else:
             self.xml.addQuickElement("None")
         self.xml.endElement("field")
@@ -100,8 +109,25 @@ class Serializer(base.Serializer):
         """
         if field.rel.through._meta.auto_created:
             self._start_relational_field(field)
+            if self.use_natural_keys and hasattr(field.rel.to, 'natural_key'):
+                # If the objects in the m2m have a natural key, use it
+                def handle_m2m(value):
+                    natural = value.natural_key()
+                    # Iterable natural keys are rolled out as subelements
+                    self.xml.startElement("object", {})
+                    for key_value in natural:
+                        self.xml.startElement("natural", {})
+                        self.xml.characters(smart_unicode(key_value))
+                        self.xml.endElement("natural")
+                    self.xml.endElement("object")
+            else:
+                def handle_m2m(value):
+                    self.xml.addQuickElement("object", attrs={
+                        'pk' : smart_unicode(value._get_pk_val())
+                    })
             for relobj in getattr(obj, field.name).iterator():
-                self.xml.addQuickElement("object", attrs={"pk" : smart_unicode(relobj._get_pk_val())})
+                handle_m2m(relobj)
+
             self.xml.endElement("field")
 
     def _start_relational_field(self, field):
@@ -187,16 +213,40 @@ class Deserializer(base.Deserializer):
         if node.getElementsByTagName('None'):
             return None
         else:
-            return field.rel.to._meta.get_field(field.rel.field_name).to_python(
-                       getInnerText(node).strip())
+            if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
+                keys = node.getElementsByTagName('natural')
+                if keys:
+                    # If there are 'natural' subelements, it must be a natural key
+                    field_value = [getInnerText(k).strip() for k in keys]
+                    obj = field.rel.to._default_manager.get_by_natural_key(*field_value)
+                    obj_pk = getattr(obj, field.rel.field_name)
+                else:
+                    # Otherwise, treat like a normal PK
+                    field_value = getInnerText(node).strip()
+                    obj_pk = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                return obj_pk
+            else:
+                field_value = getInnerText(node).strip()
+                return field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
 
     def _handle_m2m_field_node(self, node, field):
         """
         Handle a <field> node for a ManyToManyField.
         """
-        return [field.rel.to._meta.pk.to_python(
-                    c.getAttribute("pk"))
-                    for c in node.getElementsByTagName("object")]
+        if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
+            def m2m_convert(n):
+                keys = n.getElementsByTagName('natural')
+                if keys:
+                    # If there are 'natural' subelements, it must be a natural key
+                    field_value = [getInnerText(k).strip() for k in keys]
+                    obj_pk = field.rel.to._default_manager.get_by_natural_key(*field_value).pk
+                else:
+                    # Otherwise, treat like a normal PK value.
+                    obj_pk = field.rel.to._meta.pk.to_python(n.getAttribute('pk'))
+                return obj_pk
+        else:
+            m2m_convert = lambda n: field.rel.to._meta.pk.to_python(n.getAttribute('pk'))
+        return [m2m_convert(c) for c in node.getElementsByTagName("object")]
 
     def _get_model_from_node(self, node, attr):
         """

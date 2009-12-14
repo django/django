@@ -13,7 +13,7 @@ class Animal(models.Model):
     specimens = models.Manager()
 
     def __unicode__(self):
-        return self.common_name
+        return self.name
 
 def animal_pre_save_check(signal, sender, instance, **kwargs):
     "A signal that is used to check the type of data loaded from fixtures"
@@ -69,9 +69,65 @@ class Article(models.Model):
 class Widget(models.Model):
     name = models.CharField(max_length=255)
 
+    class Meta:
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return self.name
+
 class WidgetProxy(Widget):
     class Meta:
         proxy = True
+
+# Check for forward references in FKs and M2Ms with natural keys
+
+class TestManager(models.Manager):
+    def get_by_natural_key(self, key):
+        return self.get(name=key)
+
+class Store(models.Model):
+    objects = TestManager()
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return self.name
+
+    def natural_key(self):
+        return (self.name,)
+
+class Person(models.Model):
+    objects = TestManager()
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return self.name
+
+    # Person doesn't actually have a dependency on store, but we need to define
+    # one to test the behaviour of the dependency resolution algorithm.
+    def natural_key(self):
+        return (self.name,)
+    natural_key.dependencies = ['fixtures_regress.store']
+
+class Book(models.Model):
+    name = models.CharField(max_length=255)
+    author = models.ForeignKey(Person)
+    stores = models.ManyToManyField(Store)
+
+    class Meta:
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return u'%s by %s (available at %s)' % (
+            self.name,
+            self.author.name,
+            ', '.join(s.name for s in self.stores.all())
+        )
 
 __test__ = {'API_TESTS':"""
 >>> from django.core import management
@@ -192,4 +248,121 @@ Weight = 1.2 (<type 'float'>)
 >>> management.call_command('dumpdata', 'fixtures_regress', format='json')
 [{"pk": 1, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]
 
+###############################################
+# Check that natural key requirements are taken into account
+# when serializing models
+>>> management.call_command('loaddata', 'forward_ref_lookup.json', verbosity=0)
+
+>>> management.call_command('dumpdata', 'fixtures_regress.book', 'fixtures_regress.person', 'fixtures_regress.store', verbosity=0, use_natural_keys=True)
+[{"pk": 2, "model": "fixtures_regress.store", "fields": {"name": "Amazon"}}, {"pk": 3, "model": "fixtures_regress.store", "fields": {"name": "Borders"}}, {"pk": 4, "model": "fixtures_regress.person", "fields": {"name": "Neal Stephenson"}}, {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]], "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]
+
+# Now lets check the dependency sorting explicitly
+
+# First Some models with pathological circular dependencies
+>>> class Circle1(models.Model):
+...     name = models.CharField(max_length=255)
+...     def natural_key(self):
+...         return self.name
+...     natural_key.dependencies = ['fixtures_regress.circle2']
+
+>>> class Circle2(models.Model):
+...     name = models.CharField(max_length=255)
+...     def natural_key(self):
+...         return self.name
+...     natural_key.dependencies = ['fixtures_regress.circle1']
+
+>>> class Circle3(models.Model):
+...     name = models.CharField(max_length=255)
+...     def natural_key(self):
+...         return self.name
+...     natural_key.dependencies = ['fixtures_regress.circle3']
+
+>>> class Circle4(models.Model):
+...     name = models.CharField(max_length=255)
+...     def natural_key(self):
+...         return self.name
+...     natural_key.dependencies = ['fixtures_regress.circle5']
+
+>>> class Circle5(models.Model):
+...     name = models.CharField(max_length=255)
+...     def natural_key(self):
+...         return self.name
+...     natural_key.dependencies = ['fixtures_regress.circle6']
+
+>>> class Circle6(models.Model):
+...     name = models.CharField(max_length=255)
+...     def natural_key(self):
+...         return self.name
+...     natural_key.dependencies = ['fixtures_regress.circle4']
+
+>>> class ExternalDependency(models.Model):
+...     name = models.CharField(max_length=255)
+...     def natural_key(self):
+...         return self.name
+...     natural_key.dependencies = ['fixtures_regress.book']
+
+# It doesn't matter what order you mention the models
+# Store *must* be serialized before then Person, and both
+# must be serialized before Book.
+>>> from django.core.management.commands.dumpdata import sort_dependencies
+>>> sort_dependencies([('fixtures_regress', [Book, Person, Store])])
+[<class 'regressiontests.fixtures_regress.models.Store'>, <class 'regressiontests.fixtures_regress.models.Person'>, <class 'regressiontests.fixtures_regress.models.Book'>]
+
+>>> sort_dependencies([('fixtures_regress', [Book, Store, Person])])
+[<class 'regressiontests.fixtures_regress.models.Store'>, <class 'regressiontests.fixtures_regress.models.Person'>, <class 'regressiontests.fixtures_regress.models.Book'>]
+
+>>> sort_dependencies([('fixtures_regress', [Store, Book, Person])])
+[<class 'regressiontests.fixtures_regress.models.Store'>, <class 'regressiontests.fixtures_regress.models.Person'>, <class 'regressiontests.fixtures_regress.models.Book'>]
+
+>>> sort_dependencies([('fixtures_regress', [Store, Person, Book])])
+[<class 'regressiontests.fixtures_regress.models.Store'>, <class 'regressiontests.fixtures_regress.models.Person'>, <class 'regressiontests.fixtures_regress.models.Book'>]
+
+>>> sort_dependencies([('fixtures_regress', [Person, Book, Store])])
+[<class 'regressiontests.fixtures_regress.models.Store'>, <class 'regressiontests.fixtures_regress.models.Person'>, <class 'regressiontests.fixtures_regress.models.Book'>]
+
+>>> sort_dependencies([('fixtures_regress', [Person, Store, Book])])
+[<class 'regressiontests.fixtures_regress.models.Store'>, <class 'regressiontests.fixtures_regress.models.Person'>, <class 'regressiontests.fixtures_regress.models.Book'>]
+
+# A dangling dependency - assume the user knows what they are doing.
+>>> sort_dependencies([('fixtures_regress', [Person, Circle1, Store, Book])])
+[<class 'regressiontests.fixtures_regress.models.Circle1'>, <class 'regressiontests.fixtures_regress.models.Store'>, <class 'regressiontests.fixtures_regress.models.Person'>, <class 'regressiontests.fixtures_regress.models.Book'>]
+
+# A tight circular dependency
+>>> sort_dependencies([('fixtures_regress', [Person, Circle2, Circle1, Store, Book])])
+Traceback (most recent call last):
+...
+CommandError: Can't resolve dependencies for fixtures_regress.Circle1, fixtures_regress.Circle2 in serialized app list.
+
+>>> sort_dependencies([('fixtures_regress', [Circle1, Book, Circle2])])
+Traceback (most recent call last):
+...
+CommandError: Can't resolve dependencies for fixtures_regress.Circle1, fixtures_regress.Circle2 in serialized app list.
+
+# A self referential dependency
+>>> sort_dependencies([('fixtures_regress', [Book, Circle3])])
+Traceback (most recent call last):
+...
+CommandError: Can't resolve dependencies for fixtures_regress.Circle3 in serialized app list.
+
+# A long circular dependency
+>>> sort_dependencies([('fixtures_regress', [Person, Circle2, Circle1, Circle3, Store, Book])])
+Traceback (most recent call last):
+...
+CommandError: Can't resolve dependencies for fixtures_regress.Circle1, fixtures_regress.Circle2, fixtures_regress.Circle3 in serialized app list.
+
+# A dependency on a normal, non-natural-key model
+>>> sort_dependencies([('fixtures_regress', [Person, ExternalDependency, Book])])
+[<class 'regressiontests.fixtures_regress.models.Person'>, <class 'regressiontests.fixtures_regress.models.Book'>, <class 'regressiontests.fixtures_regress.models.ExternalDependency'>]
+
+###############################################
+# Check that normal primary keys still work
+# on a model with natural key capabilities
+
+>>> management.call_command('loaddata', 'non_natural_1.json', verbosity=0)
+>>> management.call_command('loaddata', 'non_natural_2.xml', verbosity=0)
+
+>>> Book.objects.all()
+[<Book: Cryptonomicon by Neal Stephenson (available at Amazon, Borders)>, <Book: Ender's Game by Orson Scott Card (available at Collins Bookstore)>, <Book: Permutation City by Greg Egan (available at Angus and Robertson)>]
+
 """}
+

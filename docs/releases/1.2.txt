@@ -267,3 +267,13 @@ include %}`` tags).
 As a side effect, it is now much easier to support non-Django template
 languages. For more details, see the :ref:`notes on supporting
 non-Django template languages<topic-template-alternate-language>`.
+
+Natural keys in fixtures
+------------------------
+
+Fixtures can refer to remote objects using
+:ref:`topics-serialization-natural-keys`. This lookup scheme is an
+alternative to the normal primary-key based object references in a
+fixture, improving readability, and resolving problems referring to
+objects whose primary key value may not be predictable or known.
+

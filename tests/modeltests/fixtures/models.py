@@ -8,6 +8,9 @@ in the application directory, on in one of the directories named in the
 ``FIXTURE_DIRS`` setting.
 """
 
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.conf import settings
 
@@ -30,6 +33,62 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('-pub_date', 'headline')
+
+class Blog(models.Model):
+    name = models.CharField(max_length=100)
+    featured = models.ForeignKey(Article, related_name='fixtures_featured_set')
+    articles = models.ManyToManyField(Article, blank=True,
+                                      related_name='fixtures_articles_set')
+
+    def __unicode__(self):
+        return self.name
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100)
+    tagged_type = models.ForeignKey(ContentType, related_name="fixtures_tag_set")
+    tagged_id = models.PositiveIntegerField(default=0)
+    tagged = generic.GenericForeignKey(ct_field='tagged_type',
+                                       fk_field='tagged_id')
+
+    def __unicode__(self):
+        return '<%s: %s> tagged "%s"' % (self.tagged.__class__.__name__,
+                                         self.tagged, self.name)
+
+class PersonManager(models.Manager):
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
+
+class Person(models.Model):
+    objects = PersonManager()
+    name = models.CharField(max_length=100)
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('name',)
+
+    def natural_key(self):
+        return (self.name,)
+
+class Visa(models.Model):
+    person = models.ForeignKey(Person)
+    permissions = models.ManyToManyField(Permission, blank=True)
+
+    def __unicode__(self):
+        return '%s %s' % (self.person.name,
+                          ', '.join(p.name for p in self.permissions.all()))
+
+class Book(models.Model):
+    name = models.CharField(max_length=100)
+    authors = models.ManyToManyField(Person)
+
+    def __unicode__(self):
+        return '%s by %s' % (self.name,
+                          ' and '.join(a.name for a in self.authors.all()))
+
+    class Meta:
+        ordering = ('name',)
 
 __test__ = {'API_TESTS': """
 >>> from django.core import management
@@ -90,12 +149,53 @@ __test__ = {'API_TESTS': """
 >>> Article.objects.all()
 [<Article: XML identified as leading cause of cancer>, <Article: Django conquers world!>, <Article: Copyright is fine the way it is>, <Article: Poker on TV is great!>, <Article: Python program becomes self aware>]
 
+# Load fixture 6, JSON file with dynamic ContentType fields. Testing ManyToOne.
+>>> management.call_command('loaddata', 'fixture6.json', verbosity=0)
+>>> Tag.objects.all()
+[<Tag: <Article: Copyright is fine the way it is> tagged "copyright">, <Tag: <Article: Copyright is fine the way it is> tagged "law">]
+
+# Load fixture 7, XML file with dynamic ContentType fields. Testing ManyToOne.
+>>> management.call_command('loaddata', 'fixture7.xml', verbosity=0)
+>>> Tag.objects.all()
+[<Tag: <Article: Copyright is fine the way it is> tagged "copyright">, <Tag: <Article: Copyright is fine the way it is> tagged "legal">, <Tag: <Article: Django conquers world!> tagged "django">, <Tag: <Article: Django conquers world!> tagged "world domination">]
+
+# Load fixture 8, JSON file with dynamic Permission fields. Testing ManyToMany.
+>>> management.call_command('loaddata', 'fixture8.json', verbosity=0)
+>>> Visa.objects.all()
+[<Visa: Django Reinhardt Can add user, Can change user, Can delete user>, <Visa: Stephane Grappelli Can add user>, <Visa: Prince >]
+
+# Load fixture 9, XML file with dynamic Permission fields. Testing ManyToMany.
+>>> management.call_command('loaddata', 'fixture9.xml', verbosity=0)
+>>> Visa.objects.all()
+[<Visa: Django Reinhardt Can add user, Can change user, Can delete user>, <Visa: Stephane Grappelli Can add user, Can delete user>, <Visa: Artist formerly known as "Prince" Can change user>]
+
+>>> Book.objects.all()
+[<Book: Music for all ages by Artist formerly known as "Prince" and Django Reinhardt>]
+
 # Load a fixture that doesn't exist
 >>> management.call_command('loaddata', 'unknown.json', verbosity=0)
 
 # object list is unaffected
 >>> Article.objects.all()
 [<Article: XML identified as leading cause of cancer>, <Article: Django conquers world!>, <Article: Copyright is fine the way it is>, <Article: Poker on TV is great!>, <Article: Python program becomes self aware>]
+
+# By default, you get raw keys on dumpdata
+>>> management.call_command('dumpdata', 'fixtures.book', format='json')
+[{"pk": 1, "model": "fixtures.book", "fields": {"name": "Music for all ages", "authors": [3, 1]}}]
+
+# But you can get natural keys if you ask for them and they are available
+>>> management.call_command('dumpdata', 'fixtures.book', format='json', use_natural_keys=True)
+[{"pk": 1, "model": "fixtures.book", "fields": {"name": "Music for all ages", "authors": [["Artist formerly known as \\"Prince\\""], ["Django Reinhardt"]]}}]
+
+# Dump the current contents of the database as a JSON fixture
+>>> management.call_command('dumpdata', 'fixtures', format='json', use_natural_keys=True)
+[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 5, "model": "fixtures.article", "fields": {"headline": "XML identified as leading cause of cancer", "pub_date": "2006-06-16 16:00:00"}}, {"pk": 4, "model": "fixtures.article", "fields": {"headline": "Django conquers world!", "pub_date": "2006-06-16 15:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16 14:00:00"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker on TV is great!", "pub_date": "2006-06-16 11:00:00"}}, {"pk": 1, "model": "fixtures.article", "fields": {"headline": "Python program becomes self aware", "pub_date": "2006-06-16 11:00:00"}}, {"pk": 1, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "copyright", "tagged_id": 3}}, {"pk": 2, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "legal", "tagged_id": 3}}, {"pk": 3, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "django", "tagged_id": 4}}, {"pk": 4, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "world domination", "tagged_id": 4}}, {"pk": 3, "model": "fixtures.person", "fields": {"name": "Artist formerly known as \\"Prince\\""}}, {"pk": 1, "model": "fixtures.person", "fields": {"name": "Django Reinhardt"}}, {"pk": 2, "model": "fixtures.person", "fields": {"name": "Stephane Grappelli"}}, {"pk": 1, "model": "fixtures.visa", "fields": {"person": ["Django Reinhardt"], "permissions": [["add_user", "auth", "user"], ["change_user", "auth", "user"], ["delete_user", "auth", "user"]]}}, {"pk": 2, "model": "fixtures.visa", "fields": {"person": ["Stephane Grappelli"], "permissions": [["add_user", "auth", "user"], ["delete_user", "auth", "user"]]}}, {"pk": 3, "model": "fixtures.visa", "fields": {"person": ["Artist formerly known as \\"Prince\\""], "permissions": [["change_user", "auth", "user"]]}}, {"pk": 1, "model": "fixtures.book", "fields": {"name": "Music for all ages", "authors": [["Artist formerly known as \\"Prince\\""], ["Django Reinhardt"]]}}]
+
+# Dump the current contents of the database as an XML fixture
+>>> management.call_command('dumpdata', 'fixtures', format='xml', use_natural_keys=True)
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0"><object pk="1" model="fixtures.category"><field type="CharField" name="title">News Stories</field><field type="TextField" name="description">Latest news stories</field></object><object pk="5" model="fixtures.article"><field type="CharField" name="headline">XML identified as leading cause of cancer</field><field type="DateTimeField" name="pub_date">2006-06-16 16:00:00</field></object><object pk="4" model="fixtures.article"><field type="CharField" name="headline">Django conquers world!</field><field type="DateTimeField" name="pub_date">2006-06-16 15:00:00</field></object><object pk="3" model="fixtures.article"><field type="CharField" name="headline">Copyright is fine the way it is</field><field type="DateTimeField" name="pub_date">2006-06-16 14:00:00</field></object><object pk="2" model="fixtures.article"><field type="CharField" name="headline">Poker on TV is great!</field><field type="DateTimeField" name="pub_date">2006-06-16 11:00:00</field></object><object pk="1" model="fixtures.article"><field type="CharField" name="headline">Python program becomes self aware</field><field type="DateTimeField" name="pub_date">2006-06-16 11:00:00</field></object><object pk="1" model="fixtures.tag"><field type="CharField" name="name">copyright</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="2" model="fixtures.tag"><field type="CharField" name="name">legal</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="3" model="fixtures.tag"><field type="CharField" name="name">django</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">4</field></object><object pk="4" model="fixtures.tag"><field type="CharField" name="name">world domination</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">4</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">Artist formerly known as "Prince"</field></object><object pk="1" model="fixtures.person"><field type="CharField" name="name">Django Reinhardt</field></object><object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane Grappelli</field></object><object pk="1" model="fixtures.visa"><field to="fixtures.person" name="person" rel="ManyToOneRel"><natural>Django Reinhardt</natural></field><field to="auth.permission" name="permissions" rel="ManyToManyRel"><object><natural>add_user</natural><natural>auth</natural><natural>user</natural></object><object><natural>change_user</natural><natural>auth</natural><natural>user</natural></object><object><natural>delete_user</natural><natural>auth</natural><natural>user</natural></object></field></object><object pk="2" model="fixtures.visa"><field to="fixtures.person" name="person" rel="ManyToOneRel"><natural>Stephane Grappelli</natural></field><field to="auth.permission" name="permissions" rel="ManyToManyRel"><object><natural>add_user</natural><natural>auth</natural><natural>user</natural></object><object><natural>delete_user</natural><natural>auth</natural><natural>user</natural></object></field></object><object pk="3" model="fixtures.visa"><field to="fixtures.person" name="person" rel="ManyToOneRel"><natural>Artist formerly known as "Prince"</natural></field><field to="auth.permission" name="permissions" rel="ManyToManyRel"><object><natural>change_user</natural><natural>auth</natural><natural>user</natural></object></field></object><object pk="1" model="fixtures.book"><field type="CharField" name="name">Music for all ages</field><field to="fixtures.person" name="authors" rel="ManyToManyRel"><object><natural>Artist formerly known as "Prince"</natural></object><object><natural>Django Reinhardt</natural></object></field></object></django-objects>
+
 """}
 
 # Database flushing does not work on MySQL with the default storage engine
@@ -158,6 +258,25 @@ Multiple fixtures named 'fixture2' in '...fixtures'. Aborting.
 # because there are two fixture5's in the fixtures directory
 >>> management.call_command('loaddata', 'fixture5', verbosity=0) # doctest: +ELLIPSIS
 Multiple fixtures named 'fixture5' in '...fixtures'. Aborting.
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Load back in fixture 1, we need the articles from it
+>>> management.call_command('loaddata', 'fixture1', verbosity=0)
+
+# Try to load fixture 6 using format discovery
+>>> management.call_command('loaddata', 'fixture6', verbosity=0)
+>>> Tag.objects.all()
+[<Tag: <Article: Time to reform copyright> tagged "copyright">, <Tag: <Article: Time to reform copyright> tagged "law">]
+
+# Dump the current contents of the database as a JSON fixture
+>>> management.call_command('dumpdata', 'fixtures', format='json', use_natural_keys=True)
+[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16 12:00:00"}}, {"pk": 1, "model": "fixtures.article", "fields": {"headline": "Python program becomes self aware", "pub_date": "2006-06-16 11:00:00"}}, {"pk": 1, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "copyright", "tagged_id": 3}}, {"pk": 2, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "law", "tagged_id": 3}}, {"pk": 1, "model": "fixtures.person", "fields": {"name": "Django Reinhardt"}}, {"pk": 3, "model": "fixtures.person", "fields": {"name": "Prince"}}, {"pk": 2, "model": "fixtures.person", "fields": {"name": "Stephane Grappelli"}}]
+
+# Dump the current contents of the database as an XML fixture
+>>> management.call_command('dumpdata', 'fixtures', format='xml', use_natural_keys=True)
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0"><object pk="1" model="fixtures.category"><field type="CharField" name="title">News Stories</field><field type="TextField" name="description">Latest news stories</field></object><object pk="3" model="fixtures.article"><field type="CharField" name="headline">Time to reform copyright</field><field type="DateTimeField" name="pub_date">2006-06-16 13:00:00</field></object><object pk="2" model="fixtures.article"><field type="CharField" name="headline">Poker has no place on ESPN</field><field type="DateTimeField" name="pub_date">2006-06-16 12:00:00</field></object><object pk="1" model="fixtures.article"><field type="CharField" name="headline">Python program becomes self aware</field><field type="DateTimeField" name="pub_date">2006-06-16 11:00:00</field></object><object pk="1" model="fixtures.tag"><field type="CharField" name="name">copyright</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="2" model="fixtures.tag"><field type="CharField" name="name">law</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="1" model="fixtures.person"><field type="CharField" name="name">Django Reinhardt</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">Prince</field></object><object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane Grappelli</field></object></django-objects>
 
 """
 

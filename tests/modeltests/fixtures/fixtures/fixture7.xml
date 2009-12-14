@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+    <object pk="2" model="fixtures.tag">
+        <field type="CharField" name="name">legal</field>
+        <field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel">
+            <natural>fixtures</natural>
+            <natural>article</natural>
+        </field>
+        <field type="PositiveIntegerField" name="tagged_id">3</field>
+    </object>
+    <object pk="3" model="fixtures.tag">
+        <field type="CharField" name="name">django</field>
+        <field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel">
+            <natural>fixtures</natural>
+            <natural>article</natural>
+        </field>
+        <field type="PositiveIntegerField" name="tagged_id">4</field>
+    </object>
+    <object pk="4" model="fixtures.tag">
+        <field type="CharField" name="name">world domination</field>
+        <field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel">
+            <natural>fixtures</natural>
+            <natural>article</natural>
+        </field>
+        <field type="PositiveIntegerField" name="tagged_id">4</field>
+    </object>
+</django-objects>
