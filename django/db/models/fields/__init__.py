@@ -369,7 +369,7 @@ class Field(object):
 
 class AutoField(Field):
     """Integer"""
-    
+
     empty_strings_allowed = False
 
     def __init__(self, *args, **kwargs):
@@ -448,7 +448,7 @@ class BooleanField(Field):
 
 class CharField(Field):
     """String (up to %(max_length)s)"""
-    
+
     def get_internal_type(self):
         return "CharField"
 
@@ -471,7 +471,7 @@ class CharField(Field):
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
     """Comma-separated integers"""
-    
+
     def formfield(self, **kwargs):
         defaults = {
             'form_class': forms.RegexField,
@@ -488,7 +488,7 @@ ansi_date_re = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}$')
 
 class DateField(Field):
     """Date (without time)"""
-    
+
     empty_strings_allowed = False
 
     def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
@@ -571,7 +571,7 @@ class DateField(Field):
 
 class DateTimeField(DateField):
     """Date (with time)"""
-    
+
     def get_internal_type(self):
         return "DateTimeField"
 
@@ -637,7 +637,7 @@ class DateTimeField(DateField):
 
 class DecimalField(Field):
     """Decimal number"""
-    
+
     empty_strings_allowed = False
 
     def __init__(self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs):
@@ -694,7 +694,7 @@ class DecimalField(Field):
 
 class EmailField(CharField):
     """E-mail address"""
-    
+
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 75)
         CharField.__init__(self, *args, **kwargs)
@@ -706,7 +706,7 @@ class EmailField(CharField):
 
 class FilePathField(Field):
     """File path"""
-    
+
     def __init__(self, verbose_name=None, name=None, path='', match=None, recursive=False, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
         kwargs['max_length'] = kwargs.get('max_length', 100)
@@ -727,7 +727,7 @@ class FilePathField(Field):
 
 class FloatField(Field):
     """Floating point number"""
-    
+
     empty_strings_allowed = False
 
     def get_prep_value(self, value):
@@ -754,14 +754,10 @@ class FloatField(Field):
 
 class IntegerField(Field):
     """Integer"""
-    
-    empty_strings_allowed = False
-<<<<<<< HEAD:django/db/models/fields/__init__.py
-    def get_prep_value(self, value):
-=======
 
-    def get_db_prep_value(self, value):
->>>>>>> master:django/db/models/fields/__init__.py
+    empty_strings_allowed = False
+
+    def get_prep_value(self, value):
         if value is None:
             return None
         return int(value)
@@ -785,7 +781,7 @@ class IntegerField(Field):
 
 class IPAddressField(Field):
     """IP address"""
-    
+
     empty_strings_allowed = False
 
     def __init__(self, *args, **kwargs):
@@ -845,7 +841,7 @@ class NullBooleanField(Field):
 
 class PositiveIntegerField(IntegerField):
     """Integer"""
-    
+
     def get_internal_type(self):
         return "PositiveIntegerField"
 
@@ -885,13 +881,13 @@ class SlugField(CharField):
 
 class SmallIntegerField(IntegerField):
     """Integer"""
-    
+
     def get_internal_type(self):
         return "SmallIntegerField"
 
 class TextField(Field):
     """Text"""
-    
+
     def get_internal_type(self):
         return "TextField"
 
@@ -902,7 +898,7 @@ class TextField(Field):
 
 class TimeField(Field):
     """Time"""
-    
+
     empty_strings_allowed = False
 
     def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
@@ -982,7 +978,7 @@ class TimeField(Field):
 
 class URLField(CharField):
     """URL"""
-    
+
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 200)
         self.verify_exists = verify_exists
@@ -995,7 +991,7 @@ class URLField(CharField):
 
 class XMLField(TextField):
     """XML text"""
-    
+
     def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):
         self.schema_path = schema_path
         Field.__init__(self, verbose_name, name, **kwargs)
