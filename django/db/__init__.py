@@ -34,13 +34,14 @@ if not settings.DATABASES:
 if DEFAULT_DB_ALIAS not in settings.DATABASES:
     raise ImproperlyConfigured("You must default a '%s' database" % DEFAULT_DB_ALIAS)
 
-for database in settings.DATABASES.values():
+for alias, database in settings.DATABASES.items():
     if database['ENGINE'] in ("postgresql", "postgresql_psycopg2", "sqlite3", "mysql", "oracle"):
         import warnings
         if 'django.contrib.gis' in settings.INSTALLED_APPS:
             warnings.warn(
-                "django.contrib.gis is now implemented as a full database backend.\n"
-                "Modify DATABASE_ENGINE to select a backend from 'django.contrib.gis.db.backends'",
+                "django.contrib.gis is now implemented as a full database backend. "
+                "Modify ENGINE in the %s database configuration to select "
+                "a backend from 'django.contrib.gis.db.backends'" % alias,
                 PendingDeprecationWarning
             )
             if database['ENGINE'] == 'postgresql_psycopg2':
@@ -51,7 +52,8 @@ for database in settings.DATABASES.values():
                 full_engine = 'django.contrib.gis.db.backends.%s' % database['ENGINE']
         else:
             warnings.warn(
-                "Short names for DATABASE_ENGINE are deprecated; prepend with 'django.db.backends.'",
+                "Short names for ENGINE in database configurations are deprecated. "
+                "Prepend %s.ENGINE with 'django.db.backends.'" % alias,
                 PendingDeprecationWarning
             )
             full_engine = "django.db.backends.%s" % database['ENGINE']
