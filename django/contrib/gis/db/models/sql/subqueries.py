@@ -2,7 +2,7 @@ from django.db import connections
 from django.db.models.sql.subqueries import InsertQuery
 
 class GeoInsertQuery(InsertQuery):
-    def insert_values(self, insert_values, connection, raw_values=False):
+    def insert_values(self, insert_values, raw_values=False):
         """
         Set up the insert query from the 'insert_values' dictionary. The
         dictionary gives the model field names and their target values.
@@ -14,19 +14,13 @@ class GeoInsertQuery(InsertQuery):
         """
         placeholders, values = [], []
         for field, val in insert_values:
-            if hasattr(field, 'get_placeholder'):
-                # Some fields (e.g. geo fields) need special munging before
-                # they can be inserted.
-                placeholders.append(field.get_placeholder(val, connection))
-            else:
-                placeholders.append('%s')
-
+            placeholders.append((field, val))
             self.columns.append(field.column)
-            
+
             if not placeholders[-1] == 'NULL':
                 values.append(val)
         if raw_values:
-            self.values.extend(values)
+            self.values.extend([(None, v) for v in values])
         else:
             self.params += tuple(values)
             self.values.extend(placeholders)
@@ -38,6 +32,5 @@ def insert_query(model, values, return_id=False, raw_values=False, using=None):
     part of the public API.
     """
     query = GeoInsertQuery(model)
-    compiler = query.get_compiler(using=using)
-    query.insert_values(values, compiler.connection, raw_values)
-    return compiler.execute_sql(return_id)
+    query.insert_values(values, raw_values)
+    return query.get_compiler(using=using).execute_sql(return_id)

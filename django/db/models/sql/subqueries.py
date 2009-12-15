@@ -183,15 +183,17 @@ class InsertQuery(Query):
         self.columns = []
         self.values = []
         self.params = ()
-        self.return_id = False
 
     def clone(self, klass=None, **kwargs):
-        extras = {'columns': self.columns[:], 'values': self.values[:],
-                  'params': self.params, 'return_id': self.return_id}
+        extras = {
+            'columns': self.columns[:],
+            'values': self.values[:],
+            'params': self.params
+        }
         extras.update(kwargs)
         return super(InsertQuery, self).clone(klass, **extras)
 
-    def insert_values(self, insert_values, connection, raw_values=False):
+    def insert_values(self, insert_values, raw_values=False):
         """
         Set up the insert query from the 'insert_values' dictionary. The
         dictionary gives the model field names and their target values.
@@ -203,17 +205,11 @@ class InsertQuery(Query):
         """
         placeholders, values = [], []
         for field, val in insert_values:
-            if hasattr(field, 'get_placeholder'):
-                # Some fields (e.g. geo fields) need special munging before
-                # they can be inserted.
-                placeholders.append(field.get_placeholder(val, connection))
-            else:
-                placeholders.append('%s')
-
+            placeholders.append((field, val))
             self.columns.append(field.column)
             values.append(val)
         if raw_values:
-            self.values.extend(values)
+            self.values.extend([(None, v) for v in values])
         else:
             self.params += tuple(values)
             self.values.extend(placeholders)

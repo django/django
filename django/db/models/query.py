@@ -1149,6 +1149,5 @@ def insert_query(model, values, return_id=False, raw_values=False, using=None):
     part of the public API.
     """
     query = sql.InsertQuery(model)
-    compiler = query.get_compiler(using=using)
-    query.insert_values(values, compiler.connection, raw_values)
-    return compiler.execute_sql(return_id)
+    query.insert_values(values, raw_values)
+    return query.get_compiler(using=using).execute_sql(return_id)

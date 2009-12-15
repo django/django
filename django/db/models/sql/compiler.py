@@ -689,6 +689,18 @@ class SQLCompiler(object):
 
 
 class SQLInsertCompiler(SQLCompiler):
+    def placeholder(self, field, val):
+        if field is None:
+            # A field value of None means the value is raw.
+            return val
+        elif hasattr(field, 'get_placeholder'):
+            # Some fields (e.g. geo fields) need special munging before
+            # they can be inserted.
+            return field.get_placeholder(val, self.connection)
+        else:
+            # Return the common case for the placeholder
+            return '%s'
+
     def as_sql(self):
         # We don't need quote_name_unless_alias() here, since these are all
         # going to be column names (so we can avoid the extra overhead).
@@ -696,18 +708,18 @@ class SQLInsertCompiler(SQLCompiler):
         opts = self.query.model._meta
         result = ['INSERT INTO %s' % qn(opts.db_table)]
         result.append('(%s)' % ', '.join([qn(c) for c in self.query.columns]))
-        result.append('VALUES (%s)' % ', '.join(self.query.values))
+        values = [self.placeholder(*v) for v in self.query.values]
+        result.append('VALUES (%s)' % ', '.join(values))
         params = self.query.params
-        if self.query.return_id and self.connection.features.can_return_id_from_insert:
+        if self.return_id and self.connection.features.can_return_id_from_insert:
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             r_fmt, r_params = self.connection.ops.return_insert_id()
             result.append(r_fmt % col)
             params = params + r_params
         return ' '.join(result), params
 
-
     def execute_sql(self, return_id=False):
-        self.query.return_id = return_id
+        self.return_id = return_id
         cursor = super(SQLInsertCompiler, self).execute_sql(None)
         if not (return_id and cursor):
             return
