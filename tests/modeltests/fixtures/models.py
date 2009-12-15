@@ -262,28 +262,28 @@ Multiple fixtures named 'fixture5' in '...fixtures'. Aborting.
 
 >>> management.call_command('flush', verbosity=0, interactive=False)
 
-# Load fixtures 6 and 7. These will load using the 'default' database identifier implicitly
->>> management.call_command('loaddata', 'fixture6', verbosity=0)
->>> management.call_command('loaddata', 'fixture7', verbosity=0)
+# Load db fixtures 1 and 2. These will load using the 'default' database identifier implicitly
+>>> management.call_command('loaddata', 'db_fixture_1', verbosity=0)
+>>> management.call_command('loaddata', 'db_fixture_2', verbosity=0)
 >>> Article.objects.all()
 [<Article: Who needs more than one database?>, <Article: Who needs to use compressed data?>, <Article: Python program becomes self aware>]
 
 >>> management.call_command('flush', verbosity=0, interactive=False)
 
-# Load fixtures 6 and 7. These will load using the 'default' database identifier explicitly
->>> management.call_command('loaddata', 'fixture6', verbosity=0, using='default')
->>> management.call_command('loaddata', 'fixture7', verbosity=0, using='default')
+# Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
+>>> management.call_command('loaddata', 'db_fixture_1', verbosity=0, using='default')
+>>> management.call_command('loaddata', 'db_fixture_2', verbosity=0, using='default')
 >>> Article.objects.all()
 [<Article: Who needs more than one database?>, <Article: Who needs to use compressed data?>, <Article: Python program becomes self aware>]
 
 >>> management.call_command('flush', verbosity=0, interactive=False)
 
-# Try to load fixture 8. This won't load because the database identifier doesn't match
->>> management.call_command('loaddata', 'fixture8', verbosity=0)
+# Try to load db fixture 3. This won't load because the database identifier doesn't match
+>>> management.call_command('loaddata', 'db_fixture_3', verbosity=0)
 >>> Article.objects.all()
 [<Article: Python program becomes self aware>]
 
->>> management.call_command('loaddata', 'fixture8', verbosity=0, using='default')
+>>> management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
 >>> Article.objects.all()
 [<Article: Python program becomes self aware>]
 
