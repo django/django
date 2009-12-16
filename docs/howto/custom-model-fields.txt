@@ -5,6 +5,7 @@ Writing custom model fields
 ===========================
 
 .. versionadded:: 1.0
+.. currentmodule:: django.db.models
 
 Introduction
 ============
@@ -165,7 +166,8 @@ behave like any existing field, so we'll subclass directly from
     from django.db import models
 
     class HandField(models.Field):
-        """A hand of cards (bridge style)"""
+
+        description = "A hand of cards (bridge style)"
 
         def __init__(self, *args, **kwargs):
             kwargs['max_length'] = 104
@@ -248,7 +250,8 @@ simple: make sure your field subclass uses a special metaclass:
 For example::
 
     class HandField(models.Field):
-        """A hand of cards (bridge style)"""
+
+        description = "A hand of cards (bridge style)"
 
         __metaclass__ = models.SubfieldBase
 
@@ -262,16 +265,17 @@ called when the attribute is initialized.
 Documenting your Custom Field
 -----------------------------
 
+.. class:: django.db.models.Field
+
+.. attribute:: description
+
 As always, you should document your field type, so users will know what it is.
-The best way to do this is to simply provide a docstring for it.  This will 
-automatically be picked up by ``django.contrib.admindocs``, if you have it
-installed, and the first line of it will show up as the field type in the 
-documentation for any model that uses your field.  In the above examples, it 
-will show up as 'A hand of cards (bridge style)'.  Note that if you provide a 
-more verbose docstring, only the first line will show up in 
-``django.contrib.admindocs``.  The full docstring will, of course, still be
-available through ``pydoc`` or the interactive interpreter's ``help()`` 
-function.
+In addition to providing a docstring for it, which is useful for developers,
+you can also allow users of the admin app to see a short description of the
+field type via the ``django.contrib.admindocs`` application. To do this simply 
+provide descriptive text in a ``description`` class attribute of your custom field. 
+In the above example, the type description displayed by the ``admindocs`` application 
+for a ``HandField`` will be 'A hand of cards (bridge style)'.
 
 Useful methods
 --------------

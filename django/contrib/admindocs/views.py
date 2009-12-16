@@ -327,19 +327,11 @@ def get_return_data_type(func_name):
     return ''
 
 def get_readable_field_data_type(field):
-    """Returns the first line of a doc string for a given field type, if it 
-    exists.  Fields' docstrings can contain format strings, which will be 
-    interpolated against the values of Field.__dict__ before being output.  
-    If no docstring is given, a sensible value will be auto-generated from 
-    the field's class name."""
+    """Returns the description for a given field type, if it exists,
+    Fields' descriptions can contain format strings, which will be interpolated
+    against the values of field.__dict__ before being output."""
 
-    if field.__doc__:
-        doc = field.__doc__.split('\n')[0]
-        return _(doc) % field.__dict__
-    else:
-        return _(u'Field of type: %(field_type)s') % {
-            'field_type': field.__class__.__name__
-        } 
+    return field.description % field.__dict__
 
 def extract_views_from_urlpatterns(urlpatterns, base=''):
     """
