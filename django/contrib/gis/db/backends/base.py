@@ -1,5 +1,6 @@
 """
-
+Base/mixin classes for the spatial backend database operations and the
+`SpatialRefSys` model the backend.
 """
 import re
 from django.conf import settings
@@ -14,8 +15,9 @@ class BaseSpatialOperations(object):
     distance_functions = {}
     geometry_functions = {}
     geometry_operators = {}
+    geography_operators = {}
+    geography_functions = {}
     gis_terms = {}
-    limited_where = {}
 
     # Quick booleans for the type of this spatial backend, and
     # an attribute for the spatial database version tuple (if applicable)
@@ -28,6 +30,9 @@ class BaseSpatialOperations(object):
     # How the geometry column should be selected.
     select = None
 
+    # Does the spatial database have a geography type?
+    geography = False
+
     area = False
     centroid = False
     difference = False
@@ -37,11 +42,13 @@ class BaseSpatialOperations(object):
     envelope = False
     force_rhr = False
     mem_size = False
+    bounding_circle = False
     num_geom = False
     num_points = False
     perimeter = False
     perimeter3d = False
     point_on_surface = False
+    polygonize = False
     scale = False
     snap_to_grid = False
     sym_difference = False
@@ -67,11 +74,6 @@ class BaseSpatialOperations(object):
     from_text = False
     from_wkb = False
 
-    def geo_quote_name(self, name):
-        if isinstance(name, unicode):
-            name = name.encode('ascii')
-        return "'%s'" % name
-
     # Default conversion functions for aggregates; will be overridden if implemented
     # for the spatial backend.
     def convert_extent(self, box):
@@ -83,6 +85,37 @@ class BaseSpatialOperations(object):
     def convert_geom(self, geom_val, geom_field):
         raise NotImplementedError('Aggregate method not implemented for this spatial backend.')
 
+    # For quoting column values, rather than columns.
+    def geo_quote_name(self, name):
+        if isinstance(name, unicode):
+            name = name.encode('ascii')
+        return "'%s'" % name
+
+    # GeometryField operations
+    def geo_db_type(self, f):
+        """
+        Returns the database column type for the geometry field on
+        the spatial backend.
+        """
+        raise NotImplementedError
+
+    def get_distance(self, f, value, lookup_type):
+        """
+        Returns the distance parameters for the given geometry field,
+        lookup value, and lookup type.
+        """
+        raise NotImplementedError('Distance operations not available on this spatial backend.')
+
+    def get_geom_placeholder(self, f, value):
+        """
+        Returns the placeholder for the given geometry field with the given
+        value.  Depending on the spatial backend, the placeholder may contain a
+        stored procedure call to the transformation function of the spatial
+        backend.
+        """
+        raise NotImplementedError
+
+    # Spatial SQL Construction
     def spatial_aggregate_sql(self, agg):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')
 

@@ -14,7 +14,7 @@ from django.db.backends.oracle.base import DatabaseOperations
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
 from django.contrib.gis.db.backends.util import SpatialFunction
-from django.contrib.gis.geometry import Geometry
+from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 
 class SDOOperation(SpatialFunction):
@@ -91,7 +91,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     sym_difference = 'SDO_GEOM.SDO_XOR'
     transform = 'SDO_CS.TRANSFORM'
     union = 'SDO_GEOM.SDO_UNION'
-    unionagg = 'SDO_AGGR_UNION'    
+    unionagg = 'SDO_AGGR_UNION'
 
     # We want to get SDO Geometries as WKT because it is much easier to
     # instantiate GEOS proxies from WKT than SDO_GEOMETRY(...) strings.
@@ -128,6 +128,10 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     gis_terms += geometry_functions.keys()
     gis_terms = dict([(term, None) for term in gis_terms])
 
+    def __init__(self, connection):
+        super(OracleOperations, self).__init__()
+        self.connection = connection
+
     def convert_extent(self, clob):
         if clob:
             # Generally, Oracle returns a polygon for the extent -- however,
@@ -156,7 +160,40 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             return None
 
-    def get_geom_placeholder(self, value, srid):
+    def geo_db_type(self, f):
+        """
+        Returns the geometry database type for Oracle.  Unlike other spatial
+        backends, no stored procedure is necessary and it's the same for all
+        geometry types.
+        """
+        return 'MDSYS.SDO_GEOMETRY'
+
+    def get_distance(self, f, value, lookup_type):
+        """
+        Returns the distance parameters given the value and the lookup type.
+        On Oracle, geometry columns with a geodetic coordinate system behave
+        implicitly like a geography column, and thus meters will be used as
+        the distance parameter on them.
+        """
+        if not value:
+            return []
+        value = value[0]
+        if isinstance(value, Distance):
+            if f.geodetic(self.connection):
+                dist_param = value.m
+            else:
+                dist_param = getattr(value, Distance.unit_attname(f.units_name(self.connection)))
+        else:
+            dist_param = value
+
+        # dwithin lookups on oracle require a special string parameter
+        # that starts with "distance=".
+        if lookup_type == 'dwithin':
+            dist_param = 'distance=%s' % dist_param
+
+        return [dist_param]
+
+    def get_geom_placeholder(self, f, value):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
@@ -165,26 +202,25 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         if value is None:
             return 'NULL'
 
-        def transform_value(value, srid):
-            return value.srid != srid
+        def transform_value(val, srid):
+            return val.srid != srid
 
         if hasattr(value, 'expression'):
-            if transform_value(value, srid):
-                placeholder = '%s(%%s, %s)' % (self.transform, srid)
+            if transform_value(value, f.srid):
+                placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
             else:
                 placeholder = '%s'
             # No geometry value used for F expression, substitue in
             # the column name instead.
             return placeholder % '%s.%s' % tuple(map(self.quote_name, value.cols[value.expression]))
         else:
-            if transform_value(value, srid):
-                return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (self.transform, value.srid, srid)
+            if transform_value(value, f.srid):
+                return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (self.transform, value.srid, f.srid)
             else:
-                return 'SDO_GEOMETRY(%%s, %s)' % srid
+                return 'SDO_GEOMETRY(%%s, %s)' % f.srid
 
-    def spatial_lookup_sql(self, lvalue, lookup_type, value, field):
+    def spatial_lookup_sql(self, lvalue, lookup_type, value, field, qn):
         "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
-        qn = self.quote_name
         alias, col, db_type = lvalue
 
         # Getting the quoted table name as `geo_col`.
@@ -214,15 +250,15 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
                 if lookup_type == 'relate':
                     # The SDORelate class handles construction for these queries,
                     # and verifies the mask argument.
-                    return sdo_op(value[1]).as_sql(geo_col, self.get_geom_placeholder(geom, field.srid))
+                    return sdo_op(value[1]).as_sql(geo_col, self.get_geom_placeholder(field, geom))
                 else:
                     # Otherwise, just call the `as_sql` method on the SDOOperation instance.
-                    return sdo_op.as_sql(geo_col, self.get_geom_placeholder(geom, field.srid))
+                    return sdo_op.as_sql(geo_col, self.get_geom_placeholder(field, geom))
             else:
                 # Lookup info is a SDOOperation instance, whose `as_sql` method returns
                 # the SQL necessary for the geometry function call. For example:
                 #  SDO_CONTAINS("geoapp_country"."poly", SDO_GEOMTRY('POINT(5 23)', 4326)) = 'TRUE'
-                return lookup_info.as_sql(geo_col, self.get_geom_placeholder(value, field.srid))
+                return lookup_info.as_sql(geo_col, self.get_geom_placeholder(field, value))
         elif lookup_type == 'isnull':
             # Handling 'isnull' lookup type
             return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))

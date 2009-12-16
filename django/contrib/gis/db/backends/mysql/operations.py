@@ -31,6 +31,9 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
 
     gis_terms = dict([(term, None) for term in geometry_functions.keys() + ['isnull']])
 
+    def geo_db_type(self, f):
+        return f.geom_type
+
     def get_geom_placeholder(self, value, srid):
         """
         The placeholder here has to include MySQL's WKT constructor.  Because
@@ -43,8 +46,7 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
             placeholder = '%s(%%s)' % self.from_text
         return placeholder
 
-    def spatial_lookup_sql(self, lvalue, lookup_type, value, field):
-        qn = self.quote_name
+    def spatial_lookup_sql(self, lvalue, lookup_type, value, field, qn):
         alias, col, db_type = lvalue
 
         geo_col = '%s.%s' % (qn(alias), qn(col))

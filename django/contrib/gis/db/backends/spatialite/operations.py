@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
 from django.contrib.gis.db.backends.util import SpatialOperation, SpatialFunction
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
-from django.contrib.gis.geometry import Geometry
+from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.base import DatabaseOperations
@@ -119,11 +119,17 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         try:
             vtup = self.spatialite_version_tuple()
             version = vtup[1:]
-            self.spatial_version = version
             if version < (2, 3, 1):
-                raise Exception('GeoDjango only supports SpatiaLite versions 2.3.1+')
-        except Exception, e:
+                raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions '
+                                           '2.3.1 and above')
+            self.spatial_version = version
+        except ImproperlyConfigured:
             raise
+        except Exception, msg:
+            raise ImproperlyConfigured('Cannot determine the SpatiaLite version for the "%s" '
+                                       'database (error was "%s").  Was the SpatiaLite initialization '
+                                       'SQL loaded on this database?' %
+                                       (self.connection.settings_dict['NAME'], msg))
 
         # Creating the GIS terms dictionary.
         gis_terms = ['isnull']
@@ -147,7 +153,36 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             return None
 
-    def get_geom_placeholder(self, value, srid):
+    def geo_db_type(self, f):
+        """
+        Returns None because geometry columnas are added via the
+        `AddGeometryColumn` stored procedure on SpatiaLite.
+        """
+        return None
+
+    def get_distance(self, f, value, lookup_type):
+        """
+        Returns the distance parameters for the given geometry field,
+        lookup value, and lookup type.  SpatiaLite only supports regular
+        cartesian-based queries (no spheroid/sphere calculations for point
+        geometries like PostGIS).
+        """
+        if not value:
+            return []
+        value = value[0]
+        if isinstance(value, Distance):
+            if f.geodetic(self.connection):
+                raise ValueError('SpatiaLite does not support distance queries on '
+                                 'geometry fields with a geodetic coordinate system. '
+                                 'Distance objects; use a numeric value of your '
+                                 'distance in degrees instead.')
+            else:
+                dist_param = getattr(value, Distance.unit_attname(f.units_name(self.connection)))
+        else:
+            dist_param = value
+        return [dist_param]
+
+    def get_geom_placeholder(self, f, value):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
@@ -156,19 +191,19 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         def transform_value(value, srid):
             return not (value is None or value.srid == srid)
         if hasattr(value, 'expression'):
-            if transform_value(value, srid):
-                placeholder = '%s(%%s, %s)' % (self.transform, srid)
+            if transform_value(value, f.srid):
+                placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
             else:
                 placeholder = '%s'
             # No geometry value used for F expression, substitue in
             # the column name instead.
             return placeholder % '%s.%s' % tuple(map(self.quote_name, value.cols[value.expression]))
         else:
-            if transform_value(value, srid):
+            if transform_value(value, f.srid):
                 # Adding Transform() to the SQL placeholder.
-                return '%s(%s(%%s,%s), %s)' % (self.transform, self.from_text, value.srid, srid)
+                return '%s(%s(%%s,%s), %s)' % (self.transform, self.from_text, value.srid, f.srid)
             else:
-                return '%s(%%s,%s)' % (self.from_text, srid)
+                return '%s(%%s,%s)' % (self.from_text, f.srid)
 
     def _get_spatialite_func(self, func):
         """
@@ -229,13 +264,12 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         sql_function = getattr(self, agg_name)
         return sql_template, sql_function
 
-    def spatial_lookup_sql(self, lvalue, lookup_type, value, field):
+    def spatial_lookup_sql(self, lvalue, lookup_type, value, field, qn):
         """
         Returns the SpatiaLite-specific SQL for the given lookup value
         [a tuple of (alias, column, db_type)], lookup type, lookup
         value, and the model field.
         """
-        qn = self.quote_name
         alias, col, db_type = lvalue
 
         # Getting the quoted field as `geo_col`.
@@ -278,7 +312,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
                 op = tmp
                 geom = value
             # Calling the `as_sql` function on the operation instance.
-            return op.as_sql(geo_col, self.get_geom_placeholder(geom, field.srid))
+            return op.as_sql(geo_col, self.get_geom_placeholder(field, geom))
         elif lookup_type == 'isnull':
             # Handling 'isnull' lookup type
             return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))

@@ -44,7 +44,7 @@ class GeoWhereNode(WhereNode):
         lvalue, lookup_type, value_annot, params_or_value = child
         if isinstance(lvalue, GeoConstraint):
             data, params = lvalue.process(lookup_type, params_or_value, connection)
-            spatial_sql = connection.ops.spatial_lookup_sql(data, lookup_type, params_or_value, lvalue.field)
+            spatial_sql = connection.ops.spatial_lookup_sql(data, lookup_type, params_or_value, lvalue.field, qn)
             return spatial_sql, params
         else:
             return super(GeoWhereNode, self).make_atom(child, qn, connection)
@@ -52,7 +52,7 @@ class GeoWhereNode(WhereNode):
     @classmethod
     def _check_geo_field(cls, opts, lookup):
         """
-        Utility for checking the given lookup with the given model options.  
+        Utility for checking the given lookup with the given model options.
         The lookup is a string either specifying the geographic field, e.g.
         'point, 'the_geom', or a related lookup on a geographic field like
         'address__point'.
@@ -74,7 +74,7 @@ class GeoWhereNode(WhereNode):
             # If the field list is still around, then it means that the
             # lookup was for a geometry field across a relationship --
             # thus we keep on getting the related model options and the
-            # model field associated with the next field in the list 
+            # model field associated with the next field in the list
             # until there's no more left.
             while len(field_list):
                 opts = geo_fld.rel.to._meta

@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet, Q, ValuesQuerySet, ValuesListQueryS
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.db.models.fields import get_srid_info, GeometryField, PointField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery, GeoWhereNode
-from django.contrib.gis.geometry import Geometry
+from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 
 class GeoQuerySet(QuerySet):
@@ -542,6 +542,7 @@ class GeoQuerySet(QuerySet):
         # units of the geometry field.
         connection = connections[self.db]
         geodetic = geo_field.geodetic(connection)
+        geography = geo_field.geography
 
         if geodetic:
             dist_att = 'm'
@@ -569,7 +570,8 @@ class GeoQuerySet(QuerySet):
         # keyword or when calculating the length of geodetic field, make
         # sure the 'spheroid' distance setting string is passed in so we
         # get the correct spatial stored procedure.
-        if spheroid or (backend.postgis and geodetic and length):
+        if spheroid or (backend.postgis and geodetic and
+                        (not geography) and length):
             lookup_params.append('spheroid')
         lookup_params = geo_field.get_prep_value(lookup_params)
         params = geo_field.get_db_prep_lookup('distance_lte', lookup_params, connection=connection)
@@ -625,7 +627,7 @@ class GeoQuerySet(QuerySet):
                     # `transform()` was not used on this GeoQuerySet.
                     procedure_fmt  = '%(geo_col)s,%(geom)s'
 
-                if geodetic:
+                if not geography and geodetic:
                     # Spherical distance calculation is needed (because the geographic
                     # field is geodetic). However, the PostGIS ST_distance_sphere/spheroid()
                     # procedures may only do queries from point columns to point geometries
@@ -644,7 +646,7 @@ class GeoQuerySet(QuerySet):
                         procedure_args.update({'function' : backend.distance_sphere})
             elif length or perimeter:
                 procedure_fmt = '%(geo_col)s'
-                if geodetic and length:
+                if not geography and geodetic and length:
                     # There's no `length_sphere`, and `length_spheroid` also
                     # works on 3D geometries.
                     procedure_fmt += ",'%(spheroid)s'"

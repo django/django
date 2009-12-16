@@ -1,7 +1,7 @@
 from django.db.models.fields import Field
 from django.contrib.gis import forms
 from django.contrib.gis.db.models.proxy import GeometryProxy
-from django.contrib.gis.geometry import Geometry, GeometryException
+from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.contrib.gis.measure import Distance
 from django.db.models.sql.expressions import SQLEvaluator
 
@@ -40,8 +40,8 @@ def get_srid_info(srid, connection):
 
     return _srid_cache[name][srid]
 
-class GeometryField(SpatialBackend.Field):
-    """The base GIS field -- maps to the OpenGIS Specification Geometry type."""
+class GeometryField(Field):
+    "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 
     # The OpenGIS Geometry name.
     geom_type = 'GEOMETRY'
@@ -50,7 +50,7 @@ class GeometryField(SpatialBackend.Field):
     geodetic_units = ('Decimal Degree', 'degree')
 
     def __init__(self, verbose_name=None, srid=4326, spatial_index=True, dim=2,
-                 **kwargs):
+                 geography=False, **kwargs):
         """
         The initialization function for geometry fields.  Takes the following
         as keyword arguments:
@@ -67,8 +67,14 @@ class GeometryField(SpatialBackend.Field):
         dim:
          The number of dimensions for this geometry.  Defaults to 2.
 
-        Oracle-specific keywords:
-         extent, tolerance.
+        extent:
+         Customize the extent, in a 4-tuple of WGS 84 coordinates, for the
+         geometry field entry in the `USER_SDO_GEOM_METADATA` table.  Defaults
+         to (-180.0, -90.0, 180.0, 90.0).
+
+        tolerance:
+         Define the tolerance, in meters, to use for the geometry field
+         entry in the `USER_SDO_GEOM_METADATA` table.  Defaults to 0.05.
         """
 
         # Setting the index flag with the value of the `spatial_index` keyword.
@@ -84,6 +90,9 @@ class GeometryField(SpatialBackend.Field):
         # Setting the verbose_name keyword argument with the positional
         # first parameter, so this works like normal fields.
         kwargs['verbose_name'] = verbose_name
+
+        # Is this a geography rather than a geometry column?
+        self.geography = geography
 
         # Oracle-specific private attributes for creating the entrie in
         # `USER_SDO_GEOM_METADATA`
@@ -121,17 +130,13 @@ class GeometryField(SpatialBackend.Field):
         """
         return self.units_name(connection) in self.geodetic_units
 
-    def get_distance(self, dist_val, lookup_type, connection):
+    def get_distance(self, value, lookup_type, connection):
         """
         Returns a distance number in units of the field.  For example, if
         `D(km=1)` was passed in and the units of the field were in meters,
         then 1000 would be returned.
         """
-        # Getting the distance parameter and any options.
-        if len(dist_val) == 1:
-            dist, option = dist_val[0], None
-        else: 
-            dist, option = dist_val
+        return connection.ops.get_distance(self, value, lookup_type)
 
         if isinstance(dist, Distance):
             if self.geodetic(connection):
@@ -149,7 +154,7 @@ class GeometryField(SpatialBackend.Field):
 
         if connection.ops.oracle and lookup_type == 'dwithin':
             dist_param = 'distance=%s' % dist_param
-            
+
         if connection.ops.postgis and self.geodetic(connection) and lookup_type != 'dwithin' and option == 'spheroid':
             # On PostGIS, by default `ST_distance_sphere` is used; but if the
             # accuracy of `ST_distance_spheroid` is needed than the spheroid
@@ -179,11 +184,11 @@ class GeometryField(SpatialBackend.Field):
         # from the given string input.
         if isinstance(geom, Geometry):
             pass
-        elif isinstance(geom, basestring):
+        elif isinstance(geom, basestring) or hasattr(geom, '__geo_interface__'):
             try:
                 geom = Geometry(geom)
             except GeometryException:
-                raise ValueError('Could not create geometry from lookup value: %s' % str(value))
+                raise ValueError('Could not create geometry from lookup value.')
         else:
             raise ValueError('Cannot use parameter of `%s` type as lookup parameter.' % type(value))
 
@@ -217,17 +222,7 @@ class GeometryField(SpatialBackend.Field):
         setattr(cls, self.attname, GeometryProxy(Geometry, self))
 
     def db_type(self, connection):
-        if (connection.ops.postgis or
-            connection.ops.spatialite):
-            # Geometry columns on these spatial backends are initialized via
-            # the `AddGeometryColumn` stored procedure.
-            return None
-        elif connection.ops.mysql:
-            return self.geom_type
-        elif connection.ops.oracle:
-            return 'MDSYS.SDO_GEOMETRY'
-        else:
-            raise NotImplementedError
+        return connection.ops.geo_db_type(self)
 
     def formfield(self, **kwargs):
         defaults = {'form_class' : forms.GeometryField,
@@ -240,7 +235,11 @@ class GeometryField(SpatialBackend.Field):
 
     def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
         """
-        XXX: Document me.
+        Prepare for the database lookup, and return any spatial parameters
+        necessary for the query.  This includes wrapping any geometry
+        parameters with a backend-specific adapter and formatting any distance
+        parameters into the correct units for the coordinate system of the
+        field.
         """
         if lookup_type in connection.ops.gis_terms:
             # special case for isnull lookup
@@ -254,8 +253,6 @@ class GeometryField(SpatialBackend.Field):
                 if lookup_type in connection.ops.distance_functions:
                     # Getting the distance parameter in the units of the field.
                     params += self.get_distance(value[1:], lookup_type, connection)
-                elif lookup_type in connection.ops.limited_where:
-                    pass
                 else:
                     params += value[1:]
             elif isinstance(value, SQLEvaluator):
@@ -281,33 +278,31 @@ class GeometryField(SpatialBackend.Field):
             return connection.ops.Adapter(self.get_prep_value(value))
 
     def get_placeholder(self, value, connection):
-        return connection.ops.get_geom_placeholder(value, self.srid)
+        """
+        Returns the placeholder for the geometry column for the
+        given value.
+        """
+        return connection.ops.get_geom_placeholder(self, value)
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
-    """Point"""
     geom_type = 'POINT'
 
 class LineStringField(GeometryField):
-    """Line string"""
     geom_type = 'LINESTRING'
 
 class PolygonField(GeometryField):
-    """Polygon"""
     geom_type = 'POLYGON'
 
 class MultiPointField(GeometryField):
-    """Multi-point"""
     geom_type = 'MULTIPOINT'
 
 class MultiLineStringField(GeometryField):
-    """Multi-line string"""
     geom_type = 'MULTILINESTRING'
 
 class MultiPolygonField(GeometryField):
-    """Multi polygon"""
     geom_type = 'MULTIPOLYGON'
 
 class GeometryCollectionField(GeometryField):
-    """Geometry collection"""
     geom_type = 'GEOMETRYCOLLECTION'
+

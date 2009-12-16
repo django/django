@@ -7,4 +7,4 @@ class DatabaseWrapper(OracleDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
         self.creation = OracleCreation(self)
-        self.ops = OracleOperations()
+        self.ops = OracleOperations(self)

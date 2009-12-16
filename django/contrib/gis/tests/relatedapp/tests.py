@@ -1,7 +1,7 @@
 import os, unittest
 from django.contrib.gis.geos import *
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
-from django.contrib.gis.geometry import Geometry
+from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.tests.utils import mysql, oracle, postgis, spatialite, no_mysql, no_oracle, no_spatialite
 from django.conf import settings
 from models import City, Location, DirectoryEntry, Parcel, Book, Author
