@@ -644,6 +644,53 @@ True
 >>> formset.save()
 [<Poem: Brooklyn Bridge>, <Poem: Brooklyn Bridge>]
 
+We can provide a custom queryset to our InlineFormSet:
+
+>>> custom_qs = queryset=Book.objects.order_by('-title')
+>>> formset = AuthorBooksFormSet(instance=author, queryset=custom_qs)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" name="book_set-0-title" value="Les Fleurs du Mal" maxlength="100" /><input type="hidden" name="book_set-0-author" value="1" id="id_book_set-0-author" /><input type="hidden" name="book_set-0-id" value="1" id="id_book_set-0-id" /></p>
+<p><label for="id_book_set-1-title">Title:</label> <input id="id_book_set-1-title" type="text" name="book_set-1-title" value="Le Spleen de Paris" maxlength="100" /><input type="hidden" name="book_set-1-author" value="1" id="id_book_set-1-author" /><input type="hidden" name="book_set-1-id" value="2" id="id_book_set-1-id" /></p>
+<p><label for="id_book_set-2-title">Title:</label> <input id="id_book_set-2-title" type="text" name="book_set-2-title" value="Flowers of Evil" maxlength="100" /><input type="hidden" name="book_set-2-author" value="1" id="id_book_set-2-author" /><input type="hidden" name="book_set-2-id" value="5" id="id_book_set-2-id" /></p>
+<p><label for="id_book_set-3-title">Title:</label> <input id="id_book_set-3-title" type="text" name="book_set-3-title" maxlength="100" /><input type="hidden" name="book_set-3-author" value="1" id="id_book_set-3-author" /><input type="hidden" name="book_set-3-id" id="id_book_set-3-id" /></p>
+<p><label for="id_book_set-4-title">Title:</label> <input id="id_book_set-4-title" type="text" name="book_set-4-title" maxlength="100" /><input type="hidden" name="book_set-4-author" value="1" id="id_book_set-4-author" /><input type="hidden" name="book_set-4-id" id="id_book_set-4-id" /></p>
+
+>>> data = {
+...     'book_set-TOTAL_FORMS': '5', # the number of forms rendered
+...     'book_set-INITIAL_FORMS': '3', # the number of forms with initial data
+...     'book_set-0-id': '1',
+...     'book_set-0-title': 'Les Fleurs du Mal',
+...     'book_set-1-id': '2',
+...     'book_set-1-title': 'Le Spleen de Paris',
+...     'book_set-2-id': '5',
+...     'book_set-2-title': 'Flowers of Evil',
+...     'book_set-3-title': 'Revue des deux mondes',
+...     'book_set-4-title': '',
+... }
+>>> formset = AuthorBooksFormSet(data, instance=author, queryset=custom_qs)
+>>> formset.is_valid()
+True
+
+>>> custom_qs = queryset=Book.objects.filter(title__startswith='F')
+>>> formset = AuthorBooksFormSet(instance=author, queryset=custom_qs)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" name="book_set-0-title" value="Flowers of Evil" maxlength="100" /><input type="hidden" name="book_set-0-author" value="1" id="id_book_set-0-author" /><input type="hidden" name="book_set-0-id" value="5" id="id_book_set-0-id" /></p>
+<p><label for="id_book_set-1-title">Title:</label> <input id="id_book_set-1-title" type="text" name="book_set-1-title" maxlength="100" /><input type="hidden" name="book_set-1-author" value="1" id="id_book_set-1-author" /><input type="hidden" name="book_set-1-id" id="id_book_set-1-id" /></p>
+<p><label for="id_book_set-2-title">Title:</label> <input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" /><input type="hidden" name="book_set-2-author" value="1" id="id_book_set-2-author" /><input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>
+>>> data = {
+...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
+...     'book_set-INITIAL_FORMS': '1', # the number of forms with initial data
+...     'book_set-0-id': '5',
+...     'book_set-0-title': 'Flowers of Evil',
+...     'book_set-1-title': 'Revue des deux mondes',
+...     'book_set-2-title': '',
+... }
+>>> formset = AuthorBooksFormSet(data, instance=author, queryset=custom_qs)
+>>> formset.is_valid()
+True
+
 
 # Test a custom primary key ###################################################
 
