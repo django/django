@@ -439,7 +439,7 @@ def create_many_related_manager(superclass, rel=False):
                 raise ValueError("%r instance needs to have a primary key value before a many-to-many relationship can be used." % instance.__class__.__name__)
 
         def get_query_set(self):
-            return superclass.get_query_set(self)._next_is_sticky().filter(**(self.core_filters))
+            return superclass.get_query_set(self).using(self.instance._state.db)._next_is_sticky().filter(**(self.core_filters))
 
         # If the ManyToMany relation has an intermediary model,
         # the add and remove methods do not exist.
@@ -709,7 +709,7 @@ class ManyToManyRel(object):
 
 class ForeignKey(RelatedField, Field):
     """Foreign Key (type determined by related field)"""
-    
+
     empty_strings_allowed = False
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel, **kwargs):
         try:
@@ -809,7 +809,7 @@ class ForeignKey(RelatedField, Field):
 
 class OneToOneField(ForeignKey):
     """One-to-one relationship
-    
+
     A OneToOneField is essentially the same as a ForeignKey, with the exception
     that always carries a "unique" constraint with it and the reverse relation
     always returns the object pointed to (since there will only ever be one),
@@ -869,7 +869,7 @@ def create_many_to_many_intermediary_model(field, klass):
 
 class ManyToManyField(RelatedField, Field):
     """Many-to-many relationship"""
-    
+
     def __init__(self, to, **kwargs):
         try:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
@@ -1032,7 +1032,10 @@ class ManyToManyField(RelatedField, Field):
         setattr(instance, self.attname, data)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.ModelMultipleChoiceField, 'queryset': self.rel.to._default_manager.complex_filter(self.rel.limit_choices_to)}
+        defaults = {
+            'form_class': forms.ModelMultipleChoiceField,
+            'queryset': self.rel.to._default_manager.complex_filter(self.rel.limit_choices_to)
+        }
         defaults.update(kwargs)
         # If initial is passed in, it's a list of related objects, but the
         # MultipleChoiceField takes a list of IDs.

@@ -160,6 +160,17 @@ class QueryTestCase(TestCase):
         self.assertEquals(list(Book.objects.using('other').filter(authors__name='Mark Pilgrim').values_list('title', flat=True)),
                           [u'Dive into Python'])
 
+        # Reget the objects to clear caches
+        dive = Book.objects.using('other').get(title="Dive into Python")
+        mark = Author.objects.using('other').get(name="Mark Pilgrim")
+
+        # Retrive related object by descriptor. Related objects should be database-baound
+        self.assertEquals(list(dive.authors.all().values_list('name', flat=True)),
+                          [u'Mark Pilgrim'])
+
+        self.assertEquals(list(mark.book_set.all().values_list('title', flat=True)),
+                          [u'Dive into Python'])
+
     def test_m2m_forward_operations(self):
         "M2M forward manipulations are all constrained to a single DB"
         # Create a book and author on the other database
@@ -285,6 +296,16 @@ class QueryTestCase(TestCase):
                           [])
         self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='Mark Pilgrim').values_list('title', flat=True)),
                           [u'Dive into Python'])
+
+        # Reget the objects to clear caches
+        dive = Book.objects.using('other').get(title="Dive into Python")
+        mark = Author.objects.using('other').get(name="Mark Pilgrim")
+
+        # Retrive related object by descriptor. Related objects should be database-baound
+        self.assertEquals(list(dive.favourite_of.all().values_list('name', flat=True)),
+                          [u'Mark Pilgrim'])
+
+        self.assertEquals(mark.favourite_book.title, u'Dive into Python')
 
     def test_foreign_key_reverse_operations(self):
         "FK reverse manipulations are all constrained to a single DB"

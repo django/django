@@ -5,6 +5,9 @@ Required for v1.2
 ~~~~~~~~~~~~~~~~~
 
  * Modify the admin interface to support multiple databases (doh).
+    - Document how it is done
+    - Modify m2m widgets to stick to the same database as parent
+    - Modify inlines to stick to same database as parent
 
 Optional for v1.2
 ~~~~~~~~~~~~~~~~~
