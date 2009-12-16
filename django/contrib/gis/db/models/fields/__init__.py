@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
 # Getting the SpatialBackend container and the geographic quoting method.
 from django.contrib.gis.db.backend import SpatialBackend, gqn
@@ -30,13 +31,15 @@ def get_srid_info(srid):
     return _srid_cache[srid]
 
 class GeometryField(SpatialBackend.Field):
-    """The base GIS field -- maps to the OpenGIS Specification Geometry type."""
+    "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 
     # The OpenGIS Geometry name.
     geom_type = 'GEOMETRY'
 
     # Geodetic units.
     geodetic_units = ('Decimal Degree', 'degree')
+
+    description = _("The base GIS field -- maps to the OpenGIS Specification Geometry type.")
 
     def __init__(self, verbose_name=None, srid=4326, spatial_index=True, dim=2, **kwargs):
         """
@@ -257,29 +260,29 @@ class GeometryField(SpatialBackend.Field):
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
-    """Point"""
     geom_type = 'POINT'
+    description = _("Point")
 
 class LineStringField(GeometryField):
-    """Line string"""
     geom_type = 'LINESTRING'
+    description = _("Line string")
 
 class PolygonField(GeometryField):
-    """Polygon"""
     geom_type = 'POLYGON'
+    description = _("Polygon")
 
 class MultiPointField(GeometryField):
-    """Multi-point"""
     geom_type = 'MULTIPOINT'
+    description = _("Multi-point")
 
 class MultiLineStringField(GeometryField):
-    """Multi-line string"""
     geom_type = 'MULTILINESTRING'
+    description = _("Multi-line string")
 
 class MultiPolygonField(GeometryField):
-    """Multi polygon"""
     geom_type = 'MULTIPOLYGON'
+    description = _("Multi polygon")
 
 class GeometryCollectionField(GeometryField):
-    """Geometry collection"""
     geom_type = 'GEOMETRYCOLLECTION'
+    description = _("Geometry collection")
