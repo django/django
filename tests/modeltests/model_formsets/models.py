@@ -646,7 +646,7 @@ True
 
 We can provide a custom queryset to our InlineFormSet:
 
->>> custom_qs = queryset=Book.objects.order_by('-title')
+>>> custom_qs = Book.objects.order_by('-title')
 >>> formset = AuthorBooksFormSet(instance=author, queryset=custom_qs)
 >>> for form in formset.forms:
 ...     print form.as_p()
@@ -672,7 +672,7 @@ We can provide a custom queryset to our InlineFormSet:
 >>> formset.is_valid()
 True
 
->>> custom_qs = queryset=Book.objects.filter(title__startswith='F')
+>>> custom_qs = Book.objects.filter(title__startswith='F')
 >>> formset = AuthorBooksFormSet(instance=author, queryset=custom_qs)
 >>> for form in formset.forms:
 ...     print form.as_p()
