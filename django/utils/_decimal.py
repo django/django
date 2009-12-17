@@ -134,7 +134,7 @@ __all__ = [
     'setcontext', 'getcontext'
 ]
 
-import copy as _copy
+import django.utils.copycompat as _copy
 
 #Rounding
 ROUND_DOWN = 'ROUND_DOWN'

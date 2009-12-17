@@ -2,7 +2,7 @@
 Form Widget classes specific to the Django admin site.
 """
 
-import copy
+import django.utils.copycompat as copy
 
 from django import forms
 from django.forms.widgets import RadioFieldRenderer
