@@ -13,12 +13,6 @@ import tempfile
 from django.db import models
 from django.core.files.storage import FileSystemStorage
 
-# Python 2.3 doesn't have sorted()
-try:
-    sorted
-except NameError:
-    from django.utils.itercompat import sorted
-
 temp_storage_dir = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(temp_storage_dir)
 
@@ -200,6 +194,12 @@ class Post(models.Model):
 
     def __unicode__(self):
         return self.name
+
+class BigInt(models.Model):
+    biggie = models.BigIntegerField()
+
+    def __unicode__(self):
+        return unicode(self.biggie)
 
 __test__ = {'API_TESTS': """
 >>> from django import forms
@@ -1145,6 +1145,28 @@ True
 # Delete the current file since this is not done by Django.
 >>> instance.file.delete()
 >>> instance.delete()
+
+# BigIntegerField ################################################################
+>>> class BigIntForm(forms.ModelForm):
+...     class Meta:
+...         model = BigInt
+... 
+>>> bif = BigIntForm({'biggie': '-9223372036854775808'})
+>>> bif.is_valid()
+True
+>>> bif = BigIntForm({'biggie': '-9223372036854775809'})
+>>> bif.is_valid()
+False
+>>> bif.errors
+{'biggie': [u'Ensure this value is greater than or equal to -9223372036854775808.']}
+>>> bif = BigIntForm({'biggie': '9223372036854775807'})
+>>> bif.is_valid()
+True
+>>> bif = BigIntForm({'biggie': '9223372036854775808'})
+>>> bif.is_valid()
+False
+>>> bif.errors
+{'biggie': [u'Ensure this value is less than or equal to 9223372036854775807.']}
 """}
 
 if test_images:

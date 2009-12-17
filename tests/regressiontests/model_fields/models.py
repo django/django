@@ -51,6 +51,9 @@ class BigD(models.Model):
 class BigS(models.Model):
     s = models.SlugField(max_length=255)
 
+class BigInt(models.Model):
+    value = models.BigIntegerField()
+    null_value = models.BigIntegerField(null = True, blank = True)
 
 ###############################################################################
 # ImageField

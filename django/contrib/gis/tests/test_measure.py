@@ -95,6 +95,8 @@ class DistanceTest(unittest.TestCase):
 
         d3 = d1 * 2
         self.assertEqual(d3.m, 200)
+        d3 = 2 * d1
+        self.assertEqual(d3.m, 200)
         d3 *= 5
         self.assertEqual(d3.m, 1000)
         
@@ -248,6 +250,8 @@ class AreaTest(unittest.TestCase):
 
         a3 = a1 * 2
         self.assertEqual(a3.sq_m, 200)
+        a3 = 2 * a1
+        self.assertEqual(a3.sq_m, 200)
         a3 *= 5
         self.assertEqual(a3.sq_m, 1000)
         
@@ -319,7 +323,6 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(repr(a1), 'Area(sq_m=100.0)')
         self.assertEqual(repr(a2), 'Area(sq_km=3.5)')
 
-        
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(DistanceTest))

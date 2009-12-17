@@ -16,6 +16,7 @@ class FlexibleFieldLookupDict:
         'smallinteger': 'SmallIntegerField',
         'int': 'IntegerField',
         'integer': 'IntegerField',
+        'bigint': 'BigIntegerField',
         'integer unsigned': 'PositiveIntegerField',
         'decimal': 'DecimalField',
         'real': 'FloatField',

@@ -4,6 +4,7 @@ class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     email = models.EmailField()
+    facebook_user_id = models.BigIntegerField()
 
     def __unicode__(self):
         return u"%s %s" % (self.first_name, self.last_name)

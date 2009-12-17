@@ -42,14 +42,15 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
         'form_class': forms.SplitDateTimeField,
         'widget': widgets.AdminSplitDateTime
     },
-    models.DateField:    {'widget': widgets.AdminDateWidget},
-    models.TimeField:    {'widget': widgets.AdminTimeWidget},
-    models.TextField:    {'widget': widgets.AdminTextareaWidget},
-    models.URLField:     {'widget': widgets.AdminURLFieldWidget},
-    models.IntegerField: {'widget': widgets.AdminIntegerFieldWidget},
-    models.CharField:    {'widget': widgets.AdminTextInputWidget},
-    models.ImageField:   {'widget': widgets.AdminFileWidget},
-    models.FileField:    {'widget': widgets.AdminFileWidget},
+    models.DateField:       {'widget': widgets.AdminDateWidget},
+    models.TimeField:       {'widget': widgets.AdminTimeWidget},
+    models.TextField:       {'widget': widgets.AdminTextareaWidget},
+    models.URLField:        {'widget': widgets.AdminURLFieldWidget},
+    models.IntegerField:    {'widget': widgets.AdminIntegerFieldWidget},
+    models.BigIntegerField: {'widget': widgets.AdminIntegerFieldWidget},
+    models.CharField:       {'widget': widgets.AdminTextInputWidget},
+    models.ImageField:      {'widget': widgets.AdminFileWidget},
+    models.FileField:       {'widget': widgets.AdminFileWidget},
 }
 
 

@@ -4,6 +4,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Maps type codes to Django Field types.
     data_types_reverse = {
         16: 'BooleanField',
+        20: 'BigIntegerField',
         21: 'SmallIntegerField',
         23: 'IntegerField',
         25: 'TextField',

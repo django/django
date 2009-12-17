@@ -321,6 +321,11 @@ The end."""),
     (inherited_obj, 900, InheritAbstractModel, {'child_data':37,'parent_data':42}),
     (inherited_obj, 910, ExplicitInheritBaseModel, {'child_data':37,'parent_data':42}),
     (inherited_obj, 920, InheritBaseModel, {'child_data':37,'parent_data':42}),
+
+    (data_obj, 1000, BigIntegerData, 9223372036854775807),
+    (data_obj, 1001, BigIntegerData, -9223372036854775808),
+    (data_obj, 1002, BigIntegerData, 0),
+    (data_obj, 1003, BigIntegerData, None),
 ]
 
 # Because Oracle treats the empty string as NULL, Oracle is expected to fail
