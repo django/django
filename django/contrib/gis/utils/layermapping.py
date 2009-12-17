@@ -67,7 +67,7 @@ class LayerMapping(object):
     def __init__(self, model, data, mapping, layer=0,
                  source_srs=None, encoding=None,
                  transaction_mode='commit_on_success',
-                 transform=True, unique=None, using=DEFAULT_DB_ALIAS):
+                 transform=True, unique=None, using=None):
         """
         A LayerMapping object is initialized using the given Model (not an instance),
         a DataSource (or string path to an OGR-supported data file), and a mapping

@@ -28,7 +28,7 @@ class QuerySet(object):
     def __init__(self, model=None, query=None, using=None):
         self.model = model
         # EmptyQuerySet instantiates QuerySet with model as None
-        self.db = using or DEFAULT_DB_ALIAS
+        self._db = using
         self.query = query or sql.Query(self.model)
         self._result_cache = None
         self._iter = None
@@ -688,7 +688,7 @@ class QuerySet(object):
         Selects which database this QuerySet should excecute it's query against.
         """
         clone = self._clone()
-        clone.db = alias
+        clone._db = alias
         return clone
 
     ###################################
@@ -708,6 +708,11 @@ class QuerySet(object):
             return False
     ordered = property(ordered)
 
+    def db(self):
+        "Return the database that will be used if this query is executed now"
+        return self._db or DEFAULT_DB_ALIAS
+    db = property(db)
+
     ###################
     # PRIVATE METHODS #
     ###################
@@ -719,7 +724,7 @@ class QuerySet(object):
         if self._sticky_filter:
             query.filter_is_sticky = True
         c = klass(model=self.model, query=query)
-        c.db = self.db
+        c._db = self._db
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()

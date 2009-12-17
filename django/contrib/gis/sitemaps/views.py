@@ -59,7 +59,7 @@ def sitemap(request, sitemaps, section=None):
     xml = smart_str(loader.render_to_string('gis/sitemaps/geo_sitemap.xml', {'urlset': urls}))
     return HttpResponse(xml, mimetype='application/xml')
 
-def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB_ALIAS):
+def kml(request, label, model, field_name=None, compress=False, using=None):
     """
     This view generates KML for the given app label, model, and field name.
 
@@ -83,15 +83,15 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
 
     if connection.ops.postgis:
         # PostGIS will take care of transformation.
-        placemarks = klass._default_manager.kml(field_name=field_name)
+        placemarks = klass._default_manager.using(using).kml(field_name=field_name)
     else:
         # There's no KML method on Oracle or MySQL, so we use the `kml`
         # attribute of the lazy geometry instead.
         placemarks = []
         if connection.ops.oracle:
-            qs = klass._default_manager.transform(4326, field_name=field_name)
+            qs = klass._default_manager.using(using).transform(4326, field_name=field_name)
         else:
-            qs = klass._default_manager.all()
+            qs = klass._default_manager.using(using).all()
         for mod in qs:
             setattr(mod, 'kml', getattr(mod, field_name).kml)
             placemarks.append(mod)
@@ -103,7 +103,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         render = render_to_kml
     return render('gis/kml/placemarks.kml', {'places' : placemarks})
 
-def kmz(request, label, model, field_name=None, using=DEFAULT_DB_ALIAS):
+def kmz(request, label, model, field_name=None, using=None):
     """
     This view returns KMZ for the given app label, model, and field name.
     """

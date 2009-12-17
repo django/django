@@ -57,7 +57,7 @@ class Tag(models.Model):
                                          self.tagged, self.name)
 
 class PersonManager(models.Manager):
-    def get_by_natural_key(self, name, using=DEFAULT_DB_ALIAS):
+    def get_by_natural_key(self, name, using=None):
         return self.using(using).get(name=name)
 
 class Person(models.Model):

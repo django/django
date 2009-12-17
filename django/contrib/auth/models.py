@@ -48,7 +48,7 @@ class SiteProfileNotAvailable(Exception):
     pass
 
 class PermissionManager(models.Manager):
-    def get_by_natural_key(self, codename, app_label, model, using=DEFAULT_DB_ALIAS):
+    def get_by_natural_key(self, codename, app_label, model, using=None):
         return self.using(using).get(
             codename=codename,
             content_type=ContentType.objects.get_by_natural_key(app_label, model)
@@ -106,7 +106,7 @@ class Group(models.Model):
         return self.name
 
 class UserManager(models.Manager):
-    def create_user(self, username, email, password=None, using=DEFAULT_DB_ALIAS):
+    def create_user(self, username, email, password=None, using=None):
         "Creates and saves a User with the given username, e-mail and password."
         now = datetime.datetime.now()
         user = self.model(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
@@ -117,7 +117,7 @@ class UserManager(models.Manager):
         user.save(using=using)
         return user
 
-    def create_superuser(self, username, email, password, using=DEFAULT_DB_ALIAS):
+    def create_superuser(self, username, email, password, using=None):
         u = self.create_user(username, email, password)
         u.is_staff = True
         u.is_active = True
