@@ -45,7 +45,7 @@ class GenericForeignKey(object):
             kwargs[self.ct_field] = self.get_content_type(obj=value)
             kwargs[self.fk_field] = value._get_pk_val()
 
-    def get_content_type(self, obj=None, id=None, using=DEFAULT_DB_ALIAS):
+    def get_content_type(self, obj=None, id=None, using=None):
         # Convenience function using get_model avoids a circular import when
         # using this model
         ContentType = get_model("contenttypes", "contenttype")
