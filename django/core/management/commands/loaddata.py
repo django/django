@@ -159,7 +159,7 @@ class Command(BaseCommand):
                                 print "Installing %s fixture '%s' from %s." % \
                                     (format, fixture_name, humanize(fixture_dir))
                             try:
-                                objects = serializers.deserialize(format, fixture)
+                                objects = serializers.deserialize(format, fixture, using=using)
                                 for obj in objects:
                                     if obj.object._meta.app_label not in excluded_apps:
                                         objects_in_fixture += 1

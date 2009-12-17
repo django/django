@@ -58,6 +58,6 @@ def Deserializer(stream_or_string, **options):
         stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string
-    for obj in PythonDeserializer(yaml.load(stream)):
+    for obj in PythonDeserializer(yaml.load(stream), **options):
         yield obj
 

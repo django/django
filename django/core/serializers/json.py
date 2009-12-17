@@ -39,7 +39,7 @@ def Deserializer(stream_or_string, **options):
         stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string
-    for obj in PythonDeserializer(simplejson.load(stream)):
+    for obj in PythonDeserializer(simplejson.load(stream), **options):
         yield obj
 
 class DjangoJSONEncoder(simplejson.JSONEncoder):

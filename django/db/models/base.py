@@ -614,7 +614,7 @@ class Model(object):
         param = smart_str(getattr(self, field.attname))
         q = Q(**{'%s__%s' % (field.name, op): param})
         q = q|Q(**{field.name: param, 'pk__%s' % op: self.pk})
-        qs = self.__class__._default_manager.filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
+        qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
         try:
             return qs[0]
         except IndexError:

@@ -16,10 +16,25 @@ class Review(models.Model):
     class Meta:
         ordering = ('source',)
 
+class PersonManager(models.Manager):
+    def get_by_natural_key(self, name, using=DEFAULT_DB_ALIAS):
+        return self.using(using).get(name=name)
+
+class Person(models.Model):
+    objects = PersonManager()
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('name',)
+
 class Book(models.Model):
     title = models.CharField(max_length=100)
     published = models.DateField()
-    authors = models.ManyToManyField('Author')
+    authors = models.ManyToManyField(Person)
+    editor = models.ForeignKey(Person, null=True, related_name='edited')
     reviews = generic.GenericRelation(Review)
 
     def __unicode__(self):
@@ -27,16 +42,6 @@ class Book(models.Model):
 
     class Meta:
         ordering = ('title',)
-
-class Author(models.Model):
-    name = models.CharField(max_length=100)
-    favourite_book = models.ForeignKey(Book, null=True, related_name='favourite_of')
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        ordering = ('name',)
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)

@@ -48,8 +48,8 @@ class SiteProfileNotAvailable(Exception):
     pass
 
 class PermissionManager(models.Manager):
-    def get_by_natural_key(self, codename, app_label, model):
-        return self.get(
+    def get_by_natural_key(self, codename, app_label, model, using=DEFAULT_DB_ALIAS):
+        return self.using(using).get(
             codename=codename,
             content_type=ContentType.objects.get_by_natural_key(app_label, model)
         )

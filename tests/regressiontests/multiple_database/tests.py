@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.db import connections
 from django.test import TestCase
 
-from models import Book, Author, Review, UserProfile
+from models import Book, Person, Review, UserProfile
 
 try:
     # we only have these models if the user is using multi-db, it's safe the
@@ -133,13 +133,13 @@ class QueryTestCase(TestCase):
         pro = Book.objects.create(title="Pro Django",
                                   published=datetime.date(2008, 12, 16))
 
-        marty = Author.objects.create(name="Marty Alchin")
+        marty = Person.objects.create(name="Marty Alchin")
 
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
-        mark = Author.objects.using('other').create(name="Mark Pilgrim")
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
 
         # Save the author relations
         pro.authors = [marty]
@@ -163,7 +163,7 @@ class QueryTestCase(TestCase):
 
         # Reget the objects to clear caches
         dive = Book.objects.using('other').get(title="Dive into Python")
-        mark = Author.objects.using('other').get(name="Mark Pilgrim")
+        mark = Person.objects.using('other').get(name="Mark Pilgrim")
 
         # Retrive related object by descriptor. Related objects should be database-baound
         self.assertEquals(list(dive.authors.all().values_list('name', flat=True)),
@@ -178,13 +178,13 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
-        mark = Author.objects.using('other').create(name="Mark Pilgrim")
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
 
         # Save the author relations
         dive.authors = [mark]
 
         # Add a second author
-        john = Author.objects.using('other').create(name="John Smith")
+        john = Person.objects.using('other').create(name="John Smith")
         self.assertEquals(list(Book.objects.using('other').filter(authors__name='John Smith').values_list('title', flat=True)),
                           [])
 
@@ -222,7 +222,7 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
-        mark = Author.objects.using('other').create(name="Mark Pilgrim")
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
 
         # Save the author relations
         dive.authors = [mark]
@@ -233,30 +233,30 @@ class QueryTestCase(TestCase):
 
         # Add a books to the m2m
         mark.book_set.add(grease)
-        self.assertEquals(list(Author.objects.using('other').filter(book__title='Dive into Python').values_list('name', flat=True)),
+        self.assertEquals(list(Person.objects.using('other').filter(book__title='Dive into Python').values_list('name', flat=True)),
                           [u'Mark Pilgrim'])
-        self.assertEquals(list(Author.objects.using('other').filter(book__title='Greasemonkey Hacks').values_list('name', flat=True)),
+        self.assertEquals(list(Person.objects.using('other').filter(book__title='Greasemonkey Hacks').values_list('name', flat=True)),
                           [u'Mark Pilgrim'])
 
         # Remove a book from the m2m
         mark.book_set.remove(grease)
-        self.assertEquals(list(Author.objects.using('other').filter(book__title='Dive into Python').values_list('name', flat=True)),
+        self.assertEquals(list(Person.objects.using('other').filter(book__title='Dive into Python').values_list('name', flat=True)),
                           [u'Mark Pilgrim'])
-        self.assertEquals(list(Author.objects.using('other').filter(book__title='Greasemonkey Hacks').values_list('name', flat=True)),
+        self.assertEquals(list(Person.objects.using('other').filter(book__title='Greasemonkey Hacks').values_list('name', flat=True)),
                           [])
 
         # Clear the books associated with mark
         mark.book_set.clear()
-        self.assertEquals(list(Author.objects.using('other').filter(book__title='Dive into Python').values_list('name', flat=True)),
+        self.assertEquals(list(Person.objects.using('other').filter(book__title='Dive into Python').values_list('name', flat=True)),
                           [])
-        self.assertEquals(list(Author.objects.using('other').filter(book__title='Greasemonkey Hacks').values_list('name', flat=True)),
+        self.assertEquals(list(Person.objects.using('other').filter(book__title='Greasemonkey Hacks').values_list('name', flat=True)),
                           [])
 
         # Create a book through the m2m interface
         mark.book_set.create(title="Dive into HTML5", published=datetime.date(2020, 1, 1))
-        self.assertEquals(list(Author.objects.using('other').filter(book__title='Dive into Python').values_list('name', flat=True)),
+        self.assertEquals(list(Person.objects.using('other').filter(book__title='Dive into Python').values_list('name', flat=True)),
                           [])
-        self.assertEquals(list(Author.objects.using('other').filter(book__title='Dive into HTML5').values_list('name', flat=True)),
+        self.assertEquals(list(Person.objects.using('other').filter(book__title='Dive into HTML5').values_list('name', flat=True)),
                           [u'Mark Pilgrim'])
 
     def test_m2m_cross_database_protection(self):
@@ -265,13 +265,13 @@ class QueryTestCase(TestCase):
         pro = Book.objects.create(title="Pro Django",
                                   published=datetime.date(2008, 12, 16))
 
-        marty = Author.objects.create(name="Marty Alchin")
+        marty = Person.objects.create(name="Marty Alchin")
 
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
-        mark = Author.objects.using('other').create(name="Mark Pilgrim")
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
         # Set a foreign key set with an object from a different database
         try:
             marty.book_set = [pro, dive]
@@ -313,91 +313,93 @@ class QueryTestCase(TestCase):
         pro = Book.objects.create(title="Pro Django",
                                   published=datetime.date(2008, 12, 16))
 
-        marty = Author.objects.create(name="Marty Alchin")
+        marty = Person.objects.create(name="Marty Alchin")
+        george = Person.objects.create(name="George Vilches")
 
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
-        mark = Author.objects.using('other').create(name="Mark Pilgrim")
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
+        chris = Person.objects.using('other').create(name="Chris Mills")
 
         # Save the author's favourite books
-        marty.favourite_book = pro
-        marty.save()
+        pro.editor = george
+        pro.save()
 
-        mark.favourite_book = dive
-        mark.save()
+        dive.editor = chris
+        dive.save()
 
-        marty = Author.objects.using('default').get(name="Marty Alchin")
-        self.assertEquals(marty.favourite_book.title, "Pro Django")
+        pro = Book.objects.using('default').get(title="Pro Django")
+        self.assertEquals(pro.editor.name, "George Vilches")
 
-        mark = Author.objects.using('other').get(name='Mark Pilgrim')
-        self.assertEquals(mark.favourite_book.title, "Dive into Python")
+        dive = Book.objects.using('other').get(title="Dive into Python")
+        self.assertEquals(dive.editor.name, "Chris Mills")
 
         # Check that queries work across foreign key joins
-        self.assertEquals(list(Book.objects.using('default').filter(favourite_of__name='Marty Alchin').values_list('title', flat=True)),
-                          [u'Pro Django'])
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='Marty Alchin').values_list('title', flat=True)),
+        self.assertEquals(list(Person.objects.using('default').filter(edited__title='Pro Django').values_list('name', flat=True)),
+                          [u'George Vilches'])
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Pro Django').values_list('name', flat=True)),
                           [])
 
-        self.assertEquals(list(Book.objects.using('default').filter(favourite_of__name='Mark Pilgrim').values_list('title', flat=True)),
+        self.assertEquals(list(Person.objects.using('default').filter(edited__title='Dive into Python').values_list('name', flat=True)),
                           [])
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='Mark Pilgrim').values_list('title', flat=True)),
-                          [u'Dive into Python'])
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into Python').values_list('name', flat=True)),
+                          [u'Chris Mills'])
 
         # Reget the objects to clear caches
+        chris = Person.objects.using('other').get(name="Chris Mills")
         dive = Book.objects.using('other').get(title="Dive into Python")
-        mark = Author.objects.using('other').get(name="Mark Pilgrim")
 
         # Retrive related object by descriptor. Related objects should be database-baound
-        self.assertEquals(list(dive.favourite_of.all().values_list('name', flat=True)),
-                          [u'Mark Pilgrim'])
-
-        self.assertEquals(mark.favourite_book.title, u'Dive into Python')
+        self.assertEquals(list(chris.edited.values_list('title', flat=True)),
+                          [u'Dive into Python'])
 
     def test_foreign_key_reverse_operations(self):
         "FK reverse manipulations are all constrained to a single DB"
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                        published=datetime.date(2009, 5, 4))
 
-        mark = Author.objects.using('other').create(name="Mark Pilgrim")
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
+        chris = Person.objects.using('other').create(name="Chris Mills")
 
         # Save the author relations
-        mark.favourite_book = dive
-        mark.save()
+        dive.editor = chris
+        dive.save()
 
-        # Add a second author
-        john = Author.objects.using('other').create(name="John Smith")
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='John Smith').values_list('title', flat=True)),
+        # Add a second book edited by chris
+        html5 = Book.objects.using('other').create(title="Dive into HTML5", published=datetime.date(2010, 3, 15))
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into HTML5').values_list('name', flat=True)),
                           [])
 
+        chris.edited.add(html5)
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into HTML5').values_list('name', flat=True)),
+                          [u'Chris Mills'])
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into Python').values_list('name', flat=True)),
+                          [u'Chris Mills'])
 
-        dive.favourite_of.add(john)
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='Mark Pilgrim').values_list('title', flat=True)),
-                          [u'Dive into Python'])
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='John Smith').values_list('title', flat=True)),
-                          [u'Dive into Python'])
-
-        # Remove the second author
-        dive.favourite_of.remove(john)
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='Mark Pilgrim').values_list('title', flat=True)),
-                          [u'Dive into Python'])
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='John Smith').values_list('title', flat=True)),
+        # Remove the second editor
+        chris.edited.remove(html5)
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into HTML5').values_list('name', flat=True)),
                           [])
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into Python').values_list('name', flat=True)),
+                          [u'Chris Mills'])
 
-        # Clear all favourite_of
-        dive.favourite_of.clear()
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='Mark Pilgrim').values_list('title', flat=True)),
+        # Clear all edited books
+        chris.edited.clear()
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into HTML5').values_list('name', flat=True)),
                           [])
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='John Smith').values_list('title', flat=True)),
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into Python').values_list('name', flat=True)),
                           [])
 
         # Create an author through the m2m interface
-        dive.favourite_of.create(name='Jane Brown')
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='Mark Pilgrim').values_list('title', flat=True)),
+        chris.edited.create(title='Dive into Water', published=datetime.date(2010, 3, 15))
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into HTML5').values_list('name', flat=True)),
                           [])
-        self.assertEquals(list(Book.objects.using('other').filter(favourite_of__name='Jane Brown').values_list('title', flat=True)),
-                          [u'Dive into Python'])
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into Water').values_list('name', flat=True)),
+                          [u'Chris Mills'])
+        self.assertEquals(list(Person.objects.using('other').filter(edited__title='Dive into Python').values_list('name', flat=True)),
+                          [])
 
     def test_foreign_key_cross_database_protection(self):
         "Operations that involve sharing FK objects across databases raise an error"
@@ -405,31 +407,31 @@ class QueryTestCase(TestCase):
         pro = Book.objects.create(title="Pro Django",
                                   published=datetime.date(2008, 12, 16))
 
-        marty = Author.objects.create(name="Marty Alchin")
+        marty = Person.objects.create(name="Marty Alchin")
 
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
-        mark = Author.objects.using('other').create(name="Mark Pilgrim")
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
 
         # Set a foreign key with an object from a different database
         try:
-            marty.favourite_book = dive
+            dive.editor = marty
             self.fail("Shouldn't be able to assign across databases")
         except ValueError:
             pass
 
         # Set a foreign key set with an object from a different database
         try:
-            dive.favourite_of = [mark, marty]
+            marty.edited = [pro, dive]
             self.fail("Shouldn't be able to assign across databases")
         except ValueError:
             pass
 
         # Add to a foreign key set with an object from a different database
         try:
-            dive.favourite_of.add(marty)
+            marty.edited.add(dive)
             self.fail("Shouldn't be able to assign across databases")
         except ValueError:
             pass
@@ -437,37 +439,50 @@ class QueryTestCase(TestCase):
         # BUT! if you assign a FK object when the base object hasn't
         # been saved yet, you implicitly assign the database for the
         # base object.
-        john = Author(name="John Smith")
+        chris = Person(name="Chris Mills")
+        html5 = Book(title="Dive into HTML5", published=datetime.date(2010, 3, 15))
         # initially, no db assigned
-        self.assertEquals(john._state.db, None)
+        self.assertEquals(chris._state.db, None)
+        self.assertEquals(html5._state.db, None)
 
-        # Dive comes from 'other', so john is set to use 'other'...
-        john.favourite_book = dive
-        self.assertEquals(john._state.db, 'other')
+        # old object comes from 'other', so the new object is set to use 'other'...
+        dive.editor = chris
+        html5.editor = mark
+        # self.assertEquals(chris._state.db, 'other')
+        self.assertEquals(html5._state.db, 'other')
         # ... but it isn't saved yet
-        self.assertEquals(list(Author.objects.using('other').values_list('name',flat=True)),
+        self.assertEquals(list(Person.objects.using('other').values_list('name',flat=True)),
                           [u'Mark Pilgrim'])
+        self.assertEquals(list(Book.objects.using('other').values_list('title',flat=True)),
+                           [u'Dive into Python'])
 
-        # When saved, John goes to 'other'
-        john.save()
-        self.assertEquals(list(Author.objects.using('default').values_list('name',flat=True)),
+        # When saved (no using required), new objects goes to 'other'
+        chris.save()
+        html5.save()
+        self.assertEquals(list(Person.objects.using('default').values_list('name',flat=True)),
                           [u'Marty Alchin'])
-        self.assertEquals(list(Author.objects.using('other').values_list('name',flat=True)),
-                          [u'John Smith', u'Mark Pilgrim'])
+        self.assertEquals(list(Person.objects.using('other').values_list('name',flat=True)),
+                          [u'Chris Mills', u'Mark Pilgrim'])
+        self.assertEquals(list(Book.objects.using('default').values_list('title',flat=True)),
+                          [u'Pro Django'])
+        self.assertEquals(list(Book.objects.using('other').values_list('title',flat=True)),
+                          [u'Dive into HTML5', u'Dive into Python'])
 
         # This also works if you assign the FK in the constructor
-        jane = Author(name='Jane Brown', favourite_book=dive)
-        self.assertEquals(jane._state.db, 'other')
+        water = Book(title="Dive into Water", published=datetime.date(2001, 1, 1), editor=mark)
+        self.assertEquals(water._state.db, 'other')
         # ... but it isn't saved yet
-        self.assertEquals(list(Author.objects.using('other').values_list('name',flat=True)),
-                          [u'John Smith', u'Mark Pilgrim'])
+        self.assertEquals(list(Book.objects.using('default').values_list('title',flat=True)),
+                          [u'Pro Django'])
+        self.assertEquals(list(Book.objects.using('other').values_list('title',flat=True)),
+                          [u'Dive into HTML5', u'Dive into Python'])
 
-        # When saved, Jane goes to 'other'
-        jane.save()
-        self.assertEquals(list(Author.objects.using('default').values_list('name',flat=True)),
-                          [u'Marty Alchin'])
-        self.assertEquals(list(Author.objects.using('other').values_list('name',flat=True)),
-                          [u'Jane Brown', u'John Smith', u'Mark Pilgrim'])
+        # When saved, the new book goes to 'other'
+        water.save()
+        self.assertEquals(list(Book.objects.using('default').values_list('title',flat=True)),
+                          [u'Pro Django'])
+        self.assertEquals(list(Book.objects.using('other').values_list('title',flat=True)),
+                          [u'Dive into HTML5', u'Dive into Python', u'Dive into Water'])
 
     def test_generic_key_separation(self):
         "Generic fields are constrained to a single database"
@@ -591,6 +606,21 @@ class QueryTestCase(TestCase):
         self.assertEquals(list(Review.objects.using('other').filter(object_id=dive.pk).values_list('source',flat=True)),
                           [u'Python Daily', u'Python Weekly'])
 
+    def test_ordering(self):
+        "get_next_by_XXX commands stick to a single database"
+        pro = Book.objects.create(title="Pro Django",
+                                  published=datetime.date(2008, 12, 16))
+
+        dive = Book.objects.using('other').create(title="Dive into Python",
+                                                  published=datetime.date(2009, 5, 4))
+
+        learn = Book.objects.using('other').create(title="Learning Python",
+                                                   published=datetime.date(2008, 7, 16))
+
+        self.assertEquals(learn.get_next_by_published().title, "Dive into Python")
+        self.assertEquals(dive.get_previous_by_published().title, "Learning Python")
+
+
 class UserProfileTestCase(TestCase):
     def setUp(self):
         self.old_auth_profile_module = getattr(settings, 'AUTH_PROFILE_MODULE', None)
@@ -624,7 +654,7 @@ class FixtureTestCase(TestCase):
             Book.objects.get(title="Pro Django")
             Book.objects.using('default').get(title="Pro Django")
         except Book.DoesNotExist:
-            self.fail('"Dive Into Python" should exist on default database')
+            self.fail('"Pro Django" should exist on default database')
 
         self.assertRaises(Book.DoesNotExist,
             Book.objects.using('other').get,
