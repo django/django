@@ -25,7 +25,7 @@ class CommentPostBadRequest(http.HttpResponseBadRequest):
 
 @csrf_protect
 @require_POST
-def post_comment(request, next=None):
+def post_comment(request, next=None, using=None):
     """
     Post a comment.
 
@@ -50,7 +50,7 @@ def post_comment(request, next=None):
         return CommentPostBadRequest("Missing content_type or object_pk field.")
     try:
         model = models.get_model(*ctype.split(".", 1))
-        target = model._default_manager.get(pk=object_pk)
+        target = model._default_manager.using(using).get(pk=object_pk)
     except TypeError:
         return CommentPostBadRequest(
             "Invalid content_type value: %r" % escape(ctype))
