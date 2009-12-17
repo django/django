@@ -292,15 +292,27 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
     ct_field_name = "content_type"
     ct_fk_field_name = "object_id"
 
-    def __init__(self, data=None, files=None, instance=None, save_as_new=None, prefix=None):
+    def __init__(self, data=None, files=None, instance=None, save_as_new=None,
+                 prefix=None, queryset=None):
+        # Avoid a circular import.
+        from django.contrib.contenttypes.models import ContentType
         opts = self.model._meta
         self.instance = instance
         self.rel_name = '-'.join((
             opts.app_label, opts.object_name.lower(),
             self.ct_field.name, self.ct_fk_field.name,
         ))
+        if self.instance is None or self.instance.pk is None:
+            qs = self.model._default_manager.none()
+        else:
+            if queryset is None:
+                queryset = self.model._default_manager
+            qs = queryset.filter(**{
+                self.ct_field.name: ContentType.objects.get_for_model(self.instance),
+                self.ct_fk_field.name: self.instance.pk,
+            })
         super(BaseGenericInlineFormSet, self).__init__(
-            queryset=self.get_queryset(), data=data, files=files,
+            queryset=qs, data=data, files=files,
             prefix=prefix
         )
 
@@ -311,19 +323,6 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
                         cls.ct_field.name, cls.ct_fk_field.name,
         ))
     get_default_prefix = classmethod(get_default_prefix)
-
-    def get_queryset(self):
-        # Avoid a circular import.
-        from django.contrib.contenttypes.models import ContentType
-        if self.instance is None or self.instance.pk is None:
-            return self.model._default_manager.none()
-        qs = self.model._default_manager.filter(**{
-            self.ct_field.name: ContentType.objects.get_for_model(self.instance),
-            self.ct_fk_field.name: self.instance.pk,
-        })
-        if not qs.ordered:
-            qs = qs.order_by(self.model._meta.pk.name)
-        return qs
 
     def save_new(self, form, commit=True):
         # Avoid a circular import.

@@ -17,7 +17,7 @@ class GenericAdminViewTest(TestCase):
         self.original_template_debug = settings.TEMPLATE_DEBUG
         settings.TEMPLATE_DEBUG = True
         self.client.login(username='super', password='secret')
-        
+
         # Can't load content via a fixture (since the GenericForeignKey
         # relies on content type IDs, which will vary depending on what
         # other tests have been run), thus we do it here.
@@ -25,26 +25,30 @@ class GenericAdminViewTest(TestCase):
         self.episode_pk = e.pk
         m = Media(content_object=e, url='http://example.com/podcast.mp3')
         m.save()
-        self.media_pk = m.pk
-    
+        self.mp3_media_pk = m.pk
+
+        m = Media(content_object=e, url='http://example.com/logo.png')
+        m.save()
+        self.png_media_pk = m.pk
+
     def tearDown(self):
         self.client.logout()
         settings.TEMPLATE_DEBUG = self.original_template_debug
-    
+
     def testBasicAddGet(self):
         """
         A smoke test to ensure GET on the add_view works.
         """
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/add/')
         self.failUnlessEqual(response.status_code, 200)
-    
+
     def testBasicEditGet(self):
         """
         A smoke test to ensure GET on the change_view works.
         """
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%d/' % self.episode_pk)
         self.failUnlessEqual(response.status_code, 200)
-    
+
     def testBasicAddPost(self):
         """
         A smoke test to ensure POST on add_view works.
@@ -57,7 +61,7 @@ class GenericAdminViewTest(TestCase):
         }
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/episode/add/', post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
-    
+
     def testBasicEditPost(self):
         """
         A smoke test to ensure POST on edit_view works.
@@ -65,17 +69,45 @@ class GenericAdminViewTest(TestCase):
         post_data = {
             "name": u"This Week in Django",
             # inline data
-            "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": u"2",
-            "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": u"1",
-            "generic_inline_admin-media-content_type-object_id-0-id": u"%d" % self.media_pk,
+            "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": u"3",
+            "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": u"2",
+            "generic_inline_admin-media-content_type-object_id-0-id": u"%d" % self.mp3_media_pk,
             "generic_inline_admin-media-content_type-object_id-0-url": u"http://example.com/podcast.mp3",
-            "generic_inline_admin-media-content_type-object_id-1-id": u"",
-            "generic_inline_admin-media-content_type-object_id-1-url": u"",
+            "generic_inline_admin-media-content_type-object_id-1-id": u"%d" % self.png_media_pk,
+            "generic_inline_admin-media-content_type-object_id-1-url": u"http://example.com/logo.png",
+            "generic_inline_admin-media-content_type-object_id-2-id": u"",
+            "generic_inline_admin-media-content_type-object_id-2-url": u"",
         }
         url = '/generic_inline_admin/admin/generic_inline_admin/episode/%d/' % self.episode_pk
         response = self.client.post(url, post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
-    
+
+    def testGenericInlineFormset(self):
+        EpisodeMediaFormSet = generic_inlineformset_factory(Media, can_delete=False, extra=3)
+        e = Episode.objects.get(name='This Week in Django')
+
+        # Works with no queryset
+        formset = EpisodeMediaFormSet(instance=e)
+        self.assertEquals(len(formset.forms), 5)
+        self.assertEquals(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="text" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/podcast.mp3" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="1" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>')
+        self.assertEquals(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="text" name="generic_inline_admin-media-content_type-object_id-1-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" value="2" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>')
+        self.assertEquals(formset.forms[2].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-2-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-2-url" type="text" name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-2-id" id="id_generic_inline_admin-media-content_type-object_id-2-id" /></p>')
+
+        # A queryset can be used to alter display ordering
+        formset = EpisodeMediaFormSet(instance=e, queryset=Media.objects.order_by('url'))
+        self.assertEquals(len(formset.forms), 5)
+        self.assertEquals(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="text" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="2" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>')
+        self.assertEquals(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="text" name="generic_inline_admin-media-content_type-object_id-1-url" value="http://example.com/podcast.mp3" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" value="1" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>')
+        self.assertEquals(formset.forms[2].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-2-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-2-url" type="text" name="generic_inline_admin-media-content_type-object_id-2-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-2-id" id="id_generic_inline_admin-media-content_type-object_id-2-id" /></p>')
+
+
+        # Works with a queryset that omits items
+        formset = EpisodeMediaFormSet(instance=e, queryset=Media.objects.filter(url__endswith=".png"))
+        self.assertEquals(len(formset.forms), 4)
+        self.assertEquals(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="text" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="2" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>')
+        self.assertEquals(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="text" name="generic_inline_admin-media-content_type-object_id-1-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>')
+
+
     def testGenericInlineFormsetFactory(self):
         # Regression test for #10522.
         inline_formset = generic_inlineformset_factory(Media,
