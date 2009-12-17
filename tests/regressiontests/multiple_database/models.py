@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.db import models, DEFAULT_DB_ALIAS
@@ -36,3 +37,8 @@ class Author(models.Model):
 
     class Meta:
         ordering = ('name',)
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+    flavor = models.CharField(max_length=100)
+

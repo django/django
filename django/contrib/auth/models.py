@@ -3,7 +3,7 @@ import urllib
 
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
@@ -106,7 +106,7 @@ class Group(models.Model):
         return self.name
 
 class UserManager(models.Manager):
-    def create_user(self, username, email, password=None):
+    def create_user(self, username, email, password=None, using=DEFAULT_DB_ALIAS):
         "Creates and saves a User with the given username, e-mail and password."
         now = datetime.datetime.now()
         user = self.model(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
@@ -114,15 +114,15 @@ class UserManager(models.Manager):
             user.set_password(password)
         else:
             user.set_unusable_password()
-        user.save()
+        user.save(using=using)
         return user
 
-    def create_superuser(self, username, email, password):
+    def create_superuser(self, username, email, password, using=DEFAULT_DB_ALIAS):
         u = self.create_user(username, email, password)
         u.is_staff = True
         u.is_active = True
         u.is_superuser = True
-        u.save()
+        u.save(using=using)
         return u
 
     def make_random_password(self, length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
@@ -319,7 +319,7 @@ class User(models.Model):
             try:
                 app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
                 model = models.get_model(app_label, model_name)
-                self._profile_cache = model._default_manager.get(user__id__exact=self.id)
+                self._profile_cache = model._default_manager.using(self._state.db).get(user__id__exact=self.id)
                 self._profile_cache.user = self
             except (ImportError, ImproperlyConfigured):
                 raise SiteProfileNotAvailable

@@ -2,10 +2,11 @@ import datetime
 import pickle
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import connections
 from django.test import TestCase
 
-from models import Book, Author, Review
+from models import Book, Author, Review, UserProfile
 
 try:
     # we only have these models if the user is using multi-db, it's safe the
@@ -590,6 +591,27 @@ class QueryTestCase(TestCase):
         self.assertEquals(list(Review.objects.using('other').filter(object_id=dive.pk).values_list('source',flat=True)),
                           [u'Python Daily', u'Python Weekly'])
 
+class UserProfileTestCase(TestCase):
+    def setUp(self):
+        self.old_auth_profile_module = getattr(settings, 'AUTH_PROFILE_MODULE', None)
+        settings.AUTH_PROFILE_MODULE = 'multiple_database.UserProfile'
+
+    def tearDown(self):
+        settings.AUTH_PROFILE_MODULE = self.old_auth_profile_module
+
+    def test_user_profiles(self):
+
+        alice = User.objects.create_user('alice', 'alice@example.com')
+        bob = User.objects.create_user('bob', 'bob@example.com', using='other')
+
+        alice_profile = UserProfile(user=alice, flavor='chocolate')
+        alice_profile.save()
+
+        bob_profile = UserProfile(user=bob, flavor='crunchy frog')
+        bob_profile.save()
+
+        self.assertEquals(alice.get_profile().flavor, 'chocolate')
+        self.assertEquals(bob.get_profile().flavor, 'crunchy frog')
 
 class FixtureTestCase(TestCase):
     multi_db = True
