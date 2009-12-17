@@ -6,8 +6,16 @@ Required for v1.2
 
  * Modify the admin interface to support multiple databases (doh).
     - Document how it is done
-    - Modify m2m widgets to stick to the same database as parent
-    - Modify inlines to stick to same database as parent
+
+ * Make sure we can't get rid of using= arguments everywhere
+
+ * Resolve uses of _default_manager
+    * django/contrib/databrowse/datastructures.py
+    * django/contrib/databrowse/fieldchoices.py
+    * django/db/models/fields/__init__.py
+        - ManyToManyField.isValidIDList (deprecated method?)
+    * django/db/models/fields/files.py
+        - FileField.delete_file
 
 Optional for v1.2
 ~~~~~~~~~~~~~~~~~
