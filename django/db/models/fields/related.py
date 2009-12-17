@@ -284,7 +284,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
         elif value is not None and value._state.db != instance._state.db:
             if instance._state.db is None:
                 instance._state.db = value._state.db
-            else:
+            elif value._state.db is None:
+                value._state.db = instance._state.db
+            elif value._state.db is not None and instance._state.db is not None:
                 raise ValueError('Cannot assign "%r": instance is on database "%s", value is is on database "%s"' %
                                     (value, instance._state.db, value._state.db))
 
@@ -782,10 +784,10 @@ class ForeignKey(RelatedField, Field):
             self.rel.field_name = cls._meta.pk.name
 
     def formfield(self, **kwargs):
+        db = kwargs.pop('using', None)
         defaults = {
             'form_class': forms.ModelChoiceField,
-            'queryset': self.rel.to._default_manager.complex_filter(
-                                                    self.rel.limit_choices_to),
+            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to),
             'to_field_name': self.rel.field_name,
         }
         defaults.update(kwargs)
@@ -1030,9 +1032,10 @@ class ManyToManyField(RelatedField, Field):
         setattr(instance, self.attname, data)
 
     def formfield(self, **kwargs):
+        db = kwargs.pop('using', None)
         defaults = {
             'form_class': forms.ModelMultipleChoiceField,
-            'queryset': self.rel.to._default_manager.complex_filter(self.rel.limit_choices_to)
+            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to)
         }
         defaults.update(kwargs)
         # If initial is passed in, it's a list of related objects, but the

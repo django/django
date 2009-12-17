@@ -102,8 +102,9 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     A Widget for displaying ForeignKeys in the "raw_id" interface rather than
     in a <select> box.
     """
-    def __init__(self, rel, attrs=None):
+    def __init__(self, rel, attrs=None, using=None):
         self.rel = rel
+        self.db = using
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
@@ -148,7 +149,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
     def label_for_value(self, value):
         key = self.rel.get_related_field().name
-        obj = self.rel.to._default_manager.get(**{key: value})
+        obj = self.rel.to._default_manager.using(self.db).get(**{key: value})
         return '&nbsp;<strong>%s</strong>' % escape(truncate_words(obj, 14))
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
@@ -156,8 +157,8 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     A Widget for displaying ManyToMany ids in the "raw_id" interface rather than
     in a <select multiple> box.
     """
-    def __init__(self, rel, attrs=None):
-        super(ManyToManyRawIdWidget, self).__init__(rel, attrs)
+    def __init__(self, rel, attrs=None, using=None):
+        super(ManyToManyRawIdWidget, self).__init__(rel, attrs, using=None)
 
     def render(self, name, value, attrs=None):
         attrs['class'] = 'vManyToManyRawIdAdminField'
