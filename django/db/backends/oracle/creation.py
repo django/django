@@ -27,6 +27,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'FilePathField':                'NVARCHAR2(%(max_length)s)',
         'FloatField':                   'DOUBLE PRECISION',
         'IntegerField':                 'NUMBER(11)',
+        'BigIntegerField':              'NUMBER(19)',
         'IPAddressField':               'VARCHAR2(15)',
         'NullBooleanField':             'NUMBER(1) CHECK ((%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL))',
         'OneToOneField':                'NUMBER(11)',
