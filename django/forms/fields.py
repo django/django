@@ -2,28 +2,19 @@
 Field classes.
 """
 
-import copy
 import datetime
 import os
 import re
 import time
 import urlparse
+from decimal import Decimal, DecimalException
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
 
-# Python 2.3 fallbacks
-try:
-    from decimal import Decimal, DecimalException
-except ImportError:
-    from django.utils._decimal import Decimal, DecimalException
-try:
-    set
-except NameError:
-    from sets import Set as set
-
 import django.core.exceptions
+import django.utils.copycompat as copy
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 

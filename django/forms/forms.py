@@ -2,8 +2,7 @@
 Form classes
 """
 
-from copy import deepcopy
-
+from django.utils.copycompat import deepcopy
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode

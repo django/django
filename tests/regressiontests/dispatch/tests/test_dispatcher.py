@@ -1,8 +1,8 @@
 from django.dispatch import Signal
 import unittest
-import copy
 import sys
 import gc
+import django.utils.copycompat as copy
 
 if sys.platform.startswith('java'):
     def garbage_collect():

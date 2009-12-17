@@ -220,7 +220,7 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertEqual(_ComplexObject, SimpleLazyObject(complex_object).__class__)
 
     def test_deepcopy(self):
-        import copy
+        import django.utils.copycompat as copy
         # Check that we *can* do deep copy, and that it returns the right
         # objects.
 

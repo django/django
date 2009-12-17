@@ -2,12 +2,12 @@
 The main QuerySet implementation. This provides the public API for the ORM.
 """
 
-from copy import deepcopy
 from django.db import connection, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
 from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory
 from django.db.models import signals, sql
+from django.utils.copycompat import deepcopy
 
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).

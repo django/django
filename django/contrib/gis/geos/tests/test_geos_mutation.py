@@ -2,9 +2,11 @@
 # Modified from original contribution by Aryeh Leib Taurog, which was
 # released under the New BSD license.
 import unittest
+
+import django.utils.copycompat as copy
+
 from django.contrib.gis.geos import *
 from django.contrib.gis.geos.error import GEOSIndexError
-import copy
 
 def getItem(o,i): return o[i]
 def delItem(o,i): del o[i]

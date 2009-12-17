@@ -1,4 +1,3 @@
-import copy
 import types
 import sys
 import os
@@ -13,6 +12,7 @@ from django.db.models.options import Options
 from django.db import connection, transaction, DatabaseError
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
+import django.utils.copycompat as copy
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings

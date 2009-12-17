@@ -1,12 +1,10 @@
-import copy
 import datetime
+import decimal
 import os
 import re
 import time
-try:
-    import decimal
-except ImportError:
-    from django.utils import _decimal as decimal    # for Python 2.3
+
+import django.utils.copycompat as copy
 
 from django.db import connection
 from django.db.models import signals

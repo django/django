@@ -1,4 +1,4 @@
-import copy
+import django.utils.copycompat as copy
 from django.db.models.query import QuerySet, EmptyQuerySet, insert_query
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist

@@ -7,7 +7,7 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
-from copy import deepcopy
+from django.utils.copycompat import deepcopy
 from django.utils.tree import Node
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode
