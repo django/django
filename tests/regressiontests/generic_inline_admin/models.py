@@ -20,7 +20,7 @@ class Media(models.Model):
 
 class MediaInline(generic.GenericTabularInline):
     model = Media
-    
+
 class EpisodeAdmin(admin.ModelAdmin):
     inlines = [
         MediaInline,
@@ -56,7 +56,7 @@ class MediaMaxNumInline(generic.GenericTabularInline):
     model = Media
     extra = 5
     max_num = 2
-    
+
 admin.site.register(EpisodeMaxNum, inlines=[MediaMaxNumInline])
 
 #
