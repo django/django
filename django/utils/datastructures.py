@@ -1,4 +1,4 @@
-from copy import deepcopy
+from django.utils.copycompat import deepcopy
 
 
 class MergeDict(object):
@@ -214,7 +214,7 @@ class MultiValueDict(dict):
         return self.__class__(super(MultiValueDict, self).items())
 
     def __deepcopy__(self, memo=None):
-        import copy
+        import django.utils.copycompat as copy
         if memo is None:
             memo = {}
         result = self.__class__()

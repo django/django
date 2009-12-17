@@ -1,10 +1,14 @@
-import os, unittest
-from copy import copy
+import os
+import unittest
 from decimal import Decimal
-from models import City, County, CountyFeat, Interstate, ICity1, ICity2, State, city_mapping, co_mapping, cofeat_mapping, inter_mapping
-from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal, MissingForeignKey
+
+from django.utils.copycompat import copy
+
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.tests.utils import mysql
+from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal, MissingForeignKey
+
+from models import City, County, CountyFeat, Interstate, ICity1, ICity2, State, city_mapping, co_mapping, cofeat_mapping, inter_mapping
 
 shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')

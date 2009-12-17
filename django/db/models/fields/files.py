@@ -1,6 +1,7 @@
-import copy
 import datetime
 import os
+
+import django.utils.copycompat as copy
 
 from django.conf import settings
 from django.db.models.fields import Field

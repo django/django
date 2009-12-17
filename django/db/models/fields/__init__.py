@@ -1,9 +1,10 @@
-import copy
 import datetime
 import decimal
 import os
 import re
 import time
+
+import django.utils.copycompat as copy
 
 from django.db import connection
 from django.db.models import signals

@@ -183,7 +183,7 @@ class QueryDict(MultiValueDict):
         return result
 
     def __deepcopy__(self, memo):
-        import copy
+        import django.utils.copycompat as copy
         result = self.__class__('', mutable=True)
         memo[id(self)] = result
         for key, value in dict.items(self):
