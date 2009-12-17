@@ -129,6 +129,49 @@ class Book(models.Model):
             ', '.join(s.name for s in self.stores.all())
         )
 
+# ome models with pathological circular dependencies
+class Circle1(models.Model):
+    name = models.CharField(max_length=255)
+    def natural_key(self):
+        return self.name
+    natural_key.dependencies = ['fixtures_regress.circle2']
+
+class Circle2(models.Model):
+    name = models.CharField(max_length=255)
+    def natural_key(self):
+        return self.name
+    natural_key.dependencies = ['fixtures_regress.circle1']
+
+class Circle3(models.Model):
+    name = models.CharField(max_length=255)
+    def natural_key(self):
+        return self.name
+    natural_key.dependencies = ['fixtures_regress.circle3']
+
+class Circle4(models.Model):
+    name = models.CharField(max_length=255)
+    def natural_key(self):
+        return self.name
+    natural_key.dependencies = ['fixtures_regress.circle5']
+
+class Circle5(models.Model):
+    name = models.CharField(max_length=255)
+    def natural_key(self):
+        return self.name
+    natural_key.dependencies = ['fixtures_regress.circle6']
+
+class Circle6(models.Model):
+    name = models.CharField(max_length=255)
+    def natural_key(self):
+        return self.name
+    natural_key.dependencies = ['fixtures_regress.circle4']
+
+class ExternalDependency(models.Model):
+    name = models.CharField(max_length=255)
+    def natural_key(self):
+        return self.name
+    natural_key.dependencies = ['fixtures_regress.book']
+
 __test__ = {'API_TESTS':"""
 >>> from django.core import management
 
@@ -235,8 +278,7 @@ Weight = 1.2 (<type 'float'>)
 [{"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}}, {"pk": 2, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.29..., "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}, {"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}}]
 
 ###############################################
-# Regression for #11428 - Proxy models aren't included
-# when you run dumpdata over an entire app
+# Regression for #11428 - Proxy models aren't included when you dumpdata 
 
 # Flush out the database first
 >>> management.call_command('reset', 'fixtures_regress', interactive=False, verbosity=0)
@@ -245,7 +287,7 @@ Weight = 1.2 (<type 'float'>)
 >>> Widget(name='grommet').save()
 
 # Dump data for the entire app. The proxy class shouldn't be included
->>> management.call_command('dumpdata', 'fixtures_regress', format='json')
+>>> management.call_command('dumpdata', 'fixtures_regress.widget', 'fixtures_regress.widgetproxy', format='json')
 [{"pk": 1, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]
 
 ###############################################
@@ -257,49 +299,6 @@ Weight = 1.2 (<type 'float'>)
 [{"pk": 2, "model": "fixtures_regress.store", "fields": {"name": "Amazon"}}, {"pk": 3, "model": "fixtures_regress.store", "fields": {"name": "Borders"}}, {"pk": 4, "model": "fixtures_regress.person", "fields": {"name": "Neal Stephenson"}}, {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]], "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]
 
 # Now lets check the dependency sorting explicitly
-
-# First Some models with pathological circular dependencies
->>> class Circle1(models.Model):
-...     name = models.CharField(max_length=255)
-...     def natural_key(self):
-...         return self.name
-...     natural_key.dependencies = ['fixtures_regress.circle2']
-
->>> class Circle2(models.Model):
-...     name = models.CharField(max_length=255)
-...     def natural_key(self):
-...         return self.name
-...     natural_key.dependencies = ['fixtures_regress.circle1']
-
->>> class Circle3(models.Model):
-...     name = models.CharField(max_length=255)
-...     def natural_key(self):
-...         return self.name
-...     natural_key.dependencies = ['fixtures_regress.circle3']
-
->>> class Circle4(models.Model):
-...     name = models.CharField(max_length=255)
-...     def natural_key(self):
-...         return self.name
-...     natural_key.dependencies = ['fixtures_regress.circle5']
-
->>> class Circle5(models.Model):
-...     name = models.CharField(max_length=255)
-...     def natural_key(self):
-...         return self.name
-...     natural_key.dependencies = ['fixtures_regress.circle6']
-
->>> class Circle6(models.Model):
-...     name = models.CharField(max_length=255)
-...     def natural_key(self):
-...         return self.name
-...     natural_key.dependencies = ['fixtures_regress.circle4']
-
->>> class ExternalDependency(models.Model):
-...     name = models.CharField(max_length=255)
-...     def natural_key(self):
-...         return self.name
-...     natural_key.dependencies = ['fixtures_regress.book']
 
 # It doesn't matter what order you mention the models
 # Store *must* be serialized before then Person, and both
