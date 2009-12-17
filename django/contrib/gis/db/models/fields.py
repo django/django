@@ -1,4 +1,5 @@
 from django.db.models.fields import Field
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
@@ -48,6 +49,8 @@ class GeometryField(Field):
 
     # Geodetic units.
     geodetic_units = ('Decimal Degree', 'degree')
+
+    description = _("The base GIS field -- maps to the OpenGIS Specification Geometry type.")
 
     def __init__(self, verbose_name=None, srid=4326, spatial_index=True, dim=2,
                  geography=False, **kwargs):
@@ -287,22 +290,28 @@ class GeometryField(Field):
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
     geom_type = 'POINT'
+    description = _("Point")
 
 class LineStringField(GeometryField):
     geom_type = 'LINESTRING'
+    description = _("Line string")
 
 class PolygonField(GeometryField):
     geom_type = 'POLYGON'
+    description = _("Polygon")
 
 class MultiPointField(GeometryField):
     geom_type = 'MULTIPOINT'
+    description = _("Multi-point")
 
 class MultiLineStringField(GeometryField):
     geom_type = 'MULTILINESTRING'
+    description = _("Multi-line string")
 
 class MultiPolygonField(GeometryField):
     geom_type = 'MULTIPOLYGON'
+    description = _("Multi polygon")
 
 class GeometryCollectionField(GeometryField):
     geom_type = 'GEOMETRYCOLLECTION'
-
+    description = _("Geometry collection")

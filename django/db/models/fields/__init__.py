@@ -60,6 +60,13 @@ class Field(object):
     creation_counter = 0
     auto_creation_counter = -1
 
+    # Generic field type description, usually overriden by subclasses
+    def _description(self):
+        return _(u'Field of type: %(field_type)s') % {
+            'field_type': self.__class__.__name__
+        }
+    description = property(_description)
+
     def __init__(self, verbose_name=None, name=None, primary_key=False,
             max_length=None, unique=False, blank=False, null=False,
             db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
@@ -369,10 +376,9 @@ class Field(object):
         return getattr(obj, self.attname)
 
 class AutoField(Field):
-    """Integer"""
+    description = ugettext_lazy("Integer")
 
     empty_strings_allowed = False
-
     def __init__(self, *args, **kwargs):
         assert kwargs.get('primary_key', False) is True, "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
@@ -402,10 +408,8 @@ class AutoField(Field):
         return None
 
 class BooleanField(Field):
-    """Boolean (Either True or False)"""
-
     empty_strings_allowed = False
-
+    description = ugettext_lazy("Boolean (Either True or False)")
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
         if 'default' not in kwargs and not kwargs.get('null'):
@@ -448,7 +452,7 @@ class BooleanField(Field):
         return super(BooleanField, self).formfield(**defaults)
 
 class CharField(Field):
-    """String (up to %(max_length)s)"""
+    description = ugettext_lazy("String (up to %(max_length)s)")
 
     def get_internal_type(self):
         return "CharField"
@@ -471,7 +475,7 @@ class CharField(Field):
 
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
-    """Comma-separated integers"""
+    description = ugettext_lazy("Comma-separated integers")
 
     def formfield(self, **kwargs):
         defaults = {
@@ -488,10 +492,9 @@ class CommaSeparatedIntegerField(CharField):
 ansi_date_re = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}$')
 
 class DateField(Field):
-    """Date (without time)"""
+    description = ugettext_lazy("Date (without time)")
 
     empty_strings_allowed = False
-
     def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
         #HACKs : auto_now_add/auto_now should be done as a default or a pre_save.
@@ -571,7 +574,7 @@ class DateField(Field):
         return super(DateField, self).formfield(**defaults)
 
 class DateTimeField(DateField):
-    """Date (with time)"""
+    description = ugettext_lazy("Date (with time)")
 
     def get_internal_type(self):
         return "DateTimeField"
@@ -637,10 +640,8 @@ class DateTimeField(DateField):
         return super(DateTimeField, self).formfield(**defaults)
 
 class DecimalField(Field):
-    """Decimal number"""
-
     empty_strings_allowed = False
-
+    description = ugettext_lazy("Decimal number")
     def __init__(self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         Field.__init__(self, verbose_name, name, **kwargs)
@@ -694,8 +695,7 @@ class DecimalField(Field):
         return super(DecimalField, self).formfield(**defaults)
 
 class EmailField(CharField):
-    """E-mail address"""
-
+    description = ugettext_lazy("E-mail address")
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 75)
         CharField.__init__(self, *args, **kwargs)
@@ -706,7 +706,7 @@ class EmailField(CharField):
         return super(EmailField, self).formfield(**defaults)
 
 class FilePathField(Field):
-    """File path"""
+    description = ugettext_lazy("File path")
 
     def __init__(self, verbose_name=None, name=None, path='', match=None, recursive=False, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
@@ -727,9 +727,8 @@ class FilePathField(Field):
         return "FilePathField"
 
 class FloatField(Field):
-    """Floating point number"""
-
     empty_strings_allowed = False
+    description = ugettext_lazy("Floating point number")
 
     def get_prep_value(self, value):
         if value is None:
@@ -754,9 +753,8 @@ class FloatField(Field):
         return super(FloatField, self).formfield(**defaults)
 
 class IntegerField(Field):
-    """Integer"""
-
     empty_strings_allowed = False
+    description = ugettext_lazy("Integer")
 
     def get_prep_value(self, value):
         if value is None:
@@ -781,10 +779,8 @@ class IntegerField(Field):
         return super(IntegerField, self).formfield(**defaults)
 
 class IPAddressField(Field):
-    """IP address"""
-
     empty_strings_allowed = False
-
+    description = ugettext_lazy("IP address")
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 15
         Field.__init__(self, *args, **kwargs)
@@ -798,10 +794,8 @@ class IPAddressField(Field):
         return super(IPAddressField, self).formfield(**defaults)
 
 class NullBooleanField(Field):
-    """Boolean (Either True, False or None)"""
-
     empty_strings_allowed = False
-
+    description = ugettext_lazy("Boolean (Either True, False or None)")
     def __init__(self, *args, **kwargs):
         kwargs['null'] = True
         Field.__init__(self, *args, **kwargs)
@@ -841,7 +835,7 @@ class NullBooleanField(Field):
         return super(NullBooleanField, self).formfield(**defaults)
 
 class PositiveIntegerField(IntegerField):
-    """Integer"""
+    description = ugettext_lazy("Integer")
 
     def get_internal_type(self):
         return "PositiveIntegerField"
@@ -852,8 +846,7 @@ class PositiveIntegerField(IntegerField):
         return super(PositiveIntegerField, self).formfield(**defaults)
 
 class PositiveSmallIntegerField(IntegerField):
-    """Integer"""
-
+    description = ugettext_lazy("Integer")
     def get_internal_type(self):
         return "PositiveSmallIntegerField"
 
@@ -863,8 +856,7 @@ class PositiveSmallIntegerField(IntegerField):
         return super(PositiveSmallIntegerField, self).formfield(**defaults)
 
 class SlugField(CharField):
-    """String (up to %(max_length)s)"""
-
+    description = ugettext_lazy("String (up to %(max_length)s)")
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 50)
         # Set db_index=True unless it's been set manually.
@@ -881,13 +873,13 @@ class SlugField(CharField):
         return super(SlugField, self).formfield(**defaults)
 
 class SmallIntegerField(IntegerField):
-    """Integer"""
+    description = ugettext_lazy("Integer")
 
     def get_internal_type(self):
         return "SmallIntegerField"
 
 class TextField(Field):
-    """Text"""
+    description = ugettext_lazy("Text")
 
     def get_internal_type(self):
         return "TextField"
@@ -898,10 +890,9 @@ class TextField(Field):
         return super(TextField, self).formfield(**defaults)
 
 class TimeField(Field):
-    """Time"""
+    description = ugettext_lazy("Time")
 
     empty_strings_allowed = False
-
     def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
         if auto_now or auto_now_add:
@@ -978,7 +969,7 @@ class TimeField(Field):
         return super(TimeField, self).formfield(**defaults)
 
 class URLField(CharField):
-    """URL"""
+    description = ugettext_lazy("URL")
 
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 200)
@@ -991,7 +982,7 @@ class URLField(CharField):
         return super(URLField, self).formfield(**defaults)
 
 class XMLField(TextField):
-    """XML text"""
+    description = ugettext_lazy("XML text")
 
     def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):
         self.schema_path = schema_path

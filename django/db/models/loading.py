@@ -35,6 +35,7 @@ class AppCache(object):
         postponed = [],
         nesting_level = 0,
         write_lock = threading.RLock(),
+        _get_models_cache = {},
     )
 
     def __init__(self):
@@ -140,6 +141,11 @@ class AppCache(object):
         explicit intermediate table) are not included. However, if you
         specify include_auto_created=True, they will be.
         """
+        cache_key = (app_mod, include_auto_created)
+        try:
+            return self._get_models_cache[cache_key]
+        except KeyError:
+            pass
         self._populate()
         if app_mod:
             model_list = self.app_models.get(app_mod.__name__.split('.')[-2], SortedDict()).values()
@@ -148,7 +154,8 @@ class AppCache(object):
             for app_entry in self.app_models.itervalues():
                 model_list.extend(app_entry.values())
         if not include_auto_created:
-            return filter(lambda o: not o._meta.auto_created, model_list)
+            model_list = filter(lambda o: not o._meta.auto_created, model_list)
+        self._get_models_cache[cache_key] = model_list
         return model_list
 
     def get_model(self, app_label, model_name, seed_cache=True):
@@ -183,6 +190,7 @@ class AppCache(object):
                 if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
                     continue
             model_dict[model_name] = model
+        self._get_models_cache.clear()
 
 cache = AppCache()
 
