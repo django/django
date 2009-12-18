@@ -225,8 +225,9 @@ Methods
     .. method:: models.User.has_perm(perm, obj=None)
 
         Returns ``True`` if the user has the specified permission, where perm is
-        in the format ``"<app label>.<permission codename>"``.
-        If the user is inactive, this method will always return ``False``.
+        in the format ``"<app label>.<permission codename>"``. (see
+        `permissions`_ section below). If the user is inactive, this method will
+        always return ``False``.
 
         .. versionadded:: 1.2
 
@@ -1122,6 +1123,8 @@ generic view itself. For example::
     def limited_object_detail(*args, **kwargs):
         return object_detail(*args, **kwargs)
 
+.. _permissions:
+
 Permissions
 ===========
 
@@ -1163,6 +1166,14 @@ will be created for all previously-installed models, as well as for any new
 models being installed at that time. Afterward, it will create default
 permissions for new models each time you run :djadmin:`manage.py syncdb
 <syncdb>`.
+
+Assuming you have an application with an
+:attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
+to test for basic permissions you should use:
+
+    * add: ``user.has_perm('foo.add_bar')``
+    * change: ``user.has_perm('foo.change_bar')``
+    * delete: ``user.has_perm('foo.delete_bar')``
 
 .. _custom-permissions:
 
