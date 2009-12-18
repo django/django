@@ -351,6 +351,13 @@ class ModelAdmin(BaseModelAdmin):
         defaults.update(kwargs)
         return modelform_factory(self.model, **defaults)
 
+    def get_changelist(self, request, **kwargs):
+        """
+        Returns the ChangeList class for use on the changelist page.
+        """
+        from django.contrib.admin.views.main import ChangeList
+        return ChangeList
+
     def get_changelist_form(self, request, **kwargs):
         """
         Returns a Form class for use in the Formset on the changelist page.
@@ -888,7 +895,7 @@ class ModelAdmin(BaseModelAdmin):
     @csrf_protect
     def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."
-        from django.contrib.admin.views.main import ChangeList, ERROR_FLAG
+        from django.contrib.admin.views.main import ERROR_FLAG
         opts = self.model._meta
         app_label = opts.app_label
         if not self.has_change_permission(request, None):
@@ -905,6 +912,7 @@ class ModelAdmin(BaseModelAdmin):
             except ValueError:
                 pass
 
+        ChangeList = self.get_changelist(request)
         try:
             cl = ChangeList(request, self.model, list_display, self.list_display_links, self.list_filter,
                 self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self.list_editable, self)

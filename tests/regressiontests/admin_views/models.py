@@ -4,6 +4,7 @@ import os
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.contrib import admin
+from django.contrib.admin.views.main import ChangeList
 from django.core.mail import EmailMessage
 
 class Section(models.Model):
@@ -420,6 +421,20 @@ class CategoryInline(admin.StackedInline):
 class CollectorAdmin(admin.ModelAdmin):
     inlines = [WidgetInline, DooHickeyInline, GrommetInline, WhatsitInline, FancyDoodadInline, CategoryInline]
 
+class Gadget(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+class CustomChangeList(ChangeList):
+    def get_query_set(self):
+        return self.root_query_set.filter(pk=9999) # Does not exist
+
+class GadgetAdmin(admin.ModelAdmin):
+    def get_changelist(self, request, **kwargs):
+        return CustomChangeList
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -443,6 +458,7 @@ admin.site.register(Recommendation, RecommendationAdmin)
 admin.site.register(Recommender)
 admin.site.register(Collector, CollectorAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Gadget, GadgetAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

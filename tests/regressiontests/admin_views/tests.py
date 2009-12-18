@@ -1203,6 +1203,33 @@ class AdminActionsTest(TestCase):
         self.failUnlessEqual(Subscriber.objects.count(), 2)
 
 
+class TestCustomChangeList(TestCase):
+    fixtures = ['admin-views-users.xml']
+    urlbit = 'admin'
+
+    def setUp(self):
+        result = self.client.login(username='super', password='secret')
+        self.failUnlessEqual(result, True)
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_custom_changelist(self):
+        """
+        Validate that a custom ChangeList class can be used (#9749)
+        """
+        # Insert some data
+        post_data = {"name": u"First Gadget"}
+        response = self.client.post('/test_admin/%s/admin_views/gadget/add/' % self.urlbit, post_data)
+        self.failUnlessEqual(response.status_code, 302) # redirect somewhere
+        # Hit the page once to get messages out of the queue message list
+        response = self.client.get('/test_admin/%s/admin_views/gadget/' % self.urlbit)
+        # Ensure that that data is still not visible on the page
+        response = self.client.get('/test_admin/%s/admin_views/gadget/' % self.urlbit)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertNotContains(response, 'First Gadget')
+
+
 class TestInlineNotEditable(TestCase):
     fixtures = ['admin-views-users.xml']
 
