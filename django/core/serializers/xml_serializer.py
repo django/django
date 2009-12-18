@@ -219,7 +219,7 @@ class Deserializer(base.Deserializer):
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj = field.rel.to._default_manager.get_by_natural_key(*field_value, **{'using':self.db})
+                    obj = field.rel.to._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
                     obj_pk = getattr(obj, field.rel.field_name)
                 else:
                     # Otherwise, treat like a normal PK
@@ -240,7 +240,7 @@ class Deserializer(base.Deserializer):
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj_pk = field.rel.to._default_manager.get_by_natural_key(*field_value, **{'using':self.db}).pk
+                    obj_pk = field.rel.to._default_manager.db_manager(self.db).get_by_natural_key(*field_value).pk
                 else:
                     # Otherwise, treat like a normal PK value.
                     obj_pk = field.rel.to._meta.pk.to_python(n.getAttribute('pk'))

@@ -8,55 +8,51 @@ class ContentTypeManager(models.Manager):
     # This cache is shared by all the get_for_* methods.
     _cache = {}
 
-    def get_by_natural_key(self, app_label, model, using=None):
-        db = using or DEFAULT_DB_ALIAS
+    def get_by_natural_key(self, app_label, model):
         try:
-            ct = self.__class__._cache[db][(app_label, model)]
+            ct = self.__class__._cache[self.db][(app_label, model)]
         except KeyError:
-            ct = self.using(db).get(app_label=app_label, model=model)
+            ct = self.get(app_label=app_label, model=model)
         return ct
 
-    def get_for_model(self, model, using=None):
+    def get_for_model(self, model):
         """
         Returns the ContentType object for a given model, creating the
         ContentType if necessary. Lookups are cached so that subsequent lookups
         for the same model don't hit the database.
         """
-        db = using or DEFAULT_DB_ALIAS
         opts = model._meta
         while opts.proxy:
             model = opts.proxy_for_model
             opts = model._meta
         key = (opts.app_label, opts.object_name.lower())
         try:
-            ct = self.__class__._cache[db][key]
+            ct = self.__class__._cache[self.db][key]
         except KeyError:
             # Load or create the ContentType entry. The smart_unicode() is
             # needed around opts.verbose_name_raw because name_raw might be a
             # django.utils.functional.__proxy__ object.
-            ct, created = self.using(db).get_or_create(
+            ct, created = self.get_or_create(
                 app_label = opts.app_label,
                 model = opts.object_name.lower(),
                 defaults = {'name': smart_unicode(opts.verbose_name_raw)},
             )
-            self._add_to_cache(db, ct)
+            self._add_to_cache(self.db, ct)
 
         return ct
 
-    def get_for_id(self, id, using=None):
+    def get_for_id(self, id):
         """
         Lookup a ContentType by ID. Uses the same shared cache as get_for_model
         (though ContentTypes are obviously not created on-the-fly by get_by_id).
         """
-        db = using or DEFAULT_DB_ALIAS
         try:
-            ct = self.__class__._cache[db][id]
-
+            ct = self.__class__._cache[self.db][id]
         except KeyError:
             # This could raise a DoesNotExist; that's correct behavior and will
             # make sure that only correct ctypes get stored in the cache dict.
-            ct = self.using(db).get(pk=id)
-            self._add_to_cache(db, ct)
+            ct = self.get(pk=id)
+            self._add_to_cache(self.db, ct)
         return ct
 
     def clear_cache(self):

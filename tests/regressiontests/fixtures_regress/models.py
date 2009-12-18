@@ -83,8 +83,8 @@ class WidgetProxy(Widget):
 # Check for forward references in FKs and M2Ms with natural keys
 
 class TestManager(models.Manager):
-    def get_by_natural_key(self, key, using=None):
-        return self.using(using).get(name=key)
+    def get_by_natural_key(self, key):
+        return self.get(name=key)
 
 class Store(models.Model):
     objects = TestManager()

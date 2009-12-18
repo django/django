@@ -50,9 +50,9 @@ class GenericForeignKey(object):
         # using this model
         ContentType = get_model("contenttypes", "contenttype")
         if obj:
-             return ContentType.objects.get_for_model(obj, using=obj._state.db)
+             return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
         elif id:
-             return ContentType.objects.get_for_id(id, using=using)
+             return ContentType.objects.db_manager(using).get_for_id(id)
         else:
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
@@ -201,7 +201,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
             join_table = qn(self.field.m2m_db_table()),
             source_col_name = qn(self.field.m2m_column_name()),
             target_col_name = qn(self.field.m2m_reverse_name()),
-            content_type = ContentType.objects.get_for_model(instance, using=instance._state.db),
+            content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(instance),
             content_type_field_name = self.field.content_type_field_name,
             object_id_field_name = self.field.object_id_field_name
         )

@@ -97,7 +97,7 @@ def Deserializer(object_list, **options):
                 if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
                         if hasattr(value, '__iter__'):
-                            return field.rel.to._default_manager.get_by_natural_key(*value, **{'using':db}).pk
+                            return field.rel.to._default_manager.db_manager(db).get_by_natural_key(*value).pk
                         else:
                             return smart_unicode(field.rel.to._meta.pk.to_python(value))
                 else:
@@ -109,7 +109,7 @@ def Deserializer(object_list, **options):
                 if field_value is not None:
                     if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                         if hasattr(field_value, '__iter__'):
-                            obj = field.rel.to._default_manager.get_by_natural_key(*field_value, **{'using':db})
+                            obj = field.rel.to._default_manager.db_manager(db).get_by_natural_key(*field_value)
                             value = getattr(obj, field.rel.field_name)
                         else:
                             value = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)

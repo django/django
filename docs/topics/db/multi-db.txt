@@ -109,3 +109,30 @@ the ``'legacy_users'`` database to the ``'new_users'`` database you might do::
 
     >>> user_obj.save(using='new_users')
     >>> user_obj.delete(using='legacy_users')
+
+
+Using ``Managers`` with Multiple Databases
+==========================================
+
+When you call ``using()`` Django returns a ``QuerySet`` that will be evaluated
+against that database.  However, sometimes you want to chain ``using()``
+together with a cusotm manager method that doesn't return a ``QuerySet``,
+such as the ``get_by_natural_key`` method.  To solve this issue you can use the
+``db_manager()`` method on a manager.  This method returns a copy of the
+*manager* bound to that specific database.  This let's you do things like::
+    
+    >>> Book.objects.db("other").get_by_natural_key(...)
+
+If you are overiding ``get_query_set()`` on your manager you must be sure to
+either, a) call the method on the parent (using ``super()``), or b) do the
+appropriate handling of the ``_db`` attribute on the manager.  For example if
+you wanted to return a custom ``QuerySet`` class from the ``get_query_set``
+method you could do this::
+
+    class MyManager(models.Manager):
+        ...
+        def get_query_set(self):
+            qs = CustomQuerySet(self.model)
+            if self._db is not None:
+                qs = qs.using(self._db)
+            return qs

@@ -17,8 +17,8 @@ class Review(models.Model):
         ordering = ('source',)
 
 class PersonManager(models.Manager):
-    def get_by_natural_key(self, name, using=None):
-        return self.using(using).get(name=name)
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
 
 class Person(models.Model):
     objects = PersonManager()

@@ -632,7 +632,7 @@ class UserProfileTestCase(TestCase):
     def test_user_profiles(self):
 
         alice = User.objects.create_user('alice', 'alice@example.com')
-        bob = User.objects.create_user('bob', 'bob@example.com', using='other')
+        bob = User.objects.db_manager('other').create_user('bob', 'bob@example.com')
 
         alice_profile = UserProfile(user=alice, flavor='chocolate')
         alice_profile.save()
