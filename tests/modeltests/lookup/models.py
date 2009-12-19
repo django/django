@@ -102,6 +102,12 @@ Article 4
 <Article: Article 2>
 >>> Article.objects.in_bulk([3])
 {3: <Article: Article 3>}
+>>> Article.objects.in_bulk(set([3]))
+{3: <Article: Article 3>}
+>>> Article.objects.in_bulk(frozenset([3]))
+{3: <Article: Article 3>}
+>>> Article.objects.in_bulk((3,))
+{3: <Article: Article 3>}
 >>> Article.objects.in_bulk([1000])
 {}
 >>> Article.objects.in_bulk([])
