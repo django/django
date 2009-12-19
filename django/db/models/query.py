@@ -320,6 +320,8 @@ class QuerySet(object):
         keyword arguments.
         """
         clone = self.filter(*args, **kwargs)
+        if self.query.can_filter():
+            clone = clone.order_by()
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
