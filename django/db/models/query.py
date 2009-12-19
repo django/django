@@ -328,6 +328,8 @@ class QuerySet(object):
         keyword arguments.
         """
         clone = self.filter(*args, **kwargs)
+        if self.query.can_filter():
+            clone = clone.order_by()
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
@@ -394,7 +396,7 @@ class QuerySet(object):
         """
         assert self.query.can_filter(), \
                 "Cannot use 'limit' or 'offset' with in_bulk"
-        assert isinstance(id_list, (tuple,  list)), \
+        assert isinstance(id_list, (tuple,  list, set, frozenset)), \
                 "in_bulk() must be provided with a list of IDs."
         if not id_list:
             return {}
