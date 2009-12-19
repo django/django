@@ -80,6 +80,21 @@ You should also audit your existing code for any instances of this behavior
 before enabling this feature. It's faster, but it provides less automatic
 protection for multi-call operations.
 
+Indexes for ``varchar`` and ``text`` columns
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. versionadded:: 1.1.2
+
+When specifying ``db_index=True`` on your model fields, Django typically
+outputs a single ``CREATE INDEX`` statement.  However, if the database type
+for the field is either ``varchar`` or ``text`` (e.g., used by ``CharField``,
+``FileField``, and ``TextField``), then Django will create
+an additional index that uses an appropriate `PostgreSQL operator class`_
+for the column.  The extra index is necessary to correctly perfrom
+lookups that use the ``LIKE`` operator in their SQL, as is done with the
+``contains`` and ``startswith`` lookup types.
+
+.. _PostgreSQL operator class: http://www.postgresql.org/docs/8.4/static/indexes-opclass.html
+
 .. _mysql-notes:
 
 MySQL notes
