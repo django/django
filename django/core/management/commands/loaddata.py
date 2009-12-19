@@ -76,7 +76,17 @@ class Command(BaseCommand):
         if has_bz2:
             compression_types['bz2'] = bz2.BZ2File
 
-        app_fixtures = [os.path.join(os.path.dirname(app.__file__), 'fixtures') for app in get_apps()]
+        app_module_paths = []
+        for app in get_apps():
+            if hasattr(app, '__path__'):
+                # It's a 'models/' subpackage
+                for path in app.__path__:
+                    app_module_paths.append(path)
+            else:
+                # It's a models.py module
+                app_module_paths.append(app.__file__)
+
+        app_fixtures = [os.path.join(os.path.dirname(path), 'fixtures') for path in app_module_paths]
         for fixture_label in fixture_labels:
             parts = fixture_label.split('.')
 
