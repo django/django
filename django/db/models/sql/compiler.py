@@ -627,6 +627,13 @@ class SQLCompiler(object):
                             fields = self.query.select_fields + self.query.related_select_fields
                         else:
                             fields = self.query.model._meta.fields
+                        # If the field was deferred, exclude it from being passed
+                        # into `resolve_columns` because it wasn't selected.
+                        only_load = self.deferred_to_columns()
+                        if only_load:
+                            db_table = self.query.model._meta.db_table
+                            fields = [f for f in fields if db_table in only_load and
+                                      f.column in only_load[db_table]]
                     row = self.resolve_columns(row, fields)
 
                 if self.query.aggregate_select:

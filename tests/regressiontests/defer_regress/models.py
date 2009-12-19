@@ -31,6 +31,10 @@ class Leaf(models.Model):
     def __unicode__(self):
         return self.name
 
+class ResolveThis(models.Model):
+    num = models.FloatField()
+    name = models.CharField(max_length=16)
+
 __test__ = {"regression_tests": """
 Deferred fields should really be deferred and not accidentally use the field's
 default value just because they aren't passed to __init__.
