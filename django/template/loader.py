@@ -80,7 +80,7 @@ def find_template_loader(loader):
         module, attr = loader.rsplit('.', 1)
         try:
             mod = import_module(module)
-        except ImportError:
+        except ImportError, e:
             raise ImproperlyConfigured('Error importing template source loader %s: "%s"' % (loader, e))
         try:
             TemplateLoader = getattr(mod, attr)
