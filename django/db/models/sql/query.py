@@ -14,7 +14,7 @@ from django.utils.encoding import force_unicode
 from django.db import connection, connections, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
-from django.db.models.query_utils import select_related_descend
+from django.db.models.query_utils import select_related_descend, InvalidQuery
 from django.db.models.sql import aggregates as base_aggregates_module
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
@@ -22,7 +22,43 @@ from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import WhereNode, Constraint, EverythingNode, AND, OR
 from django.core.exceptions import FieldError
 
-__all__ = ['Query']
+__all__ = ['Query', 'RawQuery']
+
+class RawQuery(object):
+    """
+    A single raw SQL query
+    """
+
+    def __init__(self, sql, connection, params=None):
+        self.validate_sql(sql)
+        self.params = params or ()
+        self.sql = sql
+        self.connection = connection
+        self.cursor = None
+
+    def get_columns(self):
+        if self.cursor is None:
+            self._execute_query()
+        return [column_meta[0] for column_meta in self.cursor.description]
+
+    def validate_sql(self, sql):
+        if not sql.lower().strip().startswith('select'):
+            raise InvalidQuery('Raw queries are limited to SELECT queries. Use '
+                               'connection.cursor directly for types of queries.')
+
+    def __iter__(self):
+        # Always execute a new query for a new iterator.
+        # This could be optomized with a cache at the expense of RAM.
+        self._execute_query()
+        return self.cursor
+
+    def __repr__(self):
+        return "<RawQuery: %r>" % (self.sql % self.params)
+
+    def _execute_query(self):
+        self.cursor = self.connection.cursor()
+        self.cursor.execute(self.sql, self.params)
+
 
 class Query(object):
     """

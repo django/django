@@ -20,6 +20,13 @@ class CyclicDependency(Exception):
     """
     pass
 
+class InvalidQuery(Exception):
+    """
+    The query passed to raw isn't a safe query to use with raw.
+    """
+    pass
+
+
 class CollectedObjects(object):
     """
     A container that stores keys and lists of values along with remembering the
