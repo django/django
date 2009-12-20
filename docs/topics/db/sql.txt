@@ -1,10 +1,183 @@
 .. _topics-db-sql:
 
+==========================
 Performing raw SQL queries
 ==========================
 
-Feel free to write custom SQL statements in custom model methods and
-module-level methods. The object ``django.db.connection`` represents the
+.. currentmodule:: django.db.models
+
+When the :ref:`model query APIs <topics-db-queries>` don't go far enough, you
+can fall back to writing raw SQL. Django gives you two ways of performing raw
+SQL queries: you can use :meth:`Manager.raw()` to `perform raw queries and
+return model instances`__, or you can avoid the model layer entirely and
+`execute custom SQL directly`__.
+
+__ `performing raw queries`_
+__ `executing custom SQL directly`_
+
+Performing raw queries
+======================
+
+.. versionadded:: 1.2
+
+The ``raw()`` manager method can be used to perform raw SQL queries that
+return model instances:
+
+.. method:: Manager.raw(query, params=None, translations=None)
+
+This method method takes a raw SQL query, executes it, and returns model
+instances.
+
+This is best illustrated with an example. Suppose you've got the following model::
+
+    class Person(models.Model):
+        first_name = models.CharField(...)
+        last_name = models.CharField(...)
+        birth_date = models.DateField(...)
+
+You could then execute custom SQL like so::
+
+    >>> Person.objects.raw('SELECT * from myapp_person')
+    [<Person: John Doe>, <Person: Jane Doe>, ...]
+
+.. admonition:: Model table names
+
+    Where'd the name of the ``Person`` table come from in that example?
+
+    By default, Django figures out a database table name by joining the
+    model's "app label" -- the name you used in ``manage.py startapp`` -- to
+    the model's class name, with an underscore between them. In the example
+    we've assumed that the ``Person`` model lives in an app named ``myapp``,
+    so its table would be ``myapp_person``.
+
+    For more details check out the documentation for the
+    :attr:`~Options.db_table` option, which also lets you manually set the
+    database table name.
+
+Of course, this example isn't very exciting -- it's exactly the same as
+running ``Person.objects.all()``. However, ``raw()`` has a bunch of other
+options that make it very powerful.
+
+Mapping query fields to model fields
+------------------------------------
+
+``raw()`` automatically maps fields in the query to fields on the model.
+
+The order of fields in your query doesn't matter. In other words, both
+of the following queries work identically::
+
+    >>> Person.objects.raw('SELECT id, first_name, last_name, birth_date FROM myapp_person')
+    ...
+    >>> Person.objects.raw('SELECT last_name, birth_date, first_name, id FROM myapp_person')
+    ...
+
+Matching is done by name. This means that you can use SQL's ``AS`` clauses to
+map fields in the query to model fields. So if you had some other table that
+had ``Person`` data in it, you could easily map it into ``Person`` instances::
+
+    >>> Person.objects.raw('''SELECT first AS first_name,
+    ...                              last AS last_name,
+    ...                              bd AS birth_date,
+    ...                              pk as id,
+    ...                       FROM some_other_table)
+
+As long as the names match, the model instances will be created correctly.
+
+Alternatively, you can map fields in the query to model fields using the
+``translations`` argument to ``raw()``. This is a dictionary mapping names of
+fields in the query to names of fields on the model. For example, the above
+query could also be written::
+
+    >>> name_map = {'first': 'first_name', 'last': 'last_name', 'bd': 'birth_date', 'pk': 'id'}
+    >>> Person.objects.raw('SELECT * FROM some_other_table', translations=name_map)
+
+Deferring model fields
+----------------------
+
+Fields may also be left out::
+
+    >>> people = Person.objects.raw('SELECT id, first_name FROM myapp_person'):
+
+The ``Person`` objects returned by this query will be :ref:`deferred
+<queryset-defer>` model instances. This means that the fields that are omitted
+from the query will be loaded on demand. For example::
+
+    >>> for p in Person.objects.raw('SELECT id, first_name FROM myapp_person'):
+    ...     print p.first_name, # This will be retrieved by the original query
+    ...     print p.last_name # This will be retrieved on demand
+    ...
+    John Smith
+    Jane Jones
+
+From outward appearances, this looks like the query has retrieved both
+the first name and last name. However, this example actually issued 3
+queries. Only the first names were retrieved by the raw() query -- the
+last names were both retrieved on demand when they were printed.
+
+There is only one field that you can't leave out - the primary key
+field. Django uses the primary key to identify model instances, so it
+must always be included in a raw query. An ``InvalidQuery`` exception
+will be raised if you forget to include the primary key.
+
+Adding annotations
+------------------
+
+You can also execute queries containing fields that aren't defined on the
+model. For example, we could use `PostgreSQL's age() function`__ to get a list
+of people with their ages calculated by the database::
+
+    >>> people = Person.objects.raw('SELECT *, age(birth_date) AS age FROM myapp_person')
+    >>> for p in people:
+    ...   print "%s is %s." % (p.first_name, p.age)
+    John is 37.
+    Jane is 42.
+    ...
+
+__ http://www.postgresql.org/docs/8.4/static/functions-datetime.html
+
+Passing parameters into ``raw()``
+---------------------------------
+
+If you need to perform parameterized queries, you can use the ``params``
+argument to ``raw()``::
+
+    >>> lname = 'Doe'
+    >>> Person.objects.raw('SELECT * FROM myapp_person WHERE last_name = %s', [lname])
+
+``params`` is a list of parameters. You'll use ``%s`` placeholders in the
+query string (regardless of your database engine); they'll be replaced with
+parameters from the ``params`` list.
+
+.. warning::
+
+    **Do not use string formatting on raw queries!**
+
+    It's tempting to write the above query as::
+
+        >>> query = 'SELECT * FROM myapp_person WHERE last_name = %s', % lname
+        >>> Person.objects.raw(query)
+
+    **Don't.**
+
+    Using the ``params`` list completely protects you from `SQL injection
+    attacks`__`, a common exploit where attackers inject arbitrary SQL into
+    your database. If you use string interpolation, sooner or later you'll
+    fall victim to SQL injection. As long as you remember to always use the
+    ``params`` list you'll be protected.
+
+__ http://en.wikipedia.org/wiki/SQL_injection
+
+Executing custom SQL directly
+=============================
+
+Sometimes even :meth:`Manager.raw` isn't quite enough: you might need to
+perform queries that don't map cleanly to models, or directly execute
+``UPDATE``, ``INSERT``, or ``DELETE`` queries.
+
+In these cases, you can always access the database directly, routing around
+the model layer entirely.
+
+The object ``django.db.connection`` represents the
 current database connection, and ``django.db.transaction`` represents the
 current database transaction. To use the database connection, call
 ``connection.cursor()`` to get a cursor object. Then, call
@@ -15,7 +188,7 @@ changing operation, you should then call
 to the database. If your query is purely a data retrieval operation, no commit
 is required. For example::
 
-    def my_custom_sql(self):
+    def my_custom_sql():
         from django.db import connection, transaction
         cursor = connection.cursor()
 
@@ -77,13 +250,6 @@ library will automatically add quotes and escaping to your parameter(s) as
 necessary. (Also note that Django expects the ``"%s"`` placeholder, *not* the
 ``"?"`` placeholder, which is used by the SQLite Python bindings. This is for
 the sake of consistency and sanity.)
-
-An easier option?
------------------
-
-A final note: If all you want to do is a custom ``WHERE`` clause, you can just
-use the ``where``, ``tables`` and ``params`` arguments to the
-:ref:`extra clause <extra>` in the standard queryset API.
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 

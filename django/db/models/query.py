@@ -5,7 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 from django.db import connection, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
-from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory
+from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory, InvalidQuery
 from django.db.models import signals, sql
 from django.utils.copycompat import deepcopy
 
@@ -287,7 +287,7 @@ class QuerySet(object):
         Returns a dictionary containing the calculations (aggregation)
         over the current queryset
 
-        If args is present the expression is passed as a kwarg ussing
+        If args is present the expression is passed as a kwarg using
         the Aggregate object's default alias.
         """
         for arg in args:
@@ -1107,6 +1107,89 @@ def delete_objects(seen_objs):
         if forced_managed:
             transaction.leave_transaction_management()
 
+class RawQuerySet(object):
+    """
+    Provides an iterator which converts the results of raw SQL queries into
+    annotated model instances.
+    """
+    def __init__(self, query, model=None, query_obj=None, params=None, translations=None):
+        self.model = model
+        self.query = query_obj or sql.RawQuery(sql=query, connection=connection, params=params)
+        self.params = params or ()
+        self.translations = translations or {}
+
+    def __iter__(self):
+        for row in self.query:
+            yield self.transform_results(row)
+
+    def __repr__(self):
+        return "<RawQuerySet: %r>" % (self.query.sql % self.params)
+
+    @property
+    def columns(self):
+        """
+        A list of model field names in the order they'll appear in the
+        query results.
+        """
+        if not hasattr(self, '_columns'):
+            self._columns = self.query.get_columns()
+
+            # Adjust any column names which don't match field names
+            for (query_name, model_name) in self.translations.items():
+                try:
+                    index = self._columns.index(query_name)
+                    self._columns[index] = model_name
+                except ValueError:
+                    # Ignore translations for non-existant column names
+                    pass
+
+        return self._columns
+
+    @property
+    def model_fields(self):
+        """
+        A dict mapping column names to model field names.
+        """
+        if not hasattr(self, '_model_fields'):
+            self._model_fields = {}
+            for field in self.model._meta.fields:
+                name, column = field.get_attname_column()
+                self._model_fields[column] = name
+        return self._model_fields
+
+    def transform_results(self, values):
+        model_init_kwargs = {}
+        annotations = ()
+
+        # Associate fields to values
+        for pos, value in enumerate(values):
+            column = self.columns[pos]
+
+            # Separate properties from annotations
+            if column in self.model_fields.keys():
+                model_init_kwargs[self.model_fields[column]] = value
+            else:
+                annotations += (column, value),
+
+        # Construct model instance and apply annotations
+        skip = set()
+        for field in self.model._meta.fields:
+            if field.name not in model_init_kwargs.keys():
+                skip.add(field.attname)
+
+        if skip:
+            if self.model._meta.pk.attname in skip:
+                raise InvalidQuery('Raw query must include the primary key')
+            model_cls = deferred_class_factory(self.model, skip)
+        else:
+            model_cls = self.model
+
+        instance = model_cls(**model_init_kwargs)
+
+        for field, value in annotations:
+            setattr(instance, field, value)
+
+        return instance
 
 def insert_query(model, values, return_id=False, raw_values=False):
     """
