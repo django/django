@@ -333,8 +333,6 @@ class ManyToManySearchInput(ManyToManyRawIdWidget):
             'templates/widget/m2m_searchinput.html',
         ), context))
         
-        output.reverse()
-        
         return mark_safe(u''.join(output))
 
 class RelatedFieldWidgetWrapper(forms.Widget):
