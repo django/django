@@ -7,10 +7,10 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
-    ContentType.objects.clear_cache()
-    content_types = list(ContentType.objects.filter(app_label=app.__name__.split('.')[-2]))
-    app_models = get_models(app)
     db = kwargs['db']
+    ContentType.objects.clear_cache()
+    content_types = list(ContentType.objects.using(db).filter(app_label=app.__name__.split('.')[-2]))
+    app_models = get_models(app)
     if not app_models:
         return
     for klass in app_models:
