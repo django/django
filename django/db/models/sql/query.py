@@ -29,12 +29,15 @@ class RawQuery(object):
     A single raw SQL query
     """
 
-    def __init__(self, sql, connection, params=None):
+    def __init__(self, sql, using, params=None):
         self.validate_sql(sql)
         self.params = params or ()
         self.sql = sql
-        self.connection = connection
+        self.using = using
         self.cursor = None
+
+    def clone(self, using):
+        return RawQuery(self.sql, using, params=self.params)
 
     def get_columns(self):
         if self.cursor is None:
@@ -56,7 +59,7 @@ class RawQuery(object):
         return "<RawQuery: %r>" % (self.sql % self.params)
 
     def _execute_query(self):
-        self.cursor = self.connection.cursor()
+        self.cursor = connections[self.using].cursor()
         self.cursor.execute(self.sql, self.params)
 
 

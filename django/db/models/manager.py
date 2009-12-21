@@ -91,7 +91,7 @@ class Manager(object):
         obj = copy.copy(self)
         obj._db = alias
         return obj
-    
+
     @property
     def db(self):
         return self._db or DEFAULT_DB_ALIAS
@@ -189,7 +189,7 @@ class Manager(object):
 
     def using(self, *args, **kwargs):
         return self.get_query_set().using(*args, **kwargs)
-    
+
     def exists(self, *args, **kwargs):
         return self.get_query_set().exists(*args, **kwargs)
 
@@ -199,9 +199,8 @@ class Manager(object):
     def _update(self, values, **kwargs):
         return self.get_query_set()._update(values, **kwargs)
 
-    def raw(self, query, params=None, *args, **kwargs):
-        kwargs["using"] = self.db
-        return RawQuerySet(model=self.model, query=query, params=params, *args, **kwargs)
+    def raw(self, raw_query, params=None, *args, **kwargs):
+        return RawQuerySet(raw_query=raw_query, model=self.model, params=params, using=self.db, *args, **kwargs)
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.

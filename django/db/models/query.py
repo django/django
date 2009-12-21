@@ -711,10 +711,10 @@ class QuerySet(object):
             return False
     ordered = property(ordered)
 
+    @property
     def db(self):
         "Return the database that will be used if this query is executed now"
         return self._db or DEFAULT_DB_ALIAS
-    db = property(db)
 
     ###################
     # PRIVATE METHODS #
@@ -1154,11 +1154,12 @@ class RawQuerySet(object):
     Provides an iterator which converts the results of raw SQL queries into
     annotated model instances.
     """
-    def __init__(self, query, model=None, query_obj=None, params=None,
+    def __init__(self, raw_query, model=None, query=None, params=None,
         translations=None, using=None):
+        self.raw_query = raw_query
         self.model = model
-        self.using = using
-        self.query = query_obj or sql.RawQuery(sql=query, connection=connections[using], params=params)
+        self._db = using
+        self.query = query or sql.RawQuery(sql=raw_query, using=self.db, params=params)
         self.params = params or ()
         self.translations = translations or {}
 
@@ -1167,7 +1168,21 @@ class RawQuerySet(object):
             yield self.transform_results(row)
 
     def __repr__(self):
-        return "<RawQuerySet: %r>" % (self.query.sql % self.params)
+        return "<RawQuerySet: %r>" % (self.raw_query % self.params)
+
+    @property
+    def db(self):
+        "Return the database that will be used if this query is executed now"
+        return self._db or DEFAULT_DB_ALIAS
+
+    def using(self, alias):
+        """
+        Selects which database this Raw QuerySet should excecute it's query against.
+        """
+        return RawQuerySet(self.raw_query, model=self.model,
+                query=self.query.clone(using=alias),
+                params=self.params, translations=self.translations,
+                using=alias)
 
     @property
     def columns(self):
@@ -1232,8 +1247,8 @@ class RawQuerySet(object):
 
         for field, value in annotations:
             setattr(instance, field, value)
-        
-        instance._state.db = self.using
+
+        instance._state.db = self.query.using
 
         return instance
 

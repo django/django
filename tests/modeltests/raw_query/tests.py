@@ -10,7 +10,7 @@ class RawQueryTests(TestCase):
         """
         Execute the passed query against the passed model and check the output
         """
-        results = list(model.objects.raw(query=query, params=params, translations=translations))
+        results = list(model.objects.raw(query, params=params, translations=translations))
         self.assertProcessed(results, expected_results, expected_annotations)
         self.assertAnnotations(results, expected_annotations)
 
@@ -111,7 +111,7 @@ class RawQueryTests(TestCase):
         query = "SELECT * FROM raw_query_author WHERE first_name = %s"
         author = Author.objects.all()[2]
         params = [author.first_name]
-        results = list(Author.objects.raw(query=query, params=params))
+        results = list(Author.objects.raw(query, params=params))
         self.assertProcessed(results, [author])
         self.assertNoAnnotations(results)
         self.assertEqual(len(results), 1)
