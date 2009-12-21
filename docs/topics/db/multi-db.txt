@@ -12,7 +12,7 @@ interacting with a single database.  While none of this documentation is
 incorrect, to fully interact with multiple databases additional steps must be
 taken.
 
-Defining Your Databases
+Defining your databases
 =======================
 
 The first step to using more than one database with Django is to tell Django
@@ -27,7 +27,7 @@ you choose.  If at any time you attempt to access a database that isn't defined
 in your :setting:`DATABASES` setting then Django will raise a
 ``django.db.utils.ConnectionDoesNotExist`` exception.
 
-Selecting a Database for a ``QuerySet``
+Selecting a database for a ``QuerySet``
 =======================================
 
 It is possible to select the database for a ``QuerySet`` at any point during
@@ -35,8 +35,8 @@ it's construction.  To choose the database that a query will be preformed
 against simply call the ``using()`` method on the ``QuerySet`` with the sole
 argument being the database alias.
 
-Select a Database to Save a Model To
-====================================
+Select a database to save to
+============================
 
 To choose what database to save a model to, provide a ``using`` keyword
 argument to ``Model.save()``.  For example if you had a user model that you
@@ -99,19 +99,26 @@ primary key on both databases. If that primary key is already in use
 when you try to save onto the ``second`` database, an error will be
 raised.
 
-Select a Database to Delete a Model From
-========================================
+Select a database to delete from
+================================
 
-To select which database to delete a model from you also use a ``using``
-keyword argument to the ``Model.delete()`` method, analogous to the ``using``
-keyword argument to ``save()``.  For example if you were migrating a user from
-the ``'legacy_users'`` database to the ``'new_users'`` database you might do::
+By default, a call to delete an existing object will be executed on the
+same database that was used to retrieve the object in the first place::
+
+    >>> user_obj = User.objects.using('legacy_users').get(username='fred')
+    >>> user_obj.delete() # will delete from the `legacy_users` database
+
+If you want to specify the database from which a model will be
+deleted, you can use a ``using`` keyword argument to the
+``Model.delete()`` method. This argument is analogous to the ``using``
+keyword argument to ``save()``. For example if you were migrating a
+user from the ``'legacy_users'`` database to the ``'new_users'``
+database you might use the commands::
 
     >>> user_obj.save(using='new_users')
     >>> user_obj.delete(using='legacy_users')
 
-
-Using ``Managers`` with Multiple Databases
+Using ``Managers`` with multiple databases
 ==========================================
 
 When you call ``using()`` Django returns a ``QuerySet`` that will be evaluated
@@ -120,10 +127,10 @@ together with a cusotm manager method that doesn't return a ``QuerySet``,
 such as the ``get_by_natural_key`` method.  To solve this issue you can use the
 ``db_manager()`` method on a manager.  This method returns a copy of the
 *manager* bound to that specific database.  This let's you do things like::
-    
+
     >>> Book.objects.db("other").get_by_natural_key(...)
 
-If you are overiding ``get_query_set()`` on your manager you must be sure to
+If you are overriding ``get_query_set()`` on your manager you must be sure to
 either, a) call the method on the parent (using ``super()``), or b) do the
 appropriate handling of the ``_db`` attribute on the manager.  For example if
 you wanted to return a custom ``QuerySet`` class from the ``get_query_set``
@@ -136,3 +143,89 @@ method you could do this::
             if self._db is not None:
                 qs = qs.using(self._db)
             return qs
+
+Exposing multiple databases in Django's admin interface
+=======================================================
+
+Django's admin doesn't have any explicit support for multi databases.
+If you want to provide an admin interface for a model on a database
+other than ``default``, you need to write custom
+:class:`~django.contrib.admin.ModelAdmin` classes that will direct the
+admin to use a specific database for content.
+
+There are four methods that require customization on a ModelAdmin
+object::
+
+    class MultiDBModelAdmin(admin.ModelAdmin):
+        # A handy constant for the name of the alternate database
+        using = 'other'
+
+        def save_model(self, request, obj, form, change):
+            # Tell Django to save objects to the 'other' database
+            obj.save(using=self.using)
+
+        def queryset(self, request):
+            # Tell Django to look for objects on the 'other' database
+            return super(MultiDBModelAdmin, self).queryset(request).using(self.using)
+
+        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+            # Tell Django to populate ForeignKey widgets using a query
+            # on the 'other' database
+            return super(MultiDBModelAdmin, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+
+        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+            # Tell Django to populate ManyToMany widgets using a query
+            # on the 'other' database
+            return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+
+The implementation provided here implements a multi-db strategy where
+all objects of a given type are stored on a specific database (e.g.,
+all ``User`` objects are on the ``other`` database). If your usage of
+multi-db is more complex, your ModelAdmin will need to reflect that
+strategy.
+
+Inlines can be handled in a similar fashion -- they require just three
+customized methods::
+
+    class MultiDBTabularInline(admin.TabularInline):
+        using = 'other'
+
+        def queryset(self, request):
+            # Tell Django to look for inline objects on the 'other' database
+            return super(MultiDBTabularInline, self).queryset(request).using(self.using)
+
+        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+            # Tell Django to populate ForeignKey widgets using a query
+            # on the 'other' database
+            return super(MultiDBTabularInline, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+
+        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+            # Tell Django to populate ManyToMany widgets using a query
+            # on the 'other' database
+            return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+
+Once you have written your model admin definitions, they can be
+registered with any Admin instance::
+
+    from django.contrib import admin
+
+    # Specialize the multi-db admin objects for use with specific models
+    class BookInline(MultiDBTabularInline):
+        model = Book
+
+    class PublisherAdmin(MultiDBModelAdmin):
+        inlines = [BookInline]
+
+        admin.site.register
+
+    admin.site.register(Author, MultiDBModelAdmin)
+    admin.site.register(Publisher, PublisherAdmin)
+
+    othersite = admin.Site('othersite')
+    othersite.register(Publisher, MultiDBModelAdmin)
+
+This example sets up two admin sites. On the first site, the
+``Author`` and ``Publisher`` objects are exposed; ``Publisher``
+objects have an tabular inline showing books published by that
+publisher. The second site exposes just publishers, without the
+inlines.
