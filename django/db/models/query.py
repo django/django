@@ -1154,9 +1154,11 @@ class RawQuerySet(object):
     Provides an iterator which converts the results of raw SQL queries into
     annotated model instances.
     """
-    def __init__(self, query, model=None, query_obj=None, params=None, translations=None):
+    def __init__(self, query, model=None, query_obj=None, params=None,
+        translations=None, using=None):
         self.model = model
-        self.query = query_obj or sql.RawQuery(sql=query, connection=connection, params=params)
+        self.using = using
+        self.query = query_obj or sql.RawQuery(sql=query, connection=connections[using], params=params)
         self.params = params or ()
         self.translations = translations or {}
 
@@ -1230,6 +1232,8 @@ class RawQuerySet(object):
 
         for field, value in annotations:
             setattr(instance, field, value)
+        
+        instance._state.db = self.using
 
         return instance
 

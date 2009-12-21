@@ -187,7 +187,7 @@ class DeferredAttribute(object):
         cls = self.model_ref()
         data = instance.__dict__
         if data.get(self.field_name, self) is self:
-            data[self.field_name] = cls._base_manager.filter(pk=instance.pk).values_list(self.field_name, flat=True).get()
+            data[self.field_name] = cls._base_manager.filter(pk=instance.pk).values_list(self.field_name, flat=True).using(instance._state.db).get()
         return data[self.field_name]
 
     def __set__(self, instance, value):

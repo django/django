@@ -200,6 +200,7 @@ class Manager(object):
         return self.get_query_set()._update(values, **kwargs)
 
     def raw(self, query, params=None, *args, **kwargs):
+        kwargs["using"] = self.db
         return RawQuerySet(model=self.model, query=query, params=params, *args, **kwargs)
 
 class ManagerDescriptor(object):
