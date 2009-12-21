@@ -289,10 +289,10 @@ class ManyToManySearchInput(ManyToManyRawIdWidget):
         self.search_fields = search_fields
         super(ManyToManySearchInput, self).__init__(rel, attrs)
 
-    def label_for_value(self, value):
+    def prepopulated_data_for_value(self, value):
         key = self.rel.get_related_field().name
-        objs = self.rel.to._default_manager.filter(**{key + '__in': value.split(',')})
-        return ','.join([str(o) for o in objs])
+        objs = self.rel.to._default_manager.filter(**{key + '__in': value})
+        return [{'id': o.id, 'name': unicode(o)} for o in objs]
         
     def get_search_path(self, name):
         return '../autocomplete/%s/' % name
@@ -300,45 +300,41 @@ class ManyToManySearchInput(ManyToManyRawIdWidget):
     def render(self, name, value, attrs=None):
         if attrs is None:
             attrs = {}
-        output = [super(ManyToManySearchInput, self).render(name, value, attrs)]
-        if value:
-            value = ','.join([str(v) for v in value])
-        else:
-            value = ''
-        opts = self.rel.to._meta
-        app_label = opts.app_label
-        model_name = opts.object_name.lower()
-        related_url = '../../../%s/%s/' % (app_label, model_name)
+        if not attrs.has_key('class'):
+            attrs['class'] = 'vM2MRawIdAdminField'
+        
+        if not value:
+            value = []
+        
         params = self.url_parameters()
         if params:
             url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
         else:
             url = ''
-        if not attrs.has_key('class'):
-            attrs['class'] = 'vM2MRawIdAdminField'
-        # Call the TextInput render method directly to have more control
-        output = [forms.TextInput.render(self, name, value, attrs)]
-        if value:
-            label = self.label_for_value(value)
-        else:
-            label = u''
+        
+        output = [forms.TextInput.render(self, name, ','.join([str(v) for v in value]), attrs)]
+        opts = self.rel.to._meta
+
         context = {
             'url': url,
-            'related_url': related_url,
+            'related_url': '../../../%s/%s/' % (opts.app_label, opts.object_name.lower()),
             'admin_media_prefix': settings.ADMIN_MEDIA_PREFIX,
             'search_path': self.get_search_path(name),
             'search_fields': ','.join(self.search_fields),
-            'model_name': model_name,
-            'app_label': app_label,
-            'label': label,
             'name': name,
+            'model_name': opts.object_name.lower(),
+            'app_label': opts.app_label,
+            'prepopulated_data': self.prepopulated_data_for_value(value),
         }
+        
         output.append(render_to_string(self.widget_template or (
             'templates/widget/%s/%s/m2m_searchinput.html' % (app_label, model_name),
             'templates/widget/%s/m2m_searchinput.html' % app_label,
             'templates/widget/m2m_searchinput.html',
         ), context))
+        
         output.reverse()
+        
         return mark_safe(u''.join(output))
 
 class RelatedFieldWidgetWrapper(forms.Widget):

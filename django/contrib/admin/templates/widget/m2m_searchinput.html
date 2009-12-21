@@ -4,9 +4,15 @@
 </a>
 <script type="text/javascript">
 $(document).ready(function() {
+    $('#id_{{ name }}').val('');
     $('#id_{{ name }}').tokenInput("{{ search_path }}", {
         noResultsText: "No results found.",
-        searchingText: "Searching..."
+        searchingText: "Searching...",
+        prePopulate: [
+        {% for p in prepopulated_data %}
+          {id: {{ p.id }}, name: "{{ p.name }}"},
+        {% endfor %}
+        ]
     });
     
     $('#add_id_{{ name }}').hide();
