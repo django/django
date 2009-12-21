@@ -4,9 +4,6 @@ Django Multiple Database TODO List
 Required for v1.2
 ~~~~~~~~~~~~~~~~~
 
- * Modify the admin interface to support multiple databases (doh).
-    - Document how it is done
-
  * Resolve uses of _default_manager
     * django/contrib/databrowse/datastructures.py
     * django/contrib/databrowse/fieldchoices.py
