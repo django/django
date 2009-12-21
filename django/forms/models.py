@@ -681,6 +681,7 @@ class BaseModelFormSet(BaseFormSet):
                 qs = pk.rel.to._default_manager.get_query_set()
             else:
                 qs = self.model._default_manager.get_query_set()
+            qs = qs.using(form.instance._state.db)
             form.fields[self._pk_field.name] = ModelChoiceField(qs, initial=pk_value, required=False, widget=HiddenInput)
         super(BaseModelFormSet, self).add_fields(form, index)
 
