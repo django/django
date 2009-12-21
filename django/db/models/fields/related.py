@@ -1,7 +1,8 @@
 from django.db import connection, transaction, DEFAULT_DB_ALIAS
 from django.db.backends import util
 from django.db.models import signals, get_model
-from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist
+from django.db.models.fields import (AutoField, Field, IntegerField,
+    PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
 from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
@@ -11,10 +12,6 @@ from django.utils.functional import curry
 from django.core import exceptions
 from django import forms
 
-try:
-    set
-except NameError:
-    from sets import Set as set   # Python 2.3 fallback
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
@@ -284,11 +281,11 @@ class ReverseSingleRelatedObjectDescriptor(object):
         elif value is not None and value._state.db != instance._state.db:
             if instance._state.db is None:
                 instance._state.db = value._state.db
-            elif value._state.db is None:
+            else:#elif value._state.db is None:
                 value._state.db = instance._state.db
-            elif value._state.db is not None and instance._state.db is not None:
-                raise ValueError('Cannot assign "%r": instance is on database "%s", value is is on database "%s"' %
-                                    (value, instance._state.db, value._state.db))
+#            elif value._state.db is not None and instance._state.db is not None:
+#                raise ValueError('Cannot assign "%r": instance is on database "%s", value is is on database "%s"' %
+#                                    (value, instance._state.db, value._state.db))
 
         # If we're setting the value of a OneToOneField to None, we need to clear
         # out the cache on any old related object. Otherwise, deleting the
@@ -503,9 +500,9 @@ def create_many_related_manager(superclass, rel=False):
                 new_ids = set()
                 for obj in objs:
                     if isinstance(obj, self.model):
-                        if obj._state.db != self.instance._state.db:
-                            raise ValueError('Cannot add "%r": instance is on database "%s", value is is on database "%s"' %
-                                                (obj, self.instance._state.db, obj._state.db))
+#                        if obj._state.db != self.instance._state.db:
+#                            raise ValueError('Cannot add "%r": instance is on database "%s", value is is on database "%s"' %
+#                                                (obj, self.instance._state.db, obj._state.db))
                         new_ids.add(obj.pk)
                     elif isinstance(obj, Model):
                         raise TypeError, "'%s' instance expected" % self.model._meta.object_name
