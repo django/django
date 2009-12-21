@@ -154,13 +154,13 @@ parameters from the ``params`` list.
 
     It's tempting to write the above query as::
 
-        >>> query = 'SELECT * FROM myapp_person WHERE last_name = %s', % lname
+        >>> query = 'SELECT * FROM myapp_person WHERE last_name = %s' % lname
         >>> Person.objects.raw(query)
 
     **Don't.**
 
     Using the ``params`` list completely protects you from `SQL injection
-    attacks`__`, a common exploit where attackers inject arbitrary SQL into
+    attacks`__, a common exploit where attackers inject arbitrary SQL into
     your database. If you use string interpolation, sooner or later you'll
     fall victim to SQL injection. As long as you remember to always use the
     ``params`` list you'll be protected.
