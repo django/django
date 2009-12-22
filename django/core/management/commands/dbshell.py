@@ -16,7 +16,7 @@ class Command(BaseCommand):
     requires_model_validation = False
 
     def handle(self, **options):
-        connection = connections[options['database']]
+        connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
         try:
             connection.client.runshell()
         except OSError:

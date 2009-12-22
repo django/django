@@ -16,5 +16,5 @@ class Command(AppCommand):
     output_transaction = True
 
     def handle_app(self, app, **options):
-        connection = connections[options['database']]
+        connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
         return u'\n'.join(connection.ops.sequence_reset_sql(self.style, models.get_models(app))).encode('utf-8')

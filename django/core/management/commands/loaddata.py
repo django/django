@@ -36,7 +36,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *fixture_labels, **options):
-        using = options['database']
+        using = options.get('database', DEFAULT_DB_ALIAS)
         excluded_apps = options.get('exclude', [])
 
         connection = connections[using]

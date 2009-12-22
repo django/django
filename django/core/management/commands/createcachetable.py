@@ -18,7 +18,7 @@ class Command(LabelCommand):
     requires_model_validation = False
 
     def handle_label(self, tablename, **options):
-        alias = options['database']
+        alias = options.get('database', DEFAULT_DB_ALIAS)
         connection = connections[alias]
         fields = (
             # "key" is a reserved word in MySQL, so use "cache_key" instead.

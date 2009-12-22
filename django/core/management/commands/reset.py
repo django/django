@@ -20,7 +20,7 @@ class Command(AppCommand):
     output_transaction = True
 
     def handle_app(self, app, **options):
-        using = options['database']
+        using = options.get('database', DEFAULT_DB_ALIAS)
         connection = connections[using]
 
         app_name = app.__name__.split('.')[-2]

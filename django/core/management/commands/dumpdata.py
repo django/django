@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
         format = options.get('format','json')
         indent = options.get('indent',None)
-        using = options['database']
+        using = options.get('database', DEFAULT_DB_ALIAS)
         connection = connections[using]
         exclude = options.get('exclude',[])
         show_traceback = options.get('traceback', False)
