@@ -59,7 +59,7 @@ def sitemap(request, sitemaps, section=None):
     xml = smart_str(loader.render_to_string('gis/sitemaps/geo_sitemap.xml', {'urlset': urls}))
     return HttpResponse(xml, mimetype='application/xml')
 
-def kml(request, label, model, field_name=None, compress=False, using=None):
+def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB_ALIAS):
     """
     This view generates KML for the given app label, model, and field name.
 
@@ -103,7 +103,7 @@ def kml(request, label, model, field_name=None, compress=False, using=None):
         render = render_to_kml
     return render('gis/kml/placemarks.kml', {'places' : placemarks})
 
-def kmz(request, label, model, field_name=None, using=None):
+def kmz(request, label, model, field_name=None, using=DEFAULT_DB_ALIAS):
     """
     This view returns KMZ for the given app label, model, and field name.
     """
