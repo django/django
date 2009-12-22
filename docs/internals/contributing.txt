@@ -815,7 +815,7 @@ following is a minimal settings file that can be used to test SQLite::
         },
         'other': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'TEST_NAME: 'other_db'
+            'TEST_NAME': 'other_db'
         }
     }
 
