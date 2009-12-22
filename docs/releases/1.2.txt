@@ -318,6 +318,41 @@ For more information, see the full
 :ref:`messages documentation <ref-contrib-messages>`. You should begin to
 update your code to use the new API immediately.
 
+Date format helper functions
+----------------------------
+
+``django.utils.translation.get_date_formats()`` and
+``django.utils.translation.get_partial_date_formats()`` have been deprecated
+in favor of the appropriate calls to ``django.utils.formats.get_format()``
+which is locale aware when :setting:`USE_L10N` is set to ``True``, and falls
+back to default settings if set to ``False``.
+
+To get the different date formats, instead of writing::
+
+    from django.utils.translation import get_date_formats
+    date_format, datetime_format, time_format = get_date_formats()
+
+use::
+
+    from django.utils import formats
+
+    date_format = formats.get_format('DATE_FORMAT')
+    datetime_format = formats.get_format('DATETIME_FORMAT')
+    time_format = formats.get_format('TIME_FORMAT')
+
+or, when directly formatting a date value::
+
+    from django.utils import formats
+    value_formatted = formats.date_format(value, 'DATETIME_FORMAT')
+
+The same applies to the globals found in ``django.forms.fields``:
+
+  * ``DEFAULT_DATE_INPUT_FORMATS``
+  * ``DEFAULT_TIME_INPUT_FORMATS``
+  * ``DEFAULT_DATETIME_INPUT_FORMATS``
+
+Use ``django.utils.formats.get_format()`` to get the appropriate formats.
+
 What's new in Django 1.2
 ========================
 
@@ -440,3 +475,13 @@ The ``test`` subcommand of ``django-admin.py``, and the ``runtests.py`` script
 used to run Django's own test suite, support a new ``--failfast`` option. 
 When specified, this option causes the test runner to exit after 
 encountering a failure instead of continuing with the test run.
+
+Improved localization
+---------------------
+
+Django's :ref:`internationalization framework <topics-i18n>` has been
+expanded by locale aware formatting and form processing. That means, if
+enabled, dates and numbers on templates will be displayed using the format
+specified for the current locale. Django will also use localized formats
+when parsing data in forms.
+See :ref:`Format localization <format-localization>` for more details.

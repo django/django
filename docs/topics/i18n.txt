@@ -4,20 +4,20 @@
 Internationalization
 ====================
 
-Django has full support for internationalization of text in code and templates.
-Here's how it works.
+Django has full support for internationalization of text in code and
+templates, and format localization of dates and numbers. Here's how it works.
 
 Overview
 ========
 
 The goal of internationalization is to allow a single Web application to offer
-its content and functionality in multiple languages.
+its content and functionality in multiple languages and locales.
 
-You, the Django developer, can accomplish this goal by adding a minimal amount
-of hooks to your Python code and templates. These hooks are called
-**translation strings**. They tell Django: "This text should be translated into
-the end user's language, if a translation for this text is available in that
-language."
+For text translation, you, the Django developer, can accomplish this goal by
+adding a minimal amount of hooks to your Python code and templates. These hooks
+are called **translation strings**. They tell Django: "This text should be
+translated into the end user's language, if a translation for this text is
+available in that language."
 
 Django takes care of using these hooks to translate Web apps, on the fly,
 according to users' language preferences.
@@ -28,6 +28,12 @@ Essentially, Django does two things:
       should be translatable.
     * It uses these hooks to translate Web apps for particular users according
       to their language preferences.
+
+For format localization, it's just necessary to set
+:setting:`USE_L10N = True <USE_L10N>` in your settings file. If
+:setting:`USE_L10N` is set to ``True``, Django will display
+numbers and dates in the format of the current locale. That includes field
+representation on templates, and allowed input formats on the admin.
 
 If you don't need internationalization in your app
 ==================================================
@@ -1074,3 +1080,53 @@ have been found to not support this command. Do not attempt to use Django
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
 "xgettext.exe has generated errors and will be closed by Windows".
+
+.. _format-localization:
+
+Format localization
+===================
+
+Django's formatting system is disabled by default. To enable it, it's necessay
+to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
+
+When using Django's formatting system, dates and numbers on templates will be
+displayed using the format specified for the current locale. Two users
+accessing the same content, but in different language, will see date and
+number fields formatted in different ways, depending on the format for their
+current locale.
+
+Django will also use localized formats when parsing data in forms. That means
+Django uses different formats for different locales when guessing the format
+used by the user when inputting data on forms. Note that Django uses different
+formats for displaying data, and for parsing it.
+
+Creating custom format files
+----------------------------
+
+Django provides format definitions for many locales, but sometimes you might
+want to create your own, because a format files doesn't exist for your locale,
+or because you want to overwrite some of the values.
+
+To use custom formats, first thing to do, is to specify the path where you'll
+place format files. To do that, just set your :setting:`FORMAT_MODULE_PATH`
+setting to the the path (in the format ``'foo.bar.baz``) where format files
+will exists.
+
+Files are not placed directly in this directory, but in a directory named as
+the locale, and must be named ``formats.py``.
+
+To customize the English formats, a structure like this would be needed::
+
+    mysite/
+        formats/
+            __init__.py
+            en/
+                __init__.py
+                formats.py
+
+where :file:`formats.py` contains custom format definitions. For example::
+
+    THOUSAND_SEPARATOR = ' '
+
+to use a space as a thousand separator, instead of the default for English,
+a comma.

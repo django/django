@@ -1,10 +1,12 @@
+import os
+import gettext as gettext_module
+
 from django import http
 from django.conf import settings
 from django.utils import importlib
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
-import os
-import gettext as gettext_module
+from django.utils.formats import get_format_modules
 
 def set_language(request):
     """
@@ -31,6 +33,24 @@ def set_language(request):
             else:
                 response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
     return response
+
+def get_formats():
+    """
+    Returns an iterator over all formats in formats file
+    """
+    FORMAT_SETTINGS = ('DATE_FORMAT', 'DATETIME_FORMAT', 'TIME_FORMAT',
+        'YEAR_MONTH_FORMAT', 'MONTH_DAY_FORMAT', 'SHORT_DATE_FORMAT',
+        'SHORT_DATETIME_FORMAT', 'FIRST_DAY_OF_WEEK', 'DECIMAL_SEPARATOR',
+        'THOUSAND_SEPARATOR', 'NUMBER_GROUPING')
+
+    result = {}
+    for module in [settings] + get_format_modules():
+        for attr in FORMAT_SETTINGS:
+            try:
+                result[attr] = getattr(module, attr)
+            except AttributeError:
+                pass
+    return result
 
 NullSource = """
 /* gettext identity library */
@@ -185,10 +205,13 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         else:
             raise TypeError, k
     csrc.sort()
-    for k,v in pdict.items():
+    for k, v in pdict.items():
         src.append("catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))
+    for k, v in get_formats().items():
+        src.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(unicode(v))))
     src.extend(csrc)
     src.append(LibFoot)
     src.append(InterPolate)
     src = ''.join(src)
     return http.HttpResponse(src, 'text/javascript')
+

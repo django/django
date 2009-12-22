@@ -372,12 +372,32 @@ DATE_FORMAT
 
 Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 
-The default formatting to use for date fields on Django admin change-list
-pages -- and, possibly, by other parts of the system. See
-:ttag:`allowed date format strings <now>`.
+The default formatting to use for date fields in any part of the system.
+Note that if ``USE_L10N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
 
-See also ``DATETIME_FORMAT``, ``TIME_FORMAT``, ``YEAR_MONTH_FORMAT``
-and ``MONTH_DAY_FORMAT``.
+See also ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATE_FORMAT``.
+
+.. setting:: DATE_INPUT_FORMATS
+
+DATE_INPUT_FORMATS
+------------------
+
+Default::
+
+    ('%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', '%b %d %Y',
+    '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
+    '%B %d, %Y', '%d %B %Y', '%d %B, %Y')
+
+A tuple of formats that will be accepted when inputting data on a date
+field. Formats will be tried in order, using the first valid.
+Note that these format strings are specified in Python's datetime_ module
+syntax, that is different from the one used by Django for formatting dates
+to be displayed.
+
+See also ``DATETIME_INPUT_FORMATS`` and ``TIME_INPUT_FORMATS``.
+
+.. _datetime: http://docs.python.org/library/datetime.html#strftime-behavior
 
 .. setting:: DATETIME_FORMAT
 
@@ -386,12 +406,32 @@ DATETIME_FORMAT
 
 Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 
-The default formatting to use for datetime fields on Django admin change-list
-pages -- and, possibly, by other parts of the system. See
-:ttag:`allowed date format strings <now>`.
+The default formatting to use for datetime fields in any part of the system.
+Note that if ``USE_L10N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
 
-See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
-``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
+See also ``DATE_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
+
+.. setting:: DATETIME_INPUT_FORMATS
+
+DATETIME_INPUT_FORMATS
+----------------------
+
+Default::
+
+    ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d',
+    '%m/%d/%Y %H:%M:%S', '%m/%d/%Y %H:%M', '%m/%d/%Y',
+    '%m/%d/%y %H:%M:%S', '%m/%d/%y %H:%M', '%m/%d/%y')
+
+A tuple of formats that will be accepted when inputting data on a datetime
+field. Formats will be tried in order, using the first valid.
+Note that these format strings are specified in Python's datetime_ module
+syntax, that is different from the one used by Django for formatting dates
+to be displayed.
+
+See also ``DATE_INPUT_FORMATS`` and ``TIME_INPUT_FORMATS``.
+
+.. _datetime: http://docs.python.org/library/datetime.html#strftime-behavior
 
 .. setting:: DEBUG
 
@@ -431,6 +471,14 @@ will be suppressed, and exceptions will propagate upwards.  This can
 be useful for some test setups, and should never be used on a live
 site.
 
+.. setting:: DECIMAL_SEPARATOR
+
+DECIMAL_SEPARATOR
+-----------------
+
+Default: ``'.'`` (Dot)
+
+Default decimal separator used when formatting decimal numbers.
 
 .. setting:: DEFAULT_CHARSET
 
@@ -680,6 +728,21 @@ system's standard umask.
 
 .. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html
 
+.. setting:: FIRST_DAY_OF_WEEK
+
+FIRST_DAY_OF_WEEK
+-----------------
+
+Default: ``0`` (Sunday)
+
+Number representing the first day of the week. This is especially useful
+when displaying a calendar. This value is only used when not using
+format internationalization, or when a format cannot be found for the
+current locale.
+
+The value must be an integer from 0 to 6, where 0 means Sunday, 1 means
+Monday and so on.
+
 .. setting:: FIXTURE_DIRS
 
 FIXTURE_DIRS
@@ -700,6 +763,34 @@ If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
 environment variable in any HTTP request. This setting can be used to override
 the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
 of the preferred value or not supplied at all.
+
+.. setting:: FORMAT_MODULE_PATH
+
+FORMAT_MODULE_PATH
+------------------
+
+Default: ``None``
+
+A full Python path to a Python package that contains format definitions for
+project locales. If not ``None``, Django will check for a ``formats.py``
+file, under the directory named as the current locale, and will use the
+formats defined on this file.
+
+For example, if ``FORMAT_MODULE_PATH`` is set to ``mysite.formats``, and
+current language is ``en`` (English), Django will expect a directory tree
+like::
+
+    mysite/
+        formats/
+            __init__.py
+            en/
+                __init__.py
+                formats.py
+
+Available formats are ``DATE_FORMAT``, ``TIME_FORMAT``, ``DATETIME_FORMAT``,
+``YEAR_MONTH_FORMAT``, ``MONTH_DAY_FORMAT``, ``SHORT_DATE_FORMAT``,
+``SHORT_DATETIME_FORMAT``, ``FIRST_DAY_OF_WEEK``, ``DECIMAL_SEPARATOR``,
+``THOUSAND_SEPARATOR`` and ``NUMBER_GROUPING``.
 
 .. setting:: IGNORABLE_404_ENDS
 
@@ -845,7 +936,7 @@ LOGIN_URL
 
 Default: ``'/accounts/login/'``
 
-The URL where requests are redirected for login, specially when using the
+The URL where requests are redirected for login, especially when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator.
 
 .. setting:: LOGOUT_URL
@@ -969,6 +1060,21 @@ locales have different formats. For example, U.S. English would say
 
 See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
 ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``YEAR_MONTH_FORMAT``.
+
+.. setting:: NUMBER_GROUPING
+
+NUMBER_GROUPING
+----------------
+
+Default: ``0``
+
+Number of digits grouped together on the integer part of a number. Common use
+is to display a thousand separator. If this setting is ``0``, then, no grouping
+will be applied to the number. If this setting is greater than ``0`` then the
+setting ``THOUSAND_SEPARATOR`` will be used as the separator between those
+groups.
+
+See also ``THOUSAND_SEPARATOR``
 
 .. setting:: PREPEND_WWW
 
@@ -1173,6 +1279,32 @@ Default: ``False``
 Whether to save the session data on every request. See
 :ref:`topics-http-sessions`.
 
+.. setting:: SHORT_DATE_FORMAT
+
+SHORT_DATE_FORMAT
+-----------------
+
+Default: ``m/d/Y`` (e.g. ``12/31/2003``)
+
+An available formatting that can be used for date fields on templates.
+Note that if ``USE_L10N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
+
+See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
+
+.. setting:: SHORT_DATETIME_FORMAT
+
+SHORT_DATETIME_FORMAT
+---------------------
+
+Default: ``m/d/Y P`` (e.g. ``12/31/2003 4 p.m.``)
+
+An available formatting that can be used for datetime fields on templates.
+Note that if ``USE_L10N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
+
+See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
+
 .. setting:: SITE_ID
 
 SITE_ID
@@ -1277,6 +1409,18 @@ The name of the method to use for starting the test suite. See
 
 .. _Testing Django Applications: ../testing/
 
+.. setting:: THOUSAND_SEPARATOR
+
+THOUSAND_SEPARATOR
+------------------
+
+Default ``,`` (Comma)
+
+Default thousand separator used when formatting numbers. This setting is
+used only when ``NUMBER_GROUPPING`` is set.
+
+See also ``NUMBER_GROUPPING``, ``DECIMAL_SEPARATOR``
+
 .. setting:: TIME_FORMAT
 
 TIME_FORMAT
@@ -1284,12 +1428,28 @@ TIME_FORMAT
 
 Default: ``'P'`` (e.g. ``4 p.m.``)
 
-The default formatting to use for time fields on Django admin change-list
-pages -- and, possibly, by other parts of the system. See
-:ttag:`allowed date format strings <now>`.
+The default formatting to use for time fields in any part of the system.
+Note that if ``USE_L10N`` is set to ``True``, then locale format will
+be applied. See :ttag:`allowed date format strings <now>`.
 
-See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
-``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
+See also ``DATE_FORMAT`` and ``DATETIME_FORMAT``.
+
+.. setting:: TIME_INPUT_FORMATS
+
+TIME_INPUT_FORMATS
+------------------
+
+Default: ``('%H:%M:%S', '%H:%M')``
+
+A tuple of formats that will be accepted when inputting data on a time
+field. Formats will be tried in order, using the first valid.
+Note that these format strings are specified in Python's datetime_ module
+syntax, that is different from the one used by Django for formatting dates
+to be displayed.
+
+See also ``DATE_INPUT_FORMATS`` and ``DATETIME_INPUT_FORMATS``.
+
+.. _datetime: http://docs.python.org/library/datetime.html#strftime-behavior
 
 .. setting:: TIME_ZONE
 
@@ -1344,6 +1504,19 @@ A boolean that specifies whether to output the "Etag" header. This saves
 bandwidth but slows down performance. This is only used if ``CommonMiddleware``
 is installed (see :ref:`topics-http-middleware`).
 
+.. setting:: USE_L10N
+
+USE_L10N
+--------
+
+Default ``False``
+
+A boolean that specifies if data will be localized by default or not. If this
+is set to ``True``, e.g. Django will display numbers and dates using the
+format of the current locale.
+
+See also ``USE_I18N`` and ``LANGUAGE_CODE``
+
 .. setting:: USE_I18N
 
 USE_I18N
@@ -1355,6 +1528,22 @@ A boolean that specifies whether Django's internationalization system should be
 enabled. This provides an easy way to turn it off, for performance. If this is
 set to ``False``, Django will make some optimizations so as not to load the
 internationalization machinery.
+
+See also ``USE_L10N``
+
+.. setting:: USE_THOUSAND_SEPARATOR
+
+USE_THOUSAND_SEPARATOR
+----------------------
+
+Default ``False``
+
+A boolean that specifies wheter to display numbers using a thousand separator.
+If this is set to ``True``, Django will use values from ``THOUSAND_SEPARATOR``
+and ``NUMBER_GROUPING`` from current locale, to format the number.
+``USE_L10N`` must be set to ``True``, in order to format numbers.
+
+See also ``THOUSAND_SEPARATOR`` and ``NUMBER_GROUPING``.
 
 .. setting:: YEAR_MONTH_FORMAT
 

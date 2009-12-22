@@ -18,6 +18,7 @@ from django.conf import settings
 from django.utils.translation import ugettext, ungettext
 from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils.safestring import mark_safe, SafeData
+from django.utils.formats import date_format, number_format
 
 register = Library()
 
@@ -166,14 +167,14 @@ def floatformat(text, arg=-1):
         return input_val
 
     if not m and p < 0:
-        return mark_safe(u'%d' % (int(d)))
+        return mark_safe(number_format(u'%d' % (int(d)), 0))
 
     if p == 0:
         exp = Decimal(1)
     else:
         exp = Decimal('1.0') / (Decimal(10) ** abs(p))
     try:
-        return mark_safe(u'%s' % str(d.quantize(exp, ROUND_HALF_UP)))
+        return mark_safe(number_format(u'%s' % str(d.quantize(exp, ROUND_HALF_UP)), abs(p)))
     except InvalidOperation:
         return input_val
 floatformat.is_safe = True
@@ -685,9 +686,12 @@ def date(value, arg=None):
     if arg is None:
         arg = settings.DATE_FORMAT
     try:
-        return format(value, arg)
+        return date_format(value, arg)
     except AttributeError:
-        return ''
+        try:
+            return format(value, arg)
+        except AttributeError:
+            return ''
 date.is_safe = False
 
 def time(value, arg=None):
@@ -698,9 +702,12 @@ def time(value, arg=None):
     if arg is None:
         arg = settings.TIME_FORMAT
     try:
-        return time_format(value, arg)
+        return date_format(value, arg)
     except AttributeError:
-        return ''
+        try:
+            return time_format(value, arg)
+        except AttributeError:
+            return ''
 time.is_safe = False
 
 def timesince(value, arg=None):

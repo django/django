@@ -60,6 +60,7 @@ from django.utils.text import smart_split, unescape_string_literal
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.translation import ugettext as _
 from django.utils.safestring import SafeData, EscapeData, mark_safe, mark_for_escaping
+from django.utils.formats import localize
 from django.utils.html import escape
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
@@ -815,6 +816,7 @@ def _render_value_in_context(value, context):
     means escaping, if required, and conversion to a unicode object. If value
     is a string, it is expected to have already been translated.
     """
+    value = localize(value)
     value = force_unicode(value)
     if (context.autoescape and not isinstance(value, SafeData)) or isinstance(value, EscapeData):
         return escape(value)

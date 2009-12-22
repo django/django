@@ -10,6 +10,7 @@ from django.utils.html import escape, conditional_escape
 from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
+from django.utils.formats import localize
 from django.utils import datetime_safe
 from datetime import time
 from util import flatatt
@@ -208,7 +209,7 @@ class Input(Widget):
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_unicode(value)
+            final_attrs['value'] = force_unicode(localize(value, is_input=True))
         return mark_safe(u'<input%s />' % flatatt(final_attrs))
 
 class TextInput(Input):

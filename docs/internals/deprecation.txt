@@ -62,6 +62,18 @@ their deprecation, as per the :ref:`Django deprecation policy
           backwards compatibility. These have been deprecated since the 1.2
           release.
 
+        * ``django.utils.translation.get_date_formats()`` and
+          ``django.utils.translation.get_partial_date_formats()``. These
+          functions are replaced by the new locale aware formatting; use
+          ``django.utils.formats.get_format()`` to get the appropriate
+          formats.
+
+        * In ``django.forms.fields``: ``DEFAULT_DATE_INPUT_FORMATS``,
+          ``DEFAULT_TIME_INPUT_FORMATS`` and
+          ``DEFAULT_DATETIME_INPUT_FORMATS``. Use
+          ``django.utils.formats.get_format()`` to get the appropriate
+          formats.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the

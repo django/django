@@ -7,6 +7,7 @@ import os
 import re
 import time
 import urlparse
+import warnings
 from decimal import Decimal, DecimalException
 try:
     from cStringIO import StringIO
@@ -17,6 +18,7 @@ import django.core.exceptions
 import django.utils.copycompat as copy
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
+from django.utils.formats import get_format
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget
@@ -36,6 +38,20 @@ __all__ = (
 # These values, if given to to_python(), will trigger the self.required check.
 EMPTY_VALUES = (None, '')
 
+def en_format(name):
+    """
+    Helper function to stay backward compatible.
+    """
+    from django.conf.locale.en import formats
+    warnings.warn(
+        "`django.forms.fields.DEFAULT_%s` is deprecated; use `django.utils.formats.get_format('%s')` instead." % (name, name),
+        PendingDeprecationWarning
+    )
+    return getattr(formats, name)
+
+DEFAULT_DATE_INPUT_FORMATS = en_format('DATE_INPUT_FORMATS')
+DEFAULT_TIME_INPUT_FORMATS = en_format('TIME_INPUT_FORMATS')
+DEFAULT_DATETIME_INPUT_FORMATS = en_format('DATETIME_INPUT_FORMATS')
 
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
@@ -200,7 +216,9 @@ class FloatField(Field):
         if not self.required and value in EMPTY_VALUES:
             return None
         try:
-            value = float(value)
+            # We always accept dot as decimal separator
+            if isinstance(value, str) or isinstance(value, unicode):
+                value = float(value.replace(get_format('DECIMAL_SEPARATOR'), '.'))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'])
         if self.max_value is not None and value > self.max_value:
@@ -236,7 +254,9 @@ class DecimalField(Field):
             return None
         value = smart_str(value).strip()
         try:
-            value = Decimal(value)
+            # We always accept dot as decimal separator
+            if isinstance(value, str) or isinstance(value, unicode):
+                value = Decimal(value.replace(get_format('DECIMAL_SEPARATOR'), '.'))
         except DecimalException:
             raise ValidationError(self.error_messages['invalid'])
 
@@ -264,14 +284,6 @@ class DecimalField(Field):
             raise ValidationError(self.error_messages['max_whole_digits'] % (self.max_digits - self.decimal_places))
         return value
 
-DEFAULT_DATE_INPUT_FORMATS = (
-    '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
-    '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
-    '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
-    '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
-    '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
-)
-
 class DateField(Field):
     widget = DateInput
     default_error_messages = {
@@ -280,7 +292,7 @@ class DateField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or DEFAULT_DATE_INPUT_FORMATS
+        self.input_formats = input_formats
 
     def clean(self, value):
         """
@@ -294,17 +306,12 @@ class DateField(Field):
             return value.date()
         if isinstance(value, datetime.date):
             return value
-        for format in self.input_formats:
+        for format in self.input_formats or get_format('DATE_INPUT_FORMATS'):
             try:
                 return datetime.date(*time.strptime(value, format)[:3])
             except ValueError:
                 continue
         raise ValidationError(self.error_messages['invalid'])
-
-DEFAULT_TIME_INPUT_FORMATS = (
-    '%H:%M:%S',     # '14:30:59'
-    '%H:%M',        # '14:30'
-)
 
 class TimeField(Field):
     widget = TimeInput
@@ -314,7 +321,7 @@ class TimeField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(TimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or DEFAULT_TIME_INPUT_FORMATS
+        self.input_formats = input_formats
 
     def clean(self, value):
         """
@@ -326,24 +333,12 @@ class TimeField(Field):
             return None
         if isinstance(value, datetime.time):
             return value
-        for format in self.input_formats:
+        for format in self.input_formats or get_format('TIME_INPUT_FORMATS'):
             try:
                 return datetime.time(*time.strptime(value, format)[3:6])
             except ValueError:
                 continue
         raise ValidationError(self.error_messages['invalid'])
-
-DEFAULT_DATETIME_INPUT_FORMATS = (
-    '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
-    '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
-    '%Y-%m-%d',              # '2006-10-25'
-    '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
-    '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
-    '%m/%d/%Y',              # '10/25/2006'
-    '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
-    '%m/%d/%y %H:%M',        # '10/25/06 14:30'
-    '%m/%d/%y',              # '10/25/06'
-)
 
 class DateTimeField(Field):
     widget = DateTimeInput
@@ -353,7 +348,7 @@ class DateTimeField(Field):
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateTimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats or DEFAULT_DATETIME_INPUT_FORMATS
+        self.input_formats = input_formats
 
     def clean(self, value):
         """
@@ -373,7 +368,7 @@ class DateTimeField(Field):
             if len(value) != 2:
                 raise ValidationError(self.error_messages['invalid'])
             value = '%s %s' % tuple(value)
-        for format in self.input_formats:
+        for format in self.input_formats or get_format('DATETIME_INPUT_FORMATS'):
             try:
                 return datetime.datetime(*time.strptime(value, format)[:6])
             except ValueError:

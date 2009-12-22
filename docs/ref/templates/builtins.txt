@@ -1047,7 +1047,12 @@ If ``value`` is ``"String with spaces"``, the output will be ``"Stringwithspaces
 date
 ~~~~
 
-Formats a date according to the given format (same as the `now`_ tag).
+Formats a date according to the given format.
+
+Given format can be one of the predefined ones ``DATE_FORMAT``,
+``DATETIME_FORMAT``, ``SHORT_DATE_FORMAT`` or ``SHORT_DATETIME_FORMAT``,
+or a custom format, same as the `now`_ tag. Note that predefined formats may
+vary depending on the current locale.
 
 For example::
 
@@ -1062,7 +1067,7 @@ When used without a format string::
     {{ value|date }}
 
 ...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
-used.
+used, without applying any localization.
 
 .. templatefilter:: default
 
@@ -1610,7 +1615,11 @@ output will be ``"Joel is a slug"``.
 time
 ~~~~
 
-Formats a time according to the given format (same as the `now`_ tag).
+Formats a time according to the given format.
+
+Given format can be the predefined one ``TIME_FORMAT``, or a custom format,
+same as the `now`_ tag. Note that the predefined format is locale depending.
+
 The time filter will only accept parameters in the format string that relate
 to the time of day, not the date (for obvious reasons). If you need to
 format a date, use the `date`_ filter.
@@ -1627,7 +1636,7 @@ When used without a format string::
     {{ value|time }}
 
 ...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
-used.
+used, without aplying any localization.
 
 .. templatefilter:: timesince
 

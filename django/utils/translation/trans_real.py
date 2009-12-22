@@ -4,6 +4,7 @@ import locale
 import os
 import re
 import sys
+import warnings
 import gettext as gettext_module
 from cStringIO import StringIO
 
@@ -266,15 +267,16 @@ def do_translate(message, translation_function):
     translation object to use. If no current translation is activated, the
     message will be run through the default translation object.
     """
+    eol_message = message.replace('\r\n', '\n').replace('\r', '\n')
     global _default, _active
     t = _active.get(currentThread(), None)
     if t is not None:
-        result = getattr(t, translation_function)(message)
+        result = getattr(t, translation_function)(eol_message)
     else:
         if _default is None:
             from django.conf import settings
             _default = translation(settings.LANGUAGE_CODE)
-        result = getattr(_default, translation_function)(message)
+        result = getattr(_default, translation_function)(eol_message)
     if isinstance(message, SafeData):
         return mark_safe(result)
     return result
@@ -388,39 +390,6 @@ def get_language_from_request(request):
                 return lang
 
     return settings.LANGUAGE_CODE
-
-def get_date_formats():
-    """
-    Checks whether translation files provide a translation for some technical
-    message ID to store date and time formats. If it doesn't contain one, the
-    formats provided in the settings will be used.
-    """
-    from django.conf import settings
-    date_format = ugettext('DATE_FORMAT')
-    datetime_format = ugettext('DATETIME_FORMAT')
-    time_format = ugettext('TIME_FORMAT')
-    if date_format == 'DATE_FORMAT':
-        date_format = settings.DATE_FORMAT
-    if datetime_format == 'DATETIME_FORMAT':
-        datetime_format = settings.DATETIME_FORMAT
-    if time_format == 'TIME_FORMAT':
-        time_format = settings.TIME_FORMAT
-    return date_format, datetime_format, time_format
-
-def get_partial_date_formats():
-    """
-    Checks whether translation files provide a translation for some technical
-    message ID to store partial date formats. If it doesn't contain one, the
-    formats provided in the settings will be used.
-    """
-    from django.conf import settings
-    year_month_format = ugettext('YEAR_MONTH_FORMAT')
-    month_day_format = ugettext('MONTH_DAY_FORMAT')
-    if year_month_format == 'YEAR_MONTH_FORMAT':
-        year_month_format = settings.YEAR_MONTH_FORMAT
-    if month_day_format == 'MONTH_DAY_FORMAT':
-        month_day_format = settings.MONTH_DAY_FORMAT
-    return year_month_format, month_day_format
 
 dot_re = re.compile(r'\S')
 def blankout(src, char):
@@ -537,3 +506,52 @@ def parse_accept_lang_header(lang_string):
         result.append((lang, priority))
     result.sort(lambda x, y: -cmp(x[1], y[1]))
     return result
+
+# get_date_formats and get_partial_date_formats aren't used anymore by Django
+# and are kept for backward compatibility.
+# Note, it's also important to keep format names marked for translation.
+# For compatibility we still want to have formats on translation catalogs.
+# That makes template code like {{ my_date|date:_('DATE_FORMAT') }} still work
+def get_date_formats():
+    """
+    Checks whether translation files provide a translation for some technical
+    message ID to store date and time formats. If it doesn't contain one, the
+    formats provided in the settings will be used.
+    """
+    warnings.warn(
+        '`django.utils.translation.get_date_formats` is deprecated. '
+        'Please update your code to use the new i18n aware formatting.',
+        PendingDeprecationWarning
+    )
+    from django.conf import settings
+    date_format = ugettext('DATE_FORMAT')
+    datetime_format = ugettext('DATETIME_FORMAT')
+    time_format = ugettext('TIME_FORMAT')
+    if date_format == 'DATE_FORMAT':
+        date_format = settings.DATE_FORMAT
+    if datetime_format == 'DATETIME_FORMAT':
+        datetime_format = settings.DATETIME_FORMAT
+    if time_format == 'TIME_FORMAT':
+        time_format = settings.TIME_FORMAT
+    return date_format, datetime_format, time_format
+
+def get_partial_date_formats():
+    """
+    Checks whether translation files provide a translation for some technical
+    message ID to store partial date formats. If it doesn't contain one, the
+    formats provided in the settings will be used.
+    """
+    warnings.warn(
+        '`django.utils.translation.get_partial_date_formats` is deprecated. '
+        'Please update your code to use the new i18n aware formatting.',
+        PendingDeprecationWarning
+    )
+    from django.conf import settings
+    year_month_format = ugettext('YEAR_MONTH_FORMAT')
+    month_day_format = ugettext('MONTH_DAY_FORMAT')
+    if year_month_format == 'YEAR_MONTH_FORMAT':
+        year_month_format = settings.YEAR_MONTH_FORMAT
+    if month_day_format == 'MONTH_DAY_FORMAT':
+        month_day_format = settings.MONTH_DAY_FORMAT
+    return year_month_format, month_day_format
+
