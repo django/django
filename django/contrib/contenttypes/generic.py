@@ -205,6 +205,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
             content_type_field_name = self.field.content_type_field_name,
             object_id_field_name = self.field.object_id_field_name
         )
+
         return manager
 
     def __set__(self, instance, value):

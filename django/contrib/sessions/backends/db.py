@@ -58,7 +58,6 @@ class SessionStore(SessionBase):
             session_data = self.encode(self._get_session(no_load=must_create)),
             expire_date = self.get_expiry_date()
         )
-        # TODO update for multidb
         sid = transaction.savepoint(using=self.using)
         try:
             obj.save(force_insert=must_create)

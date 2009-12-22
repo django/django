@@ -30,3 +30,4 @@ class PhoneNumberField(Field):
         defaults = {'form_class': USPhoneNumberField}
         defaults.update(kwargs)
         return super(PhoneNumberField, self).formfield(**defaults)
+
