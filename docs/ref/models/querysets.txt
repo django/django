@@ -1037,7 +1037,8 @@ Example::
 
 ``count()`` performs a ``SELECT COUNT(*)`` behind the scenes, so you should
 always use ``count()`` rather than loading all of the record into Python
-objects and calling ``len()`` on the result.
+objects and calling ``len()`` on the result (unless you need to load the
+objects into memory anyway, in which case ``len()`` will be faster).
 
 Depending on which database you're using (e.g. PostgreSQL vs. MySQL),
 ``count()`` may return a long integer instead of a normal Python integer. This
@@ -1140,8 +1141,11 @@ Aggregation <topics-db-aggregation>`.
 Returns ``True`` if the :class:`QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way
 possible, but it *does* execute nearly the same query. This means that calling
-:meth:`QuerySet.exists()` is faster that ``bool(some_query_set)``, but not by
-a large degree.
+:meth:`QuerySet.exists()` is faster than ``bool(some_query_set)``, but not by
+a large degree.  If ``some_query_set`` has not yet been evaluated, but you know
+that it will be at some point, then using ``some_query_set.exists()`` will do
+more overall work (an additional query) than simply using
+``bool(some_query_set)``.
 
 Field lookups
 -------------
