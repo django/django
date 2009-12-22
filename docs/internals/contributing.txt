@@ -451,7 +451,7 @@ will not work. (Internally, ``setttings`` is a ``LazyObject`` which configures
 itself automatically when the settings are accessed if it has not already been
 configured).
 
-So, if there is a module containg some code as follows::
+So, if there is a module containing some code as follows::
 
     from django.conf import settings
     from django.core.urlresolvers import get_callable
