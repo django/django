@@ -67,6 +67,7 @@ class BaseModelAdmin(object):
     radio_fields = {}
     prepopulated_fields = {}
     formfield_overrides = {}
+    readonly_fields = ()
 
     def __init__(self):
         self.formfield_overrides = dict(FORMFIELD_FOR_DBFIELD_DEFAULTS, **self.formfield_overrides)
@@ -177,6 +178,9 @@ class BaseModelAdmin(object):
             return [(None, {'fields': self.fields})]
         return None
     declared_fieldsets = property(_declared_fieldsets)
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.readonly_fields
 
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
@@ -327,7 +331,8 @@ class ModelAdmin(BaseModelAdmin):
         if self.declared_fieldsets:
             return self.declared_fieldsets
         form = self.get_form(request, obj)
-        return [(None, {'fields': form.base_fields.keys()})]
+        fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
+        return [(None, {'fields': fields})]
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -342,12 +347,15 @@ class ModelAdmin(BaseModelAdmin):
             exclude = []
         else:
             exclude = list(self.exclude)
+        exclude.extend(kwargs.get("exclude", []))
+        exclude.extend(self.get_readonly_fields(request, obj))
         # if exclude is an empty list we pass None to be consistant with the
         # default on modelform_factory
+        exclude = exclude or None
         defaults = {
             "form": self.form,
             "fields": fields,
-            "exclude": (exclude + kwargs.get("exclude", [])) or None,
+            "exclude": exclude,
             "formfield_callback": curry(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
@@ -782,13 +790,17 @@ class ModelAdmin(BaseModelAdmin):
                                   queryset=inline.queryset(request))
                 formsets.append(formset)
 
-        adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)), self.prepopulated_fields)
+        adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
+            self.prepopulated_fields, self.get_readonly_fields(request),
+            model_admin=self)
         media = self.media + adminForm.media
 
         inline_admin_formsets = []
         for inline, formset in zip(self.inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request))
-            inline_admin_formset = helpers.InlineAdminFormSet(inline, formset, fieldsets)
+            readonly = list(inline.get_readonly_fields(request))
+            inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
+                fieldsets, readonly, model_admin=self)
             inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
 
@@ -875,13 +887,17 @@ class ModelAdmin(BaseModelAdmin):
                                   queryset=inline.queryset(request))
                 formsets.append(formset)
 
-        adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj), self.prepopulated_fields)
+        adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj),
+            self.prepopulated_fields, self.get_readonly_fields(request, obj),
+            model_admin=self)
         media = self.media + adminForm.media
 
         inline_admin_formsets = []
         for inline, formset in zip(self.inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
-            inline_admin_formset = helpers.InlineAdminFormSet(inline, formset, fieldsets)
+            readonly = list(inline.get_readonly_fields(request, obj))
+            inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
+                fieldsets, readonly, model_admin=self)
             inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
 
@@ -1174,14 +1190,17 @@ class InlineModelAdmin(BaseModelAdmin):
             exclude = []
         else:
             exclude = list(self.exclude)
+        exclude.extend(kwargs.get("exclude", []))
+        exclude.extend(self.get_readonly_fields(request, obj))
         # if exclude is an empty list we use None, since that's the actual
         # default
+        exclude = exclude or None
         defaults = {
             "form": self.form,
             "formset": self.formset,
             "fk_name": self.fk_name,
             "fields": fields,
-            "exclude": (exclude + kwargs.get("exclude", [])) or None,
+            "exclude": exclude,
             "formfield_callback": curry(self.formfield_for_dbfield, request=request),
             "extra": self.extra,
             "max_num": self.max_num,
@@ -1193,7 +1212,8 @@ class InlineModelAdmin(BaseModelAdmin):
         if self.declared_fieldsets:
             return self.declared_fieldsets
         form = self.get_formset(request).form
-        return [(None, {'fields': form.base_fields.keys()})]
+        fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
+        return [(None, {'fields': fields})]
 
     def queryset(self, request):
         return self.model._default_manager.all()

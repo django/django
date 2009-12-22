@@ -172,6 +172,11 @@ The ``field_options`` dictionary can have the following keys:
             'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
             }
 
+        .. versionadded:: 1.2
+
+        ``fields`` can contain values defined in
+        :attr:`ModelAdmin.readonly_fields` to be displayed as read-only.
+
     * ``classes``
         A list containing extra CSS classes to apply to the fieldset.
 
@@ -209,6 +214,11 @@ the ``django.contrib.flatpages.FlatPage`` model as follows::
 
 In the above example, only the fields 'url', 'title' and 'content' will be
 displayed, sequentially, in the form.
+
+.. versionadded:: 1.2
+
+``fields`` can contain values defined in :attr:`ModelAdmin.readonly_fields`
+to be displayed as read-only.
 
 .. admonition:: Note
 
@@ -540,6 +550,21 @@ into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
     class ArticleAdmin(admin.ModelAdmin):
         raw_id_fields = ("newspaper",)
 
+.. attribute:: ModelAdmin.readonly_fields
+
+.. versionadded:: 1.2
+
+By default the admin shows all fields as editable. Any fields in this option
+(which should be a ``list`` or ``tuple``) will display its data as-is and
+non-editable. This option behaves nearly identical to :attr:`ModelAdmin.list_display`.
+Usage is the same, however, when you specify :attr:`ModelAdmin.fields` or
+:attr:`ModelAdmin.fieldsets` the read-only fields must be present to be shown
+(they are ignored otherwise).
+
+If ``readonly_fields`` is used without defining explicit ordering through
+:attr:`ModelAdmin.fields` or :attr:`ModelAdmin.fieldsets` they will be added
+last after all editable fields.
+
 .. attribute:: ModelAdmin.save_as
 
 Set ``save_as`` to enable a "save as" feature on admin change forms.
@@ -743,6 +768,15 @@ model instance::
                 instance.user = request.user
                 instance.save()
             formset.save_m2m()
+
+.. method:: ModelAdmin.get_readonly_fields(self, request, obj=None)
+
+.. versionadded:: 1.2
+
+The ``get_readonly_fields`` method is given the ``HttpRequest`` and the
+``obj`` being edited (or ``None`` on an add form) and is expected to return a
+``list`` or ``tuple`` of field names that will be displayed as read-only, as
+described above in the :attr:`ModelAdmin.readonly_fields` section.
 
 .. method:: ModelAdmin.get_urls(self)
 

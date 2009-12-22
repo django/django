@@ -485,3 +485,10 @@ enabled, dates and numbers on templates will be displayed using the format
 specified for the current locale. Django will also use localized formats
 when parsing data in forms.
 See :ref:`Format localization <format-localization>` for more details.
+
+Added ``readonly_fields`` to ``ModelAdmin``
+-------------------------------------------
+
+:attr:`django.contrib.admin.ModelAdmin.readonly_fields` has been added to
+enable non-editable fields in add/change pages for models and inlines. Field
+and calculated values can be displayed along side editable fields.
