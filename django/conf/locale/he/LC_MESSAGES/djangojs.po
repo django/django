@@ -2,19 +2,19 @@
 # Copyright (C) 2006 THE djangojs'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the djangojs package.
 # Meir Kriheli <meir@mksoft.co.il>, 2006.
-# 
-# 
+#
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-06 13:08+0300\n"
+"POT-Creation-Date: 2009-12-22 20:43+0100\n"
 "PO-Revision-Date: 2007-05-06 13:08+0300\n"
 "Last-Translator: Meir Kriheli <meir@mksoft.co.il>\n"
 "Language-Team: Hebrew\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -57,6 +57,10 @@ msgstr ""
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
 msgstr "ר ש ש ר ח ש ש"
+
+#: contrib/admin/media/js/calendar.js:26
+msgid "FIRST_DAY_OF_WEEK"
+msgstr ""
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
@@ -117,4 +121,3 @@ msgstr "אתמול"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "מחר"
-
