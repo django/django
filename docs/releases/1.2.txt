@@ -428,15 +428,15 @@ alternative to the normal primary-key based object references in a
 fixture, improving readability, and resolving problems referring to
 objects whose primary key value may not be predictable or known.
 
-`BigIntegerField`
------------------
+``BigIntegerField``
+-------------------
 
 Models can now use a 64 bit :class:`~django.db.models.BigIntegerField` type.
 
 Fast Failure for Tests
 ----------------------
 
-The `test` subcommand of `django-admin.py`, and the `runtests.py` script
-used to run Django's own test suite, support a new `--failfast` option. 
+The ``test`` subcommand of ``django-admin.py``, and the ``runtests.py`` script
+used to run Django's own test suite, support a new ``--failfast`` option. 
 When specified, this option causes the test runner to exit after 
 encountering a failure instead of continuing with the test run.
