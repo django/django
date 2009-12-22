@@ -290,6 +290,9 @@ Custom database types
 
 .. method:: db_type(self, connection)
 
+.. versionadded:: 1.2
+   The ``connection`` argument was added to support multiple databases.
+
 Returns the database column data type for the :class:`~django.db.models.Field`,
 taking into account the connection object, and the settings associated with it.
 
@@ -426,6 +429,9 @@ Converting Python objects to query values
 
 .. method:: get_prep_value(self, value)
 
+.. versionadded:: 1.2
+   This method was factored out of ``get_db_prep_value()``
+
 This is the reverse of :meth:`to_python` when working with the
 database backends (as opposed to serialization). The ``value``
 parameter is the current value of the model's attribute (a field has
@@ -451,6 +457,9 @@ Converting query values to database values
 
 .. method:: get_db_prep_value(self, value, connection, prepared=False)
 
+.. versionadded:: 1.2
+   The ``connection`` and ``prepared arguments were added to support multiple databases.
+
 Some data types (for example, dates) need to be in a specific format
 before they can be used by a database backend.
 :meth:`get_db_prep_value` is the method where those conversions should
@@ -466,6 +475,9 @@ initial data conversions before performing any database-specific
 processing.
 
 .. method:: get_db_prep_save(self, value, connection)
+
+.. versionadded:: 1.2
+   The ``connection`` argument was added to support multiple databases.
 
 Same as the above, but called when the Field value must be *saved* to
 the database. As the default implementation just calls
@@ -504,6 +516,9 @@ As with value conversions, preparing a value for database lookups is a
 two phase process.
 
 .. method:: get_prep_lookup(self, lookup_type, value)
+
+.. versionadded:: 1.2
+   This method was factored out of ``get_db_prep_lookup()``
 
 :meth:`get_prep_lookup` performs the first phase of lookup preparation,
 performing generic data validity checks
@@ -552,6 +567,9 @@ accepted lookup types to ``exact`` and ``in``::
                 raise TypeError('Lookup type %r not supported.' % lookup_type)
 
 .. method:: get_db_prep_lookup(self, lookup_type, value, connection, prepared=False)
+
+.. versionadded:: 1.2
+   The ``connection`` and ``prepared`` arguments were added to support multiple databases.
 
 Performs any database-specific data conversions required by a lookup.
 As with :meth:`get_db_prep_value`, the specific connection that will
