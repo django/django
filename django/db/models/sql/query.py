@@ -42,7 +42,9 @@ class RawQuery(object):
     def get_columns(self):
         if self.cursor is None:
             self._execute_query()
-        return [column_meta[0] for column_meta in self.cursor.description]
+        converter = connections[self.using].introspection.table_name_converter
+        return [converter(column_meta[0])
+                for column_meta in self.cursor.description]
 
     def validate_sql(self, sql):
         if not sql.lower().strip().startswith('select'):
@@ -53,7 +55,7 @@ class RawQuery(object):
         # Always execute a new query for a new iterator.
         # This could be optomized with a cache at the expense of RAM.
         self._execute_query()
-        return self.cursor
+        return iter(self.cursor)
 
     def __repr__(self):
         return "<RawQuery: %r>" % (self.sql % self.params)
