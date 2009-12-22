@@ -7,7 +7,7 @@ this behavior by explicitly adding ``primary_key=True`` to a field.
 """
 
 from django.conf import settings
-from django.db import models, transaction, IntegrityError
+from django.db import models, transaction, IntegrityError, DEFAULT_DB_ALIAS
 
 from fields import MyAutoField
 
@@ -156,7 +156,7 @@ True
 # SQLite lets objects be saved with an empty primary key, even though an
 # integer is expected. So we can't check for an error being raised in that case
 # for SQLite. Remove it from the suite for this next bit.
-if settings.DATABASE_ENGINE != 'sqlite3':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.sqlite3':
     __test__["API_TESTS"] += """
 # The primary key must be specified, so an error is raised if you try to create
 # an object without it.

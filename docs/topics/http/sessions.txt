@@ -24,14 +24,6 @@ To enable session functionality, do the following:
       The default ``settings.py`` created by ``django-admin.py startproject`` has
       ``SessionMiddleware`` activated.
 
-    * Add ``'django.contrib.sessions'`` to your ``INSTALLED_APPS`` setting,
-      and run ``manage.py syncdb`` to install the single database table
-      that stores session data.
-
-.. versionchanged:: 1.0
-   This step is optional if you're not using the database session backend;
-   see `configuring the session engine`_.
-
 If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES`` and ``'django.contrib.sessions'``
 from your ``INSTALLED_APPS``. It'll save you a small bit of overhead.
@@ -45,6 +37,22 @@ By default, Django stores sessions in your database (using the model
 ``django.contrib.sessions.models.Session``). Though this is convenient, in
 some setups it's faster to store session data elsewhere, so Django can be
 configured to store session data on your filesystem or in your cache.
+
+Using database-backed sessions
+------------------------------
+
+If you want to use a database-backed session, you need to add
+``'django.contrib.sessions'`` to your ``INSTALLED_APPS`` setting.
+
+If you want to store your session data on a database other than ``default``
+alias, you should set the :setting:`SESSION_DB_ALIAS` setting.
+
+Once you have configured your installation, run ``manage.py syncdb``
+to install the single database table that stores session data.
+
+.. versionadded:: 1.2
+   The :setting:`SESSION_DB_ALIAS` setting was added in Django 1.2. It
+   is not required in earlier versions.
 
 Using cached sessions
 ---------------------
@@ -86,6 +94,9 @@ disregards persistence. In most cases, the ``cached_db`` backend will be fast
 enough, but if you need that last bit of performance, and are willing to let
 session data be expunged from time to time, the ``cache`` backend is for you.
 
+If you use the ``cached_db`` session backend, you also need to follow the
+configuration instructions for the `using database-backed sessions`_.
+
 Using file-based sessions
 -------------------------
 
@@ -96,6 +107,7 @@ You might also want to set the ``SESSION_FILE_PATH`` setting (which defaults
 to output from ``tempfile.gettempdir()``, most likely ``/tmp``) to control
 where Django stores session files. Be sure to check that your Web server has
 permissions to read and write to this location.
+
 
 Using sessions in views
 =======================

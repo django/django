@@ -121,6 +121,11 @@ createcachetable
 Creates a cache table named ``tablename`` for use with the database cache
 backend. See :ref:`topics-cache` for more information.
 
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database
+onto which the cachetable will be installed.
+
 createsuperuser
 ---------------
 
@@ -155,8 +160,8 @@ dbshell
 .. django-admin:: dbshell
 
 Runs the command-line client for the database engine specified in your
-``DATABASE_ENGINE`` setting, with the connection parameters specified in your
-``DATABASE_USER``, ``DATABASE_PASSWORD``, etc., settings.
+``ENGINE`` setting, with the connection parameters specified in your
+``USER``, ``PASSWORD``, etc., settings.
 
     * For PostgreSQL, this runs the ``psql`` command-line client.
     * For MySQL, this runs the ``mysql`` command-line client.
@@ -166,6 +171,12 @@ This command assumes the programs are on your ``PATH`` so that a simple call to
 the program name (``psql``, ``mysql``, ``sqlite3``) will find the program in
 the right place. There's no way to specify the location of the program
 manually.
+
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database
+onto which to open a shell.
+
 
 diffsettings
 ------------
@@ -199,21 +210,6 @@ records to dump. If you're using a :ref:`custom manager <custom-managers>` as
 the default manager and it filters some of the available records, not all of the
 objects will be dumped.
 
-.. django-admin-option:: --exclude
-
-.. versionadded:: 1.0
-
-Exclude a specific application from the applications whose contents is
-output. For example, to specifically exclude the `auth` application from
-the output, you would call::
-
-    django-admin.py dumpdata --exclude=auth
-
-If you want to exclude multiple applications, use multiple ``--exclude``
-directives::
-
-    django-admin.py dumpdata --exclude=auth --exclude=contenttypes
-
 .. django-admin-option:: --format <fmt>
 
 By default, ``dumpdata`` will format its output in JSON, but you can use the
@@ -226,6 +222,11 @@ By default, ``dumpdata`` will output all data on a single line. This isn't
 easy for humans to read, so you can use the ``--indent`` option to
 pretty-print the output with a number of indentation spaces.
 
+.. versionadded:: 1.0
+
+The :djadminopt:`--exclude` option may be provided to prevent specific
+applications from being dumped.
+
 .. versionadded:: 1.1
 
 In addition to specifying application names, you can provide a list of
@@ -233,6 +234,11 @@ individual models, in the form of ``appname.Model``. If you specify a model
 name to ``dumpdata``, the dumped output will be restricted to that model,
 rather than the entire application. You can also mix application names and
 model names.
+
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database
+onto which the data will be loaded.
 
 .. django-admin-option:: --natural
 
@@ -243,7 +249,6 @@ any foreign key and many-to-many relationship with a model that provides
 a natural key definition. If you are dumping ``contrib.auth`` ``Permission``
 objects or ``contrib.contenttypes`` ``ContentType`` objects, you should
 probably be using this flag.
-
 
 flush
 -----
@@ -258,13 +263,19 @@ fixture will be re-installed.
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option may be used to specify the database
+to flush.
+
+
 inspectdb
 ---------
 
 .. django-admin:: inspectdb
 
 Introspects the database tables in the database pointed-to by the
-``DATABASE_NAME`` setting and outputs a Django model module (a ``models.py``
+``NAME`` setting and outputs a Django model module (a ``models.py``
 file) to standard output.
 
 Use this if you have a legacy database with which you'd like to use Django.
@@ -301,12 +312,23 @@ needed.
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL and with certain types of MySQL tables.
 
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option may be used to specify the
+database to introspect.
+
+
 loaddata <fixture fixture ...>
 ------------------------------
 
 .. django-admin:: loaddata
 
 Searches for and loads the contents of the named fixture into the database.
+
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database
+onto which the data will be loaded.
 
 What's a "fixture"?
 ~~~~~~~~~~~~~~~~~~~
@@ -389,6 +411,37 @@ installation will be aborted, and any data installed in the call to
     references in your data files - MySQL doesn't provide a mechanism to
     defer checking of row constraints until a transaction is committed.
 
+Database-specific fixtures
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are in a multi-database setup, you may have fixture data that
+you want to load onto one database, but not onto another. In this
+situation, you can add database identifier into . If your
+:setting:`DATABASES` setting has a 'master' database defined, you can
+define the fixture ``mydata.master.json`` or
+``mydata.master.json.gz``. This fixture will only be loaded if you
+have specified that you want to load data onto the ``master``
+database.
+
+Excluding applications from loading
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.2
+
+The :djadminopt:`--exclude` option may be provided to prevent specific
+applications from being loaded.
+
+For example, if you wanted to exclude models from ``django.contrib.auth``
+from being loaded into your database, you would call::
+
+    django-admin.py loaddata mydata.json --exclude auth
+
+This will look for for a JSON fixture called ``mydata`` in all the
+usual locations - including the ``fixtures`` directory of the
+``django.contrib.auth`` application. However, any fixture object that
+identifies itself as belonging to the ``auth`` application (e.g.,
+instance of ``auth.User``) would be ignored by loaddata.
+
 makemessages
 ------------
 
@@ -449,6 +502,11 @@ Executes the equivalent of ``sqlreset`` for the given app name(s).
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
+
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the alias
+of the database to reset.
 
 runfcgi [options]
 -----------------
@@ -567,6 +625,11 @@ sql <appname appname ...>
 
 Prints the CREATE TABLE SQL statements for the given app name(s).
 
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
+
 sqlall <appname appname ...>
 ----------------------------
 
@@ -577,12 +640,22 @@ Prints the CREATE TABLE and initial-data SQL statements for the given app name(s
 Refer to the description of ``sqlcustom`` for an explanation of how to
 specify initial data.
 
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
+
 sqlclear <appname appname ...>
 ------------------------------
 
 .. django-admin:: sqlclear
 
 Prints the DROP TABLE SQL statements for the given app name(s).
+
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
 
 sqlcustom <appname appname ...>
 -------------------------------
@@ -605,6 +678,11 @@ table modifications, or insert any SQL functions into the database.
 
 Note that the order in which the SQL files are processed is undefined.
 
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
+
 sqlflush
 --------
 
@@ -613,6 +691,11 @@ sqlflush
 Prints the SQL statements that would be executed for the :djadmin:`flush`
 command.
 
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
+
 sqlindexes <appname appname ...>
 --------------------------------
 
@@ -620,12 +703,22 @@ sqlindexes <appname appname ...>
 
 Prints the CREATE INDEX SQL statements for the given app name(s).
 
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
+
 sqlreset <appname appname ...>
 ------------------------------
 
 .. django-admin:: sqlreset
 
 Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app name(s).
+
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
 
 sqlsequencereset <appname appname ...>
 --------------------------------------
@@ -639,6 +732,11 @@ number for automatically incremented fields.
 
 Use this command to generate SQL which will fix cases where a sequence is out
 of sync with its automatically incremented field data.
+
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
 
 startapp <appname>
 ------------------
@@ -696,8 +794,15 @@ with an appropriate extension (e.g. ``json`` or ``xml``). See the
 documentation for ``loaddata`` for details on the specification of fixture
 data files.
 
+--noinput
+~~~~~~~~~
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
+
+.. versionadded:: 1.2
+
+The :djadminopt:`--database` option can be used to specify the database to
+synchronize.
 
 test <app or test identifier>
 -----------------------------
@@ -847,6 +952,30 @@ Common options
 
 The following options are not available on every commands, but they are
 common to a number of commands.
+
+.. django-admin-option:: --database
+
+.. versionadded:: 1.2
+
+Used to specify the database on which a command will operate. If not
+specified, this option will default to an alias of ``default``.
+
+For example, to dump data from the database with the alias ``master``::
+
+    django-admin.py dumpdata --database=master
+
+.. django-admin-option:: --exclude
+
+Exclude a specific application from the applications whose contents is
+output. For example, to specifically exclude the `auth` application from
+the output of dumpdata, you would call::
+
+    django-admin.py dumpdata --exclude=auth
+
+If you want to exclude multiple applications, use multiple ``--exclude``
+directives::
+
+    django-admin.py dumpdata --exclude=auth --exclude=contenttypes
 
 .. django-admin-option:: --locale
 

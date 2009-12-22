@@ -96,9 +96,9 @@ class DistanceTest(unittest.TestCase):
             # Creating the query set.
             qs = AustraliaCity.objects.order_by('name')
             if type_error:
-                # A TypeError should be raised on PostGIS when trying to pass
+                # A ValueError should be raised on PostGIS when trying to pass
                 # Distance objects into a DWithin query using a geodetic field.
-                self.assertRaises(TypeError, AustraliaCity.objects.filter, point__dwithin=(self.au_pnt, dist))
+                self.assertRaises(ValueError, AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist)).count)
             else:
                 self.assertEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
 
@@ -237,15 +237,15 @@ class DistanceTest(unittest.TestCase):
             # Oracle doesn't have this limitation -- PostGIS only allows geodetic
             # distance queries from Points to PointFields.
             mp = GEOSGeometry('MULTIPOINT(0 0, 5 23)')
-            self.assertRaises(TypeError,
+            self.assertRaises(ValueError, len,
                               AustraliaCity.objects.filter(point__distance_lte=(mp, D(km=100))))
             # Too many params (4 in this case) should raise a ValueError.
-            self.assertRaises(ValueError,
-                              AustraliaCity.objects.filter, point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4'))
+            self.assertRaises(ValueError, len,
+                              AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4')))
 
         # Not enough params should raise a ValueError.
-        self.assertRaises(ValueError,
-                          AustraliaCity.objects.filter, point__distance_lte=('POINT(5 23)',))
+        self.assertRaises(ValueError, len,
+                          AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)',)))
 
         # Getting all cities w/in 550 miles of Hobart.
         hobart = AustraliaCity.objects.get(name='Hobart')

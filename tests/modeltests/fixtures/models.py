@@ -11,8 +11,9 @@ in the application directory, on in one of the directories named in the
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.conf import settings
+
 
 class Category(models.Model):
     title = models.CharField(max_length=100)
@@ -200,7 +201,7 @@ __test__ = {'API_TESTS': """
 
 # Database flushing does not work on MySQL with the default storage engine
 # because it requires transaction support.
-if settings.DATABASE_ENGINE != 'mysql':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
     __test__['API_TESTS'] += \
 """
 # Reset the database representation of this app. This will delete all data.
@@ -260,6 +261,41 @@ Multiple fixtures named 'fixture2' in '...fixtures'. Aborting.
 Multiple fixtures named 'fixture5' in '...fixtures'. Aborting.
 
 >>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Load db fixtures 1 and 2. These will load using the 'default' database identifier implicitly
+>>> management.call_command('loaddata', 'db_fixture_1', verbosity=0)
+>>> management.call_command('loaddata', 'db_fixture_2', verbosity=0)
+>>> Article.objects.all()
+[<Article: Who needs more than one database?>, <Article: Who needs to use compressed data?>, <Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
+>>> management.call_command('loaddata', 'db_fixture_1', verbosity=0, using='default')
+>>> management.call_command('loaddata', 'db_fixture_2', verbosity=0, using='default')
+>>> Article.objects.all()
+[<Article: Who needs more than one database?>, <Article: Who needs to use compressed data?>, <Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Try to load db fixture 3. This won't load because the database identifier doesn't match
+>>> management.call_command('loaddata', 'db_fixture_3', verbosity=0)
+>>> Article.objects.all()
+[<Article: Python program becomes self aware>]
+
+>>> management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
+>>> Article.objects.all()
+[<Article: Python program becomes self aware>]
+
+>>> management.call_command('flush', verbosity=0, interactive=False)
+
+# Try to load fixture 1, but this time, exclude the 'fixtures' app.
+>>> management.call_command('loaddata', 'fixture1', verbosity=0, exclude='fixtures')
+>>> Article.objects.all()
+[<Article: Python program becomes self aware>]
+
+>>> Category.objects.all()
+[]
 
 # Load back in fixture 1, we need the articles from it
 >>> management.call_command('loaddata', 'fixture1', verbosity=0)

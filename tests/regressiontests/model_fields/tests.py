@@ -44,8 +44,9 @@ class DecimalFieldTests(django.test.TestCase):
         self.assertEqual(f._format(None), None)
 
     def test_get_db_prep_lookup(self):
+        from django.db import connection
         f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f.get_db_prep_lookup('exact', None), [None])
+        self.assertEqual(f.get_db_prep_lookup('exact', None, connection=connection), [None])
 
     def test_filter_with_strings(self):
         """
@@ -98,13 +99,14 @@ class DateTimeFieldTests(unittest.TestCase):
 
 class BooleanFieldTests(unittest.TestCase):
     def _test_get_db_prep_lookup(self, f):
-        self.assertEqual(f.get_db_prep_lookup('exact', True), [True])
-        self.assertEqual(f.get_db_prep_lookup('exact', '1'), [True])
-        self.assertEqual(f.get_db_prep_lookup('exact', 1), [True])
-        self.assertEqual(f.get_db_prep_lookup('exact', False), [False])
-        self.assertEqual(f.get_db_prep_lookup('exact', '0'), [False])
-        self.assertEqual(f.get_db_prep_lookup('exact', 0), [False])
-        self.assertEqual(f.get_db_prep_lookup('exact', None), [None])
+        from django.db import connection
+        self.assertEqual(f.get_db_prep_lookup('exact', True, connection=connection), [True])
+        self.assertEqual(f.get_db_prep_lookup('exact', '1', connection=connection), [True])
+        self.assertEqual(f.get_db_prep_lookup('exact', 1, connection=connection), [True])
+        self.assertEqual(f.get_db_prep_lookup('exact', False, connection=connection), [False])
+        self.assertEqual(f.get_db_prep_lookup('exact', '0', connection=connection), [False])
+        self.assertEqual(f.get_db_prep_lookup('exact', 0, connection=connection), [False])
+        self.assertEqual(f.get_db_prep_lookup('exact', None, connection=connection), [None])
 
     def test_booleanfield_get_db_prep_lookup(self):
         self._test_get_db_prep_lookup(models.BooleanField())

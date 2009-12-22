@@ -1,0 +1,10 @@
+[
+    {
+        "pk": "6",
+        "model": "fixtures.article",
+        "fields": {
+            "headline": "Who needs more than one database?",
+            "pub_date": "2006-06-16 14:00:00"
+        }
+    }
+]

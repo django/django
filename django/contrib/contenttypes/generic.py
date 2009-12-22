@@ -5,7 +5,7 @@ Classes allowing "generic" relations through ContentType and object-id fields.
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import signals
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models.fields.related import RelatedField, Field, ManyToManyRel
 from django.db.models.loading import get_model
 from django.forms import ModelForm
@@ -45,14 +45,14 @@ class GenericForeignKey(object):
             kwargs[self.ct_field] = self.get_content_type(obj=value)
             kwargs[self.fk_field] = value._get_pk_val()
 
-    def get_content_type(self, obj=None, id=None):
+    def get_content_type(self, obj=None, id=None, using=None):
         # Convenience function using get_model avoids a circular import when
         # using this model
         ContentType = get_model("contenttypes", "contenttype")
         if obj:
-            return ContentType.objects.get_for_model(obj)
+             return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
         elif id:
-            return ContentType.objects.get_for_id(id)
+             return ContentType.objects.db_manager(using).get_for_id(id)
         else:
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
@@ -73,7 +73,7 @@ class GenericForeignKey(object):
             f = self.model._meta.get_field(self.ct_field)
             ct_id = getattr(instance, f.get_attname(), None)
             if ct_id:
-                ct = self.get_content_type(id=ct_id)
+                ct = self.get_content_type(id=ct_id, using=instance._state.db)
                 try:
                     rel_obj = ct.get_object_for_this_type(pk=getattr(instance, self.fk_field))
                 except ObjectDoesNotExist:
@@ -149,7 +149,7 @@ class GenericRelation(RelatedField, Field):
     def get_internal_type(self):
         return "ManyToManyField"
 
-    def db_type(self):
+    def db_type(self, connection):
         # Since we're simulating a ManyToManyField, in effect, best return the
         # same db_type as well.
         return None
@@ -201,7 +201,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
             join_table = qn(self.field.m2m_db_table()),
             source_col_name = qn(self.field.m2m_column_name()),
             target_col_name = qn(self.field.m2m_reverse_name()),
-            content_type = ContentType.objects.get_for_model(instance),
+            content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(instance),
             content_type_field_name = self.field.content_type_field_name,
             object_id_field_name = self.field.object_id_field_name
         )
@@ -247,7 +247,7 @@ def create_generic_related_manager(superclass):
                 '%s__pk' % self.content_type_field_name : self.content_type.id,
                 '%s__exact' % self.object_id_field_name : self.pk_val,
             }
-            return superclass.get_query_set(self).filter(**query)
+            return superclass.get_query_set(self).using(self.instance._state.db).filter(**query)
 
         def add(self, *objs):
             for obj in objs:
@@ -255,17 +255,17 @@ def create_generic_related_manager(superclass):
                     raise TypeError, "'%s' instance expected" % self.model._meta.object_name
                 setattr(obj, self.content_type_field_name, self.content_type)
                 setattr(obj, self.object_id_field_name, self.pk_val)
-                obj.save()
+                obj.save(using=self.instance._state.db)
         add.alters_data = True
 
         def remove(self, *objs):
             for obj in objs:
-                obj.delete()
+                obj.delete(using=self.instance._state.db)
         remove.alters_data = True
 
         def clear(self):
             for obj in self.all():
-                obj.delete()
+                obj.delete(using=self.instance._state.db)
         clear.alters_data = True
 
         def create(self, **kwargs):

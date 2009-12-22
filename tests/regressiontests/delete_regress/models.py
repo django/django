@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import models, backend, connection, transaction
+from django.db import models, backend, connection, transaction, DEFAULT_DB_ALIAS
 from django.db.models import sql, query
 from django.test import TransactionTestCase
 
@@ -8,17 +8,18 @@ class Book(models.Model):
 
 # Can't run this test under SQLite, because you can't
 # get two connections to an in-memory database.
-if settings.DATABASE_ENGINE != 'sqlite3':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.sqlite3':
     class DeleteLockingTest(TransactionTestCase):
         def setUp(self):
             # Create a second connection to the database
+            conn_settings = settings.DATABASES[DEFAULT_DB_ALIAS]
             self.conn2 = backend.DatabaseWrapper({
-                'DATABASE_HOST': settings.DATABASE_HOST,
-                'DATABASE_NAME': settings.DATABASE_NAME,
-                'DATABASE_OPTIONS': settings.DATABASE_OPTIONS,
-                'DATABASE_PASSWORD': settings.DATABASE_PASSWORD,
-                'DATABASE_PORT': settings.DATABASE_PORT,
-                'DATABASE_USER': settings.DATABASE_USER,
+                'HOST': conn_settings['HOST'],
+                'NAME': conn_settings['NAME'],
+                'OPTIONS': conn_settings['OPTIONS'],
+                'PASSWORD': conn_settings['PASSWORD'],
+                'PORT': conn_settings['PORT'],
+                'USER': conn_settings['USER'],
                 'TIME_ZONE': settings.TIME_ZONE,
             })
 

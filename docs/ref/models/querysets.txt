@@ -874,6 +874,24 @@ logically::
     # existing set of fields).
     Entry.objects.defer("body").only("headline", "body")
 
+``using(alias)``
+~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.2
+
+This method is for controlling which database the ``QuerySet`` will be
+evaluated against if you are using more than one database.  The only argument
+this method takes is the alias of a database, as defined in
+:setting:`DATABASES`.
+
+For example::
+
+    # queries the database with the 'default' alias.
+    >>> Entry.objects.all()
+
+    # queries the database with the 'backup' alias
+    >>> Entry.objects.using('backup')
+
 
 QuerySet methods that do not return QuerySets
 ---------------------------------------------

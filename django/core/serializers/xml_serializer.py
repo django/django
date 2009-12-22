@@ -4,7 +4,7 @@ XML serializer.
 
 from django.conf import settings
 from django.core.serializers import base
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import smart_unicode
 from xml.dom import pulldom
@@ -149,6 +149,7 @@ class Deserializer(base.Deserializer):
     def __init__(self, stream_or_string, **options):
         super(Deserializer, self).__init__(stream_or_string, **options)
         self.event_stream = pulldom.parse(self.stream)
+        self.db = options.pop('using', DEFAULT_DB_ALIAS)
 
     def next(self):
         for event, node in self.event_stream:
@@ -218,7 +219,7 @@ class Deserializer(base.Deserializer):
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj = field.rel.to._default_manager.get_by_natural_key(*field_value)
+                    obj = field.rel.to._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
                     obj_pk = getattr(obj, field.rel.field_name)
                 else:
                     # Otherwise, treat like a normal PK
@@ -239,7 +240,7 @@ class Deserializer(base.Deserializer):
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj_pk = field.rel.to._default_manager.get_by_natural_key(*field_value).pk
+                    obj_pk = field.rel.to._default_manager.db_manager(self.db).get_by_natural_key(*field_value).pk
                 else:
                     # Otherwise, treat like a normal PK value.
                     obj_pk = field.rel.to._meta.pk.to_python(n.getAttribute('pk'))

@@ -79,10 +79,10 @@ class Comment(BaseCommentAbstractModel):
     def __unicode__(self):
         return "%s: %s..." % (self.name, self.comment[:50])
 
-    def save(self, force_insert=False, force_update=False):
+    def save(self, *args, **kwargs):
         if self.submit_date is None:
             self.submit_date = datetime.datetime.now()
-        super(Comment, self).save(force_insert, force_update)
+        super(Comment, self).save(*args, **kwargs)
 
     def _get_userinfo(self):
         """
@@ -185,7 +185,7 @@ class CommentFlag(models.Model):
         return "%s flag of comment ID %s by %s" % \
             (self.flag, self.comment_id, self.user.username)
 
-    def save(self, force_insert=False, force_update=False):
+    def save(self, *args, **kwargs):
         if self.flag_date is None:
             self.flag_date = datetime.datetime.now()
-        super(CommentFlag, self).save(force_insert, force_update)
+        super(CommentFlag, self).save(*args, **kwargs)

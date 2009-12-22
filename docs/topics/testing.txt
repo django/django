@@ -278,33 +278,35 @@ The test database
 -----------------
 
 Tests that require a database (namely, model tests) will not use your "real"
-(production) database. A separate, blank database is created for the tests.
+(production) database. Separate, blank databases are created for the tests.
 
-Regardless of whether the tests pass or fail, the test database is destroyed
+Regardless of whether the tests pass or fail, the test databases are destroyed
 when all the tests have been executed.
 
-By default this test database gets its name by prepending ``test_`` to the
-value of the :setting:`DATABASE_NAME` setting. When using the SQLite database
-engine the tests will by default use an in-memory database (i.e., the database
-will be created in memory, bypassing the filesystem entirely!). If you want to
-use a different database name, specify the :setting:`TEST_DATABASE_NAME`
-setting.
+By default the test databases get their names by prepending ``test_``
+to the value of the :setting:`NAME`` settings for the databased
+defined in :setting:`DATABASES`. When using the SQLite database engine
+the tests will by default use an in-memory database (i.e., the
+database will be created in memory, bypassing the filesystem
+entirely!). If you want to use a different database name, specify
+``TEST_NAME`` in the dictionary for any given database in
+:setting:`DATABASES`.
 
-Aside from using a separate database, the test runner will otherwise use all of
-the same database settings you have in your settings file:
-:setting:`DATABASE_ENGINE`, :setting:`DATABASE_USER`, :setting:`DATABASE_HOST`,
-etc. The test database is created by the user specified by
-:setting:`DATABASE_USER`, so you'll need to make sure that the given user
-account has sufficient privileges to create a new database on the system.
+Aside from using a separate database, the test runner will otherwise
+use all of the same database settings you have in your settings file:
+:setting:`ENGINE`, :setting:`USER`, :setting:`HOST`, etc. The test
+database is created by the user specified by ``USER``, so you'll need
+to make sure that the given user account has sufficient privileges to
+create a new database on the system.
 
 .. versionadded:: 1.0
 
-For fine-grained control over the
-character encoding of your test database, use the
-:setting:`TEST_DATABASE_CHARSET` setting. If you're using MySQL, you can also
-use the :setting:`TEST_DATABASE_COLLATION` setting to control the particular
-collation used by the test database. See the :ref:`settings documentation
-<ref-settings>` for details of these advanced settings.
+For fine-grained control over the character encoding of your test
+database, use the :setting:`TEST_CHARSET` option. If you're using
+MySQL, you can also use the :setting:`TEST_COLLATION` option to
+control the particular collation used by the test database. See the
+:ref:`settings documentation <ref-settings>` for details of these
+advanced settings.
 
 Other test conditions
 ---------------------
@@ -1037,6 +1039,39 @@ URLconf for the duration of the test case.
 
 .. _emptying-test-outbox:
 
+Multi-database support
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. attribute:: TestCase.multi_db
+
+.. versionadded:: 1.2
+
+Django sets up a test database corresponding to every database that is
+defined in the :setting:``DATABASES`` definition in your settings
+file. However, a big part of the time taken to run a Django TestCase
+is consumed by the call to ``flush`` that ensures that you have a
+clean database at the start of each test run. If you have multiple
+databases, multiple flushes are required (one for each database),
+which can be a time consuming activity -- especially if your tests
+don't need to test multi-database activity.
+
+As an optimization, Django only flushes the ``default`` database at
+the start of each test run. If your setup contains multiple databases,
+and you have a test that requires every database to be clean, you can
+use the ``multi_db`` attribute on the test suite to request a full
+flush.
+
+For example::
+
+    class TestMyViews(TestCase):
+        multi_db = True
+
+        def testIndexPageView(self):
+            call_some_test_code()
+
+This test case will flush *all* the test databases before running
+``testIndexPageView``.
+
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1251,16 +1286,17 @@ utility methods in the ``django.test.utils`` module.
 .. function:: setup_test_environment()
 
     Performs any global pre-test setup, such as the installing the
-    instrumentation of the template rendering system and setting up the dummy
-    ``SMTPConnection``.
+    instrumentation of the template rendering system and setting up
+    the dummy ``SMTPConnection``.
 
 .. function:: teardown_test_environment()
 
-    Performs any global post-test teardown, such as removing the black magic
-    hooks into the template system and restoring normal e-mail services.
+    Performs any global post-test teardown, such as removing the black
+    magic hooks into the template system and restoring normal e-mail
+    services.
 
-The creation module of the database backend (``connection.creation``) also
-provides some utilities that can be useful during testing.
+The creation module of the database backend (``connection.creation``)
+also provides some utilities that can be useful during testing.
 
 .. function:: create_test_db(verbosity=1, autoclobber=False)
 
@@ -1268,27 +1304,29 @@ provides some utilities that can be useful during testing.
 
     ``verbosity`` has the same behavior as in ``run_tests()``.
 
-    ``autoclobber`` describes the behavior that will occur if a database with
-    the same name as the test database is discovered:
+    ``autoclobber`` describes the behavior that will occur if a
+    database with the same name as the test database is discovered:
 
-        * If ``autoclobber`` is ``False``, the user will be asked to approve
-          destroying the existing database. ``sys.exit`` is called if the user
-          does not approve.
+        * If ``autoclobber`` is ``False``, the user will be asked to
+          approve destroying the existing database. ``sys.exit`` is
+          called if the user does not approve.
 
-        * If autoclobber is ``True``, the database will be destroyed without
-          consulting the user.
+        * If autoclobber is ``True``, the database will be destroyed
+          without consulting the user.
 
     Returns the name of the test database that it created.
 
-    ``create_test_db()`` has the side effect of modifying
-    ``settings.DATABASE_NAME`` to match the name of the test database.
+    ``create_test_db()`` has the side effect of modifying the value of
+    :setting:`NAME` in :setting:`DATABASES` to match the name of the test
+    database.
 
     .. versionchanged:: 1.0
        ``create_test_db()`` now returns the name of the test database.
 
 .. function:: destroy_test_db(old_database_name, verbosity=1)
 
-    Destroys the database whose name is in the :setting:`DATABASE_NAME` setting
-    and restores the value of :setting:`DATABASE_NAME` to the provided name.
+    Destroys the database whose name is in stored in :setting:`NAME` in the
+    :setting:`DATABASES`, and sets :setting:`NAME` to use the
+    provided name.
 
     ``verbosity`` has the same behavior as in ``run_tests()``.

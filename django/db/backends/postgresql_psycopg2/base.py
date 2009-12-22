@@ -4,7 +4,6 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
-from django.conf import settings
 from django.db.backends import *
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql.operations import DatabaseOperations as PostgresqlDatabaseOperations
@@ -64,37 +63,37 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
         self.features = DatabaseFeatures()
-        autocommit = self.settings_dict["DATABASE_OPTIONS"].get('autocommit', False)
+        autocommit = self.settings_dict["OPTIONS"].get('autocommit', False)
         self.features.uses_autocommit = autocommit
         self._set_isolation_level(int(not autocommit))
-        self.ops = DatabaseOperations()
+        self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
-        self.validation = BaseDatabaseValidation()
+        self.validation = BaseDatabaseValidation(self)
 
     def _cursor(self):
         set_tz = False
         settings_dict = self.settings_dict
         if self.connection is None:
             set_tz = True
-            if settings_dict['DATABASE_NAME'] == '':
+            if settings_dict['NAME'] == '':
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured("You need to specify DATABASE_NAME in your Django settings file.")
+                raise ImproperlyConfigured("You need to specify NAME in your Django settings file.")
             conn_params = {
-                'database': settings_dict['DATABASE_NAME'],
+                'database': settings_dict['NAME'],
             }
-            conn_params.update(settings_dict['DATABASE_OPTIONS'])
+            conn_params.update(settings_dict['OPTIONS'])
             if 'autocommit' in conn_params:
                 del conn_params['autocommit']
-            if settings_dict['DATABASE_USER']:
-                conn_params['user'] = settings_dict['DATABASE_USER']
-            if settings_dict['DATABASE_PASSWORD']:
-                conn_params['password'] = settings_dict['DATABASE_PASSWORD']
-            if settings_dict['DATABASE_HOST']:
-                conn_params['host'] = settings_dict['DATABASE_HOST']
-            if settings_dict['DATABASE_PORT']:
-                conn_params['port'] = settings_dict['DATABASE_PORT']
+            if settings_dict['USER']:
+                conn_params['user'] = settings_dict['USER']
+            if settings_dict['PASSWORD']:
+                conn_params['password'] = settings_dict['PASSWORD']
+            if settings_dict['HOST']:
+                conn_params['host'] = settings_dict['HOST']
+            if settings_dict['PORT']:
+                conn_params['port'] = settings_dict['PORT']
             self.connection = Database.connect(**conn_params)
             self.connection.set_client_encoding('UTF8')
             self.connection.set_isolation_level(self.isolation_level)
@@ -150,4 +149,3 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         finally:
             self.isolation_level = level
             self.features.uses_savepoints = bool(level)
-

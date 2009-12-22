@@ -1,4 +1,6 @@
-import django.utils.copycompat as copy
+from django.utils import copycompat as copy
+
+from django.db import DEFAULT_DB_ALIAS
 from django.db.models.query import QuerySet, EmptyQuerySet, insert_query, RawQuerySet
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
@@ -49,6 +51,7 @@ class Manager(object):
         self._set_creation_counter()
         self.model = None
         self._inherited = False
+        self._db = None
 
     def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
@@ -84,6 +87,15 @@ class Manager(object):
         mgr._inherited = True
         return mgr
 
+    def db_manager(self, alias):
+        obj = copy.copy(self)
+        obj._db = alias
+        return obj
+
+    @property
+    def db(self):
+        return self._db or DEFAULT_DB_ALIAS
+
     #######################
     # PROXIES TO QUERYSET #
     #######################
@@ -95,7 +107,10 @@ class Manager(object):
         """Returns a new QuerySet object.  Subclasses can override this method
         to easily customize the behavior of the Manager.
         """
-        return QuerySet(self.model)
+        qs = QuerySet(self.model)
+        if self._db is not None:
+            qs = qs.using(self._db)
+        return qs
 
     def none(self):
         return self.get_empty_query_set()
@@ -172,6 +187,9 @@ class Manager(object):
     def only(self, *args, **kwargs):
         return self.get_query_set().only(*args, **kwargs)
 
+    def using(self, *args, **kwargs):
+        return self.get_query_set().using(*args, **kwargs)
+
     def exists(self, *args, **kwargs):
         return self.get_query_set().exists(*args, **kwargs)
 
@@ -181,8 +199,8 @@ class Manager(object):
     def _update(self, values, **kwargs):
         return self.get_query_set()._update(values, **kwargs)
 
-    def raw(self, query, params=None, *args, **kwargs):
-        return RawQuerySet(model=self.model, query=query, params=params, *args, **kwargs)
+    def raw(self, raw_query, params=None, *args, **kwargs):
+        return RawQuerySet(raw_query=raw_query, model=self.model, params=params, using=self.db, *args, **kwargs)
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.

@@ -19,8 +19,8 @@ class PhoneNumberField(Field):
     def get_internal_type(self):
         return "PhoneNumberField"
 
-    def db_type(self):
-        if settings.DATABASE_ENGINE == 'oracle':
+    def db_type(self, connection):
+        if connection.settings_dict['ENGINE'] == 'django.db.backends.oracle':
             return 'VARCHAR2(20)'
         else:
             return 'varchar(20)'

@@ -18,15 +18,16 @@ Give Django your database parameters
 ====================================
 
 You'll need to tell Django what your database connection parameters are, and
-what the name of the database is. Do that by editing these settings in your
-:ref:`settings file <topics-settings>`:
+what the name of the database is. Do that by editing the :setting:`DATABASES`
+setting and assigning values to the following keys for the ``'default'``
+connection:
 
-    * :setting:`DATABASE_NAME`
-    * :setting:`DATABASE_ENGINE`
-    * :setting:`DATABASE_USER`
-    * :setting:`DATABASE_PASSWORD`
-    * :setting:`DATABASE_HOST`
-    * :setting:`DATABASE_PORT`
+    * :setting:`NAME`
+    * :setting:`ENGINE`
+    * :setting:`USER`
+    * :setting:`PASSWORD`
+    * :setting:`HOST`
+    * :setting:`PORT`
 
 Auto-generate the models
 ========================

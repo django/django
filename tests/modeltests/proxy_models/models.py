@@ -166,12 +166,13 @@ class ProxyImprovement(Improvement):
 __test__ = {'API_TESTS' : """
 # The MyPerson model should be generating the same database queries as the
 # Person model (when the same manager is used in each case).
->>> MyPerson.other.all().query.as_sql() == Person.objects.order_by("name").query.as_sql()
+>>> from django.db import DEFAULT_DB_ALIAS
+>>> MyPerson.other.all().query.get_compiler(DEFAULT_DB_ALIAS).as_sql() == Person.objects.order_by("name").query.get_compiler(DEFAULT_DB_ALIAS).as_sql()
 True
 
 # The StatusPerson models should have its own table (it's using ORM-level
 # inheritance).
->>> StatusPerson.objects.all().query.as_sql() == Person.objects.all().query.as_sql()
+>>> StatusPerson.objects.all().query.get_compiler(DEFAULT_DB_ALIAS).as_sql() == Person.objects.all().query.get_compiler(DEFAULT_DB_ALIAS).as_sql()
 False
 
 # Creating a Person makes them accessible through the MyPerson proxy.

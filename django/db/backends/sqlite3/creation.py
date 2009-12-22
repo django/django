@@ -1,6 +1,5 @@
 import os
 import sys
-from django.conf import settings
 from django.db.backends.creation import BaseDatabaseCreation
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -30,7 +29,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'TextField':                    'text',
         'TimeField':                    'time',
     }
-    
+
     def sql_for_pending_references(self, model, style, pending_references):
         "SQLite3 doesn't support constraints"
         return []
@@ -38,10 +37,10 @@ class DatabaseCreation(BaseDatabaseCreation):
     def sql_remove_table_constraints(self, model, references_to_delete, style):
         "SQLite3 doesn't support constraints"
         return []
-        
+
     def _create_test_db(self, verbosity, autoclobber):
-        if settings.TEST_DATABASE_NAME and settings.TEST_DATABASE_NAME != ":memory:":
-            test_database_name = settings.TEST_DATABASE_NAME
+        test_database_name = self.connection.settings_dict['TEST_NAME']
+        if test_database_name and test_database_name != ":memory:":
             # Erase the old test database
             if verbosity >= 1:
                 print "Destroying old test database..."
@@ -64,7 +63,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         else:
             test_database_name = ":memory:"
         return test_database_name
-        
+
     def _destroy_test_db(self, test_database_name, verbosity):
         if test_database_name and test_database_name != ":memory:":
             # Remove the SQLite database file

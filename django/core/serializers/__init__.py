@@ -36,14 +36,14 @@ except ImportError:
 _serializers = {}
 
 def register_serializer(format, serializer_module, serializers=None):
-    """"Register a new serializer. 
-    
+    """"Register a new serializer.
+
     ``serializer_module`` should be the fully qualified module name
     for the serializer.
-    
+
     If ``serializers`` is provided, the registration will be added
     to the provided dictionary.
-    
+
     If ``serializers`` is not provided, the registration will be made
     directly into the global register of serializers. Adding serializers
     directly is not a thread-safe operation.
@@ -53,7 +53,7 @@ def register_serializer(format, serializer_module, serializers=None):
         _serializers[format] = module
     else:
         serializers[format] = module
-        
+
 def unregister_serializer(format):
     "Unregister a given serializer. This is not a thread-safe operation."
     del _serializers[format]
@@ -87,7 +87,7 @@ def serialize(format, queryset, **options):
     s.serialize(queryset, **options)
     return s.getvalue()
 
-def deserialize(format, stream_or_string):
+def deserialize(format, stream_or_string, **options):
     """
     Deserialize a stream or a string. Returns an iterator that yields ``(obj,
     m2m_relation_dict)``, where ``obj`` is a instantiated -- but *unsaved* --
@@ -95,7 +95,7 @@ def deserialize(format, stream_or_string):
     list_of_related_objects}``.
     """
     d = get_deserializer(format)
-    return d(stream_or_string)
+    return d(stream_or_string, **options)
 
 def _load_serializers():
     """

@@ -158,34 +158,40 @@ It worked!
 Database setup
 --------------
 
-Now, edit :file:`settings.py`. It's a normal Python module with module-level
-variables representing Django settings. Change these settings to match your
-database's connection parameters:
+Now, edit :file:`settings.py`. It's a normal Python module with
+module-level variables representing Django settings. Change the
+following keys in the :setting:`DATABASES` ``'default'`` item to match
+your databases connection settings.
 
-    * :setting:`DATABASE_ENGINE` -- Either 'postgresql_psycopg2', 'mysql' or
-      'sqlite3'. Other backends are :setting:`also available <DATABASE_ENGINE>`.
+    * :setting:`ENGINE` -- Either
+      ``'django.db.backends.postgresql_psycopg2'``,
+      ``'django.db.backends.mysql'`` or
+      ``'django.db.backends.sqlite3'``. Other backends are
+      :setting:`also available <ENGINE>`.
 
-    * :setting:`DATABASE_NAME` -- The name of your database. If you're using
-      SQLite, the database will be a file on your computer; in that case,
-      ``DATABASE_NAME`` should be the full absolute path, including filename, of
-      that file. If the file doesn't exist, it will automatically be created
-      when you synchronize the database for the first time (see below).
+    * :setting:`NAME` -- The name of your database. If you're using
+      SQLite, the database will be a file on your computer; in that
+      case, :setting:`NAME` should be the full absolute path,
+      including filename, of that file. If the file doesn't exist, it
+      will automatically be created when you synchronize the database
+      for the first time (see below).
 
-      When specifying the path, always use forward slashes, even on Windows
-      (e.g. ``C:/homes/user/mysite/sqlite3.db``).
+      When specifying the path, always use forward slashes, even on
+      Windows (e.g. ``C:/homes/user/mysite/sqlite3.db``).
 
-    * :setting:`DATABASE_USER` -- Your database username (not used for SQLite).
+    * :setting:`USER` -- Your database username (not used for SQLite).
 
-    * :setting:`DATABASE_PASSWORD` -- Your database password (not used for
+    * :setting:`PASSWORD` -- Your database password (not used for
       SQLite).
 
-    * :setting:`DATABASE_HOST` -- The host your database is on. Leave this as an
-      empty string if your database server is on the same physical machine (not
-      used for SQLite).
+    * :setting:`HOST` -- The host your database is on. Leave this as
+      an empty string if your database server is on the same physical
+      machine (not used for SQLite).
 
-If you're new to databases, we recommend simply using SQLite (by setting
-:setting:`DATABASE_ENGINE` to ``'sqlite3'``). SQLite is included as part of
-Python 2.5 and later, so you won't need to install anything else.
+If you're new to databases, we recommend simply using SQLite (by
+setting :setting:`ENGINE` to ``'django.db.backends.sqlite3'``). SQLite
+is included as part of Python 2.5 and later, so you won't need to
+install anything else.
 
 .. note::
 

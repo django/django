@@ -23,7 +23,7 @@ Performing raw queries
 The ``raw()`` manager method can be used to perform raw SQL queries that
 return model instances:
 
-.. method:: Manager.raw(query, params=None, translations=None)
+.. method:: Manager.raw(raw_query, params=None, translations=None)
 
 This method method takes a raw SQL query, executes it, and returns model
 instances.

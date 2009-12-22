@@ -153,15 +153,16 @@ class DeserializedObject(object):
         self.m2m_data = m2m_data
 
     def __repr__(self):
-        return "<DeserializedObject: %s>" % smart_str(self.object)
+        return "<DeserializedObject: %s.%s(pk=%s)>" % (
+            self.object._meta.app_label, self.object._meta.object_name, self.object.pk)
 
-    def save(self, save_m2m=True):
+    def save(self, save_m2m=True, using=None):
         # Call save on the Model baseclass directly. This bypasses any
         # model-defined save. The save is also forced to be raw.
         # This ensures that the data that is deserialized is literally
         # what came from the file, not post-processed by pre_save/save
         # methods.
-        models.Model.save_base(self.object, raw=True)
+        models.Model.save_base(self.object, using=using, raw=True)
         if self.m2m_data and save_m2m:
             for accessor_name, object_list in self.m2m_data.items():
                 setattr(self.object, accessor_name, object_list)

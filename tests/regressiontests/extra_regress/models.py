@@ -16,11 +16,13 @@ class RevisionableModel(models.Model):
     def __unicode__(self):
         return u"%s (%s, %s)" % (self.title, self.id, self.base.id)
 
-    def save(self, force_insert=False, force_update=False):
-        super(RevisionableModel, self).save(force_insert, force_update)
+    def save(self, *args, **kwargs):
+        super(RevisionableModel, self).save(*args, **kwargs)
         if not self.base:
             self.base = self
-            super(RevisionableModel, self).save()
+            kwargs.pop('force_insert', None)
+            kwargs.pop('force_update', None)
+            super(RevisionableModel, self).save(*args, **kwargs)
 
     def new_revision(self):
         new_revision = copy.copy(self)

@@ -1,6 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
+from django.db import connections, DEFAULT_DB_ALIAS
 from django.utils.datastructures import SortedDict
 
 from optparse import make_option
@@ -11,6 +12,9 @@ class Command(BaseCommand):
             help='Specifies the output serialization format for fixtures.'),
         make_option('--indent', default=None, dest='indent', type='int',
             help='Specifies the indent level to use when pretty-printing output'),
+        make_option('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
+                'fixtures into. Defaults to the "default" database.'),
         make_option('-e', '--exclude', dest='exclude',action='append', default=[],
             help='App to exclude (use multiple --exclude to exclude multiple apps).'),
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
@@ -24,14 +28,16 @@ class Command(BaseCommand):
 
         format = options.get('format','json')
         indent = options.get('indent',None)
+        using = options.get('database', DEFAULT_DB_ALIAS)
+        connection = connections[using]
         exclude = options.get('exclude',[])
         show_traceback = options.get('traceback', False)
         use_natural_keys = options.get('use_natural_keys', False)
 
-        excluded_apps = [get_app(app_label) for app_label in exclude]
+        excluded_apps = set(get_app(app_label) for app_label in exclude)
 
         if len(app_labels) == 0:
-            app_list = SortedDict([(app, None) for app in get_apps() if app not in excluded_apps])
+            app_list = SortedDict((app, None) for app in get_apps() if app not in excluded_apps)
         else:
             app_list = SortedDict()
             for label in app_labels:
@@ -74,7 +80,7 @@ class Command(BaseCommand):
         objects = []
         for model in sort_dependencies(app_list.items()):
             if not model._meta.proxy:
-                objects.extend(model._default_manager.all())
+                objects.extend(model._default_manager.using(using).all())
 
         try:
             return serializers.serialize(format, objects, indent=indent,
@@ -137,7 +143,7 @@ def sort_dependencies(app_list):
         changed = False
         while model_dependencies:
             model, deps = model_dependencies.pop()
-            
+
             # If all of the models in the dependency list are either already
             # on the final model list, or not on the original serialization list,
             # then we've found another model with all it's dependencies satisfied.

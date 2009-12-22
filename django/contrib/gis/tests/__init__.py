@@ -1,4 +1,5 @@
 import sys, unittest
+from django.test.simple import run_tests
 from django.utils.importlib import import_module
 
 def geo_suite():
@@ -14,12 +15,11 @@ def geo_suite():
     from django.contrib.gis.utils import HAS_GEOIP
     from django.contrib.gis.tests.utils import postgis, mysql
 
-    # The test suite.
-    s = unittest.TestSuite()
+    gis_tests = []
 
     # Adding the GEOS tests.
     from django.contrib.gis.geos import tests as geos_tests
-    s.addTest(geos_tests.suite())
+    gis_tests.append(geos_tests.suite())
 
     # Tests that require use of a spatial database (e.g., creation of models)
     test_apps = ['geoapp', 'relatedapp']
@@ -44,7 +44,7 @@ def geo_suite():
 
         # Adding the GDAL tests.
         from django.contrib.gis.gdal import tests as gdal_tests
-        s.addTest(gdal_tests.suite())
+        gis_tests.append(gdal_tests.suite())
     else:
         print >>sys.stderr, "GDAL not available - no tests requiring GDAL will be run."
 
@@ -55,9 +55,9 @@ def geo_suite():
     # in the `test_suite_names`.
     for suite_name in test_suite_names:
         tsuite = import_module('django.contrib.gis.tests.' + suite_name)
-        s.addTest(tsuite.suite())
+        gis_tests.append(tsuite.suite())
 
-    return s, test_apps
+    return gis_tests, test_apps
 
 def run_gis_tests(test_labels, **kwargs):
     """
@@ -83,20 +83,12 @@ def run_gis_tests(test_labels, **kwargs):
     # Setting the URLs.
     settings.ROOT_URLCONF = 'django.contrib.gis.tests.urls'
 
-    # Creating the test suite, adding the test models to INSTALLED_APPS, and
-    # adding the model test suites to our suite package.
-    gis_suite, test_apps = geo_suite()
+    # Creating the test suite, adding the test models to INSTALLED_APPS
+    # so they will be tested.
+    gis_tests, test_apps = geo_suite()
     for test_model in test_apps:
         module_name = 'django.contrib.gis.tests.%s' % test_model
-        if mysql:
-            test_module = 'tests_mysql'
-        else:
-            test_module = 'tests'
         new_installed.append(module_name)
-
-        # Getting the model test suite
-        tsuite = import_module(module_name + '.' + test_module)
-        gis_suite.addTest(tsuite.suite())
 
     # Resetting the loaded flag to take into account what we appended to
     # the INSTALLED_APPS (since this routine is invoked through
@@ -105,67 +97,13 @@ def run_gis_tests(test_labels, **kwargs):
     settings.INSTALLED_APPS = new_installed
     loading.cache.loaded = False
 
+    kwargs['extra_tests'] = gis_tests
+
     # Running the tests using the GIS test runner.
-    result = run_tests(test_labels, suite=gis_suite, **kwargs)
+    result = run_tests(test_labels, **kwargs)
 
     # Restoring modified settings.
     settings.INSTALLED_APPS = old_installed
     settings.ROOT_URLCONF = old_root_urlconf
 
     return result
-
-def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[], suite=None):
-    """
-    Set `TEST_RUNNER` in your settings with this routine in order to
-    scaffold test spatial databases correctly for your GeoDjango models.
-    For more documentation, please consult the following URL:
-      http://geodjango.org/docs/testing.html.
-    """
-    from django.conf import settings
-    from django.db import connection
-    from django.db.models import get_app, get_apps
-    from django.test.simple import build_suite, build_test, reorder_suite, TestCase
-    from django.test.utils import setup_test_environment, teardown_test_environment
-
-    # The `create_test_spatial_db` routine abstracts away all the steps needed
-    # to properly construct a spatial database for the backend.
-    from django.contrib.gis.db.backend import create_test_spatial_db
-
-    # Setting up for testing.
-    setup_test_environment()
-    settings.DEBUG = False
-    old_name = settings.DATABASE_NAME
-
-    # Creating the test spatial database.
-    create_test_spatial_db(verbosity=verbosity, autoclobber=not interactive)
-
-    # The suite may be passed in manually, e.g., when we run the GeoDjango test,
-    # we want to build it and pass it in due to some customizations.  Otherwise,
-    # the normal test suite creation process from `django.test.simple.run_tests`
-    # is used to create the test suite.
-    if suite is None:
-        suite = unittest.TestSuite()
-        if test_labels:
-            for label in test_labels:
-                if '.' in label:
-                    suite.addTest(build_test(label))
-                else:
-                    app = get_app(label)
-                    suite.addTest(build_suite(app))
-        else:
-            for app in get_apps():
-                suite.addTest(build_suite(app))
-
-        for test in extra_tests:
-            suite.addTest(test)
-
-    suite = reorder_suite(suite, (TestCase,))
-
-    # Executing the tests (including the model tests), and destorying the
-    # test database after the tests have completed.
-    result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-    connection.creation.destroy_test_db(old_name, verbosity)
-    teardown_test_environment()
-
-    # Returning the total failures and errors
-    return len(result.failures) + len(result.errors)

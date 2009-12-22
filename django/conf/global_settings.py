@@ -131,6 +131,9 @@ DATABASE_HOST = ''             # Set to empty string for localhost. Not used wit
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 DATABASE_OPTIONS = {}          # Set to empty dictionary for default.
 
+DATABASES = {
+}
+
 # The email backend to use. For possible shortcuts see django.core.mail.
 # The default is to use the SMTP backend.
 # Third-party backends can be specified by providing a Python path

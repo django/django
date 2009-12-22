@@ -118,23 +118,27 @@ The SQL files are read by the :djadmin:`sqlcustom`, :djadmin:`sqlreset`,
 <ref-django-admin>`. Refer to the :ref:`manage.py documentation
 <ref-django-admin>` for more information.
 
-Note that if you have multiple SQL data files, there's no guarantee of the order
-in which they're executed. The only thing you can assume is that, by the time
-your custom data files are executed, all the database tables already will have
-been created.
+Note that if you have multiple SQL data files, there's no guarantee of
+the order in which they're executed. The only thing you can assume is
+that, by the time your custom data files are executed, all the
+database tables already will have been created.
 
 Database-backend-specific SQL data
 ----------------------------------
 
-There's also a hook for backend-specific SQL data. For example, you can have
-separate initial-data files for PostgreSQL and MySQL. For each app, Django
-looks for a file called ``<appname>/sql/<modelname>.<backend>.sql``, where
-``<appname>`` is your app directory, ``<modelname>`` is the model's name in
-lowercase and ``<backend>`` is the value of :setting:`DATABASE_ENGINE` in your
-settings file (e.g., ``postgresql``, ``mysql``).
+There's also a hook for backend-specific SQL data. For example, you
+can have separate initial-data files for PostgreSQL and MySQL. For
+each app, Django looks for a file called
+``<appname>/sql/<modelname>.<backend>.sql``, where ``<appname>`` is
+your app directory, ``<modelname>`` is the model's name in lowercase
+and ``<backend>`` is the last part of the module name provided for the
+:setting:`ENGINE` in your settings file (e.g., if you have defined a
+database with an :setting:`ENGINE` value of
+``django.db.backends.postgresql``, Django will look for
+``<appname>/sql/<modelname>.postgresql.sql``).
 
-Backend-specific SQL data is executed before non-backend-specific SQL data. For
-example, if your app contains the files ``sql/person.sql`` and
-``sql/person.postgresql.sql`` and you're installing the app on PostgreSQL,
-Django will execute the contents of ``sql/person.postgresql.sql`` first, then
-``sql/person.sql``.
+Backend-specific SQL data is executed before non-backend-specific SQL
+data. For example, if your app contains the files ``sql/person.sql``
+and ``sql/person.postgresql.sql`` and you're installing the app on
+PostgreSQL, Django will execute the contents of
+``sql/person.postgresql.sql`` first, then ``sql/person.sql``.

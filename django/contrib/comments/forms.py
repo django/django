@@ -28,7 +28,7 @@ class CommentSecurityForm(forms.Form):
             initial = {}
         initial.update(self.generate_security_data())
         super(CommentSecurityForm, self).__init__(data=data, initial=initial)
-        
+
     def security_errors(self):
         """Return just those errors associated with security"""
         errors = ErrorDict()
@@ -107,13 +107,13 @@ class CommentDetailsForm(CommentSecurityForm):
         """
         if not self.is_valid():
             raise ValueError("get_comment_object may only be called on valid forms")
-        
+
         CommentModel = self.get_comment_model()
         new = CommentModel(**self.get_comment_create_data())
         new = self.check_for_duplicate_comment(new)
-        
+
         return new
-        
+
     def get_comment_model(self):
         """
         Get the comment model to create with this form. Subclasses in custom
@@ -121,7 +121,7 @@ class CommentDetailsForm(CommentSecurityForm):
         check_for_duplicate_comment to provide custom comment models.
         """
         return Comment
-        
+
     def get_comment_create_data(self):
         """
         Returns the dict of data to be used to create a comment. Subclasses in
@@ -140,13 +140,15 @@ class CommentDetailsForm(CommentSecurityForm):
             is_public    = True,
             is_removed   = False,
         )
-        
+
     def check_for_duplicate_comment(self, new):
         """
         Check that a submitted comment isn't a duplicate. This might be caused
         by someone posting a comment twice. If it is a dup, silently return the *previous* comment.
         """
-        possible_duplicates = self.get_comment_model()._default_manager.filter(
+        possible_duplicates = self.get_comment_model()._default_manager.using(
+            self.target_object._state.db
+        ).filter(
             content_type = new.content_type,
             object_pk = new.object_pk,
             user_name = new.user_name,
@@ -156,7 +158,7 @@ class CommentDetailsForm(CommentSecurityForm):
         for old in possible_duplicates:
             if old.submit_date.date() == new.submit_date.date() and old.comment == new.comment:
                 return old
-                
+
         return new
 
     def clean_comment(self):

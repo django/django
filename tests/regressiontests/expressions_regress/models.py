@@ -2,7 +2,7 @@
 Spanning tests for all the operations that F() expressions can perform.
 """
 from django.conf import settings
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 
 #
 # Model for testing arithmetic expressions.
@@ -121,7 +121,7 @@ Complex expressions of different connection types are possible.
 """}
 
 # Oracle doesn't support the Bitwise OR operator.
-if settings.DATABASE_ENGINE != 'oracle':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.oracle':
     __test__['API_TESTS'] += """
 
 >>> _ = Number.objects.filter(pk=n.pk).update(integer=42, float=15.5)

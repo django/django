@@ -29,10 +29,6 @@ except ImportError, exc:
         module = 'either pysqlite2 or sqlite3 modules (tried in that order)'
     raise ImproperlyConfigured, "Error loading %s: %s" % (module, exc)
 
-try:
-    import decimal
-except ImportError:
-    from django.utils import _decimal as decimal # for Python 2.3
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -154,19 +150,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
-        self.validation = BaseDatabaseValidation()
+        self.validation = BaseDatabaseValidation(self)
 
     def _cursor(self):
         if self.connection is None:
             settings_dict = self.settings_dict
-            if not settings_dict['DATABASE_NAME']:
+            if not settings_dict['NAME']:
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured, "Please fill out DATABASE_NAME in the settings module before using the database."
+                raise ImproperlyConfigured, "Please fill out the database NAME in the settings module before using the database."
             kwargs = {
-                'database': settings_dict['DATABASE_NAME'],
+                'database': settings_dict['NAME'],
                 'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
             }
-            kwargs.update(settings_dict['DATABASE_OPTIONS'])
+            kwargs.update(settings_dict['OPTIONS'])
             self.connection = Database.connect(**kwargs)
             # Register extract, date_trunc, and regexp functions.
             self.connection.create_function("django_extract", 2, _sqlite_extract)
@@ -179,7 +175,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # If database is in memory, closing the connection destroys the
         # database. To prevent accidental data loss, ignore close requests on
         # an in-memory db.
-        if self.settings_dict['DATABASE_NAME'] != ":memory:":
+        if self.settings_dict['NAME'] != ":memory:":
             BaseDatabaseWrapper.close(self)
 
 class SQLiteCursorWrapper(Database.Cursor):

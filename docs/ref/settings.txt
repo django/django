@@ -189,30 +189,67 @@ where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
 :ref:`ref-contrib-csrf`.
 
-.. setting:: DATABASE_ENGINE
 
-DATABASE_ENGINE
----------------
+.. setting:: DATABASES
+
+DATABASES
+---------
+
+.. versionadded: 1.2
+
+Default: ``{}`` (Empty dictionary)
+
+A dictionary containing the settings for all databases to be used with
+Django. It is a nested dictionary who's contents maps database aliases
+to a dictionary containing the options for an individual database.
+
+The :setting:`DATABASES` setting must configure a ``default`` database;
+any number of additional databases may also be specified.
+
+The simplest possible settings file is for a single-database setup using
+SQLite. This can be configured using the following::
+
+    DATABASES = {
+        'default': {
+            'BACKEND': 'django.db.backends.sqlite3',
+            'NAME': 'mydatabase'
+        }
+    }
+
+For other database backends, or more complex SQLite configurations, other options
+will be required. The following inner options are available.
+
+.. setting:: ENGINE
+
+ENGINE
+~~~~~~
 
 Default: ``''`` (Empty string)
 
-The database backend to use. The built-in database backends are
-``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'sqlite3'``, and
-``'oracle'``.
+The database backend to use. The built-in database backends are:
+
+    * ``'django.db.backends.postgresql_psycopg2'``
+    * ``'django.db.backends.postgresql'``
+    * ``'django.db.backends.mysql'``
+    * ``'django.db.backends.sqlite3'``
+    * ``'django.db.backends.oracle'``
 
 You can use a database backend that doesn't ship with Django by setting
-``DATABASE_ENGINE`` to a fully-qualified path (i.e.
+``ENGINE`` to a fully-qualified path (i.e.
 ``mypackage.backends.whatever``). Writing a whole new database backend from
 scratch is left as an exercise to the reader; see the other backends for
 examples.
 
-.. versionadded:: 1.0
-    Support for external database backends is new in 1.0.
+.. note::
+    Prior to Django 1.2, you could use a short version of the backend name
+    to reference the built-in database backends (e.g., you could use
+    ``'sqlite3'`` to refer to the SQLite backend). This format has been
+    deprecated, and will be removed in Django 1.4.
 
-.. setting:: DATABASE_HOST
+.. setting:: HOST
 
-DATABASE_HOST
--------------
+HOST
+~~~~
 
 Default: ``''`` (Empty string)
 
@@ -222,7 +259,7 @@ localhost. Not used with SQLite.
 If this value starts with a forward slash (``'/'``) and you're using MySQL,
 MySQL will connect via a Unix socket to the specified socket. For example::
 
-    DATABASE_HOST = '/var/run/mysql'
+    "HOST": '/var/run/mysql'
 
 If you're using MySQL and this value *doesn't* start with a forward slash, then
 this value is assumed to be the host.
@@ -232,10 +269,10 @@ for the connection, rather than a network connection to localhost. If you
 explicitly need to use a TCP/IP connection on the local machine with
 PostgreSQL, specify ``localhost`` here.
 
-.. setting:: DATABASE_NAME
+.. setting:: NAME
 
-DATABASE_NAME
--------------
+NAME
+~~~~
 
 Default: ``''`` (Empty string)
 
@@ -243,43 +280,90 @@ The name of the database to use. For SQLite, it's the full path to the database
 file. When specifying the path, always use forward slashes, even on Windows
 (e.g. ``C:/homes/user/mysite/sqlite3.db``).
 
-.. setting:: DATABASE_OPTIONS
+.. setting:: OPTIONS
 
-DATABASE_OPTIONS
-----------------
+OPTIONS
+~~~~~~~
 
 Default: ``{}`` (Empty dictionary)
 
 Extra parameters to use when connecting to the database. Consult backend
 module's document for available keywords.
 
-.. setting:: DATABASE_PASSWORD
+.. setting:: PASSWORD
 
-DATABASE_PASSWORD
------------------
+PASSWORD
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
 The password to use when connecting to the database. Not used with SQLite.
 
-.. setting:: DATABASE_PORT
+.. setting:: PORT
 
-DATABASE_PORT
--------------
+PORT
+~~~~
 
 Default: ``''`` (Empty string)
 
 The port to use when connecting to the database. An empty string means the
 default port. Not used with SQLite.
 
-.. setting:: DATABASE_USER
+.. setting:: USER
 
-DATABASE_USER
--------------
+USER
+~~~~
 
 Default: ``''`` (Empty string)
 
 The username to use when connecting to the database. Not used with SQLite.
+
+.. setting:: TEST_CHARSET
+
+TEST_CHARSET
+~~~~~~~~~~~~
+
+Default: ``None``
+
+The character set encoding used to create the test database. The value of this
+string is passed directly through to the database, so its format is
+backend-specific.
+
+Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and
+MySQL_ (``mysql``) backends.
+
+.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
+.. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+
+.. setting:: TEST_COLLATION
+
+TEST_COLLATION
+~~~~~~~~~~~~~~
+
+Default: ``None``
+
+The collation order to use when creating the test database. This value is
+passed directly to the backend, so its format is backend-specific.
+
+Only supported for the ``mysql`` backend (see `section 10.3.2`_ of the MySQL
+manual for details).
+
+.. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+
+.. setting:: TEST_NAME
+
+TEST_NAME
+~~~~~~~~~
+
+Default: ``None``
+
+The name of database to use when running the test suite.
+
+If the default value (``None``) is used with the SQLite database engine, the
+tests will use a memory resident database. For all other database engines the
+test database will use the name ``'test_' + DATABASE_NAME``.
+
+See :ref:`topics-testing`.
 
 .. setting:: DATE_FORMAT
 
@@ -1045,6 +1129,18 @@ See the :ref:`topics-http-sessions`.
 
 .. setting:: SESSION_EXPIRE_AT_BROWSER_CLOSE
 
+SESSION_DB_ALIAS
+----------------
+
+.. versionadded:: 1.2
+
+Default: ``None``
+
+If you're using database-backed session storage, this selects the database
+alias that will be used to store session data. By default, Django will use
+the ``default`` database, but you can store session data on any database
+you choose.
+
 SESSION_EXPIRE_AT_BROWSER_CLOSE
 -------------------------------
 
@@ -1169,56 +1265,6 @@ Default: ``''`` (Empty string)
 Output, as a string, that the template system should use for invalid (e.g.
 misspelled) variables. See :ref:`invalid-template-variables`..
 
-.. setting:: TEST_DATABASE_CHARSET
-
-TEST_DATABASE_CHARSET
----------------------
-
-.. versionadded:: 1.0
-
-Default: ``None``
-
-The character set encoding used to create the test database. The value of this
-string is passed directly through to the database, so its format is
-backend-specific.
-
-Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and MySQL_ (``mysql``) backends.
-
-.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
-.. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
-
-.. setting:: TEST_DATABASE_COLLATION
-
-TEST_DATABASE_COLLATION
-------------------------
-
-.. versionadded:: 1.0
-
-Default: ``None``
-
-The collation order to use when creating the test database. This value is
-passed directly to the backend, so its format is backend-specific.
-
-Only supported for the ``mysql`` backend (see `section 10.3.2`_ of the MySQL
-manual for details).
-
-.. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
-
-.. setting:: TEST_DATABASE_NAME
-
-TEST_DATABASE_NAME
-------------------
-
-Default: ``None``
-
-The name of database to use when running the test suite.
-
-If the default value (``None``) is used with the SQLite database engine, the
-tests will use a memory resident database. For all other database engines the
-test database will use the name ``'test_' + settings.DATABASE_NAME``.
-
-See :ref:`topics-testing`.
-
 .. setting:: TEST_RUNNER
 
 TEST_RUNNER
@@ -1328,3 +1374,97 @@ Different locales have different formats. For example, U.S. English would say
 
 See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
 ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``MONTH_DAY_FORMAT``.
+
+Deprecated settings
+===================
+
+.. setting:: DATABASE_ENGINE
+
+DATABASE_ENGINE
+---------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`ENGINE` in
+   :setting:`DATABASES`.
+
+.. setting:: DATABASE_HOST
+
+DATABASE_HOST
+-------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`HOST` in
+   :setting:`DATABASES`.
+
+.. setting:: DATABASE_NAME
+
+DATABASE_NAME
+-------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`NAME` in
+   :setting:`DATABASES`.
+
+.. setting:: DATABASE_OPTIONS
+
+DATABASE_OPTIONS
+----------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`OPTIONS` in
+   :setting:`DATABASES`.
+
+.. setting:: DATABASE_PASSWORD
+
+DATABASE_PASSWORD
+-----------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`PASSWORD` in
+   :setting:`DATABASES`.
+
+.. setting:: DATABASE_PORT
+
+DATABASE_PORT
+-------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`PORT` in
+   :setting:`DATABASES`.
+
+.. setting:: DATABASE_USER
+
+DATABASE_USER
+-------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`USER` in
+   :setting:`DATABASES`.
+
+.. setting:: TEST_DATABASE_CHARSET
+
+TEST_DATABASE_CHARSET
+---------------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`TEST_CHARSET` in
+   :setting:`DATABASES`.
+
+.. setting:: TEST_DATABASE_COLLATION
+
+TEST_DATABASE_COLLATION
+-----------------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`TEST_COLLATION` in
+   :setting:`DATABASES`.
+
+.. setting:: TEST_DATABASE_NAME
+
+TEST_DATABASE_NAME
+------------------
+
+.. deprecated:: 1.2
+   This setting has been replaced by :setting:`TEST_NAME` in
+   :setting:`DATABASES`.
+

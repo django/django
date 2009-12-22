@@ -141,8 +141,9 @@ class BaseModelAdmin(object):
         """
         Get a form Field for a ForeignKey.
         """
+        db = kwargs.get('using')
         if db_field.name in self.raw_id_fields:
-            kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
+            kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel, using=db)
         elif db_field.name in self.radio_fields:
             kwargs['widget'] = widgets.AdminRadioSelect(attrs={
                 'class': get_ul_class(self.radio_fields[db_field.name]),
@@ -159,9 +160,10 @@ class BaseModelAdmin(object):
         # a field in admin.
         if not db_field.rel.through._meta.auto_created:
             return None
+        db = kwargs.get('using')
 
         if db_field.name in self.raw_id_fields:
-            kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel)
+            kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel, using=db)
             kwargs['help_text'] = ''
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
             kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
@@ -739,7 +741,7 @@ class ModelAdmin(BaseModelAdmin):
                 form_validated = False
                 new_object = self.model()
             prefixes = {}
-            for FormSet in self.get_formsets(request):
+            for FormSet, inline in zip(self.get_formsets(request), self.inline_instances):
                 prefix = FormSet.get_default_prefix()
                 prefixes[prefix] = prefixes.get(prefix, 0) + 1
                 if prefixes[prefix] != 1:
@@ -747,7 +749,7 @@ class ModelAdmin(BaseModelAdmin):
                 formset = FormSet(data=request.POST, files=request.FILES,
                                   instance=new_object,
                                   save_as_new=request.POST.has_key("_saveasnew"),
-                                  prefix=prefix)
+                                  prefix=prefix, queryset=inline.queryset(request))
                 formsets.append(formset)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, change=False)
@@ -770,12 +772,14 @@ class ModelAdmin(BaseModelAdmin):
                     initial[k] = initial[k].split(",")
             form = ModelForm(initial=initial)
             prefixes = {}
-            for FormSet in self.get_formsets(request):
+            for FormSet, inline in zip(self.get_formsets(request),
+                                       self.inline_instances):
                 prefix = FormSet.get_default_prefix()
                 prefixes[prefix] = prefixes.get(prefix, 0) + 1
                 if prefixes[prefix] != 1:
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
-                formset = FormSet(instance=self.model(), prefix=prefix)
+                formset = FormSet(instance=self.model(), prefix=prefix,
+                                  queryset=inline.queryset(request))
                 formsets.append(formset)
 
         adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)), self.prepopulated_fields)
@@ -837,13 +841,16 @@ class ModelAdmin(BaseModelAdmin):
                 form_validated = False
                 new_object = obj
             prefixes = {}
-            for FormSet in self.get_formsets(request, new_object):
+            for FormSet, inline in zip(self.get_formsets(request, new_object),
+                                       self.inline_instances):
                 prefix = FormSet.get_default_prefix()
                 prefixes[prefix] = prefixes.get(prefix, 0) + 1
                 if prefixes[prefix] != 1:
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
                 formset = FormSet(request.POST, request.FILES,
-                                  instance=new_object, prefix=prefix)
+                                  instance=new_object, prefix=prefix,
+                                  queryset=inline.queryset(request))
+
                 formsets.append(formset)
 
             if all_valid(formsets) and form_validated:
@@ -859,12 +866,13 @@ class ModelAdmin(BaseModelAdmin):
         else:
             form = ModelForm(instance=obj)
             prefixes = {}
-            for FormSet in self.get_formsets(request, obj):
+            for FormSet, inline in zip(self.get_formsets(request, obj), self.inline_instances):
                 prefix = FormSet.get_default_prefix()
                 prefixes[prefix] = prefixes.get(prefix, 0) + 1
                 if prefixes[prefix] != 1:
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
-                formset = FormSet(instance=obj, prefix=prefix)
+                formset = FormSet(instance=obj, prefix=prefix,
+                                  queryset=inline.queryset(request))
                 formsets.append(formset)
 
         adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj), self.prepopulated_fields)
@@ -1186,6 +1194,9 @@ class InlineModelAdmin(BaseModelAdmin):
             return self.declared_fieldsets
         form = self.get_formset(request).form
         return [(None, {'fields': form.base_fields.keys()})]
+
+    def queryset(self, request):
+        return self.model._default_manager.all()
 
 class StackedInline(InlineModelAdmin):
     template = 'admin/edit_inline/stacked.html'

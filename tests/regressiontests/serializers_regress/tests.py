@@ -13,7 +13,7 @@ from cStringIO import StringIO
 
 from django.utils.functional import curry
 from django.core import serializers
-from django.db import transaction
+from django.db import transaction, DEFAULT_DB_ALIAS
 from django.core import management
 from django.conf import settings
 
@@ -260,19 +260,19 @@ The end."""),
     (fk_obj, 452, FKDataToField, None),
 
     (fk_obj, 460, FKDataToO2O, 300),
-        
+
     (im2m_obj, 470, M2MIntermediateData, None),
-    
+
     #testing post- and prereferences and extra fields
     (im_obj, 480, Intermediate, {'right': 300, 'left': 470}),
-    (im_obj, 481, Intermediate, {'right': 300, 'left': 490}), 
-    (im_obj, 482, Intermediate, {'right': 500, 'left': 470}), 
-    (im_obj, 483, Intermediate, {'right': 500, 'left': 490}), 
-    (im_obj, 484, Intermediate, {'right': 300, 'left': 470, 'extra': "extra"}), 
-    (im_obj, 485, Intermediate, {'right': 300, 'left': 490, 'extra': "extra"}), 
-    (im_obj, 486, Intermediate, {'right': 500, 'left': 470, 'extra': "extra"}), 
-    (im_obj, 487, Intermediate, {'right': 500, 'left': 490, 'extra': "extra"}), 
-    
+    (im_obj, 481, Intermediate, {'right': 300, 'left': 490}),
+    (im_obj, 482, Intermediate, {'right': 500, 'left': 470}),
+    (im_obj, 483, Intermediate, {'right': 500, 'left': 490}),
+    (im_obj, 484, Intermediate, {'right': 300, 'left': 470, 'extra': "extra"}),
+    (im_obj, 485, Intermediate, {'right': 300, 'left': 490, 'extra': "extra"}),
+    (im_obj, 486, Intermediate, {'right': 500, 'left': 470, 'extra': "extra"}),
+    (im_obj, 487, Intermediate, {'right': 500, 'left': 490, 'extra': "extra"}),
+
     (im2m_obj, 490, M2MIntermediateData, []),
 
     (data_obj, 500, Anchor, "Anchor 3"),
@@ -331,7 +331,7 @@ The end."""),
 # Because Oracle treats the empty string as NULL, Oracle is expected to fail
 # when field.empty_strings_allowed is True and the value is None; skip these
 # tests.
-if settings.DATABASE_ENGINE == 'oracle':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
     test_data = [data for data in test_data
                  if not (data[0] == data_obj and
                          data[2]._meta.get_field('data').empty_strings_allowed and
@@ -340,7 +340,7 @@ if settings.DATABASE_ENGINE == 'oracle':
 # Regression test for #8651 -- a FK to an object iwth PK of 0
 # This won't work on MySQL since it won't let you create an object
 # with a primary key of 0,
-if settings.DATABASE_ENGINE != 'mysql':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
     test_data.extend([
         (data_obj, 0, Anchor, "Anchor 0"),
         (fk_obj, 465, FKData, 0),

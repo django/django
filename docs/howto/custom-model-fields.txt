@@ -272,9 +272,9 @@ Documenting your Custom Field
 As always, you should document your field type, so users will know what it is.
 In addition to providing a docstring for it, which is useful for developers,
 you can also allow users of the admin app to see a short description of the
-field type via the ``django.contrib.admindocs`` application. To do this simply 
-provide descriptive text in a ``description`` class attribute of your custom field. 
-In the above example, the type description displayed by the ``admindocs`` application 
+field type via the ``django.contrib.admindocs`` application. To do this simply
+provide descriptive text in a ``description`` class attribute of your custom field.
+In the above example, the type description displayed by the ``admindocs`` application
 for a ``HandField`` will be 'A hand of cards (bridge style)'.
 
 Useful methods
@@ -288,10 +288,13 @@ approximately decreasing order of importance, so start from the top.
 Custom database types
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: db_type(self)
+.. method:: db_type(self, connection)
+
+.. versionadded:: 1.2
+   The ``connection`` argument was added to support multiple databases.
 
 Returns the database column data type for the :class:`~django.db.models.Field`,
-taking into account the current :setting:`DATABASE_ENGINE` setting.
+taking into account the connection object, and the settings associated with it.
 
 Say you've created a PostgreSQL custom type called ``mytype``. You can use this
 field with Django by subclassing ``Field`` and implementing the :meth:`db_type`
@@ -300,7 +303,7 @@ method, like so::
     from django.db import models
 
     class MytypeField(models.Field):
-        def db_type(self):
+        def db_type(self, connection):
             return 'mytype'
 
 Once you have ``MytypeField``, you can use it in any model, just like any other
@@ -315,13 +318,13 @@ If you aim to build a database-agnostic application, you should account for
 differences in database column types. For example, the date/time column type
 in PostgreSQL is called ``timestamp``, while the same column in MySQL is called
 ``datetime``. The simplest way to handle this in a ``db_type()`` method is to
-import the Django settings module and check the :setting:`DATABASE_ENGINE` setting.
+check the ``connection.settings_dict['ENGINE']`` attribute.
+
 For example::
 
     class MyDateField(models.Field):
-        def db_type(self):
-            from django.conf import settings
-            if settings.DATABASE_ENGINE == 'mysql':
+        def db_type(self, connection):
+            if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
                 return 'datetime'
             else:
                 return 'timestamp'
@@ -329,7 +332,7 @@ For example::
 The :meth:`db_type` method is only called by Django when the framework
 constructs the ``CREATE TABLE`` statements for your application -- that is, when
 you first create your tables. It's not called at any other time, so it can
-afford to execute slightly complex code, such as the :setting:`DATABASE_ENGINE`
+afford to execute slightly complex code, such as the ``connection.settings_dict``
 check in the above example.
 
 Some database column types accept parameters, such as ``CHAR(25)``, where the
@@ -340,7 +343,7 @@ sense to have a ``CharMaxlength25Field``, shown here::
 
     # This is a silly example of hard-coded parameters.
     class CharMaxlength25Field(models.Field):
-        def db_type(self):
+        def db_type(self, connection):
             return 'char(25)'
 
     # In the model:
@@ -358,7 +361,7 @@ time -- i.e., when the class is instantiated. To do that, just implement
             self.max_length = max_length
             super(BetterCharField, self).__init__(*args, **kwargs)
 
-        def db_type(self):
+        def db_type(self, connection):
             return 'char(%s)' % self.max_length
 
     # In the model:
@@ -421,33 +424,67 @@ Python object type we want to store in the model's attribute.
 called when it is created, you should be using `The SubfieldBase metaclass`_
 mentioned earlier. Otherwise :meth:`to_python` won't be called automatically.
 
-Converting Python objects to database values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Converting Python objects to query values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: get_db_prep_value(self, value)
+.. method:: get_prep_value(self, value)
 
-This is the reverse of :meth:`to_python` when working with the database backends
-(as opposed to serialization). The ``value`` parameter is the current value of
-the model's attribute (a field has no reference to its containing model, so it
-cannot retrieve the value itself), and the method should return data in a format
-that can be used as a parameter in a query for the database backend.
+.. versionadded:: 1.2
+   This method was factored out of ``get_db_prep_value()``
+
+This is the reverse of :meth:`to_python` when working with the
+database backends (as opposed to serialization). The ``value``
+parameter is the current value of the model's attribute (a field has
+no reference to its containing model, so it cannot retrieve the value
+itself), and the method should return data in a format that has been
+prepared for use as a parameter in a query.
+
+This conversion should *not* include any database-specific
+conversions. If database-specific conversions are required, they
+should be made in the call to :meth:`get_db_prep_value`.
 
 For example::
 
     class HandField(models.Field):
         # ...
 
-        def get_db_prep_value(self, value):
+        def get_prep_value(self, value):
             return ''.join([''.join(l) for l in (value.north,
                     value.east, value.south, value.west)])
 
-.. method:: get_db_prep_save(self, value)
+Converting query values to database values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Same as the above, but called when the Field value must be *saved* to the
-database. As the default implementation just calls ``get_db_prep_value``, you
-shouldn't need to implement this method unless your custom field needs a
-special conversion when being saved that is not the same as the conversion used
-for normal query parameters (which is implemented by ``get_db_prep_value``).
+.. method:: get_db_prep_value(self, value, connection, prepared=False)
+
+.. versionadded:: 1.2
+   The ``connection`` and ``prepared arguments were added to support multiple databases.
+
+Some data types (for example, dates) need to be in a specific format
+before they can be used by a database backend.
+:meth:`get_db_prep_value` is the method where those conversions should
+be made. The specific connection that will be used for the query is
+passed as the ``connection`` parameter. This allows you to use
+backend-specific conversion logic if it is required.
+
+The ``prepared`` argument describes whether or not the value has
+already been passed through :meth:`get_prep_value` conversions. When
+``prepared`` is False, the default implementation of
+:meth:`get_db_prep_value` will call :meth:`get_prep_value` to do
+initial data conversions before performing any database-specific
+processing.
+
+.. method:: get_db_prep_save(self, value, connection)
+
+.. versionadded:: 1.2
+   The ``connection`` argument was added to support multiple databases.
+
+Same as the above, but called when the Field value must be *saved* to
+the database. As the default implementation just calls
+``get_db_prep_value``, you shouldn't need to implement this method
+unless your custom field needs a special conversion when being saved
+that is not the same as the conversion used for normal query
+parameters (which is implemented by ``get_db_prep_value``).
 
 Preprocessing values before saving
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -475,7 +512,16 @@ correct value.
 Preparing values for use in database lookups
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: get_db_prep_lookup(self, lookup_type, value)
+As with value conversions, preparing a value for database lookups is a
+two phase process.
+
+.. method:: get_prep_lookup(self, lookup_type, value)
+
+.. versionadded:: 1.2
+   This method was factored out of ``get_db_prep_lookup()``
+
+:meth:`get_prep_lookup` performs the first phase of lookup preparation,
+performing generic data validity checks
 
 Prepares the ``value`` for passing to the database when used in a lookup (a
 ``WHERE`` constraint in SQL). The ``lookup_type`` will be one of the valid
@@ -492,33 +538,44 @@ by with handling the lookup types that need special handling for your field
 and pass the rest to the :meth:`get_db_prep_lookup` method of the parent class.
 
 If you needed to implement ``get_db_prep_save()``, you will usually need to
-implement ``get_db_prep_lookup()``. If you don't, ``get_db_prep_value`` will be
+implement ``get_prep_lookup()``. If you don't, ``get_prep_value`` will be
 called by the default implementation, to manage ``exact``, ``gt``, ``gte``,
 ``lt``, ``lte``, ``in`` and ``range`` lookups.
 
 You may also want to implement this method to limit the lookup types that could
 be used with your custom field type.
 
-Note that, for ``range`` and ``in`` lookups, ``get_db_prep_lookup`` will receive
+Note that, for ``range`` and ``in`` lookups, ``get_prep_lookup`` will receive
 a list of objects (presumably of the right type) and will need to convert them
 to a list of things of the right type for passing to the database. Most of the
-time, you can reuse ``get_db_prep_value()``, or at least factor out some common
+time, you can reuse ``get_prep_value()``, or at least factor out some common
 pieces.
 
-For example, the following code implements ``get_db_prep_lookup`` to limit the
+For example, the following code implements ``get_prep_lookup`` to limit the
 accepted lookup types to ``exact`` and ``in``::
 
     class HandField(models.Field):
         # ...
 
-        def get_db_prep_lookup(self, lookup_type, value):
+        def get_prep_lookup(self, lookup_type, value):
             # We only handle 'exact' and 'in'. All others are errors.
             if lookup_type == 'exact':
-                return [self.get_db_prep_value(value)]
+                return [self.get_prep_value(value)]
             elif lookup_type == 'in':
-                return [self.get_db_prep_value(v) for v in value]
+                return [self.get_prep_value(v) for v in value]
             else:
                 raise TypeError('Lookup type %r not supported.' % lookup_type)
+
+.. method:: get_db_prep_lookup(self, lookup_type, value, connection, prepared=False)
+
+.. versionadded:: 1.2
+   The ``connection`` and ``prepared`` arguments were added to support multiple databases.
+
+Performs any database-specific data conversions required by a lookup.
+As with :meth:`get_db_prep_value`, the specific connection that will
+be used for the query is passed as the ``connection`` parameter.
+The ``prepared`` argument describes whether the value has already been
+prepared with :meth:`get_prep_lookup`.
 
 Specifying the form field for a model field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,14 +1,25 @@
+from optparse import make_option
+
 from django.core.management.base import LabelCommand
+from django.db import connections, transaction, models, DEFAULT_DB_ALIAS
 
 class Command(LabelCommand):
     help = "Creates the table needed to use the SQL cache backend."
     args = "<tablename>"
     label = 'tablename'
 
+    option_list = LabelCommand.option_list + (
+        make_option('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database onto '
+                'which the cache table will be installed. '
+                'Defaults to the "default" database.'),
+    )
+
     requires_model_validation = False
 
     def handle_label(self, tablename, **options):
-        from django.db import connection, transaction, models
+        alias = options.get('database', DEFAULT_DB_ALIAS)
+        connection = connections[alias]
         fields = (
             # "key" is a reserved word in MySQL, so use "cache_key" instead.
             models.CharField(name='cache_key', max_length=255, unique=True, primary_key=True),
@@ -19,7 +30,7 @@ class Command(LabelCommand):
         index_output = []
         qn = connection.ops.quote_name
         for f in fields:
-            field_output = [qn(f.name), f.db_type()]
+            field_output = [qn(f.name), f.db_type(connection=connection)]
             field_output.append("%sNULL" % (not f.null and "NOT " or ""))
             if f.primary_key:
                 field_output.append("PRIMARY KEY")
@@ -39,4 +50,4 @@ class Command(LabelCommand):
         curs.execute("\n".join(full_statement))
         for statement in index_output:
             curs.execute(statement)
-        transaction.commit_unless_managed()
+        transaction.commit_unless_managed(using=alias)

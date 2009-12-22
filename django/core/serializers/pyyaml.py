@@ -5,12 +5,8 @@ Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 """
 
 from StringIO import StringIO
+import decimal
 import yaml
-
-try:
-    import decimal
-except ImportError:
-    from django.utils import _decimal as decimal # Python 2.3 fallback
 
 from django.db import models
 from django.core.serializers.python import Serializer as PythonSerializer
@@ -58,6 +54,6 @@ def Deserializer(stream_or_string, **options):
         stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string
-    for obj in PythonDeserializer(yaml.load(stream)):
+    for obj in PythonDeserializer(yaml.load(stream), **options):
         yield obj
 

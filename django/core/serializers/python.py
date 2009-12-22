@@ -6,7 +6,7 @@ other serializers.
 
 from django.conf import settings
 from django.core.serializers import base
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.utils.encoding import smart_unicode, is_protected_type
 
 class Serializer(base.Serializer):
@@ -77,6 +77,7 @@ def Deserializer(object_list, **options):
     It's expected that you pass the Python objects themselves (instead of a
     stream or a string) to the constructor
     """
+    db = options.pop('using', DEFAULT_DB_ALIAS)
     models.get_apps()
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
@@ -96,7 +97,7 @@ def Deserializer(object_list, **options):
                 if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
                         if hasattr(value, '__iter__'):
-                            return field.rel.to._default_manager.get_by_natural_key(*value).pk
+                            return field.rel.to._default_manager.db_manager(db).get_by_natural_key(*value).pk
                         else:
                             return smart_unicode(field.rel.to._meta.pk.to_python(value))
                 else:
@@ -108,7 +109,7 @@ def Deserializer(object_list, **options):
                 if field_value is not None:
                     if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                         if hasattr(field_value, '__iter__'):
-                            obj = field.rel.to._default_manager.get_by_natural_key(*field_value)
+                            obj = field.rel.to._default_manager.db_manager(db).get_by_natural_key(*field_value)
                             value = getattr(obj, field.rel.field_name)
                         else:
                             value = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)

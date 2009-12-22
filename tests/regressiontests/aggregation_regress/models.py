@@ -1,7 +1,7 @@
 # coding: utf-8
 import pickle
 
-from django.db import connection, models
+from django.db import connection, models, DEFAULT_DB_ALIAS
 from django.conf import settings
 
 try:
@@ -97,19 +97,19 @@ __test__ = {'API_TESTS': """
 {'pages__sum': 3703}
 
 # Annotations get combined with extra select clauses
->>> sorted(Book.objects.all().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost' : 'price * .5'}).get(pk=2).__dict__.items())
+>>> sorted((k,v) for k,v in Book.objects.all().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost' : 'price * .5'}).get(pk=2).__dict__.items() if k != '_state')
 [('contact_id', 3), ('id', 2), ('isbn', u'067232959'), ('manufacture_cost', ...11.545...), ('mean_auth_age', 45.0), ('name', u'Sams Teach Yourself Django in 24 Hours'), ('pages', 528), ('price', Decimal("23.09")), ('pubdate', datetime.date(2008, 3, 3)), ('publisher_id', 2), ('rating', 3.0)]
 
 # Order of the annotate/extra in the query doesn't matter
->>> sorted(Book.objects.all().extra(select={'manufacture_cost' : 'price * .5'}).annotate(mean_auth_age=Avg('authors__age')).get(pk=2).__dict__.items())
+>>> sorted((k,v) for k,v in Book.objects.all().extra(select={'manufacture_cost' : 'price * .5'}).annotate(mean_auth_age=Avg('authors__age')).get(pk=2).__dict__.items()if k != '_state')
 [('contact_id', 3), ('id', 2), ('isbn', u'067232959'), ('manufacture_cost', ...11.545...), ('mean_auth_age', 45.0), ('name', u'Sams Teach Yourself Django in 24 Hours'), ('pages', 528), ('price', Decimal("23.09")), ('pubdate', datetime.date(2008, 3, 3)), ('publisher_id', 2), ('rating', 3.0)]
 
 # Values queries can be combined with annotate and extra
->>> sorted(Book.objects.all().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost' : 'price * .5'}).values().get(pk=2).items())
+>>> sorted((k,v) for k,v in Book.objects.all().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost' : 'price * .5'}).values().get(pk=2).items()if k != '_state')
 [('contact_id', 3), ('id', 2), ('isbn', u'067232959'), ('manufacture_cost', ...11.545...), ('mean_auth_age', 45.0), ('name', u'Sams Teach Yourself Django in 24 Hours'), ('pages', 528), ('price', Decimal("23.09")), ('pubdate', datetime.date(2008, 3, 3)), ('publisher_id', 2), ('rating', 3.0)]
 
 # The order of the (empty) values, annotate and extra clauses doesn't matter
->>> sorted(Book.objects.all().values().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost' : 'price * .5'}).get(pk=2).items())
+>>> sorted((k,v) for k,v in Book.objects.all().values().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost' : 'price * .5'}).get(pk=2).items()if k != '_state')
 [('contact_id', 3), ('id', 2), ('isbn', u'067232959'), ('manufacture_cost', ...11.545...), ('mean_auth_age', 45.0), ('name', u'Sams Teach Yourself Django in 24 Hours'), ('pages', 528), ('price', Decimal("23.09")), ('pubdate', datetime.date(2008, 3, 3)), ('publisher_id', 2), ('rating', 3.0)]
 
 # If the annotation precedes the values clause, it won't be included
@@ -250,10 +250,10 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 >>> out = pickle.dumps(qs)
 
 # Then check that the round trip works.
->>> query = qs.query.as_sql()[0]
+>>> query = qs.query.get_compiler(qs.db).as_sql()[0]
 >>> select_fields = qs.query.select_fields
 >>> query2 = pickle.loads(pickle.dumps(qs))
->>> query2.query.as_sql()[0] == query
+>>> query2.query.get_compiler(query2.db).as_sql()[0] == query
 True
 >>> query2.query.select_fields = select_fields
 
@@ -327,7 +327,7 @@ def run_stddev_tests():
     Stddev and Variance are not guaranteed to be available for SQLite, and
     are not available for PostgreSQL before 8.2.
     """
-    if settings.DATABASE_ENGINE == 'sqlite3':
+    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.sqlite3':
         return False
 
     class StdDevPop(object):
@@ -379,6 +379,5 @@ if run_stddev_tests():
 
 >>> Book.objects.aggregate(Variance('price', sample=True))
 {'price__variance': 700.53...}
-
 
 """

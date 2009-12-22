@@ -1,11 +1,12 @@
 from django.conf import settings
+from django.db import DEFAULT_DB_ALIAS
 
 # function that will pass a test.
 def pass_test(*args): return
 
 def no_backend(test_func, backend):
     "Use this decorator to disable test on specified backend."
-    if settings.DATABASE_ENGINE == backend:
+    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1] == backend:
         return pass_test
     else:
         return test_func
@@ -13,12 +14,13 @@ def no_backend(test_func, backend):
 # Decorators to disable entire test functions for specific
 # spatial backends.
 def no_oracle(func): return no_backend(func, 'oracle')
-def no_postgis(func): return no_backend(func, 'postgresql_psycopg2')
+def no_postgis(func): return no_backend(func, 'postgis')
 def no_mysql(func): return no_backend(func, 'mysql')
-def no_spatialite(func): return no_backend(func, 'sqlite3')
+def no_spatialite(func): return no_backend(func, 'spatialite')
 
 # Shortcut booleans to omit only portions of tests.
-oracle  = settings.DATABASE_ENGINE == 'oracle'
-postgis = settings.DATABASE_ENGINE == 'postgresql_psycopg2' 
-mysql   = settings.DATABASE_ENGINE == 'mysql'
-spatialite = settings.DATABASE_ENGINE == 'sqlite3'
+_default_db = settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1]
+oracle  = _default_db == 'oracle'
+postgis = _default_db == 'postgis'
+mysql   = _default_db == 'mysql'
+spatialite = _default_db == 'spatialite'

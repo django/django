@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 
@@ -10,7 +10,7 @@ class ContentTypeManager(models.Manager):
 
     def get_by_natural_key(self, app_label, model):
         try:
-            ct = self.__class__._cache[(app_label, model)]
+            ct = self.__class__._cache[self.db][(app_label, model)]
         except KeyError:
             ct = self.get(app_label=app_label, model=model)
         return ct
@@ -27,7 +27,7 @@ class ContentTypeManager(models.Manager):
             opts = model._meta
         key = (opts.app_label, opts.object_name.lower())
         try:
-            ct = self.__class__._cache[key]
+            ct = self.__class__._cache[self.db][key]
         except KeyError:
             # Load or create the ContentType entry. The smart_unicode() is
             # needed around opts.verbose_name_raw because name_raw might be a
@@ -37,7 +37,7 @@ class ContentTypeManager(models.Manager):
                 model = opts.object_name.lower(),
                 defaults = {'name': smart_unicode(opts.verbose_name_raw)},
             )
-            self._add_to_cache(ct)
+            self._add_to_cache(self.db, ct)
 
         return ct
 
@@ -47,12 +47,12 @@ class ContentTypeManager(models.Manager):
         (though ContentTypes are obviously not created on-the-fly by get_by_id).
         """
         try:
-            ct = self.__class__._cache[id]
+            ct = self.__class__._cache[self.db][id]
         except KeyError:
             # This could raise a DoesNotExist; that's correct behavior and will
             # make sure that only correct ctypes get stored in the cache dict.
             ct = self.get(pk=id)
-            self._add_to_cache(ct)
+            self._add_to_cache(self.db, ct)
         return ct
 
     def clear_cache(self):
@@ -64,12 +64,12 @@ class ContentTypeManager(models.Manager):
         """
         self.__class__._cache.clear()
 
-    def _add_to_cache(self, ct):
+    def _add_to_cache(self, using, ct):
         """Insert a ContentType into the cache."""
         model = ct.model_class()
         key = (model._meta.app_label, model._meta.object_name.lower())
-        self.__class__._cache[key] = ct
-        self.__class__._cache[ct.id] = ct
+        self.__class__._cache.setdefault(using, {})[key] = ct
+        self.__class__._cache.setdefault(using, {})[ct.id] = ct
 
 class ContentType(models.Model):
     name = models.CharField(max_length=100)
@@ -99,7 +99,7 @@ class ContentType(models.Model):
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
         """
-        return self.model_class()._default_manager.get(**kwargs)
+        return self.model_class()._default_manager.using(self._state.db).get(**kwargs)
 
     def natural_key(self):
         return (self.app_label, self.model)

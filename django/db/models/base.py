@@ -9,7 +9,7 @@ from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneF
 from django.db.models.query import delete_objects, Q
 from django.db.models.query_utils import CollectedObjects, DeferredAttribute
 from django.db.models.options import Options
-from django.db import connection, transaction, DatabaseError
+from django.db import connections, transaction, DatabaseError, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 import django.utils.copycompat as copy
@@ -230,12 +230,22 @@ class ModelBase(type):
 
         signals.class_prepared.send(sender=cls)
 
+class ModelState(object):
+    """
+    A class for storing instance state
+    """
+    def __init__(self, db=None):
+        self.db = db
+
 class Model(object):
     __metaclass__ = ModelBase
     _deferred = False
 
     def __init__(self, *args, **kwargs):
         signals.pre_init.send(sender=self.__class__, args=args, kwargs=kwargs)
+
+        # Set up the storage for instane state
+        self._state = ModelState()
 
         # There is a rather weird disparity here; if kwargs, it's set, then args
         # overrides it. It should be one or the other; don't duplicate the work
@@ -404,7 +414,7 @@ class Model(object):
             return getattr(self, field_name)
         return getattr(self, field.attname)
 
-    def save(self, force_insert=False, force_update=False):
+    def save(self, force_insert=False, force_update=False, using=None):
         """
         Saves the current instance. Override this in a subclass if you want to
         control the saving process.
@@ -416,18 +426,20 @@ class Model(object):
         if force_insert and force_update:
             raise ValueError("Cannot force both insert and updating in "
                     "model saving.")
-        self.save_base(force_insert=force_insert, force_update=force_update)
+        self.save_base(using=using, force_insert=force_insert, force_update=force_update)
 
     save.alters_data = True
 
-    def save_base(self, raw=False, cls=None, origin=None,
-            force_insert=False, force_update=False):
+    def save_base(self, raw=False, cls=None, origin=None, force_insert=False,
+            force_update=False, using=None):
         """
         Does the heavy-lifting involved in saving. Subclasses shouldn't need to
         override this method. It's separate from save() in order to hide the
         need for overrides of save() to pass around internal-only parameters
         ('raw', 'cls', and 'origin').
         """
+        using = using or self._state.db or DEFAULT_DB_ALIAS
+        connection = connections[using]
         assert not (force_insert and force_update)
         if cls is None:
             cls = self.__class__
@@ -458,7 +470,7 @@ class Model(object):
                 if field and getattr(self, parent._meta.pk.attname) is None and getattr(self, field.attname) is not None:
                     setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
 
-                self.save_base(cls=parent, origin=org)
+                self.save_base(cls=parent, origin=org, using=using)
 
                 if field:
                     setattr(self, field.attname, self._get_pk_val(parent._meta))
@@ -476,11 +488,11 @@ class Model(object):
             if pk_set:
                 # Determine whether a record with the primary key already exists.
                 if (force_update or (not force_insert and
-                        manager.filter(pk=pk_val).exists())):
+                        manager.using(using).filter(pk=pk_val).exists())):
                     # It does already exist, so do an UPDATE.
                     if force_update or non_pks:
                         values = [(f, None, (raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]
-                        rows = manager.filter(pk=pk_val)._update(values)
+                        rows = manager.using(using).filter(pk=pk_val)._update(values)
                         if force_update and not rows:
                             raise DatabaseError("Forced update did not affect any rows.")
                 else:
@@ -489,27 +501,33 @@ class Model(object):
                 if not pk_set:
                     if force_update:
                         raise ValueError("Cannot force an update in save() with no primary key.")
-                    values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields if not isinstance(f, AutoField)]
+                    values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True), connection=connection))
+                        for f in meta.local_fields if not isinstance(f, AutoField)]
                 else:
-                    values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields]
+                    values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True), connection=connection))
+                        for f in meta.local_fields]
 
                 if meta.order_with_respect_to:
                     field = meta.order_with_respect_to
-                    values.append((meta.get_field_by_name('_order')[0], manager.filter(**{field.name: getattr(self, field.attname)}).count()))
+                    values.append((meta.get_field_by_name('_order')[0], manager.using(using).filter(**{field.name: getattr(self, field.attname)}).count()))
                 record_exists = False
 
                 update_pk = bool(meta.has_auto_field and not pk_set)
                 if values:
                     # Create a new record.
-                    result = manager._insert(values, return_id=update_pk)
+                    result = manager._insert(values, return_id=update_pk, using=using)
                 else:
                     # Create a new record with defaults for everything.
-                    result = manager._insert([(meta.pk, connection.ops.pk_default_value())], return_id=update_pk, raw_values=True)
+                    result = manager._insert([(meta.pk, connection.ops.pk_default_value())], return_id=update_pk, raw_values=True, using=using)
 
                 if update_pk:
                     setattr(self, meta.pk.attname, result)
-            transaction.commit_unless_managed()
+            transaction.commit_unless_managed(using=using)
 
+        # Store the database on which the object was saved
+        self._state.db = using
+
+        # Signal that the save is complete
         if origin and not meta.auto_created:
             signals.post_save.send(sender=origin, instance=self,
                 created=(not record_exists), raw=raw)
@@ -572,7 +590,9 @@ class Model(object):
             # delete it and all its descendents.
             parent_obj._collect_sub_objects(seen_objs)
 
-    def delete(self):
+    def delete(self, using=None):
+        using = using or self._state.db or DEFAULT_DB_ALIAS
+        connection = connections[using]
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 
         # Find all the objects than need to be deleted.
@@ -580,7 +600,7 @@ class Model(object):
         self._collect_sub_objects(seen_objs)
 
         # Actually delete the objects.
-        delete_objects(seen_objs)
+        delete_objects(seen_objs, using)
 
     delete.alters_data = True
 
@@ -594,7 +614,7 @@ class Model(object):
         param = smart_str(getattr(self, field.attname))
         q = Q(**{'%s__%s' % (field.name, op): param})
         q = q|Q(**{field.name: param, 'pk__%s' % op: self.pk})
-        qs = self.__class__._default_manager.filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
+        qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
         try:
             return qs[0]
         except IndexError:
@@ -603,17 +623,16 @@ class Model(object):
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
-            qn = connection.ops.quote_name
-            op = is_next and '>' or '<'
+            op = is_next and 'gt' or 'lt'
             order = not is_next and '-_order' or '_order'
             order_field = self._meta.order_with_respect_to
-            # FIXME: When querysets support nested queries, this can be turned
-            # into a pure queryset operation.
-            where = ['%s %s (SELECT %s FROM %s WHERE %s=%%s)' % \
-                (qn('_order'), op, qn('_order'),
-                qn(self._meta.db_table), qn(self._meta.pk.column))]
-            params = [self.pk]
-            obj = self._default_manager.filter(**{order_field.name: getattr(self, order_field.attname)}).extra(where=where, params=params).order_by(order)[:1].get()
+            obj = self._default_manager.filter(**{
+                order_field.name: getattr(self, order_field.attname)
+            }).filter(**{
+                '_order__%s' % op: self._default_manager.values('_order').filter(**{
+                    self._meta.pk.name: self.pk
+                })
+            }).order_by(order)[:1].get()
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
@@ -627,14 +646,16 @@ class Model(object):
 
 # ORDERING METHODS #########################
 
-def method_set_order(ordered_obj, self, id_list):
+def method_set_order(ordered_obj, self, id_list, using=None):
+    if using is None:
+        using = DEFAULT_DB_ALIAS
     rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
     order_name = ordered_obj._meta.order_with_respect_to.name
     # FIXME: It would be nice if there was an "update many" version of update
     # for situations like this.
     for i, j in enumerate(id_list):
         ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
-    transaction.commit_unless_managed()
+    transaction.commit_unless_managed(using=using)
 
 
 def method_get_order(ordered_obj, self):

@@ -1,6 +1,5 @@
 import sys, time, os
 from django.conf import settings
-from django.db import connection
 from django.core import mail
 from django.core.mail.backends import locmem
 from django.test import signals

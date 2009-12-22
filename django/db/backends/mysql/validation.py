@@ -11,8 +11,7 @@ class DatabaseValidation(BaseDatabaseValidation):
           characters if they have a unique index on them.
         """
         from django.db import models
-        from django.db import connection
-        db_version = connection.get_server_version()
+        db_version = self.connection.get_server_version()
         varchar_fields = (models.CharField, models.CommaSeparatedIntegerField,
                 models.SlugField)
         if isinstance(f, varchar_fields) and f.max_length > 255:
@@ -25,4 +24,3 @@ class DatabaseValidation(BaseDatabaseValidation):
 
             if msg:
                 errors.add(opts, msg % {'name': f.name, 'cls': f.__class__.__name__, 'version': '.'.join([str(n) for n in db_version[:3]])})
-

@@ -29,22 +29,18 @@ class Date(object):
     """
     Add a date selection column.
     """
-    def __init__(self, col, lookup_type, date_sql_func):
+    def __init__(self, col, lookup_type):
         self.col = col
         self.lookup_type = lookup_type
-        self.date_sql_func = date_sql_func
 
     def relabel_aliases(self, change_map):
         c = self.col
         if isinstance(c, (list, tuple)):
             self.col = (change_map.get(c[0], c[0]), c[1])
 
-    def as_sql(self, quote_func=None):
-        if not quote_func:
-            quote_func = lambda x: x
+    def as_sql(self, qn, connection):
         if isinstance(self.col, (list, tuple)):
-            col = '%s.%s' % tuple([quote_func(c) for c in self.col])
+            col = '%s.%s' % tuple([qn(c) for c in self.col])
         else:
             col = self.col
-        return self.date_sql_func(self.lookup_type, col)
-
+        return connection.ops.date_trunc_sql(self.lookup_type, col)

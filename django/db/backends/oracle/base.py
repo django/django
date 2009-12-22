@@ -26,7 +26,6 @@ except ImportError, e:
 
 from django.db.backends import *
 from django.db.backends.signals import connection_created
-from django.db.backends.oracle import query
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
@@ -47,13 +46,13 @@ else:
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
     needs_datetime_string_cast = False
-    uses_custom_query_class = True
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
     can_return_id_from_insert = True
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "django.db.backends.oracle.compiler"
 
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
@@ -102,6 +101,54 @@ WHEN (new.%(col_name)s IS NULL)
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type)
         return sql
 
+    def convert_values(self, value, field):
+        if isinstance(value, Database.LOB):
+            value = value.read()
+            if field and field.get_internal_type() == 'TextField':
+                value = force_unicode(value)
+
+        # Oracle stores empty strings as null. We need to undo this in
+        # order to adhere to the Django convention of using the empty
+        # string instead of null, but only if the field accepts the
+        # empty string.
+        if value is None and field and field.empty_strings_allowed:
+            value = u''
+        # Convert 1 or 0 to True or False
+        elif value in (1, 0) and field and field.get_internal_type() in ('BooleanField', 'NullBooleanField'):
+            value = bool(value)
+        # Force floats to the correct type
+        elif value is not None and field and field.get_internal_type() == 'FloatField':
+            value = float(value)
+        # Convert floats to decimals
+        elif value is not None and field and field.get_internal_type() == 'DecimalField':
+            value = util.typecast_decimal(field.format_number(value))
+        # cx_Oracle always returns datetime.datetime objects for
+        # DATE and TIMESTAMP columns, but Django wants to see a
+        # python datetime.date, .time, or .datetime.  We use the type
+        # of the Field to determine which to cast to, but it's not
+        # always available.
+        # As a workaround, we cast to date if all the time-related
+        # values are 0, or to time if the date is 1/1/1900.
+        # This could be cleaned a bit by adding a method to the Field
+        # classes to normalize values from the database (the to_python
+        # method is used for validation and isn't what we want here).
+        elif isinstance(value, Database.Timestamp):
+            # In Python 2.3, the cx_Oracle driver returns its own
+            # Timestamp object that we must convert to a datetime class.
+            if not isinstance(value, datetime.datetime):
+                value = datetime.datetime(value.year, value.month,
+                        value.day, value.hour, value.minute, value.second,
+                        value.fsecond)
+            if field and field.get_internal_type() == 'DateTimeField':
+                pass
+            elif field and field.get_internal_type() == 'DateField':
+                value = value.date()
+            elif field and field.get_internal_type() == 'TimeField' or (value.year == 1900 and value.month == value.day == 1):
+                value = value.time()
+            elif value.hour == value.minute == value.second == value.microsecond == 0:
+                value = value.date()
+        return value
+
     def datetime_cast_sql(self):
         return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
 
@@ -140,9 +187,6 @@ WHEN (new.%(col_name)s IS NULL)
         if value is None:
             return u''
         return force_unicode(value.read())
-
-    def query_class(self, DefaultQueryClass):
-        return query.query_class(DefaultQueryClass, Database)
 
     def quote_name(self, name):
         # SQL92 requires delimited (quoted) names to be case-sensitive.  When
@@ -291,29 +335,29 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
-        self.validation = BaseDatabaseValidation()
+        self.validation = BaseDatabaseValidation(self)
 
     def _valid_connection(self):
         return self.connection is not None
 
     def _connect_string(self):
         settings_dict = self.settings_dict
-        if len(settings_dict['DATABASE_HOST'].strip()) == 0:
-            settings_dict['DATABASE_HOST'] = 'localhost'
-        if len(settings_dict['DATABASE_PORT'].strip()) != 0:
-            dsn = Database.makedsn(settings_dict['DATABASE_HOST'],
-                                   int(settings_dict['DATABASE_PORT']),
-                                   settings_dict['DATABASE_NAME'])
+        if len(settings_dict['HOST'].strip()) == 0:
+            settings_dict['HOST'] = 'localhost'
+        if len(settings_dict['PORT'].strip()) != 0:
+            dsn = Database.makedsn(settings_dict['HOST'],
+                                   int(settings_dict['PORT']),
+                                   settings_dict['NAME'])
         else:
-            dsn = settings_dict['DATABASE_NAME']
-        return "%s/%s@%s" % (settings_dict['DATABASE_USER'],
-                             settings_dict['DATABASE_PASSWORD'], dsn)
+            dsn = settings_dict['NAME']
+        return "%s/%s@%s" % (settings_dict['USER'],
+                             settings_dict['PASSWORD'], dsn)
 
     def _cursor(self):
         cursor = None
         if not self._valid_connection():
             conn_string = convert_unicode(self._connect_string())
-            self.connection = Database.connect(conn_string, **self.settings_dict['DATABASE_OPTIONS'])
+            self.connection = Database.connect(conn_string, **self.settings_dict['OPTIONS'])
             cursor = FormatStylePlaceholderCursor(self.connection)
             # Set oracle date to ansi date format.  This only needs to execute
             # once when we create a new connection. We also set the Territory

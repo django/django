@@ -44,18 +44,20 @@ Autocommit mode
 
 .. versionadded:: 1.1
 
-If your application is particularly read-heavy and doesn't make many database
-writes, the overhead of a constantly open transaction can sometimes be
-noticeable. For those situations, if you're using the ``postgresql_psycopg2``
-backend, you can configure Django to use *"autocommit"* behavior for the
-connection, meaning that each database operation will normally be in its own
-transaction, rather than having the transaction extend over multiple
-operations. In this case, you can still manually start a transaction if you're
-doing something that requires consistency across multiple database operations.
-The autocommit behavior is enabled by setting the ``autocommit`` key in the
-:setting:`DATABASE_OPTIONS` setting::
+If your application is particularly read-heavy and doesn't make many
+database writes, the overhead of a constantly open transaction can
+sometimes be noticeable. For those situations, if you're using the
+``postgresql_psycopg2`` backend, you can configure Django to use
+*"autocommit"* behavior for the connection, meaning that each database
+operation will normally be in its own transaction, rather than having
+the transaction extend over multiple operations. In this case, you can
+still manually start a transaction if you're doing something that
+requires consistency across multiple database operations. The
+autocommit behavior is enabled by setting the ``autocommit`` key in
+the :setting:`OPTIONS` part of your database configuration in
+:setting:`DATABASES`::
 
-    DATABASE_OPTIONS = {
+    OPTIONS = {
         "autocommit": True,
     }
 
@@ -67,11 +69,11 @@ objects are changed or none of them are.
 .. admonition:: This is database-level autocommit
 
     This functionality is not the same as the
-    :ref:`topics-db-transactions-autocommit` decorator. That decorator is a
-    Django-level implementation that commits automatically after data changing
-    operations. The feature enabled using the :setting:`DATABASE_OPTIONS`
-    settings provides autocommit behavior at the database adapter level. It
-    commits after *every* operation.
+    :ref:`topics-db-transactions-autocommit` decorator. That decorator
+    is a Django-level implementation that commits automatically after
+    data changing operations. The feature enabled using the
+    :setting:`OPTIONS` option provides autocommit behavior at the
+    database adapter level. It commits after *every* operation.
 
 If you are using this feature and performing an operation akin to delete or
 updating that requires multiple operations, you are strongly recommended to
@@ -249,29 +251,33 @@ Refer to the :ref:`settings documentation <ref-settings>`.
 
 Connection settings are used in this order:
 
-    1. :setting:`DATABASE_OPTIONS`.
-    2. :setting:`DATABASE_NAME`, :setting:`DATABASE_USER`,
-       :setting:`DATABASE_PASSWORD`, :setting:`DATABASE_HOST`,
-       :setting:`DATABASE_PORT`
+    1. :setting:`OPTIONS`.
+    2. :setting:`NAME`, :setting:`USER`, :setting:`PASSWORD`,
+       :setting:`HOST`, :setting:`PORT`
     3. MySQL option files.
 
-In other words, if you set the name of the database in ``DATABASE_OPTIONS``,
-this will take precedence over ``DATABASE_NAME``, which would override
+In other words, if you set the name of the database in ``OPTIONS``,
+this will take precedence over ``NAME``, which would override
 anything in a `MySQL option file`_.
 
 Here's a sample configuration which uses a MySQL option file::
 
     # settings.py
-    DATABASE_ENGINE = "mysql"
-    DATABASE_OPTIONS = {
-        'read_default_file': '/path/to/my.cnf',
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'OPTIONS': {
+                'read_default_file': '/path/to/my.cnf',
+            },
+        }
     }
+
 
     # my.cnf
     [client]
-    database = DATABASE_NAME
-    user = DATABASE_USER
-    password = DATABASE_PASSWORD
+    database = NAME
+    user = USER
+    password = PASSWORD
     default-character-set = utf8
 
 Several other MySQLdb connection options may be useful, such as ``ssl``,
@@ -302,7 +308,7 @@ storage engine, you have a couple of options.
     * Another option is to use the ``init_command`` option for MySQLdb prior to
       creating your tables::
 
-          DATABASE_OPTIONS = {
+          OPTIONS = {
              "init_command": "SET storage_engine=INNODB",
           }
 
@@ -467,7 +473,7 @@ If you're getting this error, you can solve it by:
     * Increase the default timeout value by setting the ``timeout`` database
       option option::
 
-          DATABASE_OPTIONS = {
+          OPTIONS = {
               # ...
              "timeout": 20,
               # ...
@@ -520,25 +526,34 @@ Connecting to the database
 
 Your Django settings.py file should look something like this for Oracle::
 
-    DATABASE_ENGINE = 'oracle'
-    DATABASE_NAME = 'xe'
-    DATABASE_USER = 'a_user'
-    DATABASE_PASSWORD = 'a_password'
-    DATABASE_HOST = ''
-    DATABASE_PORT = ''
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.oracle',
+            'NAME': 'xe',
+            'USER': 'a_user',
+            'PASSWORD': 'a_password',
+            'HOST': '',
+            'PORT': ''     ,
+        }
+    }
+
 
 If you don't use a ``tnsnames.ora`` file or a similar naming method that
 recognizes the SID ("xe" in this example), then fill in both
-:setting:`DATABASE_HOST` and :setting:`DATABASE_PORT` like so::
+``HOST`` and ``PORT`` like so::
 
-    DATABASE_ENGINE = 'oracle'
-    DATABASE_NAME = 'xe'
-    DATABASE_USER = 'a_user'
-    DATABASE_PASSWORD = 'a_password'
-    DATABASE_HOST = 'dbprod01ned.mycompany.com'
-    DATABASE_PORT = '1540'
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.oracle',
+            'NAME': 'xe',
+            'USER': 'a_user',
+            'PASSWORD': 'a_password',
+            'HOST': 'dbprod01ned.mycompany.com',
+            'PORT': '1540',
+        }
+    }
 
-You should supply both :setting:`DATABASE_HOST` and :setting:`DATABASE_PORT`, or leave both
+You should supply both ``HOST`` and ``PORT``, or leave both
 as empty strings.
 
 Tablespace options

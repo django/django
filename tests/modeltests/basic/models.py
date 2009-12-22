@@ -16,7 +16,7 @@ try:
 except NameError:
     from django.utils.itercompat import sorted
 
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
@@ -373,7 +373,7 @@ from django.conf import settings
 
 building_docs = getattr(settings, 'BUILDING_DOCS', False)
 
-if building_docs or settings.DATABASE_ENGINE == 'postgresql':
+if building_docs or settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.postgresql':
     __test__['API_TESTS'] += """
 # In PostgreSQL, microsecond-level precision is available.
 >>> a9 = Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
@@ -382,7 +382,7 @@ if building_docs or settings.DATABASE_ENGINE == 'postgresql':
 datetime.datetime(2005, 7, 31, 12, 30, 45, 180)
 """
 
-if building_docs or settings.DATABASE_ENGINE == 'mysql':
+if building_docs or settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.mysql':
     __test__['API_TESTS'] += """
 # In MySQL, microsecond-level precision isn't available. You'll lose
 # microsecond-level precision once the data is saved.

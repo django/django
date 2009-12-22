@@ -793,27 +793,53 @@ To run the tests, ``cd`` to the ``tests/`` directory and type:
     ./runtests.py --settings=path.to.django.settings
 
 Yes, the unit tests need a settings module, but only for database connection
-info, with the ``DATABASE_ENGINE`` setting.
+info. Your :setting:`DATABASES` setting needs to define two databases:
 
-If you're using the ``sqlite3`` database backend, no further settings are
-needed. A temporary database will be created in memory when running the tests.
+    * A ``default`` database. This database should use the backend that
+      you want to use for primary testing
 
-If you're using another backend:
+    * A database with the alias ``other``. The ``other`` database is
+      used to establish that queries can be directed to different
+      databases. As a result, this database can use any backend you
+      want. It doesn't need to use the same backend as the ``default``
+      database (although it can use the same backend if you want to).
 
-    * Your :setting:`DATABASE_USER` setting needs to specify an existing user account
-      for the database engine.
+If you're using the SQLite database backend, you need to define
+:setting:`ENGINE` for both databases, plus a
+:setting:`TEST_NAME` for the ``other`` database. The
+following is a minimal settings file that can be used to test SQLite::
 
-    * The :setting:`DATABASE_NAME` setting must be the name of an existing database to
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3'
+        },
+        'other': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'TEST_NAME: 'other_db'
+        }
+    }
+
+
+If you're using another backend, you will need to provide other details for
+each database:
+
+    * The :setting:`USER` option for each of your databases needs to
+      specify an existing user account for the database.
+
+    * The :setting:`PASSWORD` option needs to provide the password for
+      the :setting:`USER` that has been specified.
+
+    * The :setting:`NAME` option must be the name of an existing database to
       which the given user has permission to connect. The unit tests will not
       touch this database; the test runner creates a new database whose name is
-      :setting:`DATABASE_NAME` prefixed with ``test_``, and this test database is
+      :setting:`NAME` prefixed with ``test_``, and this test database is
       deleted when the tests are finished. This means your user account needs
       permission to execute ``CREATE DATABASE``.
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
-you will need to include a value for ``TEST_DATABASE_CHARSET`` in your settings
-file.
+you will need to include a value for ``TEST_CHARSET`` in the settings
+dictionary for the applicable database.
 
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:

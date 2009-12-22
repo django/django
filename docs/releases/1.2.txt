@@ -76,6 +76,148 @@ changes:
 
        __members__ = property(lambda self: self.__dir__())
 
+Specifying databases
+--------------------
+
+Prior to Django 1.1, Django used a number of settings to control access to a
+single database. Django 1.2 introduces support for multiple databases, and as
+a result, the way you define database settings has changed.
+
+Any existing Django settings file will continue to work as expected until
+Django 1.4. Old-style database settings will be automatically translated to
+the new-style format.
+
+In the old-style (pre 1.2) format, there were a number of
+``DATABASE_`` settings at the top level of your settings file. For
+example::
+
+    DATABASE_NAME = 'test_db'
+    DATABASE_BACKEND = 'postgresl_psycopg2'
+    DATABASE_USER = 'myusername'
+    DATABASE_PASSWORD = 's3krit'
+
+These settings are now contained inside a dictionary named
+:setting:`DATABASES`. Each item in the dictionary corresponds to a
+single database connection, with the name ``'default'`` describing the
+default database connection. The setting names have also been
+shortened to reflect the fact that they are stored in a dictionary.
+The sample settings given previously would now be stored using::
+
+    DATABASES = {
+        'default': {
+            'NAME': 'test_db',
+            'BACKEND': 'django.db.backends.postgresl_psycopg2',
+            'USER': 'myusername',
+            'PASSWORD': 's3krit',
+        }
+    }
+
+This affects the following settings:
+
+    =========================================  ==========================
+     Old setting                                New Setting
+    =========================================  ==========================
+    :setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
+    :setting:`DATABASE_HOST`                   :setting:`HOST`
+    :setting:`DATABASE_NAME`                   :setting:`NAME`
+    :setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
+    :setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
+    :setting:`DATABASE_PORT`                   :setting:`PORT`
+    :setting:`DATABASE_USER`                   :setting:`USER`
+    :setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
+    :setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
+    :setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+    =========================================  ==========================
+
+These changes are also required if you have manually created a database
+connection using ``DatabaseWrapper()`` from your database backend of choice.
+
+In addition to the change in structure, Django 1.2 removes the special
+handling for the built-in database backends. All database backends
+must now be specified by a fully qualified module name (i.e.,
+``django.db.backends.postgresl_psycopg2``, rather than just
+``postgresql_psycopg2``).
+
+``__dict__`` on Model instances
+-------------------------------
+
+Historically, the ``__dict__`` attribute of a model instance has only contained
+attributes corresponding to the fields on a model.
+
+In order to support multiple database configurations, Django 1.2 has
+added a ``_state`` attribute to object instances. This attribute will
+appear in ``__dict__`` for a model instance. If your code relies on
+iterating over __dict__ to obtain a list of fields, you must now
+filter out ``_state`` attribute of out ``__dict__``.
+
+``get_db_prep_*()`` methods on Field
+------------------------------------
+
+Prior to v1.2, a custom field had the option of defining several
+functions to support conversion of Python values into
+database-compatible values. A custom field might look something like::
+
+    class CustomModelField(models.Field):
+        # ...
+
+        def get_db_prep_save(self, value):
+            # ...
+
+        def get_db_prep_value(self, value):
+            # ...
+
+        def get_db_prep_lookup(self, lookup_type, value):
+            # ...
+
+In 1.2, these three methods have undergone a change in prototype, and
+two extra methods have been introduced::
+
+    class CustomModelField(models.Field):
+        # ...
+
+        def get_prep_value(self, value):
+            # ...
+
+        def get_prep_lookup(self, lookup_type, value):
+            # ...
+
+        def get_db_prep_save(self, value, connection):
+            # ...
+
+        def get_db_prep_value(self, value, connection, prepared=False):
+            # ...
+
+        def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
+            # ...
+
+These changes are required to support multiple databases -
+``get_db_prep_*`` can no longer make any assumptions regarding the
+database for which it is preparing. The ``connection`` argument now
+provides the preparation methods with the specific connection for
+which the value is being prepared.
+
+The two new methods exist to differentiate general data preparation
+requirements, and requirements that are database-specific. The
+``prepared`` argument is used to indicate to the database preparation
+methods whether generic value preparation has been performed. If
+an unprepared (i.e., ``prepared=False``) value is provided to the
+``get_db_prep_*()`` calls, they should invoke the corresponding
+``get_prep_*()`` calls to perform generic data preparation.
+
+Conversion functions has been provided which will transparently
+convert functions adhering to the old prototype into functions
+compatible with the new prototype. However, this conversion function
+will be removed in Django 1.4, so you should upgrade your Field
+definitions to use the new prototype.
+
+If your ``get_db_prep_*()`` methods made no use of the database
+connection, you should be able to upgrade by renaming
+``get_db_prep_value()`` to ``get_prep_value()`` and
+``get_db_prep_lookup()`` to ``get_prep_lookup()`. If you require
+database specific conversions, then you will need to provide an
+implementation ``get_db_prep_*`` that uses the ``connection``
+argument to resolve database-specific values.
+
 Stateful template tags
 ----------------------
 
@@ -218,6 +360,15 @@ messaging, for both anonymous and authenticated clients. The messages framework
 replaces the deprecated user message API and allows you to temporarily store
 messages in one request and retrieve them for display in a subsequent request
 (usually the next one).
+
+Support for multiple databases
+------------------------------
+
+Django 1.2 adds the ability to use :ref:`more than one database
+<topics-db-multi-db>` in your Django project. Queries can be
+issued at a specific database with the `using()` method on
+querysets; individual objects can be saved to a specific database
+by providing a ``using`` argument when you save the instance.
 
 'Smart' if tag
 --------------

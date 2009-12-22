@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db.backends.creation import BaseDatabaseCreation
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -31,9 +30,9 @@ class DatabaseCreation(BaseDatabaseCreation):
     }
 
     def sql_table_creation_suffix(self):
-        assert settings.TEST_DATABASE_COLLATION is None, "PostgreSQL does not support collation setting at database creation time."
-        if settings.TEST_DATABASE_CHARSET:
-            return "WITH ENCODING '%s'" % settings.TEST_DATABASE_CHARSET
+        assert self.connection.settings_dict['TEST_COLLATION'] is None, "PostgreSQL does not support collation setting at database creation time."
+        if self.connection.settings_dict['TEST_CHARSET']:
+            return "WITH ENCODING '%s'" % self.connection.settings_dict['TEST_CHARSET']
         return ''
 
     def sql_indexes_for_field(self, model, f, style):

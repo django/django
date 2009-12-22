@@ -30,7 +30,19 @@ their deprecation, as per the :ref:`Django deprecation policy
           class in favor of a generic E-mail backend API.
 
         * The many to many SQL generation functions on the database backends
-          will be removed.  These have been deprecated since the 1.2 release.
+          will be removed.
+
+        * The ability to use the ``DATABASE_*`` family of top-level settings to
+          define database connections will be removed.
+
+        * The ability to use shorthand notation to specify a database backend
+          (i.e., ``sqlite3`` instead of ``django.db.backends.sqlite3``) will be
+          removed.
+
+        * The ``get_db_prep_save``, ``get_db_prep_value`` and
+          ``get_db_prep_lookup`` methods on Field were modified in 1.2 to support
+          multiple databases. In 1.4, the support functions that allow methods
+          with the old prototype to continue working will be removed.
 
         * The ``Message`` model (in ``django.contrib.auth``), its related
           manager in the ``User`` model (``user.message_set``), and the
