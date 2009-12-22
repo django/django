@@ -61,6 +61,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Slovakia_
     * `South Africa`_
     * Spain_
+    * Sweden_
     * Switzerland_
     * `United Kingdom`_
     * `United States of America`_
@@ -101,6 +102,7 @@ Here's an example of how to use them::
 .. _Slovakia: `Slovakia (sk)`_
 .. _South Africa: `South Africa (za)`_
 .. _Spain: `Spain (es)`_
+.. _Sweden: `Sweden (se)`_
 .. _Switzerland: `Switzerland (ch)`_
 .. _United Kingdom: `United Kingdom (uk)`_
 .. _United States of America: `United States of America (us)`_
@@ -595,6 +597,60 @@ Spain (``es``)
 .. class:: es.forms.ESRegionSelect
 
     A ``Select`` widget that uses a list of Spanish regions as its choices.
+
+Sweden (``se``)
+===============
+
+.. class:: se.forms.SECountySelect
+
+    A Select form widget that uses a list of the Swedish counties (län) as its
+    choices.
+
+    The cleaned value is the official county code -- see
+    http://en.wikipedia.org/wiki/Counties_of_Sweden for a list.
+
+.. class:: se.forms.SEOrganisationNumber
+
+    A form field that validates input as a Swedish organisation number
+    (organisationsnummer).
+
+    It accepts the same input as SEPersonalIdentityField (for sole
+    proprietorships (enskild firma). However, co-ordination numbers are not
+    accepted.
+
+    It also accepts ordinary Swedish organisation numbers with the format
+    NNNNNNNNNN.
+
+    The return value will be YYYYMMDDXXXX for sole proprietors, and NNNNNNNNNN
+    for other organisations.
+
+.. class:: se.forms.SEPersonalIdentityNumber
+
+    A form field that validates input as a Swedish personal identity number
+    (personnummer).
+
+    The correct formats are YYYYMMDD-XXXX, YYYYMMDDXXXX, YYMMDD-XXXX,
+    YYMMDDXXXX and YYMMDD+XXXX.
+
+    A \+ indicates that the person is older than 100 years, which will be taken
+    into consideration when the date is validated.
+    
+    The checksum will be calculated and checked. The birth date is checked
+    to be a valid date.
+
+    By default, co-ordination numbers (samordningsnummer) will be accepted. To
+    only allow real personal identity numbers, pass the keyword argument
+    coordination_number=False to the constructor.
+
+    The cleaned value will always have the format YYYYMMDDXXXX.
+
+.. class:: se.forms.SEPostalCodeField
+
+    A form field that validates input as a Swedish postal code (postnummer).
+    Valid codes consist of five digits (XXXXX). The number can optionally be
+    formatted with a space after the third digit (XXX XX).
+
+    The cleaned value will never contain the space. 
 
 Switzerland (``ch``)
 ====================
