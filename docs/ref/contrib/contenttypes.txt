@@ -183,15 +183,11 @@ The ``ContentTypeManager``
         probably won't ever need to call this method yourself; Django will call
         it automatically when it's needed.
 
-    .. method:: models.ContentTypeManager.get_for_model(model, using=DEFAULT_DB_ALIAS)
+    .. method:: models.ContentTypeManager.get_for_model(model)
 
         Takes either a model class or an instance of a model, and returns the
         :class:`~django.contrib.contenttypes.models.ContentType` instance
         representing that model.
-
-        By default, this will find the content type on the default database.
-        You can load an instance from a different database by providing
-        a ``using`` argument.
 
 The :meth:`~models.ContentTypeManager.get_for_model()` method is especially useful when you know you
 need to work with a :class:`ContentType <django.contrib.contenttypes.models.ContentType>` but don't want to go to the
