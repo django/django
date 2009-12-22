@@ -7,26 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-14 12:33+0100\n"
+"POT-Creation-Date: 2009-12-22 20:42+0100\n"
 "PO-Revision-Date: 2008-01-23 11:04+0100\n"
 "Last-Translator: Michael Thornhill <michael@maithu.com>\n"
 "Language-Team: Gaeilge <ga@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: contrib/admin/media/js/calendar.js:24
-#: contrib/admin/media/js/dateparse.js:32
-msgid "January February March April May June July August September October November December"
-msgstr "Eanair Feabhra Márta Aibreán Bealtaine Meitheamh Iúil Lúnasa Mean Fómhair Deireadh Fómhair Nollaig"
-
-#: contrib/admin/media/js/calendar.js:25
-msgid "S M T W T F S"
-msgstr "D L M C D A S"
-
-#: contrib/admin/media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Domhnaigh Luain Máirt Céadaoin Déardaoin Aoine Sathairn"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -57,6 +44,36 @@ msgstr "Roghnaigh do rogha agus cniog"
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
 msgstr "Glan iomlán"
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Eanair Feabhra Márta Aibreán Bealtaine Meitheamh Iúil Lúnasa Mean Fómhair "
+"Deireadh Fómhair Nollaig"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "D L M C D A S"
+
+#: contrib/admin/media/js/calendar.js:26
+msgid "FIRST_DAY_OF_WEEK"
+msgstr ""
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Domhnaigh Luain Máirt Céadaoin Déardaoin Aoine Sathairn"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Taispeán"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Folaigh"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
@@ -104,13 +121,3 @@ msgstr "Inné"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "Amárach"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "Taispeán"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "Folaigh"
-
