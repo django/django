@@ -28,7 +28,9 @@ whatever alias you choose.
 
 The following is an example ``settings.py`` snippet defining two
 databases - a default Postgres database, and a MySQL database called
-``users``::
+``users``:
+
+.. code-block:: python
 
     DATABASES = {
         'default': {
@@ -56,7 +58,9 @@ It is possible to select the database for a ``QuerySet`` at any point
 during it's construction. To choose the database that a query will be
 preformed against simply call the ``using()`` method on the
 ``QuerySet``. ``using()`` takes a single argument: the alias of the
-database on which you want to run the query. For example::
+database on which you want to run the query. For example:
+
+.. code-block:: python
 
     # This will run on the 'default' database...
     >>> Author.objects.all()

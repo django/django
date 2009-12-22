@@ -458,7 +458,7 @@ Converting query values to database values
 .. method:: get_db_prep_value(self, value, connection, prepared=False)
 
 .. versionadded:: 1.2
-   The ``connection`` and ``prepared arguments were added to support multiple databases.
+   The ``connection`` and ``prepared`` arguments were added to support multiple databases.
 
 Some data types (for example, dates) need to be in a specific format
 before they can be used by a database backend.
