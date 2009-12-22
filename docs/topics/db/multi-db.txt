@@ -7,44 +7,73 @@ Multiple Databases
 .. versionadded:: 1.2
 
 This topic guide describes Django's support for interacting with multiple
-databases.  Most of the rest of Django's documentation assumes you are
-interacting with a single database.  While none of this documentation is
-incorrect, to fully interact with multiple databases additional steps must be
-taken.
+databases. Most of the rest of Django's documentation assumes you are
+interacting with a single database. If you want to interact with multiple
+databases, some additional steps must be taken.
 
 Defining your databases
 =======================
 
-The first step to using more than one database with Django is to tell Django
-about the database servers you'll be using.  This is done using the
-:setting:`DATABASES` setting.  This setting maps database aliases, which are
-a way to refer to a specific database throughout Django, to a dictionary of
-settings for that specific connection.  The settings in the inner dictionaries
-are described fully in the :setting:`DATABASES` documentation.  The important
-thing to note is that your primary database should have the alias
-``'default'``, and any additional databases you have can have whatever alias
-you choose.  If at any time you attempt to access a database that isn't defined
-in your :setting:`DATABASES` setting then Django will raise a
+The first step to using more than one database with Django is to tell
+Django about the database servers you'll be using. This is done using
+the :setting:`DATABASES` setting. This setting maps database aliases,
+which are a way to refer to a specific database throughout Django, to
+a dictionary of settings for that specific connection. The settings in
+the inner dictionaries are described fully in the :setting:`DATABASES`
+documentation.
+
+Regardless of how many databases you have, you *must* have a database
+named ``'default'``. Any additional databases you have can have
+whatever alias you choose.
+
+The following is an example ``settings.py`` snippet defining two
+databases - a default Postgres database, and a MySQL database called
+``users``::
+
+    DATABASES = {
+        'default': {
+            'NAME': 'app_data',
+            'BACKEND': 'django.db.backends.postgres_psycopg2',
+            'USER': 'postgres_user',
+            'PASSWORD': 's3krit'
+        },
+        'users': {
+            'NAME': 'user_data'
+            'BACKEND': 'django.db.backends.mysql',
+            'USER': 'mysql_user',
+            'PASSWORD': 'priv4te'
+        }
+    }
+
+If you attempt to access a database that you haven't defined in your
+:setting:`DATABASES` setting then Django will raise a
 ``django.db.utils.ConnectionDoesNotExist`` exception.
 
 Selecting a database for a ``QuerySet``
 =======================================
 
-It is possible to select the database for a ``QuerySet`` at any point during
-it's construction.  To choose the database that a query will be preformed
-against simply call the ``using()`` method on the ``QuerySet`` with the sole
-argument being the database alias.
+It is possible to select the database for a ``QuerySet`` at any point
+during it's construction. To choose the database that a query will be
+preformed against simply call the ``using()`` method on the
+``QuerySet``. ``using()`` takes a single argument: the alias of the
+database on which you want to run the query. For example::
+
+    # This will run on the 'default' database...
+    >>> Author.objects.all()
+    # So will this...
+    >>> Author.objects.using('default').all()
+    # This will run on the 'other' database
+    >>> Author.objects.using('other').all()
 
 Select a database to save to
 ============================
 
 To choose what database to save a model to, provide a ``using`` keyword
-argument to ``Model.save()``.  For example if you had a user model that you
-wanted to save to the ``'legacy_users'`` database you would do::
+argument to ``Model.save()``. For example if you had a user model that you
+wanted to save to the ``'legacy_users'`` database you would save the user
+by calling::
 
     >>> user_obj.save(using='legacy_users')
-
-To save the user.
 
 Moving an object from one database to another
 ---------------------------------------------
@@ -121,18 +150,23 @@ database you might use the commands::
 Using ``Managers`` with multiple databases
 ==========================================
 
-When you call ``using()`` Django returns a ``QuerySet`` that will be evaluated
-against that database.  However, sometimes you want to chain ``using()``
-together with a cusotm manager method that doesn't return a ``QuerySet``,
-such as the ``get_by_natural_key`` method.  To solve this issue you can use the
-``db_manager()`` method on a manager.  This method returns a copy of the
-*manager* bound to that specific database.  This let's you do things like::
+When you call ``using()`` Django returns a ``QuerySet`` that will be
+evaluated against that database. However, sometimes you want to direct
+a manager to use a specific database chain ``using()``. If you call
+``using()``, you won't have access to any of the methods on the
+manager.
 
-    >>> Book.objects.db("other").get_by_natural_key(...)
+To overcome this limitation, managers provide a ``db_manager()``
+method. This method returns a copy of the *manager* bound to that
+specific database. So, if you want to load an object using it's
+natural key (using the ``get_by_natural_key()`` method on the manager,
+you can call::
+
+    >>> Book.objects.db_mamanger("other").get_by_natural_key(...)
 
 If you are overriding ``get_query_set()`` on your manager you must be sure to
-either, a) call the method on the parent (using ``super()``), or b) do the
-appropriate handling of the ``_db`` attribute on the manager.  For example if
+either, call the method on the parent (using ``super()``), or do the
+appropriate handling of the ``_db`` attribute on the manager. For example if
 you wanted to return a custom ``QuerySet`` class from the ``get_query_set``
 method you could do this::
 
@@ -147,9 +181,9 @@ method you could do this::
 Exposing multiple databases in Django's admin interface
 =======================================================
 
-Django's admin doesn't have any explicit support for multi databases.
-If you want to provide an admin interface for a model on a database
-other than ``default``, you need to write custom
+Django's admin doesn't have any explicit support for multiple
+databases. If you want to provide an admin interface for a model on a
+database other than ``default``, you need to write custom
 :class:`~django.contrib.admin.ModelAdmin` classes that will direct the
 admin to use a specific database for content.
 
