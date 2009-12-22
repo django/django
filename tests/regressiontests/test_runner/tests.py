@@ -4,25 +4,25 @@ Tests for django test runner
 import StringIO
 import unittest
 import django
-from django.test import TestCase, TransactionTestCase, simple 
+from django.test import simple
 
-class DjangoTestRunnerTests(TestCase):
-    
+class DjangoTestRunnerTests(unittest.TestCase):
+
     def test_failfast(self):
-        class MockTestOne(TransactionTestCase):
+        class MockTestOne(unittest.TestCase):
             def runTest(self):
                 assert False
-        class MockTestTwo(TransactionTestCase):
+        class MockTestTwo(unittest.TestCase):
             def runTest(self):
                 assert False
-                
+
         suite = unittest.TestSuite([MockTestOne(), MockTestTwo()])
         mock_stream = StringIO.StringIO()
         dtr = simple.DjangoTestRunner(verbosity=0, failfast=False, stream=mock_stream)
         result = dtr.run(suite)
         self.assertEqual(2, result.testsRun)
         self.assertEqual(2, len(result.failures))
-        
+
         dtr = simple.DjangoTestRunner(verbosity=0, failfast=True, stream=mock_stream)
         result = dtr.run(suite)
         self.assertEqual(1, result.testsRun)
