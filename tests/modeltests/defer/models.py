@@ -183,10 +183,4 @@ u"bar"
 >>> obj.name = "bb"
 >>> obj.save()
 
-# Finally, we need to flush the app cache for the defer module.
-# Using only/defer creates some artifical entries in the app cache
-# that messes up later tests. Purge all entries, just to be sure.
->>> from django.db.models.loading import cache
->>> cache.app_models['defer'] = {}
-
 """}
