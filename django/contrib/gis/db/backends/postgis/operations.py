@@ -450,6 +450,19 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
 
         return (version, major, minor1, minor2)
 
+    def proj_version_tuple(self):
+        """
+        Return the version of PROJ.4 used by PostGIS as a tuple of the
+        major, minor, and subminor release numbers.
+        """
+        proj_regex = re.compile(r'(\d+)\.(\d+)\.(\d+)')
+        proj_ver_str = self.postgis_proj_version()
+        m = proj_regex.search(proj_ver_str)
+        if m:
+            return tuple(map(int, [m.group(1), m.group(2), m.group(3)]))
+        else:
+            raise Exception('Could not determine PROJ.4 version from PostGIS.')
+
     def num_params(self, lookup_type, num_param):
         """
         Helper routine that returns a boolean indicating whether the number of

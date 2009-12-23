@@ -1,6 +1,8 @@
-import sys, unittest
-from django.test.simple import run_tests
-from django.utils.importlib import import_module
+import sys
+
+def run_tests(*args, **kwargs):
+    from django.test.simple import run_tests as base_run_tests
+    return base_run_tests(*args, **kwargs)
 
 def geo_suite():
     """
@@ -14,6 +16,8 @@ def geo_suite():
     from django.contrib.gis.gdal import HAS_GDAL
     from django.contrib.gis.utils import HAS_GEOIP
     from django.contrib.gis.tests.utils import postgis, mysql
+    from django.db import connection
+    from django.utils.importlib import import_module
 
     gis_tests = []
 
@@ -23,25 +27,27 @@ def geo_suite():
 
     # Tests that require use of a spatial database (e.g., creation of models)
     test_apps = ['geoapp', 'relatedapp']
+    if postgis and connection.ops.geography:
+        # Test geography support with PostGIS 1.5+.
+        test_apps.append('geogapp')
 
     # Tests that do not require setting up and tearing down a spatial database.
     test_suite_names = [
         'test_measure',
         ]
 
-    # Tests applications that require a test spatial db.
-    if not mysql:
-        test_apps.append('distapp')
-
-    # Only PostGIS using GEOS 3.1+ can support 3D so far.
-    if postgis and GEOS_PREPARE:
-        test_apps.append('geo3d')
-
     if HAS_GDAL:
         # These tests require GDAL.
+        if not mysql:
+            test_apps.append('distapp')
+
+        # Only PostGIS using GEOS 3.1+ can support 3D so far.
+        if postgis and GEOS_PREPARE:
+            test_apps.append('geo3d')
+
         test_suite_names.extend(['test_spatialrefsys', 'test_geoforms'])
         test_apps.append('layermap')
-
+        
         # Adding the GDAL tests.
         from django.contrib.gis.gdal import tests as gdal_tests
         gis_tests.append(gdal_tests.suite())
