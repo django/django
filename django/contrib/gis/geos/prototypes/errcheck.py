@@ -1,22 +1,27 @@
 """
  Error checking functions for GEOS ctypes prototype functions.
 """
-import os
-from ctypes import string_at, CDLL
-from ctypes.util import find_library
+from ctypes import c_void_p, string_at, CDLL
 from django.contrib.gis.geos.error import GEOSException
+from django.contrib.gis.geos.libgeos import lgeos, GEOS_VERSION
 
-# Getting the C library, needed to free the string pointers
-# returned from GEOS.
-if os.name == 'nt':
-    libc_name = 'msvcrt'
+# Getting the `free` routine used to free the memory allocated for
+# string pointers returned by GEOS.
+if GEOS_VERSION >= (3, 1, 0):
+    # In versions 3.1 and above, `GEOSFree` was added to the C API
+    # because `free` isn't always available on all platforms.
+    free = lgeos.GEOSFree
+    free.argtypes = [c_void_p]
+    free.restype = None
 else:
-    libc_name = 'libc'
-libc = CDLL(find_library(libc_name))
+    # Getting the `free` routine from the C library of the platform.
+    # The C library is obtained by passing None into `CDLL`.
+    libc = CDLL(None)
+    free = libc.free
 
 ### ctypes error checking routines ###
 def last_arg_byref(args):
-    "Returns the last C argument's by reference value."
+    "Returns the last C argument's value by reference."
     return args[-1]._obj.value
 
 def check_dbl(result, func, cargs):
@@ -60,7 +65,7 @@ def check_sized_string(result, func, cargs):
     # correct size.
     s = string_at(result, last_arg_byref(cargs))
     # Freeing the memory allocated within GEOS
-    libc.free(result)
+    free(result)
     return s
 
 def check_string(result, func, cargs):
@@ -73,7 +78,7 @@ def check_string(result, func, cargs):
     # Getting the string value at the pointer address.
     s = string_at(result)
     # Freeing the memory allocated within GEOS
-    libc.free(result)
+    free(result)
     return s
 
 def check_zero(result, func, cargs):
