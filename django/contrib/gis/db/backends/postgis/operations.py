@@ -199,9 +199,11 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         if version < (1, 3, 0):
             UNIONAGG = 'GeomUnion'
             UNION = 'Union'
+            MAKELINE = False
         else:
             UNIONAGG = 'ST_Union'
             UNION = 'ST_Union'
+            MAKELINE = 'ST_MakeLine'
 
         # Only PostGIS versions 1.3.4+ have GeoJSON serialization support.
         if version < (1, 3, 4):
@@ -212,11 +214,10 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         # ST_ContainsProperly ST_MakeLine, and ST_GeoHash added in 1.4.
         if version >= (1, 4, 0):
             GEOHASH = 'ST_GeoHash'
-            MAKELINE = 'ST_MakeLine'
             BOUNDINGCIRCLE = 'ST_MinimumBoundingCircle'
             self.geometry_functions['contains_properly'] = PostGISFunction(prefix, 'ContainsProperly')
         else:
-            GEOHASH, MAKELINE, BOUNDINGCIRCLE = False, False, False
+            GEOHASH, BOUNDINGCIRCLE = False, False
 
         # Geography type support added in 1.5.
         if version >= (1, 5, 0):
