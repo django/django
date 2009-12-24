@@ -55,7 +55,9 @@ class ConnectionHandler(object):
             conn = self.databases[alias]
         except KeyError:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
-        conn.setdefault('ENGINE', 'dummy')
+        conn.setdefault('ENGINE', 'django.db.backends.dummy')
+        if conn['ENGINE'] == 'django.db.backends.':
+            conn['ENGINE'] = 'django.db.backends.dummy'
         conn.setdefault('OPTIONS', {})
         conn.setdefault('TEST_CHARSET', None)
         conn.setdefault('TEST_COLLATION', None)

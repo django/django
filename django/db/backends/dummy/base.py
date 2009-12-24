@@ -41,13 +41,16 @@ class DatabaseWrapper(object):
     _commit = complain
     _rollback = ignore
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, settings_dict, alias, *args, **kwargs):
         self.features = BaseDatabaseFeatures()
         self.ops = DatabaseOperations()
         self.client = DatabaseClient(self)
         self.creation = BaseDatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
-        self.validation = BaseDatabaseValidation()
+        self.validation = BaseDatabaseValidation(self)
+
+        self.settings_dict = settings_dict
+        self.alias = alias
 
     def close(self):
         pass
