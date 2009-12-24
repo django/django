@@ -4185,7 +4185,7 @@ msgstr ""
 #: .\forms\fields.py:139 .\newforms\fields.py:125
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
-"Переконайтеся, що це значення має не менще %(max)d символів (зараз %(length)"
+"Переконайтеся, що це значення має не менще %(min)d символів (зараз %(length)"
 "d)."
 
 #: .\forms\fields.py:167 .\forms\fields.py:196 .\forms\fields.py:225
