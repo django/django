@@ -49,7 +49,7 @@ class RawQuery(object):
     def validate_sql(self, sql):
         if not sql.lower().strip().startswith('select'):
             raise InvalidQuery('Raw queries are limited to SELECT queries. Use '
-                               'connection.cursor directly for types of queries.')
+                               'connection.cursor directly for other types of queries.')
 
     def __iter__(self):
         # Always execute a new query for a new iterator.
