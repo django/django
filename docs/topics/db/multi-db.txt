@@ -166,7 +166,7 @@ specific database. So, if you want to load an object using it's
 natural key (using the ``get_by_natural_key()`` method on the manager,
 you can call::
 
-    >>> Book.objects.db_mamanger("other").get_by_natural_key(...)
+    >>> Book.objects.db_manager("other").get_by_natural_key(...)
 
 If you are overriding ``get_query_set()`` on your manager you must be sure to
 either, call the method on the parent (using ``super()``), or do the
