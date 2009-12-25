@@ -97,7 +97,7 @@ class LayerMapping(object):
         if self.spatial_backend.mysql:
             transform = False
         else:
-            self.geo_col = self.geometry_column()
+            self.geo_field = self.geometry_field()
 
         # Checking the source spatial reference system, and getting
         # the coordinate transformation object (unless the `transform`
@@ -426,41 +426,20 @@ class LayerMapping(object):
         SpatialRefSys = self.spatial_backend.spatial_ref_sys()
         try:
             # Getting the target spatial reference system
-            target_srs = SpatialRefSys.objects.get(srid=self.geo_col.srid).srs
+            target_srs = SpatialRefSys.objects.get(srid=self.geo_field.srid).srs
 
             # Creating the CoordTransform object
             return CoordTransform(self.source_srs, target_srs)
         except Exception, msg:
             raise LayerMapError('Could not translate between the data source and model geometry: %s' % msg)
 
-    def geometry_column(self):
-        "Returns the GeometryColumn model associated with the geographic column."
+    def geometry_field(self):
+        "Returns the GeometryField instance associated with the geographic column."
         # Use the `get_field_by_name` on the model's options so that we
-        # get the correct model if there's model inheritance -- otherwise
-        # the returned model is None.
+        # get the correct field instance if there's model inheritance.
         opts = self.model._meta
         fld, model, direct, m2m = opts.get_field_by_name(self.geom_field)
-        if model is None: model = self.model
-
-        # Trying to get the `GeometryColumns` object that corresponds to the
-        # the geometry field.
-        try:
-            db_table = model._meta.db_table
-            geo_col = fld.column
-
-            if self.spatial_backend.oracle:
-                # Making upper case for Oracle.
-                db_table = db_table.upper()
-                geo_col = geo_col.upper()
-
-            GeometryColumns = self.spatial_backend.geometry_columns()
-
-            gc_kwargs = { GeometryColumns.table_name_col() : db_table,
-                          GeometryColumns.geom_col_name() : geo_col,
-                         }
-            return GeometryColumns.objects.get(**gc_kwargs)
-        except Exception, msg:
-            raise LayerMapError('Geometry column does not exist for model. (did you run syncdb?):\n %s' % msg)
+        return fld
 
     def make_multi(self, geom_type, model_field):
         """
