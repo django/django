@@ -35,13 +35,13 @@ databases - a default Postgres database, and a MySQL database called
     DATABASES = {
         'default': {
             'NAME': 'app_data',
-            'BACKEND': 'django.db.backends.postgres_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'USER': 'postgres_user',
             'PASSWORD': 's3krit'
         },
         'users': {
             'NAME': 'user_data'
-            'BACKEND': 'django.db.backends.mysql',
+            'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'priv4te'
         }
