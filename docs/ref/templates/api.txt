@@ -502,12 +502,14 @@ The Python API
 
 Django has two ways to load templates from files:
 
-``django.template.loader.get_template(template_name)``
+.. function:: django.template.loader.get_template(template_name)
+
     ``get_template`` returns the compiled template (a ``Template`` object) for
     the template with the given name. If the template doesn't exist, it raises
     ``django.template.TemplateDoesNotExist``.
 
-``django.template.loader.select_template(template_name_list)``
+.. function:: django.template.loader.select_template(template_name_list)
+
     ``select_template`` is just like ``get_template``, except it takes a list
     of template names. Of the list, it returns the first template that exists.
 

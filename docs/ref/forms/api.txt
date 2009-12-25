@@ -4,6 +4,8 @@
 The Forms API
 =============
 
+.. module:: django.forms.forms
+
 .. currentmodule:: django.forms
 
 .. admonition:: About this document
@@ -24,6 +26,8 @@ A :class:`Form` instance is either **bound** to a set of data, or **unbound**.
 
     * If it's **unbound**, it cannot do validation (because there's no data to
       validate!), but it can still render the blank form as HTML.
+
+.. class:: Form
 
 To create an unbound :class:`Form` instance, simply instantiate the class::
 
@@ -134,24 +138,25 @@ Dynamic initial values
 
 .. attribute:: Form.initial
 
-Use ``initial`` to declare the initial value of form fields at runtime. For
-example, you might want to fill in a ``username`` field with the username of the
-current session.
+Use :attr:`~Form.initial` to declare the initial value of form fields at
+runtime. For example, you might want to fill in a ``username`` field with the
+username of the current session.
 
-To accomplish this, use the ``initial`` argument to a ``Form``. This argument,
-if given, should be a dictionary mapping field names to initial values. Only
-include the fields for which you're specifying an initial value; it's not
-necessary to include every field in your form. For example::
+To accomplish this, use the :attr:`~Form.initial` argument to a :class:`Form`.
+This argument, if given, should be a dictionary mapping field names to initial
+values. Only include the fields for which you're specifying an initial value;
+it's not necessary to include every field in your form. For example::
 
     >>> f = ContactForm(initial={'subject': 'Hi there!'})
 
 These values are only displayed for unbound forms, and they're not used as
 fallback values if a particular value isn't provided.
 
-Note that if a ``Field`` defines ``initial`` *and* you include ``initial`` when
-instantiating the ``Form``, then the latter ``initial`` will have precedence. In
-this example, ``initial`` is provided both at the field level and at the form
-instance level, and the latter gets precedence::
+Note that if a :class:`~django.forms.fields.Field` defines
+:attr:`~Form.initial` *and* you include ``initial`` when instantiating the
+``Form``, then the latter ``initial`` will have precedence. In this example,
+``initial`` is provided both at the field level and at the form instance level,
+and the latter gets precedence::
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='class')
@@ -166,20 +171,21 @@ instance level, and the latter gets precedence::
 Accessing "clean" data
 ----------------------
 
-Each ``Field`` in a ``Form`` class is responsible not only for validating data,
-but also for "cleaning" it -- normalizing it to a consistent format. This is a
-nice feature, because it allows data for a particular field to be input in
+.. attribute:: Form.cleaned_data
+
+Each field in a :class:`Form` class is responsible not only for validating
+data, but also for "cleaning" it -- normalizing it to a consistent format. This
+is a nice feature, because it allows data for a particular field to be input in
 a variety of ways, always resulting in consistent output.
 
-For example, ``DateField`` normalizes input into a Python ``datetime.date``
-object. Regardless of whether you pass it a string in the format
-``'1994-07-15'``, a ``datetime.date`` object or a number of other formats,
-``DateField`` will always normalize it to a ``datetime.date`` object as long as
-it's valid.
+For example, :class:`~django.forms.DateField` normalizes input into a
+Python ``datetime.date`` object. Regardless of whether you pass it a string in
+the format ``'1994-07-15'``, a ``datetime.date`` object, or a number of other
+formats, ``DateField`` will always normalize it to a ``datetime.date`` object
+as long as it's valid.
 
-Once you've created a ``Form`` instance with a set of data and validated it,
-you can access the clean data via the ``cleaned_data`` attribute of the ``Form``
-object::
+Once you've created a :class:`~Form` instance with a set of data and validated
+it, you can access the clean data via its ``cleaned_data`` attribute::
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -322,49 +328,56 @@ a form object, and each rendering method returns a Unicode object.
 ``as_p()``
 ~~~~~~~~~~
 
-``Form.as_p()`` renders the form as a series of ``<p>`` tags, with each ``<p>``
-containing one field::
+.. method:: Form.as_p
 
-    >>> f = ContactForm()
-    >>> f.as_p()
-    u'<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>'
-    >>> print f.as_p()
-    <p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
-    <p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>
-    <p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>
-    <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
+    ``as_p()`` renders the form as a series of ``<p>`` tags, with each ``<p>``
+    containing one field::
+
+        >>> f = ContactForm()
+        >>> f.as_p()
+        u'<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>'
+        >>> print f.as_p()
+        <p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
+        <p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>
+        <p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>
+        <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
 
 ``as_ul()``
 ~~~~~~~~~~~
 
-``Form.as_ul()`` renders the form as a series of ``<li>`` tags, with each
-``<li>`` containing one field. It does *not* include the ``<ul>`` or ``</ul>``,
-so that you can specify any HTML attributes on the ``<ul>`` for flexibility::
+.. method:: Form.as_ul
 
-    >>> f = ContactForm()
-    >>> f.as_ul()
-    u'<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>\n<li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>'
-    >>> print f.as_ul()
-    <li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>
-    <li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>
-    <li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>
-    <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>
+    ``as_ul()`` renders the form as a series of ``<li>`` tags, with each
+    ``<li>`` containing one field. It does *not* include the ``<ul>`` or
+    ``</ul>``, so that you can specify any HTML attributes on the ``<ul>`` for
+    flexibility::
+
+        >>> f = ContactForm()
+        >>> f.as_ul()
+        u'<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>\n<li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>'
+        >>> print f.as_ul()
+        <li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>
+        <li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>
+        <li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>
+        <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>
 
 ``as_table()``
 ~~~~~~~~~~~~~~
 
-Finally, ``Form.as_table()`` outputs the form as an HTML ``<table>``. This is
-exactly the same as ``print``. In fact, when you ``print`` a form object, it
-calls its ``as_table()`` method behind the scenes::
+.. method:: Form.as_table
 
-    >>> f = ContactForm()
-    >>> f.as_table()
-    u'<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
-    >>> print f.as_table()
-    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
-    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
-    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+    Finally, ``as_table()`` outputs the form as an HTML ``<table>``. This is
+    exactly the same as ``print``. In fact, when you ``print`` a form object,
+    it calls its ``as_table()`` method behind the scenes::
+
+        >>> f = ContactForm()
+        >>> f.as_table()
+        u'<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
+        >>> print f.as_table()
+        <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
+        <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
+        <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
+        <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
 
 Styling required or erroneous form rows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -383,9 +396,9 @@ attributes::
     class ContactForm(Form):
         error_css_class = 'error'
         required_css_class = 'required'
-        
+
         # ... and the rest of your fields here
-        
+
 Once you've done that, rows will be given ``"error"`` and/or ``"required"``
 classes, as needed. The HTML will look something like::
 
