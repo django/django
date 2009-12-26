@@ -327,7 +327,7 @@ translates (roughly) into the following SQL::
    arguments whose names and values are evaluated at runtime. For more
    information, see `Keyword Arguments`_ in the official Python tutorial.
 
-   .. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
+   .. _`Keyword Arguments`: http://docs.python.org/tutorial/controlflow.html#keyword-arguments
 
 If you pass an invalid keyword argument, a lookup function will raise
 ``TypeError``.

@@ -940,7 +940,7 @@ attributes. Thus, you can subclass the appropriate feed generator class
 (``Atom1Feed`` or ``Rss201rev2Feed``) and extend these callbacks. They are:
 
 .. _georss: http://georss.org/
-.. _itunes podcast format: http://www.apple.com/itunes/store/podcaststechspecs.html
+.. _itunes podcast format: http://www.apple.com/itunes/podcasts/specs.html
 
 ``SyndicationFeed.root_attributes(self, )``
     Return a ``dict`` of attributes to add to the root feed element

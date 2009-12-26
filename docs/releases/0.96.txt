@@ -227,8 +227,8 @@ start of your tests. This makes testing with real data much easier.
 
 See `the testing documentation`_ for the full details.
 
-.. _doctest: http://docs.python.org/lib/module-doctest.html
-.. _unittest: http://docs.python.org/lib/module-unittest.html
+.. _doctest: http://docs.python.org/library/doctest.html
+.. _unittest: http://docs.python.org/library/unittest.html
 .. _the testing documentation: http://www.djangoproject.com/documentation/0.96/testing/
 .. _serialization formats: http://www.djangoproject.com/documentation/0.96/serialization/
 

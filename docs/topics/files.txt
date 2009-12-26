@@ -55,7 +55,7 @@ Internally, Django uses a ``django.core.files.File`` any time it needs to
 represent a file. This object is a thin wrapper around Python's `built-in file
 object`_ with some Django-specific additions.
 
-.. _built-in file object: http://docs.python.org/lib/bltin-file-objects.html
+.. _built-in file object: http://docs.python.org/library/stdtypes.html#bltin-file-objects
 
 Most of the time you'll simply use a ``File`` that Django's given you (i.e. a
 file attached to a model as above, or perhaps an uploaded file).

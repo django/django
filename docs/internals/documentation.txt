@@ -10,7 +10,7 @@ based on docutils__. The basic idea is that lightly-formatted plain-text
 documentation is transformed into HTML, PDF, and any other output format.
 
 __ http://sphinx.pocoo.org/
-__ http://docutils.sf.net/
+__ http://docutils.sourceforge.net/
 
 To actually build the documentation locally, you'll currently need to install
 Sphinx -- ``easy_install Sphinx`` should do the trick.

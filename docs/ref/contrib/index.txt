@@ -19,7 +19,7 @@ those packages have.
     ``'django.contrib.admin'``) to your ``INSTALLED_APPS`` setting and re-run
     ``manage.py syncdb``.
 
-.. _"batteries included" philosophy: http://docs.python.org/tut/node12.html#batteries-included
+.. _"batteries included" philosophy: http://docs.python.org/tutorial/stdlib.html#batteries-included
 
 .. toctree::
    :maxdepth: 1

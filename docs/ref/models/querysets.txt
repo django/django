@@ -94,7 +94,7 @@ the query construction and is not part of the public API. However, it is safe
 (and fully supported) to pickle and unpickle the attribute's contents as
 described here.
 
-.. _pickle: http://docs.python.org/lib/module-pickle.html
+.. _pickle: http://docs.python.org/library/pickle.html
 
 .. _queryset-api:
 
