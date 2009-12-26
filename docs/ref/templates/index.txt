@@ -1,7 +1,8 @@
 .. _ref-templates-index:
 
-Template reference
-==================
+=========
+Templates
+=========
 
 Django's template engine provides a powerful mini-language for defining the
 user-facing layer of your application, encouraging a clean separation of

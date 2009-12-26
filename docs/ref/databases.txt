@@ -1,8 +1,8 @@
 .. _ref-databases:
 
-===============================
-Notes about supported databases
-===============================
+=========
+Databases
+=========
 
 Django attempts to support as many features as possible on all database
 backends. However, not all database backends are alike, and we've had to make

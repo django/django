@@ -1,5 +1,6 @@
 .. _ref-index:
 
+=============
 API Reference
 =============
 
@@ -20,4 +21,3 @@ API Reference
    signals
    templates/index
    unicode
-

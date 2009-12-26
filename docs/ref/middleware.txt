@@ -1,8 +1,8 @@
 .. _ref-middleware:
 
-=============================
-Built-in middleware reference
-=============================
+==========
+Middleware
+==========
 
 .. module:: django.middleware
    :synopsis: Django's built-in middleware classes.

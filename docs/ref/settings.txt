@@ -1,5 +1,13 @@
 .. _ref-settings:
 
+========
+Settings
+========
+
+.. contents::
+    :local:
+    :depth: 1
+
 Available settings
 ==================
 

@@ -1,5 +1,6 @@
 .. _ref-models-index:
 
+======
 Models
 ======
 

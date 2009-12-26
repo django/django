@@ -1,8 +1,8 @@
 .. _ref-contrib-index:
 
-============================
-The "django.contrib" add-ons
-============================
+====================
+``contrib`` packages
+====================
 
 Django aims to follow Python's `"batteries included" philosophy`_. It ships
 with a variety of extra, optional tools that solve common Web-development
