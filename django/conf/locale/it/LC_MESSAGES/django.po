@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-27 11:12+0200\n"
+"POT-Creation-Date: 2009-12-24 19:00+0100\n"
 "PO-Revision-Date: 2009-07-27 11:10+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italian <django-it@googlegroups.com>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 0.3\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -516,8 +516,7 @@ msgid ""
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Si è verificato un errore. Gli amministratori del sito ne sono stati "
-"informati"
-"via e-mail e verrà corretto a breve. Grazie per la tua pazienza."
+"informati via e-mail e verrà corretto a breve. Grazie per la tua pazienza."
 
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
@@ -3650,8 +3649,8 @@ msgstr "Inserisci un codice postale nel formato XXXXX o XXXXX-XXXX ."
 #: contrib/localflavor/us/forms.py:54
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr ""
-"Inserisci un numero di assistenza sociale USA valido, nel formato "
-"XXX-XX-XXXX ."
+"Inserisci un numero di assistenza sociale USA valido, nel formato XXX-XX-"
+"XXXX ."
 
 #: contrib/localflavor/za/forms.py:20
 msgid "Enter a valid South African ID number"
@@ -3976,9 +3975,8 @@ msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Correggi i dati duplicati di %(field_name)s che deve essere unico/a per "
-"%(lookup)s "
-"in %(date_field)s."
+"Correggi i dati duplicati di %(field_name)s che deve essere unico/a per %"
+"(lookup)s in %(date_field)s."
 
 #: forms/models.py:592
 msgid "Please correct the duplicate values below."
@@ -3987,8 +3985,7 @@ msgstr "Correggi i dati duplicati qui sotto."
 #: forms/models.py:826
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
-"La foreign key inline non concorda con la chiave primaria dell'istanza "
-"padre."
+"La foreign key inline non concorda con la chiave primaria dell'istanza padre."
 
 #: forms/models.py:891
 msgid "Select a valid choice. That choice is not one of the available choices."
@@ -4320,4 +4317,3 @@ msgstr "%(verbose_name)s aggiornato/a correttamente."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s cancellato/a."
-
