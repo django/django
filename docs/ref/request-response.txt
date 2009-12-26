@@ -298,9 +298,9 @@ a subclass of dictionary. Exceptions are outlined here:
           >>> q = q.copy() # to make it mutable
           >>> q.update({'a': '2'})
           >>> q.getlist('a')
-          ['1', '2']
+          [u'1', u'2']
           >>> q['a'] # returns the last
-          ['2']
+          [u'2']
 
 .. method:: QueryDict.items()
 
@@ -309,7 +309,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.items()
-           [('a', '3')]
+           [(u'a', u'3')]
 
 .. method:: QueryDict.iteritems()
 
@@ -329,7 +329,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.values()
-           ['3']
+           [u'3']
 
 .. method:: QueryDict.itervalues()
 
@@ -369,7 +369,7 @@ In addition, ``QueryDict`` has the following methods:
 
          >>> q = QueryDict('a=1&a=2&a=3')
          >>> q.lists()
-         [('a', ['1', '2', '3'])]
+         [(u'a', [u'1', u'2', u'3'])]
 
 .. method:: QueryDict.urlencode()
 
