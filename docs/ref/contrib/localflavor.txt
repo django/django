@@ -168,7 +168,7 @@ Austria (``at``)
 
 .. class:: at.forms.ATStateSelect
 
-    A ``Select`` widget that uses a list of Austrian states as its choices. 
+    A ``Select`` widget that uses a list of Austrian states as its choices.
 
 .. class:: at.forms.ATSocialSecurityNumberField
 
@@ -518,7 +518,7 @@ Romania (``ro``)
 
 .. class:: ro.forms.ROIBANField
 
-    A form field that validates its input as a Romanian International Bank 
+    A form field that validates its input as a Romanian International Bank
     Account Number (IBAN). The valid format is ROXX-XXXX-XXXX-XXXX-XXXX-XXXX,
     with or without hyphens.
 
@@ -634,7 +634,7 @@ Sweden (``se``)
 
     A \+ indicates that the person is older than 100 years, which will be taken
     into consideration when the date is validated.
-    
+
     The checksum will be calculated and checked. The birth date is checked
     to be a valid date.
 
@@ -650,7 +650,7 @@ Sweden (``se``)
     Valid codes consist of five digits (XXXXX). The number can optionally be
     formatted with a space after the third digit (XXX XX).
 
-    The cleaned value will never contain the space. 
+    The cleaned value will never contain the space.
 
 Switzerland (``ch``)
 ====================
@@ -683,7 +683,7 @@ United Kingdom (``uk``)
 
     A form field that validates input as a UK postcode. The regular
     expression used is sourced from the schema for British Standard BS7666
-    address types at http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd.
+    address types at http://www.cabinetoffice.gov.uk/media/291293/bs7666-v2-0.xml.
 
 .. class:: uk.forms.UKCountySelect
 

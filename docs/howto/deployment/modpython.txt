@@ -375,9 +375,9 @@ set of imports until it stops crashing, so as to find the specific module that
 causes the problem. Drop down further into modules and look into their imports,
 as necessary.
 
-.. _Expat Causing Apache Crash: http://www.dscpl.com.au/articles/modpython-006.html
+.. _Expat Causing Apache Crash: http://www.dscpl.com.au/wiki/ModPython/Articles/ExpatCausingApacheCrash
 .. _mod_python FAQ entry: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
-.. _Getting mod_python Working: http://www.dscpl.com.au/articles/modpython-001.html
+.. _Getting mod_python Working: http://www.dscpl.com.au/wiki/ModPython/Articles/GettingModPythonWorking
 
 If you get a UnicodeEncodeError
 ===============================

@@ -341,7 +341,7 @@ Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and
 MySQL_ (``mysql``) backends.
 
 .. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
-.. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+.. _MySQL: http://dev.mysql.com/doc/refman/5.0/en/charset-database.html
 
 .. setting:: TEST_COLLATION
 
@@ -353,10 +353,9 @@ Default: ``None``
 The collation order to use when creating the test database. This value is
 passed directly to the backend, so its format is backend-specific.
 
-Only supported for the ``mysql`` backend (see `section 10.3.2`_ of the MySQL
-manual for details).
+Only supported for the ``mysql`` backend (see the `MySQL manual`_ for details).
 
-.. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+.. _MySQL manual: MySQL_
 
 .. setting:: TEST_NAME
 
@@ -734,7 +733,7 @@ system's standard umask.
     get totally incorrect behavior.
 
 
-.. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html
+.. _documentation for os.chmod: http://docs.python.org/library/os.html#os.chmod
 
 .. setting:: FIRST_DAY_OF_WEEK
 

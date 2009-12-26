@@ -555,7 +555,7 @@ By default, :class:`FileField` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
-.. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
+.. _`strftime formatting`: http://docs.python.org/library/time.html#time.strftime
 
 ``FilePathField``
 -----------------

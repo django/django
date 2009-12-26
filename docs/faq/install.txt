@@ -35,7 +35,7 @@ also need a database engine. PostgreSQL_ is recommended, because we're
 PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 .. _Python: http://www.python.org/
-.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _WSGI: http://www.python.org/dev/peps/pep-0333/
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/

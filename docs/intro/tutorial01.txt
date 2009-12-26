@@ -102,7 +102,7 @@ These files are:
       contents" of your Django-powered site. You can read more about URLs in
       :ref:`topics-http-urls`.
 
-.. _more about packages: http://docs.python.org/tut/node8.html#packages
+.. _more about packages: http://docs.python.org/tutorial/modules.html#packages
 
 The development server
 ----------------------
@@ -367,7 +367,7 @@ Finally, note a relationship is defined, using
 to a single Poll. Django supports all the common database relationships:
 many-to-ones, many-to-manys and one-to-ones.
 
-.. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
+.. _`Python path`: http://docs.python.org/tutorial/modules.html#the-module-search-path
 
 Activating models
 =================

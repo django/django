@@ -251,5 +251,4 @@ necessary. (Also note that Django expects the ``"%s"`` placeholder, *not* the
 ``"?"`` placeholder, which is used by the SQLite Python bindings. This is for
 the sake of consistency and sanity.)
 
-.. _Python DB-API: http://www.python.org/peps/pep-0249.html
-
+.. _Python DB-API: http://www.python.org/dev/peps/pep-0249/

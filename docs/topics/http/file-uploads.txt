@@ -30,7 +30,7 @@ is a dictionary containing a key for each ``FileField`` (or ``ImageField``, or
 other ``FileField`` subclass) in the form. So the data from the above form would
 be accessible as ``request.FILES['file']``.
 
-Note that ``request.FILES`` will only contain data if the request method was 
+Note that ``request.FILES`` will only contain data if the request method was
 ``POST`` and the ``<form>`` that posted the request has the attribute
 ``enctype="multipart/form-data"``. Otherwise, ``request.FILES`` will be empty.
 
@@ -140,19 +140,19 @@ Three settings control Django's file upload behavior:
 
         Defaults to your system's standard temporary directory (i.e. ``/tmp`` on
         most Unix-like systems).
-        
+
     :setting:`FILE_UPLOAD_PERMISSIONS`
         The numeric mode (i.e. ``0644``) to set newly uploaded files to. For
         more information about what these modes mean, see the `documentation for
         os.chmod`_
-        
+
         If this isn't given or is ``None``, you'll get operating-system
         dependent behavior. On most platforms, temporary files will have a mode
         of ``0600``, and files saved from memory will be saved using the
         system's standard umask.
-        
+
         .. warning::
-        
+
             If you're not familiar with file modes, please note that the leading
             ``0`` is very important: it indicates an octal number, which is the
             way that modes must be specified. If you try to use ``644``, you'll
@@ -173,7 +173,7 @@ Three settings control Django's file upload behavior:
         Which means "try to upload to memory first, then fall back to temporary
         files."
 
-.. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html 
+.. _documentation for os.chmod: http://docs.python.org/library/os.html#os.chmod
 
 ``UploadedFile`` objects
 ========================
@@ -197,17 +197,17 @@ define the following methods/attributes:
     ``UploadedFile.temporary_file_path()``
         Only files uploaded onto disk will have this method; it returns the full
         path to the temporary uploaded file.
-        
+
 .. note::
 
     Like regular Python files, you can read the file line-by-line simply by
     iterating over the uploaded file:
-    
+
     .. code-block:: python
-        
+
         for line in uploadedfile:
             do_something_with(line)
-            
+
     However, *unlike* standard Python files, :class:`UploadedFile` only
     understands ``\n`` (also known as "Unix-style") line endings. If you know
     that you need to handle uploaded files with different line endings, you'll

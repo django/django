@@ -147,7 +147,7 @@ as must have ``CREATE DATABASE`` rights.
 For more details about how doctest works, see the `standard library
 documentation for doctest`_.
 
-.. _doctest: http://docs.python.org/lib/module-doctest.html
+.. _doctest: http://docs.python.org/library/doctest.html
 .. _standard library documentation for doctest: doctest_
 
 Writing unit tests
@@ -197,9 +197,9 @@ suite.
 For more details about ``unittest``, see the `standard library unittest
 documentation`_.
 
-.. _unittest: http://docs.python.org/lib/module-unittest.html
+.. _unittest: http://docs.python.org/library/unittest.html
 .. _standard library unittest documentation: unittest_
-.. _suggested organization: http://docs.python.org/lib/organizing-tests.html
+.. _suggested organization: http://docs.python.org/library/unittest.html#organizing-tests
 
 Which should I use?
 -------------------
@@ -414,7 +414,7 @@ a different focus. In short:
 A comprehensive test suite should use a combination of both test types.
 
 .. _Twill: http://twill.idyll.org/
-.. _Selenium: http://www.openqa.org/selenium/
+.. _Selenium: http://seleniumhq.org/
 
 Overview and a quick example
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -467,8 +467,8 @@ Note a few important things about how the test client works:
       This black magic (essentially a patching of Django's template system in
       memory) only happens during test running.
 
-.. _urllib: http://docs.python.org/lib/module-urllib.html
-.. _urllib2: http://docs.python.org/lib/module-urllib2.html
+.. _urllib: http://docs.python.org/library/urllib.html
+.. _urllib2: http://docs.python.org/library/urllib2.html
 
 Making requests
 ~~~~~~~~~~~~~~~
@@ -809,7 +809,7 @@ can access these properties as part of a test condition.
     A dictionary-like object containing session information. See the
     :ref:`session documentation<topics-http-sessions>` for full details.
 
-.. _Cookie module documentation: http://docs.python.org/lib/module-Cookie.html
+.. _Cookie module documentation: http://docs.python.org/library/cookie.html
 
 Example
 ~~~~~~~

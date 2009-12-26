@@ -849,7 +849,8 @@ dependencies:
     *  Textile_
     *  Docutils_
     *  setuptools_
-    *  memcached_, plus the either the python-memcached_ or cmemcached_ Python binding
+    *  memcached_, plus the either the python-memcached_ or cmemcached_
+       Python binding
 
 If you want to test the memcached cache backend, you will also need to define
 a :setting:`CACHE_BACKEND` setting that points at your memcached instance.
@@ -864,7 +865,7 @@ associated tests will be skipped.
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
 .. _memcached: http://www.danga.com/memcached/
 .. _python-memcached: http://pypi.python.org/pypi/python-memcached/
-.. _cmemcached: http://pypi.python.org/pypi/cmemcache
+.. _cmemcached: http://gijsbert.org/cmemcache/index.html
 
 To run a subset of the unit tests, append the names of the test modules to the
 ``runtests.py`` command line. See the list of directories in
@@ -959,9 +960,9 @@ for feature branches:
        If you want a feature branch in SVN, you'll need to ask in
        `django-developers`_ for a mentor.
 
-.. _git: http://git.or.cz/
-.. _mercurial: http://www.selenic.com/mercurial/
-.. _bazaar: http://bazaar-vcs.org/
+.. _git: http://git-scm.com/
+.. _mercurial: http://mercurial.selenic.com/
+.. _bazaar: http://bazaar.canonical.com/
 .. _django branches: http://code.djangoproject.com/wiki/DjangoBranches
 
 Branch rules
@@ -1093,7 +1094,7 @@ If you're using Django 0.95 or earlier and installed it using
 file. Then copy the branch's version of the ``django`` directory into
 ``site-packages``.
 
-.. _path file: http://docs.python.org/lib/module-site.html
+.. _path file: http://docs.python.org/library/site.html
 
 Deciding on features
 ====================
@@ -1159,6 +1160,6 @@ requests for commit access are potential flame-war starters, and will be ignored
 .. _django-users: http://groups.google.com/group/django-users
 .. _`#django`: irc://irc.freenode.net/django
 .. _list of tickets with patches: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
-.. _pep8.py: http://svn.browsershots.org/trunk/devtools/pep8/pep8.py
+.. _pep8.py: http://pypi.python.org/pypi/pep8/
 .. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
 .. _`tags/releases`: http://code.djangoproject.com/browser/django/tags/releases
