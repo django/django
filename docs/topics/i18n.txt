@@ -231,15 +231,15 @@ Pluralization
 Use the function ``django.utils.translation.ungettext()`` to specify pluralized
 messages.
 
-``ungettext`` takes three arguments: the singular translation string, the plural
-translation string and the number of objects.
+``ungettext`` takes three arguments: the singular translation string, the
+plural translation string and the number of objects.
 
-This function is useful when your need you Django application to be localizable
+This function is useful when you need your Django application to be localizable
 to languages where the number and complexity of `plural forms
 <http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
 greater than the two forms used in English ('object' for the singular and
-'objects' for all the cases where ``count`` is different from zero, irrespective
-of its value.)
+'objects' for all the cases where ``count`` is different from zero,
+irrespective of its value).
 
 For example::
 
@@ -282,8 +282,8 @@ cardinality of the elements at play.
 .. note::
 
     When using this technique, make sure you use a single name for every
-    extrapolated variable included in the literal. In the example above note how
-    we used the ``name`` Python variable in both translation strings. This
+    extrapolated variable included in the literal. In the example above note
+    how we used the ``name`` Python variable in both translation strings. This
     example would fail::
 
         from django.utils.translation import ungettext
@@ -361,8 +361,8 @@ To pluralize, specify both the singular and plural forms with the
     {% endblocktrans %}
 
 When you use the pluralization feature and bind additional values to local
-variables apart from the counter value that selects the translated literal to be
-used, have in mind that the ``blocktrans`` construct is internally converted
+variables apart from the counter value that selects the translated literal to
+be used, have in mind that the ``blocktrans`` construct is internally converted
 to an ``ungettext`` call. This means the same :ref:`notes regarding ungettext
 variables <pluralization-var-notes>` apply.
 
@@ -381,8 +381,8 @@ Each ``RequestContext`` has access to three translation-specific variables:
       left-to-right language, e.g.: English, French, German etc.
 
 
-If you don't use the ``RequestContext`` extension, you can get those values with
-three tags::
+If you don't use the ``RequestContext`` extension, you can get those values
+with three tags::
 
     {% get_current_language as LANGUAGE_CODE %}
     {% get_available_languages as LANGUAGES %}
@@ -548,8 +548,6 @@ multiple times::
 When `creating JavaScript translation catalogs`_ you need to use the special
 'djangojs' domain, **not** ``-e js``.
 
-.. _create a JavaScript translation catalog: `Creating JavaScript translation catalogs`_
-
 .. admonition:: No gettext?
 
     If you don't have the ``gettext`` utilities installed, ``django-admin.py
@@ -590,8 +588,8 @@ A quick explanation:
       out empty, so it's your responsibility to change it. Make sure you keep
       the quotes around your translation.
     * As a convenience, each message includes, in the form of a comment line
-      prefixed with ``#`` and located above the ``msgid`` line, the filename and
-      line number from which the translation string was gleaned.
+      prefixed with ``#`` and located above the ``msgid`` line, the filename
+      and line number from which the translation string was gleaned.
 
 Long messages are a special case. There, the first string directly after the
 ``msgstr`` (or ``msgid``) is an empty string. Then the content itself will be
@@ -621,9 +619,9 @@ After you create your message file -- and each time you make changes to it --
 you'll need to compile it into a more efficient form, for use by ``gettext``.
 Do this with the ``django-admin.py compilemessages`` utility.
 
-This tool runs over all available ``.po`` files and creates ``.mo`` files, which
-are binary files optimized for use by ``gettext``. In the same directory from
-which you ran ``django-admin.py makemessages``, run ``django-admin.py
+This tool runs over all available ``.po`` files and creates ``.mo`` files,
+which are binary files optimized for use by ``gettext``. In the same directory
+from which you ran ``django-admin.py makemessages``, run ``django-admin.py
 compilemessages`` like this::
 
    django-admin.py compilemessages
@@ -824,9 +822,9 @@ message file. The choice is yours.
     If you're using manually configured settings, as described
     :ref:`settings-without-django-settings-module`, the ``locale`` directory in
     the project directory will not be examined, since Django loses the ability
-    to work out the location of the project directory. (Django normally uses the
-    location of the settings file to determine this, and a settings file doesn't
-    exist if you're manually configuring your settings.)
+    to work out the location of the project directory. (Django normally uses
+    the location of the settings file to determine this, and a settings file
+    doesn't exist if you're manually configuring your settings.)
 
 All message file repositories are structured the same way. They are:
 
@@ -840,12 +838,13 @@ To create message files, you use the same ``django-admin.py makemessages``
 tool as with the Django message files. You only need to be in the right place
 -- in the directory where either the ``conf/locale`` (in case of the source
 tree) or the ``locale/`` (in case of app messages or project messages)
-directory are located. And you use the same ``django-admin.py compilemessages``
-to produce the binary ``django.mo`` files that are used by ``gettext``.
+directory are located. And you use the same ``django-admin.py
+compilemessages`` to produce the binary ``django.mo`` files that are used by
+``gettext``.
 
-You can also run ``django-admin.py compilemessages --settings=path.to.settings``
-to make the compiler process all the directories in your ``LOCALE_PATHS``
-setting.
+You can also run ``django-admin.py compilemessages
+--settings=path.to.settings`` to make the compiler process all the directories
+in your ``LOCALE_PATHS`` setting.
 
 Application message files are a bit complicated to discover -- they need the
 ``LocaleMiddleware``. If you don't use the middleware, only the Django message
@@ -1020,14 +1019,16 @@ Creating JavaScript translation catalogs
 
 You create and update the translation catalogs the same way as the other
 
-Django translation catalogs -- with the django-admin.py makemessages tool. The
-only difference is you need to provide a ``-d djangojs`` parameter, like this::
+Django translation catalogs -- with the ``django-admin.py makemessages`` tool.
+The only difference is you need to provide a ``-d djangojs`` parameter, like
+this::
 
     django-admin.py makemessages -d djangojs -l de
 
 This would create or update the translation catalog for JavaScript for German.
-After updating translation catalogs, just run ``django-admin.py compilemessages``
-the same way as you do with normal Django translation catalogs.
+After updating translation catalogs, just run ``django-admin.py
+compilemessages`` the same way as you do with normal Django translation
+catalogs.
 
 Specialties of Django translation
 ==================================
@@ -1048,10 +1049,11 @@ does translation:
 ``gettext`` on Windows
 ======================
 
-This is only needed for people who either want to extract message IDs or compile
-message files (``.po``). Translation work itself just involves editing existing
-files of this type, but if you want to create your own message files, or want to
-test or compile a changed message file, you will need the ``gettext`` utilities:
+This is only needed for people who either want to extract message IDs or
+compile message files (``.po``). Translation work itself just involves editing
+existing files of this type, but if you want to create your own message files,
+or want to test or compile a changed message file, you will need the
+``gettext`` utilities:
 
     * Download the following zip files from the GNOME servers
       http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ or from one
