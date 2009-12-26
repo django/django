@@ -1,8 +1,8 @@
 .. _ref-middleware:
 
-=============================
-Built-in middleware reference
-=============================
+==========
+Middleware
+==========
 
 .. module:: django.middleware
    :synopsis: Django's built-in middleware classes.
@@ -149,8 +149,8 @@ Message middleware
 
 .. versionadded:: 1.2
    ``MessageMiddleware`` was added.
-   
-Enables cookie- and session-based message support. See the 
+
+Enables cookie- and session-based message support. See the
 :ref:`messages documentation <ref-contrib-messages>`.
 
 Session middleware

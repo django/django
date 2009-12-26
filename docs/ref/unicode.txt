@@ -1,8 +1,8 @@
 .. _ref-unicode:
 
-======================
-Unicode data in Django
-======================
+============
+Unicode data
+============
 
 .. versionadded:: 1.0
 

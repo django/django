@@ -1,5 +1,6 @@
 .. _ref-forms-index:
 
+=====
 Forms
 =====
 
@@ -7,7 +8,7 @@ Detailed form API reference. For introductory material, see :ref:`topics-forms-i
 
 .. toctree::
    :maxdepth: 1
-   
+
    api
    fields
    widgets

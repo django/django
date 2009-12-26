@@ -1088,4 +1088,3 @@ In addition to ``extra_context``, the template's context will be:
       variable's name depends on the ``template_object_name`` parameter, which
       is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
       this variable's name will be ``foo``.
-
