@@ -109,6 +109,8 @@ def check_errcode(result, func, cargs):
 
 def check_pointer(result, func, cargs):
     "Makes sure the result pointer is valid."
+    if isinstance(result, (int, long)):
+        result = c_void_p(result)
     if bool(result): 
         return result
     else: 
