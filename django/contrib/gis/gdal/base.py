@@ -24,7 +24,7 @@ class GDALBase(object):
     def _set_ptr(self, ptr):
         # Only allow the pointer to be set with pointers of the
         # compatible type or None (NULL).
-        if isinstance(ptr, int):
+        if isinstance(ptr, (int, long)):
             self._ptr = self.ptr_type(ptr)
         elif isinstance(ptr, (self.ptr_type, NoneType)):
             self._ptr = ptr
