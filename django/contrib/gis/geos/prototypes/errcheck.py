@@ -7,8 +7,8 @@ from django.contrib.gis.geos.libgeos import lgeos, GEOS_VERSION
 
 # Getting the `free` routine used to free the memory allocated for
 # string pointers returned by GEOS.
-if GEOS_VERSION >= (3, 1, 0):
-    # In versions 3.1 and above, `GEOSFree` was added to the C API
+if GEOS_VERSION >= (3, 1, 1):
+    # In versions 3.1.1 and above, `GEOSFree` was added to the C API
     # because `free` isn't always available on all platforms.
     free = lgeos.GEOSFree
     free.argtypes = [c_void_p]
