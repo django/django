@@ -248,7 +248,7 @@ class BaseModelForm(BaseForm):
         except ValidationError, e:
             for k, v in e.message_dict.items():
                 if k != NON_FIELD_ERRORS:
-                    self._errors.setdefault(k, []).extend(v)
+                    self._errors.setdefault(k, ErrorList()).extend(v)
 
                     # Remove the data from the cleaned_data dict since it was invalid
                     if k in self.cleaned_data:
