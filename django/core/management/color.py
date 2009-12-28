@@ -2,6 +2,7 @@
 Sets up the terminal color scheme.
 """
 
+import os
 import sys
 
 from django.utils import termcolors
@@ -21,16 +22,21 @@ def supports_color():
 def color_style():
     """Returns a Style object with the Django color scheme."""
     if not supports_color():
-        return no_style()
-    class dummy: pass
-    style = dummy()
-    style.ERROR = termcolors.make_style(fg='red', opts=('bold',))
-    style.ERROR_OUTPUT = termcolors.make_style(fg='red', opts=('bold',))
-    style.NOTICE = termcolors.make_style(fg='red')
-    style.SQL_FIELD = termcolors.make_style(fg='green', opts=('bold',))
-    style.SQL_COLTYPE = termcolors.make_style(fg='green')
-    style.SQL_KEYWORD = termcolors.make_style(fg='yellow')
-    style.SQL_TABLE = termcolors.make_style(opts=('bold',))
+        style = no_style()
+    else:
+        DJANGO_COLORS = os.environ.get('DJANGO_COLORS', '')
+        color_settings = termcolors.parse_color_setting(DJANGO_COLORS)
+        if color_settings:
+            class dummy: pass
+            style = dummy()
+            # The nocolor palette has all available roles.
+            # Use that pallete as the basis for populating
+            # the palette as defined in the environment.
+            for role in termcolors.PALETTES[termcolors.NOCOLOR_PALETTE]:
+                format = color_settings.get(role,{})
+                setattr(style, role, termcolors.make_style(**format))
+        else:
+            style = no_style()
     return style
 
 def no_style():

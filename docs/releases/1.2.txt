@@ -472,8 +472,8 @@ Fast Failure for Tests
 ----------------------
 
 The ``test`` subcommand of ``django-admin.py``, and the ``runtests.py`` script
-used to run Django's own test suite, support a new ``--failfast`` option. 
-When specified, this option causes the test runner to exit after 
+used to run Django's own test suite, support a new ``--failfast`` option.
+When specified, this option causes the test runner to exit after
 encountering a failure instead of continuing with the test run.
 
 Improved localization
@@ -492,3 +492,10 @@ Added ``readonly_fields`` to ``ModelAdmin``
 :attr:`django.contrib.admin.ModelAdmin.readonly_fields` has been added to
 enable non-editable fields in add/change pages for models and inlines. Field
 and calculated values can be displayed along side editable fields.
+
+Customizable syntax highlighting
+--------------------------------
+
+You can now use the ``DJANGO_COLORS`` environment variable to modify
+or disable the colors used by ``django-admin.py`` to provide
+:ref:`syntax highlighting <syntax-coloring>`.

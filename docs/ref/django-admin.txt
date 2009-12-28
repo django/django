@@ -991,13 +991,92 @@ being executed as an unattended, automated script.
 Extra niceties
 ==============
 
+.. _syntax-coloring:
+
 Syntax coloring
 ---------------
 
-The ``django-admin.py`` / ``manage.py`` commands that output SQL to standard
-output will use pretty color-coded output if your terminal supports
-ANSI-colored output. It won't use the color codes if you're piping the
-command's output to another program.
+The ``django-admin.py`` / ``manage.py`` commands that output SQL to
+standard output will use pretty color-coded output if your terminal
+supports ANSI-colored output. It won't use the color codes if you're
+piping the command's output to another program.
+
+The colors used for syntax highlighting can be customized. Django
+ships with three color palettes:
+
+    * ``dark``, suited to terminals that show white text on a black
+      background. This is the default palette.
+
+    * ``light``, suited to terminals that show white text on a black
+      background.
+
+    * ``nocolor``, which disables syntax highlighting.
+
+You select a palette by setting a ``DJANGO_COLORS`` environment
+variable to specify the palette you want to use. For example, to
+specify the ``light`` palette under a Unix or OS/X BASH shell, you
+would run the following at a command prompt::
+
+    export DJANGO_COLORS="light"
+
+You can also customize the colors that are used. Django specifies a
+number of roles in which color is used:
+
+    * ``error`` - A major error.
+    * ``notice`` - A minor error.
+    * ``sql_field`` - The name of a model field in SQL.
+    * ``sql_coltype`` - The type of a model field in SQL.
+    * ``sql_keyword`` - A SQL keyword.
+    * ``sql_table`` - The name of a model in SQL.
+
+Each of these roles can be assigned a specific foreground and
+background color, from the following list:
+
+    * ``black``
+    * ``red``
+    * ``green``
+    * ``yellow``
+    * ``blue``
+    * ``magenta``
+    * ``cyan``
+    * ``white``
+
+Each of these colors can then be modified by using the following
+display options:
+
+    * ``bold``
+    * ``underscore``
+    * ``blink``
+    * ``reverse``
+    * ``conceal``
+
+A color specification follows one of the the following patterns:
+
+    * ``role=fg``
+    * ``role=fg/bg``
+    * ``role=fg,option,option``
+    * ``role=fg/bg,option,option``
+
+where ``role`` is the name of a valid color role, ``fg`` is the
+foreground color, ``bg`` is the background color and each ``option``
+is one of the color modifying options. Multiple color specifications
+are then separated by semicolon. For example::
+
+    export DJANGO_COLORS="error=yellow/blue,blink;notice=magenta"
+
+would specify that errors be displayed using blinking yellow on blue,
+and notices displayed using magenta. All other color roles would be
+left uncolored.
+
+Colors can also be specified by extending a base palette. If you put
+a palette name in a color specification, all the colors implied by that
+palette will be loaded. So::
+
+    export DJANGO_COLORS="light;error=yellow/blue,blink;notice=magenta"
+
+would specify the use of all the colors in the light color palette,
+*except* for the colors for errors and notices which would be
+overridden as specified.
 
 Bash completion
 ---------------
