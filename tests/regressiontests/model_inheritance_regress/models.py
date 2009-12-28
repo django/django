@@ -314,7 +314,8 @@ DoesNotExist: ArticleWithAuthor matching query does not exist.
 # likely to ocurr naturally with model inheritance, so we check it here).
 # Regression test for #9390. This necessarily pokes at the SQL string for the
 # query, since the duplicate problems are only apparent at that late stage.
->>> sql = ArticleWithAuthor.objects.order_by('pub_date', 'pk').query.as_sql()[0]
+>>> qs = ArticleWithAuthor.objects.order_by('pub_date', 'pk')
+>>> sql = qs.query.get_compiler(qs.db).as_sql()[0]
 >>> fragment = sql[sql.find('ORDER BY'):]
 >>> pos = fragment.find('pub_date')
 >>> fragment.find('pub_date', pos + 1) == -1

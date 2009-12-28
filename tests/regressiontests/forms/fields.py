@@ -27,17 +27,19 @@ __init__(). For example, CharField has a max_length option.
 import datetime
 import time
 import re
-from unittest import TestCase
 import os
 
+from unittest import TestCase
+
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.forms.widgets import RadioFieldRenderer
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 try:
     from decimal import Decimal
 except ImportError:
     from django.utils._decimal import Decimal
+
 
 def fix_os_paths(x):
     if isinstance(x, basestring):
@@ -50,7 +52,8 @@ def fix_os_paths(x):
         return x
 
 
-class TestFields(TestCase):
+class FieldsTests(TestCase):
+
     def assertRaisesErrorWithMessage(self, error, message, callable, *args, **kwargs):
         self.assertRaises(error, callable, *args, **kwargs)
         try:
@@ -187,7 +190,7 @@ class TestFields(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is greater than or equal to 0.5.']", f.clean, '0.4')
         self.assertEqual(1.5, f.clean('1.5'))
         self.assertEqual(0.5, f.clean('0.5'))
-    
+
     # DecimalField ################################################################
 
     def test_decimalfield_13(self):
@@ -487,11 +490,11 @@ class TestFields(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://inv-.-alid.com')
         self.assertEqual(u'http://valid-----hyphens.com/', f.clean('http://valid-----hyphens.com'))
 
-    def test_url_regexp_for_performance(self):
+    def test_url_regex_ticket11198(self):
         f = URLField()
         # hangs "forever" if catastrophic backtracking in ticket:#11198 not fixed
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://%s' % ("X"*200,))
-        
+
         # a second test, to make sure the problem is really addressed, even on 
         # domains that don't fail the domain label length check in the regex
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://%s' % ("X"*60,))
@@ -575,7 +578,7 @@ class TestFields(TestCase):
         self.assertEqual(False, f.clean('0'))
         self.assertEqual(True, f.clean('Django rocks'))
         self.assertEqual(False, f.clean('False'))
-        
+
     # ChoiceField #################################################################
 
     def test_choicefield_46(self):
@@ -750,7 +753,7 @@ class TestFields(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'not an e-mail')
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'', f.clean(None))
-    
+
     # FilePathField ###############################################################
 
     def test_filepathfield_65(self):

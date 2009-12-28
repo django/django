@@ -327,7 +327,7 @@ translates (roughly) into the following SQL::
    arguments whose names and values are evaluated at runtime. For more
    information, see `Keyword Arguments`_ in the official Python tutorial.
 
-   .. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
+   .. _`Keyword Arguments`: http://docs.python.org/tutorial/controlflow.html#keyword-arguments
 
 If you pass an invalid keyword argument, a lookup function will raise
 ``TypeError``.
@@ -1059,14 +1059,9 @@ Falling back to raw SQL
 =======================
 
 If you find yourself needing to write an SQL query that is too complex for
-Django's database-mapper to handle, you can fall back into raw-SQL statement
-mode.
-
-The preferred way to do this is by giving your model custom methods or custom
-manager methods that execute queries. Although there's nothing in Django that
-*requires* database queries to live in the model layer, this approach keeps all
-your data-access logic in one place, which is smart from an code-organization
-standpoint. For instructions, see :ref:`topics-db-sql`.
+Django's database-mapper to handle, you can fall back on writing SQL by hand.
+Django has a couple of options for writing raw SQL queries; see
+:ref:`topics-db-sql`.
 
 Finally, it's important to note that the Django database layer is merely an
 interface to your database. You can access your database via other tools,

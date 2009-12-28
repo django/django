@@ -7,12 +7,17 @@ from django.conf import settings
 from django.core import mail
 from django.core.management import call_command
 from django.core.urlresolvers import clear_url_caches
-from django.db import transaction, connection
+from django.db import transaction, connections, DEFAULT_DB_ALIAS
 from django.http import QueryDict
 from django.test import _doctest as doctest
 from django.test.client import Client
 from django.utils import simplejson
 from django.utils.encoding import smart_str
+
+try:
+    all
+except NameError:
+    from django.utils.itercompat import all
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 normalize_decimals = lambda s: re.sub(r"Decimal\('(\d+(\.\d*)?)'\)", lambda m: "Decimal(\"%s\")" % m.groups()[0], s)
@@ -201,7 +206,8 @@ class DocTestRunner(doctest.DocTestRunner):
                                                           example, exc_info)
         # Rollback, in case of database errors. Otherwise they'd have
         # side effects on other tests.
-        transaction.rollback_unless_managed()
+        for conn in connections:
+            transaction.rollback_unless_managed(using=conn)
 
 class TransactionTestCase(unittest.TestCase):
     def _pre_setup(self):
@@ -219,11 +225,19 @@ class TransactionTestCase(unittest.TestCase):
         mail.outbox = []
 
     def _fixture_setup(self):
-        call_command('flush', verbosity=0, interactive=False)
-        if hasattr(self, 'fixtures'):
-            # We have to use this slightly awkward syntax due to the fact
-            # that we're using *args and **kwargs together.
-            call_command('loaddata', *self.fixtures, **{'verbosity': 0})
+        # If the test case has a multi_db=True flag, flush all databases.
+        # Otherwise, just flush default.
+        if getattr(self, 'multi_db', False):
+            databases = connections
+        else:
+            databases = [DEFAULT_DB_ALIAS]
+        for db in databases:
+            call_command('flush', verbosity=0, interactive=False, database=db)
+
+            if hasattr(self, 'fixtures'):
+                # We have to use this slightly awkward syntax due to the fact
+                # that we're using *args and **kwargs together.
+                call_command('loaddata', *self.fixtures, **{'verbosity': 0, 'database': db})
 
     def _urlconf_setup(self):
         if hasattr(self, 'urls'):
@@ -427,6 +441,14 @@ class TransactionTestCase(unittest.TestCase):
             (u"Template '%s' was used unexpectedly in rendering the"
              u" response") % template_name)
 
+def connections_support_transactions():
+    """
+    Returns True if all connections support transactions.  This is messy
+    because 2.4 doesn't support any or all.
+    """
+    return all(conn.settings_dict['SUPPORTS_TRANSACTIONS']
+        for conn in connections.all())
+
 class TestCase(TransactionTestCase):
     """
     Does basically the same as TransactionTestCase, but surrounds every test
@@ -436,27 +458,47 @@ class TestCase(TransactionTestCase):
     """
 
     def _fixture_setup(self):
-        if not settings.DATABASE_SUPPORTS_TRANSACTIONS:
+        if not connections_support_transactions():
             return super(TestCase, self)._fixture_setup()
 
-        transaction.enter_transaction_management()
-        transaction.managed(True)
+        # If the test case has a multi_db=True flag, setup all databases.
+        # Otherwise, just use default.
+        if getattr(self, 'multi_db', False):
+            databases = connections
+        else:
+            databases = [DEFAULT_DB_ALIAS]
+
+        for db in databases:
+            transaction.enter_transaction_management(using=db)
+            transaction.managed(True, using=db)
         disable_transaction_methods()
 
         from django.contrib.sites.models import Site
         Site.objects.clear_cache()
 
-        if hasattr(self, 'fixtures'):
-            call_command('loaddata', *self.fixtures, **{
-                                                        'verbosity': 0,
-                                                        'commit': False
-                                                        })
+        for db in databases:
+            if hasattr(self, 'fixtures'):
+                call_command('loaddata', *self.fixtures, **{
+                                                            'verbosity': 0,
+                                                            'commit': False,
+                                                            'database': db
+                                                            })
 
     def _fixture_teardown(self):
-        if not settings.DATABASE_SUPPORTS_TRANSACTIONS:
+        if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
 
+        # If the test case has a multi_db=True flag, teardown all databases.
+        # Otherwise, just teardown default.
+        if getattr(self, 'multi_db', False):
+            databases = connections
+        else:
+            databases = [DEFAULT_DB_ALIAS]
+
         restore_transaction_methods()
-        transaction.rollback()
-        transaction.leave_transaction_management()
-        connection.close()
+        for db in databases:
+            transaction.rollback(using=db)
+            transaction.leave_transaction_management(using=db)
+
+        for connection in connections.all():
+            connection.close()

@@ -53,7 +53,7 @@ for each platform.
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
-.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _WSGI: http://www.python.org/dev/peps/pep-0333/
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 .. _database-installation:
@@ -125,7 +125,7 @@ Django will need permission to create a test database.
 .. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 .. _SQLite: http://www.sqlite.org/
-.. _pysqlite: http://pysqlite.org/
+.. _pysqlite: http://trac.edgewall.org/wiki/PySqlite
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
 .. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/

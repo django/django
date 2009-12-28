@@ -1,7 +1,7 @@
-from copy import deepcopy
 from datetime import datetime
 
 from django.utils import tree
+from django.utils.copycompat import deepcopy
 
 class ExpressionNode(tree.Node):
     """
@@ -41,8 +41,8 @@ class ExpressionNode(tree.Node):
     def prepare(self, evaluator, query, allow_joins):
         return evaluator.prepare_node(self, query, allow_joins)
 
-    def evaluate(self, evaluator, qn):
-        return evaluator.evaluate_node(self, qn)
+    def evaluate(self, evaluator, qn, connection):
+        return evaluator.evaluate_node(self, qn, connection)
 
     #############
     # OPERATORS #
@@ -109,5 +109,5 @@ class F(ExpressionNode):
     def prepare(self, evaluator, query, allow_joins):
         return evaluator.prepare_leaf(self, query, allow_joins)
 
-    def evaluate(self, evaluator, qn):
-        return evaluator.evaluate_leaf(self, qn)
+    def evaluate(self, evaluator, qn, connection):
+        return evaluator.evaluate_leaf(self, qn, connection)

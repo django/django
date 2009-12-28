@@ -7,10 +7,10 @@
    {{ inline_admin_formset.formset.non_form_errors }}
    <table>
      <thead><tr>
-     {% for field in inline_admin_formset.fields %}
-       {% if not field.is_hidden %}
-         <th {% if forloop.first %}colspan="2"{% endif %}>{{ field.label|capfirst }}</th>
-        {% endif %}
+     {% for is_hidden, label in inline_admin_formset.fields %}
+       {% if not is_hidden %}
+         <th {% if forloop.first %}colspan="2"{% endif %}>{{ label|capfirst }}</th>
+       {% endif %}
      {% endfor %}
      {% if inline_admin_formset.formset.can_delete %}<th>{% trans "Delete?" %}</th>{% endif %}
      </tr></thead>
@@ -44,8 +44,12 @@
           {% for line in fieldset %}
             {% for field in line %}
               <td class="{{ field.field.name }}">
-              {{ field.field.errors.as_ul }}
-              {{ field.field }}
+              {% if field.is_readonly %}
+                  <p>{{ field.contents }}</p>
+              {% else %}
+                  {{ field.field.errors.as_ul }}
+                  {{ field.field }}
+              {% endif %}
               </td>
             {% endfor %}
           {% endfor %}

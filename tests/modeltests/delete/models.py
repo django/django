@@ -171,9 +171,9 @@ True
 # temporarily replace the UpdateQuery class to verify that E.f is actually nulled out first
 >>> import django.db.models.sql
 >>> class LoggingUpdateQuery(django.db.models.sql.UpdateQuery):
-...     def clear_related(self, related_field, pk_list):
+...     def clear_related(self, related_field, pk_list, using):
 ...         print "CLEARING FIELD",related_field.name
-...         return super(LoggingUpdateQuery, self).clear_related(related_field, pk_list)
+...         return super(LoggingUpdateQuery, self).clear_related(related_field, pk_list, using)
 >>> original_class = django.db.models.sql.UpdateQuery
 >>> django.db.models.sql.UpdateQuery = LoggingUpdateQuery
 >>> e1.delete()

@@ -3,19 +3,15 @@ import urllib
 
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
 from django.utils.hashcompat import md5_constructor, sha_constructor
 from django.utils.translation import ugettext_lazy as _
 
-UNUSABLE_PASSWORD = '!' # This will never be a valid hash
 
-try:
-    set
-except NameError:
-    from sets import Set as set   # Python 2.3 fallback
+UNUSABLE_PASSWORD = '!' # This will never be a valid hash
 
 def get_hexdigest(algorithm, salt, raw_password):
     """
@@ -47,6 +43,13 @@ def check_password(raw_password, enc_password):
 class SiteProfileNotAvailable(Exception):
     pass
 
+class PermissionManager(models.Manager):
+    def get_by_natural_key(self, codename, app_label, model):
+        return self.get(
+            codename=codename,
+            content_type=ContentType.objects.get_by_natural_key(app_label, model)
+        )
+
 class Permission(models.Model):
     """The permissions system provides a way to assign permissions to specific users and groups of users.
 
@@ -63,6 +66,7 @@ class Permission(models.Model):
     name = models.CharField(_('name'), max_length=50)
     content_type = models.ForeignKey(ContentType)
     codename = models.CharField(_('codename'), max_length=100)
+    objects = PermissionManager()
 
     class Meta:
         verbose_name = _('permission')
@@ -75,6 +79,10 @@ class Permission(models.Model):
             unicode(self.content_type.app_label),
             unicode(self.content_type),
             unicode(self.name))
+
+    def natural_key(self):
+        return (self.codename,) + self.content_type.natural_key()
+    natural_key.dependencies = ['contenttypes.contenttype']
 
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
@@ -102,7 +110,7 @@ class UserManager(models.Manager):
             user.set_password(password)
         else:
             user.set_unusable_password()
-        user.save()
+        user.save(using=self.db)
         return user
 
     def create_superuser(self, username, email, password):
@@ -110,7 +118,7 @@ class UserManager(models.Manager):
         u.is_staff = True
         u.is_active = True
         u.is_superuser = True
-        u.save()
+        u.save(using=self.db)
         return u
 
     def make_random_password(self, length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
@@ -121,7 +129,8 @@ class UserManager(models.Manager):
         return ''.join([choice(allowed_chars) for i in range(length)])
 
 class User(models.Model):
-    """Users within the Django authentication system are represented by this model.
+    """
+    Users within the Django authentication system are represented by this model.
 
     Username and password are required. Other fields are optional.
     """
@@ -151,11 +160,16 @@ class User(models.Model):
         return "/users/%s/" % urllib.quote(smart_str(self.username))
 
     def is_anonymous(self):
-        "Always returns False. This is a way of comparing User objects to anonymous users."
+        """
+        Always returns False. This is a way of comparing User objects to
+        anonymous users.
+        """
         return False
 
     def is_authenticated(self):
-        """Always return True. This is a way to tell if the user has been authenticated in templates.
+        """
+        Always return True. This is a way to tell if the user has been
+        authenticated in templates.
         """
         return True
 
@@ -194,30 +208,41 @@ class User(models.Model):
     def has_usable_password(self):
         return self.password != UNUSABLE_PASSWORD
 
-    def get_group_permissions(self):
+    def get_group_permissions(self, obj=None):
         """
         Returns a list of permission strings that this user has through
         his/her groups. This method queries all available auth backends.
+        If an object is passed in, only permissions matching this object
+        are returned.
         """
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
-                permissions.update(backend.get_group_permissions(self))
+                if obj is not None and backend.supports_object_permissions:
+                    group_permissions = backend.get_group_permissions(self, obj)
+                else:
+                    group_permissions = backend.get_group_permissions(self)
+                permissions.update(group_permissions)
         return permissions
 
-    def get_all_permissions(self):
+    def get_all_permissions(self, obj=None):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_all_permissions"):
-                permissions.update(backend.get_all_permissions(self))
+                if obj is not None and backend.supports_object_permissions:
+                    all_permissions = backend.get_all_permissions(self, obj)
+                else:
+                    all_permissions = backend.get_all_permissions(self)
+                permissions.update(all_permissions)
         return permissions
 
-    def has_perm(self, perm):
+    def has_perm(self, perm, obj=None):
         """
         Returns True if the user has the specified permission. This method
         queries all available auth backends, but returns immediately if any
         backend returns True. Thus, a user who has permission from a single
-        auth backend is assumed to have permission in general.
+        auth backend is assumed to have permission in general. If an object
+        is provided, permissions for this specific object are checked.
         """
         # Inactive users have no permissions.
         if not self.is_active:
@@ -230,14 +255,22 @@ class User(models.Model):
         # Otherwise we need to check the backends.
         for backend in auth.get_backends():
             if hasattr(backend, "has_perm"):
-                if backend.has_perm(self, perm):
-                    return True
+                if obj is not None and backend.supports_object_permissions:
+                    if backend.has_perm(self, perm, obj):
+                        return True
+                else:
+                    if backend.has_perm(self, perm):
+                        return True
         return False
 
-    def has_perms(self, perm_list):
-        """Returns True if the user has each of the specified permissions."""
+    def has_perms(self, perm_list, obj=None):
+        """
+        Returns True if the user has each of the specified permissions.
+        If object is passed, it checks if the user has all required perms
+        for this object.
+        """
         for perm in perm_list:
-            if not self.has_perm(perm):
+            if not self.has_perm(perm, obj):
                 return False
         return True
 
@@ -282,11 +315,19 @@ class User(models.Model):
             try:
                 app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
                 model = models.get_model(app_label, model_name)
-                self._profile_cache = model._default_manager.get(user__id__exact=self.id)
+                self._profile_cache = model._default_manager.using(self._state.db).get(user__id__exact=self.id)
                 self._profile_cache.user = self
             except (ImportError, ImproperlyConfigured):
                 raise SiteProfileNotAvailable
         return self._profile_cache
+
+    def _get_message_set(self):
+        import warnings
+        warnings.warn('The user messaging API is deprecated. Please update'
+                      ' your code to use the new messages framework.',
+                      category=PendingDeprecationWarning)
+        return self._message_set
+    message_set = property(_get_message_set)
 
 class Message(models.Model):
     """
@@ -297,7 +338,7 @@ class Message(models.Model):
     actions. For example, "The poll Foo was created successfully." is a
     message.
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name='_message_set')
     message = models.TextField(_('message'))
 
     def __unicode__(self):
@@ -350,10 +391,10 @@ class AnonymousUser(object):
         return self._user_permissions
     user_permissions = property(_get_user_permissions)
 
-    def has_perm(self, perm):
+    def has_perm(self, perm, obj=None):
         return False
 
-    def has_perms(self, perm_list):
+    def has_perms(self, perm_list, obj=None):
         return False
 
     def has_module_perms(self, module):

@@ -1,21 +1,31 @@
-from itertools import izip
+from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.query import sql
-from django.db.models.fields.related import ForeignKey
 
-from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.db.models.fields import GeometryField
-from django.contrib.gis.db.models.sql import aggregates as gis_aggregates_module
+from django.contrib.gis.db.models.sql import aggregates as gis_aggregates
 from django.contrib.gis.db.models.sql.conversion import AreaField, DistanceField, GeomField
 from django.contrib.gis.db.models.sql.where import GeoWhereNode
+from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 
-# Valid GIS query types.
-ALL_TERMS = sql.constants.QUERY_TERMS.copy()
-ALL_TERMS.update(SpatialBackend.gis_terms)
 
+<<<<<<< HEAD
 # Pulling out other needed constants/routines to avoid attribute lookups.
 TABLE_NAME = sql.constants.TABLE_NAME
 get_proxied_model = sql.query.get_proxied_model
+=======
+ALL_TERMS = dict([(x, None) for x in (
+            'bbcontains', 'bboverlaps', 'contained', 'contains',
+            'contains_properly', 'coveredby', 'covers', 'crosses', 'disjoint',
+            'distance_gt', 'distance_gte', 'distance_lt', 'distance_lte',
+            'dwithin', 'equals', 'exact',
+            'intersects', 'overlaps', 'relate', 'same_as', 'touches', 'within',
+            'left', 'right', 'overlaps_left', 'overlaps_right',
+            'overlaps_above', 'overlaps_below',
+            'strictly_above', 'strictly_below'
+            )])
+ALL_TERMS.update(sql.constants.QUERY_TERMS)
+>>>>>>> master
 
 class GeoQuery(sql.Query):
     """
@@ -23,24 +33,19 @@ class GeoQuery(sql.Query):
     """
     # Overridding the valid query terms.
     query_terms = ALL_TERMS
-    aggregates_module = gis_aggregates_module
+    aggregates_module = gis_aggregates
+
+    compiler = 'GeoSQLCompiler'
 
     #### Methods overridden from the base Query class ####
-    def __init__(self, model, conn):
-        super(GeoQuery, self).__init__(model, conn, where=GeoWhereNode)
+    def __init__(self, model, where=GeoWhereNode):
+        super(GeoQuery, self).__init__(model, where)
         # The following attributes are customized for the GeoQuerySet.
         # The GeoWhereNode and SpatialBackend classes contain backend-specific
         # routines and functions.
         self.custom_select = {}
         self.transformed_srid = None
         self.extra_select_fields = {}
-
-    if SpatialBackend.oracle:
-        # Have to override this so that GeoQuery, instead of OracleQuery,
-        # is returned when unpickling.
-        def __reduce__(self):
-            callable, args, data = super(GeoQuery, self).__reduce__()
-            return (unpickle_geoquery, (), data)
 
     def clone(self, *args, **kwargs):
         obj = super(GeoQuery, self).clone(*args, **kwargs)
@@ -51,6 +56,7 @@ class GeoQuery(sql.Query):
         obj.extra_select_fields = self.extra_select_fields.copy()
         return obj
 
+<<<<<<< HEAD
     def get_columns(self, with_aliases=False):
         """
         Return the list of columns to use in the select statement. If no
@@ -238,12 +244,16 @@ class GeoQuery(sql.Query):
     def convert_values(self, value, field):
         """
         Using the same routines that Oracle does we can convert our
+=======
+    def convert_values(self, value, field, connection):
+        """        Using the same routines that Oracle does we can convert our
+>>>>>>> master
         extra selection objects into Geometry and Distance objects.
         TODO: Make converted objects 'lazy' for less overhead.
         """
-        if SpatialBackend.oracle:
+        if connection.ops.oracle:
             # Running through Oracle's first.
-            value = super(GeoQuery, self).convert_values(value, field or GeomField())
+            value = super(GeoQuery, self).convert_values(value, field or GeomField(), connection)
 
         if isinstance(field, DistanceField):
             # Using the field's distance attribute, can instantiate
@@ -252,10 +262,20 @@ class GeoQuery(sql.Query):
         elif isinstance(field, AreaField):
             value = Area(**{field.area_att : value})
         elif isinstance(field, (GeomField, GeometryField)) and value:
-            value = SpatialBackend.Geometry(value)
+            value = Geometry(value)
         return value
 
-    def resolve_aggregate(self, value, aggregate):
+    def get_aggregation(self, using):
+        # Remove any aggregates marked for reduction from the subquery
+        # and move them to the outer AggregateQuery.
+        connection = connections[using]
+        for alias, aggregate in self.aggregate_select.items():
+            if isinstance(aggregate, gis_aggregates.GeoAggregate):
+                if not getattr(aggregate, 'is_extent', False) or connection.ops.oracle:
+                    self.extra_select_fields[alias] = GeomField()
+        return super(GeoQuery, self).get_aggregation(using)
+
+    def resolve_aggregate(self, value, aggregate, connection):
         """
         Overridden from GeoQuery's normalize to handle the conversion of
         GeoAggregate objects.
@@ -263,77 +283,21 @@ class GeoQuery(sql.Query):
         if isinstance(aggregate, self.aggregates_module.GeoAggregate):
             if aggregate.is_extent:
                 if aggregate.is_extent == '3D':
+<<<<<<< HEAD
                     return self.aggregates_module.convert_extent3d(value)
                 else:
                     return self.aggregates_module.convert_extent(value)
+=======
+                    return connection.ops.convert_extent3d(value)
+                else:
+                    return connection.ops.convert_extent(value)
+>>>>>>> master
             else:
-                return self.aggregates_module.convert_geom(value, aggregate.source)
+                return connection.ops.convert_geom(value, aggregate.source)
         else:
-            return super(GeoQuery, self).resolve_aggregate(value, aggregate)
-
-    #### Routines unique to GeoQuery ####
-    def get_extra_select_format(self, alias):
-        sel_fmt = '%s'
-        if alias in self.custom_select:
-            sel_fmt = sel_fmt % self.custom_select[alias]
-        return sel_fmt
-
-    def get_field_select(self, field, alias=None, column=None):
-        """
-        Returns the SELECT SQL string for the given field.  Figures out
-        if any custom selection SQL is needed for the column  The `alias`
-        keyword may be used to manually specify the database table where
-        the column exists, if not in the model associated with this
-        `GeoQuery`.  Similarly, `column` may be used to specify the exact
-        column name, rather than using the `column` attribute on `field`.
-        """
-        sel_fmt = self.get_select_format(field)
-        if field in self.custom_select:
-            field_sel = sel_fmt % self.custom_select[field]
-        else:
-            field_sel = sel_fmt % self._field_column(field, alias, column)
-        return field_sel
-
-    def get_select_format(self, fld):
-        """
-        Returns the selection format string, depending on the requirements
-        of the spatial backend.  For example, Oracle and MySQL require custom
-        selection formats in order to retrieve geometries in OGC WKT. For all
-        other fields a simple '%s' format string is returned.
-        """
-        if SpatialBackend.select and hasattr(fld, 'geom_type'):
-            # This allows operations to be done on fields in the SELECT,
-            # overriding their values -- used by the Oracle and MySQL
-            # spatial backends to get database values as WKT, and by the
-            # `transform` method.
-            sel_fmt = SpatialBackend.select
-
-            # Because WKT doesn't contain spatial reference information,
-            # the SRID is prefixed to the returned WKT to ensure that the
-            # transformed geometries have an SRID different than that of the
-            # field -- this is only used by `transform` for Oracle and
-            # SpatiaLite backends.
-            if self.transformed_srid and ( SpatialBackend.oracle or
-                                           SpatialBackend.spatialite ):
-                sel_fmt = "'SRID=%d;'||%s" % (self.transformed_srid, sel_fmt)
-        else:
-            sel_fmt = '%s'
-        return sel_fmt
+            return super(GeoQuery, self).resolve_aggregate(value, aggregate, connection)
 
     # Private API utilities, subject to change.
-    def _field_column(self, field, table_alias=None, column=None):
-        """
-        Helper function that returns the database column for the given field.
-        The table and column are returned (quoted) in the proper format, e.g.,
-        `"geoapp_city"."point"`.  If `table_alias` is not specified, the
-        database table associated with the model of this `GeoQuery` will be
-        used.  If `column` is specified, it will be used instead of the value
-        in `field.column`.
-        """
-        if table_alias is None: table_alias = self.model._meta.db_table
-        return "%s.%s" % (self.quote_name_unless_alias(table_alias),
-                          self.connection.ops.quote_name(column or field.column))
-
     def _geo_field(self, field_name=None):
         """
         Returns the first Geometry field encountered; or specified via the
@@ -350,12 +314,3 @@ class GeoQuery(sql.Query):
             # Otherwise, check by the given field name -- which may be
             # a lookup to a _related_ geographic field.
             return GeoWhereNode._check_geo_field(self.model._meta, field_name)
-
-if SpatialBackend.oracle:
-    def unpickle_geoquery():
-        """
-        Utility function, called by Python's unpickling machinery, that handles
-        unpickling of GeoQuery subclasses of OracleQuery.
-        """
-        return GeoQuery.__new__(GeoQuery)
-    unpickle_geoquery.__safe_for_unpickling__ = True

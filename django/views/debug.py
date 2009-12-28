@@ -76,8 +76,12 @@ class ExceptionReporter:
                         for t in source_list_func(str(self.exc_value))]
                 except (ImportError, AttributeError):
                     template_list = []
+                if hasattr(loader, '__class__'):
+                    loader_name = loader.__module__ + '.' + loader.__class__.__name__
+                else:
+                    loader_name = loader.__module__ + '.' + loader.__name__
                 self.loader_debug_info.append({
-                    'loader': loader.__module__ + '.' + loader.__name__,
+                    'loader': loader_name,
                     'templates': template_list,
                 })
         if settings.TEMPLATE_DEBUG and hasattr(self.exc_value, 'source'):
@@ -809,7 +813,7 @@ EMPTY_URLCONF_TEMPLATE = """
 <div id="instructions">
   <p>Of course, you haven't actually done any work yet. Here's what to do next:</p>
   <ul>
-    <li>If you plan to use a database, edit the <code>DATABASE_*</code> settings in <code>{{ project_name }}/settings.py</code>.</li>
+    <li>If you plan to use a database, edit the <code>DATABASES</code> setting in <code>{{ project_name }}/settings.py</code>.</li>
     <li>Start your first app by running <code>python {{ project_name }}/manage.py startapp [appname]</code>.</li>
   </ul>
 </div>

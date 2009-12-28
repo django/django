@@ -1,11 +1,18 @@
+from optparse import make_option
+
+from django.conf import settings
 from django.core.management.base import AppCommand, CommandError
 from django.core.management.color import no_style
-from optparse import make_option
+from django.core.management.sql import sql_reset
+from django.db import connections, transaction, DEFAULT_DB_ALIAS
 
 class Command(AppCommand):
     option_list = AppCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
+        make_option('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to reset. '
+                'Defaults to the "default" database.'),
     )
     help = "Executes ``sqlreset`` for the given app(s) in the current database."
     args = '[appname ...]'
@@ -13,15 +20,13 @@ class Command(AppCommand):
     output_transaction = True
 
     def handle_app(self, app, **options):
-        from django.db import connection, transaction
-        from django.conf import settings
-        from django.core.management.sql import sql_reset
+        using = options.get('database', DEFAULT_DB_ALIAS)
+        connection = connections[using]
 
         app_name = app.__name__.split('.')[-2]
-
         self.style = no_style()
 
-        sql_list = sql_reset(app, self.style)
+        sql_list = sql_reset(app, self.style, connection)
 
         if options.get('interactive'):
             confirm = raw_input("""
@@ -30,7 +35,7 @@ This will IRREVERSIBLY DESTROY any data for
 the "%s" application in the database "%s".
 Are you sure you want to do this?
 
-Type 'yes' to continue, or 'no' to cancel: """ % (app_name, settings.DATABASE_NAME))
+Type 'yes' to continue, or 'no' to cancel: """ % (app_name, connection.settings_dict['NAME']))
         else:
             confirm = 'yes'
 

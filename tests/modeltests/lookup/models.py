@@ -4,7 +4,7 @@
 This demonstrates features of the database API.
 """
 
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 from django.conf import settings
 
 class Article(models.Model):
@@ -43,7 +43,9 @@ False
 True
 """}
 
-if settings.DATABASE_ENGINE in ('postgresql', 'postgresql_pysycopg2'):
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] in (
+        'django.db.backends.postgresql',
+        'django.db.backends.postgresql_pysycopg2'):
     __test__['API_TESTS'] += r"""
 # text matching tests for PostgreSQL 8.3
 >>> Article.objects.filter(id__iexact='1')
@@ -101,6 +103,12 @@ Article 4
 >>> arts[2]
 <Article: Article 2>
 >>> Article.objects.in_bulk([3])
+{3: <Article: Article 3>}
+>>> Article.objects.in_bulk(set([3]))
+{3: <Article: Article 3>}
+>>> Article.objects.in_bulk(frozenset([3]))
+{3: <Article: Article 3>}
+>>> Article.objects.in_bulk((3,))
 {3: <Article: Article 3>}
 >>> Article.objects.in_bulk([1000])
 {}
@@ -399,7 +407,7 @@ FieldError: Join on field 'headline' not permitted. Did you misspell 'starts' fo
 """
 
 
-if settings.DATABASE_ENGINE != 'mysql':
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
     __test__['API_TESTS'] += r"""
 # grouping and backreferences
 >>> Article.objects.filter(headline__regex=r'b(.).*b\1')

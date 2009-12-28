@@ -17,7 +17,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         FIELD_TYPE.FLOAT: 'FloatField',
         FIELD_TYPE.INT24: 'IntegerField',
         FIELD_TYPE.LONG: 'IntegerField',
-        FIELD_TYPE.LONGLONG: 'IntegerField',
+        FIELD_TYPE.LONGLONG: 'BigIntegerField',
         FIELD_TYPE.SHORT: 'IntegerField',
         FIELD_TYPE.STRING: 'CharField',
         FIELD_TYPE.TIMESTAMP: 'DateTimeField',

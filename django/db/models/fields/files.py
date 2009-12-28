@@ -1,6 +1,7 @@
-import copy
 import datetime
 import os
+
+import django.utils.copycompat as copy
 
 from django.conf import settings
 from django.db.models.fields import Field
@@ -216,6 +217,8 @@ class FileField(Field):
     # The descriptor to use for accessing the attribute off of the class.
     descriptor_class = FileDescriptor
 
+    description = ugettext_lazy("File path")
+
     def __init__(self, verbose_name=None, name=None, upload_to='', storage=None, **kwargs):
         for arg in ('primary_key', 'unique'):
             if arg in kwargs:
@@ -232,12 +235,12 @@ class FileField(Field):
     def get_internal_type(self):
         return "FileField"
 
-    def get_db_prep_lookup(self, lookup_type, value):
+    def get_prep_lookup(self, lookup_type, value):
         if hasattr(value, 'name'):
             value = value.name
-        return super(FileField, self).get_db_prep_lookup(lookup_type, value)
+        return super(FileField, self).get_prep_lookup(lookup_type, value)
 
-    def get_db_prep_value(self, value):
+    def get_prep_value(self, value):
         "Returns field's value prepared for saving into a database."
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:
@@ -325,6 +328,7 @@ class ImageFieldFile(ImageFile, FieldFile):
 class ImageField(FileField):
     attr_class = ImageFieldFile
     descriptor_class = ImageFileDescriptor
+    description = ugettext_lazy("File path")
 
     def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field

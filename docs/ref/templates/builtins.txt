@@ -323,6 +323,9 @@ displayed by the ``{{ athlete_list|length }}`` variable.
 As you can see, the ``if`` tag can take an optional ``{% else %}`` clause that
 will be displayed if the test fails.
 
+Boolean operators
+^^^^^^^^^^^^^^^^^
+
 ``if`` tags may use ``and``, ``or`` or ``not`` to test a number of variables or
 to negate a given variable::
 
@@ -348,24 +351,153 @@ to negate a given variable::
         There are some athletes and absolutely no coaches.
     {% endif %}
 
-``if`` tags don't allow ``and`` and ``or`` clauses within the same tag, because
-the order of logic would be ambiguous. For example, this is invalid::
+.. versionchanged:: 1.2
+
+Use of both ``and`` and ``or`` clauses within the same tag is allowed, with
+``and`` having higher precedence than ``or`` e.g.::
 
     {% if athlete_list and coach_list or cheerleader_list %}
 
-If you need to combine ``and`` and ``or`` to do advanced logic, just use nested
-``if`` tags. For example::
+will be interpreted like:
 
-    {% if athlete_list %}
-        {% if coach_list or cheerleader_list %}
-            We have athletes, and either coaches or cheerleaders!
-        {% endif %}
+.. code-block:: python
+
+    if (athlete_list and coach_list) or cheerleader_list
+
+Use of actual brackets in the ``if`` tag is invalid syntax.  If you need them to
+indicate precedence, you should use nested ``if`` tags.
+
+.. versionadded:: 1.2
+
+
+``if`` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
+``<=``, ``>=`` and ``in`` which work as follows:
+
+
+``==`` operator
+^^^^^^^^^^^^^^^
+
+Equality. Example::
+
+    {% if somevar == "x" %}
+      This appears if variable somevar equals the string "x"
     {% endif %}
 
-Multiple uses of the same logical operator are fine, as long as you use the
-same operator. For example, this is valid::
+``!=`` operator
+^^^^^^^^^^^^^^^
 
-    {% if athlete_list or coach_list or parent_list or teacher_list %}
+Inequality. Example::
+
+    {% if somevar != "x" %}
+      This appears if variable somevar does not equal the string "x",
+      or if somevar is not found in the context
+    {% endif %}
+
+``<`` operator
+^^^^^^^^^^^^^^
+
+Less than. Example::
+
+    {% if somevar < 100 %}
+      This appears if variable somevar is less than 100.
+    {% endif %}
+
+``>`` operator
+^^^^^^^^^^^^^^
+
+Greater than. Example::
+
+    {% if somevar > 0 %}
+      This appears if variable somevar is greater than 0.
+    {% endif %}
+
+``<=`` operator
+^^^^^^^^^^^^^^^
+
+Less than or equal to. Example::
+
+    {% if somevar <= 100 %}
+      This appears if variable somevar is less than 100 or equal to 100.
+    {% endif %}
+
+``>=`` operator
+^^^^^^^^^^^^^^^
+
+Greater than or equal to. Example::
+
+    {% if somevar >= 1 %}
+      This appears if variable somevar is greater than 1 or equal to 1.
+    {% endif %}
+
+``in`` operator
+^^^^^^^^^^^^^^^
+
+Contained within. This operator is supported by many Python containers to test
+whether the given value is in the container.  The following are some examples of
+how ``x in y`` will be interpreted::
+
+    {% if "bc" in "abcdef" %}
+      This appears since "bc" is a substring of "abcdef"
+    {% endif %}
+
+    {% if "hello" in greetings %}
+      If greetings is a list or set, one element of which is the string
+      "hello", this will appear.
+    {% endif %}
+
+    {% if user in users %}
+      If users is a QuerySet, this will appear if user is an
+      instance that belongs to the QuerySet.
+    {% endif %}
+
+
+The comparison operators cannot be 'chained' like in Python or in mathematical
+notation. For example, instead of using::
+
+    {% if a > b > c %}  (WRONG)
+
+you should use::
+
+    {% if a > b and b > c %}
+
+
+Filters
+^^^^^^^
+
+You can also use filters in the ``if`` expression. For example::
+
+    {% if messages|length >= 100 %}
+       You have lots of messages today!
+    {% endif %}
+
+Complex expressions
+^^^^^^^^^^^^^^^^^^^
+
+All of the above can be combined to form complex expressions. For such
+expressions, it can be important to know how the operators are grouped when the
+expression is evaluated - that is, the precedence rules.  The precedence of the
+operators, from lowest to highest, is as follows:
+
+ * ``or``
+ * ``and``
+ * ``not``
+ * ``in``
+ * ``==``, ``!=``, ``<``, ``>``,``<=``, ``>=``
+
+(This follows Python exactly). So, for example, the following complex if tag:
+
+    {% if a == b or c == d and e %}
+
+...will be interpreted as:
+
+.. code-block:: python
+
+    (a == b) or ((c == d) and e)
+
+If you need different precedence, you will need to use nested if tags. Sometimes
+that is better for clarity anyway, for the sake of those who do not know the
+precedence rules.
+
 
 .. templatetag:: ifchanged
 
@@ -437,12 +569,18 @@ You cannot check for equality with Python objects such as ``True`` or
 ``False``.  If you need to test if something is true or false, use the ``if``
 tag instead.
 
+.. versionadded:: 1.2
+   An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the ``==`` operator.
+
 .. templatetag:: ifnotequal
 
 ifnotequal
 ~~~~~~~~~~
 
 Just like ``ifequal``, except it tests that the two arguments are not equal.
+
+.. versionadded:: 1.2
+   An alternative to the ``ifnotequal`` tag is to use the :ttag:`if` tag and the ``!=`` operator.
 
 .. templatetag:: include
 
@@ -919,7 +1057,12 @@ If ``value`` is ``"String with spaces"``, the output will be ``"Stringwithspaces
 date
 ~~~~
 
-Formats a date according to the given format (same as the `now`_ tag).
+Formats a date according to the given format.
+
+Given format can be one of the predefined ones ``DATE_FORMAT``,
+``DATETIME_FORMAT``, ``SHORT_DATE_FORMAT`` or ``SHORT_DATETIME_FORMAT``,
+or a custom format, same as the `now`_ tag. Note that predefined formats may
+vary depending on the current locale.
 
 For example::
 
@@ -934,7 +1077,7 @@ When used without a format string::
     {{ value|date }}
 
 ...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
-used.
+used, without applying any localization.
 
 .. templatefilter:: default
 
@@ -1482,7 +1625,11 @@ output will be ``"Joel is a slug"``.
 time
 ~~~~
 
-Formats a time according to the given format (same as the `now`_ tag).
+Formats a time according to the given format.
+
+Given format can be the predefined one ``TIME_FORMAT``, or a custom format,
+same as the `now`_ tag. Note that the predefined format is locale depending.
+
 The time filter will only accept parameters in the format string that relate
 to the time of day, not the date (for obvious reasons). If you need to
 format a date, use the `date`_ filter.
@@ -1499,7 +1646,7 @@ When used without a format string::
     {{ value|time }}
 
 ...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
-used.
+used, without aplying any localization.
 
 .. templatefilter:: timesince
 

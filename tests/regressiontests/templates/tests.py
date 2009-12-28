@@ -15,7 +15,7 @@ import unittest
 from django import template
 from django.core import urlresolvers
 from django.template import loader
-from django.template.loaders import app_directories, filesystem
+from django.template.loaders import app_directories, filesystem, cached
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
@@ -24,6 +24,7 @@ from context import context_tests
 from custom import custom_filters
 from parser import filter_parsing, variable_parsing
 from unicode import unicode_tests
+from smartif import *
 
 try:
     from loaders import *
@@ -100,13 +101,15 @@ class UTF8Class:
 
 class Templates(unittest.TestCase):
     def test_loaders_security(self):
+        ad_loader = app_directories.Loader()
+        fs_loader = filesystem.Loader()
         def test_template_sources(path, template_dirs, expected_sources):
             if isinstance(expected_sources, list):
                 # Fix expected sources so they are normcased and abspathed
                 expected_sources = [os.path.normcase(os.path.abspath(s)) for s in expected_sources]
             # Test the two loaders (app_directores and filesystem).
-            func1 = lambda p, t: list(app_directories.get_template_sources(p, t))
-            func2 = lambda p, t: list(filesystem.get_template_sources(p, t))
+            func1 = lambda p, t: list(ad_loader.get_template_sources(p, t))
+            func2 = lambda p, t: list(fs_loader.get_template_sources(p, t))
             for func in (func1, func2):
                 if isinstance(expected_sources, list):
                     self.assertEqual(func(path, template_dirs), expected_sources)
@@ -197,8 +200,11 @@ class Templates(unittest.TestCase):
             except KeyError:
                 raise template.TemplateDoesNotExist, template_name
 
+        cache_loader = cached.Loader(('test_template_loader',))
+        cache_loader._cached_loaders = (test_template_loader,)
+
         old_template_loaders = loader.template_source_loaders
-        loader.template_source_loaders = [test_template_loader]
+        loader.template_source_loaders = [cache_loader]
 
         failures = []
         tests = template_tests.items()
@@ -231,20 +237,22 @@ class Templates(unittest.TestCase):
             for invalid_str, result in [('', normal_string_result),
                                         (expected_invalid_str, invalid_string_result)]:
                 settings.TEMPLATE_STRING_IF_INVALID = invalid_str
-                try:
-                    test_template = loader.get_template(name)
-                    output = self.render(test_template, vals)
-                except ContextStackException:
-                    failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Context stack was left imbalanced" % (invalid_str, name))
-                    continue
-                except Exception:
-                    exc_type, exc_value, exc_tb = sys.exc_info()
-                    if exc_type != result:
-                        tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
-                        failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Got %s, exception: %s\n%s" % (invalid_str, name, exc_type, exc_value, tb))
-                    continue
-                if output != result:
-                    failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Expected %r, got %r" % (invalid_str, name, result, output))
+                for is_cached in (False, True):
+                    try:
+                        test_template = loader.get_template(name)
+                        output = self.render(test_template, vals)
+                    except ContextStackException:
+                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Context stack was left imbalanced" % (is_cached, invalid_str, name))
+                        continue
+                    except Exception:
+                        exc_type, exc_value, exc_tb = sys.exc_info()
+                        if exc_type != result:
+                            tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
+                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Got %s, exception: %s\n%s" % (is_cached, invalid_str, name, exc_type, exc_value, tb))
+                        continue
+                    if output != result:
+                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, name, result, output))
+                cache_loader.reset()
 
             if 'LANGUAGE_CODE' in vals[1]:
                 deactivate()
@@ -534,6 +542,27 @@ class Templates(unittest.TestCase):
             'if-tag02': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"),
             'if-tag03': ("{% if foo %}yes{% else %}no{% endif %}", {}, "no"),
 
+            # Filters
+            'if-tag-filter01': ("{% if foo|length == 5 %}yes{% else %}no{% endif %}", {'foo': 'abcde'}, "yes"),
+            'if-tag-filter02': ("{% if foo|upper == 'ABC' %}yes{% else %}no{% endif %}", {}, "no"),
+
+            # Equality
+            'if-tag-eq01': ("{% if foo == bar %}yes{% else %}no{% endif %}", {}, "yes"),
+            'if-tag-eq02': ("{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1}, "no"),
+            'if-tag-eq03': ("{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1, 'bar': 1}, "yes"),
+            'if-tag-eq04': ("{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1, 'bar': 2}, "no"),
+            'if-tag-eq05': ("{% if foo == '' %}yes{% else %}no{% endif %}", {}, "no"),
+
+            # Comparison
+            'if-tag-gt-01': ("{% if 2 > 1 %}yes{% else %}no{% endif %}", {}, "yes"),
+            'if-tag-gt-02': ("{% if 1 > 1 %}yes{% else %}no{% endif %}", {}, "no"),
+            'if-tag-gte-01': ("{% if 1 >= 1 %}yes{% else %}no{% endif %}", {}, "yes"),
+            'if-tag-gte-02': ("{% if 1 >= 2 %}yes{% else %}no{% endif %}", {}, "no"),
+            'if-tag-lt-01': ("{% if 1 < 2 %}yes{% else %}no{% endif %}", {}, "yes"),
+            'if-tag-lt-02': ("{% if 1 < 1 %}yes{% else %}no{% endif %}", {}, "no"),
+            'if-tag-lte-01': ("{% if 1 <= 1 %}yes{% else %}no{% endif %}", {}, "yes"),
+            'if-tag-lte-02': ("{% if 2 <= 1 %}yes{% else %}no{% endif %}", {}, "no"),
+
             # AND
             'if-tag-and01': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'yes'),
             'if-tag-and02': ("{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': False}, 'no'),
@@ -554,14 +583,13 @@ class Templates(unittest.TestCase):
             'if-tag-or07': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': True}, 'yes'),
             'if-tag-or08': ("{% if foo or bar %}yes{% else %}no{% endif %}", {'bar': True}, 'yes'),
 
-            # TODO: multiple ORs
+            # multiple ORs
+            'if-tag-or09': ("{% if foo or bar or baz %}yes{% else %}no{% endif %}", {'baz': True}, 'yes'),
 
             # NOT
             'if-tag-not01': ("{% if not foo %}no{% else %}yes{% endif %}", {'foo': True}, 'yes'),
-            'if-tag-not02': ("{% if not %}yes{% else %}no{% endif %}", {'foo': True}, 'no'),
-            'if-tag-not03': ("{% if not %}yes{% else %}no{% endif %}", {'not': True}, 'yes'),
-            'if-tag-not04': ("{% if not not %}no{% else %}yes{% endif %}", {'not': True}, 'yes'),
-            'if-tag-not05': ("{% if not not %}no{% else %}yes{% endif %}", {}, 'no'),
+            'if-tag-not02': ("{% if not not foo %}no{% else %}yes{% endif %}", {'foo': True}, 'no'),
+            # not03 to not05 removed, now TemplateSyntaxErrors
 
             'if-tag-not06': ("{% if foo and not bar %}yes{% else %}no{% endif %}", {}, 'no'),
             'if-tag-not07': ("{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': True, 'bar': True}, 'no'),
@@ -599,12 +627,21 @@ class Templates(unittest.TestCase):
             'if-tag-not34': ("{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': True}, 'yes'),
             'if-tag-not35': ("{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, 'yes'),
 
-            # AND and OR raises a TemplateSyntaxError
-            'if-tag-error01': ("{% if foo or bar and baz %}yes{% else %}no{% endif %}", {'foo': False, 'bar': False}, template.TemplateSyntaxError),
+            # Various syntax errors
+            'if-tag-error01': ("{% if %}yes{% endif %}", {}, template.TemplateSyntaxError),
             'if-tag-error02': ("{% if foo and %}yes{% else %}no{% endif %}", {'foo': True}, template.TemplateSyntaxError),
             'if-tag-error03': ("{% if foo or %}yes{% else %}no{% endif %}", {'foo': True}, template.TemplateSyntaxError),
             'if-tag-error04': ("{% if not foo and %}yes{% else %}no{% endif %}", {'foo': True}, template.TemplateSyntaxError),
             'if-tag-error05': ("{% if not foo or %}yes{% else %}no{% endif %}", {'foo': True}, template.TemplateSyntaxError),
+            'if-tag-error06': ("{% if abc def %}yes{% endif %}", {}, template.TemplateSyntaxError),
+            'if-tag-error07': ("{% if not %}yes{% endif %}", {}, template.TemplateSyntaxError),
+            'if-tag-error08': ("{% if and %}yes{% endif %}", {}, template.TemplateSyntaxError),
+            'if-tag-error09': ("{% if or %}yes{% endif %}", {}, template.TemplateSyntaxError),
+            'if-tag-error10': ("{% if == %}yes{% endif %}", {}, template.TemplateSyntaxError),
+            'if-tag-error11': ("{% if 1 == %}yes{% endif %}", {}, template.TemplateSyntaxError),
+            'if-tag-error12': ("{% if a not b %}yes{% endif %}", {}, template.TemplateSyntaxError),
+
+            # Additional, more precise parsing tests are in SmartIfTests
 
             ### IFCHANGED TAG #########################################################
             'ifchanged01': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': (1,2,3)}, '123'),

@@ -10,6 +10,7 @@ from django.test.utils import ContextList
 from django.core.urlresolvers import reverse
 from django.core.exceptions import SuspiciousOperation
 from django.template import TemplateDoesNotExist, TemplateSyntaxError, Context
+from django.template import loader
 
 class AssertContainsTests(TestCase):
     def setUp(self):
@@ -436,6 +437,11 @@ class ExceptionTests(TestCase):
 
 class TemplateExceptionTests(TestCase):
     def setUp(self):
+        # Reset the loaders so they don't try to render cached templates.
+        if loader.template_source_loaders is not None:
+            for template_loader in loader.template_source_loaders:
+                if hasattr(template_loader, 'reset'):
+                    template_loader.reset()
         self.old_templates = settings.TEMPLATE_DIRS
         settings.TEMPLATE_DIRS = ()
 

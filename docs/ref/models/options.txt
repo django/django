@@ -4,8 +4,9 @@
 Model ``Meta`` options
 ======================
 
-This document explains all the possible :ref:`metadata options <meta-options>`  that you can give your model in its internal
-``class Meta``.
+This document explains all the possible :ref:`metadata options
+<meta-options>` that you can give your model in its internal ``class
+Meta``.
 
 Available ``Meta`` options
 ==========================
@@ -242,4 +243,3 @@ The plural name for the object::
     verbose_name_plural = "stories"
 
 If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
-

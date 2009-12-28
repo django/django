@@ -1,8 +1,8 @@
 import os, unittest
 from django.contrib.gis.geos import *
-from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
-from django.contrib.gis.tests.utils import no_mysql, no_oracle, no_spatialite
+from django.contrib.gis.geometry.backend import Geometry
+from django.contrib.gis.tests.utils import mysql, oracle, postgis, spatialite, no_mysql, no_oracle, no_spatialite
 from django.conf import settings
 from models import City, Location, DirectoryEntry, Parcel, Book, Author
 
@@ -95,7 +95,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         # geometries than PostGIS.  The second union aggregate is for a union
         # query that includes limiting information in the WHERE clause (in other
         # words a `.filter()` precedes the call to `.unionagg()`).
-        if SpatialBackend.oracle:
+        if oracle:
             ref_u1 = MultiPoint(p3, p1, p2, srid=4326)
             ref_u2 = MultiPoint(p3, p2, srid=4326)
         else:
@@ -144,7 +144,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P2', qs[0].name)
 
-        if not SpatialBackend.mysql:
+        if not mysql:
             # This time center2 is in a different coordinate system and needs
             # to be wrapped in transformation SQL.
             qs = Parcel.objects.filter(center2__within=F('border1'))
@@ -157,7 +157,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P1', qs[0].name)
 
-        if not SpatialBackend.mysql:
+        if not mysql:
             # This time the city column should be wrapped in transformation SQL.
             qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
             self.assertEqual(1, len(qs))
@@ -175,8 +175,8 @@ class RelatedGeoModelTest(unittest.TestCase):
         for m, d, t in zip(gqs, gvqs, gvlqs):
             # The values should be Geometry objects and not raw strings returned
             # by the spatial database.
-            self.failUnless(isinstance(d['point'], SpatialBackend.Geometry))
-            self.failUnless(isinstance(t[1], SpatialBackend.Geometry))
+            self.failUnless(isinstance(d['point'], Geometry))
+            self.failUnless(isinstance(t[1], Geometry))
             self.assertEqual(m.point, d['point'])
             self.assertEqual(m.point, t[1])
 
@@ -238,7 +238,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         # as Dallas.
         dallas = City.objects.get(name='Dallas')
         ftworth = City.objects.create(name='Fort Worth', state='TX', location=dallas.location)
-        
+
         # Count annotation should be 2 for the Dallas location now.
         loc = Location.objects.annotate(num_cities=Count('city')).get(id=dallas.location.id)
         self.assertEqual(2, loc.num_cities)
@@ -279,11 +279,11 @@ class RelatedGeoModelTest(unittest.TestCase):
     def test14_collect(self):
         "Testing the `collect` GeoQuerySet method and `Collect` aggregate."
         # Reference query:
-        # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN 
-        #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id") 
+        # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
+        #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id")
         #    WHERE "relatedapp_city"."state" = 'TX';
         ref_geom = fromstr('MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,-95.363151 29.763374,-96.801611 32.782057)')
-        
+
         c1 = City.objects.filter(state='TX').collect(field_name='location__point')
         c2 = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']
 

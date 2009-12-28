@@ -90,30 +90,30 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
         self.features = DatabaseFeatures()
-        self.ops = DatabaseOperations()
+        self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
-        self.validation = BaseDatabaseValidation()
+        self.validation = BaseDatabaseValidation(self)
 
     def _cursor(self):
         set_tz = False
         settings_dict = self.settings_dict
         if self.connection is None:
             set_tz = True
-            if settings_dict['DATABASE_NAME'] == '':
+            if settings_dict['NAME'] == '':
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured("You need to specify DATABASE_NAME in your Django settings file.")
-            conn_string = "dbname=%s" % settings_dict['DATABASE_NAME']
-            if settings_dict['DATABASE_USER']:
-                conn_string = "user=%s %s" % (settings_dict['DATABASE_USER'], conn_string)
-            if settings_dict['DATABASE_PASSWORD']:
-                conn_string += " password='%s'" % settings_dict['DATABASE_PASSWORD']
-            if settings_dict['DATABASE_HOST']:
-                conn_string += " host=%s" % settings_dict['DATABASE_HOST']
-            if settings_dict['DATABASE_PORT']:
-                conn_string += " port=%s" % settings_dict['DATABASE_PORT']
-            self.connection = Database.connect(conn_string, **settings_dict['DATABASE_OPTIONS'])
+                raise ImproperlyConfigured("You need to specify NAME in your Django settings file.")
+            conn_string = "dbname=%s" % settings_dict['NAME']
+            if settings_dict['USER']:
+                conn_string = "user=%s %s" % (settings_dict['USER'], conn_string)
+            if settings_dict['PASSWORD']:
+                conn_string += " password='%s'" % settings_dict['PASSWORD']
+            if settings_dict['HOST']:
+                conn_string += " host=%s" % settings_dict['HOST']
+            if settings_dict['PORT']:
+                conn_string += " port=%s" % settings_dict['PORT']
+            self.connection = Database.connect(conn_string, **settings_dict['OPTIONS'])
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
             connection_created.send(sender=self.__class__)
         cursor = self.connection.cursor()
@@ -142,7 +142,7 @@ def typecast_string(s):
 try:
     Database.register_type(Database.new_type((1082,), "DATE", util.typecast_date))
 except AttributeError:
-    raise Exception("You appear to be using psycopg version 2. Set your DATABASE_ENGINE to 'postgresql_psycopg2' instead of 'postgresql'.")
+    raise Exception("You appear to be using psycopg version 2. Set your DATABASES.ENGINE to 'postgresql_psycopg2' instead of 'postgresql'.")
 Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time))
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))

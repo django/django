@@ -19,6 +19,10 @@ class Song(models.Model):
     def __unicode__(self):
         return self.title
 
+    def readonly_method_on_model(self):
+        # does nothing
+        pass
+
 
 class TwoAlbumFKAndAnE(models.Model):
     album1 = models.ForeignKey(Album, related_name="album1_set")
@@ -109,6 +113,63 @@ Exception: <class 'regressiontests.admin_validation.models.TwoAlbumFKAndAnE'> ha
 ...     fk_name = "album1"
 
 >>> validate_inline(TwoAlbumFKAndAnEInline, None, Album)
+
+>>> class SongAdmin(admin.ModelAdmin):
+...     readonly_fields = ("title",)
+
+>>> validate(SongAdmin, Song)
+
+>>> def my_function(obj):
+...     # does nothing
+...     pass
+>>> class SongAdmin(admin.ModelAdmin):
+...     readonly_fields = (my_function,)
+
+>>> validate(SongAdmin, Song)
+
+>>> class SongAdmin(admin.ModelAdmin):
+...     readonly_fields = ("readonly_method_on_modeladmin",)
+...
+...     def readonly_method_on_modeladmin(self, obj):
+...         # does nothing
+...         pass
+
+>>> validate(SongAdmin, Song)
+
+>>> class SongAdmin(admin.ModelAdmin):
+...     readonly_fields = ("readonly_method_on_model",)
+
+>>> validate(SongAdmin, Song)
+
+>>> class SongAdmin(admin.ModelAdmin):
+...     readonly_fields = ("title", "nonexistant")
+
+>>> validate(SongAdmin, Song)
+Traceback (most recent call last):
+    ...
+ImproperlyConfigured: SongAdmin.readonly_fields[1], 'nonexistant' is not a callable or an attribute of 'SongAdmin' or found in the model 'Song'.
+
+>>> class SongAdmin(admin.ModelAdmin):
+...     readonly_fields = ("title", "awesome_song")
+...     fields = ("album", "title", "awesome_song")
+
+>>> validate(SongAdmin, Song)
+Traceback (most recent call last):
+    ...
+ImproperlyConfigured: SongAdmin.readonly_fields[1], 'awesome_song' is not a callable or an attribute of 'SongAdmin' or found in the model 'Song'.
+
+>>> class SongAdmin(SongAdmin):
+...     def awesome_song(self, instance):
+...         if instance.title == "Born to Run":
+...             return "Best Ever!"
+...         return "Status unknown."
+
+>>> validate(SongAdmin, Song)
+
+>>> class SongAdmin(admin.ModelAdmin):
+...     readonly_fields = (lambda obj: "test",)
+
+>>> validate(SongAdmin, Song)
 
 # Regression test for #12203/#12237 - Fail more gracefully when a M2M field that
 # specifies the 'through' option is included in the 'fields' or the 'fieldsets'

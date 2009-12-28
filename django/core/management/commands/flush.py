@@ -1,20 +1,28 @@
+from optparse import make_option
+
+from django.conf import settings
+from django.db import connections, transaction, models, DEFAULT_DB_ALIAS
+from django.core.management import call_command
 from django.core.management.base import NoArgsCommand, CommandError
 from django.core.management.color import no_style
+from django.core.management.sql import sql_flush, emit_post_sync_signal
 from django.utils.importlib import import_module
-from optparse import make_option
+
+
 
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
+        make_option('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to flush. '
+                'Defaults to the "default" database.'),
     )
     help = "Executes ``sqlflush`` on the current database."
 
     def handle_noargs(self, **options):
-        from django.conf import settings
-        from django.db import connection, transaction, models
-        from django.core.management.sql import sql_flush, emit_post_sync_signal
-
+        db = options.get('database', DEFAULT_DB_ALIAS)
+        connection = connections[db]
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive')
 
@@ -28,7 +36,7 @@ class Command(NoArgsCommand):
             except ImportError:
                 pass
 
-        sql_list = sql_flush(self.style, only_django=True)
+        sql_list = sql_flush(self.style, connection, only_django=True)
 
         if interactive:
             confirm = raw_input("""You have requested a flush of the database.
@@ -36,7 +44,7 @@ This will IRREVERSIBLY DESTROY all data currently in the %r database,
 and return each table to the state it was in after syncdb.
 Are you sure you want to do this?
 
-    Type 'yes' to continue, or 'no' to cancel: """ % settings.DATABASE_NAME)
+    Type 'yes' to continue, or 'no' to cancel: """ % connection.settings_dict['NAME'])
         else:
             confirm = 'yes'
 
@@ -46,23 +54,24 @@ Are you sure you want to do this?
                 for sql in sql_list:
                     cursor.execute(sql)
             except Exception, e:
-                transaction.rollback_unless_managed()
+                transaction.rollback_unless_managed(using=db)
                 raise CommandError("""Database %s couldn't be flushed. Possible reasons:
-      * The database isn't running or isn't configured correctly.
-      * At least one of the expected database tables doesn't exist.
-      * The SQL was invalid.
-    Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.
-    The full error: %s""" % (settings.DATABASE_NAME, e))
-            transaction.commit_unless_managed()
+  * The database isn't running or isn't configured correctly.
+  * At least one of the expected database tables doesn't exist.
+  * The SQL was invalid.
+Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.
+The full error: %s""" % (connection.settings_dict['NAME'], e))
+            transaction.commit_unless_managed(using=db)
 
             # Emit the post sync signal. This allows individual
             # applications to respond as if the database had been
             # sync'd from scratch.
-            emit_post_sync_signal(models.get_models(), verbosity, interactive)
+            emit_post_sync_signal(models.get_models(), verbosity, interactive, db)
 
             # Reinstall the initial_data fixture.
-            from django.core.management import call_command
-            call_command('loaddata', 'initial_data', **options)
+            kwargs = options.copy()
+            kwargs['database'] = db
+            call_command('loaddata', 'initial_data', **kwargs)
 
         else:
             print "Flush cancelled."

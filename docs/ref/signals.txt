@@ -1,8 +1,8 @@
 .. _ref-signals:
 
-=========================
-Built-in signal reference
-=========================
+=======
+Signals
+=======
 
 A list of all the signals that Django sends.
 

@@ -1,6 +1,6 @@
 import os
 import re
-from Cookie import SimpleCookie, CookieError
+from Cookie import BaseCookie, SimpleCookie, CookieError
 from pprint import pformat
 from urllib import urlencode
 from urlparse import urljoin
@@ -183,7 +183,7 @@ class QueryDict(MultiValueDict):
         return result
 
     def __deepcopy__(self, memo):
-        import copy
+        import django.utils.copycompat as copy
         result = self.__class__('', mutable=True)
         memo[id(self)] = result
         for key, value in dict.items(self):
@@ -251,13 +251,15 @@ class QueryDict(MultiValueDict):
 def parse_cookie(cookie):
     if cookie == '':
         return {}
-    try:
-        c = SimpleCookie()
-        c.load(cookie)
-    except CookieError:
-        # Invalid cookie
-        return {}
-
+    if not isinstance(cookie, BaseCookie):
+        try:
+            c = SimpleCookie()
+            c.load(cookie)
+        except CookieError:
+            # Invalid cookie
+            return {}
+    else:
+        c = cookie
     cookiedict = {}
     for key in c.keys():
         cookiedict[key] = c.get(key).value

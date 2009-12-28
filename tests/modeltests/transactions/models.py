@@ -7,7 +7,7 @@ commit-on-success behavior. Alternatively, you can manage the transaction
 manually.
 """
 
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
 
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
@@ -28,7 +28,7 @@ from django.conf import settings
 
 building_docs = getattr(settings, 'BUILDING_DOCS', False)
 
-if building_docs or settings.DATABASE_ENGINE != 'mysql':
+if building_docs or settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
     __test__['API_TESTS'] += """
 # the default behavior is to autocommit after each save() action
 >>> def create_a_reporter_then_fail(first, last):

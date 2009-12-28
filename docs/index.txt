@@ -28,7 +28,7 @@ Having trouble? We'd like to help!
 .. _archives of the django-users mailing list: http://groups.google.com/group/django-users/
 .. _post a question: http://groups.google.com/group/django-users/
 .. _#django IRC channel: irc://irc.freenode.net/django
-.. _IRC logs: http://oebfare.com/logger/django/
+.. _IRC logs: http://botland.oebfare.com/logger/django/
 .. _ticket tracker: http://code.djangoproject.com/
 
 First steps
@@ -65,7 +65,8 @@ The model layer
       :ref:`Raw SQL <topics-db-sql>` |
       :ref:`Transactions <topics-db-transactions>` |
       :ref:`Aggregation <topics-db-aggregation>` |
-      :ref:`Custom fields <howto-custom-model-fields>`
+      :ref:`Custom fields <howto-custom-model-fields>` |
+      :ref:`Multiple databases <topics-db-multi-db>`
 
     * **Other:**
       :ref:`Supported databases <ref-databases>` |
@@ -170,6 +171,7 @@ Other batteries included
     * :ref:`Internationalization <topics-i18n>`
     * :ref:`Jython support <howto-jython>`
     * :ref:`"Local flavor" <ref-contrib-localflavor>`
+    * :ref:`Messages <ref-contrib-messages>`
     * :ref:`Pagination <topics-pagination>`
     * :ref:`Redirects <ref-contrib-redirects>`
     * :ref:`Serialization <topics-serialization>`

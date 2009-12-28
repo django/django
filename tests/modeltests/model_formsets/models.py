@@ -512,7 +512,7 @@ book.
 ...     'book_set-INITIAL_FORMS': '1', # the number of forms with initial data
 ...     'book_set-0-id': '1',
 ...     'book_set-0-title': 'Les Fleurs du Mal',
-...     'book_set-1-title': 'Le Spleen de Paris',
+...     'book_set-1-title': 'Les Paradis Artificiels',
 ...     'book_set-2-title': '',
 ... }
 
@@ -521,14 +521,14 @@ book.
 True
 
 >>> formset.save()
-[<Book: Le Spleen de Paris>]
+[<Book: Les Paradis Artificiels>]
 
-As you can see, 'Le Spleen de Paris' is now a book belonging to Charles Baudelaire.
+As you can see, 'Les Paradis Artificiels' is now a book belonging to Charles Baudelaire.
 
 >>> for book in author.book_set.order_by('id'):
 ...     print book.title
 Les Fleurs du Mal
-Le Spleen de Paris
+Les Paradis Artificiels
 
 The save_as_new parameter lets you re-associate the data to a new instance.
 This is used in the admin for save_as functionality.
@@ -539,14 +539,14 @@ This is used in the admin for save_as functionality.
 ...     'book_set-0-id': '1',
 ...     'book_set-0-title': 'Les Fleurs du Mal',
 ...     'book_set-1-id': '2',
-...     'book_set-1-title': 'Le Spleen de Paris',
+...     'book_set-1-title': 'Les Paradis Artificiels',
 ...     'book_set-2-title': '',
 ... }
 
 >>> new_author = Author.objects.create(name='Charles Baudelaire')
 >>> formset = AuthorBooksFormSet(data, instance=new_author, save_as_new=True)
 >>> [book for book in formset.save() if book.author.pk == new_author.pk]
-[<Book: Les Fleurs du Mal>, <Book: Le Spleen de Paris>]
+[<Book: Les Fleurs du Mal>, <Book: Les Paradis Artificiels>]
 
 Test using a custom prefix on an inline formset.
 
@@ -639,6 +639,53 @@ True
 
 >>> formset.save()
 [<Poem: Brooklyn Bridge>, <Poem: Brooklyn Bridge>]
+
+We can provide a custom queryset to our InlineFormSet:
+
+>>> custom_qs = Book.objects.order_by('-title')
+>>> formset = AuthorBooksFormSet(instance=author, queryset=custom_qs)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" name="book_set-0-title" value="Les Paradis Artificiels" maxlength="100" /><input type="hidden" name="book_set-0-author" value="1" id="id_book_set-0-author" /><input type="hidden" name="book_set-0-id" value="2" id="id_book_set-0-id" /></p>
+<p><label for="id_book_set-1-title">Title:</label> <input id="id_book_set-1-title" type="text" name="book_set-1-title" value="Les Fleurs du Mal" maxlength="100" /><input type="hidden" name="book_set-1-author" value="1" id="id_book_set-1-author" /><input type="hidden" name="book_set-1-id" value="1" id="id_book_set-1-id" /></p>
+<p><label for="id_book_set-2-title">Title:</label> <input id="id_book_set-2-title" type="text" name="book_set-2-title" value="Flowers of Evil" maxlength="100" /><input type="hidden" name="book_set-2-author" value="1" id="id_book_set-2-author" /><input type="hidden" name="book_set-2-id" value="5" id="id_book_set-2-id" /></p>
+<p><label for="id_book_set-3-title">Title:</label> <input id="id_book_set-3-title" type="text" name="book_set-3-title" maxlength="100" /><input type="hidden" name="book_set-3-author" value="1" id="id_book_set-3-author" /><input type="hidden" name="book_set-3-id" id="id_book_set-3-id" /></p>
+<p><label for="id_book_set-4-title">Title:</label> <input id="id_book_set-4-title" type="text" name="book_set-4-title" maxlength="100" /><input type="hidden" name="book_set-4-author" value="1" id="id_book_set-4-author" /><input type="hidden" name="book_set-4-id" id="id_book_set-4-id" /></p>
+
+>>> data = {
+...     'book_set-TOTAL_FORMS': '5', # the number of forms rendered
+...     'book_set-INITIAL_FORMS': '3', # the number of forms with initial data
+...     'book_set-0-id': '1',
+...     'book_set-0-title': 'Les Fleurs du Mal',
+...     'book_set-1-id': '2',
+...     'book_set-1-title': 'Les Paradis Artificiels',
+...     'book_set-2-id': '5',
+...     'book_set-2-title': 'Flowers of Evil',
+...     'book_set-3-title': 'Revue des deux mondes',
+...     'book_set-4-title': '',
+... }
+>>> formset = AuthorBooksFormSet(data, instance=author, queryset=custom_qs)
+>>> formset.is_valid()
+True
+
+>>> custom_qs = Book.objects.filter(title__startswith='F')
+>>> formset = AuthorBooksFormSet(instance=author, queryset=custom_qs)
+>>> for form in formset.forms:
+...     print form.as_p()
+<p><label for="id_book_set-0-title">Title:</label> <input id="id_book_set-0-title" type="text" name="book_set-0-title" value="Flowers of Evil" maxlength="100" /><input type="hidden" name="book_set-0-author" value="1" id="id_book_set-0-author" /><input type="hidden" name="book_set-0-id" value="5" id="id_book_set-0-id" /></p>
+<p><label for="id_book_set-1-title">Title:</label> <input id="id_book_set-1-title" type="text" name="book_set-1-title" maxlength="100" /><input type="hidden" name="book_set-1-author" value="1" id="id_book_set-1-author" /><input type="hidden" name="book_set-1-id" id="id_book_set-1-id" /></p>
+<p><label for="id_book_set-2-title">Title:</label> <input id="id_book_set-2-title" type="text" name="book_set-2-title" maxlength="100" /><input type="hidden" name="book_set-2-author" value="1" id="id_book_set-2-author" /><input type="hidden" name="book_set-2-id" id="id_book_set-2-id" /></p>
+>>> data = {
+...     'book_set-TOTAL_FORMS': '3', # the number of forms rendered
+...     'book_set-INITIAL_FORMS': '1', # the number of forms with initial data
+...     'book_set-0-id': '5',
+...     'book_set-0-title': 'Flowers of Evil',
+...     'book_set-1-title': 'Revue des deux mondes',
+...     'book_set-2-title': '',
+... }
+>>> formset = AuthorBooksFormSet(data, instance=author, queryset=custom_qs)
+>>> formset.is_valid()
+True
 
 
 # Test a custom primary key ###################################################
@@ -881,7 +928,7 @@ False
 >>> form = formset.forms[0] # this formset only has one form
 >>> now = form.fields['date_joined'].initial
 >>> print form.as_p()
-<p><label for="id_membership_set-0-date_joined">Date joined:</label> <input type="text" name="membership_set-0-date_joined" value="..." id="id_membership_set-0-date_joined" /><input type="hidden" name="initial-membership_set-0-date_joined" value="..." id="id_membership_set-0-date_joined" /></p>
+<p><label for="id_membership_set-0-date_joined">Date joined:</label> <input type="text" name="membership_set-0-date_joined" value="..." id="id_membership_set-0-date_joined" /><input type="hidden" name="initial-membership_set-0-date_joined" value="..." id="initial-membership_set-0-id_membership_set-0-date_joined" /></p>
 <p><label for="id_membership_set-0-karma">Karma:</label> <input type="text" name="membership_set-0-karma" id="id_membership_set-0-karma" /><input type="hidden" name="membership_set-0-person" value="1" id="id_membership_set-0-person" /><input type="hidden" name="membership_set-0-id" id="id_membership_set-0-id" /></p>
 
 # test for validation with callable defaults. Validations rely on hidden fields

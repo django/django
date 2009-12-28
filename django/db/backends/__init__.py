@@ -1,37 +1,31 @@
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
-try:
-    set
-except NameError:
-    # Python 2.3 compat
-    from sets import Set as set
+import decimal
+from threading import local
 
-try:
-    import decimal
-except ImportError:
-    # Python 2.3 fallback
-    from django.utils import _decimal as decimal
-
+from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import util
 from django.utils import datetime_safe
+from django.utils.importlib import import_module
 
 class BaseDatabaseWrapper(local):
     """
     Represents a database connection.
     """
     ops = None
-    def __init__(self, settings_dict):
+
+    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         # `settings_dict` should be a dictionary containing keys such as
-        # DATABASE_NAME, DATABASE_USER, etc. It's called `settings_dict`
-        # instead of `settings` to disambiguate it from Django settings
-        # modules.
+        # NAME, USER, etc. It's called `settings_dict` instead of `settings`
+        # to disambiguate it from Django settings modules.
         self.connection = None
         self.queries = []
         self.settings_dict = settings_dict
+        self.alias = alias
+
+    def __eq__(self, other):
+        return self.settings_dict == other.settings_dict
+
+    def __ne__(self, other):
+        return not self == other
 
     def _commit(self):
         if self.connection is not None:
@@ -91,7 +85,6 @@ class BaseDatabaseFeatures(object):
     # True if django.db.backend.utils.typecast_timestamp is used on values
     # returned from dates() calls.
     needs_datetime_string_cast = True
-    uses_custom_query_class = False
     empty_fetchmany_value = []
     update_can_self_select = True
     interprets_empty_strings_as_nulls = False
@@ -109,6 +102,11 @@ class BaseDatabaseOperations(object):
     a backend performs ordering or calculates the ID of a recently-inserted
     row.
     """
+    compiler_module = "django.db.models.sql.compiler"
+
+    def __init__(self):
+        self._cache = {}
+
     def autoinc_sql(self, table, column):
         """
         Returns any SQL needed to support auto-incrementing primary keys, or
@@ -271,14 +269,17 @@ class BaseDatabaseOperations(object):
         """
         pass
 
-    def query_class(self, DefaultQueryClass):
+    def compiler(self, compiler_name):
         """
-        Given the default Query class, returns a custom Query class
-        to use for this backend. Returns None if a custom Query isn't used.
-        See also BaseDatabaseFeatures.uses_custom_query_class, which regulates
-        whether this method is called at all.
+        Returns the SQLCompiler class corresponding to the given name,
+        in the namespace corresponding to the `compiler_module` attribute
+        on this backend.
         """
-        return None
+        if compiler_name not in self._cache:
+            self._cache[compiler_name] = getattr(
+                import_module(self.compiler_module), compiler_name
+            )
+        return self._cache[compiler_name]
 
     def quote_name(self, name):
         """
@@ -565,6 +566,9 @@ class BaseDatabaseValidation(object):
     """
     This class encapsualtes all backend-specific model validation.
     """
+    def __init__(self, connection):
+        self.connection = connection
+
     def validate_field(self, errors, opts, f):
         "By default, there is no backend-specific validation"
         pass

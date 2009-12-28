@@ -104,7 +104,7 @@ geos_version.restype = c_char_p
 
 # Regular expression should be able to parse version strings such as
 # '3.0.0rc4-CAPI-1.3.3', or '3.0.0-CAPI-1.4.1'
-version_regex = re.compile(r'^(?P<version>(?P<major>\d+)\.(?P<minor>\d+)\.\d+)(rc(?P<release_candidate>\d+))?-CAPI-(?P<capi_version>\d+\.\d+\.\d+)$')
+version_regex = re.compile(r'^(?P<version>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<subminor>\d+))(rc(?P<release_candidate>\d+))?-CAPI-(?P<capi_version>\d+\.\d+\.\d+)$')
 def geos_version_info():
     """
     Returns a dictionary containing the various version metadata parsed from
@@ -115,14 +115,16 @@ def geos_version_info():
     ver = geos_version()
     m = version_regex.match(ver)
     if not m: raise GEOSException('Could not parse version info string "%s"' % ver)
-    return dict((key, m.group(key)) for key in ('version', 'release_candidate', 'capi_version', 'major', 'minor'))
+    return dict((key, m.group(key)) for key in ('version', 'release_candidate', 'capi_version', 'major', 'minor', 'subminor'))
 
 # Version numbers and whether or not prepared geometry support is available.
 _verinfo = geos_version_info()
 GEOS_MAJOR_VERSION = int(_verinfo['major'])
 GEOS_MINOR_VERSION = int(_verinfo['minor'])
+GEOS_SUBMINOR_VERSION = int(_verinfo['subminor'])
 del _verinfo
-GEOS_PREPARE = GEOS_MAJOR_VERSION > 3 or GEOS_MAJOR_VERSION == 3 and GEOS_MINOR_VERSION >= 1
+GEOS_VERSION = (GEOS_MAJOR_VERSION, GEOS_MINOR_VERSION, GEOS_SUBMINOR_VERSION)
+GEOS_PREPARE = GEOS_VERSION >= (3, 1, 0)
 
 # Calling the finishGEOS() upon exit of the interpreter.
 atexit.register(lgeos.finishGEOS)

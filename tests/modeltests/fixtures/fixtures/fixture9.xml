@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+    <object pk="2" model="fixtures.visa">
+        <field type="CharField" name="person">
+            <natural>Stephane Grappelli</natural>
+        </field>
+        <field to="auth.permission" name="permissions" rel="ManyToManyRel">
+            <object>
+                <natural>add_user</natural>
+                <natural>auth</natural>
+                <natural>user</natural>
+            </object>
+            <object>
+                <natural>delete_user</natural>
+                <natural>auth</natural>
+                <natural>user</natural>
+            </object>
+        </field>
+    </object>
+    <object pk="3" model="fixtures.person">
+        <field type="CharField" name="name">
+            <natural>Artist formerly known as &quot;Prince&quot;</natural>
+        </field>
+    </object>
+    <object pk="3" model="fixtures.visa">
+        <field type="CharField" name="person">
+            <natural>Artist formerly known as &quot;Prince&quot;</natural>
+        </field>
+        <field to="auth.permission" name="permissions" rel="ManyToManyRel">
+            <object>
+                <natural>change_user</natural>
+                <natural>auth</natural>
+                <natural>user</natural>
+            </object>
+        </field>
+    </object>
+    <object pk="1" model="fixtures.book">
+        <field type="CharField" name="name">Music for all ages</field>
+        <field to="fixtures.person" name="authors" rel="ManyToManyRel">
+            <object>
+                <natural>Django Reinhardt</natural>
+            </object>
+            <object>
+                <natural>Artist formerly known as &quot;Prince&quot;</natural>
+            </object>
+        </field>
+    </object>
+</django-objects>

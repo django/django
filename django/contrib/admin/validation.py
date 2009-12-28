@@ -1,13 +1,11 @@
-try:
-    set
-except NameError:
-    from sets import Set as set   # Python 2.3 fallback
-
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.forms.models import BaseModelForm, BaseModelFormSet, fields_for_model, _get_foreign_key
+from django.forms.models import (BaseModelForm, BaseModelFormSet, fields_for_model,
+    _get_foreign_key)
 from django.contrib.admin.options import flatten_fieldsets, BaseModelAdmin
 from django.contrib.admin.options import HORIZONTAL, VERTICAL
+from django.contrib.admin.util import lookup_field
+
 
 __all__ = ['validate']
 
@@ -123,6 +121,18 @@ def validate(cls, model):
                 continue
             get_field(cls, model, opts, 'ordering[%d]' % idx, field)
 
+    if hasattr(cls, "readonly_fields"):
+        check_isseq(cls, "readonly_fields", cls.readonly_fields)
+        for idx, field in enumerate(cls.readonly_fields):
+            if not callable(field):
+                if not hasattr(cls, field):
+                    if not hasattr(model, field):
+                        try:
+                            opts.get_field(field)
+                        except models.FieldDoesNotExist:
+                            raise ImproperlyConfigured("%s.readonly_fields[%d], %r is not a callable or an attribute of %r or found in the model %r."
+                                % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
+
     # list_select_related = False
     # save_as = False
     # save_on_top = False
@@ -195,6 +205,11 @@ def validate_base(cls, model):
     if cls.fields: # default value is None
         check_isseq(cls, 'fields', cls.fields)
         for field in cls.fields:
+            if field in cls.readonly_fields:
+                # Stuff can be put in fields that isn't actually a model field
+                # if it's in readonly_fields, readonly_fields will handle the
+                # validation of such things.
+                continue
             check_formfield(cls, model, opts, 'fields', field)
             f = get_field(cls, model, opts, 'fields', field)
             if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:

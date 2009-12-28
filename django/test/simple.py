@@ -10,6 +10,26 @@ TEST_MODULE = 'tests'
 
 doctestOutputChecker = OutputChecker()
 
+class DjangoTestRunner(unittest.TextTestRunner):
+    
+    def __init__(self, verbosity=0, failfast=False, **kwargs):
+        super(DjangoTestRunner, self).__init__(verbosity=verbosity, **kwargs)
+        self.failfast = failfast
+        
+    def _makeResult(self):
+        result = super(DjangoTestRunner, self)._makeResult()
+        failfast = self.failfast
+        
+        def stoptest_override(func):
+            def stoptest(test):
+                if failfast and not result.wasSuccessful():
+                    result.stop()
+                func(test)
+            return stoptest
+        
+        setattr(result, 'stopTest', stoptest_override(result.stopTest))
+        return result
+
 def get_tests(app_module):
     try:
         app_path = app_module.__name__.split('.')[:-1]
@@ -146,7 +166,7 @@ def reorder_suite(suite, classes):
         bins[0].addTests(bins[i+1])
     return bins[0]
 
-def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
+def run_tests(test_labels, verbosity=1, interactive=True, failfast=False, extra_tests=[]):
     """
     Run the unit tests for all the test labels in the provided list.
     Labels must be of the form:
@@ -186,11 +206,15 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
 
     suite = reorder_suite(suite, (TestCase,))
 
-    old_name = settings.DATABASE_NAME
-    from django.db import connection
-    connection.creation.create_test_db(verbosity, autoclobber=not interactive)
-    result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-    connection.creation.destroy_test_db(old_name, verbosity)
+    from django.db import connections
+    old_names = []
+    for alias in connections:
+        connection = connections[alias]
+        old_names.append((connection, connection.settings_dict['NAME']))
+        connection.creation.create_test_db(verbosity, autoclobber=not interactive)
+    result = DjangoTestRunner(verbosity=verbosity, failfast=failfast).run(suite)
+    for connection, old_name in old_names:
+        connection.creation.destroy_test_db(old_name, verbosity)
 
     teardown_test_environment()
 

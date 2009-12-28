@@ -9,12 +9,12 @@ class DatabaseClient(BaseDatabaseClient):
     def runshell(self):
         settings_dict = self.connection.settings_dict
         args = [self.executable_name]
-        db = settings_dict['DATABASE_OPTIONS'].get('db', settings_dict['DATABASE_NAME'])
-        user = settings_dict['DATABASE_OPTIONS'].get('user', settings_dict['DATABASE_USER'])
-        passwd = settings_dict['DATABASE_OPTIONS'].get('passwd', settings_dict['DATABASE_PASSWORD'])
-        host = settings_dict['DATABASE_OPTIONS'].get('host', settings_dict['DATABASE_HOST'])
-        port = settings_dict['DATABASE_OPTIONS'].get('port', settings_dict['DATABASE_PORT'])
-        defaults_file = settings_dict['DATABASE_OPTIONS'].get('read_default_file')
+        db = settings_dict['OPTIONS'].get('db', settings_dict['NAME'])
+        user = settings_dict['OPTIONS'].get('user', settings_dict['USER'])
+        passwd = settings_dict['OPTIONS'].get('passwd', settings_dict['PASSWORD'])
+        host = settings_dict['OPTIONS'].get('host', settings_dict['HOST'])
+        port = settings_dict['OPTIONS'].get('port', settings_dict['PORT'])
+        defaults_file = settings_dict['OPTIONS'].get('read_default_file')
         # Seems to be no good way to set sql_mode with CLI.
 
         if defaults_file:

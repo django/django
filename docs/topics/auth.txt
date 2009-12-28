@@ -23,6 +23,9 @@ The auth system consists of:
       user.
     * Messages: A simple way to queue messages for given users.
 
+.. deprecated:: 1.2
+   The Messages component of the auth system will be removed in Django 1.4.
+ 
 Installation
 ============
 
@@ -199,28 +202,49 @@ Methods
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
         been called for this user.
 
-    .. method:: models.User.get_group_permissions()
+    .. method:: models.User.get_group_permissions(obj=None)
 
         Returns a list of permission strings that the user has, through his/her
         groups.
 
-    .. method:: models.User.get_all_permissions()
+        .. versionadded:: 1.2
+
+        If ``obj`` is passed in, only returns the group permissions for
+        this specific object.
+
+    .. method:: models.User.get_all_permissions(obj=None)
 
         Returns a list of permission strings that the user has, both through
         group and user permissions.
 
-    .. method:: models.User.has_perm(perm)
+        .. versionadded:: 1.2
+
+        If ``obj`` is passed in, only returns the permissions for this
+        specific object.
+
+    .. method:: models.User.has_perm(perm, obj=None)
 
         Returns ``True`` if the user has the specified permission, where perm is
-        in the format ``"<app label>.<permission codename>"``.
-        If the user is inactive, this method will always return ``False``.
+        in the format ``"<app label>.<permission codename>"``. (see
+        `permissions`_ section below). If the user is inactive, this method will
+        always return ``False``.
 
-    .. method:: models.User.has_perms(perm_list)
+        .. versionadded:: 1.2
+
+        If ``obj`` is passed in, this method won't check for a permission for
+        the model, but for this specific object.
+
+    .. method:: models.User.has_perms(perm_list, obj=None)
 
         Returns ``True`` if the user has each of the specified permissions,
         where each perm is in the format 
         ``"<app label>.<permission codename>"``. If the user is inactive,
         this method will always return ``False``.
+
+        .. versionadded:: 1.2
+
+        If ``obj`` is passed in, this method won't check for permissions for
+        the model, but for the specific object.
 
     .. method:: models.User.has_module_perms(package_name)
 
@@ -1099,6 +1123,8 @@ generic view itself. For example::
     def limited_object_detail(*args, **kwargs):
         return object_detail(*args, **kwargs)
 
+.. _permissions:
+
 Permissions
 ===========
 
@@ -1140,6 +1166,14 @@ will be created for all previously-installed models, as well as for any new
 models being installed at that time. Afterward, it will create default
 permissions for new models each time you run :djadmin:`manage.py syncdb
 <syncdb>`.
+
+Assuming you have an application with an
+:attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
+to test for basic permissions you should use:
+
+    * add: ``user.has_perm('foo.add_bar')``
+    * change: ``user.has_perm('foo.change_bar')``
+    * delete: ``user.has_perm('foo.delete_bar')``
 
 .. _custom-permissions:
 
@@ -1289,6 +1323,11 @@ messages.
 Messages
 ========
 
+.. deprecated:: 1.2
+   This functionality will be removed in Django 1.4.  You should use the
+   :ref:`messages framework <ref-contrib-messages>` for all new projects and
+   begin to update your existing code immediately.
+
 The message system is a lightweight way to queue messages for given users.
 
 A message is associated with a :class:`~django.contrib.auth.models.User`.
@@ -1334,13 +1373,16 @@ logged-in user and his/her messages are made available in the
     </ul>
     {% endif %}
 
-Note that :class:`~django.template.context.RequestContext` calls
-:meth:`~django.contrib.auth.models.User.get_and_delete_messages` behind the
-scenes, so any messages will be deleted even if you don't display them.
+.. versionchanged:: 1.2
+   The ``messages`` template variable uses a backwards compatible method in the
+   :ref:`messages framework <ref-contrib-messages>` to retrieve messages from
+   both the user ``Message`` model and from the new framework.  Unlike in
+   previous revisions, the messages will not be erased unless they are actually
+   displayed.
 
 Finally, note that this messages framework only works with users in the user
 database. To send messages to anonymous users, use the
-:ref:`session framework <topics-http-sessions>`.
+:ref:`messages framework <ref-contrib-messages>`.
 
 .. _authentication-backends:
 
@@ -1510,3 +1552,24 @@ A full authorization implementation can be found in
 the ``auth_permission`` table most of the time.
 
 .. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
+
+Handling object permissions
+---------------------------
+
+Django's permission framework has a foundation for object permissions, though
+there is no implementation for it in the core. That means that checking for
+object permissions will always return ``False`` or an empty list (depending on
+the check performed).
+
+To enable object permissions in your own
+:ref:`authentication backend <ref-authentication-backends>` you'll just have
+to allow passing an ``obj`` parameter to the permission methods and set the
+``supports_objects_permissions`` class attribute to ``True``.
+
+A nonexistent ``supports_objects_permissions`` will raise a hidden
+``PendingDeprecationWarning`` if used in Django 1.2. In Django 1.3, this
+warning will be upgraded to a ``DeprecationWarning``, which will be displayed
+loudly. Additionally ``supports_objects_permissions`` will be set to ``False``.
+Django 1.4 will assume that every backend supports object permissions and
+won't check for the existence of ``supports_objects_permissions``, which
+means not supporting ``obj`` as a parameter will raise a ``TypeError``.

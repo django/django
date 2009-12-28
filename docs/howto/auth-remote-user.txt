@@ -12,7 +12,7 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 `WebAuth`_, `mod_auth_sspi`_, etc.
 
 .. _mod_authnz_ldap: http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
-.. _CAS: http://www.ja-sig.org/products/cas/
+.. _CAS: http://www.jasig.org/cas
 .. _Cosign: http://weblogin.org
 .. _WebAuth: http://www.stanford.edu/services/webauth/
 .. _mod_auth_sspi: http://sourceforge.net/projects/mod-auth-sspi

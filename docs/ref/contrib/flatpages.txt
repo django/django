@@ -26,7 +26,6 @@ content in a custom template.
 
 Here are some examples of flatpages on Django-powered sites:
 
-    * http://www.chicagocrime.org/about/
     * http://www.everyblock.com/about/
     * http://www.lawrence.com/about/contact/
 

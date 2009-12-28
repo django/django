@@ -1,0 +1,102 @@
+[
+    {
+        "pk": 1,
+        "model": "raw_query.author",
+        "fields": {
+            "dob": "1950-09-20",
+            "first_name": "Joe",
+            "last_name": "Smith"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "raw_query.author",
+        "fields": {
+            "dob": "1920-04-02",
+            "first_name": "Jill",
+            "last_name": "Doe"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "raw_query.author",
+        "fields": {
+            "dob": "1986-01-25",
+            "first_name": "Bob",
+            "last_name": "Smith"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "raw_query.author",
+        "fields": {
+            "dob": "1932-05-10",
+            "first_name": "Bill",
+            "last_name": "Jones"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "raw_query.book",
+        "fields": {
+            "author": 1,
+            "title": "The awesome book"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "raw_query.book",
+        "fields": {
+            "author": 1,
+            "title": "The horrible book"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "raw_query.book",
+        "fields": {
+            "author": 1,
+            "title": "Another awesome book"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "raw_query.book",
+        "fields": {
+            "author": 3,
+            "title": "Some other book"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "raw_query.coffee",
+        "fields": {
+            "brand": "dunkin doughnuts"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "raw_query.coffee",
+        "fields": {
+            "brand": "starbucks"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "raw_query.reviewer",
+        "fields": {
+            "reviewed": [
+                2,
+                3,
+                4
+            ]
+        }
+    },
+    {
+        "pk": 2,
+        "model": "raw_query.reviewer",
+        "fields": {
+            "reviewed": []
+        }
+    }
+]

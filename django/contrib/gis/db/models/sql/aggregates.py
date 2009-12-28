@@ -1,84 +1,10 @@
 from django.db.models.sql.aggregates import *
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.sql.conversion import GeomField
-from django.contrib.gis.db.backend import SpatialBackend
-
-# Default SQL template for spatial aggregates.
-geo_template = '%(function)s(%(field)s)'
-
-# Default conversion functions for aggregates; will be overridden if implemented
-# for the spatial backend.
-def convert_extent(box):
-    raise NotImplementedError('Aggregate extent not implemented for this spatial backend.')
-
-def convert_extent3d(box):
-    raise NotImplementedError('Aggregate 3D extent not implemented for this spatial backend.')
-
-def convert_geom(wkt, geo_field):
-    raise NotImplementedError('Aggregate method not implemented for this spatial backend.')
-
-if SpatialBackend.postgis:
-    def convert_extent(box):
-        # Box text will be something like "BOX(-90.0 30.0, -85.0 40.0)";
-        # parsing out and returning as a 4-tuple.
-        ll, ur = box[4:-1].split(',')
-        xmin, ymin = map(float, ll.split())
-        xmax, ymax = map(float, ur.split())
-        return (xmin, ymin, xmax, ymax)
-
-    def convert_extent3d(box3d):
-        # Box text will be something like "BOX3D(-90.0 30.0 1, -85.0 40.0 2)";
-        # parsing out and returning as a 4-tuple.
-        ll, ur = box3d[6:-1].split(',')
-        xmin, ymin, zmin = map(float, ll.split())
-        xmax, ymax, zmax = map(float, ur.split())
-        return (xmin, ymin, zmin, xmax, ymax, zmax)
-
-    def convert_geom(hex, geo_field):
-        if hex: return SpatialBackend.Geometry(hex)
-        else: return None
-elif SpatialBackend.oracle:
-    # Oracle spatial aggregates need a tolerance.
-    geo_template = '%(function)s(SDOAGGRTYPE(%(field)s,%(tolerance)s))'
-
-    def convert_extent(clob):
-        if clob:
-            # Generally, Oracle returns a polygon for the extent -- however,
-            # it can return a single point if there's only one Point in the
-            # table.
-            ext_geom = SpatialBackend.Geometry(clob.read())
-            gtype = str(ext_geom.geom_type)
-            if gtype == 'Polygon':
-                # Construct the 4-tuple from the coordinates in the polygon.
-                shell = ext_geom.shell
-                ll, ur = shell[0][:2], shell[2][:2]
-            elif gtype == 'Point':
-                ll = ext_geom.coords[:2]
-                ur = ll
-            else:
-                raise Exception('Unexpected geometry type returned for extent: %s' % gtype)
-            xmin, ymin = ll
-            xmax, ymax = ur
-            return (xmin, ymin, xmax, ymax)
-        else:
-            return None
-
-    def convert_geom(clob, geo_field):
-        if clob:
-            return SpatialBackend.Geometry(clob.read(), geo_field.srid)
-        else:
-            return None
-elif SpatialBackend.spatialite:
-    # SpatiaLite returns WKT.
-    def convert_geom(wkt, geo_field):
-        if wkt:
-            return SpatialBackend.Geometry(wkt, geo_field.srid)
-        else:
-            return None
 
 class GeoAggregate(Aggregate):
-    # Overriding the SQL template with the geographic one.
-    sql_template = geo_template
+    # Default SQL template for spatial aggregates.
+    sql_template = '%(function)s(%(field)s)'
 
     # Conversion class, if necessary.
     conversion_class = None
@@ -86,41 +12,50 @@ class GeoAggregate(Aggregate):
     # Flags for indicating the type of the aggregate.
     is_extent = False
 
-    def __init__(self, col, source=None, is_summary=False, **extra):
+    def __init__(self, col, source=None, is_summary=False, tolerance=0.05, **extra):
         super(GeoAggregate, self).__init__(col, source, is_summary, **extra)
 
-        if not self.is_extent and SpatialBackend.oracle:
-            self.extra.setdefault('tolerance', 0.05)
+        # Required by some Oracle aggregates.
+        self.tolerance = tolerance
 
         # Can't use geographic aggregates on non-geometry fields.
         if not isinstance(self.source, GeometryField):
             raise ValueError('Geospatial aggregates only allowed on geometry fields.')
 
-        # Making sure the SQL function is available for this spatial backend.
-        if not self.sql_function:
-            raise NotImplementedError('This aggregate functionality not implemented for your spatial backend.')
+    def as_sql(self, qn, connection):
+        "Return the aggregate, rendered as SQL."
+
+        if connection.ops.oracle:
+            self.extra['tolerance'] = self.tolerance
+
+        if hasattr(self.col, 'as_sql'):
+            field_name = self.col.as_sql(qn, connection)
+        elif isinstance(self.col, (list, tuple)):
+            field_name = '.'.join([qn(c) for c in self.col])
+        else:
+            field_name = self.col
+
+        sql_template, sql_function = connection.ops.spatial_aggregate_sql(self)
+
+        params = {
+            'function': sql_function,
+            'field': field_name
+        }
+        params.update(self.extra)
+
+        return sql_template % params
 
 class Collect(GeoAggregate):
-    conversion_class = GeomField
-    sql_function = SpatialBackend.collect
+    pass
 
 class Extent(GeoAggregate):
     is_extent = '2D'
-    sql_function = SpatialBackend.extent
-
-if SpatialBackend.oracle:
-    # Have to change Extent's attributes here for Oracle.
-    Extent.conversion_class = GeomField
-    Extent.sql_template = '%(function)s(%(field)s)'
 
 class Extent3D(GeoAggregate):
     is_extent = '3D'
-    sql_function = SpatialBackend.extent3d
 
 class MakeLine(GeoAggregate):
-    conversion_class = GeomField
-    sql_function = SpatialBackend.make_line
+    pass
 
 class Union(GeoAggregate):
-    conversion_class = GeomField
-    sql_function = SpatialBackend.unionagg
+    pass

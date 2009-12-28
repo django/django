@@ -6,6 +6,7 @@ from django.contrib.sites.models import Site
 from django.conf import settings
 from django.utils.importlib import import_module
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 
 
 def template_validator(request):
@@ -23,7 +24,7 @@ def template_validator(request):
         form = TemplateValidatorForm(settings_modules, site_list,
                                      data=request.POST)
         if form.is_valid():
-            request.user.message_set.create(message='The template is valid.')
+            messages.info(request, 'The template is valid.')
     else:
         form = TemplateValidatorForm(settings_modules, site_list)
     return render_to_response('admin/template_validator.html', {

@@ -16,13 +16,13 @@ For example, Django was used at kusports.com_ to generate customized,
 printer-friendly NCAA tournament brackets, as PDF files, for people
 participating in a March Madness contest.
 
-.. _ReportLab: http://www.reportlab.org/rl_toolkit.html
+.. _ReportLab: http://www.reportlab.org/oss/rl-toolkit/
 .. _kusports.com: http://www.kusports.com/
 
 Install ReportLab
 =================
 
-Download and install the ReportLab library from http://www.reportlab.org/downloads.html.
+Download and install the ReportLab library from http://www.reportlab.org/oss/rl-toolkit/download/.
 The `user guide`_ (not coincidentally, a PDF file) explains how to install it.
 
 Test your installation by importing it in the Python interactive interpreter::
@@ -138,17 +138,15 @@ Further resources
 
     * PDFlib_ is another PDF-generation library that has Python bindings. To
       use it with Django, just use the same concepts explained in this article.
-    * `Pisa HTML2PDF`_ is yet another PDF-generation library. Pisa ships with
+    * `Pisa XHTML2PDF`_ is yet another PDF-generation library. Pisa ships with
       an example of how to integrate Pisa with Django.
     * HTMLdoc_ is a command-line script that can convert HTML to PDF. It
       doesn't have a Python interface, but you can escape out to the shell
       using ``system`` or ``popen`` and retrieve the output in Python.
-    * `forge_fdf in Python`_ is a library that fills in PDF forms.
 
 .. _PDFlib: http://www.pdflib.org/
-.. _`Pisa HTML2PDF`: http://www.htmltopdf.org/
+.. _`Pisa XHTML2PDF`: http://www.xhtml2pdf.com/
 .. _HTMLdoc: http://www.htmldoc.org/
-.. _forge_fdf in Python: http://www.accesspdf.com/article.php/20050421092951834
 
 Other formats
 =============

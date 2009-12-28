@@ -46,6 +46,10 @@ the full list of conversions:
     ===============================  ========================================
     ``AutoField``                    Not represented in the form
 
+    ``BigIntegerField``              ``IntegerField`` with ``min_value`` set
+                                     to -9223372036854775808 and ``max_value``
+                                     set to 9223372036854775807.
+
     ``BooleanField``                 ``BooleanField``
 
     ``CharField``                    ``CharField`` with ``max_length`` set to
@@ -107,6 +111,10 @@ the full list of conversions:
 .. versionadded:: 1.0
     The ``FloatField`` form field and ``DecimalField`` model and form fields
     are new in Django 1.0.
+
+.. versionadded:: 1.2
+    The ``BigIntegerField`` is new in Django 1.2.
+
 
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:

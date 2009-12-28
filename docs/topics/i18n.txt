@@ -4,20 +4,20 @@
 Internationalization
 ====================
 
-Django has full support for internationalization of text in code and templates.
-Here's how it works.
+Django has full support for internationalization of text in code and
+templates, and format localization of dates and numbers. Here's how it works.
 
 Overview
 ========
 
 The goal of internationalization is to allow a single Web application to offer
-its content and functionality in multiple languages.
+its content and functionality in multiple languages and locales.
 
-You, the Django developer, can accomplish this goal by adding a minimal amount
-of hooks to your Python code and templates. These hooks are called
-**translation strings**. They tell Django: "This text should be translated into
-the end user's language, if a translation for this text is available in that
-language."
+For text translation, you, the Django developer, can accomplish this goal by
+adding a minimal amount of hooks to your Python code and templates. These hooks
+are called **translation strings**. They tell Django: "This text should be
+translated into the end user's language, if a translation for this text is
+available in that language."
 
 Django takes care of using these hooks to translate Web apps, on the fly,
 according to users' language preferences.
@@ -28,6 +28,12 @@ Essentially, Django does two things:
       should be translatable.
     * It uses these hooks to translate Web apps for particular users according
       to their language preferences.
+
+For format localization, it's just necessary to set
+:setting:`USE_L10N = True <USE_L10N>` in your settings file. If
+:setting:`USE_L10N` is set to ``True``, Django will display
+numbers and dates in the format of the current locale. That includes field
+representation on templates, and allowed input formats on the admin.
 
 If you don't need internationalization in your app
 ==================================================
@@ -225,15 +231,15 @@ Pluralization
 Use the function ``django.utils.translation.ungettext()`` to specify pluralized
 messages.
 
-``ungettext`` takes three arguments: the singular translation string, the plural
-translation string and the number of objects.
+``ungettext`` takes three arguments: the singular translation string, the
+plural translation string and the number of objects.
 
-This function is useful when your need you Django application to be localizable
+This function is useful when you need your Django application to be localizable
 to languages where the number and complexity of `plural forms
 <http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
 greater than the two forms used in English ('object' for the singular and
-'objects' for all the cases where ``count`` is different from zero, irrespective
-of its value.)
+'objects' for all the cases where ``count`` is different from zero,
+irrespective of its value).
 
 For example::
 
@@ -276,8 +282,8 @@ cardinality of the elements at play.
 .. note::
 
     When using this technique, make sure you use a single name for every
-    extrapolated variable included in the literal. In the example above note how
-    we used the ``name`` Python variable in both translation strings. This
+    extrapolated variable included in the literal. In the example above note
+    how we used the ``name`` Python variable in both translation strings. This
     example would fail::
 
         from django.utils.translation import ungettext
@@ -355,8 +361,8 @@ To pluralize, specify both the singular and plural forms with the
     {% endblocktrans %}
 
 When you use the pluralization feature and bind additional values to local
-variables apart from the counter value that selects the translated literal to be
-used, have in mind that the ``blocktrans`` construct is internally converted
+variables apart from the counter value that selects the translated literal to
+be used, have in mind that the ``blocktrans`` construct is internally converted
 to an ``ungettext`` call. This means the same :ref:`notes regarding ungettext
 variables <pluralization-var-notes>` apply.
 
@@ -375,8 +381,8 @@ Each ``RequestContext`` has access to three translation-specific variables:
       left-to-right language, e.g.: English, French, German etc.
 
 
-If you don't use the ``RequestContext`` extension, you can get those values with
-three tags::
+If you don't use the ``RequestContext`` extension, you can get those values
+with three tags::
 
     {% get_current_language as LANGUAGE_CODE %}
     {% get_available_languages as LANGUAGES %}
@@ -542,8 +548,6 @@ multiple times::
 When `creating JavaScript translation catalogs`_ you need to use the special
 'djangojs' domain, **not** ``-e js``.
 
-.. _create a JavaScript translation catalog: `Creating JavaScript translation catalogs`_
-
 .. admonition:: No gettext?
 
     If you don't have the ``gettext`` utilities installed, ``django-admin.py
@@ -584,8 +588,8 @@ A quick explanation:
       out empty, so it's your responsibility to change it. Make sure you keep
       the quotes around your translation.
     * As a convenience, each message includes, in the form of a comment line
-      prefixed with ``#`` and located above the ``msgid`` line, the filename and
-      line number from which the translation string was gleaned.
+      prefixed with ``#`` and located above the ``msgid`` line, the filename
+      and line number from which the translation string was gleaned.
 
 Long messages are a special case. There, the first string directly after the
 ``msgstr`` (or ``msgid``) is an empty string. Then the content itself will be
@@ -615,9 +619,9 @@ After you create your message file -- and each time you make changes to it --
 you'll need to compile it into a more efficient form, for use by ``gettext``.
 Do this with the ``django-admin.py compilemessages`` utility.
 
-This tool runs over all available ``.po`` files and creates ``.mo`` files, which
-are binary files optimized for use by ``gettext``. In the same directory from
-which you ran ``django-admin.py makemessages``, run ``django-admin.py
+This tool runs over all available ``.po`` files and creates ``.mo`` files,
+which are binary files optimized for use by ``gettext``. In the same directory
+from which you ran ``django-admin.py makemessages``, run ``django-admin.py
 compilemessages`` like this::
 
    django-admin.py compilemessages
@@ -818,9 +822,9 @@ message file. The choice is yours.
     If you're using manually configured settings, as described
     :ref:`settings-without-django-settings-module`, the ``locale`` directory in
     the project directory will not be examined, since Django loses the ability
-    to work out the location of the project directory. (Django normally uses the
-    location of the settings file to determine this, and a settings file doesn't
-    exist if you're manually configuring your settings.)
+    to work out the location of the project directory. (Django normally uses
+    the location of the settings file to determine this, and a settings file
+    doesn't exist if you're manually configuring your settings.)
 
 All message file repositories are structured the same way. They are:
 
@@ -834,12 +838,13 @@ To create message files, you use the same ``django-admin.py makemessages``
 tool as with the Django message files. You only need to be in the right place
 -- in the directory where either the ``conf/locale`` (in case of the source
 tree) or the ``locale/`` (in case of app messages or project messages)
-directory are located. And you use the same ``django-admin.py compilemessages``
-to produce the binary ``django.mo`` files that are used by ``gettext``.
+directory are located. And you use the same ``django-admin.py
+compilemessages`` to produce the binary ``django.mo`` files that are used by
+``gettext``.
 
-You can also run ``django-admin.py compilemessages --settings=path.to.settings``
-to make the compiler process all the directories in your ``LOCALE_PATHS``
-setting.
+You can also run ``django-admin.py compilemessages
+--settings=path.to.settings`` to make the compiler process all the directories
+in your ``LOCALE_PATHS`` setting.
 
 Application message files are a bit complicated to discover -- they need the
 ``LocaleMiddleware``. If you don't use the middleware, only the Django message
@@ -1014,14 +1019,16 @@ Creating JavaScript translation catalogs
 
 You create and update the translation catalogs the same way as the other
 
-Django translation catalogs -- with the django-admin.py makemessages tool. The
-only difference is you need to provide a ``-d djangojs`` parameter, like this::
+Django translation catalogs -- with the ``django-admin.py makemessages`` tool.
+The only difference is you need to provide a ``-d djangojs`` parameter, like
+this::
 
     django-admin.py makemessages -d djangojs -l de
 
 This would create or update the translation catalog for JavaScript for German.
-After updating translation catalogs, just run ``django-admin.py compilemessages``
-the same way as you do with normal Django translation catalogs.
+After updating translation catalogs, just run ``django-admin.py
+compilemessages`` the same way as you do with normal Django translation
+catalogs.
 
 Specialties of Django translation
 ==================================
@@ -1042,10 +1049,11 @@ does translation:
 ``gettext`` on Windows
 ======================
 
-This is only needed for people who either want to extract message IDs or compile
-message files (``.po``). Translation work itself just involves editing existing
-files of this type, but if you want to create your own message files, or want to
-test or compile a changed message file, you will need the ``gettext`` utilities:
+This is only needed for people who either want to extract message IDs or
+compile message files (``.po``). Translation work itself just involves editing
+existing files of this type, but if you want to create your own message files,
+or want to test or compile a changed message file, you will need the
+``gettext`` utilities:
 
     * Download the following zip files from the GNOME servers
       http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ or from one
@@ -1074,3 +1082,53 @@ have been found to not support this command. Do not attempt to use Django
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
 "xgettext.exe has generated errors and will be closed by Windows".
+
+.. _format-localization:
+
+Format localization
+===================
+
+Django's formatting system is disabled by default. To enable it, it's necessay
+to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
+
+When using Django's formatting system, dates and numbers on templates will be
+displayed using the format specified for the current locale. Two users
+accessing the same content, but in different language, will see date and
+number fields formatted in different ways, depending on the format for their
+current locale.
+
+Django will also use localized formats when parsing data in forms. That means
+Django uses different formats for different locales when guessing the format
+used by the user when inputting data on forms. Note that Django uses different
+formats for displaying data, and for parsing it.
+
+Creating custom format files
+----------------------------
+
+Django provides format definitions for many locales, but sometimes you might
+want to create your own, because a format files doesn't exist for your locale,
+or because you want to overwrite some of the values.
+
+To use custom formats, first thing to do, is to specify the path where you'll
+place format files. To do that, just set your :setting:`FORMAT_MODULE_PATH`
+setting to the the path (in the format ``'foo.bar.baz``) where format files
+will exists.
+
+Files are not placed directly in this directory, but in a directory named as
+the locale, and must be named ``formats.py``.
+
+To customize the English formats, a structure like this would be needed::
+
+    mysite/
+        formats/
+            __init__.py
+            en/
+                __init__.py
+                formats.py
+
+where :file:`formats.py` contains custom format definitions. For example::
+
+    THOUSAND_SEPARATOR = ' '
+
+to use a space as a thousand separator, instead of the default for English,
+a comma.

@@ -31,6 +31,10 @@ class Leaf(models.Model):
     def __unicode__(self):
         return self.name
 
+class ResolveThis(models.Model):
+    num = models.FloatField()
+    name = models.CharField(max_length=16)
+
 __test__ = {"regression_tests": """
 Deferred fields should really be deferred and not accidentally use the field's
 default value just because they aren't passed to __init__.
@@ -132,11 +136,14 @@ False
 >>> i2._deferred # Item must still be non-deferred
 False
 
-# Finally, we need to flush the app cache for the defer module.
-# Using only/defer creates some artifical entries in the app cache
-# that messes up later tests. Purge all entries, just to be sure.
->>> from django.db.models.loading import cache
->>> cache.app_models['defer_regress'] = {}
+# Regression for #11936 - loading.get_models should not return deferred models by default.
+>>> from django.db.models.loading import get_models
+>>> sorted(get_models(models.get_app('defer_regress')), key=lambda obj: obj._meta.object_name)
+[<class 'regressiontests.defer_regress.models.Child'>, <class 'regressiontests.defer_regress.models.Item'>, <class 'regressiontests.defer_regress.models.Leaf'>, <class 'regressiontests.defer_regress.models.RelatedItem'>, <class 'regressiontests.defer_regress.models.ResolveThis'>]
+
+>>> sorted(get_models(models.get_app('defer_regress'), include_deferred=True), key=lambda obj: obj._meta.object_name)
+[<class 'regressiontests.defer_regress.models.Child'>, <class 'regressiontests.defer_regress.models.Item'>, <class 'regressiontests.defer_regress.models.Item_Deferred_name'>, <class 'regressiontests.defer_regress.models.Item_Deferred_name_other_value_text'>, <class 'regressiontests.defer_regress.models.Item_Deferred_other_value_text_value'>, <class 'regressiontests.defer_regress.models.Item_Deferred_text_value'>, <class 'regressiontests.defer_regress.models.Leaf'>, <class 'regressiontests.defer_regress.models.Leaf_Deferred_name_value'>, <class 'regressiontests.defer_regress.models.Leaf_Deferred_second_child_value'>, <class 'regressiontests.defer_regress.models.Leaf_Deferred_value'>, <class 'regressiontests.defer_regress.models.RelatedItem'>, <class 'regressiontests.defer_regress.models.RelatedItem_Deferred_item_id'>, <class 'regressiontests.defer_regress.models.ResolveThis'>, <class 'regressiontests.defer_regress.models.ResolveThis_Deferred_num'>]
 
 """
 }
+

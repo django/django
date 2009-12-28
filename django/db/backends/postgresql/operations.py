@@ -6,14 +6,15 @@ from django.db.backends import BaseDatabaseOperations
 # used by both the 'postgresql' and 'postgresql_psycopg2' backends.
 
 class DatabaseOperations(BaseDatabaseOperations):
-    def __init__(self):
+    def __init__(self, connection):
+        super(DatabaseOperations, self).__init__()
         self._postgres_version = None
+        self.connection = connection
 
     def _get_postgres_version(self):
         if self._postgres_version is None:
-            from django.db import connection
             from django.db.backends.postgresql.version import get_version
-            cursor = connection.cursor()
+            cursor = self.connection.cursor()
             self._postgres_version = get_version(cursor)
         return self._postgres_version
     postgres_version = property(_get_postgres_version)

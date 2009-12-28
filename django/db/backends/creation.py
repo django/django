@@ -47,7 +47,7 @@ class BaseDatabaseCreation(object):
         pending_references = {}
         qn = self.connection.ops.quote_name
         for f in opts.local_fields:
-            col_type = f.db_type()
+            col_type = f.db_type(connection=self.connection)
             tablespace = f.db_tablespace or opts.db_tablespace
             if col_type is None:
                 # Skip ManyToManyFields, because they're not represented as
@@ -75,7 +75,7 @@ class BaseDatabaseCreation(object):
             table_output.append(' '.join(field_output))
         if opts.order_with_respect_to:
             table_output.append(style.SQL_FIELD(qn('_order')) + ' ' + \
-                style.SQL_COLTYPE(models.IntegerField().db_type()))
+                style.SQL_COLTYPE(models.IntegerField().db_type(connection=self.connection)))
         for field_constraints in opts.unique_together:
             table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
                 ", ".join([style.SQL_FIELD(qn(opts.get_field(f).column)) for f in field_constraints]))
@@ -173,7 +173,7 @@ class BaseDatabaseCreation(object):
                 style.SQL_TABLE(qn(f.m2m_db_table())) + ' (']
             table_output.append('    %s %s %s%s,' %
                 (style.SQL_FIELD(qn('id')),
-                style.SQL_COLTYPE(models.AutoField(primary_key=True).db_type()),
+                style.SQL_COLTYPE(models.AutoField(primary_key=True).db_type(connection=self.connection)),
                 style.SQL_KEYWORD('NOT NULL PRIMARY KEY'),
                 tablespace_sql))
 
@@ -217,14 +217,14 @@ class BaseDatabaseCreation(object):
         table_output = [
             '    %s %s %s %s (%s)%s,' %
                 (style.SQL_FIELD(qn(field.m2m_column_name())),
-                style.SQL_COLTYPE(models.ForeignKey(model).db_type()),
+                style.SQL_COLTYPE(models.ForeignKey(model).db_type(connection=self.connection)),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(qn(opts.db_table)),
                 style.SQL_FIELD(qn(opts.pk.column)),
                 self.connection.ops.deferrable_sql()),
             '    %s %s %s %s (%s)%s,' %
                 (style.SQL_FIELD(qn(field.m2m_reverse_name())),
-                style.SQL_COLTYPE(models.ForeignKey(field.rel.to).db_type()),
+                style.SQL_COLTYPE(models.ForeignKey(field.rel.to).db_type(connection=self.connection)),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(qn(field.rel.to._meta.db_table)),
                 style.SQL_FIELD(qn(field.rel.to._meta.pk.column)),
@@ -322,18 +322,16 @@ class BaseDatabaseCreation(object):
         database already exists. Returns the name of the test database created.
         """
         if verbosity >= 1:
-            print "Creating test database..."
+            print "Creating test database '%s'..." % self.connection.alias
 
         test_database_name = self._create_test_db(verbosity, autoclobber)
 
         self.connection.close()
-        settings.DATABASE_NAME = test_database_name
-        self.connection.settings_dict["DATABASE_NAME"] = test_database_name
+        self.connection.settings_dict["NAME"] = test_database_name
         can_rollback = self._rollback_works()
-        settings.DATABASE_SUPPORTS_TRANSACTIONS = can_rollback
-        self.connection.settings_dict["DATABASE_SUPPORTS_TRANSACTIONS"] = can_rollback
+        self.connection.settings_dict["SUPPORTS_TRANSACTIONS"] = can_rollback
 
-        call_command('syncdb', verbosity=verbosity, interactive=False)
+        call_command('syncdb', verbosity=verbosity, interactive=False, database=self.connection.alias)
 
         if settings.CACHE_BACKEND.startswith('db://'):
             from django.core.cache import parse_backend_uri
@@ -350,10 +348,10 @@ class BaseDatabaseCreation(object):
         "Internal implementation - creates the test db tables."
         suffix = self.sql_table_creation_suffix()
 
-        if settings.TEST_DATABASE_NAME:
-            test_database_name = settings.TEST_DATABASE_NAME
+        if self.connection.settings_dict['TEST_NAME']:
+            test_database_name = self.connection.settings_dict['TEST_NAME']
         else:
-            test_database_name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
+            test_database_name = TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
 
         qn = self.connection.ops.quote_name
 
@@ -403,11 +401,10 @@ class BaseDatabaseCreation(object):
         database already exists. Returns the name of the test database created.
         """
         if verbosity >= 1:
-            print "Destroying test database..."
+            print "Destroying test database '%s'..." % self.connection.alias
         self.connection.close()
-        test_database_name = settings.DATABASE_NAME
-        settings.DATABASE_NAME = old_database_name
-        self.connection.settings_dict["DATABASE_NAME"] = old_database_name
+        test_database_name = self.connection.settings_dict['NAME']
+        self.connection.settings_dict['NAME'] = old_database_name
 
         self._destroy_test_db(test_database_name, verbosity)
 
@@ -436,4 +433,3 @@ class BaseDatabaseCreation(object):
     def sql_table_creation_suffix(self):
         "SQL to append to the end of the test table creation statements"
         return ''
-

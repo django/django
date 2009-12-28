@@ -277,6 +277,13 @@ class LazyObject(object):
                 self._setup()
             setattr(self._wrapped, name, value)
 
+    def __delattr__(self, name):
+        if name == "_wrapped":
+            raise TypeError("can't delete _wrapped.")
+        if self._wrapped is None:
+            self._setup()
+        delattr(self._wrapped, name)
+
     def _setup(self):
         """
         Must be implemented by subclasses to initialise the wrapped object.
@@ -328,8 +335,10 @@ class SimpleLazyObject(LazyObject):
             memo[id(self)] = result
             return result
         else:
-            import copy
-            return copy.deepcopy(self._wrapped, memo)
+            # Changed to use deepcopy from copycompat, instead of copy
+            # For Python 2.4.
+            from django.utils.copycompat import deepcopy
+            return deepcopy(self._wrapped, memo)
 
     # Need to pretend to be the wrapped class, for the sake of objects that care
     # about this (especially in equality tests)

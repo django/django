@@ -1,6 +1,5 @@
 from django.db.models.manager import Manager
 from django.contrib.gis.db.models.query import GeoQuerySet
-from django.contrib.gis.db.models.sql.subqueries import insert_query
 
 class GeoManager(Manager):
     "Overrides Manager to return Geographic QuerySets."
@@ -54,7 +53,7 @@ class GeoManager(Manager):
 
     def make_line(self, *args, **kwargs):
         return self.get_query_set().make_line(*args, **kwargs)
-    
+
     def mem_size(self, *args, **kwargs):
         return self.get_query_set().mem_size(*args, **kwargs)
 
@@ -93,6 +92,3 @@ class GeoManager(Manager):
 
     def unionagg(self, *args, **kwargs):
         return self.get_query_set().unionagg(*args, **kwargs)
-
-    def _insert(self, values, **kwargs):
-        return insert_query(self.model, values, **kwargs)

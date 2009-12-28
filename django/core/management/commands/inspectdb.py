@@ -1,20 +1,29 @@
+import keyword
+from optparse import make_option
+
 from django.core.management.base import NoArgsCommand, CommandError
+from django.db import connections, DEFAULT_DB_ALIAS
 
 class Command(NoArgsCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
+
+    option_list = NoArgsCommand.option_list + (
+        make_option('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to '
+                'introspect.  Defaults to using the "default" database.'),
+    )
 
     requires_model_validation = False
 
     def handle_noargs(self, **options):
         try:
-            for line in self.handle_inspection():
+            for line in self.handle_inspection(options):
                 print line
         except NotImplementedError:
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
-    def handle_inspection(self):
-        from django.db import connection
-        import keyword
+    def handle_inspection(self, options):
+        connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
 
         table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
 
