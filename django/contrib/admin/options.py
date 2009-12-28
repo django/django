@@ -8,7 +8,7 @@ from django.contrib.admin import helpers
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -367,6 +367,20 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.views.main import ChangeList
         return ChangeList
+
+    def get_object(self, request, object_id):
+        """
+        Returns an instance matching the primary key provided. ``None``  is
+        returned if no match is found (or the object_id failed validation
+        against the primary key field).
+        """
+        queryset = self.queryset(request)
+        model = queryset.model
+        try:
+            object_id = model._meta.pk.to_python(object_id)
+            return queryset.get(pk=object_id)
+        except (model.DoesNotExist, ValidationError):
+            return None
 
     def get_changelist_form(self, request, **kwargs):
         """
@@ -825,13 +839,7 @@ class ModelAdmin(BaseModelAdmin):
         model = self.model
         opts = model._meta
 
-        try:
-            obj = self.queryset(request).get(pk=unquote(object_id))
-        except model.DoesNotExist:
-            # Don't raise Http404 just yet, because we haven't checked
-            # permissions yet. We don't want an unauthenticated user to be able
-            # to determine whether a given object exists.
-            obj = None
+        obj = self.get_object(request, unquote(object_id))
 
         if not self.has_change_permission(request, obj):
             raise PermissionDenied
@@ -1036,13 +1044,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
-        try:
-            obj = self.queryset(request).get(pk=unquote(object_id))
-        except self.model.DoesNotExist:
-            # Don't raise Http404 just yet, because we haven't checked
-            # permissions yet. We don't want an unauthenticated user to be able
-            # to determine whether a given object exists.
-            obj = None
+        obj = self.get_object(request, unquote(object_id))
 
         if not self.has_delete_permission(request, obj):
             raise PermissionDenied
