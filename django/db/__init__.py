@@ -79,14 +79,15 @@ IntegrityError = backend.IntegrityError
 # Register an event that closes the database connection
 # when a Django request is finished.
 def close_connection(**kwargs):
-    connection.close()
+    for conn in connections.all():
+        conn.close()
 signals.request_finished.connect(close_connection)
 
 # Register an event that resets connection.queries
 # when a Django request is started.
 def reset_queries(**kwargs):
-    for connection in connections.all():
-        connection.queries = []
+    for conn in connections.all():
+        conn.queries = []
 signals.request_started.connect(reset_queries)
 
 # Register an event that rolls back the connections
