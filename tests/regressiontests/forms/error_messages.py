@@ -6,8 +6,8 @@ tests = r"""
 # CharField ###################################################################
 
 >>> e = {'required': 'REQUIRED'}
->>> e['min_length'] = 'LENGTH %(length)s, MIN LENGTH %(min)s'
->>> e['max_length'] = 'LENGTH %(length)s, MAX LENGTH %(max)s'
+>>> e['min_length'] = 'LENGTH %(show_value)s, MIN LENGTH %(limit_value)s'
+>>> e['max_length'] = 'LENGTH %(show_value)s, MAX LENGTH %(limit_value)s'
 >>> f = CharField(min_length=5, max_length=10, error_messages=e)
 >>> f.clean('')
 Traceback (most recent call last):
@@ -156,8 +156,8 @@ ValidationError: [u'INVALID']
 
 >>> e = {'required': 'REQUIRED'}
 >>> e['invalid'] = 'INVALID'
->>> e['min_length'] = 'LENGTH %(length)s, MIN LENGTH %(min)s'
->>> e['max_length'] = 'LENGTH %(length)s, MAX LENGTH %(max)s'
+>>> e['min_length'] = 'LENGTH %(show_value)s, MIN LENGTH %(limit_value)s'
+>>> e['max_length'] = 'LENGTH %(show_value)s, MAX LENGTH %(limit_value)s'
 >>> f = RegexField(r'^\d+$', min_length=5, max_length=10, error_messages=e)
 >>> f.clean('')
 Traceback (most recent call last):
@@ -180,8 +180,8 @@ ValidationError: [u'LENGTH 11, MAX LENGTH 10']
 
 >>> e = {'required': 'REQUIRED'}
 >>> e['invalid'] = 'INVALID'
->>> e['min_length'] = 'LENGTH %(length)s, MIN LENGTH %(min)s'
->>> e['max_length'] = 'LENGTH %(length)s, MAX LENGTH %(max)s'
+>>> e['min_length'] = 'LENGTH %(show_value)s, MIN LENGTH %(limit_value)s'
+>>> e['max_length'] = 'LENGTH %(show_value)s, MAX LENGTH %(limit_value)s'
 >>> f = EmailField(min_length=8, max_length=10, error_messages=e)
 >>> f.clean('')
 Traceback (most recent call last):

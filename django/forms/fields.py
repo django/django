@@ -170,19 +170,13 @@ class Field(object):
         return result
 
 class CharField(Field):
-    default_error_messages = {
-        'max_length': _(u'Ensure this value has at most %(max)d characters (it has %(length)d).'),
-        'min_length': _(u'Ensure this value has at least %(min)d characters (it has %(length)d).'),
-    }
-
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         self.max_length, self.min_length = max_length, min_length
         super(CharField, self).__init__(*args, **kwargs)
-        # TODO: use this as soon as you make regex validator and use it in RegexField
-        #if min_length is not None:
-        #    self.validators.append(validators.MinLengthValidator(min_length))
-        #if max_length is not None:
-        #    self.validators.append(validators.MaxLengthValidator(max_length))
+        if min_length is not None:
+            self.validators.append(validators.MinLengthValidator(min_length))
+        if max_length is not None:
+            self.validators.append(validators.MaxLengthValidator(max_length))
 
     def to_python(self, value):
         "Returns a Unicode object."
@@ -190,18 +184,6 @@ class CharField(Field):
             return u''
         return smart_unicode(value)
     
-    def validate(self, value):
-        "Validates max_length and min_length."
-        super(CharField, self).validate(value)
-        if value in validators.EMPTY_VALUES:
-            # non-required field, no need for further validation
-            return
-        value_length = len(value)
-        if self.max_length is not None and value_length > self.max_length:
-            raise ValidationError(self.error_messages['max_length'] % {'max': self.max_length, 'length': value_length})
-        if self.min_length is not None and value_length < self.min_length:
-            raise ValidationError(self.error_messages['min_length'] % {'min': self.min_length, 'length': value_length})
-
     def widget_attrs(self, widget):
         if self.max_length is not None and isinstance(widget, (TextInput, PasswordInput)):
             # The HTML attribute is maxlength, not max_length.

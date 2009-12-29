@@ -386,7 +386,7 @@ class FieldsTests(TestCase):
     def test_regexfield_31(self):
         f = RegexField('^\d+$', min_length=5, max_length=10)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 5 characters (it has 3).']", f.clean, '123')
-        self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 5 characters (it has 3).']", f.clean, 'abc')
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 5 characters (it has 3).', u'Enter a valid value.']", f.clean, 'abc')
         self.assertEqual(u'12345', f.clean('12345'))
         self.assertEqual(u'1234567890', f.clean('1234567890'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 10 characters (it has 11).']", f.clean, '12345678901')
