@@ -229,7 +229,7 @@ class GeoQuery(sql.Query):
         if SpatialBackend.oracle or getattr(self, 'geo_values', False):
             # We resolve the rest of the columns if we're on Oracle or if
             # the `geo_values` attribute is defined.
-            for value, field in izip(row[index_start:], fields):
+            for value, field in map(None, row[index_start:], fields):
                 values.append(self.convert_values(value, field))
         else:
             values.extend(row[index_start:])
