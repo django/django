@@ -29,10 +29,12 @@ class GetUniqueCheckTests(unittest.TestCase):
 
 class PerformUniqueChecksTest(unittest.TestCase):
     def setUp(self):
+        # set debug to True to gain access to connection.queries
         self._old_debug, settings.DEBUG = settings.DEBUG, True
         super(PerformUniqueChecksTest, self).setUp()
 
     def tearDown(self):
+        # restore old debug value
         settings.DEBUG = self._old_debug
         super(PerformUniqueChecksTest, self).tearDown()
 
