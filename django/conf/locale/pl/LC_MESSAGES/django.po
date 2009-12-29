@@ -5,11 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2009-10-25 20:56+0100\n"
-=======
 "POT-Creation-Date: 2009-12-23 12:55+0100\n"
->>>>>>> master
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -227,11 +223,7 @@ msgstr "chiński tradycyjny"
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Usunięto %(count)d %(items)s."
 
-<<<<<<< HEAD
-#: contrib/admin/actions.py:67 contrib/admin/options.py:1027
-=======
 #: contrib/admin/actions.py:67 contrib/admin/options.py:1073
->>>>>>> master
 msgid "Are you sure?"
 msgstr "Jesteś pewien?"
 
@@ -274,17 +266,6 @@ msgstr "Ten miesiąc"
 msgid "This year"
 msgstr "Ten rok"
 
-<<<<<<< HEAD
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:435
-msgid "Yes"
-msgstr "Tak"
-
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:435
-msgid "No"
-msgstr "Nie"
-
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:435
-=======
 #: contrib/admin/filterspecs.py:147 forms/widgets.py:431
 msgid "Yes"
 msgstr "Tak"
@@ -294,7 +275,6 @@ msgid "No"
 msgstr "Nie"
 
 #: contrib/admin/filterspecs.py:154 forms/widgets.py:431
->>>>>>> master
 msgid "Unknown"
 msgstr "Nieznany"
 
@@ -339,15 +319,9 @@ msgstr "brak"
 msgid "Changed %s."
 msgstr "Zmieniono %s"
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:519 contrib/admin/options.py:529
-#: contrib/comments/templates/comments/preview.html:16 forms/models.py:384
-#: forms/models.py:596
-=======
 #: contrib/admin/options.py:540 contrib/admin/options.py:550
 #: contrib/comments/templates/comments/preview.html:16 forms/models.py:385
 #: forms/models.py:598
->>>>>>> master
 msgid "and"
 msgstr "i"
 
@@ -370,57 +344,33 @@ msgstr "Usunięto %(name)s \"%(object)s\"."
 msgid "No fields changed."
 msgstr "Żadne pole nie zmienione."
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:599 contrib/auth/admin.py:67
-=======
 #: contrib/admin/options.py:620 contrib/auth/admin.py:68
->>>>>>> master
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:603 contrib/admin/options.py:636
-#: contrib/auth/admin.py:75
-msgid "You may edit it again below."
-msgstr "Możesz ponownie edytować wpis poniżej."
-
-#: contrib/admin/options.py:613 contrib/admin/options.py:646
-=======
 #: contrib/admin/options.py:624 contrib/admin/options.py:657
 #: contrib/auth/admin.py:77
 msgid "You may edit it again below."
 msgstr "Możesz ponownie edytować wpis poniżej."
 
 #: contrib/admin/options.py:634 contrib/admin/options.py:667
->>>>>>> master
 #, python-format
 msgid "You may add another %s below."
 msgstr "Możesz dodać nowy wpis %s poniżej."
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:634
-=======
 #: contrib/admin/options.py:655
->>>>>>> master
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:642
-=======
 #: contrib/admin/options.py:663
->>>>>>> master
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" dodane pomyślnie. Możesz edytować ponownie wpis poniżej."
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:773
-=======
 #: contrib/admin/options.py:714
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -433,42 +383,25 @@ msgid "No action selected."
 msgstr "Nie wybrano akcji."
 
 #: contrib/admin/options.py:808
->>>>>>> master
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj %s"
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:804 contrib/admin/options.py:1005
-=======
 #: contrib/admin/options.py:840 contrib/admin/options.py:1051
->>>>>>> master
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:861
-=======
 #: contrib/admin/options.py:905
->>>>>>> master
 #, python-format
 msgid "Change %s"
 msgstr "Zmień %s"
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:905
-msgid "Database error"
-msgstr "Błąd bazy danych"
-
-#: contrib/admin/options.py:941
-=======
 #: contrib/admin/options.py:950
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
 #: contrib/admin/options.py:986
->>>>>>> master
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -476,29 +409,17 @@ msgstr[0] "%(count)s %(name)s został pomyślnie zmieniony."
 msgstr[1] "%(count)s %(name)s zostały pomyślnie zmienione."
 msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:1020
-=======
 #: contrib/admin/options.py:1066
->>>>>>> master
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" usunięty pomyślnie."
 
-<<<<<<< HEAD
-#: contrib/admin/options.py:1057
-=======
 #: contrib/admin/options.py:1103
->>>>>>> master
 #, python-format
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
 
-<<<<<<< HEAD
-#: contrib/admin/sites.py:21 contrib/admin/views/decorators.py:14
-=======
 #: contrib/admin/sites.py:22 contrib/admin/views/decorators.py:14
->>>>>>> master
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -507,19 +428,11 @@ msgstr ""
 "Proszę wpisać poprawną nazwę użytkownika i hasło. Uwaga: wielkość liter ma "
 "znaczenie."
 
-<<<<<<< HEAD
-#: contrib/admin/sites.py:288 contrib/admin/views/decorators.py:40
-msgid "Please log in again, because your session has expired."
-msgstr "Twoja sesja wygasła, zaloguj się ponownie."
-
-#: contrib/admin/sites.py:295 contrib/admin/views/decorators.py:47
-=======
 #: contrib/admin/sites.py:292 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Twoja sesja wygasła, zaloguj się ponownie."
 
 #: contrib/admin/sites.py:299 contrib/admin/views/decorators.py:47
->>>>>>> master
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -527,47 +440,27 @@ msgstr ""
 "Twoja przeglądarka nie chce akceptować ciasteczek. Zmień jej ustawienia i "
 "spróbuj ponownie."
 
-<<<<<<< HEAD
-#: contrib/admin/sites.py:311 contrib/admin/sites.py:317
-=======
 #: contrib/admin/sites.py:315 contrib/admin/sites.py:321
->>>>>>> master
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Nazwy użytkowników nie mogą zawierać znaku '@'."
 
-<<<<<<< HEAD
-#: contrib/admin/sites.py:314 contrib/admin/views/decorators.py:62
-=======
 #: contrib/admin/sites.py:318 contrib/admin/views/decorators.py:62
->>>>>>> master
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Podany adres e-mail nie jest Twoją nazwą użytkownika. Spróbuj '%s'."
 
-<<<<<<< HEAD
-#: contrib/admin/sites.py:370
-msgid "Site administration"
-msgstr "Administracja stroną"
-
-#: contrib/admin/sites.py:384 contrib/admin/templates/admin/login.html:26
-=======
 #: contrib/admin/sites.py:374
 msgid "Site administration"
 msgstr "Administracja stroną"
 
 #: contrib/admin/sites.py:388 contrib/admin/templates/admin/login.html:26
->>>>>>> master
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Zaloguj się"
 
-<<<<<<< HEAD
-#: contrib/admin/sites.py:429
-=======
 #: contrib/admin/sites.py:433
->>>>>>> master
 #, python-format
 msgid "%s administration"
 msgstr "%s - administracja"
@@ -598,19 +491,11 @@ msgstr "Teraz:"
 msgid "Change:"
 msgstr "Zmień:"
 
-<<<<<<< HEAD
-#: contrib/admin/widgets.py:125
-msgid "Lookup"
-msgstr "Szukaj"
-
-#: contrib/admin/widgets.py:237
-=======
 #: contrib/admin/widgets.py:126
 msgid "Lookup"
 msgstr "Szukaj"
 
 #: contrib/admin/widgets.py:238
->>>>>>> master
 msgid "Add Another"
 msgstr "Dodaj kolejny"
 
@@ -796,13 +681,8 @@ msgid ""
 "Are you sure you want to delete the selected %(object_name)s objects? All of "
 "the following objects and their related items will be deleted:"
 msgstr ""
-<<<<<<< HEAD
-"Czy chcesz skasować wybrane %(object_name)s? Następujące obiekty i zależne od "
-"nich zostaną skasowane:"
-=======
 "Czy chcesz skasować wybrane %(object_name)s? Następujące obiekty i zależne "
 "od nich zostaną skasowane:"
->>>>>>> master
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -1181,92 +1061,7 @@ msgstr "liczba %s"
 msgid "Fields on %s objects"
 msgstr "Pola obiektów %s"
 
-<<<<<<< HEAD
-#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:345
-#: contrib/admindocs/views.py:347 contrib/admindocs/views.py:353
-#: contrib/admindocs/views.py:354 contrib/admindocs/views.py:356
-msgid "Integer"
-msgstr "Liczba całkowita"
-
-#: contrib/admindocs/views.py:335
-msgid "Boolean (Either True or False)"
-msgstr "Wartość logiczna (True, False - prawda lub fałsz)"
-
-#: contrib/admindocs/views.py:336 contrib/admindocs/views.py:355
-#, python-format
-msgid "String (up to %(max_length)s)"
-msgstr "Łańcuch (do %(max_length)s znaków)"
-
-#: contrib/admindocs/views.py:337
-msgid "Comma-separated integers"
-msgstr "Liczby całkowite rozdzielone przecinkami"
-
-#: contrib/admindocs/views.py:338
-msgid "Date (without time)"
-msgstr "Data (bez godziny)"
-
-#: contrib/admindocs/views.py:339
-msgid "Date (with time)"
-msgstr "Data (z godziną)"
-
-#: contrib/admindocs/views.py:340
-msgid "Decimal number"
-msgstr "Liczba dziesiętna"
-
-#: contrib/admindocs/views.py:341
-msgid "E-mail address"
-msgstr "Adres e-mail"
-
-#: contrib/admindocs/views.py:342 contrib/admindocs/views.py:343
-#: contrib/admindocs/views.py:346
-msgid "File path"
-msgstr "Ścieżka do pliku"
-
-#: contrib/admindocs/views.py:344
-msgid "Floating point number"
-msgstr "Liczba zmiennoprzecinkowa"
-
-#: contrib/admindocs/views.py:348 contrib/comments/models.py:60
-msgid "IP address"
-msgstr "Adres IP"
-
-#: contrib/admindocs/views.py:350
-msgid "Boolean (Either True, False or None)"
-msgstr "Wartość logiczna (True, False, None - prawda, fałsz lub nic)"
-
-#: contrib/admindocs/views.py:351
-msgid "Relation to parent model"
-msgstr "Relacja do modelu rodzica"
-
-#: contrib/admindocs/views.py:352
-msgid "Phone number"
-msgstr "Numer telefonu"
-
-#: contrib/admindocs/views.py:357
-msgid "Text"
-msgstr "Tekst"
-
-#: contrib/admindocs/views.py:358
-msgid "Time"
-msgstr "Czas"
-
-#: contrib/admindocs/views.py:359 contrib/comments/forms.py:95
-#: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admindocs/views.py:360
-msgid "U.S. state (two uppercase letters)"
-msgstr "Stan USA (dwie duże litery)"
-
-#: contrib/admindocs/views.py:361
-msgid "XML text"
-msgstr "Tekst XML"
-
-#: contrib/admindocs/views.py:387
-=======
 #: contrib/admindocs/views.py:356
->>>>>>> master
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s nie jest obiektem urlpattern"
@@ -1556,19 +1351,11 @@ msgstr "użytkownicy"
 msgid "message"
 msgstr "wiadomość"
 
-<<<<<<< HEAD
-#: contrib/auth/views.py:58
-msgid "Logged out"
-msgstr "Wylogowany"
-
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
-=======
 #: contrib/auth/views.py:60
 msgid "Logged out"
 msgstr "Wylogowany"
 
 #: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:414
->>>>>>> master
 msgid "Enter a valid e-mail address."
 msgstr "Wprowadź poprawny adres e-mail."
 
@@ -4278,9 +4065,6 @@ msgstr "Czas"
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Proszę wpisać poprawną godzinę w formacie HH:MM[:ss[.uuuuuu]]."
 
-<<<<<<< HEAD
-#: db/models/fields/related.py:816
-=======
 #: db/models/fields/__init__.py:999
 msgid "XML text"
 msgstr "Tekst XML"
@@ -4298,18 +4082,13 @@ msgid "Many-to-many relationship"
 msgstr "Powiązanie wiele do wiele"
 
 #: db/models/fields/related.py:889
->>>>>>> master
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Przytrzymaj wciśnięty klawisz \"Ctrl\" lub \"Command\" na Mac'u aby "
 "zaznaczyć więcej niż jeden wybór."
 
-<<<<<<< HEAD
-#: db/models/fields/related.py:894
-=======
 #: db/models/fields/related.py:950
->>>>>>> master
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4324,17 +4103,6 @@ msgstr[2] ""
 "Proszę podać poprawne identyfikatory %(self)s. Wartości %(value)r są "
 "niepoprawne."
 
-<<<<<<< HEAD
-#: forms/fields.py:53
-msgid "This field is required."
-msgstr "To pole jest wymagane."
-
-#: forms/fields.py:54
-msgid "Enter a valid value."
-msgstr "Wpisz poprawną wartość."
-
-#: forms/fields.py:137
-=======
 #: forms/fields.py:60
 msgid "This field is required."
 msgstr "To pole jest wymagane."
@@ -4344,112 +4112,52 @@ msgid "Enter a valid value."
 msgstr "Wpisz poprawną wartość."
 
 #: forms/fields.py:144
->>>>>>> master
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Upewnij się, że ta wartość ma co najwyżej %(max)d znaków (ma długość %"
 "(length)d)."
 
-<<<<<<< HEAD
-#: forms/fields.py:138
-=======
 #: forms/fields.py:145
->>>>>>> master
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Upewnij się, że ta wartość ma co najmniej %(min)d znaków (ma długość %"
 "(length)d)."
 
-<<<<<<< HEAD
-#: forms/fields.py:165
-msgid "Enter a whole number."
-msgstr "Wpisz liczbę całkowitą."
-
-#: forms/fields.py:166 forms/fields.py:195 forms/fields.py:224
-=======
 #: forms/fields.py:172
 msgid "Enter a whole number."
 msgstr "Wpisz liczbę całkowitą."
 
 #: forms/fields.py:173 forms/fields.py:202 forms/fields.py:233
->>>>>>> master
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Upewnij się, że ta wartość jest mniejsza lub równa %s."
 
-<<<<<<< HEAD
-#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
-=======
 #: forms/fields.py:174 forms/fields.py:203 forms/fields.py:234
->>>>>>> master
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Upewnij się, że ta wartość jest większa lub równa %s."
 
-<<<<<<< HEAD
-#: forms/fields.py:194 forms/fields.py:223
-msgid "Enter a number."
-msgstr "Wpisz liczbę."
-
-#: forms/fields.py:226
-=======
 #: forms/fields.py:201 forms/fields.py:232
 msgid "Enter a number."
 msgstr "Wpisz liczbę."
 
 #: forms/fields.py:235
->>>>>>> master
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Upewnij się, że jest nie więcej niż %s cyfr."
 
-<<<<<<< HEAD
-#: forms/fields.py:227
-=======
 #: forms/fields.py:236
->>>>>>> master
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Upewnij się, że jest nie więcej niż %s miejsc po przecinku."
 
-<<<<<<< HEAD
-#: forms/fields.py:228
-=======
 #: forms/fields.py:237
->>>>>>> master
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Upewnij się, że jest nie więcej niż %s miejsc przed przecinkiem."
 
-<<<<<<< HEAD
-#: forms/fields.py:287 forms/fields.py:862
-msgid "Enter a valid date."
-msgstr "Wpisz poprawną datę."
-
-#: forms/fields.py:321 forms/fields.py:863
-msgid "Enter a valid time."
-msgstr "Wpisz poprawną godzinę."
-
-#: forms/fields.py:360
-msgid "Enter a valid date/time."
-msgstr "Wpisz poprawną datę/godzinę."
-
-#: forms/fields.py:446
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Nie wysłano żadnego pliku. Sprawdź typ kodowania formularza."
-
-#: forms/fields.py:447
-msgid "No file was submitted."
-msgstr "Żaden plik nie został przesłany."
-
-#: forms/fields.py:448
-msgid "The submitted file is empty."
-msgstr "Wysłany plik jest pusty."
-
-#: forms/fields.py:449
-=======
 #: forms/fields.py:290 forms/fields.py:848
 msgid "Enter a valid date."
 msgstr "Wpisz poprawną datę."
@@ -4475,7 +4183,6 @@ msgid "The submitted file is empty."
 msgstr "Wysłany plik jest pusty."
 
 #: forms/fields.py:435
->>>>>>> master
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -4483,11 +4190,7 @@ msgstr ""
 "Upewnij się, że nazwa tego pliku ma co najwyżej %(max)d znaków (ma długość %"
 "(length)d)."
 
-<<<<<<< HEAD
-#: forms/fields.py:482
-=======
 #: forms/fields.py:468
->>>>>>> master
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -4495,17 +4198,6 @@ msgstr ""
 "Wgraj poprawny plik graficzny. Ten, który został wgrany, nie jest obrazem, "
 "albo jest uszkodzony."
 
-<<<<<<< HEAD
-#: forms/fields.py:543
-msgid "Enter a valid URL."
-msgstr "Wpisz poprawny URL."
-
-#: forms/fields.py:544
-msgid "This URL appears to be a broken link."
-msgstr "Ten odnośnik jest nieprawidłowy."
-
-#: forms/fields.py:624 forms/fields.py:702
-=======
 #: forms/fields.py:529
 msgid "Enter a valid URL."
 msgstr "Wpisz poprawny URL."
@@ -4515,23 +4207,11 @@ msgid "This URL appears to be a broken link."
 msgstr "Ten odnośnik jest nieprawidłowy."
 
 #: forms/fields.py:610 forms/fields.py:688
->>>>>>> master
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Wybierz poprawną wartość. %(value)s nie jest jednym z dostępnych wyborów."
 
-<<<<<<< HEAD
-#: forms/fields.py:703 forms/fields.py:764 forms/models.py:999
-msgid "Enter a list of values."
-msgstr "Podaj listę wartości."
-
-#: forms/fields.py:891
-msgid "Enter a valid IPv4 address."
-msgstr "Wprowadź poprawny adres IPv4."
-
-#: forms/fields.py:901
-=======
 #: forms/fields.py:689 forms/fields.py:750 forms/models.py:1007
 msgid "Enter a list of values."
 msgstr "Podaj listę wartości."
@@ -4541,7 +4221,6 @@ msgid "Enter a valid IPv4 address."
 msgstr "Wprowadź poprawny adres IPv4."
 
 #: forms/fields.py:887
->>>>>>> master
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki."
@@ -4550,49 +4229,29 @@ msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki
 msgid "Order"
 msgstr "Porządek"
 
-<<<<<<< HEAD
-#: forms/models.py:363
-=======
 #: forms/models.py:364
->>>>>>> master
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 "Wartości w %(field_name)s muszą być unikalne dla wyszukiwań %(lookup)s w %"
 "(date_field)s"
 
-<<<<<<< HEAD
-#: forms/models.py:377 forms/models.py:385
-=======
 #: forms/models.py:378 forms/models.py:386
->>>>>>> master
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s już istnieje w %(model_name)s."
 
-<<<<<<< HEAD
-#: forms/models.py:590
-=======
 #: forms/models.py:592
->>>>>>> master
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Popraw zduplikowane dane w %(field)s."
 
-<<<<<<< HEAD
-#: forms/models.py:594
-=======
 #: forms/models.py:596
->>>>>>> master
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "Popraw zduplikowane dane w %(field)s, które wymaga unikalności."
 
-<<<<<<< HEAD
-#: forms/models.py:600
-=======
 #: forms/models.py:602
->>>>>>> master
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -4601,21 +4260,6 @@ msgstr ""
 "Popraw zduplikowane dane w %(field_name)s, które wymaga unikalności dla %"
 "(lookup)s w polu %(date_field)s."
 
-<<<<<<< HEAD
-#: forms/models.py:608
-msgid "Please correct the duplicate values below."
-msgstr "Popraw poniższe zduplikowane wartości."
-
-#: forms/models.py:863
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Osadzony klucz obcy nie pasuje do klucza głównego obiektu rodzica."
-
-#: forms/models.py:926
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów."
-
-#: forms/models.py:1000
-=======
 #: forms/models.py:610
 msgid "Please correct the duplicate values below."
 msgstr "Popraw poniższe zduplikowane wartości."
@@ -4629,16 +4273,11 @@ msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów."
 
 #: forms/models.py:1008
->>>>>>> master
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Wybierz poprawną wartość. %s nie jest jednym z dostępnych wyborów."
 
-<<<<<<< HEAD
-#: forms/models.py:1002
-=======
 #: forms/models.py:1010
->>>>>>> master
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" nie jest poprawną wartością klucza głównego."
@@ -4969,12 +4608,9 @@ msgstr "%(verbose_name)s zostało pomyślnie zmienione."
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s zostało usunięte."
 
-<<<<<<< HEAD
-=======
 #~ msgid "Relation to parent model"
 #~ msgstr "Relacja do modelu rodzica"
 
->>>>>>> master
 #~ msgid "Comment moderation queue"
 #~ msgstr "Kolejka moderacji komentarzy"
 
