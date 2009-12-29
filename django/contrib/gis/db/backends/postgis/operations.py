@@ -404,11 +404,12 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         """
         cursor = self.connection._cursor()
         try:
-            cursor.execute('SELECT %s()' % func)
-            row = cursor.fetchone()
-        except:
-            # Responsibility of callers to perform error handling.
-            raise
+            try:
+                cursor.execute('SELECT %s()' % func)
+                row = cursor.fetchone()
+            except:
+                # Responsibility of callers to perform error handling.
+                raise
         finally:
             cursor.close()
         return row[0]

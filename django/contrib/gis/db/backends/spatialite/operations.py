@@ -211,11 +211,12 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         """
         cursor = self.connection._cursor()
         try:
-            cursor.execute('SELECT %s()' % func)
-            row = cursor.fetchone()
-        except:
-            # TODO: raise helpful exception here.
-            raise
+            try:
+                cursor.execute('SELECT %s()' % func)
+                row = cursor.fetchone()
+            except:
+                # Responsibility of caller to perform error handling.
+                raise
         finally:
             cursor.close()
         return row[0]
