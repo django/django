@@ -218,22 +218,26 @@ class User(models.Model):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
-                if obj is not None and backend.supports_object_permissions:
-                    group_permissions = backend.get_group_permissions(self, obj)
+                if obj is not None:
+                    if backend.supports_object_permissions:
+                        permissions.update(
+                            backend.get_group_permissions(self, obj)
+                        )
                 else:
-                    group_permissions = backend.get_group_permissions(self)
-                permissions.update(group_permissions)
+                    permissions.update(backend.get_group_permissions(self))
         return permissions
 
     def get_all_permissions(self, obj=None):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_all_permissions"):
-                if obj is not None and backend.supports_object_permissions:
-                    all_permissions = backend.get_all_permissions(self, obj)
+                if obj is not None:
+                    if backend.supports_object_permissions:
+                        permissions.update(
+                            backend.get_all_permissions(self, obj)
+                        )
                 else:
-                    all_permissions = backend.get_all_permissions(self)
-                permissions.update(all_permissions)
+                    permissions.update(backend.get_all_permissions(self))
         return permissions
 
     def has_perm(self, perm, obj=None):
@@ -255,9 +259,10 @@ class User(models.Model):
         # Otherwise we need to check the backends.
         for backend in auth.get_backends():
             if hasattr(backend, "has_perm"):
-                if obj is not None and backend.supports_object_permissions:
-                    if backend.has_perm(self, perm, obj):
-                        return True
+                if obj is not None:
+                    if (backend.supports_object_permissions and
+                        backend.has_perm(self, perm, obj)):
+                            return True
                 else:
                     if backend.has_perm(self, perm):
                         return True
