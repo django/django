@@ -7,12 +7,12 @@ from django.utils.importlib import import_module
 from django.utils.encoding import smart_str
 from django.utils import dateformat, numberformat, datetime_safe
 
-def get_format_modules():
+def get_format_modules(reverse=False):
     """
     Returns an iterator over the format modules found in the project and Django
     """
     modules = []
-    if not check_for_language(get_language()):
+    if not check_for_language(get_language()) or not settings.USE_L10N:
         return modules
     locale = to_locale(get_language())
     if settings.FORMAT_MODULE_PATH:
@@ -30,6 +30,8 @@ def get_format_modules():
                 # Don't return duplicates
                 if mod not in modules:
                     modules.append(mod)
+    if reverse:
+        modules.reverse()
     return modules
 
 def get_format(format_type):
