@@ -10,6 +10,8 @@ tests = r"""
 ...     from decimal import Decimal
 ... except ImportError:
 ...     from django.utils._decimal import Decimal
+>>> from django.utils.translation import activate, deactivate
+>>> from django.conf import settings
 
 ###########
 # Widgets #
@@ -1082,6 +1084,13 @@ True
 False
 >>> w._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), [u'06/05/2008', u'12:41'])
 True
+>>> activate('de-at')
+>>> settings.USE_L10N = True
+>>> w._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), [u'06.05.2008', u'12:41'])
+True
+>>> deactivate()
+>>> settings.USE_L10N = False
+
 
 # DateTimeInput ###############################################################
 
@@ -1099,6 +1108,12 @@ u'<input type="text" name="date" value="2007-09-17 12:51:34" />'
 u'<input type="text" name="date" value="2007-09-17 12:51:34" />'
 >>> w.render('date', datetime.datetime(2007, 9, 17, 12, 51))
 u'<input type="text" name="date" value="2007-09-17 12:51:00" />'
+>>> activate('de-at')
+>>> settings.USE_L10N = True
+>>> w.render('date', d)
+u'<input type="text" name="date" value="17.09.2007 12:51:34" />'
+>>> deactivate()
+>>> settings.USE_L10N = False
 
 Use 'format' to change the way a value is displayed.
 >>> w = DateTimeInput(format='%d/%m/%Y %H:%M')
@@ -1106,6 +1121,7 @@ Use 'format' to change the way a value is displayed.
 u'<input type="text" name="date" value="17/09/2007 12:51" />'
 >>> w._has_changed(d, '17/09/2007 12:51')
 False
+
 
 # DateInput ###################################################################
 
@@ -1124,6 +1140,13 @@ u'<input type="text" name="date" value="2007-09-17" />'
 We should be able to initialize from a unicode value.
 >>> w.render('date', u'2007-09-17')
 u'<input type="text" name="date" value="2007-09-17" />'
+
+>>> activate('de-at')
+>>> settings.USE_L10N = True
+>>> w.render('date', d)
+u'<input type="text" name="date" value="17.09.2007" />'
+>>> deactivate()
+>>> settings.USE_L10N = False
 
 Use 'format' to change the way a value is displayed.
 >>> w = DateInput(format='%d/%m/%Y')
@@ -1153,6 +1176,13 @@ We should be able to initialize from a unicode value.
 >>> w.render('time', u'13:12:11')
 u'<input type="text" name="time" value="13:12:11" />'
 
+>>> activate('de-at')
+>>> settings.USE_L10N = True
+>>> w.render('date', d)
+u'<input type="text" name="date" value="17.09.2007" />'
+>>> deactivate()
+>>> settings.USE_L10N = False
+
 Use 'format' to change the way a value is displayed.
 >>> w = TimeInput(format='%H:%M')
 >>> w.render('time', t)
@@ -1176,6 +1206,12 @@ u'<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" n
 u'<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" name="date_1" value="12:51:34" />'
 >>> w.render('date', datetime.datetime(2007, 9, 17, 12, 51))
 u'<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" name="date_1" value="12:51:00" />'
+>>> activate('de-at')
+>>> settings.USE_L10N = True
+>>> w.render('date', datetime.datetime(2007, 9, 17, 12, 51))
+u'<input type="hidden" name="date_0" value="17.09.2007" /><input type="hidden" name="date_1" value="12:51:00" />'
+>>> deactivate()
+>>> settings.USE_L10N = False
 
 """
 

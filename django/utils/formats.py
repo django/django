@@ -4,8 +4,8 @@ import datetime
 from django.conf import settings
 from django.utils.translation import get_language, to_locale, check_for_language
 from django.utils.importlib import import_module
-from django.utils import dateformat
-from django.utils import numberformat
+from django.utils.encoding import smart_str
+from django.utils import dateformat, numberformat, datetime_safe
 
 def get_format_modules():
     """
@@ -65,11 +65,10 @@ def number_format(value, decimal_pos=None):
         get_format('THOUSAND_SEPARATOR'),
     )
 
-def localize(value, is_input=False):
+def localize(value):
     """
-    Checks value, and if it has a localizable type (date,
-    number...) it returns the value as a string using
-    current locale format
+    Checks if value is a localizable type (date, number...) and returns it
+    formatted as a string using current locale format
     """
     if settings.USE_L10N:
         if isinstance(value, decimal.Decimal):
@@ -79,19 +78,27 @@ def localize(value, is_input=False):
         elif isinstance(value, int):
             return number_format(value)
         elif isinstance(value, datetime.datetime):
-            if not is_input:
-                return date_format(value, 'DATETIME_FORMAT')
-            else:
-                return value.strftime(get_format('DATETIME_INPUT_FORMATS')[0])
+            return date_format(value, 'DATETIME_FORMAT')
         elif isinstance(value, datetime.date):
-            if not is_input:
-                return date_format(value)
-            else:
-                return value.strftime(get_format('DATE_INPUT_FORMATS')[0])
+            return date_format(value)
         elif isinstance(value, datetime.time):
-            if not is_input:
-                return date_format(value, 'TIME_FORMAT')
-            else:
-                return value.strftime(get_format('TIME_INPUT_FORMATS')[0])
+            return date_format(value, 'TIME_FORMAT')
     return value
 
+def localize_input(value, default=None):
+    """
+    Checks if an input value is a localizable type and returns it
+    formatted with the appropriate formatting string of the current locale.
+    """
+    if isinstance(value, datetime.datetime):
+        value = datetime_safe.new_datetime(value)
+        format = smart_str(default or get_format('DATETIME_INPUT_FORMATS')[0])
+        return value.strftime(format)
+    elif isinstance(value, datetime.date):
+        value = datetime_safe.new_date(value)
+        format = smart_str(default or get_format('DATE_INPUT_FORMATS')[0])
+        return value.strftime(format)
+    elif isinstance(value, datetime.time):
+        format = smart_str(default or get_format('TIME_INPUT_FORMATS')[0])
+        return value.strftime(format)
+    return value

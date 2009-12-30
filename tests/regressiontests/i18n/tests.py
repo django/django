@@ -4,12 +4,13 @@ import datetime
 
 from django.template import Template, Context
 from django.conf import settings
-from django.utils.formats import get_format, date_format, number_format, localize
+from django.utils.formats import get_format, date_format, number_format, localize, localize_input
 from django.utils.numberformat import format
 from django.test import TestCase, client
 from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy
 
-from forms import I18nForm, SelectDateForm, SelectDateWidget
+from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
+
 
 class TranslationTests(TestCase):
 
@@ -320,6 +321,28 @@ class FormattingTests(TestCase):
         activate('es-us')
         try:
             self.assertEqual(u'31 de diciembre de 2009', date_format(self.d))
+        finally:
+            deactivate()
+
+    def test_localized_input(self):
+        """
+        Tests if form input is correctly localized
+        """
+        settings.USE_L10N = True
+        activate('de-at')
+        try:
+            form6 = CompanyForm({
+                'name': u'acme',
+                'date_added': datetime.datetime(2009, 12, 31, 6, 0, 0),
+            })
+            form6.save()
+            self.assertEqual(True, form6.is_valid())
+            self.assertEqual(
+                form6.as_ul(),
+                u'<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>'
+            )
+            self.assertEqual(localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)), '31.12.2009 06:00:00')
+            self.assertEqual(datetime.datetime(2009, 12, 31, 6, 0, 0), form6.cleaned_data['date_added'])
         finally:
             deactivate()
 

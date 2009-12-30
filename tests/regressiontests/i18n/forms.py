@@ -1,5 +1,6 @@
 from django import template, forms
 from django.forms.extras import SelectDateWidget
+from models import Company
 
 class I18nForm(forms.Form):
     decimal_field = forms.DecimalField()
@@ -11,3 +12,6 @@ class I18nForm(forms.Form):
 class SelectDateForm(forms.Form):
     date_field = forms.DateField(widget=SelectDateWidget)
 
+class CompanyForm(forms.ModelForm):
+    class Meta:
+        model = Company

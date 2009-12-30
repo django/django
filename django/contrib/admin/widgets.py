@@ -41,21 +41,21 @@ class FilteredSelectMultiple(forms.SelectMultiple):
             (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked), settings.ADMIN_MEDIA_PREFIX))
         return mark_safe(u''.join(output))
 
-class AdminDateWidget(forms.TextInput):
+class AdminDateWidget(forms.DateTimeInput):
     class Media:
         js = (settings.ADMIN_MEDIA_PREFIX + "js/calendar.js",
               settings.ADMIN_MEDIA_PREFIX + "js/admin/DateTimeShortcuts.js")
 
-    def __init__(self, attrs={}):
-        super(AdminDateWidget, self).__init__(attrs={'class': 'vDateField', 'size': '10'})
+    def __init__(self, attrs={}, format=None):
+        super(AdminDateWidget, self).__init__(attrs={'class': 'vDateField', 'size': '10'}, format=format)
 
-class AdminTimeWidget(forms.TextInput):
+class AdminTimeWidget(forms.TimeInput):
     class Media:
         js = (settings.ADMIN_MEDIA_PREFIX + "js/calendar.js",
               settings.ADMIN_MEDIA_PREFIX + "js/admin/DateTimeShortcuts.js")
 
-    def __init__(self, attrs={}):
-        super(AdminTimeWidget, self).__init__(attrs={'class': 'vTimeField', 'size': '8'})
+    def __init__(self, attrs={}, format=None):
+        super(AdminTimeWidget, self).__init__(attrs={'class': 'vTimeField', 'size': '8'}, format=format)
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
