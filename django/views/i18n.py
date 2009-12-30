@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils import importlib
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
+from django.utils.encoding import smart_unicode
 from django.utils.formats import get_format_modules
 
 def set_language(request):
@@ -208,7 +209,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     for k, v in pdict.items():
         src.append("catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))
     for k, v in get_formats().items():
-        src.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(unicode(v))))
+        src.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_unicode(v))))
     src.extend(csrc)
     src.append(LibFoot)
     src.append(InterPolate)
