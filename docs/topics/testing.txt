@@ -278,7 +278,7 @@ a test case, add the name of the test method to the label::
    You can now trigger a graceful exit from a test run by pressing ``Ctrl-C``. 
 
 If you press ``Ctrl-C`` while the tests are running, the test runner will 
-wait fur the currently running test to complete and then exit gracefully.
+wait for the currently running test to complete and then exit gracefully.
 During a graceful exit the test runner will output details of any test 
 failures, report on how many tests were run and how many errors and failures
 were encountered, and destroy any test databases as usual. Thus pressing 
