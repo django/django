@@ -27,8 +27,10 @@ class DjangoTestRunner(unittest.TextTestRunner):
         """
         self._default_keyboard_interrupt_handler = signal.signal(signal.SIGINT,
             self._keyboard_interrupt_handler)
-        result = super(DjangoTestRunner, self).run(*args, **kwargs)
-        signal.signal(signal.SIGINT, self._default_keyboard_interrupt_handler)
+        try:
+            result = super(DjangoTestRunner, self).run(*args, **kwargs)
+        finally:
+            signal.signal(signal.SIGINT, self._default_keyboard_interrupt_handler)
         return result
 
     def _keyboard_interrupt_handler(self, signal_number, stack_frame):
