@@ -8,8 +8,7 @@ from django.contrib.gis.db.backends.postgis.adapter import PostGISAdapter
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.postgresql.operations import DatabaseOperations
-from django.db.backends.postgresql_psycopg2.base import Database
+from django.db.backends.postgresql_psycopg2.base import Database, DatabaseOperations
 
 #### Classes used in constructing PostGIS spatial SQL ####
 class PostGISOperator(SpatialOperation):
