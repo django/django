@@ -1,4 +1,7 @@
+import sys
+import signal
 import unittest
+
 from django.conf import settings
 from django.db.models import get_app, get_apps
 from django.test import _doctest as doctest
@@ -11,22 +14,48 @@ TEST_MODULE = 'tests'
 doctestOutputChecker = OutputChecker()
 
 class DjangoTestRunner(unittest.TextTestRunner):
-    
+
     def __init__(self, verbosity=0, failfast=False, **kwargs):
         super(DjangoTestRunner, self).__init__(verbosity=verbosity, **kwargs)
         self.failfast = failfast
-        
+        self._keyboard_interrupt_intercepted = False
+
+    def run(self, *args, **kwargs):
+        """
+        Runs the test suite after registering a custom signal handler
+        that triggers a graceful exit when Ctrl-C is pressed.
+        """
+        self._default_keyboard_interrupt_handler = signal.signal(signal.SIGINT,
+            self._keyboard_interrupt_handler)
+        result = super(DjangoTestRunner, self).run(*args, **kwargs)
+        signal.signal(signal.SIGINT, self._default_keyboard_interrupt_handler)
+        return result
+
+    def _keyboard_interrupt_handler(self, signal_number, stack_frame):
+        """
+        Handles Ctrl-C by setting a flag that will stop the test run when
+        the currently running test completes.
+        """
+        self._keyboard_interrupt_intercepted = True
+        sys.stderr.write(" <Test run halted by Ctrl-C> ")
+        # Set the interrupt handler back to the default handler, so that 
+        # another Ctrl-C press will trigger immediate exit.
+        signal.signal(signal.SIGINT, self._default_keyboard_interrupt_handler)
+
     def _makeResult(self):
         result = super(DjangoTestRunner, self)._makeResult()
         failfast = self.failfast
-        
+
         def stoptest_override(func):
             def stoptest(test):
-                if failfast and not result.wasSuccessful():
+                # If we were set to failfast and the unit test failed,
+                # or if the user has typed Ctrl-C, report and quit
+                if (failfast and not result.wasSuccessful()) or \
+                    self._keyboard_interrupt_intercepted:
                     result.stop()
                 func(test)
             return stoptest
-        
+
         setattr(result, 'stopTest', stoptest_override(result.stopTest))
         return result
 

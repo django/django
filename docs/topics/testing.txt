@@ -242,8 +242,8 @@ in different circumstances.
 Running tests
 =============
 
-Once you've written tests, run them using your project's ``manage.py``
-utility::
+Once you've written tests, run them using the :djadmin:`test` subcommand of
+your project's ``manage.py`` utility::
 
     $ ./manage.py test
 
@@ -273,6 +273,23 @@ And it gets even more granular than that! To run a *single* test method inside
 a test case, add the name of the test method to the label::
 
     $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
+
+.. versionadded:: 1.2
+   You can now trigger a graceful exit from a test run by pressing ``Ctrl-C``. 
+
+If you press ``Ctrl-C`` while the tests are running, the test runner will 
+wait fur the currently running test to complete and then exit gracefully.
+During a graceful exit the test runner will output details of any test 
+failures, report on how many tests were run and how many errors and failures
+were encountered, and destroy any test databases as usual. Thus pressing 
+``Ctrl-C`` can be very useful if you forget to pass the :djadminopt:`--failfast`
+option, notice that some tests are unexpectedly failing, and want to get details 
+on the failures without waiting for the full test run to complete.
+
+If you do not want to wait for the currently running test to finish, you
+can press ``Ctrl-C`` a second time and the test run will halt immediately,
+but not gracefully. No details of the tests run before the interruption will
+be reported, and any test databases created by the run will not be destroyed.
 
 The test database
 -----------------

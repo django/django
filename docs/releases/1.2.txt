@@ -471,10 +471,12 @@ Models can now use a 64 bit :class:`~django.db.models.BigIntegerField` type.
 Fast Failure for Tests
 ----------------------
 
-The ``test`` subcommand of ``django-admin.py``, and the ``runtests.py`` script
-used to run Django's own test suite, support a new ``--failfast`` option.
-When specified, this option causes the test runner to exit after
-encountering a failure instead of continuing with the test run.
+The :djadmin:`test` subcommand of ``django-admin.py``, and the ``runtests.py`` 
+script used to run Django's own test suite, support a new ``--failfast`` option.
+When specified, this option causes the test runner to exit after encountering 
+a failure instead of continuing with the test run.  In addition, the handling 
+of ``Ctrl-C`` during a test run has been improved to trigger a graceful exit 
+from the test run that reports details of the tests run before the interruption.        
 
 Improved localization
 ---------------------
