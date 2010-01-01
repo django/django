@@ -60,6 +60,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Norway_
     * Peru_
     * Poland_
+    * Portugal_
     * Romania_
     * Slovakia_
     * `South Africa`_
@@ -105,6 +106,7 @@ Here's an example of how to use them::
 .. _Norway: `Norway (no)`_
 .. _Peru: `Peru (pe)`_
 .. _Poland: `Poland (pl)`_
+.. _Portugal: `Portugal (pt)`_
 .. _Romania: `Romania (ro)`_
 .. _Slovakia: `Slovakia (sk)`_
 .. _South Africa: `South Africa (za)`_
@@ -498,17 +500,17 @@ Norway (``no``)
 Peru (``pe``)
 =============
 
-.. class:: pt.forms.PEDNIField
+.. class:: pe.forms.PEDNIField
 
     A form field that validates input as a DNI (Peruvian national identity)
     number.
 
-.. class:: pt.forms.PERUCField
+.. class:: pe.forms.PERUCField
 
     A form field that validates input as an RUC (Registro Unico de
     Contribuyentes) number. Valid RUC numbers have 11 digits.
 
-.. class:: pt.forms.PEDepartmentSelect
+.. class:: pe.forms.PEDepartmentSelect
 
     A ``Select`` widget that uses a list of Peruvian Departments as its choices.
 
@@ -551,6 +553,19 @@ Poland (``pl``)
 
     A ``Select`` widget that uses a list of Polish voivodeships (administrative
     provinces) as its choices.
+
+Portugal (``pt``)
+=================
+
+.. class:: pt.forms.PTZipCodeField
+
+    A form field that validates input as a Portuguese zip code.
+
+.. class:: pt.forms.PTPhoneNumberField
+
+    A form field that validates input as a Portuguese phone number.
+    Valid numbers have 9 digits (may include spaces) or start by 00
+    or + (international).
 
 Romania (``ro``)
 ================
