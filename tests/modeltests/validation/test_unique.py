@@ -2,8 +2,8 @@ import unittest
 
 from django.conf import settings
 from django.db import connection
-
 from models import CustomPKModel, UniqueTogetherModel, UniqueFieldsModel, UniqueForDateModel, ModelToValidate
+
 
 class GetUniqueCheckTests(unittest.TestCase):
     def test_unique_fields_get_collected(self):
@@ -26,7 +26,6 @@ class GetUniqueCheckTests(unittest.TestCase):
             ), m._get_unique_checks()
         )
 
-
 class PerformUniqueChecksTest(unittest.TestCase):
     def setUp(self):
         # set debug to True to gain access to connection.queries
@@ -43,12 +42,12 @@ class PerformUniqueChecksTest(unittest.TestCase):
         l = len(connection.queries)
         mtv = ModelToValidate(number=10, name='Some Name')
         setattr(mtv, '_adding', True)
-        mtv.clean()
+        mtv.full_validate()
         self.assertEqual(l+1, len(connection.queries))
 
     def test_primary_key_unique_check_not_performed_when_not_adding(self):
         """Regression test for #12132"""
         l = len(connection.queries)
         mtv = ModelToValidate(number=10, name='Some Name')
-        mtv.clean()
+        mtv.full_validate()
         self.assertEqual(l, len(connection.queries))

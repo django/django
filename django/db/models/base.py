@@ -644,7 +644,7 @@ class Model(object):
 
     def validate(self):
         """
-        Hook for doing any extra model-wide validation after Model.clean() been
+        Hook for doing any extra model-wide validation after clean() has been
         called on every field. Any ValidationError raised by this method will
         not be associated with a particular field; it will have a special-case
         association with the field named '__all__'.
@@ -785,7 +785,7 @@ class Model(object):
                 'field_label': unicode(field_labels)
             }
 
-    def clean(self, exclude=[]):
+    def full_validate(self, exclude=[]):
         """
         Cleans all fields and raises ValidationError containing message_dict of 
         all validation errors if any occur.
