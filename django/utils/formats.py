@@ -40,6 +40,7 @@ def get_format(format_type):
     language (locale), defaults to the format in the settings.
     format_type is the name of the format, e.g. 'DATE_FORMAT'
     """
+    format_type = smart_str(format_type)
     if settings.USE_L10N:
         for module in get_format_modules():
             try:

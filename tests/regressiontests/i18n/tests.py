@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import sys
 import decimal
 import datetime
@@ -137,6 +138,10 @@ class FormattingTests(TestCase):
         self.assertEqual(u'6B6B6B6B6A6', format(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
         self.assertEqual(u'-66666.6', format(-66666.666, decimal_sep='.', decimal_pos=1))
         self.assertEqual(u'-66666.0', format(int('-66666'), decimal_sep='.', decimal_pos=1))
+
+        # date filter
+        self.assertEqual(u'31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
+        self.assertEqual(u'⌚ 10:15', Template('{{ t|time:"⌚ H:i" }}').render(self.ctxt))
 
     def test_l10n_disabled(self):
         """
