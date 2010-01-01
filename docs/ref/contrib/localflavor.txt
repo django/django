@@ -50,6 +50,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Germany_
     * Iceland_
     * India_
+    * Indonesia_
     * Ireland_
     * Italy_
     * Japan_
@@ -95,6 +96,7 @@ Here's an example of how to use them::
 .. _The Netherlands: `The Netherlands (nl)`_
 .. _Iceland: `Iceland (is\_)`_
 .. _India: `India (in\_)`_
+.. _Indonesia: `Indonesia (id)`_
 .. _Ireland: `Ireland (ie)`_
 .. _Italy: `Italy (it)`_
 .. _Japan: `Japan (jp)`_
@@ -381,6 +383,39 @@ Ireland (``ie``)
 .. class:: ie.forms.IECountySelect
 
     A ``Select`` widget that uses a list of Irish Counties as its choices.
+
+Indonesia (``id``)
+==================
+
+.. class:: id.forms.IDPostCodeField
+
+    A form field that validates input as an Indonesian post code field.
+
+.. class:: id.forms.IDProvinceSelect
+
+    A ``Select`` widget that uses a list of Indonesian provinces as its choices.
+
+.. class:: id.forms.IDPhoneNumberField
+
+    A form field that validates input as an Indonesian telephone number.
+
+.. class:: id.forms.IDLicensePlatePrefixSelect
+
+    A ``Select`` widget that uses a list of Indonesian license plate
+    prefix code as its choices.
+
+.. class:: id.forms.IDLicensePlateField
+
+    A form field that validates input as an Indonesian vehicle license plate.
+
+.. class:: id.forms.IDNationalIdentityNumberField
+
+    A form field that validates input as an Indonesian national identity
+    number (`NIK`_/KTP). The output will be in the format of
+    'XX.XXXX.DDMMYY.XXXX'. Dots or spaces can be used in the input to break
+    down the numbers.
+
+.. _NIK: http://en.wikipedia.org/wiki/Indonesian_identity_card
 
 Italy (``it``)
 ==============
