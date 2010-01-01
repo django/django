@@ -52,6 +52,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * India_
     * Italy_
     * Japan_
+    * Kuwait_
     * Mexico_
     * `The Netherlands`_
     * Norway_
@@ -95,6 +96,7 @@ Here's an example of how to use them::
 .. _India: `India (in\_)`_
 .. _Italy: `Italy (it)`_
 .. _Japan: `Japan (jp)`_
+.. _Kuwait: `Kuwait (kw)`_
 .. _Mexico: `Mexico (mx)`_
 .. _Norway: `Norway (no)`_
 .. _Peru: `Peru (pe)`_
@@ -409,6 +411,18 @@ Japan (``jp``)
 .. class:: jp.forms.JPPrefectureSelect
 
     A ``Select`` widget that uses a list of Japanese prefectures as its choices.
+
+Kuwait (``kw``)
+===============
+
+.. class:: kw.forms.KWCivilIDNumberField
+
+    A form field that validates input as a Kuwaiti Civil ID number. A valid
+    Civil ID number must obey the following rules:
+
+    * The number consist of 12 digits.
+    * The birthdate of the person is a valid date.
+    * The calculated checksum equals to the last digit of the Civil ID.
 
 Mexico (``mx``)
 ===============

@@ -18,6 +18,7 @@ from localflavor.generic import tests as localflavor_generic_tests
 from localflavor.is_ import tests as localflavor_is_tests
 from localflavor.it import tests as localflavor_it_tests
 from localflavor.jp import tests as localflavor_jp_tests
+from localflavor.kw import tests as localflavor_kw_tests
 from localflavor.nl import tests as localflavor_nl_tests
 from localflavor.pl import tests as localflavor_pl_tests
 from localflavor.ro import tests as localflavor_ro_tests
@@ -55,6 +56,7 @@ __test__ = {
     'localflavor_is_tests': localflavor_is_tests,
     'localflavor_it_tests': localflavor_it_tests,
     'localflavor_jp_tests': localflavor_jp_tests,
+    'localflavor_kw_tests': localflavor_kw_tests,
     'localflavor_nl_tests': localflavor_nl_tests,
     'localflavor_pl_tests': localflavor_pl_tests,
     'localflavor_ro_tests': localflavor_ro_tests,
