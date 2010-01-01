@@ -32,7 +32,7 @@ Validating objects
 
 .. versionadded:: 1.2
 
-To validate your model, just call it's ``full_validate()`` method:
+To validate your model, just call its ``full_validate()`` method:
 
 .. method:: Model.full_validate([exclude=[]])
 
