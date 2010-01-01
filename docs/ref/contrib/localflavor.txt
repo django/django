@@ -480,14 +480,14 @@ Peru (``pe``)
 Poland (``pl``)
 ===============
 
-.. class:: pl.forms.PLNationalIdentificationNumberField
+.. class:: pl.forms.PLPESELField
 
     A form field that validates input as a Polish national identification number
     (PESEL_).
 
 .. _PESEL: http://en.wikipedia.org/wiki/PESEL
 
-.. class:: pl.forms.PLNationalBusinessRegisterField
+.. class:: pl.forms.PLREGONField
 
     A form field that validates input as a Polish National Official Business
     Register Number (REGON_), having either seven or nine digits. The checksum
@@ -501,18 +501,18 @@ Poland (``pl``)
     A form field that validates input as a Polish postal code. The valid format
     is XX-XXX, where X is a digit.
 
-.. class:: pl.forms.PLTaxNumberField
+.. class:: pl.forms.PLNIPField
 
     A form field that validates input as a Polish Tax Number (NIP). Valid
     formats are XXX-XXX-XX-XX or XX-XX-XXX-XXX. The checksum algorithm used
     for NIPs is documented at http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
 
-.. class:: pl.forms.PLAdministrativeUnitSelect
+.. class:: pl.forms.PLCountySelect
 
     A ``Select`` widget that uses a list of Polish administrative units as its
     choices.
 
-.. class:: pl.forms.PLVoivodeshipSelect
+.. class:: pl.forms.PLProvinceSelect
 
     A ``Select`` widget that uses a list of Polish voivodeships (administrative
     provinces) as its choices.
