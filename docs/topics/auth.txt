@@ -34,7 +34,7 @@ Authentication support is bundled as a Django application in
 
     1. Put ``'django.contrib.auth'`` and ``'django.contrib.contenttypes'`` in
        your :setting:`INSTALLED_APPS` setting.
-       (The :class:`~django.contrib.auth.models.Permisson` model in
+       (The :class:`~django.contrib.auth.models.Permission` model in
        :mod:`django.contrib.auth` depends on :mod:`django.contrib.contenttypes`.)
     2. Run the command ``manage.py syncdb``.
 
