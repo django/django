@@ -436,17 +436,17 @@ Norway (``no``)
 Peru (``pe``)
 =============
 
-.. class:: pt.forms.PEDNIField
+.. class:: pe.forms.PEDNIField
 
     A form field that validates input as a DNI (Peruvian national identity)
     number.
 
-.. class:: pt.forms.PERUCField
+.. class:: pe.forms.PERUCField
 
     A form field that validates input as an RUC (Registro Unico de
     Contribuyentes) number. Valid RUC numbers have 11 digits.
 
-.. class:: pt.forms.PEDepartmentSelect
+.. class:: pe.forms.PEDepartmentSelect
 
     A ``Select`` widget that uses a list of Peruvian Departments as its choices.
 
