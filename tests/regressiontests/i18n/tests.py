@@ -4,7 +4,7 @@ import datetime
 
 from django.template import Template, Context
 from django.conf import settings
-from django.utils.formats import get_format, date_format, number_format, localize, localize_input
+from django.utils.formats import get_format, date_format, time_format, number_format, localize, localize_input
 from django.utils.numberformat import format
 from django.test import TestCase, client
 from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy
@@ -91,8 +91,10 @@ class FormattingTests(TestCase):
         self.f = 99999.999
         self.d = datetime.date(2009, 12, 31)
         self.dt = datetime.datetime(2009, 12, 31, 20, 50)
+        self.t = datetime.time(10, 15, 48)
         self.ctxt = Context({
             'n': self.n,
+            't': self.t,
             'd': self.d,
             'dt': self.dt,
             'f': self.f
@@ -103,10 +105,10 @@ class FormattingTests(TestCase):
         settings.USE_I18N = self._use_i18n
         settings.USE_L10N = self._use_l10n
         settings.USE_THOUSAND_SEPARATOR = self._use_thousand_separator
-    
+
     def test_locale_independent(self):
         """
-        Localization of dates and numbers
+        Localization of numbers
         """
         settings.USE_L10N = True
         settings.USE_THOUSAND_SEPARATOR = False
@@ -130,6 +132,7 @@ class FormattingTests(TestCase):
             self.assertEqual('N j, Y', get_format('DATE_FORMAT'))
             self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual('.', get_format('DECIMAL_SEPARATOR'))
+            self.assertEqual(u'10:15 a.m.', time_format(self.t))
             self.assertEqual(u'des. 31, 2009', date_format(self.d))
             self.assertEqual(u'desembre 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual(u'12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
@@ -144,6 +147,7 @@ class FormattingTests(TestCase):
             self.assertEqual(u'2009-12-31 20:50:00', Template('{{ dt }}').render(self.ctxt))
             self.assertEqual(u'66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
             self.assertEqual(u'100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+            self.assertEqual(u'10:15 a.m.', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'12/31/2009 8:50 p.m.', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
 
@@ -184,6 +188,7 @@ class FormattingTests(TestCase):
             self.assertEqual('j \de F \de Y', get_format('DATE_FORMAT'))
             self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual(',', get_format('DECIMAL_SEPARATOR'))
+            self.assertEqual(u'10:15:48', time_format(self.t))
             self.assertEqual(u'31 de desembre de 2009', date_format(self.d))
             self.assertEqual(u'desembre del 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual(u'31/12/2009 20:50', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
@@ -210,6 +215,7 @@ class FormattingTests(TestCase):
             self.assertEqual(u'31 de desembre de 2009 a les 20:50', Template('{{ dt }}').render(self.ctxt))
             self.assertEqual(u'66666,67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
             self.assertEqual(u'100000,0', Template('{{ f|floatformat }}').render(self.ctxt))
+            self.assertEqual(u'10:15:48', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'31/12/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'31/12/2009 20:50', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
 

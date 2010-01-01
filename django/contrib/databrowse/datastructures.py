@@ -158,7 +158,7 @@ class EasyInstanceField(object):
                 if isinstance(self.field, models.DateTimeField):
                     objs = capfirst(formats.date_format(self.raw_value, 'DATETIME_FORMAT'))
                 elif isinstance(self.field, models.TimeField):
-                    objs = capfirst(formats.date_format(self.raw_value, 'TIME_FORMAT'))
+                    objs = capfirst(formats.time_format(self.raw_value, 'TIME_FORMAT'))
                 else:
                     objs = capfirst(formats.date_format(self.raw_value, 'DATE_FORMAT'))
             else:

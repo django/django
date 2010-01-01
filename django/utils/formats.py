@@ -55,6 +55,12 @@ def date_format(value, format=None):
     """
     return dateformat.format(value, get_format(format or 'DATE_FORMAT'))
 
+def time_format(value, format=None):
+    """
+    Formats a datetime.time object using a localizable format
+    """
+    return dateformat.time_format(value, get_format(format or 'TIME_FORMAT'))
+
 def number_format(value, decimal_pos=None):
     """
     Formats a numeric value using localization settings
@@ -84,7 +90,7 @@ def localize(value):
         elif isinstance(value, datetime.date):
             return date_format(value)
         elif isinstance(value, datetime.time):
-            return date_format(value, 'TIME_FORMAT')
+            return time_format(value, 'TIME_FORMAT')
     return value
 
 def localize_input(value, default=None):
