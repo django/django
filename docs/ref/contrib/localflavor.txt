@@ -65,6 +65,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Switzerland_
     * `United Kingdom`_
     * `United States of America`_
+    * Uruguay_
 
 The ``django.contrib.localflavor`` package also includes a ``generic`` subpackage,
 containing useful code that is not specific to one particular country or culture.
@@ -106,6 +107,7 @@ Here's an example of how to use them::
 .. _Switzerland: `Switzerland (ch)`_
 .. _United Kingdom: `United Kingdom (uk)`_
 .. _United States of America: `United States of America (us)`_
+.. _Uruguay: `Uruguay (uy)`_
 
 Adding flavors
 ==============
@@ -738,3 +740,15 @@ United States of America (``us``)
 
     A model field that forms represent as a ``forms.USStateField`` field and
     stores the two-letter U.S. state abbreviation in the database.
+
+Uruguay (``uy``)
+================
+
+.. class:: uy.forms.UYCIField
+
+    A field that validates Uruguayan 'Cedula de identidad' (CI) numbers.
+
+.. class:: uy.forms.UYDepartamentSelect
+
+    A ``Select`` widget that uses a list of  Uruguayan departaments as its
+    choices.
