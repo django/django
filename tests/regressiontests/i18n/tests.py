@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils.formats import get_format, date_format, time_format, number_format, localize, localize_input
 from django.utils.numberformat import format
 from django.test import TestCase, client
-from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy
+from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, to_locale
 
 from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 
@@ -80,6 +80,23 @@ class TranslationTests(TestCase):
             self.assertEqual(u'Catalan Win\nEOF\n', ugettext(u'Win\r\nEOF\r\n'))
         finally:
             deactivate()
+
+    def test_to_locale(self):
+        """
+        Tests the to_locale function and the special case of Serbian Latin
+        (refs #12230 and r11299)
+        """
+        self.assertEqual(to_locale('en-us'), 'en_US')
+        self.assertEqual(to_locale('sr-lat'), 'sr_Lat')
+
+    def test_to_language(self):
+        """
+        Test the to_language function
+        """
+        from django.utils.translation.trans_real import to_language
+        self.assertEqual(to_language('en_US'), 'en-us')
+        self.assertEqual(to_language('sr_Lat'), 'sr-lat')
+
 
 class FormattingTests(TestCase):
 
