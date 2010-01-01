@@ -252,8 +252,7 @@ def lookup_field(name, obj, model_admin=None):
 
 def label_for_field(name, model, model_admin):
     try:
-        model._meta.get_field_by_name(name)[0]
-        return name
+        return model._meta.get_field_by_name(name)[0].verbose_name
     except models.FieldDoesNotExist:
         if name == "__unicode__":
             return force_unicode(model._meta.verbose_name)
