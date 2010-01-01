@@ -284,14 +284,14 @@ class BaseForm(StrAndUnicode):
                 if name in self.cleaned_data:
                     del self.cleaned_data[name]
 
-        # run complex validators after the fields have been cleaned since they
-        # need access to all_values
+        # Run complex validators after the fields have been cleaned since they
+        # need access to all_values.
         for name, field in self.fields.items():
             if not name in self.cleaned_data:
                 continue
             failed = False
             for v in field.validators:
-                # skip noncomplex validators, they have already been run on the Field
+                # Skip noncomplex validators, they have already been run on the field.
                 if not isinstance(v, ComplexValidator):
                     continue
                 try:

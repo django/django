@@ -819,8 +819,9 @@ class Model(object):
                             error_list.append(message)
                         else:
                             error_list.extend(e.messages)
+        # Form.clean() is run even if other validation fails, so do the
+        # same with Model.validate() for consistency.
         try:
-            # TODO: run this only if not errors??
             self.validate()
         except ValidationError, e:
             if hasattr(e, 'message_dict'):

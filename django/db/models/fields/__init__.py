@@ -149,7 +149,6 @@ class Field(object):
         for k in translated_keys:
             self.error_messages[k] = _(self.error_messages[k])
 
-
     def __cmp__(self, other):
         # This is needed because bisect does not take a comparison function.
         return cmp(self.creation_counter, other.creation_counter)
@@ -177,8 +176,8 @@ class Field(object):
 
         errors = []
         for v in self.validators:
-            # don't run complex validators since they need obj
-            # and must therefore be run on the model level
+            # Don't run complex validators since they need the model instance
+            # and must therefore be run on the model level.
             if not isinstance(v, validators.ComplexValidator):
                 try:
                     v(value)
@@ -192,14 +191,14 @@ class Field(object):
                         errors.extend(e.messages)
         if errors:
             raise exceptions.ValidationError(errors)
-    
+
     def validate(self, value, model_instance):
         """
         Validates value and throws ValidationError. Subclasses should override
         this to provide validation logic.
         """
         if not self.editable:
-            # skip validation for non-editable fields
+            # Skip validation for non-editable fields.
             return
         if self._choices and value:
             if not value in dict(self.choices):
@@ -208,15 +207,12 @@ class Field(object):
         if value is None and not self.null:
             raise exceptions.ValidationError(self.error_messages['null'])
 
-        # cannot do if not value because of 0 passed to integer fields
         if not self.blank and value in validators.EMPTY_VALUES:
             raise exceptions.ValidationError(self.error_messages['blank'])
 
-
-
     def clean(self, value, model_instance):
         """
-        Convert the value's type and wun validation. Validation errors from to_python
+        Convert the value's type and run validation. Validation errors from to_python
         and validate are propagated. The correct value is returned if no error is 
         raised.
         """
@@ -493,7 +489,7 @@ class AutoField(Field):
             return int(value)
         except (TypeError, ValueError):
             raise exceptions.ValidationError(self.error_messages['invalid'])
-        
+
     def validate(self, value, model_instance):
         pass
 
@@ -1112,3 +1108,4 @@ class XMLField(TextField):
     def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):
         self.schema_path = schema_path
         Field.__init__(self, verbose_name, name, **kwargs)
+

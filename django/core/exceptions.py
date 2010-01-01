@@ -44,6 +44,7 @@ class ValidationError(Exception):
         """
         if isinstance(message, dict):
             self.message_dict = message
+            # Reduce each list of messages into a single list.
             message = reduce(operator.add, message.values())
 
         if isinstance(message, list):

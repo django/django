@@ -39,7 +39,7 @@ class PerformUniqueChecksTest(unittest.TestCase):
         super(PerformUniqueChecksTest, self).tearDown()
 
     def test_primary_key_unique_check_performed_when_adding(self):
-        "Check#12132"
+        """Regression test for #12132"""
         l = len(connection.queries)
         mtv = ModelToValidate(number=10, name='Some Name')
         setattr(mtv, '_adding', True)
@@ -47,7 +47,7 @@ class PerformUniqueChecksTest(unittest.TestCase):
         self.assertEqual(l+1, len(connection.queries))
 
     def test_primary_key_unique_check_not_performed_when_not_adding(self):
-        "Check#12132"
+        """Regression test for #12132"""
         l = len(connection.queries)
         mtv = ModelToValidate(number=10, name='Some Name')
         mtv.clean()

@@ -2,8 +2,8 @@ from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
 
-# import ValidationError so that it can be imported from this
-# module to maintain backwards compatibility
+# Import ValidationError so that it can be imported from this
+# module to maintain backwards compatibility.
 from django.core.exceptions import ValidationError
 
 def flatatt(attrs):
