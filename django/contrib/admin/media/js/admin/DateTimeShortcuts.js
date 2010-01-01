@@ -80,10 +80,10 @@ var DateTimeShortcuts = {
         quickElement('h2', clock_box, gettext('Choose a time'));
         time_list = quickElement('ul', clock_box, '');
         time_list.className = 'timelist';
-        quickElement("a", quickElement("li", time_list, ""), gettext("Now"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + gettext('TIME_INPUT_FORMATS') + "'));")
-        quickElement("a", quickElement("li", time_list, ""), gettext("Midnight"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,0,0,0,0).strftime('" + gettext('TIME_INPUT_FORMATS') + "'));")
-        quickElement("a", quickElement("li", time_list, ""), gettext("6 a.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,6,0,0,0).strftime('" + gettext('TIME_INPUT_FORMATS') + "'));")
-        quickElement("a", quickElement("li", time_list, ""), gettext("Noon"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,12,0,0,0).strftime('" + gettext('TIME_INPUT_FORMATS') + "'));")
+        quickElement("a", quickElement("li", time_list, ""), gettext("Now"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + gettext('TIME_INPUT_FORMATS') + "'));");
+        quickElement("a", quickElement("li", time_list, ""), gettext("Midnight"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,0,0,0,0).strftime('" + gettext('TIME_INPUT_FORMATS') + "'));");
+        quickElement("a", quickElement("li", time_list, ""), gettext("6 a.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,6,0,0,0).strftime('" + gettext('TIME_INPUT_FORMATS') + "'));");
+        quickElement("a", quickElement("li", time_list, ""), gettext("Noon"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,12,0,0,0).strftime('" + gettext('TIME_INPUT_FORMATS') + "'));");
 
         cancel_p = quickElement('p', clock_box, '');
         cancel_p.className = 'calendar-cancel';
@@ -195,20 +195,19 @@ var DateTimeShortcuts = {
     openCalendar: function(num) {
         var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1+num)
         var cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName+num)
-	var inp = DateTimeShortcuts.calendarInputs[num];
+        var inp = DateTimeShortcuts.calendarInputs[num];
 
-	// Determine if the current value in the input has a valid date.
-	// If so, draw the calendar with that date's year and month.
-	if (inp.value) {
-	    var date_parts = inp.value.split('-');
-	    var year = date_parts[0];
-	    var month = parseFloat(date_parts[1]);
-	    if (year.match(/\d\d\d\d/) && month >= 1 && month <= 12) {
-		DateTimeShortcuts.calendars[num].drawDate(month, year);
-	    }
-	}
+        // Determine if the current value in the input has a valid date.
+        // If so, draw the calendar with that date's year and month.
+        if (inp.value) {
+            var date_parts = inp.value.split('-');
+            var year = date_parts[0];
+            var month = parseFloat(date_parts[1]);
+            if (year.match(/\d\d\d\d/) && month >= 1 && month <= 12) {
+                DateTimeShortcuts.calendars[num].drawDate(month, year);
+            }
+        }
 
-    
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
         if (getStyle(document.body,'direction')!='rtl') {
@@ -244,7 +243,7 @@ var DateTimeShortcuts = {
         format = format.replace('\n', '\\n');
         format = format.replace('\t', '\\t');
         format = format.replace("'", "\\'");
-        return "function(y, m, d) { DateTimeShortcuts.calendarInputs["+num+"].value = new Date(y, m-1, d).strftime('"+format+"');document.getElementById(DateTimeShortcuts.calendarDivName1+"+num+").style.display='none';}"
+        return "function(y, m, d) { DateTimeShortcuts.calendarInputs["+num+"].value = new Date(y, m-1, d).strftime('"+format+"');document.getElementById(DateTimeShortcuts.calendarDivName1+"+num+").style.display='none';}";
     },
     handleCalendarQuickLink: function(num, offset) {
        var d = new Date();
