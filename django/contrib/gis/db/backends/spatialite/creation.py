@@ -24,8 +24,7 @@ class SpatiaLiteCreation(DatabaseCreation):
         self.connection.settings_dict["NAME"] = test_database_name
         can_rollback = self._rollback_works()
         self.connection.settings_dict["SUPPORTS_TRANSACTIONS"] = can_rollback
-        # Need to load the SpatiaLite library and initializatin SQL before running `syncdb`.
-        self.connection.load_spatialite()
+        # Need to load the SpatiaLite initialization SQL before running `syncdb`.
         self.load_spatialite_sql()
         call_command('syncdb', verbosity=verbosity, interactive=False, database=self.connection.alias)
 

@@ -51,8 +51,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     name = 'spatialite'
     spatialite = True
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
-    valid_aggregates = dict([(k, None) for k in
-                             ('Extent', 'Union')])
+    valid_aggregates = dict([(k, None) for k in ('Extent', 'Union')])
 
     Adapter = SpatiaLiteAdapter
 
@@ -112,10 +111,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         super(DatabaseOperations, self).__init__()
         self.connection = connection
 
-        # Load the spatialite library (must be done before getting the
-        # SpatiaLite version).
-        self.connection.load_spatialite()
-
+        # Determine the version of the SpatiaLite library.
         try:
             vtup = self.spatialite_version_tuple()
             version = vtup[1:]
@@ -269,7 +265,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         """
         Returns the SpatiaLite-specific SQL for the given lookup value
         [a tuple of (alias, column, db_type)], lookup type, lookup
-        value, and the model field.
+        value, the model field, and the quoting function.
         """
         alias, col, db_type = lvalue
 
