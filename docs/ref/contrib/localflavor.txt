@@ -50,6 +50,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Germany_
     * Iceland_
     * India_
+    * Ireland_
     * Italy_
     * Japan_
     * Kuwait_
@@ -94,6 +95,7 @@ Here's an example of how to use them::
 .. _The Netherlands: `The Netherlands (nl)`_
 .. _Iceland: `Iceland (is\_)`_
 .. _India: `India (in\_)`_
+.. _Ireland: `Ireland (ie)`_
 .. _Italy: `Italy (it)`_
 .. _Japan: `Japan (jp)`_
 .. _Kuwait: `Kuwait (kw)`_
@@ -372,6 +374,13 @@ India (``in_``)
 
     A ``Select`` widget that uses a list of Indian states/territories as its
     choices.
+
+Ireland (``ie``)
+================
+
+.. class:: ie.forms.IECountySelect
+
+    A ``Select`` widget that uses a list of Irish Counties as its choices.
 
 Italy (``it``)
 ==============
