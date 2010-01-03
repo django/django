@@ -232,6 +232,16 @@ party packages, or that you wrote yourself, you should ensure that the
 information, see
 :ref:`template tag thread safety considerations<template_tag_thread_safety>`.
 
+Test runner exit status code
+----------------------------
+
+The exit status code of the test runners (``tests/runtests.py`` and ``python
+manage.py test``) no longer represents the number of failed tests, since a
+failure of 256 or more tests resulted in a wrong exit status code.  The exit
+status code for the test runner is now 0 for success (no failing tests) and 1
+for any number of test failures.  If needed, the number of test failures can be
+found at the end of the test runner's output.
+
 .. _deprecated-features-1.2:
 
 Features deprecated in 1.2
@@ -471,12 +481,12 @@ Models can now use a 64 bit :class:`~django.db.models.BigIntegerField` type.
 Fast Failure for Tests
 ----------------------
 
-The :djadmin:`test` subcommand of ``django-admin.py``, and the ``runtests.py`` 
+The :djadmin:`test` subcommand of ``django-admin.py``, and the ``runtests.py``
 script used to run Django's own test suite, support a new ``--failfast`` option.
-When specified, this option causes the test runner to exit after encountering 
-a failure instead of continuing with the test run.  In addition, the handling 
-of ``Ctrl-C`` during a test run has been improved to trigger a graceful exit 
-from the test run that reports details of the tests run before the interruption.        
+When specified, this option causes the test runner to exit after encountering
+a failure instead of continuing with the test run.  In addition, the handling
+of ``Ctrl-C`` during a test run has been improved to trigger a graceful exit
+from the test run that reports details of the tests run before the interruption.
 
 Improved localization
 ---------------------

@@ -17,7 +17,7 @@ class Command(BaseCommand):
     def handle(self, *test_labels, **options):
         from django.conf import settings
         from django.test.utils import get_runner
-        
+
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
         failfast = options.get('failfast', False)
@@ -25,10 +25,10 @@ class Command(BaseCommand):
 
         # Some custom test runners won't accept the failfast flag, so let's make sure they accept it before passing it to them
         if 'failfast' in test_runner.func_code.co_varnames:
-            failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, 
+            failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive,
                                    failfast=failfast)
         else:
             failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive)
 
         if failures:
-            sys.exit(failures)
+            sys.exit(bool(failures))
