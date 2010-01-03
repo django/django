@@ -19,8 +19,21 @@ development or deployment currently using or targeting Django 1.1.
 For full details on the new features, backwards incompatibilities, and
 deprecated features in the 1.1 branch, see the :ref:`releases-1.1`.
 
+Backwards-incompatible changes in 1.1.2
+=======================================
+
+Test runner exit status code
+----------------------------
+
+The exit status code of the test runners (``tests/runtests.py`` and ``python
+manage.py test``) no longer represents the number of failed tests, since a
+failure of 256 or more tests resulted in a wrong exit status code.  The exit
+status code for the test runner is now 0 for success (no failing tests) and 1
+for any number of test failures.  If needed, the number of test failures can be
+found at the end of the test runner's output.
+
 One new feature
----------------
+===============
 
 Ordinarily, a point release would not include new features, but in the
 case of Django 1.1.2, we have made an exception to this rule. Django
