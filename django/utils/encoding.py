@@ -131,12 +131,21 @@ def iri_to_uri(iri):
 
     Returns an ASCII string containing the encoded result.
     """
-    # The list of safe characters here is constructed from the printable ASCII
-    # characters that are not explicitly excluded by the list at the end of
-    # section 3.1 of RFC 3987.
+    # The list of safe characters here is constructed from the "reserved" and
+    # "unreserved" characters specified in sections 2.2 and 2.3 of RFC 3986:
+    #     reserved    = gen-delims / sub-delims
+    #     gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@"
+    #     sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
+    #                   / "*" / "+" / "," / ";" / "="
+    #     unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
+    # Of the unreserved characters, urllib.quote already considers all but
+    # the ~ safe.
+    # The % character is also added to the list of safe characters here, as the
+    # end of section 3.1 of RFC 3987 specifically mentions that % must not be
+    # converted.
     if iri is None:
         return iri
-    return urllib.quote(smart_str(iri), safe='/#%[]=:;$&()+,!?*')
+    return urllib.quote(smart_str(iri), safe="/#%[]=:;$&()+,!?*@'~")
 
 
 # The encoding of the default system locale but falls back to the
