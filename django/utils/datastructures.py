@@ -1,3 +1,5 @@
+from types import GeneratorType
+
 from django.utils.copycompat import deepcopy
 
 
@@ -65,6 +67,11 @@ class SortedDict(dict):
     def __init__(self, data=None):
         if data is None:
             data = {}
+        elif isinstance(data, GeneratorType):
+            # Unfortunately we need to be able to read a generator twice.  Once
+            # to get the data into self with our super().__init__ call and a
+            # second time to setup keyOrder correctly
+            data = list(data)
         super(SortedDict, self).__init__(data)
         if isinstance(data, dict):
             self.keyOrder = data.keys()
