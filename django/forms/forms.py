@@ -3,7 +3,6 @@ Form classes
 """
 
 from django.core.exceptions import ValidationError
-from django.core.validators import ComplexValidator
 from django.utils.copycompat import deepcopy
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape
@@ -283,31 +282,6 @@ class BaseForm(StrAndUnicode):
                 self._errors[name] = self.error_class(e.messages)
                 if name in self.cleaned_data:
                     del self.cleaned_data[name]
-
-        # Run complex validators after the fields have been cleaned since they
-        # need access to all_values.
-        for name, field in self.fields.items():
-            if not name in self.cleaned_data:
-                continue
-            failed = False
-            for v in field.validators:
-                # Skip noncomplex validators, they have already been run on the field.
-                if not isinstance(v, ComplexValidator):
-                    continue
-                try:
-                    v(self.cleaned_data[name], all_values=self.cleaned_data)
-                except ValidationError, e:
-                    failed = True
-                    error_list = self._errors.setdefault(name, self.error_class())
-                    if hasattr(e, 'code') and e.code in field.error_messages:
-                        message = field.error_messages[e.code]
-                        if e.params:
-                            message = message % e.params
-                        error_list.append(message)
-                    else:
-                        error_list.extend(e.messages)
-            if failed:
-                del self.cleaned_data[name]
         try:
             self.cleaned_data = self.clean()
         except ValidationError, e:

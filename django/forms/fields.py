@@ -130,19 +130,16 @@ class Field(object):
             return
         errors = []
         for v in self.validators:
-            # don't run complex validators since they need all_values
-            # and must therefore be run on the form level
-            if not isinstance(v, validators.ComplexValidator):
-                try:
-                    v(value)
-                except ValidationError, e:
-                    if hasattr(e, 'code') and e.code in self.error_messages:
-                        message = self.error_messages[e.code]
-                        if e.params:
-                            message = message % e.params
-                        errors.append(message)
-                    else:
-                        errors.extend(e.messages)
+            try:
+                v(value)
+            except ValidationError, e:
+                if hasattr(e, 'code') and e.code in self.error_messages:
+                    message = self.error_messages[e.code]
+                    if e.params:
+                        message = message % e.params
+                    errors.append(message)
+                else:
+                    errors.extend(e.messages)
         if errors:
             raise ValidationError(errors)
 

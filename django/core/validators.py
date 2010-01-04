@@ -135,26 +135,3 @@ class MaxLengthValidator(BaseValidator):
     message = _(u'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).')
     code = 'max_length'
 
-
-class ComplexValidator(object):
-    def get_value(self, name, all_values, obj):
-        assert all_values or obj, "Either all_values or obj must be supplied"
-
-        if all_values:
-            return all_values.get(name, None)
-        if obj:
-            return getattr(obj, name, None)
-        
-
-    def __call__(self, value, all_values={}, obj=None):
-        raise NotImplementedError()
-
-class RequiredIfOtherFieldBlank(ComplexValidator):
-    def __init__(self, other_field):
-        self.other_field = other_field
-
-    def __call__(self, value, all_values={}, obj=None):
-        if self.get_value(self.other_field, all_values, obj) in EMPTY_VALUES:
-            if value in EMPTY_VALUES:
-                raise ValidationError('This field is required if %s is blank.' % self.other_field)
-

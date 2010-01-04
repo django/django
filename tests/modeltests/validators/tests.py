@@ -9,8 +9,7 @@ from django.core.validators import (
         validate_integer, validate_email, validate_slug, validate_ipv4_address,
         validate_comma_separated_integer_list, MaxValueValidator,
         MinValueValidator, MaxLengthValidator, MinLengthValidator,
-        RequiredIfOtherFieldBlank, URLValidator, BaseValidator,
-        RegexValidator,
+        URLValidator, BaseValidator, RegexValidator,
 )
 
 now = datetime.now()
@@ -152,33 +151,4 @@ test_counter = 0
 for validator, value, expected in SIMPLE_VALIDATORS_VALUES:
     setattr(TestSimpleValidators, *get_simple_test_func(validator, expected, value, test_counter))
     test_counter += 1
-
-class TestComplexValidators(TestCase):
-    pass
-
-COMPLEX_VALIDATORS_VALUES = (
-    #(validator, value, all_values, obj, expected),
-    (RequiredIfOtherFieldBlank('other'), 'given', {'other': 'given'}, None, None),
-    (RequiredIfOtherFieldBlank('other'), '', {'other': 'given'}, None, None),
-    (RequiredIfOtherFieldBlank('other'), 'given', {}, None, AssertionError),
-    (RequiredIfOtherFieldBlank('other'), '', {}, None, AssertionError),
-    (RequiredIfOtherFieldBlank('other'), '', {'other': ''}, None, ValidationError),
-)
-
-def get_complex_test_func(validator, expected, value, all_values, obj, num):
-    if isinstance(expected, type) and issubclass(expected, Exception):
-        test_mask = 'test_%s_raises_error_%d'
-        def test_func(self):
-            self.assertRaises(expected, validator, value, all_values=all_values, obj=obj)
-    else:
-        test_mask = 'test_%s_%d'
-        def test_func(self):
-            self.assertEqual(expected, validator(value, all_values=all_values, obj=obj))
-    test_name = test_mask % (validator.__class__.__name__, num)
-    return test_name, test_func
-
-test_counter = {}
-for validator, value, all_values, obj, expected in COMPLEX_VALIDATORS_VALUES:
-    num = test_counter[validator.__class__.__name__] = test_counter.setdefault(validator.__class__.__name__, 0) + 1
-    setattr(TestComplexValidators, *get_complex_test_func(validator, expected, value, all_values, obj, num))
 

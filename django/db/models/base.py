@@ -799,26 +799,6 @@ class Model(object):
             except ValidationError, e:
                 errors[f.name] = e.messages
 
-        # run complex validators after the fields have been cleaned since they
-        # need access to model_instance.
-        for f in self._meta.fields:
-            if f.name in errors:
-                continue
-
-            value = getattr(self, f.attname)
-            for v in f.validators:
-                if isinstance(v, validators.ComplexValidator):
-                    try:
-                        v(value, obj=self)
-                    except ValidationError, e:
-                        error_list = errors.setdefault(f.name, [])
-                        if hasattr(e, 'code') and e.code in f.error_messages:
-                            message = f.error_messages[e.code]
-                            if e.params:
-                                message = message % e.params
-                            error_list.append(message)
-                        else:
-                            error_list.extend(e.messages)
         # Form.clean() is run even if other validation fails, so do the
         # same with Model.validate() for consistency.
         try:

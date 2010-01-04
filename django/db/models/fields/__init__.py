@@ -176,19 +176,16 @@ class Field(object):
 
         errors = []
         for v in self.validators:
-            # Don't run complex validators since they need the model instance
-            # and must therefore be run on the model level.
-            if not isinstance(v, validators.ComplexValidator):
-                try:
-                    v(value)
-                except exceptions.ValidationError, e:
-                    if hasattr(e, 'code') and e.code in self.error_messages:
-                        message = self.error_messages[e.code]
-                        if e.params:
-                            message = message % e.params
-                        errors.append(message)
-                    else:
-                        errors.extend(e.messages)
+            try:
+                v(value)
+            except exceptions.ValidationError, e:
+                if hasattr(e, 'code') and e.code in self.error_messages:
+                    message = self.error_messages[e.code]
+                    if e.params:
+                        message = message % e.params
+                    errors.append(message)
+                else:
+                    errors.extend(e.messages)
         if errors:
             raise exceptions.ValidationError(errors)
 
