@@ -9,7 +9,7 @@ from django.template import Template
 
 def post_form_response():
     resp = HttpResponse(content="""
-<html><body><form method="POST"><input type="text" /></form></body></html>
+<html><body><form method="post"><input type="text" /></form></body></html>
 """, mimetype="text/html")
     return resp
 
