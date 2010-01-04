@@ -19,7 +19,6 @@ class RelatedGeoModelTest(unittest.TestCase):
             loc = Location.objects.create(point=Point(lon, lat))
             c = City.objects.create(name=name, state=state, location=loc)
 
-    @no_oracle # TODO: Fix select_related() problems w/Oracle and pagination.
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
         qs1 = City.objects.all()
@@ -34,7 +33,6 @@ class RelatedGeoModelTest(unittest.TestCase):
                 self.assertEqual(Point(lon, lat), c.location.point)
 
     @no_mysql
-    @no_oracle # Pagination problem is implicated in this test as well.
     def test03_transform_related(self):
         "Testing the `transform` GeoQuerySet method on related geographic models."
         # All the transformations are to state plane coordinate systems using

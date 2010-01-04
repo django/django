@@ -37,7 +37,7 @@ class CalendarPlugin(DatabrowsePlugin):
             return [mark_safe(u'%s%s/%s/%s/%s/%s/' % (
                 easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
-                d.year,
+                str(d.year),
                 datetime_safe.new_date(d).strftime('%b').lower(),
                 d.day))]
 

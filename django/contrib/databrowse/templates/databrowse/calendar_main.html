@@ -10,7 +10,7 @@
 
 <ul class="objectlist">
 {% for year in date_list %}
-<li class="{% cycle 'odd' 'even' %}"><a href="{{ year.year }}/">{{ year.year }}</a></li>
+<li class="{% cycle 'odd' 'even' %}"><a href="{{ year|date:"Y" }}/">{{ year|date:"Y" }}</a></li>
 {% endfor %}
 </ul>
 

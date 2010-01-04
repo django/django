@@ -162,7 +162,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
     failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, failfast=failfast,
                            extra_tests=extra_tests)
     if failures:
-        sys.exit(failures)
+        sys.exit(bool(failures))
 
     # Restore the old settings.
     settings.INSTALLED_APPS = old_installed_apps

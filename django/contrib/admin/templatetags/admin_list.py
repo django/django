@@ -247,8 +247,8 @@ def date_hierarchy(cl):
             return {
                 'show': True,
                 'choices': [{
-                    'link': link({year_field: year.year}),
-                    'title': year.year
+                    'link': link({year_field: str(year.year)}),
+                    'title': str(year.year),
                 } for year in years]
             }
 date_hierarchy = register.inclusion_tag('admin/date_hierarchy.html')(date_hierarchy)

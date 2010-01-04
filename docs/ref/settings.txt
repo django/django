@@ -219,7 +219,7 @@ SQLite. This can be configured using the following::
 
     DATABASES = {
         'default': {
-            'BACKEND': 'django.db.backends.sqlite3',
+            'ENGINE': 'django.db.backends.sqlite3',
             'NAME': 'mydatabase'
         }
     }

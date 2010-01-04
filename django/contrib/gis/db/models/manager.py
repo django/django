@@ -10,7 +10,10 @@ class GeoManager(Manager):
     use_for_related_fields = True
 
     def get_query_set(self):
-        return GeoQuerySet(model=self.model)
+        qs = GeoQuerySet(self.model)
+        if self._db is not None:
+            qs = qs.using(self._db)
+        return qs
 
     def area(self, *args, **kwargs):
         return self.get_query_set().area(*args, **kwargs)

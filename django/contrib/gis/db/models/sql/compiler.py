@@ -191,8 +191,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         if self.connection.ops.oracle or getattr(self.query, 'geo_values', False):
             # We resolve the rest of the columns if we're on Oracle or if
             # the `geo_values` attribute is defined.
-            for value, field in izip(row[index_start:], fields):
-                values.append(self.query.convert_values(value, field, self.connection))
+            for value, field in map(None, row[index_start:], fields):
+                values.append(self.query.convert_values(value, field, connection=self.connection))
         else:
             values.extend(row[index_start:])
         return tuple(values)

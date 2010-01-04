@@ -4,7 +4,7 @@ USA-specific Form helpers
 
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.forms.fields import Field, RegexField, Select
+from django.forms.fields import Field, RegexField, Select, CharField
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 import re
@@ -21,7 +21,7 @@ class USZipCodeField(RegexField):
         super(USZipCodeField, self).__init__(r'^\d{5}(?:-\d{4})?$',
             max_length=None, min_length=None, *args, **kwargs)
 
-class USPhoneNumberField(Field):
+class USPhoneNumberField(CharField):
     default_error_messages = {
         'invalid': u'Phone numbers must be in XXX-XXX-XXXX format.',
     }

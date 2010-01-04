@@ -19,7 +19,7 @@ from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
 
-re_formatchars = re.compile(r'(?<!\\)([aAbBdDfFgGhHiIjlLmMnNOPrsStTUwWyYzZ])')
+re_formatchars = re.compile(r'(?<!\\)([aAbBcdDfFgGhHiIjlLmMnNOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
 
 class Formatter(object):
@@ -104,6 +104,11 @@ class TimeFormat(Formatter):
         "Seconds; i.e. '00' to '59'"
         return u'%02d' % self.data.second
 
+    def u(self):
+        "Microseconds"
+        return self.data.microsecond
+
+
 class DateFormat(TimeFormat):
     year_days = [None, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
 
@@ -117,6 +122,13 @@ class DateFormat(TimeFormat):
     def b(self):
         "Month, textual, 3 letters, lowercase; e.g. 'jan'"
         return MONTHS_3[self.data.month]
+
+    def c(self):
+        """
+        ISO 8601 Format
+        Example : '2008-01-02T10:30:00.000123'
+        """
+        return self.data.isoformat(' ')
 
     def d(self):
         "Day of the month, 2 digits with leading zeros; i.e. '01' to '31'"

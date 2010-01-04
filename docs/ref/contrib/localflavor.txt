@@ -50,13 +50,17 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Germany_
     * Iceland_
     * India_
+    * Indonesia_
+    * Ireland_
     * Italy_
     * Japan_
+    * Kuwait_
     * Mexico_
     * `The Netherlands`_
     * Norway_
     * Peru_
     * Poland_
+    * Portugal_
     * Romania_
     * Slovakia_
     * `South Africa`_
@@ -65,6 +69,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Switzerland_
     * `United Kingdom`_
     * `United States of America`_
+    * Uruguay_
 
 The ``django.contrib.localflavor`` package also includes a ``generic`` subpackage,
 containing useful code that is not specific to one particular country or culture.
@@ -92,12 +97,16 @@ Here's an example of how to use them::
 .. _The Netherlands: `The Netherlands (nl)`_
 .. _Iceland: `Iceland (is\_)`_
 .. _India: `India (in\_)`_
+.. _Indonesia: `Indonesia (id)`_
+.. _Ireland: `Ireland (ie)`_
 .. _Italy: `Italy (it)`_
 .. _Japan: `Japan (jp)`_
+.. _Kuwait: `Kuwait (kw)`_
 .. _Mexico: `Mexico (mx)`_
 .. _Norway: `Norway (no)`_
 .. _Peru: `Peru (pe)`_
 .. _Poland: `Poland (pl)`_
+.. _Portugal: `Portugal (pt)`_
 .. _Romania: `Romania (ro)`_
 .. _Slovakia: `Slovakia (sk)`_
 .. _South Africa: `South Africa (za)`_
@@ -106,6 +115,7 @@ Here's an example of how to use them::
 .. _Switzerland: `Switzerland (ch)`_
 .. _United Kingdom: `United Kingdom (uk)`_
 .. _United States of America: `United States of America (us)`_
+.. _Uruguay: `Uruguay (uy)`_
 
 Adding flavors
 ==============
@@ -369,6 +379,46 @@ India (``in_``)
     A ``Select`` widget that uses a list of Indian states/territories as its
     choices.
 
+Ireland (``ie``)
+================
+
+.. class:: ie.forms.IECountySelect
+
+    A ``Select`` widget that uses a list of Irish Counties as its choices.
+
+Indonesia (``id``)
+==================
+
+.. class:: id.forms.IDPostCodeField
+
+    A form field that validates input as an Indonesian post code field.
+
+.. class:: id.forms.IDProvinceSelect
+
+    A ``Select`` widget that uses a list of Indonesian provinces as its choices.
+
+.. class:: id.forms.IDPhoneNumberField
+
+    A form field that validates input as an Indonesian telephone number.
+
+.. class:: id.forms.IDLicensePlatePrefixSelect
+
+    A ``Select`` widget that uses a list of Indonesian license plate
+    prefix code as its choices.
+
+.. class:: id.forms.IDLicensePlateField
+
+    A form field that validates input as an Indonesian vehicle license plate.
+
+.. class:: id.forms.IDNationalIdentityNumberField
+
+    A form field that validates input as an Indonesian national identity
+    number (`NIK`_/KTP). The output will be in the format of
+    'XX.XXXX.DDMMYY.XXXX'. Dots or spaces can be used in the input to break
+    down the numbers.
+
+.. _NIK: http://en.wikipedia.org/wiki/Indonesian_identity_card
+
 Italy (``it``)
 ==============
 
@@ -408,6 +458,18 @@ Japan (``jp``)
 
     A ``Select`` widget that uses a list of Japanese prefectures as its choices.
 
+Kuwait (``kw``)
+===============
+
+.. class:: kw.forms.KWCivilIDNumberField
+
+    A form field that validates input as a Kuwaiti Civil ID number. A valid
+    Civil ID number must obey the following rules:
+
+    * The number consist of 12 digits.
+    * The birthdate of the person is a valid date.
+    * The calculated checksum equals to the last digit of the Civil ID.
+
 Mexico (``mx``)
 ===============
 
@@ -438,31 +500,31 @@ Norway (``no``)
 Peru (``pe``)
 =============
 
-.. class:: pt.forms.PEDNIField
+.. class:: pe.forms.PEDNIField
 
     A form field that validates input as a DNI (Peruvian national identity)
     number.
 
-.. class:: pt.forms.PERUCField
+.. class:: pe.forms.PERUCField
 
     A form field that validates input as an RUC (Registro Unico de
     Contribuyentes) number. Valid RUC numbers have 11 digits.
 
-.. class:: pt.forms.PEDepartmentSelect
+.. class:: pe.forms.PEDepartmentSelect
 
     A ``Select`` widget that uses a list of Peruvian Departments as its choices.
 
 Poland (``pl``)
 ===============
 
-.. class:: pl.forms.PLNationalIdentificationNumberField
+.. class:: pl.forms.PLPESELField
 
     A form field that validates input as a Polish national identification number
     (PESEL_).
 
 .. _PESEL: http://en.wikipedia.org/wiki/PESEL
 
-.. class:: pl.forms.PLNationalBusinessRegisterField
+.. class:: pl.forms.PLREGONField
 
     A form field that validates input as a Polish National Official Business
     Register Number (REGON_), having either seven or nine digits. The checksum
@@ -476,21 +538,34 @@ Poland (``pl``)
     A form field that validates input as a Polish postal code. The valid format
     is XX-XXX, where X is a digit.
 
-.. class:: pl.forms.PLTaxNumberField
+.. class:: pl.forms.PLNIPField
 
     A form field that validates input as a Polish Tax Number (NIP). Valid
     formats are XXX-XXX-XX-XX or XX-XX-XXX-XXX. The checksum algorithm used
     for NIPs is documented at http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
 
-.. class:: pl.forms.PLAdministrativeUnitSelect
+.. class:: pl.forms.PLCountySelect
 
     A ``Select`` widget that uses a list of Polish administrative units as its
     choices.
 
-.. class:: pl.forms.PLVoivodeshipSelect
+.. class:: pl.forms.PLProvinceSelect
 
     A ``Select`` widget that uses a list of Polish voivodeships (administrative
     provinces) as its choices.
+
+Portugal (``pt``)
+=================
+
+.. class:: pt.forms.PTZipCodeField
+
+    A form field that validates input as a Portuguese zip code.
+
+.. class:: pt.forms.PTPhoneNumberField
+
+    A form field that validates input as a Portuguese phone number.
+    Valid numbers have 9 digits (may include spaces) or start by 00
+    or + (international).
 
 Romania (``ro``)
 ================
@@ -738,3 +813,15 @@ United States of America (``us``)
 
     A model field that forms represent as a ``forms.USStateField`` field and
     stores the two-letter U.S. state abbreviation in the database.
+
+Uruguay (``uy``)
+================
+
+.. class:: uy.forms.UYCIField
+
+    A field that validates Uruguayan 'Cedula de identidad' (CI) numbers.
+
+.. class:: uy.forms.UYDepartamentSelect
+
+    A ``Select`` widget that uses a list of  Uruguayan departaments as its
+    choices.

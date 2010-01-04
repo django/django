@@ -60,9 +60,9 @@ MultiValueDictKeyError: "Key 'lastname' not found in <MultiValueDict: {'position
 >>> d.setlist('lastname', ['Holovaty', 'Willison'])
 >>> d.getlist('lastname')
 ['Holovaty', 'Willison']
->>> d.values() 
+>>> d.values()
 ['Developer', 'Simon', 'Willison']
->>> list(d.itervalues()) 
+>>> list(d.itervalues())
 ['Developer', 'Simon', 'Willison']
 
 ### SortedDict #################################################################
@@ -94,6 +94,9 @@ True
 'not one'
 >>> d.pop('one', 'missing')
 'missing'
+
+>>> SortedDict((i, i) for i in xrange(3))
+{0: 0, 1: 1, 2: 2}
 
 We don't know which item will be popped in popitem(), so we'll just check that
 the number of keys has decreased.

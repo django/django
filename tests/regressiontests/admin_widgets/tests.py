@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.admin import widgets
 from unittest import TestCase
 from django.test import TestCase as DjangoTestCase
+from django.db.models import DateField
 import models
 
 class AdminFormfieldForDBFieldTests(TestCase):
@@ -89,7 +90,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
     def testFormfieldOverrides(self):
         self.assertFormfield(models.Event, 'start_date', forms.TextInput,
-                             formfield_overrides={'widget': forms.TextInput})
+                             formfield_overrides={DateField: {'widget': forms.TextInput}})
 
     def testFieldWithChoices(self):
         self.assertFormfield(models.Member, 'gender', forms.Select)

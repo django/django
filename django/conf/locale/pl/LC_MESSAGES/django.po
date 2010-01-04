@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-23 12:55+0100\n"
+"POT-Creation-Date: 2009-12-30 08:54+0100\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -223,7 +223,7 @@ msgstr "chiński tradycyjny"
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Usunięto %(count)d %(items)s."
 
-#: contrib/admin/actions.py:67 contrib/admin/options.py:1073
+#: contrib/admin/actions.py:67 contrib/admin/options.py:1075
 msgid "Are you sure?"
 msgstr "Jesteś pewien?"
 
@@ -314,94 +314,94 @@ msgstr "logi"
 msgid "None"
 msgstr "brak"
 
-#: contrib/admin/options.py:540
+#: contrib/admin/options.py:554
 #, python-format
 msgid "Changed %s."
 msgstr "Zmieniono %s"
 
-#: contrib/admin/options.py:540 contrib/admin/options.py:550
+#: contrib/admin/options.py:554 contrib/admin/options.py:564
 #: contrib/comments/templates/comments/preview.html:16 forms/models.py:385
 #: forms/models.py:598
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/options.py:545
+#: contrib/admin/options.py:559
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:549
+#: contrib/admin/options.py:563
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Zmieniono %(list)s w %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:554
+#: contrib/admin/options.py:568
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Usunięto %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:558
+#: contrib/admin/options.py:572
 msgid "No fields changed."
 msgstr "Żadne pole nie zmienione."
 
-#: contrib/admin/options.py:620 contrib/auth/admin.py:68
+#: contrib/admin/options.py:634 contrib/auth/admin.py:68
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
 
-#: contrib/admin/options.py:624 contrib/admin/options.py:657
+#: contrib/admin/options.py:638 contrib/admin/options.py:671
 #: contrib/auth/admin.py:77
 msgid "You may edit it again below."
 msgstr "Możesz ponownie edytować wpis poniżej."
 
-#: contrib/admin/options.py:634 contrib/admin/options.py:667
+#: contrib/admin/options.py:648 contrib/admin/options.py:681
 #, python-format
 msgid "You may add another %s below."
 msgstr "Możesz dodać nowy wpis %s poniżej."
 
-#: contrib/admin/options.py:655
+#: contrib/admin/options.py:669
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
 
-#: contrib/admin/options.py:663
+#: contrib/admin/options.py:677
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" dodane pomyślnie. Możesz edytować ponownie wpis poniżej."
 
-#: contrib/admin/options.py:714
+#: contrib/admin/options.py:728
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Wykonanie akcji wymaga wybrania obiektów. Żaden obiekt nie został zmieniony."
 
-#: contrib/admin/options.py:728
+#: contrib/admin/options.py:742
 msgid "No action selected."
 msgstr "Nie wybrano akcji."
 
-#: contrib/admin/options.py:808
+#: contrib/admin/options.py:822
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj %s"
 
-#: contrib/admin/options.py:840 contrib/admin/options.py:1051
+#: contrib/admin/options.py:848 contrib/admin/options.py:1053
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
 
-#: contrib/admin/options.py:905
+#: contrib/admin/options.py:913
 #, python-format
 msgid "Change %s"
 msgstr "Zmień %s"
 
-#: contrib/admin/options.py:950
+#: contrib/admin/options.py:958
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
-#: contrib/admin/options.py:986
+#: contrib/admin/options.py:994
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -409,12 +409,12 @@ msgstr[0] "%(count)s %(name)s został pomyślnie zmieniony."
 msgstr[1] "%(count)s %(name)s zostały pomyślnie zmienione."
 msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
 
-#: contrib/admin/options.py:1066
+#: contrib/admin/options.py:1068
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" usunięty pomyślnie."
 
-#: contrib/admin/options.py:1103
+#: contrib/admin/options.py:1105
 #, python-format
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
@@ -546,9 +546,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Wystąpił niespodziewany błąd. Raport został wysłany e-mailem "
-"administratorowi strony i powinien zostać wkrótce naprawiony. Dziękujemy za "
-"cierpliwość."
+"Wystąpił niespodziewany błąd. Został on zgłoszony e-mailem administratorowi "
+"strony i powinien zostać wkrótce naprawiony. Dziękujemy za cierpliwość."
 
 #: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"

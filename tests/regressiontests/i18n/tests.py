@@ -1,15 +1,17 @@
+# -*- encoding: utf-8 -*-
 import sys
 import decimal
 import datetime
 
 from django.template import Template, Context
 from django.conf import settings
-from django.utils.formats import get_format, date_format, number_format, localize
+from django.utils.formats import get_format, date_format, time_format, number_format, localize, localize_input
 from django.utils.numberformat import format
 from django.test import TestCase, client
-from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy
+from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, to_locale
 
-from forms import I18nForm, SelectDateForm, SelectDateWidget
+from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
+
 
 class TranslationTests(TestCase):
 
@@ -80,6 +82,23 @@ class TranslationTests(TestCase):
         finally:
             deactivate()
 
+    def test_to_locale(self):
+        """
+        Tests the to_locale function and the special case of Serbian Latin
+        (refs #12230 and r11299)
+        """
+        self.assertEqual(to_locale('en-us'), 'en_US')
+        self.assertEqual(to_locale('sr-lat'), 'sr_Lat')
+
+    def test_to_language(self):
+        """
+        Test the to_language function
+        """
+        from django.utils.translation.trans_real import to_language
+        self.assertEqual(to_language('en_US'), 'en-us')
+        self.assertEqual(to_language('sr_Lat'), 'sr-lat')
+
+
 class FormattingTests(TestCase):
 
     def setUp(self):
@@ -90,8 +109,10 @@ class FormattingTests(TestCase):
         self.f = 99999.999
         self.d = datetime.date(2009, 12, 31)
         self.dt = datetime.datetime(2009, 12, 31, 20, 50)
+        self.t = datetime.time(10, 15, 48)
         self.ctxt = Context({
             'n': self.n,
+            't': self.t,
             'd': self.d,
             'dt': self.dt,
             'f': self.f
@@ -102,10 +123,10 @@ class FormattingTests(TestCase):
         settings.USE_I18N = self._use_i18n
         settings.USE_L10N = self._use_l10n
         settings.USE_THOUSAND_SEPARATOR = self._use_thousand_separator
-    
+
     def test_locale_independent(self):
         """
-        Localization of dates and numbers
+        Localization of numbers
         """
         settings.USE_L10N = True
         settings.USE_THOUSAND_SEPARATOR = False
@@ -118,6 +139,10 @@ class FormattingTests(TestCase):
         self.assertEqual(u'-66666.6', format(-66666.666, decimal_sep='.', decimal_pos=1))
         self.assertEqual(u'-66666.0', format(int('-66666'), decimal_sep='.', decimal_pos=1))
 
+        # date filter
+        self.assertEqual(u'31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
+        self.assertEqual(u'⌚ 10:15', Template('{{ t|time:"⌚ H:i" }}').render(self.ctxt))
+
     def test_l10n_disabled(self):
         """
         Catalan locale with format i18n disabled translations will be used,
@@ -129,6 +154,7 @@ class FormattingTests(TestCase):
             self.assertEqual('N j, Y', get_format('DATE_FORMAT'))
             self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual('.', get_format('DECIMAL_SEPARATOR'))
+            self.assertEqual(u'10:15 a.m.', time_format(self.t))
             self.assertEqual(u'des. 31, 2009', date_format(self.d))
             self.assertEqual(u'desembre 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual(u'12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
@@ -143,6 +169,7 @@ class FormattingTests(TestCase):
             self.assertEqual(u'2009-12-31 20:50:00', Template('{{ dt }}').render(self.ctxt))
             self.assertEqual(u'66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
             self.assertEqual(u'100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+            self.assertEqual(u'10:15 a.m.', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'12/31/2009 8:50 p.m.', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
 
@@ -168,7 +195,7 @@ class FormattingTests(TestCase):
             self.assertEqual(datetime.date(2009, 12, 31), form2.cleaned_data['date_field'])
             self.assertEqual(
                 u'<select name="mydate_month" id="id_mydate_month">\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
-                SelectDateWidget().render('mydate', datetime.date(2009, 12, 31))
+                SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
         finally:
             deactivate()
@@ -183,6 +210,7 @@ class FormattingTests(TestCase):
             self.assertEqual('j \de F \de Y', get_format('DATE_FORMAT'))
             self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual(',', get_format('DECIMAL_SEPARATOR'))
+            self.assertEqual(u'10:15:48', time_format(self.t))
             self.assertEqual(u'31 de desembre de 2009', date_format(self.d))
             self.assertEqual(u'desembre del 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual(u'31/12/2009 20:50', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
@@ -209,6 +237,7 @@ class FormattingTests(TestCase):
             self.assertEqual(u'31 de desembre de 2009 a les 20:50', Template('{{ dt }}').render(self.ctxt))
             self.assertEqual(u'66666,67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
             self.assertEqual(u'100000,0', Template('{{ f|floatformat }}').render(self.ctxt))
+            self.assertEqual(u'10:15:48', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'31/12/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'31/12/2009 20:50', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
 
@@ -235,7 +264,7 @@ class FormattingTests(TestCase):
             self.assertEqual(datetime.date(2009, 12, 31), form4.cleaned_data['date_field'])
             self.assertEqual(
                 u'<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
-                SelectDateWidget().render('mydate', datetime.date(2009, 12, 31))
+                SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
         finally:
             deactivate()
@@ -300,7 +329,7 @@ class FormattingTests(TestCase):
             self.assertEqual(datetime.date(2009, 12, 31), form6.cleaned_data['date_field'])
             self.assertEqual(
                 u'<select name="mydate_month" id="id_mydate_month">\n<option value="1">January</option>\n<option value="2">February</option>\n<option value="3">March</option>\n<option value="4">April</option>\n<option value="5">May</option>\n<option value="6">June</option>\n<option value="7">July</option>\n<option value="8">August</option>\n<option value="9">September</option>\n<option value="10">October</option>\n<option value="11">November</option>\n<option value="12" selected="selected">December</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
-                SelectDateWidget().render('mydate', datetime.date(2009, 12, 31))
+                SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
         finally:
             deactivate()
@@ -320,6 +349,28 @@ class FormattingTests(TestCase):
         activate('es-us')
         try:
             self.assertEqual(u'31 de diciembre de 2009', date_format(self.d))
+        finally:
+            deactivate()
+
+    def test_localized_input(self):
+        """
+        Tests if form input is correctly localized
+        """
+        settings.USE_L10N = True
+        activate('de-at')
+        try:
+            form6 = CompanyForm({
+                'name': u'acme',
+                'date_added': datetime.datetime(2009, 12, 31, 6, 0, 0),
+            })
+            form6.save()
+            self.assertEqual(True, form6.is_valid())
+            self.assertEqual(
+                form6.as_ul(),
+                u'<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>'
+            )
+            self.assertEqual(localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)), '31.12.2009 06:00:00')
+            self.assertEqual(datetime.datetime(2009, 12, 31, 6, 0, 0), form6.cleaned_data['date_added'])
         finally:
             deactivate()
 
