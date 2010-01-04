@@ -238,3 +238,4 @@ More information
    custom
    forms
    moderation
+   example
