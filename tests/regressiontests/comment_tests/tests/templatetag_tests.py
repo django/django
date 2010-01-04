@@ -83,4 +83,15 @@ class CommentTemplateTagTests(CommentTestCase):
         ctx, out = self.render(t, author=author)
         self.assertEqual(out, "/cr/%s/%s/#c2-by-Joe Somebody" % (ct.id, author.id))
 
+    def testRenderCommentList(self, tag=None):
+        t = "{% load comments %}" + (tag or "{% render_comment_list for comment_tests.article a.id %}")
+        ctx, out = self.render(t, a=Article.objects.get(pk=1))
+        self.assert_(out.strip().startswith("<dl id=\"comments\">"))
+        self.assert_(out.strip().endswith("</dl>"))
+
+    def testRenderCommentListFromLiteral(self):
+        self.testRenderCommentList("{% render_comment_list for comment_tests.article 1 %}")
+
+    def testRenderCommentListFromObject(self):
+        self.testRenderCommentList("{% render_comment_list for a %}")
 

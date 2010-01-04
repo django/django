@@ -81,10 +81,10 @@ class BaseCommentNode(template.Node):
             object_pk    = smart_unicode(object_pk),
             site__pk     = settings.SITE_ID,
         )
-        
+
         # The is_public and is_removed fields are implementation details of the
         # built-in comment model's spam filtering system, so they might not
-        # be present on a custom comment model subclass. If they exist, we 
+        # be present on a custom comment model subclass. If they exist, we
         # should filter on them.
         field_names = [f.name for f in self.comment_model._meta.fields]
         if 'is_public' in field_names:
@@ -169,6 +169,46 @@ class RenderCommentFormNode(CommentFormNode):
         else:
             return ''
 
+class RenderCommentListNode(CommentListNode):
+    """Render the comment list directly"""
+
+    #@classmethod
+    def handle_token(cls, parser, token):
+        """Class method to parse render_comment_list and return a Node."""
+        tokens = token.contents.split()
+        if tokens[1] != 'for':
+            raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
+
+        # {% render_comment_list for obj %}
+        if len(tokens) == 3:
+            return cls(object_expr=parser.compile_filter(tokens[2]))
+
+        # {% render_comment_list for app.models pk %}
+        elif len(tokens) == 4:
+            return cls(
+                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                object_pk_expr = parser.compile_filter(tokens[3])
+            )
+    handle_token = classmethod(handle_token)
+
+    def render(self, context):
+        ctype, object_pk = self.get_target_ctype_pk(context)
+        if object_pk:
+            template_search_list = [
+                "comments/%s/%s/list.html" % (ctype.app_label, ctype.model),
+                "comments/%s/list.html" % ctype.app_label,
+                "comments/list.html"
+            ]
+            qs = self.get_query_set(context)
+            context.push()
+            liststr = render_to_string(template_search_list, {
+                "comment_list" : self.get_context_value_from_queryset(context, qs)
+            }, context)
+            context.pop()
+            return liststr
+        else:
+            return ''
+
 # We could just register each classmethod directly, but then we'd lose out on
 # the automagic docstrings-into-admin-docs tricks. So each node gets a cute
 # wrapper function that just exists to hold the docstring.
@@ -215,6 +255,24 @@ def get_comment_list(parser, token):
 
     """
     return CommentListNode.handle_token(parser, token)
+
+#@register.tag
+def render_comment_list(parser, token):
+    """
+    Render the comment list (as returned by ``{% get_comment_list %}``)
+    through the ``comments/list.html`` template
+
+    Syntax::
+
+        {% render_comment_list for [object] %}
+        {% render_comment_list for [app].[model] [object_id] %}
+
+    Example usage::
+
+        {% render_comment_list for event %}
+
+    """
+    return RenderCommentListNode.handle_token(parser, token)
 
 #@register.tag
 def get_comment_form(parser, token):
@@ -272,3 +330,4 @@ register.tag(get_comment_form)
 register.tag(render_comment_form)
 register.simple_tag(comment_form_target)
 register.simple_tag(get_comment_permalink)
+register.tag(render_comment_list)

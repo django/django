@@ -84,10 +84,33 @@ different ways you can specify which object to attach to:
        In the above, ``blog.entry`` is the app label and (lower-cased) model
        name of the model class.
 
-.. templatetag:: get_comment_list
-
 Displaying comments
 -------------------
+
+To display a list of comments, you can use the template tags
+:ttag:`render_comment_list` or :ttag:`get_comment_list`.
+
+.. templatetag:: render_comment_list
+
+Quickly rendering a comment list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The easiest way to display a list of comments for some object is by using
+:ttag:`render_comment_list`::
+
+    {% render_comment_list for [object] %}
+
+For example::
+
+    {% render_comment_list for event %}
+
+This will render comments using a template named ``comments/list.html``, a
+default version of which is included with Django.
+
+.. templatetag:: get_comment_list
+
+Rendering a custom comment list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To get the list of comments for some object, use :ttag:`get_comment_list`::
 

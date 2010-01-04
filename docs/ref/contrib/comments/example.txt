@@ -39,6 +39,18 @@ available in the context, then you can refer to it directly::
    {% get_comment_count for entry as comment_count %}
    <p>{{ comment_count }} comments have been posted.</p>
 
+Next, we can use the :ttag:`render_comment_list` tag, to render all comments
+to the given instance (``entry``) by using the ``comments/list.html`` template.
+
+   {% render_comment_list for entry %}
+
+Django will will look for the ``list.html`` under the following directories
+(for our example)::
+
+  comments/blog/post/list.html
+  comments/blog/list.html
+  comments/list.html
+
 To get a list of comments, we make use of the :ttag:`get_comment_list` tag.
 This tag's usage is very similar to the :ttag:`get_comment_count` tag. We
 need to remember that the :ttag:`get_comment_list` returns a list of comments
@@ -58,7 +70,7 @@ display the comments template available under your ``comments/form.html``.
 The other method gives you a chance to customize the form.
 
 The first method makes use of the :ttag:`render_comment_form` tag. It's usage
-too is similar to the other two tags we have discussed above::
+too is similar to the other three tags we have discussed above::
 
    {% render_comment_form for entry %}
 
@@ -74,6 +86,7 @@ tag called :ttag:`comment_form_target`. This tag on rendering gives the URL
 where the comment form is posted. Without any :ref:`customization
 <ref-contrib-comments-custom>`, :ttag:`comment_form_target` evaluates to
 ``/comments/post/``. We use this tag in the form's ``action`` attribute.
+
 The :ttag:`get_comment_form` tag renders a ``form`` for a model instance by
 creating a context variable. One can iterate over the ``form`` object to
 get individual fields. This gives you fine-grain control over the form::
