@@ -104,6 +104,44 @@ This returns a list of :class:`~django.contrib.comments.models.Comment` objects;
 see :ref:`the comment model documentation <ref-contrib-comments-models>` for
 details.
 
+.. templatetag:: get_comment_permalink
+
+Linking to comments
+-------------------
+
+To provide a permalink to a specific comment, use :ttag:`get_comment_permalink`::
+
+    {% get_comment_permalink comment_obj [format_string] %}
+
+By default, the named anchor that will be appended to the URL will be the letter
+'c' followed by the comment id, for example 'c82'. You may specify a custom
+format string if you wish to override this behavior::
+
+    {% get_comment_permalink comment "#c%(id)s-by-%(user_name)s"%}
+
+The format string is a standard python format string. Valid mapping keys
+include any attributes of the comment object.
+
+Regardless of whether you specify a custom anchor pattern, you must supply a
+matching named anchor at a suitable place in your template.
+
+For example::
+
+    {% for comment in comment_list %}
+        <a name="c{{ comment.id }}"></a>
+        <a href="{% get_comment_permalink comment %}">
+            permalink for comment #{{ forloop.counter }}
+        </a>
+        ...
+    {% endfor %}
+
+.. warning::
+
+    There's a known bug in Safari/Webkit which causes the named anchor to be
+    forgotten following a redirect. The practical impact for comments is that
+    the Safari/webkit browsers will arrive at the correct page but will not
+    scroll to the named anchor.
+
 .. templatetag:: get_comment_count
 
 Counting comments

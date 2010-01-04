@@ -252,8 +252,23 @@ def comment_form_target():
     """
     return comments.get_form_target()
 
+#@register.simple_tag
+def get_comment_permalink(comment, anchor_pattern=None):
+    """
+    Get the permalink for a comment, optionally specifying the format of the
+    named anchor to be appended to the end of the URL.
+
+    Example::
+        {{ get_comment_permalink comment "#c%(id)s-by-%(user_name)s" }}
+    """
+
+    if anchor_pattern:
+        return comment.get_absolute_url(anchor_pattern)
+    return comment.get_absolute_url()
+
 register.tag(get_comment_count)
 register.tag(get_comment_list)
 register.tag(get_comment_form)
 register.tag(render_comment_form)
 register.simple_tag(comment_form_target)
+register.simple_tag(get_comment_permalink)

@@ -1,5 +1,6 @@
 from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment
+from django.contrib.contenttypes.models import ContentType
 from django.template import Template, Context
 from regressiontests.comment_tests.models import Article, Author
 from regressiontests.comment_tests.tests import CommentTestCase
@@ -63,3 +64,23 @@ class CommentTemplateTagTests(CommentTestCase):
 
     def testGetCommentListFromObject(self):
         self.testGetCommentList("{% get_comment_list for a as cl %}")
+
+    def testGetCommentPermalink(self):
+        self.createSomeComments()
+        t = "{% load comments %}{% get_comment_list for comment_tests.author author.id as cl %}"
+        t += "{% get_comment_permalink cl.0 %}"
+        ct = ContentType.objects.get_for_model(Author)
+        author = Author.objects.get(pk=1)
+        ctx, out = self.render(t, author=author)
+        self.assertEqual(out, "/cr/%s/%s/#c2" % (ct.id, author.id))
+
+    def testGetCommentPermalinkFormatted(self):
+        self.createSomeComments()
+        t = "{% load comments %}{% get_comment_list for comment_tests.author author.id as cl %}"
+        t += "{% get_comment_permalink cl.0 '#c%(id)s-by-%(user_name)s' %}"
+        ct = ContentType.objects.get_for_model(Author)
+        author = Author.objects.get(pk=1)
+        ctx, out = self.render(t, author=author)
+        self.assertEqual(out, "/cr/%s/%s/#c2-by-Joe Somebody" % (ct.id, author.id))
+
+
