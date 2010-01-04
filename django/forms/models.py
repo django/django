@@ -9,7 +9,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, UnresolvableValidationError
 from django.core.validators import EMPTY_VALUES
 from util import ErrorList
 from forms import BaseForm, get_declared_fields
@@ -254,9 +254,13 @@ class BaseModelForm(BaseForm):
                     if k in self.cleaned_data:
                         del self.cleaned_data[k]
 
-            # what about fields that don't validate but aren't present on the form?
             if NON_FIELD_ERRORS in e.message_dict:
                 raise ValidationError(e.message_dict[NON_FIELD_ERRORS])
+
+            # there are errors on some fields not displayed in this form
+            if set(e.message_dict.keys()) - set(self.fields.keys() + [NON_FIELD_ERRORS]):
+                raise UnresolvableValidationError(e.message_dict)
+
 
         return self.cleaned_data
 

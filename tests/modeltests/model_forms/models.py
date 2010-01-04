@@ -1432,9 +1432,9 @@ False
 ...         exclude = ('quantity',)
 >>> form = PriceForm({'price': '6.00'})
 >>> form.is_valid()
-False
->>> form.errors
-{'quantity': [u'This field cannot be null.']}
+Traceback (most recent call last):
+  ...
+UnresolvableValidationError: {'quantity': [u'This field cannot be null.']}
 
 # Unique & unique together with null values
 >>> class BookForm(ModelForm):
