@@ -306,7 +306,7 @@ def comment_form_target():
 
     Example::
 
-        <form action="{% comment_form_target %}" method="POST">
+        <form action="{% comment_form_target %}" method="post">
     """
     return comments.get_form_target()
 

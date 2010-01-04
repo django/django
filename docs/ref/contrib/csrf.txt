@@ -49,7 +49,7 @@ To enable CSRF protection for your views, follow these steps:
     2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
        the ``<form>`` element if the form is for an internal URL, e.g.::
 
-           <form action="" method="POST">{% csrf_token %}
+           <form action="" method="post">{% csrf_token %}
 
        This should not be done for POST forms that target external URLs, since
        that would cause the CSRF token to be leaked, leading to a vulnerability.

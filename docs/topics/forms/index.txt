@@ -172,7 +172,7 @@ Forms are designed to work with the Django template language. In the above
 example, we passed our ``ContactForm`` instance to the template using the
 context variable ``form``. Here's a simple example template::
 
-    <form action="/contact/" method="POST">
+    <form action="/contact/" method="post">
     {{ form.as_p }}
     <input type="submit" value="Submit" />
     </form>
@@ -183,7 +183,7 @@ The form only outputs its own fields; it is up to you to provide the surrounding
 ``form.as_p`` will output the form with each form field and accompanying label
 wrapped in a paragraph. Here's the output for our example template::
 
-   <form action="/contact/" method="POST">
+   <form action="/contact/" method="post">
    <p><label for="id_subject">Subject:</label>
        <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
    <p><label for="id_message">Message:</label>
@@ -211,7 +211,7 @@ If the default generated HTML is not to your taste, you can completely customize
 the way a form is presented using the Django template language. Extending the
 above example::
 
-    <form action="/contact/" method="POST">
+    <form action="/contact/" method="post">
         <div class="fieldWrapper">
             {{ form.subject.errors }}
             <label for="id_subject">E-mail subject:</label>
@@ -263,7 +263,7 @@ If you're using the same HTML for each of your form fields, you can reduce
 duplicate code by looping through each field in turn using a ``{% for %}``
 loop::
 
-    <form action="/contact/" method="POST">
+    <form action="/contact/" method="post">
         {% for field in form %}
             <div class="fieldWrapper">
                 {{ field.errors }}
@@ -322,7 +322,7 @@ and visible fields independently: ``hidden_fields()`` and
 ``visible_fields()``. Here's a modification of an earlier example that uses
 these two methods::
 
-    <form action="/contact/" method="POST">
+    <form action="/contact/" method="post">
         {% for field in form.visible_fields %}
             <div class="fieldWrapper">
 
@@ -356,7 +356,7 @@ If your site uses the same rendering logic for forms in multiple places, you
 can reduce duplication by saving the form's loop in a standalone template and
 using the :ttag:`include` tag to reuse it in other templates::
 
-    <form action="/contact/" method="POST">
+    <form action="/contact/" method="post">
         {% include "form_snippet.html" %}
         <p><input type="submit" value="Send message" /></p>
     </form>
@@ -373,7 +373,7 @@ using the :ttag:`include` tag to reuse it in other templates::
 If the form object passed to a template has a different name within the
 context, you can alias it using the :ttag:`with` tag::
 
-    <form action="/comments/add/" method="POST">
+    <form action="/comments/add/" method="post">
         {% with comment_form as form %}
             {% include "form_snippet.html" %}
         {% endwith %}

@@ -218,7 +218,7 @@ you can use in the template::
 A complete form might look like::
 
     {% get_comment_form for event as form %}
-    <form action="{% comment_form_target %}" method="POST">
+    <form action="{% comment_form_target %}" method="post">
       {{ form }}
       <tr>
         <td></td>
@@ -239,7 +239,7 @@ You may have noticed that the above example uses another template tag --
 form. This will always return the correct URL that comments should be posted to;
 you'll always want to use it like above::
 
-    <form action="{% comment_form_target %}" method="POST">
+    <form action="{% comment_form_target %}" method="post">
 
 Redirecting after the comment post
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
