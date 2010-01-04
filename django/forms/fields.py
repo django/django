@@ -21,6 +21,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 from django.utils.formats import get_format
 
+# provide this import for backwards compatibility
+from django.core.validators import EMPTY_VALUES
+
 from util import ErrorList
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, \
         FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, \

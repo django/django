@@ -4,7 +4,8 @@ UY-specific form helpers.
 """
 import re
 
-from django.forms.fields import Select, RegexField, EMPTY_VALUES
+from django.core.validators import EMPTY_VALUES
+from django.forms.fields import Select, RegexField
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.localflavor.uy.util import get_validation_digit
