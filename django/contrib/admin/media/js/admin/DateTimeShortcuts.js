@@ -44,7 +44,7 @@ var DateTimeShortcuts = {
         var shortcuts_span = document.createElement('span');
         inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
         var now_link = document.createElement('a');
-        now_link.setAttribute('href', "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + gettext('TIME_INPUT_FORMATS') + "'));");
+        now_link.setAttribute('href', "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + get_format('TIME_INPUT_FORMATS')[0] + "'));");
         now_link.appendChild(document.createTextNode(gettext('Now')));
         var clock_link = document.createElement('a');
         clock_link.setAttribute('href', 'javascript:DateTimeShortcuts.openClock(' + num + ');');
@@ -80,10 +80,11 @@ var DateTimeShortcuts = {
         quickElement('h2', clock_box, gettext('Choose a time'));
         time_list = quickElement('ul', clock_box, '');
         time_list.className = 'timelist';
-        quickElement("a", quickElement("li", time_list, ""), gettext("Now"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + gettext('TIME_INPUT_FORMATS') + "'));");
-        quickElement("a", quickElement("li", time_list, ""), gettext("Midnight"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,0,0,0,0).strftime('" + gettext('TIME_INPUT_FORMATS') + "'));");
-        quickElement("a", quickElement("li", time_list, ""), gettext("6 a.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,6,0,0,0).strftime('" + gettext('TIME_INPUT_FORMATS') + "'));");
-        quickElement("a", quickElement("li", time_list, ""), gettext("Noon"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,12,0,0,0).strftime('" + gettext('TIME_INPUT_FORMATS') + "'));");
+        time_format = get_format('TIME_INPUT_FORMATS')[0];
+        quickElement("a", quickElement("li", time_list, ""), gettext("Now"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + time_format + "'));");
+        quickElement("a", quickElement("li", time_list, ""), gettext("Midnight"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,0,0,0,0).strftime('" + time_format + "'));");
+        quickElement("a", quickElement("li", time_list, ""), gettext("6 a.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,6,0,0,0).strftime('" + time_format + "'));");
+        quickElement("a", quickElement("li", time_list, ""), gettext("Noon"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,12,0,0,0).strftime('" + time_format + "'));");
 
         cancel_p = quickElement('p', clock_box, '');
         cancel_p.className = 'calendar-cancel';
@@ -236,7 +237,7 @@ var DateTimeShortcuts = {
         DateTimeShortcuts.calendars[num].drawNextMonth();
     },
     handleCalendarCallback: function(num) {
-        format = gettext('DATE_INPUT_FORMATS');
+        format = get_format('DATE_INPUT_FORMATS')[0];
         // the format needs to be escaped a little
         format = format.replace('\\', '\\\\');
         format = format.replace('\r', '\\r');
@@ -248,7 +249,7 @@ var DateTimeShortcuts = {
     handleCalendarQuickLink: function(num, offset) {
        var d = new Date();
        d.setDate(d.getDate() + offset)
-       DateTimeShortcuts.calendarInputs[num].value = d.strftime(gettext('DATE_INPUT_FORMATS'));
+       DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
        DateTimeShortcuts.dismissCalendar(num);
     },
     cancelEventPropagation: function(e) {
