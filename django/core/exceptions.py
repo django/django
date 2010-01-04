@@ -67,7 +67,7 @@ class BaseValidationError(Exception):
 class ValidationError(BaseValidationError):
     pass
 
-class  UnresolvableValidationError(BaseValidationError):
+class UnresolvableValidationError(BaseValidationError):
     """Validation error that cannot be resolved by the user."""
     pass
 
