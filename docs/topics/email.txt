@@ -408,7 +408,7 @@ settings file.
 The SMTP backend is the default configuration inherited by Django. If you
 want to specify it explicitly, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp'
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 .. admonition:: SMTPConnection objects
 
@@ -433,7 +433,7 @@ providing the ``stream`` keyword argument when constructing the connection.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.console'
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -451,7 +451,7 @@ the ``file_path`` keyword when creating a connection with
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased'
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
 
 This backend is not intended for use in production -- it is provided as a
@@ -470,7 +470,7 @@ be send.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = 'django.core.mail.backends.locmem'
+  EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
@@ -483,7 +483,7 @@ Dummy backend
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
 
-   EMAIL_BACKEND = 'django.core.mail.backends.dummy'
+   EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -495,7 +495,7 @@ Defining a custom e-mail backend
 
 If you need to change how e-mails are send you can write your own e-mail
 backend. The ``EMAIL_BACKEND`` setting in your settings file is then the
-Python import path for your backend.
+Python import path for your backend class.
 
 Custom e-mail backends should subclass ``BaseEmailBackend`` that is located in
 the ``django.core.mail.backends.base`` module. A custom e-mail backend must
@@ -503,7 +503,7 @@ implement the ``send_messages(email_messages)`` method. This method receives a
 list of :class:`~django.core.mail.EmailMessage` instances and returns the
 number of successfully delivered messages. If your backend has any concept of
 a persistent session or connection, you should also implement the ``open()``
-and ``close()`` methods. Refer to ``SMTPEmailBackend`` for a reference
+and ``close()`` methods. Refer to ``smtp.EmailBackend`` for a reference
 implementation.
 
 .. _topics-sending-multiple-emails:
