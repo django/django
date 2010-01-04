@@ -29,7 +29,12 @@ __all__ = (
     'ModelMultipleChoiceField',
 )
 
-def make_instance(form, instance, fields=None, exclude=None):
+def construct_instance(form, instance, fields=None, exclude=None):
+    """
+    Constructs and returns a model instance from the bound ``form``'s
+    ``cleaned_data``, but does not save the returned instance to the
+    database.
+    """
     from django.db import models
     opts = instance._meta
 
@@ -59,7 +64,19 @@ def make_instance(form, instance, fields=None, exclude=None):
 
     return instance
 
-def save_made_instance(form, instance, fields=None, commit=True, fail_message='saved'):
+def save_instance(form, instance, fields=None, fail_message='saved',
+                  commit=True, exclude=None, construct=True):
+    """
+    Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
+
+    If commit=True, then the changes to ``instance`` will be saved to the
+    database. Returns ``instance``.
+
+    If construct=False, assume ``instance`` has already been constructed and
+    just needs to be saved.
+    """
+    if construct:
+        instance = construct_instance(form, instance, fields, exclude)
     opts = instance._meta
     if form.errors:
         raise ValueError("The %s could not be %s because the data didn't"
@@ -82,18 +99,6 @@ def save_made_instance(form, instance, fields=None, commit=True, fail_message='s
         # saving of m2m data.
         form.save_m2m = save_m2m
     return instance
-
-
-def save_instance(form, instance, fields=None, fail_message='saved',
-                  commit=True, exclude=None):
-    """
-    Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
-
-    If commit=True, then the changes to ``instance`` will be saved to the
-    database. Returns ``instance``.
-    """
-    instance = make_instance(form, instance, fields, exclude)
-    return save_made_instance(form, instance, fields, commit, fail_message)
 
 def make_model_save(model, fields, fail_message):
     """Returns the save() method for a Form."""
@@ -242,7 +247,7 @@ class BaseModelForm(BaseForm):
 
     def clean(self):
         opts = self._meta
-        self.instance = make_instance(self, self.instance, opts.fields, opts.exclude)
+        self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
         try:
             self.instance.full_validate(exclude=self._errors.keys())
         except ValidationError, e:
@@ -276,7 +281,8 @@ class BaseModelForm(BaseForm):
             fail_message = 'created'
         else:
             fail_message = 'changed'
-        return save_made_instance(self, self.instance, self._meta.fields, commit, fail_message)
+        return save_instance(self, self.instance, self._meta.fields,
+                             fail_message, commit, construct=False)
 
     save.alters_data = True
 
