@@ -78,6 +78,12 @@ PALETTES = {
         'SQL_COLTYPE':  {},
         'SQL_KEYWORD':  {},
         'SQL_TABLE':    {},
+        'HTTP_INFO':         {},
+        'HTTP_SUCCESS':      {},
+        'HTTP_REDIRECT':     {},
+        'HTTP_BAD_REQUEST':  {},
+        'HTTP_NOT_FOUND':    {},
+        'HTTP_SERVER_ERROR': {},
     },
     DARK_PALETTE: {
         'ERROR':        { 'fg': 'red', 'opts': ('bold',) },
@@ -86,6 +92,12 @@ PALETTES = {
         'SQL_COLTYPE':  { 'fg': 'green' },
         'SQL_KEYWORD':  { 'fg': 'yellow' },
         'SQL_TABLE':    { 'opts': ('bold',) },
+        'HTTP_INFO':         { 'opts': ('bold',) },
+        'HTTP_SUCCESS':      { },
+        'HTTP_REDIRECT':     { 'fg': 'green' },
+        'HTTP_BAD_REQUEST':  { 'fg': 'red', 'opts': ('bold',) },
+        'HTTP_NOT_FOUND':    { 'fg': 'yellow' },
+        'HTTP_SERVER_ERROR': { 'fg': 'magenta', 'opts': ('bold',) },
     },
     LIGHT_PALETTE: {
         'ERROR':        { 'fg': 'red', 'opts': ('bold',) },
@@ -94,6 +106,12 @@ PALETTES = {
         'SQL_COLTYPE':  { 'fg': 'green' },
         'SQL_KEYWORD':  { 'fg': 'blue' },
         'SQL_TABLE':    { 'opts': ('bold',) },
+        'HTTP_INFO':         { 'opts': ('bold',) },
+        'HTTP_SUCCESS':      { },
+        'HTTP_REDIRECT':     { 'fg': 'green', 'opts': ('bold',) },
+        'HTTP_BAD_REQUEST':  { 'fg': 'red', 'opts': ('bold',) },
+        'HTTP_NOT_FOUND':    { 'fg': 'red' },
+        'HTTP_SERVER_ERROR': { 'fg': 'magenta', 'opts': ('bold',) },
     }
 }
 DEFAULT_PALETTE = DARK_PALETTE
@@ -117,7 +135,9 @@ def parse_color_setting(config_string):
     definition will augment the base palette definition.
 
     Valid roles:
-        'error', 'notice', 'sql_field', 'sql_coltype', 'sql_keyword', 'sql_table'
+        'error', 'notice', 'sql_field', 'sql_coltype', 'sql_keyword', 'sql_table',
+        'http_info', 'http_success', 'http_redirect', 'http_bad_request',
+        'http_not_found', 'http_server_error'
 
     Valid colors:
         'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'

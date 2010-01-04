@@ -15,6 +15,7 @@ import stat
 import sys
 import urllib
 
+from django.core.management.color import color_style
 from django.utils.http import http_date
 from django.utils._os import safe_join
 
@@ -557,6 +558,7 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
         # We set self.path to avoid crashes in log_message() on unsupported
         # requests (like "OPTIONS").
         self.path = ''
+        self.style = color_style()
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def get_environ(self):
@@ -608,7 +610,26 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
         # Don't bother logging requests for admin images or the favicon.
         if self.path.startswith(self.admin_media_prefix) or self.path == '/favicon.ico':
             return
-        sys.stderr.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
+
+        msg = "[%s] %s\n" % (self.log_date_time_string(), format % args)
+
+        # Utilize terminal colors, if available
+        if args[1][0] == '2':
+            # Put 2XX first, since it should be the common case
+            msg = self.style.HTTP_SUCCESS(msg)
+        elif args[1][0] == '1':
+            msg = self.style.HTTP_INFO(msg)
+        elif args[1][0] == '3':
+            msg = self.style.HTTP_REDIRECT(msg)
+        elif args[1] == '404':
+            msg = self.style.HTTP_NOT_FOUND(msg)
+        elif args[1][0] == '4':
+            msg = self.style.HTTP_BAD_REQUEST(msg)
+        else:
+            # Any 5XX, or any other response
+            msg = self.style.HTTP_SERVER_ERROR(msg)
+
+        sys.stderr.write(msg)
 
 class AdminMediaHandler(object):
     """
