@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
@@ -20,6 +20,11 @@ class UserCreationForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ("username",)
+
+    def clean(self):
+        # avoid check for blank=True on the model field
+        self.instance.password = UNUSABLE_PASSWORD
+        super(UserCreationForm, self).clean()
 
     def clean_username(self):
         username = self.cleaned_data["username"]
