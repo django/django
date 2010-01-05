@@ -12,6 +12,7 @@ import datastructures
 import itercompat
 
 from decorators import DecoratorFromMiddlewareTests
+from functional import FunctionalTestCase
 
 # We need this because "datastructures" uses sorted() and the tests are run in
 # the scope of this module.

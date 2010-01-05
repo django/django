@@ -167,9 +167,13 @@ def lazy(func, *resultclasses):
             for resultclass in resultclasses:
                 cls.__dispatch[resultclass] = {}
                 for (k, v) in resultclass.__dict__.items():
+                    # All __promise__ return the same wrapper method, but they
+                    # also do setup, inserting the method into the dispatch
+                    # dict.
+                    meth = cls.__promise__(resultclass, k, v)
                     if hasattr(cls, k):
                         continue
-                    setattr(cls, k, cls.__promise__(resultclass, k, v))
+                    setattr(cls, k, meth)
             cls._delegate_str = str in resultclasses
             cls._delegate_unicode = unicode in resultclasses
             assert not (cls._delegate_str and cls._delegate_unicode), "Cannot call lazy() with both str and unicode return types."
