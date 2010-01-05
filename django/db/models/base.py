@@ -715,9 +715,7 @@ class Model(object):
             if not getattr(self, '_adding', False) and self.pk is not None:
                 qs = qs.exclude(pk=self.pk)
 
-            # This cute trick with extra/values is the most efficient way to
-            # tell if a particular query returns any results.
-            if qs.extra(select={'a': 1}).values('a').order_by():
+            if qs.exists():
                 if len(unique_check) == 1:
                     key = unique_check[0]
                 else:
