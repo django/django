@@ -68,7 +68,7 @@ class ImprovedArticleWithParentLink(models.Model):
     article = models.OneToOneField(Article, parent_link=True)
 
 class BetterWriter(Writer):
-    pass
+    score = models.IntegerField()
 
 class WriterProfile(models.Model):
     writer = models.OneToOneField(Writer, primary_key=True)
@@ -555,6 +555,8 @@ inserted as 'initial' data in each Field.
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
 >>> f = TestArticleForm({'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': u'1', 'article': 'Hello.'}, instance=art)
+>>> f.errors
+{}
 >>> f.is_valid()
 True
 >>> test_art = f.save()
@@ -967,10 +969,20 @@ ValidationError: [u'Select a valid choice. 4 is not one of the available choices
 >>> ImprovedArticleWithParentLinkForm.base_fields.keys()
 []
 
->>> bw = BetterWriter(name=u'Joe Better')
+>>> bw = BetterWriter(name=u'Joe Better', score=10)
 >>> bw.save()
 >>> sorted(model_to_dict(bw).keys())
-['id', 'name', 'writer_ptr']
+['id', 'name', 'score', 'writer_ptr']
+
+>>> class BetterWriterForm(ModelForm):
+...     class Meta:
+...         model = BetterWriter
+>>> form = BetterWriterForm({'name': 'Some Name', 'score': 12})
+>>> form.is_valid()
+True
+>>> bw2 = form.save()
+>>> bw2.delete()
+
 
 >>> class WriterProfileForm(ModelForm):
 ...     class Meta:
@@ -1101,16 +1113,6 @@ True
 >>> instance.file.delete()
 
 >>> instance.delete()
-
-# Test the non-required FileField
-
->>> f = TextFileForm(data={'description': u'Assistance'})
->>> f.fields['file'].required = False
->>> f.is_valid()
-True
->>> instance = f.save()
->>> instance.file
-<FieldFile: None>
 
 >>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': SimpleUploadedFile('test3.txt', 'hello world')}, instance=instance)
 >>> f.is_valid()
@@ -1358,27 +1360,35 @@ __test__['API_TESTS'] += """
 ...    class Meta:
 ...        model = CommaSeparatedInteger
 
->>> f = CommaSeparatedIntegerForm().fields['field']
->>> f.clean('1,2,3')
-u'1,2,3'
->>> f.clean('1a,2')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter only digits separated by commas.']
->>> f.clean(',,,,')
-u',,,,'
->>> f.clean('1.2')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter only digits separated by commas.']
->>> f.clean('1,a,2')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter only digits separated by commas.']
->>> f.clean('1,,2')
-u'1,,2'
->>> f.clean('1')
-u'1'
+>>> f = CommaSeparatedIntegerForm({'field': '1,2,3'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'field': u'1,2,3'}
+>>> f = CommaSeparatedIntegerForm({'field': '1a,2'})
+>>> f.errors
+{'field': [u'Enter only digits separated by commas.']}
+>>> f = CommaSeparatedIntegerForm({'field': ',,,,'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'field': u',,,,'}
+>>> f = CommaSeparatedIntegerForm({'field': '1.2'})
+>>> f.errors
+{'field': [u'Enter only digits separated by commas.']}
+>>> f = CommaSeparatedIntegerForm({'field': '1,a,2'})
+>>> f.errors
+{'field': [u'Enter only digits separated by commas.']}
+>>> f = CommaSeparatedIntegerForm({'field': '1,,2'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'field': u'1,,2'}
+>>> f = CommaSeparatedIntegerForm({'field': '1'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'field': u'1'}
 
 # unique/unique_together validation
 
@@ -1415,13 +1425,16 @@ False
 >>> form._errors
 {'__all__': [u'Price with this Price and Quantity already exists.']}
 
+# This form is never valid because quantity is blank=False.
 >>> class PriceForm(ModelForm):
 ...     class Meta:
 ...         model = Price
 ...         exclude = ('quantity',)
 >>> form = PriceForm({'price': '6.00'})
 >>> form.is_valid()
-True
+Traceback (most recent call last):
+  ...
+UnresolvableValidationError: {'quantity': [u'This field cannot be null.']}
 
 # Unique & unique together with null values
 >>> class BookForm(ModelForm):

@@ -28,7 +28,7 @@ u'C1064AAB'
 >>> f.clean('C1064AABB')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 8 characters (it has 9).']
+ValidationError: [u'Ensure this value has at most 8 characters (it has 9).', u'Enter a postal code in the format NNNN or ANNNNAAA.']
 >>> f.clean('C1064AA')
 Traceback (most recent call last):
 ...
@@ -44,7 +44,7 @@ ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
 >>> f.clean('500')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 4 characters (it has 3).']
+ValidationError: [u'Ensure this value has at least 4 characters (it has 3).', u'Enter a postal code in the format NNNN or ANNNNAAA.']
 >>> f.clean('5PPP')
 Traceback (most recent call last):
 ...
@@ -78,7 +78,7 @@ u'C1064AAB'
 >>> f.clean('C1064AABB')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 8 characters (it has 9).']
+ValidationError: [u'Ensure this value has at most 8 characters (it has 9).', u'Enter a postal code in the format NNNN or ANNNNAAA.']
 >>> f.clean('C1064AA')
 Traceback (most recent call last):
 ...
@@ -94,7 +94,7 @@ ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
 >>> f.clean('500')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 4 characters (it has 3).']
+ValidationError: [u'Ensure this value has at least 4 characters (it has 3).', u'Enter a postal code in the format NNNN or ANNNNAAA.']
 >>> f.clean('5PPP')
 Traceback (most recent call last):
 ...

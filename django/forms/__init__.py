@@ -10,7 +10,7 @@ TODO:
     "This form field requires foo.js" and form.js_includes()
 """
 
-from util import ValidationError
+from django.core.exceptions import ValidationError
 from widgets import *
 from fields import *
 from forms import *

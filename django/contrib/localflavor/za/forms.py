@@ -2,8 +2,9 @@
 South Africa-specific Form helpers
 """
 
+from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.forms.fields import Field, RegexField, EMPTY_VALUES
+from django.forms.fields import Field, RegexField
 from django.utils.checksums import luhn
 from django.utils.translation import gettext as _
 import re

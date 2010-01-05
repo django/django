@@ -7,7 +7,7 @@ from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
+from django.utils.translation import ugettext_lazy as _, string_concat, ungettext, ugettext
 from django.utils.functional import curry
 from django.core import exceptions
 from django import forms
@@ -473,7 +473,7 @@ def create_many_related_manager(superclass, rel=False):
             if not rel.through._meta.auto_created:
                 opts = through._meta
                 raise AttributeError, "Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
-            new_obj = super(ManyRelatedManager, self).using(self.instance._state.db).create(**kwargs)
+            new_obj = super(ManyRelatedManager, self).create(**kwargs)
             self.add(new_obj)
             return new_obj
         create.alters_data = True
@@ -708,7 +708,10 @@ class ManyToManyRel(object):
 
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
-    description = ugettext_lazy("Foreign Key (type determined by related field)")
+    default_error_messages = {
+        'invalid': _('Model %(model)s with pk %(pk)r does not exist.')
+    }
+    description = _("Foreign Key (type determined by related field)")
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel, **kwargs):
         try:
             to_name = to._meta.object_name.lower()
@@ -730,6 +733,18 @@ class ForeignKey(RelatedField, Field):
         Field.__init__(self, **kwargs)
 
         self.db_index = True
+
+    def validate(self, value, model_instance):
+        if self.rel.parent_link:
+            return
+        super(ForeignKey, self).validate(value, model_instance)
+        if not value:
+            return
+        try:
+            self.rel.to._default_manager.get(**{self.rel.field_name:value})
+        except self.rel.to.DoesNotExist, e:
+            raise exceptions.ValidationError(
+                    self.error_messages['invalid'] % {'model': self.rel.to._meta.verbose_name, 'pk': value})
 
     def get_attname(self):
         return '%s_id' % self.name
@@ -812,7 +827,7 @@ class OneToOneField(ForeignKey):
     always returns the object pointed to (since there will only ever be one),
     rather than returning a list.
     """
-    description = ugettext_lazy("One-to-one relationship")
+    description = _("One-to-one relationship")
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True
         super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)
@@ -825,6 +840,12 @@ class OneToOneField(ForeignKey):
         if self.rel.parent_link:
             return None
         return super(OneToOneField, self).formfield(**kwargs)
+
+    def save_form_data(self, instance, data):
+        if isinstance(data, self.rel.to):
+            setattr(instance, self.name, data)
+        else:
+            setattr(instance, self.attname, data)
 
 def create_many_to_many_intermediary_model(field, klass):
     from django.db import models
@@ -866,7 +887,7 @@ def create_many_to_many_intermediary_model(field, klass):
     })
 
 class ManyToManyField(RelatedField, Field):
-    description = ugettext_lazy("Many-to-many relationship")
+    description = _("Many-to-many relationship")
     def __init__(self, to, **kwargs):
         try:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
@@ -886,7 +907,7 @@ class ManyToManyField(RelatedField, Field):
 
         Field.__init__(self, **kwargs)
 
-        msg = ugettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
+        msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
 
     def get_choices_default(self):

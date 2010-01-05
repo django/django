@@ -5,7 +5,7 @@ Swedish specific Form helpers
 import re
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from django.forms.fields import EMPTY_VALUES
+from django.core.validators import EMPTY_VALUES
 from django.contrib.localflavor.se.utils import (id_number_checksum,
     validate_id_birthday, format_personal_id_number, valid_organisation,
     format_organisation_number)

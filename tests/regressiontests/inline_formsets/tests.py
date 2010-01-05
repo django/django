@@ -81,7 +81,7 @@ class DeletionTests(TestCase):
         regression for #10750
         """
         # exclude some required field from the forms
-        ChildFormSet = inlineformset_factory(School, Child, exclude=['father', 'mother'])
+        ChildFormSet = inlineformset_factory(School, Child)
         school = School.objects.create(name=u'test')
         mother = Parent.objects.create(name=u'mother')
         father = Parent.objects.create(name=u'father')
@@ -89,13 +89,13 @@ class DeletionTests(TestCase):
             'child_set-TOTAL_FORMS': u'1',
             'child_set-INITIAL_FORMS': u'0',
             'child_set-0-name': u'child',
+            'child_set-0-mother': unicode(mother.pk),
+            'child_set-0-father': unicode(father.pk),
         }
         formset = ChildFormSet(data, instance=school)
         self.assertEqual(formset.is_valid(), True)
         objects = formset.save(commit=False)
-        for obj in objects:
-            obj.mother = mother
-            obj.father = father
-            obj.save()
+        self.assertEqual(school.child_set.count(), 0)
+        objects[0].save()
         self.assertEqual(school.child_set.count(), 1)
 

@@ -257,6 +257,17 @@ And here is a custom error message::
 In the `built-in Field classes`_ section below, each ``Field`` defines the
 error message keys it uses.
 
+``validators``
+~~~~~~~~~~~~~~
+.. versionadded:: 1.2
+
+.. attribute:: Field.validators
+
+The ``validators`` argument lets you provide a list of validation functions
+for this field.
+
+See the :ref:`validators documentation <validators>` for more information.
+
 Built-in ``Field`` classes
 --------------------------
 

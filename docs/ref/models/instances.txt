@@ -27,6 +27,31 @@ The keyword arguments are simply the names of the fields you've defined on your
 model. Note that instantiating a model in no way touches your database; for
 that, you need to ``save()``.
 
+Validating objects
+==================
+
+.. versionadded:: 1.2
+
+To validate your model, just call its ``full_validate()`` method:
+
+.. method:: Model.full_validate([exclude=[]])
+
+The optional ``exclude`` argument can contain a list of field names that should
+be omitted when validating. This method raises ``ValidationError`` containing a
+message dict with errors from all fields.
+
+To add your own validation logic, override the supplied ``validate()`` method:
+
+.. method:: Model.validate()
+
+The ``validate()`` method on ``Model`` by default checks for uniqueness of
+fields and group of fields that are declared to be unique so, remember to call
+``self.validate_unique()`` or the superclasses ``validate`` method if you want
+this validation to run.
+
+Any ``ValidationError`` raised in this method will be propagated in the
+``message_dict`` under ``NON_FIELD_ERRORS``.
+
 Saving objects
 ==============
 

@@ -2,8 +2,9 @@
 IT-specific Form helpers
 """
 
+from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.forms.fields import Field, RegexField, Select, EMPTY_VALUES
+from django.forms.fields import Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.contrib.localflavor.it.util import ssn_check_digit, vat_number_check_digit

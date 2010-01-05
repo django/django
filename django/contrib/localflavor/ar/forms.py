@@ -4,7 +4,8 @@ AR-specific Form helpers.
 """
 
 from django.forms import ValidationError
-from django.forms.fields import RegexField, CharField, Select, EMPTY_VALUES
+from django.core.validators import EMPTY_VALUES
+from django.forms.fields import RegexField, CharField, Select
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 

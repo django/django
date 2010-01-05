@@ -38,6 +38,7 @@ from formsets import tests as formset_tests
 from media import media_tests
 
 from fields import FieldsTests
+from validators import TestFieldWithValidators
 
 __test__ = {
     'extra_tests': extra_tests,

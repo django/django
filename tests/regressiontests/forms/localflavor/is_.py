@@ -15,11 +15,11 @@ u'230880-3449'
 >>> f.clean('230880343')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 10 characters (it has 9).']
+ValidationError: [u'Ensure this value has at least 10 characters (it has 9).', u'Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.']
 >>> f.clean('230880343234')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 11 characters (it has 12).']
+ValidationError: [u'Ensure this value has at most 11 characters (it has 12).', u'Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.']
 >>> f.clean('abcdefghijk')
 Traceback (most recent call last):
 ...
@@ -61,18 +61,18 @@ ValidationError: [u'Enter a valid value.']
 >>> f.clean('123456')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 7 characters (it has 6).']
+ValidationError: [u'Ensure this value has at least 7 characters (it has 6).', u'Enter a valid value.']
 >>> f.clean('123456555')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 8 characters (it has 9).']
+ValidationError: [u'Ensure this value has at most 8 characters (it has 9).', u'Enter a valid value.']
 >>> f.clean('abcdefg')
 Traceback (most recent call last):
 ValidationError: [u'Enter a valid value.']
 >>> f.clean(' 1234567 ')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 8 characters (it has 9).']
+ValidationError: [u'Ensure this value has at most 8 characters (it has 9).', u'Enter a valid value.']
 >>> f.clean(' 12367  ')
 Traceback (most recent call last):
 ...

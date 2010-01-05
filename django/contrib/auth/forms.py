@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
@@ -21,6 +21,12 @@ class UserCreationForm(forms.ModelForm):
         model = User
         fields = ("username",)
 
+    def clean(self):
+        # Fill the password field so model validation won't complain about it
+        # being blank. We'll set it with the real value below.
+        self.instance.password = UNUSABLE_PASSWORD
+        super(UserCreationForm, self).clean()
+
     def clean_username(self):
         username = self.cleaned_data["username"]
         try:
@@ -34,14 +40,8 @@ class UserCreationForm(forms.ModelForm):
         password2 = self.cleaned_data["password2"]
         if password1 != password2:
             raise forms.ValidationError(_("The two password fields didn't match."))
+        self.instance.set_password(password1)
         return password2
-
-    def save(self, commit=True):
-        user = super(UserCreationForm, self).save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
-        if commit:
-            user.save()
-        return user
 
 class UserChangeForm(forms.ModelForm):
     username = forms.RegexField(label=_("Username"), max_length=30, regex=r'^\w+$',

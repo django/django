@@ -2,6 +2,7 @@
 Form classes
 """
 
+from django.core.exceptions import ValidationError
 from django.utils.copycompat import deepcopy
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape
@@ -10,7 +11,7 @@ from django.utils.safestring import mark_safe
 
 from fields import Field, FileField
 from widgets import Media, media_property, TextInput, Textarea
-from util import flatatt, ErrorDict, ErrorList, ValidationError
+from util import flatatt, ErrorDict, ErrorList
 
 __all__ = ('BaseForm', 'Form')
 

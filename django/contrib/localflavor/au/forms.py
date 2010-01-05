@@ -2,9 +2,10 @@
 Australian-specific Form helpers
 """
 
+from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.forms.fields import Field, RegexField, Select, EMPTY_VALUES
-from django.forms.util import smart_unicode
+from django.forms.fields import Field, RegexField, Select
+from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 import re
 

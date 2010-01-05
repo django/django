@@ -3,7 +3,8 @@ import sys
 import os
 from itertools import izip
 import django.db.models.manager     # Imported to register signal handler.
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS
+from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
 from django.db.models.query import delete_objects, Q
@@ -12,9 +13,11 @@ from django.db.models.options import Options
 from django.db import connections, transaction, DatabaseError, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
+from django.utils.translation import ugettext_lazy as _
 import django.utils.copycompat as copy
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
+from django.utils.text import get_text_list, capfirst
 from django.conf import settings
 
 class ModelBase(type):
@@ -638,6 +641,180 @@ class Model(object):
 
     def prepare_database_save(self, unused):
         return self.pk
+
+    def validate(self):
+        """
+        Hook for doing any extra model-wide validation after clean() has been
+        called on every field. Any ValidationError raised by this method will
+        not be associated with a particular field; it will have a special-case
+        association with the field defined by NON_FIELD_ERRORS.
+        """
+        self.validate_unique()
+
+    def validate_unique(self):
+        unique_checks, date_checks = self._get_unique_checks()
+
+        errors = self._perform_unique_checks(unique_checks)
+        date_errors = self._perform_date_checks(date_checks)
+
+        for k, v in date_errors.items():
+             errors.setdefault(k, []).extend(v)
+
+        if errors:
+            raise ValidationError(errors)
+
+    def _get_unique_checks(self):
+        from django.db.models.fields import FieldDoesNotExist, Field as ModelField
+
+        unique_checks = list(self._meta.unique_together)
+        # these are checks for the unique_for_<date/year/month>
+        date_checks = []
+
+        # Gather a list of checks for fields declared as unique and add them to
+        # the list of checks. Again, skip empty fields and any that did not validate.
+        for f in self._meta.fields:
+            name = f.name
+            if f.unique:
+                unique_checks.append((name,))
+            if f.unique_for_date:
+                date_checks.append(('date', name, f.unique_for_date))
+            if f.unique_for_year:
+                date_checks.append(('year', name, f.unique_for_year))
+            if f.unique_for_month:
+                date_checks.append(('month', name, f.unique_for_month))
+        return unique_checks, date_checks
+
+
+    def _perform_unique_checks(self, unique_checks):
+        errors = {}
+
+        for unique_check in unique_checks:
+            # Try to look up an existing object with the same values as this
+            # object's values for all the unique field.
+
+            lookup_kwargs = {}
+            for field_name in unique_check:
+                f = self._meta.get_field(field_name)
+                lookup_value = getattr(self, f.attname)
+                if f.null and lookup_value is None:
+                    # no value, skip the lookup
+                    continue
+                if f.primary_key and not getattr(self, '_adding', False):
+                    # no need to check for unique primary key when editting 
+                    continue
+                lookup_kwargs[str(field_name)] = lookup_value
+
+            # some fields were skipped, no reason to do the check
+            if len(unique_check) != len(lookup_kwargs.keys()):
+                continue
+
+            qs = self.__class__._default_manager.filter(**lookup_kwargs)
+
+            # Exclude the current object from the query if we are editing an
+            # instance (as opposed to creating a new one)
+            if not getattr(self, '_adding', False) and self.pk is not None:
+                qs = qs.exclude(pk=self.pk)
+
+            # This cute trick with extra/values is the most efficient way to
+            # tell if a particular query returns any results.
+            if qs.extra(select={'a': 1}).values('a').order_by():
+                if len(unique_check) == 1:
+                    key = unique_check[0]
+                else:
+                    key = NON_FIELD_ERRORS
+                errors.setdefault(key, []).append(self.unique_error_message(unique_check))
+
+        return errors
+
+    def _perform_date_checks(self, date_checks):
+        errors = {}
+        for lookup_type, field, unique_for in date_checks:
+            lookup_kwargs = {}
+            # there's a ticket to add a date lookup, we can remove this special
+            # case if that makes it's way in
+            date = getattr(self, unique_for)
+            if lookup_type == 'date':
+                lookup_kwargs['%s__day' % unique_for] = date.day
+                lookup_kwargs['%s__month' % unique_for] = date.month
+                lookup_kwargs['%s__year' % unique_for] = date.year
+            else:
+                lookup_kwargs['%s__%s' % (unique_for, lookup_type)] = getattr(date, lookup_type)
+            lookup_kwargs[field] = getattr(self, field)
+
+            qs = self.__class__._default_manager.filter(**lookup_kwargs)
+            # Exclude the current object from the query if we are editing an
+            # instance (as opposed to creating a new one)
+            if not getattr(self, '_adding', False) and self.pk is not None:
+                qs = qs.exclude(pk=self.pk)
+
+            # This cute trick with extra/values is the most efficient way to
+            # tell if a particular query returns any results.
+            if qs.extra(select={'a': 1}).values('a').order_by():
+                errors.setdefault(field, []).append(
+                    self.date_error_message(lookup_type, field, unique_for)
+                )
+        return errors
+
+    def date_error_message(self, lookup_type, field, unique_for):
+        opts = self._meta
+        return _(u"%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
+            'field_name': unicode(capfirst(opts.get_field(field).verbose_name)),
+            'date_field': unicode(capfirst(opts.get_field(unique_for).verbose_name)),
+            'lookup': lookup_type,
+        }
+
+    def unique_error_message(self, unique_check):
+        opts = self._meta
+        model_name = capfirst(opts.verbose_name)
+
+        # A unique field
+        if len(unique_check) == 1:
+            field_name = unique_check[0]
+            field_label = capfirst(opts.get_field(field_name).verbose_name)
+            # Insert the error into the error dict, very sneaky
+            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': unicode(model_name),
+                'field_label': unicode(field_label)
+            }
+        # unique_together
+        else:
+            field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
+            field_labels = get_text_list(field_labels, _('and'))
+            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': unicode(model_name),
+                'field_label': unicode(field_labels)
+            }
+
+    def full_validate(self, exclude=[]):
+        """
+        Cleans all fields and raises ValidationError containing message_dict
+        of all validation errors if any occur.
+        """
+        errors = {}
+        for f in self._meta.fields:
+            if f.name in exclude:
+                continue
+            try:
+                setattr(self, f.attname, f.clean(getattr(self, f.attname), self))
+            except ValidationError, e:
+                errors[f.name] = e.messages
+
+        # Form.clean() is run even if other validation fails, so do the
+        # same with Model.validate() for consistency.
+        try:
+            self.validate()
+        except ValidationError, e:
+            if hasattr(e, 'message_dict'):
+                if errors:
+                    for k, v in e.message_dict.items():
+                        errors.set_default(k, []).extend(v)
+                else:
+                    errors = e.message_dict
+            else:
+                errors[NON_FIELD_ERRORS] = e.messages
+
+        if errors:
+            raise ValidationError(errors)
 
 
 ############################################

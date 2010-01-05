@@ -196,6 +196,17 @@ callable it will be called every time a new object is created.
 If ``False``, the field will not be editable in the admin or via forms
 automatically generated from the model class. Default is ``True``.
 
+``error_messages``
+------------------
+
+.. versionadded:: 1.2
+
+.. attribute:: Field.error_messages
+
+The ``error_messages`` argument lets you override the default messages that the
+field will raise. Pass in a dictionary with keys matching the error messages you
+want to override.
+
 ``help_text``
 -------------
 
@@ -283,6 +294,17 @@ will automatically create it using the field's attribute name, converting
 underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 
 .. _model-field-types:
+
+``validators``
+-------------------
+
+.. versionadded:: 1.2
+
+.. attribute:: Field.validators
+
+A list of validators to run for this field.See the :ref:`validators
+documentation <validators>` for more information.
+
 
 Field types
 ===========

@@ -3,6 +3,8 @@
 Form and field validation
 =========================
 
+.. versionchanged:: 1.2
+
 Form validation happens when the data is cleaned. If you want to customize
 this process, there are various places you can change, each one serving a
 different purpose. Three types of cleaning methods are run during form
@@ -20,13 +22,38 @@ If you detect multiple errors during a cleaning method and wish to signal all
 of them to the form submitter, it is possible to pass a list of errors to the
 ``ValidationError`` constructor.
 
-The three types of cleaning methods are:
+Most validation can be done using `validators`_ - simple helpers that can be
+reused easily. Validators are simple functions (or callables) that take a single
+argument and raise ``ValidationError`` on invalid input. Validators are run
+after the field's ``to_python`` and ``validate`` methods have been called.
 
-    * The ``clean()`` method on a Field subclass. This is responsible
-      for cleaning the data in a way that is generic for that type of field.
-      For example, a FloatField will turn the data into a Python ``float`` or
-      raise a ``ValidationError``. This method returns the clean data, which
-      is then inserted into the ``cleaned_data`` dictionary of the form.
+Validation of a Form is split into several steps, which can be customized or
+overridden:
+
+    * The ``to_python()`` method on a Field is the first step in every
+      validation. It coerces the value to correct datatype and raises
+      ``ValidationError`` if that is not possible. This method accepts the raw
+      value from the widget and returns the converted value. For example, a
+      FloatField will turn the data into a Python ``float`` or raise a
+      ``ValidationError``.
+
+    * The ``validate()`` method on a Field handles field-specific validation
+      that is not suitable for a validator, It takes a value that has been
+      coerced to correct datatype and raises ``ValidationError`` on any error.
+      This method does not return anything and shouldn't alter the value. You
+      should override it to handle validation logic that you can't or don't
+      want to put in a validator.
+
+    * The ``run_validators()`` method on a Field runs all of the field's
+      validators and aggregates all the errors into a single
+      ``ValidationError``. You shouldn't need to override this method.
+
+    * The ``clean()`` method on a Field subclass. This is responsible for
+      running ``to_python``, ``validate`` and ``run_validators`` in the correct
+      order and propagating their errors. If, at any time, any of the methods
+      raise ``ValidationError``, the validation stops and that error is raised.
+      This method returns the clean data, which is then inserted into the
+      ``cleaned_data`` dictionary of the form.
 
     * The ``clean_<fieldname>()`` method in a form subclass -- where
       ``<fieldname>`` is replaced with the name of the form field attribute.
@@ -141,35 +168,68 @@ Since it can sometimes be easier to put things into place by seeing each
 feature in use, here are a series of small examples that use each of the
 previous features.
 
+.. _validators:
+
+Using validators
+~~~~~~~~~~~~~~~~
+.. versionadded:: 1.2
+
+Django's form (and model) fields support use of simple utility functions and
+classes known as validators. These can passed to a field's constructor, via
+the field's ``validators`` argument, or defined on the Field class itself with
+the ``default_validators`` attribute.
+
+Simple validators can be used to validate values inside the field, let's have
+a look at Django's ``EmailField``::
+
+    class EmailField(CharField):
+        default_error_messages = {
+            'invalid': _(u'Enter a valid e-mail address.'),
+        }
+        default_validators = [validators.validate_email]
+
+As you can see, ``EmailField`` is just a ``CharField`` with customized error
+message and a validator that validates e-mail addresses. This can also be done
+on field definition so::
+
+    email = forms.EmailField()
+
+is equivalent to::
+
+    email = forms.CharField(validators=[validators.validate_email],
+            error_messages={'invalid': _(u'Enter a valid e-mail address.')})
+
+
 Form field default cleaning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let's firstly create a custom form field that validates its input is a string
-containing comma-separated e-mail addresses, with at least one address. We'll
-keep it simple and assume e-mail validation is contained in a function called
-``is_valid_email()``. The full class looks like this::
+containing comma-separated e-mail addresses. The full class looks like this::
 
     from django import forms
+    from django.core.validators import validate_email
 
     class MultiEmailField(forms.Field):
-        def clean(self, value):
-            """
-            Check that the field contains one or more comma-separated emails
-            and normalizes the data to a list of the email strings.
-            """
+        def to_python(self, value):
+            "Normalize data to a list of strings."
+
+            # Return an empty list if no input was given.
             if not value:
-                raise forms.ValidationError('Enter at least one e-mail address.')
-            emails = value.split(',')
-            for email in emails:
-                if not is_valid_email(email):
-                    raise forms.ValidationError('%s is not a valid e-mail address.' % email)
+                return []
+            return value.split(',')
 
-            # Always return the cleaned data.
-            return emails
+        def validate(self, value):
+            "Check if value consists only of valid emails."
 
-Every form that uses this field will have this ``clean()`` method run before
-anything else can be done with the field's data. This is cleaning that is
-specific to this type of field, regardless of how it is subsequently used.
+            # Use the parent's handling of required fields, etc.
+            super(MultiEmailField, self).validate(value)
+
+            for email in value:
+                validate_email(email)
+
+Every form that uses this field will have these methods run before anything
+else can be done with the field's data. This is cleaning that is specific to
+this type of field, regardless of how it is subsequently used.
 
 Let's create a simple ``ContactForm`` to demonstrate how you'd use this
 field::
@@ -183,7 +243,8 @@ field::
 
 Simply use ``MultiEmailField`` like any other form field. When the
 ``is_valid()`` method is called on the form, the ``MultiEmailField.clean()``
-method will be run as part of the cleaning process.
+method will be run as part of the cleaning process and it will, in turn, call
+the custom ``to_python()`` and ``validate()`` methods.
 
 Cleaning a specific field attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

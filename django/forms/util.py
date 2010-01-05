@@ -1,6 +1,10 @@
 from django.utils.html import conditional_escape
-from django.utils.encoding import smart_unicode, StrAndUnicode, force_unicode
+from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
+
+# Import ValidationError so that it can be imported from this
+# module to maintain backwards compatibility.
+from django.core.exceptions import ValidationError
 
 def flatatt(attrs):
     """
@@ -48,21 +52,3 @@ class ErrorList(list, StrAndUnicode):
     def __repr__(self):
         return repr([force_unicode(e) for e in self])
 
-class ValidationError(Exception):
-    def __init__(self, message):
-        """
-        ValidationError can be passed any object that can be printed (usually
-        a string) or a list of objects.
-        """
-        if isinstance(message, list):
-            self.messages = ErrorList([smart_unicode(msg) for msg in message])
-        else:
-            message = smart_unicode(message)
-            self.messages = ErrorList([message])
-
-    def __str__(self):
-        # This is needed because, without a __str__(), printing an exception
-        # instance would result in this:
-        # AttributeError: ValidationError instance has no attribute 'args'
-        # See http://www.python.org/doc/current/tut/node10.html#handling
-        return repr(self.messages)
