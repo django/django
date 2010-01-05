@@ -19,6 +19,7 @@ import django.utils.copycompat as copy
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
 from django.utils.formats import get_format
+from django.utils.functional import lazy
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget
@@ -49,9 +50,9 @@ def en_format(name):
     )
     return getattr(formats, name)
 
-DEFAULT_DATE_INPUT_FORMATS = en_format('DATE_INPUT_FORMATS')
-DEFAULT_TIME_INPUT_FORMATS = en_format('TIME_INPUT_FORMATS')
-DEFAULT_DATETIME_INPUT_FORMATS = en_format('DATETIME_INPUT_FORMATS')
+DEFAULT_DATE_INPUT_FORMATS = lazy(lambda: en_format('DATE_INPUT_FORMATS'), tuple, list)()
+DEFAULT_TIME_INPUT_FORMATS = lazy(lambda: en_format('TIME_INPUT_FORMATS'), tuple, list)()
+DEFAULT_DATETIME_INPUT_FORMATS = lazy(lambda: en_format('DATETIME_INPUT_FORMATS'), tuple, list)()
 
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
