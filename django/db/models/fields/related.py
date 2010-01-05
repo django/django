@@ -473,7 +473,7 @@ def create_many_related_manager(superclass, rel=False):
             if not rel.through._meta.auto_created:
                 opts = through._meta
                 raise AttributeError, "Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
-            new_obj = super(ManyRelatedManager, self).create(**kwargs)
+            new_obj = super(ManyRelatedManager, self).using(self.instance._state.db).create(**kwargs)
             self.add(new_obj)
             return new_obj
         create.alters_data = True
