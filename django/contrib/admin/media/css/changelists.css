@@ -228,6 +228,12 @@
     border-right: 1px solid #ddd;
 }
 
+.action_counter{
+    font-size: 11px;
+    margin: 0 0.5em;
+    display: none;
+}
+
 #changelist table input {
     margin: 0;
 }

@@ -1209,6 +1209,13 @@ class AdminActionsTest(TestCase):
         self.assertContains(response, msg)
         self.failUnlessEqual(Subscriber.objects.count(), 2)
 
+    def test_selection_counter(self):
+        """
+        Check if the selection counter is there.
+        """
+        response = self.client.get('/test_admin/admin/admin_views/subscriber/')
+        self.assertContains(response, '<span class="_acnt">0</span> of 2 subscribers selected')
+
 
 class TestCustomChangeList(TestCase):
     fixtures = ['admin-views-users.xml']

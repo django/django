@@ -2,4 +2,9 @@
 <div class="actions">
     {% for field in action_form %}<label>{{ field.label }} {{ field }}</label>{% endfor %}
     <button type="submit" class="button" title="{% trans "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}">{% trans "Go" %}</button>
+    {% if actions_selection_counter %}
+    <span class="action_counter">
+      {% blocktrans with cl.result_count as total_count %}<span class="_acnt">0</span> of {{ total_count }} {{ module_name }} selected{% endblocktrans %}
+    </span>
+    {% endif %}
 </div>

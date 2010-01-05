@@ -697,6 +697,12 @@ Controls where on the page the actions bar appears. By default, the admin
 changelist displays actions at the top of the page (``actions_on_top = True;
 actions_on_bottom = False``).
 
+.. attribute:: ModelAdmin.actions_selection_counter
+
+Controls whether a selection counter is display next to the action dropdown.
+By default, the admin changelist will display it
+(``actions_selection_counter = True``).
+
 .. attribute:: ModelAdmin.change_list_template
 
 Path to a custom template that will be used by the model objects "change list"

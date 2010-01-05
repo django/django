@@ -210,6 +210,7 @@ class ModelAdmin(BaseModelAdmin):
     action_form = helpers.ActionForm
     actions_on_top = True
     actions_on_bottom = False
+    actions_selection_counter = True
 
     def __init__(self, model, admin_site):
         self.model = model
@@ -1024,7 +1025,13 @@ class ModelAdmin(BaseModelAdmin):
         else:
             action_form = None
 
+        if cl.result_count == 1:
+            module_name = force_unicode(opts.verbose_name)
+        else:
+            module_name = force_unicode(opts.verbose_name_plural)
+
         context = {
+            'module_name': module_name,
             'title': cl.title,
             'is_popup': cl.is_popup,
             'cl': cl,
@@ -1035,6 +1042,7 @@ class ModelAdmin(BaseModelAdmin):
             'action_form': action_form,
             'actions_on_top': self.actions_on_top,
             'actions_on_bottom': self.actions_on_bottom,
+            'actions_selection_counter': self.actions_selection_counter,
         }
         context.update(extra_context or {})
         context_instance = template.RequestContext(request, current_app=self.admin_site.name)

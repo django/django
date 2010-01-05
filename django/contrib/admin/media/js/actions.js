@@ -1,10 +1,22 @@
 var Actions = {
     init: function() {
-        var selectAll = document.getElementById('action-toggle');
+        counterSpans = document.getElementsBySelector('span._acnt');
+        counterContainer = document.getElementsBySelector('span.action_counter');
+        actionCheckboxes = document.getElementsBySelector('tr input.action-select');
+        selectAll = document.getElementById('action-toggle');
+        for(var i = 0; i < counterContainer.length; i++) {
+            counterContainer[i].style.display = 'inline';
+        }
         if (selectAll) {
             selectAll.style.display = 'inline';
             addEvent(selectAll, 'click', function() {
                 Actions.checker(selectAll.checked);
+                Actions.counter();
+            });
+        }
+        for(var i = 0; i < actionCheckboxes.length; i++) {
+            addEvent(actionCheckboxes[i], 'click', function() {
+                Actions.counter();
             });
         }
         var changelistTable = document.getElementsBySelector('#changelist table')[0];
@@ -16,6 +28,7 @@ var Actions = {
                 if (target.className == 'action-select') {
                     var tr = target.parentNode.parentNode;
                     Actions.toggleRow(tr, target.checked);
+                    Actions.checked();
                 }
             });
         }
@@ -27,11 +40,24 @@ var Actions = {
             tr.className = tr.className.replace(' selected', '');
         }  
     },
+    checked: function() {
+        selectAll.checked = false;
+    },
     checker: function(checked) {
-        var actionCheckboxes = document.getElementsBySelector('tr input.action-select');
         for(var i = 0; i < actionCheckboxes.length; i++) {
             actionCheckboxes[i].checked = checked;
             Actions.toggleRow(actionCheckboxes[i].parentNode.parentNode, checked);
+        }
+    },
+    counter: function() {
+        counter = 0;
+        for(var i = 0; i < actionCheckboxes.length; i++) {
+            if(actionCheckboxes[i].checked){
+                counter++;
+            }
+        }
+        for(var i = 0; i < counterSpans.length; i++) {
+            counterSpans[i].innerHTML = counter;
         }
     }
 };
