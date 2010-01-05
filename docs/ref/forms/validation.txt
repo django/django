@@ -25,8 +25,7 @@ of them to the form submitter, it is possible to pass a list of errors to the
 Most validation can be done using `validators`_ - simple helpers that can be
 reused easily. Validators are simple functions (or callables) that take a single
 argument and raise ``ValidationError`` on invalid input. Validators are run
-inside the ``run_validators`` method that is called from ``Field.clean`` once
-the value is validated by the field's methods.
+after the field's ``to_python`` and ``validate`` methods have been called.
 
 Validation of a Form is split into several steps, which can be customized or
 overridden:
@@ -38,15 +37,16 @@ overridden:
       FloatField will turn the data into a Python ``float`` or raise a
       ``ValidationError``.
 
-    * Next step resides in ``validate()`` method. This is a method where all
-      field-specific validation, that cannot be abstracted into a validator,
-      should take place. It takes the value coerced to correct datatype and
-      raises ``ValidationError`` on any error. This method does not return
-      anything and shouldn't alter the value.
+    * The ``validate()`` method on a Field handles field-specific validation
+      that is not suitable for a validator, It takes the value coerced to
+      correct datatype and raises ``ValidationError`` on any error. This method
+      does not return anything and shouldn't alter the value. You should
+      override it to handle validation logic that you don't want to put in a
+      validator.
 
-    * Validators are run in the ``run_validators`` method. This method
-      aggregates all the errors from all validators run into a single
-      ``ValidationError``.
+    * The ``run_validators()`` method on a Field runs all of the field's
+      validators and aggregates all the errors into a single
+      ``ValidationError``. You shouldn't need to override this method.
 
     * The ``clean()`` method on a Field subclass. This is responsible for
       running ``to_python``, ``validate`` and ``run_validators`` in the correct
@@ -212,15 +212,15 @@ containing comma-separated e-mail addresses. The full class looks like this::
         def to_python(self, value):
             "Normalize data to a list of strings."
 
-            # return empty list on empty input
-            if not value: return []
-
+            # Return an empty list if no input was given.
+            if not value:
+                return []
             return value.split(',')
 
         def validate(self, value):
             "Check if value consists only of valid emails."
 
-            # check if value is given if the field is required
+            # Use the parent's handling of required fields, etc.
             super(MultiEmailField, self).validate(value)
 
             for email in value:
