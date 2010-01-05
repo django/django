@@ -182,6 +182,7 @@ Other batteries included
     * :ref:`Syndication feeds (RSS/Atom) <ref-contrib-syndication>`
     * :ref:`Unicode in Django <ref-unicode>`
     * :ref:`Web design helpers <ref-contrib-webdesign>`
+    * :ref:`Validators <ref-validators>`
 
 The Django open-source project
 ==============================

@@ -1,0 +1,145 @@
+.. _ref-validators:
+
+==========
+Validators
+==========
+
+.. versionadded:: 1.2
+
+Writing validators
+==================
+
+A validator is just a callable that takes a value, and raises a
+``ValidationError`` if it doesn't meet some criteria. They can be useful for
+re-using validation logic between different types of fields.
+
+For example, lets write a validator that only allows even numbers::
+
+    from django.core.exceptions import ValidationError
+    
+    def validate_even(value):
+        if value % 2 != 0:
+            raise ValidationError(u'%s is not an even number' % value)
+
+You can then added this to your model fields via the field's ``validators``
+argument::
+
+    from django.db import models
+
+    class MyModel(models.Model):
+        even_field = models.IntegerField(validators=[validate_even])
+
+Since values are converted to python before validators are run, you can even
+use the same validator with forms::
+
+    from django import forms
+
+    class MyForm(forms.Form):
+        even_field = forms.IntegerField(validators=[validate_even])
+
+How validators are run
+======================
+
+See the :ref:`form validation <ref-forms-validation>` for more information on
+how validators are run in forms, and :ref:`Validating objects <validating-objects>`
+for how they are run in models.
+
+Built-in validators
+===================
+
+Django has a collection of callable validators for use with model and form
+fields. Many of them are used internally, but they are available for use with
+your own fields too. They can be used in addition to, or in lieu of custom
+field.clean() methods.
+
+``RegexValidator``
+------------------
+
+.. class:: RegexValidator(regex=None, message=None, code=None)
+
+.. attribute:: regex=None
+
+The regular expression to search for the provided ``value``. Raises a
+``ValidationError`` if no match was found.
+
+.. attribute:: code='invalid'
+
+The error code to use if validation fails. Defaults to ``'invalid'``.
+
+.. attribute:: message=None
+
+The error message to use if ``regex`` doesn't match the provided ``value``.
+
+``URLValidator``
+----------------
+
+.. class:: URLValidator(verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT)
+
+A ``RegexValidaor`` that ensures a value looks like a URL, and optionally
+verifies that the URL actually exists. Raises an error code of ``'invalid'``
+if it doesn't look like a URL, and a code of ``'invalid_link'`` if it doesn't
+exist.
+
+.. attribute:: verify_exists=False
+
+If ``verify_exists`` is ``True``, this validator checks that the url actually
+exists.
+
+.. attribute:: validator_user_agent=URL_VALIDATOR_USER_AGENT
+
+If ``verify_exists`` is ``True``, use validator_user_agent as the User-agent
+for the request. Defaults to ``settings.URL_VALIDATOR_USER_AGENT``.
+
+``validate_email``
+------------------
+
+A ``RegexValidator`` instance that ensures a value looks like an email address.
+
+``validate_slug``
+-----------------
+
+A ``RegexValidator`` instance that ensures a value consists of only
+letters, numbers, underscores, or hyphens.
+
+``validate_ipv4_address``
+-------------------------
+
+A ``RegexValidator`` instance that ensures a value looks like an IPv4 address.
+
+``validate_comma_separated_integer_list``
+-----------------------------------------
+
+A ``RegexValidator`` instance that ensures a value is a comma separated list
+of integers.
+
+``MaxValueValidator``
+---------------------
+
+.. class:: MaxValueValidator(max_value)
+
+Raises a ``ValidationError`` with a code of ``'max_value'`` if ``value`` is
+greater than ``max_value``.
+
+``MinValueValidator``
+---------------------
+
+.. class:: MinValueValidator(min_value)
+
+Raises a ``ValidationError`` with a code of ``'min_value'`` if ``value`` is
+less than ``min_value``.
+
+``MaxLengthValidator``
+----------------------
+
+.. class:: MaxLengthValidator(max_length)
+
+Raises a ``ValidationError`` with a code of ``'max_length'`` if  the length of
+``value`` is greater than ``max_length``.
+
+``MinLengthValidator``
+----------------------
+
+.. class:: MinLengthValidator(min_length)
+
+Raises a ``ValidationError`` with a code of ``'min_length'`` if  the length of
+``value`` is less than ``min_length``.

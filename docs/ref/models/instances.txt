@@ -27,6 +27,8 @@ The keyword arguments are simply the names of the fields you've defined on your
 model. Note that instantiating a model in no way touches your database; for
 that, you need to ``save()``.
 
+.. _validating-objects:
+
 Validating objects
 ==================
 

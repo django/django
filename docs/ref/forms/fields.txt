@@ -266,7 +266,7 @@ error message keys it uses.
 The ``validators`` argument lets you provide a list of validation functions
 for this field.
 
-See the :ref:`validators documentation <validators>` for more information.
+See the :ref:`validators documentation <ref-validators>` for more information.
 
 Built-in ``Field`` classes
 --------------------------

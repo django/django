@@ -303,7 +303,7 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 .. attribute:: Field.validators
 
 A list of validators to run for this field.See the :ref:`validators
-documentation <validators>` for more information.
+documentation <ref-validators>` for more information.
 
 
 Field types
