@@ -21,7 +21,7 @@ For example, lets write a validator that only allows even numbers::
         if value % 2 != 0:
             raise ValidationError(u'%s is not an even number' % value)
 
-You can then added this to your model fields via the field's ``validators``
+You can then add this to your model fields via the field's ``validators``
 argument::
 
     from django.db import models
