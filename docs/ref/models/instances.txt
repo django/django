@@ -44,6 +44,13 @@ message dict with errors from all fields.
 
 To add your own validation logic, override the supplied ``validate()`` method:
 
+Note that ``full_validate`` will NOT be called automatically when you call
+your model's ``save()`` method. You will need to call it manually if you wish
+to run your model validators. This is for the purposes of backwards
+compatibility. However, if you are using a ``ModelForm``, it will call
+``full_validate`` for you, and present any errors along with the other form
+error messages.
+
 .. method:: Model.validate()
 
 The ``validate()`` method on ``Model`` by default checks for uniqueness of
