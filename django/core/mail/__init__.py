@@ -28,16 +28,17 @@ def get_connection(backend=None, fail_silently=False, **kwds):
     """
     path = backend or settings.EMAIL_BACKEND
     try:
-        mod = import_module(path)
+        mod_name, klass_name = path.rsplit('.', 1)
+        mod = import_module(mod_name)
     except ImportError, e:
-        raise ImproperlyConfigured(('Error importing email backend %s: "%s"'
-                                    % (path, e)))
+        raise ImproperlyConfigured(('Error importing email backend module %s: "%s"'
+                                    % (mod_name, e)))
     try:
-        cls = getattr(mod, 'EmailBackend')
+        klass = getattr(mod, klass_name)
     except AttributeError:
         raise ImproperlyConfigured(('Module "%s" does not define a '
-                                    '"EmailBackend" class' % path))
-    return cls(fail_silently=fail_silently, **kwds)
+                                    '"%s" class' % (mod_name, klass_name)))
+    return klass(fail_silently=fail_silently, **kwds)
 
 
 def send_mail(subject, message, from_email, recipient_list,

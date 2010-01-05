@@ -23,7 +23,7 @@ class USZipCodeField(RegexField):
 
 class USPhoneNumberField(CharField):
     default_error_messages = {
-        'invalid': u'Phone numbers must be in XXX-XXX-XXXX format.',
+        'invalid': _('Phone numbers must be in XXX-XXX-XXXX format.'),
     }
 
     def clean(self, value):
@@ -85,7 +85,7 @@ class USStateField(Field):
     abbreviation for the given state.
     """
     default_error_messages = {
-        'invalid': u'Enter a U.S. state or territory.',
+        'invalid': _('Enter a U.S. state or territory.'),
     }
 
     def clean(self, value):

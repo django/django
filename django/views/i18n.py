@@ -53,7 +53,14 @@ def get_formats():
                 result[attr] = getattr(module, attr)
             except AttributeError:
                 pass
-    return result
+    src = []
+    for k, v in result.items():
+        if isinstance(v, (basestring, int)):
+            src.append("formats['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_unicode(v))))
+        elif isinstance(v, (tuple, list)):
+            v = [javascript_quote(smart_unicode(value)) for value in v]
+            src.append("formats['%s'] = ['%s'];\n" % (javascript_quote(k), "', '".join(v)))
+    return ''.join(src)
 
 NullSource = """
 /* gettext identity library */
@@ -90,6 +97,25 @@ function ngettext(singular, plural, count) {
 }
 
 function gettext_noop(msgid) { return msgid; }
+
+"""
+
+LibFormatHead = """
+/* formatting library */
+
+var formats = new Array();
+
+"""
+
+LibFormatFoot = """
+function get_format(format_type) {
+    var value = formats[format_type];
+    if (typeof(value) == 'undefined') {
+      return msgid;
+    } else {
+      return value;
+    }
+}
 """
 
 SimplePlural = """
@@ -122,7 +148,8 @@ def null_javascript_catalog(request, domain=None, packages=None):
     Returns "identity" versions of the JavaScript i18n functions -- i.e.,
     versions that don't actually do anything.
     """
-    return http.HttpResponse(NullSource + InterPolate, 'text/javascript')
+    src = [NullSource, InterPolate, LibFormatHead, get_formats(), LibFormatFoot]
+    return http.HttpResponse(''.join(src), 'text/javascript')
 
 def javascript_catalog(request, domain='djangojs', packages=None):
     """
@@ -210,15 +237,12 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     csrc.sort()
     for k, v in pdict.items():
         src.append("catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))
-    for k, v in get_formats().items():
-        if isinstance(v, (basestring, int)):
-            src.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(smart_unicode(v))))
-        elif isinstance(v, (tuple, list)):
-            v = [javascript_quote(smart_unicode(value)) for value in v]
-            src.append("catalog['%s'] = ['%s'];\n" % (javascript_quote(k), "', '".join(v)))
     src.extend(csrc)
     src.append(LibFoot)
     src.append(InterPolate)
+    src.append(LibFormatHead)
+    src.append(get_formats())
+    src.append(LibFormatFoot)
     src = ''.join(src)
     return http.HttpResponse(src, 'text/javascript')
 

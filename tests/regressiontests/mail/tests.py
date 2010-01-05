@@ -174,7 +174,7 @@ Content
 
 # Test that the console backend can be pointed at an arbitrary stream
 >>> s = StringIO()
->>> connection = mail.get_connection('django.core.mail.backends.console', stream=s)
+>>> connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
 >>> send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
 1
 >>> print s.getvalue()
@@ -270,7 +270,7 @@ Content
 True
 
 # Test custom backend defined in this suite.
->>> conn = mail.get_connection('regressiontests.mail.custombackend')
+>>> conn = mail.get_connection('regressiontests.mail.custombackend.EmailBackend')
 >>> hasattr(conn, 'test_outbox')
 True
 >>> email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
@@ -280,23 +280,23 @@ True
 1
 
 # Test backend argument of mail.get_connection()
->>> isinstance(mail.get_connection('django.core.mail.backends.smtp'), smtp.EmailBackend)
+>>> isinstance(mail.get_connection('django.core.mail.backends.smtp.EmailBackend'), smtp.EmailBackend)
 True
->>> isinstance(mail.get_connection('django.core.mail.backends.locmem'), locmem.EmailBackend)
+>>> isinstance(mail.get_connection('django.core.mail.backends.locmem.EmailBackend'), locmem.EmailBackend)
 True
->>> isinstance(mail.get_connection('django.core.mail.backends.dummy'), dummy.EmailBackend)
+>>> isinstance(mail.get_connection('django.core.mail.backends.dummy.EmailBackend'), dummy.EmailBackend)
 True
->>> isinstance(mail.get_connection('django.core.mail.backends.console'), console.EmailBackend)
+>>> isinstance(mail.get_connection('django.core.mail.backends.console.EmailBackend'), console.EmailBackend)
 True
 >>> tmp_dir = tempfile.mkdtemp()
->>> isinstance(mail.get_connection('django.core.mail.backends.filebased', file_path=tmp_dir), filebased.EmailBackend)
+>>> isinstance(mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir), filebased.EmailBackend)
 True
 >>> shutil.rmtree(tmp_dir)
 >>> isinstance(mail.get_connection(), locmem.EmailBackend)
 True
 
 # Test connection argument of send_mail() et al
->>> connection = mail.get_connection('django.core.mail.backends.console')
+>>> connection = mail.get_connection('django.core.mail.backends.console.EmailBackend')
 >>> send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0

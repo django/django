@@ -286,7 +286,7 @@ connection with which to send e-mail, you can explicitly request an
 SMTP connection::
 
     from django.core.mail import get_connection
-    connection = get_connection('django.core.mail.backends.smtp')
+    connection = get_connection('django.core.mail.backends.smtp.EmailBackend')
     messages = get_notification_email()
     connection.send_messages(messages)
 
@@ -294,7 +294,7 @@ If your call to construct an instance of ``SMTPConnection`` required
 additional arguments, those arguments can be passed to the
 :meth:`~django.core.mail.get_connection()` call::
 
-    connection = get_connection('django.core.mail.backends.smtp', hostname='localhost', port=1234)
+    connection = get_connection('django.core.mail.backends.smtp.EmailBackend', hostname='localhost', port=1234)
 
 User Messages API
 -----------------

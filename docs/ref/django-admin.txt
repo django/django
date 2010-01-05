@@ -1026,6 +1026,12 @@ number of roles in which color is used:
     * ``sql_coltype`` - The type of a model field in SQL.
     * ``sql_keyword`` - A SQL keyword.
     * ``sql_table`` - The name of a model in SQL.
+    * ``http_info`` - A 1XX HTTP Informational server response.
+    * ``http_success`` - A 2XX HTTP Success server response.
+    * ``http_redirect`` - A 3XX HTTP Redirect server response.
+    * ``http_not_found`` - A 404 HTTP Not Found server response.
+    * ``http_bad_request`` - A 4XX HTTP Bad Request server response other than 404.
+    * ``http_server_error`` - A 5XX HTTP Server Error response.
 
 Each of these roles can be assigned a specific foreground and
 background color, from the following list:

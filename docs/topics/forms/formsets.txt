@@ -355,7 +355,7 @@ The ``manage_articles.html`` template might look like this:
 
 .. code-block:: html+django
 
-    <form method="POST" action="">
+    <form method="post" action="">
         {{ formset.management_form }}
         <table>
             {% for form in formset.forms %}
@@ -369,7 +369,7 @@ with the management form:
 
 .. code-block:: html+django
 
-    <form method="POST" action="">
+    <form method="post" action="">
         <table>
             {{ formset }}
         </table>
