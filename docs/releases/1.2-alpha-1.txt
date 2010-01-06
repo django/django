@@ -80,68 +80,6 @@ changes:
 
        __members__ = property(lambda self: self.__dir__())
 
-Specifying databases
---------------------
-
-Prior to Django 1.1, Django used a number of settings to control access to a
-single database. Django 1.2 introduces support for multiple databases, and as
-a result, the way you define database settings has changed.
-
-**Any existing Django settings file will continue to work as expected
-until Django 1.4.** Old-style database settings will be automatically
-translated to the new-style format.
-
-In the old-style (pre 1.2) format, there were a number of
-``DATABASE_`` settings at the top level of your settings file. For
-example::
-
-    DATABASE_NAME = 'test_db'
-    DATABASE_BACKEND = 'postgresl_psycopg2'
-    DATABASE_USER = 'myusername'
-    DATABASE_PASSWORD = 's3krit'
-
-These settings are now contained inside a dictionary named
-:setting:`DATABASES`. Each item in the dictionary corresponds to a
-single database connection, with the name ``'default'`` describing the
-default database connection. The setting names have also been
-shortened to reflect the fact that they are stored in a dictionary.
-The sample settings given previously would now be stored using::
-
-    DATABASES = {
-        'default': {
-            'NAME': 'test_db',
-            'BACKEND': 'django.db.backends.postgresl_psycopg2',
-            'USER': 'myusername',
-            'PASSWORD': 's3krit',
-        }
-    }
-
-This affects the following settings:
-
-    =========================================  ==========================
-     Old setting                                New Setting
-    =========================================  ==========================
-    :setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
-    :setting:`DATABASE_HOST`                   :setting:`HOST`
-    :setting:`DATABASE_NAME`                   :setting:`NAME`
-    :setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
-    :setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
-    :setting:`DATABASE_PORT`                   :setting:`PORT`
-    :setting:`DATABASE_USER`                   :setting:`USER`
-    :setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
-    :setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
-    :setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
-    =========================================  ==========================
-
-These changes are also required if you have manually created a database
-connection using ``DatabaseWrapper()`` from your database backend of choice.
-
-In addition to the change in structure, Django 1.2 removes the special
-handling for the built-in database backends. All database backends
-must now be specified by a fully qualified module name (i.e.,
-``django.db.backends.postgresql_psycopg2``, rather than just
-``postgresql_psycopg2``).
-
 ``__dict__`` on Model instances
 -------------------------------
 
@@ -299,6 +237,68 @@ additional arguments, those arguments can be passed to the
 :meth:`~django.core.mail.get_connection()` call::
 
     connection = get_connection('django.core.mail.backends.smtp.EmailBackend', hostname='localhost', port=1234)
+
+Specifying databases
+--------------------
+
+Prior to Django 1.1, Django used a number of settings to control access to a
+single database. Django 1.2 introduces support for multiple databases, and as
+a result, the way you define database settings has changed.
+
+**Any existing Django settings file will continue to work as expected
+until Django 1.4.** Old-style database settings will be automatically
+translated to the new-style format.
+
+In the old-style (pre 1.2) format, there were a number of
+``DATABASE_`` settings at the top level of your settings file. For
+example::
+
+    DATABASE_NAME = 'test_db'
+    DATABASE_BACKEND = 'postgresl_psycopg2'
+    DATABASE_USER = 'myusername'
+    DATABASE_PASSWORD = 's3krit'
+
+These settings are now contained inside a dictionary named
+:setting:`DATABASES`. Each item in the dictionary corresponds to a
+single database connection, with the name ``'default'`` describing the
+default database connection. The setting names have also been
+shortened to reflect the fact that they are stored in a dictionary.
+The sample settings given previously would now be stored using::
+
+    DATABASES = {
+        'default': {
+            'NAME': 'test_db',
+            'BACKEND': 'django.db.backends.postgresl_psycopg2',
+            'USER': 'myusername',
+            'PASSWORD': 's3krit',
+        }
+    }
+
+This affects the following settings:
+
+    =========================================  ==========================
+     Old setting                                New Setting
+    =========================================  ==========================
+    :setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
+    :setting:`DATABASE_HOST`                   :setting:`HOST`
+    :setting:`DATABASE_NAME`                   :setting:`NAME`
+    :setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
+    :setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
+    :setting:`DATABASE_PORT`                   :setting:`PORT`
+    :setting:`DATABASE_USER`                   :setting:`USER`
+    :setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
+    :setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
+    :setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+    =========================================  ==========================
+
+These changes are also required if you have manually created a database
+connection using ``DatabaseWrapper()`` from your database backend of choice.
+
+In addition to the change in structure, Django 1.2 removes the special
+handling for the built-in database backends. All database backends
+must now be specified by a fully qualified module name (i.e.,
+``django.db.backends.postgresql_psycopg2``, rather than just
+``postgresql_psycopg2``).
 
 User Messages API
 -----------------
