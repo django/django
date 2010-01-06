@@ -254,7 +254,7 @@ In the old-style (pre 1.2) format, there were a number of
 example::
 
     DATABASE_NAME = 'test_db'
-    DATABASE_BACKEND = 'postgresl_psycopg2'
+    DATABASE_ENGINE = 'postgresql_psycopg2'
     DATABASE_USER = 'myusername'
     DATABASE_PASSWORD = 's3krit'
 
@@ -268,7 +268,7 @@ The sample settings given previously would now be stored using::
     DATABASES = {
         'default': {
             'NAME': 'test_db',
-            'BACKEND': 'django.db.backends.postgresl_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'USER': 'myusername',
             'PASSWORD': 's3krit',
         }

@@ -92,7 +92,7 @@ In the old-style (pre 1.2) format, there were a number of
 example::
 
     DATABASE_NAME = 'test_db'
-    DATABASE_BACKEND = 'postgresl_psycopg2'
+    DATABASE_ENGINE = 'postgresql_psycopg2'
     DATABASE_USER = 'myusername'
     DATABASE_PASSWORD = 's3krit'
 
@@ -106,7 +106,7 @@ The sample settings given previously would now be stored using::
     DATABASES = {
         'default': {
             'NAME': 'test_db',
-            'BACKEND': 'django.db.backends.postgresl_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'USER': 'myusername',
             'PASSWORD': 's3krit',
         }
@@ -135,7 +135,7 @@ connection using ``DatabaseWrapper()`` from your database backend of choice.
 In addition to the change in structure, Django 1.2 removes the special
 handling for the built-in database backends. All database backends
 must now be specified by a fully qualified module name (i.e.,
-``django.db.backends.postgresl_psycopg2``, rather than just
+``django.db.backends.postgresql_psycopg2``, rather than just
 ``postgresql_psycopg2``).
 
 ``__dict__`` on Model instances
