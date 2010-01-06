@@ -329,7 +329,7 @@ def commit_manually(func_or_using=None):
 
         return wraps(func)(_commit_manually)
     if func_or_using is None:
-        func_or_using = DEFALUT_DB_ALIAS
+        func_or_using = DEFAULT_DB_ALIAS
     if callable(func_or_using):
         return inner_commit_manually(func_or_using, DEFAULT_DB_ALIAS)
     return lambda func: inner_commit_manually(func, func_or_using)
