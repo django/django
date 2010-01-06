@@ -511,3 +511,14 @@ Customizable syntax highlighting
 You can now use the ``DJANGO_COLORS`` environment variable to modify
 or disable the colors used by ``django-admin.py`` to provide
 :ref:`syntax highlighting <syntax-coloring>`.
+
+Model validation
+----------------
+
+Model instances now have support for :ref:`validating their own data
+<validating-objects`, and both model and form fields now accept
+configurable lists of :ref:`validators <ref-validators>` specifying
+reusable, encapsulated validation behavior. Note, however, that
+validation must still be performed explicitly: simply invoking a model
+instance's ``save()`` method will not perform any validation of the
+instance's data.
