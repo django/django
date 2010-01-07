@@ -51,6 +51,39 @@ If you attempt to access a database that you haven't defined in your
 :setting:`DATABASES` setting then Django will raise a
 ``django.db.utils.ConnectionDoesNotExist`` exception.
 
+Synchronizing your databases
+============================
+
+The :djadmin:`syncdb` management command operates on one database at a
+time. By default, it operates on the ``default`` database, but by
+providing a :djadminopt:`--database` argument, you can tell syncdb to
+synchronize a different database. So - to synchronize all models onto
+all databases in our example, you would need to call::
+
+    $ ./manage.py syncdb
+    $ ./manage.py syncdb --database=users
+
+If you don't want every application to be synchronized onto a
+particular database. you can specify the :djadminopt:`--exclude`
+argument to :djadmin:`syncdb`. The :djadminopt:`--exclude` option
+allows you to prevent a specific application or applications from
+being synchronized. For example, if you don't want the ``sales``
+application to be on the ``users`` database, you could run::
+
+    $ ./manage.py syncdb --database=users --exclude=sales
+
+Alternatively, if you want fine grained control of synchronization,
+you can pipe all or part of the output of :djadmin:`sqlall` for a
+particular application directly into your database prompt.
+
+Using other management commands
+-------------------------------
+
+The other ``django-admin.py`` commands that interact with the database
+operate in the same way as :djadmin:`syncdb` -- they only ever operate
+on one database at a time, using the :djadminopt:`--database` to control
+the database that is used.
+
 Selecting a database for a ``QuerySet``
 =======================================
 
