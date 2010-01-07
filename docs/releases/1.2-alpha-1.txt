@@ -184,8 +184,6 @@ status code for the test runner is now 0 for success (no failing tests) and 1
 for any number of test failures.  If needed, the number of test failures can be
 found at the end of the test runner's output.
 
-.. _deprecated-features-1.2:
-
 Features deprecated in 1.2
 ==========================
 
