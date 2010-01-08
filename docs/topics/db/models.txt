@@ -707,6 +707,8 @@ below -- but there are a couple that you'll almost always want to define:
         Any object that has a URL that uniquely identifies it should define this
         method.
 
+.. _overriding-model-methods:
+
 Overriding predefined model methods
 -----------------------------------
 
@@ -726,9 +728,9 @@ to happen whenever you save an object. For example (see
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def save(self, force_insert=False, force_update=False):
+        def save(self, *args, **kwargs):
             do_something()
-            super(Blog, self).save(force_insert, force_update) # Call the "real" save() method.
+            super(Blog, self).save(*args, **kwargs) # Call the "real" save() method.
             do_something_else()
 
 You can also prevent saving::
@@ -737,16 +739,24 @@ You can also prevent saving::
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def save(self, force_insert=False, force_update=False):
+        def save(self, *args, **kwargs):
             if self.name == "Yoko Ono's blog":
                 return # Yoko shall never have her own blog!
             else:
-                super(Blog, self).save(force_insert, force_update) # Call the "real" save() method.
+                super(Blog, self).save(*args, **kwargs) # Call the "real" save() method.
 
-It's important to remember to call the superclass method -- that's that
-``super(Blog, self).save()`` business -- to ensure that the object still gets
-saved into the database. If you forget to call the superclass method, the
-default behavior won't happen and the database won't get touched.
+It's important to remember to call the superclass method -- that's
+that ``super(Blog, self).save(*args, **kwargs)`` business -- to ensure
+that the object still gets saved into the database. If you forget to
+call the superclass method, the default behavior won't happen and the
+database won't get touched.
+
+It's also important that you pass through the arguments that can be
+passed to the model method -- that's what the ``*args, **kwargs`` bit
+does. Django will, from time to time, extend the capabilities of
+built-in model methods, adding new arguments. If you use ``*args,
+**kwargs`` in your method definitions, you are guaranteed that your
+code will automatically support those arguments when they are added.
 
 Executing custom SQL
 --------------------

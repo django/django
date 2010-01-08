@@ -66,15 +66,20 @@ Saving objects
 
 To save an object back to the database, call ``save()``:
 
-.. method:: Model.save([force_insert=False, force_update=False])
-
-Of course, there are some subtleties; see the sections below.
+.. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS])
 
 .. versionadded:: 1.0
+   The ``force_insert`` and ``force_update`` arguments were added.
 
-The signature of the ``save()`` method has changed from earlier versions
-(``force_insert`` and ``force_update`` have been added). If you are overriding
-these methods, be sure to use the correct signature.
+.. versionadded:: 1.1
+   The ``using`` argument was added.
+
+If you want customized saving behavior, you can override this
+``save()`` method. See :ref:`overriding-model-methods` for more
+details.
+
+The model save process also has some subtleties; see the sections
+below.
 
 Auto-incrementing primary keys
 ------------------------------
@@ -265,14 +270,21 @@ For more details, see the documentation on :ref:`F() expressions
 Deleting objects
 ================
 
-.. method:: Model.delete()
+.. method:: Model.delete([using=DEFAULT_DB_ALIAS])
 
-   Issues a SQL ``DELETE`` for the object. This only deletes the object in the
-   database; the Python instance will still be around, and will still have data
-   in its fields.
+.. versionadded:: 1.1
+   The ``using`` argument was added.
 
-   For more details, including how to delete objects in bulk, see
-   :ref:`topics-db-queries-delete`.
+Issues a SQL ``DELETE`` for the object. This only deletes the object
+in the database; the Python instance will still be around, and will
+still have data in its fields.
+
+For more details, including how to delete objects in bulk, see
+:ref:`topics-db-queries-delete`.
+
+If you want customized deletion behavior, you can override this
+``delete()`` method. See :ref:`overriding-model-methods` for more
+details.
 
 .. _model-instance-methods:
 
