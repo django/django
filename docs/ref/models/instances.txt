@@ -71,7 +71,7 @@ To save an object back to the database, call ``save()``:
 .. versionadded:: 1.0
    The ``force_insert`` and ``force_update`` arguments were added.
 
-.. versionadded:: 1.1
+.. versionadded:: 1.2
    The ``using`` argument was added.
 
 If you want customized saving behavior, you can override this
@@ -272,7 +272,7 @@ Deleting objects
 
 .. method:: Model.delete([using=DEFAULT_DB_ALIAS])
 
-.. versionadded:: 1.1
+.. versionadded:: 1.2
    The ``using`` argument was added.
 
 Issues a SQL ``DELETE`` for the object. This only deletes the object
