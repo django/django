@@ -6,7 +6,7 @@ from django import forms
 from django.db import models
 from django.core.exceptions import ValidationError
 
-from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt
+from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post
 
 try:
     from decimal import Decimal
@@ -227,3 +227,16 @@ class BigIntegerFieldTests(django.test.TestCase):
         b = BigInt.objects.get(value = '10')
         self.assertEqual(b.value, 10)
 
+class TypeCoercionTests(django.test.TestCase):
+    """
+    Test that database lookups can accept the wrong types and convert
+    them with no error: especially on Postgres 8.3+ which does not do
+    automatic casting at the DB level. See #10015.
+
+    """
+    def test_lookup_integer_in_charfield(self):
+        self.assertEquals(Post.objects.filter(title=9).count(), 0)
+        
+    def test_lookup_integer_in_textfield(self):
+        self.assertEquals(Post.objects.filter(body=24).count(), 0)
+        

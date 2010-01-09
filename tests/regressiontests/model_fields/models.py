@@ -55,6 +55,10 @@ class BigInt(models.Model):
     value = models.BigIntegerField()
     null_value = models.BigIntegerField(null = True, blank = True)
 
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    body = models.TextField()
+    
 ###############################################################################
 # ImageField
 
