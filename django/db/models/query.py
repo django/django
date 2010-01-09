@@ -1014,6 +1014,81 @@ class EmptyQuerySet(QuerySet):
         # (it raises StopIteration immediately).
         yield iter([]).next()
 
+    def all(self):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def filter(self, *args, **kwargs):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def exclude(self, *args, **kwargs):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def complex_filter(self, filter_obj):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def select_related(self, *fields, **kwargs):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def annotate(self, *args, **kwargs):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def order_by(self, *field_names):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def distinct(self, true_or_false=True):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def extra(self, select=None, where=None, params=None, tables=None,
+              order_by=None, select_params=None):
+        """
+        Always returns EmptyQuerySet.
+        """
+        assert self.query.can_filter(), \
+                "Cannot change a query once a slice has been taken"
+        return self
+
+    def reverse(self):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def defer(self, *fields):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
+    def only(self, *fields):
+        """
+        Always returns EmptyQuerySet.
+        """
+        return self
+
     # EmptyQuerySet is always an empty result in where-clauses (and similar
     # situations).
     value_annotation = False

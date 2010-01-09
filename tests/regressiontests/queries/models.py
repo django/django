@@ -8,7 +8,8 @@ import sys
 
 from django.conf import settings
 from django.db import models, DEFAULT_DB_ALIAS
-from django.db.models.query import Q, ITER_CHUNK_SIZE
+from django.db.models import Count
+from django.db.models.query import Q, ITER_CHUNK_SIZE, EmptyQuerySet
 
 # Python 2.3 doesn't have sorted()
 try:
@@ -968,6 +969,38 @@ Bug #7759 -- count should work with a partially read result set.
 ...     qs.count() == count
 ...     break
 True
+
+Bug #7235 -- an EmptyQuerySet should not raise exceptions if it is filtered.
+>>> q = EmptyQuerySet()
+>>> q.all()
+[]
+>>> q.filter(x=10)
+[]
+>>> q.exclude(y=3)
+[]
+>>> q.complex_filter({'pk': 1})
+[]
+>>> q.select_related('spam', 'eggs')
+[]
+>>> q.annotate(Count('eggs'))
+[]
+>>> q.order_by('-pub_date', 'headline')
+[]
+>>> q.distinct()
+[]
+>>> q.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+[]
+>>> q.query.low_mark = 1
+>>> q.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+Traceback (most recent call last):
+...
+AssertionError: Cannot change a query once a slice has been taken
+>>> q.reverse()
+[]
+>>> q.defer('spam', 'eggs')
+[]
+>>> q.only('spam', 'eggs')
+[]
 
 Bug #7791 -- there were "issues" when ordering and distinct-ing on fields
 related via ForeignKeys.
