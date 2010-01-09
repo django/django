@@ -2,7 +2,8 @@
 {% load i18n admin_modify adminmedia %}
 
 {% block extrahead %}{{ block.super }}
-<script type="text/javascript" src="../../../jsi18n/"></script>
+{% url admin:jsi18n as jsi18nurl %}
+<script type="text/javascript" src="{{ jsi18nurl|default:"../../../jsi18n/" }}"></script>
 {{ media }}
 {% endblock %}
 
