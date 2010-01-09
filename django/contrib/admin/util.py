@@ -281,7 +281,12 @@ def label_for_field(name, model, model_admin):
 def display_for_field(value, field):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
     from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
-    if isinstance(field, models.DateField) or isinstance(field, models.TimeField):
+
+    if field.flatchoices:
+        return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
+    elif value is None:
+        return EMPTY_CHANGELIST_VALUE
+    elif isinstance(field, models.DateField) or isinstance(field, models.TimeField):
         return formats.localize(value)
     elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):
         return _boolean_icon(value)
@@ -289,7 +294,5 @@ def display_for_field(value, field):
         return formats.number_format(value, field.decimal_places)
     elif isinstance(field, models.FloatField):
         return formats.number_format(value)
-    elif field.flatchoices:
-        return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
     else:
         return smart_unicode(value)
