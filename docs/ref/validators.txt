@@ -9,11 +9,11 @@ Validators
 Writing validators
 ==================
 
-A validator is just a callable that takes a value, and raises a
-``ValidationError`` if it doesn't meet some criteria. They can be useful for
-re-using validation logic between different types of fields.
+A validator is a callable that takes a value and raises a
+``ValidationError`` if it doesn't meet some criteria. Validators can be useful
+for re-using validation logic between different types of fields.
 
-For example, lets write a validator that only allows even numbers::
+For example, here's a validator that only allows even numbers::
 
     from django.core.exceptions import ValidationError
     
@@ -21,7 +21,7 @@ For example, lets write a validator that only allows even numbers::
         if value % 2 != 0:
             raise ValidationError(u'%s is not an even number' % value)
 
-You can then add this to your model fields via the field's ``validators``
+You can add this to a model field via the field's ``validators``
 argument::
 
     from django.db import models
@@ -29,7 +29,7 @@ argument::
     class MyModel(models.Model):
         even_field = models.IntegerField(validators=[validate_even])
 
-Since values are converted to python before validators are run, you can even
+Because values are converted to Python before validators are run, you can even
 use the same validator with forms::
 
     from django import forms
@@ -42,15 +42,15 @@ How validators are run
 
 See the :ref:`form validation <ref-forms-validation>` for more information on
 how validators are run in forms, and :ref:`Validating objects <validating-objects>`
-for how they are run in models.
+for how they're run in models.
 
 Built-in validators
 ===================
 
 Django has a collection of callable validators for use with model and form
-fields. Many of them are used internally, but they are available for use with
-your own fields too. They can be used in addition to, or in lieu of custom
-field.clean() methods.
+fields. They're used internally but are available for use with your own fields,
+too. They can be used in addition to, or in lieu of custom ``field.clean()``
+methods.
 
 ``RegexValidator``
 ------------------
@@ -75,31 +75,31 @@ The error message to use if ``regex`` doesn't match the provided ``value``.
 
 .. class:: URLValidator(verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT)
 
-A ``RegexValidaor`` that ensures a value looks like a URL, and optionally
-verifies that the URL actually exists. Raises an error code of ``'invalid'``
-if it doesn't look like a URL, and a code of ``'invalid_link'`` if it doesn't
-exist.
+A ``RegexValidator`` that ensures a value looks like a URL and optionally
+verifies that the URL actually exists (i.e., doesn't return a 404 status code).
+Raises an error code of ``'invalid'`` if it doesn't look like a URL, and a code
+of ``'invalid_link'`` if it doesn't exist.
 
 .. attribute:: verify_exists=False
 
-If ``verify_exists`` is ``True``, this validator checks that the url actually
+If ``verify_exists`` is ``True``, this validator checks that the URL actually
 exists.
 
 .. attribute:: validator_user_agent=URL_VALIDATOR_USER_AGENT
 
-If ``verify_exists`` is ``True``, use validator_user_agent as the User-agent
-for the request. Defaults to ``settings.URL_VALIDATOR_USER_AGENT``.
+If ``verify_exists`` is ``True``, it uses ``validator_user_agent`` as the "User-agent"
+for the request. This defaults to ``settings.URL_VALIDATOR_USER_AGENT``.
 
 ``validate_email``
 ------------------
 
-A ``RegexValidator`` instance that ensures a value looks like an email address.
+A ``RegexValidator`` instance that ensures a value looks like an e-mail address.
 
 ``validate_slug``
 -----------------
 
-A ``RegexValidator`` instance that ensures a value consists of only
-letters, numbers, underscores, or hyphens.
+A ``RegexValidator`` instance that ensures a value consists of only letters,
+numbers, underscores or hyphens.
 
 ``validate_ipv4_address``
 -------------------------
@@ -109,7 +109,7 @@ A ``RegexValidator`` instance that ensures a value looks like an IPv4 address.
 ``validate_comma_separated_integer_list``
 -----------------------------------------
 
-A ``RegexValidator`` instance that ensures a value is a comma separated list
+A ``RegexValidator`` instance that ensures a value is a comma-separated list
 of integers.
 
 ``MaxValueValidator``
@@ -133,7 +133,7 @@ less than ``min_value``.
 
 .. class:: MaxLengthValidator(max_length)
 
-Raises a ``ValidationError`` with a code of ``'max_length'`` if  the length of
+Raises a ``ValidationError`` with a code of ``'max_length'`` if the length of
 ``value`` is greater than ``max_length``.
 
 ``MinLengthValidator``
@@ -141,5 +141,5 @@ Raises a ``ValidationError`` with a code of ``'max_length'`` if  the length of
 
 .. class:: MinLengthValidator(min_length)
 
-Raises a ``ValidationError`` with a code of ``'min_length'`` if  the length of
+Raises a ``ValidationError`` with a code of ``'min_length'`` if the length of
 ``value`` is less than ``min_length``.
