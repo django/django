@@ -389,7 +389,7 @@ class MiscTests(TestCase):
         self.assertEqual([('en-AU', 1.0)], p('en-AU'))
         self.assertEqual([('*', 1.0)], p('*;q=1.00'))
         self.assertEqual([('en-AU', 0.123)], p('en-AU;q=0.123'))
-        self.assertEqual([('en-au', 0.10000000000000001)], p('en-au;q=0.1'))
+        self.assertEqual([('en-au', 0.5)], p('en-au;q=0.5'))
         self.assertEqual([('en-au', 1.0)], p('en-au;q=1.0'))
         self.assertEqual([('da', 1.0), ('en', 0.5), ('en-gb', 0.25)], p('da, en-gb;q=0.25, en;q=0.5'))
         self.assertEqual([('en-au-xx', 1.0)], p('en-au-xx'))
