@@ -754,7 +754,7 @@ Other optimizations
 ===================
 
 Django comes with a few other pieces of middleware that can help optimize your
-apps' performance:
+site's performance:
 
     * ``django.middleware.http.ConditionalGetMiddleware`` adds support for
       modern browsers to conditionally GET responses based on the ``ETag``
