@@ -3,7 +3,7 @@ Set of "markup" template filters for Django.  These filters transform plain text
 markup syntaxes to HTML; currently there is support for:
 
     * Textile, which requires the PyTextile library available at
-      http://dealmeida.net/projects/textile/
+      http://loopcore.com/python-textile/
 
     * Markdown, which requires the Python-markdown library from
       http://www.freewisdom.org/projects/python-markdown
