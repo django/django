@@ -342,7 +342,7 @@ it would be deleted at the same time.
 Generic relations and aggregation
 ---------------------------------
 
-:ref:`Django's database aggregation API <topics-db-aggregation`
+:ref:`Django's database aggregation API <topics-db-aggregation>`
 doesn't work with a
 :class:`~django.contrib.contenttypes.generic.GenericRelation`. For example, you
 might be tempted to try something like::

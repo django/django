@@ -380,7 +380,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 .. versionchanged:: 1.2
    Prior to version 1.2, the ``messages`` variable was a lazy accessor for
    ``user.get_and_delete_messages()``. It has been changed to include any
-   messages added via the :ref:`messages framework <ref-contrib-messages`.
+   messages added via the :ref:`messages framework <ref-contrib-messages>`.
 
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -54,7 +54,7 @@ can be used to control the visibility and editability of objects in the admin.
 My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.
 ---------------------------------------------------------------------------------------------------------------------------
 
-See :ref:`serving the admin files <howto-deployment-modpython-serving-the-admin-files`
+See :ref:`serving the admin files <howto-deployment-modpython-serving-the-admin-files>`
 in the "How to use Django with mod_python" documentation.
 
 My "list_filter" contains a ManyToManyField, but the filter doesn't display.

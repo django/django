@@ -8,7 +8,7 @@ Aggregation
 
 .. currentmodule:: django.db.models
 
-The topic guide on :ref:`Django's database-abstraction API <topics-db-queries`
+The topic guide on :ref:`Django's database-abstraction API <topics-db-queries>`
 described the way that you can use Django queries that create,
 retrieve, update and delete individual objects. However, sometimes you will
 need to retrieve values that are derived by summarizing or *aggregating* a
