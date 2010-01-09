@@ -879,8 +879,9 @@ abstract base class (only), part of the name should contain
 - ``'%(app_label)s'`` is replaced by the lower-cased name of the app the child
   class is contained within. Each installed application name must be unique
   and the model class names within each app must also be unique, therefore the
-  resulting name will end up being different. For example, given an app
-  ``common/models.py``::
+  resulting name will end up being different.
+
+For example, given an app ``common/models.py``::
 
     class Base(models.Model):
         m2m = models.ManyToManyField(OtherModel, related_name="%(app_label)s_%(class)s_related")
@@ -895,6 +896,7 @@ abstract base class (only), part of the name should contain
         pass
 
 Along with another app ``rare/models.py``::
+
     from common.models import Base
 
     class ChildB(Base):
