@@ -1862,7 +1862,6 @@ True
 
 # Checking that the label for SplitDateTimeField is not being displayed #####
 
->>> from django.forms import *
 >>> class EventForm(Form):
 ...     happened_at = SplitDateTimeField(widget=widgets.SplitHiddenDateTimeWidget)
 ...
