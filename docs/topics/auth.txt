@@ -1031,7 +1031,7 @@ checks to make sure the user is logged in and has the permission
 ``polls.can_vote``::
 
     def my_view(request):
-        if not (request.user.is_authenticated() and request.user.has_perm('polls.can_vote')):
+        if not request.user.has_perm('polls.can_vote'):
             return HttpResponse("You can't vote in this poll.")
         # ...
 

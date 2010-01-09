@@ -28,7 +28,7 @@ def staff_member_required(view_func):
     member, displaying the login page if necessary.
     """
     def _checklogin(request, *args, **kwargs):
-        if request.user.is_authenticated() and request.user.is_staff:
+        if request.user.is_staff:
             # The user is valid. Continue to the admin page.
             return view_func(request, *args, **kwargs)
 

@@ -22,7 +22,7 @@
         <div id="branding">
         {% block branding %}{% endblock %}
         </div>
-        {% if user.is_authenticated and user.is_staff %}
+        {% if user.is_staff %}
         <div id="user-tools">
             {% trans 'Welcome,' %}
             <strong>{% firstof user.first_name user.username %}</strong>.

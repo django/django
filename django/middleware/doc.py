@@ -12,7 +12,7 @@ class XViewMiddleware(object):
         indicating the view function.  This is used by the documentation module
         to lookup the view function for an arbitrary page.
         """
-        if request.method == 'HEAD' and (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS or (request.user.is_authenticated() and request.user.is_staff)):
+        if request.method == 'HEAD' and (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS or request.user.is_staff):
             response = http.HttpResponse()
             response['X-View'] = "%s.%s" % (view_func.__module__, view_func.__name__)
             return response
