@@ -1846,4 +1846,15 @@ True
 </select></td></tr>
 
 
+
+# Checking that the label for SplitDateTimeField is not being displayed #####
+
+>>> from django.forms import *
+>>> class EventForm(Form):
+...     happened_at = SplitDateTimeField(widget=widgets.SplitHiddenDateTimeWidget)
+...
+>>> form = EventForm()
+>>> form.as_ul()
+u'<input type="hidden" name="happened_at_0" id="id_happened_at_0" /><input type="hidden" name="happened_at_1" id="id_happened_at_1" />'
+
 """

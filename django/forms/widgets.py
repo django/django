@@ -725,6 +725,8 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """
     A Widget that splits datetime input into two <input type="hidden"> inputs.
     """
+    is_hidden = True
+
     def __init__(self, attrs=None):
         widgets = (HiddenInput(attrs=attrs), HiddenInput(attrs=attrs))
         super(SplitDateTimeWidget, self).__init__(widgets, attrs)
