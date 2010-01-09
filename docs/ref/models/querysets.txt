@@ -386,7 +386,7 @@ A couple of subtleties that are worth mentioning:
       For example::
 
         >>> Entry.objects.values()
-        [{'blog_id: 1, 'headline': u'First Entry', ...}, ...]
+        [{'blog_id': 1, 'headline': u'First Entry', ...}, ...]
 
         >>> Entry.objects.values('blog')
         [{'blog': 1}, ...]
