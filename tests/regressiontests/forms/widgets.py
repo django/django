@@ -183,6 +183,11 @@ u'<input type="hidden" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u
 >>> w.render('email', ['foo@example.com'], attrs={'class': 'special'})
 u'<input type="hidden" class="special" value="foo@example.com" name="email" />'
 
+Each input gets a separate ID.
+>>> w = MultipleHiddenInput()
+>>> w.render('letters', list('abc'), attrs={'id': 'hideme'})
+u'<input type="hidden" name="letters" value="a" id="hideme_0" />\n<input type="hidden" name="letters" value="b" id="hideme_1" />\n<input type="hidden" name="letters" value="c" id="hideme_2" />'
+
 # FileInput Widget ############################################################
 
 FileInput widgets don't ever show the value, because the old value is of no use
@@ -1015,6 +1020,14 @@ True
 # Unicode choices are correctly rendered as HTML
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<ul>\n<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums" value="2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
+
+# Each input gets a separate ID
+>>> print CheckboxSelectMultiple().render('letters', list('ac'), choices=zip(list('abc'), list('ABC')), attrs={'id': 'abc'})
+<ul>
+<li><label for="abc_0"><input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" /> A</label></li>
+<li><label for="abc_1"><input type="checkbox" name="letters" value="b" id="abc_1" /> B</label></li>
+<li><label for="abc_2"><input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" /> C</label></li>
+</ul>
 
 # MultiWidget #################################################################
 
