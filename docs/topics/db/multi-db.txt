@@ -1,7 +1,7 @@
 .. _topics-db-multi-db:
 
 ==================
-Multiple Databases
+Multiple databases
 ==================
 
 .. versionadded:: 1.2
@@ -9,7 +9,7 @@ Multiple Databases
 This topic guide describes Django's support for interacting with multiple
 databases. Most of the rest of Django's documentation assumes you are
 interacting with a single database. If you want to interact with multiple
-databases, some additional steps must be taken.
+databases, you'll need to take some additional steps.
 
 Defining your databases
 =======================
@@ -23,11 +23,11 @@ the inner dictionaries are described fully in the :setting:`DATABASES`
 documentation.
 
 Regardless of how many databases you have, you *must* have a database
-named ``'default'``. Any additional databases you have can have
-whatever alias you choose.
+named ``'default'``. Any additional databases can have whatever alias
+you choose.
 
 The following is an example ``settings.py`` snippet defining two
-databases - a default Postgres database, and a MySQL database called
+databases -- a default PostgreSQL database and a MySQL database called
 ``users``:
 
 .. code-block:: python
@@ -48,7 +48,7 @@ databases - a default Postgres database, and a MySQL database called
     }
 
 If you attempt to access a database that you haven't defined in your
-:setting:`DATABASES` setting then Django will raise a
+:setting:`DATABASES` setting, Django will raise a
 ``django.db.utils.ConnectionDoesNotExist`` exception.
 
 Synchronizing your databases
@@ -57,7 +57,7 @@ Synchronizing your databases
 The :djadmin:`syncdb` management command operates on one database at a
 time. By default, it operates on the ``default`` database, but by
 providing a :djadminopt:`--database` argument, you can tell syncdb to
-synchronize a different database. So - to synchronize all models onto
+synchronize a different database. So, to synchronize all models onto
 all databases in our example, you would need to call::
 
     $ ./manage.py syncdb
@@ -66,67 +66,74 @@ all databases in our example, you would need to call::
 If you don't want every application to be synchronized onto a
 particular database. you can specify the :djadminopt:`--exclude`
 argument to :djadmin:`syncdb`. The :djadminopt:`--exclude` option
-allows you to prevent a specific application or applications from
+lets you prevent a specific application or applications from
 being synchronized. For example, if you don't want the ``sales``
-application to be on the ``users`` database, you could run::
+application to be in the ``users`` database, you could run::
 
     $ ./manage.py syncdb --database=users --exclude=sales
 
-Alternatively, if you want fine grained control of synchronization,
+Alternatively, if you want fine-grained control of synchronization,
 you can pipe all or part of the output of :djadmin:`sqlall` for a
-particular application directly into your database prompt.
+particular application directly into your database prompt, like this::
+
+	$ ./manage.py sqlall sales | ./manage.py dbshell
 
 Using other management commands
 -------------------------------
 
 The other ``django-admin.py`` commands that interact with the database
 operate in the same way as :djadmin:`syncdb` -- they only ever operate
-on one database at a time, using the :djadminopt:`--database` to control
-the database that is used.
+on one database at a time, using :djadminopt:`--database` to control
+the database used.
 
 Selecting a database for a ``QuerySet``
 =======================================
 
-It is possible to select the database for a ``QuerySet`` at any point
-during it's construction. To choose the database that a query will be
-preformed against simply call the ``using()`` method on the
-``QuerySet``. ``using()`` takes a single argument: the alias of the
-database on which you want to run the query. For example:
+You can select the database for a ``QuerySet`` at any point in the ``QuerySet``
+"chain." Just call ``using()`` on the ``QuerySet`` to get another ``QuerySet``
+that uses the specified database.
+
+``using()`` takes a single argument: the alias of the database on which you
+want to run the query. For example:
 
 .. code-block:: python
 
-    # This will run on the 'default' database...
+    # This will run on the 'default' database.
     >>> Author.objects.all()
-    # So will this...
+    
+    # So will this.
     >>> Author.objects.using('default').all()
-    # This will run on the 'other' database
+    
+    # This will run on the 'other' database.
     >>> Author.objects.using('other').all()
 
-Select a database to save to
-============================
+Selecting a database for ``save()``
+===================================
 
-To choose what database to save a model to, provide a ``using`` keyword
-argument to ``Model.save()``. For example if you had a user model that you
-wanted to save to the ``'legacy_users'`` database you would save the user
-by calling::
+Use the ``using`` keyword to ``Model.save()`` to specify to which database the
+data should be saved.
 
-    >>> user_obj.save(using='legacy_users')
+For example, to save an object to the ``legacy_users`` database, you'd use this::
+
+    >>> my_object.save(using='legacy_users')
+
+If you don't specify ``using``, the ``save()`` method will always save into the
+default database.
 
 Moving an object from one database to another
 ---------------------------------------------
 
-If you have saved an instance to one database, it might be tempting to use
+If you've saved an instance to one database, it might be tempting to use
 ``save(using=...)`` as a way to migrate the instance to a new database. However,
 if you don't take appropriate steps, this could have some unexpected consequences.
 
 Consider the following example::
 
     >>> p = Person(name='Fred')
-    >>> p.save(using='first') # (1)
-    # some other processing ...
-    >>> p.save(using='second') # (2)
+    >>> p.save(using='first')  # (statement 1)
+    >>> p.save(using='second') # (statement 2)
 
-In statement 1, a new Person object is saved to the ``first``
+In statement 1, a new ``Person`` object is saved to the ``first``
 database. At this time, ``p`` doesn't have a primary key, so Django
 issues a SQL ``INSERT`` statement. This creates a primary key, and
 Django assigns that primary key to ``p``.
@@ -135,29 +142,26 @@ When the save occurs in statement 2, ``p`` already has a primary key
 value, and Django will attempt to use that primary key on the new
 database. If the primary key value isn't in use in the ``second``
 database, then you won't have any problems -- the object will be
-copied to the new databse.
+copied to the new database.
 
 However, if the primary key of ``p`` is already in use on the
-``second`` database, the existing object on the ``second`` database
-will be lost when ``p`` is saved.
+``second`` database, the existing object in the ``second`` database
+will be overridden when ``p`` is saved.
 
-There are two ways to avoid this outcome. Firstly, you can clear the
-primary key of the instance. If an object has no primary key, Django
-will treat it as a new object, avoiding any loss of data on the
-``second`` database::
-
-    >>> p = Person(name='Fred')
-    >>> p.save(using='first')
-    # some other processing ...
-    >>> p.pk = None # Clear the PK
-    >>> p.save(using='second') # Write a completely new object
-
-Secondly, you can use the ``force_insert`` option to ``save()`` to ensure that
-Django does a SQL ``INSERT``::
+You can avoid this in two ways. First, you can clear the primary key
+of the instance. If an object has no primary key, Django will treat it as
+a new object, avoiding any loss of data on the ``second`` database::
 
     >>> p = Person(name='Fred')
     >>> p.save(using='first')
-    # some other processing ...
+    >>> p.pk = None # Clear the primary key.
+    >>> p.save(using='second') # Write a completely new object.
+
+The second option is to use the ``force_insert`` option to ``save()`` to ensure
+that Django does a SQL ``INSERT``::
+
+    >>> p = Person(name='Fred')
+    >>> p.save(using='first')
     >>> p.save(using='second', force_insert=True)
 
 This will ensure that the person named ``Fred`` will have the same
@@ -165,50 +169,54 @@ primary key on both databases. If that primary key is already in use
 when you try to save onto the ``second`` database, an error will be
 raised.
 
-Select a database to delete from
-================================
+Selecting a database to delete from
+===================================
 
 By default, a call to delete an existing object will be executed on the
 same database that was used to retrieve the object in the first place::
 
-    >>> user_obj = User.objects.using('legacy_users').get(username='fred')
-    >>> user_obj.delete() # will delete from the `legacy_users` database
+    >>> u = User.objects.using('legacy_users').get(username='fred')
+    >>> u.delete() # will delete from the `legacy_users` database
 
-If you want to specify the database from which a model will be
-deleted, you can use a ``using`` keyword argument to the
-``Model.delete()`` method. This argument is analogous to the ``using``
-keyword argument to ``save()``. For example if you were migrating a
-user from the ``'legacy_users'`` database to the ``'new_users'``
-database you might use the commands::
+To specify the database from which a model will be deleted, pass a
+``using`` keyword argument to the ``Model.delete()`` method. This argument
+works just like the ``using`` keyword argument to ``save()``.
+
+For example, if you're migrating a user from the ``legacy_users`` database
+to the ``new_users`` database, you might use these commands::
 
     >>> user_obj.save(using='new_users')
     >>> user_obj.delete(using='legacy_users')
 
-Using ``Managers`` with multiple databases
-==========================================
+Using managers with multiple databases
+======================================
 
-When you call ``using()`` Django returns a ``QuerySet`` that will be
-evaluated against that database. However, sometimes you want to direct
-a manager to use a specific database chain ``using()``. If you call
-``using()``, you won't have access to any of the methods on the
-manager.
+Use the ``db_manager()`` method on managers to give managers access to a
+non-default database.
 
-To overcome this limitation, managers provide a ``db_manager()``
-method. This method returns a copy of the *manager* bound to that
-specific database. So, if you want to load an object using it's
-natural key (using the ``get_by_natural_key()`` method on the manager,
-you can call::
+For example, say you have a custom manager method that touches the database --
+``User.objects.create_user()``. Because ``create_user()`` is a
+manager method, not a ``QuerySet`` method, you can't do
+``User.objects.using('new_users').create_user()``. (The ``create_user()`` method
+is only available on ``User.objects``, the manager, not on ``QuerySet`` objects
+derived from the manager.) The solution is to use ``db_manager()``, like this::
 
-    >>> Book.objects.db_manager("other").get_by_natural_key(...)
+    User.objects.db_manager('new_users').create_user(...)
 
-If you are overriding ``get_query_set()`` on your manager you must be sure to
-either, call the method on the parent (using ``super()``), or do the
-appropriate handling of the ``_db`` attribute on the manager. For example if
-you wanted to return a custom ``QuerySet`` class from the ``get_query_set``
-method you could do this::
+``db_manager()`` returns a copy of the manager bound to the database you specify.
+
+Using ``get_query_set()`` with multiple databases
+-------------------------------------------------
+
+If you're overriding ``get_query_set()`` on your manager, be sure to either
+call the method on the parent (using ``super()``) or do the appropriate
+handling of the ``_db`` attribute on the manager (a string containing the name
+of the database to use).
+
+For example, if you want to return a custom ``QuerySet`` class from the
+``get_query_set`` method, you could do this::
 
     class MyManager(models.Manager):
-        ...
         def get_query_set(self):
             qs = CustomQuerySet(self.model)
             if self._db is not None:
@@ -220,67 +228,66 @@ Exposing multiple databases in Django's admin interface
 
 Django's admin doesn't have any explicit support for multiple
 databases. If you want to provide an admin interface for a model on a
-database other than ``default``, you need to write custom
+database other than ``default``, you'll need to write custom
 :class:`~django.contrib.admin.ModelAdmin` classes that will direct the
 admin to use a specific database for content.
 
-There are four methods that require customization on a ModelAdmin
-object::
+``ModelAdmin`` objects have four methods that require customization for
+multiple-database support::
 
     class MultiDBModelAdmin(admin.ModelAdmin):
-        # A handy constant for the name of the alternate database
+        # A handy constant for the name of the alternate database.
         using = 'other'
 
         def save_model(self, request, obj, form, change):
-            # Tell Django to save objects to the 'other' database
+            # Tell Django to save objects to the 'other' database.
             obj.save(using=self.using)
 
         def queryset(self, request):
-            # Tell Django to look for objects on the 'other' database
+            # Tell Django to look for objects on the 'other' database.
             return super(MultiDBModelAdmin, self).queryset(request).using(self.using)
 
         def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
-            # on the 'other' database
+            # on the 'other' database.
             return super(MultiDBModelAdmin, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
 
         def formfield_for_manytomany(self, db_field, request=None, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
-            # on the 'other' database
+            # on the 'other' database.
             return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
 
-The implementation provided here implements a multi-db strategy where
+The implementation provided here implements a multi-database strategy where
 all objects of a given type are stored on a specific database (e.g.,
-all ``User`` objects are on the ``other`` database). If your usage of
-multi-db is more complex, your ModelAdmin will need to reflect that
-strategy.
+all ``User`` objects are in the ``other`` database). If your usage of
+multiple databases is more complex, your ``ModelAdmin`` will need to reflect
+that strategy.
 
-Inlines can be handled in a similar fashion -- they require just three
-customized methods::
+Inlines can be handled in a similar fashion. They require three customized methods::
 
     class MultiDBTabularInline(admin.TabularInline):
         using = 'other'
 
         def queryset(self, request):
-            # Tell Django to look for inline objects on the 'other' database
+            # Tell Django to look for inline objects on the 'other' database.
             return super(MultiDBTabularInline, self).queryset(request).using(self.using)
 
         def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
-            # on the 'other' database
+            # on the 'other' database.
             return super(MultiDBTabularInline, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
 
         def formfield_for_manytomany(self, db_field, request=None, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
-            # on the 'other' database
+            # on the 'other' database.
             return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
 
-Once you have written your model admin definitions, they can be
-registered with any Admin instance::
+Once you've written your model admin definitions, they can be registered with
+any ``Admin`` instance::
 
     from django.contrib import admin
 
-    # Specialize the multi-db admin objects for use with specific models
+    # Specialize the multi-db admin objects for use with specific models.
     class BookInline(MultiDBTabularInline):
         model = Book
 
