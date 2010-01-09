@@ -34,31 +34,30 @@ Validating objects
 
 .. versionadded:: 1.2
 
-To validate your model, just call its ``full_validate()`` method:
+To validate your model, call its ``full_validate()`` method:
 
 .. method:: Model.full_validate([exclude=[]])
 
-The optional ``exclude`` argument can contain a list of field names that should
-be omitted when validating. This method raises ``ValidationError`` containing a
-message dict with errors from all fields.
+The optional ``exclude`` argument can contain a list of field names to omit
+when validating. This method raises ``ValidationError`` containing a
+message dictionary with errors from all fields.
 
 To add your own validation logic, override the supplied ``validate()`` method:
 
 Note that ``full_validate`` will NOT be called automatically when you call
-your model's ``save()`` method. You will need to call it manually if you wish
-to run your model validators. This is for the purposes of backwards
-compatibility. However, if you are using a ``ModelForm``, it will call
-``full_validate`` for you, and present any errors along with the other form
-error messages.
+your model's ``save()`` method. You'll need to call it manually if you want
+to run your model validators. (This is for backwards compatibility.) However,
+if you're using a ``ModelForm``, it will call ``full_validate`` for you and
+will present any errors along with the other form error messages.
 
 .. method:: Model.validate()
 
 The ``validate()`` method on ``Model`` by default checks for uniqueness of
-fields and group of fields that are declared to be unique so, remember to call
-``self.validate_unique()`` or the superclasses ``validate`` method if you want
+fields and group of fields that are declared to be unique, so remember to call
+``self.validate_unique()`` or the superclass' ``validate`` method if you want
 this validation to run.
 
-Any ``ValidationError`` raised in this method will be propagated in the
+Any ``ValidationError`` raised in this method will be included in the
 ``message_dict`` under ``NON_FIELD_ERRORS``.
 
 Saving objects
