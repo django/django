@@ -138,9 +138,9 @@ class BaseForm(StrAndUnicode):
         "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
         top_errors = self.non_field_errors() # Errors that should be displayed above all fields.
         output, hidden_fields = [], []
-        html_class_attr = ''
 
         for name, field in self.fields.items():
+            html_class_attr = ''
             bf = BoundField(self, field, name)
             bf_errors = self.error_class([conditional_escape(error) for error in bf.errors]) # Escape and cache in local variable.
             if bf.is_hidden:
