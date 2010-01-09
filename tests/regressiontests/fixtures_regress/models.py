@@ -182,7 +182,7 @@ __test__ = {'API_TESTS':"""
 # Create a new animal. Without a sequence reset, this new object
 # will take a PK of 1 (on Postgres), and the save will fail.
 # This is a regression test for ticket #3790.
->>> animal = Animal(name='Platypus', latin_name='Ornithorhynchus anatinus', count=2, weight=2.3)
+>>> animal = Animal(name='Platypus', latin_name='Ornithorhynchus anatinus', count=2, weight=2.2)
 >>> animal.save()
 
 ###############################################
@@ -276,7 +276,7 @@ Weight = 1.2 (<type 'float'>)
 # Regression for #11286 -- Ensure that dumpdata honors the default manager
 # Dump the current contents of the database as a JSON fixture
 >>> management.call_command('dumpdata', 'fixtures_regress.animal', format='json')
-[{"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}}, {"pk": 2, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.29..., "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}, {"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}}]
+[{"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}}, {"pk": 2, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.2, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}, {"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}}]
 
 ###############################################
 # Regression for #11428 - Proxy models aren't included when you dumpdata 
