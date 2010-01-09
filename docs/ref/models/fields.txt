@@ -939,7 +939,7 @@ that control how the relationship functions.
 
     ``limit_choices_to`` has no effect when used on a ``ManyToManyField`` with a
     custom intermediate table specified using the
-    :attr:`~ManyToManyField.through` paramter.
+    :attr:`~ManyToManyField.through` parameter.
 
 .. attribute:: ManyToManyField.symmetrical
 
