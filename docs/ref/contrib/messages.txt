@@ -71,7 +71,7 @@ Four storage classes are included:
 
 ``'django.contrib.messages.storage.session.SessionStorage'``
     This class stores all messages inside of the request's session. It
-    requires Django's ``contrib.session`` application.
+    requires Django's ``contrib.sessions`` application.
 
 ``'django.contrib.messages.storage.cookie.CookieStorage'``
     This class stores the message data in a cookie (signed with a secret hash
