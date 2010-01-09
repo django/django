@@ -94,7 +94,10 @@ class RelatedField(object):
             sup.contribute_to_class(cls, name)
 
         if not cls._meta.abstract and self.rel.related_name:
-            self.rel.related_name = self.rel.related_name % {'class': cls.__name__.lower()}
+            self.rel.related_name = self.rel.related_name % {
+                    'class': cls.__name__.lower(),
+                    'app_label': cls._meta.app_label.lower(),
+                }
 
         other = self.rel.to
         if isinstance(other, basestring) or other._meta.pk is None:

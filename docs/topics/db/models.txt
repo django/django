@@ -871,13 +871,19 @@ fields on this class are included into each of the child classes, with exactly
 the same values for the attributes (including :attr:`~django.db.models.ForeignKey.related_name`) each time.
 
 To work around this problem, when you are using :attr:`~django.db.models.ForeignKey.related_name` in an
-abstract base class (only), part of the name should be the string
-``'%(class)s'``. This is replaced by the lower-cased name of the child class
-that the field is used in. Since each class has a different name, each related
-name will end up being different. For example::
+abstract base class (only), part of the name should contain
+``'%(app_label)s'`` and ``'%(class)s'``.
+
+- ``'%(class)s'`` is replaced by the lower-cased name of the child class
+  that the field is used in.
+- ``'%(app_label)s'`` is replaced by the lower-cased name of the app the child
+  class is contained within. Each installed application name must be unique
+  and the model class names within each app must also be unique, therefore the
+  resulting name will end up being different. For example, given an app
+  ``common/models.py``::
 
     class Base(models.Model):
-        m2m = models.ManyToManyField(OtherModel, related_name="%(class)s_related")
+        m2m = models.ManyToManyField(OtherModel, related_name="%(app_label)s_%(class)s_related")
 
         class Meta:
             abstract = True
@@ -888,19 +894,28 @@ name will end up being different. For example::
     class ChildB(Base):
         pass
 
-The reverse name of the ``ChildA.m2m`` field will be ``childa_related``,
-whilst the reverse name of the ``ChildB.m2m`` field will be
-``childb_related``. It is up to you how you use the ``'%(class)s'`` portion to
-construct your related name, but if you forget to use it, Django will raise
+Along with another app ``rare/models.py``::
+    from common.models import Base
+
+    class ChildB(Base):
+        pass
+
+The reverse name of the ``commmon.ChildA.m2m`` field will be
+``common_childa_related``, whilst the reverse name of the
+``common.ChildB.m2m`` field will be ``common_childb_related``, and finally the
+reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
+It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
+to construct your related name, but if you forget to use it, Django will raise
 errors when you validate your models (or run :djadmin:`syncdb`).
 
-If you don't specify a :attr:`~django.db.models.ForeignKey.related_name` attribute for a field in an
-abstract base class, the default reverse name will be the name of the
-child class followed by ``'_set'``, just as it normally would be if
-you'd declared the field directly on the child class. For example, in
-the above code, if the :attr:`~django.db.models.ForeignKey.related_name` attribute was omitted, the
-reverse name for the ``m2m`` field would be ``childa_set`` in the
-``ChildA`` case and ``childb_set`` for the ``ChildB`` field.
+If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
+attribute for a field in an abstract base class, the default reverse name will
+be the name of the child class followed by ``'_set'``, just as it normally
+would be if you'd declared the field directly on the child class. For example,
+in the above code, if the :attr:`~django.db.models.ForeignKey.related_name`
+attribute was omitted, the reverse name for the ``m2m`` field would be
+``childa_set`` in the ``ChildA`` case and ``childb_set`` for the ``ChildB``
+field.
 
 .. _multi-table-inheritance:
 

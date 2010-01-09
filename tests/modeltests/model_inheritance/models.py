@@ -116,6 +116,31 @@ class ParkingLot(Place):
     def __unicode__(self):
         return u"%s the parking lot" % self.name
 
+#
+# Abstract base classes with related models where the sub-class has the
+# same name in a different app and inherits from the same abstract base
+# class.
+# NOTE: The actual API tests for the following classes are in
+#       model_inheritance_same_model_name/models.py - They are defined
+#       here in order to have the name conflict between apps
+#
+
+class Title(models.Model):
+    title = models.CharField(max_length=50)
+
+class NamedURL(models.Model):
+    title = models.ForeignKey(Title, related_name='attached_%(app_label)s_%(class)s_set')
+    url = models.URLField()
+
+    class Meta:
+        abstract = True
+
+class Copy(NamedURL):
+    content = models.TextField()
+
+    def __unicode__(self):
+        return self.content
+
 __test__ = {'API_TESTS':"""
 # The Student and Worker models both have 'name' and 'age' fields on them and
 # inherit the __unicode__() method, just as with normal Python subclassing.
