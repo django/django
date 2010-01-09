@@ -4,6 +4,7 @@ var Actions = {
         counterContainer = document.getElementsBySelector('span.action_counter');
         actionCheckboxes = document.getElementsBySelector('tr input.action-select');
         selectAll = document.getElementById('action-toggle');
+        lastChecked = null;
         for(var i = 0; i < counterContainer.length; i++) {
             counterContainer[i].style.display = 'inline';
         }
@@ -15,7 +16,24 @@ var Actions = {
             });
         }
         for(var i = 0; i < actionCheckboxes.length; i++) {
-            addEvent(actionCheckboxes[i], 'click', function() {
+            addEvent(actionCheckboxes[i], 'click', function(e) {
+                if (!e) { var e = window.event; }
+                var target = e.target ? e.target : e.srcElement;
+                if (lastChecked && lastChecked != target && e.shiftKey == true) {
+                    var inrange = false;
+                    lastChecked.checked = target.checked;
+                    Actions.toggleRow(lastChecked.parentNode.parentNode, target.checked);
+                    for (var i = 0; i < actionCheckboxes.length; i++) {
+                        if (actionCheckboxes[i] == lastChecked || actionCheckboxes[i] == target) {
+                            inrange = (inrange) ? false : true;
+                        }
+                        if (inrange) {
+                            actionCheckboxes[i].checked = target.checked;
+                            Actions.toggleRow(actionCheckboxes[i].parentNode.parentNode, target.checked);
+                        }
+                    }
+                }
+                lastChecked = target;
                 Actions.counter();
             });
         }
@@ -28,7 +46,6 @@ var Actions = {
                 if (target.className == 'action-select') {
                     var tr = target.parentNode.parentNode;
                     Actions.toggleRow(tr, target.checked);
-                    Actions.checked();
                 }
             });
         }
@@ -59,6 +76,7 @@ var Actions = {
         for(var i = 0; i < counterSpans.length; i++) {
             counterSpans[i].innerHTML = counter;
         }
+        selectAll.checked = (counter == actionCheckboxes.length);
     }
 };
 
