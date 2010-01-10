@@ -613,7 +613,6 @@ class AdminViewPermissionsTest(TestCase):
         self.assertNotContains(response, 'Log out')
 
         response = self.client.get('/test_admin/admin/secure-view/')
-        open('/home/maniac/Desktop/response.html', 'w').write(response.content)
         self.assertContains(response, 'id="login-form"')
 
 class AdminViewStringPrimaryKeyTest(TestCase):
