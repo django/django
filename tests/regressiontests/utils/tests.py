@@ -10,6 +10,7 @@ from django.utils.functional import SimpleLazyObject
 import timesince
 import datastructures
 import itercompat
+import tzinfo
 
 from decorators import DecoratorFromMiddlewareTests
 from functional import FunctionalTestCase
@@ -26,6 +27,7 @@ __test__ = {
     'timesince': timesince,
     'datastructures': datastructures,
     'itercompat': itercompat,
+    'tzinfo': tzinfo,
 }
 
 from dateformat import *
