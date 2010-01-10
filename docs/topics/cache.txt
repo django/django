@@ -470,14 +470,15 @@ automatically created from the ``CACHE_BACKEND`` setting::
 
     >>> from django.core.cache import cache
 
-The basic interface is ``set(key, value, timeout_seconds)`` and ``get(key)``::
+The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
 
     >>> cache.set('my_key', 'hello, world!', 30)
     >>> cache.get('my_key')
     'hello, world!'
 
-The ``timeout_seconds`` argument is optional and defaults to the ``timeout``
-argument in the ``CACHE_BACKEND`` setting (explained above).
+The ``timeout`` argument is optional and defaults to the ``timeout``
+argument in the ``CACHE_BACKEND`` setting (explained above). It's the number of
+seconds the value should be stored in the cache.
 
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
