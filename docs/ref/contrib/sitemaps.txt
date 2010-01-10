@@ -54,7 +54,7 @@ Initialization
 To activate sitemap generation on your Django site, add this line to your
 :ref:`URLconf <topics-http-urls>`::
 
-   (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+   (r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
 
 This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
 
@@ -261,7 +261,7 @@ Here's an example of a :ref:`URLconf <topics-http-urls>` using both::
         # ...
 
         # the sitemap
-        (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+        (r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
     )
 
 .. _URLconf: ../url_dispatch/
@@ -280,7 +280,7 @@ references individual sitemap files, one per each section defined in your
 
 Here's what the relevant URLconf lines would look like for the example above::
 
-   (r'^sitemap.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps}),
+   (r'^sitemap\.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps}),
    (r'^sitemap-(?P<section>.+)\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
 
 This will automatically generate a :file:`sitemap.xml` file that references both
