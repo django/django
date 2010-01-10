@@ -577,8 +577,18 @@ Using the built-in reference
 ============================
 
 Django's admin interface includes a complete reference of all template tags and
-filters available for a given site. To see it, go to your admin interface and
-click the "Documentation" link in the upper right of the page.
+filters available for a given site. To activate it, follow these steps:
+
+    * Add :mod:`django.contrib.admindocs` to your :setting:`INSTALLED_APPS`.
+    * Add ``(r'^admin/doc/', include('django.contrib.admindocs.urls'))`` to your
+      :data:`urlpatterns`. Make sure it's included *before* the ``r'^admin/'``
+      entry, so that requests to ``/admin/doc/`` don't get handled by the
+      latter entry.
+    * Install the docutils module (http://docutils.sf.net/).
+
+After you've followed those steps, you can start browsing the documentation by
+going to your admin interface and clicking the "Documentation" link in the
+upper right of the page.
 
 The reference is divided into 4 sections: tags, filters, models, and views.
 
