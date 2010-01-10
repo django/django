@@ -771,10 +771,11 @@ A :class:`CharField` for a URL. Has one extra optional argument:
 .. attribute:: URLField.verify_exists
 
     If ``True`` (the default), the URL given will be checked for existence
-    (i.e., the URL actually loads and doesn't give a 404 response). It should
-    be noted that when using the single-threaded development server, validating
-    a url being serverd by the same server will hang.
-    This should not be a problem for multithreaded servers.
+    (i.e., the URL actually loads and doesn't give a 404 response).
+    
+    Note that when you're using the single-threaded development server,
+    validating a URL being served by the same server will hang. This should not
+    be a problem for multithreaded servers.
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 
