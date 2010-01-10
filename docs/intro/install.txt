@@ -71,11 +71,11 @@ You've got three easy options to install Django:
       
 .. warning::
 
-    If do either of the first two steps, keep an eye out for parts of the
+    If you do either of the first two steps, keep an eye out for parts of the
     documentation marked **new in development version**. That phrase flags
-    features that are only available in development versions of Django; if you
-    try to use them with an official release they won't work.
-    
+    features that are only available in development versions of Django, and
+    they likely won't work with an official release.
+
 That's it!
 ----------
 
