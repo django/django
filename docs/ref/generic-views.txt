@@ -542,7 +542,7 @@ In addition to ``extra_context``, the template's context will be:
     * ``next_day``: A ``datetime.date`` object representing the next day. If
       the next day is in the future, this will be ``None``.
 
-    * ``previous_day``: A ``datetime.date`` object representing the given day.
+    * ``previous_day``: A ``datetime.date`` object representing the previous day.
       Unlike ``next_day``, this will never be ``None``.
 
     * ``object_list``: A list of objects available for the given day. This
