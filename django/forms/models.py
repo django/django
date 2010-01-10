@@ -159,7 +159,7 @@ def model_to_dict(instance, fields=None, exclude=None):
             data[f.name] = f.value_from_object(instance)
     return data
 
-def fields_for_model(model, fields=None, exclude=None, formfield_callback=lambda f: f.formfield()):
+def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
     """
     Returns a ``SortedDict`` containing form fields for the given model.
 
@@ -179,7 +179,11 @@ def fields_for_model(model, fields=None, exclude=None, formfield_callback=lambda
             continue
         if exclude and f.name in exclude:
             continue
-        formfield = formfield_callback(f)
+        if widgets and f.name in widgets:
+            kwargs = {'widget': widgets[f.name]}
+        else:
+            kwargs = {}
+        formfield = formfield_callback(f, **kwargs)
         if formfield:
             field_list.append((f.name, formfield))
     field_dict = SortedDict(field_list)
@@ -192,12 +196,13 @@ class ModelFormOptions(object):
         self.model = getattr(options, 'model', None)
         self.fields = getattr(options, 'fields', None)
         self.exclude = getattr(options, 'exclude', None)
+        self.widgets = getattr(options, 'widgets', None)
 
 
 class ModelFormMetaclass(type):
     def __new__(cls, name, bases, attrs):
         formfield_callback = attrs.pop('formfield_callback',
-                lambda f: f.formfield())
+                lambda f, **kwargs: f.formfield(**kwargs))
         try:
             parents = [b for b in bases if issubclass(b, ModelForm)]
         except NameError:
@@ -215,7 +220,7 @@ class ModelFormMetaclass(type):
         if opts.model:
             # If a model is defined, extract form fields from it.
             fields = fields_for_model(opts.model, opts.fields,
-                                      opts.exclude, formfield_callback)
+                                      opts.exclude, opts.widgets, formfield_callback)
             # Override default model fields with any custom declared ones
             # (plus, include all the other declared fields).
             fields.update(declared_fields)

@@ -287,6 +287,27 @@ Using 'fields' *and* 'exclude'. Not sure why you'd want to do this, but uh,
 >>> CategoryForm.base_fields.keys()
 ['name']
 
+Using 'widgets'
+
+>>> class CategoryForm(ModelForm):
+...
+...     class Meta:
+...         model = Category
+...         fields = ['name', 'url', 'slug']
+...         widgets = {
+...             'name': forms.Textarea,
+...             'url': forms.TextInput(attrs={'class': 'url'})
+...         }
+
+>>> str(CategoryForm()['name'])
+'<textarea id="id_name" rows="10" cols="40" name="name"></textarea>'
+
+>>> str(CategoryForm()['url'])
+'<input id="id_url" type="text" class="url" name="url" maxlength="40" />'
+
+>>> str(CategoryForm()['slug'])
+'<input id="id_slug" type="text" name="slug" maxlength="20" />'
+
 Don't allow more than one 'model' definition in the inheritance hierarchy.
 Technically, it would generate a valid form, but the fact that the resulting
 save method won't deal with multiple objects is likely to trip up people not
