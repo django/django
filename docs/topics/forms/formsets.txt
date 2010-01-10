@@ -145,7 +145,7 @@ in this form as well.
 ``total_form_count`` and ``initial_form_count``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``BaseModelFormSet`` has a couple of methods that are closely related to the
+``BaseFormSet`` has a couple of methods that are closely related to the
 ``ManagementForm``, ``total_form_count`` and ``initial_form_count``.
 
 ``total_form_count`` returns the total number of forms in this formset.
