@@ -83,7 +83,7 @@ class GenericForeignKey(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError, u"%s must be accessed via instance" % self.related.opts.object_name
+            raise AttributeError(u"%s must be accessed via instance" % self.related.opts.object_name)
 
         ct = None
         fk = None
@@ -210,7 +210,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError, "Manager must be accessed via instance"
+            raise AttributeError("Manager must be accessed via instance")
 
         manager = self.__get__(instance)
         manager.clear()
@@ -252,7 +252,7 @@ def create_generic_related_manager(superclass):
         def add(self, *objs):
             for obj in objs:
                 if not isinstance(obj, self.model):
-                    raise TypeError, "'%s' instance expected" % self.model._meta.object_name
+                    raise TypeError("'%s' instance expected" % self.model._meta.object_name)
                 setattr(obj, self.content_type_field_name, self.content_type)
                 setattr(obj, self.object_id_field_name, self.pk_val)
                 obj.save(using=self.instance._state.db)

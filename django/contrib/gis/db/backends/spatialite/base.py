@@ -39,7 +39,7 @@ class DatabaseWrapper(SqliteDatabaseWrapper):
             settings_dict = self.settings_dict
             if not settings_dict['NAME']:
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured, "Please fill out the database NAME in the settings module before using the database."
+                raise ImproperlyConfigured("Please fill out the database NAME in the settings module before using the database.")
             kwargs = {
                 'database': settings_dict['NAME'],
                 'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,

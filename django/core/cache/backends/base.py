@@ -71,7 +71,7 @@ class BaseCache(object):
         ValueError exception.
         """
         if key not in self:
-            raise ValueError, "Key '%s' not found" % key
+            raise ValueError("Key '%s' not found" % key)
         new_value = self.get(key) + delta
         self.set(key, new_value)
         return new_value

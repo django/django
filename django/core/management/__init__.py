@@ -152,7 +152,7 @@ def call_command(name, *args, **options):
         else:
             klass = load_command_class(app_name, name)
     except KeyError:
-        raise CommandError, "Unknown command: %r" % name
+        raise CommandError("Unknown command: %r" % name)
 
     # Grab out a list of defaults from the options. optparse does this for us
     # when the script runs from the command line, but since call_command can

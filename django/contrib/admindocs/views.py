@@ -187,14 +187,14 @@ def model_detail(request, app_label, model_name):
     try:
         app_mod = models.get_app(app_label)
     except ImproperlyConfigured:
-        raise Http404, _("App %r not found") % app_label
+        raise Http404(_("App %r not found") % app_label)
     model = None
     for m in models.get_models(app_mod):
         if m._meta.object_name.lower() == model_name:
             model = m
             break
     if model is None:
-        raise Http404, _("Model %(model_name)r not found in app %(app_label)r") % {'model_name': model_name, 'app_label': app_label}
+        raise Http404(_("Model %(model_name)r not found in app %(app_label)r") % {'model_name': model_name, 'app_label': app_label})
 
     opts = model._meta
 
@@ -353,7 +353,7 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
                 continue
             views.extend(extract_views_from_urlpatterns(patterns, base + p.regex.pattern))
         else:
-            raise TypeError, _("%s does not appear to be a urlpattern object") % p
+            raise TypeError(_("%s does not appear to be a urlpattern object") % p)
     return views
 
 named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')

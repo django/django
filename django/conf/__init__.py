@@ -46,7 +46,7 @@ class LazySettings(LazyObject):
         argument must support attribute access (__getattr__)).
         """
         if self._wrapped != None:
-            raise RuntimeError, 'Settings already configured.'
+            raise RuntimeError('Settings already configured.')
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
             setattr(holder, name, value)
@@ -72,7 +72,7 @@ class Settings(object):
         try:
             mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError, e:
-            raise ImportError, "Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e)
+            raise ImportError("Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e))
 
         # Settings that should be converted into tuples if they're mistakenly entered
         # as strings.

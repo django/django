@@ -530,7 +530,7 @@ class WSGIServer(HTTPServer):
         try:
             HTTPServer.server_bind(self)
         except Exception, e:
-            raise WSGIServerException, e
+            raise WSGIServerException(e)
         self.setup_environ()
 
     def setup_environ(self):

@@ -171,7 +171,7 @@ class RelatedField(object):
             return [pk_trace(v) for v in value]
         elif lookup_type == 'isnull':
             return []
-        raise TypeError, "Related Field has invalid lookup: %s" % lookup_type
+        raise TypeError("Related Field has invalid lookup: %s" % lookup_type)
 
     def _get_related_query_name(self, opts):
         # This method defines the name that can be used to identify this
@@ -203,7 +203,7 @@ class SingleRelatedObjectDescriptor(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
+            raise AttributeError("%s must be accessed via instance" % self.related.opts.object_name)
 
         # The similarity of the code below to the code in
         # ReverseSingleRelatedObjectDescriptor is annoying, but there's a bunch
@@ -270,7 +270,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError, "%s must be accessed via instance" % self._field.name
+            raise AttributeError("%s must be accessed via instance" % self._field.name)
 
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
@@ -343,7 +343,7 @@ class ForeignRelatedObjectsDescriptor(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError, "Manager must be accessed via instance"
+            raise AttributeError("Manager must be accessed via instance")
 
         manager = self.__get__(instance)
         # If the foreign key can support nulls, then completely clear the related set.
@@ -376,7 +376,7 @@ class ForeignRelatedObjectsDescriptor(object):
             def add(self, *objs):
                 for obj in objs:
                     if not isinstance(obj, self.model):
-                        raise TypeError, "'%s' instance expected" % self.model._meta.object_name
+                        raise TypeError("'%s' instance expected" % self.model._meta.object_name)
                     setattr(obj, rel_field.name, instance)
                     obj.save(using=instance._state.db)
             add.alters_data = True
@@ -404,7 +404,7 @@ class ForeignRelatedObjectsDescriptor(object):
                             setattr(obj, rel_field.name, None)
                             obj.save(using=instance._state.db)
                         else:
-                            raise rel_field.rel.to.DoesNotExist, "%r is not related to %r." % (obj, instance)
+                            raise rel_field.rel.to.DoesNotExist("%r is not related to %r." % (obj, instance))
                 remove.alters_data = True
 
                 def clear(self):
@@ -475,7 +475,7 @@ def create_many_related_manager(superclass, rel=False):
             # from the method lookup table, as we do with add and remove.
             if not rel.through._meta.auto_created:
                 opts = through._meta
-                raise AttributeError, "Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
+                raise AttributeError("Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
             new_obj = super(ManyRelatedManager, self).using(self.instance._state.db).create(**kwargs)
             self.add(new_obj)
             return new_obj
@@ -508,7 +508,7 @@ def create_many_related_manager(superclass, rel=False):
 #                                                (obj, self.instance._state.db, obj._state.db))
                         new_ids.add(obj.pk)
                     elif isinstance(obj, Model):
-                        raise TypeError, "'%s' instance expected" % self.model._meta.object_name
+                        raise TypeError("'%s' instance expected" % self.model._meta.object_name)
                     else:
                         new_ids.add(obj)
                 vals = self.through._default_manager.using(self.instance._state.db).values_list(target_field_name, flat=True)
@@ -586,11 +586,11 @@ class ManyRelatedObjectsDescriptor(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError, "Manager must be accessed via instance"
+            raise AttributeError("Manager must be accessed via instance")
 
         if not self.related.field.rel.through._meta.auto_created:
             opts = self.related.field.rel.through._meta
-            raise AttributeError, "Cannot set values on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
+            raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
         manager = self.__get__(instance)
         manager.clear()
@@ -636,11 +636,11 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError, "Manager must be accessed via instance"
+            raise AttributeError("Manager must be accessed via instance")
 
         if not self.field.rel.through._meta.auto_created:
             opts = self.field.rel.through._meta
-            raise AttributeError, "Cannot set values on a ManyToManyField which specifies an intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
+            raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
         manager = self.__get__(instance)
         manager.clear()

@@ -12,7 +12,7 @@ class TestGeom:
         if not self.bad:
             m = wkt_regex.match(wkt)
             if not m:
-                raise Exception, 'Improper WKT: "%s"' % wkt
+                raise Exception('Improper WKT: "%s"' % wkt)
             self.geo_type = m.group('type')
 
         for key, value in kwargs.items():

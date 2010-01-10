@@ -233,7 +233,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
                 pdict[k[0]] = max(k[1], pdict[k[0]])
             csrc.append("catalog['%s'][%d] = '%s';\n" % (javascript_quote(k[0]), k[1], javascript_quote(v)))
         else:
-            raise TypeError, k
+            raise TypeError(k)
     csrc.sort()
     for k, v in pdict.items():
         src.append("catalog['%s'] = [%s];\n" % (javascript_quote(k), ','.join(["''"]*(v+1))))

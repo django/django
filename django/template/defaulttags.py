@@ -439,10 +439,10 @@ def autoescape(parser, token):
     """
     args = token.contents.split()
     if len(args) != 2:
-        raise TemplateSyntaxError("'Autoescape' tag requires exactly one argument.")
+        raise TemplateSyntaxError("'autoescape' tag requires exactly one argument.")
     arg = args[1]
     if arg not in (u'on', u'off'):
-        raise TemplateSyntaxError("'Autoescape' argument should be 'on' or 'off'")
+        raise TemplateSyntaxError("'autoescape' argument should be 'on' or 'off'")
     nodelist = parser.parse(('endautoescape',))
     parser.delete_first_token()
     return AutoEscapeControlNode((arg == 'on'), nodelist)
@@ -604,8 +604,7 @@ def firstof(parser, token):
     """
     bits = token.split_contents()[1:]
     if len(bits) < 1:
-        raise TemplateSyntaxError("'firstof' statement requires at least one"
-                                  " argument")
+        raise TemplateSyntaxError("'firstof' statement requires at least one argument")
     return FirstOfNode([parser.compile_filter(bit) for bit in bits])
 firstof = register.tag(firstof)
 
@@ -704,7 +703,7 @@ do_for = register.tag("for", do_for)
 def do_ifequal(parser, token, negate):
     bits = list(token.split_contents())
     if len(bits) != 3:
-        raise TemplateSyntaxError, "%r takes two arguments" % bits[0]
+        raise TemplateSyntaxError("%r takes two arguments" % bits[0])
     end_tag = 'end' + bits[0]
     nodelist_true = parser.parse(('else', end_tag))
     token = parser.next_token()
@@ -943,7 +942,7 @@ def now(parser, token):
     """
     bits = token.contents.split('"')
     if len(bits) != 3:
-        raise TemplateSyntaxError, "'now' statement takes one argument"
+        raise TemplateSyntaxError("'now' statement takes one argument")
     format_string = bits[1]
     return NowNode(format_string)
 now = register.tag(now)
@@ -997,7 +996,7 @@ def regroup(parser, token):
     """
     firstbits = token.contents.split(None, 3)
     if len(firstbits) != 4:
-        raise TemplateSyntaxError, "'regroup' tag takes five arguments"
+        raise TemplateSyntaxError("'regroup' tag takes five arguments")
     target = parser.compile_filter(firstbits[1])
     if firstbits[2] != 'by':
         raise TemplateSyntaxError("second argument to 'regroup' tag must be 'by'")
@@ -1067,7 +1066,7 @@ def templatetag(parser, token):
     """
     bits = token.contents.split()
     if len(bits) != 2:
-        raise TemplateSyntaxError, "'templatetag' statement takes one argument"
+        raise TemplateSyntaxError("'templatetag' statement takes one argument")
     tag = bits[1]
     if tag not in TemplateTagNode.mapping:
         raise TemplateSyntaxError("Invalid templatetag argument: '%s'."

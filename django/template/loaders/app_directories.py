@@ -20,7 +20,7 @@ for app in settings.INSTALLED_APPS:
     try:
         mod = import_module(app)
     except ImportError, e:
-        raise ImproperlyConfigured, 'ImportError %s: %s' % (app, e.args[0])
+        raise ImproperlyConfigured('ImportError %s: %s' % (app, e.args[0]))
     template_dir = os.path.join(os.path.dirname(mod.__file__), 'templates')
     if os.path.isdir(template_dir):
         app_template_dirs.append(template_dir.decode(fs_encoding))
@@ -59,7 +59,7 @@ class Loader(BaseLoader):
                     file.close()
             except IOError:
                 pass
-        raise TemplateDoesNotExist, template_name
+        raise TemplateDoesNotExist(template_name)
 
 _loader = Loader()
 

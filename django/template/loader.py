@@ -122,7 +122,7 @@ def find_template(name, dirs=None):
             return (source, make_origin(display_name, loader, name, dirs))
         except TemplateDoesNotExist:
             pass
-    raise TemplateDoesNotExist, name
+    raise TemplateDoesNotExist(name)
 
 def find_template_source(name, dirs=None):
     # For backward compatibility
@@ -180,6 +180,6 @@ def select_template(template_name_list):
         except TemplateDoesNotExist:
             continue
     # If we get here, none of the templates could be loaded
-    raise TemplateDoesNotExist, ', '.join(template_name_list)
+    raise TemplateDoesNotExist(', '.join(template_name_list))
 
 add_to_builtins('django.template.loader_tags')

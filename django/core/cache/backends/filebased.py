@@ -129,7 +129,7 @@ class CacheClass(BaseCache):
         try:
             os.makedirs(self._dir)
         except OSError:
-            raise EnvironmentError, "Cache directory '%s' does not exist and could not be created'" % self._dir
+            raise EnvironmentError("Cache directory '%s' does not exist and could not be created'" % self._dir)
 
     def _key_to_file(self, key):
         """

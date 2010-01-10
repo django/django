@@ -34,16 +34,16 @@ class BaseHandler(object):
             try:
                 dot = middleware_path.rindex('.')
             except ValueError:
-                raise exceptions.ImproperlyConfigured, '%s isn\'t a middleware module' % middleware_path
+                raise exceptions.ImproperlyConfigured('%s isn\'t a middleware module' % middleware_path)
             mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
             try:
                 mod = import_module(mw_module)
             except ImportError, e:
-                raise exceptions.ImproperlyConfigured, 'Error importing middleware %s: "%s"' % (mw_module, e)
+                raise exceptions.ImproperlyConfigured('Error importing middleware %s: "%s"' % (mw_module, e))
             try:
                 mw_class = getattr(mod, mw_classname)
             except AttributeError:
-                raise exceptions.ImproperlyConfigured, 'Middleware module "%s" does not define a "%s" class' % (mw_module, mw_classname)
+                raise exceptions.ImproperlyConfigured('Middleware module "%s" does not define a "%s" class' % (mw_module, mw_classname))
 
             try:
                 mw_instance = mw_class()
@@ -113,7 +113,7 @@ class BaseHandler(object):
                         view_name = callback.func_name # If it's a function
                     except AttributeError:
                         view_name = callback.__class__.__name__ + '.__call__' # If it's a class
-                    raise ValueError, "The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name)
+                    raise ValueError("The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name))
 
                 return response
             except http.Http404, e:

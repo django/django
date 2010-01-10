@@ -185,7 +185,7 @@ class QuerySet(object):
             qs.query.set_limits(k, k + 1)
             return list(qs)[0]
         except self.model.DoesNotExist, e:
-            raise IndexError, e.args
+            raise IndexError(e.args)
 
     def __and__(self, other):
         self._merge_sanity_check(other)

@@ -123,7 +123,7 @@ class AppCache(object):
                             return None
                     else:
                         return mod
-            raise ImproperlyConfigured, "App with label %s could not be found" % app_label
+            raise ImproperlyConfigured("App with label %s could not be found" % app_label)
         finally:
             self.write_lock.release()
 

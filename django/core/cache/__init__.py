@@ -39,10 +39,10 @@ def parse_backend_uri(backend_uri):
     (scheme, host, params) tuple.
     """
     if backend_uri.find(':') == -1:
-        raise InvalidCacheBackendError, "Backend URI must start with scheme://"
+        raise InvalidCacheBackendError("Backend URI must start with scheme://")
     scheme, rest = backend_uri.split(':', 1)
     if not rest.startswith('//'):
-        raise InvalidCacheBackendError, "Backend URI must start with scheme://"
+        raise InvalidCacheBackendError("Backend URI must start with scheme://")
 
     host = rest[2:]
     qpos = rest.find('?')

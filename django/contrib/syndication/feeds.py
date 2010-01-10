@@ -38,7 +38,7 @@ class Feed(object):
         try:
             return item.get_absolute_url()
         except AttributeError:
-            raise ImproperlyConfigured, "Give your %s class a get_absolute_url() method, or define an item_link() method in your Feed class." % item.__class__.__name__
+            raise ImproperlyConfigured("Give your %s class a get_absolute_url() method, or define an item_link() method in your Feed class." % item.__class__.__name__)
 
     def __get_dynamic_attr(self, attname, obj, default=None):
         try:

@@ -76,4 +76,4 @@ class TemplateValidatorForm(forms.Form):
             error = e
         template.builtins.remove(register)
         if error:
-            raise forms.ValidationError, e.args
+            raise forms.ValidationError(e.args)

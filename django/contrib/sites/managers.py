@@ -14,7 +14,7 @@ class CurrentSiteManager(models.Manager):
             try:
                 self.model._meta.get_field(self.__field_name)
             except FieldDoesNotExist:
-                raise ValueError, "%s couldn't find a field named %s in %s." % \
-                    (self.__class__.__name__, self.__field_name, self.model._meta.object_name)
+                raise ValueError("%s couldn't find a field named %s in %s." % \
+                    (self.__class__.__name__, self.__field_name, self.model._meta.object_name))
             self.__is_validated = True
         return super(CurrentSiteManager, self).get_query_set().filter(**{self.__field_name + '__id__exact': settings.SITE_ID})

@@ -45,7 +45,7 @@ class Loader(BaseLoader):
             error_msg = "Tried %s" % tried
         else:
             error_msg = "Your TEMPLATE_DIRS setting is empty. Change it to point to at least one template directory."
-        raise TemplateDoesNotExist, error_msg
+        raise TemplateDoesNotExist(error_msg)
     load_template_source.is_usable = True
 
 _loader = Loader()

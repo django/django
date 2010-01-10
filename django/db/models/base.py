@@ -111,8 +111,7 @@ class ModelBase(type):
                     raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             if (new_class._meta.local_fields or
                     new_class._meta.local_many_to_many):
-                raise FieldError("Proxy model '%s' contains model fields."
-                        % name)
+                raise FieldError("Proxy model '%s' contains model fields." % name)
             while base._meta.proxy:
                 base = base._meta.proxy_for_model
             new_class._meta.setup_proxy(base)
@@ -333,7 +332,7 @@ class Model(object):
                 except AttributeError:
                     pass
             if kwargs:
-                raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
+                raise TypeError("'%s' is an invalid keyword argument for this function" % kwargs.keys()[0])
         signals.post_init.send(sender=self.__class__, instance=self)
 
     def __repr__(self):
@@ -427,8 +426,7 @@ class Model(object):
         non-SQL backends), respectively. Normally, they should not be set.
         """
         if force_insert and force_update:
-            raise ValueError("Cannot force both insert and updating in "
-                    "model saving.")
+            raise ValueError("Cannot force both insert and updating in model saving.")
         self.save_base(using=using, force_insert=force_insert, force_update=force_update)
 
     save.alters_data = True
@@ -621,7 +619,7 @@ class Model(object):
         try:
             return qs[0]
         except IndexError:
-            raise self.DoesNotExist, "%s matching query does not exist." % self.__class__._meta.object_name
+            raise self.DoesNotExist("%s matching query does not exist." % self.__class__._meta.object_name)
 
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next

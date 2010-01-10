@@ -25,7 +25,7 @@ class Loader(BaseLoader):
                     return (resource_string(app, pkg_name).decode(settings.FILE_CHARSET), 'egg:%s:%s' % (app, pkg_name))
                 except:
                     pass
-        raise TemplateDoesNotExist, template_name
+        raise TemplateDoesNotExist(template_name)
 
 _loader = Loader()
 

@@ -31,7 +31,7 @@ class Loader(BaseLoader):
                 return (template, make_origin(display_name, loader, name, dirs))
             except TemplateDoesNotExist:
                 pass
-        raise TemplateDoesNotExist, name
+        raise TemplateDoesNotExist(name)
 
     def load_template(self, template_name, template_dirs=None):
         if template_name not in self.template_cache:

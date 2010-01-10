@@ -94,7 +94,7 @@ class Options(object):
 
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:
-                raise TypeError, "'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
+                raise TypeError("'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys()))
         else:
             self.verbose_name_plural = string_concat(self.verbose_name, 's')
         del self.meta
@@ -274,7 +274,7 @@ class Options(object):
         for f in to_search:
             if f.name == name:
                 return f
-        raise FieldDoesNotExist, '%s has no field named %r' % (self.object_name, name)
+        raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, name))
 
     def get_field_by_name(self, name):
         """

@@ -120,11 +120,11 @@ def object_detail(request, queryset, object_id=None, slug=None,
     elif slug and slug_field:
         queryset = queryset.filter(**{slug_field: slug})
     else:
-        raise AttributeError, "Generic detail view must be called with either an object_id or a slug/slug_field."
+        raise AttributeError("Generic detail view must be called with either an object_id or a slug/slug_field.")
     try:
         obj = queryset.get()
     except ObjectDoesNotExist:
-        raise Http404, "No %s found matching the query" % (model._meta.verbose_name)
+        raise Http404("No %s found matching the query" % (model._meta.verbose_name))
     if not template_name:
         template_name = "%s/%s_detail.html" % (model._meta.app_label, model._meta.object_name.lower())
     if template_name_field:

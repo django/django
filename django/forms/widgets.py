@@ -41,7 +41,7 @@ class Media(StrAndUnicode):
 
         # Any leftover attributes must be invalid.
         # if media_attrs != {}:
-        #     raise TypeError, "'class Media' has invalid attribute(s): %s" % ','.join(media_attrs.keys())
+        #     raise TypeError("'class Media' has invalid attribute(s): %s" % ','.join(media_attrs.keys()))
 
     def __unicode__(self):
         return self.render()
