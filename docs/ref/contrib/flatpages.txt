@@ -40,7 +40,7 @@ To install the flatpages app, follow these steps:
        
        Also make sure you've correctly set :setting:`SITE_ID` to the ID of the
        site the settings file represents. This will usually be ``1`` (i.e.
-       ``SITE_ID = 1``, but if you're not using the sites framework to manage
+       ``SITE_ID = 1``, but if you're using the sites framework to manage
        multiple sites, it could be the ID of a different site.
        
     2. Add ``'django.contrib.flatpages'`` to your :setting:`INSTALLED_APPS`
