@@ -399,7 +399,7 @@ ridiculous. It's just placeholder text.
 
 That's easy to change, though, using Django's template system. The Django admin
 is powered by Django itself, and its interfaces use Django's own template
-system. (How meta!)
+system.
 
 Open your settings file (``mysite/settings.py``, remember) and look at the
 :setting:`TEMPLATE_DIRS` setting. :setting:`TEMPLATE_DIRS` is a tuple of
