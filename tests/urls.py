@@ -36,6 +36,9 @@ urlpatterns = patterns('',
     # conditional get views
     (r'condition/', include('regressiontests.conditional_processing.urls')),
 
+    # middleware exceptions tests
+    (r'middleware_exceptions/', include('regressiontests.middleware_exceptions.urls')),
+
     # special headers views
     (r'special_headers/', include('regressiontests.special_headers.urls')),
 )

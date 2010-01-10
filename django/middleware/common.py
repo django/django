@@ -34,6 +34,8 @@ class CommonMiddleware(object):
         settings.APPEND_SLASH and settings.PREPEND_WWW
         """
 
+        assert False, 1
+
         # Check for denied User-Agents
         if 'HTTP_USER_AGENT' in request.META:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
