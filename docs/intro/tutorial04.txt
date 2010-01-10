@@ -201,7 +201,7 @@ conversion. We will:
 
     2. Rename a few templates.
 
-    3. Delete some the old, now unneeded views.
+    3. Delete some of the old, unneeded views.
 
     4. Fix up URL handling for the new views.
 
