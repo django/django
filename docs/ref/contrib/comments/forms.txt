@@ -45,4 +45,4 @@ forms that you can subclass to reuse pieces of the form handling logic:
    Handles the details of the comment itself.
 
    This class contains the ``name``, ``email``, ``url``, and the ``comment``
-   field itself, along with the associated valdation logic.
+   field itself, along with the associated validation logic.
