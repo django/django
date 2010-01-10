@@ -97,14 +97,20 @@ Fields
     .. attribute:: models.User.is_active
 
         Boolean. Designates whether this user account should be considered
-        active. Set this flag to ``False`` instead of deleting accounts.
+        active. We recommend that you set this flag to ``False`` instead of
+        deleting accounts; that way, if your applications have any foreign keys
+        to users, the foreign keys won't break.
 
-        This doesn't control whether or not the user can log in. Nothing in the
-        authentication path checks the ``is_active`` flag, so if you want to
-        reject a login based on ``is_active`` being ``False``, it is up to you
-        to check that in your own login view. However, permission checking
-        using the methods like :meth:`~models.User.has_perm` does check this
-        flag and will always return ``False`` for inactive users.
+        This doesn't necessarily control whether or not the user can log in.
+        Authentication backends aren't required to check for the ``is_active``
+        flag, so if you want to reject a login based on ``is_active`` being
+        ``False``, it's up to you to check that in your own login view.
+        However, the :class:`~django.contrib.auth.forms.AuthenticationForm`
+        used by the :func:`~django.contrib.auth.views.login` view *does*
+        perform this check, as do the permission-checking methods such as
+        :meth:`~models.User.has_perm` and the authentication in the Django
+        admin. All of those functions/methods will return ``False`` for
+        inactive users.
 
     .. attribute:: models.User.is_superuser
 
