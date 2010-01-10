@@ -8,15 +8,13 @@ class RequestMiddleware(object):
         raise Exception('Exception')
 
 class MiddlewareExceptionTest(TestCase):
-    def __init__(self, *args, **kwargs):
-        super(MiddlewareExceptionTest, self).__init__(*args, **kwargs)
+    def setUp(self):
         self.exceptions = []
         got_request_exception.connect(self._on_request_exception)
-
-    def setUp(self):
         self.client.handler.load_middleware()
 
     def tearDown(self):
+        got_request_exception.disconnect(self._on_request_exception)
         self.exceptions = []
 
     def _on_request_exception(self, sender, request, **kwargs):
