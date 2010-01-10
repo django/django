@@ -105,6 +105,8 @@ def archive_month(request, year, month, queryset, date_field,
 
     Templates: ``<app_label>/<model_name>_archive_month.html``
     Context:
+        date_list:
+            List of days in this month with objects
         month:
             (date) this month
         next_month:
@@ -139,6 +141,7 @@ def archive_month(request, year, month, queryset, date_field,
     if last_day >= now.date() and not allow_future:
         lookup_kwargs['%s__lte' % date_field] = now
     object_list = queryset.filter(**lookup_kwargs)
+    date_list = object_list.dates(date_field, 'day')
     if not object_list and not allow_empty:
         raise Http404
 
@@ -160,6 +163,7 @@ def archive_month(request, year, month, queryset, date_field,
         template_name = "%s/%s_archive_month.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
+        'date_list': date_list,
         '%s_list' % template_object_name: object_list,
         'month': date,
         'next_month': next_month,

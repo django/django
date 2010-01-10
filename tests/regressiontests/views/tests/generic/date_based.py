@@ -110,6 +110,22 @@ class MonthArchiveTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['next_month'], None)
         self.assertEqual(response.context['previous_month'], prev_month)
+        
+    def test_archive_month_date_list(self):
+        author = Author(name="John Smith")
+        author.save()
+        date1 = datetime(2010, 1, 1, 0, 0, 0)
+        date2 = datetime(2010, 1, 2, 0, 0, 0)
+        Article.objects.create(title='example1', author=author, date_created=date1)
+        Article.objects.create(title='example2', author=author, date_created=date2)
+        response = self.client.get('/views/date_based/archive_month/2010/1/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['date_list']), 2)
+        self.assertEqual(response.context['date_list'][0], date1)
+        # Checks that the same date is not included more than once in the list
+        Article.objects.create(title='example2', author=author, date_created=date2)
+        response = self.client.get('/views/date_based/archive_month/2010/1/')
+        self.assertEqual(len(response.context['date_list']), 2)
 
 class DayArchiveTests(TestCase):
 

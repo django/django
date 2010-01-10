@@ -369,7 +369,14 @@ If ``template_name`` isn't specified, this view will use the template
 
 **Template context:**
 
+.. versionadded:: 1.2
+   The inclusion of ``date_list`` in the template's context is new.
+
 In addition to ``extra_context``, the template's context will be:
+
+    * ``date_list``: A list of ``datetime.date`` objects representing all
+      days that have objects available in the given month, according to
+      ``queryset``, in ascending order.    
 
     * ``month``: A ``datetime.date`` object representing the given month.
 
