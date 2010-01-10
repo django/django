@@ -950,8 +950,8 @@ If you have a ``Place`` that is also a ``Restaurant``, you can get from the
 ``Place`` object to the ``Restaurant`` object by using the lower-case version
 of the model name::
 
-    >>> p = Place.objects.filter(name="Bob's Cafe")
-    # If Bob's Cafe is a Restaurant object, this will give the child class:
+    >>> p = Place.objects.get(id=12)
+    # If p is a Restaurant object, this will give the child class:
     >>> p.restaurant
     <Restaurant: ...>
 
