@@ -803,7 +803,7 @@ class Model(object):
             if hasattr(e, 'message_dict'):
                 if errors:
                     for k, v in e.message_dict.items():
-                        errors.set_default(k, []).extend(v)
+                        errors.setdefault(k, []).extend(v)
                 else:
                     errors = e.message_dict
             else:
