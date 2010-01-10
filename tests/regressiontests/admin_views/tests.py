@@ -602,6 +602,20 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(logged.object_id, u'1')
         self.client.get('/test_admin/admin/logout/')
 
+    def testDisabledPermissionsWhenLoggedIn(self):
+        self.client.login(username='super', password='secret')
+        superuser = User.objects.get(username='super')
+        superuser.is_active = False
+        superuser.save()
+
+        response = self.client.get('/test_admin/admin/')
+        self.assertContains(response, 'id="login-form"')
+        self.assertNotContains(response, 'Log out')
+
+        response = self.client.get('/test_admin/admin/secure-view/')
+        open('/home/maniac/Desktop/response.html', 'w').write(response.content)
+        self.assertContains(response, 'id="login-form"')
+
 class AdminViewStringPrimaryKeyTest(TestCase):
     fixtures = ['admin-views-users.xml', 'string-primary-key.xml']
 
@@ -622,7 +636,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/history/' % quote(self.pk))
         self.assertContains(response, escape(self.pk))
         self.failUnlessEqual(response.status_code, 200)
- 
+
     def test_get_change_view(self):
         "Retrieving the object using urlencoded form of primary key should work"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(self.pk))

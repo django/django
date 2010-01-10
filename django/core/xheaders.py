@@ -18,7 +18,7 @@ def populate_xheaders(request, response, model, object_id):
     """
     from django.conf import settings
     if (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
-            or (hasattr(request, 'user') and request.user.is_authenticated()
+            or (hasattr(request, 'user') and request.user.is_active
                 and request.user.is_staff)):
         response['X-Object-Type'] = "%s.%s" % (model._meta.app_label, model._meta.object_name.lower())
         response['X-Object-Id'] = str(object_id)

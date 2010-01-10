@@ -35,4 +35,7 @@ urlpatterns = patterns('',
 
     # conditional get views
     (r'condition/', include('regressiontests.conditional_processing.urls')),
+
+    # special headers views
+    (r'special_headers/', include('regressiontests.special_headers.urls')),
 )

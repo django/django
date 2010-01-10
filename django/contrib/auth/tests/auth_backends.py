@@ -29,6 +29,11 @@ class BackendTest(TestCase):
         user.is_superuser = False
         user.save()
         self.assertEqual(user.has_perm('auth.test'), False)
+        user.is_staff = True
+        user.is_superuser = True
+        user.is_active = False
+        user.save()
+        self.assertEqual(user.has_perm('auth.test'), False)
 
     def test_custom_perms(self):
         user = User.objects.get(username='test')
