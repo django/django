@@ -295,6 +295,8 @@ DoesNotExist: Article matching query does not exist.
 []
 >>> Article.objects.none().count()
 0
+>>> Article.objects.none().update(headline="This should not take effect")
+0
 >>> [article for article in Article.objects.none().iterator()]
 []
 
