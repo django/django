@@ -785,8 +785,8 @@ instance you want to point to. Example::
     # Change every Entry so that it belongs to this Blog.
     >>> Entry.objects.all().update(blog=b)
 
-The ``update()`` method is applied instantly and doesn't return anything
-(similar to ``delete()``). The only restriction on the ``QuerySet`` that is
+The ``update()`` method is applied instantly and returns the number of rows
+affected by the query. The only restriction on the ``QuerySet`` that is
 updated is that it can only access one database table, the model's main
 table. So don't try to filter based on related fields or anything like that;
 it won't work.
