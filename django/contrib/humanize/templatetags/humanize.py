@@ -14,7 +14,7 @@ def ordinal(value):
     """
     try:
         value = int(value)
-    except ValueError:
+    except (TypeError, ValueError):
         return value
     t = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
     if value % 100 in (11, 12, 13): # special case
