@@ -47,15 +47,15 @@ A quick rundown:
     * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
       through its loop
 
-    * Since we are creating a POST form (which can have the effect of modifying
-      data), we unfortunately need to worry about Cross Site Request Forgeries.
+    * Since we're creating a POST form (which can have the effect of modifying
+      data), we need to worry about Cross Site Request Forgeries.
       Thankfully, you don't have to worry too hard, because Django comes with
-      very easy-to-use system for protecting against it.  In short, all POST
-      forms that are targetted at internal URLs need the ``{% csrf_token %}``
-      template tag adding.
+      a very easy-to-use system for protecting against it. In short, all POST
+      forms that are targeted at internal URLs should use the ``{% csrf_token %}``
+      template tag.
 
 The ``{% csrf_token %}`` tag requires information from the request object, which
-is not normally accessible from within the template context.  To fix this, a
+is not normally accessible from within the template context. To fix this, a
 small adjustment needs to be made to the ``detail`` view, so that it looks like
 the following::
 
