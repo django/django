@@ -37,8 +37,9 @@ def autodiscover():
         # should) bubble up, but a missing __path__ (which is legal, but weird)
         # fails silently -- apps that do weird things with __path__ might
         # need to roll their own admin registration.
+        mod = import_module(app)
         try:
-            app_path = import_module(app).__path__
+            app_path = mod.__path__
         except AttributeError:
             continue
 
