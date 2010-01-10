@@ -1395,7 +1395,7 @@ In this example, we register the default ``AdminSite`` instance
     admin.autodiscover()
 
     urlpatterns = patterns('',
-        ('^admin/', include(admin.site.urls)),
+        (r'^admin/', include(admin.site.urls)),
     )
 
 Above we used ``admin.autodiscover()`` to automatically load the
@@ -1409,7 +1409,7 @@ In this example, we register the ``AdminSite`` instance
     from myproject.admin import admin_site
 
     urlpatterns = patterns('',
-        ('^myadmin/', include(admin_site.urls)),
+        (r'^myadmin/', include(admin_site.urls)),
     )
 
 There is really no need to use autodiscover when using your own ``AdminSite``
@@ -1437,8 +1437,8 @@ respectively::
     from myproject.admin import basic_site, advanced_site
 
     urlpatterns = patterns('',
-        ('^basic-admin/', include(basic_site.urls)),
-        ('^advanced-admin/', include(advanced_site.urls)),
+        (r'^basic-admin/', include(basic_site.urls)),
+        (r'^advanced-admin/', include(advanced_site.urls)),
     )
 
 ``AdminSite`` instances take a single argument to their constructor, their
