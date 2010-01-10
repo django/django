@@ -656,7 +656,8 @@ returns the resulting string::
 
 The ``render_to_string`` shortcut takes one required argument --
 ``template_name``, which should be the name of the template to load
-and render -- and two optional arguments:
+and render (or a list of template names, in which case Django will use
+the first template in the list that exists) -- and two optional arguments:
 
     dictionary
         A dictionary to be used as variables and values for the
