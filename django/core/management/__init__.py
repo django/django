@@ -358,8 +358,7 @@ class ManagementUtility(object):
         try:
             subcommand = self.argv[1]
         except IndexError:
-            sys.stderr.write("Type '%s help' for usage.\n" % self.prog_name)
-            sys.exit(1)
+            subcommand = 'help' # Display help if no arguments were given.
 
         if subcommand == 'help':
             if len(args) > 2:
