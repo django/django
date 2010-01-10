@@ -462,6 +462,10 @@ Attributes
     A normal Python string representing the content, encoded from a Unicode
     object if necessary.
 
+.. attribute:: HttpResponse.status_code
+
+    The `HTTP Status code`_ for the response.
+
 Methods
 -------
 
