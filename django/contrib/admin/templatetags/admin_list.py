@@ -76,17 +76,17 @@ def result_headers(cl):
     lookup_opts = cl.lookup_opts
 
     for i, field_name in enumerate(cl.list_display):
-        attr = None
-        try:
-            f = lookup_opts.get_field(field_name)
-            admin_order_field = None
-            header = f.verbose_name
-        except models.FieldDoesNotExist:
-            header = label_for_field(field_name, cl.model, cl.model_admin)
+        header, attr = label_for_field(field_name, cl.model,
+            model_admin = cl.model_admin,
+            return_attr = True
+        )
+        if attr:
             # if the field is the action checkbox: no sorting and special class
             if field_name == 'action_checkbox':
-                yield {"text": header,
-                       "class_attrib": mark_safe(' class="action-checkbox-column"')}
+                yield {
+                    "text": header,
+                    "class_attrib": mark_safe(' class="action-checkbox-column"')
+                }
                 continue
             header = pretty_name(header)
 
@@ -98,6 +98,8 @@ def result_headers(cl):
 
             # So this _is_ a sortable non-field.  Go to the yield
             # after the else clause.
+        else:
+            admin_order_field = None
 
         th_classes = []
         new_order_type = 'asc'
