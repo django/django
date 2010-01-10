@@ -80,7 +80,7 @@ the URLconf to point to a view function:
         ('^about/$', direct_to_template, {
             'template': 'about.html'
         }),
-        **('^about/(\w+)/$', about_pages),**
+        **('^about/(\\w+)/$', about_pages),**
     )
 
 Next, we'll write the ``about_pages`` view::
@@ -382,7 +382,7 @@ of code by hand. As usual, we'll start by writing a URLconf:
 
     urlpatterns = patterns('',
         (r'^publishers/$', list_detail.object_list, publisher_info),
-        **(r'^books/(\w+)/$', books_by_publisher),**
+        **(r'^books/(\\w+)/$', books_by_publisher),**
     )
 
 Next, we'll write the ``books_by_publisher`` view itself::
