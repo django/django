@@ -1317,7 +1317,11 @@ extract two field values, where only one is expected::
 
         values = Blog.objects.filter(
                 name__contains='Cheddar').values_list('pk', flat=True)
-        entries = Entry.objects.filter(blog__in=values)
+        entries = Entry.objects.filter(blog__in=list(values))
+
+    Note the ``list()`` call around the Blog ``QuerySet`` to force execution of
+    the first query. Without it, a nested query would be executed, because 
+    :ref:`querysets-are-lazy`.
 
 gt
 ~~
