@@ -618,7 +618,7 @@ in the split second between the two requests.
 
 To avoid this problem, simply save the ``QuerySet`` and reuse it::
 
-    >>> queryset = Poll.objects.all()
+    >>> queryset = Entry.objects.all()
     >>> print [p.headline for p in queryset] # Evaluate the query set.
     >>> print [p.pub_date for p in queryset] # Re-use the cache from the evaluation.
 
