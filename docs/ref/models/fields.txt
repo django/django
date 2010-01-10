@@ -653,8 +653,8 @@ image. Has two extra optional arguments:
     image each time the model instance is saved.
 
 In addition to the special attributes that are available for :class:`FileField`,
-an :class:`ImageField` also has ``File.height`` and ``File.width`` attributes.
-See :ref:`topics-files`.
+an :class:`ImageField` also has :attr:`~django.core.files.File.height` and
+:attr:`~django.core.files.File.width` attributes.
 
 Requires the `Python Imaging Library`_.
 
