@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-10 21:25+0100\n"
+"POT-Creation-Date: 2010-01-11 10:18+0100\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -1738,27 +1738,27 @@ msgstr "Punkt"
 
 #: contrib/gis/db/models/fields.py:297
 msgid "Line string"
-msgstr ""
+msgstr "Ścieżka"
 
 #: contrib/gis/db/models/fields.py:301
 msgid "Polygon"
-msgstr "Wielobok"
+msgstr "Wielokąt"
 
 #: contrib/gis/db/models/fields.py:305
 msgid "Multi-point"
-msgstr ""
+msgstr "Zbiór punktów"
 
 #: contrib/gis/db/models/fields.py:309
 msgid "Multi-line string"
-msgstr ""
+msgstr "Zbiór ścieżek"
 
 #: contrib/gis/db/models/fields.py:313
 msgid "Multi polygon"
-msgstr ""
+msgstr "Zbiór wielokątów"
 
 #: contrib/gis/db/models/fields.py:317
 msgid "Geometry collection"
-msgstr ""
+msgstr "Zbiór geometrii"
 
 #: contrib/gis/forms/fields.py:17
 msgid "No geometry value provided."
@@ -4444,8 +4444,7 @@ msgstr "Wpisz tylko cyfry oddzielone przecinkami."
 #: core/validators.py:100
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr ""
-"Upewnij się, że ta wartość jest %(limit_value)s (jest %(show_value)s)."
+msgstr "Upewnij się, że ta wartość jest %(limit_value)s (jest %(show_value)s)."
 
 #: core/validators.py:118 forms/fields.py:196 forms/fields.py:248
 #, python-format
