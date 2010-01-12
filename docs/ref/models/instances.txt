@@ -59,7 +59,7 @@ compatibility.)
 Example::
 
     try:
-        article.full_validate()
+        article.full_clean()
     except ValidationError, e:
         # Do something based on the errors contained in e.error_dict.
         # Display them to a user, or handle them programatically.
