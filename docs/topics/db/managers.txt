@@ -333,7 +333,7 @@ Writing Correct Managers For Use In Automatic Manager Instances
 As already suggested by the `django.contrib.gis` example, above, the
 ``use_for_related_fields`` feature is primarily for managers that need to
 return a custom ``QuerySet`` subclass. In providing this functionality in your
-manager, there are a couple of things to be remember.
+manager, there are a couple of things to remember.
 
 Do not filter away any results in this type of manager subclass
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
