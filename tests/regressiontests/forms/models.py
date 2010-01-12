@@ -3,11 +3,13 @@ import datetime
 import tempfile
 import shutil
 
-from django.db import models
+from django.db import models, connection
+from django.conf import settings
 # Can't import as "forms" due to implementation details in the test suite (the
 # current file is called "forms" and is already imported).
 from django import forms as django_forms
 from django.core.files.storage import FileSystemStorage
+from django.test import TestCase
 
 temp_storage_location = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(location=temp_storage_location)
@@ -40,6 +42,30 @@ class FileModel(models.Model):
 
 class FileForm(django_forms.Form):
     file1 = django_forms.FileField()
+
+class Group(models.Model):
+    name = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return u'%s' % self.name
+
+class TestTicket12510(TestCase):
+    ''' It is not necessary to generate choices for ModelChoiceField (regression test for #12510). '''
+    def setUp(self):
+        self.groups = [Group.objects.create(name=name) for name in 'abc']
+        self.old_debug = settings.DEBUG
+        # turn debug on to get access to connection.queries
+        settings.DEBUG = True
+
+    def tearDown(self):
+        settings.DEBUG = self.old_debug
+
+    def test_choices_not_fetched_when_not_rendering(self):
+        field = django_forms.ModelChoiceField(Group.objects.order_by('-name'))
+        self.assertEqual('a', field.clean(self.groups[0].pk).name)
+        # only one query is required to pull the model from DB
+        self.assertEqual(1, len(connection.queries))
+
 
 __test__ = {'API_TESTS': """
 >>> from django.forms.models import ModelForm

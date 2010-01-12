@@ -903,8 +903,7 @@ class ModelChoiceField(ChoiceField):
 
     choices = property(_get_choices, ChoiceField._set_choices)
 
-    def clean(self, value):
-        Field.clean(self, value)
+    def to_python(self, value):
         if value in EMPTY_VALUES:
             return None
         try:
@@ -913,6 +912,9 @@ class ModelChoiceField(ChoiceField):
         except self.queryset.model.DoesNotExist:
             raise ValidationError(self.error_messages['invalid_choice'])
         return value
+
+    def validate(self, value):
+        return Field.validate(self, value)
 
 class ModelMultipleChoiceField(ModelChoiceField):
     """A MultipleChoiceField whose choices are a model QuerySet."""
