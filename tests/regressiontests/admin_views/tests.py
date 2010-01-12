@@ -4,7 +4,8 @@ import re
 import datetime
 from django.core.files import temp as tempfile
 from django.test import TestCase
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth import admin # Register auth models with the admin.
+from django.contrib.auth.models import User, Permission, UNUSABLE_PASSWORD
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
@@ -1766,3 +1767,37 @@ class ReadonlyTest(TestCase):
         self.assertEqual(Post.objects.count(), 2)
         p = Post.objects.order_by('-id')[0]
         self.assertEqual(p.posted, datetime.date.today())
+
+class IncompleteFormTest(TestCase):
+    """
+    Tests validation of a ModelForm that doesn't explicitly have all data
+    corresponding to model fields. Model validation shouldn't fail
+    such a forms.
+    """
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+       self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+       self.client.logout()
+
+    def test_user_creation(self):
+       response = self.client.post('/test_admin/admin/auth/user/add/', {
+           'username': 'newuser',
+           'password1': 'newpassword',
+           'password2': 'newpassword',
+       })
+       new_user = User.objects.order_by('-id')[0]
+       self.assertRedirects(response, '/test_admin/admin/auth/user/%s/' % new_user.pk)
+       self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
+
+    def test_password_mismatch(self):
+       response = self.client.post('/test_admin/admin/auth/user/add/', {
+           'username': 'newuser',
+           'password1': 'newpassword',
+           'password2': 'mismatch',
+       })
+       self.assertEquals(response.status_code, 200)
+       self.assert_('password' not in response.context['form'].errors)
+       self.assertFormError(response, 'form', 'password2', ["The two password fields didn't match."])

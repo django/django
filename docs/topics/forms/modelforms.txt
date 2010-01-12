@@ -515,6 +515,18 @@ There are a couple of things to note, however.
 Chances are these notes won't affect you unless you're trying to do something
 tricky with subclassing.
 
+Interaction with model validation
+---------------------------------
+
+As part of its validation process, ``ModelForm`` will call the ``clean()``
+method of each field on your model that has a corresponding field on your form.
+If you have excluded any model fields, validation will not be run on those
+fields. See the :ref:`form validation <ref-forms-validation>` documentation
+for more on how field cleaning and validation work. Also, your model's
+``clean()`` method will be called before any uniqueness checks are made. See
+:ref:`Validating objects <validating-objects>` for more information on the
+model's ``clean()`` hook.
+
 .. _model-formsets:
 
 Model formsets

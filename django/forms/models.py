@@ -9,7 +9,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, UnresolvableValidationError
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.core.validators import EMPTY_VALUES
 from util import ErrorList
 from forms import BaseForm, get_declared_fields
@@ -250,31 +250,51 @@ class BaseModelForm(BaseForm):
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
 
+
+    def _get_validation_exclusions(self):
+        """
+        For backwards-compatibility, several types of fields need to be
+        excluded from model validation. See the following tickets for
+        details: #12507, #12521, #12553
+        """
+        exclude = []
+        # Build up a list of fields that should be excluded from model field
+        # validation and unique checks.
+        for f in self.instance._meta.fields:
+            field = f.name
+            # Exclude fields that aren't on the form. The developer may be
+            # adding these values to the model after form validation.
+            if field not in self.fields:
+                exclude.append(f.name)
+            # Exclude fields that failed form validation. There's no need for
+            # the model fields to validate them as well.
+            elif field in self._errors.keys():
+                exclude.append(f.name)
+            # Exclude empty fields that are not required by the form. The
+            # underlying model field may be required, so this keeps the model
+            # field from raising that error.
+            else:
+                form_field = self.fields[field]
+                field_value = self.cleaned_data.get(field, None)
+                if field_value is None and not form_field.required:
+                    exclude.append(f.name)
+        return exclude
+
     def clean(self):
         opts = self._meta
         self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
+        exclude = self._get_validation_exclusions()
         try:
-            self.instance.full_validate(exclude=self._errors.keys())
+            self.instance.full_clean(exclude=exclude)
         except ValidationError, e:
             for k, v in e.message_dict.items():
                 if k != NON_FIELD_ERRORS:
                     self._errors.setdefault(k, ErrorList()).extend(v)
-
                     # Remove the data from the cleaned_data dict since it was invalid
                     if k in self.cleaned_data:
                         del self.cleaned_data[k]
-
             if NON_FIELD_ERRORS in e.message_dict:
                 raise ValidationError(e.message_dict[NON_FIELD_ERRORS])
-
-            # If model validation threw errors for fields that aren't on the
-            # form, the the errors cannot be corrected by the user. Displaying
-            # those errors would be pointless, so raise another type of
-            # exception that *won't* be caught and displayed by the form.
-            if set(e.message_dict.keys()) - set(self.fields.keys() + [NON_FIELD_ERRORS]):
-                raise UnresolvableValidationError(e.message_dict)
-
-
         return self.cleaned_data
 
     def save(self, commit=True):
@@ -412,17 +432,20 @@ class BaseModelFormSet(BaseFormSet):
         self.validate_unique()
 
     def validate_unique(self):
-        # Iterate over the forms so that we can find one with potentially valid
-        # data from which to extract the error checks
+        # Collect unique_checks and date_checks to run from all the forms.
+        all_unique_checks = set()
+        all_date_checks = set()
         for form in self.forms:
-            if hasattr(form, 'cleaned_data'):
-                break
-        else:
-            return
-        unique_checks, date_checks = form.instance._get_unique_checks()
+            if not hasattr(form, 'cleaned_data'):
+                continue
+            exclude = form._get_validation_exclusions()
+            unique_checks, date_checks = form.instance._get_unique_checks(exclude=exclude)
+            all_unique_checks = all_unique_checks.union(set(unique_checks))
+            all_date_checks = all_date_checks.union(set(date_checks))
+
         errors = []
         # Do each of the unique checks (unique and unique_together)
-        for unique_check in unique_checks:
+        for unique_check in all_unique_checks:
             seen_data = set()
             for form in self.forms:
                 # if the form doesn't have cleaned_data then we ignore it,
@@ -444,7 +467,7 @@ class BaseModelFormSet(BaseFormSet):
                     # mark the data as seen
                     seen_data.add(row_data)
         # iterate over each of the date checks now
-        for date_check in date_checks:
+        for date_check in all_date_checks:
             seen_data = set()
             lookup, field, unique_for = date_check
             for form in self.forms:

@@ -740,6 +740,11 @@ class ForeignKey(RelatedField, Field):
     def validate(self, value, model_instance):
         if self.rel.parent_link:
             return
+        # Don't validate the field if a value wasn't supplied. This is
+        # generally the case when saving new inlines in the admin.
+        # See #12507.
+        if value is None:
+            return
         super(ForeignKey, self).validate(value, model_instance)
         if not value:
             return

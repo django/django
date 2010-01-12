@@ -640,17 +640,21 @@ class Model(object):
     def prepare_database_save(self, unused):
         return self.pk
 
-    def validate(self):
+    def clean(self):
         """
         Hook for doing any extra model-wide validation after clean() has been
-        called on every field. Any ValidationError raised by this method will
-        not be associated with a particular field; it will have a special-case
-        association with the field defined by NON_FIELD_ERRORS.
+        called on every field by self.clean_fields. Any ValidationError raised
+        by this method will not be associated with a particular field; it will
+        have a special-case association with the field defined by NON_FIELD_ERRORS.
         """
-        self.validate_unique()
+        pass
 
-    def validate_unique(self):
-        unique_checks, date_checks = self._get_unique_checks()
+    def validate_unique(self, exclude=None):
+        """
+        Checks unique constraints on the model and raises ``ValidationError``
+        if any failed.
+        """
+        unique_checks, date_checks = self._get_unique_checks(exclude=exclude)
 
         errors = self._perform_unique_checks(unique_checks)
         date_errors = self._perform_date_checks(date_checks)
@@ -661,17 +665,35 @@ class Model(object):
         if errors:
             raise ValidationError(errors)
 
-    def _get_unique_checks(self):
-        from django.db.models.fields import FieldDoesNotExist, Field as ModelField
+    def _get_unique_checks(self, exclude=None):
+        """
+        Gather a list of checks to perform. Since validate_unique could be
+        called from a ModelForm, some fields may have been excluded; we can't
+        perform a unique check on a model that is missing fields involved
+        in that check.
+        Fields that did not validate should also be exluded, but they need
+        to be passed in via the exclude argument.
+        """
+        if exclude is None:
+            exclude = []
+        unique_checks = []
+        for check in self._meta.unique_together:
+            for name in check:
+                # If this is an excluded field, don't add this check.
+                if name in exclude:
+                    break
+            else:
+                unique_checks.append(check)
 
-        unique_checks = list(self._meta.unique_together)
-        # these are checks for the unique_for_<date/year/month>
+        # These are checks for the unique_for_<date/year/month>.
         date_checks = []
 
         # Gather a list of checks for fields declared as unique and add them to
-        # the list of checks. Again, skip empty fields and any that did not validate.
+        # the list of checks.
         for f in self._meta.fields:
             name = f.name
+            if name in exclude:
+                continue
             if f.unique:
                 unique_checks.append((name,))
             if f.unique_for_date:
@@ -681,7 +703,6 @@ class Model(object):
             if f.unique_for_month:
                 date_checks.append(('month', name, f.unique_for_month))
         return unique_checks, date_checks
-
 
     def _perform_unique_checks(self, unique_checks):
         errors = {}
@@ -779,33 +800,60 @@ class Model(object):
                 'field_label': unicode(field_labels)
             }
 
-    def full_validate(self, exclude=[]):
+    def full_clean(self, exclude=None):
         """
-        Cleans all fields and raises ValidationError containing message_dict
+        Calls clean_fields, clean, and validate_unique, on the model,
+        and raises a ``ValidationError`` for any errors that occured.
+        """
+        errors = {}
+        if exclude is None:
+            exclude = []
+
+        try:
+            self.clean_fields(exclude=exclude)
+        except ValidationError, e:
+            errors = e.update_error_dict(errors)
+
+        # Form.clean() is run even if other validation fails, so do the
+        # same with Model.clean() for consistency.
+        try:
+            self.clean()
+        except ValidationError, e:
+            errors = e.update_error_dict(errors)
+
+        # Run unique checks, but only for fields that passed validation.
+        for name in errors.keys():
+            if name != NON_FIELD_ERRORS and name not in exclude:
+                exclude.append(name)
+        try:
+            self.validate_unique(exclude=exclude)
+        except ValidationError, e:
+            errors = e.update_error_dict(errors)
+
+        if errors:
+            raise ValidationError(errors)
+
+    def clean_fields(self, exclude=None):
+        """
+        Cleans all fields and raises a ValidationError containing message_dict
         of all validation errors if any occur.
         """
+        if exclude is None:
+            exclude = []
+
         errors = {}
         for f in self._meta.fields:
             if f.name in exclude:
                 continue
+            # Skip validation for empty fields with blank=True. The developer
+            # is responsible for making sure they have a valid value.
+            raw_value = getattr(self, f.attname)
+            if f.blank and raw_value in validators.EMPTY_VALUES:
+                continue
             try:
-                setattr(self, f.attname, f.clean(getattr(self, f.attname), self))
+                setattr(self, f.attname, f.clean(raw_value, self))
             except ValidationError, e:
                 errors[f.name] = e.messages
-
-        # Form.clean() is run even if other validation fails, so do the
-        # same with Model.validate() for consistency.
-        try:
-            self.validate()
-        except ValidationError, e:
-            if hasattr(e, 'message_dict'):
-                if errors:
-                    for k, v in e.message_dict.items():
-                        errors.setdefault(k, []).extend(v)
-                else:
-                    errors = e.message_dict
-            else:
-                errors[NON_FIELD_ERRORS] = e.messages
 
         if errors:
             raise ValidationError(errors)

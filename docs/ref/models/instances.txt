@@ -34,31 +34,88 @@ Validating objects
 
 .. versionadded:: 1.2
 
-To validate your model, call its ``full_validate()`` method:
+There are three steps in validating a model, and all three are called by a
+model's ``full_clean()`` method. Most of the time, this method will be called
+automatically by a ``ModelForm``. (See the :ref:`ModelForm documentation
+<topics-forms-modelforms>` for more information.) You should only need to call
+``full_clean()`` if you plan to handle validation errors yourself.
 
-.. method:: Model.full_validate([exclude=[]])
+.. method:: Model.full_clean(exclude=None)
 
-The optional ``exclude`` argument can contain a list of field names to omit
-when validating. This method raises ``ValidationError`` containing a
-message dictionary with errors from all fields.
+This method calls ``Model.clean_fields()``, ``Model.clean()``, and
+``Model.validate_unique()``, in that order and raises a ``ValidationError``
+that has a ``message_dict`` attribute containing errors from all three stages.
 
-To add your own validation logic, override the supplied ``validate()`` method:
+The optional ``exclude`` argument can be used to provide a list of field names
+that can be excluded from validation and cleaning. ``ModelForm`` uses this
+argument to exclude fields that aren't present on your form from being
+validated since any errors raised could not be corrected by the user.
 
-Note that ``full_validate`` will NOT be called automatically when you call
+Note that ``full_clean()`` will NOT be called automatically when you call
 your model's ``save()`` method. You'll need to call it manually if you want
-to run your model validators. (This is for backwards compatibility.) However,
-if you're using a ``ModelForm``, it will call ``full_validate`` for you and
-will present any errors along with the other form error messages.
+to run model validation outside of a ``ModelForm``. (This is for backwards
+compatibility.)
 
-.. method:: Model.validate()
+Example::
 
-The ``validate()`` method on ``Model`` by default checks for uniqueness of
-fields and group of fields that are declared to be unique, so remember to call
-``self.validate_unique()`` or the superclass' ``validate`` method if you want
-this validation to run.
+    try:
+        article.full_validate()
+    except ValidationError, e:
+        # Do something based on the errors contained in e.error_dict.
+        # Display them to a user, or handle them programatically.
 
-Any ``ValidationError`` raised in this method will be included in the
-``message_dict`` under ``NON_FIELD_ERRORS``.
+The first step ``full_clean()`` performs is to clean each individual field.
+
+.. method:: Model.clean_fields(exclude=None)
+
+This method will validate all fields on your model. The optional ``exclude``
+argument lets you provide a list of field names to exclude from validation. It
+will raise a ``ValidationError`` if any fields fail validation.
+
+The second step ``full_clean()`` performs is to call ``Model.clean()``.
+This method should be overridden to perform custom validation on your model.
+
+.. method:: Model.clean()
+
+This method should be used to provide custom model validation, and to modify
+attributes on your model if desired. For instance, you could use it to
+automatically provide a value for a field, or to do validation that requires
+access to more than a single field::
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        # Don't allow draft entries to have a pub_date.
+        if self.status == 'draft' and self.pub_date is not None:
+            raise ValidationError('Draft entries may not have a publication date.')
+        # Set the pub_date for published items if it hasn't been set already.
+        if self.status == 'published' and self.pub_date is None:
+            self.pub_date = datetime.datetime.now()
+
+Any ``ValidationError`` raised by ``Model.clean()`` will be stored under a
+special key that is used for errors that are tied to the entire model instead
+of to a specific field. You can access these errors with ``NON_FIELD_ERRORS``::
+
+
+    from django.core.validators import ValidationError, NON_FIELD_ERRORS
+    try:
+        article.full_clean():
+    except ValidationError, e:
+        non_field_errors = e.message_dict[NON_FIELD_ERRORS]
+
+Finally, ``full_clean()`` will check any unique constraints on your model.
+
+.. method:: Model.validate_unique(exclude=None)
+
+This method is similar to ``clean_fields``, but validates all uniqueness
+constraints on your model instead of individual field values. The optional
+``exclude`` argument allows you to provide a list of field names to exclude
+from validation. It will raise a ``ValidationError`` if any fields fail
+validation.
+
+Note that if you provide an ``exclude`` argument to ``validate_unique``, any
+``unique_together`` constraint that contains one of the fields you provided
+will not be checked.
+
 
 Saving objects
 ==============

@@ -33,7 +33,7 @@ class FieldError(Exception):
     pass
 
 NON_FIELD_ERRORS = '__all__'
-class BaseValidationError(Exception):
+class ValidationError(Exception):
     """An error while validating data."""
     def __init__(self, message, code=None, params=None):
         import operator
@@ -64,10 +64,14 @@ class BaseValidationError(Exception):
             return repr(self.message_dict)
         return repr(self.messages)
 
-class ValidationError(BaseValidationError):
-    pass
-
-class UnresolvableValidationError(BaseValidationError):
-    """Validation error that cannot be resolved by the user."""
-    pass
+    def update_error_dict(self, error_dict):
+        if hasattr(self, 'message_dict'):
+            if error_dict:
+                for k, v in self.message_dict.items():
+                    error_dict.setdefault(k, []).extend(v)
+            else:
+                error_dict = self.message_dict
+        else:
+            error_dict[NON_FIELD_ERRORS] = self.messages
+        return error_dict
 

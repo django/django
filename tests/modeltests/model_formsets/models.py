@@ -543,6 +543,10 @@ This is used in the admin for save_as functionality.
 ...     'book_set-2-title': '',
 ... }
 
+>>> formset = AuthorBooksFormSet(data, instance=Author(), save_as_new=True)
+>>> formset.is_valid()
+True
+
 >>> new_author = Author.objects.create(name='Charles Baudelaire')
 >>> formset = AuthorBooksFormSet(data, instance=new_author, save_as_new=True)
 >>> [book for book in formset.save() if book.author.pk == new_author.pk]
@@ -1030,6 +1034,19 @@ False
 False
 >>> formset._non_form_errors
 [u'Please correct the duplicate data for price and quantity, which must be unique.']
+
+# Only the price field is specified, this should skip any unique checks since
+# the unique_together is not fulfilled. This will fail with a KeyError if broken.
+>>> FormSet = modelformset_factory(Price, fields=("price",), extra=2)
+>>> data = {
+...     'form-TOTAL_FORMS': '2',
+...     'form-INITIAL_FORMS': '0',
+...     'form-0-price': '24',
+...     'form-1-price': '24',
+... }
+>>> formset = FormSet(data)
+>>> formset.is_valid()
+True
 
 >>> FormSet = inlineformset_factory(Author, Book, extra=0)
 >>> author = Author.objects.order_by('id')[0]
