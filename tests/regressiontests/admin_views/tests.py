@@ -1795,27 +1795,30 @@ class IncompleteFormTest(TestCase):
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
-       self.client.login(username='super', password='secret')
+        self.client.login(username='super', password='secret')
 
     def tearDown(self):
-       self.client.logout()
+        self.client.logout()
 
     def test_user_creation(self):
-       response = self.client.post('/test_admin/admin/auth/user/add/', {
-           'username': 'newuser',
-           'password1': 'newpassword',
-           'password2': 'newpassword',
-       })
-       new_user = User.objects.order_by('-id')[0]
-       self.assertRedirects(response, '/test_admin/admin/auth/user/%s/' % new_user.pk)
-       self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
+        response = self.client.post('/test_admin/admin/auth/user/add/', {
+            'username': 'newuser',
+            'password1': 'newpassword',
+            'password2': 'newpassword',
+            '_continue': '1',
+        })
+        new_user = User.objects.order_by('-id')[0]
+        self.assertRedirects(response, '/test_admin/admin/auth/user/%s/' % new_user.pk)
+        self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
 
     def test_password_mismatch(self):
-       response = self.client.post('/test_admin/admin/auth/user/add/', {
-           'username': 'newuser',
-           'password1': 'newpassword',
-           'password2': 'mismatch',
-       })
-       self.assertEquals(response.status_code, 200)
-       self.assert_('password' not in response.context['form'].errors)
-       self.assertFormError(response, 'form', 'password2', ["The two password fields didn't match."])
+        response = self.client.post('/test_admin/admin/auth/user/add/', {
+            'username': 'newuser',
+            'password1': 'newpassword',
+            'password2': 'mismatch',
+        })
+        self.assertEquals(response.status_code, 200)
+        adminform = response.context['adminform']
+        self.assert_('password' not in adminform.form.errors)
+        self.assertEquals(adminform.form.errors['password2'],
+                          [u"The two password fields didn't match."])

@@ -15,7 +15,8 @@ class UserCreationForm(forms.ModelForm):
         help_text = _("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."),
         error_message = _("This value must contain only letters, numbers and underscores."))
     password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
-    password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput,
+        help_text = _("Enter the same password as above, for verification."))
 
     class Meta:
         model = User
