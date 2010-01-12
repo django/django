@@ -58,6 +58,7 @@ class BaseTest(TestCase):
         settings.TEMPLATE_CONTEXT_PROCESSORS = \
            self._template_context_processors
         settings.INSTALLED_APPS = self._installed_apps
+        settings.MESSAGE_STORAGE = self._message_storage
 
     def restore_setting(self, setting):
         if setting in self._remembered_settings:
