@@ -660,7 +660,7 @@ class Model(object):
         date_errors = self._perform_date_checks(date_checks)
 
         for k, v in date_errors.items():
-             errors.setdefault(k, []).extend(v)
+            errors.setdefault(k, []).extend(v)
 
         if errors:
             raise ValidationError(errors)
