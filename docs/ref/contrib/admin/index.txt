@@ -712,11 +712,20 @@ view. Templates can override or extend base admin templates as described in
 If you don't specify this attribute, a default template shipped with Django
 that provides the standard appearance is used.
 
+.. attribute:: ModelAdmin.add_form_template
+
+Path to a custom template that will be used by the model object creation
+views. Templates can override or extend base admin templates as described in
+`Overriding Admin Templates`_.
+
+If you don't specify this attribute, a default template shipped with Django
+that provides the standard appearance is used.
+
 .. attribute:: ModelAdmin.change_form_template
 
-Path to a custom template that will be used by both the model object creation
-and change views. Templates can override or extend base admin templates as
-described in `Overriding Admin Templates`_.
+Path to a custom template that will be used by the model object change views.
+Templates can override or extend base admin templates as described in
+`Overriding Admin Templates`_.
 
 If you don't specify this attribute, a default template shipped with Django
 that provides the standard appearance is used.

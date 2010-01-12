@@ -550,11 +550,11 @@ class AdminViewPermissionsTest(TestCase):
         self.assert_("var hello = 'Hello!';" in request.content)
         self.assertTemplateUsed(request, 'custom_admin/change_list.html')
 
-        # Test custom change form template
+        # Test custom add form template
         request = self.client.get('/test_admin/admin/admin_views/customarticle/add/')
-        self.assertTemplateUsed(request, 'custom_admin/change_form.html')
+        self.assertTemplateUsed(request, 'custom_admin/add_form.html')
 
-        # Add an article so we can test delete and history views
+        # Add an article so we can test delete, change, and history views
         post = self.client.post('/test_admin/admin/admin_views/customarticle/add/', {
             'content': '<p>great article</p>',
             'date_0': '2008-03-18',
@@ -563,7 +563,10 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(post, '/test_admin/admin/admin_views/customarticle/')
         self.failUnlessEqual(CustomArticle.objects.all().count(), 1)
 
-        # Test custom delete and object history templates
+        # Test custom delete, change, and object history templates
+        # Test custom change form template
+        request = self.client.get('/test_admin/admin/admin_views/customarticle/1/')
+        self.assertTemplateUsed(request, 'custom_admin/change_form.html')
         request = self.client.get('/test_admin/admin/admin_views/customarticle/1/delete/')
         self.assertTemplateUsed(request, 'custom_admin/delete_confirmation.html')
         request = self.client.get('/test_admin/admin/admin_views/customarticle/1/history/')

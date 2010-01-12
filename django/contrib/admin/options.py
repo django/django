@@ -200,6 +200,7 @@ class ModelAdmin(BaseModelAdmin):
     inlines = []
 
     # Custom templates (designed to be over-ridden in subclasses)
+    add_form_template = None
     change_form_template = None
     change_list_template = None
     delete_confirmation_template = None
@@ -618,8 +619,12 @@ class ModelAdmin(BaseModelAdmin):
             'save_on_top': self.save_on_top,
             'root_path': self.admin_site.root_path,
         })
+        if add and self.add_form_template is not None:
+            form_template = self.add_form_template
+        else:
+            form_template = self.change_form_template
         context_instance = template.RequestContext(request, current_app=self.admin_site.name)
-        return render_to_response(self.change_form_template or [
+        return render_to_response(form_template or [
             "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
