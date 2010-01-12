@@ -3,11 +3,11 @@ from django.test import TestCase
 from django.conf import settings
 from django.utils.translation import ugettext_lazy
 from django.contrib.messages import constants, utils
+from django.contrib.messages.api import MessageFailure, get_level, set_level
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.contrib.messages.api import MessageFailure
 
 
 def add_level_messages(storage):
@@ -41,16 +41,19 @@ class BaseTest(TestCase):
             if hasattr(settings, setting):
                 self._remembered_settings[setting] = getattr(settings, setting)
                 delattr(settings._wrapped, setting)
-        # backup these manually because we do not want them deleted
+        # Backup these manually because we do not want them deleted.
         self._middleware_classes = settings.MIDDLEWARE_CLASSES
         self._template_context_processors = \
            settings.TEMPLATE_CONTEXT_PROCESSORS
         self._installed_apps = settings.INSTALLED_APPS
+        self._message_storage = settings.MESSAGE_STORAGE
+        settings.MESSAGE_STORAGE = '%s.%s' % (self.storage_class.__module__,
+                                              self.storage_class.__name__)
 
     def tearDown(self):
         for setting in self.restore_settings:
             self.restore_setting(setting)
-        # restore these manually (see above)
+        # Restore these manually (see above).
         settings.MIDDLEWARE_CLASSES = self._middleware_classes
         settings.TEMPLATE_CONTEXT_PROCESSORS = \
            self._template_context_processors
@@ -319,25 +322,48 @@ class BaseTest(TestCase):
         self.assert_(storage.added_new)
 
     def test_default_level(self):
+        # get_level works even with no storage on the request.
+        request = self.get_request()
+        self.assertEqual(get_level(request), constants.INFO)
+
+        # get_level returns the default level if it hasn't been set.
         storage = self.get_storage()
+        request._messages = storage
+        self.assertEqual(get_level(request), constants.INFO)
+
+        # Only messages of sufficient level get recorded.
         add_level_messages(storage)
         self.assertEqual(len(storage), 5)
 
     def test_low_level(self):
-        storage = self.get_storage()
-        storage.level = 5
+        request = self.get_request()
+        storage = self.storage_class(request)
+        request._messages = storage
+
+        self.assert_(set_level(request, 5))
+        self.assertEqual(get_level(request), 5)
+
         add_level_messages(storage)
         self.assertEqual(len(storage), 6)
 
     def test_high_level(self):
-        storage = self.get_storage()
-        storage.level = 30
+        request = self.get_request()
+        storage = self.storage_class(request)
+        request._messages = storage
+
+        self.assert_(set_level(request, 30))
+        self.assertEqual(get_level(request), 30)
+
         add_level_messages(storage)
         self.assertEqual(len(storage), 2)
 
     def test_settings_level(self):
+        request = self.get_request()
+        storage = self.storage_class(request)
+
         settings.MESSAGE_LEVEL = 29
-        storage = self.get_storage()
+        self.assertEqual(get_level(request), 29)
+
         add_level_messages(storage)
         self.assertEqual(len(storage), 3)
 

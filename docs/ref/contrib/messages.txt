@@ -137,8 +137,11 @@ Constant    Purpose
 ``ERROR``   An action was **not** successful or some other failure occurred
 =========== ========
 
-The `MESSAGE_LEVEL`_ setting can be used to change the minimum recorded
-level. Attempts to add messages of a level less than this will be ignored.
+The `MESSAGE_LEVEL`_ setting can be used to change the minimum recorded level
+(or it can be `changed per request`_). Attempts to add messages of a level less
+than this will be ignored.
+
+.. _`changed per request`: `Changing the minimum recorded level per-request`_
 
 Message tags
 ------------
@@ -245,22 +248,27 @@ provide a mapping via the `MESSAGE_TAGS`_ setting.
 Changing the minimum recorded level per-request
 -----------------------------------------------
 
-The minimum recorded level can be set per request by changing the ``level``
-attribute of the messages storage instance::
+The minimum recorded level can be set per request via the ``set_level``
+method::
 
     from django.contrib import messages
 
     # Change the messages level to ensure the debug message is added.
-    messages.get_messages(request).level = messages.DEBUG
+    messages.set_level(request, messages.DEBUG)
     messages.debug(request, 'Test message...')
 
     # In another request, record only messages with a level of WARNING and higher
-    messages.get_messages(request).level = messages.WARNING
+    messages.set_level(request, messages.WARNING)
     messages.success(request, 'Your profile was updated.') # ignored
     messages.warning(request, 'Your account is about to expire.') # recorded
 
     # Set the messages level back to default.
-    messages.get_messages(request).level = None
+    messages.set_level(request, None)
+
+Similarly, the current effective level can be retrieved with ``get_level``::
+
+    from django.contrib import messages
+    current_level = messages.get_level(request)
 
 For more information on how the minimum recorded level functions, see
 `Message levels`_ above.

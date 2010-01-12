@@ -1,4 +1,5 @@
 from django.contrib.messages import constants
+from django.contrib.messages.storage import default_storage
 from django.utils.functional import lazy, memoize
 
 __all__ = (
@@ -42,6 +43,34 @@ def get_messages(request):
             return AnonymousUser()
 
     return lazy(memoize(get_user().get_and_delete_messages, {}, 0), list)()
+
+
+def get_level(request):
+    """
+    Returns the minimum level of messages to be recorded.
+
+    The default level is the ``MESSAGE_LEVEL`` setting. If this is not found,
+    the ``INFO`` level is used.
+    """
+    if hasattr(request, '_messages'):
+        storage = request._messages
+    else:
+        storage = default_storage(request)
+    return storage.level
+
+
+def set_level(request, level):
+    """
+    Sets the minimum level of messages to be recorded, returning ``True`` if
+    the level was recorded successfully.
+
+    If set to ``None``, the default level will be used (see the ``get_level``
+    method).
+    """
+    if not hasattr(request, '_messages'):
+        return False
+    request._messages.level = level
+    return True
 
 
 def debug(request, message, extra_tags='', fail_silently=False):
