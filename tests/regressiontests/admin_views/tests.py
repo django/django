@@ -286,10 +286,25 @@ class CustomModelAdminTest(AdminViewBasicTest):
         self.assertTemplateUsed(request, 'custom_admin/login.html')
         self.assert_('Hello from a custom login template' in request.content)
 
+    def testCustomAdminSiteLogoutTemplate(self):
+        request = self.client.get('/test_admin/admin2/logout/')
+        self.assertTemplateUsed(request, 'custom_admin/logout.html')
+        self.assert_('Hello from a custom logout template' in request.content)
+
     def testCustomAdminSiteIndexViewAndTemplate(self):
         request = self.client.get('/test_admin/admin2/')
         self.assertTemplateUsed(request, 'custom_admin/index.html')
         self.assert_('Hello from a custom index template *bar*' in request.content)
+
+    def testCustomAdminSitePasswordChangeTemplate(self):
+        request = self.client.get('/test_admin/admin2/password_change/')
+        self.assertTemplateUsed(request, 'custom_admin/password_change_form.html')
+        self.assert_('Hello from a custom password change form template' in request.content)
+
+    def testCustomAdminSitePasswordChangeDoneTemplate(self):
+        request = self.client.get('/test_admin/admin2/password_change/done/')
+        self.assertTemplateUsed(request, 'custom_admin/password_change_done.html')
+        self.assert_('Hello from a custom password change done template' in request.content)
 
     def testCustomAdminSiteView(self):
         self.client.login(username='super', password='secret')

@@ -1343,9 +1343,10 @@ and 500 pages.
 Root and login templates
 ------------------------
 
-If you wish to change the index or login templates, you are better off creating
-your own ``AdminSite`` instance (see below), and changing the :attr:`AdminSite.index_template`
-or :attr:`AdminSite.login_template` properties.
+If you wish to change the index, login or logout templates, you are better off
+creating your own ``AdminSite`` instance (see below), and changing the
+:attr:`AdminSite.index_template` , :attr:`AdminSite.login_template` or
+:attr:`AdminSite.logout_template` properties.
 
 ``AdminSite`` objects
 =====================
@@ -1375,17 +1376,30 @@ provided, a default instance name of ``admin`` will be used.
 ``AdminSite`` attributes
 ------------------------
 
+Templates can override or extend base admin templates as described in
+`Overriding Admin Templates`_.
+
 .. attribute:: AdminSite.index_template
 
 Path to a custom template that will be used by the admin site main index view.
-Templates can override or extend base admin templates as described in
-`Overriding Admin Templates`_.
 
 .. attribute:: AdminSite.login_template
 
 Path to a custom template that will be used by the admin site login view.
-Templates can override or extend base admin templates as described in
-`Overriding Admin Templates`_.
+
+.. attribute:: AdminSite.logout_template
+
+Path to a custom template that will be used by the admin site logout view.
+
+.. attribute:: AdminSite.password_change_template
+
+Path to a custom template that will be used by the admin site password change
+view.
+
+.. attribute:: AdminSite.password_change_done_template
+
+Path to a custom template that will be used by the admin site password change
+done view.
 
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
