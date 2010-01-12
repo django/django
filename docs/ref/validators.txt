@@ -41,8 +41,12 @@ How validators are run
 ======================
 
 See the :ref:`form validation <ref-forms-validation>` for more information on
-how validators are run in forms, and :ref:`Validating objects <validating-objects>`
-for how they're run in models.
+how validators are run in forms, and :ref:`Validating objects
+<validating-objects>` for how they're run in models. Note that validators will
+not be run automatically when you save a model, but if you are using a
+``ModelForm``, it will run your validators on any fields that are included in
+your form. See the :ref:`ModelForm documentation <topics-forms-modelforms>`
+for information on how model validation interacts with forms.
 
 Built-in validators
 ===================
