@@ -360,6 +360,13 @@ The same applies to the globals found in ``django.forms.fields``:
 
 Use ``django.utils.formats.get_format()`` to get the appropriate formats.
 
+email_re
+--------
+
+An undocumented regex for validating email addresses has been moved from
+django.form.fields to django.core.validators. You will need to update
+your imports if you are using it.
+
 What's new in Django 1.2
 ========================
 
