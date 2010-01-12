@@ -1,6 +1,7 @@
 from ctypes import c_double, c_int, c_uint, POINTER
-from django.contrib.gis.geos.libgeos import lgeos, GEOM_PTR, CS_PTR
+from django.contrib.gis.geos.libgeos import GEOM_PTR, CS_PTR
 from django.contrib.gis.geos.prototypes.errcheck import last_arg_byref, GEOSException
+from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
 ## Error-checking routines specific to coordinate sequences. ##
 def check_cs_ptr(result, func, cargs):
@@ -59,24 +60,24 @@ def cs_output(func, argtypes):
 ## Coordinate Sequence ctypes prototypes ##
 
 # Coordinate Sequence constructors & cloning.
-cs_clone = cs_output(lgeos.GEOSCoordSeq_clone, [CS_PTR])
-create_cs = cs_output(lgeos.GEOSCoordSeq_create, [c_uint, c_uint])
-get_cs = cs_output(lgeos.GEOSGeom_getCoordSeq, [GEOM_PTR])
+cs_clone = cs_output(GEOSFunc('GEOSCoordSeq_clone'), [CS_PTR])
+create_cs = cs_output(GEOSFunc('GEOSCoordSeq_create'), [c_uint, c_uint])
+get_cs = cs_output(GEOSFunc('GEOSGeom_getCoordSeq'), [GEOM_PTR])
 
 # Getting, setting ordinate
-cs_getordinate = cs_operation(lgeos.GEOSCoordSeq_getOrdinate, ordinate=True, get=True)
-cs_setordinate = cs_operation(lgeos.GEOSCoordSeq_setOrdinate, ordinate=True)
+cs_getordinate = cs_operation(GEOSFunc('GEOSCoordSeq_getOrdinate'), ordinate=True, get=True)
+cs_setordinate = cs_operation(GEOSFunc('GEOSCoordSeq_setOrdinate'), ordinate=True)
 
 # For getting, x, y, z
-cs_getx = cs_operation(lgeos.GEOSCoordSeq_getX, get=True)
-cs_gety = cs_operation(lgeos.GEOSCoordSeq_getY, get=True)
-cs_getz = cs_operation(lgeos.GEOSCoordSeq_getZ, get=True)
+cs_getx = cs_operation(GEOSFunc('GEOSCoordSeq_getX'), get=True)
+cs_gety = cs_operation(GEOSFunc('GEOSCoordSeq_getY'), get=True)
+cs_getz = cs_operation(GEOSFunc('GEOSCoordSeq_getZ'), get=True)
 
 # For setting, x, y, z
-cs_setx = cs_operation(lgeos.GEOSCoordSeq_setX)
-cs_sety = cs_operation(lgeos.GEOSCoordSeq_setY)
-cs_setz = cs_operation(lgeos.GEOSCoordSeq_setZ)
+cs_setx = cs_operation(GEOSFunc('GEOSCoordSeq_setX'))
+cs_sety = cs_operation(GEOSFunc('GEOSCoordSeq_setY'))
+cs_setz = cs_operation(GEOSFunc('GEOSCoordSeq_setZ'))
 
 # These routines return size & dimensions.
-cs_getsize = cs_int(lgeos.GEOSCoordSeq_getSize)
-cs_getdims = cs_int(lgeos.GEOSCoordSeq_getDimensions)
+cs_getsize = cs_int(GEOSFunc('GEOSCoordSeq_getSize'))
+cs_getdims = cs_int(GEOSFunc('GEOSCoordSeq_getDimensions'))

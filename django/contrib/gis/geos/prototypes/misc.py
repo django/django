@@ -3,8 +3,9 @@
  ones that return the area, distance, and length.
 """
 from ctypes import c_int, c_double, POINTER
-from django.contrib.gis.geos.libgeos import lgeos, GEOM_PTR
+from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_dbl
+from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
 ### ctypes generator function ###
 def dbl_from_geom(func, num_geom=1):
@@ -22,6 +23,6 @@ def dbl_from_geom(func, num_geom=1):
 ### ctypes prototypes ###
 
 # Area, distance, and length prototypes.
-geos_area = dbl_from_geom(lgeos.GEOSArea)
-geos_distance = dbl_from_geom(lgeos.GEOSDistance, num_geom=2)
-geos_length = dbl_from_geom(lgeos.GEOSLength)
+geos_area = dbl_from_geom(GEOSFunc('GEOSArea'))
+geos_distance = dbl_from_geom(GEOSFunc('GEOSDistance'), num_geom=2)
+geos_length = dbl_from_geom(GEOSFunc('GEOSLength'))

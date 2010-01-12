@@ -21,6 +21,10 @@ from django.contrib.gis.geos.mutable_list import ListMixin
 # the underlying GEOS library.
 from django.contrib.gis.geos import prototypes as capi
 
+# These functions provide access to a thread-local instance
+# of their corresponding GEOS I/O class.
+from django.contrib.gis.geos.prototypes.io import wkt_r, wkt_w, wkb_r, wkb_w, ewkb_w, ewkb_w3d
+
 # Regular expression for recognizing HEXEWKB and WKT.  A prophylactic measure
 # to prevent potentially malicious input from reaching the underlying C
 # library.  Not a substitute for good web security programming practices.
@@ -61,13 +65,13 @@ class GEOSGeometry(GEOSBase, ListMixin):
             if wkt_m:
                 # Handling WKT input.
                 if wkt_m.group('srid'): srid = int(wkt_m.group('srid'))
-                g = wkt_r.read(wkt_m.group('wkt'))
+                g = wkt_r().read(wkt_m.group('wkt'))
             elif hex_regex.match(geo_input):
                 # Handling HEXEWKB input.
-                g = wkb_r.read(geo_input)
+                g = wkb_r().read(geo_input)
             elif gdal.GEOJSON and gdal.geometries.json_regex.match(geo_input):
                 # Handling GeoJSON input.
-                g = wkb_r.read(gdal.OGRGeometry(geo_input).wkb)
+                g = wkb_r().read(gdal.OGRGeometry(geo_input).wkb)
             else:
                 raise ValueError('String or unicode input unrecognized as WKT EWKT, and HEXEWKB.')
         elif isinstance(geo_input, GEOM_PTR):
@@ -75,7 +79,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
             g = geo_input
         elif isinstance(geo_input, buffer):
             # When the input is a buffer (WKB).
-            g = wkb_r.read(geo_input)
+            g = wkb_r().read(geo_input)
         elif isinstance(geo_input, GEOSGeometry):
             g = capi.geom_clone(geo_input.ptr)
         else:
@@ -368,7 +372,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def wkt(self):
         "Returns the WKT (Well-Known Text) representation of this Geometry."
-        return wkt_w.write(self)
+        return wkt_w().write(self)
 
     @property
     def hex(self):
@@ -380,7 +384,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         # A possible faster, all-python, implementation:
         #  str(self.wkb).encode('hex')
-        return wkb_w.write_hex(self)
+        return wkb_w().write_hex(self)
 
     @property
     def hexewkb(self):
@@ -393,9 +397,9 @@ class GEOSGeometry(GEOSBase, ListMixin):
             if not GEOS_PREPARE:
                 # See: http://trac.osgeo.org/geos/ticket/216
                 raise GEOSException('Upgrade GEOS to 3.1 to get valid 3D HEXEWKB.')               
-            return ewkb_w3d.write_hex(self)
+            return ewkb_w3d().write_hex(self)
         else:
-            return ewkb_w.write_hex(self)
+            return ewkb_w().write_hex(self)
 
     @property
     def json(self):
@@ -416,7 +420,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         as a Python buffer.  SRID and Z values are not included, use the
         `ewkb` property instead.
         """
-        return wkb_w.write(self)
+        return wkb_w().write(self)
 
     @property
     def ewkb(self):
@@ -429,9 +433,9 @@ class GEOSGeometry(GEOSBase, ListMixin):
             if not GEOS_PREPARE:
                 # See: http://trac.osgeo.org/geos/ticket/216
                 raise GEOSException('Upgrade GEOS to 3.1 to get valid 3D EWKB.')
-            return ewkb_w3d.write(self)
+            return ewkb_w3d().write(self)
         else:
-            return ewkb_w.write(self)
+            return ewkb_w().write(self)
 
     @property
     def kml(self):
@@ -493,7 +497,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
             g = gdal.OGRGeometry(self.wkb, srid)
             g.transform(ct)
             # Getting a new GEOS pointer
-            ptr = wkb_r.read(g.wkb)
+            ptr = wkb_r().read(g.wkb)
             if clone:
                 # User wants a cloned transformed geometry returned.
                 return GEOSGeometry(ptr, srid=g.srid)
@@ -654,9 +658,6 @@ GEOS_CLASSES = {0 : Point,
                 6 : MultiPolygon,
                 7 : GeometryCollection,
                 }
-
-# Similarly, import the GEOS I/O instances here to avoid conflicts.
-from django.contrib.gis.geos.io import wkt_r, wkt_w, wkb_r, wkb_w, ewkb_w, ewkb_w3d
 
 # If supported, import the PreparedGeometry class.
 if GEOS_PREPARE:

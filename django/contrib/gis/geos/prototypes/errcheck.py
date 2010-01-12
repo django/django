@@ -4,14 +4,15 @@
 import os
 from ctypes import c_void_p, string_at, CDLL
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import lgeos, GEOS_VERSION
+from django.contrib.gis.geos.libgeos import GEOS_VERSION
+from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
 # Getting the `free` routine used to free the memory allocated for
 # string pointers returned by GEOS.
 if GEOS_VERSION >= (3, 1, 1):
     # In versions 3.1.1 and above, `GEOSFree` was added to the C API
     # because `free` isn't always available on all platforms.
-    free = lgeos.GEOSFree
+    free = GEOSFunc('GEOSFree')
     free.argtypes = [c_void_p]
     free.restype = None
 else:

@@ -6,7 +6,7 @@
  This module also houses GEOS Pointer utilities, including
  get_pointer_arr(), and GEOM_PTR.
 """
-import atexit, os, re, sys
+import os, re, sys
 from ctypes import c_char_p, Structure, CDLL, CFUNCTYPE, POINTER
 from ctypes.util import find_library
 from django.contrib.gis.geos.error import GEOSException
@@ -45,14 +45,14 @@ if lib_path is None:
                         '", "'.join(lib_names))
 
 # Getting the GEOS C library.  The C interface (CDLL) is used for
-#  both *NIX and Windows.
+# both *NIX and Windows.
 # See the GEOS C API source code for more details on the library function calls:
 #  http://geos.refractions.net/ro/doxygen_docs/html/geos__c_8h-source.html
 lgeos = CDLL(lib_path)
 
 # The notice and error handler C function callback definitions.
-#  Supposed to mimic the GEOS message handler (C below):
-#  "typedef void (*GEOSMessageHandler)(const char *fmt, ...);"
+# Supposed to mimic the GEOS message handler (C below):
+#  typedef void (*GEOSMessageHandler)(const char *fmt, ...);
 NOTICEFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
 def notice_h(fmt, lst, output_h=sys.stdout):
     try:
@@ -71,23 +71,19 @@ def error_h(fmt, lst, output_h=sys.stderr):
     output_h.write('GEOS_ERROR: %s\n' % err_msg)
 error_h = ERRORFUNC(error_h)
 
-# The initGEOS routine should be called first, however, that routine takes
-#  the notice and error functions as parameters.  Here is the C code that
-#  is wrapped:
-#  "extern void GEOS_DLL initGEOS(GEOSMessageHandler notice_function, GEOSMessageHandler error_function);"
-lgeos.initGEOS(notice_h, error_h)
-
 #### GEOS Geometry C data structures, and utility functions. ####
 
 # Opaque GEOS geometry structures, used for GEOM_PTR and CS_PTR
 class GEOSGeom_t(Structure): pass
 class GEOSPrepGeom_t(Structure): pass
 class GEOSCoordSeq_t(Structure): pass
+class GEOSContextHandle_t(Structure): pass
 
 # Pointers to opaque GEOS geometry structures.
 GEOM_PTR = POINTER(GEOSGeom_t)
 PREPGEOM_PTR = POINTER(GEOSPrepGeom_t)
 CS_PTR = POINTER(GEOSCoordSeq_t)
+CONTEXT_PTR  = POINTER(GEOSContextHandle_t)
 
 # Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection
 #  GEOS routines
@@ -126,5 +122,20 @@ del _verinfo
 GEOS_VERSION = (GEOS_MAJOR_VERSION, GEOS_MINOR_VERSION, GEOS_SUBMINOR_VERSION)
 GEOS_PREPARE = GEOS_VERSION >= (3, 1, 0)
 
-# Calling the finishGEOS() upon exit of the interpreter.
-atexit.register(lgeos.finishGEOS)
+if GEOS_PREPARE:
+    # Here we set up the prototypes for the initGEOS_r and finishGEOS_r
+    # routines.  These functions aren't actually called until they are
+    # attached to a GEOS context handle -- this actually occurs in
+    # geos/prototypes/threadsafe.py.
+    lgeos.initGEOS_r.restype = CONTEXT_PTR
+    lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]
+else:
+    # When thread-safety isn't available, the initGEOS routine must be called
+    # first.  This function takes the notice and error functions, defined
+    # as Python callbacks above, as parameters. Here is the C code that is
+    # wrapped:
+    #  extern void GEOS_DLL initGEOS(GEOSMessageHandler notice_function, GEOSMessageHandler error_function);
+    lgeos.initGEOS(notice_h, error_h)
+    # Calling finishGEOS() upon exit of the interpreter.
+    import atexit
+    atexit.register(lgeos.finishGEOS)
