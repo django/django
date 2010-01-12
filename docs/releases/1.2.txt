@@ -49,7 +49,8 @@ Due to new features in the :ttag:`if` template tag, it no longer accepts 'and',
 'or' and 'not' as valid **variable** names. Previously, that worked in some
 cases even though these strings were normally treated as keywords. Now, the
 keyword status is always enforced, and template code such as ``{% if not %}`` or
-``{% if and %}`` will throw a ``TemplateSyntaxError``.
+``{% if and %}`` will throw a ``TemplateSyntaxError``. Also, ``in`` is a new
+keyword and so is not a valid variable name in this context.
 
 ``LazyObject``
 --------------
