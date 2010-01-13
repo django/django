@@ -187,7 +187,7 @@ Arguments sent with this signal:
     ``sender``
         The intermediate model class describing the :class:`ManyToManyField`.
         This class is automatically created when a many-to-many field is
-        defined; it you can access it using the ``through`` attribute on the
+        defined; you can access it using the ``through`` attribute on the
         many-to-many field.
 
     ``instance``
