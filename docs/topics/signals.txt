@@ -29,6 +29,9 @@ notifications:
       Sent before or after a model's :meth:`~django.db.models.Model.delete`
       method is called.
 
+    * :data:`django.db.models.signals.m2m_changed`
+
+      Sent when a :class:`ManyToManyField` on a model is changed.
 
     * :data:`django.core.signals.request_started` &
       :data:`django.core.signals.request_finished`

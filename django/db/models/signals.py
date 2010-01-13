@@ -12,3 +12,5 @@ pre_delete = Signal(providing_args=["instance"])
 post_delete = Signal(providing_args=["instance"])
 
 post_syncdb = Signal(providing_args=["class", "app", "created_models", "verbosity", "interactive"])
+
+m2m_changed = Signal(providing_args=["action", "instance", "reverse", "model", "pk_set"])

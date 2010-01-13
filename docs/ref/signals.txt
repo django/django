@@ -170,6 +170,123 @@ Arguments sent with this signal:
         Note that the object will no longer be in the database, so be very
         careful what you do with this instance.
 
+m2m_changed
+-----------
+
+.. data:: django.db.models.signals.m2m_changed
+   :module:
+
+Sent when a :class:`ManyToManyField` is changed on a model instance.
+Strictly speaking, this is not a model signal since it is sent by the
+:class:`ManyToManyField`, but since it complements the
+:data:`pre_save`/:data:`post_save` and :data:`pre_delete`/:data:`post_delete`
+when it comes to tracking changes to models, it is included here.
+
+Arguments sent with this signal:
+
+    ``sender``
+        The intermediate model class describing the :class:`ManyToManyField`.
+        This class is automatically created when a many-to-many field is
+        defined; it you can access it using the ``through`` attribute on the
+        many-to-many field.
+
+    ``instance``
+        The instance whose many-to-many relation is updated. This can be an
+        instance of the ``sender``, or of the class the :class:`ManyToManyField`
+        is related to.
+
+    ``action``
+        A string indicating the type of update that is done on the relation.
+        This can be one of the following:
+
+        ``"add"``
+            Sent *after* one or more objects are added to the relation
+        ``"remove"``
+            Sent *after* one or more objects are removed from the relation
+        ``"clear"``
+            Sent *before* the relation is cleared
+
+    ``reverse``
+    	Indicates which side of the relation is updated (i.e., if it is the
+    	forward or reverse relation that is being modified).
+
+    ``model``
+        The class of the objects that are added to, removed from or cleared
+        from the relation.
+
+    ``pk_set``
+        With the ``"add"`` and ``"remove"`` action, this is a list of
+        primary key values that have been added to or removed from the relation.
+
+        For the ``"clear"`` action, this is ``None``.
+
+For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
+like this:
+
+.. code-block:: python
+
+    class Topping(models.Model):
+        # ...
+
+    class Pizza(models.Model):
+        # ...
+        toppings = models.ManyToManyField(Topping)
+
+If we would do something like this:
+
+.. code-block:: python
+
+    >>> p = Pizza.object.create(...)
+    >>> t = Topping.objects.create(...)
+    >>> p.toppings.add(t)
+
+the arguments sent to a :data:`m2m_changed` handler would be:
+
+    ==============  ============================================================
+    Argument        Value
+    ==============  ============================================================
+    ``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
+
+    ``instance``    ``p`` (the ``Pizza`` instance being modified)
+
+    ``action``      ``"add"``
+
+    ``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
+                    so this call modifies the forward relation)
+
+    ``model``       ``Topping`` (the class of the objects added to the
+                    ``Pizza``)
+
+    ``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
+    ==============  ============================================================
+
+And if we would then do something like this:
+
+.. code-block:: python
+
+    >>> t.pizza_set.remove(p)
+
+the arguments sent to a :data:`m2m_changed` handler would be:
+
+    ==============  ============================================================
+    Argument        Value
+    ==============  ============================================================
+    ``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
+
+    ``instance``    ``t`` (the ``Topping`` instance being modified)
+
+    ``action``      ``"remove"``
+
+    ``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
+                    so this call modifies the reverse relation)
+
+    ``model``       ``Pizza`` (the class of the objects removed from the
+                    ``Topping``)
+
+    ``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
+                    relation)
+    ==============  ============================================================
+
 class_prepared
 --------------
 
