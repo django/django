@@ -881,8 +881,8 @@ def create_many_to_many_intermediary_model(field, klass):
     from django.db import models
     managed = True
     if isinstance(field.rel.to, basestring) and field.rel.to != RECURSIVE_RELATIONSHIP_CONSTANT:
-        to = field.rel.to
         to_model = field.rel.to
+        to = to_model.split('.')[-1]
         def set_managed(field, model, cls):
             field.rel.through._meta.managed = model._meta.managed or cls._meta.managed
         add_lazy_relation(klass, field, to_model, set_managed)
