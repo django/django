@@ -116,7 +116,6 @@ class UserAdmin(admin.ModelAdmin):
 
         fieldsets = [(None, {'fields': form.base_fields.keys()})]
         adminForm = admin.helpers.AdminForm(form, fieldsets, {})
-        print adminForm, form
 
         return render_to_response(self.change_user_password_template or 'admin/auth/user/change_password.html', {
             'title': _('Change password: %s') % escape(user.username),
