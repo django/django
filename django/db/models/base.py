@@ -715,7 +715,7 @@ class Model(object):
             for field_name in unique_check:
                 f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
-                if f.null and lookup_value is None:
+                if lookup_value is None:
                     # no value, skip the lookup
                     continue
                 if f.primary_key and not getattr(self, '_adding', False):
