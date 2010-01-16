@@ -61,10 +61,11 @@ class TestTicket12510(TestCase):
         settings.DEBUG = self.old_debug
 
     def test_choices_not_fetched_when_not_rendering(self):
+        initial_queries = len(connection.queries)
         field = django_forms.ModelChoiceField(Group.objects.order_by('-name'))
         self.assertEqual('a', field.clean(self.groups[0].pk).name)
         # only one query is required to pull the model from DB
-        self.assertEqual(1, len(connection.queries))
+        self.assertEqual(initial_queries+1, len(connection.queries))
 
 
 __test__ = {'API_TESTS': """
