@@ -74,10 +74,6 @@ You can evaluate a ``QuerySet`` in the following ways:
           if Entry.objects.filter(headline="Test"):
              print "There is at least one Entry with the headline Test"
 
-      Note: *Don't* use this if all you want to do is determine if at least one
-      result exists, and don't need the actual objects. It's more efficient to
-      use ``exists()`` (see below).
-
 .. _pickling QuerySets:
 
 Pickling QuerySets
