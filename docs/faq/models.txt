@@ -3,6 +3,8 @@
 FAQ: Databases and models
 =========================
 
+.. _faq-see-raw-sql-queries:
+
 How can I see the raw SQL queries Django is running?
 ----------------------------------------------------
 

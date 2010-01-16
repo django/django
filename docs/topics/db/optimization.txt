@@ -1,0 +1,263 @@
+.. _topics-db-optimization:
+
+============================
+Database access optimization
+============================
+
+Django's database layer provides various ways to help developers get the most
+out of their databases. This documents gathers together links to the relevant
+documentation, and adds various tips, organized under an number of headings that
+outline the steps to take when attempting to optimize your database usage.
+
+Profile first
+=============
+
+As general programming practice, this goes without saying. Find out :ref:`what
+queries you are doing and what they are costing you
+<faq-see-raw-sql-queries>`. You may also want to use an external project like
+'django-debug-toolbar', or a tool that monitors your database directly.
+
+Remember that you may be optimizing for speed or memory or both, depending on
+your requirements. Sometimes optimizing for one will be detrimental to the
+other, but sometimes they will help each other. Also, work that is done by the
+database process might not have the same cost (to you) as the same amount of
+work done in your Python process. It is up to you to decide what your
+priorities are, where the balance must lie, and profile all of these as required
+since this will depend on your application and server.
+
+With everything that follows, remember to profile after every change to ensure
+that the change is a benefit, and a big enough benefit given the decrease in
+readability of your code. **All** of the suggestions below come with the caveat
+that in your circumstances the general principle might not apply, or might even
+be reversed.
+
+Use standard DB optimization techniques
+=======================================
+
+...including:
+
+* Indexes. This is a number one priority, *after* you have determined from
+  profiling what indexes should be added. Use :attr:`django.db.models.Field.db_index` to add
+  these from Django.
+
+* Appropriate use of field types.
+
+We will assume you have done the obvious things above. The rest of this document
+focuses on how to use Django in such a way that you are not doing unnecessary
+work. This document also does not address other optimization techniques that
+apply to all expensive operations, such as :ref:`general purpose caching
+<topics-cache>`.
+
+Understand QuerySets
+====================
+
+Understanding :ref:`QuerySets <ref-models-querysets>` is vital to getting good
+performance with simple code. In particular:
+
+Understand QuerySet evaluation
+------------------------------
+
+To avoid performance problems, it is important to understand:
+
+* that :ref:`QuerySets are lazy <querysets-are-lazy>`.
+
+* when :ref:`they are evaluated <when-querysets-are-evaluated>`.
+
+* how :ref:`the data is held in memory <caching-and-querysets>`.
+
+Understand cached attributes
+----------------------------
+
+As well as caching of the whole ``QuerySet``, there is caching of the result of
+attributes on ORM objects. In general, attributes that are not callable will be
+cached. For example, assuming the :ref:`example weblog models
+<queryset-model-example>`:
+
+  >>> entry = Entry.objects.get(id=1)
+  >>> entry.blog   # Blog object is retrieved at this point
+  >>> entry.blog   # cached version, no DB access
+
+But in general, callable attributes cause DB lookups every time::
+
+  >>> entry = Entry.objects.get(id=1)
+  >>> entry.authors.all()   # query performed
+  >>> entry.authors.all()   # query performed again
+
+Be careful when reading template code - the template system does not allow use
+of parentheses, but will call callables automatically, hiding the above
+distinction.
+
+Be careful with your own custom properties - it is up to you to implement
+caching.
+
+Use the ``with`` template tag
+-----------------------------
+
+To make use of the caching behaviour of ``QuerySet``, you may need to use the
+:ttag:`with` template tag.
+
+Use ``iterator()``
+------------------
+
+When you have a lot of objects, the caching behaviour of the ``QuerySet`` can
+cause a large amount of memory to be used. In this case,
+:ref:`QuerySet.iterator() <queryset-iterator>` may help.
+
+Do database work in the database rather than in Python
+======================================================
+
+For instance:
+
+* At the most basic level, use :ref:`filter and exclude <queryset-api>` to
+  filtering in the database to avoid loading data into your Python process, only
+  to throw much of it away.
+
+* Use :ref:`F() object query expressions <query-expressions>` to do filtering
+  against other fields within the same model.
+
+* Use :ref:`annotate to do aggregation in the database <topics-db-aggregation>`.
+
+If these aren't enough to generate the SQL you need:
+
+Use ``QuerySet.extra()``
+------------------------
+
+A less portable but more powerful method is :ref:`QuerySet.extra()
+<queryset-extra>`, which allows some SQL to be explicitly added to the query.
+If that still isn't powerful enough:
+
+Use raw SQL
+-----------
+
+Write your own :ref:`custom SQL to retrieve data or populate models
+<topics-db-sql>`. Use ``django.db.connection.queries`` to find out what Django
+is writing for you and start from there.
+
+Retrieve everything at once if you know you will need it
+========================================================
+
+Hitting the database multiple times for different parts of a single 'set' of
+data that you will need all parts of is, in general, less efficient than
+retrieving it all in one query. This is particularly important if you have a
+query that is executed in a loop, and could therefore end up doing many database
+queries, when only one was needed. So:
+
+Use ``QuerySet.select_related()``
+---------------------------------
+
+Understand :ref:`QuerySet.select_related() <select-related>` thoroughly, and use it:
+
+* in view code,
+
+* and in :ref:`managers and default managers <topics-db-managers>` where
+  appropriate. Be aware when your manager is and is not used; sometimes this is
+  tricky so don't make assumptions.
+
+Don't retrieve things you don't need
+====================================
+
+Use ``QuerySet.values()`` and ``values_list()``
+-----------------------------------------------
+
+When you just want a dict/list of values, and don't need ORM model objects, make
+appropriate usage of :ref:`QuerySet.values() <queryset-values>`.
+These can be useful for replacing model objects in template code - as long as
+the dicts you supply have the same attributes as those used in the template, you
+are fine.
+
+Use ``QuerySet.defer()`` and ``only()``
+---------------------------------------
+
+Use :ref:`defer() and only() <queryset-defer>` if there are database columns you
+know that you won't need (or won't need in most cases) to avoid loading
+them. Note that if you *do* use them, the ORM will have to go and get them in a
+separate query, making this a pessimization if you use it inappropriately.
+
+Use QuerySet.count()
+--------------------
+
+...if you only want the count, rather than doing ``len(queryset)``.
+
+Use QuerySet.exists()
+---------------------
+
+...if you only want to find out if at least one result exists, rather than ``if
+queryset``.
+
+But:
+
+Don't overuse ``count()`` and ``exists()``
+------------------------------------------
+
+If you are going to need other data from the QuerySet, just evaluate it.
+
+For example, assuming an Email class that has a ``body`` attribute and a
+many-to-many relation to User, the following template code is optimal:
+
+.. code-block:: html+django
+
+   {% if display_inbox %}
+     {% with user.emails.all as emails %}
+       {% if emails %}
+         <p>You have {{ emails|length }} email(s)</p>
+         {% for email in emails %}
+           <p>{{ email.body }}</p>
+         {% endfor %}
+       {% else %}
+         <p>No messages today.</p>
+       {% endif %}
+     {% endwith %}
+   {% endif %}
+
+
+It is optimal because:
+
+ 1. Since QuerySets are lazy, this does no database if 'display_inbox' is False.
+
+ #. Use of ``with`` means that we store ``user.emails.all`` in a variable for
+    later use, allowing its cache to be re-used.
+
+ #. The line ``{% if emails %}`` causes ``QuerySet.__nonzero__()`` to be called,
+    which causes the ``user.emails.all()`` query to be run on the database, and
+    at the least the first line to be turned into an ORM object. If there aren't
+    any results, it will return False, otherwise True.
+
+ #. The use of ``{{ emails|length }}`` calls ``QuerySet.__len__()``, filling
+    out the rest of the cache without doing another query.
+
+ #. The ``for`` loop iterates over the already filled cache.
+
+In total, this code does either one or zero database queries. The only
+deliberate optimization performed is the use of the ``with`` tag. Using
+``QuerySet.exists()`` or ``QuerySet.count()`` at any point would cause
+additional queries.
+
+Use ``QuerySet.update()`` and ``delete()``
+------------------------------------------
+
+Rather than retrieve a load of objects, set some values, and save them
+individual, use a bulk SQL UPDATE statement, via :ref:`QuerySet.update()
+<topics-db-queries-update>`. Similarly, do :ref:`bulk deletes
+<topics-db-queries-delete>` where possible.
+
+Note, however, that these bulk update methods cannot call the ``save()`` or ``delete()``
+methods of individual instances, which means that any custom behaviour you have
+added for these methods will not be executed, including anything driven from the
+normal database object :ref:`signals <ref-signals>`.
+
+Don't retrieve things you already have
+======================================
+
+Use foreign key values directly
+-------------------------------
+
+If you only need a foreign key value, use the foreign key value that is already on
+the object you've got, rather than getting the whole related object and taking
+its primary key. i.e. do::
+
+   entry.blog_id
+
+instead of::
+
+   entry.blog.id
+

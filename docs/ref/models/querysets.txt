@@ -66,6 +66,18 @@ You can evaluate a ``QuerySet`` in the following ways:
       iterating over a ``QuerySet`` will take advantage of your database to
       load data and instantiate objects only as you need them.
 
+    * **bool().** Testing a ``QuerySet`` in a boolean context, such as using
+      ``bool()``, ``or``, ``and`` or an ``if`` statement, will cause the query
+      to be executed. If there is at least one result, the ``QuerySet`` is
+      ``True``, otherwise ``False``. For example::
+
+          if Entry.objects.filter(headline="Test"):
+             print "There is at least one Entry with the headline Test"
+
+      Note: *Don't* use this if all you want to do is determine if at least one
+      result exists, and don't need the actual objects. It's more efficient to
+      use ``exists()`` (see below).
+
 .. _pickling QuerySets:
 
 Pickling QuerySets
@@ -302,7 +314,7 @@ a model which defines a default ordering, or when using
 ordering was undefined prior to calling ``reverse()``, and will remain
 undefined afterward).
 
-.. _querysets-distinct:
+.. _queryset-distinct:
 
 ``distinct()``
 ~~~~~~~~~~~~~~
@@ -335,6 +347,8 @@ query spans multiple tables, it's possible to get duplicate results when a
     ``values()`` together, be careful when ordering by fields not in the
     ``values()`` call.
 
+
+.. _queryset-values:
 
 ``values(*fields)``
 ~~~~~~~~~~~~~~~~~~~
@@ -616,7 +630,7 @@ call, since they are conflicting options.
 Both the ``depth`` argument and the ability to specify field names in the call
 to ``select_related()`` are new in Django version 1.0.
 
-.. _extra:
+.. _queryset-extra:
 
 ``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1062,17 +1076,18 @@ Example::
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
+.. _queryset-iterator:
+
 ``iterator()``
 ~~~~~~~~~~~~~~
 
 Evaluates the ``QuerySet`` (by performing the query) and returns an
-`iterator`_ over the results. A ``QuerySet`` typically reads all of
-its results and instantiates all of the corresponding objects the
-first time you access it; ``iterator()`` will instead read results and
-instantiate objects in discrete chunks, yielding them one at a
-time. For a ``QuerySet`` which returns a large number of objects, this
-often results in better performance and a significant reduction in
-memory use.
+`iterator`_ over the results. A ``QuerySet`` typically caches its
+results internally so that repeated evaluations do not result in
+additional queries; ``iterator()`` will instead read results directly,
+without doing any caching at the ``QuerySet`` level. For a
+``QuerySet`` which returns a large number of objects, this often
+results in better performance and a significant reduction in memory
 
 Note that using ``iterator()`` on a ``QuerySet`` which has already
 been evaluated will force it to evaluate again, repeating the query.

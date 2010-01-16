@@ -353,7 +353,7 @@ without any harmful effects, since that is already playing a role in the
 query.
 
 This behavior is the same as that noted in the queryset documentation for
-:ref:`distinct() <querysets-distinct>` and the general rule is the same:
+:ref:`distinct() <queryset-distinct>` and the general rule is the same:
 normally you won't want extra columns playing a part in the result, so clear
 out the ordering, or at least make sure it's restricted only to those fields
 you also select in a ``values()`` call.
