@@ -83,6 +83,6 @@ An easier option?
 
 A final note: If all you want to do is a custom ``WHERE`` clause, you can just
 use the ``where``, ``tables`` and ``params`` arguments to the
-:ref:`extra clause <extra>` in the standard queryset API.
+:ref:`extra clause <queryset-extra>` in the standard queryset API.
 
 .. _Python DB-API: http://www.python.org/dev/peps/pep-0249/
