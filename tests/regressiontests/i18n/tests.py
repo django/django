@@ -4,7 +4,7 @@ import misc
 regressions = ur"""
 Format string interpolation should work with *_lazy objects.
 
->>> from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy
+>>> from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, to_locale
 >>> s = ugettext_lazy('Add %(name)s')
 >>> d = {'name': 'Ringo'}
 >>> s % d
@@ -16,6 +16,21 @@ u'Ringo hinzuf\xfcgen'
 >>> s % d
 u'Dodaj Ringo'
 >>> deactivate()
+
+Tests the to_locale function and the special case of Serbian Latin (refs #12230 and r11299)
+
+>>> to_locale('en-us')
+'en_US'
+>>> to_locale('sr-lat')
+'sr_Lat'
+
+Test the to_language function
+
+>>> from django.utils.translation.trans_real import to_language
+>>> to_language('en_US')
+'en-us'
+>>> to_language('sr_Lat')
+'sr-lat'
 
 It should be possible to compare *_lazy objects.
 
