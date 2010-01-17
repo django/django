@@ -39,6 +39,8 @@ available in the context, then you can refer to it directly::
    {% get_comment_count for entry as comment_count %}
    <p>{{ comment_count }} comments have been posted.</p>
 
+.. versionadded:: 1.2
+
 Next, we can use the :ttag:`render_comment_list` tag, to render all comments
 to the given instance (``entry``) by using the ``comments/list.html`` template.
 

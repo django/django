@@ -132,6 +132,8 @@ details.
 Linking to comments
 -------------------
 
+.. versionadded:: 1.2
+
 To provide a permalink to a specific comment, use :ttag:`get_comment_permalink`::
 
     {% get_comment_permalink comment_obj [format_string] %}
