@@ -870,6 +870,8 @@ field. This would normally cause a problem in abstract base classes, since the
 fields on this class are included into each of the child classes, with exactly
 the same values for the attributes (including :attr:`~django.db.models.ForeignKey.related_name`) each time.
 
+.. versionchanged:: 1.2
+
 To work around this problem, when you are using :attr:`~django.db.models.ForeignKey.related_name` in an
 abstract base class (only), part of the name should contain
 ``'%(app_label)s'`` and ``'%(class)s'``.
