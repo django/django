@@ -242,9 +242,16 @@ class MultipleHiddenInput(HiddenInput):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        return mark_safe(u'\n'.join([(u'<input%s />' %
-            flatatt(dict(value=force_unicode(v), **final_attrs)))
-            for v in value]))
+        id_ = final_attrs.get('id', None)
+        inputs = []
+        for i, v in enumerate(value):
+            input_attrs = dict(value=force_unicode(v), **final_attrs)
+            if id_:
+                # An ID attribute was given. Add a numeric index as a suffix
+                # so that the inputs don't all have the same ID attribute.
+                input_attrs['id'] = '%s_%s' % (id_, i)
+            inputs.append(u'<input%s />' % flatatt(input_attrs))
+        return mark_safe(u'\n'.join(inputs))
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, (MultiValueDict, MergeDict)):
