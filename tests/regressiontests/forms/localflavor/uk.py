@@ -58,13 +58,7 @@ u'BT32 4PX'
 u''
 >>> f.clean('')
 u''
->>> class MyUKPostcodeField(UKPostcodeField):
-...    default_error_messages = {
-...        'invalid': 'Enter a bloody postcode!',
-...    }
-...
->>>
->>> f = MyUKPostcodeField(required=False)
+>>> f = UKPostcodeField(error_messages={'invalid': 'Enter a bloody postcode!'})
 >>> f.clean('1NV 4L1D')
 Traceback (most recent call last):
 ...
