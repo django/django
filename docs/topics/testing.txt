@@ -1247,8 +1247,8 @@ testing behavior. This behavior involves:
 
     #. Performing global post-test teardown.
 
-If you define your own test runner method and point :setting:`TEST_RUNNER` at
-that method, Django will execute your test runner whenever you run
+If you define your own test runner class and point :setting:`TEST_RUNNER` at
+that class, Django will execute your test runner whenever you run
 ``./manage.py test``. In this way, it is possible to use any test framework
 that can be executed from Python code, or to modify the Django test execution
 process to satisfy whatever testing requirements you may have.
@@ -1290,7 +1290,7 @@ set up, execute and tear down the test suite.
     write your own test runner, ensure accept and handle the ``**kwargs``
     parameter.
 
-.. method:: DjangoTestSuiteRunner.run_tests(test_labels, extra_tests=[])
+.. method:: DjangoTestSuiteRunner.run_tests(test_labels, extra_tests=None)
 
     Run the test suite.
 
@@ -1315,7 +1315,7 @@ set up, execute and tear down the test suite.
 
     Sets up the test environment ready for testing.
 
-.. method:: DjangoTestSuiteRunner.build_suite(test_labels, extra_tests=[])
+.. method:: DjangoTestSuiteRunner.build_suite(test_labels, extra_tests=None)
 
     Constructs a test suite that matches the test labels provided.
 

@@ -1409,9 +1409,12 @@ misspelled) variables. See :ref:`invalid-template-variables`..
 TEST_RUNNER
 -----------
 
-Default: ``'django.test.simple.run_tests'``
+Default: ``'django.test.simple.DjangoTestSuiteRunner'``
 
-The name of the method to use for starting the test suite. See
+.. versionchanged:: 1.2
+   Prior to 1.2, test runners were a function, not a class.
+
+The name of the class to use for starting the test suite. See
 :ref:`topics-testing`.
 
 .. _Testing Django Applications: ../testing/
