@@ -7,6 +7,7 @@ from django.db.backends.sqlite3.base import DatabaseWrapper as SqliteDatabaseWra
     _sqlite_extract, _sqlite_date_trunc, _sqlite_regexp
 from django.contrib.gis.db.backends.spatialite.client import SpatiaLiteClient
 from django.contrib.gis.db.backends.spatialite.creation import SpatiaLiteCreation
+from django.contrib.gis.db.backends.spatialite.introspection import SpatiaLiteIntrospection
 from django.contrib.gis.db.backends.spatialite.operations import SpatiaLiteOperations
 
 class DatabaseWrapper(SqliteDatabaseWrapper):
@@ -32,6 +33,7 @@ class DatabaseWrapper(SqliteDatabaseWrapper):
         self.ops = SpatiaLiteOperations(self)
         self.client = SpatiaLiteClient(self)
         self.creation = SpatiaLiteCreation(self)
+        self.introspection = SpatiaLiteIntrospection(self)
 
     def _cursor(self):
         if self.connection is None:
