@@ -74,6 +74,9 @@ their deprecation, as per the :ref:`Django deprecation policy
           ``django.utils.formats.get_format()`` to get the appropriate
           formats.
 
+        * The ability to use a function-based test runners will be removed,
+          along with the ``django.test.simple.run_tests()`` test runner.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the

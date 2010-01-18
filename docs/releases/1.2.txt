@@ -367,6 +367,14 @@ An undocumented regex for validating email addresses has been moved from
 django.form.fields to django.core.validators. You will need to update
 your imports if you are using it.
 
+Function-based test runners
+---------------------------
+
+Django 1.2 changes the test runner tools to use a class-based
+approach. Old style function-based test runners will still work, but
+should be updated to use the new :ref:`class-based runners
+<topics-testing-test_runner>`.
+
 What's new in Django 1.2
 ========================
 
@@ -428,7 +436,7 @@ added support for comparison operators. No longer will you have to type:
 .. code-block:: html+django
 
     {% ifnotequal a b %}
-     ...
+    ...
     {% endifnotequal %}
 
 You can now do this::
@@ -436,7 +444,7 @@ You can now do this::
 .. code-block:: html+django
 
     {% if a != b %}
-     ...
+    ...
     {% endif %}
 
 There's really no reason to use ``{% ifequal %}`` or ``{% ifnotequal %}``

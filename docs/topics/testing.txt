@@ -275,15 +275,15 @@ a test case, add the name of the test method to the label::
     $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
 
 .. versionadded:: 1.2
-   You can now trigger a graceful exit from a test run by pressing ``Ctrl-C``. 
+   You can now trigger a graceful exit from a test run by pressing ``Ctrl-C``.
 
-If you press ``Ctrl-C`` while the tests are running, the test runner will 
+If you press ``Ctrl-C`` while the tests are running, the test runner will
 wait for the currently running test to complete and then exit gracefully.
-During a graceful exit the test runner will output details of any test 
+During a graceful exit the test runner will output details of any test
 failures, report on how many tests were run and how many errors and failures
-were encountered, and destroy any test databases as usual. Thus pressing 
+were encountered, and destroy any test databases as usual. Thus pressing
 ``Ctrl-C`` can be very useful if you forget to pass the :djadminopt:`--failfast`
-option, notice that some tests are unexpectedly failing, and want to get details 
+option, notice that some tests are unexpectedly failing, and want to get details
 on the failures without waiting for the full test run to complete.
 
 If you do not want to wait for the currently running test to finish, you
@@ -1228,41 +1228,65 @@ alternative framework as if they were normal Django tests.
 
 When you run ``./manage.py test``, Django looks at the :setting:`TEST_RUNNER`
 setting to determine what to do. By default, :setting:`TEST_RUNNER` points to
-``'django.test.simple.run_tests'``. This method defines the default Django
+``'django.test.simple.DjangoTestSuiteRunner'``. This class defines the default Django
 testing behavior. This behavior involves:
 
     #. Performing global pre-test setup.
 
-    #. Creating the test database.
+    #. Creating the test databases.
 
     #. Running ``syncdb`` to install models and initial data into the test
-       database.
+       databases.
 
     #. Looking for unit tests and doctests in the ``models.py`` and
        ``tests.py`` files in each installed application.
 
     #. Running the unit tests and doctests that are found.
 
-    #. Destroying the test database.
+    #. Destroying the test databases.
 
     #. Performing global post-test teardown.
 
 If you define your own test runner method and point :setting:`TEST_RUNNER` at
 that method, Django will execute your test runner whenever you run
 ``./manage.py test``. In this way, it is possible to use any test framework
-that can be executed from Python code.
+that can be executed from Python code, or to modify the Django test execution
+process to satisfy whatever testing requirements you may have.
+
+.. _topics-testing-test_runner:
 
 Defining a test runner
 ----------------------
 
-.. versionadded:: 1.0
+.. versionchanged:: 1.2
+   Prior to 1.2, test runners were a single function, not a class.
 
 .. currentmodule:: django.test.simple
 
-By convention, a test runner should be called ``run_tests``. The only strict
-requirement is that it has the same arguments as the Django test runner:
+A test runner is a class defining a ``run_tests()`` method. Django ships
+with a ``DjangoTestSuiteRunner`` class that defines the default Django
+testing behavior. This class defines the ``run_tests()`` entry point,
+plus a selection of other methods that are used to by ``run_tests()`` to
+set up, execute and tear down the test suite.
 
-.. function:: run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[])
+.. class:: DjangoTestSuiteRunner(verbosity=1, interactive=True, failfast=True)
+
+    ``verbosity`` determines the amount of notification and debug information
+    that will be printed to the console; ``0`` is no output, ``1`` is normal
+    output, and ``2`` is verbose output.
+
+    If ``interactive`` is ``True``, the test suite has permission to ask the
+    user for instructions when the test suite is executed. An example of this
+    behavior would be asking for permission to delete an existing test
+    database. If ``interactive`` is ``False``, the test suite must be able to
+    run without any manual intervention.
+
+    If ``failfast`` is ``True``, the test suite will stop running after the
+    first test failure is detected.
+
+.. method:: DjangoTestSuiteRunner.run_tests(test_labels, extra_tests=[])
+
+    Run the test suite.
 
     ``test_labels`` is a list of strings describing the tests to be run. A test
     label can take one of three forms:
@@ -1275,21 +1299,61 @@ requirement is that it has the same arguments as the Django test runner:
     If ``test_labels`` has a value of ``None``, the test runner should run
     search for tests in all the applications in :setting:`INSTALLED_APPS`.
 
-    ``verbosity`` determines the amount of notification and debug information
-    that will be printed to the console; ``0`` is no output, ``1`` is normal
-    output, and ``2`` is verbose output.
+    ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
+    suite that is executed by the test runner. These extra tests are run
+    in addition to those discovered in the modules listed in ``test_labels``.
 
-    If ``interactive`` is ``True``, the test suite has permission to ask the
-    user for instructions when the test suite is executed. An example of this
-    behavior would be asking for permission to delete an existing test
-    database. If ``interactive`` is ``False``, the test suite must be able to
-    run without any manual intervention.
+    This method should return the number of tests that failed.
+
+.. method:: DjangoTestSuiteRunner.setup_test_environment()
+
+    Sets up the test environment ready for testing.
+
+.. method:: DjangoTestSuiteRunner.build_suite(test_labels, extra_tests=[])
+
+    Constructs a test suite that matches the test labels provided.
+
+    ``test_labels`` is a list of strings describing the tests to be run. A test
+    label can take one of three forms:
+
+        * ``app.TestCase.test_method`` -- Run a single test method in a test
+          case.
+        * ``app.TestCase`` -- Run all the test methods in a test case.
+        * ``app`` -- Search for and run all tests in the named application.
+
+    If ``test_labels`` has a value of ``None``, the test runner should run
+    search for tests in all the applications in :setting:`INSTALLED_APPS`.
 
     ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
     suite that is executed by the test runner. These extra tests are run
-    in addition to those discovered in the modules listed in ``module_list``.
+    in addition to those discovered in the modules listed in ``test_labels``.
 
-    This method should return the number of tests that failed.
+    Returns a ``TestSuite`` instance ready to be run.
+
+.. method:: DjangoTestSuiteRunner.setup_databases()
+
+    Creates the test databases.
+
+    Returns the list of old database names that will need to be restored
+
+.. method:: DjangoTestSuiteRunner.run_suite(suite)
+
+    Runs the test suite.
+
+    Returns the result produced by the running the test suite.
+
+.. method:: DjangoTestSuiteRunner.teardown_databases(old_names)
+
+    Destroys the test databases, restoring the old names.
+
+.. method:: DjangoTestSuiteRunner.teardown_test_environment()
+
+    Restores the pre-test environment.
+
+.. method:: DjangoTestSuiteRunner.suite_result(result)
+
+    Computes and returns a return code based on a test suite result.
+
 
 Testing utilities
 -----------------

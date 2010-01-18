@@ -487,8 +487,8 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.user_messages.LegacyFallbackS
 # TESTING #
 ###########
 
-# The name of the method to use to invoke the test suite
-TEST_RUNNER = 'django.test.simple.run_tests'
+# The name of the class to use to run the test suite
+TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
 
 # The name of the database to use for testing purposes.
 # If None, a name of 'test_' + DATABASE_NAME will be assumed

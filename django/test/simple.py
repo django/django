@@ -40,7 +40,7 @@ class DjangoTestRunner(unittest.TextTestRunner):
         """
         self._keyboard_interrupt_intercepted = True
         sys.stderr.write(" <Test run halted by Ctrl-C> ")
-        # Set the interrupt handler back to the default handler, so that 
+        # Set the interrupt handler back to the default handler, so that
         # another Ctrl-C press will trigger immediate exit.
         signal.signal(signal.SIGINT, self._default_keyboard_interrupt_handler)
 
@@ -197,56 +197,97 @@ def reorder_suite(suite, classes):
         bins[0].addTests(bins[i+1])
     return bins[0]
 
-def run_tests(test_labels, verbosity=1, interactive=True, failfast=False, extra_tests=[]):
-    """
-    Run the unit tests for all the test labels in the provided list.
-    Labels must be of the form:
-     - app.TestClass.test_method
-        Run a single specific test method
-     - app.TestClass
-        Run all the test methods in a given class
-     - app
-        Search for doctests and unittests in the named application.
 
-    When looking for tests, the test runner will look in the models and
-    tests modules for the application.
+class DjangoTestSuiteRunner(object):
+    def __init__(self, verbosity=1, interactive=True, failfast=True):
+        self.verbosity = verbosity
+        self.interactive = interactive
+        self.failfast = failfast
 
-    A list of 'extra' tests may also be provided; these tests
-    will be added to the test suite.
+    def setup_test_environment(self):
+        setup_test_environment()
+        settings.DEBUG = False
 
-    Returns the number of tests that failed.
-    """
-    setup_test_environment()
+    def build_suite(self, test_labels, extra_tests=None):
+        suite = unittest.TestSuite()
 
-    settings.DEBUG = False
-    suite = unittest.TestSuite()
-
-    if test_labels:
-        for label in test_labels:
-            if '.' in label:
-                suite.addTest(build_test(label))
-            else:
-                app = get_app(label)
+        if test_labels:
+            for label in test_labels:
+                if '.' in label:
+                    suite.addTest(build_test(label))
+                else:
+                    app = get_app(label)
+                    suite.addTest(build_suite(app))
+        else:
+            for app in get_apps():
                 suite.addTest(build_suite(app))
-    else:
-        for app in get_apps():
-            suite.addTest(build_suite(app))
 
-    for test in extra_tests:
-        suite.addTest(test)
+        if extra_tests:
+            for test in extra_tests:
+                suite.addTest(test)
 
-    suite = reorder_suite(suite, (TestCase,))
+        return reorder_suite(suite, (TestCase,))
 
-    from django.db import connections
-    old_names = []
-    for alias in connections:
-        connection = connections[alias]
-        old_names.append((connection, connection.settings_dict['NAME']))
-        connection.creation.create_test_db(verbosity, autoclobber=not interactive)
-    result = DjangoTestRunner(verbosity=verbosity, failfast=failfast).run(suite)
-    for connection, old_name in old_names:
-        connection.creation.destroy_test_db(old_name, verbosity)
+    def setup_databases(self):
+        from django.db import connections
+        old_names = []
+        for alias in connections:
+            connection = connections[alias]
+            old_names.append((connection, connection.settings_dict['NAME']))
+            connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
+        return old_names
 
-    teardown_test_environment()
+    def run_suite(self, suite):
+        return DjangoTestRunner(verbosity=self.verbosity, failfast=self.failfast).run(suite)
 
-    return len(result.failures) + len(result.errors)
+    def teardown_databases(self, old_names):
+        for connection, old_name in old_names:
+            connection.creation.destroy_test_db(old_name, self.verbosity)
+
+    def teardown_test_environment(self):
+        teardown_test_environment()
+
+    def suite_result(self, result):
+        return len(result.failures) + len(result.errors)
+
+    def run_tests(self, test_labels, extra_tests=None):
+        """
+        Run the unit tests for all the test labels in the provided list.
+        Labels must be of the form:
+         - app.TestClass.test_method
+            Run a single specific test method
+         - app.TestClass
+            Run all the test methods in a given class
+         - app
+            Search for doctests and unittests in the named application.
+
+        When looking for tests, the test runner will look in the models and
+        tests modules for the application.
+
+        A list of 'extra' tests may also be provided; these tests
+        will be added to the test suite.
+
+        Returns the number of tests that failed.
+        """
+        self.setup_test_environment()
+
+        old_names = self.setup_databases()
+
+        suite = self.build_suite(test_labels, extra_tests)
+
+        result = self.run_suite(suite)
+
+        self.teardown_databases(old_names)
+
+        self.teardown_test_environment()
+
+        return self.suite_result(result)
+
+def run_tests(test_labels, verbosity=1, interactive=True, failfast=False, extra_tests=None):
+    import warnings
+    warnings.warn(
+        'The run_tests() test runner has been deprecated in favor of DjangoTestSuiteRunner.',
+        PendingDeprecationWarning
+    )
+    test_runner = DjangoTestSuiteRunner(verbosity=verbosity, interactive=interactive, failfast=failfast)
+    return test_runner.run_tests(test_labels, extra_tests=extra_tests)

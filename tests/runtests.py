@@ -156,11 +156,23 @@ def django_tests(verbosity, interactive, failfast, test_labels):
     # Run the test suite, including the extra validation tests.
     from django.test.utils import get_runner
     if not hasattr(settings, 'TEST_RUNNER'):
-        settings.TEST_RUNNER = 'django.test.simple.run_tests'
-    test_runner = get_runner(settings)
+        settings.TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+    TestRunner = get_runner(settings)
 
-    failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive, failfast=failfast,
-                           extra_tests=extra_tests)
+    if hasattr(TestRunner, 'func_name'):
+        # Pre 1.2 test runners were just functions,
+        # and did not support the 'failfast' option.
+        import warnings
+        warnings.warn(
+            'Function-based test runners are deprecated. Test runners should be classes with a run_tests() method.',
+            PendingDeprecationWarning
+        )
+        failures = TestRunner(test_labels, verbosity=verbosity, interactive=interactive,
+            extra_tests=extra_tests)
+    else:
+        test_runner = TestRunner(verbosity=verbosity, interactive=interactive, failfast=failfast)
+        failures = test_runner.run_tests(test_labels, extra_tests=extra_tests)
+
     if failures:
         sys.exit(bool(failures))
 
