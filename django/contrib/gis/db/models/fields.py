@@ -1,45 +1,42 @@
 from django.db.models.fields import Field
+from django.db.models.sql.expressions import SQLEvaluator
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
-from django.contrib.gis.measure import Distance
-from django.db.models.sql.expressions import SQLEvaluator
 
-# Local cache of the spatial_ref_sys table, which holds static data.
-# This exists so that we don't have to hit the database each time
-# we construct a distance query.
-_srid_cache = {'postgis' : {},
-               'oracle' : {},
-               'spatialite' : {},
-               }
+# Local cache of the spatial_ref_sys table, which holds SRID data for each
+# spatial database alias. This cache exists so that the database isn't queried
+# for SRID info each time a distance query is constructed.
+_srid_cache = {}
 
 def get_srid_info(srid, connection):
     """
     Returns the units, unit name, and spheroid WKT associated with the
     given SRID from the `spatial_ref_sys` (or equivalent) spatial database
-    table.  These results are cached.
+    table for the given database connection.  These results are cached.
     """
     global _srid_cache
 
-    # No `spatial_ref_sys` table in MySQL.
-    if connection.ops.mysql:
+    try:
+        # The SpatialRefSys model for the spatial backend.
+        SpatialRefSys = connection.ops.spatial_ref_sys()
+    except NotImplementedError:
+        # No `spatial_ref_sys` table in spatial backend (e.g., MySQL).
         return None, None, None
 
-    name = connection.ops.name
-    if not srid in _srid_cache[name]:
-        if connection.ops.postgis:
-            from django.contrib.gis.db.backends.postgis.models import SpatialRefSys
-        elif connection.ops.oracle:
-            from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
-        elif connection.ops.spatialite:
-            from django.contrib.gis.db.backends.spatialite.models import SpatialRefSys
-        sr = SpatialRefSys.objects.get(srid=srid)
+    if not connection.alias in _srid_cache:
+        # Initialize SRID dictionary for database if it doesn't exist.
+        _srid_cache[connection.alias] = {}
+
+    if not srid in _srid_cache[connection.alias]:
+        # Use `SpatialRefSys` model to query for spatial reference info.
+        sr = SpatialRefSys.objects.using(connection.alias).get(srid=srid)
         units, units_name = sr.units
         spheroid = SpatialRefSys.get_spheroid(sr.wkt)
-        _srid_cache[name][srid] = (units, units_name, spheroid)
+        _srid_cache[connection.alias][srid] = (units, units_name, spheroid)
 
-    return _srid_cache[name][srid]
+    return _srid_cache[connection.alias][srid]
 
 class GeometryField(Field):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -140,31 +137,6 @@ class GeometryField(Field):
         then 1000 would be returned.
         """
         return connection.ops.get_distance(self, value, lookup_type)
-
-        if isinstance(dist, Distance):
-            if self.geodetic(connection):
-                # Won't allow Distance objects w/DWithin lookups on PostGIS.
-                if connection.ops.postgis and lookup_type == 'dwithin':
-                    raise ValueError('Only numeric values of degree units are allowed on geographic DWithin queries.')
-
-                # Spherical distance calculation parameter should be in meters.
-                dist_param = dist.m
-            else:
-                dist_param = getattr(dist, Distance.unit_attname(self.units_name(connection)))
-        else:
-            # Assuming the distance is in the units of the field.
-            dist_param = dist
-
-        if connection.ops.oracle and lookup_type == 'dwithin':
-            dist_param = 'distance=%s' % dist_param
-
-        if connection.ops.postgis and self.geodetic(connection) and lookup_type != 'dwithin' and option == 'spheroid':
-            # On PostGIS, by default `ST_distance_sphere` is used; but if the
-            # accuracy of `ST_distance_spheroid` is needed than the spheroid
-            # needs to be passed to the SQL stored procedure.
-            return [self._spheroid, dist_param]
-        else:
-            return [dist_param]
 
     def get_prep_value(self, value):
         """

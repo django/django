@@ -122,6 +122,13 @@ class BaseSpatialOperations(object):
     def spatial_lookup_sql(self, lvalue, lookup_type, value, field):
         raise NotImplmentedError
 
+    # Routines for getting the OGC-compliant models.
+    def geometry_columns(self):
+        raise NotImplementedError
+
+    def spatial_ref_sys(self):
+        raise NotImplementedError
+
 class SpatialRefSysMixin(object):
     """
     The SpatialRefSysMixin is a class used by the database-dependent
