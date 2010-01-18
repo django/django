@@ -1570,12 +1570,12 @@ the check performed).
 To enable object permissions in your own
 :ref:`authentication backend <ref-authentication-backends>` you'll just have
 to allow passing an ``obj`` parameter to the permission methods and set the
-``supports_objects_permissions`` class attribute to ``True``.
+``supports_object_permissions`` class attribute to ``True``.
 
-A nonexistent ``supports_objects_permissions`` will raise a hidden
+A nonexistent ``supports_object_permissions`` will raise a hidden
 ``PendingDeprecationWarning`` if used in Django 1.2. In Django 1.3, this
 warning will be upgraded to a ``DeprecationWarning``, which will be displayed
-loudly. Additionally ``supports_objects_permissions`` will be set to ``False``.
+loudly. Additionally ``supports_object_permissions`` will be set to ``False``.
 Django 1.4 will assume that every backend supports object permissions and
-won't check for the existence of ``supports_objects_permissions``, which
+won't check for the existence of ``supports_object_permissions``, which
 means not supporting ``obj`` as a parameter will raise a ``TypeError``.
