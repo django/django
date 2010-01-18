@@ -1269,7 +1269,7 @@ testing behavior. This class defines the ``run_tests()`` entry point,
 plus a selection of other methods that are used to by ``run_tests()`` to
 set up, execute and tear down the test suite.
 
-.. class:: DjangoTestSuiteRunner(verbosity=1, interactive=True, failfast=True)
+.. class:: DjangoTestSuiteRunner(verbosity=1, interactive=True, failfast=True, **kwargs)
 
     ``verbosity`` determines the amount of notification and debug information
     that will be printed to the console; ``0`` is no output, ``1`` is normal
@@ -1283,6 +1283,12 @@ set up, execute and tear down the test suite.
 
     If ``failfast`` is ``True``, the test suite will stop running after the
     first test failure is detected.
+
+    Django will, from time to time, extend the capabilities of
+    the test runner by adding new arguments. The ``**kwargs`` declaration
+    allows for this expansion. If you subclass ``DjangoTestSuiteRunner`` or
+    write your own test runner, ensure accept and handle the ``**kwargs``
+    parameter.
 
 .. method:: DjangoTestSuiteRunner.run_tests(test_labels, extra_tests=[])
 
