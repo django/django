@@ -223,8 +223,8 @@ A simple example is a tagging system, which might look like this::
         object_id = models.PositiveIntegerField()
         content_object = generic.GenericForeignKey('content_type', 'object_id')
 
-       def __unicode__(self):
-           return self.tag
+        def __unicode__(self):
+            return self.tag
 
 A normal :class:`~django.db.models.fields.related.ForeignKey` can only "point
 to" one other model, which means that if the ``TaggedItem`` model used a
