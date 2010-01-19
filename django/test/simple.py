@@ -124,9 +124,9 @@ def build_suite(app_module):
     return suite
 
 def build_test(label):
-    """Construct a test case a test with the specified label. Label should
-    be of the form model.TestClass or model.TestClass.test_method. Returns
-    an instantiated test or test suite corresponding to the label provided.
+    """Construct a test case with the specified label. Label should be of the
+    form model.TestClass or model.TestClass.test_method. Returns an
+    instantiated test or test suite corresponding to the label provided.
 
     """
     parts = label.split('.')
@@ -271,9 +271,9 @@ class DjangoTestSuiteRunner(object):
         """
         self.setup_test_environment()
 
-        old_names = self.setup_databases()
-
         suite = self.build_suite(test_labels, extra_tests)
+
+        old_names = self.setup_databases()
 
         result = self.run_suite(suite)
 

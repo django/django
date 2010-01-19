@@ -1233,13 +1233,13 @@ testing behavior. This behavior involves:
 
     #. Performing global pre-test setup.
 
+    #. Looking for unit tests and doctests in the ``models.py`` and
+       ``tests.py`` files in each installed application.
+
     #. Creating the test databases.
 
     #. Running ``syncdb`` to install models and initial data into the test
        databases.
-
-    #. Looking for unit tests and doctests in the ``models.py`` and
-       ``tests.py`` files in each installed application.
 
     #. Running the unit tests and doctests that are found.
 

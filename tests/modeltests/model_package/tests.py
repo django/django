@@ -37,7 +37,7 @@ __test__ = {'API_TESTS': """
 >>> a.sites.count()
 1
 
-# Regression for #12248 - Models can exist in the test package, too
+# Regression for #12245 - Models can exist in the test package, too
 
 >>> ad = Advertisment(customer="Lawrence Journal-World")
 >>> ad.save()
