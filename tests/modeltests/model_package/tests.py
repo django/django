@@ -66,8 +66,10 @@ __test__ = {'API_TESTS': """
 >>> Article.publications.through._meta.fields[2].get_attname_column()
 ('publication_id', 'publication_id')
 
->>> Article._meta.get_field('publications').m2m_db_table()
-'model_package_article_publications'
+# The oracle backend truncates the name to 'model_package_article_publ233f'.
+>>> Article._meta.get_field('publications').m2m_db_table() \\
+... in ('model_package_article_publications', 'model_package_article_publ233f')
+True
 
 >>> Article._meta.get_field('publications').m2m_column_name()
 'article_id'
