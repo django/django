@@ -435,6 +435,9 @@ class CharField(Field):
                     ugettext_lazy("This field cannot be null."))
         return smart_unicode(value)
 
+    def get_db_prep_value(self, value):
+        return self.to_python(value)
+    
     def formfield(self, **kwargs):
         defaults = {'max_length': self.max_length}
         defaults.update(kwargs)
@@ -832,6 +835,11 @@ class TextField(Field):
     description = ugettext_lazy("Text")
     def get_internal_type(self):
         return "TextField"
+
+    def get_db_prep_value(self, value):
+        if isinstance(value, basestring) or value is None:
+            return value
+        return smart_unicode(value)
 
     def formfield(self, **kwargs):
         defaults = {'widget': forms.Textarea}

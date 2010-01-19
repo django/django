@@ -52,6 +52,10 @@ class BigS(models.Model):
     s = models.SlugField(max_length=255)
 
 
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    body = models.TextField()
+    
 ###############################################################################
 # ImageField
 
