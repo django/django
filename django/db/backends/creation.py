@@ -145,6 +145,12 @@ class BaseDatabaseCreation(object):
 
     def sql_for_many_to_many(self, model, style):
         "Return the CREATE TABLE statments for all the many-to-many tables defined on a model"
+        import warnings
+        warnings.warn(
+            'Database creation API for m2m tables has been deprecated. M2M models are now automatically generated',
+            PendingDeprecationWarning
+        )
+
         output = []
         for f in model._meta.local_many_to_many:
             if model._meta.managed or f.rel.to._meta.managed:
@@ -153,11 +159,17 @@ class BaseDatabaseCreation(object):
 
     def sql_for_many_to_many_field(self, model, f, style):
         "Return the CREATE TABLE statements for a single m2m field"
+        import warnings
+        warnings.warn(
+            'Database creation API for m2m tables has been deprecated. M2M models are now automatically generated',
+            PendingDeprecationWarning
+        )
+
         from django.db import models
         from django.db.backends.util import truncate_name
 
         output = []
-        if f.creates_table:
+        if f.auto_created:
             opts = model._meta
             qn = self.connection.ops.quote_name
             tablespace = f.db_tablespace or opts.db_tablespace
@@ -210,6 +222,12 @@ class BaseDatabaseCreation(object):
 
     def sql_for_inline_many_to_many_references(self, model, field, style):
         "Create the references to other tables required by a many-to-many table"
+        import warnings
+        warnings.warn(
+            'Database creation API for m2m tables has been deprecated. M2M models are now automatically generated',
+            PendingDeprecationWarning
+        )
+
         from django.db import models
         opts = model._meta
         qn = self.connection.ops.quote_name
@@ -306,9 +324,15 @@ class BaseDatabaseCreation(object):
 
     def sql_destroy_many_to_many(self, model, f, style):
         "Returns the DROP TABLE statements for a single m2m field"
+        import warnings
+        warnings.warn(
+            'Database creation API for m2m tables has been deprecated. M2M models are now automatically generated',
+            PendingDeprecationWarning
+        )
+
         qn = self.connection.ops.quote_name
         output = []
-        if f.creates_table:
+        if f.auto_created:
             output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
                 style.SQL_TABLE(qn(f.m2m_db_table()))))
             ds = self.connection.ops.drop_sequence_sql("%s_%s" % (model._meta.db_table, f.column))
