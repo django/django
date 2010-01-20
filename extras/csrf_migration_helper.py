@@ -176,7 +176,12 @@ class Template(object):
             return self._content
         except AttributeError:
             fd = open(self.absolute_filename)
-            content = fd.read().decode(TEMPLATE_ENCODING)
+            try:
+                content = fd.read().decode(TEMPLATE_ENCODING)
+            except UnicodeDecodeError, e:
+                message = '%s in %s' % (
+                    e[4], self.absolute_filename.encode('UTF-8', 'ignore'))
+                raise UnicodeDecodeError(*(e.args[:4] + (message,)))
             fd.close()
             self._content = content
             return content
