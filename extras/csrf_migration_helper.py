@@ -119,11 +119,7 @@ PYTHON_ENCODING = "UTF-8"
 import os
 import sys
 import re
-try:
-    set
-except NameError:
-    from sets import Set as set
-
+from optparse import OptionParser
 
 USAGE = """
 This tool helps to locate forms that need CSRF tokens added and the
@@ -150,10 +146,12 @@ def get_template_dirs():
     """
     from django.conf import settings
     dirs = set()
-    if 'django.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS:
+    if ('django.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS 
+        or  'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
         dirs.update(map(unicode, settings.TEMPLATE_DIRS))
 
-    if 'django.template.loaders.app_directories.load_template_source' in settings.TEMPLATE_LOADERS:
+    if ('django.template.loaders.app_directories.load_template_source' in settings.TEMPLATE_LOADERS
+        or 'django.template.loaders.app_directories.Loader' in settings.TEMPLATE_LOADERS):
         from django.template.loaders.app_directories import app_template_dirs
         dirs.update(app_template_dirs)
     return dirs
@@ -204,7 +202,7 @@ class Template(object):
         Returns true if this template includes template 't' (via {% include %})
         """
         for r in t.relative_filenames:
-            if re.search(r'\{%\s*include\s+"' + re.escape(r) + r'"\s*%\}', self.content):
+            if re.search(r'\{%\s*include\s+(\'|")' + re.escape(r) + r'(\1)\s*%\}', self.content):
                 return True
         return False
 
@@ -219,12 +217,11 @@ class Template(object):
             pass
 
         retval = set([self])
-        for r in self.relative_filenames:
-            for t in self.all_templates:
-                if t.includes_template(self):
-                    # If two templates mutually include each other, directly or
-                    # indirectly, we have a problem here...
-                    retval = retval.union(t.related_templates())
+        for t in self.all_templates:
+            if t.includes_template(self):
+                # If two templates mutually include each other, directly or
+                # indirectly, we have a problem here...
+                retval = retval.union(t.related_templates())
 
         self._related_templates = retval
         return retval
@@ -261,6 +258,8 @@ def get_python_code(paths):
     """
     retval = []
     for p in paths:
+        if not os.path.isdir(p):
+            raise Exception("'%s' is not a directory." % p)
         for (dirpath, dirnames, filenames) in os.walk(p):
             for f in filenames:
                 if len([True for e in PYTHON_SOURCE_EXTENSIONS if f.endswith(e)]) > 0:
@@ -338,37 +337,21 @@ def main(pythonpaths):
         print "----"
 
 
+parser = OptionParser(usage=USAGE)
+parser.add_option("", "--settings", action="store", dest="settings", help="Dotted path to settings file")
+
 if __name__ == '__main__':
-    # Hacky argument parsing, one day I'll learn OptParse...
-    args = list(sys.argv[1:])
-    if len(args) > 0:
-        if args[0] in ['--help', '-h', '-?', '--usage']:
-            print USAGE
-            sys.exit(0)
-        else:
-            if args[0].startswith('--settings='):
-                module = args[0][len('--settings='):]
-                os.environ["DJANGO_SETTINGS_MODULE"] = module
-                args = args[1:]
+    options, args = parser.parse_args()
+    if len(args) == 0:
+        parser.print_help()
+        sys.exit(1)
 
-            if args[0].startswith('-'):
-                print "Unknown option: %s" % args[0]
-                print USAGE
-                sys.exit(1)
-
-            pythonpaths = args
-
-            if os.environ.get("DJANGO_SETTINGS_MODULE", None) is None:
-                print "You need to set DJANGO_SETTINGS_MODULE or use the '--settings' parameter"
-                sys.exit(1)
-            if len(pythonpaths) == 0:
-                print "Unrecognised command: %s" % command
-                print USAGE
-                sys.exit(1)
-
-            main(pythonpaths)
-
+    settings = getattr(options, 'settings', None)
+    if settings is None:
+        if os.environ.get("DJANGO_SETTINGS_MODULE", None) is None:
+            print "You need to set DJANGO_SETTINGS_MODULE or use the '--settings' parameter"
+            sys.exit(1)
     else:
-        # no args
-        print USAGE
-        sys.exit(0)
+        os.environ["DJANGO_SETTINGS_MODULE"] = settings
+
+    main(args)
