@@ -119,7 +119,7 @@ TEST_DATA = (
 )
 
 def create_simple_test_method(validator, expected, value, num):
-    if isinstance(expected, type) and issubclass(expected, Exception):
+    if expected is not None and issubclass(expected, Exception):
         test_mask = 'test_%s_raises_error_%d'
         def test_func(self):
             self.assertRaises(expected, validator, value)
