@@ -250,6 +250,16 @@ class BaseModelForm(BaseForm):
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
 
+    def _update_errors(self, message_dict):
+        for k, v in message_dict.items():
+            if k != NON_FIELD_ERRORS:
+                self._errors.setdefault(k, self.error_class()).extend(v)
+                # Remove the data from the cleaned_data dict since it was invalid
+                if k in self.cleaned_data:
+                    del self.cleaned_data[k]
+        if NON_FIELD_ERRORS in message_dict:
+            messages = message_dict[NON_FIELD_ERRORS]
+            self._errors.setdefault(NON_FIELD_ERRORS, self.error_class()).extend(messages)
 
     def _get_validation_exclusions(self):
         """
@@ -281,21 +291,45 @@ class BaseModelForm(BaseForm):
         return exclude
 
     def clean(self):
+        self.validate_unique()
+        return self.cleaned_data
+
+    def _clean_fields(self):
+        """
+        Cleans the form fields, constructs the instance, then cleans the model
+        fields.
+        """
+        super(BaseModelForm, self)._clean_fields()
         opts = self._meta
         self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
         exclude = self._get_validation_exclusions()
         try:
-            self.instance.full_clean(exclude=exclude)
+            self.instance.clean_fields(exclude=exclude)
         except ValidationError, e:
-            for k, v in e.message_dict.items():
-                if k != NON_FIELD_ERRORS:
-                    self._errors.setdefault(k, ErrorList()).extend(v)
-                    # Remove the data from the cleaned_data dict since it was invalid
-                    if k in self.cleaned_data:
-                        del self.cleaned_data[k]
-            if NON_FIELD_ERRORS in e.message_dict:
-                raise ValidationError(e.message_dict[NON_FIELD_ERRORS])
-        return self.cleaned_data
+            self._update_errors(e.message_dict)
+
+    def _clean_form(self):
+        """
+        Runs the instance's clean method, then the form's. This is becuase the
+        form will run validate_unique() by default, and we should run the
+        model's clean method first.
+        """
+        try:
+            self.instance.clean()
+        except ValidationError, e:
+            self._update_errors(e.message_dict)
+        super(BaseModelForm, self)._clean_form()
+
+    def validate_unique(self):
+        """
+        Calls the instance's validate_unique() method and updates the form's
+        validation errors if any were raised.
+        """
+        exclude = self._get_validation_exclusions()
+        try:
+            self.instance.validate_unique(exclude=exclude)
+        except ValidationError, e:
+            self._update_errors(e.message_dict)
 
     def save(self, commit=True):
         """

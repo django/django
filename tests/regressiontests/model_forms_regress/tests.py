@@ -50,6 +50,27 @@ class UniqueTogetherTests(TestCase):
         form = TripleForm({'left': '1', 'middle': '3', 'right': '1'})
         self.failUnless(form.is_valid())
 
+class TripleFormWithCleanOverride(forms.ModelForm):
+    class Meta:
+        model = Triple
+
+    def clean(self):
+        if not self.cleaned_data['left'] == self.cleaned_data['right']:
+            raise forms.ValidationError('Left and right should be equal')
+        return self.cleaned_data
+
+class OverrideCleanTests(TestCase):
+    def test_override_clean(self):
+        """
+        Regression for #12596: Calling super from ModelForm.clean() should be
+        optional.
+        """
+        form = TripleFormWithCleanOverride({'left': 1, 'middle': 2, 'right': 1})
+        self.failUnless(form.is_valid())
+        # form.instance.left will be None if the instance was not constructed
+        # by form.full_clean().
+        self.assertEquals(form.instance.left, 1)
+
 class FPForm(forms.ModelForm):
     class Meta:
         model = FilePathModel
