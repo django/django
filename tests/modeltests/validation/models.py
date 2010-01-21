@@ -12,7 +12,7 @@ class ModelToValidate(models.Model):
     name = models.CharField(max_length=100)
     created = models.DateTimeField(default=datetime.now)
     number = models.IntegerField()
-    parent = models.ForeignKey('self', blank=True, null=True)
+    parent = models.ForeignKey('self', blank=True, null=True, limit_choices_to={'number': 10})
     email = models.EmailField(blank=True)
     url = models.URLField(blank=True)
     f_with_custom_validator = models.IntegerField(blank=True, null=True, validators=[validate_answer_to_universe])

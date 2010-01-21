@@ -30,8 +30,15 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_correct_FK_value_validates(self):
         parent = ModelToValidate.objects.create(number=10, name='Some Name')
-        mtv=ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
+        mtv = ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
         self.assertEqual(None, mtv.full_clean())
+
+    def test_limitted_FK_raises_error(self):
+        # The limit_choices_to on the parent field says that a parent object's
+        # number attribute must be 10, so this should fail validation.
+        parent = ModelToValidate.objects.create(number=11, name='Other Name')
+        mtv = ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
+        self.assertFailsValidation(mtv.full_clean, ['parent'])
 
     def test_wrong_email_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', email='not-an-email')

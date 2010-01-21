@@ -770,11 +770,12 @@ class ForeignKey(RelatedField, Field):
         super(ForeignKey, self).validate(value, model_instance)
         if not value:
             return
-        try:
-            self.rel.to._default_manager.get(**{self.rel.field_name:value})
-        except self.rel.to.DoesNotExist, e:
-            raise exceptions.ValidationError(
-                    self.error_messages['invalid'] % {'model': self.rel.to._meta.verbose_name, 'pk': value})
+
+        qs = self.rel.to._default_manager.filter(**{self.rel.field_name:value})
+        qs = qs.complex_filter(self.rel.limit_choices_to)
+        if not qs.exists():
+            raise exceptions.ValidationError(self.error_messages['invalid'] % {
+                'model': self.rel.to._meta.verbose_name, 'pk': value})
 
     def get_attname(self):
         return '%s_id' % self.name
