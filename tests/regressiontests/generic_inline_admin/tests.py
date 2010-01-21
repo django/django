@@ -176,3 +176,25 @@ class GenericInlineAdminParametersTest(TestCase):
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeexclude/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.failIf('url' in formset.forms[0], 'The formset has excluded "url" field.')
+
+class GenericInlineAdminWithUniqueTogetherTest(TestCase):
+    fixtures = ['users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def testAdd(self):
+        post_data = {
+            "name": u"John Doe",
+            # inline data
+            "generic_inline_admin-phonenumber-content_type-object_id-TOTAL_FORMS": u"1",
+            "generic_inline_admin-phonenumber-content_type-object_id-INITIAL_FORMS": u"0",
+            "generic_inline_admin-phonenumber-content_type-object_id-0-id": "",
+            "generic_inline_admin-phonenumber-content_type-object_id-0-phone_number": "555-555-5555",
+        }
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/contact/add/')
+        response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/contact/add/', post_data)
+        self.failUnlessEqual(response.status_code, 302) # redirect somewhere
