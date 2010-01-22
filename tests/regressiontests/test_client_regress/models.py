@@ -602,6 +602,12 @@ class ContextTests(TestCase):
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
 
+        try:
+            response.context['does-not-exist']
+            self.fail('Should not be able to retrieve non-existent key')
+        except KeyError, e:
+            self.assertEquals(e.message, 'does-not-exist')
+
     def test_inherited_context(self):
         "Context variables can be retrieved from a list of contexts"
         response = self.client.get("/test_client_regress/request_data_extended/", data={'foo':'whiz'})
@@ -610,6 +616,13 @@ class ContextTests(TestCase):
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'bacon')
+
+        try:
+            response.context['does-not-exist']
+            self.fail('Should not be able to retrieve non-existent key')
+        except KeyError, e:
+            self.assertEquals(e.message, 'does-not-exist')
+
 
 class SessionTests(TestCase):
     fixtures = ['testdata.json']

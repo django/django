@@ -15,7 +15,7 @@ class ContextList(list):
             for subcontext in self:
                 if key in subcontext:
                     return subcontext[key]
-            raise KeyError
+            raise KeyError(key)
         else:
             return super(ContextList, self).__getitem__(key)
 
