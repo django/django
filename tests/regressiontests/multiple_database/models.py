@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import models
 
 class Review(models.Model):
     source = models.CharField(max_length=100)
@@ -36,6 +36,7 @@ class Book(models.Model):
     authors = models.ManyToManyField(Person)
     editor = models.ForeignKey(Person, null=True, related_name='edited')
     reviews = generic.GenericRelation(Review)
+    pages = models.IntegerField(default=100)
 
     def __unicode__(self):
         return self.title

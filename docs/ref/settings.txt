@@ -372,6 +372,22 @@ test database will use the name ``'test_' + DATABASE_NAME``.
 
 See :ref:`topics-testing`.
 
+
+.. setting:: DATABASE_ROUTERS
+
+DATABASE_ROUTERS
+----------------
+
+.. versionadded: 1.2
+
+Default: ``[]`` (Empty list)
+
+The list of routers that will be used to determine which database
+to use when performing a database queries.
+
+See the documentation on :ref:`automatic database routing in multi
+database configurations <topics-db-multi-db-routing>`.
+
 .. setting:: DATE_FORMAT
 
 DATE_FORMAT

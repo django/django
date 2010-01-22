@@ -1,9 +1,10 @@
 from django.utils import copycompat as copy
-
-from django.db import DEFAULT_DB_ALIAS
+from django.conf import settings
+from django.db import router
 from django.db.models.query import QuerySet, EmptyQuerySet, insert_query, RawQuerySet
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
+
 
 def ensure_default_manager(sender, **kwargs):
     """
@@ -87,30 +88,27 @@ class Manager(object):
         mgr._inherited = True
         return mgr
 
-    def db_manager(self, alias):
+    def db_manager(self, using):
         obj = copy.copy(self)
-        obj._db = alias
+        obj._db = using
         return obj
 
     @property
     def db(self):
-        return self._db or DEFAULT_DB_ALIAS
+        return self._db or router.db_for_read(self.model)
 
     #######################
     # PROXIES TO QUERYSET #
     #######################
 
     def get_empty_query_set(self):
-        return EmptyQuerySet(self.model)
+        return EmptyQuerySet(self.model, using=self._db)
 
     def get_query_set(self):
         """Returns a new QuerySet object.  Subclasses can override this method
         to easily customize the behavior of the Manager.
         """
-        qs = QuerySet(self.model)
-        if self._db is not None:
-            qs = qs.using(self._db)
-        return qs
+        return QuerySet(self.model, using=self._db)
 
     def none(self):
         return self.get_empty_query_set()
@@ -200,7 +198,7 @@ class Manager(object):
         return self.get_query_set()._update(values, **kwargs)
 
     def raw(self, raw_query, params=None, *args, **kwargs):
-        return RawQuerySet(raw_query=raw_query, model=self.model, params=params, using=self.db, *args, **kwargs)
+        return RawQuerySet(raw_query=raw_query, model=self.model, params=params, using=self._db, *args, **kwargs)
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.

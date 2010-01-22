@@ -1,4 +1,4 @@
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import connections
 from django.db.models.query import sql
 
 from django.contrib.gis.db.models.fields import GeometryField

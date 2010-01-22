@@ -6,10 +6,10 @@ Multiple databases
 
 .. versionadded:: 1.2
 
-This topic guide describes Django's support for interacting with multiple
-databases. Most of the rest of Django's documentation assumes you are
-interacting with a single database. If you want to interact with multiple
-databases, you'll need to take some additional steps.
+This topic guide describes Django's support for interacting with
+multiple databases. Most of the rest of Django's documentation assumes
+you are interacting with a single database. If you want to interact
+with multiple databases, you'll need to take some additional steps.
 
 Defining your databases
 =======================
@@ -22,9 +22,11 @@ a dictionary of settings for that specific connection. The settings in
 the inner dictionaries are described fully in the :setting:`DATABASES`
 documentation.
 
-Regardless of how many databases you have, you *must* have a database
-named ``'default'``. Any additional databases can have whatever alias
-you choose.
+Databases can have any alias you choose. However, the alias
+``default`` has special significance. Django uses the database with
+the alias of ``default`` when no other database has been selected. If
+you don't have a ``default`` database, you need to be careful to
+always specify the database that you want to use.
 
 The following is an example ``settings.py`` snippet defining two
 databases -- a default PostgreSQL database and a MySQL database called
@@ -65,10 +67,10 @@ all databases in our example, you would need to call::
 
 If you don't want every application to be synchronized onto a
 particular database. you can specify the :djadminopt:`--exclude`
-argument to :djadmin:`syncdb`. The :djadminopt:`--exclude` option
-lets you prevent a specific application or applications from
-being synchronized. For example, if you don't want the ``sales``
-application to be in the ``users`` database, you could run::
+argument to :djadmin:`syncdb`. The :djadminopt:`--exclude` option lets
+you prevent a specific application or applications from being
+synchronized. For example, if you don't want the ``sales`` application
+to be in the ``users`` database, you could run::
 
     $ ./manage.py syncdb --database=users --exclude=sales
 
@@ -86,46 +88,235 @@ operate in the same way as :djadmin:`syncdb` -- they only ever operate
 on one database at a time, using :djadminopt:`--database` to control
 the database used.
 
-Selecting a database for a ``QuerySet``
-=======================================
+.. _topics-db-multi-db-routing:
 
-You can select the database for a ``QuerySet`` at any point in the ``QuerySet``
-"chain." Just call ``using()`` on the ``QuerySet`` to get another ``QuerySet``
-that uses the specified database.
+Automatic database routing
+==========================
 
-``using()`` takes a single argument: the alias of the database on which you
-want to run the query. For example:
+The easiest way to use multiple databases is to set up a database
+routing scheme. The default routing scheme ensures that objects remain
+'sticky' to their original database (i.e., an object retrieved from
+the ``foo`` database will be saved on the same database). However, you
+can implement more interesting behaviors by defining a different
+routing scheme.
 
-.. code-block:: python
+Database routers
+----------------
 
-    # This will run on the 'default' database.
+A database Router is a class that provides three methods:
+
+.. method:: db_for_read(model, **hints)
+
+    Suggest the database that should be used for read operations for
+    objects of type ``model``.
+
+    If a database operation is able to provide any additional
+    information that might assist in selecting a database, it will be
+    provided in the ``hints`` dictionary. Details on valid hints are
+    provided :ref:`below <topics-db-multi-db-hints>`.
+
+    Returns None if there is no suggestion.
+
+.. method:: db_for_write(model, **hints)
+
+    Suggest the database that should be used for writes of objects of
+    type Model.
+
+    If a database operation is able to provide any additional
+    information that might assist in selecting a database, it will be
+    provided in the ``hints`` dictionary. Details on valid hints are
+    provided :ref:`below <topics-db-multi-db-hints>`.
+
+    Returns None if there is no suggestion.
+
+.. method:: allow_relation(obj1, obj2, **hints)
+
+    Return True if a relation between obj1 and obj2 should be
+    allowed, False if the relation should be prevented, or None if
+    the router has no opinion. This is purely a validation operation,
+    used by foreign key and many to many operations to determine if a
+    relation should be allowed between two objects.
+
+.. _topics-db-multi-db-hints:
+
+Hints
+~~~~~
+
+The hints received by the database router can be used to decide which
+database should receive a given request.
+
+At present, the only hint that will be provided is ``instance``, an
+object instance that is related to the read or write operation that is
+underway. This might be the instance that is being saved, or it might
+be an instance that is being added in a many-to-many relation. In some
+cases, no instance hint will be provided at all. The router check for
+the existence of an instance hint, and determine if hat hint should be
+used to alter routing behavior.
+
+Using routers
+-------------
+
+Database routers are installed using the :setting:`DATABASE_ROUTERS`
+setting. This setting defines a list of class names, each specifying a
+router that should be used by the master router
+(``django.db.router``).
+
+The master router is used by Django's database operations to allocate
+database usage. Whenever a query needs to know which database to use,
+it calls the master router, providing a model and a hint (if
+available). Django then tries each router in turn until a database
+suggestion can be found. If no suggestion can be found, it tries the
+current ``_state.db`` of the hint instance. If a hint instance wasn't
+provided, or the instance doesn't currently have database state, the
+master router will allocate the ``default`` database.
+
+An example
+----------
+
+.. admonition:: Example purposes only!
+
+    This example is intended as a demonstration of how the router
+    infrastructure can be used to alter database usage. It
+    intentionally ignores some complex issues in order to
+    demonstrate how routers are used.
+
+    The approach of splitting ``contrib.auth`` onto a different
+    database won't actually work on Postgres, Oracle, or MySQL with
+    InnoDB tables. ForeignKeys to a remote database won't work due as
+    they introduce referential integrity problems. If you're using
+    SQLite or MySQL with MyISAM tables, there is no referential
+    integrity checking, so you will be able to define cross-database
+    foreign keys.
+
+    The master/slave configuration described is also flawed -- it
+    doesn't provide any solution for handling replication lag (i.e.,
+    query inconsistencies introduced because of the time taken for a
+    write to propagate to the slaves). It also doesn't consider the
+    interaction of transactions with the database utiliztion strategy.
+
+So - what does this mean in practice? Say you want ``contrib.auth`` to
+exist on the 'credentials' database, and you want all other models in a
+master/slave relationship between the databses 'master', 'slave1' and
+'slave2'. To implement this, you would need 2 routers::
+
+    class AuthRouter(object):
+        """A router to control all database operations on models in
+        the contrib.auth application"""
+
+        def db_for_read(self, model, **hints):
+            "Point all operations on auth models to 'credentials'"
+            if model._meta.app_label == 'auth':
+                return 'credentials'
+            return None
+
+        def db_for_write(self, model, **hints):
+            "Point all operations on auth models to 'credentials'"
+            if model._meta.app_label == 'auth':
+                return 'credentials'
+            return None
+
+        def allow_relation(self, obj1, obj2, **hints):
+            "Allow any relation if a model in Auth is involved"
+            if obj1._meta.app_label == 'auth' or obj2._meta.app_label == 'auth':
+                return True
+            return None
+
+
+     class MasterSlaveRouter(object):
+        """A router that sets up a simple master/slave configuration"""
+
+        def db_for_read(self, model, **hints):
+            "Point all read operations to a random slave"
+            return random.choice(['slave1','slave2'])
+
+        def db_for_write(self, model, **hints):
+            "Point all write operations to the master"
+            return 'master'
+
+        def allow_relation(self, obj1, obj2, **hints):
+            "Allow any relation between two objects in the db pool"
+            db_list = ('master','slave1','slave2')
+            if obj1 in db_list and obj2 in db_list:
+                return True
+            return None
+
+Then, in your settings file, add the following (substituting ``path.to.`` with
+the actual python path to the module where you define the routers)::
+
+    DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.MasterSlaveRouter']
+
+With this setup installed, lets run some Django code::
+
+    >>> # This retrieval will be performed on the 'credentials' database
+    >>> fred = User.objects.get(username='fred')
+    >>> fred.first_name = 'Frederick'
+
+    >>> # This save will also be directed to 'credentials'
+    >>> fred.save()
+
+    >>> # These retrieval will be randomly allocated to a slave database
+    >>> dna = Person.objects.get(name='Douglas Adams')
+
+    >>> # A new object has no database allocation when created
+    >>> mh = Book(title='Mostly Harmless')
+
+    >>> # This assignment will consult the router, and set mh onto
+    >>> # the same database as the author object
+    >>> mh.author = dna
+
+    >>> # This save will force the 'mh' instance onto the master database...
+    >>> mh.save()
+
+    >>> # ... but if we re-retrieve the object, it will come back on a slave
+    >>> mh = Book.objects.get(title='Mostly Harmless')
+
+Manually selecting a database
+=============================
+
+Django also provides an API that allows you to maintain complete control
+over database usage in your code. A manually specified database allocation
+will take priority over a database allocated by a router.
+
+Manually selecting a database for a ``QuerySet``
+------------------------------------------------
+
+You can select the database for a ``QuerySet`` at any point in the
+``QuerySet`` "chain." Just call ``using()`` on the ``QuerySet`` to get
+another ``QuerySet`` that uses the specified database.
+
+``using()`` takes a single argument: the alias of the database on
+which you want to run the query. For example::
+
+    >>> # This will run on the 'default' database.
     >>> Author.objects.all()
-    
-    # So will this.
+
+    >>> # So will this.
     >>> Author.objects.using('default').all()
-    
-    # This will run on the 'other' database.
+
+    >>> # This will run on the 'other' database.
     >>> Author.objects.using('other').all()
 
 Selecting a database for ``save()``
-===================================
+-----------------------------------
 
-Use the ``using`` keyword to ``Model.save()`` to specify to which database the
-data should be saved.
+Use the ``using`` keyword to ``Model.save()`` to specify to which
+database the data should be saved.
 
-For example, to save an object to the ``legacy_users`` database, you'd use this::
+For example, to save an object to the ``legacy_users`` database, you'd
+use this::
 
     >>> my_object.save(using='legacy_users')
 
-If you don't specify ``using``, the ``save()`` method will always save into the
-default database.
+If you don't specify ``using``, the ``save()`` method will save into
+the default database allocated by the routers.
 
 Moving an object from one database to another
----------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you've saved an instance to one database, it might be tempting to use
-``save(using=...)`` as a way to migrate the instance to a new database. However,
-if you don't take appropriate steps, this could have some unexpected consequences.
+If you've saved an instance to one database, it might be tempting to
+use ``save(using=...)`` as a way to migrate the instance to a new
+database. However, if you don't take appropriate steps, this could
+have some unexpected consequences.
 
 Consider the following example::
 
@@ -149,16 +340,17 @@ However, if the primary key of ``p`` is already in use on the
 will be overridden when ``p`` is saved.
 
 You can avoid this in two ways. First, you can clear the primary key
-of the instance. If an object has no primary key, Django will treat it as
-a new object, avoiding any loss of data on the ``second`` database::
+of the instance. If an object has no primary key, Django will treat it
+as a new object, avoiding any loss of data on the ``second``
+database::
 
     >>> p = Person(name='Fred')
     >>> p.save(using='first')
     >>> p.pk = None # Clear the primary key.
     >>> p.save(using='second') # Write a completely new object.
 
-The second option is to use the ``force_insert`` option to ``save()`` to ensure
-that Django does a SQL ``INSERT``::
+The second option is to use the ``force_insert`` option to ``save()``
+to ensure that Django does a SQL ``INSERT``::
 
     >>> p = Person(name='Fred')
     >>> p.save(using='first')
@@ -170,51 +362,53 @@ when you try to save onto the ``second`` database, an error will be
 raised.
 
 Selecting a database to delete from
-===================================
+-----------------------------------
 
-By default, a call to delete an existing object will be executed on the
-same database that was used to retrieve the object in the first place::
+By default, a call to delete an existing object will be executed on
+the same database that was used to retrieve the object in the first
+place::
 
     >>> u = User.objects.using('legacy_users').get(username='fred')
     >>> u.delete() # will delete from the `legacy_users` database
 
 To specify the database from which a model will be deleted, pass a
-``using`` keyword argument to the ``Model.delete()`` method. This argument
-works just like the ``using`` keyword argument to ``save()``.
+``using`` keyword argument to the ``Model.delete()`` method. This
+argument works just like the ``using`` keyword argument to ``save()``.
 
-For example, if you're migrating a user from the ``legacy_users`` database
-to the ``new_users`` database, you might use these commands::
+For example, if you're migrating a user from the ``legacy_users``
+database to the ``new_users`` database, you might use these commands::
 
     >>> user_obj.save(using='new_users')
     >>> user_obj.delete(using='legacy_users')
 
 Using managers with multiple databases
-======================================
+--------------------------------------
 
-Use the ``db_manager()`` method on managers to give managers access to a
-non-default database.
+Use the ``db_manager()`` method on managers to give managers access to
+a non-default database.
 
-For example, say you have a custom manager method that touches the database --
-``User.objects.create_user()``. Because ``create_user()`` is a
-manager method, not a ``QuerySet`` method, you can't do
-``User.objects.using('new_users').create_user()``. (The ``create_user()`` method
-is only available on ``User.objects``, the manager, not on ``QuerySet`` objects
-derived from the manager.) The solution is to use ``db_manager()``, like this::
+For example, say you have a custom manager method that touches the
+database -- ``User.objects.create_user()``. Because ``create_user()``
+is a manager method, not a ``QuerySet`` method, you can't do
+``User.objects.using('new_users').create_user()``. (The
+``create_user()`` method is only available on ``User.objects``, the
+manager, not on ``QuerySet`` objects derived from the manager.) The
+solution is to use ``db_manager()``, like this::
 
     User.objects.db_manager('new_users').create_user(...)
 
 ``db_manager()`` returns a copy of the manager bound to the database you specify.
 
 Using ``get_query_set()`` with multiple databases
--------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're overriding ``get_query_set()`` on your manager, be sure to either
-call the method on the parent (using ``super()``) or do the appropriate
-handling of the ``_db`` attribute on the manager (a string containing the name
-of the database to use).
+If you're overriding ``get_query_set()`` on your manager, be sure to
+either call the method on the parent (using ``super()``) or do the
+appropriate handling of the ``_db`` attribute on the manager (a string
+containing the name of the database to use).
 
-For example, if you want to return a custom ``QuerySet`` class from the
-``get_query_set`` method, you could do this::
+For example, if you want to return a custom ``QuerySet`` class from
+the ``get_query_set`` method, you could do this::
 
     class MyManager(models.Manager):
         def get_query_set(self):
@@ -228,9 +422,9 @@ Exposing multiple databases in Django's admin interface
 
 Django's admin doesn't have any explicit support for multiple
 databases. If you want to provide an admin interface for a model on a
-database other than ``default``, you'll need to write custom
-:class:`~django.contrib.admin.ModelAdmin` classes that will direct the
-admin to use a specific database for content.
+database other than that that specified by your router chain, you'll
+need to write custom :class:`~django.contrib.admin.ModelAdmin` classes
+that will direct the admin to use a specific database for content.
 
 ``ModelAdmin`` objects have four methods that require customization for
 multiple-database support::
@@ -257,11 +451,11 @@ multiple-database support::
             # on the 'other' database.
             return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
 
-The implementation provided here implements a multi-database strategy where
-all objects of a given type are stored on a specific database (e.g.,
-all ``User`` objects are in the ``other`` database). If your usage of
-multiple databases is more complex, your ``ModelAdmin`` will need to reflect
-that strategy.
+The implementation provided here implements a multi-database strategy
+where all objects of a given type are stored on a specific database
+(e.g., all ``User`` objects are in the ``other`` database). If your
+usage of multiple databases is more complex, your ``ModelAdmin`` will
+need to reflect that strategy.
 
 Inlines can be handled in a similar fashion. They require three customized methods::
 
@@ -282,8 +476,8 @@ Inlines can be handled in a similar fashion. They require three customized metho
             # on the 'other' database.
             return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
 
-Once you've written your model admin definitions, they can be registered with
-any ``Admin`` instance::
+Once you've written your model admin definitions, they can be
+registered with any ``Admin`` instance::
 
     from django.contrib import admin
 

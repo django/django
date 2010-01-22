@@ -3,7 +3,7 @@ import urllib
 
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import models
 from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str

@@ -5,6 +5,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
+DEFAULT_DB_ALIAS = 'default'
+
 def load_backend(backend_name):
     try:
         module = import_module('.base', 'django.db.backends.%s' % backend_name)
@@ -55,6 +57,7 @@ class ConnectionHandler(object):
             conn = self.databases[alias]
         except KeyError:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
+
         conn.setdefault('ENGINE', 'django.db.backends.dummy')
         if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
             conn['ENGINE'] = 'django.db.backends.dummy'
@@ -82,3 +85,38 @@ class ConnectionHandler(object):
 
     def all(self):
         return [self[alias] for alias in self]
+
+class ConnectionRouter(object):
+    def __init__(self, routers):
+        self.routers = []
+        for r in routers:
+            if isinstance(r, basestring):
+                module_name, klass_name = r.rsplit('.', 1)
+                module = import_module(module_name)
+                router = getattr(module, klass_name)()
+            else:
+                router = r
+            self.routers.append(router)
+
+    def _router_func(action):
+        def _route_db(self, model, **hints):
+            chosen_db = None
+            for router in self.routers:
+                chosen_db = getattr(router, action)(model, **hints)
+                if chosen_db:
+                    return chosen_db
+            try:
+                return hints['instance']._state.db or DEFAULT_DB_ALIAS
+            except KeyError:
+                return DEFAULT_DB_ALIAS
+        return _route_db
+
+    db_for_read = _router_func('db_for_read')
+    db_for_write = _router_func('db_for_write')
+
+    def allow_relation(self, obj1, obj2, **hints):
+        for router in self.routers:
+            allow = router.allow_relation(obj1, obj2, **hints)
+            if allow is not None:
+                return allow
+        return obj1._state.db == obj2._state.db

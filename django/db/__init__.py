@@ -1,13 +1,12 @@
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
-from django.db.utils import ConnectionHandler, load_backend
+from django.db.utils import ConnectionHandler, ConnectionRouter, load_backend, DEFAULT_DB_ALIAS
 from django.utils.functional import curry
 
-__all__ = ('backend', 'connection', 'connections', 'DatabaseError',
+__all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
     'IntegrityError', 'DEFAULT_DB_ALIAS')
 
-DEFAULT_DB_ALIAS = 'default'
 
 # For backwards compatibility - Port any old database settings over to
 # the new values.
@@ -61,6 +60,7 @@ for alias, database in settings.DATABASES.items():
 
 connections = ConnectionHandler(settings.DATABASES)
 
+router = ConnectionRouter(settings.DATABASE_ROUTERS)
 
 # `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
 # for backend bits.

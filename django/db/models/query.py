@@ -4,7 +4,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 
 from copy import deepcopy
 
-from django.db import connections, transaction, IntegrityError, DEFAULT_DB_ALIAS
+from django.db import connections, router, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
 from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory, InvalidQuery
@@ -34,6 +34,7 @@ class QuerySet(object):
         self._result_cache = None
         self._iter = None
         self._sticky_filter = False
+        self._for_write = False
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -345,6 +346,7 @@ class QuerySet(object):
         and returning the created object.
         """
         obj = self.model(**kwargs)
+        self._for_write = True
         obj.save(force_insert=True, using=self.db)
         return obj
 
@@ -358,6 +360,7 @@ class QuerySet(object):
                 'get_or_create() must be passed at least one keyword argument'
         defaults = kwargs.pop('defaults', {})
         try:
+            self._for_write = True
             return self.get(**kwargs), False
         except self.model.DoesNotExist:
             try:
@@ -413,6 +416,11 @@ class QuerySet(object):
 
         del_query = self._clone()
 
+        # The delete is actually 2 queries - one to find related objects,
+        # and one to delete. Make sure that the discovery of related
+        # objects is performed on the same database as the deletion.
+        del_query._for_write = True
+
         # Disable non-supported fields.
         del_query.query.select_related = False
         del_query.query.clear_ordering()
@@ -442,6 +450,7 @@ class QuerySet(object):
         """
         assert self.query.can_filter(), \
                 "Cannot update a query once a slice has been taken."
+        self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
         if not transaction.is_managed(using=self.db):
@@ -714,7 +723,9 @@ class QuerySet(object):
     @property
     def db(self):
         "Return the database that will be used if this query is executed now"
-        return self._db or DEFAULT_DB_ALIAS
+        if self._for_write:
+            return self._db or router.db_for_write(self.model)
+        return self._db or router.db_for_read(self.model)
 
     ###################
     # PRIVATE METHODS #
@@ -726,8 +737,8 @@ class QuerySet(object):
         query = self.query.clone()
         if self._sticky_filter:
             query.filter_is_sticky = True
-        c = klass(model=self.model, query=query)
-        c._db = self._db
+        c = klass(model=self.model, query=query, using=self._db)
+        c._for_write = self._for_write
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
@@ -988,8 +999,8 @@ class DateQuerySet(QuerySet):
 
 
 class EmptyQuerySet(QuerySet):
-    def __init__(self, model=None, query=None):
-        super(EmptyQuerySet, self).__init__(model, query)
+    def __init__(self, model=None, query=None, using=None):
+        super(EmptyQuerySet, self).__init__(model, query, using)
         self._result_cache = []
 
     def __and__(self, other):
@@ -1254,7 +1265,7 @@ class RawQuerySet(object):
     @property
     def db(self):
         "Return the database that will be used if this query is executed now"
-        return self._db or DEFAULT_DB_ALIAS
+        return self._db or router.db_for_read(self.model)
 
     def using(self, alias):
         """

@@ -10,7 +10,7 @@ from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneF
 from django.db.models.query import delete_objects, Q
 from django.db.models.query_utils import CollectedObjects, DeferredAttribute
 from django.db.models.options import Options
-from django.db import connections, transaction, DatabaseError, DEFAULT_DB_ALIAS
+from django.db import connections, router, transaction, DatabaseError, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
@@ -439,7 +439,7 @@ class Model(object):
         need for overrides of save() to pass around internal-only parameters
         ('raw', 'cls', and 'origin').
         """
-        using = using or self._state.db or DEFAULT_DB_ALIAS
+        using = using or router.db_for_write(self.__class__, instance=self)
         connection = connections[using]
         assert not (force_insert and force_update)
         if cls is None:
@@ -592,7 +592,7 @@ class Model(object):
             parent_obj._collect_sub_objects(seen_objs)
 
     def delete(self, using=None):
-        using = using or self._state.db or DEFAULT_DB_ALIAS
+        using = using or router.db_for_write(self.__class__, instance=self)
         connection = connections[using]
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 
@@ -719,7 +719,7 @@ class Model(object):
                     # no value, skip the lookup
                     continue
                 if f.primary_key and not getattr(self, '_adding', False):
-                    # no need to check for unique primary key when editting 
+                    # no need to check for unique primary key when editing
                     continue
                 lookup_kwargs[str(field_name)] = lookup_value
 

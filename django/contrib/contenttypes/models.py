@@ -1,4 +1,4 @@
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 
