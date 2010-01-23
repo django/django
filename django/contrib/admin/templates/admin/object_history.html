@@ -27,7 +27,7 @@
         <tbody>
         {% for action in action_list %}
         <tr>
-            <th scope="row">{{ action.action_time|date }}</th>
+            <th scope="row">{{ action.action_time|date:"DATETIME_FORMAT" }}</th>
             <td>{{ action.user.username }}{% if action.user.get_full_name %} ({{ action.user.get_full_name }}){% endif %}</td>
             <td>{{ action.change_message }}</td>
         </tr>
