@@ -619,6 +619,8 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
             msg = self.style.HTTP_SUCCESS(msg)
         elif args[1][0] == '1':
             msg = self.style.HTTP_INFO(msg)
+        elif args[1] == '304':
+            msg = self.style.HTTP_NOT_MODIFIED(msg)
         elif args[1][0] == '3':
             msg = self.style.HTTP_REDIRECT(msg)
         elif args[1] == '404':
