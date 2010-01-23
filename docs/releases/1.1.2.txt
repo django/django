@@ -32,6 +32,17 @@ status code for the test runner is now 0 for success (no failing tests) and 1
 for any number of test failures.  If needed, the number of test failures can be
 found at the end of the test runner's output.
 
+Cookie encoding
+---------------
+
+To fix bugs with cookies in Internet Explorer, Safari, and possibly other
+browsers, our encoding of cookie values was changed so that the characters
+comma and semi-colon are treated as non-safe characters, and are therefore
+encoded as ``\054`` and ``\073`` respectively.  This could produce backwards
+incompatibilities, especially if you are storing comma or semi-colon in
+cookies and have javascript code that parses and manipulates cookie values
+client-side.
+
 One new feature
 ===============
 
