@@ -215,4 +215,18 @@ ImproperlyConfigured: 'FieldsetBookAdmin.fieldsets[1][1]['fields']' can't includ
 # the validation will fail.
 >>> validate(BookAdmin, Book)
 
+# Regression for ensuring ModelAdmin.fields can contain non-model fields
+# that broke with r11737
+
+>>> class SongForm(forms.ModelForm):
+...     extra_data = forms.CharField()
+...     class Meta:
+...         model = Song
+
+>>> class FieldsOnFormOnlyAdmin(admin.ModelAdmin):
+...     form = SongForm
+...     fields = ['title', 'extra_data']
+
+>>> validate(FieldsOnFormOnlyAdmin, Song)
+
 """}

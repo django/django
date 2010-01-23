@@ -211,7 +211,12 @@ def validate_base(cls, model):
                 # validation of such things.
                 continue
             check_formfield(cls, model, opts, 'fields', field)
-            f = get_field(cls, model, opts, 'fields', field)
+            try:
+                f = opts.get_field(field)
+            except models.FieldDoesNotExist:
+                # If we can't find a field on the model that matches,
+                # it could be an extra field on the form.
+                continue
             if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
                 raise ImproperlyConfigured("'%s.fields' can't include the ManyToManyField "
                     "field '%s' because '%s' manually specifies "
