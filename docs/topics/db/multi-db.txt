@@ -149,8 +149,8 @@ At present, the only hint that will be provided is ``instance``, an
 object instance that is related to the read or write operation that is
 underway. This might be the instance that is being saved, or it might
 be an instance that is being added in a many-to-many relation. In some
-cases, no instance hint will be provided at all. The router check for
-the existence of an instance hint, and determine if hat hint should be
+cases, no instance hint will be provided at all. The router checks for
+the existence of an instance hint, and determine if that hint should be
 used to alter routing behavior.
 
 Using routers
@@ -192,11 +192,11 @@ An example
     doesn't provide any solution for handling replication lag (i.e.,
     query inconsistencies introduced because of the time taken for a
     write to propagate to the slaves). It also doesn't consider the
-    interaction of transactions with the database utiliztion strategy.
+    interaction of transactions with the database utilization strategy.
 
 So - what does this mean in practice? Say you want ``contrib.auth`` to
 exist on the 'credentials' database, and you want all other models in a
-master/slave relationship between the databses 'master', 'slave1' and
+master/slave relationship between the databases 'master', 'slave1' and
 'slave2'. To implement this, you would need 2 routers::
 
     class AuthRouter(object):
