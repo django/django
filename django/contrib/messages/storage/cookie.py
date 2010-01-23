@@ -86,7 +86,12 @@ class CookieStorage(BaseStorage):
         unstored_messages = []
         encoded_data = self._encode(messages)
         if self.max_cookie_size:
-            while encoded_data and len(encoded_data) > self.max_cookie_size:
+            # data is going to be stored eventually by CompatCookie, which
+            # adds it's own overhead, which we must account for.
+            def stored_length(val):
+                return len(CompatCookie().value_encode(val)[1])
+
+            while encoded_data and stored_length(encoded_data) > self.max_cookie_size:
                 if remove_oldest:
                     unstored_messages.append(messages.pop(0))
                 else:
