@@ -1,10 +1,11 @@
 import hmac
 
 from django.conf import settings
-from django.utils.hashcompat import sha_hmac
 from django.contrib.messages import constants
 from django.contrib.messages.storage.base import BaseStorage, Message
+from django.http import CompatCookie
 from django.utils import simplejson as json
+from django.utils.hashcompat import sha_hmac
 
 
 class MessageEncoder(json.JSONEncoder):
@@ -46,7 +47,10 @@ class CookieStorage(BaseStorage):
     Stores messages in a cookie.
     """
     cookie_name = 'messages'
-    max_cookie_size = 4096
+    # We should be able to store 4K in a cookie, but Internet Explorer
+    # imposes 4K as the *total* limit for a domain.  To allow other
+    # cookies, we go for 3/4 of 4K.
+    max_cookie_size = 3072
     not_finished = '__messagesnotfinished__'
 
     def _get(self, *args, **kwargs):

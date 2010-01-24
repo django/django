@@ -69,19 +69,25 @@ class CookieTest(BaseTest):
         storage = self.get_storage()
         response = self.get_response()
 
+        # When storing as a cookie, the cookie has constant overhead of approx
+        # 54 chars, and each message has a constant overhead of about 37 chars
+        # and a variable overhead of zero in the best case. We aim for a message
+        # size which will fit 4 messages into the cookie, but not 5.
+        # See also FallbackTest.test_session_fallback
+        msg_size = int((CookieStorage.max_cookie_size - 54) / 4.5 - 37)
         for i in range(5):
-            storage.add(constants.INFO, str(i) * 900)
+            storage.add(constants.INFO, str(i) * msg_size)
         unstored_messages = storage.update(response)
 
         cookie_storing = self.stored_messages_count(storage, response)
         self.assertEqual(cookie_storing, 4)
 
         self.assertEqual(len(unstored_messages), 1)
-        self.assert_(unstored_messages[0].message == '0' * 900)
+        self.assert_(unstored_messages[0].message == '0' * msg_size)
 
     def test_json_encoder_decoder(self):
         """
-        Tests that an complex nested data structure containing Message
+        Tests that a complex nested data structure containing Message
         instances is properly encoded/decoded by the custom JSON
         encoder/decoder classes.
         """

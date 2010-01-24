@@ -147,8 +147,10 @@ class FallbackTest(BaseTest):
         storage = self.get_storage()
         response = self.get_response()
 
+        # see comment in CookieText.test_cookie_max_length
+        msg_size = int((CookieStorage.max_cookie_size - 54) / 4.5 - 37)
         for i in range(5):
-            storage.add(constants.INFO, str(i) * 900)
+            storage.add(constants.INFO, str(i) * msg_size)
         storage.update(response)
 
         cookie_storing = self.stored_cookie_messages_count(storage, response)
