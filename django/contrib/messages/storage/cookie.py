@@ -92,8 +92,9 @@ class CookieStorage(BaseStorage):
         if self.max_cookie_size:
             # data is going to be stored eventually by CompatCookie, which
             # adds it's own overhead, which we must account for.
+            cookie = CompatCookie() # create outside the loop
             def stored_length(val):
-                return len(CompatCookie().value_encode(val)[1])
+                return len(cookie.value_encode(val)[1])
 
             while encoded_data and stored_length(encoded_data) > self.max_cookie_size:
                 if remove_oldest:
