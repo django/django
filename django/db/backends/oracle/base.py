@@ -314,16 +314,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     operators = {
         'exact': '= %s',
         'iexact': '= UPPER(%s)',
-        'contains': "LIKEC %s ESCAPE '\\'",
-        'icontains': "LIKEC UPPER(%s) ESCAPE '\\'",
+        'contains': "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
+        'icontains': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
         'gt': '> %s',
         'gte': '>= %s',
         'lt': '< %s',
         'lte': '<= %s',
-        'startswith': "LIKEC %s ESCAPE '\\'",
-        'endswith': "LIKEC %s ESCAPE '\\'",
-        'istartswith': "LIKEC UPPER(%s) ESCAPE '\\'",
-        'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
+        'startswith': "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
+        'endswith': "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
+        'istartswith': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
+        'iendswith': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
     }
     oracle_version = None
 
