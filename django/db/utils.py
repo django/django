@@ -121,3 +121,10 @@ class ConnectionRouter(object):
             if allow is not None:
                 return allow
         return obj1._state.db == obj2._state.db
+
+    def allow_syncdb(self, db, model):
+        for router in self.routers:
+            allow = router.allow_syncdb(db, model)
+            if allow is not None:
+                return allow
+        return True

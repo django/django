@@ -8,14 +8,9 @@ from django.conf import settings
 from django.core import serializers
 from django.core.management.base import BaseCommand
 from django.core.management.color import no_style
-from django.db import connections, transaction, DEFAULT_DB_ALIAS
+from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.db.models import get_apps
 from django.utils.itercompat import product
-
-try:
-    set
-except NameError:
-    from sets import Set as set   # Python 2.3 fallback
 
 try:
     import bz2
@@ -31,13 +26,10 @@ class Command(BaseCommand):
         make_option('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
                 'fixtures into. Defaults to the "default" database.'),
-        make_option('-e', '--exclude', dest='exclude',action='append', default=[],
-            help='App to exclude (use multiple --exclude to exclude multiple apps).'),
     )
 
     def handle(self, *fixture_labels, **options):
         using = options.get('database', DEFAULT_DB_ALIAS)
-        excluded_apps = options.get('exclude', [])
 
         connection = connections[using]
         self.style = no_style()
@@ -171,7 +163,7 @@ class Command(BaseCommand):
                             try:
                                 objects = serializers.deserialize(format, fixture, using=using)
                                 for obj in objects:
-                                    if obj.object._meta.app_label not in excluded_apps:
+                                    if router.allow_syncdb(using, obj.object.__class__):
                                         objects_in_fixture += 1
                                         models.add(obj.object.__class__)
                                         obj.save(using=using)

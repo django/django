@@ -423,25 +423,6 @@ define the fixture ``mydata.master.json`` or
 have specified that you want to load data onto the ``master``
 database.
 
-Excluding applications from loading
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.2
-
-The :djadminopt:`--exclude` option may be provided to prevent specific
-applications from being loaded.
-
-For example, if you wanted to exclude models from ``django.contrib.auth``
-from being loaded into your database, you would call::
-
-    django-admin.py loaddata mydata.json --exclude auth
-
-This will look for for a JSON fixture called ``mydata`` in all the
-usual locations - including the ``fixtures`` directory of the
-``django.contrib.auth`` application. However, any fixture object that
-identifies itself as belonging to the ``auth`` application (e.g.,
-instance of ``auth.User``) would be ignored by loaddata.
-
 makemessages
 ------------
 

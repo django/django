@@ -655,6 +655,25 @@ class TestRouter(object):
     def allow_relation(self, obj1, obj2, **hints):
         return obj1._state.db in ('default', 'other') and obj2._state.db in ('default', 'other')
 
+    def allow_syncdb(self, db, model):
+        return True
+
+class AuthRouter(object):
+    # Another test router. This one doesn't do anything interesting
+    # other than validate syncdb behavior
+    def db_for_read(self, model, **hints):
+        return None
+    def db_for_write(self, model, **hints):
+        return None
+    def allow_relation(self, obj1, obj2, **hints):
+        return None
+    def allow_syncdb(self, db, model):
+        if db == 'other':
+            return model._meta.app_label == 'auth'
+        elif model._meta.app_label == 'auth':
+            return False
+        return None
+
 class RouterTestCase(TestCase):
     multi_db = True
 
@@ -676,6 +695,35 @@ class RouterTestCase(TestCase):
 
         self.assertEquals(Book.objects.db_manager('default').db, 'default')
         self.assertEquals(Book.objects.db_manager('default').all().db, 'default')
+
+    def test_syncdb_selection(self):
+        "Synchronization behaviour is predicatable"
+
+        self.assertTrue(router.allow_syncdb('default', User))
+        self.assertTrue(router.allow_syncdb('default', Book))
+
+        self.assertTrue(router.allow_syncdb('other', User))
+        self.assertTrue(router.allow_syncdb('other', Book))
+
+        # Add the auth router to the chain.
+        # TestRouter is a universal synchronizer, so it should have no effect.
+        router.routers = [TestRouter(), AuthRouter()]
+
+        self.assertTrue(router.allow_syncdb('default', User))
+        self.assertTrue(router.allow_syncdb('default', Book))
+
+        self.assertTrue(router.allow_syncdb('other', User))
+        self.assertTrue(router.allow_syncdb('other', Book))
+
+        # Now check what happens if the router order is the other way around
+        router.routers = [AuthRouter(), TestRouter()]
+
+        self.assertFalse(router.allow_syncdb('default', User))
+        self.assertTrue(router.allow_syncdb('default', Book))
+
+        self.assertTrue(router.allow_syncdb('other', User))
+        self.assertFalse(router.allow_syncdb('other', Book))
+
 
     def test_database_routing(self):
         marty = Person.objects.using('default').create(name="Marty Alchin")
@@ -1045,6 +1093,7 @@ class UserProfileTestCase(TestCase):
 
         self.assertEquals(alice.get_profile().flavor, 'chocolate')
         self.assertEquals(bob.get_profile().flavor, 'crunchy frog')
+
 
 class FixtureTestCase(TestCase):
     multi_db = True

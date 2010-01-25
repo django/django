@@ -289,14 +289,6 @@ Multiple fixtures named 'fixture5' in '...fixtures'. Aborting.
 
 >>> management.call_command('flush', verbosity=0, interactive=False)
 
-# Try to load fixture 1, but this time, exclude the 'fixtures' app.
->>> management.call_command('loaddata', 'fixture1', verbosity=0, exclude='fixtures')
->>> Article.objects.all()
-[<Article: Python program becomes self aware>]
-
->>> Category.objects.all()
-[]
-
 # Load back in fixture 1, we need the articles from it
 >>> management.call_command('loaddata', 'fixture1', verbosity=0)
 

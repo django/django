@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal
-from django.db import connections, transaction, models, DEFAULT_DB_ALIAS
+from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.utils.importlib import import_module
 
 
@@ -16,8 +16,6 @@ class Command(NoArgsCommand):
         make_option('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
                 'Defaults to the "default" database.'),
-        make_option('-e', '--exclude', dest='exclude',action='append', default=[],
-            help='App to exclude (use multiple --exclude to exclude multiple apps).'),
     )
     help = "Create the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
 
@@ -26,7 +24,6 @@ class Command(NoArgsCommand):
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive')
         show_traceback = options.get('traceback', False)
-        exclude = options.get('exclude', [])
 
         self.style = no_style()
 
@@ -59,13 +56,16 @@ class Command(NoArgsCommand):
         created_models = set()
         pending_references = {}
 
-        excluded_apps = set(models.get_app(app_label) for app_label in exclude)
-        included_apps = set(app for app in models.get_apps() if app not in excluded_apps)
+        # Build the manifest of apps and models that are to be synchronized
+        manifest = dict(
+            (app.__name__.split('.')[-2],
+                [m for m in models.get_models(app, include_auto_created=True)
+                if router.allow_syncdb(db, m)])
+            for app in models.get_apps()
+        )
 
         # Create the tables for each model
-        for app in included_apps:
-            app_name = app.__name__.split('.')[-2]
-            model_list = models.get_models(app, include_auto_created=True)
+        for app_name, model_list in manifest.items():
             for model in model_list:
                 # Create the model's database table, if it doesn't already exist.
                 if verbosity >= 2:
@@ -101,9 +101,8 @@ class Command(NoArgsCommand):
 
         # Install custom SQL for the app (but only if this
         # is a model we've just created)
-        for app in included_apps:
-            app_name = app.__name__.split('.')[-2]
-            for model in models.get_models(app):
+        for app_name, model_list in manifest.items():
+            for model in model_list:
                 if model in created_models:
                     custom_sql = custom_sql_for_model(model, self.style, connection)
                     if custom_sql:
@@ -126,9 +125,8 @@ class Command(NoArgsCommand):
                             print "No custom SQL for %s.%s model" % (app_name, model._meta.object_name)
 
         # Install SQL indicies for all newly created models
-        for app in included_apps:
-            app_name = app.__name__.split('.')[-2]
-            for model in models.get_models(app):
+        for app_name, model_list in manifest.items():
+            for model in model_list:
                 if model in created_models:
                     index_sql = connection.creation.sql_indexes_for_model(model, self.style)
                     if index_sql:
@@ -145,4 +143,4 @@ class Command(NoArgsCommand):
                             transaction.commit_unless_managed(using=db)
 
         from django.core.management import call_command
-        call_command('loaddata', 'initial_data', verbosity=verbosity, exclude=exclude, database=db)
+        call_command('loaddata', 'initial_data', verbosity=verbosity, database=db)

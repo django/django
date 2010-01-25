@@ -66,13 +66,9 @@ all databases in our example, you would need to call::
     $ ./manage.py syncdb --database=users
 
 If you don't want every application to be synchronized onto a
-particular database. you can specify the :djadminopt:`--exclude`
-argument to :djadmin:`syncdb`. The :djadminopt:`--exclude` option lets
-you prevent a specific application or applications from being
-synchronized. For example, if you don't want the ``sales`` application
-to be in the ``users`` database, you could run::
-
-    $ ./manage.py syncdb --database=users --exclude=sales
+particular database, you can define a :ref:`database
+router<topics-db-multi-db-routing>` that implements a policy
+constraining the availability of particular models.
 
 Alternatively, if you want fine-grained control of synchronization,
 you can pipe all or part of the output of :djadmin:`sqlall` for a
@@ -103,7 +99,7 @@ routing scheme.
 Database routers
 ----------------
 
-A database Router is a class that provides three methods:
+A database Router is a class that provides four methods:
 
 .. method:: db_for_read(model, **hints)
 
@@ -136,6 +132,14 @@ A database Router is a class that provides three methods:
     the router has no opinion. This is purely a validation operation,
     used by foreign key and many to many operations to determine if a
     relation should be allowed between two objects.
+
+.. method:: allow_syncdb(db, model)
+
+    Determine if the ``model`` should be synchronized onto the
+    database with alias ``db``. Return True if the model should be
+    synchronized, False if it should not be synchronized, or None if
+    the router has no opinion. This method can be used to determine
+    the availability of a model on a given database.
 
 .. _topics-db-multi-db-hints:
 
@@ -221,6 +225,13 @@ master/slave relationship between the databases 'master', 'slave1' and
                 return True
             return None
 
+        def allow_syncdb(self, db, model):
+            "Make sure the auth app only appears on the 'credentials' db"
+            if db == 'credentials':
+                return model._meta.app_label == 'auth'
+            elif model._meta.app_label == 'auth':
+                return False
+            return None
 
      class MasterSlaveRouter(object):
         """A router that sets up a simple master/slave configuration"""
@@ -240,10 +251,25 @@ master/slave relationship between the databases 'master', 'slave1' and
                 return True
             return None
 
+        def allow_syncdb(self, db, model):
+            "Explicitly put all models on all databases."
+            return True
+
 Then, in your settings file, add the following (substituting ``path.to.`` with
 the actual python path to the module where you define the routers)::
 
     DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.MasterSlaveRouter']
+
+The order in which routers are processed is significant. Routers will
+be queried in the order the are listed in the
+:setting:`DATABASE_ROUTERS` setting . In this example, the
+``AuthRouter`` is processed before the ``MasterSlaveRouter``, and as a
+result, decisions concerning the models in ``auth`` are processed
+before any other decision is made. If the :setting:`DATABASE_ROUTERS`
+setting listed the two routers in the other order,
+``MasterSlaveRouter.allow_syncdb()`` would be processed first. The
+catch-all nature of the MasterSlaveRouter implementation would mean
+that all models would be available on all databases.
 
 With this setup installed, lets run some Django code::
 
@@ -269,6 +295,7 @@ With this setup installed, lets run some Django code::
 
     >>> # ... but if we re-retrieve the object, it will come back on a slave
     >>> mh = Book.objects.get(title='Mostly Harmless')
+
 
 Manually selecting a database
 =============================
