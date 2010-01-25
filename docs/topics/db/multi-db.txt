@@ -515,8 +515,6 @@ registered with any ``Admin`` instance::
     class PublisherAdmin(MultiDBModelAdmin):
         inlines = [BookInline]
 
-        admin.site.register
-
     admin.site.register(Author, MultiDBModelAdmin)
     admin.site.register(Publisher, PublisherAdmin)
 
