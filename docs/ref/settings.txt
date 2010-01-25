@@ -357,6 +357,21 @@ Only supported for the ``mysql`` backend (see the `MySQL manual`_ for details).
 
 .. _MySQL manual: MySQL_
 
+.. setting:: TEST_MIRROR
+
+TEST_MIRROR
+~~~~~~~~~~~
+
+Default: ``None``
+
+The alias of the database that this database should mirror during
+testing.
+
+This setting exists to allow for testing of master/slave
+configurations of multiple databases. See the documentation on
+:ref:`testing master/slave configurations
+<topics-testing-masterslave>` for details.
+
 .. setting:: TEST_NAME
 
 TEST_NAME

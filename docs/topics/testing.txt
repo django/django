@@ -301,12 +301,12 @@ Regardless of whether the tests pass or fail, the test databases are destroyed
 when all the tests have been executed.
 
 By default the test databases get their names by prepending ``test_``
-to the value of the :setting:`NAME`` settings for the databased
+to the value of the :setting:`NAME` settings for the databases
 defined in :setting:`DATABASES`. When using the SQLite database engine
 the tests will by default use an in-memory database (i.e., the
 database will be created in memory, bypassing the filesystem
 entirely!). If you want to use a different database name, specify
-``TEST_NAME`` in the dictionary for any given database in
+:setting:`TEST_NAME` in the dictionary for any given database in
 :setting:`DATABASES`.
 
 Aside from using a separate database, the test runner will otherwise
@@ -324,6 +324,58 @@ MySQL, you can also use the :setting:`TEST_COLLATION` option to
 control the particular collation used by the test database. See the
 :ref:`settings documentation <ref-settings>` for details of these
 advanced settings.
+
+.. _topics-testing-masterslave:
+
+Testing master/slave configurations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.2
+
+If you're testing a multiple database configuration with master/slave
+replication, this strategy of creating test databases poses a problem.
+When the test databases are created, there won't be any replication,
+and as a result, data created on the master won't be seen on the
+slave.
+
+To compensate for this, Django allows you to define that a database is
+a *test mirror*. Consider the following (simplified) example database
+configuration::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'myproject',
+            'HOST': 'dbmaster',
+             # ... plus some other settings
+        },
+        'slave': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'myproject',
+            'HOST': 'dbslave',
+            'TEST_MIRROR': 'default'
+            # ... plus some other settings
+        }
+    }
+
+In this setup, we have two database servers: ``dbmaster``, described
+by the database alias ``default``, and ``dbslave`` described by the
+alias ``slave``. As you might expect, ``dbslave`` has been configured
+by the database administrator as a read slave of ``dbmaster``, so in
+normal activity, any write to ``default`` will appear on ``slave``.
+
+If Django created two independent test databases, this would break any
+tests that expected replication to occur. However, the ``slave``
+database has been configured as a test mirror (using the
+:setting:`TEST_MIRROR` setting), indicating that under testing,
+``slave`` should be treated as a mirror of ``default``.
+
+When the test environment is configured, a test version of ``slave``
+will *not* be created. Instead the connection to ``slave``
+will be redirected to point at ``default``. As a result, writes to
+``default`` will appear on ``slave`` -- but because they are actually
+the same database, not because there is data replication between the
+two databases.
 
 Other test conditions
 ---------------------
@@ -1349,7 +1401,9 @@ set up, execute and tear down the test suite.
 
     Creates the test databases.
 
-    Returns the list of old database names that will need to be restored
+    Returns a data structure that provides enough detail to undo the changes
+    that have been made. This data will be provided to the ``teardown_databases()``
+    function at the conclusion of testing.
 
 .. method:: DjangoTestSuiteRunner.run_suite(suite)
 
@@ -1357,9 +1411,13 @@ set up, execute and tear down the test suite.
 
     Returns the result produced by the running the test suite.
 
-.. method:: DjangoTestSuiteRunner.teardown_databases(old_names)
+.. method:: DjangoTestSuiteRunner.teardown_databases(old_config)
 
-    Destroys the test databases, restoring the old names.
+    Destroys the test databases, restoring pre-test conditions.
+
+    ``old_config`` is a data structure defining the changes in the
+    database configuration that need to be reversed. It is the return
+    value of the ``setup_databases()`` method.
 
 .. method:: DjangoTestSuiteRunner.teardown_test_environment()
 

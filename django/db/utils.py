@@ -65,6 +65,7 @@ class ConnectionHandler(object):
         conn.setdefault('TEST_CHARSET', None)
         conn.setdefault('TEST_COLLATION', None)
         conn.setdefault('TEST_NAME', None)
+        conn.setdefault('TEST_MIRROR', None)
         conn.setdefault('TIME_ZONE', settings.TIME_ZONE)
         for setting in ('NAME', 'USER', 'PASSWORD', 'HOST', 'PORT'):
             conn.setdefault(setting, '')

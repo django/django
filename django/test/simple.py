@@ -231,16 +231,30 @@ class DjangoTestSuiteRunner(object):
     def setup_databases(self):
         from django.db import connections
         old_names = []
+        mirrors = []
         for alias in connections:
             connection = connections[alias]
-            old_names.append((connection, connection.settings_dict['NAME']))
-            connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
-        return old_names
+            # If the database is a test mirror, redirect it's connection
+            # instead of creating a test database.
+            if connection.settings_dict['TEST_MIRROR']:
+                mirrors.append((alias, connection))
+                mirror_alias = connection.settings_dict['TEST_MIRROR']
+                connections._connections[alias] = connections[mirror_alias]
+            else:
+                old_names.append((connection, connection.settings_dict['NAME']))
+                connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
+        return old_names, mirrors
 
     def run_suite(self, suite):
         return DjangoTestRunner(verbosity=self.verbosity, failfast=self.failfast).run(suite)
 
-    def teardown_databases(self, old_names):
+    def teardown_databases(self, old_config):
+        from django.db import connections
+        old_names, mirrors = old_config
+        # Point all the mirrors back to the originals
+        for alias, connection in mirrors:
+            connections._connections[alias] = connection
+        # Destroy all the non-mirror databases
         for connection, old_name in old_names:
             connection.creation.destroy_test_db(old_name, self.verbosity)
 
@@ -273,11 +287,11 @@ class DjangoTestSuiteRunner(object):
 
         suite = self.build_suite(test_labels, extra_tests)
 
-        old_names = self.setup_databases()
+        old_config = self.setup_databases()
 
         result = self.run_suite(suite)
 
-        self.teardown_databases(old_names)
+        self.teardown_databases(old_config)
 
         self.teardown_test_environment()
 
