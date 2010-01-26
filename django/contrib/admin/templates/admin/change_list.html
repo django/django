@@ -17,6 +17,16 @@
   {% endif %}
 {% endblock %}
 
+{% block extrahead %}
+{{ media }}
+<script type="text/javascript">
+jQuery.noConflict();
+jQuery(document).ready(function($) {
+    $("tr input.action-select").actions();
+});
+</script>
+{% endblock %}
+
 {% block bodyclass %}change-list{% endblock %}
 
 {% if not is_popup %}

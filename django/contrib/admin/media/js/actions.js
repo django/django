@@ -1,83 +1,111 @@
-var Actions = {
-    init: function() {
-        counterSpans = document.getElementsBySelector('span._acnt');
-        counterContainer = document.getElementsBySelector('span.action_counter');
-        actionCheckboxes = document.getElementsBySelector('tr input.action-select');
-        selectAll = document.getElementById('action-toggle');
-        lastChecked = null;
-        for(var i = 0; i < counterContainer.length; i++) {
-            counterContainer[i].style.display = 'inline';
-        }
-        if (selectAll) {
-            selectAll.style.display = 'inline';
-            addEvent(selectAll, 'click', function() {
-                Actions.checker(selectAll.checked);
-                Actions.counter();
-            });
-        }
-        for(var i = 0; i < actionCheckboxes.length; i++) {
-            addEvent(actionCheckboxes[i], 'click', function(e) {
-                if (!e) { var e = window.event; }
-                var target = e.target ? e.target : e.srcElement;
-                if (lastChecked && lastChecked != target && e.shiftKey == true) {
-                    var inrange = false;
-                    lastChecked.checked = target.checked;
-                    Actions.toggleRow(lastChecked.parentNode.parentNode, target.checked);
-                    for (var i = 0; i < actionCheckboxes.length; i++) {
-                        if (actionCheckboxes[i] == lastChecked || actionCheckboxes[i] == target) {
-                            inrange = (inrange) ? false : true;
-                        }
-                        if (inrange) {
-                            actionCheckboxes[i].checked = target.checked;
-                            Actions.toggleRow(actionCheckboxes[i].parentNode.parentNode, target.checked);
-                        }
-                    }
-                }
-                lastChecked = target;
-                Actions.counter();
-            });
-        }
-        var changelistTable = document.getElementsBySelector('#changelist table')[0];
-        if (changelistTable) {
-            addEvent(changelistTable, 'click', function(e) {
-                if (!e) { var e = window.event; }
-                var target = e.target ? e.target : e.srcElement;
-                if (target.nodeType == 3) { target = target.parentNode; }
-                if (target.className == 'action-select') {
-                    var tr = target.parentNode.parentNode;
-                    Actions.toggleRow(tr, target.checked);
-                }
-            });
-        }
-    },
-    toggleRow: function(tr, checked) {
-        if (checked && tr.className.indexOf('selected') == -1) {
-            tr.className += ' selected';
-        } else if (!checked) {
-            tr.className = tr.className.replace(' selected', '');
-        }  
-    },
-    checked: function() {
-        selectAll.checked = false;
-    },
-    checker: function(checked) {
-        for(var i = 0; i < actionCheckboxes.length; i++) {
-            actionCheckboxes[i].checked = checked;
-            Actions.toggleRow(actionCheckboxes[i].parentNode.parentNode, checked);
-        }
-    },
-    counter: function() {
-        counter = 0;
-        for(var i = 0; i < actionCheckboxes.length; i++) {
-            if(actionCheckboxes[i].checked){
-                counter++;
-            }
-        }
-        for(var i = 0; i < counterSpans.length; i++) {
-            counterSpans[i].innerHTML = counter;
-        }
-        selectAll.checked = (counter == actionCheckboxes.length);
-    }
-};
-
-addEvent(window, 'load', Actions.init);
+(function($) {
+	$.fn.actions = function(opts) {
+		var options = $.extend({}, $.fn.actions.defaults, opts);
+		var actionCheckboxes = $(this);
+		checker = function(checked) {
+			if (checked) {
+				showQuestion();
+			} else {
+				reset();
+			}
+			$(actionCheckboxes).attr("checked", checked)
+				.parent().parent().toggleClass(options.selectedClass, checked);
+		}
+		updateCounter = function() {
+			var count = $(actionCheckboxes).filter(":checked").length;
+			$("span._acnt").html(count);
+			$(options.allToggle).attr("checked", function() {
+				if (count == actionCheckboxes.length) {
+					value = true;
+					showQuestion();
+				} else {
+					value = false;
+					clearAcross();
+				}
+				return value
+			});
+		}
+		showQuestion = function() {
+			$(options.acrossClears).hide();
+			$(options.acrossQuestions).show();
+			$(options.allContainer).hide();
+		}
+		showClear = function() {
+			$(options.acrossClears).show();
+			$(options.acrossQuestions).hide();
+			$(options.actionContainer).toggleClass(options.selectedClass);
+			$(options.allContainer).show();
+			$(options.counterContainer).hide();
+		}
+		reset = function() {
+			$(options.acrossClears).hide();
+			$(options.acrossQuestions).hide();
+			$(options.allContainer).hide();
+			$(options.counterContainer).show();
+		}
+		clearAcross = function() {
+			reset();
+			$(options.acrossInput).val(0);
+			$(options.actionContainer).removeClass(options.selectedClass);
+		}
+		// Show counter by default
+		$(options.counterContainer).show();
+		// Check state of checkboxes and reinit state if needed
+		$(this).filter(":checked").each(function(i) {
+			$(this).parent().parent().toggleClass(options.selectedClass);
+			updateCounter();
+			if ($(options.acrossInput).val() == 1) {
+				showClear();
+			}
+		});
+		$(options.allToggle).show().click(function() {
+			checker($(this).attr("checked"));
+			updateCounter();
+		});
+		$("div.actions span.question a").click(function(event) {
+			event.preventDefault();
+			$(options.acrossInput).val(1);
+			showClear();
+		});
+		$("div.actions span.clear a").click(function(event) {
+			event.preventDefault();
+			$(options.allToggle).attr("checked", false);
+			clearAcross();
+			checker(0);
+			updateCounter();
+		});
+		lastChecked = null;
+		$(actionCheckboxes).click(function(event) {
+			if (!event) { var event = window.event; }
+			var target = event.target ? event.target : event.srcElement;
+			if (lastChecked && $.data(lastChecked) != $.data(target) && event.shiftKey == true) {
+				var inrange = false;
+				$(lastChecked).attr("checked", target.checked)
+					.parent().parent().toggleClass(options.selectedClass, target.checked);
+				$(actionCheckboxes).each(function() {
+					if ($.data(this) == $.data(lastChecked) || $.data(this) == $.data(target)) {
+						inrange = (inrange) ? false : true;
+					}
+					if (inrange) {
+						$(this).attr("checked", target.checked)
+							.parent().parent().toggleClass(options.selectedClass, target.checked);
+					}
+				});
+			}
+			$(target).parent().parent().toggleClass(options.selectedClass, target.checked);
+			lastChecked = target;
+			updateCounter();
+		});
+	}
+	/* Setup plugin defaults */
+	$.fn.actions.defaults = {
+		actionContainer: "div.actions",
+		counterContainer: "span.action-counter",
+		allContainer: "div.actions span.all",
+		acrossInput: "div.actions input.select-across",
+		acrossQuestions: "div.actions span.question",
+		acrossClears: "div.actions span.clear",
+		allToggle: "#action-toggle",
+		selectedClass: "selected"
+	}
+})(jQuery);

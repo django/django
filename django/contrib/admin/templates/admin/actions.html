@@ -1,10 +1,20 @@
 {% load i18n %}
 <div class="actions">
-    {% for field in action_form %}<label>{{ field.label }} {{ field }}</label>{% endfor %}
+    {% for field in action_form %}{% if field.label %}<label>{{ field.label }} {% endif %}{{ field }}{% if field.label %}</label>{% endif %}{% endfor %}
     <button type="submit" class="button" title="{% trans "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}">{% trans "Go" %}</button>
     {% if actions_selection_counter %}
-    <span class="action_counter">
-      {% blocktrans with cl.result_count as total_count %}<span class="_acnt">0</span> of {{ total_count }} {{ module_name }} selected{% endblocktrans %}
-    </span>
+        <span class="action-counter">
+            {% blocktrans with cl.result_count as total_count %}<span class="_acnt">0</span> of {{ total_count }} {{ module_name }} selected{% endblocktrans %}
+        </span>
+        {% if cl.result_count != cl.result_list|length %}
+        <span class="all">
+            {% blocktrans with cl.result_count as total_count %}All {{ total_count }} {{ module_name }} selected{% endblocktrans %}
+        </span>
+        <span class="question">
+            <a href="javascript:;" title="{% trans "Click here to select all objects across all pages" %}">{% blocktrans with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktrans %}</a>
+        </span>
+        <span class="clear"><a href="javascript:;">{% trans "Clear selection" %}</a></span>
+        {% endif %}
     {% endif %}
 </div>
+
