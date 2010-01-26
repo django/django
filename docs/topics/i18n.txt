@@ -512,6 +512,16 @@ creation and upkeep of these files.
     The old tool ``bin/make-messages.py`` has been moved to the command
     ``django-admin.py makemessages`` to provide consistency throughout Django.
 
+.. admonition:: Gettext utilities
+
+    The ``makemessages`` command (and ``compilemessages`` discussed later) use
+    commands from the GNU gettext toolset: ``xgetetxt``, ``msgfmt``,
+    ``msgmerge`` and ``msguniq``.
+
+    .. versionchanged:: 1.2
+
+    The minimum version of the ``gettext`` utilities supported is 0.15.
+
 To create or update a message file, run this command::
 
     django-admin.py makemessages -l de
@@ -1062,7 +1072,7 @@ or want to test or compile a changed message file, you will need the
       * ``gettext-runtime-X.zip``
       * ``gettext-tools-X.zip``
 
-      ``X`` is the version number, we recomend using ``0.15`` or higher.
+      ``X`` is the version number, we are requiring ``0.15`` or higher.
 
     * Extract the contents of the ``bin\`` directories in both files to the
       same folder on your system (i.e. ``C:\Program Files\gettext-utils``)
