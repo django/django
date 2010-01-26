@@ -426,7 +426,6 @@ class GeoModelTest(TestCase):
     @no_mysql
     def test15_relate(self):
         "Testing the 'relate' lookup type."
-        return
         # To make things more interesting, we will have our Texas reference point in
         # different SRIDs.
         pnt1 = fromstr('POINT (649287.0363174 4177429.4494686)', srid=2847)
@@ -434,7 +433,7 @@ class GeoModelTest(TestCase):
 
         # Not passing in a geometry as first param shoud
         # raise a type error when initializing the GeoQuerySet
-        self.assertRaises(ValueError, Country.objects.filter(mpoly__relate=(23, 'foo')).count)
+        self.assertRaises(ValueError, Country.objects.filter, mpoly__relate=(23, 'foo'))
 
         # Making sure the right exception is raised for the given
         # bad arguments.

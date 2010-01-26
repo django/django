@@ -165,7 +165,7 @@ class GeometryField(Field):
             except GeometryException:
                 raise ValueError('Could not create geometry from lookup value.')
         else:
-            raise ValueError('Cannot use parameter of `%s` type as lookup parameter.' % type(value))
+            raise ValueError('Cannot use object with type %s for a geometry lookup parameter.' % type(geom).__name__)
 
         # Assigning the SRID value.
         geom.srid = self.get_srid(geom)
@@ -228,6 +228,10 @@ class GeometryField(Field):
                 if lookup_type in connection.ops.distance_functions:
                     # Getting the distance parameter in the units of the field.
                     params += self.get_distance(value[1:], lookup_type, connection)
+                elif lookup_type in connection.ops.truncate_params:
+                    # Lookup is one where SQL parameters aren't needed from the
+                    # given lookup value.
+                    pass
                 else:
                     params += value[1:]
             elif isinstance(value, SQLEvaluator):
