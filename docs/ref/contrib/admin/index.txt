@@ -1036,6 +1036,9 @@ This controls the number of extra forms the formset will display in addition
 to the initial forms. See the
 :ref:`formsets documentation <topics-forms-formsets>` for more information.
 
+Extra forms for inlines will be hidden and replaced with a link to dynamically
+add any number of new inlines for users with Javascript enabled.
+
 ``max_num``
 ~~~~~~~~~~~
 

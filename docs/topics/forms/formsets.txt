@@ -154,6 +154,15 @@ pre-filled, and is also used to determine how many forms are required. You
 will probably never need to override either of these methods, so please be
 sure you understand what they do before doing so.
 
+.. versionadded:: 1.2
+
+``empty_form``
+~~~~~~~~~~~~~~
+
+``BaseFormSet`` provides an additional attribute ``empty_form`` which returns
+a form instance with a prefix of ``__prefix__`` for easier use in dynamic
+forms with JavaScript.
+
 Custom formset validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

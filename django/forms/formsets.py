@@ -119,6 +119,21 @@ class BaseFormSet(StrAndUnicode):
         return self.forms[self.initial_form_count():]
     extra_forms = property(_get_extra_forms)
 
+    def _get_empty_form(self, **kwargs):
+        defaults = {
+            'auto_id': self.auto_id,
+            'prefix': self.add_prefix('__prefix__'),
+            'empty_permitted': True,
+        }
+        if self.data or self.files:
+            defaults['data'] = self.data
+            defaults['files'] = self.files
+        defaults.update(kwargs)
+        form = self.form(**defaults)
+        self.add_fields(form, None)
+        return form
+    empty_form = property(_get_empty_form)
+
     # Maybe this should just go away?
     def _get_cleaned_data(self):
         """
@@ -268,7 +283,7 @@ class BaseFormSet(StrAndUnicode):
         """A hook for adding extra fields on to each form instance."""
         if self.can_order:
             # Only pre-fill the ordering field for initial forms.
-            if index < self.initial_form_count():
+            if index is not None and index < self.initial_form_count():
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), initial=index+1, required=False)
             else:
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), required=False)

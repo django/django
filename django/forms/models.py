@@ -620,7 +620,10 @@ class BaseModelFormSet(BaseFormSet):
                 pk_value = form.instance.pk
             else:
                 try:
-                    pk_value = self.get_queryset()[index].pk
+                    if index is not None:
+                        pk_value = self.get_queryset()[index].pk
+                    else:
+                        pk_value = None
                 except IndexError:
                     pk_value = None
             if isinstance(pk, OneToOneField) or isinstance(pk, ForeignKey):

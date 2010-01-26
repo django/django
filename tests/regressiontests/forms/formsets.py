@@ -238,6 +238,13 @@ data.
 <li>Choice: <input type="text" name="choices-3-choice" /></li>
 <li>Votes: <input type="text" name="choices-3-votes" /></li>
 
+Make sure retrieving an empty form works, and it shows up in the form list
+
+>>> formset.empty_form.empty_permitted
+True
+>>> print formset.empty_form.as_ul()
+<li>Choice: <input type="text" name="choices-__prefix__-choice" /></li>
+<li>Votes: <input type="text" name="choices-__prefix__-votes" /></li>
 
 # FormSets with deletion ######################################################
 

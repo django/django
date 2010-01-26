@@ -416,13 +416,13 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
 /* EDIT INLINE */
 
 .inline-deletelink {
-    display: block;
+    float: right;
     text-indent: -9999px;
     background: transparent url(../img/admin/inline-delete.png) no-repeat;
     width: 15px;
     height: 15px;
-    margin: 0.4em 0;
     border: 0px none;
+    outline: 0; /* Remove dotted border around link */
 }
 
 .inline-deletelink:hover {

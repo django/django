@@ -365,7 +365,7 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 
 .button, input[type=submit], input[type=button], .submit-row input {
     background: white url(../img/admin/nav-bg.gif) bottom repeat-x;
-    padding: 3px;
+    padding: 3px 5px;
     color: black;
     border: 1px solid #bbb;
     border-color: #ddd #aaa #aaa #ddd;

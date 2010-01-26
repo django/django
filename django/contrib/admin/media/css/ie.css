@@ -49,3 +49,9 @@
 .change-list .filtered {
     _height: 400px;
 }
+
+/* IE doesn't know alpha transparency in PNGs */
+
+.inline-deletelink {
+    background: transparent url(../img/admin/inline-delete-8bit.png) no-repeat;
+}

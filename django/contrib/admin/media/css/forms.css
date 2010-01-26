@@ -247,10 +247,7 @@ fieldset.monospace textarea {
 }
 
 .inline-related h3 span.delete {
-    padding-left: 20px;
-    position: absolute;
-    top: 2px;
-    right: 10px;
+    float: right;
 }
 
 .inline-related h3 span.delete label {
@@ -272,6 +269,11 @@ fieldset.monospace textarea {
     font-weight: bold;
     background: #bcd;
     color: #fff;
+}
+
+.inline-group .tabular fieldset.module {
+    border: none;
+    border-bottom: 1px solid #ddd;
 }
 
 .inline-related.tabular fieldset.module table {
@@ -320,8 +322,28 @@ fieldset.monospace textarea {
     padding: 0 5px;
 }
 
-.inline-group ul.tools a.add {
-    background: url(../img/admin/icon_addlink.gif) 0 50% no-repeat;
-    padding-left: 14px;
+.inline-group div.add-row,
+.inline-group .tabular tr.add-row td {
+    color: #666;
+    padding: 3px 5px;
+    border-bottom: 1px solid #ddd;
+    background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
 }
 
+.inline-group .tabular tr.add-row td {
+    padding: 4px 5px 3px;
+    border-bottom: none;
+}
+
+.inline-group ul.tools a.add,
+.inline-group div.add-row a,
+.inline-group .tabular tr.add-row td a {
+    background: url(../img/admin/icon_addlink.gif) 0 50% no-repeat;
+    padding-left: 14px;
+    font-size: 11px;
+    outline: 0; /* Remove dotted border around link */
+}
+
+.empty-form {
+    display: none;
+}

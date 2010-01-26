@@ -187,6 +187,10 @@ fieldset .field-box {
     text-align: right;
 }
 
+.inline-deletelink {
+    float: left;
+}
+
 /* MISC */
 
 .inline-related h2 {
