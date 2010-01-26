@@ -140,7 +140,6 @@ fieldset.collapsed h2 {
 }
 
 fieldset.collapsed .collapse-toggle {
-    padding: 3px 5px !important;
     background: transparent;
     display: inline !important;
 }
