@@ -809,7 +809,7 @@ class TextNode(Node):
 
     def render(self, context):
         return self.s
-    
+
 def _render_value_in_context(value, context):
     """
     Converts any value to a string to become part of a rendered template. This
@@ -966,22 +966,70 @@ class Library(object):
             return func
         return dec
 
-def get_library(module_name):
-    lib = libraries.get(module_name, None)
+def import_library(taglib_module):
+    """Load a template tag library module.
+
+    Verifies that the library contains a 'register' attribute, and
+    returns that attribute as the representation of the library
+    """
+    try:
+        mod = import_module(taglib_module)
+    except ImportError:
+        return None
+    try:
+        return mod.register
+    except AttributeError:
+        raise InvalidTemplateLibrary("Template library %s does not have a variable named 'register'" % taglib_module)
+
+templatetags_modules = []
+
+def get_templatetags_modules():
+    """Return the list of all available template tag modules.
+
+    Caches the result for faster access.
+    """
+    global templatetags_modules
+    if not templatetags_modules:
+        _templatetags_modules = []
+        # Populate list once per thread.
+        for app_module in ['django'] + list(settings.INSTALLED_APPS):
+            try:
+                templatetag_module = '%s.templatetags' % app_module
+                import_module(templatetag_module)
+                _templatetags_modules.append(templatetag_module)
+            except ImportError:
+                continue
+        templatetags_modules = _templatetags_modules
+    return templatetags_modules
+
+def get_library(library_name):
+    """
+    Load the template library module with the given name.
+
+    If library is not already loaded loop over all templatetags modules to locate it.
+
+    {% load somelib %} and {% load someotherlib %} loops twice.
+
+    Subsequent loads eg. {% load somelib %} in the same process will grab the cached
+    module from libraries.
+    """
+    lib = libraries.get(library_name, None)
     if not lib:
-        try:
-            mod = import_module(module_name)
-        except ImportError, e:
-            raise InvalidTemplateLibrary("Could not load template library from %s, %s" % (module_name, e))
-        try:
-            lib = mod.register
-            libraries[module_name] = lib
-        except AttributeError:
-            raise InvalidTemplateLibrary("Template library %s does not have a variable named 'register'" % module_name)
+        templatetags_modules = get_templatetags_modules()
+        tried_modules = []
+        for module in templatetags_modules:
+            taglib_module = '%s.%s' % (module, library_name)
+            tried_modules.append(taglib_module)
+            lib = import_library(taglib_module)
+            if lib:
+                libraries[library_name] = lib
+                break
+        if not lib:
+            raise InvalidTemplateLibrary("Template library %s not found, tried %s" % (library_name, ','.join(tried_modules)))
     return lib
 
-def add_to_builtins(module_name):
-    builtins.append(get_library(module_name))
+def add_to_builtins(module):
+    builtins.append(import_library(module))
 
 add_to_builtins('django.template.defaulttags')
 add_to_builtins('django.template.defaultfilters')

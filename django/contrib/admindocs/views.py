@@ -309,12 +309,17 @@ def missing_docutils_page(request):
 
 def load_all_installed_template_libraries():
     # Load/register all template tag libraries from installed apps.
-    for e in templatetags.__path__:
-        libraries = [os.path.splitext(p)[0] for p in os.listdir(e) if p.endswith('.py') and p[0].isalpha()]
+    for module_name in template.get_templatetags_modules():
+        mod = import_module(module_name)
+        libraries = [
+            os.path.splitext(p)[0]
+            for p in os.listdir(os.path.dirname(mod.__file__))
+            if p.endswith('.py') and p[0].isalpha()
+        ]
         for library_name in libraries:
             try:
-                lib = template.get_library("django.templatetags.%s" % library_name.split('.')[-1])
-            except template.InvalidTemplateLibrary:
+                lib = template.get_library(library_name)
+            except template.InvalidTemplateLibrary, e:
                 pass
 
 def get_return_data_type(func_name):

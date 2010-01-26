@@ -920,7 +920,7 @@ def load(parser, token):
     for taglib in bits[1:]:
         # add the library to the parser
         try:
-            lib = get_library("django.templatetags.%s" % taglib)
+            lib = get_library(taglib)
             parser.add_library(lib)
         except InvalidTemplateLibrary, e:
             raise TemplateSyntaxError("'%s' is not a valid tag library: %s" %

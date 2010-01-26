@@ -59,7 +59,7 @@ def do_echo(parser, token):
 
 register.tag("echo", do_echo)
 
-template.libraries['django.templatetags.testtags'] = register
+template.libraries['testtags'] = register
 
 #####################################
 # Helper objects for template tests #
