@@ -23,3 +23,12 @@ class CacheClass(BaseCache):
 
     def has_key(self, *args, **kwargs):
         return False
+
+    def set_many(self, *args, **kwargs):
+        pass
+
+    def delete_many(self, *args, **kwargs):
+        pass
+
+    def clear(self):
+        pass

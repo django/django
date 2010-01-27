@@ -84,7 +84,7 @@ class CacheClass(BaseCache):
 
     def _cull(self, cursor, now):
         if self._cull_frequency == 0:
-            cursor.execute("DELETE FROM %s" % self._table)
+            self.clear()
         else:
             cursor.execute("DELETE FROM %s WHERE expires < %%s" % self._table, [str(now)])
             cursor.execute("SELECT COUNT(*) FROM %s" % self._table)
@@ -92,3 +92,7 @@ class CacheClass(BaseCache):
             if num > self._max_entries:
                 cursor.execute("SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s" % self._table, [num / self._cull_frequency])
                 cursor.execute("DELETE FROM %s WHERE cache_key < %%s" % self._table, [cursor.fetchone()[0]])
+
+    def clear(self):
+        cursor = connection.cursor()
+        cursor.execute('DELETE FROM %s' % self._table)

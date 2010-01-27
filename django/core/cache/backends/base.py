@@ -91,3 +91,28 @@ class BaseCache(object):
         # so that it always has the same functionality as has_key(), even
         # if a subclass overrides it.
         return self.has_key(key)
+
+    def set_many(self, data, timeout=None):
+        """
+        Set a bunch of values in the cache at once from a dict of key/value
+        pairs.  For certain backends (memcached), this is much more efficient
+        than calling set() multiple times.
+
+        If timeout is given, that timeout will be used for the key; otherwise
+        the default cache timeout will be used.
+        """
+        for key, value in data.items():
+            self.set(key, value, timeout)
+
+    def delete_many(self, keys):
+        """
+        Set a bunch of values in the cache at once.  For certain backends
+        (memcached), this is much more efficient than calling delete() multiple
+        times.
+        """
+        for key in keys:
+            self.delete(key)
+
+    def clear(self):
+        """Remove *all* values from the cache at once."""
+        raise NotImplementedError

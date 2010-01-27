@@ -62,7 +62,7 @@ It's used by sites such as Facebook and Wikipedia to reduce database access and
 dramatically increase site performance.
 
 Memcached is available for free at http://danga.com/memcached/ . It runs as a
-daemon and is allotted a specified amount of RAM. All it does is provide an
+daemon and is allotted a specified amount of RAM. All it does is provide a
 fast interface for adding, retrieving and deleting arbitrary data in the cache.
 All data is stored directly in memory, so there's no overhead of database or
 filesystem usage.
@@ -522,10 +522,36 @@ actually exist in the cache (and haven't expired)::
     >>> cache.get_many(['a', 'b', 'c'])
     {'a': 1, 'b': 2, 'c': 3}
 
-Finally, you can delete keys explicitly with ``delete()``. This is an easy way
-of clearing the cache for a particular object::
+.. versionadded:: 1.2
+
+To set multiple values more efficiently, use ``set_many()`` to pass a dictionary
+of key-value pairs::
+
+    >>> cache.set_many({'a': 1, 'b': 2, 'c': 3})
+    >>> cache.get_many(['a', 'b', 'c'])
+    {'a': 1, 'b': 2, 'c': 3}
+
+Like ``cache.set()``, ``set_many()`` takes an optional ``timeout`` parameter.
+
+You can delete keys explicitly with ``delete()``. This is an easy way of
+clearing the cache for a particular object::
 
     >>> cache.delete('a')
+
+.. versionadded:: 1.2
+
+If you want to clear a bunch of keys at once, ``delete_many()`` can take a list
+of keys to be cleared::
+
+    >>> cache.delete_many(['a', 'b', 'c'])
+
+.. versionadded:: 1.2
+
+Finally, if you want to delete all the keys in the cache, use
+``cache.clear()``.  Be careful with this; ``clear()`` will remove *everything*
+from the cache, not just the keys set by your application. ::
+
+    >>> cache.clear()
 
 .. versionadded:: 1.1
 

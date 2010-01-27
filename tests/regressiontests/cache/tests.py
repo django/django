@@ -129,9 +129,24 @@ class DummyCacheTests(unittest.TestCase):
             self.cache.set(key, value)
             self.assertEqual(self.cache.get(key), None)
 
+    def test_set_many(self):
+        "set_many does nothing for the dummy cache backend"
+        self.cache.set_many({'a': 1, 'b': 2})
+
+    def test_delete_many(self):
+        "delete_many does nothing for the dummy cache backend"
+        self.cache.delete_many(['a', 'b'])
+
+    def test_clear(self):
+        "clear does nothing for the dummy cache backend"
+        self.cache.clear()
+
 
 class BaseCacheTests(object):
     # A common set of tests to apply to all cache backends
+    def tearDown(self):
+        self.cache.clear()
+
     def test_simple(self):
         # Simple cache set/get works
         self.cache.set("key", "value")
@@ -278,6 +293,37 @@ class BaseCacheTests(object):
             self.cache.set(key, value)
             self.assertEqual(self.cache.get(key), value)
 
+    def test_set_many(self):
+        # Multiple keys can be set using set_many
+        self.cache.set_many({"key1": "spam", "key2": "eggs"})
+        self.assertEqual(self.cache.get("key1"), "spam")
+        self.assertEqual(self.cache.get("key2"), "eggs")
+
+    def test_set_many_expiration(self):
+        # set_many takes a second ``timeout`` parameter
+        self.cache.set_many({"key1": "spam", "key2": "eggs"}, 1)
+        time.sleep(2)
+        self.assertEqual(self.cache.get("key1"), None)
+        self.assertEqual(self.cache.get("key2"), None)
+
+    def test_delete_many(self):
+        # Multiple keys can be deleted using delete_many
+        self.cache.set("key1", "spam")
+        self.cache.set("key2", "eggs")
+        self.cache.set("key3", "ham")
+        self.cache.delete_many(["key1", "key2"])
+        self.assertEqual(self.cache.get("key1"), None)
+        self.assertEqual(self.cache.get("key2"), None)
+        self.assertEqual(self.cache.get("key3"), "ham")
+
+    def test_clear(self):
+        # The cache can be emptied using clear
+        self.cache.set("key1", "spam")
+        self.cache.set("key2", "eggs")
+        self.cache.clear()
+        self.assertEqual(self.cache.get("key1"), None)
+        self.assertEqual(self.cache.get("key2"), None)
+
 class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         management.call_command('createcachetable', 'test_cache_table', verbosity=0, interactive=False)
@@ -286,7 +332,7 @@ class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def tearDown(self):
         from django.db import connection
         cursor = connection.cursor()
-        cursor.execute('DROP TABLE test_cache_table');
+        cursor.execute('DROP TABLE test_cache_table')
 
 class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
@@ -308,9 +354,6 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
         self.cache = get_cache('file://%s' % self.dirname)
-
-    def tearDown(self):
-        shutil.rmtree(self.dirname)
 
     def test_hashing(self):
         """Test that keys are hashed into subdirectories correctly"""

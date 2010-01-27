@@ -2,6 +2,7 @@
 
 import os
 import time
+import shutil
 try:
     import cPickle as pickle
 except ImportError:
@@ -150,3 +151,9 @@ class CacheClass(BaseCache):
             count += len(files)
         return count
     _num_entries = property(_get_num_entries)
+
+    def clear(self):
+        try:
+            shutil.rmtree(self._dir)
+        except (IOError, OSError):
+            pass

@@ -71,3 +71,17 @@ class CacheClass(BaseCache):
         if val is None:
             raise ValueError("Key '%s' not found" % key)
         return val
+
+    def set_many(self, data, timeout=0):
+        safe_data = {}
+        for key, value in data.items():
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            safe_data[smart_str(key)] = value
+        self._cache.set_multi(safe_data, timeout or self.default_timeout)
+
+    def delete_many(self, keys):
+        self._cache.delete_multi(map(smart_str, keys))
+
+    def clear(self):
+        self._cache.flush_all()

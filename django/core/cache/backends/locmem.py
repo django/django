@@ -110,8 +110,7 @@ class CacheClass(BaseCache):
 
     def _cull(self):
         if self._cull_frequency == 0:
-            self._cache.clear()
-            self._expire_info.clear()
+            self.clear()
         else:
             doomed = [k for (i, k) in enumerate(self._cache) if i % self._cull_frequency == 0]
             for k in doomed:
@@ -133,3 +132,7 @@ class CacheClass(BaseCache):
             self._delete(key)
         finally:
             self._lock.writer_leaves()
+
+    def clear(self):
+        self._cache.clear()
+        self._expire_info.clear()
