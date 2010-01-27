@@ -103,9 +103,13 @@ class ConnectionRouter(object):
         def _route_db(self, model, **hints):
             chosen_db = None
             for router in self.routers:
-                chosen_db = getattr(router, action)(model, **hints)
-                if chosen_db:
-                    return chosen_db
+                try:
+                    chosen_db = getattr(router, action)(model, **hints)
+                    if chosen_db:
+                        return chosen_db
+                except AttributeError:
+                    # If the router doesn't have a method, skip to the next one.
+                    pass
             try:
                 return hints['instance']._state.db or DEFAULT_DB_ALIAS
             except KeyError:
@@ -117,14 +121,22 @@ class ConnectionRouter(object):
 
     def allow_relation(self, obj1, obj2, **hints):
         for router in self.routers:
-            allow = router.allow_relation(obj1, obj2, **hints)
-            if allow is not None:
-                return allow
+            try:
+                allow = router.allow_relation(obj1, obj2, **hints)
+                if allow is not None:
+                    return allow
+            except AttributeError:
+                # If the router doesn't have a method, skip to the next one.
+                pass
         return obj1._state.db == obj2._state.db
 
     def allow_syncdb(self, db, model):
         for router in self.routers:
-            allow = router.allow_syncdb(db, model)
-            if allow is not None:
-                return allow
+            try:
+                allow = router.allow_syncdb(db, model)
+                if allow is not None:
+                    return allow
+            except AttributeError:
+                # If the router doesn't have a method, skip to the next one.
+                pass
         return True

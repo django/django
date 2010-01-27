@@ -99,7 +99,7 @@ routing scheme.
 Database routers
 ----------------
 
-A database Router is a class that provides four methods:
+A database Router is a class that provides up to four methods:
 
 .. method:: db_for_read(model, **hints)
 
@@ -140,6 +140,10 @@ A database Router is a class that provides four methods:
     synchronized, False if it should not be synchronized, or None if
     the router has no opinion. This method can be used to determine
     the availability of a model on a given database.
+
+A router doesn't have to provide *all* these methods - it omit one or
+more of them. If one of the methods is omitted, Django will skip that
+router when performing the relevant check.
 
 .. _topics-db-multi-db-hints:
 

@@ -674,6 +674,11 @@ class AuthRouter(object):
             return False
         return None
 
+class WriteRouter(object):
+    # A router that only expresses an opinion on writes
+    def db_for_write(self, model, **hints):
+        return 'writer'
+
 class RouterTestCase(TestCase):
     multi_db = True
 
@@ -723,6 +728,37 @@ class RouterTestCase(TestCase):
 
         self.assertTrue(router.allow_syncdb('other', User))
         self.assertFalse(router.allow_syncdb('other', Book))
+
+    def test_partial_router(self):
+        "A router can choose to implement a subset of methods"
+        dive = Book.objects.using('other').create(title="Dive into Python",
+                                                  published=datetime.date(2009, 5, 4))
+
+        # First check the baseline behaviour
+
+        self.assertEquals(router.db_for_read(User), 'other')
+        self.assertEquals(router.db_for_read(Book), 'other')
+
+        self.assertEquals(router.db_for_write(User), 'default')
+        self.assertEquals(router.db_for_write(Book), 'default')
+
+        self.assertTrue(router.allow_relation(dive, dive))
+
+        self.assertTrue(router.allow_syncdb('default', User))
+        self.assertTrue(router.allow_syncdb('default', Book))
+
+        router.routers = [WriteRouter(), AuthRouter(), TestRouter()]
+
+        self.assertEquals(router.db_for_read(User), 'other')
+        self.assertEquals(router.db_for_read(Book), 'other')
+
+        self.assertEquals(router.db_for_write(User), 'writer')
+        self.assertEquals(router.db_for_write(Book), 'writer')
+
+        self.assertTrue(router.allow_relation(dive, dive))
+
+        self.assertFalse(router.allow_syncdb('default', User))
+        self.assertTrue(router.allow_syncdb('default', Book))
 
 
     def test_database_routing(self):
