@@ -25,11 +25,8 @@ from django.contrib.gis.geos import prototypes as capi
 # of their corresponding GEOS I/O class.
 from django.contrib.gis.geos.prototypes.io import wkt_r, wkt_w, wkb_r, wkb_w, ewkb_w, ewkb_w3d
 
-# Regular expression for recognizing HEXEWKB and WKT.  A prophylactic measure
-# to prevent potentially malicious input from reaching the underlying C
-# library.  Not a substitute for good web security programming practices.
-hex_regex = re.compile(r'^[0-9A-F]+$', re.I)
-wkt_regex = re.compile(r'^(SRID=(?P<srid>\d+);)?(?P<wkt>(POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)[ACEGIMLONPSRUTY\d,\.\-\(\) ]+)$', re.I)
+# For recognizing geometry input.
+from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
 
 class GEOSGeometry(GEOSBase, ListMixin):
     "A class that, generally, encapsulates a GEOS geometry."
@@ -69,7 +66,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
             elif hex_regex.match(geo_input):
                 # Handling HEXEWKB input.
                 g = wkb_r().read(geo_input)
-            elif gdal.GEOJSON and gdal.geometries.json_regex.match(geo_input):
+            elif gdal.GEOJSON and json_regex.match(geo_input):
                 # Handling GeoJSON input.
                 g = wkb_r().read(gdal.OGRGeometry(geo_input).wkb)
             else:

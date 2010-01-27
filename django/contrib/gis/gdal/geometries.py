@@ -39,7 +39,7 @@
   True
 """
 # Python library requisites.
-import re, sys
+import sys
 from binascii import a2b_hex
 from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
 
@@ -54,15 +54,13 @@ from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 GEOJSON = capi.GEOJSON
 
+# For recognizing geometry input.
+from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
 # The OGR_G_* routines are relevant here.
-
-# Regular expressions for recognizing HEXEWKB and WKT.
-hex_regex = re.compile(r'^[0-9A-F]+$', re.I)
-wkt_regex = re.compile(r'^(?P<type>POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)[ACEGIMLONPSRUTY\d,\.\-\(\) ]+$', re.I)
-json_regex = re.compile(r'^(\s+)?\{[\s\w,\[\]\{\}\-\."\':]+\}(\s+)?$')
 
 #### OGRGeometry Class ####
 class OGRGeometry(GDALBase):
@@ -88,13 +86,16 @@ class OGRGeometry(GDALBase):
             wkt_m = wkt_regex.match(geom_input)
             json_m = json_regex.match(geom_input)
             if wkt_m:
+                if wkt_m.group('srid'):
+                    # If there's EWKT, set the SRS w/value of the SRID.
+                    srs = int(wkt_m.group('srid'))
                 if wkt_m.group('type').upper() == 'LINEARRING':
                     # OGR_G_CreateFromWkt doesn't work with LINEARRING WKT.
                     #  See http://trac.osgeo.org/gdal/ticket/1992.
                     g = capi.create_geom(OGRGeomType(wkt_m.group('type')).num)
-                    capi.import_wkt(g, byref(c_char_p(geom_input)))
+                    capi.import_wkt(g, byref(c_char_p(wkt_m.group('wkt'))))
                 else:
-                    g = capi.from_wkt(byref(c_char_p(geom_input)), None, byref(c_void_p()))
+                    g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt'))), None, byref(c_void_p()))
             elif json_m:
                 if GEOJSON:
                     g = capi.from_json(geom_input)
@@ -340,6 +341,15 @@ class OGRGeometry(GDALBase):
     def wkt(self):
         "Returns the WKT representation of the Geometry."
         return capi.to_wkt(self.ptr, byref(c_char_p()))
+
+    @property
+    def ewkt(self):
+        "Returns the EWKT representation of the Geometry."
+        srs = self.srs
+        if srs and srs.srid:
+            return 'SRID=%s;%s' % (srs.srid, self.wkt)
+        else:
+            return self.wkt
 
     #### Geometry Methods ####
     def clone(self):
