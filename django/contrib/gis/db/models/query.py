@@ -12,7 +12,7 @@ class GeoQuerySet(QuerySet):
 
     ### Methods overloaded from QuerySet ###
     def __init__(self, model=None, query=None, using=None):
-        super(GeoQuerySet, self).__init__(model=model, query=query)
+        super(GeoQuerySet, self).__init__(model=model, query=query, using=using)
         self.query = query or GeoQuery(self.model)
 
     def values(self, *fields):
