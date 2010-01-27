@@ -148,13 +148,24 @@ class DistanceTest(unittest.TestCase):
         if oracle: tol = 2
         else: tol = 5
 
-        # Now testing geodetic distance aggregation.
-        hillsdale = AustraliaCity.objects.get(name='Hillsdale')
-        if not oracle:
-            # PostGIS is limited to disance queries only to/from point geometries,
-            # ensuring a TypeError is raised if something else is put in.
-            self.assertRaises(ValueError, AustraliaCity.objects.distance, 'LINESTRING(0 0, 1 1)')
-            self.assertRaises(ValueError, AustraliaCity.objects.distance, LineString((0, 0), (1, 1)))
+        # Testing geodetic distance calculation with a non-point geometry
+        # (a LineString of Wollongong and Shellharbour coords).
+        ls = LineString( ( (150.902, -34.4245), (150.87, -34.5789) ) )
+        if oracle or connection.ops.geography:
+            # Reference query:
+            #  SELECT ST_distance_sphere(point, ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326)) FROM distapp_australiacity ORDER BY name;
+            distances = [1120954.92533513, 140575.720018241, 640396.662906304,
+                         60580.9693849269, 972807.955955075, 568451.8357838,
+                         40435.4335201384, 0, 68272.3896586844, 12375.0643697706, 0]
+            qs = AustraliaCity.objects.distance(ls).order_by('name')
+            for city, distance in zip(qs, distances):
+                # Testing equivalence to within a meter.
+                self.assertAlmostEqual(distance, city.distance.m, 0)
+        else:
+            # PostGIS 1.4 and below is limited to disance queries only
+            # to/from point geometries, check for raising of ValueError.
+            self.assertRaises(ValueError, AustraliaCity.objects.distance, ls)
+            self.assertRaises(ValueError, AustraliaCity.objects.distance, ls.wkt)
 
         # Got the reference distances using the raw SQL statements:
         #  SELECT ST_distance_spheroid(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326), 'SPHEROID["WGS 84",6378137.0,298.257223563]') FROM distapp_australiacity WHERE (NOT (id = 11));
@@ -182,6 +193,7 @@ class DistanceTest(unittest.TestCase):
                                 1162619.7297006]
 
         # Testing with spheroid distances first.
+        hillsdale = AustraliaCity.objects.get(name='Hillsdale')
         qs = AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point, spheroid=True)
         for i, c in enumerate(qs):
             self.assertAlmostEqual(spheroid_distances[i], c.distance.m, tol)
@@ -195,8 +207,9 @@ class DistanceTest(unittest.TestCase):
     def test03c_distance_method(self):
         "Testing the `distance` GeoQuerySet method used with `transform` on a geographic field."
         # Normally you can't compute distances from a geometry field
-        # that is not a PointField (on PostGIS).
-        self.assertRaises(ValueError, CensusZipcode.objects.distance, self.stx_pnt)
+        # that is not a PointField (on PostGIS 1.4 and below).
+        if not connection.ops.geography:
+            self.assertRaises(ValueError, CensusZipcode.objects.distance, self.stx_pnt)
 
         # We'll be using a Polygon (created by buffering the centroid
         # of 77005 to 100m) -- which aren't allowed in geographic distance

@@ -632,10 +632,11 @@ class GeoQuerySet(QuerySet):
                     # field is geodetic). However, the PostGIS ST_distance_sphere/spheroid()
                     # procedures may only do queries from point columns to point geometries
                     # some error checking is required.
-                    if not isinstance(geo_field, PointField):
-                        raise ValueError('Spherical distance calculation only supported on PointFields.')
-                    if not str(Geometry(buffer(params[0].ewkb)).geom_type) == 'Point':
-                        raise ValueError('Spherical distance calculation only supported with Point Geometry parameters')
+                    if not backend.geography:
+                        if not isinstance(geo_field, PointField):
+                            raise ValueError('Spherical distance calculation only supported on PointFields.')
+                        if not str(Geometry(buffer(params[0].ewkb)).geom_type) == 'Point':
+                            raise ValueError('Spherical distance calculation only supported with Point Geometry parameters')
                     # The `function` procedure argument needs to be set differently for
                     # geodetic distance calculations.
                     if spheroid:
