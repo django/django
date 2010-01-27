@@ -931,8 +931,9 @@ class AdminViewListEditable(TestCase):
         # main form submit button = 1
         # search field and search submit button = 2
         # CSRF field = 1
-        # 6 + 2 + 4 + 1 + 2 + 1 = 16 inputs
-        self.failUnlessEqual(response.content.count("<input"), 16)
+        # field to track 'select all' across paginated views = 1
+        # 6 + 2 + 4 + 1 + 2 + 1 + 1 = 17 inputs
+        self.failUnlessEqual(response.content.count("<input"), 17)
         # 1 select per object = 3 selects
         self.failUnlessEqual(response.content.count("<select"), 4)
 
