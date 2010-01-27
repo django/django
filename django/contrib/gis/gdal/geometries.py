@@ -130,16 +130,32 @@ class OGRGeometry(GDALBase):
         # Setting the class depending upon the OGR Geometry Type
         self.__class__ = GEO_CLASSES[self.geom_type.num]
 
+    def __del__(self):
+        "Deletes this Geometry."
+        if self._ptr: capi.destroy_geom(self._ptr)
+
+    # Pickle routines
+    def __getstate__(self):
+        srs = self.srs
+        if srs:
+            srs = srs.wkt
+        else:
+            srs = None
+        return str(self.wkb), srs
+
+    def __setstate__(self, state):
+        wkb, srs = state
+        ptr = capi.from_wkb(wkb, None, byref(c_void_p()), len(wkb))
+        if not ptr: raise OGRException('Invalid OGRGeometry loaded from pickled state.')
+        self.ptr = ptr
+        self.srs = srs
+
     @classmethod
     def from_bbox(cls, bbox):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
         return OGRGeometry( 'POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %  (
                 x0, y0, x0, y1, x1, y1, x1, y0, x0, y0) )
-
-    def __del__(self):
-        "Deletes this Geometry."
-        if self._ptr: capi.destroy_geom(self._ptr)
 
     ### Geometry set-like operations ###
     # g = g1 | g2

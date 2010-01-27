@@ -447,6 +447,16 @@ class OGRGeomTest(unittest.TestCase):
         self.assertEqual([1.0, 2.0, 3.0], ls_25d.z)
         self.assertEqual(3, ls_25d.coord_dim)
 
+    def test17_pickle(self):
+        "Testing pickle support."
+        import cPickle
+        g1 = OGRGeometry('LINESTRING(1 1 1,2 2 2,3 3 3)', 'WGS84')
+        g2 = cPickle.loads(cPickle.dumps(g1))
+        self.assertEqual(g1, g2)
+        self.assertEqual(4326, g2.srs.srid)
+        self.assertEqual(g1.srs.wkt, g2.srs.wkt)
+        
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(OGRGeomTest))
