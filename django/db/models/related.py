@@ -45,3 +45,6 @@ class RelatedObject(object):
             return self.field.rel.related_name or (self.opts.object_name.lower() + '_set')
         else:
             return self.field.rel.related_name or (self.opts.object_name.lower())
+
+    def get_cache_name(self):
+        return "_%s_cache" % self.get_accessor_name()

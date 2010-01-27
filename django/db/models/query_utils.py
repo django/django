@@ -197,19 +197,29 @@ class DeferredAttribute(object):
         """
         instance.__dict__[self.field_name] = value
 
-def select_related_descend(field, restricted, requested):
+def select_related_descend(field, restricted, requested, reverse=False):
     """
     Returns True if this field should be used to descend deeper for
     select_related() purposes. Used by both the query construction code
     (sql.query.fill_related_selections()) and the model instance creation code
     (query.get_cached_row()).
+
+    Arguments:
+     * field - the field to be checked
+     * restricted - a boolean field, indicating if the field list has been
+       manually restricted using a requested clause)
+     * requested - The select_related() dictionary.
+     * reverse - boolean, True if we are checking a reverse select related
     """
     if not field.rel:
         return False
-    if field.rel.parent_link:
+    if field.rel.parent_link and not reverse:
         return False
-    if restricted and field.name not in requested:
-        return False
+    if restricted:
+        if reverse and field.related_query_name() not in requested:
+            return False
+        if not reverse and field.name not in requested:
+            return False
     if not restricted and field.null:
         return False
     return True

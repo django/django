@@ -619,16 +619,28 @@ This is also valid::
 
 ...and would also pull in the ``building`` relation.
 
-You can only refer to ``ForeignKey`` relations in the list of fields passed to
-``select_related``. You *can* refer to foreign keys that have ``null=True``
-(unlike the default ``select_related()`` call). It's an error to use both a
-list of fields and the ``depth`` parameter in the same ``select_related()``
-call, since they are conflicting options.
+You can refer to any ``ForeignKey`` or ``OneToOneField`` relation in
+the list of fields passed to ``select_related``. Ths includes foreign
+keys that have ``null=True`` (unlike the default ``select_related()``
+call). It's an error to use both a list of fields and the ``depth``
+parameter in the same ``select_related()`` call, since they are
+conflicting options.
 
 .. versionadded:: 1.0
 
 Both the ``depth`` argument and the ability to specify field names in the call
 to ``select_related()`` are new in Django version 1.0.
+
+.. versionchanged:: 1.2
+
+You can also refer to the reverse direction of a ``OneToOneFields`` in
+the list of fields passed to ``select_related`` -- that is, you can traverse
+a ``OneToOneField`` back to the object on which the field is defined. Instead
+of specifying the field name, use the ``related_name`` for the field on the
+related object.
+
+``OneToOneFields`` will not be traversed in the reverse direction if you
+are performing a depth-based ``select_related``.
 
 .. _queryset-extra:
 
@@ -1335,7 +1347,7 @@ extract two field values, where only one is expected::
         entries = Entry.objects.filter(blog__in=list(values))
 
     Note the ``list()`` call around the Blog ``QuerySet`` to force execution of
-    the first query. Without it, a nested query would be executed, because 
+    the first query. Without it, a nested query would be executed, because
     :ref:`querysets-are-lazy`.
 
 gt

@@ -189,7 +189,7 @@ class SingleRelatedObjectDescriptor(object):
     # SingleRelatedObjectDescriptor instance.
     def __init__(self, related):
         self.related = related
-        self.cache_name = '_%s_cache' % related.get_accessor_name()
+        self.cache_name = related.get_cache_name()
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -319,7 +319,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
             # cache. This cache also might not exist if the related object
             # hasn't been accessed yet.
             if related:
-                cache_name = '_%s_cache' % self.field.related.get_accessor_name()
+                cache_name = self.field.related.get_cache_name()
                 try:
                     delattr(related, cache_name)
                 except AttributeError:

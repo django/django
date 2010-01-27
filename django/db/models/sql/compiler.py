@@ -520,7 +520,7 @@ class SQLCompiler(object):
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
-        if requested is None and restricted is not False:
+        if requested is None:
             if isinstance(self.query.select_related, dict):
                 requested = self.query.select_related
                 restricted = True
@@ -599,6 +599,72 @@ class SQLCompiler(object):
                 self.query.update_dupe_avoidance(dupe_opts, dupe_col, alias)
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
                     used, next, restricted, new_nullable, dupe_set, avoid)
+
+        if restricted:
+            related_fields = [
+                (o.field, o.model)
+                for o in opts.get_all_related_objects()
+                if o.field.unique
+            ]
+            for f, model in related_fields:
+                if not select_related_descend(f, restricted, requested, reverse=True):
+                    continue
+                # The "avoid" set is aliases we want to avoid just for this
+                # particular branch of the recursion. They aren't permanently
+                # forbidden from reuse in the related selection tables (which is
+                # what "used" specifies).
+                avoid = avoid_set.copy()
+                dupe_set = orig_dupe_set.copy()
+                table = model._meta.db_table
+
+                int_opts = opts
+                alias = root_alias
+                alias_chain = []
+                chain = opts.get_base_chain(f.rel.to)
+                if chain is not None:
+                    for int_model in chain:
+                        # Proxy model have elements in base chain
+                        # with no parents, assign the new options
+                        # object and skip to the next base in that
+                        # case
+                        if not int_opts.parents[int_model]:
+                            int_opts = int_model._meta
+                            continue
+                        lhs_col = int_opts.parents[int_model].column
+                        dedupe = lhs_col in opts.duplicate_targets
+                        if dedupe:
+                            avoid.update(self.query.dupe_avoidance.get(id(opts), lhs_col),
+                                ())
+                            dupe_set.add((opts, lhs_col))
+                        int_opts = int_model._meta
+                        alias = self.query.join(
+                            (alias, int_opts.db_table, lhs_col, int_opts.pk.column),
+                            exclusions=used, promote=True, reuse=used
+                        )
+                        alias_chain.append(alias)
+                        for dupe_opts, dupe_col in dupe_set:
+                            self.query.update_dupe_avoidance(dupe_opts, dupe_col, alias)
+                    dedupe = f.column in opts.duplicate_targets
+                    if dupe_set or dedupe:
+                        avoid.update(self.query.dupe_avoidance.get((id(opts), f.column), ()))
+                        if dedupe:
+                            dupe_set.add((opts, f.column))
+                alias = self.query.join(
+                    (alias, table, f.rel.get_related_field().column, f.column),
+                    exclusions=used.union(avoid),
+                    promote=True
+                )
+                used.add(alias)
+                columns, aliases = self.get_default_columns(start_alias=alias,
+                    opts=model._meta, as_pairs=True)
+                self.query.related_select_cols.extend(columns)
+                self.query.related_select_fields.extend(model._meta.fields)
+
+                next = requested.get(f.related_query_name(), {})
+                new_nullable = f.null or None
+
+                self.fill_related_selections(model._meta, table, cur_depth+1,
+                    used, next, restricted, new_nullable)
 
     def deferred_to_columns(self):
         """
