@@ -92,9 +92,14 @@ class ConnectionRouter(object):
         self.routers = []
         for r in routers:
             if isinstance(r, basestring):
-                module_name, klass_name = r.rsplit('.', 1)
-                module = import_module(module_name)
-                router = getattr(module, klass_name)()
+                try:
+                    module_name, klass_name = r.rsplit('.', 1)
+                    module = import_module(module_name)
+                    router = getattr(module, klass_name)()
+                except ImportError, e:
+                    raise ImproperlyConfigured('Error importing database router %s: "%s"' % (klass_name, e))
+                except AttributeError:
+                    raise ImproperlyConfigured('Module "%s" does not define a "%s" database router' % (module, klass_name))
             else:
                 router = r
             self.routers.append(router)
