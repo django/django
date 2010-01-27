@@ -22,5 +22,6 @@ recursive-include django/contrib/databrowse/templates *
 recursive-include django/contrib/formtools/templates *
 recursive-include django/contrib/gis/templates *
 recursive-include django/contrib/gis/tests/data *
-recursive-include django/contrib/gis/tests/geoapp/sql *
+recursive-include django/contrib/gis/tests/geoapp/fixtures *
+recursive-include django/contrib/gis/tests/geogapp/fixtures *
 recursive-include django/contrib/sitemaps/templates *
