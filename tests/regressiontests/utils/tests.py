@@ -29,6 +29,7 @@ __test__ = {
 }
 
 from dateformat import *
+from feedgenerator import *
 
 class TestUtilsHtml(TestCase):
 

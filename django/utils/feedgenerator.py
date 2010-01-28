@@ -19,8 +19,8 @@ For definitions of the different versions of RSS, see:
 http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
 
-import re
 import datetime
+import urlparse
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_unicode, iri_to_uri
 
@@ -46,12 +46,16 @@ def rfc3339_date(date):
         return date.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 def get_tag_uri(url, date):
-    "Creates a TagURI. See http://diveintomark.org/archives/2004/05/28/howto-atom-id"
-    tag = re.sub('^http://', '', url)
+    """
+    Creates a TagURI.
+
+    See http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    """
+    url_split = urlparse.urlparse(url)
+    d = ''
     if date is not None:
-        tag = re.sub('/', ',%s:/' % date.strftime('%Y-%m-%d'), tag, 1)
-    tag = re.sub('#', '/', tag)
-    return u'tag:' + tag
+        d = ',%s' % date.strftime('%Y-%m-%d')
+    return u'tag:%s%s:%s/%s' % (url_split.hostname, d, url_split.path, url_split.fragment)
 
 class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
