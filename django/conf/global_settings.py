@@ -85,6 +85,7 @@ LANGUAGES = (
     ('ru', gettext_noop('Russian')),
     ('sk', gettext_noop('Slovak')),
     ('sl', gettext_noop('Slovenian')),
+    ('sq', gettext_noop('Albanian')),
     ('sr', gettext_noop('Serbian')),
     ('sr-latn', gettext_noop('Serbian Latin')),
     ('sv', gettext_noop('Swedish')),

@@ -1,0 +1,119 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-01-27 22:39-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+msgid "Choose all"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr ""
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr ""
+
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr ""
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr ""
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "Now"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+msgid "Clock"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+msgid "Choose a time"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "Midnight"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+msgid "6 a.m."
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
+msgid "Noon"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:89
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
+msgid "Cancel"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:129
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:178
+msgid "Today"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+msgid "Calendar"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:176
+msgid "Yesterday"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
+msgid "Tomorrow"
+msgstr ""
