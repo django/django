@@ -549,3 +549,12 @@ reusable, encapsulated validation behavior. Note, however, that
 validation must still be performed explicitly. Simply invoking a model
 instance's ``save()`` method will not perform any validation of the
 instance's data.
+
+Object-level permissions
+------------------------
+
+A foundation for specifying permissions at the per-object level has been added.
+Although there is no implementation of this in core, a custom authentication
+backend can provide this implementation and it will be used by
+:class:`django.contrib.auth.models.User`. See the :ref:`authentication docs 
+<topics-auth>` for more information.
