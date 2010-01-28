@@ -66,22 +66,22 @@ class CommentTemplateTagTests(CommentTestCase):
         self.testGetCommentList("{% get_comment_list for a as cl %}")
 
     def testGetCommentPermalink(self):
-        self.createSomeComments()
+        c1, c2, c3, c4 = self.createSomeComments()
         t = "{% load comments %}{% get_comment_list for comment_tests.author author.id as cl %}"
         t += "{% get_comment_permalink cl.0 %}"
         ct = ContentType.objects.get_for_model(Author)
         author = Author.objects.get(pk=1)
         ctx, out = self.render(t, author=author)
-        self.assertEqual(out, "/cr/%s/%s/#c2" % (ct.id, author.id))
+        self.assertEqual(out, "/cr/%s/%s/#c%s" % (ct.id, author.id, c2.id))
 
     def testGetCommentPermalinkFormatted(self):
-        self.createSomeComments()
+        c1, c2, c3, c4 = self.createSomeComments()
         t = "{% load comments %}{% get_comment_list for comment_tests.author author.id as cl %}"
         t += "{% get_comment_permalink cl.0 '#c%(id)s-by-%(user_name)s' %}"
         ct = ContentType.objects.get_for_model(Author)
         author = Author.objects.get(pk=1)
         ctx, out = self.render(t, author=author)
-        self.assertEqual(out, "/cr/%s/%s/#c2-by-Joe Somebody" % (ct.id, author.id))
+        self.assertEqual(out, "/cr/%s/%s/#c%s-by-Joe Somebody" % (ct.id, author.id, c2.id))
 
     def testRenderCommentList(self, tag=None):
         t = "{% load comments %}" + (tag or "{% render_comment_list for comment_tests.article a.id %}")
