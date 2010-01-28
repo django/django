@@ -198,7 +198,7 @@ class Client(object):
         using the arguments to the request.
         """
         environ = {
-            'HTTP_COOKIE':      self.cookies,
+            'HTTP_COOKIE':       self.cookies.output(header='', sep='; '),
             'PATH_INFO':         '/',
             'QUERY_STRING':      '',
             'REMOTE_ADDR':       '127.0.0.1',
