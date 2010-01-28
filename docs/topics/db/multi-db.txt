@@ -92,9 +92,14 @@ Automatic database routing
 The easiest way to use multiple databases is to set up a database
 routing scheme. The default routing scheme ensures that objects remain
 'sticky' to their original database (i.e., an object retrieved from
-the ``foo`` database will be saved on the same database). However, you
-can implement more interesting behaviors by defining a different
-routing scheme.
+the ``foo`` database will be saved on the same database). The default
+routing scheme ensures that if a database isn't specified, all queries
+fall back to the ``default`` database.
+
+You don't have to do anything to activate the default routing scheme
+-- it is provided 'out of the box' on every Django project. However,
+if you want to implement more interesting database allocation
+behaviors, you can define and install your own database routers.
 
 Database routers
 ----------------
