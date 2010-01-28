@@ -17,19 +17,19 @@ msgstr ""
 
 #: .\conf\global_settings.py:39
 msgid "Arabic"
-msgstr "Araba"
+msgstr "Arabă"
 
 #: .\conf\global_settings.py:40
 msgid "Bengali"
-msgstr "Bengaleza"
+msgstr "Bengaleză"
 
 #: .\conf\global_settings.py:41
 msgid "Bulgarian"
-msgstr "Bulgara"
+msgstr "Bulgară"
 
 #: .\conf\global_settings.py:42
 msgid "Catalan"
-msgstr "Catalana"
+msgstr "Catalană"
 
 #: .\conf\global_settings.py:43
 msgid "Czech"
@@ -37,11 +37,11 @@ msgstr "Cehă"
 
 #: .\conf\global_settings.py:44
 msgid "Welsh"
-msgstr "Galeza"
+msgstr "Galeză"
 
 #: .\conf\global_settings.py:45
 msgid "Danish"
-msgstr "Daneza"
+msgstr "Daneză"
 
 #: .\conf\global_settings.py:46
 msgid "German"
@@ -49,7 +49,7 @@ msgstr "Germană"
 
 #: .\conf\global_settings.py:47
 msgid "Greek"
-msgstr "Greaca"
+msgstr "Greacă"
 
 #: .\conf\global_settings.py:48
 msgid "English"
@@ -61,19 +61,19 @@ msgstr "Spaniolă"
 
 #: .\conf\global_settings.py:50
 msgid "Argentinean Spanish"
-msgstr "Spaniola argentiniana"
+msgstr "Spaniolă argentiniană"
 
 #: .\conf\global_settings.py:51
 msgid "Basque"
-msgstr "Basca"
+msgstr "Bască"
 
 #: .\conf\global_settings.py:52
 msgid "Persian"
-msgstr "Persana"
+msgstr "Persană"
 
 #: .\conf\global_settings.py:53
 msgid "Finnish"
-msgstr "Finlandeza"
+msgstr "Finlandeză"
 
 #: .\conf\global_settings.py:54
 msgid "French"
@@ -81,7 +81,7 @@ msgstr "Franceză"
 
 #: .\conf\global_settings.py:55
 msgid "Irish"
-msgstr "Irlandeza"
+msgstr "Irlandeză"
 
 #: .\conf\global_settings.py:56
 msgid "Galician"
@@ -89,19 +89,19 @@ msgstr "Galiciană"
 
 #: .\conf\global_settings.py:57
 msgid "Hungarian"
-msgstr "Ungara"
+msgstr "Ungară"
 
 #: .\conf\global_settings.py:58
 msgid "Hebrew"
-msgstr "Ebraica"
+msgstr "Ebraică"
 
 #: .\conf\global_settings.py:59
 msgid "Croatian"
-msgstr "Croata"
+msgstr "Croată"
 
 #: .\conf\global_settings.py:60
 msgid "Icelandic"
-msgstr "Islandeza"
+msgstr "Islandeză"
 
 #: .\conf\global_settings.py:61
 msgid "Italian"
@@ -109,19 +109,19 @@ msgstr "Italiană"
 
 #: .\conf\global_settings.py:62
 msgid "Japanese"
-msgstr "Japoneza"
+msgstr "Japoneză"
 
 #: .\conf\global_settings.py:63
 msgid "Georgian"
-msgstr "Georgiana"
+msgstr "Georgiană"
 
 #: .\conf\global_settings.py:64
 msgid "Korean"
-msgstr "Koreana"
+msgstr "Koreană"
 
 #: .\conf\global_settings.py:65
 msgid "Khmer"
-msgstr "Khmera"
+msgstr "Khmeră"
 
 #: .\conf\global_settings.py:66
 msgid "Kannada"
@@ -129,15 +129,15 @@ msgstr "Limba kannada"
 
 #: .\conf\global_settings.py:67
 msgid "Latvian"
-msgstr "Letona"
+msgstr "Letonă"
 
 #: .\conf\global_settings.py:68
 msgid "Macedonian"
-msgstr "Macedoneana"
+msgstr "Macedoneană"
 
 #: .\conf\global_settings.py:69
 msgid "Dutch"
-msgstr "Olandeza"
+msgstr "Olandeză"
 
 #: .\conf\global_settings.py:70
 msgid "Norwegian"
@@ -145,19 +145,19 @@ msgstr "Norvegiană"
 
 #: .\conf\global_settings.py:71
 msgid "Polish"
-msgstr "Poloneza"
+msgstr "Poloneză"
 
 #: .\conf\global_settings.py:72
 msgid "Portugese"
-msgstr "Portugheza"
+msgstr "Portugheză"
 
 #: .\conf\global_settings.py:73
 msgid "Brazilian Portuguese"
-msgstr "Portugheza braziliana"
+msgstr "Portugheză braziliană"
 
 #: .\conf\global_settings.py:74
 msgid "Romanian"
-msgstr "Romana"
+msgstr "Română"
 
 #: .\conf\global_settings.py:75
 msgid "Russian"
@@ -165,19 +165,19 @@ msgstr "Rusă"
 
 #: .\conf\global_settings.py:76
 msgid "Slovak"
-msgstr "Slovaca"
+msgstr "Slovacă"
 
 #: .\conf\global_settings.py:77
 msgid "Slovenian"
-msgstr "Slovena"
+msgstr "Slovenă"
 
 #: .\conf\global_settings.py:78
 msgid "Serbian"
-msgstr "Sîrbă"
+msgstr "Sârbă"
 
 #: .\conf\global_settings.py:79
 msgid "Swedish"
-msgstr "Suedeza"
+msgstr "Suedeză"
 
 #: .\conf\global_settings.py:80
 msgid "Tamil"
@@ -189,11 +189,11 @@ msgstr "Limba telugu"
 
 #: .\conf\global_settings.py:82
 msgid "Turkish"
-msgstr "Turca"
+msgstr "Turcă"
 
 #: .\conf\global_settings.py:83
 msgid "Ukrainian"
-msgstr "Ucraineana"
+msgstr "Ucraineană"
 
 #: .\conf\global_settings.py:84
 msgid "Simplified Chinese"
@@ -201,7 +201,7 @@ msgstr "Chineză simplificată"
 
 #: .\conf\global_settings.py:85
 msgid "Traditional Chinese"
-msgstr "Chineza traditionala"
+msgstr "Chineză tradițională"
 
 #: .\contrib\admin\filterspecs.py:44
 #, python-format
@@ -209,7 +209,7 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
-"<h3>Dupa %s:</h3>\n"
+"<h3>După %s:</h3>\n"
 "<ul>\n"
 
 #: .\contrib\admin\filterspecs.py:74
@@ -225,7 +225,7 @@ msgstr "orice data"
 
 #: .\contrib\admin\filterspecs.py:114
 msgid "Today"
-msgstr "Astazi"
+msgstr "Astăzi"
 
 #: .\contrib\admin\filterspecs.py:117
 msgid "Past 7 days"
@@ -325,7 +325,7 @@ msgstr "Eroare server <em>(500)</em>"
 
 #: .\contrib\admin\templates\admin\500.html.py:10
 msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
-msgstr "A apărut o eroare. Este raportată către administrator via emailşi va fi fixată în scurt timp. Mulţumim pentru înţelegere."
+msgstr "A apărut o eroare. Este raportată către administrator via email şi va fi reparată în scurt timp. Mulţumim pentru înţelegere."
 
 #: .\contrib\admin\templates\admin\base.html.py:26
 msgid "Welcome,"
@@ -334,7 +334,7 @@ msgstr "Bine ai venit,"
 #: .\contrib\admin\templates\admin\base.html.py:28
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
 msgid "Documentation"
-msgstr "Documentatie"
+msgstr "Documentație"
 
 #: .\contrib\admin\templates\admin\base.html.py:29
 #: .\contrib\admin\templates\admin\auth\user\change_password.html.py:14
@@ -367,18 +367,18 @@ msgstr "Istoric"
 
 #: .\contrib\admin\templates\admin\change_form.html.py:21
 msgid "View on site"
-msgstr "Vizualizeaza pe site"
+msgstr "Vizualizează pe site"
 
 #: .\contrib\admin\templates\admin\change_form.html.py:31
 #: .\contrib\admin\templates\admin\auth\user\change_password.html.py:23
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Va rugam sa corectati eroarea de mai jos"
-msgstr[1] "Va rugam sa corectati erorile de mai jos"
+msgstr[0] "Vă rugăm să corectați eroarea de mai jos"
+msgstr[1] "Vă rugăm să corectați erorile de mai jos"
 
 #: .\contrib\admin\templates\admin\change_form.html.py:49
 msgid "Ordering"
-msgstr "Ordonate dupa"
+msgstr "Ordonate după"
 
 #: .\contrib\admin\templates\admin\change_form.html.py:52
 msgid "Order:"
@@ -392,12 +392,12 @@ msgstr "Adaugă %(name)s"
 #: .\contrib\admin\templates\admin\delete_confirmation.html.py:8
 #: .\contrib\admin\templates\admin\submit_line.html.py:3
 msgid "Delete"
-msgstr "Sterge"
+msgstr "Șterge"
 
 #: .\contrib\admin\templates\admin\delete_confirmation.html.py:13
 #, python-format
 msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
-msgstr "Ştergînd %(object_name)s '%(escaped_object)s' va avea ca rezultat ştergerea şi a obiectelor ce au legătură, dar contul tău nu are permisiunea de a şterge următoarele tipuri de obiecte:"
+msgstr "Ştergerea %(object_name)s '%(escaped_object)s' ar cauza și ştergerea obiectelor asociate, dar contul tău nu are permisiunea de a şterge următoarele tipuri de obiecte:"
 
 #: .\contrib\admin\templates\admin\delete_confirmation.html.py:20
 #, python-format
@@ -406,12 +406,12 @@ msgstr "Eşti sigur că vrei să ştergi %(object_name)s \"%(escaped_object)s\"?
 
 #: .\contrib\admin\templates\admin\delete_confirmation.html.py:25
 msgid "Yes, I'm sure"
-msgstr "Da, sînt sigur"
+msgstr "Da, sunt sigur"
 
 #: .\contrib\admin\templates\admin\filter.html.py:2
 #, python-format
 msgid " By %(filter_title)s "
-msgstr "Dupa %(filter_title)s "
+msgstr "După %(filter_title)s "
 
 #: .\contrib\admin\templates\admin\filters.html.py:4
 msgid "Filter"
@@ -420,7 +420,7 @@ msgstr "Filtru"
 #: .\contrib\admin\templates\admin\index.html.py:17
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr "Modele disponibile in applicatia %(name)s"
+msgstr "Modele disponibile în aplicația %(name)s"
 
 #: .\contrib\admin\templates\admin\index.html.py:18
 #, python-format
@@ -437,11 +437,11 @@ msgstr "Nu ai drepturi de editare."
 
 #: .\contrib\admin\templates\admin\index.html.py:52
 msgid "Recent Actions"
-msgstr "Acţiuni Recente"
+msgstr "Acţiuni recente"
 
 #: .\contrib\admin\templates\admin\index.html.py:53
 msgid "My Actions"
-msgstr "Acţiunile Mele"
+msgstr "Acţiunile mele"
 
 #: .\contrib\admin\templates\admin\index.html.py:57
 msgid "None available"
@@ -449,7 +449,7 @@ msgstr "Indisponibil"
 
 #: .\contrib\admin\templates\admin\invalid_setup.html.py:8
 msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
-msgstr "Exista o problema cu baza de date. Verificati daca tabelele necesare din baza de date au fost create si verificati daca baza de date poate fi citita de utilizatorul potrivit."
+msgstr "Există o problema cu baza de date. Verificați dacă tabelele necesare din baza de date au fost create și verificați dacă baza de date poate fi citită de utilizatorul potrivit."
 
 #: .\contrib\admin\templates\admin\login.html.py:17
 #: .\contrib\comments\templates\comments\form.html.py:6
@@ -460,7 +460,7 @@ msgstr "Utilizator:"
 #: .\contrib\admin\templates\admin\login.html.py:20
 #: .\contrib\comments\templates\comments\form.html.py:8
 msgid "Password:"
-msgstr "Parola:"
+msgstr "Parolă:"
 
 #: .\contrib\admin\templates\admin\login.html.py:25
 #: .\contrib\admin\views\decorators.py:31
@@ -485,11 +485,11 @@ msgstr "N j, Y, P"
 
 #: .\contrib\admin\templates\admin\object_history.html.py:35
 msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
-msgstr "Acest obiect nu are un istoric al schimbărilor. Probabil nu a fost adăugat prinintermediul acestui sit de administrare."
+msgstr "Acest obiect nu are un istoric al schimbărilor. Probabil nu a fost adăugat prin intermediul acestui sit de administrare."
 
 #: .\contrib\admin\templates\admin\pagination.html.py:10
 msgid "Show all"
-msgstr "Arata tot/toate"
+msgstr "Arată tot/toate"
 
 #: .\contrib\admin\templates\admin\search_form.html.py:8
 msgid "Go"
@@ -509,23 +509,23 @@ msgstr "%(full_result_count)s total"
 
 #: .\contrib\admin\templates\admin\submit_line.html.py:4
 msgid "Save as new"
-msgstr "Salvati ca nou"
+msgstr "Salvați ca nou"
 
 #: .\contrib\admin\templates\admin\submit_line.html.py:5
 msgid "Save and add another"
-msgstr "Salvati si adaugati altul"
+msgstr "Salvați și adăugați altul"
 
 #: .\contrib\admin\templates\admin\submit_line.html.py:6
 msgid "Save and continue editing"
-msgstr "Salvati si continuati"
+msgstr "Salvați și continuați"
 
 #: .\contrib\admin\templates\admin\submit_line.html.py:7
 msgid "Save"
-msgstr "Salveaza"
+msgstr "Salvează"
 
 #: .\contrib\admin\templates\admin\auth\user\add_form.html.py:6
 msgid "First, enter a username and password. Then, you'll be able to edit more user options."
-msgstr "Intai introduceti un nume de utilizator si o parola. Apoi veti putea modifica mai multe optiuni de utilizator."
+msgstr "Introduceți mai întâi un nume de utilizator și o parolă. Apoi veți putea modifica mai multe opțiuni de utilizator."
 
 #: .\contrib\admin\templates\admin\auth\user\add_form.html.py:12
 msgid "Username"
@@ -534,30 +534,30 @@ msgstr "Utilizator"
 #: .\contrib\admin\templates\admin\auth\user\add_form.html.py:18
 #: .\contrib\admin\templates\admin\auth\user\change_password.html.py:33
 msgid "Password"
-msgstr "Parola"
+msgstr "Parolă"
 
 #: .\contrib\admin\templates\admin\auth\user\add_form.html.py:23
 #: .\contrib\admin\templates\admin\auth\user\change_password.html.py:38
 msgid "Password (again)"
-msgstr "Parola (repeta)"
+msgstr "Parolă (din nou)"
 
 #: .\contrib\admin\templates\admin\auth\user\add_form.html.py:24
 #: .\contrib\admin\templates\admin\auth\user\change_password.html.py:39
 msgid "Enter the same password as above, for verification."
-msgstr "Introduceti parola din nou pentru verificare."
+msgstr "Introduceți parola din nou pentru verificare."
 
 #: .\contrib\admin\templates\admin\auth\user\change_password.html.py:27
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Introduceti o parola noua pentru utilizatorul <strong>%(username)s</strong>."
+msgstr "Introduceți o parolă nouă pentru utilizatorul <strong>%(username)s</strong>."
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
 msgid "Bookmarklets"
-msgstr ""
+msgstr "Bookmarklet-uri"
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:4
 msgid "Documentation bookmarklets"
-msgstr ""
+msgstr "Bookmarklet-uri documentație"
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:8
 msgid ""
@@ -569,42 +569,49 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">Pentru a instala bookmarklet-uri, trage link-ul în bara de\n"
+"bookmark-uri, sau click dreapta pe link și adaugă la bookmark-uri. Acum poți\n"
+"selecta bookmarklet-ul din orice pagina a sitului. Este posibil ca unele din\n"
+"aceste bookmarklet-uri sunt accesibile doar de pe un computer desemnat ca\n"
+"\"intern\" (vorbește cu administratorul tău de sistem dacă nu ești sigur că\n"
+"al tău este \"intern\").</p>\n"
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:18
 msgid "Documentation for this page"
-msgstr "Documentatie pentru aceasta pagina"
+msgstr "Documentație pentru această pagină"
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:19
 msgid "Jumps you from any page to the documentation for the view that generates that page."
-msgstr "Te trimite de la orice pagina la documentatia pentru view-ul care genereaza acea pagina."
+msgstr "Te trimite de la orice pagină la documentația pentru view-ul care generează acea pagină."
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:21
 msgid "Show object ID"
-msgstr "Arata ID-ul obiectului"
+msgstr "Arată ID-ul obiectului"
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:22
 msgid "Shows the content-type and unique ID for pages that represent a single object."
-msgstr "Arata tipul de continut si ID-ul unic pentru paginile care reprezinta un singur obiect."
+msgstr "Arată tipul de conținut și ID-ul unic pentru paginile ce reprezintă un singur obiect."
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:24
 msgid "Edit this object (current window)"
-msgstr "Modifica acest obiect (in aceasta fereastra)"
+msgstr "Modifică acest obiect (în fereastra curentă)"
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Sare la pagina de administrare pentru pagini care reprezinta un singur obiect."
+msgstr "Sare la pagina de administrare pentru pagini ce reprezintă un singur obiect."
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:27
 msgid "Edit this object (new window)"
-msgstr "Modifica acest obiect (intr-o fereastra noua)"
+msgstr "Modifică acest obiect (într-o fereastra nouă)"
 
 #: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:28
 msgid "As above, but opens the admin page in a new window."
-msgstr "La fel ca deasupra, dar deschide pagina de administrare intr-o fereastra noua"
+msgstr "La fel ca mai sus, dar deschide pagina de administrare într-o fereastră nouă"
 
 #: .\contrib\admin\templates\registration\logged_out.html.py:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Mulţumesc pentru petrecerea folositoare a timpului cu saitul astăzi."
+msgstr "Mulţumesc pentru petrecerea folositoare a timpului cu situl astăzi."
 
 #: .\contrib\admin\templates\registration\logged_out.html.py:10
 msgid "Log in again"
@@ -628,7 +635,7 @@ msgstr "Parola a fost schimbată."
 
 #: .\contrib\admin\templates\registration\password_change_form.html.py:11
 msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
-msgstr "Introdu te rog vechea parolă, pentru motive de siguranţă, şi apoi tastează noua parolă de două ori aşa încît putem verifica dacă ai tastat corect."
+msgstr "Introdu te rog vechea parolă, pentru motive de siguranţă, şi apoi tastează noua parolă de două ori pentru a verifica dacă ai tastat corect."
 
 #: .\contrib\admin\templates\registration\password_change_form.html.py:16
 msgid "Old password:"
@@ -660,7 +667,7 @@ msgstr "Parola resetată cu succes"
 
 #: .\contrib\admin\templates\registration\password_reset_done.html.py:12
 msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
-msgstr "Am trimis o nouă parolă prin email la adresa furnizată. Ar trebuisă o primeşti în scurt timp."
+msgstr "Am trimis o nouă parolă prin email la adresa furnizată. Ar trebui să o primeşti în scurt timp."
 
 #: .\contrib\admin\templates\registration\password_reset_email.html.py:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -678,15 +685,15 @@ msgstr "Noua ta parolă este: %(new_password)s"
 
 #: .\contrib\admin\templates\registration\password_reset_email.html.py:7
 msgid "Feel free to change this password by going to this page:"
-msgstr "Poţi schmiba această parolă vizitînd această pagină:"
+msgstr "Poţi schmiba această parolă vizitând această pagină:"
 
 #: .\contrib\admin\templates\registration\password_reset_email.html.py:11
 msgid "Your username, in case you've forgotten:"
-msgstr "Numele tău utilizator, în caz că ai uitat:"
+msgstr "Numele tău de utilizator, în caz că ai uitat:"
 
 #: .\contrib\admin\templates\registration\password_reset_email.html.py:13
 msgid "Thanks for using our site!"
-msgstr "Mulţumesc pentru folosirea saitului nostru!"
+msgstr "Mulţumesc pentru folosirea sitului nostru!"
 
 #: .\contrib\admin\templates\registration\password_reset_email.html.py:15
 #, python-format
@@ -734,7 +741,7 @@ msgstr "%(name)s \"%(obj)s\" a fost inserat cu succes."
 #: .\contrib\admin\views\main.py:271
 #: .\contrib\admin\views\main.py:356
 msgid "You may edit it again below."
-msgstr "Va puteti edita datele din nou mai jos."
+msgstr "Vă puteți edita datele din nou mai jos."
 
 #: .\contrib\admin\views\auth.py:31
 msgid "Add user"
@@ -752,24 +759,24 @@ msgstr "Schimbă parola: %s"
 #: .\contrib\admin\views\decorators.py:17
 #: .\contrib\auth\forms.py:60
 msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
-msgstr "Va rugam sa introduceti username-ul si parola corecta. Aveti grija deoarececasutele sunt case sensitive."
+msgstr "Va rugăm să introduceți numele de utilizator și parola corecte. Aveți grijă deoarece căsuțele sunt case sensitive."
 
 #: .\contrib\admin\views\decorators.py:69
 msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
-msgstr "Va rugam sa va inregistrati din nou, deoarece sesiunea a expirat. Nu va faceti griji datele au fost salvate."
+msgstr "Vă rugăm să vă înregistrați din nou, deoarece sesiunea a expirat. Nu vă faceti griji: datele au fost salvate."
 
 #: .\contrib\admin\views\decorators.py:76
 msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
-msgstr "Se pare ca browserul dumneavostra nu este configurat sa accepte cookies. Va rugam sa va setati browserul sa accepte cookies, dati un reload la pagina si incercati din nou."
+msgstr "Se pare că browserul dumneavostră nu este configurat să accepte cookies. Vă rugăm să vă setați browserul să accepte cookies, dați un reload la pagină și încercați din nou."
 
 #: .\contrib\admin\views\decorators.py:90
 msgid "Usernames cannot contain the '@' character."
-msgstr "Username-ul nu are voie sa contina caracterul '@'."
+msgstr "Username-ul nu are voie să conțină caracterul '@'."
 
 #: .\contrib\admin\views\decorators.py:92
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Adresa ta de e-mail nu este numele tau de utilizator. Incearca '%s' in schimb."
+msgstr "Adresa ta de e-mail nu este numele tău de utilizator. Incearcă '%s' în schimb."
 
 #: .\contrib\admin\views\doc.py:48
 #: .\contrib\admin\views\doc.py:50
@@ -797,7 +804,7 @@ msgstr "Applicatia %r inexistenta"
 #: .\contrib\admin\views\doc.py:173
 #, python-format
 msgid "Model %(name)r not found in app %(label)r"
-msgstr "Modelul %(name)r nu a fost gasit in aplicatia %(label)r"
+msgstr "Modelul %(name)r nu a fost gasit în aplicatia %(label)r"
 
 #: .\contrib\admin\views\doc.py:185
 #, python-format
@@ -824,12 +831,12 @@ msgstr "toate %s"
 #: .\contrib\admin\views\doc.py:226
 #, python-format
 msgid "number of %s"
-msgstr "numarul de %s"
+msgstr "numărul de %s"
 
 #: .\contrib\admin\views\doc.py:231
 #, python-format
 msgid "Fields on %s objects"
-msgstr "Campuri in %s obiecte"
+msgstr "Campuri în %s obiecte"
 
 #: .\contrib\admin\views\doc.py:293
 #: .\contrib\admin\views\doc.py:304
@@ -852,7 +859,7 @@ msgstr "Sir de caractere (pana la %(max_length)s caractere)"
 
 #: .\contrib\admin\views\doc.py:296
 msgid "Comma-separated integers"
-msgstr "Numere intregi separate de virgule"
+msgstr "Numere întregi separate de virgule"
 
 #: .\contrib\admin\views\doc.py:297
 msgid "Date (without time)"
@@ -864,7 +871,7 @@ msgstr "Data (cu ora)"
 
 #: .\contrib\admin\views\doc.py:299
 msgid "Decimal number"
-msgstr "Numar zecimal"
+msgstr "Număr zecimal"
 
 #: .\contrib\admin\views\doc.py:300
 msgid "E-mail address"
@@ -878,7 +885,7 @@ msgstr "Calea fisierului"
 
 #: .\contrib\admin\views\doc.py:303
 msgid "Floating point number"
-msgstr "Numar cu virgula"
+msgstr "Număr cu virgula"
 
 #: .\contrib\admin\views\doc.py:307
 #: .\contrib\comments\models.py:89
@@ -895,7 +902,7 @@ msgstr "Relatia cu un model parinte"
 
 #: .\contrib\admin\views\doc.py:311
 msgid "Phone number"
-msgstr "Numar de telefon"
+msgstr "Număr de telefon"
 
 #: .\contrib\admin\views\doc.py:316
 msgid "Text"
@@ -931,7 +938,7 @@ msgstr "Administrare site"
 #: .\contrib\admin\views\main.py:365
 #, python-format
 msgid "You may add another %s below."
-msgstr "Mai puteti adauga un alt %s mai jos."
+msgstr "Mai puteți adauga un alt %s mai jos."
 
 #: .\contrib\admin\views\main.py:298
 #, python-format
@@ -941,7 +948,7 @@ msgstr "Adaugă %s"
 #: .\contrib\admin\views\main.py:344
 #, python-format
 msgid "Added %s."
-msgstr "Adaugat %s."
+msgstr "Am adăugat %s."
 
 #: .\contrib\admin\views\main.py:344
 #: .\contrib\admin\views\main.py:346
@@ -949,21 +956,21 @@ msgstr "Adaugat %s."
 #: .\core\validators.py:283
 #: .\db\models\manipulators.py:309
 msgid "and"
-msgstr "si"
+msgstr "și"
 
 #: .\contrib\admin\views\main.py:346
 #, python-format
 msgid "Changed %s."
-msgstr "Schimbă %s."
+msgstr "Am schimbat %s."
 
 #: .\contrib\admin\views\main.py:348
 #, python-format
 msgid "Deleted %s."
-msgstr "Am sters %s."
+msgstr "Am șters %s."
 
 #: .\contrib\admin\views\main.py:351
 msgid "No fields changed."
-msgstr "Nu s-a facut nicio schimbare."
+msgstr "Nici-un câmp nu a fost schimbat."
 
 #: .\contrib\admin\views\main.py:354
 #, python-format
@@ -973,7 +980,7 @@ msgstr "%(name)s \"%(obj)s\" au fost modificate cu succes."
 #: .\contrib\admin\views\main.py:362
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" au fost adaugate cu succes. Le puteti edita mai jos."
+msgstr "%(name)s \"%(obj)s\" au fost adăugate cu succes. Le puteți edita mai jos."
 
 #: .\contrib\admin\views\main.py:400
 #, python-format
@@ -983,45 +990,45 @@ msgstr "Schimbă %s"
 #: .\contrib\admin\views\main.py:487
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Unul sau mai multe %(fieldname)s in %(name)s: %(obj)s"
+msgstr "Unul sau mai multe %(fieldname)s în %(name)s: %(obj)s"
 
 #: .\contrib\admin\views\main.py:492
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Unul sau mai multe %(fieldname)s in %(name)s:"
+msgstr "Unul sau mai multe %(fieldname)s în %(name)s:"
 
 #: .\contrib\admin\views\main.py:524
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" au fost sterse cu succes."
+msgstr "%(name)s \"%(obj)s\" au fost șterse cu succes."
 
 #: .\contrib\admin\views\main.py:527
 msgid "Are you sure?"
-msgstr "Sunteti sigur?"
+msgstr "Sunteți sigur?"
 
 #: .\contrib\admin\views\main.py:549
 #, python-format
 msgid "Change history: %s"
-msgstr "Schimbari facute: %s"
+msgstr "Schimbări făcute: %s"
 
 #: .\contrib\admin\views\main.py:583
 #, python-format
 msgid "Select %s"
-msgstr "Selecteaza %s"
+msgstr "Selectează %s"
 
 #: .\contrib\admin\views\main.py:583
 #, python-format
 msgid "Select %s to change"
-msgstr "Selecteaza %s pentru schimbare"
+msgstr "Selectează %s pentru schimbare"
 
 #: .\contrib\admin\views\main.py:784
 msgid "Database error"
-msgstr "Erroare de baza de date"
+msgstr "Eroare de bază de date"
 
 #: .\contrib\auth\forms.py:17
 #: .\contrib\auth\forms.py:138
 msgid "The two password fields didn't match."
-msgstr "Cele doua campuri pentru parole nu au coincis."
+msgstr "Cele doua câmpuri pentru parole nu au coincis."
 
 #: .\contrib\auth\forms.py:25
 msgid "A user with that username already exists."
@@ -1029,7 +1036,7 @@ msgstr "Un utilizator cu acest nume de utilizator exista deja,"
 
 #: .\contrib\auth\forms.py:53
 msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
-msgstr "Se pare ca browserul dumneavoastra nu suporta cookies. Aveti nevoie de un browser care suporta cookies ca sa va logati."
+msgstr "Se pare că browserul dumneavoastra nu suporta cookies. Aveti nevoie de un browser care suporta cookies ca să vă logati."
 
 #: .\contrib\auth\forms.py:62
 msgid "This account is inactive."
@@ -1037,20 +1044,20 @@ msgstr "Acest cont este inactiv."
 
 #: .\contrib\auth\forms.py:84
 msgid "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
-msgstr "Acea adresa de e-mail nu are un nume de utilizator asociat. Sunteti sigur ca v-ati inregistrat?"
+msgstr "Acea adresa de e-mail nu are un nume de utilizator asociat. Sunteți sigur că v-ați înregistrat?"
 
 #: .\contrib\auth\forms.py:107
 #, python-format
 msgid "Password reset on %s"
-msgstr "Parola resetata pe %s"
+msgstr "Parola resetată pe %s"
 
 #: .\contrib\auth\forms.py:117
 msgid "The two 'new password' fields didn't match."
-msgstr "Cele doua campuri 'parola noua' nu au coincis."
+msgstr "Cele două câmpuri 'parola noua' nu au coincis."
 
 #: .\contrib\auth\forms.py:124
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Parola veche a dumneavoastra a fost introdusa incorect. Va rugam introduceti-o din nou."
+msgstr "Parola dumneavoastră veche a fost introdusă incorect. Vă rugăm să o introduceți din nou."
 
 #: .\contrib\auth\models.py:73
 #: .\contrib\auth\models.py:93
@@ -1085,7 +1092,7 @@ msgstr "nume utilizator"
 
 #: .\contrib\auth\models.py:131
 msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
-msgstr "Necesar. 30 de caractere sau mai putin. Doar caractere alfanumerice (litere, cifre, liniute de subliniere)."
+msgstr "Necesar. 30 de caractere sau mai puțin. Doar caractere alfanumerice (litere, cifre, liniuțe de subliniere)."
 
 #: .\contrib\auth\models.py:132
 msgid "first name"
@@ -1097,15 +1104,15 @@ msgstr "Nume"
 
 #: .\contrib\auth\models.py:134
 msgid "e-mail address"
-msgstr "adresa email"
+msgstr "adresă email"
 
 #: .\contrib\auth\models.py:135
 msgid "password"
-msgstr "parola"
+msgstr "parolă"
 
 #: .\contrib\auth\models.py:135
 msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
-msgstr "Folositi '[algo]$[salt]$[hexdigest]' sau folositi <a href=\"password/\">formularul de schimbare a parolei</a>."
+msgstr "Folosiți '[algo]$[salt]$[hexdigest]' sau folosiți <a href=\"password/\">formularul de schimbare a parolei</a>."
 
 #: .\contrib\auth\models.py:136
 msgid "staff status"
@@ -1113,7 +1120,7 @@ msgstr "stare staff"
 
 #: .\contrib\auth\models.py:136
 msgid "Designates whether the user can log into this admin site."
-msgstr "Decide cînd utilizatorul se poate loga în acest sit de adminstrare."
+msgstr "Decide când utilizatorul se poate loga în acest sit de adminstrare."
 
 #: .\contrib\auth\models.py:137
 msgid "active"
@@ -1121,7 +1128,7 @@ msgstr "activ"
 
 #: .\contrib\auth\models.py:137
 msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
-msgstr "Indica daca acest user va fi tratat ca activ sau nu. Deselecteaza-l in loc de a sterge conturi."
+msgstr "Indică dacă acest utilizator va fi tratat ca activ sau nu. Deselectează-l în loc de a șterge conturi."
 
 #: .\contrib\auth\models.py:138
 msgid "superuser status"
@@ -1129,7 +1136,7 @@ msgstr "stare superutilizator"
 
 #: .\contrib\auth\models.py:138
 msgid "Designates that this user has all permissions without explicitly assigning them."
-msgstr "Indica daca acest user are toate permisiile fara a le selecta explicit."
+msgstr "Indică daca acest user are toate permisiunile fără a le selecta explicit."
 
 #: .\contrib\auth\models.py:139
 msgid "last login"
@@ -1182,7 +1189,7 @@ msgstr "Deautentificat"
 #: .\contrib\comments\models.py:71
 #: .\contrib\comments\models.py:176
 msgid "object ID"
-msgstr "id obiect"
+msgstr "ID obiect"
 
 #: .\contrib\comments\models.py:72
 msgid "headline"
@@ -1233,7 +1240,7 @@ msgstr "este rating valid"
 #: .\contrib\comments\models.py:87
 #: .\contrib\comments\models.py:179
 msgid "date/time submitted"
-msgstr "data/ora crearii"
+msgstr "data/ora creării"
 
 #: .\contrib\comments\models.py:88
 #: .\contrib\comments\models.py:180
@@ -1242,11 +1249,11 @@ msgstr "public"
 
 #: .\contrib\comments\models.py:90
 msgid "is removed"
-msgstr "sters"
+msgstr "șters"
 
 #: .\contrib\comments\models.py:90
 msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
-msgstr "Bifeaza aceasta casuta daca comentariul nu este adecvat. Un mesaj de tipul \"Acest comentariu a fost sters\" va fi afisat in schimb."
+msgstr "Bifează această casuța dacă comentariul nu este adecvat. Un mesaj de tipul \"Acest comentariu a fost șters\" va fi afișat în schimb."
 
 #: .\contrib\comments\models.py:96
 msgid "comments"
@@ -1255,7 +1262,7 @@ msgstr "comentarii"
 #: .\contrib\comments\models.py:140
 #: .\contrib\comments\models.py:222
 msgid "Content object"
-msgstr "Obiect-referinta"
+msgstr "Obiect comentariu"
 
 #: .\contrib\comments\models.py:168
 #, python-format
@@ -1282,15 +1289,15 @@ msgstr "adresa ip"
 
 #: .\contrib\comments\models.py:183
 msgid "approved by staff"
-msgstr "aprobat de echipa"
+msgstr "aprobat de echipă"
 
 #: .\contrib\comments\models.py:187
 msgid "free comment"
-msgstr "permite comentariu fara inregistrare"
+msgstr "permite comentariu fara înregistrare"
 
 #: .\contrib\comments\models.py:188
 msgid "free comments"
-msgstr "permite comentarii fara inregistrare"
+msgstr "permite comentarii fara înregistrare"
 
 #: .\contrib\comments\models.py:250
 msgid "score"
@@ -1313,7 +1320,7 @@ msgstr "punctaje karmice"
 #: .\contrib\comments\models.py:260
 #, fuzzy, python-format
 msgid "%(score)d rating by %(user)s"
-msgstr "Punctaj %(score)d atribuit de catre %(user)s"
+msgstr "Punctaj %(score)d atribuit de către %(user)s"
 
 #: .\contrib\comments\models.py:277
 #, python-format
@@ -1328,17 +1335,17 @@ msgstr ""
 
 #: .\contrib\comments\models.py:285
 msgid "flag date"
-msgstr "data marcarii"
+msgstr "data marcării"
 
 #: .\contrib\comments\models.py:289
 #, fuzzy
 msgid "user flag"
-msgstr "stegulet de utilizator"
+msgstr "steguleț de utilizator"
 
 #: .\contrib\comments\models.py:290
 #, fuzzy
 msgid "user flags"
-msgstr "stegulete de utilizatori"
+msgstr "stegulețe de utilizatori"
 
 #: .\contrib\comments\models.py:294
 #, python-format
@@ -1347,20 +1354,20 @@ msgstr "Marcajul lui %r"
 
 #: .\contrib\comments\models.py:300
 msgid "deletion date"
-msgstr "data stergerii"
+msgstr "data ștergerii"
 
 #: .\contrib\comments\models.py:303
 msgid "moderator deletion"
-msgstr "sters de moderator"
+msgstr "șters de moderator"
 
 #: .\contrib\comments\models.py:304
 msgid "moderator deletions"
-msgstr "sterse de moderator"
+msgstr "șterse de moderator"
 
 #: .\contrib\comments\models.py:308
 #, python-format
 msgid "Moderator deletion by %r"
-msgstr "Sters de moderatorul %r"
+msgstr "Șters de moderatorul %r"
 
 #: .\contrib\comments\templates\comments\form.html.py:8
 msgid "Forgotten your password?"
@@ -1378,11 +1385,11 @@ msgstr "Necesar"
 #: .\contrib\comments\templates\comments\form.html.py:12
 #: .\contrib\comments\templates\comments\form.html.py:23
 msgid "Optional"
-msgstr "Optional"
+msgstr "Opțional"
 
 #: .\contrib\comments\templates\comments\form.html.py:23
 msgid "Post a photo"
-msgstr "Adauga o poza"
+msgstr "Adaugă o poză"
 
 #: .\contrib\comments\templates\comments\form.html.py:28
 #: .\contrib\comments\templates\comments\freeform.html.py:5
@@ -1396,11 +1403,11 @@ msgstr "Previzualizare comentariu"
 
 #: .\contrib\comments\templates\comments\freeform.html.py:4
 msgid "Your name:"
-msgstr "numele dumneavoastra"
+msgstr "numele dumneavoastră"
 
 #: .\contrib\comments\views\comments.py:28
 msgid "This rating is required because you've entered at least one other rating."
-msgstr "Acest rating este necesar deoarece ai introdus cel putin un alt rating."
+msgstr "Acest rating este necesar deoarece ai introdus cel puțin un alt rating."
 
 #: .\contrib\comments\views\comments.py:112
 #, python-format
@@ -1413,11 +1420,11 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
-"Acest comentariu a fost postat de un utilizator care a postat mai putin de %(count)s comentariu:\n"
+"Acest comentariu a fost postat de un utilizator care a postat mai puțin de %(count)s comentariu:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"Acest comentariu a fost postat de un utilizator care a postat mai putin de %(count)s comentarii:\n"
+"Acest comentariu a fost postat de un utilizator care a postat mai puțin de %(count)s comentarii:\n"
 "\n"
 "%(text)s"
 
@@ -1435,27 +1442,27 @@ msgstr ""
 #: .\contrib\comments\views\comments.py:190
 #: .\contrib\comments\views\comments.py:283
 msgid "Only POSTs are allowed"
-msgstr "Doar postarile sunt permise"
+msgstr "Doar postările sunt permise"
 
 #: .\contrib\comments\views\comments.py:194
 #: .\contrib\comments\views\comments.py:287
 msgid "One or more of the required fields wasn't submitted"
-msgstr "Unul sau mai multe campuri necesare nu a fost completat"
+msgstr "Unul sau mai multe câmpuri necesare nu au fost completate"
 
 #: .\contrib\comments\views\comments.py:198
 #: .\contrib\comments\views\comments.py:289
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Cineva a modificat formularul de comentarii (incalcare a securitatii)"
+msgstr "Cineva a modificat formularul de comentarii (încălcare a securității)"
 
 #: .\contrib\comments\views\comments.py:208
 #: .\contrib\comments\views\comments.py:295
 msgid "The comment form had an invalid 'target' parameter -- the object ID was invalid"
-msgstr "Formularul de comentariu a avut un parametru 'tinta' invalid -- ID-ul obiectului a fost invalid"
+msgstr "Formularul de comentariu a avut un parametru 'țintă' invalid -- ID-ul obiectului a fost invalid"
 
 #: .\contrib\comments\views\comments.py:259
 #: .\contrib\comments\views\comments.py:324
 msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "Formularul de comentariu nu specifica nici 'previzualizare' nici 'postare'"
+msgstr "Formularul de comentariu nu specifică nici 'previzualizare' nici 'postare'"
 
 #: .\contrib\comments\views\karma.py:21
 msgid "Anonymous users cannot vote"
@@ -1467,12 +1474,12 @@ msgstr "Comentariu cu ID invalid"
 
 #: .\contrib\comments\views\karma.py:27
 msgid "No voting for yourself"
-msgstr "Nu poti vota pentru tine"
+msgstr "Nu poți vota pentru tine"
 
 #: .\contrib\contenttypes\models.py:67
 #, fuzzy
 msgid "python model class name"
-msgstr "nume clasa model python"
+msgstr "nume clasă model python"
 
 #: .\contrib\contenttypes\models.py:71
 msgid "content type"
@@ -1480,11 +1487,11 @@ msgstr "tip conţinut"
 
 #: .\contrib\contenttypes\models.py:72
 msgid "content types"
-msgstr "tipuri conţinute"
+msgstr "tipuri conţinut"
 
 #: .\contrib\flatpages\models.py:9
 msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Exemplu: '/about/contact'. Asiguraţi-vă că aveţi slash-uri la început şi la sfîrşit."
+msgstr "Exemplu: '/despre/contact'. Asiguraţi-vă că aveţi slash-uri la început şi la sfârşit."
 
 #: .\contrib\flatpages\models.py:10
 msgid "title"
@@ -1524,7 +1531,7 @@ msgstr "pagini plate"
 
 #: .\contrib\flatpages\models.py:27
 msgid "Advanced options"
-msgstr "Optiuni avansate"
+msgstr "Opțiuni avansate"
 
 #: .\contrib\humanize\templatetags\humanize.py:19
 msgid "th"
@@ -1577,7 +1584,7 @@ msgstr "trei"
 
 #: .\contrib\humanize\templatetags\humanize.py:73
 msgid "four"
-msgstr "patry"
+msgstr "patru"
 
 #: .\contrib\humanize\templatetags\humanize.py:73
 msgid "five"
@@ -1585,11 +1592,11 @@ msgstr "cinci"
 
 #: .\contrib\humanize\templatetags\humanize.py:73
 msgid "six"
-msgstr "sase"
+msgstr "șase"
 
 #: .\contrib\humanize\templatetags\humanize.py:73
 msgid "seven"
-msgstr "sapte"
+msgstr "șapte"
 
 #: .\contrib\humanize\templatetags\humanize.py:73
 msgid "eight"
@@ -1597,15 +1604,15 @@ msgstr "opt"
 
 #: .\contrib\humanize\templatetags\humanize.py:73
 msgid "nine"
-msgstr "noua"
+msgstr "nouă"
 
 #: .\contrib\humanize\templatetags\humanize.py:93
 msgid "today"
-msgstr "astazi"
+msgstr "astăzi"
 
 #: .\contrib\humanize\templatetags\humanize.py:95
 msgid "tomorrow"
-msgstr "maine"
+msgstr "mâine"
 
 #: .\contrib\humanize\templatetags\humanize.py:97
 msgid "yesterday"
@@ -1613,7 +1620,7 @@ msgstr "ieri"
 
 #: .\contrib\localflavor\ar\forms.py:27
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "Introduceti un cod postal valid de forma NNNN sau ANNNNAAA."
+msgstr "Introduceți un cod poștal valid de forma NNNN sau ANNNNAAA."
 
 #: .\contrib\localflavor\ar\forms.py:49
 #: .\contrib\localflavor\br\forms.py:96
@@ -1621,15 +1628,15 @@ msgstr "Introduceti un cod postal valid de forma NNNN sau ANNNNAAA."
 #: .\contrib\localflavor\pe\forms.py:23
 #: .\contrib\localflavor\pe\forms.py:51
 msgid "This field requires only numbers."
-msgstr "Acest camp accepta doar numere."
+msgstr "Acest câmp acceptă doar numere."
 
 #: .\contrib\localflavor\ar\forms.py:50
 msgid "This field requires 7 or 8 digits."
-msgstr "Acest camp are nevoie de 7 sau 8 cifre."
+msgstr "Acest câmp are nevoie de 7 sau 8 cifre."
 
 #: .\contrib\localflavor\ar\forms.py:79
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Introduceti un CUIT valid de forma XX-XXXXXXXX-X sau XXXXXXXXXXXX."
+msgstr "Introduceți un CUIT valid de forma XX-XXXXXXXX-X sau XXXXXXXXXXXX."
 
 #: .\contrib\localflavor\ar\forms.py:80
 msgid "Invalid CUIT."
@@ -1637,43 +1644,43 @@ msgstr "CUIT invalid."
 
 #: .\contrib\localflavor\au\forms.py:16
 msgid "Enter a 4 digit post code."
-msgstr "Introduceti un cod postal de 4 cifre."
+msgstr "Introduceți un cod poștal de 4 cifre."
 
 #: .\contrib\localflavor\br\forms.py:21
 msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Adaugati un cod postal de forma XXXXX-XXX."
+msgstr "Adăugați un cod poștal de forma XXXXX-XXX."
 
 #: .\contrib\localflavor\br\forms.py:30
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "Numerele de telefon trebuie să fie in format XXX-XXX-XXXX."
+msgstr "Numerele de telefon trebuie să fie în format XXX-XXX-XXXX."
 
 #: .\contrib\localflavor\br\forms.py:58
 msgid "Select a valid brazilian state. That state is not one of the available states."
-msgstr "Selectati un stat brazilian valid. Acest stat nu se afla printre statele disponibile."
+msgstr "Selectați un stat brazilian valid. Acest stat nu se află printre statele disponibile."
 
 #: .\contrib\localflavor\br\forms.py:94
 msgid "Invalid CPF number."
-msgstr "Numar CPF invalid."
+msgstr "Număr CPF invalid."
 
 #: .\contrib\localflavor\br\forms.py:95
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Acest camp are nevoie de cel mult 11 cifre sau 14 caractere."
+msgstr "Acest câmp are nevoie de cel mult 11 cifre sau 14 caractere."
 
 #: .\contrib\localflavor\br\forms.py:134
 msgid "Invalid CNPJ number."
-msgstr "Numar CNPJ invalid."
+msgstr "Număr CNPJ invalid."
 
 #: .\contrib\localflavor\br\forms.py:136
 msgid "This field requires at least 14 digits"
-msgstr "Acest camd are nevoie de cel putin 14 cifre."
+msgstr "Acest câmp are nevoie de cel puțin 14 cifre."
 
 #: .\contrib\localflavor\ca\forms.py:17
 msgid "Enter a postal code in the format XXX XXX."
-msgstr "Introduceti un cod postal de forma XXX XXX."
+msgstr "Introduceți un cod poștal de forma XXX XXX."
 
 #: .\contrib\localflavor\ca\forms.py:88
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "Introduceti un numar canadia de asigurare sociala valid de forma XXX-XXX-XXX."
+msgstr "Introduceți un număr canadian de asigurare socială valid de forma XXX-XXX-XXX."
 
 #: .\contrib\localflavor\ch\ch_states.py:5
 msgid "Aargau"
@@ -1782,19 +1789,19 @@ msgstr "Zurich"
 #: .\contrib\localflavor\ch\forms.py:16
 #: .\contrib\localflavor\no\forms.py:12
 msgid "Enter a zip code in the format XXXX."
-msgstr "Introduceti un cod postal de forma XXXX."
+msgstr "Introduceți un cod poștal de forma XXXX."
 
 #: .\contrib\localflavor\ch\forms.py:64
 msgid "Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format."
-msgstr "Introduceti un numar elvetian de identitate sau pasaport, valid, de forma X1234567<0 sau 1234567890."
+msgstr "Introduceți un număr elvetian de identitate sau pașaport, valid, de forma X1234567<0 sau 1234567890."
 
 #: .\contrib\localflavor\cl\forms.py:29
 msgid "Enter a valid Chilean RUT."
-msgstr "Introduceti RUT chilian valid."
+msgstr "Introduceți RUT chilian valid."
 
 #: .\contrib\localflavor\cl\forms.py:30
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Introduceti un RUT chilian valid. Formatul este XX.XXX.XXX-X."
+msgstr "Introduceți un RUT chilian valid. Formatul este XX.XXX.XXX-X."
 
 #: .\contrib\localflavor\cl\forms.py:31
 msgid "The Chilean RUT is not valid."
@@ -1868,11 +1875,11 @@ msgstr "Turingia"
 #: .\contrib\localflavor\fi\forms.py:12
 #: .\contrib\localflavor\fr\forms.py:15
 msgid "Enter a zip code in the format XXXXX."
-msgstr "Introduceti un cod postal de forma XXXXX."
+msgstr "Introduceți un cod poștal de forma XXXXX."
 
 #: .\contrib\localflavor\de\forms.py:41
 msgid "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format."
-msgstr "Introduceti un numar german de identitate valid, de forma XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
+msgstr "Introduceți un număr german de identitate valid, de forma XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
 
 #: .\contrib\localflavor\es\es_provinces.py:5
 msgid "Arava"
@@ -2115,7 +2122,7 @@ msgstr "Castile-La Mancha"
 
 #: .\contrib\localflavor\es\es_regions.py:13
 msgid "Castile and Leon"
-msgstr "Castilia si Leon"
+msgstr "Castilia și Leon"
 
 #: .\contrib\localflavor\es\es_regions.py:14
 msgid "Catalonia"
@@ -2135,7 +2142,7 @@ msgstr "Regiunea Murcia"
 
 #: .\contrib\localflavor\es\es_regions.py:20
 msgid "Foral Community of Navarre"
-msgstr "Comunitatea Forala Navara"
+msgstr "Comunitatea Forală Navara"
 
 #: .\contrib\localflavor\es\es_regions.py:21
 msgid "Valencian Community"
@@ -2143,11 +2150,11 @@ msgstr "Comunitatea Valencia"
 
 #: .\contrib\localflavor\es\forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Introduceti un cod postal valid in intervalul si de forma 01XXX - 52XXX."
+msgstr "Introduceți un cod poștal valid în intervalul și de forma 01XXX - 52XXX."
 
 #: .\contrib\localflavor\es\forms.py:39
 msgid "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or 9XXXXXXXX."
-msgstr "Introduceti un numa de telefon valid intr-unul dintre formatele 6XXXXXXXX, 8XXXXXXXX sau 9XXXXXXXX."
+msgstr "Introduceți un număr de telefon valid într-unul dintre formatele 6XXXXXXXX, 8XXXXXXXX sau 9XXXXXXXX."
 
 #: .\contrib\localflavor\es\forms.py:66
 msgid "Please enter a valid NIF, NIE, or CIF."
@@ -2155,59 +2162,59 @@ msgstr "Introduceţi vă rog un NIF, NIE sau CIF valid."
 
 #: .\contrib\localflavor\es\forms.py:67
 msgid "Please enter a valid NIF or NIE."
-msgstr "Introduceti va rog un NIF sau NIE valid."
+msgstr "Introduceți vă rog un NIF sau NIE valid."
 
 #: .\contrib\localflavor\es\forms.py:68
 msgid "Invalid checksum for NIF."
-msgstr "Suma de control invalda pentru NIF."
+msgstr "Sumă de control invalidă pentru NIF."
 
 #: .\contrib\localflavor\es\forms.py:69
 msgid "Invalid checksum for NIE."
-msgstr "Suma de control invalida pentru NIE."
+msgstr "Sumă de control invalidă pentru NIE."
 
 #: .\contrib\localflavor\es\forms.py:70
 msgid "Invalid checksum for CIF."
-msgstr "Suma de control invalida pentru CIF."
+msgstr "Sumă de control invalidă pentru CIF."
 
 #: .\contrib\localflavor\es\forms.py:142
 msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr "Introduceti un numar de cont bancar valid de forma XXXX-XXXX-XX-XXXXXXXXXX."
+msgstr "Introduceți un număr de cont bancar valid de forma XXXX-XXXX-XX-XXXXXXXXXX."
 
 #: .\contrib\localflavor\es\forms.py:143
 msgid "Invalid checksum for bank account number."
-msgstr "Suma de control invalida pentru numarul de cont bancar."
+msgstr "Sumă de control invalidă pentru numărul de cont bancar."
 
 #: .\contrib\localflavor\fi\forms.py:28
 msgid "Enter a valid Finnish social security number."
-msgstr "Introduceti un numar finlandez de securitate sociala valid."
+msgstr "Introduceți un număr finlandez de securitate socială valid."
 
 #: .\contrib\localflavor\in_\forms.py:14
 msgid "Enter a zip code in the format XXXXXXX."
-msgstr "Introduceti un cod postal de forma XXXXXXX."
+msgstr "Introduceți un cod poștal de forma XXXXXXX."
 
 #: .\contrib\localflavor\is_\forms.py:17
 msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr "Introduceti un numa islandez de autentificare valid. Formatul este XXXXXX-XXXX."
+msgstr "Introduceți un număr islandez de autentificare valid. Formatul este XXXXXX-XXXX."
 
 #: .\contrib\localflavor\is_\forms.py:18
 msgid "The Icelandic identification number is not valid."
-msgstr "Numarul islandez de identificare nu este valid."
+msgstr "Numărul islandez de identificare nu este valid."
 
 #: .\contrib\localflavor\it\forms.py:14
 msgid "Enter a valid zip code."
-msgstr "Introduceti un cod postal valid."
+msgstr "Introduceți un cod poștal valid."
 
 #: .\contrib\localflavor\it\forms.py:43
 msgid "Enter a valid Social Security number."
-msgstr "Introduceti un numar de securitate sociala valid."
+msgstr "Introduceți un număr de securitate socială valid."
 
 #: .\contrib\localflavor\it\forms.py:68
 msgid "Enter a valid VAT number."
-msgstr "Introduceti un numar VAT valid."
+msgstr "Introduceți un număr TVA valid."
 
 #: .\contrib\localflavor\jp\forms.py:17
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "Introduceti un cod postal de forma XXXXXXX sau XXX-XXXX."
+msgstr "Introduceți un cod poștal de forma XXXXXXX sau XXX-XXXX."
 
 #: .\contrib\localflavor\jp\jp_prefectures.py:4
 msgid "Hokkaido"
@@ -2527,15 +2534,15 @@ msgstr "Zacatecas"
 
 #: .\contrib\localflavor\nl\forms.py:21
 msgid "Enter a valid postal code"
-msgstr "Introduceti un cod postal valid"
+msgstr "Introduceți un cod poștal valid"
 
 #: .\contrib\localflavor\nl\forms.py:52
 msgid "Enter a valid phone number"
-msgstr "Introduceţi un număr îde telefon valid"
+msgstr "Introduceţi un număr de telefon valid"
 
 #: .\contrib\localflavor\nl\forms.py:78
 msgid "Enter a valid SoFi number"
-msgstr "Introduceti un numar SoFi valid"
+msgstr "Introduceți un număr SoFi valid"
 
 #: .\contrib\localflavor\nl\nl_provinces.py:4
 msgid "Drente"
@@ -2587,47 +2594,47 @@ msgstr "Olanda de Sud"
 
 #: .\contrib\localflavor\no\forms.py:33
 msgid "Enter a valid Norwegian social security number."
-msgstr "Introduceti un numar norvegian de securitate sociala valid."
+msgstr "Introduceți un număr norvegian de securitate socială valid."
 
 #: .\contrib\localflavor\pe\forms.py:24
 msgid "This field requires 8 digits."
-msgstr "Acest camp are nevoie de 8 cifre."
+msgstr "Acest câmp are nevoie de 8 cifre."
 
 #: .\contrib\localflavor\pe\forms.py:52
 msgid "This field requires 11 digits."
-msgstr "Acest camp are nevoie de 11 cifre."
+msgstr "Acest câmp are nevoie de 11 cifre."
 
 #: .\contrib\localflavor\pl\forms.py:39
 msgid "National Identification Number consists of 11 digits."
-msgstr "Numarul National de Identificare contine 11 cifre."
+msgstr "Numărul Național de Identificare conține 11 cifre."
 
 #: .\contrib\localflavor\pl\forms.py:40
 msgid "Wrong checksum for the National Identification Number."
-msgstr "Suma de control gresita pentru Numarul National de Identificare."
+msgstr "Sumă de control greșită pentru Numărul Național de Identificare."
 
 #: .\contrib\localflavor\pl\forms.py:72
 msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr "Introduceti un numar de taxa(NIP) de forma XXX-XXX-XX-XX sau XX-XX-XXX-XXX."
+msgstr "Introduceți un număr de taxă(NIP) de forma XXX-XXX-XX-XX sau XX-XX-XXX-XXX."
 
 #: .\contrib\localflavor\pl\forms.py:73
 msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr "Suma de control gresita pentru Numarul de Taxa (NIP)."
+msgstr "Sumă de control greșită pentru Numărul de Taxa (NIP)."
 
 #: .\contrib\localflavor\pl\forms.py:112
 msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr "Numarul National din Registrul pentru Afaceri (REGON) contine 7 sau 9 cifre."
+msgstr "Numărul National din Registrul pentru Afaceri (REGON) contine 7 sau 9 cifre."
 
 #: .\contrib\localflavor\pl\forms.py:113
 msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr "Suma de control gresita pentru Numarul National din Registrul pentru Afaceri (REGON)."
+msgstr "Suma de control gresita pentru Numărul National din Registrul pentru Afaceri (REGON)."
 
 #: .\contrib\localflavor\pl\forms.py:156
 msgid "Enter a postal code in the format XX-XXX."
-msgstr "Introduceti un cod postal de forma XX-XXX."
+msgstr "Introduceți un cod poștal de forma XX-XXX."
 
 #: .\contrib\localflavor\pl\pl_voivodeships.py:8
 msgid "Lower Silesia"
-msgstr "Silezia Inferioara"
+msgstr "Silezia Inferioară"
 
 #: .\contrib\localflavor\pl\pl_voivodeships.py:9
 msgid "Kuyavia-Pomerania"
@@ -2647,7 +2654,7 @@ msgstr "Lodz"
 
 #: .\contrib\localflavor\pl\pl_voivodeships.py:13
 msgid "Lesser Poland"
-msgstr "Polonia Mica"
+msgstr "Polonia Mică"
 
 #: .\contrib\localflavor\pl\pl_voivodeships.py:14
 msgid "Masovia"
@@ -2687,11 +2694,11 @@ msgstr "Polonia Mare"
 
 #: .\contrib\localflavor\pl\pl_voivodeships.py:23
 msgid "West Pomerania"
-msgstr "Pomerania Occidentala"
+msgstr "Pomerania Occidentală"
 
 #: .\contrib\localflavor\sk\forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Introduceti un cod postal de forma XXXXX or XXX XX."
+msgstr "Introduceți un cod poștal de forma XXXXX or XXX XX."
 
 #: .\contrib\localflavor\sk\sk_districts.py:8
 msgid "Banska Bystrica"
@@ -3043,7 +3050,7 @@ msgstr "Regiunea Zilina"
 
 #: .\contrib\localflavor\uk\forms.py:21
 msgid "Enter a valid postcode."
-msgstr "Introduceti un cod postal valid."
+msgstr "Introduceți un cod poștal valid."
 
 #: .\contrib\localflavor\uk\uk_regions.py:11
 msgid "Bedfordshire"
@@ -3059,7 +3066,7 @@ msgstr "Cheshire"
 
 #: .\contrib\localflavor\uk\uk_regions.py:15
 msgid "Cornwall and Isles of Scilly"
-msgstr "Cornwall si Insulele Scilly"
+msgstr "Cornwall și Insulele Scilly"
 
 #: .\contrib\localflavor\uk\uk_regions.py:16
 msgid "Cumbria"
@@ -3179,7 +3186,7 @@ msgstr "Surrey"
 
 #: .\contrib\localflavor\uk\uk_regions.py:45
 msgid "Tyne and Wear"
-msgstr "Tyne si Wear"
+msgstr "Tyne și Wear"
 
 #: .\contrib\localflavor\uk\uk_regions.py:46
 msgid "Warwickshire"
@@ -3271,7 +3278,7 @@ msgstr "Central Scotland"
 
 #: .\contrib\localflavor\uk\uk_regions.py:77
 msgid "Dumfries and Galloway"
-msgstr "Dumfries si Galloway"
+msgstr "Dumfries și Galloway"
 
 #: .\contrib\localflavor\uk\uk_regions.py:78
 msgid "Fife"
@@ -3323,23 +3330,23 @@ msgstr "Scotia"
 
 #: .\contrib\localflavor\uk\uk_regions.py:93
 msgid "Wales"
-msgstr "Tara Galilor"
+msgstr "Țara Galilor"
 
 #: .\contrib\localflavor\us\forms.py:16
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "Introduceti un cod postal de forma XXXXX or XXXXX-XXXX."
+msgstr "Introduceți un cod poștal de forma XXXXX or XXXXX-XXXX."
 
 #: .\contrib\localflavor\us\forms.py:54
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr "Introduceti un numar SUA de Securitate Sociala de forma XXX-XX-XXXX format."
+msgstr "Introduceți un număr SUA de Securitate Sociala de forma XXX-XX-XXXX format."
 
 #: .\contrib\localflavor\za\forms.py:20
 msgid "Enter a valid South African ID number"
-msgstr "Introduceti un ID sud african valid"
+msgstr "Introduceți un ID sud african valid"
 
 #: .\contrib\localflavor\za\forms.py:54
 msgid "Enter a valid South African postal code"
-msgstr "Introduceti un cod postal sud african valid"
+msgstr "Introduceți un cod poștal sud african valid"
 
 #: .\contrib\localflavor\za\za_provinces.py:4
 msgid "Eastern Cape"
@@ -3383,7 +3390,7 @@ msgstr "redirectat de la "
 
 #: .\contrib\redirects\models.py:8
 msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
-msgstr "Aceasta ar trebui să fie o cale absolută, excluzînd numele de domeniu. Exemplu: '/evenimente/cautare/'."
+msgstr "Aceasta ar trebui să fie o cale absolută, excluzând numele de domeniu. Exemplu: '/evenimente/cautare/'."
 
 #: .\contrib\redirects\models.py:9
 msgid "redirect to"
@@ -3391,7 +3398,7 @@ msgstr "redirectat la"
 
 #: .\contrib\redirects\models.py:10
 msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
-msgstr "Aceasta poate fi o cale absolută (ca mai sus) sau un URL începînd cu 'http://'."
+msgstr "Aceasta poate fi o cale absolută (ca mai sus) sau un URL începând cu 'http://'."
 
 #: .\contrib\redirects\models.py:13
 msgid "redirect"
@@ -3443,7 +3450,7 @@ msgstr "Această valoare trebuie să conţină numai litere, numere şi liniuţe
 
 #: .\core\validators.py:76
 msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
-msgstr "Această valoare trebuie să conţină numai litere, numere, liniuţe de subliniere, slash-uri si dash-uri."
+msgstr "Această valoare trebuie să conţină numai litere, numere, liniuţe de subliniere, slash-uri și dash-uri."
 
 #: .\core\validators.py:80
 msgid "This value must contain only letters, numbers, underscores or hyphens."
@@ -3451,11 +3458,11 @@ msgstr "Această valoare trebuie să conţină numai litere, numere, liniuţe de
 
 #: .\core\validators.py:84
 msgid "Uppercase letters are not allowed here."
-msgstr "Literele mari nu sînt permise aici."
+msgstr "Literele mari nu sunt permise aici."
 
 #: .\core\validators.py:88
 msgid "Lowercase letters are not allowed here."
-msgstr "Literele mici nu sînt permise aici."
+msgstr "Literele mici nu sunt permise aici."
 
 #: .\core\validators.py:95
 msgid "Enter only digits separated by commas."
@@ -3471,11 +3478,11 @@ msgstr "Introduceţi vă rog o adresă IP validă."
 
 #: .\core\validators.py:115
 msgid "Empty values are not allowed here."
-msgstr "Valorile vide nu sînt permise aici."
+msgstr "Valorile vide nu sunt permise aici."
 
 #: .\core\validators.py:119
 msgid "Non-numeric characters aren't allowed here."
-msgstr "Caracterele ne-numerice nu sînt permise aici."
+msgstr "Caracterele ne-numerice nu sunt permise aici."
 
 #: .\core\validators.py:123
 msgid "This value can't be comprised solely of digits."
@@ -3488,11 +3495,11 @@ msgstr "Introduceţi un număr întreg."
 
 #: .\core\validators.py:132
 msgid "Only alphabetical characters are allowed here."
-msgstr "Numai caractere alfabetice sînt permise aici."
+msgstr "Numai caractere alfabetice sunt permise aici."
 
 #: .\core\validators.py:147
 msgid "Year must be 1900 or later."
-msgstr "Anul trebuie sa fie 1900 sau posterior."
+msgstr "Anul trebuie să fie 1900 sau posterior."
 
 #: .\core\validators.py:151
 #, python-format
@@ -3502,7 +3509,7 @@ msgstr "Data invalida: %s"
 #: .\core\validators.py:156
 #: .\db\models\fields\__init__.py:527
 msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Introduceţi o dată validă in format: AAAA-LL-ZZ."
+msgstr "Introduceţi o dată validă în format: AAAA-LL-ZZ."
 
 #: .\core\validators.py:161
 msgid "Enter a valid time in HH:MM format."
@@ -3537,7 +3544,7 @@ msgstr "URL-ul %s nu pointează către o imagine validă."
 #: .\core\validators.py:204
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "Numerele de telefon trebuie să fie in format XXX-XXX-XXXX. \"%s\" e invalid."
+msgstr "Numerele de telefon trebuie să fie în format XXX-XXX-XXXX. \"%s\" e invalid."
 
 #: .\core\validators.py:212
 #, python-format
@@ -3554,7 +3561,7 @@ msgid ""
 "Valid HTML is required. Specific errors are:\n"
 "%s"
 msgstr ""
-"E necesar cod HTML valid. Erorile specifice sînt:\n"
+"E necesar cod HTML valid. Erorile specifice sunt:\n"
 "%s"
 
 #: .\core\validators.py:237
@@ -3581,46 +3588,46 @@ msgstr "Introduceţi o abreviere validă în U.S."
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Îngrijiţi-vă limbajul! Cuvîntul %s nu este permis aici."
-msgstr[1] "Îngrijiţi-vă limbajul! Cuvintele %s nu sînt permise aici."
+msgstr[0] "Îngrijiţi-vă limbajul! Cuvântul %s nu este permis aici."
+msgstr[1] "Îngrijiţi-vă limbajul! Cuvintele %s nu sunt permise aici."
 
 #: .\core\validators.py:288
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr "Acest camp trebuie sa fie identic cu '%s'."
+msgstr "Acest câmp trebuie să fie identic cu '%s'."
 
 #: .\core\validators.py:307
 msgid "Please enter something for at least one field."
-msgstr "Va rog completati cel putin un camp."
+msgstr "Vă rog completați cel puțin un câmp."
 
 #: .\core\validators.py:316
 #: .\core\validators.py:327
 msgid "Please enter both fields or leave them both empty."
-msgstr "Vă rog comletaţi ambele cîmpuri sau lăsaţi-le goale pe ambele."
+msgstr "Vă rog completaţi ambele câmpuri sau lăsaţi-le goale pe ambele."
 
 #: .\core\validators.py:335
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Acest cîmp e necesar dacă %(field)s este %(value)s"
+msgstr "Acest câmp e necesar dacă %(field)s este %(value)s"
 
 #: .\core\validators.py:348
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Acest cîmp e necesar dacă %(field)s nu este %(value)s"
+msgstr "Acest câmp e necesar dacă %(field)s nu este %(value)s"
 
 #: .\core\validators.py:367
 msgid "Duplicate values are not allowed."
-msgstr "Valorile duplicate nu sînt permise."
+msgstr "Valorile duplicate nu sunt permise."
 
 #: .\core\validators.py:382
 #, python-format
 msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Aceasta valoare trebuie sa fie cuprinsa intre %(lower)s si %(upper)s."
+msgstr "Această valoare trebuie să fie cuprinsa între %(lower)s și %(upper)s."
 
 #: .\core\validators.py:384
 #, python-format
 msgid "This value must be at least %s."
-msgstr "Această valoare trebuie să fie cel putin %s."
+msgstr "Această valoare trebuie să fie cel puțin %s."
 
 #: .\core\validators.py:386
 #, python-format
@@ -3647,8 +3654,8 @@ msgstr[1] "Vă rog introduceţi un număr zecimal valid cu cel mult %s cifre."
 #, python-format
 msgid "Please enter a valid decimal number with a whole part of at most %s digit."
 msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "Vă rog introduceţi un număr zecimal valid cu partea intreaga cel mult %s cifră."
-msgstr[1] "Vă rog introduceţi un număr zecimal valid cu partea intreaga cel mult %s cifre."
+msgstr[0] "Vă rog introduceţi un număr zecimal valid cu partea întreagă de cel mult %s cifră."
+msgstr[1] "Vă rog introduceţi un număr zecimal valid cu partea întreagă de cel mult %s cifre."
 
 #: .\core\validators.py:450
 #, python-format
@@ -3659,12 +3666,12 @@ msgstr[1] "Vă rog introduceţi un număr zecimal valid cu cel mult %s zecimale.
 
 #: .\core\validators.py:458
 msgid "Please enter a valid floating point number."
-msgstr "Vă rog introduceţi un număr cu virgula valid."
+msgstr "Vă rog introduceţi un număr cu virgulă valid."
 
 #: .\core\validators.py:467
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Asigură-te că fişierul încărcact are cel puţin %s octeţi."
+msgstr "Asigură-te că fişierul încărcat are cel puţin %s octeţi."
 
 #: .\core\validators.py:468
 #, python-format
@@ -3673,11 +3680,11 @@ msgstr "Asigură-te că fişierul încărcact are cel mult %s octeţi."
 
 #: .\core\validators.py:485
 msgid "The format for this field is wrong."
-msgstr "Formatul acestui cîmp este invalid."
+msgstr "Formatul acestui câmp este invalid."
 
 #: .\core\validators.py:500
 msgid "This field is invalid."
-msgstr "Cîmpul este invalid."
+msgstr "Câmpul este invalid."
 
 #: .\core\validators.py:536
 #, python-format
@@ -3697,12 +3704,12 @@ msgstr "Te rog închide tagurile %(tag)s din linia %(line)s. ( Linia începe cu 
 #: .\core\validators.py:576
 #, python-format
 msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
-msgstr "Textul începînd cu linia %(line)s nu e permis în acest context. (Linia începînd cu \"%(start)s\".)"
+msgstr "Textul începând cu linia %(line)s nu e permis în acest context. (Linia începând cu \"%(start)s\".)"
 
 #: .\core\validators.py:581
 #, python-format
 msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
-msgstr "\"%(attr)s\" în linia %(line)s e un atribut invalid. (Linia începînd cu \"%(start)s\".)"
+msgstr "\"%(attr)s\" în linia %(line)s e un atribut invalid. (Linia începând cu \"%(start)s\".)"
 
 #: .\core\validators.py:586
 #, python-format
@@ -3722,12 +3729,12 @@ msgstr "Atributul \"%(attr)s\" din linia %(line)s are o valoare invalidă. ( Lin
 #: .\db\models\manipulators.py:308
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s de acest tip %(type)s exista deja pentru %(field)s dat."
+msgstr "%(object)s de acest tip %(type)s există deja pentru %(field)s dat."
 
 #: .\db\models\fields\__init__.py:52
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s cu acest %(fieldname)s exista deja."
+msgstr "%(optname)s cu acest %(fieldname)s există deja."
 
 #: .\db\models\fields\__init__.py:161
 #: .\db\models\fields\__init__.py:327
@@ -3736,36 +3743,36 @@ msgstr "%(optname)s cu acest %(fieldname)s exista deja."
 #: .\newforms\fields.py:46
 #: .\oldforms\__init__.py:374
 msgid "This field is required."
-msgstr "Campul acesta trebuie completat obligatoriu."
+msgstr "Acest câmp este obligatoriu."
 
 #: .\db\models\fields\__init__.py:427
 msgid "This value must be an integer."
-msgstr "Această valoare trebuie să fie un numar intreg"
+msgstr "Această valoare trebuie să fie un număr intreg."
 
 #: .\db\models\fields\__init__.py:466
 msgid "This value must be either True or False."
-msgstr "Această valoare trebuie să fie ori falsa ori adevarata"
+msgstr "Această valoare trebuie să fie ori falsă ori adevarată."
 
 #: .\db\models\fields\__init__.py:490
 msgid "This field cannot be null."
-msgstr "Cîmpul nu poate fi gol"
+msgstr "Câmpul nu poate fi gol"
 
 #: .\db\models\fields\__init__.py:668
 msgid "This value must be a decimal number."
-msgstr "Această valoare trebuie să fie un numar zecimal."
+msgstr "Această valoare trebuie să fie un număr zecimal."
 
 #: .\db\models\fields\__init__.py:779
 msgid "Enter a valid filename."
-msgstr "Introduceti un nume de fisier valid."
+msgstr "Introduceți un nume de fișier valid."
 
 #: .\db\models\fields\__init__.py:960
 msgid "This value must be either None, True or False."
-msgstr "Această valoare trebuie să fie falsa, adevarata sau nici una."
+msgstr "Această valoare trebuie să fie falsă, adevarată sau nici una."
 
 #: .\db\models\fields\related.py:93
 #, python-format
 msgid "Please enter a valid %s."
-msgstr "Introduceti va rog un %s valid."
+msgstr "Introduceți vă rog un %s valid."
 
 #: .\db\models\fields\related.py:701
 msgid "Separate multiple IDs with commas."
@@ -3773,42 +3780,42 @@ msgstr "Separă ID-urile multiple cu virgulă."
 
 #: .\db\models\fields\related.py:703
 msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr " Ţine apăsat \"Control\", sau \"Command\" pe un Mac, pentru a selectie multipla."
+msgstr " Ţine apăsat \"Control\", sau \"Command\" pe un Mac, pentru selecție multiplă."
 
 #: .\db\models\fields\related.py:750
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "Introduceti un ID valid pentru %(self)s. Valoarea %(value)r nu este valida."
-msgstr[1] "Introduceti ID-uri valide pentru %(self)s. Valorile %(value)r nu sunt valide."
+msgstr[0] "Introduceți un ID valid pentru %(self)s. Valoarea %(value)r nu este validă."
+msgstr[1] "Introduceți ID-uri valide pentru %(self)s. Valorile %(value)r nu sunt valide."
 
 #: .\newforms\fields.py:47
 msgid "Enter a valid value."
-msgstr "Introduceti o valoare valida."
+msgstr "Introduceți o valoare validă."
 
 #: .\newforms\fields.py:124
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr "Asigurati-va ca aceasta valoare are cel mult %(max)d caractere (are %(length)d)."
+msgstr "Asigurați-vă că această valoare are cel mult %(max)d caractere (are %(length)d)."
 
 #: .\newforms\fields.py:125
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr "Asigurati-va ca aceasta valoare are cel putin %(min)d caractere (are %(length)d)."
+msgstr "Asigurați-vă că această valoare are cel puțin %(min)d caractere (are %(length)d)."
 
 #: .\newforms\fields.py:153
 #: .\newforms\fields.py:182
 #: .\newforms\fields.py:211
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
-msgstr "Asigurati-va ca aceasta valoare este mai mica sau egala cu %s."
+msgstr "Asigurați-vă că această valoare este mai mică sau egală cu %s."
 
 #: .\newforms\fields.py:154
 #: .\newforms\fields.py:183
 #: .\newforms\fields.py:212
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
-msgstr "Asigurati-va ca aceasta valoare este mai mare sau egala cu %s."
+msgstr "Asigurați-vă că aceasta valoare este mai mare sau egală cu %s."
 
 #: .\newforms\fields.py:181
 #: .\newforms\fields.py:210
@@ -3818,44 +3825,44 @@ msgstr "Introduceţi un număr."
 #: .\newforms\fields.py:213
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
-msgstr "Asigurati-va ca nu exista mai mult de %s cifre in total."
+msgstr "Asigurați-vă că nu exista mai mult de %s cifre în total."
 
 #: .\newforms\fields.py:214
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
-msgstr "Asigurati-va ca nu exista mai mult de %s spatii zecimale."
+msgstr "Asigurați-vă că nu exista mai mult de %s spații zecimale."
 
 #: .\newforms\fields.py:215
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr "Asigurati-va ca nu exista mai mult de %s cifre inainte de virgula."
+msgstr "Asigurați-vă că nu exista mai mult de %s cifre înainte de virgulă."
 
 #: .\newforms\fields.py:263
 #: .\newforms\fields.py:751
 msgid "Enter a valid date."
-msgstr "Introduceti o data valida."
+msgstr "Introduceți o dată validă."
 
 #: .\newforms\fields.py:296
 #: .\newforms\fields.py:752
 msgid "Enter a valid time."
-msgstr "Introduceti o ora valida."
+msgstr "Introduceți o oră validă."
 
 #: .\newforms\fields.py:335
 msgid "Enter a valid date/time."
-msgstr "Introduceti o data/ora valida."
+msgstr "Introduceți o dată/oră validă."
 
 #: .\newforms\fields.py:434
 msgid "No file was submitted."
-msgstr "Nici un fisier nu a fost trimis."
+msgstr "Nici un fișier nu a fost trimis."
 
 #: .\newforms\fields.py:435
 #: .\oldforms\__init__.py:689
 msgid "The submitted file is empty."
-msgstr "Fisierul uploadat este gol"
+msgstr "Fișierul uploadat este gol"
 
 #: .\newforms\fields.py:497
 msgid "Enter a valid URL."
-msgstr "Introduceti un URL valid."
+msgstr "Introduceți un URL valid."
 
 #: .\newforms\fields.py:498
 msgid "This URL appears to be a broken link."
@@ -3864,49 +3871,49 @@ msgstr "URL-ul e invalid."
 #: .\newforms\fields.py:560
 #: .\newforms\models.py:299
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Selectati o optiune valida. Aceasta optiune nu face parte din optiunile disponibile."
+msgstr "Selectați o opțiune validă. Această opțiune nu face parte din opțiunile disponibile."
 
 #: .\newforms\fields.py:599
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Selectati o optiune valida. %(value)s nu face parte din optiunile disponibile."
+msgstr "Selectați o opțiune validă. %(value)s nu face parte din opțiunile disponibile."
 
 #: .\newforms\fields.py:600
 #: .\newforms\fields.py:662
 #: .\newforms\models.py:371
 msgid "Enter a list of values."
-msgstr "Introduceti o lista de valori."
+msgstr "Introduceți o listă de valori."
 
 #: .\newforms\fields.py:780
 msgid "Enter a valid IPv4 address."
-msgstr "Introduceţi o adresă IPv4 valida."
+msgstr "Introduceţi o adresă IPv4 validă."
 
 #: .\newforms\models.py:372
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Selectati o optiune valida. %s nu face parte din optiunile disponibile."
+msgstr "Selectați o opțiune validă. %s nu face parte din opțiunile disponibile."
 
 #: .\oldforms\__init__.py:409
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Asigurati-va ca textul dumneavoastra are mai putin de %s caracter."
-msgstr[1] "Asigurati-va ca textul dumneavoastra are mai putin de %s caractere."
+msgstr[0] "Asigurați-va că textul dumneavoastră are mai puțin de %s caracter."
+msgstr[1] "Asigurați-va că textul dumneavoastră are mai puțin de %s caractere."
 
 #: .\oldforms\__init__.py:414
 msgid "Line breaks are not allowed here."
-msgstr "Randurile noi nu sînt permise aici."
+msgstr "Randurile noi nu sunt permise aici."
 
 #: .\oldforms\__init__.py:512
 #: .\oldforms\__init__.py:586
 #: .\oldforms\__init__.py:625
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Selectati o optiune valida. '%(data)s' nu face parte din %(choices)s."
+msgstr "Selectați o opțiune validă. '%(data)s' nu face parte din %(choices)s."
 
 #: .\oldforms\__init__.py:745
 msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Introduceţi un număr întreg cu valoare intre -32,768 si 32,767."
+msgstr "Introduceţi un număr întreg cu valoare intre -32,768 și 32,767."
 
 #: .\oldforms\__init__.py:755
 msgid "Enter a positive number."
@@ -3914,7 +3921,7 @@ msgstr "Introduceţi un număr pozitiv."
 
 #: .\oldforms\__init__.py:765
 msgid "Enter a whole number between 0 and 32,767."
-msgstr "Introduceţi un număr întreg cu valoare intre 0 si 32,767."
+msgstr "Introduceţi un număr întreg cu valoare intre 0 și 32,767."
 
 #: .\template\defaultfilters.py:698
 msgid "yes,no,maybe"
@@ -3960,11 +3967,11 @@ msgstr "AM"
 
 #: .\utils\dateformat.py:97
 msgid "midnight"
-msgstr "miezul noptii"
+msgstr "miezul nopții"
 
 #: .\utils\dateformat.py:99
 msgid "noon"
-msgstr "amiaza"
+msgstr "amiază"
 
 #: .\utils\dates.py:6
 msgid "Monday"
@@ -3988,7 +3995,7 @@ msgstr "Vineri"
 
 #: .\utils\dates.py:7
 msgid "Saturday"
-msgstr "Sîmbătă"
+msgstr "Sâmbătă"
 
 #: .\utils\dates.py:7
 msgid "Sunday"
@@ -4016,7 +4023,7 @@ msgstr "Vin"
 
 #: .\utils\dates.py:11
 msgid "Sat"
-msgstr "Sam"
+msgstr "Sâm"
 
 #: .\utils\dates.py:11
 msgid "Sun"
@@ -4164,14 +4171,14 @@ msgstr[1] "ani"
 #: .\utils\timesince.py:22
 msgid "month"
 msgid_plural "months"
-msgstr[0] "luna"
+msgstr[0] "lună"
 msgstr[1] "luni"
 
 #: .\utils\timesince.py:23
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] "saptamana"
-msgstr[1] "saptamani"
+msgstr[0] "săptămână"
+msgstr[1] "săptămâni"
 
 #: .\utils\timesince.py:24
 msgid "day"
@@ -4182,7 +4189,7 @@ msgstr[1] "zile"
 #: .\utils\timesince.py:25
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] "ora"
+msgstr[0] "oră"
 msgstr[1] "ore"
 
 #: .\utils\timesince.py:26
@@ -4238,7 +4245,7 @@ msgstr "%(verbose_name)s a fost actualizat cu succes."
 #: .\views\generic\create_update.py:184
 #, python-format
 msgid "The %(verbose_name)s was deleted."
-msgstr "%(verbose_name)s a fost sters."
+msgstr "%(verbose_name)s a fost șters."
 
 #~ msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
 #~ msgstr "Ai <a href=\"/password_reset/\">uitat parola</a>?"
