@@ -597,7 +597,7 @@ msgstr "Historikk"
 #: contrib/admin/templates/admin/edit_inline/stacked.html:13
 #: contrib/admin/templates/admin/edit_inline/tabular.html:27
 msgid "View on site"
-msgstr "Vis på nettside"
+msgstr "Vis på nettsted"
 
 #: contrib/admin/templates/admin/change_form.html:38
 #: contrib/admin/templates/admin/change_list.html:54
@@ -992,7 +992,7 @@ msgstr "Velg %s du ønsker å redigere"
 
 #: contrib/admin/views/template.py:37 contrib/sites/models.py:38
 msgid "site"
-msgstr "nettside"
+msgstr "nettsted"
 
 #: contrib/admin/views/template.py:39
 msgid "template"
@@ -3861,7 +3861,7 @@ msgstr "visningsnavn"
 
 #: contrib/sites/models.py:39
 msgid "sites"
-msgstr "nettsider"
+msgstr "nettsteder"
 
 #: db/models/fields/__init__.py:356 db/models/fields/__init__.py:710
 msgid "This value must be an integer."
