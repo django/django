@@ -12,6 +12,7 @@ class ModelBackend(object):
     Authenticates against django.contrib.auth.models.User.
     """
     supports_object_permissions = False
+    supports_anonymous_user = True
 
     # TODO: Model, login attribute name and password attribute name should be
     # configurable.
@@ -58,6 +59,8 @@ class ModelBackend(object):
         return user_obj._group_perm_cache
 
     def get_all_permissions(self, user_obj):
+        if user_obj.is_anonymous():
+            return set()
         if not hasattr(user_obj, '_perm_cache'):
             user_obj._perm_cache = set([u"%s.%s" % (p.content_type.app_label, p.codename) for p in user_obj.user_permissions.select_related()])
             user_obj._perm_cache.update(self.get_group_permissions(user_obj))

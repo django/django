@@ -13,9 +13,9 @@ their deprecation, as per the :ref:`Django deprecation policy
           hooking up admin URLs.  This has been deprecated since the 1.1
           release.
 
-        * Authentication backends need to define the boolean attribute
-          ``supports_object_permissions``. The old backend style is deprecated
-          since the 1.2 release.
+        * Authentication backends need to define the boolean attributes
+          ``supports_object_permissions`` and ``supports_anonymous_user``.
+          The old backend style is deprecated since the 1.2 release.
 
     * 1.4
         * ``CsrfResponseMiddleware``.  This has been deprecated since the 1.2
@@ -55,6 +55,11 @@ their deprecation, as per the :ref:`Django deprecation policy
         * Authentication backends need to support the ``obj`` parameter for
           permission checking. The ``supports_object_permissions`` variable
           is not checked any longer and can be removed.
+
+        * Authentication backends need to support the ``AnonymousUser``
+          being passed to all methods dealing with permissions.
+          The ``supports_anonymous_user`` variable is not checked any
+          longer and can be removed.
 
         * The ability to specify a callable template loader rather than a
           ``Loader`` class will be removed, as will the ``load_template_source``

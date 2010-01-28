@@ -1559,6 +1559,38 @@ the ``auth_permission`` table most of the time.
 
 .. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
 
+Authorization for anonymous users
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionchanged:: 1.2
+
+An anonymous user is one that is not authenticated i.e. they have provided no
+valid authentication details. However, that does not necessarily mean they are
+not authorized to do anything. At the most basic level, most Web sites
+authorize anonymous users to browse most of the site, and many allow anonymous
+posting of comments etc.
+
+Django's permission framework does not have a place to store permissions for
+anonymous users. However, it has a foundation that allows custom authentication
+backends to specify authorization for anonymous users. This is especially useful
+for the authors of re-usable apps, who can delegate all questions of authorization
+to the auth backend, rather than needing settings, for example, to control
+anonymous access.
+
+To enable this in your own backend, you must set the class attribute
+``supports_anonymous_user`` to ``True``. (This precaution is to maintain
+compatibility with backends that assume that all user objects are actual
+instances of the :class:`django.contrib.auth.models.User` class). With this
+in place, :class:`django.contrib.auth.models.AnonymousUser` will delegate all
+the relevant permission methods to the authentication backends.
+
+A nonexistent ``supports_anonymous_user`` attribute will raise a hidden
+``PendingDeprecationWarning`` if used in Django 1.2. In Django 1.3, this
+warning will be upgraded to a ``DeprecationWarning``, which will be displayed
+loudly. Additionally ``supports_anonymous_user`` will be set to ``False``.
+Django 1.4 will assume that every backend supports anonymous users being
+passed to the authorization methods.
+
 Handling object permissions
 ---------------------------
 

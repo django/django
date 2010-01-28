@@ -26,6 +26,12 @@ def load_backend(path):
         warn("Authentication backends without a `supports_object_permissions` attribute are deprecated. Please define it in %s." % cls,
              PendingDeprecationWarning)
         cls.supports_object_permissions = False
+    try:
+        getattr(cls, 'supports_anonymous_user')
+    except AttributeError:
+        warn("Authentication backends without a `supports_anonymous_user` attribute are deprecated. Please define it in %s." % cls,
+             PendingDeprecationWarning)
+        cls.supports_anonymous_user = False
     return cls()
 
 def get_backends():

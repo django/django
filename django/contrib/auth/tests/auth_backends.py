@@ -88,14 +88,15 @@ class BackendTest(TestCase):
         self.assertEqual(user.get_all_permissions(), set(['auth.test']))
 
 
-
-
 class TestObj(object):
     pass
 
 
 class SimpleRowlevelBackend(object):
     supports_object_permissions = True
+
+    # This class also supports tests for anonymous user permissions,
+    # via subclasses which just set the 'supports_anonymous_user' attribute.
 
     def has_perm(self, user, perm, obj=None):
         if not obj:
@@ -104,9 +105,13 @@ class SimpleRowlevelBackend(object):
         if isinstance(obj, TestObj):
             if user.username == 'test2':
                 return True
-            elif isinstance(user, AnonymousUser) and perm == 'anon':
+            elif user.is_anonymous() and perm == 'anon':
+                # not reached due to supports_anonymous_user = False
                 return True
         return False
+
+    def has_module_perms(self, user, app_label):
+        return app_label == "app1"
 
     def get_all_permissions(self, user, obj=None):
         if not obj:
@@ -115,6 +120,8 @@ class SimpleRowlevelBackend(object):
         if not isinstance(obj, TestObj):
             return ['none']
 
+        if user.is_anonymous():
+            return ['anon']
         if user.username == 'test2':
             return ['simple', 'advanced']
         else:
@@ -134,7 +141,9 @@ class SimpleRowlevelBackend(object):
 
 
 class RowlevelBackendTest(TestCase):
-
+    """
+    Tests for auth backend that supports object level permissions
+    """
     backend = 'django.contrib.auth.tests.auth_backends.SimpleRowlevelBackend'
 
     def setUp(self):
@@ -142,8 +151,7 @@ class RowlevelBackendTest(TestCase):
         settings.AUTHENTICATION_BACKENDS = self.curr_auth + (self.backend,)
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.user2 = User.objects.create_user('test2', 'test2@example.com', 'test')
-        self.user3 = AnonymousUser()
-        self.user4 = User.objects.create_user('test4', 'test4@example.com', 'test')
+        self.user3 = User.objects.create_user('test3', 'test3@example.com', 'test')
 
     def tearDown(self):
         settings.AUTHENTICATION_BACKENDS = self.curr_auth
@@ -165,5 +173,75 @@ class RowlevelBackendTest(TestCase):
     def test_get_group_permissions(self):
         content_type=ContentType.objects.get_for_model(Group)
         group = Group.objects.create(name='test_group')
-        self.user4.groups.add(group)
-        self.assertEqual(self.user4.get_group_permissions(TestObj()), set(['group_perm']))
+        self.user3.groups.add(group)
+        self.assertEqual(self.user3.get_group_permissions(TestObj()), set(['group_perm']))
+
+
+class AnonymousUserBackend(SimpleRowlevelBackend):
+
+    supports_anonymous_user = True
+
+
+class NoAnonymousUserBackend(SimpleRowlevelBackend):
+
+    supports_anonymous_user = False
+
+
+class AnonymousUserBackendTest(TestCase):
+    """
+    Tests for AnonymousUser delegating to backend if it has 'supports_anonymous_user' = True
+    """
+
+    backend = 'django.contrib.auth.tests.auth_backends.AnonymousUserBackend'
+
+    def setUp(self):
+        self.curr_auth = settings.AUTHENTICATION_BACKENDS
+        settings.AUTHENTICATION_BACKENDS = (self.backend,)
+        self.user1 = AnonymousUser()
+
+    def tearDown(self):
+        settings.AUTHENTICATION_BACKENDS = self.curr_auth
+
+    def test_has_perm(self):
+        self.assertEqual(self.user1.has_perm('perm', TestObj()), False)
+        self.assertEqual(self.user1.has_perm('anon', TestObj()), True)
+
+    def test_has_perms(self):
+        self.assertEqual(self.user1.has_perms(['anon'], TestObj()), True)
+        self.assertEqual(self.user1.has_perms(['anon', 'perm'], TestObj()), False)
+
+    def test_has_module_perms(self):
+        self.assertEqual(self.user1.has_module_perms("app1"), True)
+        self.assertEqual(self.user1.has_module_perms("app2"), False)
+
+    def test_get_all_permissions(self):
+        self.assertEqual(self.user1.get_all_permissions(TestObj()), set(['anon']))
+
+
+class NoAnonymousUserBackendTest(TestCase):
+    """
+    Tests that AnonymousUser does not delegate to backend if it has 'supports_anonymous_user' = False
+    """
+    backend = 'django.contrib.auth.tests.auth_backends.NoAnonymousUserBackend'
+
+    def setUp(self):
+        self.curr_auth = settings.AUTHENTICATION_BACKENDS
+        settings.AUTHENTICATION_BACKENDS = self.curr_auth + (self.backend,)
+        self.user1 = AnonymousUser()
+
+    def tearDown(self):
+        settings.AUTHENTICATION_BACKENDS = self.curr_auth
+
+    def test_has_perm(self):
+        self.assertEqual(self.user1.has_perm('perm', TestObj()), False)
+        self.assertEqual(self.user1.has_perm('anon', TestObj()), False)
+
+    def test_has_perms(self):
+        self.assertEqual(self.user1.has_perms(['anon'], TestObj()), False)
+
+    def test_has_module_perms(self):
+        self.assertEqual(self.user1.has_module_perms("app1"), False)
+        self.assertEqual(self.user1.has_module_perms("app2"), False)
+
+    def test_get_all_permissions(self):
+        self.assertEqual(self.user1.get_all_permissions(TestObj()), set())

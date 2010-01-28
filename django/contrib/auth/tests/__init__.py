@@ -4,7 +4,7 @@ from django.contrib.auth.tests.views \
 from django.contrib.auth.tests.forms import FORM_TESTS
 from django.contrib.auth.tests.remote_user \
         import RemoteUserTest, RemoteUserNoCreateTest, RemoteUserCustomTest
-from django.contrib.auth.tests.auth_backends import BackendTest, RowlevelBackendTest
+from django.contrib.auth.tests.auth_backends import BackendTest, RowlevelBackendTest, AnonymousUserBackendTest, NoAnonymousUserBackendTest
 from django.contrib.auth.tests.tokens import TOKEN_GENERATOR_TESTS
 
 # The password for the fixture data users is 'password'

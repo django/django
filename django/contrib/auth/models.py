@@ -128,6 +128,49 @@ class UserManager(models.Manager):
         from random import choice
         return ''.join([choice(allowed_chars) for i in range(length)])
 
+
+# A few helper functions for common logic between User and AnonymousUser.
+def _user_get_all_permissions(user, obj):
+    permissions = set()
+    anon = user.is_anonymous()
+    for backend in auth.get_backends():
+        if not anon or backend.supports_anonymous_user:
+            if hasattr(backend, "get_all_permissions"):
+                if obj is not None:
+                    if backend.supports_object_permissions:
+                        permissions.update(
+                            backend.get_all_permissions(user, obj)
+                        )
+                else:
+                    permissions.update(backend.get_all_permissions(user))
+    return permissions
+
+
+def _user_has_perm(user, perm, obj):
+    anon = user.is_anonymous()
+    for backend in auth.get_backends():
+        if not anon or backend.supports_anonymous_user:
+            if hasattr(backend, "has_perm"):
+                if obj is not None:
+                    if (backend.supports_object_permissions and
+                        backend.has_perm(user, perm, obj)):
+                            return True
+                else:
+                    if backend.has_perm(user, perm):
+                        return True
+    return False
+
+
+def _user_has_module_perms(user, app_label):
+    anon = user.is_anonymous()
+    for backend in auth.get_backends():
+        if not anon or backend.supports_anonymous_user:
+            if hasattr(backend, "has_module_perms"):
+                if backend.has_module_perms(user, app_label):
+                    return True
+    return False
+
+
 class User(models.Model):
     """
     Users within the Django authentication system are represented by this model.
@@ -228,17 +271,7 @@ class User(models.Model):
         return permissions
 
     def get_all_permissions(self, obj=None):
-        permissions = set()
-        for backend in auth.get_backends():
-            if hasattr(backend, "get_all_permissions"):
-                if obj is not None:
-                    if backend.supports_object_permissions:
-                        permissions.update(
-                            backend.get_all_permissions(self, obj)
-                        )
-                else:
-                    permissions.update(backend.get_all_permissions(self))
-        return permissions
+        return _user_get_all_permissions(self, obj)
 
     def has_perm(self, perm, obj=None):
         """
@@ -257,16 +290,7 @@ class User(models.Model):
             return True
 
         # Otherwise we need to check the backends.
-        for backend in auth.get_backends():
-            if hasattr(backend, "has_perm"):
-                if obj is not None:
-                    if (backend.supports_object_permissions and
-                        backend.has_perm(self, perm, obj)):
-                            return True
-                else:
-                    if backend.has_perm(self, perm):
-                        return True
-        return False
+        return _user_has_perm(self, perm, obj)
 
     def has_perms(self, perm_list, obj=None):
         """
@@ -290,11 +314,7 @@ class User(models.Model):
         if self.is_superuser:
             return True
 
-        for backend in auth.get_backends():
-            if hasattr(backend, "has_module_perms"):
-                if backend.has_module_perms(self, app_label):
-                    return True
-        return False
+        return _user_has_module_perms(self, app_label)
 
     def get_and_delete_messages(self):
         messages = []
@@ -396,14 +416,23 @@ class AnonymousUser(object):
         return self._user_permissions
     user_permissions = property(_get_user_permissions)
 
+    def get_group_permissions(self, obj=None):
+        return set()
+
+    def get_all_permissions(self, obj=None):
+        return _user_get_all_permissions(self, obj=obj)
+
     def has_perm(self, perm, obj=None):
-        return False
+        return _user_has_perm(self, perm, obj=obj)
 
     def has_perms(self, perm_list, obj=None):
-        return False
+        for perm in perm_list:
+            if not self.has_perm(perm, obj):
+                return False
+        return True
 
     def has_module_perms(self, module):
-        return False
+        return _user_has_module_perms(self, module)
 
     def get_and_delete_messages(self):
         return []

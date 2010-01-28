@@ -558,3 +558,13 @@ Although there is no implementation of this in core, a custom authentication
 backend can provide this implementation and it will be used by
 :class:`django.contrib.auth.models.User`. See the :ref:`authentication docs 
 <topics-auth>` for more information.
+
+Permissions for anonymous users
+-------------------------------
+
+If you provide a custom auth backend with ``supports_anonymous_user`` set to
+``True``, AnonymousUser will check the backend for permissions, just like
+User already did.  This is useful for centralizing permission handling - apps
+can always delegate the question of whether something is allowed or not to
+the authorization/authentication backend. See the :ref:`authentication
+docs <topics-auth>` for more details.
