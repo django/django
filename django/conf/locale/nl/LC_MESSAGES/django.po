@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-08 15:34+0200\n"
+"POT-Creation-Date: 2009-08-08 09:21+0200\n"
 "PO-Revision-Date: 2008-08-28 13:58+0100\n"
 "Last-Translator: Rudolph Froger <rudolphfroger@estrate.nl>\n"
 "Language-Team: \n"
@@ -224,7 +224,7 @@ msgstr "Traditioneel Chinees"
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s succesvol verwijderd."
 
-#: contrib/admin/actions.py:67 contrib/admin/options.py:1025
+#: contrib/admin/actions.py:67 contrib/admin/options.py:1027
 msgid "Are you sure?"
 msgstr "Weet u het zeker?"
 
@@ -322,7 +322,7 @@ msgstr "%s gewijzigd."
 
 #: contrib/admin/options.py:519 contrib/admin/options.py:529
 #: contrib/comments/templates/comments/preview.html:16 forms/models.py:388
-#: forms/models.py:587
+#: forms/models.py:600
 msgid "and"
 msgstr "en"
 
@@ -345,69 +345,69 @@ msgstr "%(name)s \"%(object)s\" verwijderd."
 msgid "No fields changed."
 msgstr "Geen velden gewijzigd."
 
-#: contrib/admin/options.py:598 contrib/auth/admin.py:67
+#: contrib/admin/options.py:599 contrib/auth/admin.py:67
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "De %(name)s \"%(obj)s\" is toegevoegd."
 
-#: contrib/admin/options.py:602 contrib/admin/options.py:635
+#: contrib/admin/options.py:603 contrib/admin/options.py:636
 #: contrib/auth/admin.py:75
 msgid "You may edit it again below."
 msgstr "U kunt dit hieronder weer bewerken."
 
-#: contrib/admin/options.py:612 contrib/admin/options.py:645
+#: contrib/admin/options.py:613 contrib/admin/options.py:646
 #, python-format
 msgid "You may add another %s below."
 msgstr "U kunt hieronder de volgende %s toevoegen."
 
-#: contrib/admin/options.py:633
+#: contrib/admin/options.py:634
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Het wijzigen van %(name)s \"%(obj)s\" is geslaagd."
 
-#: contrib/admin/options.py:641
+#: contrib/admin/options.py:642
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "De %(name)s \"%(obj)s\" was toegevoegd. U kunt het hieronder wijzigen."
 
-#: contrib/admin/options.py:772
+#: contrib/admin/options.py:773
 #, python-format
 msgid "Add %s"
 msgstr "Toevoegen %s"
 
-#: contrib/admin/options.py:803 contrib/admin/options.py:1003
+#: contrib/admin/options.py:804 contrib/admin/options.py:1005
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s object met primaire sleutel %(key)r bestaat niet."
 
-#: contrib/admin/options.py:860
+#: contrib/admin/options.py:861
 #, python-format
 msgid "Change %s"
 msgstr "Wijzig %s"
 
-#: contrib/admin/options.py:904
+#: contrib/admin/options.py:905
 msgid "Database error"
 msgstr "Databasefout"
 
-#: contrib/admin/options.py:940
+#: contrib/admin/options.py:941
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s is succesvol gewijzigd."
 msgstr[1] "%(count)s %(name)s zijn succesvol gewijzigd."
 
-#: contrib/admin/options.py:1018
+#: contrib/admin/options.py:1020
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "De verwijdering van %(name)s \"%(obj)s\" is geslaagd."
 
-#: contrib/admin/options.py:1054
+#: contrib/admin/options.py:1057
 #, python-format
 msgid "Change history: %s"
 msgstr "Wijzigingsgeschiedenis: %s"
 
-#: contrib/admin/sites.py:20 contrib/admin/views/decorators.py:14
+#: contrib/admin/sites.py:21 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:80
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -416,11 +416,11 @@ msgstr ""
 "Voer een correcte gebruikersnaam en wachtwoord in. Let op, de velden zijn "
 "hoofdletter-gevoelig."
 
-#: contrib/admin/sites.py:278 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:285 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Uw sessie is verlopen, meld u opnieuw aan."
 
-#: contrib/admin/sites.py:285 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:292 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -428,27 +428,27 @@ msgstr ""
 "Het lijkt erop dat uw browser geen cookies accepteert. Zet het gebruik van "
 "cookies aan in uw browser, laad deze pagina nogmaals en probeer het opnieuw."
 
-#: contrib/admin/sites.py:301 contrib/admin/sites.py:307
+#: contrib/admin/sites.py:308 contrib/admin/sites.py:314
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Gebruikersnamen mogen geen '@' teken bevatten."
 
-#: contrib/admin/sites.py:304 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:311 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Uw e-mailadres is niet uw gebruikersnaam. Probeer '%s' eens."
 
-#: contrib/admin/sites.py:360
+#: contrib/admin/sites.py:367
 msgid "Site administration"
 msgstr "Sitebeheer"
 
-#: contrib/admin/sites.py:373 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:381 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Inloggen"
 
-#: contrib/admin/sites.py:417
+#: contrib/admin/sites.py:426
 #, python-format
 msgid "%s administration"
 msgstr "%s beheer"
@@ -498,7 +498,7 @@ msgstr "Onze excuses, maar de gevraagde pagina bestaat niet."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:31
+#: contrib/admin/templates/admin/base.html:54
 #: contrib/admin/templates/admin/change_form.html:17
 #: contrib/admin/templates/admin/change_list.html:25
 #: contrib/admin/templates/admin/delete_confirmation.html:6
@@ -543,7 +543,7 @@ msgstr "Voer de geselecteerde actie uit"
 
 #: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
-msgstr "Zoek"
+msgstr "Voer Uit"
 
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
@@ -551,18 +551,18 @@ msgstr "Zoek"
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:27
 msgid "Welcome,"
 msgstr "Welkom,"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:32
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Documentatie"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:40
 #: contrib/admin/templates/admin/auth/user/change_password.html:14
 #: contrib/admin/templates/admin/auth/user/change_password.html:47
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -570,7 +570,7 @@ msgstr "Documentatie"
 msgid "Change password"
 msgstr "Wachtwoord wijzigen"
 
-#: contrib/admin/templates/admin/base.html:26
+#: contrib/admin/templates/admin/base.html:47
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Log out"
@@ -659,8 +659,8 @@ msgid ""
 "objects:"
 msgstr ""
 "Het verwijderen van %(object_name)s zal ook gerelateerde objecten "
-"verwijderen. Echter, u heeft geen rechten om de volgende typen objecten "
-"te verwijderen:"
+"verwijderen. Echter, u heeft geen rechten om de volgende typen objecten te "
+"verwijderen:"
 
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:22
 #, python-format
@@ -668,8 +668,8 @@ msgid ""
 "Are you sure you want to delete the selected %(object_name)s objects? All of "
 "the following objects and it's related items will be deleted:"
 msgstr ""
-"Weet u zeker dat u %(object_name)s objecten wilt verwijderen? "
-"Alle volgende objecten worden verwijderd:"
+"Weet u zeker dat u %(object_name)s objecten wilt verwijderen? Alle volgende "
+"objecten worden verwijderd:"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -752,6 +752,11 @@ msgstr ""
 msgid "Show all"
 msgstr "Alles tonen"
 
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Opslaan"
+
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Search"
 msgstr "Zoek"
@@ -767,10 +772,6 @@ msgstr[1] "%(counter)s resultaten"
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s totaal"
-
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Save"
-msgstr "Opslaan"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save as new"
@@ -997,144 +998,145 @@ msgstr "site"
 msgid "template"
 msgstr "sjabloon"
 
-#: contrib/admindocs/views.py:58 contrib/admindocs/views.py:60
-#: contrib/admindocs/views.py:62
+#: contrib/admindocs/views.py:61 contrib/admindocs/views.py:63
+#: contrib/admindocs/views.py:65
 msgid "tag:"
 msgstr "tag:"
 
-#: contrib/admindocs/views.py:91 contrib/admindocs/views.py:93
-#: contrib/admindocs/views.py:95
+#: contrib/admindocs/views.py:94 contrib/admindocs/views.py:96
+#: contrib/admindocs/views.py:98
 msgid "filter:"
 msgstr "filter:"
 
-#: contrib/admindocs/views.py:155 contrib/admindocs/views.py:157
-#: contrib/admindocs/views.py:159
+#: contrib/admindocs/views.py:158 contrib/admindocs/views.py:160
+#: contrib/admindocs/views.py:162
 msgid "view:"
 msgstr "view:"
 
-#: contrib/admindocs/views.py:187
+#: contrib/admindocs/views.py:190
 #, python-format
 msgid "App %r not found"
 msgstr "Toepassing %r niet gevonden"
 
-#: contrib/admindocs/views.py:194
+#: contrib/admindocs/views.py:197
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Model %(model_name)r niet gevonden in toepassing %(app_label)r"
 
-#: contrib/admindocs/views.py:206
+#: contrib/admindocs/views.py:209
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "het gerelateerde `%(app_label)s.%(data_type)s` object"
 
-#: contrib/admindocs/views.py:206 contrib/admindocs/views.py:228
-#: contrib/admindocs/views.py:242 contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:209 contrib/admindocs/views.py:228
+#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:261 contrib/admindocs/views.py:266
 msgid "model:"
 msgstr "model:"
 
-#: contrib/admindocs/views.py:237
+#: contrib/admindocs/views.py:224 contrib/admindocs/views.py:256
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "gerelateerde `%(app_label)s.%(object_name)s` objecten"
 
-#: contrib/admindocs/views.py:242
+#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:261
 #, python-format
 msgid "all %s"
 msgstr "alle %s"
 
-#: contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:266
 #, python-format
 msgid "number of %s"
 msgstr "aantal %s"
 
-#: contrib/admindocs/views.py:252
+#: contrib/admindocs/views.py:271
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Velden van %s objecten"
 
-#: contrib/admindocs/views.py:315 contrib/admindocs/views.py:326
-#: contrib/admindocs/views.py:328 contrib/admindocs/views.py:334
-#: contrib/admindocs/views.py:335 contrib/admindocs/views.py:337
+#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:345
+#: contrib/admindocs/views.py:347 contrib/admindocs/views.py:353
+#: contrib/admindocs/views.py:354 contrib/admindocs/views.py:356
 msgid "Integer"
 msgstr "Geheel getal"
 
-#: contrib/admindocs/views.py:316
+#: contrib/admindocs/views.py:335
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (True danwel False)"
 
-#: contrib/admindocs/views.py:317 contrib/admindocs/views.py:336
+#: contrib/admindocs/views.py:336 contrib/admindocs/views.py:355
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Karakterreeks (hooguit %(max_length)s)"
 
-#: contrib/admindocs/views.py:318
+#: contrib/admindocs/views.py:337
 msgid "Comma-separated integers"
 msgstr "Komma-gescheiden gehele getallen"
 
-#: contrib/admindocs/views.py:319
+#: contrib/admindocs/views.py:338
 msgid "Date (without time)"
 msgstr "Datum (zonder tijd)"
 
-#: contrib/admindocs/views.py:320
+#: contrib/admindocs/views.py:339
 msgid "Date (with time)"
 msgstr "Datum (met tijd)"
 
-#: contrib/admindocs/views.py:321
+#: contrib/admindocs/views.py:340
 msgid "Decimal number"
 msgstr "Decimaal getal"
 
-#: contrib/admindocs/views.py:322
+#: contrib/admindocs/views.py:341
 msgid "E-mail address"
 msgstr "E-mailadres"
 
-#: contrib/admindocs/views.py:323 contrib/admindocs/views.py:324
-#: contrib/admindocs/views.py:327
+#: contrib/admindocs/views.py:342 contrib/admindocs/views.py:343
+#: contrib/admindocs/views.py:346
 msgid "File path"
 msgstr "Bestandspad"
 
-#: contrib/admindocs/views.py:325
+#: contrib/admindocs/views.py:344
 msgid "Floating point number"
 msgstr "Decimaal getal"
 
-#: contrib/admindocs/views.py:329 contrib/comments/models.py:60
+#: contrib/admindocs/views.py:348 contrib/comments/models.py:60
 msgid "IP address"
 msgstr "IP-adres"
 
-#: contrib/admindocs/views.py:331
+#: contrib/admindocs/views.py:350
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (True, False of None)"
 
-#: contrib/admindocs/views.py:332
+#: contrib/admindocs/views.py:351
 msgid "Relation to parent model"
 msgstr "Relatie tot oudermodel"
 
-#: contrib/admindocs/views.py:333
+#: contrib/admindocs/views.py:352
 msgid "Phone number"
 msgstr "Telefoonnummer"
 
-#: contrib/admindocs/views.py:338
+#: contrib/admindocs/views.py:357
 msgid "Text"
 msgstr "Tekst"
 
-#: contrib/admindocs/views.py:339
+#: contrib/admindocs/views.py:358
 msgid "Time"
 msgstr "Tijd"
 
-#: contrib/admindocs/views.py:340 contrib/comments/forms.py:95
+#: contrib/admindocs/views.py:359 contrib/comments/forms.py:95
 #: contrib/comments/templates/comments/moderation_queue.html:37
 #: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admindocs/views.py:341
+#: contrib/admindocs/views.py:360
 msgid "U.S. state (two uppercase letters)"
 msgstr "Staat van de VS (twee hoofdletters)"
 
-#: contrib/admindocs/views.py:342
+#: contrib/admindocs/views.py:361
 msgid "XML text"
 msgstr "XML-tekst"
 
-#: contrib/admindocs/views.py:368
+#: contrib/admindocs/views.py:387
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s lijkt geen urlpattern-object te zijn"
@@ -1361,7 +1363,7 @@ msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
 msgstr ""
-"Gebruik '[algo]$[salt]$[hexdigest]' of gebruik het<a href=\"password/"
+"Gebruik '[algo]$[salt]$[hexdigest]' of gebruik het <a href=\"password/"
 "\">wachtwoord wijzigen formulier</a>."
 
 #: contrib/auth/models.py:133
@@ -1530,8 +1532,8 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Vink dit vak aan indien de opmerking niet gepast is. Een \"Dit commentaar "
-"is verwijderd\" bericht wordt dan getoond."
+"Vink dit vak aan indien de opmerking niet gepast is. Een \"Dit commentaar is "
+"verwijderd\" bericht wordt dan getoond."
 
 #: contrib/comments/models.py:77
 msgid "comments"
@@ -1607,7 +1609,8 @@ msgstr "Bedankt voor het goedkeuren"
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
-"Bedankt dat u de tijd heeft genomen om de kwaliteit van de discussie op onze site te verbeteren"
+"Bedankt dat u de tijd heeft genomen om de kwaliteit van de discussie op onze "
+"site te verbeteren"
 
 #: contrib/comments/templates/comments/delete.html:4
 msgid "Remove a comment"
@@ -2190,12 +2193,12 @@ msgstr "Geef een postcode op in het formaat XXXXX of XXX XX."
 
 #: contrib/localflavor/cz/forms.py:47
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
-msgstr ""
-"Geef een geboorte nummer op in het formaat XXXXXX/XXXX or XXXXXXXXXX."
+msgstr "Geef een geboorte nummer op in het formaat XXXXXX/XXXX or XXXXXXXXXX."
 
 #: contrib/localflavor/cz/forms.py:48
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr "Ongeldige optionele parameter Geslacht, geldige waarden zijn 'f' en 'm'"
+msgstr ""
+"Ongeldige optionele parameter Geslacht, geldige waarden zijn 'f' en 'm'"
 
 #: contrib/localflavor/cz/forms.py:49
 msgid "Enter a valid birth number."
@@ -3035,7 +3038,8 @@ msgstr "Verkeerd controlecijfer voor het fiscaal nummer (NIP)."
 #: contrib/localflavor/pl/forms.py:109
 msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
 msgstr ""
-"Het Nationaal Zakelijk Registratie Nummer (REGON) bestaat uit 9 of 14 cijfers."
+"Het Nationaal Zakelijk Registratie Nummer (REGON) bestaat uit 9 of 14 "
+"cijfers."
 
 #: contrib/localflavor/pl/forms.py:110
 msgid "Wrong checksum for the National Business Register Number (REGON)."
@@ -3883,7 +3887,7 @@ msgstr "sites"
 msgid "This value must be an integer."
 msgstr "De waarde moet een geheel getal zijn."
 
-#: db/models/fields/__init__.py:3883918
+#: db/models/fields/__init__.py:388
 msgid "This value must be either True or False."
 msgstr "De waarde moet of True (Waar) of False (Onwaar) zijn."
 
@@ -3912,8 +3916,8 @@ msgstr "Geef geldige datum/tijd in JJJJ-MM-DD UU:MM[:ss[.uuuuuu]] formaat."
 msgid "This value must be a decimal number."
 msgstr "De waarde moet een decimaal getal zijn."
 
-#: db/models/fields/__init__.py:686
 # Choose 'kommagetal' because it's user input.
+#: db/models/fields/__init__.py:686
 msgid "This value must be a float."
 msgstr "De waarde moet een kommagetal zijn."
 
@@ -3925,14 +3929,14 @@ msgstr "De waarde moet of None (leeg), True (Waar) of False (Onwaar) zijn."
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Geef een geldige tijd in UU:MM[:ss[.uuuuuu]] formaat."
 
-#: db/models/fields/related.py:792
+#: db/models/fields/related.py:816
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Houd \"Control\", of \"Command\" op een Mac, ingedrukt om meerdere te "
 "selecteren."
 
-#: db/models/fields/related.py:870
+#: db/models/fields/related.py:894
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3952,15 +3956,15 @@ msgstr "Geef een geldige waarde."
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
-"Zorg ervoor dat waarde korter is dan %(max)d tekens (huidige lengte "
-"%(length)d)."
+"Zorg ervoor dat waarde korter is dan %(max)d tekens (huidige lengte %(length)"
+"d)."
 
 #: forms/fields.py:139
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
-"Zorg ervoor dat deze tekst langer is dan %(min)d tekens (huidige lengte "
-"%(length)d)."
+"Zorg ervoor dat deze tekst langer is dan %(min)d tekens (huidige lengte %"
+"(length)d)."
 
 #: forms/fields.py:166
 msgid "Enter a whole number."
@@ -4026,7 +4030,8 @@ msgstr "Het verstuurde bestand is leeg."
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr ""
-"De bestandsnaam mag maximaal %(max)d karakters bevatten (dit zijn er nu %(length)d)."
+"De bestandsnaam mag maximaal %(max)d karakters bevatten (dit zijn er nu %"
+"(length)d)."
 
 #: forms/fields.py:483
 msgid ""
@@ -4049,7 +4054,7 @@ msgstr "Deze URL lijkt niet te werken."
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Selecteer een geldige keuze. %(value)s is geen beschikbare keuze."
 
-#: forms/fields.py:704 forms/fields.py:765 forms/models.py:962
+#: forms/fields.py:704 forms/fields.py:765 forms/models.py:1003
 msgid "Enter a list of values."
 msgstr "Geef een lijst op met waardes."
 
@@ -4078,43 +4083,45 @@ msgstr "%(field_name)s moet uniek zijn voor %(date_field)s %(lookup)s."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Er bestaat al een %(model_name)s met eenzelfde %(field_label)s."
 
-#: forms/models.py:581
+#: forms/models.py:594
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Verbeter de dubbele gegevens voor %(field)s."
 
-#: forms/models.py:585
+#: forms/models.py:598
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "Verbeter de dubbele gegevens voor %(field)s, welke uniek moet zijn."
 
-#: forms/models.py:591
+#: forms/models.py:604
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
-msgstr "Verbeter de dubbele gegevens voor %(field_name)s, welke uniek moet "
-"zijn voor de %(lookup)s in %(date_field)s."
+msgstr ""
+"Verbeter de dubbele gegevens voor %(field_name)s, welke uniek moet zijn voor "
+"de %(lookup)s in %(date_field)s."
 
-#: forms/models.py:599
+#: forms/models.py:612
 msgid "Please correct the duplicate values below."
 msgstr "Verbeter de dubbele waarden hieronder."
 
-#: forms/models.py:837
+#: forms/models.py:867
 msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "De secundaire sleutel komt niet overeen met de primaire sleutel van "
-"de bovenliggende instantie."
+msgstr ""
+"De secundaire sleutel komt niet overeen met de primaire sleutel van de "
+"bovenliggende instantie."
 
-#: forms/models.py:892
+#: forms/models.py:930
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Selecteer een geldige keuze. Deze keuze is niet beschikbaar."
 
-#: forms/models.py:963
+#: forms/models.py:1004
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Selecteer een geldige keuze. %s is geen beschikbare keuze."
 
-#: forms/models.py:965
+#: forms/models.py:1006
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" is geen geldige waarde voor een primaire sleutel."
@@ -4145,27 +4152,27 @@ msgstr "%.1f MB"
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: utils/dateformat.py:41
+#: utils/dateformat.py:42
 msgid "p.m."
 msgstr "p.m."
 
-#: utils/dateformat.py:42
+#: utils/dateformat.py:43
 msgid "a.m."
 msgstr "a.m."
 
-#: utils/dateformat.py:47
+#: utils/dateformat.py:48
 msgid "PM"
 msgstr "PM"
 
-#: utils/dateformat.py:48
+#: utils/dateformat.py:49
 msgid "AM"
 msgstr "AM"
 
-#: utils/dateformat.py:97
+#: utils/dateformat.py:98
 msgid "midnight"
 msgstr "middernacht"
 
-#: utils/dateformat.py:99
+#: utils/dateformat.py:100
 msgid "noon"
 msgstr "middag"
 
