@@ -1,0 +1,4997 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-01-27 09:58-0800\n"
+"PO-Revision-Date: 2010-01-27 22:36-0700\n"
+"Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
+"Language-Team: FRISIAN <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr ""
+
+#: forms/models.py:964
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr ""
+
+#: contrib/admin/options.py:1006
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] ""
+msgstr[1] ""
+
+#: db/models/base.py:775
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr ""
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr ""
+
+#: db/models/base.py:790 db/models/base.py:798
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s mei dit %(field_label)s bestiet al."
+
+#: contrib/admin/templates/admin/app_index.html:10
+#: contrib/admin/templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr ""
+
+#: contrib/admin/options.py:860 contrib/admin/options.py:1072
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+#: utils/timesince.py:50
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr ""
+
+#: contrib/comments/feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr ""
+
+#: template/defaultfilters.py:806
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:51
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/defaultfilters.py:811
+#, python-format
+msgid "%.1f GB"
+msgstr ""
+
+#: template/defaultfilters.py:808
+#, python-format
+msgid "%.1f KB"
+msgstr ""
+
+#: template/defaultfilters.py:810
+#, python-format
+msgid "%.1f MB"
+msgstr ""
+
+#: contrib/admin/sites.py:447
+#, python-format
+msgid "%s administration"
+msgstr ""
+
+#: contrib/admindocs/views.py:361
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr ""
+
+#: utils/timesince.py:56
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ""
+
+#: contrib/comments/admin.py:60
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "1 result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/filterspecs.py:44
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+
+#: contrib/admin/templates/admin/actions.html:7
+#, python-format
+msgid ""
+"<span class=\"_acnt\">0</span> of %(total_count)s %(module_name)s selected"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:19
+msgid "A Coruna"
+msgstr ""
+
+#: contrib/auth/forms.py:31
+msgid "A user with that username already exists."
+msgstr ""
+
+#: utils/dateformat.py:49
+msgid "AM"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:5
+msgid "Aargau"
+msgstr ""
+
+#: contrib/admin/templates/admin/object_history.html:24
+msgid "Action"
+msgstr ""
+
+#: contrib/admin/helpers.py:19
+msgid "Action:"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:21
+#: contrib/admin/templates/admin/index.html:29
+msgid "Add"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_list.html:57
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
+
+#: contrib/admin/options.py:834
+#, python-format
+msgid "Add %s"
+msgstr ""
+
+#: contrib/admin/widgets.py:238
+msgid "Add Another"
+msgstr ""
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:33
+#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr ""
+
+#: contrib/admin/options.py:561
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr ""
+
+#: contrib/flatpages/admin.py:22
+msgid "Advanced options"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:12
+msgid "Aguascalientes"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:26
+msgid "Aichi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:8
+msgid "Akita"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:7
+msgid "Alacant"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:6
+msgid "Albacete"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:75 contrib/admin/filterspecs.py:92
+#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
+msgid "All"
+msgstr ""
+
+#: contrib/admin/templates/admin/actions.html:11
+#, python-format
+msgid "All %(total_count)s %(module_name)s selected"
+msgstr ""
+
+#: contrib/admin/templatetags/admin_list.py:240
+msgid "All dates"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:8
+msgid "Almeria"
+msgstr ""
+
+#: contrib/gis/forms/fields.py:20
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:5
+msgid "Andalusia"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:8
+msgid "Antrim"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:113
+msgid "Any date"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:5
+msgid "Aomori"
+msgstr ""
+
+#: contrib/admindocs/views.py:190
+#, python-format
+msgid "App %r not found"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:7
+msgid "Appenzell Ausserrhoden"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:6
+msgid "Appenzell Innerrhoden"
+msgstr ""
+
+#: contrib/comments/templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr ""
+
+#: contrib/comments/admin.py:44
+msgid "Approve selected comments"
+msgstr ""
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "April"
+msgstr ""
+
+#: conf/global_settings.py:44
+msgid "Arabic"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:6
+msgid "Aragon"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:5
+msgid "Arava"
+msgstr ""
+
+#: contrib/admin/templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+
+#: contrib/admin/actions.py:67 contrib/admin/options.py:1094
+msgid "Are you sure?"
+msgstr ""
+
+#: conf/global_settings.py:56
+msgid "Argentinean Spanish"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:9
+msgid "Armagh"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:37
+msgid "Asturias"
+msgstr ""
+
+#: utils/dates.py:32
+msgid "Aug."
+msgstr ""
+
+#: utils/dates.py:19
+msgid "August"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:9
+msgid "Avila"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:10
+msgid "Badajoz"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:5
+msgid "Baden-Wuerttemberg"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:13
+msgid "Baja California"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:14
+msgid "Baja California Sur"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:8
+msgid "Balearic Islands"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:9
+#: contrib/localflavor/id/id_choices.py:73
+msgid "Bali"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:65
+msgid "Bandung"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:11
+msgid "Banovce nad Bebravou"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:8
+msgid "Banska Bystrica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:8
+msgid "Banska Bystrica region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:9
+msgid "Banska Stiavnica"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:10
+#: contrib/localflavor/id/id_choices.py:45
+msgid "Banten"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:95
+msgid "Banyumas"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:12
+msgid "Barcelona"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:10
+msgid "Bardejov"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:9
+msgid "Basel-Land"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:8
+msgid "Basel-Stadt"
+msgstr ""
+
+#: conf/global_settings.py:57
+msgid "Basque"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:9
+msgid "Basque Country"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:6
+msgid "Bavaria"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:11
+msgid "Bedfordshire"
+msgstr ""
+
+#: conf/global_settings.py:45
+msgid "Bengali"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:11
+#: contrib/localflavor/id/id_choices.py:54
+msgid "Bengkulu"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:7
+msgid "Berlin"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:10
+msgid "Berne"
+msgstr ""
+
+#: db/models/fields/__init__.py:892
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:52
+msgid "Bizkaia"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:25
+msgid "Blekinge"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:84
+msgid "Bogor"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:97
+msgid "Bojonegoro"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr ""
+
+#: db/models/fields/__init__.py:512
+msgid "Boolean (Either True or False)"
+msgstr ""
+
+#: db/models/fields/__init__.py:923
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:75
+msgid "Borders"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:8
+msgid "Brandenburg"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:13
+msgid "Bratislava I"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:14
+msgid "Bratislava II"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:15
+msgid "Bratislava III"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:16
+msgid "Bratislava IV"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:17
+msgid "Bratislava V"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:9
+msgid "Bratislava region"
+msgstr ""
+
+#: conf/global_settings.py:81
+msgid "Brazilian Portuguese"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:9
+msgid "Bremen"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:12
+msgid "Brezno"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:12
+msgid "Buckinghamshire"
+msgstr ""
+
+#: conf/global_settings.py:46
+msgid "Bulgarian"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:5
+msgid "Burgenland"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:13
+msgid "Burgos"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:18
+msgid "Bytca"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:14
+msgid "Caceres"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:19
+msgid "Cadca"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:15
+msgid "Cadiz"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:15
+msgid "Campeche"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:10
+msgid "Canary Islands"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:43
+#: contrib/localflavor/es/es_regions.py:11
+msgid "Cantabria"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:6
+msgid "Carinthia"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:10
+msgid "Carlow"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:12
+msgid "Carlsbad Region"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:16
+msgid "Castello"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:13
+msgid "Castile and Leon"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:12
+msgid "Castile-La Mancha"
+msgstr ""
+
+#: conf/global_settings.py:47
+msgid "Catalan"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:14
+msgid "Catalonia"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:11
+msgid "Cavan"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:9
+msgid "Central Bohemian Region"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:76
+msgid "Central Scotland"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:55
+msgid "Ceuta"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:35
+msgid "Change"
+msgstr ""
+
+#: contrib/admin/options.py:925
+#, python-format
+msgid "Change %s"
+msgstr ""
+
+#: contrib/admin/options.py:1124
+#, python-format
+msgid "Change history: %s"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_change_form.html:43
+#: contrib/admin/templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr ""
+
+#: contrib/admin/templates/admin/base.html:40
+#: contrib/admin/templates/admin/auth/user/change_password.html:15
+#: contrib/admin/templates/admin/auth/user/change_password.html:48
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Change password"
+msgstr ""
+
+#: contrib/auth/admin.py:121
+#, python-format
+msgid "Change password: %s"
+msgstr ""
+
+#: contrib/admin/widgets.py:96
+msgid "Change:"
+msgstr ""
+
+#: contrib/admin/options.py:565
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr ""
+
+#: contrib/admin/options.py:556
+#, python-format
+msgid "Changed %s."
+msgstr ""
+
+#: contrib/comments/models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:14
+msgid "Cheshire"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:17
+msgid "Chiapas"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:15
+msgid "Chiba"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:16
+msgid "Chihuahua"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:80
+msgid "Cirebon"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:17
+msgid "Ciudad Real"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:12
+msgid "Clare"
+msgstr ""
+
+#: contrib/admin/templates/admin/actions.html:16
+msgid "Clear selection"
+msgstr ""
+
+#: contrib/admin/templates/admin/actions.html:14
+msgid "Click here to select all objects across all pages"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:64
+msgid "Clwyd"
+msgstr ""
+
+#: contrib/localflavor/se/forms.py:108
+msgid "Co-ordination numbers are not allowed."
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:18
+msgid "Coahuila"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:19
+msgid "Colima"
+msgstr ""
+
+#: db/models/fields/__init__.py:582
+msgid "Comma-separated integers"
+msgstr ""
+
+#: contrib/comments/forms.py:96
+msgid "Comment"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr ""
+
+#: contrib/comments/admin.py:12
+msgid "Content"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:18
+msgid "Cordoba"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:13
+msgid "Cork"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:15
+msgid "Cornwall and Isles of Scilly"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:63
+msgid "Corps Consulate"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:64
+msgid "Corps Diplomatic"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:55
+msgid "County Antrim"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:56
+msgid "County Armagh"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:57
+msgid "County Down"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:58
+msgid "County Fermanagh"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:59
+msgid "County Londonderry"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:60
+msgid "County Tyrone"
+msgstr ""
+
+#: conf/global_settings.py:66
+msgid "Croatian"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:20
+msgid "Cuenca"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:16
+msgid "Cumbria"
+msgstr ""
+
+#: contrib/admin/widgets.py:96
+msgid "Currently:"
+msgstr ""
+
+#: conf/global_settings.py:48
+msgid "Czech"
+msgstr ""
+
+#: utils/translation/trans_real.py:531
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:530
+msgid "DATE_FORMAT"
+msgstr "N j, Y"
+
+#: contrib/localflavor/se/se_counties.py:32
+msgid "Dalarna"
+msgstr ""
+
+#: conf/global_settings.py:50
+msgid "Danish"
+msgstr ""
+
+#: contrib/admin/options.py:970
+msgid "Database error"
+msgstr ""
+
+#: db/models/fields/__init__.py:684
+msgid "Date (with time)"
+msgstr ""
+
+#: db/models/fields/__init__.py:596
+msgid "Date (without time)"
+msgstr ""
+
+#: contrib/admin/templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr ""
+
+#: contrib/admin/widgets.py:72
+msgid "Date:"
+msgstr ""
+
+#: utils/dates.py:32
+msgid "Dec."
+msgstr ""
+
+#: utils/dates.py:20
+msgid "December"
+msgstr ""
+
+#: db/models/fields/__init__.py:752
+msgid "Decimal number"
+msgstr ""
+
+#: contrib/admin/templates/admin/delete_confirmation.html:10
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:291
+msgid "Delete"
+msgstr ""
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:9
+msgid "Delete multiple objects"
+msgstr ""
+
+#: contrib/admin/actions.py:85
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
+
+#: contrib/admin/templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr ""
+
+#: contrib/admin/options.py:570
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr ""
+
+#: contrib/admin/templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:15
+#, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:17
+msgid "Derbyshire"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:14
+msgid "Derry"
+msgstr ""
+
+#: contrib/auth/models.py:144
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+
+#: contrib/auth/models.py:142
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: contrib/auth/models.py:143
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:20
+msgid "Detva"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:18
+msgid "Devon"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:20
+msgid "Distrito Federal"
+msgstr ""
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr ""
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr ""
+
+#: contrib/admin/templates/admin/base.html:32
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:21
+msgid "Dolny Kubin"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:15
+msgid "Donegal"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:19
+msgid "Dorset"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:16
+msgid "Down"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:4
+msgid "Drenthe"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:17
+msgid "Dublin"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:77
+msgid "Dumfries and Galloway"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:22
+msgid "Dunajska Streda"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:21
+msgid "Durango"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:20
+msgid "Durham"
+msgstr ""
+
+#: conf/global_settings.py:77
+msgid "Dutch"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:65
+msgid "Dyfed"
+msgstr ""
+
+#: contrib/auth/forms.py:101
+msgid "E-mail"
+msgstr ""
+
+#: db/models/fields/__init__.py:807
+msgid "E-mail address"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:21
+msgid "East Sussex"
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:4
+msgid "Eastern Cape"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:41
+msgid "Ehime"
+msgstr ""
+
+#: contrib/comments/forms.py:94
+msgid "Email address"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:90
+msgid "England"
+msgstr ""
+
+#: conf/global_settings.py:53
+msgid "English"
+msgstr ""
+
+#: forms/fields.py:251
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Wês wis dat der net mear as %s desimale plakken binne."
+
+#: forms/fields.py:252
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr "Wês wis dat der net mear as %s sifers foar it desimale punt."
+
+#: forms/fields.py:250
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Wês wis dat der yn totaal net mear as %s sifers binne."
+
+#: forms/fields.py:424
+#, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+
+#: core/validators.py:129
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+
+#: core/validators.py:135
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+
+#: core/validators.py:100
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+
+#: core/validators.py:123 forms/fields.py:197 forms/fields.py:249
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+
+#: core/validators.py:118 forms/fields.py:196 forms/fields.py:248
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+
+#: contrib/localflavor/au/forms.py:17
+msgid "Enter a 4 digit post code."
+msgstr ""
+
+#: contrib/localflavor/se/forms.py:150
+msgid "Enter a Swedish postal code in the format XXXXX."
+msgstr ""
+
+#: contrib/localflavor/us/forms.py:88
+msgid "Enter a U.S. state or territory."
+msgstr ""
+
+#: contrib/localflavor/cz/forms.py:48
+msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
+msgstr ""
+
+#: forms/fields.py:653 forms/fields.py:715 forms/models.py:961
+msgid "Enter a list of values."
+msgstr "Jou in list mei weardes."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:28
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+#: forms/fields.py:225 forms/fields.py:247
+msgid "Enter a number."
+msgstr "Jou in nûmer."
+
+#: contrib/localflavor/ar/forms.py:28
+msgid "Enter a postal code in the format NNNN or ANNNNAAA."
+msgstr ""
+
+#: contrib/localflavor/pl/forms.py:148
+msgid "Enter a postal code in the format XX-XXX."
+msgstr ""
+
+#: contrib/localflavor/ca/forms.py:25
+msgid "Enter a postal code in the format XXX XXX."
+msgstr ""
+
+#: contrib/localflavor/cz/forms.py:28 contrib/localflavor/sk/forms.py:30
+msgid "Enter a postal code in the format XXXXX or XXX XX."
+msgstr ""
+
+#: contrib/localflavor/jp/forms.py:16
+msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
+msgstr ""
+
+#: contrib/localflavor/pl/forms.py:71
+msgid ""
+"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgstr ""
+
+#: core/validators.py:88 forms/fields.py:854
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Jou in falida 'slug' gearsteld mei letters, nûmers, ûnderstreekjes of "
+"koppelteken."
+
+#: contrib/localflavor/at/forms.py:48
+msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+msgstr ""
+
+#: contrib/localflavor/uy/forms.py:28
+msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
+msgstr ""
+
+#: contrib/localflavor/uy/forms.py:30
+msgid "Enter a valid CI number."
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:19
+msgid "Enter a valid CIF."
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:56
+msgid "Enter a valid CNP."
+msgstr ""
+
+#: contrib/localflavor/ar/forms.py:80
+msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
+msgstr ""
+
+#: contrib/localflavor/ca/forms.py:96
+msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
+msgstr ""
+
+#: contrib/localflavor/cl/forms.py:30
+msgid "Enter a valid Chilean RUT."
+msgstr ""
+
+#: contrib/localflavor/cl/forms.py:31
+msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
+msgstr ""
+
+#: contrib/localflavor/fi/forms.py:29
+msgid "Enter a valid Finnish social security number."
+msgstr ""
+
+#: contrib/localflavor/de/forms.py:42
+msgid ""
+"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
+"format."
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:141
+msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
+msgstr ""
+
+#: contrib/localflavor/cz/forms.py:107
+msgid "Enter a valid IC number."
+msgstr ""
+
+#: core/validators.py:91 forms/fields.py:847
+msgid "Enter a valid IPv4 address."
+msgstr "Jou in falide IPv4-adres."
+
+#: contrib/localflavor/is_/forms.py:18
+msgid ""
+"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgstr ""
+
+#: contrib/localflavor/kw/forms.py:25
+msgid "Enter a valid Kuwaiti Civil ID number"
+msgstr ""
+
+#: contrib/localflavor/id/forms.py:170
+msgid "Enter a valid NIK/KTP number"
+msgstr ""
+
+#: contrib/localflavor/no/forms.py:34
+msgid "Enter a valid Norwegian social security number."
+msgstr ""
+
+#: contrib/localflavor/nl/forms.py:79
+msgid "Enter a valid SoFi number"
+msgstr ""
+
+#: contrib/localflavor/it/forms.py:44
+msgid "Enter a valid Social Security number."
+msgstr ""
+
+#: contrib/localflavor/za/forms.py:21
+msgid "Enter a valid South African ID number"
+msgstr ""
+
+#: contrib/localflavor/za/forms.py:55
+msgid "Enter a valid South African postal code"
+msgstr ""
+
+#: contrib/localflavor/se/forms.py:50
+msgid "Enter a valid Swedish organisation number."
+msgstr ""
+
+#: contrib/localflavor/se/forms.py:107
+msgid "Enter a valid Swedish personal identity number."
+msgstr ""
+
+#: contrib/localflavor/ch/forms.py:65
+msgid ""
+"Enter a valid Swiss identity or passport card number in X1234567<0 or "
+"1234567890 format."
+msgstr ""
+
+#: contrib/localflavor/us/forms.py:55
+msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
+msgstr ""
+
+#: core/validators.py:69 forms/fields.py:510
+msgid "Enter a valid URL."
+msgstr "Jou in falide URL."
+
+#: contrib/localflavor/it/forms.py:69
+msgid "Enter a valid VAT number."
+msgstr ""
+
+#: contrib/localflavor/cz/forms.py:50
+msgid "Enter a valid birth number."
+msgstr ""
+
+#: db/models/fields/__init__.py:600
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Jou in falide daum yn JJJJ-MM-DD-formaat."
+
+#: forms/fields.py:309 forms/fields.py:819
+msgid "Enter a valid date."
+msgstr "Jou in falide datum."
+
+#: db/models/fields/__init__.py:682
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "Jou in falide datum/tiid yn JJJ-MM-DD OO:MM[:ss[.uuuuuu]]-formaat."
+
+#: forms/fields.py:363
+msgid "Enter a valid date/time."
+msgstr "Jou in falide datum.tiid."
+
+#: contrib/auth/management/commands/createsuperuser.py:23
+#: core/validators.py:85 forms/fields.py:414
+msgid "Enter a valid e-mail address."
+msgstr ""
+
+#: contrib/localflavor/id/forms.py:68 contrib/localflavor/nl/forms.py:53
+msgid "Enter a valid phone number"
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:40
+msgid ""
+"Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
+"9XXXXXXXX."
+msgstr ""
+
+#: contrib/localflavor/id/forms.py:28
+msgid "Enter a valid post code"
+msgstr ""
+
+#: contrib/localflavor/nl/forms.py:22
+msgid "Enter a valid postal code"
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:194
+msgid "Enter a valid postal code in the format XXXXXX"
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:20
+msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
+msgstr ""
+
+#: contrib/localflavor/uk/forms.py:21
+msgid "Enter a valid postcode."
+msgstr ""
+
+#: db/models/fields/__init__.py:1027
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "Jou in falide tiid yn OO:MM[:ss[.uuuuuu]]-formaat."
+
+#: forms/fields.py:337 forms/fields.py:820
+msgid "Enter a valid time."
+msgstr "Jou in falide tiid."
+
+#: core/validators.py:19 forms/fields.py:66
+msgid "Enter a valid value."
+msgstr "Jou in falide wearde."
+
+#: contrib/localflavor/id/forms.py:107
+msgid "Enter a valid vehicle license plate number"
+msgstr ""
+
+#: contrib/localflavor/it/forms.py:15
+msgid "Enter a valid zip code."
+msgstr ""
+
+#: forms/fields.py:195
+msgid "Enter a whole number."
+msgstr "Jou in folslein nûmer."
+
+#: contrib/localflavor/pt/forms.py:17
+msgid "Enter a zip code in the format XXXX-XXX."
+msgstr ""
+
+#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:17
+#: contrib/localflavor/no/forms.py:13
+msgid "Enter a zip code in the format XXXX."
+msgstr ""
+
+#: contrib/localflavor/us/forms.py:17
+msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
+msgstr ""
+
+#: contrib/localflavor/br/forms.py:22
+msgid "Enter a zip code in the format XXXXX-XXX."
+msgstr ""
+
+#: contrib/localflavor/de/forms.py:15 contrib/localflavor/fi/forms.py:13
+#: contrib/localflavor/fr/forms.py:16
+msgid "Enter a zip code in the format XXXXX."
+msgstr ""
+
+#: contrib/localflavor/in_/forms.py:15
+msgid "Enter a zip code in the format XXXXXXX."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr ""
+
+#: core/validators.py:94 db/models/fields/__init__.py:587
+msgid "Enter only digits separated by commas."
+msgstr "Jou allinnich sifers, skieden troch komma's."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:42
+#: contrib/auth/forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:22
+msgid "Essex"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:26
+msgid "Estado de México"
+msgstr ""
+
+#: conf/global_settings.py:55
+msgid "Estonian"
+msgstr ""
+
+#: contrib/flatpages/admin.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+
+#: contrib/flatpages/models.py:12
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:15
+msgid "Extremadura"
+msgstr ""
+
+#: utils/dates.py:31
+msgid "Feb."
+msgstr ""
+
+#: utils/dates.py:18
+msgid "February"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:96
+msgid "Federal Government"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:18
+msgid "Fermanagh"
+msgstr ""
+
+#: db/models/fields/__init__.py:72
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+#: contrib/admindocs/views.py:271
+#, python-format
+msgid "Fields on %s objects"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:78
+msgid "Fife"
+msgstr ""
+
+#: db/models/fields/__init__.py:814 db/models/fields/files.py:220
+#: db/models/fields/files.py:331
+msgid "File path"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_list.html:76
+msgid "Filter"
+msgstr ""
+
+#: conf/global_settings.py:59
+msgid "Finnish"
+msgstr ""
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:5
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr ""
+
+#: contrib/comments/admin.py:40
+msgid "Flag selected comments"
+msgstr ""
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:5
+msgid "Flevoland"
+msgstr ""
+
+#: db/models/fields/__init__.py:839
+msgid "Floating point number"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:20
+msgid "Foral Community of Navarre"
+msgstr ""
+
+#: db/models/fields/related.py:757
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:5
+msgid "Free State"
+msgstr ""
+
+#: conf/global_settings.py:60
+msgid "French"
+msgstr ""
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:11
+msgid "Fribourg"
+msgstr ""
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:6
+msgid "Friesland"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:23
+msgid "Fukui"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:43
+msgid "Fukuoka"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:10
+msgid "Fukushima"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:23
+msgid "Galanta"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:16
+msgid "Galicia"
+msgstr ""
+
+#: conf/global_settings.py:62
+msgid "Galician"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:19
+msgid "Galway"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:100
+msgid "Garut"
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:6
+msgid "Gauteng"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:7
+msgid "Gelderland"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:24
+msgid "Gelnica"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:12
+msgid "Geneva"
+msgstr ""
+
+#: contrib/gis/db/models/fields.py:293
+msgid "Geometry collection"
+msgstr ""
+
+#: conf/global_settings.py:70
+msgid "Georgian"
+msgstr ""
+
+#: conf/global_settings.py:51
+msgid "German"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:24
+msgid "Gifu"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:21
+msgid "Girona"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:13
+msgid "Glarus"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:23
+msgid "Gloucestershire"
+msgstr ""
+
+#: contrib/admin/templates/admin/actions.html:4
+msgid "Go"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:14
+#: contrib/localflavor/id/id_choices.py:75
+msgid "Gorontalo"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:24
+msgid "Gotland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:79
+msgid "Grampian"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:22
+msgid "Granada"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:14
+msgid "Graubuenden"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:24
+msgid "Greater London"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:25
+msgid "Greater Manchester"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:22
+msgid "Greater Poland"
+msgstr ""
+
+#: conf/global_settings.py:52
+msgid "Greek"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:8
+msgid "Groningen"
+msgstr ""
+
+#: contrib/auth/admin.py:29
+msgid "Groups"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:23
+msgid "Guadalajara"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:23
+msgid "Guanajuato"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:22
+msgid "Guerrero"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:24
+msgid "Guipuzkoa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:13
+msgid "Gunma"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:66
+msgid "Gwent"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:67
+msgid "Gwynedd"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:33
+msgid "Gävleborg"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:27
+msgid "Halland"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:10
+msgid "Hamburg"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:26
+msgid "Hampshire"
+msgstr ""
+
+#: conf/global_settings.py:64
+msgid "Hebrew"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:27
+msgid "Hertfordshire"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:11
+msgid "Hessen"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:24
+msgid "Hidalgo"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:80
+msgid "Highland"
+msgstr ""
+
+#: conf/global_settings.py:65
+msgid "Hindi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:37
+msgid "Hiroshima"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:28
+#: contrib/admin/templates/admin/object_history.html:10
+msgid "History"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:25
+msgid "Hlohovec"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:4
+msgid "Hokkaido"
+msgstr ""
+
+#: db/models/fields/related.py:959
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Hâld \"Control\", of \"Command\" op in Mac del, om mear as ien te "
+"selektearjen."
+
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/app_index.html:8
+#: contrib/admin/templates/admin/base.html:54
+#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_list.html:36
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:6
+#: contrib/admin/templates/admin/invalid_setup.html:4
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/admin/auth/user/change_password.html:11
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:5
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:15
+msgid "Hradec Region"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:25
+msgid "Huelva"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:26
+msgid "Huesca"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:26
+msgid "Humenne"
+msgstr ""
+
+#: conf/global_settings.py:63
+msgid "Hungarian"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:31
+msgid "Hyogo"
+msgstr ""
+
+#: contrib/comments/models.py:60 db/models/fields/__init__.py:905
+msgid "IP address"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:11
+msgid "Ibaraki"
+msgstr ""
+
+#: conf/global_settings.py:67
+msgid "Icelandic"
+msgstr ""
+
+#: contrib/flatpages/models.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+
+#: contrib/comments/forms.py:182
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:27
+msgid "Ilava"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:11
+msgid "Illes Balears"
+msgstr ""
+
+#: contrib/auth/admin.py:28
+msgid "Important dates"
+msgstr ""
+
+#: contrib/auth/models.py:148
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+
+#: db/models/fields/__init__.py:471 db/models/fields/__init__.py:867
+#: db/models/fields/__init__.py:963 db/models/fields/__init__.py:974
+#: db/models/fields/__init__.py:1001
+msgid "Integer"
+msgstr ""
+
+#: contrib/localflavor/br/forms.py:135
+msgid "Invalid CNPJ number."
+msgstr ""
+
+#: contrib/localflavor/br/forms.py:95
+msgid "Invalid CPF number."
+msgstr ""
+
+#: contrib/localflavor/ar/forms.py:81
+msgid "Invalid CUIT."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:71
+msgid "Invalid checksum for CIF."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:70
+msgid "Invalid checksum for NIE."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:69
+msgid "Invalid checksum for NIF."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:144
+msgid "Invalid checksum for bank account number."
+msgstr ""
+
+#: db/models/fields/__init__.py:601
+#, python-format
+msgid "Invalid date: %s"
+msgstr "Foute datum: %s"
+
+#: contrib/gis/forms/fields.py:19
+msgid "Invalid geometry type."
+msgstr ""
+
+#: contrib/gis/forms/fields.py:18
+msgid "Invalid geometry value."
+msgstr ""
+
+#: contrib/localflavor/cz/forms.py:49
+msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
+msgstr ""
+
+#: conf/global_settings.py:61
+msgid "Irish"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:22
+msgid "Ishikawa"
+msgstr ""
+
+#: conf/global_settings.py:68
+msgid "Italian"
+msgstr ""
+
+#: contrib/admin/options.py:736
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:6
+msgid "Iwate"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:27
+msgid "Jaen"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:13
+#: contrib/localflavor/id/id_choices.py:51
+msgid "Jakarta"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:25
+msgid "Jalisco"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:15
+#: contrib/localflavor/id/id_choices.py:57
+msgid "Jambi"
+msgstr ""
+
+#: utils/dates.py:31
+msgid "Jan."
+msgstr ""
+
+#: utils/dates.py:18
+msgid "January"
+msgstr ""
+
+#: conf/global_settings.py:69
+msgid "Japanese"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:16
+msgid "Jawa Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:17
+msgid "Jawa Tengah"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:18
+msgid "Jawa Timur"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:94
+msgid "Jember"
+msgstr ""
+
+#: utils/dates.py:19 utils/dates.py:31
+msgid "July"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "June"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:15
+msgid "Jura"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:35
+msgid "Jämtland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:21
+msgid "Jönköping"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:40
+msgid "Kagawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:49
+msgid "Kagoshima"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:19
+#: contrib/localflavor/id/id_choices.py:88
+msgid "Kalimantan Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:20
+#: contrib/localflavor/id/id_choices.py:66
+msgid "Kalimantan Selatan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:21
+#: contrib/localflavor/id/id_choices.py:89
+msgid "Kalimantan Tengah"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:22
+#: contrib/localflavor/id/id_choices.py:90
+msgid "Kalimantan Timur"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:23
+msgid "Kalmar"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:17
+msgid "Kanagawa"
+msgstr ""
+
+#: conf/global_settings.py:73
+msgid "Kannada"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:50
+msgid "Kediri"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:28
+msgid "Kent"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:61
+msgid "Kepulauan Bangka Belitung"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:23
+msgid "Kepulauan Bangka-Belitung"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:24
+#: contrib/localflavor/id/id_choices.py:62
+msgid "Kepulauan Riau"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:20
+msgid "Kerry"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:28
+msgid "Kezmarok"
+msgstr ""
+
+#: conf/global_settings.py:72
+msgid "Khmer"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:21
+msgid "Kildare"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:22
+msgid "Kilkenny"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:42
+msgid "Kochi"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:29
+msgid "Komarno"
+msgstr ""
+
+#: conf/global_settings.py:71
+msgid "Korean"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:34
+msgid "Kosice - okolie"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:30
+msgid "Kosice I"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:31
+msgid "Kosice II"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:32
+msgid "Kosice III"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:33
+msgid "Kosice IV"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:10
+msgid "Kosice region"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:22
+msgid "Kronoberg"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:35
+msgid "Krupina"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:46
+msgid "Kumamoto"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:9
+msgid "Kuyavia-Pomerania"
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:7
+msgid "KwaZulu-Natal"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:29
+msgid "Kyoto"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:36
+msgid "Kysucke Nove Mesto"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:30
+#: contrib/localflavor/es/es_regions.py:17
+msgid "La Rioja"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:25
+#: contrib/localflavor/id/id_choices.py:55
+msgid "Lampung"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:29
+msgid "Lancashire"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:23
+msgid "Laois"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:39
+msgid "Las Palmas"
+msgstr ""
+
+#: contrib/comments/feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr ""
+
+#: conf/global_settings.py:74
+msgid "Latvian"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:30
+msgid "Leicestershire"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:24
+msgid "Leitrim"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:28
+msgid "Leon"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:13
+msgid "Lesser Poland"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:37
+msgid "Levice"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:38
+msgid "Levoca"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:14
+msgid "Liberec Region"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:9
+msgid "Limburg"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:25
+msgid "Limerick"
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:8
+msgid "Limpopo"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:31
+msgid "Lincolnshire"
+msgstr ""
+
+#: contrib/gis/db/models/fields.py:273
+msgid "Line string"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:39
+msgid "Liptovsky Mikulas"
+msgstr ""
+
+#: conf/global_settings.py:75
+msgid "Lithuanian"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:29
+msgid "Lleida"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:12
+msgid "Lodz"
+msgstr ""
+
+#: contrib/admin/sites.py:402 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/templates/registration/password_reset_complete.html:14
+#: contrib/admin/views/decorators.py:20
+msgid "Log in"
+msgstr ""
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr ""
+
+#: contrib/admin/templates/admin/base.html:47
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Log out"
+msgstr ""
+
+#: contrib/auth/views.py:60
+msgid "Logged out"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:26
+msgid "Longford"
+msgstr ""
+
+#: contrib/admin/sites.py:313 contrib/admin/views/decorators.py:47
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+
+#: contrib/admin/widgets.py:126
+msgid "Lookup"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:81
+msgid "Lothian"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:27
+msgid "Louth"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:7
+msgid "Lower Austria"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:13
+msgid "Lower Saxony"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:8
+msgid "Lower Silesia"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:10
+msgid "Lublin"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:11
+msgid "Lubusz"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:40
+msgid "Lucenec"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:16
+msgid "Lucerne"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:31
+msgid "Lugo"
+msgstr ""
+
+#: utils/translation/trans_real.py:554
+msgid "MONTH_DAY_FORMAT"
+msgstr "F j"
+
+#: conf/global_settings.py:76
+msgid "Macedonian"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:49
+msgid "Madiun"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:32
+#: contrib/localflavor/es/es_regions.py:18
+msgid "Madrid"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:92
+msgid "Madura"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:46
+msgid "Magelang"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:41
+msgid "Malacky"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:33
+msgid "Malaga"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:93
+msgid "Malang"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:26
+#: contrib/localflavor/id/id_choices.py:70
+msgid "Maluku"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:27
+#: contrib/localflavor/id/id_choices.py:71
+msgid "Maluku Utara"
+msgstr ""
+
+#: db/models/fields/related.py:939
+msgid "Many-to-many relationship"
+msgstr ""
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "March"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:42
+msgid "Martin"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:14
+msgid "Masovia"
+msgstr ""
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "May"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:28
+msgid "Mayo"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:29
+msgid "Meath"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:12
+msgid "Mecklenburg-Western Pomerania"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:43
+msgid "Medzilaborce"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:56
+msgid "Melilla"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:32
+msgid "Merseyside"
+msgstr ""
+
+#: contrib/comments/admin.py:15
+msgid "Metadata"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:44
+msgid "Michalovce"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:27
+msgid "Michoacán"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:68
+msgid "Mid Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:27
+msgid "Mie"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:7
+msgid "Miyagi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:48
+msgid "Miyazaki"
+msgstr ""
+
+#: db/models/fields/related.py:755
+#, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr ""
+
+#: contrib/admindocs/views.py:197
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr ""
+
+#: utils/dates.py:10
+msgid "Mon"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:30
+msgid "Monaghan"
+msgstr ""
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:21
+msgid "Moravian-Silesian Region"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:28
+msgid "Morelos"
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:9
+msgid "Mpumalanga"
+msgstr ""
+
+#: contrib/gis/db/models/fields.py:289
+msgid "Multi polygon"
+msgstr ""
+
+#: contrib/gis/db/models/fields.py:285
+msgid "Multi-line string"
+msgstr ""
+
+#: contrib/gis/db/models/fields.py:281
+msgid "Multi-point"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:34
+msgid "Murcia"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:54
+msgid "My Actions"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:45
+msgid "Myjava"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:77
+msgid "NTB - Lombok"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:81
+msgid "NTB - Sumbawa"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:82
+msgid "NTT - Flores"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:83
+msgid "NTT - Sumba"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:72
+msgid "NTT - Timor"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:19
+msgid "Nagano"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:45
+msgid "Nagasaki"
+msgstr ""
+
+#: contrib/comments/forms.py:93
+msgid "Name"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:46
+msgid "Namestovo"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:28
+#: contrib/localflavor/id/id_choices.py:59
+msgid "Nanggroe Aceh Darussalam"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:32
+msgid "Nara"
+msgstr ""
+
+#: contrib/localflavor/pl/forms.py:109
+msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
+msgstr ""
+
+#: contrib/localflavor/pl/forms.py:38
+msgid "National Identification Number consists of 11 digits."
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:35
+msgid "Navarre"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:29
+msgid "Nayarit"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:17
+msgid "Neuchatel"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_change_form.html:32
+#: contrib/auth/forms.py:144
+msgid "New password"
+msgstr ""
+
+#: contrib/auth/forms.py:145
+msgid "New password confirmation"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:18
+msgid "Nidwalden"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:20
+msgid "Niigata"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:47
+msgid "Nitra"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:11
+msgid "Nitra region"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:435
+msgid "No"
+msgstr ""
+
+#: contrib/admin/options.py:754
+msgid "No action selected."
+msgstr ""
+
+#: contrib/admin/options.py:574
+msgid "No fields changed."
+msgstr ""
+
+#: forms/fields.py:422
+msgid "No file was submitted."
+msgstr "Der is gjin bestân yntsjinne."
+
+#: forms/fields.py:421
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+"Der is gjin bestân yntsjinne. Kontrolearje it kodearringstype op it "
+"formulier."
+
+#: contrib/gis/forms/fields.py:17
+msgid "No geometry value provided."
+msgstr ""
+
+#: contrib/admin/options.py:137 contrib/admin/options.py:152
+msgid "None"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:58
+msgid "None available"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:10
+msgid "Noord-Brabant"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:11
+msgid "Noord-Holland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:33
+msgid "Norfolk"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:17
+msgid "Norrbotten"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:14
+msgid "North Rhine-Westphalia"
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:11
+msgid "North West"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:34
+msgid "North Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:35
+msgid "Northamptonshire"
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:10
+msgid "Northern Cape"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:91
+msgid "Northern Ireland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:36
+msgid "Northumberland"
+msgstr ""
+
+#: conf/global_settings.py:78
+msgid "Norwegian"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:37
+msgid "Nottinghamshire"
+msgstr ""
+
+#: utils/dates.py:32
+msgid "Nov."
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:48
+msgid "Nove Mesto nad Vahom"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:49
+msgid "Nove Zamky"
+msgstr ""
+
+#: utils/dates.py:19
+msgid "November"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:30
+msgid "Nuevo León"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:29
+msgid "Nusa Tenggara Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:30
+msgid "Nusa Tenggara Timur"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:31
+msgid "Oaxaca"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:19
+msgid "Obwalden"
+msgstr ""
+
+#: utils/dates.py:32
+msgid "Oct."
+msgstr ""
+
+#: utils/dates.py:19
+msgid "October"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:31
+msgid "Offaly"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:47
+msgid "Oita"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:36
+msgid "Okayama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:50
+msgid "Okinawa"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_change_form.html:27
+#: contrib/auth/forms.py:170
+msgid "Old password"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:19
+msgid "Olomouc Region"
+msgstr ""
+
+#: contrib/admin/util.py:175
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr ""
+
+#: contrib/admin/util.py:170
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr ""
+
+#: db/models/fields/related.py:879
+msgid "One-to-one relationship"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:15
+msgid "Opole"
+msgstr ""
+
+#: forms/formsets.py:287 forms/formsets.py:289
+msgid "Order"
+msgstr "Oarder"
+
+#: contrib/localflavor/uk/uk_regions.py:82
+msgid "Orkney Islands"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:30
+msgid "Osaka"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:36
+msgid "Ourense"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:12
+msgid "Overijssel"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:38
+msgid "Oxfordshire"
+msgstr ""
+
+#: utils/dateformat.py:48
+msgid "PM"
+msgstr ""
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:38
+msgid "Palencia"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:31
+msgid "Papua"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:32
+msgid "Papua Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:78
+msgid "Papua dan Papua Barat"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:16
+msgid "Pardubice Region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:50
+msgid "Partizanske"
+msgstr ""
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:35
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:61 contrib/auth/forms.py:186
+msgid "Password"
+msgstr ""
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:41
+#: contrib/admin/templates/registration/password_change_form.html:37
+#: contrib/auth/forms.py:187
+msgid "Password (again)"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:5
+#: contrib/admin/templates/registration/password_change_form.html:7
+#: contrib/admin/templates/registration/password_change_form.html:19
+msgid "Password change"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr ""
+
+#: contrib/auth/admin.py:111
+msgid "Password changed successfully."
+msgstr ""
+
+#: contrib/auth/forms.py:18
+msgid "Password confirmation"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_complete.html:4
+#: contrib/admin/templates/registration/password_reset_confirm.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr ""
+
+#: contrib/auth/forms.py:136
+#, python-format
+msgid "Password reset on %s"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr ""
+
+#: contrib/admin/templates/admin/login.html:22
+msgid "Password:"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:117
+msgid "Past 7 days"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:87
+msgid "Pati"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:85
+msgid "Pekalongan"
+msgstr ""
+
+#: contrib/auth/admin.py:27
+msgid "Permissions"
+msgstr ""
+
+#: conf/global_settings.py:58
+msgid "Persian"
+msgstr ""
+
+#: contrib/auth/admin.py:26
+msgid "Personal info"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:51
+msgid "Pezinok"
+msgstr ""
+
+#: contrib/localflavor/us/models.py:17
+msgid "Phone number"
+msgstr ""
+
+#: contrib/localflavor/fr/forms.py:31
+msgid "Phone numbers must be in 0X XX XX XX XX format."
+msgstr ""
+
+#: contrib/localflavor/br/forms.py:31
+msgid "Phone numbers must be in XX-XXXX-XXXX format."
+msgstr ""
+
+#: contrib/localflavor/us/forms.py:26
+msgid "Phone numbers must be in XXX-XXX-XXXX format."
+msgstr ""
+
+#: contrib/localflavor/ro/forms.py:171
+msgid "Phone numbers must be in XXXX-XXXXXX format."
+msgstr ""
+
+#: contrib/localflavor/pt/forms.py:37
+msgid "Phone numbers must have 9 digits, or start by + or 00."
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:52
+msgid "Piestany"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:11
+msgid "Pilsen Region"
+msgstr ""
+
+#: forms/models.py:542
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: forms/models.py:538
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr ""
+
+#: forms/models.py:548
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: forms/models.py:556
+msgid "Please correct the duplicate values below."
+msgstr ""
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/templates/admin/change_form.html:39
+#: contrib/admin/templates/admin/change_list.html:65
+#: contrib/admin/templates/admin/auth/user/change_password.html:24
+#: contrib/admin/templates/registration/password_change_form.html:15
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/sites.py:22 contrib/admin/views/decorators.py:14
+#: contrib/auth/forms.py:81
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:68
+msgid "Please enter a valid NIF or NIE."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:67
+msgid "Please enter a valid NIF, NIE, or CIF."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:143
+msgid ""
+"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgstr ""
+
+#: db/models/fields/related.py:1020
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] ""
+"Jou asjobleaft falide %(self)s IDs. De wearde %(value)r is net goed."
+msgstr[1] ""
+"Jou asjobleaft falide %(self)s IDs. De wearden %(value)r binne net goed."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:14
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: contrib/admin/sites.py:306 contrib/admin/views/decorators.py:40
+msgid "Please log in again, because your session has expired."
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:17
+msgid "Podlasie"
+msgstr ""
+
+#: contrib/gis/db/models/fields.py:269
+msgid "Point"
+msgstr ""
+
+#: conf/global_settings.py:79
+msgid "Polish"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:53
+msgid "Poltar"
+msgstr ""
+
+#: contrib/gis/db/models/fields.py:277
+msgid "Polygon"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:18
+msgid "Pomerania"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:40
+msgid "Pontevedra"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:54
+msgid "Poprad"
+msgstr ""
+
+#: conf/global_settings.py:80
+msgid "Portuguese"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Post"
+msgstr ""
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr ""
+
+#: contrib/comments/models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:55
+msgid "Povazska Bystrica"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:69
+msgid "Powys"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:8
+msgid "Prague"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:56
+msgid "Presov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:12
+msgid "Presov region"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:18
+#: contrib/comments/templates/comments/preview.html:33
+msgid "Preview"
+msgstr ""
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:13
+msgid "Preview your comment"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:57
+msgid "Prievidza"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:7
+msgid "Principality of Asturias"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:58
+msgid "Puchov"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:32
+msgid "Puebla"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:98
+msgid "Purwakarta"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:33
+msgid "Querétaro"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:34
+msgid "Quintana Roo"
+msgstr ""
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:19
+msgid "Region of Murcia"
+msgstr ""
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:36
+#: contrib/admin/templates/admin/edit_inline/tabular.html:81
+#: contrib/comments/templates/comments/delete.html:12
+msgid "Remove"
+msgstr ""
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr ""
+
+#: contrib/comments/admin.py:48
+msgid "Remove selected comments"
+msgstr ""
+
+#: contrib/auth/forms.py:15 contrib/auth/forms.py:49
+#: contrib/auth/models.py:137
+msgid ""
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:59
+msgid "Revuca"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:15
+msgid "Rhineland-Palatinate"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:33
+#: contrib/localflavor/id/id_choices.py:60
+msgid "Riau"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:60
+msgid "Rimavska Sobota"
+msgstr ""
+
+#: conf/global_settings.py:82
+msgid "Romanian"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:32
+msgid "Roscommon"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:61
+msgid "Roznava"
+msgstr ""
+
+#: contrib/admin/templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr ""
+
+#: conf/global_settings.py:83
+msgid "Russian"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:62
+msgid "Ruzomberok"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:16
+msgid "Saarland"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:63
+msgid "Sabinov"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:44
+msgid "Saga"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:14
+msgid "Saitama"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:73
+msgid "Sala"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:41
+msgid "Salamanca"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:9
+msgid "Salzburg"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:36
+msgid "San Luis Potosí"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:42
+msgid "Santa Cruz de Tenerife"
+msgstr ""
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr ""
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr ""
+
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr ""
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr ""
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr ""
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:17
+msgid "Saxony"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:18
+msgid "Saxony-Anhalt"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:20
+msgid "Schaffhausen"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:19
+msgid "Schleswig-Holstein"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:21
+msgid "Schwyz"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:92
+msgid "Scotland"
+msgstr ""
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Search"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:44
+msgid "Segovia"
+msgstr ""
+
+#: contrib/admin/views/main.py:70
+#, python-format
+msgid "Select %s"
+msgstr ""
+
+#: contrib/admin/views/main.py:70
+#, python-format
+msgid "Select %s to change"
+msgstr ""
+
+#: contrib/localflavor/br/forms.py:59
+msgid ""
+"Select a valid brazilian state. That state is not one of the available "
+"states."
+msgstr ""
+
+#: forms/fields.py:577 forms/fields.py:652
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+"Selektearje in falide kar. %(value)s is net ien fan de beskikbere karren."
+
+#: forms/models.py:962
+#, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "Selektearje in falide kar. %s is net ien fan de beskikbere karren."
+
+#: forms/models.py:886
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Selektearje in falide kar. Dizze kar is net ien fan de beskikbere karren."
+
+#: contrib/admin/templates/admin/actions.html:14
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:86
+msgid "Semarang"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:64
+msgid "Senec"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:65
+msgid "Senica"
+msgstr ""
+
+#: utils/dates.py:32
+msgid "Sept."
+msgstr ""
+
+#: utils/dates.py:19
+msgid "September"
+msgstr ""
+
+#: conf/global_settings.py:86
+msgid "Serbian"
+msgstr ""
+
+#: conf/global_settings.py:87
+msgid "Serbian Latin"
+msgstr ""
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr ""
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr ""
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:45
+msgid "Seville"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:83
+msgid "Shetland Islands"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:28
+msgid "Shiga"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:35
+msgid "Shimane"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:25
+msgid "Shizuoka"
+msgstr ""
+
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:39
+msgid "Shropshire"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:99
+msgid "Sidoarjo"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:19
+msgid "Silesia"
+msgstr ""
+
+#: conf/global_settings.py:94
+msgid "Simplified Chinese"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:35
+msgid "Sinaloa"
+msgstr ""
+
+#: contrib/admin/sites.py:388
+msgid "Site administration"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:66
+msgid "Skalica"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:26
+msgid "Skåne"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:33
+msgid "Sligo"
+msgstr ""
+
+#: conf/global_settings.py:84
+msgid "Slovak"
+msgstr ""
+
+#: conf/global_settings.py:85
+msgid "Slovenian"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:67
+msgid "Snina"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:68
+msgid "Sobrance"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:22
+msgid "Solothurn"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:40
+msgid "Somerset"
+msgstr ""
+
+#: contrib/admin/templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:37
+msgid "Sonora"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:46
+msgid "Soria"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:10
+msgid "South Bohemian Region"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:70
+msgid "South Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:18
+msgid "South Moravian Region"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:41
+msgid "South Yorkshire"
+msgstr ""
+
+#: conf/global_settings.py:54
+msgid "Spanish"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:69
+msgid "Spisska Nova Ves"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:23
+msgid "St. Gallen"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:42
+msgid "Staffordshire"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:70
+msgid "Stara Lubovna"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:15
+msgid "Stockholm"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:84
+msgid "Strathclyde"
+msgstr ""
+
+#: db/models/fields/__init__.py:554 db/models/fields/__init__.py:984
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:71
+msgid "Stropkov"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:10
+msgid "Styria"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:16
+msgid "Subcarpatia"
+msgstr ""
+
+#: contrib/admin/actions.py:60
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:43
+msgid "Suffolk"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:34
+#: contrib/localflavor/id/id_choices.py:68
+msgid "Sulawesi Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:35
+#: contrib/localflavor/id/id_choices.py:69
+msgid "Sulawesi Selatan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:36
+#: contrib/localflavor/id/id_choices.py:76
+msgid "Sulawesi Tengah"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:37
+#: contrib/localflavor/id/id_choices.py:79
+msgid "Sulawesi Tenggara"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:38
+msgid "Sulawesi Utara"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:67
+msgid "Sulawesi Utara Daratan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:74
+msgid "Sulawesi Utara Kepulauan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:39
+#: contrib/localflavor/id/id_choices.py:52
+msgid "Sumatera Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:40
+#: contrib/localflavor/id/id_choices.py:56
+msgid "Sumatera Selatan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:41
+#: contrib/localflavor/id/id_choices.py:58
+msgid "Sumatera Utara"
+msgstr ""
+
+#: utils/dates.py:11
+msgid "Sun"
+msgstr ""
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:91
+msgid "Surabaya"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:48
+msgid "Surakarta - Solo"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:44
+msgid "Surrey"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:72
+msgid "Svidnik"
+msgstr ""
+
+#: conf/global_settings.py:88
+msgid "Swedish"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:20
+msgid "Swietokrzyskie"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:19
+msgid "Södermanland"
+msgstr ""
+
+#: utils/translation/trans_real.py:532
+msgid "TIME_FORMAT"
+msgstr "P"
+
+#: contrib/localflavor/mx/mx_states.py:38
+msgid "Tabasco"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:39
+msgid "Tamaulipas"
+msgstr ""
+
+#: conf/global_settings.py:89
+msgid "Tamil"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:53
+msgid "Tapanuli"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:47
+msgid "Tarragona"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:85
+msgid "Tayside"
+msgstr ""
+
+#: conf/global_settings.py:90
+msgid "Telugu"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:48
+msgid "Teruel"
+msgstr ""
+
+#: db/models/fields/__init__.py:1007
+msgid "Text"
+msgstr ""
+
+#: conf/global_settings.py:91
+msgid "Thai"
+msgstr ""
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr ""
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr ""
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr ""
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr ""
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr ""
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr ""
+
+#: contrib/auth/forms.py:110
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: contrib/admin/options.py:640
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr ""
+
+#: contrib/admin/options.py:683
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+
+#: contrib/admin/options.py:675
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr ""
+
+#: contrib/admin/options.py:1087
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr ""
+
+#: views/generic/create_update.py:115
+#, python-format
+msgid "The %(verbose_name)s was created successfully."
+msgstr "De %(verbose_name)s is súksesfol oanmakke."
+
+#: views/generic/create_update.py:201
+#, python-format
+msgid "The %(verbose_name)s was deleted."
+msgstr "De %(verbose_name)s is fuortsmiten."
+
+#: views/generic/create_update.py:158
+#, python-format
+msgid "The %(verbose_name)s was updated successfully."
+msgstr "De %(verbose_name)s is súksesfol fernijd."
+
+#: contrib/localflavor/cl/forms.py:32
+msgid "The Chilean RUT is not valid."
+msgstr ""
+
+#: contrib/localflavor/is_/forms.py:19
+msgid "The Icelandic identification number is not valid."
+msgstr ""
+
+#: contrib/gis/db/models/fields.py:50
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+
+#: forms/models.py:820
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+#: forms/fields.py:423
+msgid "The submitted file is empty."
+msgstr "It yntsjinne bestân is leech."
+
+#: contrib/auth/forms.py:37 contrib/auth/forms.py:156
+#: contrib/auth/forms.py:198
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+#: core/validators.py:71 forms/fields.py:511
+msgid "This URL appears to be a broken link."
+msgstr "Dit URL liket in ferbrutsen keppeling."
+
+#: contrib/auth/forms.py:83
+msgid "This account is inactive."
+msgstr ""
+
+#: contrib/redirects/models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+
+#: contrib/comments/models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+
+#: contrib/comments/models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+
+#: db/models/fields/__init__.py:67
+msgid "This field cannot be blank."
+msgstr ""
+
+#: db/models/fields/__init__.py:66
+msgid "This field cannot be null."
+msgstr "Dit fjild kin net leech wêze."
+
+#: forms/fields.py:65
+msgid "This field is required."
+msgstr "Dit fjild is fereaske."
+
+#: contrib/localflavor/pe/forms.py:53
+msgid "This field requires 11 digits."
+msgstr ""
+
+#: contrib/localflavor/ar/forms.py:51
+msgid "This field requires 7 or 8 digits."
+msgstr ""
+
+#: contrib/localflavor/pe/forms.py:25
+msgid "This field requires 8 digits."
+msgstr ""
+
+#: contrib/localflavor/br/forms.py:137
+msgid "This field requires at least 14 digits"
+msgstr ""
+
+#: contrib/localflavor/br/forms.py:96
+msgid "This field requires at most 11 digits or 14 characters."
+msgstr ""
+
+#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:97
+#: contrib/localflavor/br/forms.py:136 contrib/localflavor/pe/forms.py:24
+#: contrib/localflavor/pe/forms.py:52
+msgid "This field requires only numbers."
+msgstr ""
+
+#: contrib/admin/filterspecs.py:119
+msgid "This month"
+msgstr ""
+
+#: contrib/admin/templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+
+#: contrib/redirects/models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+
+#: db/models/fields/__init__.py:750
+msgid "This value must be a decimal number."
+msgstr "Dizze wearde moat in desimaal nûmer wêze."
+
+#: db/models/fields/__init__.py:837 db/models/fields/__init__.py:865
+msgid "This value must be a float."
+msgstr ""
+
+#: db/models/fields/__init__.py:475
+msgid "This value must be an integer."
+msgstr "Dizze wearde moat in integer wêze."
+
+#: db/models/fields/__init__.py:921
+msgid "This value must be either None, True or False."
+msgstr "Dizze wearde moat of Gjin, of Wier of Net wier wêze."
+
+#: db/models/fields/__init__.py:510
+msgid "This value must be either True or False."
+msgstr "Dizze wearde moat of Wier of Net wier wêze."
+
+#: contrib/auth/forms.py:16 contrib/auth/forms.py:50
+msgid "This value must contain only letters, numbers and underscores."
+msgstr ""
+
+#: contrib/flatpages/admin.py:11
+msgid ""
+"This value must contain only letters, numbers, underscores, dashes or "
+"slashes."
+msgstr ""
+
+#: contrib/admin/filterspecs.py:121
+msgid "This year"
+msgstr ""
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:24
+msgid "Thurgau"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:20
+msgid "Thuringia"
+msgstr ""
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:25
+msgid "Ticino"
+msgstr ""
+
+#: db/models/fields/__init__.py:1023
+msgid "Time"
+msgstr ""
+
+#: contrib/admin/widgets.py:72
+msgid "Time:"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:34
+msgid "Tipperary"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:40
+msgid "Tlaxcala"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:12
+msgid "Tochigi"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:114
+msgid "Today"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:39
+msgid "Tokushima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:16
+msgid "Tokyo"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:49
+msgid "Toledo"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:74
+msgid "Topolcany"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:34
+msgid "Tottori"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:21
+msgid "Toyama"
+msgstr ""
+
+#: conf/global_settings.py:95
+msgid "Traditional Chinese"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:75
+msgid "Trebisov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:76
+msgid "Trencin"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:13
+msgid "Trencin region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:77
+msgid "Trnava"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:14
+msgid "Trnava region"
+msgstr ""
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr ""
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:78
+msgid "Turcianske Teplice"
+msgstr ""
+
+#: conf/global_settings.py:92
+msgid "Turkish"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:79
+msgid "Tvrdosin"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:45
+msgid "Tyne and Wear"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:11
+msgid "Tyrol"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:35
+msgid "Tyrone"
+msgstr ""
+
+#: contrib/localflavor/us/models.py:8
+msgid "U.S. state (two uppercase letters)"
+msgstr ""
+
+#: contrib/comments/forms.py:95 contrib/flatpages/admin.py:8
+#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1103
+msgid "URL"
+msgstr ""
+
+#: conf/global_settings.py:93
+msgid "Ukrainian"
+msgstr ""
+
+#: contrib/comments/models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:435
+msgid "Unknown"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:72
+msgid "Unknown content"
+msgstr ""
+
+#: forms/fields.py:459
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Laad in falide ôfbylding op. It bestân dy't jo opladen hawwe wie net in "
+"ôfbylding of in skansearre ôfbylding."
+
+#: contrib/localflavor/at/at_states.py:8
+msgid "Upper Austria"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:18
+msgid "Uppsala"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:26
+msgid "Uri"
+msgstr ""
+
+#: contrib/auth/models.py:141
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+
+#: contrib/admin/templates/admin/object_history.html:23
+msgid "User"
+msgstr ""
+
+#: contrib/auth/forms.py:14 contrib/auth/forms.py:48 contrib/auth/forms.py:60
+msgid "Username"
+msgstr ""
+
+#: contrib/admin/templates/admin/login.html:19
+msgid "Username:"
+msgstr ""
+
+#: contrib/admin/sites.py:329 contrib/admin/sites.py:335
+#: contrib/admin/views/decorators.py:66
+msgid "Usernames cannot contain the '@' character."
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:13
+msgid "Usti Region"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:13
+msgid "Utrecht"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:27
+msgid "Valais"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:50
+msgid "Valencia"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:21
+msgid "Valencian Community"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:51
+msgid "Valladolid"
+msgstr ""
+
+#: db/models/fields/__init__.py:65
+#, python-format
+msgid "Value %r is not a valid choice."
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:28
+msgid "Vaud"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:80
+msgid "Velky Krtis"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:41
+msgid "Veracruz"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:13
+msgid "Vienna"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_form.html:29
+#: contrib/admin/templates/admin/edit_inline/stacked.html:9
+#: contrib/admin/templates/admin/edit_inline/tabular.html:28
+msgid "View on site"
+msgstr ""
+
+#: contrib/localflavor/at/at_states.py:12
+msgid "Vorarlberg"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:81
+msgid "Vranov nad Toplou"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:17
+msgid "Vysocina Region"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:29
+msgid "Värmland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:16
+msgid "Västerbotten"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:34
+msgid "Västernorrland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:31
+msgid "Västmanland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:28
+msgid "Västra Götaland"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:33
+msgid "Wakayama"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:93
+msgid "Wales"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:21
+msgid "Warmia-Masuria"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:46
+msgid "Warwickshire"
+msgstr ""
+
+#: contrib/comments/forms.py:175
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/localflavor/ie/ie_counties.py:36
+msgid "Waterford"
+msgstr ""
+
+#: contrib/formtools/wizard.py:132
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr ""
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr ""
+
+#: contrib/admin/templates/admin/base.html:27
+msgid "Welcome,"
+msgstr ""
+
+#: conf/global_settings.py:49
+msgid "Welsh"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:71
+msgid "West Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:47
+msgid "West Midlands"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:23
+msgid "West Pomerania"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:48
+msgid "West Sussex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:49
+msgid "West Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:12
+msgid "Western Cape"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:86
+msgid "Western Isles"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:37
+msgid "Westmeath"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:38
+msgid "Wexford"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:39
+msgid "Wicklow"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:50
+msgid "Wiltshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:51
+msgid "Worcestershire"
+msgstr ""
+
+#: contrib/localflavor/pl/forms.py:110
+msgid "Wrong checksum for the National Business Register Number (REGON)."
+msgstr ""
+
+#: contrib/localflavor/pl/forms.py:39
+msgid "Wrong checksum for the National Identification Number."
+msgstr ""
+
+#: contrib/localflavor/pl/forms.py:72
+msgid "Wrong checksum for the Tax Number (NIP)."
+msgstr ""
+
+#: db/models/fields/__init__.py:1111
+msgid "XML text"
+msgstr ""
+
+#: utils/translation/trans_real.py:553
+msgid "YEAR_MONTH_FORMAT"
+msgstr "F Y"
+
+#: contrib/localflavor/jp/jp_prefectures.py:9
+msgid "Yamagata"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:38
+msgid "Yamaguchi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:18
+msgid "Yamanashi"
+msgstr ""
+
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:435
+msgid "Yes"
+msgstr ""
+
+#: contrib/admin/templates/admin/delete_confirmation.html:28
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:33
+msgid "Yes, I'm sure"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:12
+#: contrib/localflavor/id/id_choices.py:47
+msgid "Yogyakarta"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr ""
+
+#: contrib/admin/options.py:654 contrib/admin/options.py:687
+#, python-format
+msgid "You may add another %s below."
+msgstr ""
+
+#: contrib/admin/options.py:644 contrib/admin/options.py:677
+msgid "You may edit it again below."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr ""
+
+#: contrib/auth/forms.py:88
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+
+#: contrib/admin/sites.py:332 contrib/admin/views/decorators.py:62
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr ""
+
+#: contrib/auth/forms.py:178
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:42
+msgid "Yucatán"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:43
+msgid "Zacatecas"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:53
+msgid "Zamora"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:54
+msgid "Zaragoza"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:84
+msgid "Zarnovica"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:14
+msgid "Zeeland"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:85
+msgid "Ziar nad Hronom"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:86
+msgid "Zilina"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:15
+msgid "Zilina region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:82
+msgid "Zlate Moravce"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:20
+msgid "Zlin Region"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:29
+msgid "Zug"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:15
+msgid "Zuid-Holland"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:30
+msgid "Zurich"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:83
+msgid "Zvolen"
+msgstr ""
+
+#: utils/dateformat.py:43
+msgid "a.m."
+msgstr ""
+
+#: contrib/admin/models.py:24
+msgid "action flag"
+msgstr ""
+
+#: contrib/admin/models.py:19
+msgid "action time"
+msgstr ""
+
+#: contrib/auth/models.py:143
+msgid "active"
+msgstr ""
+
+#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:261
+#, python-format
+msgid "all %s"
+msgstr ""
+
+#: contrib/admin/options.py:556 contrib/admin/options.py:566
+#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:797
+#: forms/models.py:544
+msgid "and"
+msgstr ""
+
+#: contrib/comments/admin.py:43
+msgid "approved"
+msgstr ""
+
+#: utils/dates.py:23
+msgid "apr"
+msgstr ""
+
+#: utils/dates.py:24
+msgid "aug"
+msgstr ""
+
+#: contrib/admin/models.py:25
+msgid "change message"
+msgstr ""
+
+#: contrib/auth/models.py:68
+msgid "codename"
+msgstr ""
+
+#: contrib/comments/models.py:56 contrib/comments/models.py:76
+#: contrib/comments/models.py:169
+msgid "comment"
+msgstr ""
+
+#: contrib/comments/models.py:181
+msgid "comment flag"
+msgstr ""
+
+#: contrib/comments/models.py:182
+msgid "comment flags"
+msgstr ""
+
+#: contrib/comments/models.py:77
+msgid "comments"
+msgstr ""
+
+#: contrib/flatpages/models.py:9
+msgid "content"
+msgstr ""
+
+#: contrib/comments/models.py:22 contrib/contenttypes/models.py:81
+msgid "content type"
+msgstr ""
+
+#: contrib/contenttypes/models.py:82
+msgid "content types"
+msgstr ""
+
+#: contrib/comments/models.py:171
+msgid "date"
+msgstr ""
+
+#: contrib/auth/models.py:146
+msgid "date joined"
+msgstr ""
+
+#: contrib/comments/models.py:59
+msgid "date/time submitted"
+msgstr ""
+
+#: utils/timesince.py:24
+msgid "day"
+msgid_plural "days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/dates.py:24
+msgid "dec"
+msgstr ""
+
+#: contrib/sites/models.py:33
+msgid "display name"
+msgstr ""
+
+#: contrib/sites/models.py:32
+msgid "domain name"
+msgstr ""
+
+#: contrib/auth/models.py:140
+msgid "e-mail address"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "eight"
+msgstr ""
+
+#: contrib/flatpages/models.py:10
+msgid "enable comments"
+msgstr ""
+
+#: contrib/sessions/models.py:48
+msgid "expire date"
+msgstr ""
+
+#: utils/dates.py:23
+msgid "feb"
+msgstr ""
+
+#: contrib/admindocs/views.py:94 contrib/admindocs/views.py:96
+#: contrib/admindocs/views.py:98
+msgid "filter:"
+msgstr ""
+
+#: contrib/auth/models.py:138
+msgid "first name"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "five"
+msgstr ""
+
+#: contrib/comments/models.py:170
+msgid "flag"
+msgstr ""
+
+#: contrib/comments/admin.py:39
+msgid "flagged"
+msgstr ""
+
+#: contrib/flatpages/models.py:18
+msgid "flat page"
+msgstr ""
+
+#: contrib/flatpages/models.py:19
+msgid "flat pages"
+msgstr ""
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "four"
+msgstr ""
+
+#: contrib/auth/models.py:98
+msgid "group"
+msgstr ""
+
+#: contrib/auth/models.py:99 contrib/auth/models.py:147
+msgid "groups"
+msgstr ""
+
+#: utils/timesince.py:25
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/comments/models.py:61
+msgid "is public"
+msgstr ""
+
+#: contrib/comments/models.py:64
+msgid "is removed"
+msgstr ""
+
+#: utils/dates.py:23
+msgid "jan"
+msgstr ""
+
+#: utils/dates.py:24
+msgid "jul"
+msgstr ""
+
+#: utils/dates.py:23
+msgid "jun"
+msgstr ""
+
+#: contrib/auth/models.py:145
+msgid "last login"
+msgstr ""
+
+#: contrib/auth/models.py:139
+msgid "last name"
+msgstr ""
+
+#: contrib/messages/tests/base.py:101
+msgid "lazy message"
+msgstr ""
+
+#: contrib/admin/models.py:29
+msgid "log entries"
+msgstr ""
+
+#: contrib/admin/models.py:28
+msgid "log entry"
+msgstr ""
+
+#: utils/dates.py:23
+msgid "mar"
+msgstr ""
+
+#: utils/dates.py:23
+msgid "may"
+msgstr ""
+
+#: contrib/auth/models.py:347
+msgid "message"
+msgstr ""
+
+#: utils/dateformat.py:98
+msgid "midnight"
+msgstr ""
+
+#: utils/timesince.py:26
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:45
+msgid "minutes"
+msgstr ""
+
+#: contrib/admindocs/views.py:209 contrib/admindocs/views.py:228
+#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:261 contrib/admindocs/views.py:266
+msgid "model:"
+msgstr ""
+
+#: utils/timesince.py:22
+msgid "month"
+msgid_plural "months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/auth/models.py:66 contrib/auth/models.py:94
+msgid "name"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "nd"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "nine"
+msgstr ""
+
+#: utils/dateformat.py:100
+msgid "noon"
+msgstr ""
+
+#: utils/dates.py:24
+msgid "nov"
+msgstr ""
+
+#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:266
+#, python-format
+msgid "number of %s"
+msgstr ""
+
+#: contrib/comments/models.py:24
+msgid "object ID"
+msgstr ""
+
+#: contrib/admin/models.py:22
+msgid "object id"
+msgstr ""
+
+#: contrib/admin/models.py:23
+msgid "object repr"
+msgstr ""
+
+#: utils/dates.py:24
+msgid "oct"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "one"
+msgstr ""
+
+#: utils/text.py:128
+msgid "or"
+msgstr ""
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "or make changes"
+msgstr ""
+
+#: utils/dateformat.py:42
+msgid "p.m."
+msgstr ""
+
+#: contrib/auth/models.py:141
+msgid "password"
+msgstr ""
+
+#: contrib/auth/models.py:72
+msgid "permission"
+msgstr ""
+
+#: contrib/auth/models.py:73 contrib/auth/models.py:95
+msgid "permissions"
+msgstr ""
+
+#: contrib/contenttypes/models.py:77
+msgid "python model class name"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "rd"
+msgstr ""
+
+#: contrib/redirects/models.py:13
+msgid "redirect"
+msgstr ""
+
+#: contrib/redirects/models.py:7
+msgid "redirect from"
+msgstr ""
+
+#: contrib/redirects/models.py:9
+msgid "redirect to"
+msgstr ""
+
+#: contrib/redirects/models.py:14
+msgid "redirects"
+msgstr ""
+
+#: contrib/flatpages/models.py:13
+msgid "registration required"
+msgstr ""
+
+#: contrib/admindocs/views.py:224 contrib/admindocs/views.py:256
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr ""
+
+#: contrib/comments/admin.py:47
+msgid "removed"
+msgstr ""
+
+#: utils/dates.py:24
+msgid "sep"
+msgstr ""
+
+#: contrib/sessions/models.py:53
+msgid "session"
+msgstr ""
+
+#: contrib/sessions/models.py:47
+msgid "session data"
+msgstr ""
+
+#: contrib/sessions/models.py:45
+msgid "session key"
+msgstr ""
+
+#: contrib/sessions/models.py:54
+msgid "sessions"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "seven"
+msgstr ""
+
+#: contrib/admin/views/template.py:38 contrib/sites/models.py:38
+msgid "site"
+msgstr ""
+
+#: contrib/sites/models.py:39
+msgid "sites"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "six"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "st"
+msgstr ""
+
+#: contrib/auth/models.py:142
+msgid "staff status"
+msgstr ""
+
+#: contrib/auth/models.py:144
+msgid "superuser status"
+msgstr ""
+
+#: contrib/admindocs/views.py:61 contrib/admindocs/views.py:63
+#: contrib/admindocs/views.py:65
+msgid "tag:"
+msgstr ""
+
+#: contrib/admin/views/template.py:40
+msgid "template"
+msgstr ""
+
+#: contrib/flatpages/models.py:11
+msgid "template name"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:19
+msgid "th"
+msgstr ""
+
+#: contrib/admindocs/views.py:209
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "three"
+msgstr ""
+
+#: contrib/flatpages/models.py:8
+msgid "title"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:93
+msgid "today"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:95
+msgid "tomorrow"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:73
+msgid "two"
+msgstr ""
+
+#: contrib/auth/models.py:153 contrib/comments/models.py:50
+#: contrib/comments/models.py:168
+msgid "user"
+msgstr ""
+
+#: contrib/auth/models.py:149
+msgid "user permissions"
+msgstr ""
+
+#: contrib/comments/models.py:54
+msgid "user's URL"
+msgstr ""
+
+#: contrib/comments/models.py:53
+msgid "user's email address"
+msgstr ""
+
+#: contrib/comments/models.py:52
+msgid "user's name"
+msgstr ""
+
+#: contrib/auth/models.py:137
+msgid "username"
+msgstr ""
+
+#: contrib/auth/models.py:154
+msgid "users"
+msgstr ""
+
+#: contrib/admindocs/views.py:158 contrib/admindocs/views.py:160
+#: contrib/admindocs/views.py:162
+msgid "view:"
+msgstr ""
+
+#: utils/timesince.py:23
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: utils/timesince.py:21
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/defaultfilters.py:775
+msgid "yes,no,maybe"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:97
+msgid "yesterday"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:30
+msgid "Örebro"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:20
+msgid "Östergötland"
+msgstr ""
+
+#~ msgid ""
+#~ "Ensure this value has at least %(min)d characters (it has %(length)d)."
+#~ msgstr ""
+#~ "Wês wis dat dizze wearde minstens %(min)d karakters hat (it hat %(length)"
+#~ "d)."
+
+#~ msgid ""
+#~ "Ensure this value has at most %(max)d characters (it has %(length)d)."
+#~ msgstr ""
+#~ "Wês wis dat dizze wearde maksimaal %(max)d karakters hat (it hat %(length)"
+#~ "d)."
+
+#~ msgid "Ensure this value is greater than or equal to %s."
+#~ msgstr "Wês wis dat dizze wearde grutter of lyk is oan %s."
+
+#~ msgid "Ensure this value is less than or equal to %s."
+#~ msgstr "Wês wis dat dizze wearde minder of lyk is oan %s."
