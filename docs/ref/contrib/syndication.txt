@@ -572,18 +572,18 @@ This example illustrates all possible attributes and methods for a
         # COPYRIGHT NOTICE -- One of the following three is optional. The
         # framework looks for them in this order.
 
-        def copyright(self, obj):
+        def feed_copyright(self, obj):
             """
             Takes the object returned by get_object() and returns the feed's
             copyright notice as a normal Python string.
             """
 
-        def copyright(self):
+        def feed_copyright(self):
             """
             Returns the feed's copyright notice as a normal Python string.
             """
 
-        copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
+        feed_copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
 
         # TTL -- One of the following three is optional. The framework looks
         # for them in this order. Ignored for Atom feeds.
