@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.syndication.feeds import Feed
+from django.contrib.syndication.views import Feed
 from django.contrib.sites.models import Site
 from django.contrib import comments
 from django.utils.translation import ugettext as _
@@ -33,6 +33,6 @@ class LatestCommentFeed(Feed):
             params = [settings.COMMENTS_BANNED_USERS_GROUP]
             qs = qs.extra(where=where, params=params)
         return qs.order_by('-submit_date')[:40]
-        
+
     def item_pubdate(self, item):
         return item.submit_date

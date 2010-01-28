@@ -386,6 +386,87 @@ approach. Old style function-based test runners will still work, but
 should be updated to use the new :ref:`class-based runners
 <topics-testing-test_runner>`.
 
+.. _1.2-updating-feeds:
+
+``Feed`` in ``django.contrib.syndication.feeds``
+------------------------------------------------
+
+The :class:`django.contrib.syndication.feeds.Feed` class has been
+replaced by the :class:`django.contrib.syndication.views.Feed` class.
+The old ``feeds.Feed`` class is deprecated, and will be removed in
+Django 1.4.
+
+The new class has an almost identical API, but allows instances to be
+used as views. For example, consider the use of the old framework in
+the following :ref:`URLconf <topics-http-urls>`::
+
+    from django.conf.urls.defaults import *
+    from myproject.feeds import LatestEntries, LatestEntriesByCategory
+
+    feeds = {
+        'latest': LatestEntries,
+        'categories': LatestEntriesByCategory,
+    }
+
+    urlpatterns = patterns('',
+        # ...
+        (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
+            {'feed_dict': feeds}),
+        # ...
+    )
+
+Using the new Feed class, these feeds can be deployed directly as views::
+
+    from django.conf.urls.defaults import *
+    from myproject.feeds import LatestEntries, LatestEntriesByCategory
+
+    urlpatterns = patterns('',
+        # ...
+        (r'^feeds/latest/$', LatestEntries()),
+        (r'^feeds/categories/(?P<category_id>\d+)/$', LatestEntriesByCategory()),
+        # ...
+    )
+
+If you currently use the ``feed()`` view, the ``LatestEntries`` class
+would not need to be modified apart from subclassing the new
+:class:`~django.contrib.syndication.views.Feed` class.
+
+However, ``LatestEntriesByCategory`` uses the ``get_object()`` method
+with the ``bits`` argument to specify a specific category to show. In
+the new :class:`~django.contrib.syndication.views.Feed` class,
+``get_object()`` method takes a ``request`` and arguments from the
+URL, so it would look like this::
+
+    from django.contrib.syndication.views import Feed
+    from django.shortcuts import get_object_or_404
+    from myproject.models import Category
+
+    class LatestEntriesByCategory(Feed):
+        def get_object(self, request, category_id):
+            return get_object_or_404(Category, id=category_id)
+
+        # ...
+
+Additionally, the ``get_feed()`` method on ``Feed`` classes now take
+different arguments, which may impact you if you use the ``Feed``
+classes directly. Instead of just taking an optional ``url`` argument,
+it now takes two arguments: the object returned by its own
+``get_object()`` method, and the current ``request`` object.
+
+To take into account ``Feed`` classes not being initialized for each
+request, the ``__init__()`` method now takes no arguments by default.
+Previously it would have taken the ``slug`` from the URL and the
+``request`` object.
+
+In accordance with `RSS best practices`_, RSS feeds will now include
+an ``atom:link`` element. You may need to update your tests to take
+this into account.
+
+For more information, see the full :ref:`syndication framework
+documentation <ref-contrib-syndication>`.
+
+.. _RSS best practices: http://www.rssboard.org/rss-profile
+
 What's new in Django 1.2
 ========================
 
@@ -556,7 +637,7 @@ Object-level permissions
 A foundation for specifying permissions at the per-object level has been added.
 Although there is no implementation of this in core, a custom authentication
 backend can provide this implementation and it will be used by
-:class:`django.contrib.auth.models.User`. See the :ref:`authentication docs 
+:class:`django.contrib.auth.models.User`. See the :ref:`authentication docs
 <topics-auth>` for more information.
 
 Permissions for anonymous users
@@ -568,3 +649,12 @@ User already did.  This is useful for centralizing permission handling - apps
 can always delegate the question of whether something is allowed or not to
 the authorization/authentication backend. See the :ref:`authentication
 docs <topics-auth>` for more details.
+
+Syndication feeds as views
+--------------------------
+
+:ref:`Syndication feeds <ref-contrib-syndication>` can now be used directly as
+views in your :ref:`URLconf <topics-http-urls>`. This means that you can
+maintain complete control over the URL structure of your feeds. Like any other view, feeds views are passed a ``request`` object, so you can
+do anything you would normally do with a view, like user based access control,
+or making a feed a named URL.

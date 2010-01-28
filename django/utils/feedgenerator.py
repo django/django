@@ -19,8 +19,8 @@ For definitions of the different versions of RSS, see:
 http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
 
-import re
 import datetime
+import urlparse
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_unicode, iri_to_uri
 
@@ -46,12 +46,16 @@ def rfc3339_date(date):
         return date.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 def get_tag_uri(url, date):
-    "Creates a TagURI. See http://diveintomark.org/archives/2004/05/28/howto-atom-id"
-    tag = re.sub('^http://', '', url)
+    """
+    Creates a TagURI.
+
+    See http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    """
+    url_split = urlparse.urlparse(url)
+    d = ''
     if date is not None:
-        tag = re.sub('/', ',%s:/' % date.strftime('%Y-%m-%d'), tag, 1)
-    tag = re.sub('#', '/', tag)
-    return u'tag:' + tag
+        d = ',%s' % date.strftime('%Y-%m-%d')
+    return u'tag:%s%s:%s/%s' % (url_split.hostname, d, url_split.path, url_split.fragment)
 
 class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
@@ -61,6 +65,9 @@ class SyndicationFeed(object):
         to_unicode = lambda s: force_unicode(s, strings_only=True)
         if categories:
             categories = [force_unicode(c) for c in categories]
+        if ttl is not None:
+            # Force ints to unicode
+            ttl = force_unicode(ttl)
         self.feed = {
             'title': to_unicode(title),
             'link': iri_to_uri(link),
@@ -91,6 +98,9 @@ class SyndicationFeed(object):
         to_unicode = lambda s: force_unicode(s, strings_only=True)
         if categories:
             categories = [to_unicode(c) for c in categories]
+        if ttl is not None:
+            # Force ints to unicode
+            ttl = force_unicode(ttl)
         item = {
             'title': to_unicode(title),
             'link': iri_to_uri(link),
@@ -186,7 +196,8 @@ class RssFeed(SyndicationFeed):
         handler.endElement(u"rss")
 
     def rss_attributes(self):
-        return {u"version": self._version}
+        return {u"version": self._version,
+                u"xmlns:atom": u"http://www.w3.org/2005/Atom"}
 
     def write_items(self, handler):
         for item in self.items:
@@ -198,6 +209,7 @@ class RssFeed(SyndicationFeed):
         handler.addQuickElement(u"title", self.feed['title'])
         handler.addQuickElement(u"link", self.feed['link'])
         handler.addQuickElement(u"description", self.feed['description'])
+        handler.addQuickElement(u"atom:link", None, {u"rel": u"self", u"href": self.feed['feed_url']})
         if self.feed['language'] is not None:
             handler.addQuickElement(u"language", self.feed['language'])
         for cat in self.feed['categories']:
@@ -235,7 +247,7 @@ class Rss201rev2Feed(RssFeed):
         elif item["author_email"]:
             handler.addQuickElement(u"author", item["author_email"])
         elif item["author_name"]:
-            handler.addQuickElement(u"dc:creator", item["author_name"], {"xmlns:dc": u"http://purl.org/dc/elements/1.1/"})
+            handler.addQuickElement(u"dc:creator", item["author_name"], {u"xmlns:dc": u"http://purl.org/dc/elements/1.1/"})
 
         if item['pubdate'] is not None:
             handler.addQuickElement(u"pubDate", rfc2822_date(item['pubdate']).decode('utf-8'))
