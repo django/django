@@ -11,7 +11,7 @@ def validate_answer_to_universe(value):
 class ModelToValidate(models.Model):
     name = models.CharField(max_length=100)
     created = models.DateTimeField(default=datetime.now)
-    number = models.IntegerField()
+    number = models.IntegerField(db_column='number_val')
     parent = models.ForeignKey('self', blank=True, null=True, limit_choices_to={'number': 10})
     email = models.EmailField(blank=True)
     url = models.URLField(blank=True)
@@ -47,7 +47,7 @@ class UniqueForDateModel(models.Model):
 
 class CustomMessagesModel(models.Model):
     other  = models.IntegerField(blank=True, null=True)
-    number = models.IntegerField(
+    number = models.IntegerField(db_column='number_val',
         error_messages={'null': 'NULL', 'not42': 'AAARGH', 'not_equal': '%s != me'},
         validators=[validate_answer_to_universe]
     )
