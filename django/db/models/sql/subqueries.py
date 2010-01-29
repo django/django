@@ -50,15 +50,19 @@ class DeleteQuery(Query):
 
         for f in cls._meta.many_to_many:
             w1 = self.where_class()
+            db_prep_value = None
             if isinstance(f, generic.GenericRelation):
                 from django.contrib.contenttypes.models import ContentType
-                field = f.rel.to._meta.get_field(f.content_type_field_name)
-                w1.add((Constraint(None, field.column, field), 'exact',
+                ct_field = f.rel.to._meta.get_field(f.content_type_field_name)
+                w1.add((Constraint(None, ct_field.column, ct_field), 'exact',
                         ContentType.objects.get_for_model(cls).id), AND)
+                id_field = f.rel.to._meta.get_field(f.object_id_field_name)
+                db_prep_value = id_field.get_db_prep_value
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                 where = self.where_class()
                 where.add((Constraint(None, f.m2m_column_name(), f), 'in',
-                        pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
+                        map(db_prep_value,
+                            pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE])),
                         AND)
                 if w1:
                     where.add(w1, AND)

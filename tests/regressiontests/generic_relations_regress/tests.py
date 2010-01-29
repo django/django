@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
-from models import Link, Place, Restaurant, Person, Address
+from models import Link, Place, Restaurant, Person, Address, CharLink, TextLink, OddRelation1, OddRelation2
 
 class GenericRelationTests(TestCase):
 
@@ -30,3 +30,13 @@ class GenericRelationTests(TestCase):
         qs = Person.objects.filter(addresses__zipcode='80433')
         self.assertEqual(1, qs.count())
         self.assertEqual('Chef', qs[0].name)
+
+    def test_charlink_delete(self):
+        oddrel = OddRelation1.objects.create(name='clink')
+        cl = CharLink.objects.create(content_object=oddrel)
+        oddrel.delete()
+
+    def test_textlink_delete(self):
+        oddrel = OddRelation2.objects.create(name='tlink')
+        tl = TextLink.objects.create(content_object=oddrel)
+        oddrel.delete()
