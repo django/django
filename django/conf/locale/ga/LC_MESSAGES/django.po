@@ -1,16 +1,18 @@
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-12-22 19:26+0100\n"
-"PO-Revision-Date: 2009-10-01 11:40+0100\n"
-"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
-"Language-Team: Gaeilge <ga@li.org>\n"
+"PO-Revision-Date: 2009-12-24 06:01+0100\n"
+"Last-Translator: Kevin Scannell <kscanne@gmail.com>\n"
+"Language-Team: Irish <gaeilge-gnulinux@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n < 11 ? "
+"3 : 4\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -1404,6 +1406,9 @@ msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: contrib/comments/feeds.py:13
 #, python-format
@@ -3870,7 +3875,7 @@ msgstr "Slánuimhir"
 
 #: db/models/fields/__init__.py:395 db/models/fields/__init__.py:775
 msgid "This value must be an integer."
-msgstr "Ní mór go mbeadh an luach slánuimhir."
+msgstr "Ní mór don luach seo a bheith ina shlánuimhir."
 
 #: db/models/fields/__init__.py:413
 msgid "Boolean (Either True or False)"
@@ -3878,7 +3883,7 @@ msgstr "Boole"
 
 #: db/models/fields/__init__.py:428
 msgid "This value must be either True or False."
-msgstr "Ní mór go mbeadh an luach ceachtar Fíor nó Bréagach."
+msgstr "Ní mór don luach seo a bheith Fíor nó Bréagach."
 
 #: db/models/fields/__init__.py:456 db/models/fields/__init__.py:873
 #, python-format
@@ -3887,7 +3892,7 @@ msgstr "Teaghrán (suas go %(max_length)s)"
 
 #: db/models/fields/__init__.py:469
 msgid "This field cannot be null."
-msgstr "Ní féidir an réimse seo a bheith null."
+msgstr "Ní cheadaítear luach nialasach sa réimse seo."
 
 #: db/models/fields/__init__.py:479
 msgid "Comma-separated integers"
@@ -3895,7 +3900,7 @@ msgstr "Slánuimhireacha camóg-scartha"
 
 #: db/models/fields/__init__.py:487
 msgid "Enter only digits separated by commas."
-msgstr "Cuir isteach digite amháin anseo scartha le camóg."
+msgstr "Ná cuir isteach ach digití scartha ag camóga."
 
 #: db/models/fields/__init__.py:496
 msgid "Date (without time)"
@@ -3903,7 +3908,7 @@ msgstr "Dáta (gan am)"
 
 #: db/models/fields/__init__.py:520
 msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Cuir isteach dáta bailí i bhformáid YYYY-MM-DD."
+msgstr "Cuir dáta bailí isteach, san fhormáid BBBB-MM-LL."
 
 #: db/models/fields/__init__.py:529
 #, python-format
@@ -3916,7 +3921,8 @@ msgstr "Dáta (le am)"
 
 #: db/models/fields/__init__.py:600 db/models/fields/__init__.py:618
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "Iontráil dáta/am bailí i bhformáid YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
+msgstr ""
+"Cuir dáta/am bailí isteach, san fhormáid BBBB-MM-LL UU:NN[:ss[.uuuuuu]]."
 
 #: db/models/fields/__init__.py:645
 msgid "Decimal number"
@@ -3924,7 +3930,7 @@ msgstr "Uimhir deachúlach"
 
 #: db/models/fields/__init__.py:660
 msgid "This value must be a decimal number."
-msgstr "Ní mór go mbeadh an luach uimhir deachúil."
+msgstr "Ní mór don luach seo a bheith ina uimhir dheachúlach."
 
 #: db/models/fields/__init__.py:699
 msgid "E-mail address"
@@ -3953,7 +3959,7 @@ msgstr "Boole (Fíor, Bréagach nó Dada)"
 
 #: db/models/fields/__init__.py:826
 msgid "This value must be either None, True or False."
-msgstr "Ní mór go mbeadh an luach None, Fíor nó Bréagach."
+msgstr "Ní mór don luach seo a bheith Faic, Fíor nó Bréagach."
 
 #: db/models/fields/__init__.py:896
 msgid "Text"
@@ -3965,7 +3971,7 @@ msgstr "am"
 
 #: db/models/fields/__init__.py:939 db/models/fields/__init__.py:953
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "Iontráil am bailí i bhformáid HH:MM[:ss[.uuuuuu]]."
+msgstr "Cuir am bailí isteach san fhormáid UU:NN[:ss[.uuuuuu]]."
 
 #: db/models/fields/__init__.py:999
 msgid "XML text"
@@ -3987,8 +3993,8 @@ msgstr ""
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"Cuir síos \"Control\", nó \"Command\" ar Mac, a roghnú níos mó ná ceann "
-"amháin."
+"Ar ríomhaire Mac, coinnigh an eochair \"Control\" nó \"Command\" síos chun "
+"níos mó ná rud amháin a roghnú."
 
 #: db/models/fields/related.py:950
 #, python-format
@@ -3996,10 +4002,19 @@ msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
-"Le do thoil cur isteach %(self)s IDs bailí. Tá an luach %(value)r neamhbailí."
+"Cuir aitheantas bailí %(self)s isteach. Tá an luach %(value)r neamhbhailí."
 msgstr[1] ""
-"Le do thoil cur isteach %(self)s IDs bailí. Tá na luachanna %(value)r "
-"neamhbailí."
+"Cuir aitheantas bailí %(self)s isteach. Tá na luachanna %(value)r "
+"neamhbhailí."
+msgstr[2] ""
+"Cuir aitheantas bailí %(self)s isteach. Tá na luachanna %(value)r "
+"neamhbhailí."
+msgstr[3] ""
+"Cuir aitheantas bailí %(self)s isteach. Tá na luachanna %(value)r "
+"neamhbhailí."
+msgstr[4] ""
+"Cuir aitheantas bailí %(self)s isteach. Tá na luachanna %(value)r "
+"neamhbhailí."
 
 #: forms/fields.py:60
 msgid "This field is required."
@@ -4007,80 +4022,78 @@ msgstr "Tá an réimse seo riachtanach."
 
 #: forms/fields.py:61
 msgid "Enter a valid value."
-msgstr "Cuir isteach luach bailí."
+msgstr "Cuir luach bailí isteach."
 
 #: forms/fields.py:144
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
-"Déan Cinnte go bhfuil níos lú ná %(max)d carachtair (tá %(length)d) ag an "
-"luach seo."
+"Bí cinnte nach bhfuil níos mó ná %(max)d carachtar sa luach seo (fad %"
+"(length)d)."
 
 #: forms/fields.py:145
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
-"Déan Cinnte go bhfuil ar a laghad %(min)d carachtair (tá %(length)d) ag an "
-"luach seo."
+"Bí cinnte nach bhfuil níos lú ná %(min)d carachtar sa luach seo (fad %"
+"(length)d)."
 
 #: forms/fields.py:172
 msgid "Enter a whole number."
-msgstr "Cuir isteach uimhir lán."
+msgstr "Cuir slánuimhir isteach."
 
 #: forms/fields.py:173 forms/fields.py:202 forms/fields.py:233
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
-msgstr "Cinntiú go bhfuil an luach níos lú ná nó cothrom le %s."
+msgstr "Bí cinnte go bhfuil an luach seo cothrom le nó níos lú ná %s."
 
 #: forms/fields.py:174 forms/fields.py:203 forms/fields.py:234
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
-msgstr "Cinntiú go bhfuil an luach níos mó ná nó cothrom le %s."
+msgstr "Bí cinnte go bhfuil an luach seo cothrom le nó níos mó ná %s."
 
 #: forms/fields.py:201 forms/fields.py:232
 msgid "Enter a number."
-msgstr "Iontráil uimhir."
+msgstr "Cuir uimhir isteach."
 
 #: forms/fields.py:235
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
-msgstr "Cinntiú go mbíonn níos mó ná %s dhigit san iomlán."
+msgstr "Bí cinnte nach bhfuil níos mó ná %s digit ann."
 
 #: forms/fields.py:236
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
-msgstr "Cinntiú go mbíonn níos lú ná %s ionad dheachúlacha."
+msgstr "Bí cinnte nach bhfuil níos mó ná %s ionad deachúlach ann."
 
 #: forms/fields.py:237
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr "Cinntiú go mbíonn níos lú ná %s dhigit roimh an pointe deachúil."
+msgstr "Bí cinnte nach bhfuil níos mó ná %s digit roimh an bpointe deachúlach."
 
 #: forms/fields.py:290 forms/fields.py:848
 msgid "Enter a valid date."
-msgstr "Cuir isteach dáta bailí."
+msgstr "Cuir dáta bailí isteach."
 
 #: forms/fields.py:319 forms/fields.py:849
 msgid "Enter a valid time."
-msgstr "Iontráil am bailí."
+msgstr "Cuir am bailí isteach."
 
 #: forms/fields.py:346
 msgid "Enter a valid date/time."
-msgstr "Iontráil dáta/am bailí."
+msgstr "Cuir dáta/am bailí isteach."
 
 #: forms/fields.py:432
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
-"Níor cuireadh isteach aon chomhad ann. Seiceáil an cineál ionchódú ar an "
-"bhfoirm."
+msgstr "Níor seoladh comhad. Deimhnigh cineál an ionchódaithe ar an bhfoirm."
 
 #: forms/fields.py:433
 msgid "No file was submitted."
-msgstr "Níor cuireadh isteach aon chomhad."
+msgstr "Níor seoladh aon chomhad."
 
 #: forms/fields.py:434
 msgid "The submitted file is empty."
-msgstr "Tá an comhad curtha isteach folamh."
+msgstr "Tá an comhad a seoladh folamh."
 
 #: forms/fields.py:435
 #, python-format
@@ -4095,41 +4108,40 @@ msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Uaslód íomhá bailí. Ní raibh an comhad uaslódáithe ceachtar íomhá nó íomhá "
-"ceart."
+"Uasluchtaigh íomhá bhailí. Níorbh íomhá é an comhad a d'uasluchtaigh tú, nó "
+"b'íomhá thruaillithe é."
 
 #: forms/fields.py:529
 msgid "Enter a valid URL."
-msgstr "Cuir URL bailí."
+msgstr "Cuir URL bailí isteach."
 
 #: forms/fields.py:530
 msgid "This URL appears to be a broken link."
-msgstr "is dócha go bhfuil nasc an URL seo briste."
+msgstr "Dealraíonn sé gur nasc briste é an URL seo."
 
 #: forms/fields.py:610 forms/fields.py:688
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr ""
-"Roghnaigh rogha bailí. Níl %(value)s ar cheann de na roghanna atá ar fáil."
+msgstr "Déan rogha bhailí. Ní ceann de na roghanna é %(value)s."
 
 #: forms/fields.py:689 forms/fields.py:750 forms/models.py:1007
 msgid "Enter a list of values."
-msgstr "Iontráil liosta de luachanna."
+msgstr "Cuir liosta de luachanna isteach."
 
 #: forms/fields.py:877
 msgid "Enter a valid IPv4 address."
-msgstr "Iontráil seoladh IPv4 bailí."
+msgstr "Cuir seoladh bailí IPv4 isteach."
 
 #: forms/fields.py:887
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Iontráil slug bailí, níl ach litreacha, uimhreacha, fílínta agus daiseanna "
-"ceadaithe."
+"Cuir 'slug' bailí isteach atá déanta as litreacha, uimhreacha, fostríoca nó "
+"fleiscíní."
 
 #: forms/formsets.py:271 forms/formsets.py:273
 msgid "Order"
-msgstr "Ordú"
+msgstr "Ord"
 
 #: forms/models.py:364
 #, python-format
@@ -4139,7 +4151,7 @@ msgstr "Ní mór a bheith %(field_name)s uathúil don %(date_field)s %(lookup)s.
 #: forms/models.py:378 forms/models.py:386
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "%(model_name)s leis an %(field_label)s ann cheana féin."
+msgstr "Tá %(model_name)s leis an %(field_label)s seo ann cheana."
 
 #: forms/models.py:592
 #, python-format
@@ -4174,13 +4186,12 @@ msgstr ""
 
 #: forms/models.py:934
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr ""
-"Roghnaigh rogha bailí. Níl an rogha sin ar cheann de na roghanna atá ar fáil."
+msgstr "Déan rogha bhailí. Ní ceann de na roghanna é do roghasa."
 
 #: forms/models.py:1008
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Roghnaigh rogha bailí. Níl %s ceann de na roghanna atá ar fáil."
+msgstr "Déan rogha bhailí. Ní ceann de na roghanna é %s."
 
 #: forms/models.py:1010
 #, python-format
@@ -4473,7 +4484,7 @@ msgstr ", %(number)d %(type)s"
 
 #: utils/translation/trans_real.py:527
 msgid "DATE_FORMAT"
-msgstr "j F Y"
+msgstr "N j, Y"
 
 #: utils/translation/trans_real.py:528
 msgid "DATETIME_FORMAT"
@@ -4481,25 +4492,25 @@ msgstr ""
 
 #: utils/translation/trans_real.py:529
 msgid "TIME_FORMAT"
-msgstr "H:i:s"
+msgstr "P"
 
 #: utils/translation/trans_real.py:550
 msgid "YEAR_MONTH_FORMAT"
-msgstr ""
+msgstr "F Y"
 
 #: utils/translation/trans_real.py:551
 msgid "MONTH_DAY_FORMAT"
-msgstr "j F"
+msgstr "F j"
 
 #: views/generic/create_update.py:115
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
-msgstr "Cruthaíodh an %(verbose_name)s go rathúil."
+msgstr "D'éirigh le cruthú %(verbose_name)s."
 
 #: views/generic/create_update.py:158
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
-msgstr "D'athraigh %(verbose_name)s go rathúil."
+msgstr "D'éirigh le nuashonrú %(verbose_name)s."
 
 #: views/generic/create_update.py:201
 #, python-format
