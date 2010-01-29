@@ -18,14 +18,15 @@ class GeoFeedTest(unittest.TestCase):
         # Uses `GEOSGeometry` in `item_geometry`
         doc1 = minidom.parseString(self.client.get('/geoapp/feeds/rss1/').content)
         # Uses a 2-tuple in `item_geometry`
-        doc2 = minidom.parseString(self.client.get('/geoapp/feeds/rss2/').content) 
+        doc2 = minidom.parseString(self.client.get('/geoapp/feeds/rss2/').content)
         feed1, feed2 = doc1.firstChild, doc2.firstChild
 
         # Making sure the box got added to the second GeoRSS feed.
-        self.assertChildNodes(feed2.getElementsByTagName('channel')[0], 
-                              ['title', 'link', 'description', 'language', 'lastBuildDate', 'item', 'georss:box']
+        self.assertChildNodes(feed2.getElementsByTagName('channel')[0],
+                              ['title', 'link', 'description', 'language',
+                               'lastBuildDate', 'item', 'georss:box', 'atom:link']
                               )
-        
+
         # Incrementing through the feeds.
         for feed in [feed1, feed2]:
             # Ensuring the georss namespace was added to the <rss> element.
@@ -33,7 +34,7 @@ class GeoFeedTest(unittest.TestCase):
             chan = feed.getElementsByTagName('channel')[0]
             items = chan.getElementsByTagName('item')
             self.assertEqual(len(items), City.objects.count())
-                
+
             # Ensuring the georss element was added to each item in the feed.
             for item in items:
                 self.assertChildNodes(item, ['title', 'link', 'description', 'guid', 'georss:point'])
@@ -45,14 +46,14 @@ class GeoFeedTest(unittest.TestCase):
         feed1, feed2 = doc1.firstChild, doc2.firstChild
 
         # Making sure the box got added to the second GeoRSS feed.
-        self.assertChildNodes(feed2, ['title', 'link', 'id', 'updated', 'entry', 'georss:box'])        
+        self.assertChildNodes(feed2, ['title', 'link', 'id', 'updated', 'entry', 'georss:box'])
 
         for feed in [feed1, feed2]:
             # Ensuring the georsss namespace was added to the <feed> element.
             self.assertEqual(feed.getAttribute(u'xmlns:georss'),  u'http://www.georss.org/georss')
             entries = feed.getElementsByTagName('entry')
             self.assertEqual(len(entries), City.objects.count())
-            
+
             # Ensuring the georss element was added to each entry in the feed.
             for entry in entries:
                 self.assertChildNodes(entry, ['title', 'link', 'id', 'summary', 'georss:point'])
