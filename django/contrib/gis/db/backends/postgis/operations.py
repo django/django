@@ -8,7 +8,8 @@ from django.contrib.gis.db.backends.postgis.adapter import PostGISAdapter
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.postgresql_psycopg2.base import Database, DatabaseOperations
+from django.db.backends.postgresql_psycopg2.base import DatabaseOperations
+from django.db.utils import DatabaseError
 
 #### Classes used in constructing PostGIS spatial SQL ####
 class PostGISOperator(SpatialOperation):
@@ -99,7 +100,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
 
             self.geom_func_prefix = prefix
             self.spatial_version = version
-        except Database.ProgrammingError:
+        except DatabaseError:
             raise ImproperlyConfigured('Cannot determine PostGIS version for database "%s". '
                                        'GeoDjango requires at least PostGIS version 1.3. '
                                        'Was the database created from a spatial database '
