@@ -2,7 +2,7 @@ from django.db import connections
 from django.db.models.query import QuerySet, Q, ValuesQuerySet, ValuesListQuerySet
 
 from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.db.models.fields import get_srid_info, GeometryField, PointField
+from django.contrib.gis.db.models.fields import get_srid_info, GeometryField, PointField, LineStringField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery, GeoWhereNode
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
@@ -118,6 +118,15 @@ class GeoQuerySet(QuerySet):
           (xmin, ymin, zmin, xmax, ymax, zmax).
         """
         return self._spatial_aggregate(aggregates.Extent3D, **kwargs)
+
+    def force_rhr(self, **kwargs):
+        """
+        Returns a modified version of the Polygon/MultiPolygon in which
+        all of the vertices follow the Right-Hand-Rule.  By default,
+        this is attached as the `force_rhr` attribute on each element
+        of the GeoQuerySet.
+        """
+        return self._geom_attribute('force_rhr', **kwargs)
 
     def geojson(self, precision=8, crs=False, bbox=False, **kwargs):
         """
@@ -243,6 +252,16 @@ class GeoQuerySet(QuerySet):
         of this GeoQuerySet; otherwise sets with None.
         """
         return self._geom_attribute('point_on_surface', **kwargs)
+
+    def reverse(self, **kwargs):
+        """
+        Reverses the coordinate order of the geometry, and attaches as a
+        `reverse` attribute on each element of this GeoQuerySet.
+        """
+        s = {'select_field' : GeomField(),}
+        if connections[self.db].ops.oracle:
+            s['geo_field_type'] = LineStringField
+        return self._spatial_attribute('reverse', s, **kwargs)
 
     def scale(self, x, y, z=0.0, **kwargs):
         """
@@ -489,7 +508,8 @@ class GeoQuerySet(QuerySet):
 
         # Performing setup for the spatial column, unless told not to.
         if settings.get('setup', True):
-            default_args, geo_field = self._spatial_setup(att, desc=settings['desc'], field_name=field_name)
+            default_args, geo_field = self._spatial_setup(att, desc=settings['desc'], field_name=field_name,
+                                                          geo_field_type=settings.get('geo_field_type', None))
             for k, v in default_args.iteritems(): settings['procedure_args'].setdefault(k, v)
         else:
             geo_field = settings['geo_field']

@@ -88,6 +88,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     num_points = 'SDO_UTIL.GETNUMVERTICES'
     perimeter = length
     point_on_surface = 'SDO_GEOM.SDO_POINTONSURFACE'
+    reverse = 'SDO_UTIL.REVERSE_LINESTRING'
     sym_difference = 'SDO_GEOM.SDO_XOR'
     transform = 'SDO_CS.TRANSFORM'
     union = 'SDO_GEOM.SDO_UNION'

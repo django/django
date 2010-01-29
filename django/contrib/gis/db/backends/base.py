@@ -50,6 +50,7 @@ class BaseSpatialOperations(object):
     perimeter3d = False
     point_on_surface = False
     polygonize = False
+    reverse = False
     scale = False
     snap_to_grid = False
     sym_difference = False

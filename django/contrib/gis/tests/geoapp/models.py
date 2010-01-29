@@ -27,6 +27,12 @@ class State(models.Model):
     objects = models.GeoManager()
     def __unicode__(self): return self.name
 
+class Track(models.Model):
+    name = models.CharField(max_length=30)
+    line = models.LineStringField()
+    objects = models.GeoManager()
+    def __unicode__(self): return self.name
+
 if not spatialite:
     class Feature(models.Model):
         name = models.CharField(max_length=20)

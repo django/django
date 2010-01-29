@@ -8,7 +8,7 @@ from django.contrib.gis.tests.utils import \
     mysql, oracle, postgis, spatialite
 from django.test import TestCase
 
-from models import Country, City, PennsylvaniaCity, State
+from models import Country, City, PennsylvaniaCity, State, Track
 
 if not spatialite:
     from models import Feature, MinusOneSRID
@@ -686,6 +686,33 @@ class GeoModelTest(TestCase):
         # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr('MULTIPOLYGON(((12.4 43.87,12.45 43.87,12.45 44.1,12.5 44.1,12.5 43.87,12.45 43.87,12.4 43.87)))')
         self.failUnless(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23, 0.5, 0.17).get(name='San Marino').snap_to_grid, tol))
+
+    @no_mysql
+    @no_spatialite
+    def test28_reverse(self):
+        "Testing GeoQuerySet.reverse()."
+        coords = [ (-95.363151, 29.763374), (-95.448601, 29.713803) ]
+        Track.objects.create(name='Foo', line=LineString(coords))
+        t = Track.objects.reverse().get(name='Foo')
+        coords.reverse()
+        self.assertEqual(tuple(coords), t.reverse.coords)
+        if oracle:
+            self.assertRaises(TypeError, State.objects.reverse)
+        
+    @no_mysql
+    @no_oracle
+    @no_spatialite
+    def test29_force_rhr(self):
+        "Testing GeoQuerySet.force_rhr()."
+        rings = ( ( (0, 0), (5, 0), (0, 5), (0, 0) ),
+                  ( (1, 1), (1, 3), (3, 1), (1, 1) ),
+                  )
+        rhr_rings = ( ( (0, 0), (0, 5), (5, 0), (0, 0) ),
+                      ( (1, 1), (3, 1), (1, 3), (1, 1) ),
+                      )
+        State.objects.create(name='Foo', poly=Polygon(*rings))
+        s = State.objects.force_rhr().get(name='Foo')
+        self.assertEqual(rhr_rings, s.force_rhr.coords)
 
 from test_feeds import GeoFeedTest
 from test_regress import GeoRegressionTests

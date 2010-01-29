@@ -252,6 +252,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.envelope = prefix + 'Envelope'
         self.extent = prefix + 'Extent'
         self.extent3d = prefix + 'Extent3D'
+        self.force_rhr = prefix + 'ForceRHR'
         self.geohash = GEOHASH
         self.geojson = GEOJSON
         self.gml = prefix + 'AsGML'
@@ -268,6 +269,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.perimeter3d = prefix + 'Perimeter3D'
         self.point_on_surface = prefix + 'PointOnSurface'
         self.polygonize = prefix + 'Polygonize'
+        self.reverse = prefix + 'Reverse'
         self.scale = prefix + 'Scale'
         self.snap_to_grid = prefix + 'SnapToGrid'
         self.svg = prefix + 'AsSVG'

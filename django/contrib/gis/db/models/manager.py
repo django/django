@@ -36,6 +36,9 @@ class GeoManager(Manager):
     def extent3d(self, *args, **kwargs):
         return self.get_query_set().extent3d(*args, **kwargs)
 
+    def force_rhr(self, *args, **kwargs):
+        return self.get_query_set().force_rhr(*args, **kwargs)
+
     def geojson(self, *args, **kwargs):
         return self.get_query_set().geojson(*args, **kwargs)
 
@@ -68,6 +71,9 @@ class GeoManager(Manager):
 
     def point_on_surface(self, *args, **kwargs):
         return self.get_query_set().point_on_surface(*args, **kwargs)
+
+    def reverse(self, *args, **kwargs):
+        return self.get_query_set().reverse(*args, **kwargs)
 
     def scale(self, *args, **kwargs):
         return self.get_query_set().scale(*args, **kwargs)
