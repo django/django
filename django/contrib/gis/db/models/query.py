@@ -162,6 +162,20 @@ class GeoQuerySet(QuerySet):
              }
         return self._spatial_attribute('geojson', s, **kwargs)
 
+    def geohash(self, precision=20, **kwargs):
+        """
+        Returns a GeoHash representation of the given field in a `geohash`
+        attribute on each element of the GeoQuerySet.
+
+        The `precision` keyword may be used to custom the number of
+        _characters_ used in the output GeoHash, the default is 20.
+        """
+        s = {'desc' : 'GeoHash', 
+             'procedure_args': {'precision': precision},
+             'procedure_fmt': '%(geo_col)s,%(precision)s',
+             }
+        return self._spatial_attribute('geohash', s, **kwargs)
+
     def gml(self, precision=8, version=2, **kwargs):
         """
         Returns GML representation of the given field in a `gml` attribute
@@ -253,12 +267,13 @@ class GeoQuerySet(QuerySet):
         """
         return self._geom_attribute('point_on_surface', **kwargs)
 
-    def reverse(self, **kwargs):
+    def reverse_geom(self, **kwargs):
         """
         Reverses the coordinate order of the geometry, and attaches as a
         `reverse` attribute on each element of this GeoQuerySet.
         """
         s = {'select_field' : GeomField(),}
+        kwargs.setdefault('model_att', 'reverse_geom')
         if connections[self.db].ops.oracle:
             s['geo_field_type'] = LineStringField
         return self._spatial_attribute('reverse', s, **kwargs)

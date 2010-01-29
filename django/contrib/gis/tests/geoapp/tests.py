@@ -690,14 +690,14 @@ class GeoModelTest(TestCase):
     @no_mysql
     @no_spatialite
     def test28_reverse(self):
-        "Testing GeoQuerySet.reverse()."
+        "Testing GeoQuerySet.reverse_geom()."
         coords = [ (-95.363151, 29.763374), (-95.448601, 29.713803) ]
         Track.objects.create(name='Foo', line=LineString(coords))
-        t = Track.objects.reverse().get(name='Foo')
+        t = Track.objects.reverse_geom().get(name='Foo')
         coords.reverse()
-        self.assertEqual(tuple(coords), t.reverse.coords)
+        self.assertEqual(tuple(coords), t.reverse_geom.coords)
         if oracle:
-            self.assertRaises(TypeError, State.objects.reverse)
+            self.assertRaises(TypeError, State.objects.reverse_geom)
         
     @no_mysql
     @no_oracle
@@ -713,6 +713,21 @@ class GeoModelTest(TestCase):
         State.objects.create(name='Foo', poly=Polygon(*rings))
         s = State.objects.force_rhr().get(name='Foo')
         self.assertEqual(rhr_rings, s.force_rhr.coords)
+
+    @no_mysql
+    @no_oracle
+    @no_spatialite
+    def test29_force_rhr(self):
+        "Testing GeoQuerySet.geohash()."
+        if not connection.ops.geohash: return
+        # Reference query:
+        # SELECT ST_GeoHash(point) FROM geoapp_city WHERE name='Houston';
+        # SELECT ST_GeoHash(point, 5) FROM geoapp_city WHERE name='Houston';
+        ref_hash = '9vk1mfq8jx0c8e0386z6'
+        h1 = City.objects.geohash().get(name='Houston')
+        h2 = City.objects.geohash(precision=5).get(name='Houston')
+        self.assertEqual(ref_hash, h1.geohash)
+        self.assertEqual(ref_hash[:5], h2.geohash)
 
 from test_feeds import GeoFeedTest
 from test_regress import GeoRegressionTests
