@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
-from django.db.utils import ConnectionHandler, ConnectionRouter, load_backend, DEFAULT_DB_ALIAS
+from django.db.utils import ConnectionHandler, ConnectionRouter, load_backend, DEFAULT_DB_ALIAS, \
+                            DatabaseError, IntegrityError
 from django.utils.functional import curry
 
 __all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
@@ -73,8 +74,6 @@ router = ConnectionRouter(settings.DATABASE_ROUTERS)
 # connections['default'] instead.
 connection = connections[DEFAULT_DB_ALIAS]
 backend = load_backend(connection.settings_dict['ENGINE'])
-DatabaseError = backend.DatabaseError
-IntegrityError = backend.IntegrityError
 
 # Register an event that closes the database connection
 # when a Django request is finished.

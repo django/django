@@ -5,6 +5,7 @@ Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
 import re
+import sys
 
 try:
     import MySQLdb as Database
@@ -24,6 +25,7 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE, FLAG, CLIENT
 
+from django.db import utils
 from django.db.backends import *
 from django.db.backends.signals import connection_created
 from django.db.backends.mysql.client import DatabaseClient
@@ -82,22 +84,30 @@ class CursorWrapper(object):
     def execute(self, query, args=None):
         try:
             return self.cursor.execute(query, args)
+        except Database.IntegrityError, e:
+            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
         except Database.OperationalError, e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
-                raise Database.IntegrityError(tuple(e))
+                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
             raise
+        except Database.DatabaseError, e:
+            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def executemany(self, query, args):
         try:
             return self.cursor.executemany(query, args)
+        except Database.IntegrityError, e:
+            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
         except Database.OperationalError, e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
-                raise Database.IntegrityError(tuple(e))
+                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
             raise
+        except Database.DatabaseError, e:
+            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def __getattr__(self, attr):
         if attr in self.__dict__:

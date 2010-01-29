@@ -4,8 +4,10 @@ Oracle database backend for Django.
 Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 """
 
-import os
+
 import datetime
+import os
+import sys
 import time
 try:
     from decimal import Decimal
@@ -24,6 +26,7 @@ except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
+from django.db import utils
 from django.db.backends import *
 from django.db.backends.signals import connection_created
 from django.db.backends.oracle.client import DatabaseClient
@@ -480,11 +483,13 @@ class FormatStylePlaceholderCursor(object):
         self._guess_input_sizes([params])
         try:
             return self.cursor.execute(query, self._param_generator(params))
-        except DatabaseError, e:
+        except Database.IntegrityError, e:
+            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+        except Database.DatabaseError, e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if e.args[0].code == 1400 and not isinstance(e, IntegrityError):
-                e = IntegrityError(e.args[0])
-            raise e
+                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def executemany(self, query, params=None):
         try:
@@ -504,11 +509,13 @@ class FormatStylePlaceholderCursor(object):
         try:
             return self.cursor.executemany(query,
                                 [self._param_generator(p) for p in formatted])
-        except DatabaseError, e:
+        except Database.IntegrityError, e:
+            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+        except Database.DatabaseError, e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if e.args[0].code == 1400 and not isinstance(e, IntegrityError):
-                e = IntegrityError(e.args[0])
-            raise e
+                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def fetchone(self):
         row = self.cursor.fetchone()

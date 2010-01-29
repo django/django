@@ -7,6 +7,9 @@ Python 2.5 and later can use a pysqlite2 module or the sqlite3 module in the
 standard library.
 """
 
+import sys
+
+from django.db import utils
 from django.db.backends import *
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.client import DatabaseClient
@@ -185,16 +188,25 @@ class SQLiteCursorWrapper(Database.Cursor):
     you'll need to use "%%s".
     """
     def execute(self, query, params=()):
-        query = self.convert_query(query, len(params))
-        return Database.Cursor.execute(self, query, params)
+        try:
+            query = self.convert_query(query, len(params))
+            return Database.Cursor.execute(self, query, params)
+        except Database.IntegrityError, e:
+            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+        except Database.DatabaseError, e:
+            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def executemany(self, query, param_list):
         try:
-          query = self.convert_query(query, len(param_list[0]))
-          return Database.Cursor.executemany(self, query, param_list)
+            query = self.convert_query(query, len(param_list[0]))
+            return Database.Cursor.executemany(self, query, param_list)
         except (IndexError,TypeError):
-          # No parameter list provided
-          return None
+            # No parameter list provided
+            return None
+        except Database.IntegrityError, e:
+            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+        except Database.DatabaseError, e:
+            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def convert_query(self, query, num_params):
         return query % tuple("?" * num_params)

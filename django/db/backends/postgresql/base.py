@@ -4,6 +4,9 @@ PostgreSQL database backend for Django.
 Requires psycopg 1: http://initd.org/projects/psycopg1
 """
 
+import sys
+
+from django.db import utils
 from django.db.backends import *
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql.client import DatabaseClient
@@ -50,11 +53,21 @@ class UnicodeCursorWrapper(object):
             return tuple([smart_str(p, self.charset, True) for p in params])
 
     def execute(self, sql, params=()):
-        return self.cursor.execute(smart_str(sql, self.charset), self.format_params(params))
+        try:
+            return self.cursor.execute(query, args)
+        except Database.IntegrityError, e:
+            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+        except Database.DatabaseError, e:
+            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def executemany(self, sql, param_list):
-        new_param_list = [self.format_params(params) for params in param_list]
-        return self.cursor.executemany(sql, new_param_list)
+        try:
+            new_param_list = [self.format_params(params) for params in param_list]
+            return self.cursor.executemany(sql, new_param_list)
+        except Database.IntegrityError, e:
+            raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+        except Database.DatabaseError, e:
+            raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def __getattr__(self, attr):
         if attr in self.__dict__:

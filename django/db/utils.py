@@ -7,6 +7,16 @@ from django.utils.importlib import import_module
 
 DEFAULT_DB_ALIAS = 'default'
 
+# Define some exceptions that mirror the PEP249 interface.
+# We will rethrow any backend-specific errors using these
+# common wrappers
+class DatabaseError(Exception):
+    pass
+
+class IntegrityError(DatabaseError):
+    pass
+
+
 def load_backend(backend_name):
     try:
         module = import_module('.base', 'django.db.backends.%s' % backend_name)
@@ -40,8 +50,10 @@ def load_backend(backend_name):
             else:
                 raise # If there's some other error, this must be an error in Django itself.
 
+
 class ConnectionDoesNotExist(Exception):
     pass
+
 
 class ConnectionHandler(object):
     def __init__(self, databases):
@@ -86,6 +98,7 @@ class ConnectionHandler(object):
 
     def all(self):
         return [self[alias] for alias in self]
+
 
 class ConnectionRouter(object):
     def __init__(self, routers):
