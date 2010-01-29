@@ -25,7 +25,7 @@ The auth system consists of:
 
 .. deprecated:: 1.2
    The Messages component of the auth system will be removed in Django 1.4.
- 
+
 Installation
 ============
 
@@ -243,7 +243,7 @@ Methods
     .. method:: models.User.has_perms(perm_list, obj=None)
 
         Returns ``True`` if the user has each of the specified permissions,
-        where each perm is in the format 
+        where each perm is in the format
         ``"<app label>.<permission codename>"``. If the user is inactive,
         this method will always return ``False``.
 
@@ -351,7 +351,18 @@ Django requires add *and* change permissions as a slight security measure.
 Changing passwords
 ~~~~~~~~~~~~~~~~~~
 
-Change a password with :meth:`~django.contrib.auth.models.User.set_password()`:
+.. versionadded:: 1.2
+   The ``manage.py change_password`` command was added.
+
+:djadmin:`manage.py change_password <username>` offers a method of
+changing a User's password from the command line. It prompts you to
+change the password of a given user which you must enter twice. If
+they both match, the new password will be changed immediately. If you
+do not supply a user, the command will attempt to change the password
+whose username matches the current user.
+
+You can also change a password programmatically, using
+:meth:`~django.contrib.auth.models.User.set_password()`:
 
 .. code-block:: python
 
