@@ -54,7 +54,7 @@ class UnicodeCursorWrapper(object):
 
     def execute(self, sql, params=()):
         try:
-            return self.cursor.execute(query, args)
+            return self.cursor.execute(sql, params)
         except Database.IntegrityError, e:
             raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
         except Database.DatabaseError, e:
