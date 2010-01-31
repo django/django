@@ -20,15 +20,27 @@ def linebreak_iter(template_source):
         p = template_source.find('\n', p+1)
     yield len(template_source) + 1
 
+def cleanse_setting(key, value):
+    """Cleanse an individual setting key/value of sensitive content.
+
+    If the value is a dictionary, recursively cleanse the keys in
+    that dictionary.
+    """
+    if HIDDEN_SETTINGS.search(key):
+        cleansed = '********************'
+    else:
+        if isinstance(value, dict):
+            cleansed = dict((k, cleanse_setting(k, v)) for k,v in value.items())
+        else:
+            cleansed = value
+    return cleansed
+
 def get_safe_settings():
     "Returns a dictionary of the settings module, with sensitive settings blurred out."
     settings_dict = {}
     for k in dir(settings):
         if k.isupper():
-            if HIDDEN_SETTINGS.search(k):
-                settings_dict[k] = '********************'
-            else:
-                settings_dict[k] = getattr(settings, k)
+            settings_dict[k] = cleanse_setting(k, getattr(settings, k))
     return settings_dict
 
 def technical_500_response(request, exc_type, exc_value, tb):
