@@ -26,13 +26,17 @@ def cleanse_setting(key, value):
     If the value is a dictionary, recursively cleanse the keys in
     that dictionary.
     """
-    if HIDDEN_SETTINGS.search(key):
-        cleansed = '********************'
-    else:
-        if isinstance(value, dict):
-            cleansed = dict((k, cleanse_setting(k, v)) for k,v in value.items())
+    try:
+        if HIDDEN_SETTINGS.search(key):
+            cleansed = '********************'
         else:
-            cleansed = value
+            if isinstance(value, dict):
+                cleansed = dict((k, cleanse_setting(k, v)) for k,v in value.items())
+            else:
+                cleansed = value
+    except TypeError:
+        # If the key isn't regex-able, just return as-is.
+        cleansed = value
     return cleansed
 
 def get_safe_settings():
