@@ -196,9 +196,9 @@ class InlineAdminFormSet(object):
             yield InlineAdminForm(self.formset, form, self.fieldsets,
                 self.opts.prepopulated_fields, None, self.readonly_fields,
                 model_admin=self.model_admin)
-
         yield InlineAdminForm(self.formset, self.formset.empty_form,
-            self.fieldsets, self.opts.prepopulated_fields, None)
+            self.fieldsets, self.opts.prepopulated_fields, None,
+            self.readonly_fields, model_admin=self.model_admin)
 
     def fields(self):
         fk = getattr(self.formset, "fk", None)
