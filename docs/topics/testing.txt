@@ -261,18 +261,38 @@ Note that we used ``animals``, not ``myproject.animals``.
 .. versionadded:: 1.0
    You can now choose which test to run.
 
-If you use unit tests, as opposed to
-doctests, you can be even *more* specific in choosing which tests to execute.
-To run a single test case in an application (for example, the
-``AnimalTestCase`` described in the "Writing unit tests" section), add the
-name of the test case to the label on the command line::
+You can be even *more* specific by naming an individual test case. To
+run a single test case in an application (for example, the
+``AnimalTestCase`` described in the "Writing unit tests" section), add
+the name of the test case to the label on the command line::
 
     $ ./manage.py test animals.AnimalTestCase
 
-And it gets even more granular than that! To run a *single* test method inside
-a test case, add the name of the test method to the label::
+And it gets even more granular than that! To run a *single* test
+method inside a test case, add the name of the test method to the
+label::
 
     $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
+
+.. versionadded:: 1.2
+   The ability to select individual doctests was added.
+
+You can use the same rules if you're using doctests. Django will use the
+test label as a path to the test method or class that you want to run.
+If your ``models.py`` or ``tests.py`` has a function with a doctest, or
+class with a class-level doctest, you can invoke that test by appending the
+name of the test method or class to the label::
+
+    $ ./manage.py test animals.classify
+
+If you want to run the doctest for a specific method in a class, add the
+name of the method to the label::
+
+    $ ./manage.py test animals.Classifier.run
+
+If you're using a ``__test__`` dictionary to specify doctests for a
+module, Django will use the label as a key in the ``__test__`` dictionary
+for defined in ``models.py`` and ``tests.py``.
 
 .. versionadded:: 1.2
    You can now trigger a graceful exit from a test run by pressing ``Ctrl-C``.

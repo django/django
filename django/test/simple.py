@@ -133,24 +133,58 @@ def build_test(label):
     if len(parts) < 2 or len(parts) > 3:
         raise ValueError("Test label '%s' should be of the form app.TestCase or app.TestCase.test_method" % label)
 
+    #
+    # First, look for TestCase instances with a name that matches
+    #
     app_module = get_app(parts[0])
+    test_module = get_tests(app_module)
     TestClass = getattr(app_module, parts[1], None)
 
     # Couldn't find the test class in models.py; look in tests.py
     if TestClass is None:
-        test_module = get_tests(app_module)
         if test_module:
             TestClass = getattr(test_module, parts[1], None)
 
-    if len(parts) == 2: # label is app.TestClass
+    try:
+        if issubclass(TestClass, unittest.TestCase):
+            print 'is a test case'
+            if len(parts) == 2: # label is app.TestClass
+                try:
+                    return unittest.TestLoader().loadTestsFromTestCase(TestClass)
+                except TypeError:
+                    raise ValueError("Test label '%s' does not refer to a test class" % label)
+            else: # label is app.TestClass.test_method
+                return TestClass(parts[2])
+    except TypeError:
+        # TestClass isn't a TestClass - it must be a method or normal class
+        pass
+
+    #
+    # If there isn't a TestCase, look for a doctest that matches
+    #
+    tests = []
+    for module in app_module, test_module:
         try:
-            return unittest.TestLoader().loadTestsFromTestCase(TestClass)
-        except TypeError:
-            raise ValueError("Test label '%s' does not refer to a test class" % label)
-    else: # label is app.TestClass.test_method
-        if not TestClass:
-            raise ValueError("Test label '%s' does not refer to a test class" % label)
-        return TestClass(parts[2])
+            doctests = doctest.DocTestSuite(module,
+                                            checker=doctestOutputChecker,
+                                            runner=DocTestRunner)
+            # Now iterate over the suite, looking for doctests whose name
+            # matches the pattern that was given
+            for test in doctests:
+                if test._dt_test.name in (
+                        '%s.%s' % (module.__name__, '.'.join(parts[1:])),
+                        '%s.__test__.%s' % (module.__name__, '.'.join(parts[1:]))):
+                    tests.append(test)
+        except ValueError:
+            # No doctests found.
+            pass
+
+    # If no tests were found, then we were given a bad test label.
+    if not tests:
+        raise ValueError("Test label '%s' does not refer to a test" % label)
+
+    # Construct a suite out of the tests that matched.
+    return unittest.TestSuite(tests)
 
 # Python 2.3 compatibility: TestSuites were made iterable in 2.4.
 # We need to iterate over them, so we add the missing method when
