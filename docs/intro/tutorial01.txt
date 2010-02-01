@@ -320,22 +320,6 @@ These concepts are represented by simple Python classes. Edit the
         choice = models.CharField(max_length=200)
         votes = models.IntegerField()
 
-.. admonition:: Errors about :attr:`~django.db.models.Field.max_length`
-
-   If Django gives you an error message saying that
-   :attr:`~django.db.models.Field.max_length` is not a valid argument, you're
-   most likely using an old version of Django. (This version of the tutorial is
-   written for the latest development version of Django.) If you're using a
-   Subversion checkout of Django's development version (see :ref:`the
-   installation docs <topics-install>` for more information), you shouldn't have
-   any problems.
-
-   If you want to stick with an older version of Django, you'll want to switch
-   to `the Django 0.96 tutorial`_, because this tutorial covers several features
-   that only exist in the Django development version.
-
-.. _the Django 0.96 tutorial: http://www.djangoproject.com/documentation/0.96/tutorial01/
-
 The code is straightforward. Each model is represented by a class that
 subclasses :class:`django.db.models.Model`. Each model has a number of class
 variables, each of which represents a database field in the model.
