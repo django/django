@@ -379,6 +379,12 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             fields = None
+        if self.exclude is None:
+            exclude = []
+        else:
+            exclude = list(self.exclude)
+        exclude.extend(self.get_readonly_fields(request, obj))
+        exclude = exclude or None
         defaults = {
             "ct_field": self.ct_field,
             "fk_field": self.ct_fk_field,
@@ -390,7 +396,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "can_order": False,
             "fields": fields,
             "max_num": self.max_num,
-            "exclude": self.exclude
+            "exclude": exclude
         }
         return generic_inlineformset_factory(self.model, **defaults)
 
