@@ -247,7 +247,7 @@ def lookup_field(name, obj, model_admin=None):
         f = None
     else:
         attr = None
-        value = getattr(obj, f.attname)
+        value = getattr(obj, name)
     return f, attr, value
 
 def label_for_field(name, model, model_admin=None, return_attr=False):

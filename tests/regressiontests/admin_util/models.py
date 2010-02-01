@@ -6,6 +6,7 @@ class Article(models.Model):
     """
     A simple Article model for testing
     """
+    site = models.ForeignKey('sites.Site', related_name="admin_articles")
     title = models.CharField(max_length=100)
     title2 = models.CharField(max_length=100, verbose_name="another name")
     created = models.DateTimeField()
