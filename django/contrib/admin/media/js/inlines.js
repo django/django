@@ -30,9 +30,8 @@
 				el.name = el.name.replace(id_regex, replacement);
 			}
 		};
-		var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
-		var initialForms = $("#id_" + options.prefix + "-INITIAL_FORMS");
-		var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS");
+		var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").attr("autocomplete", "off");
+		var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").attr("autocomplete", "off");
 		// only show the add button if we are allowed to add more items
 		var showAddButton = ((maxForms.val() == 0) || ((maxForms.val()-totalForms.val()) > 0));
 		var selectedItems = this;
