@@ -20,10 +20,11 @@
 {% block extrahead %}
 {{ block.super }}
 <script type="text/javascript">
-jQuery.noConflict();
-jQuery(document).ready(function($) {
-    $("tr input.action-select").actions();
-});
+(function($) {
+    $(document).ready(function($) {
+        $("tr input.action-select").actions();
+    });
+})(jQuery.noConflict());
 </script>
 {% endblock %}
 
