@@ -87,6 +87,7 @@ class AdminViewBasicTest(TestCase):
             # inline data
             "article_set-TOTAL_FORMS": u"3",
             "article_set-INITIAL_FORMS": u"0",
+            "article_set-MAX_NUM_FORMS": u"0",
         }
         response = self.client.post('/test_admin/%s/admin_views/section/add/' % self.urlbit, post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
@@ -97,6 +98,7 @@ class AdminViewBasicTest(TestCase):
         # inline data
         "article_set-TOTAL_FORMS": u"6",
         "article_set-INITIAL_FORMS": u"3",
+        "article_set-MAX_NUM_FORMS": u"0",
         "article_set-0-id": u"1",
         # there is no title in database, give one here or formset will fail.
         "article_set-0-title": u"Norske bostaver æøå skaper problemer",
@@ -864,6 +866,7 @@ class AdminViewUnicodeTest(TestCase):
             # inline data
             "chapter_set-TOTAL_FORMS": u"6",
             "chapter_set-INITIAL_FORMS": u"3",
+            "chapter_set-MAX_NUM_FORMS": u"0",
             "chapter_set-0-id": u"1",
             "chapter_set-0-title": u"Norske bostaver æøå skaper problemer",
             "chapter_set-0-content": u"&lt;p&gt;Svært frustrerende med UnicodeDecodeError&lt;/p&gt;",
@@ -926,14 +929,14 @@ class AdminViewListEditable(TestCase):
     def test_changelist_input_html(self):
         response = self.client.get('/test_admin/admin/admin_views/person/')
         # 2 inputs per object(the field and the hidden id field) = 6
-        # 2 management hidden fields = 2
+        # 3 management hidden fields = 3
         # 4 action inputs (3 regular checkboxes, 1 checkbox to select all)
         # main form submit button = 1
         # search field and search submit button = 2
         # CSRF field = 1
         # field to track 'select all' across paginated views = 1
-        # 6 + 2 + 4 + 1 + 2 + 1 + 1 = 17 inputs
-        self.failUnlessEqual(response.content.count("<input"), 17)
+        # 6 + 3 + 4 + 1 + 2 + 1 + 1 = 18 inputs
+        self.failUnlessEqual(response.content.count("<input"), 18)
         # 1 select per object = 3 selects
         self.failUnlessEqual(response.content.count("<select"), 4)
 
@@ -941,6 +944,7 @@ class AdminViewListEditable(TestCase):
         data = {
             "form-TOTAL_FORMS": "3",
             "form-INITIAL_FORMS": "3",
+            "form-MAX_NUM_FORMS": "0",
 
             "form-0-gender": "1",
             "form-0-id": "1",
@@ -961,6 +965,7 @@ class AdminViewListEditable(TestCase):
         data = {
             "form-TOTAL_FORMS": "2",
             "form-INITIAL_FORMS": "2",
+            "form-MAX_NUM_FORMS": "0",
 
             "form-0-id": "1",
             "form-0-gender": "1",
@@ -978,6 +983,7 @@ class AdminViewListEditable(TestCase):
         data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
 
             "form-0-id": "1",
             "form-0-gender": "1"
@@ -998,6 +1004,7 @@ class AdminViewListEditable(TestCase):
         data = {
             "form-TOTAL_FORMS": "4",
             "form-INITIAL_FORMS": "4",
+            "form-MAX_NUM_FORMS": "0",
 
             "form-0-order": "14",
             "form-0-id": "1",
@@ -1069,9 +1076,11 @@ class AdminInheritedInlinesTest(TestCase):
             # inline data
             "accounts-TOTAL_FORMS": u"1",
             "accounts-INITIAL_FORMS": u"0",
+            "accounts-MAX_NUM_FORMS": u"0",
             "accounts-0-username": foo_user,
             "accounts-2-TOTAL_FORMS": u"1",
             "accounts-2-INITIAL_FORMS": u"0",
+            "accounts-2-MAX_NUM_FORMS": u"0",
             "accounts-2-0-username": bar_user,
         }
 
@@ -1096,6 +1105,7 @@ class AdminInheritedInlinesTest(TestCase):
 
             "accounts-TOTAL_FORMS": "2",
             "accounts-INITIAL_FORMS": u"1",
+            "accounts-MAX_NUM_FORMS": u"0",
 
             "accounts-0-username": "%s-1" % foo_user,
             "accounts-0-account_ptr": "1",
@@ -1103,6 +1113,7 @@ class AdminInheritedInlinesTest(TestCase):
 
             "accounts-2-TOTAL_FORMS": u"2",
             "accounts-2-INITIAL_FORMS": u"1",
+            "accounts-2-MAX_NUM_FORMS": u"0",
 
             "accounts-2-0-username": "%s-1" % bar_user,
             "accounts-2-0-account_ptr": "2",
@@ -1348,6 +1359,7 @@ class AdminInlineFileUploadTest(TestCase):
             "name": u"Test Gallery",
             "pictures-TOTAL_FORMS": u"2",
             "pictures-INITIAL_FORMS": u"1",
+            "pictures-MAX_NUM_FORMS": u"0",
             "pictures-0-id": u"1",
             "pictures-0-gallery": u"1",
             "pictures-0-name": "Test Picture",
@@ -1370,6 +1382,7 @@ class AdminInlineTests(TestCase):
 
             "widget_set-TOTAL_FORMS": "3",
             "widget_set-INITIAL_FORMS": u"0",
+            "widget_set-MAX_NUM_FORMS": u"0",
             "widget_set-0-id": "",
             "widget_set-0-owner": "1",
             "widget_set-0-name": "",
@@ -1382,6 +1395,7 @@ class AdminInlineTests(TestCase):
 
             "doohickey_set-TOTAL_FORMS": "3",
             "doohickey_set-INITIAL_FORMS": u"0",
+            "doohickey_set-MAX_NUM_FORMS": u"0",
             "doohickey_set-0-owner": "1",
             "doohickey_set-0-code": "",
             "doohickey_set-0-name": "",
@@ -1394,6 +1408,7 @@ class AdminInlineTests(TestCase):
 
             "grommet_set-TOTAL_FORMS": "3",
             "grommet_set-INITIAL_FORMS": u"0",
+            "grommet_set-MAX_NUM_FORMS": u"0",
             "grommet_set-0-code": "",
             "grommet_set-0-owner": "1",
             "grommet_set-0-name": "",
@@ -1406,6 +1421,7 @@ class AdminInlineTests(TestCase):
 
             "whatsit_set-TOTAL_FORMS": "3",
             "whatsit_set-INITIAL_FORMS": u"0",
+            "whatsit_set-MAX_NUM_FORMS": u"0",
             "whatsit_set-0-owner": "1",
             "whatsit_set-0-index": "",
             "whatsit_set-0-name": "",
@@ -1418,6 +1434,7 @@ class AdminInlineTests(TestCase):
 
             "fancydoodad_set-TOTAL_FORMS": "3",
             "fancydoodad_set-INITIAL_FORMS": u"0",
+            "fancydoodad_set-MAX_NUM_FORMS": u"0",
             "fancydoodad_set-0-doodad_ptr": "",
             "fancydoodad_set-0-owner": "1",
             "fancydoodad_set-0-name": "",
@@ -1433,6 +1450,7 @@ class AdminInlineTests(TestCase):
 
             "category_set-TOTAL_FORMS": "3",
             "category_set-INITIAL_FORMS": "0",
+            "category_set-MAX_NUM_FORMS": "0",
             "category_set-0-order": "",
             "category_set-0-id": "",
             "category_set-0-collector": "1",
@@ -1624,6 +1642,7 @@ class AdminInlineTests(TestCase):
 
             "category_set-TOTAL_FORMS": "7",
             "category_set-INITIAL_FORMS": "4",
+            "category_set-MAX_NUM_FORMS": "0",
 
             "category_set-0-order": "14",
             "category_set-0-id": "1",
@@ -1750,9 +1769,9 @@ class ReadonlyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/post/add/')
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="posted"')
-        # 3 fields + 2 submit buttons + 2 inline management form fields, + 2
-        # hidden fields for inlines + 1 field for the inline
-        self.assertEqual(response.content.count("input"), 10)
+        # 3 fields + 2 submit buttons + 4 inline management form fields, + 2
+        # hidden fields for inlines + 1 field for the inline + 2 empty form
+        self.assertEqual(response.content.count("input"), 14)
         self.assertContains(response, formats.localize(datetime.date.today()))
         self.assertContains(response,
             "<label>Awesomeness level:</label>")
@@ -1773,6 +1792,7 @@ class ReadonlyTest(TestCase):
             "content": "This is an incredible development.",
             "link_set-TOTAL_FORMS": "1",
             "link_set-INITIAL_FORMS": "0",
+            "link_set-MAX_NUM_FORMS": "0",
         }
         response = self.client.post('/test_admin/admin/admin_views/post/add/', data)
         self.assertEqual(response.status_code, 302)

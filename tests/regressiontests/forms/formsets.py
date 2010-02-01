@@ -20,7 +20,7 @@ but we'll look at how to do so later.
 
 >>> formset = ChoiceFormSet(auto_id=False, prefix='choices')
 >>> print formset
-<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" />
+<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" /></td></tr>
 <tr><th>Votes:</th><td><input type="text" name="choices-0-votes" /></td></tr>
 
@@ -34,6 +34,7 @@ the TOTAL_FORMS field appropriately.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '1', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ... }
@@ -60,6 +61,7 @@ any of the forms.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '1', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '',
 ... }
@@ -90,6 +92,7 @@ Let's simulate what would happen if we submitted this form.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '2', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '1', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-1-choice': '',
@@ -111,6 +114,7 @@ handle that later.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '2', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '1', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-1-choice': 'The Decemberists',
@@ -130,6 +134,7 @@ handle that case later.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '2', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '1', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': '', # deleted value
 ...     'choices-0-votes': '', # deleted value
 ...     'choices-1-choice': '',
@@ -167,6 +172,7 @@ number of forms to be completed.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': '',
 ...     'choices-0-votes': '',
 ...     'choices-1-choice': '',
@@ -187,6 +193,7 @@ We can just fill out one of the forms.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-1-choice': '',
@@ -207,6 +214,7 @@ And once again, if we try to partially complete a form, validation will fail.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-1-choice': 'The Decemberists',
@@ -274,6 +282,7 @@ To delete something, we just need to set that form's special delete field to
 >>> data = {
 ...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '2', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-0-DELETE': '',
@@ -303,6 +312,7 @@ it's going to be deleted.
 >>> data = {
 ...     'check-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'check-INITIAL_FORMS': '2', # the number of forms with initial data
+...     'check-MAX_NUM_FORMS': '0', # max number of forms
 ...     'check-0-field': '200',
 ...     'check-0-DELETE': '',
 ...     'check-1-field': '50',
@@ -351,6 +361,7 @@ something at the front of the list, you'd need to set it's order to 0.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '2', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-0-ORDER': '1',
@@ -377,6 +388,7 @@ they will be sorted below everything else.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '4', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '3', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-0-ORDER': '1',
@@ -406,6 +418,7 @@ Ordering should work with blank fieldsets.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '3', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ... }
 
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
@@ -450,6 +463,7 @@ Let's delete Fergie, and put The Decemberists ahead of Calexico.
 >>> data = {
 ...     'choices-TOTAL_FORMS': '4', # the number of forms rendered
 ...     'choices-INITIAL_FORMS': '3', # the number of forms with initial data
+...     'choices-MAX_NUM_FORMS': '0', # max number of forms
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-0-ORDER': '1',
@@ -508,6 +522,7 @@ We start out with a some duplicate data.
 >>> data = {
 ...     'drinks-TOTAL_FORMS': '2', # the number of forms rendered
 ...     'drinks-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'drinks-MAX_NUM_FORMS': '0', # max number of forms
 ...     'drinks-0-name': 'Gin and Tonic',
 ...     'drinks-1-name': 'Gin and Tonic',
 ... }
@@ -529,6 +544,7 @@ Make sure we didn't break the valid case.
 >>> data = {
 ...     'drinks-TOTAL_FORMS': '2', # the number of forms rendered
 ...     'drinks-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'drinks-MAX_NUM_FORMS': '0', # max number of forms
 ...     'drinks-0-name': 'Gin and Tonic',
 ...     'drinks-1-name': 'Bloody Mary',
 ... }

@@ -10,6 +10,7 @@ class DeletionTests(TestCase):
         data = {
             'poem_set-TOTAL_FORMS': u'1',
             'poem_set-INITIAL_FORMS': u'1',
+            'poem_set-MAX_NUM_FORMS': u'0',
             'poem_set-0-id': str(poem.pk),
             'poem_set-0-poet': str(poet.pk),
             'poem_set-0-name': u'test',
@@ -30,6 +31,7 @@ class DeletionTests(TestCase):
         data = {
             'poem_set-TOTAL_FORMS': u'1',
             'poem_set-INITIAL_FORMS': u'0',
+            'poem_set-MAX_NUM_FORMS': u'0',
             'poem_set-0-id': u'',
             'poem_set-0-poem': u'1',
             'poem_set-0-name': u'x' * 1000,
@@ -58,6 +60,7 @@ class DeletionTests(TestCase):
         data = {
             'poem_set-TOTAL_FORMS': u'1',
             'poem_set-INITIAL_FORMS': u'1',
+            'poem_set-MAX_NUM_FORMS': u'0',
             'poem_set-0-id': u'1',
             'poem_set-0-poem': u'1',
             'poem_set-0-name': u'x' * 1000,
@@ -88,6 +91,7 @@ class DeletionTests(TestCase):
         data = {
             'child_set-TOTAL_FORMS': u'1',
             'child_set-INITIAL_FORMS': u'0',
+            'child_set-MAX_NUM_FORMS': u'0',
             'child_set-0-name': u'child',
         }
         formset = ChildFormSet(data, instance=school)

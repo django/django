@@ -20,29 +20,24 @@
 		var updateElementIndex = function(el, prefix, ndx) {
 			var id_regex = new RegExp("(" + prefix + "-\\d+)");
 			var replacement = prefix + "-" + ndx;
-			if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
-			if (el.id) el.id = el.id.replace(id_regex, replacement);
-			if (el.name) el.name = el.name.replace(id_regex, replacement);
+			if ($(el).attr("for")) {
+				$(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+			}
+			if (el.id) {
+				el.id = el.id.replace(id_regex, replacement);
+			}
+			if (el.name) {
+				el.name = el.name.replace(id_regex, replacement);
+			}
 		};
 		var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
 		var initialForms = $("#id_" + options.prefix + "-INITIAL_FORMS");
-		var maxForms = parseInt(totalForms.val());
+		var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS");
 		// only show the add button if we are allowed to add more items
-		var showAddButton = (maxForms - parseInt(initialForms.val())) > 0;
+		var showAddButton = ((maxForms.val() == 0) || ((maxForms.val()-totalForms.val()) > 0));
 		var selectedItems = this;
 		$(this).each(function(i) {
 			$(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
-			// hide the extras, but only if there were no form errors
-			if (!$(".errornote").html()) {
-				var relatedItems = $(selectedItems).not("." + options.emptyCssClass);
-				extraRows = relatedItems.length;
-				if (parseInt(initialForms.val()) >= 0) {
-					$(relatedItems).slice(initialForms.val()).remove();
-				} else {
-					$(relatedItems).remove();
-				}
-				totalForms.val(parseInt(initialForms.val()));
-			}
 		});
 		if ($(this).length && showAddButton) {
 			var addButton;
@@ -58,9 +53,8 @@
 				addButton = $(this).filter(":last").next().find("a");
 			}
 			addButton.click(function() {
-				var totalForms = parseInt($("#id_" + options.prefix + "-TOTAL_FORMS").val());
-				var initialForms = parseInt($("#id_" + options.prefix + "-INITIAL_FORMS").val());
-				var nextIndex = totalForms + 1;
+				var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
+				var nextIndex = parseInt(totalForms.val()) + 1;
 				var template = $("#" + options.prefix + "-empty");
 				var row = template.clone(true).get(0);
 				$(row).removeClass(options.emptyCssClass).removeAttr("id").insertBefore($(template));
@@ -79,10 +73,13 @@
 					// last child element of the form's container:
 					$(row).children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
 				}
+				$(row).find("input,select,textarea,label").each(function() {
+					updateElementIndex(this, options.prefix, totalForms.val());
+				});
 				// Update number of total forms
-				$("#id_" + options.prefix + "-TOTAL_FORMS").val(nextIndex);
-				// Hide add button in case we've hit the max
-				if (maxForms <= nextIndex) {
+				$(totalForms).val(nextIndex);
+				// Hide add button in case we've hit the max, except we want to add infinitely
+				if ((maxForms.val() != 0) && (maxForms.val() <= totalForms.val())) {
 					addButton.parent().hide();
 				}
 				// The delete button of each row triggers a bunch of other things
@@ -91,44 +88,45 @@
 					var row = $(this).parents("." + options.formCssClass);
 					row.remove();
 					// If a post-delete callback was provided, call it with the deleted form:
-					if (options.removed) options.removed(row);
+					if (options.removed) {
+						options.removed(row);
+					}
 					// Update the TOTAL_FORMS form count.
 					var forms = $("." + options.formCssClass);
 					$("#id_" + options.prefix + "-TOTAL_FORMS").val(forms.length);
 					// Show add button again once we drop below max
-					if (maxForms >= forms.length) {
+					if ((maxForms.val() == 0) || (maxForms.val() >= forms.length)) {
 						addButton.parent().show();
 					}
 					// Also, update names and ids for all remaining form controls
 					// so they remain in sequence:
-					for (var i=0, formCount=forms.length; i<formCount; i++) {
+					for (var i=0, formCount=forms.length; i<formCount; i++)
+					{
 						$(forms.get(i)).find("input,select,textarea,label").each(function() {
 							updateElementIndex(this, options.prefix, i);
 						});
 					}
 					return false;
 				});
-				$(row).find("input,select,textarea,label").each(function() {
-					updateElementIndex(this, options.prefix, totalForms);
-				});
 				// If a post-add callback was supplied, call it with the added form:
-				if (options.added) options.added($(row));
+				if (options.added) {
+					options.added($(row));
+				}
 				return false;
 			});
 		}
-		return $(this);
+		return this;
 	}
-
 	/* Setup plugin defaults */
 	$.fn.formset.defaults = {
-		prefix: "form",					 // The form prefix for your django formset
-		addText: "add another",			 // Text for the add link
-		deleteText: "remove",			 // Text for the delete link
-		addCssClass: "add-row",			 // CSS class applied to the add link
-		deleteCssClass: "delete-row",	 // CSS class applied to the delete link
-		emptyCssClass: "empty-row",		 // CSS class applied to the empty row
-		formCssClass: "dynamic-form",	 // CSS class applied to each form in a formset
-		added: null,					 // Function called each time a new form is added
-		removed: null					 // Function called each time a form is deleted
+		prefix: "form",					// The form prefix for your django formset
+		addText: "add another",			// Text for the add link
+		deleteText: "remove",			// Text for the delete link
+		addCssClass: "add-row",			// CSS class applied to the add link
+		deleteCssClass: "delete-row",	// CSS class applied to the delete link
+		emptyCssClass: "empty-row",		// CSS class applied to the empty row
+		formCssClass: "dynamic-form",	// CSS class applied to each form in a formset
+		added: null,					// Function called each time a new form is added
+		removed: null					// Function called each time a form is deleted
 	}
-})(jQuery)
+})(jQuery);

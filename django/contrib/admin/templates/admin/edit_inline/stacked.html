@@ -19,24 +19,25 @@
 </div>
 
 <script type="text/javascript">
-jQuery.noConflict();
-jQuery(document).ready(function($) {
-    var rows = "#{{ inline_admin_formset.formset.prefix }}-group .inline-related";
-    updateInlineLabel = function(row) {
-        $(rows).find(".inline_label").each(function(i) {
-            var count = i + 1;
-            $(this).html($(this).html().replace(/(#\d+)/g, "#" + count));
+(function($) {
+    $(document).ready(function() {
+        var rows = "#{{ inline_admin_formset.formset.prefix }}-group .inline-related";
+        updateInlineLabel = function(row) {
+            $(rows).find(".inline_label").each(function(i) {
+                var count = i + 1;
+                $(this).html($(this).html().replace(/(#\d+)/g, "#" + count));
+            });
+        }
+        $(rows).formset({
+            prefix: "{{ inline_admin_formset.formset.prefix }}",
+            addText: "{% blocktrans with inline_admin_formset.opts.verbose_name|title as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
+            formCssClass: "dynamic-{{ inline_admin_formset.formset.prefix }}",
+            deleteCssClass: "inline-deletelink",
+            deleteText: "{% trans "Remove" %}",
+            emptyCssClass: "empty-form",
+            removed: updateInlineLabel,
+            added: updateInlineLabel
         });
-    }
-    $(rows).formset({
-        prefix: "{{ inline_admin_formset.formset.prefix }}",
-        addText: "{% blocktrans with inline_admin_formset.opts.verbose_name|title as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
-        formCssClass: "dynamic-{{ inline_admin_formset.formset.prefix }}",
-        deleteCssClass: "inline-deletelink",
-        deleteText: "{% trans "Remove" %}",
-        emptyCssClass: "empty-form",
-        removed: updateInlineLabel,
-        added: updateInlineLabel
     });
-});
+})(jQuery.noConflict());
 </script>

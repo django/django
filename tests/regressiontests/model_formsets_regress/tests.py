@@ -20,6 +20,7 @@ class InlineFormsetTests(TestCase):
             'username': u'apollo13',
             'usersite_set-TOTAL_FORMS': u'1',
             'usersite_set-INITIAL_FORMS': u'0',
+            'usersite_set-MAX_NUM_FORMS': u'0',
             'usersite_set-0-data': u'10',
             'usersite_set-0-user': u'apollo13'
         }
@@ -43,6 +44,7 @@ class InlineFormsetTests(TestCase):
         data = {
             'usersite_set-TOTAL_FORMS': u'1',
             'usersite_set-INITIAL_FORMS': u'1',
+            'usersite_set-MAX_NUM_FORMS': u'0',
             'usersite_set-0-id': unicode(usersite[0]['id']),
             'usersite_set-0-data': u'11',
             'usersite_set-0-user': u'apollo13'
@@ -60,6 +62,7 @@ class InlineFormsetTests(TestCase):
         data = {
             'usersite_set-TOTAL_FORMS': u'2',
             'usersite_set-INITIAL_FORMS': u'1',
+            'usersite_set-MAX_NUM_FORMS': u'0',
             'usersite_set-0-id': unicode(usersite[0]['id']),
             'usersite_set-0-data': u'11',
             'usersite_set-0-user': u'apollo13',
@@ -92,6 +95,7 @@ class InlineFormsetTests(TestCase):
             'name': u"Guido's House of Pasta",
             'manager_set-TOTAL_FORMS': u'1',
             'manager_set-INITIAL_FORMS': u'0',
+            'manager_set-MAX_NUM_FORMS': u'0',
             'manager_set-0-name': u'Guido Van Rossum'
         }
         restaurant = User()
@@ -113,6 +117,7 @@ class InlineFormsetTests(TestCase):
         data = {
             'manager_set-TOTAL_FORMS': u'1',
             'manager_set-INITIAL_FORMS': u'1',
+            'manager_set-MAX_NUM_FORMS': u'0',
             'manager_set-0-id': unicode(manager[0]['id']),
             'manager_set-0-name': u'Terry Gilliam'
         }
@@ -128,6 +133,7 @@ class InlineFormsetTests(TestCase):
         data = {
             'manager_set-TOTAL_FORMS': u'2',
             'manager_set-INITIAL_FORMS': u'1',
+            'manager_set-MAX_NUM_FORMS': u'0',
             'manager_set-0-id': unicode(manager[0]['id']),
             'manager_set-0-name': u'Terry Gilliam',
             'manager_set-1-name': u'John Cleese'

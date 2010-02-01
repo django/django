@@ -9,6 +9,7 @@ class DeletionTests(TestCase):
         data = {
             'form-TOTAL_FORMS': u'1',
             'form-INITIAL_FORMS': u'1',
+            'form-MAX_NUM_FORMS': u'0',
             'form-0-id': str(poet.pk),
             'form-0-name': u'test',
             'form-0-DELETE': u'on',
@@ -27,6 +28,7 @@ class DeletionTests(TestCase):
         data = {
             'form-TOTAL_FORMS': u'1',
             'form-INITIAL_FORMS': u'0',
+            'form-MAX_NUM_FORMS': u'0',
             'form-0-id': u'',
             'form-0-name': u'x' * 1000,
         }
@@ -53,6 +55,7 @@ class DeletionTests(TestCase):
         data = {
             'form-TOTAL_FORMS': u'1',
             'form-INITIAL_FORMS': u'1',
+            'form-MAX_NUM_FORMS': u'0',
             'form-0-id': u'1',
             'form-0-name': u'x' * 1000,
         }

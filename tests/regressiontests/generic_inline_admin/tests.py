@@ -58,6 +58,7 @@ class GenericAdminViewTest(TestCase):
             # inline data
             "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": u"1",
             "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": u"0",
+            "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": u"0",
         }
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/episode/add/', post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
@@ -71,6 +72,7 @@ class GenericAdminViewTest(TestCase):
             # inline data
             "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": u"3",
             "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": u"2",
+            "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": u"0",
             "generic_inline_admin-media-content_type-object_id-0-id": u"%d" % self.mp3_media_pk,
             "generic_inline_admin-media-content_type-object_id-0-url": u"http://example.com/podcast.mp3",
             "generic_inline_admin-media-content_type-object_id-1-id": u"%d" % self.png_media_pk,
@@ -192,6 +194,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
             # inline data
             "generic_inline_admin-phonenumber-content_type-object_id-TOTAL_FORMS": u"1",
             "generic_inline_admin-phonenumber-content_type-object_id-INITIAL_FORMS": u"0",
+            "generic_inline_admin-phonenumber-content_type-object_id-MAX_NUM_FORMS": u"0",
             "generic_inline_admin-phonenumber-content_type-object_id-0-id": "",
             "generic_inline_admin-phonenumber-content_type-object_id-0-phone_number": "555-555-5555",
         }
