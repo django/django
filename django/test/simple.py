@@ -147,7 +147,6 @@ def build_test(label):
 
     try:
         if issubclass(TestClass, unittest.TestCase):
-            print 'is a test case'
             if len(parts) == 2: # label is app.TestClass
                 try:
                     return unittest.TestLoader().loadTestsFromTestCase(TestClass)
