@@ -173,6 +173,10 @@ class ValidationTest(django.test.TestCase):
         f = models.CharField(choices=[('a','A'), ('b','B')])
         self.assertRaises(ValidationError, f.clean, "not a", None)
 
+    def test_choices_validation_supports_named_groups(self):
+        f = models.IntegerField(choices=(('group',((10,'A'),(20,'B'))),(30,'C')))
+        self.assertEqual(10, f.clean(10, None))
+
     def test_nullable_integerfield_raises_error_with_blank_false(self):
         f = models.IntegerField(null=True, blank=False)
         self.assertRaises(ValidationError, f.clean, None, None)
@@ -202,7 +206,7 @@ class ValidationTest(django.test.TestCase):
 class BigIntegerFieldTests(django.test.TestCase):
     def test_limits(self):
         # Ensure that values that are right at the limits can be saved
-        # and then retrieved without corruption. 
+        # and then retrieved without corruption.
         maxval = 9223372036854775807
         minval = -maxval - 1
         BigInt.objects.create(value=maxval)
@@ -236,7 +240,7 @@ class TypeCoercionTests(django.test.TestCase):
     """
     def test_lookup_integer_in_charfield(self):
         self.assertEquals(Post.objects.filter(title=9).count(), 0)
-        
+
     def test_lookup_integer_in_textfield(self):
         self.assertEquals(Post.objects.filter(body=24).count(), 0)
-        
+
