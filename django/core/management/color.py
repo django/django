@@ -35,6 +35,9 @@ def color_style():
             for role in termcolors.PALETTES[termcolors.NOCOLOR_PALETTE]:
                 format = color_settings.get(role,{})
                 setattr(style, role, termcolors.make_style(**format))
+            # For backwards compatibility,
+            # set style for ERROR_OUTPUT == ERROR
+            setattr(style, 'ERROR_OUTPUT', style.ERROR)
         else:
             style = no_style()
     return style
