@@ -10,7 +10,7 @@ Test the globbing of INSTALLED_APPS.
 >>> old_sys_path = sys.path
 >>> sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
->>> old_tz = os.environ["TZ"]
+>>> old_tz = os.environ.get("TZ")
 >>> settings = Settings('test_settings')
 
 >>> settings.INSTALLED_APPS
