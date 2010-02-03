@@ -37,7 +37,7 @@ def color_style():
                 setattr(style, role, termcolors.make_style(**format))
             # For backwards compatibility,
             # set style for ERROR_OUTPUT == ERROR
-            setattr(style, 'ERROR_OUTPUT', style.ERROR)
+            style.ERROR_OUTPUT = style.ERROR
         else:
             style = no_style()
     return style
