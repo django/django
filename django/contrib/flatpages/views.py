@@ -5,9 +5,15 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.core.xheaders import populate_xheaders
 from django.utils.safestring import mark_safe
+from django.views.decorators.csrf import csrf_protect
 
 DEFAULT_TEMPLATE = 'flatpages/default.html'
 
+# This view is called from FlatpageFallbackMiddleware.process_response
+# when a 404 is raised, which often means CsrfViewMiddleware.process_view
+# has not been called even if CsrfViewMiddleware is installed. So we need
+# to use @csrf_protect, in case the template needs {% csrf_token %}.
+@csrf_protect
 def flatpage(request, url):
     """
     Flat page view.
