@@ -362,12 +362,13 @@ class FormattingTests(TestCase):
             form6 = CompanyForm({
                 'name': u'acme',
                 'date_added': datetime.datetime(2009, 12, 31, 6, 0, 0),
+                'cents_payed': decimal.Decimal('59.47'),
             })
             form6.save()
             self.assertEqual(True, form6.is_valid())
             self.assertEqual(
                 form6.as_ul(),
-                u'<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>'
+                u'<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>\n<li><label for="id_cents_payed">Cents payed:</label> <input type="text" name="cents_payed" value="59,47" id="id_cents_payed" /></li>'
             )
             self.assertEqual(localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)), '31.12.2009 06:00:00')
             self.assertEqual(datetime.datetime(2009, 12, 31, 6, 0, 0), form6.cleaned_data['date_added'])
