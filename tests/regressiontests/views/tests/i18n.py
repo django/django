@@ -21,7 +21,7 @@ class I18NTests(TestCase):
 
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
-        for lang_code in ['es', 'fr', 'en', 'ru']:
+        for lang_code in ['es', 'fr', 'ru']:
             activate(lang_code)
             catalog = gettext.translation('djangojs', locale_dir, [lang_code])
             trans_txt = catalog.ugettext('this is to be translated')
@@ -30,3 +30,40 @@ class I18NTests(TestCase):
             # catalog['this is to be translated'] = 'same_that_trans_txt'
             # javascript_quote is used to be able to check unicode strings
             self.assertContains(response, javascript_quote(trans_txt), 1)
+
+class JsI18NTests(TestCase):
+    """
+    Tests django views in django/views/i18n.py that need to change
+    settings.LANGUAGE_CODE.
+    """
+
+    def setUp(self):
+        self.old_language_code = settings.LANGUAGE_CODE
+
+    def tearDown(self):
+        settings.LANGUAGE_CODE = self.old_language_code
+
+    def test_jsi18n_with_missing_en_files(self):
+        """
+        The javascript_catalog shouldn't load the fallback language in the
+        case that the current selected language is actually the one translated
+        from, and hence missing translation files completely.
+
+        This happens easily when you're translating from English to other
+        languages and you've set settings.LANGUAGE_CODE to some other language
+        than English.
+        """
+        settings.LANGUAGE_CODE = 'es'
+        activate('en-us')
+        response = self.client.get('/views/jsi18n/')
+        self.assertNotContains(response, 'esto tiene que ser traducido')
+
+    def test_jsi18n_fallback_language(self):
+        """
+        Let's make sure that the fallback language is still working properly
+        in cases where the selected language cannot be found.
+        """
+        settings.LANGUAGE_CODE = 'fr'
+        activate('fi')
+        response = self.client.get('/views/jsi18n/')
+        self.assertContains(response, 'il faut le traduire')
