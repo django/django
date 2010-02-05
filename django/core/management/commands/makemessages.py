@@ -2,7 +2,6 @@ import re
 import os
 import sys
 import glob
-import warnings
 from itertools import dropwhile
 from optparse import make_option
 from subprocess import PIPE, Popen
@@ -35,6 +34,13 @@ def handle_extensions(extensions=('html',)):
     # are handled in make_messages() (they are copied to file.ext.py files to
     # trick xgettext to parse them as Python files)
     return set([x for x in ext_list if x != '.py'])
+
+def _popen(cmd):
+    """
+    Friendly wrapper around Popen for Windows
+    """
+    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt', universal_newlines=True)
+    return p.communicate()
 
 def make_messages(locale=None, domain='django', verbosity='1', all=False, extensions=None):
     """
@@ -69,8 +75,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
         raise CommandError(message)
 
     # We require gettext version 0.15 or newer.
-    p = Popen('xgettext --version', shell=True, stdout=PIPE, stderr=PIPE)
-    match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', p.stdout.read())
+    output = _popen('xgettext --version')[0]
+    match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', output)
     if match:
         xversion = (int(match.group('major')), int(match.group('minor')))
         if xversion < (0, 15):
@@ -110,9 +116,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                 thefile = '%s.py' % file
                 open(os.path.join(dirpath, thefile), "w").write(src)
                 cmd = 'xgettext -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (domain, os.path.join(dirpath, thefile))
-                p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
-                msgs = p.stdout.read()
-                errors = p.stderr.read()
+                msgs, errors = _popen(cmd)
                 if errors:
                     raise CommandError("errors happened while running xgettext on %s\n%s" % (file, errors))
                 old = '#: '+os.path.join(dirpath, thefile)[2:]
@@ -140,9 +144,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                 cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=ugettext_noop --keyword=ugettext_lazy --keyword=ungettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
                     domain, os.path.join(dirpath, thefile))
-                p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
-                msgs = p.stdout.read()
-                errors = p.stderr.read()
+                msgs, errors = _popen(cmd)
                 if errors:
                     raise CommandError("errors happened while running xgettext on %s\n%s" % (file, errors))
 
@@ -161,16 +163,12 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                     os.unlink(os.path.join(dirpath, thefile))
 
         if os.path.exists(potfile):
-            p = Popen('msguniq --to-code=utf-8 "%s"' % potfile, shell=True, stdout=PIPE, stderr=PIPE)
-            msgs = p.stdout.read()
-            errors = p.stderr.read()
+            msgs, errors = _popen('msguniq --to-code=utf-8 "%s"' % potfile)
             if errors:
                 raise CommandError("errors happened while running msguniq\n%s" % errors)
             open(potfile, 'w').write(msgs)
             if os.path.exists(pofile):
-                p = Popen('msgmerge -q "%s" "%s"' % (pofile, potfile), shell=True, stdout=PIPE, stderr=PIPE)
-                msgs = p.stdout.read()
-                errors = p.stderr.read()
+                msgs, errors = _popen('msgmerge -q "%s" "%s"' % (pofile, potfile))
                 if errors:
                     raise CommandError("errors happened while running msgmerge\n%s" % errors)
             open(pofile, 'wb').write(msgs)
