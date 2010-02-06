@@ -1,0 +1,218 @@
+.. _releases-1.2-beta-1:
+
+===============================
+Django 1.2 beta 1 release notes
+===============================
+
+February 5, 2010
+
+Welcome to Django 1.2 beta 1!
+
+This is the second in a series of preview/development releases leading
+up to the eventual release of Django 1.2, currently scheduled to take
+place in March 2010. This release is primarily targeted at developers
+who are interested in trying out new features and testing the Django
+codebase to help identify and resolve bugs prior to the final 1.2
+release.
+
+As such, this release is *not* intended for production use, and any
+such use is discouraged.
+
+This document covers changes since the Django 1.2 alpha release; the
+:ref:`1.2 alpha release notes <releases-1.2-alpha-1>` cover new and
+updated features in Django between 1.1 and 1.2 alpha.
+
+
+What's new in 1.2 beta
+======================
+
+This 1.2 beta release marks the final feature freeze for Django 1.2;
+while most feature development was completed for 1.2 alpha (which
+constituted a freeze on major features), a few other new features were
+added afterward and so are new as of 1.2 beta.
+
+Additionally, some existing APIs have been deprecated; under `our API
+stability policy <misc-api-stability>`, these APIs will continue to
+work for now, but will raise ``PendingDeprecationWarning`` in Django
+1.2 and ``DeprecationWarning`` in Django 1.3, before being removed in
+Django 1.4.
+
+
+Class-based test runners
+------------------------
+
+Django 1.2 changes the test runner tools to use a class-based
+approach. Old style function-based test runners will still work, but
+should be updated to use the new :ref:`class-based runners
+<topics-testing-test_runner>`.
+
+
+``Feed`` in ``django.contrib.syndication.feeds``
+------------------------------------------------
+
+The :class:`django.contrib.syndication.feeds.Feed` class is being
+replaced by the :class:`django.contrib.syndication.views.Feed` class.
+The old ``feeds.Feed`` class is deprecated, and will be removed in
+Django 1.4.
+
+The new class has an almost identical API, but allows instances to be
+used as views. For example, consider the use of the old framework in
+the following :ref:`URLconf <topics-http-urls>`::
+
+    from django.conf.urls.defaults import *
+    from myproject.feeds import LatestEntries, LatestEntriesByCategory
+
+    feeds = {
+        'latest': LatestEntries,
+        'categories': LatestEntriesByCategory,
+    }
+
+    urlpatterns = patterns('',
+        # ...
+        (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
+            {'feed_dict': feeds}),
+        # ...
+    )
+
+Using the new Feed class, these feeds can be deployed directly as views::
+
+    from django.conf.urls.defaults import *
+    from myproject.feeds import LatestEntries, LatestEntriesByCategory
+
+    urlpatterns = patterns('',
+        # ...
+        (r'^feeds/latest/$', LatestEntries()),
+        (r'^feeds/categories/(?P<category_id>\d+)/$', LatestEntriesByCategory()),
+        # ...
+    )
+
+If you currently use the ``feed()`` view, the ``LatestEntries`` class
+would not need to be modified apart from subclassing the new
+:class:`~django.contrib.syndication.views.Feed` class.
+
+However, ``LatestEntriesByCategory`` uses the ``get_object()`` method
+with the ``bits`` argument to specify a specific category to show. In
+the new :class:`~django.contrib.syndication.views.Feed` class,
+``get_object()`` method takes a ``request`` and arguments from the
+URL, so it would look like this::
+
+    from django.contrib.syndication.views import Feed
+    from django.shortcuts import get_object_or_404
+    from myproject.models import Category
+
+    class LatestEntriesByCategory(Feed):
+        def get_object(self, request, category_id):
+            return get_object_or_404(Category, id=category_id)
+
+        # ...
+
+Additionally, the ``get_feed()`` method on ``Feed`` classes now take
+different arguments, which may impact you if you use the ``Feed``
+classes directly. Instead of just taking an optional ``url`` argument,
+it now takes two arguments: the object returned by its own
+``get_object()`` method, and the current ``request`` object.
+
+To take into account ``Feed`` classes not being initialized for each
+request, the ``__init__()`` method now takes no arguments by default.
+Previously it would have taken the ``slug`` from the URL and the
+``request`` object.
+
+In accordance with `RSS best practices`_, RSS feeds will now include
+an ``atom:link`` element. You may need to update your tests to take
+this into account.
+
+For more information, see the full :ref:`syndication framework
+documentation <ref-contrib-syndication>`.
+
+.. _RSS best practices: http://www.rssboard.org/rss-profile
+
+
+Cookie encoding
+---------------
+
+Due to cookie-handling bugs in Internet Explorer, Safari, and possibly
+other browsers, our encoding of cookie values was changed so that the
+characters comma (',') and semi-colon (';') are treated as non-safe
+characters, and are therefore encoded as ``\054`` and ``\073``
+respectively. This could produce backwards incompatibilities if you
+are relying on the ability to set these characters directly in cookie
+values.
+
+
+Object-level permissions
+------------------------
+
+A foundation for specifying permissions at the per-object level has
+been added. The default authentication backends shipped with Django do
+not make use of this, but third-party authentication backends are free
+to do so.  See the :ref:`authentication docs <topics-auth>` for more
+information.
+
+Permissions for anonymous users
+-------------------------------
+
+If you provide a custom authentication backend with the attribute
+``supports_anonymous_user`` set to ``True``, the ``AnonymousUser``
+class will check the backend for permissions, just as the normal
+``User`` does. This is intended to help centralize permission
+handling; apps can always delegate the question of whether something
+is allowed or not to the authorization/authentication system. See the
+:ref:`authentication docs <topics-auth>` for more details.
+
+
+The Django 1.2 roadmap
+======================
+
+Before the final Django 1.2 release, at least one additional
+preview/development releases will be made available. The current
+schedule consists of at least the following:
+
+* Week of **March 2, 2010**: First Django 1.2 release
+  candidate. String freeze for translations.
+
+* Week of **March 9, 2010**: Django 1.2 final release.
+
+If necessary, additional beta or release-candidate packages will be
+issued prior to the final 1.2 release. Django 1.2 will be released
+approximately one week after the final release candidate.
+
+
+What you can do to help
+=======================
+
+In order to provide a high-quality 1.2 release, we need your
+help. Although this beta release is, again, *not* intended for
+production use, you can help the Django team by trying out the beta
+codebase in a safe test environment and reporting any bugs or issues
+you encounter. The Django ticket tracker is the central place to
+search for open issues:
+
+    * http://code.djangoproject.com/timeline
+
+Please open new tickets if no existing ticket corresponds to a problem
+you're running into.
+
+Additionally, discussion of Django development, including progress
+toward the 1.2 release, takes place daily on the django-developers
+mailing list:
+
+    * http://groups.google.com/group/django-developers
+
+... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If
+... you're
+interested in helping out with Django's development, feel free to join the
+discussions there.
+
+Django's online documentation also includes pointers on how to
+contribute to Django:
+
+    * :ref:`How to contribute to Django <internals-contributing>`
+
+Contributions on any level -- developing code, writing documentation
+or simply triaging tickets and helping to test proposed bugfixes --
+are always welcome and appreciated.
+
+Development sprints for Django 1.2 will also be taking place at PyCon
+US 2010, on the dedicated sprint days (February 22 through 25), and
+anyone who wants to help out is welcome to join in, either in person
+at PyCon or virtually in the IRC channel or on the mailing list.
