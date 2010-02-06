@@ -27,13 +27,14 @@ Deprecations and other changes in 1.2 beta
 ==========================================
 
 This beta release deprecates one portion of public API, and introduces
-a potentially backwards-incompatible change to another. Under `our API
-stability policy <misc-api-stability>`, deprecation proceeds over
-multiple release cycles: initially, the deprecated API will raise
-``PendingDeprecationWarning``, followed by raising
-``DeprecationWarning`` in the following release, and finally removal
-of the deprecated API. APIs beginning the deprecation process in
-Django 1.2 will be removed in the Django 1.4 release.
+a potentially backwards-incompatible change to another. Under
+:ref:`our API stability policy <misc-api-stability>`, deprecation
+proceeds over multiple release cycles: initially, the deprecated API
+will raise ``PendingDeprecationWarning``, followed by raising
+``DeprecationWarning`` in the next release, and finally removal of the
+deprecated API in the release after that. APIs beginning the
+deprecation process in Django 1.2 will be removed in the Django 1.4
+release.
 
 
 Unit test runners
