@@ -142,11 +142,14 @@ values.
 Object-level permissions
 ------------------------
 
-A foundation for specifying permissions at the per-object level has
-been added. The default authentication backends shipped with Django do
-not make use of this, but third-party authentication backends are free
-to do so.  See the :ref:`authentication docs <topics-auth>` for more
-information.
+A foundation for specifying permissions at the per-object level was
+added in Django 1.2 alpha but not documented with the alpha release.
+
+The default authentication backends shipped with Django do not
+currently make use of this, but third-party authentication backends
+are free to do so. See the :ref:`authentication docs <topics-auth>`
+for more information.
+
 
 Permissions for anonymous users
 -------------------------------
