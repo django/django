@@ -155,8 +155,7 @@ mailing list:
 
     * http://groups.google.com/group/django-developers
 
-... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If
-... you're
+... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
 interested in helping out with Django's development, feel free to join the
 discussions there.
 
