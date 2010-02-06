@@ -352,9 +352,9 @@ Changing passwords
 ~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.2
-   The ``manage.py change_password`` command was added.
+   The ``manage.py changepassword`` command was added.
 
-:djadmin:`manage.py change_password <username>` offers a method of
+:djadmin:`manage.py changepassword <username>` offers a method of
 changing a User's password from the command line. It prompts you to
 change the password of a given user which you must enter twice. If
 they both match, the new password will be changed immediately. If you
