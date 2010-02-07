@@ -19,6 +19,7 @@
 
 {% block extrahead %}
 {{ block.super }}
+{% if action_form %}{% if actions_on_top or actions_on_bottom %}
 <script type="text/javascript">
 (function($) {
     $(document).ready(function($) {
@@ -26,6 +27,7 @@
     });
 })(jQuery.noConflict());
 </script>
+{% endif %}{% endif %}
 {% endblock %}
 
 {% block bodyclass %}change-list{% endblock %}
