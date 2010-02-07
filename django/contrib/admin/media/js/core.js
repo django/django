@@ -174,12 +174,12 @@ Date.prototype.strftime = function(format) {
     };
     var result = '', i = 0;
     while (i < format.length) {
-        if (format[i] === '%') {
-            result = result + fields[format[i + 1]];
+        if (format.charAt(i) === '%') {
+            result = result + fields[format.charAt(i + 1)];
             ++i;
         }
         else {
-            result = result + format[i];
+            result = result + format.charAt(i);
         }
         ++i;
     }
