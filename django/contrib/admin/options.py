@@ -13,6 +13,7 @@ from django.db import models, transaction
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
+from django.utils.decorators import method_decorator
 from django.utils.datastructures import SortedDict
 from django.utils.functional import update_wrapper
 from django.utils.html import escape
@@ -53,6 +54,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.FileField:       {'widget': widgets.AdminFileWidget},
 }
 
+csrf_protect_m = method_decorator(csrf_protect)
 
 class BaseModelAdmin(object):
     """Functionality common to both ModelAdmin and InlineAdmin."""
@@ -754,7 +756,7 @@ class ModelAdmin(BaseModelAdmin):
             msg = _("No action selected.")
             self.message_user(request, msg)
 
-    @csrf_protect
+    @csrf_protect_m
     @transaction.commit_on_success
     def add_view(self, request, form_url='', extra_context=None):
         "The 'add' admin view for this model."
@@ -844,7 +846,7 @@ class ModelAdmin(BaseModelAdmin):
         context.update(extra_context or {})
         return self.render_change_form(request, context, form_url=form_url, add=True)
 
-    @csrf_protect
+    @csrf_protect_m
     @transaction.commit_on_success
     def change_view(self, request, object_id, extra_context=None):
         "The 'change' admin view for this model."
@@ -936,7 +938,7 @@ class ModelAdmin(BaseModelAdmin):
         context.update(extra_context or {})
         return self.render_change_form(request, context, change=True, obj=obj)
 
-    @csrf_protect
+    @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
         "The 'change list' admin view for this model."
         from django.contrib.admin.views.main import ERROR_FLAG
@@ -1057,7 +1059,7 @@ class ModelAdmin(BaseModelAdmin):
             'admin/change_list.html'
         ], context, context_instance=context_instance)
 
-    @csrf_protect
+    @csrf_protect_m
     def delete_view(self, request, object_id, extra_context=None):
         "The 'delete' admin view for this model."
         opts = self.model._meta

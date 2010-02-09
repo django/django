@@ -251,6 +251,55 @@ incompatibilities, especially if you are storing comma or semi-colon in
 cookies and have javascript code that parses and manipulates cookie values
 client-side.
 
+``user_passes_test``, ``login_required`` and ``permission_required``
+--------------------------------------------------------------------
+
+``django.contrib.auth.decorators`` provides the decorators ``login_required``,
+``permission_required`` and ``user_passes_test``. Previously it was possible to
+use these decorators both on functions (where the first argument is 'request')
+and on methods (where the first argument is 'self', and the second argument is
+'request'). However, we have found that the trick which enabled this is
+flawed. It only works in limited circumstances, and produces errors that are
+very difficult to debug when it does not work.
+
+For this reason, the 'auto adapt' behaviour has been removed, and if you are
+using these decorators on methods, you will need to manually apply
+:func:`django.utils.decorators.method_decorator` to convert the decorator to one
+that works with methods. You would change code from this::
+
+    class MyClass(object):
+
+        @login_required
+        def my_view(self, request):
+            pass
+
+to this::
+
+    from django.utils.decorators import method_decorator
+
+    class MyClass(object):
+
+        @method_decorator(login_required)
+        def my_view(self, request):
+            pass
+
+or::
+
+    from django.utils.decorators import method_decorator
+
+    login_required_m = method_decorator(login_required)
+
+    class MyClass(object):
+
+        @login_required_m
+        def my_view(self, request):
+            pass
+
+For those following trunk, this change also applies to other decorators
+introduced since 1.1, including ``csrf_protect``, ``cache_control`` and anything
+created using ``decorator_from_middleware``.
+
+
 .. _deprecated-features-1.2:
 
 Features deprecated in 1.2

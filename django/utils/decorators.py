@@ -7,44 +7,24 @@ except ImportError:
     from django.utils.functional import wraps, update_wrapper  # Python 2.3, 2.4 fallback.
 
 
-# Licence for MethodDecoratorAdaptor and auto_adapt_to_methods
-#
-# This code is taken from stackoverflow.com [1], the code being supplied by
-# users 'Ants Aasma' [2] and 'Silent Ghost' [3] with modifications.  It is
-# legally included here under the terms of the Creative Commons
-# Attribution-Share Alike 2.5 Generic Licence [4]
-#
-# [1] http://stackoverflow.com/questions/1288498/using-the-same-decorator-with-arguments-with-functions-and-methods
-# [2] http://stackoverflow.com/users/107366/ants-aasma
-# [3] http://stackoverflow.com/users/12855/silentghost
-# [4] http://creativecommons.org/licenses/by-sa/2.5/
+def method_decorator(decorator):
+    """
+    Converts a function decorator into a method decorator
+    """
+    def _dec(func):
+        def _wrapper(self, *args, **kwargs):
+            def bound_func(*args2, **kwargs2):
+                return func(self, *args2, **kwargs2)
+            # bound_func has the signature that 'decorator' expects i.e.  no
+            # 'self' argument, but it is a closure over self so it can call
+            # 'func' correctly.
+            return decorator(bound_func)(*args, **kwargs)
+        return wraps(func)(_wrapper)
+    update_wrapper(_dec, decorator)
+    # Change the name to aid debugging.
+    _dec.__name__ = 'method_dec(%s)' % decorator.__name__
+    return _dec
 
-class MethodDecoratorAdaptor(object):
-    """
-    Generic way of creating decorators that adapt to being
-    used on methods
-    """
-    def __init__(self, decorator, func):
-        update_wrapper(self, func)
-        # NB: update the __dict__ first, *then* set
-        # our own .func and .decorator, in case 'func' is actually
-        # another MethodDecoratorAdaptor object, which has its
-        # 'func' and 'decorator' attributes in its own __dict__
-        self.decorator = decorator
-        self.func = func
-    def __call__(self, *args, **kwargs):
-        return self.decorator(self.func)(*args, **kwargs)
-    def __get__(self, instance, owner):
-        return self.decorator(self.func.__get__(instance, owner))
-
-def auto_adapt_to_methods(decorator):
-    """
-    Takes a decorator function, and returns a decorator-like callable that can
-    be used on methods as well as functions.
-    """
-    def adapt(func):
-        return MethodDecoratorAdaptor(decorator, func)
-    return wraps(decorator)(adapt)
 
 def decorator_from_middleware_with_args(middleware_class):
     """
@@ -61,6 +41,7 @@ def decorator_from_middleware_with_args(middleware_class):
     """
     return make_middleware_decorator(middleware_class)
 
+
 def decorator_from_middleware(middleware_class):
     """
     Given a middleware class (not an instance), returns a view decorator. This
@@ -68,6 +49,7 @@ def decorator_from_middleware(middleware_class):
     is created with no params passed.
     """
     return make_middleware_decorator(middleware_class)()
+
 
 def make_middleware_decorator(middleware_class):
     def _make_decorator(*m_args, **m_kwargs):
@@ -96,5 +78,5 @@ def make_middleware_decorator(middleware_class):
                         return result
                 return response
             return wraps(view_func)(_wrapped_view)
-        return auto_adapt_to_methods(_decorator)
+        return _decorator
     return _make_decorator

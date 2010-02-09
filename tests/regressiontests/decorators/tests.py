@@ -10,7 +10,7 @@ from django.utils.functional import allow_lazy, lazy, memoize
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.views.decorators.vary import vary_on_headers, vary_on_cookie
 from django.views.decorators.cache import cache_page, never_cache, cache_control
-from django.utils.decorators import auto_adapt_to_methods
+from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 
@@ -46,6 +46,7 @@ fully_decorated = staff_member_required(fully_decorated)
 fully_decorated = memoize(fully_decorated, {}, 1)
 fully_decorated = allow_lazy(fully_decorated)
 fully_decorated = lazy(fully_decorated)
+
 
 class DecoratorsTest(TestCase):
 
@@ -112,42 +113,25 @@ class DecoratorsTest(TestCase):
         my_view_cached2 = cache_page(my_view, 123, key_prefix="test")
         self.assertEqual(my_view_cached2(HttpRequest()), "response")
 
-class MethodDecoratorAdapterTests(TestCase):
-    def test_auto_adapt_to_methods(self):
-        """
-        Test that auto_adapt_to_methods actually works.
-        """
-        # Need 2 decorators with auto_adapt_to_methods,
-        # to check it plays nicely with composing itself.
 
-        def my_decorator(func):
-            def wrapped(*args, **kwargs):
-                # need to ensure that the first arg isn't 'self'
-                self.assertEqual(args[0], "test")
-                return "my_decorator:" + func(*args, **kwargs)
-            wrapped.my_decorator_custom_attribute = True
-            return wraps(func)(wrapped)
-        my_decorator = auto_adapt_to_methods(my_decorator)
+# For testing method_decorator, a decorator that assumes a single argument.
+# We will get type arguments if there is a mismatch in the number of arguments.
+def simple_dec(func):
+    def wrapper(arg):
+        return func("test:" + arg)
+    return wraps(func)(wrapper)
 
-        def my_decorator2(func):
-            def wrapped(*args, **kwargs):
-                # need to ensure that the first arg isn't 'self'
-                self.assertEqual(args[0], "test")
-                return "my_decorator2:" + func(*args, **kwargs)
-            wrapped.my_decorator2_custom_attribute = True
-            return wraps(func)(wrapped)
-        my_decorator2 = auto_adapt_to_methods(my_decorator2)
+simple_dec_m = method_decorator(simple_dec)
 
-        class MyClass(object):
-            def my_method(self, *args, **kwargs):
-                return "my_method:%r %r" % (args, kwargs)
-            my_method = my_decorator2(my_decorator(my_method))
 
-        obj = MyClass()
-        self.assertEqual(obj.my_method("test", 123, name='foo'),
-                         "my_decorator2:my_decorator:my_method:('test', 123) {'name': 'foo'}")
-        self.assertEqual(obj.my_method.__name__, 'my_method')
-        self.assertEqual(getattr(obj.my_method, 'my_decorator_custom_attribute', False),
-                         True)
-        self.assertEqual(getattr(obj.my_method, 'my_decorator2_custom_attribute', False),
-                         True)
+class MethodDecoratorTests(TestCase):
+    """
+    Tests for method_decorator
+    """
+    def test_method_decorator(self):
+        class Test(object):
+            @simple_dec_m
+            def say(self, arg):
+                return arg
+
+        self.assertEqual("test:hello", Test().say("hello"))

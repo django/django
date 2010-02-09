@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.forms.forms import Form
 from django.forms import fields
 from django.shortcuts import render_to_response
+from django.utils.decorators import method_decorator
 
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -147,14 +148,15 @@ def permission_protected_view(request):
 permission_protected_view = permission_required('modeltests.test_perm')(permission_protected_view)
 
 class _ViewManager(object):
+    @method_decorator(login_required)
     def login_protected_view(self, request):
         t = Template('This is a login protected test using a method. '
                      'Username is {{ user.username }}.',
                      name='Login Method Template')
         c = Context({'user': request.user})
         return HttpResponse(t.render(c))
-    login_protected_view = login_required(login_protected_view)
 
+    @method_decorator(permission_required('modeltests.test_perm'))
     def permission_protected_view(self, request):
         t = Template('This is a permission protected test using a method. '
                      'Username is {{ user.username }}. '
@@ -162,7 +164,6 @@ class _ViewManager(object):
                      name='Permissions Template')
         c = Context({'user': request.user})
         return HttpResponse(t.render(c))
-    permission_protected_view = permission_required('modeltests.test_perm')(permission_protected_view)
 
 _view_manager = _ViewManager()
 login_protected_method_view = _view_manager.login_protected_view

@@ -6,7 +6,7 @@ except ImportError:
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.utils.http import urlquote
-from django.utils.decorators import auto_adapt_to_methods
+
 
 def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
     """
@@ -26,7 +26,8 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
             tup = login_url, redirect_field_name, path
             return HttpResponseRedirect('%s?%s=%s' % tup)
         return wraps(view_func)(_wrapped_view)
-    return auto_adapt_to_methods(decorator)
+    return decorator
+
 
 def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME):
     """
@@ -40,6 +41,7 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME):
     if function:
         return actual_decorator(function)
     return actual_decorator
+
 
 def permission_required(perm, login_url=None):
     """
