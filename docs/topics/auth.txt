@@ -1082,7 +1082,7 @@ The permission_required decorator
 
         from django.contrib.auth.decorators import permission_required
 
-        permission_required('polls.can_vote')
+        @permission_required('polls.can_vote')
         def my_view(request):
             ...
 
@@ -1095,7 +1095,7 @@ The permission_required decorator
 
         from django.contrib.auth.decorators import permission_required
 
-        permission_required('polls.can_vote', login_url='/loginpage/')
+        @permission_required('polls.can_vote', login_url='/loginpage/')
         def my_view(request):
             ...
 
