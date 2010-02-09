@@ -696,36 +696,19 @@ The login_required decorator
 
         from django.contrib.auth.decorators import login_required
 
-        def my_view(request):
-            # ...
-        my_view = login_required(my_view)
-
-    Here's an equivalent example, using the more compact decorator syntax
-    introduced in Python 2.4::
-
-        from django.contrib.auth.decorators import login_required
-
         @login_required
         def my_view(request):
-            # ...
+            ...
 
     :func:`~django.contrib.auth.decorators.login_required` also takes an
     optional ``redirect_field_name`` parameter. Example::
 
-        from django.contrib.auth.decorators import login_required
-
-        def my_view(request):
-            # ...
-        my_view = login_required(redirect_field_name='redirect_to')(my_view)
-
-    Again, an equivalent example of the more compact decorator syntax
-    introduced in Python 2.4::
 
         from django.contrib.auth.decorators import login_required
 
         @login_required(redirect_field_name='redirect_to')
         def my_view(request):
-            # ...
+            ...
 
     :func:`~django.contrib.auth.decorators.login_required` does the following:
 
@@ -1058,22 +1041,14 @@ checks to make sure the user is logged in and has the permission
 
         from django.contrib.auth.decorators import user_passes_test
 
+        @user_passes_test(lambda u: u.has_perm('polls.can_vote'))
         def my_view(request):
-            # ...
-        my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
+            ...
 
     We're using this particular test as a relatively simple example. However,
     if you just want to test whether a permission is available to a user, you
     can use the :func:`~django.contrib.auth.decorators.permission_required()`
     decorator, described later in this document.
-
-    Here's the same thing, using Python 2.4's decorator syntax::
-
-        from django.contrib.auth.decorators import user_passes_test
-
-        @user_passes_test(lambda u: u.has_perm('polls.can_vote'))
-        def my_view(request):
-            # ...
 
     :func:`~django.contrib.auth.decorators.user_passes_test` takes a required
     argument: a callable that takes a
@@ -1093,7 +1068,7 @@ checks to make sure the user is logged in and has the permission
 
         @user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')
         def my_view(request):
-            # ...
+            ...
 
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1107,9 +1082,9 @@ The permission_required decorator
 
         from django.contrib.auth.decorators import permission_required
 
+        permission_required('polls.can_vote')
         def my_view(request):
-            # ...
-        my_view = permission_required('polls.can_vote')(my_view)
+            ...
 
     As for the :meth:`User.has_perm` method, permission names take the form
     ``"<app label>.<permission codename>"`` (i.e. ``polls.can_vote`` for a
@@ -1120,9 +1095,9 @@ The permission_required decorator
 
         from django.contrib.auth.decorators import permission_required
 
+        permission_required('polls.can_vote', login_url='/loginpage/')
         def my_view(request):
-            # ...
-        my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
+            ...
 
     As in the :func:`~decorators.login_required` decorator, ``login_url``
     defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.

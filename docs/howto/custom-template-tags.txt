@@ -138,8 +138,7 @@ The ``Library.filter()`` method takes two arguments:
     2. The compilation function -- a Python function (not the name of the
        function as a string).
 
-If you're using Python 2.4 or above, you can use ``register.filter()`` as a
-decorator instead::
+You can use ``register.filter()`` as a decorator instead::
 
     @register.filter(name='cut')
     @stringfilter
@@ -557,8 +556,7 @@ The ``tag()`` method takes two arguments:
     2. The compilation function -- a Python function (not the name of the
        function as a string).
 
-As with filter registration, it is also possible to use this as a decorator, in
-Python 2.4 and above::
+As with filter registration, it is also possible to use this as a decorator::
 
     @register.tag(name="current_time")
     def do_current_time(parser, token):
@@ -657,7 +655,7 @@ Our earlier ``current_time`` function could thus be written like this::
 
     register.simple_tag(current_time)
 
-In Python 2.4, the decorator syntax also works::
+The decorator syntax also works::
 
     @register.simple_tag
     def current_time(format_string):
@@ -738,8 +736,7 @@ loader, we'd register the tag like this::
     # Here, register is a django.template.Library instance, as before
     register.inclusion_tag('results.html')(show_results)
 
-As always, Python 2.4 decorator syntax works as well, so we could have
-written::
+As always, decorator syntax works as well, so we could have written::
 
     @register.inclusion_tag('results.html')
     def show_results(poll):
