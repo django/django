@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
+__all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address', 
+           'CharLink', 'TextLink', 'OddRelation1', 'OddRelation2', 
+           'Contact', 'Organization', 'Note')
+
 class Link(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
@@ -58,4 +62,18 @@ class OddRelation1(models.Model):
 class OddRelation2(models.Model):
     name = models.CharField(max_length=100)
     tlinks = generic.GenericRelation(TextLink)
+
+# models for test_q_object_or:
+class Note(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey()
+    note = models.TextField()
+
+class Contact(models.Model):
+    notes = generic.GenericRelation(Note)
+
+class Organization(models.Model):
+    name = models.CharField(max_length=255)
+    contacts = models.ManyToManyField(Contact, related_name='organizations')
 
