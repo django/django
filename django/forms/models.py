@@ -317,7 +317,7 @@ class BaseModelForm(BaseForm):
         try:
             self.instance.clean()
         except ValidationError, e:
-            self._update_errors(e.message_dict)
+            self._update_errors({NON_FIELD_ERRORS: e.messages})
         super(BaseModelForm, self)._clean_form()
 
     def validate_unique(self):
