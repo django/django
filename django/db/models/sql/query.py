@@ -1100,13 +1100,13 @@ class Query(object):
             for child in q_object.children:
                 if connector == OR:
                     refcounts_before = self.alias_refcount.copy()
+                self.where.start_subtree(connector)
                 if isinstance(child, Node):
-                    self.where.start_subtree(connector)
                     self.add_q(child, used_aliases)
-                    self.where.end_subtree()
                 else:
                     self.add_filter(child, connector, q_object.negated,
                             can_reuse=used_aliases)
+                self.where.end_subtree()
                 if connector == OR:
                     # Aliases that were newly added or not used at all need to
                     # be promoted to outer joins if they are nullable relations.
