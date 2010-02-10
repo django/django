@@ -36,7 +36,7 @@ class UniqueTogetherModel(models.Model):
     efield = models.EmailField()
 
     class Meta:
-        unique_together = (('ifield', 'cfield',), ('ifield', 'efield'))
+        unique_together = (('ifield', 'cfield',), ['ifield', 'efield'])
 
 class UniqueForDateModel(models.Model):
     start_date = models.DateField()

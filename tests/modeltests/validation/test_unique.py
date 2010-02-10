@@ -13,7 +13,7 @@ class GetUniqueCheckTests(unittest.TestCase):
             m._get_unique_checks()
         )
 
-    def test_unique_together_gets_picked_up(self):
+    def test_unique_together_gets_picked_up_and_converted_to_tuple(self):
         m = UniqueTogetherModel()
         self.assertEqual(
             ([('ifield', 'cfield',),('ifield', 'efield'), ('id',), ], []),

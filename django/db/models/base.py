@@ -683,7 +683,7 @@ class Model(object):
                 if name in exclude:
                     break
             else:
-                unique_checks.append(check)
+                unique_checks.append(tuple(check))
 
         # These are checks for the unique_for_<date/year/month>.
         date_checks = []
