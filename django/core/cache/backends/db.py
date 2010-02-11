@@ -12,7 +12,7 @@ except ImportError:
 class CacheClass(BaseCache):
     def __init__(self, table, params):
         BaseCache.__init__(self, params)
-        self._table = table
+        self._table = connection.ops.quote_name(table)
         max_entries = params.get('max_entries', 300)
         try:
             self._max_entries = int(max_entries)
