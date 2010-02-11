@@ -38,8 +38,8 @@ class Command(LabelCommand):
                 field_output.append("UNIQUE")
             if f.db_index:
                 unique = f.unique and "UNIQUE " or ""
-                index_output.append("CREATE %sINDEX %s_%s ON %s (%s);" % \
-                    (unique, tablename, f.name, qn(tablename),
+                index_output.append("CREATE %sINDEX %s ON %s (%s);" % \
+                    (unique, qn('%s_%s' % (tablename, f.name)), qn(tablename),
                     qn(f.name)))
             table_output.append(" ".join(field_output))
         full_statement = ["CREATE TABLE %s (" % qn(tablename)]

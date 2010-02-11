@@ -342,13 +342,15 @@ class BaseCacheTests(object):
 
 class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
-        management.call_command('createcachetable', 'test_cache_table', verbosity=0, interactive=False)
-        self.cache = get_cache('db://test_cache_table')
+        # Spaces are used in the table name to ensure quoting/escaping is working
+        self._table_name = 'test cache table'
+        management.call_command('createcachetable', self._table_name, verbosity=0, interactive=False)
+        self.cache = get_cache('db://%s' % self._table_name)
 
     def tearDown(self):
         from django.db import connection
         cursor = connection.cursor()
-        cursor.execute('DROP TABLE test_cache_table')
+        cursor.execute('DROP TABLE %s' % connection.ops.quote_name(self._table_name))
 
 class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
