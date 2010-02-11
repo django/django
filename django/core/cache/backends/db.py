@@ -81,7 +81,8 @@ class CacheClass(BaseCache):
     def has_key(self, key):
         now = datetime.now().replace(microsecond=0)
         cursor = connection.cursor()
-        cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s and expires > %%s" % self._table, [key, now])
+        cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s and expires > %%s" % self._table,
+                        [key, connection.ops.value_to_db_datetime(now)])
         return cursor.fetchone() is not None
 
     def _cull(self, cursor, now):
