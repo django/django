@@ -324,6 +324,22 @@ class BaseCacheTests(object):
         self.assertEqual(self.cache.get("key1"), None)
         self.assertEqual(self.cache.get("key2"), None)
 
+    def test_long_timeout(self):
+        '''
+        Using a timeout greater than 30 days makes memcached think
+        it is an absolute expiration timestamp instead of a relative
+        offset. Test that we honour this convention. Refs #12399.
+        '''
+        self.cache.set('key1', 'eggs', 60*60*24*30 + 1) #30 days + 1 second
+        self.assertEqual(self.cache.get('key1'), 'eggs')
+
+        self.cache.add('key2', 'ham', 60*60*24*30 + 1)
+        self.assertEqual(self.cache.get('key2'), 'ham')
+
+        self.cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 60*60*24*30 + 1)
+        self.assertEqual(self.cache.get('key3'), 'sausage')
+        self.assertEqual(self.cache.get('key4'), 'lobster bisque')
+
 class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         management.call_command('createcachetable', 'test_cache_table', verbosity=0, interactive=False)
