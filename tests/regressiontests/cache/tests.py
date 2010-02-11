@@ -290,10 +290,6 @@ class BaseCacheTests(object):
         self.cache.add('key2', 'ham', 60*60*24*30 + 1)
         self.assertEqual(self.cache.get('key2'), 'ham')
 
-        self.cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 60*60*24*30 + 1)
-        self.assertEqual(self.cache.get('key3'), 'sausage')
-        self.assertEqual(self.cache.get('key4'), 'lobster bisque')
-
 class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         # Spaces are used in the table name to ensure quoting/escaping is working

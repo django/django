@@ -60,9 +60,11 @@ class CacheClass(BaseCache):
             result = cursor.fetchone()
             if result and (mode == 'set' or
                     (mode == 'add' and result[1] < now)):
-                cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE cache_key = %%s" % self._table, [encoded, str(exp), key])
+                cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE cache_key = %%s" % self._table,
+                               [encoded, connection.ops.value_to_db_datetime(exp), key])
             else:
-                cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
+                cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table,
+                               [key, encoded, connection.ops.value_to_db_datetime(exp)])
         except DatabaseError:
             # To be threadsafe, updates/inserts are allowed to fail silently
             transaction.rollback_unless_managed()
@@ -86,7 +88,8 @@ class CacheClass(BaseCache):
         if self._cull_frequency == 0:
             cursor.execute("DELETE FROM %s" % self._table)
         else:
-            cursor.execute("DELETE FROM %s WHERE expires < %%s" % self._table, [str(now)])
+            cursor.execute("DELETE FROM %s WHERE expires < %%s" % self._table,
+                           [connection.ops.value_to_db_datetime(now)])
             cursor.execute("SELECT COUNT(*) FROM %s" % self._table)
             num = cursor.fetchone()[0]
             if num > self._max_entries:
