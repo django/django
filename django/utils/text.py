@@ -157,12 +157,12 @@ recapitalize = allow_lazy(recapitalize)
 
 def phone2numeric(phone):
     "Converts a phone number with letters into its numeric equivalent."
-    letters = re.compile(r'[A-PR-Y]', re.I)
-    char2number = lambda m: {'a': '2', 'c': '2', 'b': '2', 'e': '3',
-         'd': '3', 'g': '4', 'f': '3', 'i': '4', 'h': '4', 'k': '5',
-         'j': '5', 'm': '6', 'l': '5', 'o': '6', 'n': '6', 'p': '7',
-         's': '7', 'r': '7', 'u': '8', 't': '8', 'w': '9', 'v': '8',
-         'y': '9', 'x': '9'}.get(m.group(0).lower())
+    letters = re.compile(r'[A-Z]', re.I)
+    char2number = lambda m: {'a': '2', 'b': '2', 'c': '2', 'd': '3', 'e': '3',
+         'f': '3', 'g': '4', 'h': '4', 'i': '4', 'j': '5', 'k': '5', 'l': '5',
+         'm': '6', 'n': '6', 'o': '6', 'p': '7', 'q': '7', 'r': '7', 's': '7',
+         't': '8', 'u': '8', 'v': '8', 'w': '9', 'x': '9', 'y': '9', 'z': '9',
+        }.get(m.group(0).lower())
     return letters.sub(char2number, phone)
 phone2numeric = allow_lazy(phone2numeric)
 
