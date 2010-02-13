@@ -799,7 +799,7 @@ def filesizeformat(bytes):
     """
     try:
         bytes = float(bytes)
-    except TypeError:
+    except (TypeError,ValueError,UnicodeDecodeError):
         return u"0 bytes"
 
     if bytes < 1024:

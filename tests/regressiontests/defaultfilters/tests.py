@@ -476,6 +476,15 @@ u'1024.0 MB'
 >>> filesizeformat(1024*1024*1024)
 u'1.0 GB'
 
+>>> filesizeformat(complex(1,-1))
+u'0 bytes'
+
+>>> filesizeformat("")
+u'0 bytes'
+
+>>> filesizeformat(u"\N{GREEK SMALL LETTER ALPHA}")
+u'0 bytes'
+
 >>> pluralize(1)
 u''
 
