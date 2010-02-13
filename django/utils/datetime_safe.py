@@ -4,7 +4,7 @@
 #
 # Based on code submitted to comp.lang.python by Andrew Dalke
 #
-# >>> datetime_safe.date(1850, 8, 2).strftime("%Y/%M/%d was a %A")
+# >>> datetime_safe.date(1850, 8, 2).strftime("%Y/%m/%d was a %A")
 # '1850/08/02 was a Friday'
 
 from datetime import date as real_date, datetime as real_datetime
@@ -83,7 +83,7 @@ def strftime(dt, fmt):
             sites.append(site)
 
     s = s1
-    syear = "%4d" % (dt.year,)
+    syear = "%04d" % (dt.year,)
     for site in sites:
         s = s[:site] + syear + s[site+4:]
     return s

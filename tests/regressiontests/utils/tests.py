@@ -10,6 +10,7 @@ from django.utils.functional import SimpleLazyObject
 import timesince
 import datastructures
 import dateformat
+import datetime_safe
 import itercompat
 from decorators import DecoratorFromMiddlewareTests
 from functional import FunctionalTestCase
@@ -25,6 +26,7 @@ except NameError:
 __test__ = {
     'timesince': timesince,
     'datastructures': datastructures,
+    'datetime_safe': datetime_safe,
     'itercompat': itercompat,
 }
 
