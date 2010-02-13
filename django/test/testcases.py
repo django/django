@@ -397,7 +397,7 @@ class TransactionTestCase(unittest.TestCase):
         # Put context(s) into a list to simplify processing.
         contexts = to_list(response.context)
         if not contexts:
-            self.fail(msg_prefix + "Response did not use any contexts to"
+            self.fail(msg_prefix + "Response did not use any contexts to "
                       "render the response")
 
         # Put error(s) into a list to simplify processing.
