@@ -9,6 +9,7 @@ from django.utils.functional import SimpleLazyObject
 
 import timesince
 import datastructures
+import datetime_safe
 import itercompat
 import tzinfo
 
@@ -26,6 +27,7 @@ except NameError:
 __test__ = {
     'timesince': timesince,
     'datastructures': datastructures,
+    'datetime_safe': datetime_safe,
     'itercompat': itercompat,
     'tzinfo': tzinfo,
 }

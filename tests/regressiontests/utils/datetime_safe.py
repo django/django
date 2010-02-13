@@ -1,4 +1,4 @@
-r"""
+"""
 >>> from datetime import date as original_date, datetime as original_datetime
 >>> from django.utils.datetime_safe import date, datetime
 >>> just_safe = (1900, 1, 1)
@@ -34,4 +34,11 @@ True
 '00'
 >>> datetime(*just_safe).strftime('%y')
 '00'
+
+>>> date(1850, 8, 2).strftime("%Y/%m/%d was a %A")
+'1850/08/02 was a Friday'
+
+# Regression for #12524 -- Check that pre-1000AD dates are padded with zeros if necessary
+>>> date(1, 1, 1).strftime("%Y/%m/%d was a %A")
+'0001/01/01 was a Monday'
 """
