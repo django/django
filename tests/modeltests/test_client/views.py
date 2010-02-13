@@ -63,6 +63,12 @@ def redirect_view(request):
         query = ''
     return HttpResponseRedirect('/test_client/get_view/' + query)
 
+def view_with_secure(request):
+    "A view that indicates if the request was secure"
+    response = HttpResponse()
+    response.test_was_secure_request = request.is_secure()
+    return response
+
 def double_redirect_view(request):
     "A view that redirects all requests to a redirection view"
     return HttpResponseRedirect('/test_client/permanent_redirect_view/')

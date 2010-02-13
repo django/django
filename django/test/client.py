@@ -470,11 +470,15 @@ class Client(object):
             redirect_chain = response.redirect_chain
             redirect_chain.append((url, response.status_code))
 
+            extra = {}
+            if scheme:
+                extra['wsgi.url_scheme'] = scheme
+
             # The test client doesn't handle external links,
             # but since the situation is simulated in test_client,
             # we fake things here by ignoring the netloc portion of the
             # redirected URL.
-            response = self.get(path, QueryDict(query), follow=False)
+            response = self.get(path, QueryDict(query), follow=False, **extra)
             response.redirect_chain = redirect_chain
 
             # Prevent loops

@@ -138,6 +138,16 @@ class ClientTest(TestCase):
         self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302, target_status_code=200)
         self.assertEquals(len(response.redirect_chain), 2)
 
+    def test_redirect_http(self):
+        "GET a URL that redirects to an http URI"
+        response = self.client.get('/test_client/http_redirect_view/',follow=True)
+        self.assertFalse(response.test_was_secure_request)
+
+    def test_redirect_https(self):
+        "GET a URL that redirects to an https URI"
+        response = self.client.get('/test_client/https_redirect_view/',follow=True)
+        self.assertTrue(response.test_was_secure_request)
+
     def test_notfound_response(self):
         "GET a URL that responds as '404:Not Found'"
         response = self.client.get('/test_client/bad_view/')
