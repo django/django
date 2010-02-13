@@ -127,7 +127,3 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     def test_changelist_foreignkey(self):
         response = self.client.get('%s/admin_widgets/car/' % self.admin_root)
         self.failUnless('%s/auth/user/add/' % self.admin_root in response.content)
-
-class OldAdminForeignKeyWidgetChangeList(AdminForeignKeyWidgetChangeList):
-    urls = 'regressiontests.admin_widgets.urls2'
-    admin_root = '/deep/down/admin'
