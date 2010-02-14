@@ -196,6 +196,10 @@ them. Something like this will work::
 Natural keys
 ------------
 
+.. versionadded:: 1.2
+   The ability to use natural keys when serializing/deserializing data was
+   added in the 1.2 release.
+
 The default serialization strategy for foreign keys and many-to-many
 relations is to serialize the value of the primary key(s) of the
 objects in the relation. This strategy works well for most types of
@@ -341,7 +345,7 @@ a `forward reference` with natural keys - the data you are referencing
 must exist before you include a natural key reference to that data.
 
 To accommodate this limitation, calls to :djadmin:`dumpdata` that use
-the :djadminopt:`--natural` optionwill serialize any model with a
+the :djadminopt:`--natural` option will serialize any model with a
 ``natural_key()`` method before it serializes normal key objects.
 
 However, this may not always be enough. If your natural key refers to
