@@ -580,7 +580,7 @@ added support for comparison operators. No longer will you have to type:
     ...
     {% endifnotequal %}
 
-You can now do this::
+You can now do this:
 
 .. code-block:: html+django
 
