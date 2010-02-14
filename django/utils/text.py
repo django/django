@@ -1,5 +1,4 @@
 import re
-from django.conf import settings
 from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
 from django.utils.translation import ugettext_lazy
@@ -37,24 +36,25 @@ def wrap(text, width):
     return u''.join(_generator())
 wrap = allow_lazy(wrap, unicode)
 
-def truncate_words(s, num):
-    "Truncates a string after a certain number of words."
+def truncate_words(s, num, end_text='...'):
+    """Truncates a string after a certain number of words. Takes an optional
+    argument of what should be used to notify that the string has been
+    truncated, defaults to ellipsis (...)"""
     s = force_unicode(s)
     length = int(num)
     words = s.split()
     if len(words) > length:
         words = words[:length]
-        if not words[-1].endswith('...'):
-            words.append('...')
+        if not words[-1].endswith(end_text):
+            words.append(end_text)
     return u' '.join(words)
 truncate_words = allow_lazy(truncate_words, unicode)
 
-def truncate_html_words(s, num):
-    """
-    Truncates html to a certain number of words (not counting tags and
+def truncate_html_words(s, num, end_text='...'):
+    """Truncates html to a certain number of words (not counting tags and
     comments). Closes opened tags if they were correctly closed in the given
-    html.
-    """
+    html. Takes an optional argument of what should be used to notify that the
+    string has been truncated, defaults to ellipsis (...)."""
     s = force_unicode(s)
     length = int(num)
     if length <= 0:
@@ -65,7 +65,7 @@ def truncate_html_words(s, num):
     re_tag = re.compile(r'<(/)?([^ ]+?)(?: (/)| .*?)?>')
     # Count non-HTML words and keep note of open tags
     pos = 0
-    ellipsis_pos = 0
+    end_text_pos = 0
     words = 0
     open_tags = []
     while words <= length:
@@ -78,11 +78,11 @@ def truncate_html_words(s, num):
             # It's an actual non-HTML word
             words += 1
             if words == length:
-                ellipsis_pos = pos
+                end_text_pos = pos
             continue
         # Check for tag
         tag = re_tag.match(m.group(0))
-        if not tag or ellipsis_pos:
+        if not tag or end_text_pos:
             # Don't worry about non tags or tags after our truncate point
             continue
         closing_tag, tagname, self_closing = tag.groups()
@@ -104,7 +104,9 @@ def truncate_html_words(s, num):
     if words <= length:
         # Don't try to close tags if we don't need to truncate
         return s
-    out = s[:ellipsis_pos] + ' ...'
+    out = s[:end_text_pos]
+    if end_text:
+        out += ' ' + end_text
     # Close any tags still open
     for tag in open_tags:
         out += '</%s>' % tag
