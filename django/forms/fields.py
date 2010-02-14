@@ -483,7 +483,12 @@ class ImageField(FileField):
             return None
         elif not data and initial:
             return initial
-        from PIL import Image
+            
+        # Try to import PIL in either of the two ways it can end up installed.
+        try:
+            from PIL import Image
+        except ImportError:
+            import Image
 
         # We need to get a file object for PIL. We might have a path or we might
         # have to read the data into memory.

@@ -47,10 +47,14 @@ def get_validation_errors(outfile, app=None):
             if isinstance(f, models.FileField) and not f.upload_to:
                 e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
+                # Try to import PIL in either of the two ways it can end up installed.
                 try:
                     from PIL import Image
                 except ImportError:
-                    e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
+                    try:
+                        import Image
+                    except ImportError:
+                        e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
             if isinstance(f, models.BooleanField) and getattr(f, 'null', False):
                 e.add(opts, '"%s": BooleanFields do not accept null values. Use a NullBooleanField instead.' % f.name)
             if f.choices:
