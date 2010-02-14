@@ -30,7 +30,12 @@ class ImageFile(File):
 
 def get_image_dimensions(file_or_path):
     """Returns the (width, height) of an image, given an open file or a path."""
-    from PIL import ImageFile as PILImageFile
+    # Try to import PIL in either of the two ways it can end up installed.
+    try:
+        from PIL import ImageFile as PILImageFile
+    except ImportError:
+        import ImageFile as PILImageFile
+        
     p = PILImageFile.Parser()
     close = False
     if hasattr(file_or_path, 'read'):

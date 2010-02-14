@@ -93,11 +93,15 @@ class TextFile(models.Model):
         return self.description
 
 try:
-    # If PIL is available, try testing ImageFields.
-    # Checking for the existence of Image is enough for CPython, but
-    # for PyPy, you need to check for the underlying modules
-    # If PIL is not available, ImageField tests are omitted.
-    from PIL import Image, _imaging
+    # If PIL is available, try testing ImageFields. Checking for the existence
+    # of Image is enough for CPython, but for PyPy, you need to check for the
+    # underlying modules If PIL is not available, ImageField tests are omitted.
+    # Try to import PIL in either of the two ways it can end up installed.
+    try:
+        from PIL import Image, _imaging
+    except ImportError:
+        import Image, _imaging
+    
     test_images = True
 
     class ImageFile(models.Model):

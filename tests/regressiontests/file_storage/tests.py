@@ -18,12 +18,16 @@ try:
 except ImportError:
     import dummy_threading as threading
 
+# Try to import PIL in either of the two ways it can end up installed.
+# Checking for the existence of Image is enough for CPython, but
+# for PyPy, you need to check for the underlying modules
 try:
-    # Checking for the existence of Image is enough for CPython, but
-    # for PyPy, you need to check for the underlying modules
     from PIL import Image, _imaging
 except ImportError:
-    Image = None
+    try:
+        import Image, _imaging
+    except ImportError:
+        Image = None
 
 class FileStorageTests(unittest.TestCase):
     storage_class = FileSystemStorage
