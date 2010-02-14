@@ -606,7 +606,7 @@ class ContextTests(TestCase):
             response.context['does-not-exist']
             self.fail('Should not be able to retrieve non-existent key')
         except KeyError, e:
-            self.assertEquals(e.message, 'does-not-exist')
+            self.assertEquals(e.args[0], 'does-not-exist')
 
     def test_inherited_context(self):
         "Context variables can be retrieved from a list of contexts"
@@ -621,7 +621,7 @@ class ContextTests(TestCase):
             response.context['does-not-exist']
             self.fail('Should not be able to retrieve non-existent key')
         except KeyError, e:
-            self.assertEquals(e.message, 'does-not-exist')
+            self.assertEquals(e.args[0], 'does-not-exist')
 
 
 class SessionTests(TestCase):
