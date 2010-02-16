@@ -3,11 +3,6 @@ import sys
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 
-try:
-    set
-except NameError:
-    from sets import Set as set     # For Python 2.3
-
 def compile_messages(locale=None):
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):

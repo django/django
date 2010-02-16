@@ -60,7 +60,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     """
     This class sets up the GNUTranslations context with regard to output
     charset. Django uses a defined DEFAULT_CHARSET as the output charset on
-    Python 2.4. With Python 2.3, use DjangoTranslation23.
+    Python 2.4.
     """
     def __init__(self, *args, **kw):
         from django.conf import settings
@@ -87,23 +87,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def __repr__(self):
         return "<DjangoTranslation lang:%s>" % self.__language
 
-class DjangoTranslation23(DjangoTranslation):
-    """
-    Compatibility class that is only used with Python 2.3.
-    Python 2.3 doesn't support set_output_charset on translation objects and
-    needs this wrapper class to make sure input charsets from translation files
-    are correctly translated to output charsets.
-
-    With a full switch to Python 2.4, this can be removed from the source.
-    """
-    def gettext(self, msgid):
-        res = self.ugettext(msgid)
-        return res.encode(self.django_output_charset)
-
-    def ngettext(self, msgid1, msgid2, n):
-        res = self.ungettext(msgid1, msgid2, n)
-        return res.encode(self.django_output_charset)
-
 def translation(language):
     """
     Returns a translation object.
@@ -120,11 +103,6 @@ def translation(language):
         return t
 
     from django.conf import settings
-
-    # set up the right translation class
-    klass = DjangoTranslation
-    if sys.version_info < (2, 4):
-        klass = DjangoTranslation23
 
     globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
 
@@ -147,7 +125,7 @@ def translation(language):
 
         def _translation(path):
             try:
-                t = gettext_module.translation('django', path, [loc], klass)
+                t = gettext_module.translation('django', path, [loc], DjangoTranslation)
                 t.set_language(lang)
                 return t
             except IOError, e:
