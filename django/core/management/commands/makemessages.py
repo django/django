@@ -18,7 +18,7 @@ except NameError:
 # still sensible for us to use it, since subprocess didn't exist in 2.3.
 warnings.filterwarnings('ignore', category=DeprecationWarning, message=r'os\.popen3')
 
-pythonize_re = re.compile(r'\n\s*//')
+pythonize_re = re.compile(r'(?:^|\n)\s*//')
 
 def handle_extensions(extensions=('html',)):
     """
