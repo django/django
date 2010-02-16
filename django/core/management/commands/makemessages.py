@@ -1,7 +1,8 @@
-import re
-import os
-import sys
+import fnmatch
 import glob
+import os
+import re
+import sys
 from itertools import dropwhile
 from optparse import make_option
 from subprocess import PIPE, Popen
@@ -56,18 +57,33 @@ def walk(root, topdown=True, onerror=None, followlinks=False):
                     for link_dirpath, link_dirnames, link_filenames in walk(p):
                         yield (link_dirpath, link_dirnames, link_filenames)
 
-def find_files(root, symlinks=False):
+def is_ignored(path, ignore_patterns):
+    """
+    Helper function to check if the given path should be ignored or not.
+    """
+    for pattern in ignore_patterns:
+        if fnmatch.fnmatchcase(path, pattern):
+            return True
+    return False
+
+def find_files(root, ignore_patterns, verbosity, symlinks=False):
     """
     Helper function to get all files in the given root.
     """
     all_files = []
     for (dirpath, dirnames, filenames) in walk(".", followlinks=symlinks):
-        all_files.extend([(dirpath, f) for f in filenames])
+        for f in filenames:
+            norm_filepath = os.path.normpath(os.path.join(dirpath, f))
+            if is_ignored(norm_filepath, ignore_patterns):
+                if verbosity > 1:
+                    sys.stdout.write('ignoring file %s in %s\n' % (f, dirpath))
+            else:
+                all_files.extend([(dirpath, f)])
     all_files.sort()
     return all_files
 
 def make_messages(locale=None, domain='django', verbosity='1', all=False,
-        extensions=None, symlinks=False):
+        extensions=None, symlinks=False, ignore_patterns=[]):
     """
     Uses the locale directory from the Django SVN tree or an application/
     project to process all
@@ -127,7 +143,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
         if os.path.exists(potfile):
             os.unlink(potfile)
 
-        for dirpath, file in find_files(".", symlinks=symlinks):
+        for dirpath, file in find_files(".", ignore_patterns, verbosity, symlinks=symlinks):
             file_base, file_ext = os.path.splitext(file)
             if domain == 'djangojs' and file_ext in extensions:
                 if verbosity > 1:
@@ -204,11 +220,15 @@ class Command(BaseCommand):
             help='The domain of the message files (default: "django").'),
         make_option('--all', '-a', action='store_true', dest='all',
             default=False, help='Reexamines all source code and templates for new translation strings and updates all message files for all available languages.'),
-        make_option('--symlinks', '-s', action='store_true', dest='symlinks',
-            default=False, help='Follows symlinks to directories when examining source code and templates for translation strings.'),
         make_option('--extension', '-e', dest='extensions',
             help='The file extension(s) to examine (default: ".html", separate multiple extensions with commas, or use -e multiple times)',
             action='append'),
+        make_option('--symlinks', '-s', action='store_true', dest='symlinks',
+            default=False, help='Follows symlinks to directories when examining source code and templates for translation strings.'),
+        make_option('--ignore', '-i', action='append', dest='ignore_patterns',
+            default=[], metavar='PATTERN', help='Ignore files or directories matching this glob-style pattern. Use multiple times to ignore more.'),
+        make_option('--no-default-ignore', action='store_false', dest='use_default_ignore_patterns',
+            default=True, help="Don't ignore the common glob-style patterns 'CVS', '.*' and '*~'."),
     )
     help = "Runs over the entire source tree of the current directory and pulls out all strings marked for translation. It creates (or updates) a message file in the conf/locale (in the django tree) or locale (for project and application) directory."
 
@@ -225,6 +245,10 @@ class Command(BaseCommand):
         process_all = options.get('all')
         extensions = options.get('extensions')
         symlinks = options.get('symlinks')
+        ignore_patterns = options.get('ignore_patterns')
+        if options.get('use_default_ignore_patterns'):
+            ignore_patterns += ['CVS', '.*', '*~']
+        ignore_patterns = list(set(ignore_patterns))
 
         if domain == 'djangojs':
             extensions = handle_extensions(extensions or ['js'])
@@ -234,4 +258,4 @@ class Command(BaseCommand):
         if verbosity > 1:
             sys.stdout.write('examining files with the extensions: %s\n' % get_text_list(list(extensions), 'and'))
 
-        make_messages(locale, domain, verbosity, process_all, extensions, symlinks)
+        make_messages(locale, domain, verbosity, process_all, extensions, symlinks, ignore_patterns)

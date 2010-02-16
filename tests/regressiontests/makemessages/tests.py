@@ -28,6 +28,9 @@ class ExtractorTests(TestCase):
     def assertMsgId(self, msgid, s):
         return self.assert_(re.search('^msgid "%s"' % msgid, s, re.MULTILINE))
 
+    def assertNotMsgId(self, msgid, s):
+        return self.assert_(not re.search('^msgid "%s"' % msgid, s, re.MULTILINE))
+
 
 class JavascriptExtractorTests(ExtractorTests):
 
@@ -40,6 +43,20 @@ class JavascriptExtractorTests(ExtractorTests):
         po_contents = open(self.PO_FILE, 'r').read()
         self.assertMsgId('This literal should be included.', po_contents)
         self.assertMsgId('This one as well.', po_contents)
+
+
+class IgnoredExtractorTests(ExtractorTests):
+
+    PO_FILE='locale/%s/LC_MESSAGES/django.po' % LOCALE
+
+    def test_ignore_option(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0, ignore_patterns=['ignore_dir/*'])
+        self.assert_(os.path.exists(self.PO_FILE))
+        po_contents = open(self.PO_FILE, 'r').read()
+        self.assertMsgId('This literal should be included.', po_contents)
+        self.assertNotMsgId('This should be ignored.', po_contents)
+
 
 class SymlinkExtractorTests(ExtractorTests):
 

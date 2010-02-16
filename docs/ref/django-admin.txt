@@ -483,6 +483,24 @@ Example usage::
 
     django-admin.py makemessages --locale=de --symlinks
 
+.. django-admin-option:: --ignore
+
+Use the ``--ignore`` or ``-i`` option to ignore files or directories matching
+the given `glob-style pattern`_. Use multiple times to ignore more.
+
+These patterns are used by default: ``'CVS'``, ``'.*'``, ``'*~'``
+
+Example usage::
+
+    django-admin.py makemessages --locale=en_US --ignore=apps/* --ignore=secret/*.html
+
+.. _`glob-style pattern`: http://docs.python.org/library/glob.html
+
+.. django-admin-option:: --no-default-ignore
+
+Use the ``--no-default-ignore`` option to disable the default values of
+:djadminopt:`--ignore`.
+
 reset <appname appname ...>
 ---------------------------
 
