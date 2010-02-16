@@ -85,6 +85,21 @@ source tree.
 >>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'es-ar,de'}
 >>> g(r)
 'es-ar'
+
+# Now test that we parse language preferences stored in a cookie correctly.
+>>> from django.conf import settings
+>>> r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'pt-br'}
+>>> r.META = {}
+>>> g(r)
+'pt-br'
+>>> r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'pt'}
+>>> r.META = {}
+>>> g(r)
+'pt'
+>>> r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'es'}
+>>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
+>>> g(r)
+'es'
 """
 
 # Python 2.3 and 2.4 return slightly different results for completely bogus
@@ -98,7 +113,12 @@ This test assumes there won't be a Django translation to a US variation
 of the Spanish language, a safe assumption. When the user sets it
 as the preferred language, the main 'es' translation should be selected
 instead.
+>>> r.COOKIES = {}
 >>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'es-us'}
+>>> g(r)
+'es'
+>>> r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'es-us'}
+>>> r.META = {}
 >>> g(r)
 'es'
 """
@@ -108,7 +128,12 @@ This tests the following scenario: there isn't a main language (zh)
 translation of Django but there is a translation to variation (zh_CN)
 the user sets zh-cn as the preferred language, it should be selected by
 Django without falling back nor ignoring it.
+>>> r.COOKIES = {}
 >>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,de'}
+>>> g(r)
+'zh-cn'
+>>> r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-cn'}
+>>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
 >>> g(r)
 'zh-cn'
 """
