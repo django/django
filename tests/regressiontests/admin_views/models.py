@@ -5,6 +5,8 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.contrib import admin
 from django.core.mail import EmailMessage
+from django import forms
+from django.forms.models import BaseModelFormSet
 
 class Section(models.Model):
     """
@@ -168,6 +170,14 @@ class Person(models.Model):
     class Meta:
         ordering = ["id"]
 
+class BasePersonModelFormSet(BaseModelFormSet):
+    def clean(self):
+        for person_dict in self.cleaned_data:
+            person = person_dict.get('id')
+            alive = person_dict.get('alive')
+            if person and alive and person.name == "Grace Hopper":
+                raise forms.ValidationError, "Grace is not a Zombie"
+
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'gender', 'alive')
     list_editable = ('gender', 'alive')
@@ -175,6 +185,10 @@ class PersonAdmin(admin.ModelAdmin):
     search_fields = (u'name',)
     ordering = ["id"]
     save_as = True
+
+    def get_changelist_formset(self, request, **kwargs):
+        return super(PersonAdmin, self).get_changelist_formset(request,
+            formset=BasePersonModelFormSet, **kwargs)
 
 class Persona(models.Model):
     """

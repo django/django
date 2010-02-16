@@ -921,7 +921,6 @@ class AdminViewListEditable(TestCase):
             "form-2-id": "3",
         }
         self.client.post('/test_admin/admin/admin_views/person/', data)
-
         self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
         self.failUnlessEqual(Person.objects.get(name="Grace Hopper").gender, 2)
 
@@ -953,6 +952,19 @@ class AdminViewListEditable(TestCase):
         self.client.post('/test_admin/admin/admin_views/person/?q=mauchly', data)
 
         self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
+
+    def test_non_form_errors(self):
+        # test if non-form errors are handled; ticket #12716
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+
+            "form-0-id": "2",
+            "form-0-alive": "1",
+            "form-0-gender": "2",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/person/', data)
+        self.assertContains(response, "Grace is not a Zombie")
 
     def test_list_editable_ordering(self):
         collector = Collector.objects.create(id=1, name="Frederick Clegg")
