@@ -11,6 +11,7 @@ from django.core.management.base import CommandError, BaseCommand
 from django.utils.text import get_text_list
 
 pythonize_re = re.compile(r'(?:^|\n)\s*//')
+plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 
 def handle_extensions(extensions=('html',)):
     """
@@ -82,6 +83,37 @@ def find_files(root, ignore_patterns, verbosity, symlinks=False):
     all_files.sort()
     return all_files
 
+def copy_plural_forms(msgs, locale, domain, verbosity):
+    """
+    Copies plural forms header contents from a Django catalog of locale to
+    the msgs string, inserting it at the right place. msgs should be the
+    contents of a newly created .po file.
+    """
+    import django
+    django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
+    if domain == 'djangojs':
+        domains = ('djangojs', 'django')
+    else:
+        domains = ('django',)
+    for domain in domains:
+        django_po = os.path.join(django_dir, 'conf', 'locale', locale, 'LC_MESSAGES', '%s.po' % domain)
+        if os.path.exists(django_po):
+            m = plural_forms_re.search(open(django_po, 'rU').read())
+            if m:
+                if verbosity > 1:
+                    sys.stderr.write("copying plural forms: %s\n" % m.group('value'))
+                lines = []
+                seen = False
+                for line in msgs.split('\n'):
+                    if not line and not seen:
+                        line = '%s\n' % m.group('value')
+                        seen = True
+                    lines.append(line)
+                msgs = '\n'.join(lines)
+                break
+    return msgs
+
+
 def make_messages(locale=None, domain='django', verbosity='1', all=False,
         extensions=None, symlinks=False, ignore_patterns=[]):
     """
@@ -97,8 +129,10 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
 
     from django.utils.translation import templatize
 
+    invoked_for_django = False
     if os.path.isdir(os.path.join('conf', 'locale')):
         localedir = os.path.abspath(os.path.join('conf', 'locale'))
+        invoked_for_django = True
     elif os.path.isdir('locale'):
         localedir = os.path.abspath('locale')
     else:
@@ -208,6 +242,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                 msgs, errors = _popen('msgmerge -q "%s" "%s"' % (pofile, potfile))
                 if errors:
                     raise CommandError("errors happened while running msgmerge\n%s" % errors)
+            elif not invoked_for_django:
+                msgs = copy_plural_forms(msgs, locale, domain, verbosity)
             open(pofile, 'wb').write(msgs)
             os.unlink(potfile)
 

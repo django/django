@@ -8,6 +8,8 @@ LOCALE='de'
 
 class ExtractorTests(TestCase):
 
+    PO_FILE='locale/%s/LC_MESSAGES/django.po' % LOCALE
+
     def setUp(self):
         self._cwd = os.getcwd()
         self.test_dir = os.path.abspath(os.path.dirname(__file__))
@@ -47,8 +49,6 @@ class JavascriptExtractorTests(ExtractorTests):
 
 class IgnoredExtractorTests(ExtractorTests):
 
-    PO_FILE='locale/%s/LC_MESSAGES/django.po' % LOCALE
-
     def test_ignore_option(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, ignore_patterns=['ignore_dir/*'])
@@ -59,8 +59,6 @@ class IgnoredExtractorTests(ExtractorTests):
 
 
 class SymlinkExtractorTests(ExtractorTests):
-
-    PO_FILE='locale/%s/LC_MESSAGES/django.po' % LOCALE
 
     def setUp(self):
         self._cwd = os.getcwd()
@@ -88,3 +86,13 @@ class SymlinkExtractorTests(ExtractorTests):
             po_contents = open(self.PO_FILE, 'r').read()
             self.assertMsgId('This literal should be included.', po_contents)
             self.assert_('templates_symlinked/test.html' in po_contents)
+
+
+class CopyPluralFormsExtractorTests(ExtractorTests):
+
+    def test_copy_plural_forms(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        self.assert_(os.path.exists(self.PO_FILE))
+        po_contents = open(self.PO_FILE, 'r').read()
+        self.assert_('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
