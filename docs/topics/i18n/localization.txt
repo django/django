@@ -78,10 +78,10 @@ The script should be run from one of two places:
     * The root directory of your Django project.
     * The root directory of your Django app.
 
-Th script runs over your project source tree or your application source tree and
-pulls out all strings marked for translation. It creates (or updates) a message
-file in the directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the
-file will be ``locale/de/LC_MESSAGES/django.po``.
+The script runs over your project source tree or your application source tree
+and pulls out all strings marked for translation. It creates (or updates) a
+message file in the directory ``locale/LANG/LC_MESSAGES``. In the ``de``
+example, the file will be ``locale/de/LC_MESSAGES/django.po``.
 
 By default ``django-admin.py makemessages`` examines every file that has the
 ``.html`` file extension. In case you want to override that default, use the

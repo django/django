@@ -471,8 +471,17 @@ Example usage::
 Use the ``--domain`` or ``-d`` option to change the domain of the messages files.
 Currently supported:
 
-	* ``django`` for all ``*.py`` and ``*.html`` files (default)
-	* ``djangojs`` for ``*.js`` files
+    * ``django`` for all ``*.py`` and ``*.html`` files (default)
+    * ``djangojs`` for ``*.js`` files
+
+.. django-admin-option:: --symlinks
+
+Use the ``--symlinks`` or ``-s`` option to follow symlinks to directories when
+looking for new translation strings.
+
+Example usage::
+
+    django-admin.py makemessages --locale=de --symlinks
 
 reset <appname appname ...>
 ---------------------------

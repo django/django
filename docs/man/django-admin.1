@@ -46,7 +46,7 @@ Executes
 .B sqlall
 for the given app(s) in the current database.
 .TP
-.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "]"
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "]"
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the django tree) or locale (for project and application) directory.
@@ -154,6 +154,10 @@ The domain of the message files (default: "django") when using makemessages.
 .I \-e, \-\-extension=EXTENSION
 The file extension(s) to examine (default: ".html", separate multiple
 extensions with commas, or use -e multiple times).
+.TP
+.I \-e, \-\-symlinks
+Follows symlinks to directories when examining source code and templates for
+translation strings.
 .TP
 .I \-a, \-\-all
 Process all available locales when using makemessages..SH "ENVIRONMENT"

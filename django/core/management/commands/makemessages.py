@@ -43,7 +43,31 @@ def _popen(cmd):
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt', universal_newlines=True)
     return p.communicate()
 
-def make_messages(locale=None, domain='django', verbosity='1', all=False, extensions=None):
+def walk(root, topdown=True, onerror=None, followlinks=False):
+    """
+    A version of os.walk that can follow symlinks for Python < 2.6
+    """
+    for dirpath, dirnames, filenames in os.walk(root, topdown, onerror):
+        yield (dirpath, dirnames, filenames)
+        if followlinks:
+            for d in dirnames:
+                p = os.path.join(dirpath, d)
+                if os.path.islink(p):
+                    for link_dirpath, link_dirnames, link_filenames in walk(p):
+                        yield (link_dirpath, link_dirnames, link_filenames)
+
+def find_files(root, symlinks=False):
+    """
+    Helper function to get all files in the given root.
+    """
+    all_files = []
+    for (dirpath, dirnames, filenames) in walk(".", followlinks=symlinks):
+        all_files.extend([(dirpath, f) for f in filenames])
+    all_files.sort()
+    return all_files
+
+def make_messages(locale=None, domain='django', verbosity='1', all=False,
+        extensions=None, symlinks=False):
     """
     Uses the locale directory from the Django SVN tree or an application/
     project to process all
@@ -103,11 +127,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
         if os.path.exists(potfile):
             os.unlink(potfile)
 
-        all_files = []
-        for (dirpath, dirnames, filenames) in os.walk("."):
-            all_files.extend([(dirpath, f) for f in filenames])
-        all_files.sort()
-        for dirpath, file in all_files:
+        for dirpath, file in find_files(".", symlinks=symlinks):
             file_base, file_ext = os.path.splitext(file)
             if domain == 'djangojs' and file_ext in extensions:
                 if verbosity > 1:
@@ -184,6 +204,8 @@ class Command(BaseCommand):
             help='The domain of the message files (default: "django").'),
         make_option('--all', '-a', action='store_true', dest='all',
             default=False, help='Reexamines all source code and templates for new translation strings and updates all message files for all available languages.'),
+        make_option('--symlinks', '-s', action='store_true', dest='symlinks',
+            default=False, help='Follows symlinks to directories when examining source code and templates for translation strings.'),
         make_option('--extension', '-e', dest='extensions',
             help='The file extension(s) to examine (default: ".html", separate multiple extensions with commas, or use -e multiple times)',
             action='append'),
@@ -202,6 +224,7 @@ class Command(BaseCommand):
         verbosity = int(options.get('verbosity'))
         process_all = options.get('all')
         extensions = options.get('extensions')
+        symlinks = options.get('symlinks')
 
         if domain == 'djangojs':
             extensions = handle_extensions(extensions or ['js'])
@@ -211,4 +234,4 @@ class Command(BaseCommand):
         if verbosity > 1:
             sys.stdout.write('examining files with the extensions: %s\n' % get_text_list(list(extensions), 'and'))
 
-        make_messages(locale, domain, verbosity, process_all, extensions)
+        make_messages(locale, domain, verbosity, process_all, extensions, symlinks)
