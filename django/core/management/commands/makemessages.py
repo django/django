@@ -7,6 +7,7 @@ from optparse import make_option
 from subprocess import PIPE, Popen
 
 from django.core.management.base import CommandError, BaseCommand
+from django.utils.text import get_text_list
 
 pythonize_re = re.compile(r'\n\s*//')
 
@@ -108,7 +109,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
         all_files.sort()
         for dirpath, file in all_files:
             file_base, file_ext = os.path.splitext(file)
-            if domain == 'djangojs' and file_ext == '.js':
+            if domain == 'djangojs' and file_ext in extensions:
                 if verbosity > 1:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                 src = open(os.path.join(dirpath, file), "rU").read()
@@ -200,14 +201,14 @@ class Command(BaseCommand):
         domain = options.get('domain')
         verbosity = int(options.get('verbosity'))
         process_all = options.get('all')
-        extensions = options.get('extensions') or ['html']
+        extensions = options.get('extensions')
 
         if domain == 'djangojs':
-            extensions = []
+            extensions = handle_extensions(extensions or ['js'])
         else:
-            extensions = handle_extensions(extensions)
+            extensions = handle_extensions(extensions or ['html'])
 
-        if '.js' in extensions:
-            raise CommandError("JavaScript files should be examined by using the special 'djangojs' domain only.")
+        if verbosity > 1:
+            sys.stdout.write('examining files with the extensions: %s\n' % get_text_list(list(extensions), 'and'))
 
         make_messages(locale, domain, verbosity, process_all, extensions)
