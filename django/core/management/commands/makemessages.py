@@ -9,7 +9,7 @@ from subprocess import PIPE, Popen
 from django.core.management.base import CommandError, BaseCommand
 from django.utils.text import get_text_list
 
-pythonize_re = re.compile(r'\n\s*//')
+pythonize_re = re.compile(r'(?:^|\n)\s*//')
 
 def handle_extensions(extensions=('html',)):
     """
