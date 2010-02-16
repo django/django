@@ -454,3 +454,46 @@ class MiscTests(TestCase):
         # by Django without falling back nor ignoring it.
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,de'}
         self.assertEqual(g(r), 'zh-cn')
+
+    def test_parse_language_cookie(self):
+        """
+        Now test that we parse language preferences stored in a cookie correctly.
+        """
+        from django.utils.translation.trans_real import get_language_from_request
+        g = get_language_from_request
+        from django.http import HttpRequest
+        r = HttpRequest
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'pt-br'}
+        r.META = {}
+        self.assertEqual('pt-br', g(r))
+
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'pt'}
+        r.META = {}
+        self.assertEqual('pt', g(r))
+
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'es'}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
+        self.assertEqual('es', g(r))
+
+        # Python 2.3 and 2.4 return slightly different results for completely
+        # bogus locales, so we omit this test for that anything below 2.4.
+        # It's relatively harmless in any cases (GIGO). This also means this
+        # won't be executed on Jython currently, but life's like that
+        # sometimes. (On those platforms, passing in a truly bogus locale
+        # will get you the default locale back.)
+        if sys.version_info >= (2, 5):
+            # This test assumes there won't be a Django translation to a US
+            # variation of the Spanish language, a safe assumption. When the
+            # user sets it as the preferred language, the main 'es'
+            # translation should be selected instead.
+            r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'es-us'}
+            r.META = {}
+            self.assertEqual(g(r), 'es')
+
+        # This tests the following scenario: there isn't a main language (zh)
+        # translation of Django but there is a translation to variation (zh_CN)
+        # the user sets zh-cn as the preferred language, it should be selected
+        # by Django without falling back nor ignoring it.
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-cn'}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
+        self.assertEqual(g(r), 'zh-cn')

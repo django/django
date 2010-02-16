@@ -356,6 +356,10 @@ def get_language_from_request(request):
             return lang_code
 
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+
+    if lang_code and lang_code not in supported:
+        lang_code = lang_code.split('-')[0] # e.g. if fr-ca is not supported fallback to fr
+
     if lang_code and lang_code in supported and check_for_language(lang_code):
         return lang_code
 
