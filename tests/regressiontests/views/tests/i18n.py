@@ -1,4 +1,3 @@
-from os import path
 import gettext
 
 from django.conf import settings

@@ -155,15 +155,15 @@ def translation(language):
             if os.path.isdir(localepath):
                 res = _merge(localepath)
 
-        if projectpath and os.path.isdir(projectpath):
-            res = _merge(projectpath)
-
         for appname in settings.INSTALLED_APPS:
             app = import_module(appname)
             apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
 
             if os.path.isdir(apppath):
                 res = _merge(apppath)
+
+        if projectpath and os.path.isdir(projectpath):
+            res = _merge(projectpath)
 
         if res is None:
             if fallback is not None:
