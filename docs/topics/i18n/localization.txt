@@ -1,0 +1,294 @@
+.. _topics-i18n-localization:
+
+============
+Localization
+============
+
+This document covers two localization-related topics: `Creating language
+files`_ and `locale aware date, time and numbers input/output in forms`_
+
+.. _`Creating language files`: how-to-create-language-files_
+.. _`locale aware date, time and numbers input/output in forms`: format-localization_
+
+.. seealso::
+
+    The :ref:`howto-i18n` document included with the Django HOW-TO documents collection.
+
+.. _how-to-create-language-files:
+
+How to create language files
+============================
+
+Once the string literals of an application have been tagged for later
+translation, the translation themselves need to be written (or obtained). Here's
+how that works.
+
+.. _locale-restrictions:
+
+.. admonition:: Locale restrictions
+
+    Django does not support localizing your application into a locale for which
+    Django itself has not been translated. In this case, it will ignore your
+    translation files. If you were to try this and Django supported it, you
+    would inevitably see a mixture of translated strings (from your application)
+    and English strings (from Django itself). If you want to support a locale
+    for your application that is not already part of Django, you'll need to make
+    at least a minimal translation of the Django core.
+
+    A good starting point is to copy the Django English ``.po`` file and to
+    translate at least some :term:`translation strings <translation string>`.
+
+Message files
+-------------
+
+The first step is to create a :term:`message file` for a new language. A message
+file is a plain-text file, representing a single language, that contains all
+available translation strings and how they should be represented in the given
+language. Message files have a ``.po`` file extension.
+
+Django comes with a tool, ``django-admin.py makemessages``, that automates the
+creation and upkeep of these files.
+
+.. admonition:: A note to Django veterans
+
+    The old tool ``bin/make-messages.py`` has been moved to the command
+    ``django-admin.py makemessages`` to provide consistency throughout Django.
+
+.. admonition:: Gettext utilities
+
+    The ``makemessages`` command (and ``compilemessages`` discussed later) use
+    commands from the GNU gettext toolset: ``xgetetxt``, ``msgfmt``,
+    ``msgmerge`` and ``msguniq``.
+
+    .. versionchanged:: 1.2
+
+    The minimum version of the ``gettext`` utilities supported is 0.15.
+
+To create or update a message file, run this command::
+
+    django-admin.py makemessages -l de
+
+...where ``de`` is the language code for the message file you want to create.
+The language code, in this case, is in :term:`locale format<locale name>`. For
+example, it's ``pt_BR`` for Brazilian Portuguese and ``de_AT`` for Austrian
+German.
+
+The script should be run from one of two places:
+
+    * The root directory of your Django project.
+    * The root directory of your Django app.
+
+Th script runs over your project source tree or your application source tree and
+pulls out all strings marked for translation. It creates (or updates) a message
+file in the directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the
+file will be ``locale/de/LC_MESSAGES/django.po``.
+
+By default ``django-admin.py makemessages`` examines every file that has the
+``.html`` file extension. In case you want to override that default, use the
+``--extension`` or ``-e`` option to specify the file extensions to examine::
+
+    django-admin.py makemessages -l de -e txt
+
+Separate multiple extensions with commas and/or use ``-e`` or ``--extension``
+multiple times::
+
+    django-admin.py makemessages -l de -e html,txt -e xml
+
+When :ref:`creating message files from JavaScript source code
+<creating-message-files-from-js-code>` you need to use the special 'djangojs'
+domain, **not** ``-e js``.
+
+.. admonition:: No gettext?
+
+    If you don't have the ``gettext`` utilities installed, ``django-admin.py
+    makemessages`` will create empty files. If that's the case, either install
+    the ``gettext`` utilities or just copy the English message file
+    (``locale/en/LC_MESSAGES/django.po``) if available and use it as a starting
+    point; it's just an empty translation file.
+
+.. admonition:: Working on Windows?
+
+   If you're using Windows and need to install the GNU gettext utilities so
+   ``django-admin makemessages`` works see :ref:`gettext_on_windows` for more
+   information.
+
+The format of ``.po`` files is straightforward. Each ``.po`` file contains a
+small bit of metadata, such as the translation maintainer's contact
+information, but the bulk of the file is a list of **messages** -- simple
+mappings between translation strings and the actual translated text for the
+particular language.
+
+For example, if your Django app contained a translation string for the text
+``"Welcome to my site."``, like so::
+
+    _("Welcome to my site.")
+
+...then ``django-admin.py makemessages`` will have created a ``.po`` file
+containing the following snippet -- a message::
+
+    #: path/to/python/module.py:23
+    msgid "Welcome to my site."
+    msgstr ""
+
+A quick explanation:
+
+    * ``msgid`` is the translation string, which appears in the source. Don't
+      change it.
+    * ``msgstr`` is where you put the language-specific translation. It starts
+      out empty, so it's your responsibility to change it. Make sure you keep
+      the quotes around your translation.
+    * As a convenience, each message includes, in the form of a comment line
+      prefixed with ``#`` and located above the ``msgid`` line, the filename and
+      line number from which the translation string was gleaned.
+
+Long messages are a special case. There, the first string directly after the
+``msgstr`` (or ``msgid``) is an empty string. Then the content itself will be
+written over the next few lines as one string per line. Those strings are
+directly concatenated. Don't forget trailing spaces within the strings;
+otherwise, they'll be tacked together without whitespace!
+
+.. admonition:: Mind your charset
+
+    When creating a PO file with your favorite text editor, first edit
+    the charset line (search for ``"CHARSET"``) and set it to the charset
+    you'll be using to edit the content. Due to the way the ``gettext`` tools
+    work internally and because we want to allow non-ASCII source strings in
+    Django's core and your applications, you **must** use UTF-8 as the encoding
+    for your PO file. This means that everybody will be using the same
+    encoding, which is important when Django processes the PO files.
+
+To reexamine all source code and templates for new translation strings and
+update all message files for **all** languages, run this::
+
+    django-admin.py makemessages -a
+
+Compiling message files
+-----------------------
+
+After you create your message file -- and each time you make changes to it --
+you'll need to compile it into a more efficient form, for use by ``gettext``.
+Do this with the ``django-admin.py compilemessages`` utility.
+
+This tool runs over all available ``.po`` files and creates ``.mo`` files, which
+are binary files optimized for use by ``gettext``. In the same directory from
+which you ran ``django-admin.py makemessages``, run ``django-admin.py
+compilemessages`` like this::
+
+   django-admin.py compilemessages
+
+That's it. Your translations are ready for use.
+
+.. admonition:: A note to Django veterans
+
+    The old tool ``bin/compile-messages.py`` has been moved to the command
+    ``django-admin.py compilemessages`` to provide consistency throughout
+    Django.
+
+.. admonition:: Working on Windows?
+
+   If you're using Windows and need to install the GNU gettext utilities so
+   ``django-admin compilemessages`` works see :ref:`gettext_on_windows` for more
+   information.
+
+.. _creating-message-files-from-js-code:
+
+Creating message files from JavaScript source code
+==================================================
+
+You create and update the message files the same way as the other Django message
+files -- with the ``django-admin.py makemessages`` tool. The only difference is
+you need to provide a ``-d djangojs`` parameter, like this::
+
+    django-admin.py makemessages -d djangojs -l de
+
+This would create or update the message file for JavaScript for German.
+After updating message files, just run ``django-admin.py compilemessages``
+the same way as you do with normal Django message files.
+
+.. _gettext_on_windows:
+
+``gettext`` on Windows
+======================
+
+This is only needed for people who either want to extract message IDs or compile
+message files (``.po``). Translation work itself just involves editing existing
+files of this type, but if you want to create your own message files, or want to
+test or compile a changed message file, you will need the ``gettext`` utilities:
+
+    * Download the following zip files from the GNOME servers
+      http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ or from one
+      of its mirrors_
+
+      * ``gettext-runtime-X.zip``
+      * ``gettext-tools-X.zip``
+
+      ``X`` is the version number, we are requiring ``0.15`` or higher.
+
+    * Extract the contents of the ``bin\`` directories in both files to the
+      same folder on your system (i.e. ``C:\Program Files\gettext-utils``)
+
+    * Update the system PATH:
+
+      * ``Control Panel > System > Advanced > Environment Variables``.
+      * In the ``System variables`` list, click ``Path``, click ``Edit``.
+      * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
+        ``Variable value`` field.
+
+.. _mirrors: http://ftp.gnome.org/pub/GNOME/MIRRORS
+
+You may also use ``gettext`` binaries you have obtained elsewhere, so long as
+the ``xgettext --version`` command works properly. Some version 0.14.4 binaries
+have been found to not support this command. Do not attempt to use Django
+translation utilities with a ``gettext`` package if the command ``xgettext
+--version`` entered at a Windows command prompt causes a popup window saying
+"xgettext.exe has generated errors and will be closed by Windows".
+
+.. _format-localization:
+
+Format localization
+===================
+
+Django's formatting system is disabled by default. To enable it, it's necessay
+to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
+
+When using Django's formatting system, dates and numbers on templates will be
+displayed using the format specified for the current locale. Two users
+accessing the same content, but in different language, will see date and
+number fields formatted in different ways, depending on the format for their
+current locale.
+
+Django will also use localized formats when parsing data in forms. That means
+Django uses different formats for different locales when guessing the format
+used by the user when inputting data on forms. Note that Django uses different
+formats for displaying data, and for parsing it.
+
+Creating custom format files
+----------------------------
+
+Django provides format definitions for many locales, but sometimes you might
+want to create your own, because a format files doesn't exist for your locale,
+or because you want to overwrite some of the values.
+
+To use custom formats, first thing to do, is to specify the path where you'll
+place format files. To do that, just set your :setting:`FORMAT_MODULE_PATH`
+setting to the the path (in the format ``'foo.bar.baz``) where format files
+will exists.
+
+Files are not placed directly in this directory, but in a directory named as
+the locale, and must be named ``formats.py``.
+
+To customize the English formats, a structure like this would be needed::
+
+    mysite/
+        formats/
+            __init__.py
+            en/
+                __init__.py
+                formats.py
+
+where :file:`formats.py` contains custom format definitions. For example::
+
+    THOUSAND_SEPARATOR = ' '
+
+to use a space as a thousand separator, instead of the default for English,
+a comma.

@@ -306,7 +306,7 @@ YEAR_MONTH_FORMAT = 'F Y'
 # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 MONTH_DAY_FORMAT = 'F j'
 
-# Default shortformatting for date objects. See all available format strings here:
+# Default short formatting for date objects. See all available format strings here:
 # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 SHORT_DATE_FORMAT = 'm/d/Y'
 

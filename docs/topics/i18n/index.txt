@@ -1,0 +1,115 @@
+.. _topics-i18n:
+
+=====================================
+Internationalization and localization
+=====================================
+
+Overview
+========
+
+Django has full support for internationalization of text in code and
+templates, and format localization of dates and numbers. Here's how it works.
+
+Essentially, Django does two things:
+
+    * It allows developers and template authors to specify which parts of
+      their apps should be translatable.
+    * It uses these hooks to translate Web apps for particular users according
+      to their language preferences.
+
+The complete process can be seen as divided in three stages. It is also possible
+to identify an identical number of roles with very well defined responsabilities
+associated with each of these tasks (although it's perfectly normal if you
+find yourself performing more than one of these roles):
+
+    * For applicacion authors wishing to make sure their Django apps can be
+      used in different locales: :ref:`topics-i18n-internationalization`.
+    * For translators wanting to translate Django apps: :ref:`topics-i18n-localization`.
+    * For system administrators/final users setting up internationalized apps or
+      developers integrating third party apps: :ref:`topics-i18n-deployment`.
+
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+
+   internationalization
+   localization
+   deployment
+
+.. _ seealso::
+
+For more general information about the topic, see the `GNU gettext documentation`_
+and the `Wikipedia article`_.
+
+.. _GNU gettext documentation: http://www.gnu.org/software/gettext/manual/gettext.html#Concepts
+.. _Wikipedia article: http://en.wikipedia.org/wiki/Internationalization_and_localization
+
+Glossary
+========
+
+First lets define some terms that will help us to handle a common language:
+
+.. glossary::
+
+    locale name
+      A locale name, either a language specification of the form ``ll`` or a
+      combined language and country specification of the form ``ll_CC``.
+      Examples: ``it``, ``de_AT``, ``es``, ``pt_BR``. Note the underscore in
+      some of them and the case of the part located to its right.
+
+    language code
+      Represents the name of a language. Browsers send the names of the
+      languages they accept in the ``Accept-Language`` HTTP header using this
+      format. Examples: ``it``, ``de-at``, ``es``, ``pt-br``. Note the ``-``
+      separator.
+
+    message file
+      A message file is a plain-text file, representing a single language,
+      that contains all available :term:`translation strings
+      <translation string>` and how they should be represented in the given
+      language. Message files have a ``.po`` file extension.
+
+    translation string
+      A literal that can be translated.
+
+.. _specialties-of-django-i18n:
+
+Specialties of Django translation
+=================================
+
+Django's translation machinery uses the standard ``gettext`` module that comes
+with Python. If you know ``gettext``, you might note these specialties in the
+way Django does translation:
+
+    * The string domain is ``django`` or ``djangojs``. This string domain is
+      used to differentiate between different programs that store their data
+      in a common message-file library (usually ``/usr/share/locale/``). The
+      ``django`` domain is used for python and template translation strings
+      and is loaded into the global translation catalogs. The ``djangojs``
+      domain is only used for JavaScript translation catalogs to make sure
+      that those are as small as possible.
+    * Django doesn't use ``xgettext`` alone. It uses Python wrappers around
+      ``xgettext`` and ``msgfmt``. This is mostly for convenience.
+
+.. _technical-messages:
+
+Django technical message IDs
+----------------------------
+
+.. versionchanged:: 1.2
+    Starting with Django 1.2, technical message IDs are being replaced by :ref:`format-localization`
+
+Django uses technical message IDs to translate date formats and time formats.
+Technical message IDs are :term:`translation strings <translation string>` and
+can be easily recognized; they're all upper case. You don't translate the
+message ID as with other translation strings, you provide the correct local
+variant on the provided English value. The format is identical to the format
+strings used by the ``now`` template tag.
+
+For example, with ``DATETIME_FORMAT`` (or ``DATE_FORMAT`` or ``TIME_FORMAT``),
+this would be the format string that you want to use in your language. A Django
+contributor localizing it to Spanish probably would provide a ``"j N Y P"``
+"translation" for it in the relevant ``django.po`` file::
+
+    msgid "DATETIME_FORMAT"
+    msgstr "j N Y P"

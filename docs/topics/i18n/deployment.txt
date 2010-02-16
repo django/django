@@ -1,0 +1,195 @@
+.. _topics-i18n-deployment:
+
+==========================
+Deployment of translations
+==========================
+
+If you don't need internationalization
+======================================
+
+Django's internationalization hooks are on by default, and that means there's a
+bit of i18n-related overhead in certain places of the framework. If you don't
+use internationalization, you should take the two seconds to set
+:setting:`USE_I18N = False <USE_I18N>` in your settings file. If
+:setting:`USE_I18N` is set to ``False``, then Django will make some
+optimizations so as not to load the internationalization machinery.
+
+You'll probably also want to remove ``'django.core.context_processors.i18n'``
+from your ``TEMPLATE_CONTEXT_PROCESSORS`` setting.
+
+.. note::
+
+    There is also an independent but related :setting:`USE_L10N` setting that
+    controls if Django should implement format localization.
+
+    If :setting:`USE_L10N` is set to ``True``, Django will handle numbers times,
+    and dates in the format of the current locale. That includes representation
+    of these field types on templates and allowed input formats for dates,
+    times on model forms.
+
+    See :ref:`format-localization` for more details.
+
+If you do need internationalization
+===================================
+
+.. _how-django-discovers-language-preference:
+
+How Django discovers language preference
+----------------------------------------
+
+Once you've prepared your translations -- or, if you just want to use the
+translations that come with Django -- you'll just need to activate translation
+for your app.
+
+Behind the scenes, Django has a very flexible model of deciding which language
+should be used -- installation-wide, for a particular user, or both.
+
+To set an installation-wide language preference, set :setting:`LANGUAGE_CODE`.
+Django uses this language as the default translation -- the final attempt if no
+other translator finds a translation.
+
+If all you want to do is run Django with your native language, and a language
+file is available for it, all you need to do is set ``LANGUAGE_CODE``.
+
+If you want to let each individual user specify which language he or she
+prefers, use ``LocaleMiddleware``. ``LocaleMiddleware`` enables language
+selection based on data from the request. It customizes content for each user.
+
+To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
+to your ``MIDDLEWARE_CLASSES`` setting. Because middleware order matters, you
+should follow these guidelines:
+
+    * Make sure it's one of the first middlewares installed.
+    * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
+      makes use of session data.
+    * If you use ``CacheMiddleware``, put ``LocaleMiddleware`` after it.
+
+For example, your ``MIDDLEWARE_CLASSES`` might look like this::
+
+    MIDDLEWARE_CLASSES = (
+       'django.contrib.sessions.middleware.SessionMiddleware',
+       'django.middleware.locale.LocaleMiddleware',
+       'django.middleware.common.CommonMiddleware',
+    )
+
+(For more on middleware, see the :ref:`middleware documentation
+<topics-http-middleware>`.)
+
+``LocaleMiddleware`` tries to determine the user's language preference by
+following this algorithm:
+
+    * First, it looks for a ``django_language`` key in the current user's
+      session.
+
+    * Failing that, it looks for a cookie.
+
+      .. versionchanged:: 1.0
+
+      In Django version 0.96 and before, the cookie's name is hard-coded to
+      ``django_language``. In Django 1,0, The cookie name is set by the
+      ``LANGUAGE_COOKIE_NAME`` setting. (The default name is
+      ``django_language``.)
+
+    * Failing that, it looks at the ``Accept-Language`` HTTP header. This
+      header is sent by your browser and tells the server which language(s) you
+      prefer, in order by priority. Django tries each language in the header
+      until it finds one with available translations.
+
+    * Failing that, it uses the global ``LANGUAGE_CODE`` setting.
+
+.. _locale-middleware-notes:
+
+Notes:
+
+    * In each of these places, the language preference is expected to be in the
+      standard :term:`language format<language code>`, as a string. For example,
+      Brazilian Portuguese is ``pt-br``.
+
+    * If a base language is available but the sublanguage specified is not,
+      Django uses the base language. For example, if a user specifies ``de-at``
+      (Austrian German) but Django only has ``de`` available, Django uses
+      ``de``.
+
+    * Only languages listed in the :setting:`LANGUAGES` setting can be selected.
+      If you want to restrict the language selection to a subset of provided
+      languages (because your application doesn't provide all those languages),
+      set ``LANGUAGES`` to a list of languages. For example::
+
+          LANGUAGES = (
+            ('de', _('German')),
+            ('en', _('English')),
+          )
+
+      This example restricts languages that are available for automatic
+      selection to German and English (and any sublanguage, like de-ch or
+      en-us).
+
+      .. _LANGUAGES setting: ../settings/#languages
+
+    * If you define a custom ``LANGUAGES`` setting, as explained in the
+      previous bullet, it's OK to mark the languages as translation strings
+      -- but use a "dummy" ``ugettext()`` function, not the one in
+      ``django.utils.translation``. You should *never* import
+      ``django.utils.translation`` from within your settings file, because that
+      module in itself depends on the settings, and that would cause a circular
+      import.
+
+      The solution is to use a "dummy" ``ugettext()`` function. Here's a sample
+      settings file::
+
+          ugettext = lambda s: s
+
+          LANGUAGES = (
+              ('de', ugettext('German')),
+              ('en', ugettext('English')),
+          )
+
+      With this arrangement, ``django-admin.py makemessages`` will still find
+      and mark these strings for translation, but the translation won't happen
+      at runtime -- so you'll have to remember to wrap the languages in the
+      *real* ``ugettext()`` in any code that uses ``LANGUAGES`` at runtime.
+
+    * The ``LocaleMiddleware`` can only select languages for which there is a
+      Django-provided base translation. If you want to provide translations
+      for your application that aren't already in the set of translations
+      in Django's source tree, you'll want to provide at least a basic
+      one as described in the :ref:`Locale restrictions<locale-restrictions>`
+      note.
+
+Once ``LocaleMiddleware`` determines the user's preference, it makes this
+preference available as ``request.LANGUAGE_CODE`` for each
+:class:`~django.http.HttpRequest`. Feel free to read this value in your view
+code. Here's a simple example::
+
+    def hello_world(request, count):
+        if request.LANGUAGE_CODE == 'de-at':
+            return HttpResponse("You prefer to read Austrian German.")
+        else:
+            return HttpResponse("You prefer to read another language.")
+
+Note that, with static (middleware-less) translation, the language is in
+``settings.LANGUAGE_CODE``, while with dynamic (middleware) translation, it's
+in ``request.LANGUAGE_CODE``.
+
+.. _settings file: ../settings/
+.. _middleware documentation: ../middleware/
+.. _session: ../sessions/
+.. _request object: ../request_response/#httprequest-objects
+
+How Django discovers translations
+---------------------------------
+
+As described in :ref:`using-translations-in-your-own-projects`,
+at runtime, Django looks for translations by following this algorithm:
+
+    * First, it looks for a ``locale`` directory in the application directory
+      of the view that's being called. If it finds a translation for the
+      selected language, the translation will be installed.
+    * Next, it looks for a ``locale`` directory in the project directory. If it
+      finds a translation, the translation will be installed.
+    * Finally, it checks the Django-provided base translation in
+      ``django/conf/locale``.
+
+In all cases the name of the directory containing the translation is expected to
+be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
+etc.

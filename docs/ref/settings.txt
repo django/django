@@ -883,8 +883,8 @@ LANGUAGE_CODE
 Default: ``'en-us'``
 
 A string representing the language code for this installation. This should be in
-standard language format. For example, U.S. English is ``"en-us"``. See
-:ref:`topics-i18n`.
+standard :term:`language format<language code>`. For example, U.S. English is
+``"en-us"``. See :ref:`topics-i18n`.
 
 .. setting:: LANGUAGE_COOKIE_NAME
 
@@ -911,9 +911,11 @@ see the current list of translated languages by looking in
 
 .. _online source: http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
 
-The list is a tuple of two-tuples in the format (language code, language
-name) -- for example, ``('ja', 'Japanese')``. This specifies which languages
-are available for language selection. See :ref:`topics-i18n`.
+The list is a tuple of two-tuples in the format ``(language code, language
+name)``, the ``language code`` part should be a
+:term:`language name<language code>` -- for example, ``('ja', 'Japanese')``.
+This specifies which languages are available for language selection. See
+:ref:`topics-i18n`.
 
 Generally, the default value should suffice. Only set this setting if you want
 to restrict language selection to a subset of the Django-provided languages.
@@ -948,7 +950,7 @@ LOCALE_PATHS
 Default: ``()`` (Empty tuple)
 
 A tuple of directories where Django looks for translation files.
-See :ref:`translations-in-your-own-projects`.
+See :ref:`using-translations-in-your-own-projects`.
 
 .. setting:: LOGIN_REDIRECT_URL
 

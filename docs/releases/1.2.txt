@@ -516,6 +516,19 @@ documentation <ref-contrib-syndication>`.
 
 .. _RSS best practices: http://www.rssboard.org/rss-profile
 
+Technical message IDs
+---------------------
+
+Up to version 1.1 Django used :ref:`technical message IDs<technical-messages>`
+to provide localizers the possibility to translate date and time formats. They
+were translatable :term:`translation strings <translation string>` that could
+be recognized because they were all upper case (for example
+``DATETIME_FORMAT``, ``DATE_FORMAT``, ``TIME_FORMAT``). They have been
+deprecated in favor of the new :ref:`Format localization
+<format-localization>` infrastructure that allows localizers to specify that
+information in a ``formats.py`` file in the corresponding
+``django/conf/locale/<locale name>/`` directory.
+
 What's new in Django 1.2
 ========================
 
@@ -577,7 +590,7 @@ added support for comparison operators. No longer will you have to type:
 .. code-block:: html+django
 
     {% ifnotequal a b %}
-    ...
+     ...
     {% endifnotequal %}
 
 You can now do this:
@@ -585,7 +598,7 @@ You can now do this:
 .. code-block:: html+django
 
     {% if a != b %}
-    ...
+     ...
     {% endif %}
 
 There's really no reason to use ``{% ifequal %}`` or ``{% ifnotequal %}``
