@@ -20,6 +20,7 @@ you quickly accomplish common tasks.
    deployment/index
    error-reporting
    initial-data
+   i18n
    jython
    legacy-databases
    outputting-csv

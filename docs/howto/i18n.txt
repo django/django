@@ -1,0 +1,72 @@
+.. _howto-i18n:
+
+.. _using-translations-in-your-own-projects:
+
+===============================================
+Using internationalization in your own projects
+===============================================
+
+At runtime, Django looks for translations by following this algorithm:
+
+    * First, it looks for a ``locale`` directory in the application directory
+      of the view that's being called. If it finds a translation for the
+      selected language, the translation will be installed.
+    * Next, it looks for a ``locale`` directory in the project directory. If it
+      finds a translation, the translation will be installed.
+    * Finally, it checks the Django-provided base translation in
+      ``django/conf/locale``.
+
+In all cases the name of the directory containing the translation is expected to
+be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
+etc.
+
+This way, you can write applications that include their own translations, and
+you can override base translations in your project path. Or, you can just build
+a big project out of several apps and put all translations into one big project
+message file. The choice is yours.
+
+.. note::
+
+    If you're using manually configured settings, as described in
+    :ref:`settings-without-django-settings-module`, the ``locale`` directory in
+    the project directory will not be examined, since Django loses the ability
+    to work out the location of the project directory. (Django normally uses the
+    location of the settings file to determine this, and a settings file doesn't
+    exist if you're manually configuring your settings.)
+
+All message file repositories are structured the same way. They are:
+
+    * ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
+    * ``$PROJECTPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
+    * All paths listed in ``LOCALE_PATHS`` in your settings file are
+      searched in that order for ``<language>/LC_MESSAGES/django.(po|mo)``
+    * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
+
+To create message files, you use the :djadmin:`django-admin.py makemessages <makemessages>`
+tool. You only need to be in the same directory where the ``locale/`` directory
+is located. And you use :djadmin:`django-admin.py compilemessages <compilemessages>`
+to produce the binary ``.mo`` files that are used by ``gettext``. Read the
+:ref:`topics-i18n-localization` document for more details.
+
+You can also run ``django-admin.py compilemessages --settings=path.to.settings``
+to make the compiler process all the directories in your :setting:`LOCALE_PATHS`
+setting.
+
+Application message files are a bit complicated to discover -- they need the
+:class:`~django.middleware.locale.LocaleMiddleware`. If you don't use the
+middleware, only the Django message files and project message files will be
+installed and available at runtime.
+
+Finally, you should give some thought to the structure of your translation
+files. If your applications need to be delivered to other users and will
+be used in other projects, you might want to use app-specific translations.
+But using app-specific translations and project translations could produce
+weird problems with ``makemessages``: It will traverse all directories below
+the current path and so might put message IDs into the project message file
+that are already in application message files.
+
+The easiest way out is to store applications that are not part of the project
+(and so carry their own translations) outside the project tree. That way,
+``django-admin.py makemessages`` on the project level will only translate
+strings that are connected to your explicit project and not strings that are
+distributed independently.
