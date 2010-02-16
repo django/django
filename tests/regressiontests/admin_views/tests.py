@@ -992,6 +992,20 @@ class AdminViewListEditable(TestCase):
 
         self.failUnlessEqual(Person.objects.get(name="John Mauchly").alive, False)
 
+    def test_non_form_errors(self):
+        # test if non-form errors are handled; ticket #12716
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
+
+            "form-0-id": "2",
+            "form-0-alive": "1",
+            "form-0-gender": "2",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/person/', data)
+        self.assertContains(response, "Grace is not a Zombie")
+
     def test_list_editable_ordering(self):
         collector = Collector.objects.create(id=1, name="Frederick Clegg")
 
