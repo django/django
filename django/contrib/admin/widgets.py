@@ -33,6 +33,9 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         super(FilteredSelectMultiple, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
+        if attrs is None: attrs = {}
+        attrs['class'] = 'selectfilter'
+        if self.is_stacked: attrs['class'] += 'stacked'
         output = [super(FilteredSelectMultiple, self).render(name, value, attrs, choices)]
         output.append(u'<script type="text/javascript">addEvent(window, "load", function(e) {')
         # TODO: "id_" is hard-coded here. This should instead use the correct

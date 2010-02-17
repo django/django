@@ -16,6 +16,10 @@ function findForm(node) {
 
 var SelectFilter = {
     init: function(field_id, field_name, is_stacked, admin_media_prefix) {
+        if (field_id.match(/__prefix__/)){
+            // Don't intialize on empty forms.
+            return;
+        }
         var from_box = document.getElementById(field_id);
         from_box.id += '_from'; // change its ID
         from_box.className = 'filtered';

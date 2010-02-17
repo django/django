@@ -11,6 +11,7 @@ var DateTimeShortcuts = {
     calendarLinkName: 'calendarlink',// name of the link that is used to toggle
     clockDivName: 'clockbox',        // name of clock <div> that gets toggled
     clockLinkName: 'clocklink',      // name of the link that is used to toggle
+    shortCutsClass: 'datetimeshortcuts', // class of the clock and cal shortcuts
     admin_media_prefix: '',
     init: function() {
         // Deduce admin_media_prefix by looking at the <script>s in the
@@ -42,6 +43,7 @@ var DateTimeShortcuts = {
 
         // Shortcut links (clock icon and "Now" link)
         var shortcuts_span = document.createElement('span');
+        shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
         inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
         var now_link = document.createElement('a');
         now_link.setAttribute('href', "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + get_format('TIME_INPUT_FORMATS')[0] + "'));");
@@ -128,6 +130,7 @@ var DateTimeShortcuts = {
 
         // Shortcut links (calendar icon and "Today" link)
         var shortcuts_span = document.createElement('span');
+        shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
         inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
         var today_link = document.createElement('a');
         today_link.setAttribute('href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', 0);');

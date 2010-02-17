@@ -90,8 +90,14 @@ HTML escaped.
 
 >>> w = FilteredSelectMultiple('test', False)
 >>> print conditional_escape(w.render('test', 'test'))
-<select multiple="multiple" name="test">
+<select multiple="multiple" name="test" class="selectfilter">
 </select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "%(ADMIN_MEDIA_PREFIX)s"); });</script>
+<BLANKLINE>
+
+>>> w = FilteredSelectMultiple('test', True)
+>>> print conditional_escape(w.render('test', 'test'))
+<select multiple="multiple" name="test" class="selectfilterstacked">
+</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_MEDIA_PREFIX)s"); });</script>
 <BLANKLINE>
 
 >>> w = AdminSplitDateTime()

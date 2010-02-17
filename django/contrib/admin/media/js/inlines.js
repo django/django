@@ -34,7 +34,6 @@
 		var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").attr("autocomplete", "off");
 		// only show the add button if we are allowed to add more items
 		var showAddButton = ((maxForms.val() == 0) || ((maxForms.val()-totalForms.val()) > 0));
-		var selectedItems = this;
 		$(this).each(function(i) {
 			$(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
 		});
