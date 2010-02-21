@@ -181,6 +181,14 @@ class Templates(unittest.TestCase):
         settings.SETTINGS_MODULE = old_settings_module
         settings.TEMPLATE_DEBUG = old_template_debug
 
+    def test_invalid_block_suggestion(self):
+        # See #7876
+        from django.template import Template, TemplateSyntaxError
+        try:
+            t = Template("{% if 1 %}lala{% endblock %}{% endif %}")
+        except TemplateSyntaxError, e:
+            self.assertEquals(e.args[0], "Invalid block tag: 'endblock', expected 'else' or 'endif'")
+
     def test_templates(self):
         template_tests = self.get_template_tests()
         filter_tests = filters.get_filter_tests()

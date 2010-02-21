@@ -56,7 +56,7 @@ from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils.functional import curry, Promise
-from django.utils.text import smart_split, unescape_string_literal
+from django.utils.text import smart_split, unescape_string_literal, get_text_list
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.translation import ugettext as _
 from django.utils.safestring import SafeData, EscapeData, mark_safe, mark_for_escaping
@@ -288,7 +288,7 @@ class Parser(object):
                 try:
                     compile_func = self.tags[command]
                 except KeyError:
-                    self.invalid_block_tag(token, command)
+                    self.invalid_block_tag(token, command, parse_until)
                 try:
                     compiled_result = compile_func(self, token)
                 except TemplateSyntaxError, e:
@@ -339,7 +339,9 @@ class Parser(object):
     def empty_block_tag(self, token):
         raise self.error(token, "Empty block tag")
 
-    def invalid_block_tag(self, token, command):
+    def invalid_block_tag(self, token, command, parse_until=None):
+        if parse_until:
+            raise self.error(token, "Invalid block tag: '%s', expected %s" % (command, get_text_list(["'%s'" % p for p in parse_until])))
         raise self.error(token, "Invalid block tag: '%s'" % command)
 
     def unclosed_block_tag(self, parse_until):
