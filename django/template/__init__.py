@@ -551,8 +551,8 @@ class FilterExpression(object):
                 elif var_arg:
                     args.append((True, Variable(var_arg)))
                 filter_func = parser.find_filter(filter_name)
-                self.args_check(filter_name,filter_func, args)
-                filters.append( (filter_func,args))
+                self.args_check(filter_name, filter_func, args)
+                filters.append((filter_func, args))
             upto = match.end()
         if upto != len(token):
             raise TemplateSyntaxError("Could not parse the remainder: '%s' from '%s'" % (token[upto:], token))

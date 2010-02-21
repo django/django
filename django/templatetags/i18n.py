@@ -34,16 +34,16 @@ class GetCurrentLanguageBidiNode(Node):
         return ''
 
 class TranslateNode(Node):
-    def __init__(self, value, noop):
-        self.value = Variable(value)
+    def __init__(self, filter_expression, noop):
         self.noop = noop
+        self.filter_expression = filter_expression
+        if isinstance(self.filter_expression.var, basestring):
+            self.filter_expression.var = Variable(u"'%s'" % self.filter_expression.var)
 
     def render(self, context):
-        value = self.value.resolve(context)
-        if self.noop:
-            return value
-        else:
-            return _render_value_in_context(translation.ugettext(value), context)
+        self.filter_expression.var.translate = not self.noop
+        output = self.filter_expression.resolve(context)
+        return _render_value_in_context(output, context)
 
 class BlockTranslateNode(Node):
     def __init__(self, extra_context, singular, plural=None, countervar=None,
@@ -174,6 +174,20 @@ def do_translate(parser, token):
     class TranslateParser(TokenParser):
         def top(self):
             value = self.value()
+
+            # Backwards Compatiblity fix:
+            # FilterExpression does not support single-quoted strings,
+            # so we make a cheap localized fix in order to maintain
+            # backwards compatibility with existing uses of ``trans``
+            # where single quote use is supported.
+            if value[0] == "'":
+                pos = None
+                m = re.match("^'([^']+)'(\|.*$)",value)
+                if m:
+                    value = '"%s"%s' % (m.group(1).replace('"','\\"'),m.group(2))
+                elif value[-1] == "'":
+                    value = '"%s"' % value[1:-1].replace('"','\\"')
+
             if self.more():
                 if self.tag() == 'noop':
                     noop = True
@@ -183,7 +197,7 @@ def do_translate(parser, token):
                 noop = False
             return (value, noop)
     value, noop = TranslateParser(token.contents).top()
-    return TranslateNode(value, noop)
+    return TranslateNode(parser.compile_filter(value), noop)
 
 def do_block_translate(parser, token):
     """
