@@ -168,7 +168,7 @@ One feature has been marked as deprecated in Django 1.1:
 
             (r'^admin/', include(admin.site.urls)),
 
-You should begin to remove use of this features from your code immediately.
+You should begin to remove use of this feature from your code immediately.
 
 ``AdminSite.root`` will will raise a ``PendingDeprecationWarning`` if used in
 Django 1.1. This warning is hidden by default. In Django 1.2, this warning will
