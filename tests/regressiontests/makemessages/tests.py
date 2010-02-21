@@ -1,98 +1,30 @@
 import os
-import re
-import shutil
-from django.test import TestCase
-from django.core import management
 
-LOCALE='de'
+def find_command(cmd, path=None, pathext=None):
+    if path is None:
+        path = os.environ.get('PATH', []).split(os.pathsep)
+    if isinstance(path, basestring):
+        path = [path]
+    # check if there are funny path extensions for executables, e.g. Windows
+    if pathext is None:
+        pathext = os.environ.get('PATHEXT', '.COM;.EXE;.BAT;.CMD').split(os.pathsep)
+    # don't use extensions if the command ends with one of them
+    for ext in pathext:
+        if cmd.endswith(ext):
+            pathext = ['']
+            break
+    # check if we find the command on PATH
+    for p in path:
+        f = os.path.join(p, cmd)
+        if os.path.isfile(f):
+            return f
+        for ext in pathext:
+            fext = f + ext
+            if os.path.isfile(fext):
+                return fext
+    return None
 
-class ExtractorTests(TestCase):
-
-    PO_FILE='locale/%s/LC_MESSAGES/django.po' % LOCALE
-
-    def setUp(self):
-        self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(os.path.dirname(__file__))
-
-    def _rmrf(self, dname):
-        if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
-            return
-        shutil.rmtree(dname)
-
-    def tearDown(self):
-        os.chdir(self.test_dir)
-        try:
-            self._rmrf('locale/%s' % LOCALE)
-        except OSError:
-            pass
-        os.chdir(self._cwd)
-
-    def assertMsgId(self, msgid, s):
-        return self.assert_(re.search('^msgid "%s"' % msgid, s, re.MULTILINE))
-
-    def assertNotMsgId(self, msgid, s):
-        return self.assert_(not re.search('^msgid "%s"' % msgid, s, re.MULTILINE))
-
-
-class JavascriptExtractorTests(ExtractorTests):
-
-    PO_FILE='locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
-
-    def test_javascript_literals(self):
-        os.chdir(self.test_dir)
-        management.call_command('makemessages', domain='djangojs', locale=LOCALE, verbosity=0)
-        self.assert_(os.path.exists(self.PO_FILE))
-        po_contents = open(self.PO_FILE, 'r').read()
-        self.assertMsgId('This literal should be included.', po_contents)
-        self.assertMsgId('This one as well.', po_contents)
-
-
-class IgnoredExtractorTests(ExtractorTests):
-
-    def test_ignore_option(self):
-        os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, ignore_patterns=['ignore_dir/*'])
-        self.assert_(os.path.exists(self.PO_FILE))
-        po_contents = open(self.PO_FILE, 'r').read()
-        self.assertMsgId('This literal should be included.', po_contents)
-        self.assertNotMsgId('This should be ignored.', po_contents)
-
-
-class SymlinkExtractorTests(ExtractorTests):
-
-    def setUp(self):
-        self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(os.path.dirname(__file__))
-        self.symlinked_dir = os.path.join(self.test_dir, 'templates_symlinked')
-
-    def tearDown(self):
-        super(SymlinkExtractorTests, self).tearDown()
-        os.chdir(self.test_dir)
-        try:
-            os.remove(self.symlinked_dir)
-        except OSError:
-            pass
-        os.chdir(self._cwd)
-
-    def test_symlink(self):
-        if hasattr(os, 'symlink'):
-            if os.path.exists(self.symlinked_dir):
-                self.assert_(os.path.islink(self.symlinked_dir))
-            else:
-                os.symlink(os.path.join(self.test_dir, 'templates'), self.symlinked_dir)
-            os.chdir(self.test_dir)
-            management.call_command('makemessages', locale=LOCALE, verbosity=0, symlinks=True)
-            self.assert_(os.path.exists(self.PO_FILE))
-            po_contents = open(self.PO_FILE, 'r').read()
-            self.assertMsgId('This literal should be included.', po_contents)
-            self.assert_('templates_symlinked/test.html' in po_contents)
-
-
-class CopyPluralFormsExtractorTests(ExtractorTests):
-
-    def test_copy_plural_forms(self):
-        os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
-        self.assert_(os.path.exists(self.PO_FILE))
-        po_contents = open(self.PO_FILE, 'r').read()
-        self.assert_('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
+# checks if it can find xgettext on the PATH and
+# imports the extraction tests if yes
+if find_command('xgettext'):
+    from extraction import *
