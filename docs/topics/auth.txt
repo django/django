@@ -1236,8 +1236,8 @@ The currently logged-in user and his/her permissions are made available in the
    Technically, these variables are only made available in the template context
    if you use :class:`~django.template.context.RequestContext` *and* your
    :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting contains
-   ``"django.core.context_processors.auth"``, which is default. For more, see
-   the :ref:`RequestContext docs <subclassing-context-requestcontext>`.
+   ``"django.contrib.auth.context_processors.auth"``, which is default. For
+   more, see the :ref:`RequestContext docs <subclassing-context-requestcontext>`.
 
 Users
 -----

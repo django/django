@@ -41,7 +41,7 @@ class RequestContextProcessorTests(TestCase):
 
 class AuthContextProcessorTests(TestCase):
     """
-    Tests for the ``django.core.context_processors.auth`` processor
+    Tests for the ``django.contrib.auth.context_processors.auth`` processor
     """
     urls = 'regressiontests.context_processors.urls'
     fixtures = ['context-processors-users.xml']
