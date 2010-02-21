@@ -1460,9 +1460,9 @@ THOUSAND_SEPARATOR
 Default ``,`` (Comma)
 
 Default thousand separator used when formatting numbers. This setting is
-used only when ``NUMBER_GROUPPING`` is set.
+used only when ``NUMBER_GROUPING`` is set.
 
-See also ``NUMBER_GROUPPING``, ``DECIMAL_SEPARATOR``
+See also ``NUMBER_GROUPING``, ``DECIMAL_SEPARATOR``
 
 .. setting:: TIME_FORMAT
 
