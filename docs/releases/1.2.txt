@@ -146,7 +146,7 @@ In order to support multiple database configurations, Django 1.2 has
 added a ``_state`` attribute to object instances. This attribute will
 appear in ``__dict__`` for a model instance. If your code relies on
 iterating over __dict__ to obtain a list of fields, you must now
-filter the ``_state`` attribute of out ``__dict__``.
+filter the ``_state`` attribute out of ``__dict__``.
 
 ``get_db_prep_*()`` methods on ``Field``
 ----------------------------------------

@@ -463,8 +463,8 @@ Template caching
 
 In previous versions of Django, every time you rendered a template it
 would be reloaded from disk. In Django 1.2, you can use a :ref:`cached
-template loader <template-loaders>` to load templates once, then use a
-cached the result for every subsequent render. This can lead to a
+template loader <template-loaders>` to load templates once, then use
+the cached result for every subsequent render. This can lead to a
 significant performance improvement if your templates are broken into
 lots of smaller subtemplates (using the ``{% extends %}`` or ``{%
 include %}`` tags).
