@@ -1,0 +1,115 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-02-21 13:49+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:37
+#, perl-format
+msgid "Available %s"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:45
+msgid "Choose all"
+msgstr "Chọn tất cả"
+
+#: contrib/admin/media/js/SelectFilter2.js:50
+msgid "Add"
+msgstr "Thêm"
+
+#: contrib/admin/media/js/SelectFilter2.js:52
+msgid "Remove"
+msgstr "Xóa"
+
+#: contrib/admin/media/js/SelectFilter2.js:57
+#, perl-format
+msgid "Chosen %s"
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:58
+msgid "Select your choice(s) and click "
+msgstr ""
+
+#: contrib/admin/media/js/SelectFilter2.js:63
+msgid "Clear all"
+msgstr "Xóa tất cả"
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr ""
+
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr "Hiện ra"
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Dấu đi"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr ""
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:50
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "Bây giờ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:54
+msgid "Clock"
+msgstr "Đồng hồ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "Chọn giờ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "Nửa đêm"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "6 giờ sáng"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "Buổi trưa"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:92
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
+msgid "Cancel"
+msgstr "Hủy bỏ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:182
+msgid "Today"
+msgstr "Hôm nay"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:137
+msgid "Calendar"
+msgstr "Lịch"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
+msgid "Yesterday"
+msgstr "Hôm qua"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
+msgid "Tomorrow"
+msgstr "Ngày mai"
