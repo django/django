@@ -237,8 +237,7 @@ test or compile a changed message file, you will need the ``gettext`` utilities:
 .. _mirrors: http://ftp.gnome.org/pub/GNOME/MIRRORS
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
-the ``xgettext --version`` command works properly. Some version 0.14.4 binaries
-have been found to not support this command. Do not attempt to use Django
+the ``xgettext --version`` command works properly. Do not attempt to use Django
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
 "xgettext.exe has generated errors and will be closed by Windows".
@@ -248,7 +247,7 @@ translation utilities with a ``gettext`` package if the command ``xgettext
 Format localization
 ===================
 
-Django's formatting system is disabled by default. To enable it, it's necessay
+Django's formatting system is disabled by default. To enable it, it's necessary
 to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
 
 When using Django's formatting system, dates and numbers on templates will be
@@ -271,7 +270,7 @@ or because you want to overwrite some of the values.
 
 To use custom formats, first thing to do, is to specify the path where you'll
 place format files. To do that, just set your :setting:`FORMAT_MODULE_PATH`
-setting to the the path (in the format ``'foo.bar.baz``) where format files
+setting to the path (in the format ``'foo.bar.baz``) where format files
 will exists.
 
 Files are not placed directly in this directory, but in a directory named as
