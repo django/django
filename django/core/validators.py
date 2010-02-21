@@ -1,4 +1,5 @@
 import re
+import urlparse
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -52,7 +53,29 @@ class URLValidator(RegexValidator):
         self.user_agent = validator_user_agent
 
     def __call__(self, value):
-        super(URLValidator, self).__call__(value)
+        try:
+            super(URLValidator, self).__call__(value)
+        except ValidationError, e:
+            # Trivial case failed. Try for possible IDN domain
+            if value:
+                original = value
+                value = smart_unicode(value)
+                splitted = urlparse.urlsplit(value)
+                try:
+                    netloc_ace = splitted[1].encode('idna') # IDN -> ACE
+                except UnicodeError: # invalid domain part
+                    raise e
+                value = value.replace(splitted[1], netloc_ace)
+                # If no URL path given, assume /
+                if not splitted[2]:
+                    value += u'/'
+                super(URLValidator, self).__call__(value)
+                # After validation revert ACE encoded domain-part to
+                # original (IDN) value as suggested by RFC 3490
+                value = original
+            else:
+                raise
+
         if self.verify_exists:
             import urllib2
             headers = {
@@ -77,12 +100,29 @@ def validate_integer(value):
     except (ValueError, TypeError), e:
         raise ValidationError('')
 
+class EmailValidator(RegexValidator):
+
+    def __call__(self, value):
+        try:
+            super(EmailValidator, self).__call__(value)
+        except ValidationError, e:
+            # Trivial case failed. Try for possible IDN domain-part
+            if value and u'@' in value:
+                parts = value.split(u'@')
+                domain_part = parts[-1]
+                try:
+                    parts[-1] = parts[-1].encode('idna')
+                except UnicodeError:
+                    raise e
+                super(EmailValidator, self).__call__(u'@'.join(parts))
+            else:
+                raise
 
 email_re = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
     r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*"' # quoted-string
     r')@(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?$', re.IGNORECASE)  # domain
-validate_email = RegexValidator(email_re, _(u'Enter a valid e-mail address.'), 'invalid')
+validate_email = EmailValidator(email_re, _(u'Enter a valid e-mail address.'), 'invalid')
 
 slug_re = re.compile(r'^[-\w]+$')
 validate_slug = RegexValidator(slug_re, _(u"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."), 'invalid')

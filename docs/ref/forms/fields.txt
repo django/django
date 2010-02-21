@@ -482,6 +482,11 @@ Has two optional arguments for validation, ``max_length`` and ``min_length``.
 If provided, these arguments ensure that the string is at most or at least the
 given length.
 
+.. versionchanged:: 1.2
+   The EmailField previously did not recognize e-mail addresses as valid that
+   contained an IDN (Internationalized Domain Name; a domain containing
+   unicode characters) domain part. This has now been corrected.
+
 ``FileField``
 ~~~~~~~~~~~~~
 
@@ -706,6 +711,12 @@ Takes the following optional arguments:
 
     String used as the user-agent used when checking for a URL's existence.
     Defaults to the value of the ``URL_VALIDATOR_USER_AGENT`` setting.
+
+.. versionchanged:: 1.2
+   The URLField previously did not recognize URLs as valid that contained an IDN
+   (Internationalized Domain Name; a domain name containing unicode characters)
+   domain name. This has now been corrected.
+
 
 Slightly complex built-in ``Field`` classes
 -------------------------------------------
