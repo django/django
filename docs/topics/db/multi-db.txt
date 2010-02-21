@@ -42,7 +42,7 @@ databases -- a default PostgreSQL database and a MySQL database called
             'PASSWORD': 's3krit'
         },
         'users': {
-            'NAME': 'user_data'
+            'NAME': 'user_data',
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'priv4te'
