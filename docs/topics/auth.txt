@@ -907,7 +907,7 @@ includes a few other useful built-in views located in
           :file:`registration/password_reset_email.html` if not supplied.
 
         * ``password_reset_form``: Form that will be used to set the password.
-          Defaults to ``SetPasswordForm``.
+          Defaults to :class:`~django.contrib.auth.forms.PasswordResetForm`.
 
         * ``token_generator``: Instance of the class to check the password. This
           will default to ``default_token_generator``, it's an instance of
