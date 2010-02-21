@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-09 20:20+0200\n"
+"POT-Creation-Date: 2010-02-14 22:33+0100\n"
 "PO-Revision-Date: 2008-08-13 22:00+0200\n"
 "Last-Translator: Finn Gruwier Larsen<finn@gruwier.dk>\n"
 "Language-Team: \n"
@@ -57,21 +57,22 @@ msgstr ""
 msgid "S M T W T F S"
 msgstr "S M T O T F L"
 
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr "Vis"
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Skjul"
+
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "Søndag Mandag Tirsdag Onsdag Torsdag Fredag Lørdag"
 
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "Vis"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "Skjul"
-
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Now"
 msgstr "Nu"
 
@@ -83,36 +84,36 @@ msgstr "Ur"
 msgid "Choose a time"
 msgstr "Vælg et tidspunkt"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "Midnight"
 msgstr "Midnat"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "6 a.m."
 msgstr "6 morgen"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
 msgid "Noon"
 msgstr "Middag"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:89
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
 msgid "Cancel"
 msgstr "Annuller"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:129
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:178
 msgid "Today"
 msgstr "I dag"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
 msgid "Calendar"
 msgstr "Kalender"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:176
 msgid "Yesterday"
 msgstr "I går"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
 msgid "Tomorrow"
 msgstr "I morgen"
