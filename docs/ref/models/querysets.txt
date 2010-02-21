@@ -820,7 +820,7 @@ the database.
 
 This is done by passing the names of the fields to not load to ``defer()``::
 
-    Entry.objects.defer("lede", "body")
+    Entry.objects.defer("headline", "body")
 
 A queryset that has deferred fields will still return model instances. Each
 deferred field will be retrieved from the database if you access that field
@@ -830,7 +830,7 @@ You can make multiple calls to ``defer()``. Each call adds new fields to the
 deferred set::
 
     # Defers both the body and lede fields.
-    Entry.objects.defer("body").filter(headline="Lennon").defer("lede")
+    Entry.objects.defer("body").filter(rating=5).defer("headline")
 
 The order in which fields are added to the deferred set does not matter. Calling ``defer()`` with a field name that has already been deferred is harmless (the field will still be deferred).
 
@@ -838,7 +838,7 @@ You can defer loading of fields in related models (if the related models are
 loading via ``select_related()``) by using the standard double-underscore
 notation to separate related fields::
 
-    Blog.objects.select_related().defer("entry__lede", "entry__body")
+    Blog.objects.select_related().defer("entry__headline", "entry__body")
 
 If you want to clear the set of deferred fields, pass ``None`` as a parameter
 to ``defer()``::
