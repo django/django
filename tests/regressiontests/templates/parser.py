@@ -2,6 +2,55 @@
 Testing some internals of the template processing. These are *not* examples to be copied in user code.
 """
 
+token_parsing=r"""
+Tests for TokenParser behavior in the face of quoted strings with spaces.
+
+>>> from django.template import TokenParser
+
+
+Test case 1: {% tag thevar|filter sometag %}
+
+>>> p = TokenParser("tag thevar|filter sometag")
+>>> p.tagname
+'tag'
+>>> p.value()
+'thevar|filter'
+>>> p.more()
+True
+>>> p.tag()
+'sometag'
+>>> p.more()
+False
+
+Test case 2: {% tag "a value"|filter sometag %}
+
+>>> p = TokenParser('tag "a value"|filter sometag')
+>>> p.tagname
+'tag'
+>>> p.value()
+'"a value"|filter'
+>>> p.more()
+True
+>>> p.tag()
+'sometag'
+>>> p.more()
+False
+
+Test case 3: {% tag 'a value'|filter sometag %}
+
+>>> p = TokenParser("tag 'a value'|filter sometag")
+>>> p.tagname
+'tag'
+>>> p.value()
+"'a value'|filter"
+>>> p.more()
+True
+>>> p.tag()
+'sometag'
+>>> p.more()
+False
+"""
+
 filter_parsing = r"""
 >>> from django.template import FilterExpression, Parser
 

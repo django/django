@@ -421,6 +421,20 @@ class TokenParser(object):
         "A microparser that parses for a value: some string constant or variable name."
         subject = self.subject
         i = self.pointer
+
+        def next_space_index(subject, i):
+            "Increment pointer until a real space (i.e. a space not within quotes) is encountered"
+            while i < len(subject) and subject[i] not in (' ', '\t'):
+                if subject[i] in ('"', "'"):
+                    c = subject[i]
+                    i += 1
+                    while i < len(subject) and subject[i] != c:
+                        i += 1
+                    if i >= len(subject):
+                        raise TemplateSyntaxError("Searching for value. Unexpected end of string in column %d: %s" % (i, subject))
+            	i += 1
+            return i
+
         if i >= len(subject):
             raise TemplateSyntaxError("Searching for value. Expected another value but found end of string: %s" % subject)
         if subject[i] in ('"', "'"):
@@ -431,6 +445,10 @@ class TokenParser(object):
             if i >= len(subject):
                 raise TemplateSyntaxError("Searching for value. Unexpected end of string in column %d: %s" % (i, subject))
             i += 1
+
+            # Continue parsing until next "real" space, so that filters are also included
+            i = next_space_index(subject, i)
+
             res = subject[p:i]
             while i < len(subject) and subject[i] in (' ', '\t'):
                 i += 1
@@ -439,15 +457,7 @@ class TokenParser(object):
             return res
         else:
             p = i
-            while i < len(subject) and subject[i] not in (' ', '\t'):
-                if subject[i] in ('"', "'"):
-                    c = subject[i]
-                    i += 1
-                    while i < len(subject) and subject[i] != c:
-                        i += 1
-                    if i >= len(subject):
-                        raise TemplateSyntaxError("Searching for value. Unexpected end of string in column %d: %s" % (i, subject))
-                i += 1
+            i = next_space_index(subject, i)
             s = subject[p:i]
             while i < len(subject) and subject[i] in (' ', '\t'):
                 i += 1
