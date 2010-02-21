@@ -31,6 +31,7 @@ created by :djadmin:`django-admin.py startproject <startproject>`::
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware,
     )
 
 During the request phases (:meth:`process_request` and :meth:`process_view`
