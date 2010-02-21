@@ -29,4 +29,4 @@ class Command(NoArgsCommand):
                 output.append("%s = %s  ###" % (key, user_settings[key]))
             elif user_settings[key] != default_settings[key]:
                 output.append("%s = %s" % (key, user_settings[key]))
-        print '\n'.join(output)
+        return '\n'.join(output)
