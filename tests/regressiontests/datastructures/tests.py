@@ -34,6 +34,17 @@ MergeDict can merge MultiValueDicts
 >>> mm.getlist('undefined')
 []
 
+>>> sorted(mm.keys())
+['key1', 'key2', 'key4']
+>>> len(mm.values())
+3
+>>> "value1" in mm.values()
+True
+>>> sorted(mm.items(), key=lambda k: k[0])
+[('key1', 'value1'), ('key2', 'value3'), ('key4', 'value6')]
+>>> [(k,mm.getlist(k)) for k in sorted(mm)]
+[('key1', ['value1']), ('key2', ['value2', 'value3']), ('key4', ['value5', 'value6'])]
+
 ### MultiValueDict ##########################################################
 
 >>> d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer']})
