@@ -240,6 +240,12 @@ class DecimalField(Field):
         except DecimalException:
             raise ValidationError(self.error_messages['invalid'])
 
+        # Check for NaN, Inf and -Inf values. We can't compare directly for NaN,
+        # since it is never equal to itself. However, NaN is the only value that
+        # isn't equal to itself, so we can use this to identify NaN
+        if value != value or value == Decimal("Inf") or value == Decimal("-Inf"):
+            raise ValidationError(self.error_messages['invalid'])
+
         sign, digittuple, exponent = value.as_tuple()
         decimals = abs(exponent)
         # digittuple doesn't include any leading zeros.

@@ -320,6 +320,18 @@ True
 True
 >>> f.clean(Decimal('3.14')) == Decimal("3.14")
 True
+>>> f.clean('NaN')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+>>> f.clean('Inf')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+>>> f.clean('-Inf')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
 >>> f.clean('a')
 Traceback (most recent call last):
 ...
