@@ -276,10 +276,18 @@ class BaseModelForm(BaseForm):
             # adding these values to the model after form validation.
             if field not in self.fields:
                 exclude.append(f.name)
+
+            # Don't perform model validation on fields that were defined
+            # manually on the form and excluded via the ModelForm's Meta
+            # class. See #12901.
+            elif self._meta.fields and field not in self._meta.fields:
+                exclude.append(f.name)
+
             # Exclude fields that failed form validation. There's no need for
             # the model fields to validate them as well.
             elif field in self._errors.keys():
                 exclude.append(f.name)
+
             # Exclude empty fields that are not required by the form. The
             # underlying model field may be required, so this keeps the model
             # field from raising that error.
@@ -719,16 +727,26 @@ class BaseInlineFormSet(BaseModelFormSet):
     def add_fields(self, form, index):
         super(BaseInlineFormSet, self).add_fields(form, index)
         if self._pk_field == self.fk:
-            form.fields[self._pk_field.name] = InlineForeignKeyField(self.instance, pk_field=True)
+            name = self._pk_field.name
+            kwargs = {'pk_field': True}
         else:
             # The foreign key field might not be on the form, so we poke at the
             # Model field to get the label, since we need that for error messages.
+            name = self.fk.name
             kwargs = {
-                'label': getattr(form.fields.get(self.fk.name), 'label', capfirst(self.fk.verbose_name))
+                'label': getattr(form.fields.get(name), 'label', capfirst(self.fk.verbose_name))
             }
             if self.fk.rel.field_name != self.fk.rel.to._meta.pk.name:
                 kwargs['to_field'] = self.fk.rel.field_name
-            form.fields[self.fk.name] = InlineForeignKeyField(self.instance, **kwargs)
+
+        form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
+
+        # Add the generated field to form._meta.fields if it's defined to make
+        # sure validation isn't skipped on that field.
+        if form._meta.fields:
+            if isinstance(form._meta.fields, tuple):
+                form._meta.fields = list(form._meta.fields)
+            form._meta.fields.append(self.fk.name)
 
     def get_unique_error_message(self, unique_check):
         unique_check = [field for field in unique_check if field != self.fk.name]
