@@ -289,8 +289,6 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
     """
     A formset for generic inline objects to a parent.
     """
-    ct_field_name = "content_type"
-    ct_fk_field_name = "object_id"
 
     def __init__(self, data=None, files=None, instance=None, save_as_new=None,
                  prefix=None, queryset=None):
