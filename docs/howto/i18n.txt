@@ -70,3 +70,36 @@ The easiest way out is to store applications that are not part of the project
 ``django-admin.py makemessages`` on the project level will only translate
 strings that are connected to your explicit project and not strings that are
 distributed independently.
+
+Using translations outside views and templates
+==============================================
+
+While Django provides a rich set of i18n tools for use in views and templates,
+it does not restrict the usage to Django-specific code. The Django translation
+mechanisms can be used to translate arbitrary texts to any language that is
+supported by Django (as long as an appropriate translation catalog exists, of
+course). You can load a translation catalog, activate it and translate text to
+language of your choice, but remember to switch back to original language, as
+activating a translation catalog is done on per-thread basis and such change
+will affect code running in the same thread.
+
+For example::
+
+    from django.utils import translation
+    def welcome_translated(language):
+        cur_language = translation.get_language()
+        try:
+            translation.activate(language)
+            text = translation.ugettext('welcome')
+        finally:
+            translation.activate(cur_language)
+        return text
+
+Calling this function with the value 'de' will give you ``"Willkommen"``,
+regardless of :setting:`LANGUAGE_CODE` and language set by middleware.
+
+Functions of particular interest are ``django.utils.translation.get_language()``
+which returns the language used in the current thread,
+``django.utils.translation.activate()`` which activates a translation catalog
+for the current thread, and ``django.utils.translation.check_for_language()``
+which checks if the given language is supported by Django.
