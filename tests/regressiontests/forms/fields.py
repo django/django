@@ -203,6 +203,9 @@ class FieldsTests(TestCase):
         self.assertEqual(f.clean('3.14'), Decimal("3.14"))
         self.assertEqual(f.clean(3.14), Decimal("3.14"))
         self.assertEqual(f.clean(Decimal('3.14')), Decimal("3.14"))
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, 'NaN')
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, 'Inf')
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, '-Inf')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, 'a')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, u'łąść')
         self.assertEqual(f.clean('1.0 '), Decimal("1.0"))
@@ -498,7 +501,7 @@ class FieldsTests(TestCase):
         # hangs "forever" if catastrophic backtracking in ticket:#11198 not fixed
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://%s' % ("X"*200,))
 
-        # a second test, to make sure the problem is really addressed, even on 
+        # a second test, to make sure the problem is really addressed, even on
         # domains that don't fail the domain label length check in the regex
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://%s' % ("X"*60,))
 
