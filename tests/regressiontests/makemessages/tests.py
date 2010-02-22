@@ -35,5 +35,5 @@ if xgettext_cmd:
     match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', output)
     if match:
         xversion = (int(match.group('major')), int(match.group('minor')))
-        if xversion > (0, 15):
+        if xversion >= (0, 15):
             from extraction import *
