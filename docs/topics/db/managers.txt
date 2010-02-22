@@ -235,7 +235,7 @@ this base class::
 
     class AbstractBase(models.Model):
         ...
-        objects = CustomerManager()
+        objects = CustomManager()
 
         class Meta:
             abstract = True
