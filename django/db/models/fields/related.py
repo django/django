@@ -511,7 +511,7 @@ def create_many_related_manager(superclass, rel=False):
         def _add_items(self, source_field_name, target_field_name, *objs):
             # join_table: name of the m2m link table
             # source_field_name: the PK fieldname in join_table for the source object
-            # target_col_name: the PK fieldname in join_table for the target object
+            # target_field_name: the PK fieldname in join_table for the target object
             # *objs - objects to add. Either object instances, or primary keys of object instances.
 
             # If there aren't any objects, there is nothing to do.
@@ -914,7 +914,7 @@ def create_many_to_many_intermediary_model(field, klass):
         to_model = field.rel.to
         managed = klass._meta.managed or to_model._meta.managed
     name = '%s_%s' % (klass._meta.object_name, field.name)
-    if field.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT or field.rel.to == klass._meta.object_name:
+    if field.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT or to == klass._meta.object_name:
         from_ = 'from_%s' % to.lower()
         to = 'to_%s' % to.lower()
     else:
@@ -973,7 +973,7 @@ class ManyToManyField(RelatedField, Field):
                                       connection.ops.max_name_length())
 
     def _get_m2m_attr(self, related, attr):
-        "Function that can be curried to provide the source column name for the m2m table"
+        "Function that can be curried to provide the source accessor or DB column name for the m2m table"
         cache_attr = '_m2m_%s_cache' % attr
         if hasattr(self, cache_attr):
             return getattr(self, cache_attr)
@@ -983,7 +983,7 @@ class ManyToManyField(RelatedField, Field):
                 return getattr(self, cache_attr)
 
     def _get_m2m_reverse_attr(self, related, attr):
-        "Function that can be curried to provide the related column name for the m2m table"
+        "Function that can be curried to provide the related accessor or DB column name for the m2m table"
         cache_attr = '_m2m_reverse_%s_cache' % attr
         if hasattr(self, cache_attr):
             return getattr(self, cache_attr)

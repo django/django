@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth import models as auth
 
 # No related name is needed here, since symmetrical relations are not
 # explicitly reversible.
@@ -40,6 +41,14 @@ class Line(models.Model):
 class Worksheet(models.Model):
     id = models.CharField(primary_key=True, max_length=100)
     lines = models.ManyToManyField(Line, blank=True, null=True)
+
+# Regression for #11226 -- A model with the same name that another one to
+# which it has a m2m relation. This shouldn't cause a name clash between
+# the automatically created m2m intermediary table FK field names when
+# running syncdb
+class User(models.Model):
+    name = models.CharField(max_length=30)
+    friends = models.ManyToManyField(auth.User)
 
 __test__ = {"regressions": """
 # Multiple m2m references to the same model or a different model must be

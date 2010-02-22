@@ -179,19 +179,20 @@ def get_validation_errors(outfile, app=None):
                     )
                 else:
                     seen_intermediary_signatures.append(signature)
-                seen_related_fk, seen_this_fk = False, False
-                for field in f.rel.through._meta.fields:
-                    if field.rel:
-                        if not seen_related_fk and field.rel.to == f.rel.to:
-                            seen_related_fk = True
-                        elif field.rel.to == cls:
-                            seen_this_fk = True
-                if not seen_related_fk or not seen_this_fk:
-                    e.add(opts, "'%s' has a manually-defined m2m relation "
-                        "through model %s, which does not have foreign keys "
-                        "to %s and %s" % (f.name, f.rel.through._meta.object_name,
-                            f.rel.to._meta.object_name, cls._meta.object_name)
-                    )
+                if not f.rel.through._meta.auto_created:
+                    seen_related_fk, seen_this_fk = False, False
+                    for field in f.rel.through._meta.fields:
+                        if field.rel:
+                            if not seen_related_fk and field.rel.to == f.rel.to:
+                                seen_related_fk = True
+                            elif field.rel.to == cls:
+                                seen_this_fk = True
+                    if not seen_related_fk or not seen_this_fk:
+                        e.add(opts, "'%s' is a manually-defined m2m relation "
+                            "through model %s, which does not have foreign keys "
+                            "to %s and %s" % (f.name, f.rel.through._meta.object_name,
+                                f.rel.to._meta.object_name, cls._meta.object_name)
+                        )
             elif isinstance(f.rel.through, basestring):
                 e.add(opts, "'%s' specifies an m2m relation through model %s, "
                     "which has not been installed" % (f.name, f.rel.through)

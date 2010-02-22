@@ -268,8 +268,8 @@ invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes wi
 invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 invalid_models.missingrelations: 'rel1' has a relation with model Rel1, which has either not been installed or is abstract.
 invalid_models.missingrelations: 'rel2' has an m2m relation with model Rel2, which has either not been installed or is abstract.
-invalid_models.grouptwo: 'primary' has a manually-defined m2m relation through model Membership, which does not have foreign keys to Person and GroupTwo
-invalid_models.grouptwo: 'secondary' has a manually-defined m2m relation through model MembershipMissingFK, which does not have foreign keys to Group and GroupTwo
+invalid_models.grouptwo: 'primary' is a manually-defined m2m relation through model Membership, which does not have foreign keys to Person and GroupTwo
+invalid_models.grouptwo: 'secondary' is a manually-defined m2m relation through model MembershipMissingFK, which does not have foreign keys to Group and GroupTwo
 invalid_models.missingmanualm2mmodel: 'missing_m2m' specifies an m2m relation through model MissingM2MModel, which has not been installed
 invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
 invalid_models.group: Intermediary model RelationshipDoubleFK has more than one foreign key to Person, which is ambiguous and is not permitted.
