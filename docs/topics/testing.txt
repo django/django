@@ -1371,7 +1371,7 @@ set up, execute and tear down the test suite.
     write your own test runner, ensure accept and handle the ``**kwargs``
     parameter.
 
-.. method:: DjangoTestSuiteRunner.run_tests(test_labels, extra_tests=None)
+.. method:: DjangoTestSuiteRunner.run_tests(test_labels, extra_tests=None, **kwargs)
 
     Run the test suite.
 
@@ -1392,11 +1392,11 @@ set up, execute and tear down the test suite.
 
     This method should return the number of tests that failed.
 
-.. method:: DjangoTestSuiteRunner.setup_test_environment()
+.. method:: DjangoTestSuiteRunner.setup_test_environment(**kwargs)
 
     Sets up the test environment ready for testing.
 
-.. method:: DjangoTestSuiteRunner.build_suite(test_labels, extra_tests=None)
+.. method:: DjangoTestSuiteRunner.build_suite(test_labels, extra_tests=None, **kwargs)
 
     Constructs a test suite that matches the test labels provided.
 
@@ -1417,7 +1417,7 @@ set up, execute and tear down the test suite.
 
     Returns a ``TestSuite`` instance ready to be run.
 
-.. method:: DjangoTestSuiteRunner.setup_databases()
+.. method:: DjangoTestSuiteRunner.setup_databases(**kwargs)
 
     Creates the test databases.
 
@@ -1425,13 +1425,13 @@ set up, execute and tear down the test suite.
     that have been made. This data will be provided to the ``teardown_databases()``
     function at the conclusion of testing.
 
-.. method:: DjangoTestSuiteRunner.run_suite(suite)
+.. method:: DjangoTestSuiteRunner.run_suite(suite, **kwargs)
 
     Runs the test suite.
 
     Returns the result produced by the running the test suite.
 
-.. method:: DjangoTestSuiteRunner.teardown_databases(old_config)
+.. method:: DjangoTestSuiteRunner.teardown_databases(old_config, **kwargs)
 
     Destroys the test databases, restoring pre-test conditions.
 
@@ -1439,13 +1439,14 @@ set up, execute and tear down the test suite.
     database configuration that need to be reversed. It is the return
     value of the ``setup_databases()`` method.
 
-.. method:: DjangoTestSuiteRunner.teardown_test_environment()
+.. method:: DjangoTestSuiteRunner.teardown_test_environment(**kwargs)
 
     Restores the pre-test environment.
 
-.. method:: DjangoTestSuiteRunner.suite_result(result)
+.. method:: DjangoTestSuiteRunner.suite_result(suite, result, **kwargs)
 
-    Computes and returns a return code based on a test suite result.
+    Computes and returns a return code based on a test suite, and the result
+	from that test suite.
 
 
 Testing utilities

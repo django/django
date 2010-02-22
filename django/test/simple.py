@@ -232,16 +232,16 @@ def reorder_suite(suite, classes):
 
 
 class DjangoTestSuiteRunner(object):
-    def __init__(self, verbosity=1, interactive=True, failfast=True):
+    def __init__(self, verbosity=1, interactive=True, failfast=True, **kwargs):
         self.verbosity = verbosity
         self.interactive = interactive
         self.failfast = failfast
 
-    def setup_test_environment(self):
+    def setup_test_environment(self, **kwargs):
         setup_test_environment()
         settings.DEBUG = False
 
-    def build_suite(self, test_labels, extra_tests=None):
+    def build_suite(self, test_labels, extra_tests=None, **kwargs):
         suite = unittest.TestSuite()
 
         if test_labels:
@@ -261,7 +261,7 @@ class DjangoTestSuiteRunner(object):
 
         return reorder_suite(suite, (TestCase,))
 
-    def setup_databases(self):
+    def setup_databases(self, **kwargs):
         from django.db import connections
         old_names = []
         mirrors = []
@@ -278,10 +278,10 @@ class DjangoTestSuiteRunner(object):
                 connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
         return old_names, mirrors
 
-    def run_suite(self, suite):
+    def run_suite(self, suite, **kwargs):
         return DjangoTestRunner(verbosity=self.verbosity, failfast=self.failfast).run(suite)
 
-    def teardown_databases(self, old_config):
+    def teardown_databases(self, old_config, **kwargs):
         from django.db import connections
         old_names, mirrors = old_config
         # Point all the mirrors back to the originals
@@ -291,13 +291,13 @@ class DjangoTestSuiteRunner(object):
         for connection, old_name in old_names:
             connection.creation.destroy_test_db(old_name, self.verbosity)
 
-    def teardown_test_environment(self):
+    def teardown_test_environment(self, **kwargs):
         teardown_test_environment()
 
-    def suite_result(self, result):
+    def suite_result(self, suite, result, **kwargs):
         return len(result.failures) + len(result.errors)
 
-    def run_tests(self, test_labels, extra_tests=None):
+    def run_tests(self, test_labels, extra_tests=None, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
         Labels must be of the form:
@@ -322,7 +322,7 @@ class DjangoTestSuiteRunner(object):
         result = self.run_suite(suite)
         self.teardown_databases(old_config)
         self.teardown_test_environment()
-        return self.suite_result(result)
+        return self.suite_result(suite, result)
 
 def run_tests(test_labels, verbosity=1, interactive=True, failfast=False, extra_tests=None):
     import warnings
