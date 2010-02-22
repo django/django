@@ -199,8 +199,8 @@ wizard takes a list of your :class:`~django.forms.Form` objects as arguments::
         (r'^contact/$', ContactWizard([ContactForm1, ContactForm2])),
     )
 
-Advanced FormWizard methods
-===========================
+Advanced ``FormWizard`` methods
+===============================
 
 .. class:: FormWizard
 

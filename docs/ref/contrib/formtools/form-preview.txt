@@ -108,3 +108,16 @@ These values can be overridden for a particular form preview by setting
 :attr:`~django.contrib.formtools.FormPreview.form_template` attributes on the
 FormPreview subclass. See :file:`django/contrib/formtools/templates` for the
 default templates.
+
+Advanced ``FormPreview`` methods
+================================
+
+.. versionadded:: 1.2
+
+.. method:: FormPreview.process_preview
+
+    Given a validated form, performs any extra processing before displaying the
+    preview page, and saves any extra data in context.
+
+    By default, this method is empty.  It is called after the form is validated,
+    but before the context is modified with hash information and rendered.
