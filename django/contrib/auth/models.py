@@ -110,7 +110,7 @@ class UserManager(models.Manager):
             user.set_password(password)
         else:
             user.set_unusable_password()
-        user.save(using=self.db)
+        user.save(using=self._db)
         return user
 
     def create_superuser(self, username, email, password):
@@ -118,7 +118,7 @@ class UserManager(models.Manager):
         u.is_staff = True
         u.is_active = True
         u.is_superuser = True
-        u.save(using=self.db)
+        u.save(using=self._db)
         return u
 
     def make_random_password(self, length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):

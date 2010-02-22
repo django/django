@@ -659,15 +659,31 @@ class TestRouter(object):
         return True
 
 class AuthRouter(object):
-    # Another test router. This one doesn't do anything interesting
-    # other than validate syncdb behavior
+    """A router to control all database operations on models in
+    the contrib.auth application"""
+
     def db_for_read(self, model, **hints):
+        "Point all read operations on auth models to 'default'"
+        if model._meta.app_label == 'auth':
+            # We use default here to ensure we can tell the difference
+            # between a read request and a write request for Auth objects
+            return 'default'
         return None
+
     def db_for_write(self, model, **hints):
+        "Point all operations on auth models to 'other'"
+        if model._meta.app_label == 'auth':
+            return 'other'
         return None
+
     def allow_relation(self, obj1, obj2, **hints):
+        "Allow any relation if a model in Auth is involved"
+        if obj1._meta.app_label == 'auth' or obj2._meta.app_label == 'auth':
+            return True
         return None
+
     def allow_syncdb(self, db, model):
+        "Make sure the auth app only appears on the 'other' db"
         if db == 'other':
             return model._meta.app_label == 'auth'
         elif model._meta.app_label == 'auth':
@@ -749,7 +765,7 @@ class RouterTestCase(TestCase):
 
         router.routers = [WriteRouter(), AuthRouter(), TestRouter()]
 
-        self.assertEquals(router.db_for_read(User), 'other')
+        self.assertEquals(router.db_for_read(User), 'default')
         self.assertEquals(router.db_for_read(Book), 'other')
 
         self.assertEquals(router.db_for_write(User), 'writer')
@@ -1107,6 +1123,45 @@ class RouterTestCase(TestCase):
         review3.content_object = dive
         self.assertEquals(review3._state.db, 'default')
 
+class AuthTestCase(TestCase):
+    multi_db = True
+
+    def setUp(self):
+        # Make the 'other' database appear to be a slave of the 'default'
+        self.old_routers = router.routers
+        router.routers = [AuthRouter()]
+
+    def tearDown(self):
+        # Restore the 'other' database as an independent database
+        router.routers = self.old_routers
+
+    def test_auth_manager(self):
+        "The methods on the auth manager obey database hints"
+        # Create one user using default allocation policy
+        User.objects.create_user('alice', 'alice@example.com')
+
+        # Create another user, explicitly specifying the database
+        User.objects.db_manager('default').create_user('bob', 'bob@example.com')
+
+        # The second user only exists on the other database
+        alice = User.objects.using('other').get(username='alice')
+
+        self.assertEquals(alice.username, 'alice')
+        self.assertEquals(alice._state.db, 'other')
+
+        self.assertRaises(User.DoesNotExist, User.objects.using('default').get, username='alice')
+
+        # The second user only exists on the default database
+        bob = User.objects.using('default').get(username='bob')
+
+        self.assertEquals(bob.username, 'bob')
+        self.assertEquals(bob._state.db, 'default')
+
+        self.assertRaises(User.DoesNotExist, User.objects.using('other').get, username='bob')
+
+        # That is... there is one user on each database
+        self.assertEquals(User.objects.using('default').count(), 1)
+        self.assertEquals(User.objects.using('other').count(), 1)
 
 class UserProfileTestCase(TestCase):
     def setUp(self):
