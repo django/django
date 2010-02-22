@@ -1,4 +1,6 @@
 import os
+import re
+from subprocess import Popen, PIPE
 
 def find_command(cmd, path=None, pathext=None):
     if path is None:
@@ -26,5 +28,12 @@ def find_command(cmd, path=None, pathext=None):
 
 # checks if it can find xgettext on the PATH and
 # imports the extraction tests if yes
-if find_command('xgettext'):
-    from extraction import *
+xgettext_cmd = find_command('xgettext')
+if xgettext_cmd:
+    p = Popen('%s --version' % xgettext_cmd, shell=True, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt', universal_newlines=True)
+    output = p.communicate()[0]
+    match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', output)
+    if match:
+        xversion = (int(match.group('major')), int(match.group('minor')))
+        if xversion > (0, 15):
+            from extraction import *
