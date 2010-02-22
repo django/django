@@ -651,7 +651,13 @@ unordered_list.needs_autoescape = True
 
 def add(value, arg):
     """Adds the arg to the value."""
-    return int(value) + int(arg)
+    try:
+        return int(value) + int(arg)
+    except (ValueError, TypeError):
+        try:
+            return value + arg
+        except:
+            return value
 add.is_safe = False
 
 def get_digit(value, arg):

@@ -1010,6 +1010,27 @@ For example::
 
 If ``value`` is ``4``, then the output will be ``6``.
 
+.. versionchanged:: 1.2 
+   The following behavior didn't exist in previous Django versions.
+
+This filter will first try to coerce both values to integers. If this fails,
+it'll attempt to add the values together anyway. This will work on some data
+types (strings, list, etc.) and fail on others. If it fails, the result will
+be an empty string.
+
+For example, if we have::
+
+    {{ first|add:second }}
+
+and ``first`` is ``[1, 2, 3]`` and ``second`` is ``[4, 5, 6]``, then the
+output will be ``[1, 2, 3, 4, 5, 6]``.
+
+.. warning::
+    
+    Keep in mind that strings that can both be coerced to integers will be,
+    and thus will be will be *summed*, not concatenated, as in the first
+    example above.
+
 .. templatefilter:: addslashes
 
 addslashes

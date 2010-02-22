@@ -333,4 +333,15 @@ def get_filter_tests():
         'date02': (r'{{ d|date }}', {'d': datetime(2008, 1, 1)}, 'Jan. 1, 2008'),
         #Ticket 9520: Make sure |date doesn't blow up on non-dates
         'date03': (r'{{ d|date:"m" }}', {'d': 'fail_string'}, ''),
+
+         # base tests for add that assert, that old behaviour, which means
+         # trying to add two values as ints, is kept
+         'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),
+         'add02': (r'{{ i|add:"napis" }}', {'i': 2000}, '2000'),
+         'add03': (r'{{ i|add:16 }}', {'i': 'not_an_int'}, 'not_an_int'),
+         'add04': (r'{{ i|add:"16" }}', {'i': 'not_an_int'}, 'not_an_int16'),
+         # further additions using dynamic typing
+         'add05': (r'{{ l1|add:l2 }}', {'l1': [1, 2], 'l2': [3, 4]}, '[1, 2, 3, 4]'),
+         'add06': (r'{{ t1|add:t2 }}', {'t1': (3, 4), 't2': (1, 2)}, '(3, 4, 1, 2)'),
+         'add07': (r'{{ d|add:t }}', {'d': date(2000, 1, 1), 't': timedelta(10)}, '2000-01-11'),
     }
