@@ -261,7 +261,7 @@ Put the following code in that template:
     {% if latest_poll_list %}
         <ul>
         {% for poll in latest_poll_list %}
-            <li>{{ poll.question }}</li>
+            <li><a href="/polls/{{ poll.id }}/">{{ poll.question }}</a><</li>
         {% endfor %}
         </ul>
     {% else %}
@@ -269,7 +269,8 @@ Put the following code in that template:
     {% endif %}
 
 Load the page in your Web browser, and you should see a bulleted-list
-containing the "What's up" poll from Tutorial 1.
+containing the "What's up" poll from Tutorial 1. The link points to the poll's
+detail page.
 
 A shortcut: render_to_response()
 --------------------------------
