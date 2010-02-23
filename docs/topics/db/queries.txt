@@ -778,7 +778,7 @@ a ``QuerySet``. You can do this with the ``update()`` method. For example::
 You can only set non-relation fields and ``ForeignKey`` fields using this
 method. To update a non-relation field, provide the new value as a constant.
 To update ``ForeignKey`` fields, set the new value to be the new model
-instance you want to point to. Example::
+instance you want to point to. For example::
 
     >>> b = Blog.objects.get(pk=1)
 
@@ -788,8 +788,13 @@ instance you want to point to. Example::
 The ``update()`` method is applied instantly and returns the number of rows
 affected by the query. The only restriction on the ``QuerySet`` that is
 updated is that it can only access one database table, the model's main
-table. So don't try to filter based on related fields or anything like that;
-it won't work.
+table. You can filter based on related fields, but you can only update columns
+in the model's main table. Example::
+
+    >>> b = Blog.objects.get(pk=1)
+
+    # Update all the headlines belonging to this Blog.
+    >>> Entry.objects.select_related().filter(blog=b).update(headline='Everything is the same')
 
 Be aware that the ``update()`` method is converted directly to an SQL
 statement. It is a bulk operation for direct updates. It doesn't run any
