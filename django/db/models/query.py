@@ -1203,7 +1203,7 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
                 # If the base object exists, populate the
                 # descriptor cache
                 setattr(obj, f.get_cache_name(), rel_obj)
-            if f.unique:
+            if f.unique and rel_obj is not None:
                 # If the field is unique, populate the
                 # reverse descriptor cache on the related object
                 setattr(rel_obj, f.related.get_cache_name(), obj)

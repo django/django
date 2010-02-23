@@ -2,7 +2,8 @@ from django import db
 from django.conf import settings
 from django.test import TestCase
 
-from models import User, UserProfile, UserStat, UserStatResult, StatDetails, AdvancedUserStat
+from models import (User, UserProfile, UserStat, UserStatResult, StatDetails, 
+    AdvancedUserStat, Image, Product)
 
 class ReverseSelectRelatedTestCase(TestCase):
     def setUp(self):
@@ -81,3 +82,10 @@ class ReverseSelectRelatedTestCase(TestCase):
         stat = UserStat.objects.select_related('advanceduserstat').get(posts=200)
         self.assertEqual(stat.advanceduserstat.posts, 200)
         self.assertQueries(1)
+    
+    def test_nullable_relation(self):
+        im = Image.objects.create(name="imag1")
+        p1 = Product.objects.create(name="Django Plushie", image=im)
+        p2 = Product.objects.create(name="Talking Django Plushie")
+        
+        self.assertEqual(len(Product.objects.select_related("image")), 2)
