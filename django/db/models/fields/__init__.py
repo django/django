@@ -196,7 +196,7 @@ class Field(object):
             return
         if self._choices and value:
             for option_key, option_value in self.choices:
-                if type(option_value) in (tuple, list):
+                if isinstance(option_value, (list, tuple)):
                     # This is an optgroup, so look inside the group for options.
                     for optgroup_key, optgroup_value in option_value:
                         if value == optgroup_key:
@@ -431,7 +431,7 @@ class Field(object):
         """Flattened version of choices tuple."""
         flat = []
         for choice, value in self.choices:
-            if type(value) in (list, tuple):
+            if isinstance(value, (list, tuple)):
                 flat.extend(value)
             else:
                 flat.append((choice,value))

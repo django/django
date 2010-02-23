@@ -621,7 +621,7 @@ class ChoiceField(Field):
     def valid_value(self, value):
         "Check to see if the provided value is a valid choice"
         for k, v in self.choices:
-            if type(v) in (tuple, list):
+            if isinstance(v, (list, tuple)):
                 # This is an optgroup, so look inside the group for options
                 for k2, v2 in v:
                     if value == smart_unicode(k2):
