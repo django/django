@@ -62,7 +62,7 @@ def get_validation_errors(outfile, app=None):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
                     for c in f.choices:
-                        if not type(c) in (tuple, list) or len(c) != 2:
+                        if not isinstance(c, (list, tuple)) or len(c) != 2:
                             e.add(opts, '"%s": "choices" should be a sequence of two-tuples.' % f.name)
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
