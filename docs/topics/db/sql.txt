@@ -91,6 +91,20 @@ query could also be written::
     >>> name_map = {'first': 'first_name', 'last': 'last_name', 'bd': 'birth_date', 'pk': 'id'}
     >>> Person.objects.raw('SELECT * FROM some_other_table', translations=name_map)
 
+Index lookups
+-------------
+
+``raw()`` supports indexing, so if you need only the first result you can
+write::
+
+    >>> first_person = Person.objects.raw('SELECT * from myapp_person')[0]
+
+However, the indexing and slicing are not performed at the database level. If
+you have a big amount of ``Person`` objects in your database, it would be more
+efficient to limit the query at the SQL level::
+
+    >>> first_person = Person.objects.raw('SELECT * from myapp_person LIMIT 1')[0]
+
 Deferring model fields
 ----------------------
 

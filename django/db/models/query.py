@@ -1334,6 +1334,9 @@ class RawQuerySet(object):
     def __repr__(self):
         return "<RawQuerySet: %r>" % (self.raw_query % self.params)
 
+    def __getitem__(self, k):
+        return list(self)[k]
+
     @property
     def db(self):
         "Return the database that will be used if this query is executed now"

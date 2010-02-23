@@ -186,3 +186,18 @@ class RawQueryTests(TestCase):
             second_iterations += 1
 
         self.assertEqual(first_iterations, second_iterations)
+
+    def testGetItem(self):
+        # Indexing on RawQuerySets
+        query = "SELECT * FROM raw_query_author ORDER BY id ASC"
+        third_author = Author.objects.raw(query)[2]
+        self.assertEqual(third_author.first_name, 'Bob')
+
+        first_two = Author.objects.raw(query)[0:2]
+        self.assertEquals(len(first_two), 2)
+
+        try:
+            Author.objects.raw(query)['test']
+            self.fail('Index lookups should only accept int, long or slice')
+        except TypeError:
+            pass
