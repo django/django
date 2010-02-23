@@ -390,7 +390,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "formfield_callback": self.formfield_for_dbfield,
             "formset": self.formset,
             "extra": self.extra,
-            "can_delete": True,
+            "can_delete": self.can_delete,
             "can_order": False,
             "fields": fields,
             "max_num": self.max_num,

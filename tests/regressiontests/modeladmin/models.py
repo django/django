@@ -291,6 +291,7 @@ blank=True for the model field.  Finally, the widget should have the
 ...     form = AdminConcertForm
 ...     model = Concert
 ...     fk_name = 'main_band'
+...     can_delete = True
 
 >>> class BandAdmin(ModelAdmin):
 ...     inlines = [

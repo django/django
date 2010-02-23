@@ -1187,6 +1187,7 @@ class InlineModelAdmin(BaseModelAdmin):
     template = None
     verbose_name = None
     verbose_name_plural = None
+    can_delete = True
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
@@ -1232,6 +1233,7 @@ class InlineModelAdmin(BaseModelAdmin):
             "formfield_callback": curry(self.formfield_for_dbfield, request=request),
             "extra": self.extra,
             "max_num": self.max_num,
+            "can_delete": self.can_delete,
         }
         defaults.update(kwargs)
         return inlineformset_factory(self.parent_model, self.model, **defaults)
