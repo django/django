@@ -362,7 +362,8 @@ True
 >>> Book.objects.filter(pk=1).annotate(mean_age=Avg('authors__age')).values_list('mean_age', flat=True)
 [34.5]
 
->>> Book.objects.values_list('price').annotate(count=Count('price')).order_by('-count', 'price')
-[(Decimal('29.69'), 2), (Decimal('23.09'), 1), (Decimal('30'), 1), (Decimal('75'), 1), (Decimal('82.8'), 1)]
+>>> qs = Book.objects.values_list('price').annotate(count=Count('price')).order_by('-count', 'price')
+>>> list(qs) == [(Decimal('29.69'), 2), (Decimal('23.09'), 1), (Decimal('30'), 1), (Decimal('75'), 1), (Decimal('82.8'), 1)]
+True
 
 """}
