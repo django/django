@@ -320,6 +320,13 @@ time, rather than ``CACHE_MIDDLEWARE_SECONDS``. Using the decorators in
 the ``never_cache`` decorator). See the `using other headers`__ section for
 more on these decorators.
 
+.. versionadded:: 1.2
+
+If :setting:`USE_I18N` is set to ``True`` then the generated cache key will
+include the name of the currently active :term:`language<language code>`.
+This allows you to easily cache multilingual sites without having to create
+the cache key yourself.
+
 __ `Controlling cache: Using other headers`_
 
 The per-view cache

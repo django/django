@@ -14,6 +14,8 @@ from django.core import management
 from django.core.cache import get_cache
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.http import HttpResponse, HttpRequest
+from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware
+from django.utils import translation
 from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
 from django.utils.hashcompat import md5_constructor
 from regressiontests.cache.models import Poll, expensive_calculation
@@ -401,12 +403,15 @@ class CacheUtils(unittest.TestCase):
         self.path = '/cache/test/'
         self.old_settings_key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.old_middleware_seconds = settings.CACHE_MIDDLEWARE_SECONDS
+        self.orig_use_i18n = settings.USE_I18N
         settings.CACHE_MIDDLEWARE_KEY_PREFIX = 'settingsprefix'
         settings.CACHE_MIDDLEWARE_SECONDS = 1
+        settings.USE_I18N = False
 
     def tearDown(self):
         settings.CACHE_MIDDLEWARE_KEY_PREFIX = self.old_settings_key_prefix
         settings.CACHE_MIDDLEWARE_SECONDS = self.old_middleware_seconds
+        settings.USE_I18N = self.orig_use_i18n
 
     def _get_request(self, path):
         request = HttpRequest()
@@ -457,6 +462,102 @@ class CacheUtils(unittest.TestCase):
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
         self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+
+class CacheI18nTest(unittest.TestCase):
+
+    def setUp(self):
+        self.orig_cache_middleware_seconds = settings.CACHE_MIDDLEWARE_SECONDS
+        self.orig_cache_middleware_key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.orig_cache_backend = settings.CACHE_BACKEND
+        self.orig_use_i18n = settings.USE_I18N
+        self.orig_languages =  settings.LANGUAGES
+        settings.LANGUAGES = (
+                ('en', 'English'),
+                ('es', 'Spanish'),
+        )
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX = 'settingsprefix'
+        settings.CACHE_MIDDLEWARE_SECONDS
+        self.path = '/cache/test/'
+
+    def tearDown(self):
+        settings.CACHE_MIDDLEWARE_SECONDS = self.orig_cache_middleware_seconds
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX = self.orig_cache_middleware_key_prefix
+        settings.CACHE_BACKEND = self.orig_cache_backend
+        settings.USE_I18N = self.orig_use_i18n
+        settings.LANGUAGES = self.orig_languages
+        translation.deactivate()
+
+    def _get_request(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        request.path = request.path_info = self.path
+        return request
+
+    def _get_request_cache(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        request.path = request.path_info = self.path
+        request._cache_update_cache = True
+        request.method = 'GET'
+        request.session = {}
+        return request
+
+    def test_cache_key_i18n(self):
+        settings.USE_I18N = True
+        request = self._get_request()
+        lang = translation.get_language()
+        response = HttpResponse()
+        key = learn_cache_key(request, response)
+        self.assertTrue(key.endswith(lang), "Cache keys should include the language name when i18n is active")
+        key2 = get_cache_key(request)
+        self.assertEqual(key, key2)
+
+    def test_cache_key_no_i18n (self):
+        settings.USE_I18N = False
+        request = self._get_request()
+        lang = translation.get_language()
+        response = HttpResponse()
+        key = learn_cache_key(request, response)
+        self.assertFalse(key.endswith(lang), "Cache keys shouldn't include the language name when i18n is inactive")
+
+    def test_middleware(self):
+        def set_cache(request, lang, msg):
+            translation.activate(lang)
+            response = HttpResponse()
+            response.content= msg
+            return UpdateCacheMiddleware().process_response(request, response)
+
+        settings.CACHE_MIDDLEWARE_SECONDS = 60
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX="test"
+        settings.CACHE_BACKEND='locmem:///'
+        settings.USE_I18N = True
+        en_message ="Hello world!"
+        es_message ="Hola mundo!"
+
+        request = self._get_request_cache()
+        set_cache(request, 'en', en_message)
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        # Check that we can recover the cache
+        self.assertNotEqual(get_cache_data.content, None)
+        self.assertEqual(en_message, get_cache_data.content)
+        # change the session language and set content
+        request = self._get_request_cache()
+        set_cache(request, 'es', es_message)
+        # change again the language
+        translation.activate('en')
+        # retrieve the content from cache
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertEqual(get_cache_data.content, en_message)
+        # change again the language
+        translation.activate('es')
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertEqual(get_cache_data.content, es_message)
 
 if __name__ == '__main__':
     unittest.main()
