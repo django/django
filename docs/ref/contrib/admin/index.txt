@@ -1026,7 +1026,7 @@ many possibilities of customization. Inlines are built around
 ~~~~~~~~
 
 The value for ``form`` defaults to ``BaseModelForm``. This is what is
-passed through to ``formset_factory`` when creating the formset for this
+passed through to ``inlineformset_factory`` when creating the formset for this
 inline.
 
 ``extra``
