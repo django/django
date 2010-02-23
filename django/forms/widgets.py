@@ -452,9 +452,13 @@ class NullBooleanSelect(Select):
                 False: False}.get(value, None)
 
     def _has_changed(self, initial, data):
-        # Sometimes data or initial could be None or u'' which should be the
-        # same thing as False.
-        return bool(initial) != bool(data)
+        # For a NullBooleanSelect, None (unknown) and False (No)
+        # are not the same
+        if initial is not None:
+            initial = bool(initial)
+        if data is not None:
+            data = bool(data)
+        return initial != data
 
 class SelectMultiple(Select):
     def render(self, name, value, attrs=None, choices=()):

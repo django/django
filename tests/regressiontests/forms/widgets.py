@@ -532,6 +532,20 @@ Choices can be nested one level in order to create HTML optgroups:
 <option value="2">Yes</option>
 <option value="3" selected="selected">No</option>
 </select>
+>>> w._has_changed(False, None)
+True
+>>> w._has_changed(None, False)
+True
+>>> w._has_changed(None, None)
+False
+>>> w._has_changed(False, False)
+False
+>>> w._has_changed(True, False)
+True
+>>> w._has_changed(True, None)
+True
+>>> w._has_changed(True, True)
+False
 
 """ + \
 r""" # [This concatenation is to keep the string below the jython's 32K limit].
