@@ -331,7 +331,7 @@ otherwise. See :ref:`automatic-primary-key-fields`.
 A 64 bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from -9223372036854775808 to 9223372036854775807. The
 admin represents this as an ``<input type="text">`` (a single-line input).
- 
+
 
 ``BooleanField``
 ----------------
@@ -772,7 +772,7 @@ A :class:`CharField` for a URL. Has one extra optional argument:
 
     If ``True`` (the default), the URL given will be checked for existence
     (i.e., the URL actually loads and doesn't give a 404 response).
-    
+
     Note that when you're using the single-threaded development server,
     validating a URL being served by the same server will hang. This should not
     be a problem for multithreaded servers.
@@ -913,12 +913,13 @@ the model is related. This works exactly the same as it does for
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django creates an intermediary join table to represent the
-many-to-many relationship. By default, this table name is generated using the
-names of the two tables being joined. Since some databases don't support table
-names above a certain length, these table names will be automatically
-truncated to 64 characters and a uniqueness hash will be used. This means you
-might see table names like ``author_books_9cdf4``; this is perfectly normal.
+Behind the scenes, Django creates an intermediary join table to
+represent the many-to-many relationship. By default, this table name
+is generated using the name of the many-to-many field and the model
+that contains it. Since some databases don't support table names above
+a certain length, these table names will be automatically truncated to
+64 characters and a uniqueness hash will be used. This means you might
+see table names like ``author_books_9cdf4``; this is perfectly normal.
 You can manually provide the name of the join table using the
 :attr:`~ManyToManyField.db_table` option.
 
