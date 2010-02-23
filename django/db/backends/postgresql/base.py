@@ -102,6 +102,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
+        import warnings
+        warnings.warn(
+            'The ``postgres`` backend has been deprecated. Use ``postgres_psycopg2`` instead.',
+            PendingDeprecationWarning
+        )
+
         self.features = DatabaseFeatures()
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)

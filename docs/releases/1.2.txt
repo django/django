@@ -305,6 +305,18 @@ created using ``decorator_from_middleware``.
 Features deprecated in 1.2
 ==========================
 
+``postgresql`` database backend
+-------------------------------
+
+The ``psycopg1`` library has not been updated since October 2005. As a
+result, the ``postgresql`` database backend, which depends on this
+library, has been deprecated.
+
+If you are currently using the ``postgresql`` backend, you should
+migrate to using the ``postgresql_psycopg2`` backend. To update your
+code, install the ``psycopg2`` library and change the
+``DATABASE_ENGINE`` setting to read ``postgresql_psycopg2``.
+
 CSRF response-rewriting middleware
 ----------------------------------
 
