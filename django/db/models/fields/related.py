@@ -227,7 +227,7 @@ class SingleRelatedObjectDescriptor(object):
                 value._state.db = router.db_for_write(value.__class__, instance=instance)
             elif value._state.db is not None and instance._state.db is not None:
                 if not router.allow_relation(value, instance):
-                    raise ValueError('Cannot assign "%r": instance is on database "%s", value is is on database "%s"' %
+                    raise ValueError('Cannot assign "%r": instance is on database "%s", value is on database "%s"' %
                                         (value, instance._state.db, value._state.db))
 
         # Set the value of the related field to the value of the related object's related field
@@ -299,7 +299,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
                 value._state.db = router.db_for_write(value.__class__, instance=instance)
             elif value._state.db is not None and instance._state.db is not None:
                 if not router.allow_relation(value, instance):
-                    raise ValueError('Cannot assign "%r": instance is on database "%s", value is is on database "%s"' %
+                    raise ValueError('Cannot assign "%r": instance is on database "%s", value is on database "%s"' %
                                         (value, instance._state.db, value._state.db))
 
         # If we're setting the value of a OneToOneField to None, we need to clear
@@ -521,7 +521,7 @@ def create_many_related_manager(superclass, rel=False):
                 for obj in objs:
                     if isinstance(obj, self.model):
                         if not router.allow_relation(obj, self.instance):
-                           raise ValueError('Cannot add "%r": instance is on database "%s", value is is on database "%s"' %
+                           raise ValueError('Cannot add "%r": instance is on database "%s", value is on database "%s"' %
                                                (obj, self.instance._state.db, obj._state.db))
                         new_ids.add(obj.pk)
                     elif isinstance(obj, Model):
