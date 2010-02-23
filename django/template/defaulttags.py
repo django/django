@@ -1071,6 +1071,13 @@ def templatetag(parser, token):
     return TemplateTagNode(tag)
 templatetag = register.tag(templatetag)
 
+# Regex for URL arguments including filters
+url_arg_re = re.compile(
+    r"(?:(%(name)s)=)?(%(value)s(?:\|%(name)s(?::%(value)s)?)*)" % {
+        'name':'\w+',
+        'value':'''(?:(?:'[^']*')|(?:"[^"]*")|(?:[\w\.-]+))'''},
+    re.VERBOSE)
+
 def url(parser, token):
     """
     Returns an absolute URL matching given view with its parameters.
@@ -1118,13 +1125,20 @@ def url(parser, token):
                 asvar = bits.next()
                 break
             else:
-                for arg in bit.split(","):
-                    if '=' in arg:
-                        k, v = arg.split('=', 1)
-                        k = k.strip()
-                        kwargs[k] = parser.compile_filter(v)
-                    elif arg:
-                        args.append(parser.compile_filter(arg))
+                end = 0
+                for i, match in enumerate(url_arg_re.finditer(bit)):
+                    if (i == 0 and match.start() != 0) or \
+                          (i > 0 and (bit[end:match.start()] != ',')):
+                        raise TemplateSyntaxError("Malformed arguments to url tag")
+                    end = match.end()
+                    name, value = match.group(1), match.group(2)
+                    if name:
+                        kwargs[name] = parser.compile_filter(value)
+                    else:
+                        args.append(parser.compile_filter(value))
+                if end != len(bit):
+                    raise TemplateSyntaxError("Malformed arguments to url tag")
+
     return URLNode(viewname, args, kwargs, asvar)
 url = register.tag(url)
 

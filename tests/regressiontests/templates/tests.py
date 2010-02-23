@@ -1031,11 +1031,20 @@ class Templates(unittest.TestCase):
             'url08': (u'{% url метка_оператора v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
             'url09': (u'{% url метка_оператора_2 tag=v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
             'url10': ('{% url regressiontests.templates.views.client_action id=client.id,action="two words" %}', {'client': {'id': 1}}, '/url_tag/client/1/two%20words/'),
+            'url11': ('{% url regressiontests.templates.views.client_action id=client.id,action="==" %}', {'client': {'id': 1}}, '/url_tag/client/1/==/'),
+            'url12': ('{% url regressiontests.templates.views.client_action id=client.id,action="," %}', {'client': {'id': 1}}, '/url_tag/client/1/,/'),
+            'url12': ('{% url regressiontests.templates.views.client_action id=client.id,action=arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
 
             # Failures
             'url-fail01': ('{% url %}', {}, template.TemplateSyntaxError),
             'url-fail02': ('{% url no_such_view %}', {}, urlresolvers.NoReverseMatch),
             'url-fail03': ('{% url regressiontests.templates.views.client %}', {}, urlresolvers.NoReverseMatch),
+            'url-fail04': ('{% url view id, %}', {}, template.TemplateSyntaxError),
+            'url-fail05': ('{% url view id= %}', {}, template.TemplateSyntaxError),
+            'url-fail06': ('{% url view a.id=id %}', {}, template.TemplateSyntaxError),
+            'url-fail07': ('{% url view a.id!id %}', {}, template.TemplateSyntaxError),
+            'url-fail08': ('{% url view id="unterminatedstring %}', {}, template.TemplateSyntaxError),
+            'url-fail09': ('{% url view id=", %}', {}, template.TemplateSyntaxError),
 
             # {% url ... as var %}
             'url-asvar01': ('{% url regressiontests.templates.views.index as url %}', {}, ''),
