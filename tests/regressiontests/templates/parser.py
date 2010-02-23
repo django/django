@@ -76,6 +76,13 @@ u"Some 'Bad' News"
 []
 >>> fe.var
 u'Some "Good" News'
+
+Filtered variables should reject access of attributes beginning with underscores.
+
+>>> FilterExpression('article._hidden|upper', p)
+Traceback (most recent call last):
+...
+TemplateSyntaxError: Variables and attributes may not begin with underscores: 'article._hidden'
 """
 
 variable_parsing = r"""
@@ -105,4 +112,10 @@ u'Some "Good" News'
 >>> Variable(ur"'Some \'Better\' News'").resolve(c)
 u"Some 'Better' News"
 
+Variables should reject access of attributes beginning with underscores.
+
+>>> Variable('article._hidden')
+Traceback (most recent call last):
+...
+TemplateSyntaxError: Variables and attributes may not begin with underscores: 'article._hidden'
 """
