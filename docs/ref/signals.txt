@@ -176,6 +176,8 @@ m2m_changed
 .. data:: django.db.models.signals.m2m_changed
    :module:
 
+.. versionadded:: 1.2
+
 Sent when a :class:`ManyToManyField` is changed on a model instance.
 Strictly speaking, this is not a model signal since it is sent by the
 :class:`ManyToManyField`, but since it complements the
