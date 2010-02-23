@@ -23,3 +23,6 @@ class Coffee(models.Model):
 
 class Reviewer(models.Model):
     reviewed = models.ManyToManyField(Book)
+
+class FriendlyAuthor(Author):
+    pass

@@ -1402,7 +1402,7 @@ class RawQuerySet(object):
         # Construct model instance and apply annotations
         skip = set()
         for field in self.model._meta.fields:
-            if field.name not in model_init_kwargs.keys():
+            if field.attname not in model_init_kwargs.keys():
                 skip.add(field.attname)
 
         if skip:
