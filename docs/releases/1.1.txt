@@ -170,7 +170,7 @@ One feature has been marked as deprecated in Django 1.1:
 
 You should begin to remove use of this feature from your code immediately.
 
-``AdminSite.root`` will will raise a ``PendingDeprecationWarning`` if used in
+``AdminSite.root`` will raise a ``PendingDeprecationWarning`` if used in
 Django 1.1. This warning is hidden by default. In Django 1.2, this warning will
 be upgraded to a ``DeprecationWarning``, which will be displayed loudly. Django
 1.3 will remove ``AdminSite.root()`` entirely.
