@@ -210,4 +210,8 @@ True
 >>> TestObject.objects.filter(pk__in=TestObject.objects.values('pk').extra(select={'extra': 1}))
 [<TestObject: TestObject: first,second,third>]
 
+>>> pk = TestObject.objects.get().pk
+>>> TestObject.objects.filter(pk=pk) | TestObject.objects.extra(where=["id > %s"], params=[pk])
+[<TestObject: TestObject: first,second,third>]
+
 """}

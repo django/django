@@ -220,7 +220,7 @@ class WhereNode(tree.Node):
                 child.relabel_aliases(change_map)
             elif isinstance(child, tree.Node):
                 self.relabel_aliases(change_map, child)
-            else:
+            elif isinstance(child, (list, tuple)):
                 if isinstance(child[0], (list, tuple)):
                     elt = list(child[0])
                     if elt[0] in change_map:
@@ -253,6 +253,14 @@ class NothingNode(object):
 
     def relabel_aliases(self, change_map, node=None):
         return
+
+class ExtraWhere(object):
+    def __init__(self, sqls, params):
+        self.sqls = sqls
+        self.params = params
+    
+    def as_sql(self, qn=None, connection=None):
+        return " AND ".join(self.sqls), tuple(self.params or ())
 
 class Constraint(object):
     """

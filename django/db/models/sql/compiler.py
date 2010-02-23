@@ -84,12 +84,6 @@ class SQLCompiler(object):
         if where:
             result.append('WHERE %s' % where)
             params.extend(w_params)
-        if self.query.extra_where:
-            if not where:
-                result.append('WHERE')
-            else:
-                result.append('AND')
-            result.append(' AND '.join(self.query.extra_where))
 
         grouping, gb_params = self.get_grouping()
         if grouping:
@@ -124,7 +118,6 @@ class SQLCompiler(object):
                         result.append('LIMIT %d' % val)
                 result.append('OFFSET %d' % self.query.low_mark)
 
-        params.extend(self.query.extra_params)
         return ' '.join(result), tuple(params)
 
     def as_nested_sql(self):

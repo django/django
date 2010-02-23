@@ -19,7 +19,8 @@ from django.db.models.sql import aggregates as base_aggregates_module
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
 from django.db.models.sql.expressions import SQLEvaluator
-from django.db.models.sql.where import WhereNode, Constraint, EverythingNode, AND, OR
+from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
+    ExtraWhere, AND, OR)
 from django.core.exceptions import FieldError
 
 __all__ = ['Query', 'RawQuery']
@@ -128,8 +129,6 @@ class Query(object):
         self._extra_select_cache = None
 
         self.extra_tables = ()
-        self.extra_where = ()
-        self.extra_params = ()
         self.extra_order_by = ()
 
         # A tuple that is a set of model field names and either True, if these
@@ -256,8 +255,6 @@ class Query(object):
         else:
             obj._extra_select_cache = self._extra_select_cache.copy()
         obj.extra_tables = self.extra_tables
-        obj.extra_where = self.extra_where
-        obj.extra_params = self.extra_params
         obj.extra_order_by = self.extra_order_by
         obj.deferred_loading = deepcopy(self.deferred_loading)
         if self.filter_is_sticky and self.used_aliases:
@@ -466,9 +463,6 @@ class Query(object):
             if self.extra and rhs.extra:
                 raise ValueError("When merging querysets using 'or', you "
                         "cannot have extra(select=...) on both sides.")
-            if self.extra_where and rhs.extra_where:
-                raise ValueError("When merging querysets using 'or', you "
-                        "cannot have extra(where=...) on both sides.")
         self.extra.update(rhs.extra)
         extra_select_mask = set()
         if self.extra_select_mask is not None:
@@ -478,8 +472,6 @@ class Query(object):
         if extra_select_mask:
             self.set_extra_mask(extra_select_mask)
         self.extra_tables += rhs.extra_tables
-        self.extra_where += rhs.extra_where
-        self.extra_params += rhs.extra_params
 
         # Ordering uses the 'rhs' ordering, unless it has none, in which case
         # the current ordering is used.
@@ -1611,10 +1603,8 @@ class Query(object):
                 select_pairs[name] = (entry, entry_params)
             # This is order preserving, since self.extra_select is a SortedDict.
             self.extra.update(select_pairs)
-        if where:
-            self.extra_where += tuple(where)
-        if params:
-            self.extra_params += tuple(params)
+        if where or params:
+            self.where.add(ExtraWhere(where, params), AND)
         if tables:
             self.extra_tables += tuple(tables)
         if order_by:
