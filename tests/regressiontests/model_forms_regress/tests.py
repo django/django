@@ -6,7 +6,7 @@ from django.forms.models import modelform_factory
 from django.conf import settings
 from django.test import TestCase
 
-from models import Person, RealPerson, Triple, FilePathModel, Article, Publication, CustomFF
+from models import Person, RealPerson, Triple, FilePathModel, Article, Publication, CustomFF, Author, Author1
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
@@ -152,3 +152,35 @@ class ModelClassTests(TestCase):
         class NoModelModelForm(forms.ModelForm):
             pass
         self.assertRaises(ValueError, NoModelModelForm)
+
+class OneToOneFieldTests(TestCase):
+    def test_assignment_of_none(self):
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = ['publication', 'full_name']
+
+        publication = Publication.objects.create(title="Pravda",
+            date_published=date(1991, 8, 22))
+        author = Author.objects.create(publication=publication, full_name='John Doe')
+        form = AuthorForm({'publication':u'', 'full_name':'John Doe'}, instance=author)
+        self.assert_(form.is_valid())
+        self.assertEqual(form.cleaned_data['publication'], None)
+        author = form.save()
+        # author object returned from form still retains original publication object
+        # that's why we need to retreive it from database again
+        new_author = Author.objects.get(pk=author.pk)
+        self.assertEqual(new_author.publication, None)
+
+    def test_assignment_of_none_null_false(self):
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author1
+                fields = ['publication', 'full_name']
+
+        publication = Publication.objects.create(title="Pravda",
+            date_published=date(1991, 8, 22))
+        author = Author1.objects.create(publication=publication, full_name='John Doe')
+        form = AuthorForm({'publication':u'', 'full_name':'John Doe'}, instance=author)
+        self.assert_(not form.is_valid())
+

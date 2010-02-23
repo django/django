@@ -47,3 +47,10 @@ class RealPerson(models.Model):
         if self.name.lower() == 'anonymous':
             raise ValidationError("Please specify a real name.")
 
+class Author(models.Model):
+    publication = models.OneToOneField(Publication, null=True, blank=True)
+    full_name = models.CharField(max_length=255)
+
+class Author1(models.Model):
+    publication = models.OneToOneField(Publication, null=False)
+    full_name = models.CharField(max_length=255)
