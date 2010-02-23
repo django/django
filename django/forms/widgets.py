@@ -382,7 +382,12 @@ class CheckboxInput(Widget):
             # A missing value means False because HTML form submission does not
             # send results for unselected checkboxes.
             return False
-        return super(CheckboxInput, self).value_from_datadict(data, files, name)
+        value = data.get(name)
+        # Translate true and false strings to boolean values.
+        values =  {'true': True, 'false': False}
+        if isinstance(value, basestring):
+            value = values.get(value.lower(), value)
+        return value
 
     def _has_changed(self, initial, data):
         # Sometimes data or initial could be None or u'' which should be the
