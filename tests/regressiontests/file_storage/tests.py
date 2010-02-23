@@ -181,7 +181,7 @@ class FileStoragePathParsing(TestCase):
         # Before 2.6, a leading dot was treated as an extension, and so
         # underscore gets added to beginning instead of end.
         if sys.version_info < (2, 6):
-            self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_.test')))
+            self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_1.test')))
         else:
             self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
 
