@@ -3,6 +3,7 @@ Testing of admin inline formsets.
 
 """
 from django.db import models
+from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
@@ -28,6 +29,24 @@ class Child(models.Model):
 
     def __unicode__(self):
         return u'I am %s, a child of %s' % (self.name, self.parent)
+
+
+class Holder(models.Model):
+    dummy = models.IntegerField()
+
+
+class Inner(models.Model):
+    dummy = models.IntegerField()
+    holder = models.ForeignKey(Holder)
+
+
+class InnerInline(admin.StackedInline):
+    model = Inner
+    can_delete = False
+
+
+# Test bug #12561
+admin.site.register(Holder, inlines=[InnerInline])
 
 __test__ = {'API_TESTS': """
 

@@ -5,7 +5,8 @@ from django.conf import settings
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
 
 # local test models
-from models import Episode, EpisodeExtra, EpisodeMaxNum, EpisodeExclude, Media
+from models import Episode, EpisodeExtra, EpisodeMaxNum, EpisodeExclude, \
+                   Media, EpisodePermanent, MediaPermanentInline
 
 class GenericAdminViewTest(TestCase):
     fixtures = ['users.xml']
@@ -177,3 +178,11 @@ class GenericInlineAdminParametersTest(TestCase):
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeexclude/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.failIf('url' in formset.forms[0], 'The formset has excluded "url" field.')
+
+class NoInlineDeletionTest(TestCase):
+    def test_no_deletion(self):
+        fake_site = object()
+        inline = MediaPermanentInline(EpisodePermanent, fake_site)
+        fake_request = object()
+        formset = inline.get_formset(fake_request)
+        self.assertFalse(formset.can_delete)

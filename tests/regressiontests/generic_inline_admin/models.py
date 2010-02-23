@@ -72,3 +72,15 @@ class MediaExcludeInline(generic.GenericTabularInline):
 
 admin.site.register(EpisodeExclude, inlines=[MediaExcludeInline])
 
+#
+# Generic inline with can_delete=False
+#
+
+class EpisodePermanent(Episode):
+    pass
+
+class MediaPermanentInline(generic.GenericTabularInline):
+    model = Media
+    can_delete = False
+
+admin.site.register(EpisodePermanent, inlines=[MediaPermanentInline])
