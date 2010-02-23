@@ -145,5 +145,10 @@ class CustomModelFormSaveMethod(TestCase):
         data = {'name': 'anonymous'}
         form = RealPersonForm(data)
         self.assertEqual(form.is_valid(), False)
-        self.assertEqual(form.errors['__all__'], ['Please specify a real name.']) 
+        self.assertEqual(form.errors['__all__'], ['Please specify a real name.'])
 
+class ModelClassTests(TestCase):
+    def test_no_model_class(self):
+        class NoModelModelForm(forms.ModelForm):
+            pass
+        self.assertRaises(ValueError, NoModelModelForm)

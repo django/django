@@ -236,6 +236,8 @@ class BaseModelForm(BaseForm):
                  empty_permitted=False, instance=None):
         opts = self._meta
         if instance is None:
+            if opts.model is None:
+                raise ValueError('ModelForm has no model class specified.')
             # if we didn't get an instance, instantiate a new one
             self.instance = opts.model()
             object_data = {}
