@@ -88,5 +88,5 @@ the provided filename into account. The ``name`` argument passed to this method
 will have already cleaned to a filename valid for the storage system, according
 to the ``get_valid_name()`` method described above.
 
-The code provided on ``Storage`` simply appends underscores to the filename
-until it finds one that's available in the destination directory.
+The code provided on ``Storage`` simply appends ``"_1"``, ``"_2"``, etc. to the
+filename until it finds one that's available in the destination directory.

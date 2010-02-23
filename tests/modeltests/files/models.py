@@ -5,14 +5,11 @@
 and where files should be stored.
 """
 
-import shutil
 import random
 import tempfile
 from django.db import models
 from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.storage import FileSystemStorage
-from django.core.cache import cache
 
 temp_storage_location = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(location=temp_storage_location)
@@ -64,6 +61,7 @@ ValueError: The 'normal' attribute has no file associated with it.
 # File objects can be assigned to FileField attributes,  but shouldn't get
 # committed until the model it's attached to is saved.
 
+>>> from django.core.files.uploadedfile import SimpleUploadedFile
 >>> obj1.normal = SimpleUploadedFile('assignment.txt', 'content')
 >>> dirs, files = temp_storage.listdir('tests')
 >>> dirs
@@ -93,16 +91,17 @@ ValueError: The 'normal' attribute has no file associated with it.
 >>> obj2 = Storage()
 >>> obj2.normal.save('django_test.txt', ContentFile('more content'))
 >>> obj2.normal
-<FieldFile: tests/django_test_.txt>
+<FieldFile: tests/django_test_1.txt>
 >>> obj2.normal.size
 12
 
 # Push the objects into the cache to make sure they pickle properly
 
+>>> from django.core.cache import cache
 >>> cache.set('obj1', obj1)
 >>> cache.set('obj2', obj2)
 >>> cache.get('obj2').normal
-<FieldFile: tests/django_test_.txt>
+<FieldFile: tests/django_test_1.txt>
 
 # Deleting an object deletes the file it uses, if there are no other objects
 # still using that file.
@@ -110,7 +109,17 @@ ValueError: The 'normal' attribute has no file associated with it.
 >>> obj2.delete()
 >>> obj2.normal.save('django_test.txt', ContentFile('more content'))
 >>> obj2.normal
-<FieldFile: tests/django_test_.txt>
+<FieldFile: tests/django_test_1.txt>
+
+# Multiple files with the same name get _N appended to them.
+
+>>> objs = [Storage() for i in range(3)] 
+>>> for o in objs:  
+...     o.normal.save('multiple_files.txt', ContentFile('Same Content')) 
+>>> [o.normal for o in objs]
+[<FieldFile: tests/multiple_files.txt>, <FieldFile: tests/multiple_files_1.txt>, <FieldFile: tests/multiple_files_2.txt>]
+>>> for o in objs: 
+...     o.delete() 
 
 # Default values allow an object to access a single file.
 
@@ -139,5 +148,7 @@ ValueError: The 'normal' attribute has no file associated with it.
 >>> obj2.normal.delete()
 >>> obj3.default.delete()
 >>> obj4.random.delete()
+
+>>> import shutil
 >>> shutil.rmtree(temp_storage_location)
 """}

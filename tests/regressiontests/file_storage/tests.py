@@ -126,9 +126,9 @@ class FileSaveRaceConditionTest(TestCase):
         name = self.save_file('conflict')
         self.thread.join()
         self.assert_(self.storage.exists('conflict'))
-        self.assert_(self.storage.exists('conflict_'))
+        self.assert_(self.storage.exists('conflict_1'))
         self.storage.delete('conflict')
-        self.storage.delete('conflict_')
+        self.storage.delete('conflict_1')
 
 class FileStoragePermissions(TestCase):
     def setUp(self):
@@ -167,7 +167,7 @@ class FileStoragePathParsing(TestCase):
 
         self.failIf(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
         self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
-        self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_')))
+        self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_1')))
 
     def test_first_character_dot(self):
         """
@@ -183,7 +183,7 @@ class FileStoragePathParsing(TestCase):
         if sys.version_info < (2, 6):
             self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_.test')))
         else:
-            self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_')))
+            self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
 
 if Image is not None:
     class DimensionClosingBug(TestCase):
