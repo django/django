@@ -826,6 +826,20 @@ following is a minimal settings file that can be used to test SQLite::
         }
     }
 
+As a convenience, this settings file is included in your Django
+distribution. It is called ``test_sqlite`, and is included in
+the ``tests`` directory. This allows you to get started running
+the tests against the sqlite database without doing anything on
+your filesystem. However it should be noted that running against
+other database backends is recommended for certain types of test
+cases.
+
+To run the tests with this included settings file, ``cd``
+to the ``tests/`` directory and type:
+
+.. code-block:: bash
+
+    ./runtests.py --settings=test_sqlite
 
 If you're using another backend, you will need to provide other details for
 each database:
