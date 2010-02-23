@@ -1002,10 +1002,10 @@ Extra niceties
 Syntax coloring
 ---------------
 
-The ``django-admin.py`` / ``manage.py`` commands that output SQL to
-standard output will use pretty color-coded output if your terminal
-supports ANSI-colored output. It won't use the color codes if you're
-piping the command's output to another program.
+The ``django-admin.py`` / ``manage.py`` commands will use pretty
+color-coded output if your terminal supports ANSI-colored output. It
+won't use the color codes if you're piping the command's output to
+another program.
 
 The colors used for syntax highlighting can be customized. Django
 ships with three color palettes:
@@ -1013,7 +1013,7 @@ ships with three color palettes:
     * ``dark``, suited to terminals that show white text on a black
       background. This is the default palette.
 
-    * ``light``, suited to terminals that show white text on a black
+    * ``light``, suited to terminals that show black text on a white
       background.
 
     * ``nocolor``, which disables syntax highlighting.
