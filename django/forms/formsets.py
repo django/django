@@ -271,7 +271,7 @@ class BaseFormSet(StrAndUnicode):
         try:
             self.clean()
         except ValidationError, e:
-            self._non_form_errors = e.messages
+            self._non_form_errors = self.error_class(e.messages)
 
     def clean(self):
         """

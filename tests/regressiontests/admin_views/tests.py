@@ -11,6 +11,7 @@ from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from django.forms.util import ErrorList
 from django.utils import formats
 from django.utils.cache import get_max_age
 from django.utils.html import escape
@@ -1027,6 +1028,22 @@ class AdminViewListEditable(TestCase):
         }
         response = self.client.post('/test_admin/admin/admin_views/person/', data)
         self.assertContains(response, "Grace is not a Zombie")
+
+    def test_non_form_errors_is_errorlist(self):
+        # test if non-form errors are correctly handled; ticket #12878
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
+
+            "form-0-id": "2",
+            "form-0-alive": "1",
+            "form-0-gender": "2",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/person/', data)
+        non_form_errors = response.context['cl'].formset.non_form_errors()
+        self.assert_(isinstance(non_form_errors, ErrorList))
+        self.assertEqual(str(non_form_errors), str(ErrorList(["Grace is not a Zombie"])))
 
     def test_list_editable_ordering(self):
         collector = Collector.objects.create(id=1, name="Frederick Clegg")
