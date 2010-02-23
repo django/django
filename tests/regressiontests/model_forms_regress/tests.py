@@ -101,3 +101,9 @@ class CustomFieldSaveTests(TestCase):
         # generate an AssertionError if it is called more than once during save.
         form = CFFForm(data = {'f': None})
         form.save()
+
+class ModelClassTests(TestCase):
+    def test_no_model_class(self):
+        class NoModelModelForm(forms.ModelForm):
+            pass
+        self.assertRaises(ValueError, NoModelModelForm)
