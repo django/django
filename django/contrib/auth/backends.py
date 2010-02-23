@@ -4,7 +4,7 @@ except NameError:
     from sets import Set as set # Python 2.3 fallback
 
 from django.db import connection
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 
 
 class ModelBackend(object):
@@ -30,32 +30,10 @@ class ModelBackend(object):
         groups.
         """
         if not hasattr(user_obj, '_group_perm_cache'):
-            cursor = connection.cursor()
-            # The SQL below works out to the following, after DB quoting:
-            # cursor.execute("""
-            #     SELECT ct."app_label", p."codename"
-            #     FROM "auth_permission" p, "auth_group_permissions" gp, "auth_user_groups" ug, "django_content_type" ct
-            #     WHERE p."id" = gp."permission_id"
-            #         AND gp."group_id" = ug."group_id"
-            #         AND ct."id" = p."content_type_id"
-            #         AND ug."user_id" = %s, [self.id])
-            qn = connection.ops.quote_name
-            sql = """
-                SELECT ct.%s, p.%s
-                FROM %s p, %s gp, %s ug, %s ct
-                WHERE p.%s = gp.%s
-                    AND gp.%s = ug.%s
-                    AND ct.%s = p.%s
-                    AND ug.%s = %%s""" % (
-                qn('app_label'), qn('codename'),
-                qn('auth_permission'), qn('auth_group_permissions'),
-                qn('auth_user_groups'), qn('django_content_type'),
-                qn('id'), qn('permission_id'),
-                qn('group_id'), qn('group_id'),
-                qn('id'), qn('content_type_id'),
-                qn('user_id'),)
-            cursor.execute(sql, [user_obj.id])
-            user_obj._group_perm_cache = set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
+            perms = Permission.objects.filter(group__user=user_obj
+                ).values_list('content_type__app_label', 'codename'
+                ).order_by()
+            user_obj._group_perm_cache = set(["%s.%s" % (ct, name) for ct, name in perms])
         return user_obj._group_perm_cache
 
     def get_all_permissions(self, user_obj):
