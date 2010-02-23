@@ -104,7 +104,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         import warnings
         warnings.warn(
-            'The ``postgres`` backend has been deprecated. Use ``postgres_psycopg2`` instead.',
+            'The "postgresql" backend has been deprecated. Use "postgres_psycopg2" instead.',
             PendingDeprecationWarning
         )
 
