@@ -196,8 +196,4 @@ class RawQueryTests(TestCase):
         first_two = Author.objects.raw(query)[0:2]
         self.assertEquals(len(first_two), 2)
 
-        try:
-            Author.objects.raw(query)['test']
-            self.fail('Index lookups should only accept int, long or slice')
-        except TypeError:
-            pass
+        self.assertRaises(TypeError, lambda: Author.objects.raw(query)['test'])
