@@ -52,10 +52,14 @@ class ModelBase(type):
 
         new_class.add_to_class('_meta', Options(meta, **kwargs))
         if not abstract:
-            new_class.add_to_class('DoesNotExist',
-                    subclass_exception('DoesNotExist', ObjectDoesNotExist, module))
-            new_class.add_to_class('MultipleObjectsReturned',
-                    subclass_exception('MultipleObjectsReturned', MultipleObjectsReturned, module))
+            new_class.add_to_class('DoesNotExist', subclass_exception('DoesNotExist',
+                    tuple(x.DoesNotExist
+                            for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
+                                    or (ObjectDoesNotExist,), module))
+            new_class.add_to_class('MultipleObjectsReturned', subclass_exception('MultipleObjectsReturned',
+                    tuple(x.MultipleObjectsReturned
+                            for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
+                                    or (MultipleObjectsReturned,), module))
             if base_meta and not base_meta.abstract:
                 # Non-abstract child classes inherit some attributes from their
                 # non-abstract parent (unless an ABC comes before it in the
@@ -919,8 +923,8 @@ model_unpickle.__safe_for_unpickle__ = True
 
 if sys.version_info < (2, 5):
     # Prior to Python 2.5, Exception was an old-style class
-    def subclass_exception(name, parent, unused):
-        return types.ClassType(name, (parent,), {})
+    def subclass_exception(name, parents, unused):
+        return types.ClassType(name, parents, {})
 else:
-    def subclass_exception(name, parent, module):
-        return type(name, (parent,), {'__module__': module})
+    def subclass_exception(name, parents, module):
+        return type(name, parents, {'__module__': module})

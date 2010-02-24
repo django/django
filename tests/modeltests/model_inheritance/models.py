@@ -38,6 +38,9 @@ class Student(CommonInfo):
     class Meta:
         pass
 
+class StudentWorker(Student, Worker):
+    pass
+
 #
 # Abstract base classes with related models
 #
@@ -176,6 +179,32 @@ Traceback (most recent call last):
     ...
 AttributeError: type object 'CommonInfo' has no attribute 'objects'
 
+# A StudentWorker which does not exist is both a Student and Worker which does not exist.
+>>> try:
+...     StudentWorker.objects.get(id=1)
+... except Student.DoesNotExist:
+...     pass
+>>> try:
+...     StudentWorker.objects.get(id=1)
+... except Worker.DoesNotExist:
+...     pass
+
+# MultipleObjectsReturned is also inherited.
+>>> sw1 = StudentWorker()
+>>> sw1.name = 'Wilma'
+>>> sw1.age = 35
+>>> sw1.save()
+>>> sw2 = StudentWorker()
+>>> sw2.name = 'Betty'
+>>> sw2.age = 34
+>>> sw2.save()
+>>> try:
+...     StudentWorker.objects.get(id__lt=10)
+... except Student.MultipleObjectsReturned:
+...     pass
+... except Worker.MultipleObjectsReturned:
+...     pass
+
 # Create a Post
 >>> post = Post(title='Lorem Ipsum')
 >>> post.save()
@@ -266,6 +295,18 @@ FieldError: Cannot resolve keyword 'supplier' into field. Choices are: address, 
 Traceback (most recent call last):
     ...
 DoesNotExist: ItalianRestaurant matching query does not exist.
+
+# An ItalianRestaurant which does not exist is also a Place which does not exist.
+>>> try:
+...     ItalianRestaurant.objects.get(name='The Noodle Void')
+... except Place.DoesNotExist:
+...     pass
+
+# MultipleObjectsReturned is also inherited.
+>>> try:
+...     Restaurant.objects.get(id__lt=10)
+... except Place.MultipleObjectsReturned:
+...     pass
 
 # Related objects work just as they normally do.
 

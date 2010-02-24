@@ -206,6 +206,26 @@ False
 >>> MyPersonProxy.objects.all()
 [<MyPersonProxy: Bazza del Frob>, <MyPersonProxy: Foo McBar>, <MyPersonProxy: homer>]
 
+# Proxy models are included in the ancestors for a model's DoesNotExist and MultipleObjectsReturned
+>>> try:
+...     MyPersonProxy.objects.get(name='Zathras')
+... except Person.DoesNotExist:
+...     pass
+>>> try:
+...     MyPersonProxy.objects.get(id__lt=10)
+... except Person.MultipleObjectsReturned:
+...     pass
+>>> try:
+...     StatusPerson.objects.get(name='Zathras')
+... except Person.DoesNotExist:
+...     pass
+>>> sp1 = StatusPerson.objects.create(name='Bazza Jr.')
+>>> sp2 = StatusPerson.objects.create(name='Foo Jr.')
+>>> try:
+...     StatusPerson.objects.get(id__lt=10)
+... except Person.MultipleObjectsReturned:
+...     pass
+
 # And now for some things that shouldn't work...
 #
 # All base classes must be non-abstract
