@@ -183,11 +183,29 @@ class DeferredAttribute(object):
         Retrieves and caches the value from the datastore on the first lookup.
         Returns the cached value.
         """
+        from django.db.models.fields import FieldDoesNotExist
+
         assert instance is not None
         cls = self.model_ref()
         data = instance.__dict__
         if data.get(self.field_name, self) is self:
-            data[self.field_name] = cls._base_manager.filter(pk=instance.pk).values_list(self.field_name, flat=True).using(instance._state.db).get()
+            # self.field_name is the attname of the field, but only() takes the
+            # actual name, so we need to translate it here.
+            try:
+                cls._meta.get_field_by_name(self.field_name)
+                name = self.field_name
+            except FieldDoesNotExist:
+                name = [f.name for f in cls._meta.fields
+                    if f.attname == self.field_name][0]
+            # We use only() instead of values() here because we want the
+            # various data coersion methods (to_python(), etc.) to be called
+            # here.
+            val = getattr(
+                cls._base_manager.filter(pk=instance.pk).only(name).using(
+                    instance._state.db).get(),
+                self.field_name
+            )
+            data[self.field_name] = val
         return data[self.field_name]
 
     def __set__(self, instance, value):
