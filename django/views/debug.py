@@ -1,14 +1,16 @@
+import datetime
 import os
 import re
 import sys
-import datetime
 
 from django.conf import settings
-from django.template import Template, Context, TemplateDoesNotExist
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
+from django.template import (Template, Context, TemplateDoesNotExist,
+    TemplateSyntaxError)
 from django.utils.html import escape
 from django.utils.importlib import import_module
-from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
 from django.utils.encoding import smart_unicode, smart_str
+
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
 
@@ -100,7 +102,8 @@ class ExceptionReporter:
                     'loader': loader_name,
                     'templates': template_list,
                 })
-        if settings.TEMPLATE_DEBUG and hasattr(self.exc_value, 'source'):
+        if (settings.TEMPLATE_DEBUG and hasattr(self.exc_value, 'source') and
+            isinstance(self.exc_value, TemplateSyntaxError)):
             self.get_template_exception_info()
 
         frames = self.get_traceback_frames()
