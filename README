@@ -11,8 +11,7 @@ how we recommend you read the docs:
       docs/intro/tutorial02.txt, etc.).
 
     * If you want to set up an actual deployment server, read
-      docs/howto/deployment/modpython.txt for instructions on running Django
-      under mod_python.
+      docs/howto/deployment/index.txt for instructions.
 
     * You'll probably want to read through the topical guides (in docs/topics)
       next; from there you can jump to the HOWTOs (in docs/howto) for specific
