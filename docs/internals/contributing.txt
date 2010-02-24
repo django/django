@@ -900,7 +900,7 @@ for generic relations and internationalization, type:
 
 .. code-block:: bash
 
-    PYTHONPATH=..
+    PYTHONPATH=`pwd`/..
     ./runtests.py --settings=settings generic_relations i18n
 
 Contrib apps
