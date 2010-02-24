@@ -15,6 +15,11 @@ class Person(models.Model):
     def __unicode__(self):
         return u'%s %s' % (self.first_name, self.last_name)
 
+class SchoolClass(models.Model):
+    year = models.PositiveIntegerField()
+    day = models.CharField(max_length=9, blank=True)
+    last_updated = models.DateTimeField()
+
 qn = connection.ops.quote_name
 
 __test__ = {'API_TESTS': """
