@@ -9,10 +9,8 @@
 """
 import re
 from decimal import Decimal
-from django.db import connection
 from django.contrib.gis.db.backend.util import SpatialFunction
 from django.contrib.gis.measure import Distance
-qn = connection.ops.quote_name
 
 # The GML, distance, transform, and union procedures.
 AREA = 'SDO_GEOM.SDO_AREA'
@@ -110,7 +108,7 @@ ORACLE_SPATIAL_TERMS += MISC_TERMS
 ORACLE_SPATIAL_TERMS = dict((term, None) for term in ORACLE_SPATIAL_TERMS) # Making dictionary for fast lookups
 
 #### The `get_geo_where_clause` function for Oracle ####
-def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
+def get_geo_where_clause(table_alias, name, lookup_type, geo_annot, qn):
     "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
     # Getting the quoted table name as `geo_col`.
     geo_col = '%s.%s' % (qn(table_alias), qn(name))

@@ -5,12 +5,9 @@
 
 import re
 from decimal import Decimal
-from django.db import connection
 from django.conf import settings
 from django.contrib.gis.measure import Distance
 from django.contrib.gis.db.backend.util import SpatialOperation, SpatialFunction
-
-qn = connection.ops.quote_name
 
 # Get the PostGIS version information.
 # To avoid the need to do a database query to determine the PostGIS version
@@ -250,7 +247,7 @@ def num_params(lookup_type, val):
     else: return exactly_two(val)
 
 #### The `get_geo_where_clause` function for PostGIS. ####
-def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
+def get_geo_where_clause(table_alias, name, lookup_type, geo_annot, qn):
     "Returns the SQL WHERE clause for use in PostGIS SQL construction."
     # Getting the quoted field as `geo_col`.
     geo_col = '%s.%s' % (qn(table_alias), qn(name))

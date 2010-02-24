@@ -87,7 +87,7 @@ class GeoWhereNode(WhereNode):
                 # will be populated in the GeoFieldSQL object returned by the
                 # GeometryField.
                 alias, col, db_type = obj
-                gwc = get_geo_where_clause(alias, col, lookup_type, value_annot)
+                gwc = get_geo_where_clause(alias, col, lookup_type, value_annot, qn)
                 return gwc % value_annot.where, params
             else:
                 raise TypeError('Invalid lookup type: %r' % lookup_type)

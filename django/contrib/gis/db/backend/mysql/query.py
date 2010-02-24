@@ -7,9 +7,6 @@
  indices may only be used on MyISAM tables -- if you need 
  transactions, take a look at PostGIS.
 """
-from django.db import connection
-qn = connection.ops.quote_name
-
 # To ease implementation, WKT is passed to/from MySQL.
 GEOM_FROM_TEXT = 'GeomFromText'
 GEOM_FROM_WKB = 'GeomFromWKB'
@@ -40,7 +37,7 @@ MYSQL_GIS_TERMS  = MYSQL_GIS_FUNCTIONS.keys()
 MYSQL_GIS_TERMS += MISC_TERMS
 MYSQL_GIS_TERMS = dict((term, None) for term in MYSQL_GIS_TERMS) # Making dictionary 
 
-def get_geo_where_clause(table_alias, name, lookup_type, geo_annot):
+def get_geo_where_clause(table_alias, name, lookup_type, geo_annot, qn):
     "Returns the SQL WHERE clause for use in MySQL spatial SQL construction."
     # Getting the quoted field as `geo_col`.
     geo_col = '%s.%s' % (qn(table_alias), qn(name))
