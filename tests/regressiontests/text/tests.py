@@ -27,6 +27,8 @@ friends'
 [u'url', u'search_page', u'words=hello']
 >>> list(smart_split(u'url search_page words="something else'))
 [u'url', u'search_page', u'words="something', u'else']
+>>> list(smart_split("cut:','|cut:' '"))
+[u"cut:','|cut:' '"]
 
 ### urlquote #############################################################
 >>> from django.utils.http import urlquote, urlquote_plus
