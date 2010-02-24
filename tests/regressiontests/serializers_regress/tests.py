@@ -8,7 +8,8 @@ forward, backwards and self references.
 """
 
 
-import unittest, datetime
+import datetime
+import unittest
 from cStringIO import StringIO
 
 from django.utils.functional import curry
@@ -321,6 +322,8 @@ The end."""),
     (inherited_obj, 900, InheritAbstractModel, {'child_data':37,'parent_data':42}),
     (inherited_obj, 910, ExplicitInheritBaseModel, {'child_data':37,'parent_data':42}),
     (inherited_obj, 920, InheritBaseModel, {'child_data':37,'parent_data':42}),
+    (data_obj, 1004, LengthModel, 0),
+    (data_obj, 1005, LengthModel, 1),
 ]
 
 # Because Oracle treats the empty string as NULL, Oracle is expected to fail
