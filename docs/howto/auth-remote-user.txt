@@ -4,6 +4,8 @@
 Authentication using ``REMOTE_USER``
 ====================================
 
+.. currentmodule:: django.contrib.backends
+
 This document describes how to make use of external authentication sources
 (where the Web server sets the ``REMOTE_USER`` environment variable) in your
 Django applications.  This type of authentication solution is typically seen on

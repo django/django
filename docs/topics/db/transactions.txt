@@ -4,6 +4,8 @@
 Managing database transactions
 ==============================
 
+.. currentmodule:: django.db
+
 Django gives you a few ways to control how database transactions are managed,
 if you're using a database that supports transactions.
 
