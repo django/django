@@ -106,6 +106,14 @@ the query construction and is not part of the public API. However, it is safe
 (and fully supported) to pickle and unpickle the attribute's contents as
 described here.
 
+.. admonition:: You can't share pickles between versions
+
+	Pickles of QuerySets are only valid for the version of Django that
+	was used to generate them. If you generate a pickle using Django
+	version N, there is no guarantee that pickle will be readable with
+	Django version N+1. Pickles should not be used as part of a long-term
+	archival strategy.
+
 .. _pickle: http://docs.python.org/library/pickle.html
 
 .. _queryset-api:
