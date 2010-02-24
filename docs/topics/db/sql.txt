@@ -25,8 +25,10 @@ return model instances:
 
 .. method:: Manager.raw(raw_query, params=None, translations=None)
 
-This method method takes a raw SQL query, executes it, and returns model
-instances.
+This method method takes a raw SQL query, executes it, and returns a
+:class:`~django.db.models.query.RawQuerySet` instance. This
+:class:`~django.db.models.query.RawQuerySet` instance can be iterated
+over just like an normal QuerySet to provide object instances.
 
 This is best illustrated with an example. Suppose you've got the following model::
 
@@ -37,8 +39,10 @@ This is best illustrated with an example. Suppose you've got the following model
 
 You could then execute custom SQL like so::
 
-    >>> Person.objects.raw('SELECT * from myapp_person')
-    [<Person: John Doe>, <Person: Jane Doe>, ...]
+    >>> for p in Person.objects.raw('SELECT * FROM myapp_person'):
+    ...     print p
+    John Smith
+    Jane Jones
 
 .. admonition:: Model table names
 
@@ -110,7 +114,7 @@ Deferring model fields
 
 Fields may also be left out::
 
-    >>> people = Person.objects.raw('SELECT id, first_name FROM myapp_person'):
+    >>> people = Person.objects.raw('SELECT id, first_name FROM myapp_person')
 
 The ``Person`` objects returned by this query will be :ref:`deferred
 <queryset-defer>` model instances. This means that the fields that are omitted
@@ -142,7 +146,7 @@ of people with their ages calculated by the database::
 
     >>> people = Person.objects.raw('SELECT *, age(birth_date) AS age FROM myapp_person')
     >>> for p in people:
-    ...   print "%s is %s." % (p.first_name, p.age)
+    ...     print "%s is %s." % (p.first_name, p.age)
     John is 37.
     Jane is 42.
     ...
