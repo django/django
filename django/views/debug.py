@@ -420,6 +420,10 @@ TECHNICAL_500_TEMPLATE = """
       <td>{{ request.build_absolute_uri|escape }}</td>
     </tr>
     <tr>
+      <th>Django Version:</th>
+      <td>{{ django_version_info }}</td>
+    </tr>
+    <tr>
       <th>Exception Type:</th>
       <td>{{ exception_type }}</td>
     </tr>
