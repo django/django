@@ -9,15 +9,15 @@ File Uploads
 .. versionadded:: 1.0
 
 When Django handles a file upload, the file data ends up placed in
-``request.FILES`` (for more on the ``request`` object see the documentation for
-:ref:`request and response objects <ref-request-response>`). This document
-explains how files are stored on disk and in memory, and how to customize the
-default behavior.
+:attr:`request.FILES <django.http.HttpRequest.FILES>` (for more on the
+``request`` object see the documentation for :ref:`request and response objects
+<ref-request-response>`). This document explains how files are stored on disk
+and in memory, and how to customize the default behavior.
 
 Basic file uploads
 ==================
 
-Consider a simple form containing a ``FileField``::
+Consider a simple form containing a :class:`~django.forms.FileField`::
 
     from django import forms
 
@@ -25,14 +25,17 @@ Consider a simple form containing a ``FileField``::
         title = forms.CharField(max_length=50)
         file  = forms.FileField()
 
-A view handling this form will receive the file data in ``request.FILES``, which
-is a dictionary containing a key for each ``FileField`` (or ``ImageField``, or
-other ``FileField`` subclass) in the form. So the data from the above form would
+A view handling this form will receive the file data in
+:attr:`request.FILES <django.http.HttpRequest.FILES>`, which is a dictionary
+containing a key for each :class:`~django.forms.FileField` (or
+:class:`~django.forms.ImageField`, or other :class:`~django.forms.FileField`
+subclass) in the form. So the data from the above form would
 be accessible as ``request.FILES['file']``.
 
-Note that ``request.FILES`` will only contain data if the request method was
-``POST`` and the ``<form>`` that posted the request has the attribute
-``enctype="multipart/form-data"``. Otherwise, ``request.FILES`` will be empty.
+Note that :attr:`request.FILES <django.http.HttpRequest.FILES>` will only
+contain data if the request method was ``POST`` and the ``<form>`` that posted
+the request has the attribute ``enctype="multipart/form-data"``. Otherwise,
+``request.FILES`` will be empty.
 
 Most of the time, you'll simply pass the file data from ``request`` into the
 form as described in :ref:`binding-uploaded-files`. This would look
@@ -54,16 +57,16 @@ something like::
             form = UploadFileForm()
         return render_to_response('upload.html', {'form': form})
 
-Notice that we have to pass ``request.FILES`` into the form's constructor; this
-is how file data gets bound into a form.
+Notice that we have to pass :attr:`request.FILES <django.http.HttpRequest.FILES>`
+into the form's constructor; this is how file data gets bound into a form.
 
 Handling uploaded files
 -----------------------
 
 The final piece of the puzzle is handling the actual file data from
-``request.FILES``. Each entry in this dictionary is an ``UploadedFile`` object
--- a simple wrapper around an uploaded file. You'll usually use one of these
-methods to access the uploaded content:
+:attr:`request.FILES <django.http.HttpRequest.FILES>`. Each entry in this
+dictionary is an ``UploadedFile`` object -- a simple wrapper around an uploaded
+file. You'll usually use one of these methods to access the uploaded content:
 
     ``UploadedFile.read()``
         Read the entire uploaded data from the file. Be careful with this
