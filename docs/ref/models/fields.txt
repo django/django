@@ -342,18 +342,11 @@ A true/false field.
 
 The admin represents this as a checkbox.
 
-.. admonition:: MySQL users..
+.. versionchanged:: 1.2
 
-    A boolean field in MySQL is stored as a ``TINYINT`` column with a value of
-    either 0 or 1 (most databases have a proper ``BOOLEAN`` type instead). So,
-    for MySQL, only, when a ``BooleanField`` is retrieved from the database
-    and stored on a model attribute, it will have the values 1 or 0, rather
-    than ``True`` or ``False``. Normally, this shouldn't be a problem, since
-    Python guarantees that ``1 == True`` and ``0 == False`` are both true.
-    Just be careful if you're writing something like ``obj is True`` when
-    ``obj`` is a value from a boolean attribute on a model. If that model was
-    constructed using the ``mysql`` backend, the "``is``" test will fail.
-    Prefer an equality test (using "``==``") in cases like this.
+    In previous versions of Django when running under MySQL ``BooleanFields``
+    would return their data as ``ints``, instead of true ``bools``.  See the
+    release notes for a complete description of the change.
 
 ``CharField``
 -------------

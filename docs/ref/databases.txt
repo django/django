@@ -326,12 +326,11 @@ Notes on specific fields
 Boolean fields
 ~~~~~~~~~~~~~~
 
-Since MySQL doesn't have a direct ``BOOLEAN`` column type, Django uses a
-``TINYINT`` column with values of ``1`` and ``0`` to store values for the
-:class:`~django.db.models.BooleanField` model field. Refer to the documentation
-of that field for more details, but usually this won't be something that will
-matter unless you're printing out the field values and are expecting to see
-``True`` and ``False.``.
+.. versionchanged:: 1.2
+
+In previous versions of Django when running under MySQL ``BooleanFields`` would
+return their data as ``ints``, instead of true ``bools``.  See the release
+notes for a complete description of the change.
 
 Character fields
 ~~~~~~~~~~~~~~~~

@@ -302,6 +302,16 @@ created using ``decorator_from_middleware``.
 
 .. _deprecated-features-1.2:
 
+``BooleanField`` on MySQL
+--------------------------
+
+In previous versions of Django ``BoleanFields`` under MySQL would return their
+values as either ``1`` or ``0``, instead of ``True`` or ``False``.  For most
+people this shouldn't have been a problem because ``bool`` is a subclass of
+``int``, however in Django 1.2 MySQL correctly returns a real ``bool``.  The
+only time this should ever be an issue is if you were expecting printing the
+``repr`` of a ``BooleanField`` to print ``1`` or ``0``.
+
 Features deprecated in 1.2
 ==========================
 
