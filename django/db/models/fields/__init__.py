@@ -404,7 +404,7 @@ class Field(object):
         return first_choice + list(self.flatchoices)
 
     def _get_val_from_obj(self, obj):
-        if obj:
+        if obj is not None:
             return getattr(obj, self.attname)
         else:
             return self.get_default()

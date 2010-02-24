@@ -258,3 +258,9 @@ class InheritBaseModel(BaseModel):
 class ExplicitInheritBaseModel(BaseModel):
     parent = models.OneToOneField(BaseModel)
     child_data = models.IntegerField()
+
+class LengthModel(models.Model):
+    data = models.IntegerField()
+
+    def __len__(self):
+        return self.data

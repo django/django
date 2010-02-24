@@ -8,7 +8,9 @@ forward, backwards and self references.
 """
 
 
-import unittest, datetime
+import datetime
+import decimal
+import unittest
 from cStringIO import StringIO
 
 from django.utils.functional import curry
@@ -18,10 +20,6 @@ from django.core import management
 from django.conf import settings
 
 from models import *
-try:
-    import decimal
-except ImportError:
-    from django.utils import _decimal as decimal
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.
@@ -326,6 +324,8 @@ The end."""),
     (data_obj, 1001, BigIntegerData, -9223372036854775808),
     (data_obj, 1002, BigIntegerData, 0),
     (data_obj, 1003, BigIntegerData, None),
+    (data_obj, 1004, LengthModel, 0),
+    (data_obj, 1005, LengthModel, 1),
 ]
 
 # Because Oracle treats the empty string as NULL, Oracle is expected to fail
