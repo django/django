@@ -280,6 +280,8 @@ class BaseModelForm(BaseForm):
             # class. See #12901.
             elif self._meta.fields and field not in self._meta.fields:
                 exclude.append(f.name)
+            elif self._meta.exclude and field in self._meta.exclude:
+                exclude.append(f.name)
 
             # Exclude fields that failed form validation. There's no need for
             # the model fields to validate them as well.
