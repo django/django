@@ -362,6 +362,7 @@ ValidationError: [u'4 IS INVALID CHOICE']
 # Subclassing ErrorList #######################################################
 
 >>> from django.utils.safestring import mark_safe
+>>> from django.utils.encoding import force_unicode
 >>>
 >>> class TestForm(Form):
 ...      first_name = CharField()
@@ -377,7 +378,7 @@ ValidationError: [u'4 IS INVALID CHOICE']
 ...      def as_divs(self):
 ...          if not self: return u''
 ...          return mark_safe(u'<div class="error">%s</div>'
-...                    % ''.join([u'<p>%s</p>' % e for e in self]))
+...                    % ''.join([u'<p>%s</p>' % force_unicode(e) for e in self]))
 ...
 
 This form should print errors the default way.
