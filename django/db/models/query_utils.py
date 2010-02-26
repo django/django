@@ -47,7 +47,7 @@ class CollectedObjects(object):
         else:
             self.blocked = {}
 
-    def add(self, model, pk, obj, parent_model, nullable=False):
+    def add(self, model, pk, obj, parent_model, parent_obj=None, nullable=False):
         """
         Adds an item to the container.
 
@@ -57,6 +57,8 @@ class CollectedObjects(object):
         * obj - the object itself.
         * parent_model - the model of the parent object that this object was
           reached through.
+        * parent_obj - the parent object this object was reached
+          through (not used here, but needed in the API for use elsewhere)
         * nullable - should be True if this relation is nullable.
 
         Returns True if the item already existed in the structure and

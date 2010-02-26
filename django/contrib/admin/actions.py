@@ -36,15 +36,7 @@ def delete_selected(modeladmin, request, queryset):
 
     # Populate deletable_objects, a data structure of all related objects that
     # will also be deleted.
-
-    # deletable_objects must be a list if we want to use '|unordered_list' in the template
-    deletable_objects = []
-    perms_needed = set()
-    i = 0
-    for obj in queryset:
-        deletable_objects.append([mark_safe(u'%s: <a href="%s/">%s</a>' % (escape(force_unicode(capfirst(opts.verbose_name))), obj.pk, escape(obj))), []])
-        get_deleted_objects(deletable_objects[i], perms_needed, request.user, obj, opts, 1, modeladmin.admin_site, levels_to_root=2)
-        i=i+1
+    deletable_objects, perms_needed = get_deleted_objects(queryset, opts, request.user, modeladmin.admin_site, levels_to_root=2)
 
     # The user has already confirmed the deletion.
     # Do the deletion and return a None to display the change list view again.
@@ -66,7 +58,7 @@ def delete_selected(modeladmin, request, queryset):
     context = {
         "title": _("Are you sure?"),
         "object_name": force_unicode(opts.verbose_name),
-        "deletable_objects": deletable_objects,
+        "deletable_objects": [deletable_objects],
         'queryset': queryset,
         "perms_lacking": perms_needed,
         "opts": opts,
