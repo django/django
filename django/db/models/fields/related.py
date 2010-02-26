@@ -843,7 +843,7 @@ class ManyToManyField(RelatedField, Field):
                         self._m2m_column_name_cache = f.column
                         break
             # If this is an m2m relation to self, avoid the inevitable name clash
-            elif related.model == related.parent_model:
+            elif related.model._meta.object_name.lower() == related.parent_model._meta.object_name.lower():
                 self._m2m_column_name_cache = 'from_' + related.model._meta.object_name.lower() + '_id'
             else:
                 self._m2m_column_name_cache = related.model._meta.object_name.lower() + '_id'

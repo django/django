@@ -160,7 +160,7 @@ def get_validation_errors(outfile, app=None):
                             elif field.rel.to == cls:
                                 seen_this_fk = True
                     if not seen_related_fk or not seen_this_fk:
-                        e.add(opts, "'%s' has a manually-defined m2m relation through model %s, which does not have foreign keys to %s and %s" % (f.name, f.rel.through, f.rel.to._meta.object_name, cls._meta.object_name))
+                        e.add(opts, "'%s' is a manually-defined m2m relation through model %s, which does not have foreign keys to %s and %s" % (f.name, f.rel.through, f.rel.to._meta.object_name, cls._meta.object_name))
                 else:
                     e.add(opts, "'%s' specifies an m2m relation through model %s, which has not been installed" % (f.name, f.rel.through))
 
