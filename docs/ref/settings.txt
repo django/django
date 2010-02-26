@@ -1412,6 +1412,11 @@ of items to be merged into the context.
    default.  For more information, see the :ref:`messages documentation
    <ref-contrib-messages>`.
 
+.. versionchanged:: 1.2
+    The auth context processor was moved in this release from its old location
+    ``django.core.context_processors.auth`` to
+    ``django.contrib.auth.context_processors.auth``.
+
 .. setting:: TEMPLATE_DEBUG
 
 TEMPLATE_DEBUG

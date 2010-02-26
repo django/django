@@ -325,6 +325,11 @@ and return a dictionary of items to be merged into the context. By default,
    The ``'messages'`` context processor was added.  For more information, see
    the :ref:`messages documentation <ref-contrib-messages>`.
 
+.. versionchanged:: 1.2
+    The auth context processor was moved in this release from its old location
+    ``django.core.context_processors.auth`` to
+    ``django.contrib.auth.context_processors.auth``.
+
 Each processor is applied in order. That means, if one processor adds a
 variable to the context and a second processor adds a variable with the same
 name, the second will override the first. The default processors are explained
@@ -376,6 +381,10 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
     * ``perms`` -- An instance of
       ``django.core.context_processors.PermWrapper``, representing the
       permissions that the currently logged-in user has.
+
+.. versionchanged:: 1.2
+    This context processor was moved in this release from
+    ``django.core.context_processors.auth`` to its current location.
 
 .. versionchanged:: 1.2
    Prior to version 1.2, the ``messages`` variable was a lazy accessor for
