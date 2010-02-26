@@ -9,6 +9,11 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 
 from django.utils.datastructures import SortedDict
 
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
+
 def quote(s):
     """
     Ensure that primary key values do not confuse the admin URLs by escaping
