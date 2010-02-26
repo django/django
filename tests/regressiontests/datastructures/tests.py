@@ -42,7 +42,7 @@ MergeDict can merge MultiValueDicts
 True
 >>> sorted(mm.items(), key=lambda k: k[0])
 [('key1', 'value1'), ('key2', 'value3'), ('key4', 'value6')]
->>> [(k,mm.getlist(k)) for k in sorted(mm)]
+>>> [(k,mm.getlist(k)) for k in sorted(mm.keys())]
 [('key1', ['value1']), ('key2', ['value2', 'value3']), ('key4', ['value5', 'value6'])]
 
 ### MultiValueDict ##########################################################
@@ -106,7 +106,17 @@ True
 >>> d.pop('one', 'missing')
 'missing'
 
->>> SortedDict((i, i) for i in xrange(3))
+This SortedDict test tests that it works properly when called with a
+a generator expression. But having that syntax anywhere in the test
+when run under Python 2.3 will cause a SyntaxError. Thus the rigamorale
+with eval so that the test will run and test what it is intended to test
+when run on Pythons > 2.3, but not cause a SyntaxError when run on Python 2.3.
+>>> import sys
+>>> if sys.version_info[0] == 2 and sys.version_info[1] == 3:
+...     arg = '[(i, i) for i in xrange(3)]'
+... else:
+...     arg = '((i, i) for i in xrange(3))'
+>>> SortedDict(eval(arg))
 {0: 0, 1: 1, 2: 2}
 
 We don't know which item will be popped in popitem(), so we'll just check that
@@ -171,3 +181,9 @@ AttributeError: Object is immutable!
 'Normal: a. Modified: *a'
 
 """
+
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted  # For Python 2.3
+

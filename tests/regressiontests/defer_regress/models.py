@@ -6,6 +6,11 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models
 
+try:
+    sorted
+except NameError:
+    from django.utils.itercompat import sorted  # For Python 2.3
+
 class Item(models.Model):
     name = models.CharField(max_length=15)
     text = models.TextField(default="xyzzy")

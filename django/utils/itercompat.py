@@ -67,9 +67,15 @@ def is_iterable(x):
     else:
         return True
 
-def sorted(in_value):
+def sorted(in_value, key=None):
     "A naive implementation of sorted"
-    out_value = in_value[:]
+    if key:
+        out_value = [(key(item), index, item) for index, item in enumerate(in_value)]
+    else:
+        out_value = in_value[:]
     out_value.sort()
-    return out_value
+    if key:
+        return [item[2] for item in out_value]
+    else:
+        return out_value
 

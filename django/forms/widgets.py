@@ -2,6 +2,11 @@
 HTML Widget classes
 """
 
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
+
 import django.utils.copycompat as copy
 from itertools import chain
 from django.conf import settings

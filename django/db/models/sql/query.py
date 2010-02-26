@@ -18,8 +18,7 @@ from django.db.models.fields import FieldDoesNotExist
 from django.db.models.query_utils import select_related_descend
 from django.db.models.sql import aggregates as base_aggregates_module
 from django.db.models.sql.expressions import SQLEvaluator
-from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
-    ExtraWhere, AND, OR)
+from django.db.models.sql.where import WhereNode, Constraint, EverythingNode, ExtraWhere, AND, OR
 from django.core.exceptions import FieldError
 from datastructures import EmptyResultSet, Empty, MultiJoin
 from constants import *

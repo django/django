@@ -1,10 +1,14 @@
 import datetime
-import decimal
 import os
 import re
 import time
 
 import django.utils.copycompat as copy
+
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal    # for Python 2.3
 
 from django.db import connection
 from django.db.models import signals
@@ -437,7 +441,7 @@ class CharField(Field):
 
     def get_db_prep_value(self, value):
         return self.to_python(value)
-    
+
     def formfield(self, **kwargs):
         defaults = {'max_length': self.max_length}
         defaults.update(kwargs)

@@ -5,19 +5,19 @@ from forms import PlaceForm
 class USLocalflavorTests(TestCase):
     def setUp(self):
         self.form = PlaceForm({'state':'GA', 'state_req':'NC', 'name':'impossible'})
-        
+
     def test_get_display_methods(self):
         """Test that the get_*_display() methods are added to the model instances."""
         place = self.form.save()
         self.assertEqual(place.get_state_display(), 'Georgia')
         self.assertEqual(place.get_state_req_display(), 'North Carolina')
-    
+
     def test_required(self):
         """Test that required USStateFields throw appropriate errors."""
         form = PlaceForm({'state':'GA', 'name':'Place in GA'})
-        self.assertFalse(form.is_valid())
+        self.failIf(form.is_valid())
         self.assertEqual(form.errors['state_req'], [u'This field is required.'])
-    
+
     def test_field_blank_option(self):
         """Test that the empty option is there."""
         state_select_html = """\

@@ -63,12 +63,12 @@ class GenericRelationTests(TestCase):
         # search with a non-matching note and a matching org name
         qs = Contact.objects.filter(Q(notes__note__icontains=r'other note') |
                             Q(organizations__name__icontains=r'org name'))
-        self.assertTrue(org_contact in qs)
+        self.failUnless(org_contact in qs)
         # search again, with the same query parameters, in reverse order
         qs = Contact.objects.filter(
             Q(organizations__name__icontains=r'org name') |
             Q(notes__note__icontains=r'other note'))
-        self.assertTrue(org_contact in qs)
+        self.failUnless(org_contact in qs)
 
 
 

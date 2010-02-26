@@ -185,4 +185,4 @@ class NoInlineDeletionTest(TestCase):
         inline = MediaPermanentInline(EpisodePermanent, fake_site)
         fake_request = object()
         formset = inline.get_formset(fake_request)
-        self.assertFalse(formset.can_delete)
+        self.failIf(formset.can_delete)

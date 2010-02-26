@@ -7,7 +7,6 @@ import os
 import re
 import time
 import urlparse
-from decimal import Decimal, DecimalException
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -17,6 +16,16 @@ import django.core.exceptions
 import django.utils.copycompat as copy
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
+
+# Python 2.3 fallbacks
+try:
+    from decimal import Decimal, DecimalException
+except ImportError:
+    from django.utils._decimal import Decimal, DecimalException
+try:
+    set
+except NameError:
+    from sets import Set as set
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget
@@ -489,7 +498,7 @@ class ImageField(FileField):
             return None
         elif not data and initial:
             return initial
-            
+
         # Try to import PIL in either of the two ways it can end up installed.
         try:
             from PIL import Image

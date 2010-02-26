@@ -148,8 +148,8 @@ class AppCache(object):
         model_list = []
         for app in app_list:
             model_list.extend(
-                model for model in app.values()
-                if (not model._deferred or include_deferred)
+                [model for model in app.values()
+                if (not model._deferred or include_deferred)]
             )
         return model_list
 

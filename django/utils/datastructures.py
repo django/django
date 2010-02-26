@@ -2,6 +2,11 @@ from types import GeneratorType
 
 from django.utils.copycompat import deepcopy
 
+# Python 2.3 doesn't have set as a builtin
+try:
+    set
+except NameError:
+    from sets import Set as set
 
 class MergeDict(object):
     """
