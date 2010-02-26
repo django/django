@@ -203,7 +203,7 @@ end users) indicating the reason the request was rejected.  See
 DATABASES
 ---------
 
-.. versionadded: 1.2
+.. versionadded:: 1.2
 
 Default: ``{}`` (Empty dictionary)
 
@@ -393,7 +393,7 @@ See :ref:`topics-testing`.
 DATABASE_ROUTERS
 ----------------
 
-.. versionadded: 1.2
+.. versionadded:: 1.2
 
 Default: ``[]`` (Empty list)
 
@@ -410,9 +410,13 @@ DATE_FORMAT
 
 Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 
-The default formatting to use for date fields in any part of the system.
-Note that if ``USE_L10N`` is set to ``True``, then locale format will
-be applied. See :ttag:`allowed date format strings <now>`.
+The default formatting to use for displaying date fields in any part of the
+system.  Note that if setting:`USE_L10N` is set to ``True``, then the
+locale-dictated format has higher precedence and will be applied instead. See
+:ttag:`allowed date format strings <now>`.
+
+.. versionchanged:: 1.2
+    This setting can now be overriden by setting ``USE_L10N`` to ``True``.
 
 See also ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATE_FORMAT``.
 
@@ -420,6 +424,8 @@ See also ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATE_FORMAT``.
 
 DATE_INPUT_FORMATS
 ------------------
+
+.. versionadded:: 1.2
 
 Default::
 
@@ -444,9 +450,13 @@ DATETIME_FORMAT
 
 Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 
-The default formatting to use for datetime fields in any part of the system.
-Note that if ``USE_L10N`` is set to ``True``, then locale format will
-be applied. See :ttag:`allowed date format strings <now>`.
+The default formatting to use for displaying datetime fields in any part of the
+system.  Note that if setting:`USE_L10N` is set to ``True``, then the
+locale-dictated format has higher precedence and will be applied instead. See
+:ttag:`allowed date format strings <now>`.
+
+.. versionchanged:: 1.2
+    This setting can now be overriden by setting ``USE_L10N`` to ``True``.
 
 See also ``DATE_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
 
@@ -454,6 +464,8 @@ See also ``DATE_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
 
 DATETIME_INPUT_FORMATS
 ----------------------
+
+.. versionadded:: 1.2
 
 Default::
 
@@ -513,6 +525,8 @@ site.
 
 DECIMAL_SEPARATOR
 -----------------
+
+.. versionadded:: 1.2
 
 Default: ``'.'`` (Dot)
 
@@ -771,6 +785,8 @@ system's standard umask.
 FIRST_DAY_OF_WEEK
 -----------------
 
+.. versionadded:: 1.2
+
 Default: ``0`` (Sunday)
 
 Number representing the first day of the week. This is especially useful
@@ -806,6 +822,8 @@ of the preferred value or not supplied at all.
 
 FORMAT_MODULE_PATH
 ------------------
+
+.. versionadded:: 1.2
 
 Default: ``None``
 
@@ -1106,6 +1124,8 @@ See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
 NUMBER_GROUPING
 ----------------
 
+.. versionadded:: 1.2
+
 Default: ``0``
 
 Number of digits grouped together on the integer part of a number. Common use
@@ -1328,11 +1348,14 @@ Whether to save the session data on every request. See
 SHORT_DATE_FORMAT
 -----------------
 
+.. versionadded:: 1.2
+
 Default: ``m/d/Y`` (e.g. ``12/31/2003``)
 
-An available formatting that can be used for date fields on templates.
-Note that if ``USE_L10N`` is set to ``True``, then locale format will
-be applied. See :ttag:`allowed date format strings <now>`.
+An available formatting that can be used for displaying date fields on
+templates.  Note that if ``USE_L10N`` is set to ``True``, then the corresponding
+locale-dictated format has higher precedence and will be applied. See
+:ttag:`allowed date format strings <now>`.
 
 See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
 
@@ -1341,11 +1364,14 @@ See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
 SHORT_DATETIME_FORMAT
 ---------------------
 
+.. versionadded:: 1.2
+
 Default: ``m/d/Y P`` (e.g. ``12/31/2003 4 p.m.``)
 
-An available formatting that can be used for datetime fields on templates.
-Note that if ``USE_L10N`` is set to ``True``, then locale format will
-be applied. See :ttag:`allowed date format strings <now>`.
+An available formatting that can be used for displaying datetime fields on
+templates.  Note that if ``USE_L10N`` is set to ``True``, then the corresponding
+locale-dictated format has higher precedence and will be applied. See
+:ttag:`allowed date format strings <now>`.
 
 See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
 
@@ -1461,6 +1487,8 @@ The name of the class to use for starting the test suite. See
 THOUSAND_SEPARATOR
 ------------------
 
+.. versionadded:: 1.2
+
 Default ``,`` (Comma)
 
 Default thousand separator used when formatting numbers. This setting is
@@ -1475,9 +1503,13 @@ TIME_FORMAT
 
 Default: ``'P'`` (e.g. ``4 p.m.``)
 
-The default formatting to use for time fields in any part of the system.
-Note that if ``USE_L10N`` is set to ``True``, then locale format will
-be applied. See :ttag:`allowed date format strings <now>`.
+The default formatting to use for displaying time fields in any part of the
+system.  Note that if setting:`USE_L10N` is set to ``True``, then the
+locale-dictated format has higher precedence and will be applied instead. See
+:ttag:`allowed date format strings <now>`.
+
+.. versionchanged:: 1.2
+    This setting can now be overriden by setting ``USE_L10N`` to ``True``.
 
 See also ``DATE_FORMAT`` and ``DATETIME_FORMAT``.
 
@@ -1485,6 +1517,8 @@ See also ``DATE_FORMAT`` and ``DATETIME_FORMAT``.
 
 TIME_INPUT_FORMATS
 ------------------
+
+.. versionadded:: 1.2
 
 Default: ``('%H:%M:%S', '%H:%M')``
 
@@ -1570,6 +1604,8 @@ is installed (see :ref:`topics-http-middleware`).
 USE_L10N
 --------
 
+.. versionadded:: 1.2
+
 Default ``False``
 
 A boolean that specifies if data will be localized by default or not. If this
@@ -1596,6 +1632,8 @@ See also ``USE_L10N``
 
 USE_THOUSAND_SEPARATOR
 ----------------------
+
+.. versionadded:: 1.2
 
 Default ``False``
 

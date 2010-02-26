@@ -247,6 +247,8 @@ translation utilities with a ``gettext`` package if the command ``xgettext
 Format localization
 ===================
 
+.. versionadded:: 1.2
+
 Django's formatting system is disabled by default. To enable it, it's necessary
 to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
 

@@ -1010,7 +1010,7 @@ For example::
 
 If ``value`` is ``4``, then the output will be ``6``.
 
-.. versionchanged:: 1.2 
+.. versionchanged:: 1.2
    The following behavior didn't exist in previous Django versions.
 
 This filter will first try to coerce both values to integers. If this fails,
@@ -1026,7 +1026,7 @@ and ``first`` is ``[1, 2, 3]`` and ``second`` is ``[4, 5, 6]``, then the
 output will be ``[1, 2, 3, 4, 5, 6]``.
 
 .. warning::
-    
+
     Keep in mind that strings that can both be coerced to integers will be,
     and thus will be will be *summed*, not concatenated, as in the first
     example above.
@@ -1103,12 +1103,25 @@ If ``value`` is a ``datetime`` object (e.g., the result of
 ``datetime.datetime.now()``), the output will be the string
 ``'Wed 09 Jan 2008'``.
 
+Another example:
+
+Assuming that :setting:`USE_L10N` is ``True`` and :setting:`LANGUAGE_CODE` is,
+for example, ``"es"``, then for::
+
+    {{ value|date:"SHORT_DATE_FORMAT" }}
+
+the output will be the string ``"09/01/2008"`` (The ``"SHORT_DATE_FORMAT"``
+format specifier for the ``es`` locale as shipped with Django is ``"d/m/Y"``).
+
 When used without a format string::
 
     {{ value|date }}
 
 ...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
 used, without applying any localization.
+
+.. versionchanged:: 1.2
+    Predefined formats can now be influenced by the current locale.
 
 .. templatefilter:: default
 
@@ -1730,12 +1743,25 @@ For example::
 If ``value`` is equivalent to ``datetime.datetime.now()``, the output will be
 the string ``"01:23"``.
 
+Another example:
+
+Assuming that :setting:`USE_L10N` is ``True`` and :setting:`LANGUAGE_CODE` is,
+for example, ``"de"``, then for::
+
+    {{ value|time:"TIME_FORMAT" }}
+
+the output will be the string ``"01:23:00"`` (The ``"TIME_FORMAT"`` format
+specifier for the ``de`` locale as shipped with Django is ``"H:i:s"``).
+
 When used without a format string::
 
     {{ value|time }}
 
 ...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
-used, without aplying any localization.
+used, without applying any localization.
+
+.. versionchanged:: 1.2
+    Predefined formats can now be influenced by the current locale.
 
 .. templatefilter:: timesince
 
