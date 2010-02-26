@@ -1,5 +1,10 @@
 # coding: utf-8
+import os
 import misc
+
+from django.conf import settings
+from django.test import TestCase, client
+from django.utils.translation import ugettext, activate, deactivate
 
 regressions = ur"""
 Format string interpolation should work with *_lazy objects.
@@ -85,3 +90,80 @@ __test__ = {
     'regressions': regressions,
     'misc': misc.tests,
 }
+
+class ResolutionOrderI18NTests(TestCase):
+
+    def setUp(self):
+        from django.utils.translation import trans_real
+        # Okay, this is brutal, but we have no other choice to fully reset
+        # the translation framework
+        trans_real._active = {}
+        trans_real._translations = {}
+        activate('de')
+
+    def tearDown(self):
+        deactivate()
+
+    def assertUgettext(self, msgid, msgstr):
+        result = ugettext(msgid)
+        self.assert_(msgstr in result, ("The string '%s' isn't in the "
+            "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
+
+class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
+
+    def setUp(self):
+        self.old_installed_apps = settings.INSTALLED_APPS
+        settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ['regressiontests.i18n.resolution']
+        super(AppResolutionOrderI18NTests, self).setUp()
+
+    def tearDown(self):
+        settings.INSTALLED_APPS = self.old_installed_apps
+        super(AppResolutionOrderI18NTests, self).tearDown()
+
+    def test_app_translation(self):
+        self.assertUgettext('Date/time', 'APP')
+
+class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
+
+    def setUp(self):
+        self.old_locale_paths = settings.LOCALE_PATHS
+        settings.LOCALE_PATHS += (os.path.join(os.path.dirname(os.path.abspath(__file__)), 'other', 'locale'),)
+        super(LocalePathsResolutionOrderI18NTests, self).setUp()
+
+    def tearDown(self):
+        settings.LOCALE_PATHS = self.old_locale_paths
+        super(LocalePathsResolutionOrderI18NTests, self).tearDown()
+
+    def test_locale_paths_translation(self):
+        self.assertUgettext('Date/time', 'LOCALE_PATHS')
+
+class ProjectResolutionOrderI18NTests(ResolutionOrderI18NTests):
+
+    def setUp(self):
+        self.old_settings_module = settings.SETTINGS_MODULE
+        settings.SETTINGS_MODULE = 'regressiontests'
+        super(ProjectResolutionOrderI18NTests, self).setUp()
+
+    def tearDown(self):
+        settings.SETTINGS_MODULE = self.old_settings_module
+        super(ProjectResolutionOrderI18NTests, self).tearDown()
+
+    def test_project_translation(self):
+        self.assertUgettext('Date/time', 'PROJECT')
+
+    def test_project_override_app_translation(self):
+        old_installed_apps = settings.INSTALLED_APPS
+        settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ['regressiontests.i18n.resolution']
+        self.assertUgettext('Date/time', 'PROJECT')
+        settings.INSTALLED_APPS = old_installed_apps
+
+    def test_project_override_locale_paths_translation(self):
+        old_locale_paths = settings.LOCALE_PATHS
+        settings.LOCALE_PATHS += (os.path.join(os.path.dirname(os.path.abspath(__file__)), 'other', 'locale'),)
+        self.assertUgettext('Date/time', 'PROJECT')
+        settings.LOCALE_PATHS = old_locale_paths
+
+class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
+
+    def test_django_fallback(self):
+        self.assertUgettext('Date/time', 'Datum/Zeit')
