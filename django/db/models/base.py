@@ -549,7 +549,8 @@ class Model(object):
              (model_class, {pk_val: obj, pk_val: obj, ...}), ...]
         """
         pk_val = self._get_pk_val()
-        if seen_objs.add(self.__class__, pk_val, self, parent, nullable):
+        if seen_objs.add(self.__class__, pk_val, self,
+                         type(parent), parent, nullable):
             return
 
         for related in self._meta.get_all_related_objects():
@@ -560,7 +561,7 @@ class Model(object):
                 except ObjectDoesNotExist:
                     pass
                 else:
-                    sub_obj._collect_sub_objects(seen_objs, self.__class__, related.field.null)
+                    sub_obj._collect_sub_objects(seen_objs, self, related.field.null)
             else:
                 # To make sure we can access all elements, we can't use the
                 # normal manager on the related object. So we work directly
@@ -578,7 +579,7 @@ class Model(object):
                         continue
                 delete_qs = rel_descriptor.delete_manager(self).all()
                 for sub_obj in delete_qs:
-                    sub_obj._collect_sub_objects(seen_objs, self.__class__, related.field.null)
+                    sub_obj._collect_sub_objects(seen_objs, self, related.field.null)
 
         # Handle any ancestors (for the model-inheritance case). We do this by
         # traversing to the most remote parent classes -- those with no parents

@@ -10,7 +10,8 @@ from django.core.mail import EmailMessage
 from django.db import models
 from django import forms
 from django.forms.models import BaseModelFormSet
-
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 
 class Section(models.Model):
     """
@@ -494,6 +495,71 @@ class GadgetAdmin(admin.ModelAdmin):
     def get_changelist(self, request, **kwargs):
         return CustomChangeList
 
+class Villain(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+class SuperVillain(Villain):
+    pass
+
+class FunkyTag(models.Model):
+    "Because we all know there's only one real use case for GFKs."
+    name = models.CharField(max_length=25)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    def __unicode__(self):
+        return self.name
+
+class Plot(models.Model):
+    name = models.CharField(max_length=100)
+    team_leader = models.ForeignKey(Villain, related_name='lead_plots')
+    contact = models.ForeignKey(Villain, related_name='contact_plots')
+    tags = generic.GenericRelation(FunkyTag)
+
+    def __unicode__(self):
+        return self.name
+
+class PlotDetails(models.Model):
+    details = models.CharField(max_length=100)
+    plot = models.OneToOneField(Plot)
+
+    def __unicode__(self):
+        return self.details
+
+class SecretHideout(models.Model):
+    """ Secret! Not registered with the admin! """
+    location = models.CharField(max_length=100)
+    villain = models.ForeignKey(Villain)
+
+    def __unicode__(self):
+        return self.location
+
+class SuperSecretHideout(models.Model):
+    """ Secret! Not registered with the admin! """
+    location = models.CharField(max_length=100)
+    supervillain = models.ForeignKey(SuperVillain)
+
+    def __unicode__(self):
+        return self.location
+
+class CyclicOne(models.Model):
+    name = models.CharField(max_length=25)
+    two = models.ForeignKey('CyclicTwo')
+
+    def __unicode__(self):
+        return self.name
+
+class CyclicTwo(models.Model):
+    name = models.CharField(max_length=25)
+    one = models.ForeignKey(CyclicOne)
+
+    def __unicode__(self):
+        return self.name
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -519,6 +585,12 @@ admin.site.register(Collector, CollectorAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Gadget, GadgetAdmin)
+admin.site.register(Villain)
+admin.site.register(SuperVillain)
+admin.site.register(Plot)
+admin.site.register(PlotDetails)
+admin.site.register(CyclicOne)
+admin.site.register(CyclicTwo)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
