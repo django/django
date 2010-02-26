@@ -1145,7 +1145,7 @@ TIME_ZONE
 
 Default: ``'America/Chicago'``
 
-.. versionchanged:: 1.2
+.. versionchanged:: 1.1.2
    ``None`` was added as an allowed value.
 
 A string representing the time zone for this installation, or
