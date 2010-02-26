@@ -119,7 +119,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         set_tz = False
         settings_dict = self.settings_dict
         if self.connection is None:
-            set_tz = True
+            set_tz = settings_dict.get('TIME_ZONE')
             if settings_dict['NAME'] == '':
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured("You need to specify NAME in your Django settings file.")

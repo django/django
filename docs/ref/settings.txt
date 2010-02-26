@@ -1505,28 +1505,42 @@ TIME_ZONE
 
 Default: ``'America/Chicago'``
 
-A string representing the time zone for this installation. `See available choices`_.
-(Note that list of available choices lists more than one on the same line;
-you'll want to use just one of the choices for a given time zone. For instance,
-one line says ``'Europe/London GB GB-Eire'``, but you should use the first bit
-of that -- ``'Europe/London'`` -- as your ``TIME_ZONE`` setting.)
+.. versionchanged:: 1.2
+   ``None`` was added as an allowed value.
 
-Note that this is the time zone to which Django will convert all dates/times --
-not necessarily the timezone of the server. For example, one server may serve
-multiple Django-powered sites, each with a separate time-zone setting.
+A string representing the time zone for this installation, or
+``None``. `See available choices`_. (Note that list of available
+choices lists more than one on the same line; you'll want to use just
+one of the choices for a given time zone. For instance, one line says
+``'Europe/London GB GB-Eire'``, but you should use the first bit of
+that -- ``'Europe/London'`` -- as your ``TIME_ZONE`` setting.)
 
-Normally, Django sets the ``os.environ['TZ']`` variable to the time zone you
-specify in the ``TIME_ZONE`` setting. Thus, all your views and models will
-automatically operate in the correct time zone. However, if you're manually
-:ref:`manually configuring settings
-<settings-without-django-settings-module>`, Django will *not* touch the ``TZ``
-environment variable, and it'll be up to you to ensure your processes are
-running in the correct environment.
+Note that this is the time zone to which Django will convert all
+dates/times -- not necessarily the timezone of the server. For
+example, one server may serve multiple Django-powered sites, each with
+a separate time-zone setting.
+
+Normally, Django sets the ``os.environ['TZ']`` variable to the time
+zone you specify in the ``TIME_ZONE`` setting. Thus, all your views
+and models will automatically operate in the correct time zone.
+However, Django won't set the ``TZ`` environment variable under the
+following conditions:
+
+ * If you're using the manual configuration option as described in
+   :ref:`manually configuring settings
+   <settings-without-django-settings-module>`, or
+
+ * If you specify ``TIME_ZONE = None``. This will cause Django to fall
+   back to using the system timezone.
+
+If Django doesn't set the ``TZ`` environment variable, it's up to you
+to ensure your processes are running in the correct environment.
 
 .. note::
-    Django cannot reliably use alternate time zones in a Windows environment.
-    If you're running Django on Windows, this variable must be set to match the
-    system timezone.
+    Django cannot reliably use alternate time zones in a Windows
+    environment. If you're running Django on Windows, this variable
+    must be set to match the system timezone.
+
 
 .. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 
