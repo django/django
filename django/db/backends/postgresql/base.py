@@ -116,9 +116,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.validation = BaseDatabaseValidation(self)
 
     def _cursor(self):
+        new_connection = False
         set_tz = False
         settings_dict = self.settings_dict
         if self.connection is None:
+            new_connection = True
             set_tz = settings_dict.get('TIME_ZONE')
             if settings_dict['NAME'] == '':
                 from django.core.exceptions import ImproperlyConfigured
@@ -136,8 +138,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
             connection_created.send(sender=self.__class__)
         cursor = self.connection.cursor()
-        if set_tz:
-            cursor.execute("SET TIME ZONE %s", [settings_dict['TIME_ZONE']])
+        if new_connection:
+            if set_tz:
+                cursor.execute("SET TIME ZONE %s", [settings_dict['TIME_ZONE']])
             if not hasattr(self, '_version'):
                 self.__class__._version = get_version(cursor)
             if self._version[0:2] < (8, 0):
