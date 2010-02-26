@@ -63,6 +63,16 @@ class Command(NoArgsCommand):
                 if router.allow_syncdb(db, m)])
             for app in models.get_apps()
         )
+        def model_installed(model):
+            opts = model._meta
+            converter = connection.introspection.table_name_converter
+            return not ((converter(opts.db_table) in tables) or
+                (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables))
+
+        manifest = dict(
+            (app_name, filter(model_installed, model_list))
+            for app_name, model_list in manifest.iteritems()
+        )
 
         # Create the tables for each model
         for app_name, model_list in manifest.items():
@@ -70,11 +80,6 @@ class Command(NoArgsCommand):
                 # Create the model's database table, if it doesn't already exist.
                 if verbosity >= 2:
                     print "Processing %s.%s model" % (app_name, model._meta.object_name)
-                opts = model._meta
-                if (connection.introspection.table_name_converter(opts.db_table) in tables or
-                    (opts.auto_created and
-                    connection.introspection.table_name_converter(opts.auto_created._meta.db_table) in tables)):
-                    continue
                 sql, references = connection.creation.sql_create_model(model, self.style, seen_models)
                 seen_models.add(model)
                 created_models.add(model)
