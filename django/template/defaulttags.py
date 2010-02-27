@@ -595,7 +595,7 @@ def firstof(parser, token):
 
         {% filter force_escape %}
             {% firstof var1 var2 var3 "fallback value" %}
-	{% endfilter %}
+        {% endfilter %}
 
     """
     bits = token.split_contents()[1:]

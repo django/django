@@ -98,18 +98,18 @@ class UserProxyProxy(UserProxy):
 
 # We can still use `select_related()` to include related models in our querysets.
 class Country(models.Model):
-	name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
 
 class State(models.Model):
-	name = models.CharField(max_length=50)
-	country = models.ForeignKey(Country)
+    name = models.CharField(max_length=50)
+    country = models.ForeignKey(Country)
 
-	def __unicode__(self):
-		return self.name
+    def __unicode__(self):
+        return self.name
 
 class StateProxy(State):
-	class Meta:
-		proxy = True
+    class Meta:
+        proxy = True
 
 # Proxy models still works with filters (on related fields)
 # and select_related, even when mixed with model inheritance

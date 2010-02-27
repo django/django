@@ -55,7 +55,7 @@ class EnvelopeTest(unittest.TestCase):
         self.assertEqual((0, 0, 5, 6), self.e) 
         self.e.expand_to_include(-1, -1) 
         self.assertEqual((-1, -1, 5, 6), self.e) 
- 		 
+  
     def test05_expand_to_include_pt_2_tuple(self): 
         "Testing Envelope expand_to_include -- point as a single 2-tuple parameter." 
         self.e.expand_to_include((10, 10)) 
@@ -67,17 +67,17 @@ class EnvelopeTest(unittest.TestCase):
         "Testing Envelope expand_to_include -- extent as 4 parameters." 
         self.e.expand_to_include(-1, 1, 3, 7) 
         self.assertEqual((-1, 0, 5, 7), self.e) 
- 		 
+  
     def test06_expand_to_include_extent_4_tuple(self): 
         "Testing Envelope expand_to_include -- extent as a single 4-tuple parameter." 
         self.e.expand_to_include((-1, 1, 3, 7)) 
         self.assertEqual((-1, 0, 5, 7), self.e) 
- 		 
+  
     def test07_expand_to_include_envelope(self): 
         "Testing Envelope expand_to_include with Envelope as parameter." 
         self.e.expand_to_include(Envelope(-1, 1, 3, 7)) 
         self.assertEqual((-1, 0, 5, 7), self.e) 
- 		 
+  
     def test08_expand_to_include_point(self): 
         "Testing Envelope expand_to_include with Point as parameter." 
         self.e.expand_to_include(TestPoint(-1, 1)) 
