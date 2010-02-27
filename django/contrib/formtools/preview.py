@@ -99,10 +99,10 @@ class FormPreview(object):
 
     def process_preview(self, request, form, context):
         """
- 	Given a validated form, performs any extra processing before displaying
- 	the preview page, and saves any extra data in context.
- 	"""
- 	pass
+        Given a validated form, performs any extra processing before displaying
+        the preview page, and saves any extra data in context.
+        """
+        pass
 
     def security_hash(self, request, form):
         """

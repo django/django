@@ -432,7 +432,7 @@ class TokenParser(object):
                         i += 1
                     if i >= len(subject):
                         raise TemplateSyntaxError("Searching for value. Unexpected end of string in column %d: %s" % (i, subject))
-            	i += 1
+                i += 1
             return i
 
         if i >= len(subject):
