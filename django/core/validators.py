@@ -58,23 +58,18 @@ class URLValidator(RegexValidator):
         except ValidationError, e:
             # Trivial case failed. Try for possible IDN domain
             if value:
-                original = value
                 value = smart_unicode(value)
-                splitted = urlparse.urlsplit(value)
+                scheme, netloc, path, query, fragment = urlparse.urlsplit(value)
                 try:
-                    netloc_ace = splitted[1].encode('idna') # IDN -> ACE
+                    netloc = netloc.encode('idna') # IDN -> ACE
                 except UnicodeError: # invalid domain part
                     raise e
-                value = value.replace(splitted[1], netloc_ace)
-                # If no URL path given, assume /
-                if not splitted[2]:
-                    value += u'/'
-                super(URLValidator, self).__call__(value)
-                # After validation revert ACE encoded domain-part to
-                # original (IDN) value as suggested by RFC 3490
-                value = original
+                url = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+                super(URLValidator, self).__call__(url)
             else:
                 raise
+        else:
+            url = value
 
         if self.verify_exists:
             import urllib2
@@ -86,7 +81,7 @@ class URLValidator(RegexValidator):
                 "User-Agent": self.user_agent,
             }
             try:
-                req = urllib2.Request(value, None, headers)
+                req = urllib2.Request(url, None, headers)
                 u = urllib2.urlopen(req)
             except ValueError:
                 raise ValidationError(_(u'Enter a valid URL.'), code='invalid')

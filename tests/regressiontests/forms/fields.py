@@ -531,6 +531,13 @@ class FieldsTests(TestCase):
             f.clean('http://google.com/we-love-microsoft.html') # good domain, bad page
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
+        # Valid and existent IDN
+        self.assertEqual(u'http://\u05e2\u05d1\u05e8\u05d9\u05ea.idn.icann.org/', f.clean(u'http://עברית.idn.icann.org/'))
+        # Valid but non-existent IDN
+        try:
+            f.clean(u'http://broken.עברית.idn.icann.org/')
+        except ValidationError, e:
+            self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
 
     def test_urlfield_40(self):
         f = URLField(verify_exists=True, required=False)
