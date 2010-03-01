@@ -1420,7 +1420,7 @@ class AdminActionsTest(TestCase):
         Check if the selection counter is there.
         """
         response = self.client.get('/test_admin/admin/admin_views/subscriber/')
-        self.assertContains(response, '<span class="_acnt">0</span> of 2 subscribers selected')
+        self.assertContains(response, '<span class="_acnt">0</span> of 2 selected')
 
 
 class TestCustomChangeList(TestCase):
