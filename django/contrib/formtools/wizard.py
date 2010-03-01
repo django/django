@@ -19,19 +19,25 @@ from django.views.decorators.csrf import csrf_protect
 
 
 class FormWizard(object):
-    # Dictionary of extra template context variables.
-    extra_context = {}
-
     # The HTML (and POST data) field name for the "step" variable.
     step_field_name="wizard_step"
 
     # METHODS SUBCLASSES SHOULDN'T OVERRIDE ###################################
 
     def __init__(self, form_list, initial=None):
-        "form_list should be a list of Form classes (not instances)."
+        """
+        Start a new wizard with a list of forms.
+        
+        form_list should be a list of Form classes (not instances).
+        """
         self.form_list = form_list[:]
         self.initial = initial or {}
-        self.step = 0 # A zero-based counter keeping track of which step we're in.
+
+        # Dictionary of extra template context variables.
+        extra_context = {}
+
+        # A zero-based counter keeping track of which step we're in.
+        self.step = 0 
 
     def __repr__(self):
         return "step: %d\nform_list: %s\ninitial_data: %s" % (self.step, self.form_list, self.initial)
