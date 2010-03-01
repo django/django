@@ -250,12 +250,11 @@ class Moderator(object):
     models registered for comment moderation, and their associated
     moderation classes, and apply moderation to all incoming comments.
 
-    To register a model, obtain an instance of ``CommentModerator``
-    (this module exports one as ``moderator``), and call its
-    ``register`` method, passing the model class and a moderation
-    class (which should be a subclass of ``CommentModerator``). Note
-    that both of these should be the actual classes, not instances of
-    the classes.
+    To register a model, obtain an instance of ``Moderator`` (this
+    module exports one as ``moderator``), and call its ``register``
+    method, passing the model class and a moderation class (which
+    should be a subclass of ``CommentModerator``). Note that both of
+    these should be the actual classes, not instances of the classes.
 
     To cease moderation for a model, call the ``unregister`` method,
     passing the model class.
