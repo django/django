@@ -622,6 +622,8 @@ with an operator:
 
 .. attribute:: ModelAdmin.formfield_overrides
 
+.. versionadded:: 1.1
+
 This provides a quick-and-dirty way to override some of the
 :class:`~django.forms.Field` options for use in the admin.
 ``formfield_overrides`` is a dictionary mapping a field class to a dict of
@@ -662,11 +664,15 @@ The value is another dictionary; these arguments will be passed to
 
 .. attribute:: ModelAdmin.actions
 
+.. versionadded:: 1.1
+
 A list of actions to make available on the change list page. See
 :ref:`ref-contrib-admin-actions` for details.
 
 .. attribute:: ModelAdmin.actions_on_top
 .. attribute:: ModelAdmin.actions_on_bottom
+
+.. versionadded:: 1.1
 
 Controls where on the page the actions bar appears. By default, the admin
 changelist displays actions at the top of the page (``actions_on_top = True;
