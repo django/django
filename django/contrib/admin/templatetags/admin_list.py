@@ -179,7 +179,7 @@ def items_for_result(cl, result, form):
                 result_repr = conditional_escape(result_repr)
             yield mark_safe(u'<td%s>%s</td>' % (row_class, result_repr))
     if form:
-        yield mark_safe(force_unicode(form[cl.model._meta.pk.name]))
+        yield mark_safe(u'<td>%s</td>' % force_unicode(form[cl.model._meta.pk.name]))
 
 def results(cl):
     if cl.formset:
