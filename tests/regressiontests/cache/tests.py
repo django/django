@@ -278,6 +278,16 @@ class BaseCacheTests(object):
             self.cache.set(key, value)
             self.assertEqual(self.cache.get(key), value)
 
+    def test_binary_string(self):
+        # Binary strings should be cachable
+        from zlib import compress, decompress
+        value = 'value_to_be_compressed'
+        compressed_value = compress(value)
+        self.cache.set('binary1', compressed_value)
+        compressed_result = self.cache.get('binary1')
+        self.assertEqual(compressed_value, compressed_result)
+        self.assertEqual(value, decompress(compressed_result))
+
     def test_long_timeout(self):
         '''
         Using a timeout greater than 30 days makes memcached think
