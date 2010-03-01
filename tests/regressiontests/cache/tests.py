@@ -476,7 +476,6 @@ class CacheI18nTest(unittest.TestCase):
                 ('es', 'Spanish'),
         )
         settings.CACHE_MIDDLEWARE_KEY_PREFIX = 'settingsprefix'
-        settings.CACHE_MIDDLEWARE_SECONDS
         self.path = '/cache/test/'
 
     def tearDown(self):

@@ -323,9 +323,12 @@ more on these decorators.
 .. versionadded:: 1.2
 
 If :setting:`USE_I18N` is set to ``True`` then the generated cache key will
-include the name of the currently active :term:`language<language code>`.
+include the name of the active :term:`language<language code>`.
 This allows you to easily cache multilingual sites without having to create
 the cache key yourself.
+
+See :ref:`topics-i18n-deployment` for more on how Django discovers the active
+language.
 
 __ `Controlling cache: Using other headers`_
 

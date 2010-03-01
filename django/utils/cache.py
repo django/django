@@ -25,7 +25,7 @@ from django.core.cache import cache
 from django.utils.encoding import smart_str, iri_to_uri
 from django.utils.http import http_date
 from django.utils.hashcompat import md5_constructor
-from django.utils import translation
+from django.utils.translation import get_language
 from django.http import HttpRequest
 
 cc_delim_re = re.compile(r'\s*,\s*')
@@ -134,6 +134,15 @@ def patch_vary_headers(response, newheaders):
                           if newheader.lower() not in existing_headers]
     response['Vary'] = ', '.join(vary_headers + additional_headers)
 
+def _i18n_cache_key_suffix(request, cache_key):
+    """If enabled, returns the cache key ending with a locale."""
+    if settings.USE_I18N:
+        # first check if LocaleMiddleware or another middleware added
+        # LANGUAGE_CODE to request, then fall back to the active language
+        # which in turn can also fall back to settings.LANGUAGE_CODE
+        cache_key += '.%s' % getattr(request, 'LANGUAGE_CODE', get_language())
+    return cache_key
+
 def _generate_cache_key(request, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
     ctx = md5_constructor()
@@ -144,18 +153,14 @@ def _generate_cache_key(request, headerlist, key_prefix):
     path = md5_constructor(iri_to_uri(request.path))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s' % (
         key_prefix, path.hexdigest(), ctx.hexdigest())
-    if settings.USE_I18N:
-        cache_key += '.%s' % translation.get_language()
-    return cache_key
+    return _i18n_cache_key_suffix(request, cache_key)
 
 def _generate_cache_header_key(key_prefix, request):
     """Returns a cache key for the header cache."""
     path = md5_constructor(iri_to_uri(request.path))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, path.hexdigest())
-    if settings.USE_I18N:
-        cache_key += ".%s" % translation.get_language()
-    return cache_key
+    return _i18n_cache_key_suffix(request, cache_key)
 
 def get_cache_key(request, key_prefix=None):
     """
