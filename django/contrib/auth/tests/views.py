@@ -1,8 +1,9 @@
 import os
 import re
+import urllib
 
 from django.conf import settings
-from django.contrib.auth import SESSION_KEY
+from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.sites.models import Site, RequestSite
 from django.contrib.auth.models import User
@@ -183,6 +184,46 @@ class LoginTest(AuthViewsTestCase):
         self.assertEquals(response.context['site_name'], site.name)
         self.assert_(isinstance(response.context['form'], AuthenticationForm), 
                      'Login form is not an AuthenticationForm')
+
+    def test_security_check(self, password='password'):
+        login_url = reverse('django.contrib.auth.views.login')
+
+        # Those URLs should not pass the security check
+        for bad_url in ('http://example.com',
+                        'https://example.com',
+                        'ftp://exampel.com',
+                        '//example.com'):
+
+            nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
+                'url': login_url,
+                'next': REDIRECT_FIELD_NAME,
+                'bad_url': urllib.quote(bad_url)
+            }
+            response = self.client.post(nasty_url, {
+                'username': 'testclient',
+                'password': password,
+                }
+            )
+            self.assertEquals(response.status_code, 302)
+            self.assertFalse(bad_url in response['Location'], "%s should be blocked" % bad_url)
+
+        # Now, these URLs have an other URL as a GET parameter and therefore
+        # should be allowed
+        for url_ in ('http://example.com', 'https://example.com',
+                    'ftp://exampel.com',  '//example.com'):
+            safe_url = '%(url)s?%(next)s=/view/?param=%(safe_param)s' % {
+                'url': login_url,
+                'next': REDIRECT_FIELD_NAME,
+                'safe_param': urllib.quote(url_)
+            }
+            response = self.client.post(safe_url, {
+                    'username': 'testclient',
+                    'password': password,
+                }
+            )
+            self.assertEquals(response.status_code, 302)
+            self.assertTrue('/view/?param=%s' % url_ in response['Location'], "/view/?param=%s should be allowed" % url_)
+
         
 class LogoutTest(AuthViewsTestCase):
     urls = 'django.contrib.auth.tests.urls'
