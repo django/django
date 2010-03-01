@@ -87,7 +87,7 @@ ALLOWED_VARIABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01
 
 # what to report as the origin for templates that come from non-loader sources
 # (e.g. strings)
-UNKNOWN_SOURCE="&lt;unknown source&gt;"
+UNKNOWN_SOURCE = '<unknown source>'
 
 # match a variable or block tag and capture the entire tag, including start/end delimiters
 tag_re = re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),

@@ -12,6 +12,11 @@
 # might be shown to the user for debugging purposes, so it should identify where
 # the template was loaded from.
 #
+# A loader may return an already-compiled template instead of the actual
+# template source. In that case the path returned should be None, since the
+# path information is associated with the template during the compilation,
+# which has already been done.
+#
 # Each loader should have an "is_usable" attribute set. This is a boolean that
 # specifies whether the loader can be used in this Python installation. Each
 # loader is responsible for setting this when it's initialized.
@@ -37,9 +42,10 @@ class BaseLoader(object):
         return self.load_template(template_name, template_dirs)
 
     def load_template(self, template_name, template_dirs=None):
-        source, origin = self.load_template_source(template_name, template_dirs)
-        template = get_template_from_string(source, name=template_name)
-        return template, origin
+        source, display_name = self.load_template_source(template_name, template_dirs)
+        origin = make_origin(display_name, self.load_template_source, template_name, template_dirs)
+        template = get_template_from_string(source, origin, template_name)
+        return template, None
 
     def load_template_source(self, template_name, template_dirs=None):
         """
@@ -66,7 +72,7 @@ class LoaderOrigin(Origin):
         return self.loader(self.loadname, self.dirs)[0]
 
 def make_origin(display_name, loader, name, dirs):
-    if settings.TEMPLATE_DEBUG:
+    if settings.TEMPLATE_DEBUG and display_name:
         return LoaderOrigin(display_name, loader, name, dirs)
     else:
         return None

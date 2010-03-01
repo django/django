@@ -38,8 +38,8 @@ class Loader(BaseLoader):
             template, origin = self.find_template(template_name, template_dirs)
             if not hasattr(template, 'render'):
                 template = get_template_from_string(template, origin, template_name)
-            self.template_cache[template_name] = (template, origin)
-        return self.template_cache[template_name]
+            self.template_cache[template_name] = template
+        return self.template_cache[template_name], None
 
     def reset(self):
         "Empty the template cache."
