@@ -103,9 +103,25 @@ class Group(models.Model):
 
 class UserManager(models.Manager):
     def create_user(self, username, email, password=None):
-        "Creates and saves a User with the given username, e-mail and password."
+        """
+        Creates and saves a User with the given username, e-mail and password.
+        """
+
         now = datetime.datetime.now()
-        user = self.model(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
+        
+        # Normalize the address by lowercasing the domain part of the email
+        # address.
+        try:
+            email_name, domain_part = email.strip().split('@', 1)
+        except ValueError:
+            pass
+        else:
+            email = '@'.join([email_name, domain_part.lower()])
+
+        user = self.model(username=username, email=email, is_staff=False,
+                         is_active=True, is_superuser=False, last_login=now,
+                         date_joined=now)
+
         if password:
             user.set_password(password)
         else:

@@ -293,10 +293,13 @@ Manager functions
     .. method:: models.UserManager.create_user(username, email, password=None)
 
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
-        The :attr:`~django.contrib.auth.models.User.username`,
-        :attr:`~django.contrib.auth.models.User.email` and
-        :attr:`~django.contrib.auth.models.User.password` are set as given, and the
-        :class:`~django.contrib.auth.models.User` gets ``is_active=True``.
+        
+        The :attr:`~django.contrib.auth.models.User.username` and
+        :attr:`~django.contrib.auth.models.User.password` are set as given. The
+        domain portion of :attr:`~django.contrib.auth.models.User.email` is
+        automatically convered to lowercase, and the returned
+        :class:`~django.contrib.auth.models.User` object will have
+        :attr:`~models.User.is_active` set to ``True``.
 
         If no password is provided,
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
