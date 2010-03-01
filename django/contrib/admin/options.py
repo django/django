@@ -1037,13 +1037,15 @@ class ModelAdmin(BaseModelAdmin):
         else:
             action_form = None
 
-        if cl.result_count == 1:
-            module_name = force_unicode(opts.verbose_name)
-        else:
-            module_name = force_unicode(opts.verbose_name_plural)
+        selection_note = ungettext('of %(count)d selected',
+            'of %(count)d selected', len(cl.result_list))
+        selection_note_all = ungettext('%(total_count)s selected',
+            'All %(total_count)s selected', cl.result_count)
 
         context = {
-            'module_name': module_name,
+            'module_name': force_unicode(opts.verbose_name_plural),
+            'selection_note': selection_note % {'count': len(cl.result_list)},
+            'selection_note_all': selection_note_all % {'total_count': cl.result_count},
             'title': cl.title,
             'is_popup': cl.is_popup,
             'cl': cl,
