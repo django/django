@@ -109,3 +109,22 @@ def localize_input(value, default=None):
         format = smart_str(default or get_format('TIME_INPUT_FORMATS')[0])
         return value.strftime(format)
     return value
+
+def sanitize_separators(value):
+    """
+    Sanitizes a value according to the current decimal and
+    thousand separator setting. Used with form field input.
+    """
+    if settings.USE_L10N:
+        decimal_separator = get_format('DECIMAL_SEPARATOR')
+        if isinstance(value, basestring):
+            parts = []
+            if decimal_separator in value:
+                value, decimals = value.split(decimal_separator, 1)
+                parts.append(decimals)
+            if settings.USE_THOUSAND_SEPARATOR:
+                parts.append(value.replace(get_format('THOUSAND_SEPARATOR'), ''))
+            else:
+                parts.append(value)
+            value = '.'.join(reversed(parts))
+    return value

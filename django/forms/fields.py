@@ -17,9 +17,9 @@ except ImportError:
 from django.core.exceptions import ValidationError
 from django.core import validators
 import django.utils.copycompat as copy
+from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str
-from django.utils.formats import get_format
 from django.utils.functional import lazy
 
 # Provide this import for backwards compatibility.
@@ -213,7 +213,7 @@ class IntegerField(Field):
         value = super(IntegerField, self).to_python(value)
         if value in validators.EMPTY_VALUES:
             return None
-
+        value = formats.sanitize_separators(value)
         try:
             value = int(str(value))
         except (ValueError, TypeError):
@@ -233,11 +233,9 @@ class FloatField(IntegerField):
         value = super(IntegerField, self).to_python(value)
         if value in validators.EMPTY_VALUES:
             return None
-
+        value = formats.sanitize_separators(value)
         try:
-            # We always accept dot as decimal separator
-            if isinstance(value, str) or isinstance(value, unicode):
-                value = float(value.replace(get_format('DECIMAL_SEPARATOR'), '.'))
+            value = float(value)
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'])
         return value
@@ -270,11 +268,10 @@ class DecimalField(Field):
         """
         if value in validators.EMPTY_VALUES:
             return None
+        value = formats.sanitize_separators(value)
         value = smart_str(value).strip()
         try:
-            # We always accept dot as decimal separator
-            if isinstance(value, str) or isinstance(value, unicode):
-                value = Decimal(value.replace(get_format('DECIMAL_SEPARATOR'), '.'))
+            value = Decimal(value)
         except DecimalException:
             raise ValidationError(self.error_messages['invalid'])
         return value
@@ -329,7 +326,7 @@ class DateField(Field):
             return value.date()
         if isinstance(value, datetime.date):
             return value
-        for format in self.input_formats or get_format('DATE_INPUT_FORMATS'):
+        for format in self.input_formats or formats.get_format('DATE_INPUT_FORMATS'):
             try:
                 return datetime.date(*time.strptime(value, format)[:3])
             except ValueError:
@@ -355,7 +352,7 @@ class TimeField(Field):
             return None
         if isinstance(value, datetime.time):
             return value
-        for format in self.input_formats or get_format('TIME_INPUT_FORMATS'):
+        for format in self.input_formats or formats.get_format('TIME_INPUT_FORMATS'):
             try:
                 return datetime.time(*time.strptime(value, format)[3:6])
             except ValueError:
@@ -389,7 +386,7 @@ class DateTimeField(Field):
             if len(value) != 2:
                 raise ValidationError(self.error_messages['invalid'])
             value = '%s %s' % tuple(value)
-        for format in self.input_formats or get_format('DATETIME_INPUT_FORMATS'):
+        for format in self.input_formats or formats.get_format('DATETIME_INPUT_FORMATS'):
             try:
                 return datetime.datetime(*time.strptime(value, format)[:6])
             except ValueError:

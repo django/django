@@ -103,9 +103,9 @@ class TranslationTests(TestCase):
 class FormattingTests(TestCase):
 
     def setUp(self):
-        self._use_i18n = settings.USE_I18N
-        self._use_l10n = settings.USE_L10N
-        self._use_thousand_separator = settings.USE_THOUSAND_SEPARATOR
+        self.use_i18n = settings.USE_I18N
+        self.use_l10n = settings.USE_L10N
+        self.use_thousand_separator = settings.USE_THOUSAND_SEPARATOR
         self.n = decimal.Decimal('66666.666')
         self.f = 99999.999
         self.d = datetime.date(2009, 12, 31)
@@ -121,9 +121,9 @@ class FormattingTests(TestCase):
 
     def tearDown(self):
         # Restore defaults
-        settings.USE_I18N = self._use_i18n
-        settings.USE_L10N = self._use_l10n
-        settings.USE_THOUSAND_SEPARATOR = self._use_thousand_separator
+        settings.USE_I18N = self.use_i18n
+        settings.USE_L10N = self.use_l10n
+        settings.USE_THOUSAND_SEPARATOR = self.use_thousand_separator
 
     def test_locale_independent(self):
         """
@@ -179,13 +179,15 @@ class FormattingTests(TestCase):
                 'float_field': u'99999,999',
                 'date_field': u'31/12/2009',
                 'datetime_field': u'31/12/2009 20:50',
-                'time_field': u'20:50'
+                'time_field': u'20:50',
+                'integer_field': u'1.234',
             })
             self.assertEqual(False, form.is_valid())
             self.assertEqual([u'Introdu\xefu un n\xfamero.'], form.errors['float_field'])
             self.assertEqual([u'Introdu\xefu un n\xfamero.'], form.errors['decimal_field'])
             self.assertEqual([u'Introdu\xefu una data v\xe0lida.'], form.errors['date_field'])
             self.assertEqual([u'Introdu\xefu una data/hora v\xe0lides.'], form.errors['datetime_field'])
+            self.assertEqual([u'Introdu\xefu un n\xfamero sencer.'], form.errors['integer_field'])
 
             form2 = SelectDateForm({
                 'date_field_month': u'12',
@@ -231,6 +233,22 @@ class FormattingTests(TestCase):
             self.assertEqual(u'66.666,666', Template('{{ n }}').render(self.ctxt))
             self.assertEqual(u'99.999,999', Template('{{ f }}').render(self.ctxt))
 
+            form3 = I18nForm({
+                'decimal_field': u'66.666,666',
+                'float_field': u'99.999,999',
+                'date_field': u'31/12/2009',
+                'datetime_field': u'31/12/2009 20:50',
+                'time_field': u'20:50',
+                'integer_field': u'1.234',
+            })
+            self.assertEqual(True, form3.is_valid())
+            self.assertEqual(decimal.Decimal('66666.666'), form3.cleaned_data['decimal_field'])
+            self.assertEqual(99999.999, form3.cleaned_data['float_field'])
+            self.assertEqual(datetime.date(2009, 12, 31), form3.cleaned_data['date_field'])
+            self.assertEqual(datetime.datetime(2009, 12, 31, 20, 50), form3.cleaned_data['datetime_field'])
+            self.assertEqual(datetime.time(20, 50), form3.cleaned_data['time_field'])
+            self.assertEqual(1234, form3.cleaned_data['integer_field'])
+
             settings.USE_THOUSAND_SEPARATOR = False
             self.assertEqual(u'66666,666', Template('{{ n }}').render(self.ctxt))
             self.assertEqual(u'99999,999', Template('{{ f }}').render(self.ctxt))
@@ -242,27 +260,29 @@ class FormattingTests(TestCase):
             self.assertEqual(u'31/12/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'31/12/2009 20:50', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
 
-            form3 = I18nForm({
+            form4 = I18nForm({
                 'decimal_field': u'66666,666',
                 'float_field': u'99999,999',
                 'date_field': u'31/12/2009',
                 'datetime_field': u'31/12/2009 20:50',
-                'time_field': u'20:50'
+                'time_field': u'20:50',
+                'integer_field': u'1234',
             })
-            self.assertEqual(True, form3.is_valid())
-            self.assertEqual(decimal.Decimal('66666.666'), form3.cleaned_data['decimal_field'])
-            self.assertEqual(99999.999, form3.cleaned_data['float_field'])
-            self.assertEqual(datetime.date(2009, 12, 31), form3.cleaned_data['date_field'])
-            self.assertEqual(datetime.datetime(2009, 12, 31, 20, 50), form3.cleaned_data['datetime_field'])
-            self.assertEqual(datetime.time(20, 50), form3.cleaned_data['time_field'])
+            self.assertEqual(True, form4.is_valid())
+            self.assertEqual(decimal.Decimal('66666.666'), form4.cleaned_data['decimal_field'])
+            self.assertEqual(99999.999, form4.cleaned_data['float_field'])
+            self.assertEqual(datetime.date(2009, 12, 31), form4.cleaned_data['date_field'])
+            self.assertEqual(datetime.datetime(2009, 12, 31, 20, 50), form4.cleaned_data['datetime_field'])
+            self.assertEqual(datetime.time(20, 50), form4.cleaned_data['time_field'])
+            self.assertEqual(1234, form4.cleaned_data['integer_field'])
 
-            form4 = SelectDateForm({
+            form5 = SelectDateForm({
                 'date_field_month': u'12',
                 'date_field_day': u'31',
                 'date_field_year': u'2009'
             })
-            self.assertEqual(True, form4.is_valid())
-            self.assertEqual(datetime.date(2009, 12, 31), form4.cleaned_data['date_field'])
+            self.assertEqual(True, form5.is_valid())
+            self.assertEqual(datetime.date(2009, 12, 31), form5.cleaned_data['date_field'])
             self.assertEqual(
                 u'<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
                 SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
@@ -312,7 +332,8 @@ class FormattingTests(TestCase):
                 'float_field': u'99999.999',
                 'date_field': u'12/31/2009',
                 'datetime_field': u'12/31/2009 20:50',
-                'time_field': u'20:50'
+                'time_field': u'20:50',
+                'integer_field': u'1234',
             })
             self.assertEqual(True, form5.is_valid())
             self.assertEqual(decimal.Decimal('66666.666'), form5.cleaned_data['decimal_field'])
@@ -320,6 +341,7 @@ class FormattingTests(TestCase):
             self.assertEqual(datetime.date(2009, 12, 31), form5.cleaned_data['date_field'])
             self.assertEqual(datetime.datetime(2009, 12, 31, 20, 50), form5.cleaned_data['datetime_field'])
             self.assertEqual(datetime.time(20, 50), form5.cleaned_data['time_field'])
+            self.assertEqual(1234, form5.cleaned_data['integer_field'])
 
             form6 = SelectDateForm({
                 'date_field_month': u'12',
@@ -364,15 +386,17 @@ class FormattingTests(TestCase):
                 'name': u'acme',
                 'date_added': datetime.datetime(2009, 12, 31, 6, 0, 0),
                 'cents_payed': decimal.Decimal('59.47'),
+                'products_delivered': 12000,
             })
-            form6.save()
             self.assertEqual(True, form6.is_valid())
             self.assertEqual(
                 form6.as_ul(),
-                u'<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>\n<li><label for="id_cents_payed">Cents payed:</label> <input type="text" name="cents_payed" value="59,47" id="id_cents_payed" /></li>'
+                u'<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>\n<li><label for="id_cents_payed">Cents payed:</label> <input type="text" name="cents_payed" value="59,47" id="id_cents_payed" /></li>\n<li><label for="id_products_delivered">Products delivered:</label> <input type="text" name="products_delivered" value="12000" id="id_products_delivered" /></li>'
             )
             self.assertEqual(localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)), '31.12.2009 06:00:00')
             self.assertEqual(datetime.datetime(2009, 12, 31, 6, 0, 0), form6.cleaned_data['date_added'])
+            settings.USE_THOUSAND_SEPARATOR = True
+            self.assert_(u'12.000' in form6.as_ul())
         finally:
             deactivate()
 

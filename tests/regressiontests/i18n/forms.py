@@ -8,6 +8,7 @@ class I18nForm(forms.Form):
     date_field = forms.DateField()
     datetime_field = forms.DateTimeField()
     time_field = forms.TimeField()
+    integer_field = forms.IntegerField()
 
 class SelectDateForm(forms.Form):
     date_field = forms.DateField(widget=SelectDateWidget)
