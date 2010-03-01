@@ -647,6 +647,8 @@ with an operator:
 
 .. attribute:: ModelAdmin.formfield_overrides
 
+.. versionadded:: 1.1
+
 This provides a quick-and-dirty way to override some of the
 :class:`~django.forms.Field` options for use in the admin.
 ``formfield_overrides`` is a dictionary mapping a field class to a dict of
@@ -687,17 +689,23 @@ The value is another dictionary; these arguments will be passed to
 
 .. attribute:: ModelAdmin.actions
 
+.. versionadded:: 1.1
+
 A list of actions to make available on the change list page. See
 :ref:`ref-contrib-admin-actions` for details.
 
 .. attribute:: ModelAdmin.actions_on_top
 .. attribute:: ModelAdmin.actions_on_bottom
 
+.. versionadded:: 1.1
+
 Controls where on the page the actions bar appears. By default, the admin
 changelist displays actions at the top of the page (``actions_on_top = True;
 actions_on_bottom = False``).
 
 .. attribute:: ModelAdmin.actions_selection_counter
+
+.. versionadded:: 1.2
 
 Controls whether a selection counter is display next to the action dropdown.
 By default, the admin changelist will display it
@@ -713,6 +721,8 @@ If you don't specify this attribute, a default template shipped with Django
 that provides the standard appearance is used.
 
 .. attribute:: ModelAdmin.add_form_template
+
+.. versionadded:: 1.2
 
 Path to a custom template that will be used by the model object creation
 views. Templates can override or extend base admin templates as described in
@@ -1035,6 +1045,8 @@ inline.
 This controls the number of extra forms the formset will display in addition
 to the initial forms. See the
 :ref:`formsets documentation <topics-forms-formsets>` for more information.
+
+.. versionadded:: 1.2
 
 Extra forms for inlines will be hidden and replaced with a link to dynamically
 add any number of new inlines for users with Javascript enabled.
@@ -1392,14 +1404,20 @@ Path to a custom template that will be used by the admin site login view.
 
 .. attribute:: AdminSite.logout_template
 
+.. versionadded:: 1.2
+
 Path to a custom template that will be used by the admin site logout view.
 
 .. attribute:: AdminSite.password_change_template
+
+.. versionadded:: 1.2
 
 Path to a custom template that will be used by the admin site password change
 view.
 
 .. attribute:: AdminSite.password_change_done_template
+
+.. versionadded:: 1.2
 
 Path to a custom template that will be used by the admin site password change
 done view.
