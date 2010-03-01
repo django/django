@@ -742,3 +742,10 @@ views in your :ref:`URLconf <topics-http-urls>`. This means that you can
 maintain complete control over the URL structure of your feeds. Like any other view, feeds views are passed a ``request`` object, so you can
 do anything you would normally do with a view, like user based access control,
 or making a feed a named URL.
+
+Relaxed requirements for usernames
+----------------------------------
+
+The built-in :class:`~django.contrib.auth.models.User` model's
+:attr:`~django.contrib.auth.models.User.username` field now allows a wider range
+of characters, including ``@``, ``+``, ``.`` and ``-`` characters.

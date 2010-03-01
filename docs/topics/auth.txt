@@ -71,6 +71,9 @@ Fields
 
         Required. 30 characters or fewer. Alphanumeric characters only
         (letters, digits and underscores).
+        
+        .. versionchanged:: 1.2
+           Usernames may now contain ``@``, ``+``, ``.`` and ``-`` characters.
 
     .. attribute:: models.User.first_name
 

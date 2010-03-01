@@ -21,7 +21,7 @@ False
 # The username contains invalid data.
 
 >>> data = {
-...     'username': 'jsmith@example.com',
+...     'username': 'jsmith!',
 ...     'password1': 'test123',
 ...     'password2': 'test123',
 ... }
@@ -29,7 +29,7 @@ False
 >>> form.is_valid()
 False
 >>> form["username"].errors
-[u'This value must contain only letters, numbers and underscores.']
+[u'This value may contain only letters, numbers and @/./+/-/_ characters.']
 
 # The verification password is incorrect.
 
@@ -65,7 +65,7 @@ False
 # The success case.
 
 >>> data = {
-...     'username': 'jsmith2',
+...     'username': 'jsmith2@example.com',
 ...     'password1': 'test123',
 ...     'password2': 'test123',
 ... }
@@ -73,7 +73,7 @@ False
 >>> form.is_valid()
 True
 >>> form.save()
-<User: jsmith2>
+<User: jsmith2@example.com>
 
 # The user submits an invalid username.
 
@@ -189,7 +189,7 @@ True
 >>> form.is_valid()
 False
 >>> form['username'].errors
-[u'This value must contain only letters, numbers and underscores.']
+[u'This value may contain only letters, numbers and @/./+/-/_ characters.']
 
 
 ### PasswordResetForm
