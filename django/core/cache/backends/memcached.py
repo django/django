@@ -43,15 +43,9 @@ class CacheClass(BaseCache):
         val = self._cache.get(smart_str(key))
         if val is None:
             return default
-        else:
-            if isinstance(val, basestring):
-                return smart_unicode(val)
-            else:
-                return val
+        return val
 
     def set(self, key, value, timeout=0):
-        if isinstance(value, unicode):
-            value = value.encode('utf-8')
         self._cache.set(smart_str(key), value, self._get_memcache_timeout(timeout))
 
     def delete(self, key):
