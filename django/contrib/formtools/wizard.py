@@ -31,7 +31,7 @@ class FormWizard(object):
         self.initial = initial or {}
 
         # Dictionary of extra template context variables.
-        extra_context = {}
+        self.extra_context = {}
 
         # A zero-based counter keeping track of which step we're in.
         self.step = 0 
