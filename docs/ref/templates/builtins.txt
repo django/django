@@ -891,12 +891,18 @@ Returns an absolute URL (i.e., a URL without the domain name) matching a given
 view function and optional parameters. This is a way to output links without
 violating the DRY principle by having to hard-code URLs in your templates::
 
-    {% url path.to.some_view arg1,arg2,name1=value1 %}
+    {% url path.to.some_view v1,v2 %}
 
 The first argument is a path to a view function in the format
 ``package.package.module.function``. Additional arguments are optional and
-should be comma-separated values that will be used as positional and keyword
-arguments in the URL. All arguments required by the URLconf should be present.
+should be comma-separated values that will be used as arguments in the URL.
+The example above shows passing positional arguments. Alternatively you may
+use keyword syntax::
+
+    {% url path.to.some_view arg1=v1,arg2=v2 %}
+
+Do not mix both positional and keyword syntax in a single call. All arguments 
+required by the URLconf should be present. 
 
 For example, suppose you have a view, ``app_views.client``, whose URLconf
 takes a client ID (here, ``client()`` is a method inside the views file
