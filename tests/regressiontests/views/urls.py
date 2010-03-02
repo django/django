@@ -97,3 +97,12 @@ urlpatterns += patterns('django.views.generic.create_update',
 urlpatterns += patterns('',
     (r'^raises/$', views.raises)
 )
+
+# rediriects, both temporary and permanent, with non-ASCII targets
+urlpatterns += patterns('django.views.generic.simple',
+    ('^nonascii_redirect/$', 'redirect_to',
+        {'url': u'/views/中文/target/', 'permanent': False}),
+    ('^permanent_nonascii_redirect/$', 'redirect_to',
+        {'url': u'/views/中文/target/', 'permanent': True}),
+)
+
