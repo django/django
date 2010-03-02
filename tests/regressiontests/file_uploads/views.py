@@ -2,7 +2,7 @@ import os
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import simplejson
-from models import FileModel
+from models import FileModel, UPLOAD_TO
 from uploadhandler import QuotaUploadHandler, ErroringUploadHandler
 from django.utils.hashcompat import sha_constructor
 from tests import UNICODE_FILENAME
@@ -18,7 +18,7 @@ def file_upload_view(request):
         # If a file is posted, the dummy client should only post the file name,
         # not the full path.
         if os.path.dirname(form_data['file_field'].name) != '':
-            return HttpResponseServerError()            
+            return HttpResponseServerError()
         return HttpResponse('')
     else:
         return HttpResponseServerError()
@@ -62,7 +62,8 @@ def file_upload_unicode_name(request):
     # through file save.
     uni_named_file = request.FILES['file_unicode']
     obj = FileModel.objects.create(testfile=uni_named_file)
-    if not obj.testfile.name.endswith(uni_named_file.name):
+    full_name = u'%s/%s' % (UPLOAD_TO, uni_named_file.name)
+    if not os.path.exists(full_name):
         response = HttpResponseServerError()
 
     # Cleanup the object with its exotic file name immediately.
@@ -82,14 +83,14 @@ def file_upload_echo(request):
     """
     r = dict([(k, f.name) for k, f in request.FILES.items()])
     return HttpResponse(simplejson.dumps(r))
-    
+
 def file_upload_quota(request):
     """
     Dynamically add in an upload handler.
     """
     request.upload_handlers.insert(0, QuotaUploadHandler())
     return file_upload_echo(request)
-        
+
 def file_upload_quota_broken(request):
     """
     You can't change handlers after reading FILES; this view shouldn't work.
