@@ -127,3 +127,27 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     def test_changelist_foreignkey(self):
         response = self.client.get('%s/admin_widgets/car/' % self.admin_root)
         self.failUnless('%s/auth/user/add/' % self.admin_root in response.content)
+
+class AdminForeignKeyRawIdWidget(DjangoTestCase):
+    fixtures = ["admin-widgets-users.xml"]
+    admin_root = '/widget_admin'
+
+    def setUp(self):
+        self.client.login(username="super", password="secret")
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_nonexistent_target_id(self):
+        band = models.Band.objects.create(name='Bogey Blues')
+        pk = band.pk
+        band.delete()
+        post_data = {
+            "band": u'%s' % pk,
+        }
+        # Try posting with a non-existent pk in a raw id field: this
+        # should result in an error message, not a server exception.
+        response = self.client.post('%s/admin_widgets/event/add/' % self.admin_root,
+            post_data)
+        self.assertContains(response,
+            'Select a valid choice. That choice is not one of the available choices.')
