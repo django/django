@@ -61,7 +61,8 @@ class Chapter(models.Model):
         return self.title
 
     class Meta:
-        verbose_name = u'¿Chapter?'
+        # Use a utf-8 bytestring to ensure it works (see #11710)
+        verbose_name = '¿Chapter?'
 
 class ChapterXtra1(models.Model):
     chap = models.OneToOneField(Chapter, verbose_name=u'¿Chap?')
