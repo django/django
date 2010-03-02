@@ -97,6 +97,8 @@ class FirstOfNode(Node):
         return u''
 
 class ForNode(Node):
+    child_nodelists = ('nodelist_loop', 'nodelist_empty')
+
     def __init__(self, loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty=None):
         self.loopvars, self.sequence = loopvars, sequence
         self.is_reversed = is_reversed
@@ -117,14 +119,6 @@ class ForNode(Node):
             yield node
         for node in self.nodelist_empty:
             yield node
-
-    def get_nodes_by_type(self, nodetype):
-        nodes = []
-        if isinstance(self, nodetype):
-            nodes.append(self)
-        nodes.extend(self.nodelist_loop.get_nodes_by_type(nodetype))
-        nodes.extend(self.nodelist_empty.get_nodes_by_type(nodetype))
-        return nodes
 
     def render(self, context):
         if 'forloop' in context:
@@ -181,6 +175,8 @@ class ForNode(Node):
         return nodelist.render(context)
 
 class IfChangedNode(Node):
+    child_nodelists = ('nodelist_true', 'nodelist_false')
+
     def __init__(self, nodelist_true, nodelist_false, *varlist):
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
         self._last_seen = None
@@ -211,6 +207,8 @@ class IfChangedNode(Node):
         return ''
 
 class IfEqualNode(Node):
+    child_nodelists = ('nodelist_true', 'nodelist_false')
+
     def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
         self.var1, self.var2 = var1, var2
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
@@ -227,6 +225,8 @@ class IfEqualNode(Node):
         return self.nodelist_false.render(context)
 
 class IfNode(Node):
+    child_nodelists = ('nodelist_true', 'nodelist_false')
+
     def __init__(self, var, nodelist_true, nodelist_false=None):
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
         self.var = var
@@ -239,14 +239,6 @@ class IfNode(Node):
             yield node
         for node in self.nodelist_false:
             yield node
-
-    def get_nodes_by_type(self, nodetype):
-        nodes = []
-        if isinstance(self, nodetype):
-            nodes.append(self)
-        nodes.extend(self.nodelist_true.get_nodes_by_type(nodetype))
-        nodes.extend(self.nodelist_false.get_nodes_by_type(nodetype))
-        return nodes
 
     def render(self, context):
         if self.var.eval(context):

@@ -24,6 +24,7 @@ from context import context_tests
 from custom import custom_filters
 from parser import token_parsing, filter_parsing, variable_parsing
 from unicode import unicode_tests
+from nodelist import NodelistTest
 from smartif import *
 
 try:
@@ -885,6 +886,32 @@ class Templates(unittest.TestCase):
 
             # Inheritance from a template with a space in its name should work.
             'inheritance29': ("{% extends 'inheritance 28' %}", {}, '!'),
+
+            # Base template, putting block in a conditional {% if %} tag
+            'inheritance30': ("1{% if optional %}{% block opt %}2{% endblock %}{% endif %}3", {'optional': True}, '123'),
+
+            # Inherit from a template with block wrapped in an {% if %} tag (in parent), still gets overridden
+            'inheritance31': ("{% extends 'inheritance30' %}{% block opt %}two{% endblock %}", {'optional': True}, '1two3'),
+            'inheritance32': ("{% extends 'inheritance30' %}{% block opt %}two{% endblock %}", {}, '13'),
+
+            # Base template, putting block in a conditional {% ifequal %} tag
+            'inheritance33': ("1{% ifequal optional 1 %}{% block opt %}2{% endblock %}{% endifequal %}3", {'optional': 1}, '123'),
+
+            # Inherit from a template with block wrapped in an {% ifequal %} tag (in parent), still gets overridden
+            'inheritance34': ("{% extends 'inheritance33' %}{% block opt %}two{% endblock %}", {'optional': 1}, '1two3'),
+            'inheritance35': ("{% extends 'inheritance33' %}{% block opt %}two{% endblock %}", {'optional': 2}, '13'),
+
+            # Base template, putting block in a {% for %} tag
+            'inheritance36': ("{% for n in numbers %}_{% block opt %}{{ n }}{% endblock %}{% endfor %}_", {'numbers': '123'}, '_1_2_3_'),
+
+            # Inherit from a template with block wrapped in an {% for %} tag (in parent), still gets overridden
+            'inheritance37': ("{% extends 'inheritance36' %}{% block opt %}X{% endblock %}", {'numbers': '123'}, '_X_X_X_'),
+            'inheritance38': ("{% extends 'inheritance36' %}{% block opt %}X{% endblock %}", {}, '_'),
+
+            # The super block will still be found.
+            'inheritance39': ("{% extends 'inheritance30' %}{% block opt %}new{{ block.super }}{% endblock %}", {'optional': True}, '1new23'),
+            'inheritance40': ("{% extends 'inheritance33' %}{% block opt %}new{{ block.super }}{% endblock %}", {'optional': 1}, '1new23'),
+            'inheritance41': ("{% extends 'inheritance36' %}{% block opt %}new{{ block.super }}{% endblock %}", {'numbers': '123'}, '_new1_new2_new3_'),
 
             ### I18N ##################################################################
 

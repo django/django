@@ -770,6 +770,7 @@ class Node(object):
     # Set this to True for nodes that must be first in the template (although
     # they can be preceded by text nodes.
     must_be_first = False
+    child_nodelists = ('nodelist',)
 
     def render(self, context):
         "Return the node rendered as a string"
@@ -783,8 +784,10 @@ class Node(object):
         nodes = []
         if isinstance(self, nodetype):
             nodes.append(self)
-        if hasattr(self, 'nodelist'):
-            nodes.extend(self.nodelist.get_nodes_by_type(nodetype))
+        for attr in self.child_nodelists:
+            nodelist = getattr(self, attr, None)
+            if nodelist:
+                nodes.extend(nodelist.get_nodes_by_type(nodetype))
         return nodes
 
 class NodeList(list):
