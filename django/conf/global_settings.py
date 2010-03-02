@@ -44,7 +44,7 @@ LANGUAGES = (
     ('ar', gettext_noop('Arabic')),
     ('bg', gettext_noop('Bulgarian')),
     ('bn', gettext_noop('Bengali')),
-    ('bn', gettext_noop('Bosnian')),
+    ('bs', gettext_noop('Bosnian')),
     ('ca', gettext_noop('Catalan')),
     ('cs', gettext_noop('Czech')),
     ('cy', gettext_noop('Welsh')),
