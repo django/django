@@ -476,6 +476,8 @@ Currently supported:
 
 .. django-admin-option:: --symlinks
 
+.. versionadded:: 1.2
+
 Use the ``--symlinks`` or ``-s`` option to follow symlinks to directories when
 looking for new translation strings.
 
