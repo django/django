@@ -82,7 +82,9 @@ class Media(StrAndUnicode):
     def add_css(self, data):
         if data:
             for medium, paths in data.items():
-                self._css.setdefault(medium, []).extend([path for path in paths if path not in self._css[medium]])
+                for path in paths:
+                    if not self._css.get(medium) or path not in self._css[medium]:
+                        self._css.setdefault(medium, []).append(path)
 
     def __add__(self, other):
         combined = Media()

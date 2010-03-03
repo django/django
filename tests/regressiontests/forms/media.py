@@ -112,15 +112,17 @@ media_tests = r"""
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
 
-# Regression check for #12879: specifying the same JS file multiple
-# times in a single Media instance should result in that file only
-# being included once.
+# Regression check for #12879: specifying the same CSS or JS file
+# multiple times in a single Media instance should result in that file
+# only being included once.
 >>> class MyWidget4(TextInput):
 ...     class Media:
+...         css = {'all': ('/path/to/css1', '/path/to/css1')}
 ...         js = ('/path/to/js1', '/path/to/js1')
 
 >>> w4 = MyWidget4()
 >>> print w4.media
+<link href="/path/to/css1" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/path/to/js1"></script>
 
 
