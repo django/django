@@ -80,6 +80,14 @@ If it doesn't find a match, the request continues to be processed as usual.
 The middleware only gets activated for 404s -- not for 500s or responses of any
 other status code.
 
+.. admonition:: Flatpages will not apply view middleware
+
+   Because the ``FlatpageFallbackMiddleware`` is applied only after
+   URL resolution has failed and produced a 404, the response it
+   returns will not apply any :ref:`view middleware <view-middlware>`
+   methods. Only requests which are successfully routed to a view via
+   normal URL resolution apply view middleware.
+
 Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you can
 put :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at
 the end of the list, because it's a last resort.
