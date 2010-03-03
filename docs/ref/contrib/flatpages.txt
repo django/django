@@ -126,8 +126,12 @@ Flatpage templates
 ==================
 
 By default, flatpages are rendered via the template
-:file:`flatpages/default.html`, but you can override that for a particular
-flatpage.
+:file:`flatpages/default.html`, but you can override that for a
+particular flatpage: in the admin, a collapsed fieldset titled
+"Advanced options" (clicking will expand it) contains a field for
+specifying a template name. If you're creating a flat page via the
+Python API you can simply set the template name as the field
+``template_name`` on the ``FlatPage`` object.
 
 Creating the :file:`flatpages/default.html` template is your responsibility;
 in your template directory, just create a :file:`flatpages` directory
