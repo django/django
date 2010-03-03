@@ -67,14 +67,14 @@ ValueError: The 'normal' attribute has no file associated with it.
 >>> dirs
 []
 >>> files.sort()
->>> files
-['default.txt', 'django_test.txt']
+>>> files == ['default.txt', 'django_test.txt']
+True
 
 >>> obj1.save()
 >>> dirs, files = temp_storage.listdir('tests')
 >>> files.sort()
->>> files
-['assignment.txt', 'default.txt', 'django_test.txt']
+>>> files == ['assignment.txt', 'default.txt', 'django_test.txt']
+True
 
 # Files can be read in a little at a time, if necessary.
 
@@ -113,13 +113,13 @@ ValueError: The 'normal' attribute has no file associated with it.
 
 # Multiple files with the same name get _N appended to them.
 
->>> objs = [Storage() for i in range(3)] 
->>> for o in objs:  
-...     o.normal.save('multiple_files.txt', ContentFile('Same Content')) 
+>>> objs = [Storage() for i in range(3)]
+>>> for o in objs:
+...     o.normal.save('multiple_files.txt', ContentFile('Same Content'))
 >>> [o.normal for o in objs]
 [<FieldFile: tests/multiple_files.txt>, <FieldFile: tests/multiple_files_1.txt>, <FieldFile: tests/multiple_files_2.txt>]
->>> for o in objs: 
-...     o.delete() 
+>>> for o in objs:
+...     o.delete()
 
 # Default values allow an object to access a single file.
 
