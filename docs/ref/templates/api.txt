@@ -335,6 +335,13 @@ variable to the context and a second processor adds a variable with the same
 name, the second will override the first. The default processors are explained
 below.
 
+.. admonition:: When context processors are applied
+    When you use ``RequestContext``, the variables you supply directly
+    are added first, followed any variables supplied by context
+    processors. This means that a context processor may overwrite a
+    variable you've supplied, so take care to avoid variable names
+    which overlap with those supplied by your context processors.
+
 Also, you can give ``RequestContext`` a list of additional processors, using the
 optional, third positional argument, ``processors``. In this example, the
 ``RequestContext`` instance gets a ``ip_address`` variable::
