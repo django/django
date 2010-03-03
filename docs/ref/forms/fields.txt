@@ -659,6 +659,21 @@ compatibility. The preferred way to provide an error message is to use the
 ``error_messages`` argument, passing a dictionary with ``'invalid'`` as a key
 and the error message as the value.
 
+``SlugField``
+~~~~~~~~~~~~~
+
+.. class:: SlugField(**kwargs)
+
+   * Default widget: ``TextInput``
+   * Empty value: ``''`` (an empty string)
+   * Normalizes to: A Unicode object.
+   * Validates that the given value contains only letters, numbers and
+     hyphens.
+   * Error messages: ``required``, ``invalid``
+
+This field is intended for use in representing a model
+:class:`~django.db.models.SlugField` in forms.
+
 ``TimeField``
 ~~~~~~~~~~~~~
 
