@@ -112,6 +112,18 @@ media_tests = r"""
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
 
+# Regression check for #12879: specifying the same JS file multiple
+# times in a single Media instance should result in that file only
+# being included once.
+>>> class MyWidget4(TextInput):
+...     class Media:
+...         js = ('/path/to/js1', '/path/to/js1')
+
+>>> w4 = MyWidget4()
+>>> print w4.media
+<script type="text/javascript" src="/path/to/js1"></script>
+
+
 ###############################################################
 # Property-based media definitions
 ###############################################################

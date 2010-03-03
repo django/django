@@ -75,7 +75,9 @@ class Media(StrAndUnicode):
 
     def add_js(self, data):
         if data:
-            self._js.extend([path for path in data if path not in self._js])
+            for path in data:
+                if path not in self._js:
+                    self._js.append(path)
 
     def add_css(self, data):
         if data:
