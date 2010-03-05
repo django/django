@@ -219,4 +219,18 @@ class CommentViewTests(CommentTestCase):
         location = response["Location"]        
         match = re.search(r"^http://testserver/somewhere/else/\?foo=bar&c=\d+$", location)
         self.failUnless(match != None, "Unexpected redirect location: %s" % location)
-        
+
+    def testCommentDoneReSubmitWithInvalidParams(self):
+        """
+        Tests that attempting to retrieve the location specified in the 
+        post redirect, after adding some invalid data to the expected 
+        querystring it ends with, doesn't cause a server error.
+        """
+        a = Article.objects.get(pk=1)
+        data = self.getValidData(a)
+        data["comment"] = "This is another comment"
+        response = self.client.post("/post/", data)
+        location = response["Location"]
+        broken_location = location + u"\ufffd"
+        response = self.client.get(broken_location)
+        self.assertEqual(response.status_code, 200)
