@@ -112,10 +112,47 @@ BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection T
 >>> email.message()['To']
 '=?utf-8?q?S=C3=BCrname=2C_Firstname?= <to@example.com>, other@example.com'
 
+# Regression for #6918 - When a header contains unicode,
+# make sure headers can be set with a different encoding than utf-8
+>>> email = EmailMessage('Message from Firstname Sürname', 'Content', 'from@example.com', ['"Sürname, Firstname" <to@example.com>','other@example.com'])
+>>> email.encoding = 'iso-8859-1'
+>>> email.message()['To']
+'=?iso-8859-1?q?S=FCrname=2C_Firstname?= <to@example.com>, other@example.com'
+>>> email.message()['Subject'].encode()
+u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?='
+
+# Make sure headers can be set with a different encoding than utf-8 in SafeMIMEMultipart as well
+>>> headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
+>>> subject, from_email, to = 'hello', 'from@example.com', '"Sürname, Firstname" <to@example.com>'
+>>> text_content = 'This is an important message.'
+>>> html_content = '<p>This is an <strong>important</strong> message.</p>'
+>>> msg = EmailMultiAlternatives('Message from Firstname Sürname', text_content, from_email, [to], headers=headers)
+>>> msg.attach_alternative(html_content, "text/html")
+>>> msg.encoding = 'iso-8859-1'
+>>> msg.message()['To']
+'=?iso-8859-1?q?S=FCrname=2C_Firstname?= <to@example.com>'
+>>> msg.message()['Subject'].encode()
+u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?='
+
+# Regression for #12791  - Encode body correctly with other encodings than utf-8
+>>> email = EmailMessage('Subject', 'Firstname Sürname is a great guy.', 'from@example.com', ['other@example.com'])
+>>> email.encoding = 'iso-8859-1'
+>>> message = email.message()
+>>> message.as_string()
+'Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: from@example.com\nTo: other@example.com\nDate: ...\nMessage-ID: <...>\n\nFirstname S=FCrname is a great guy.'
+
+# Make sure MIME attachments also works correctly with other encodings than utf-8
+>>> text_content = 'Firstname Sürname is a great guy.'
+>>> html_content = '<p>Firstname Sürname is a <strong>great</strong> guy.</p>'
+>>> msg = EmailMultiAlternatives('Subject', text_content, 'from@example.com', ['to@example.com'])
+>>> msg.encoding = 'iso-8859-1'
+>>> msg.attach_alternative(html_content, "text/html")
+>>> msg.message().as_string()
+'Content-Type: multipart/alternative; boundary="===============...=="\nMIME-Version: 1.0\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nDate: ...\nMessage-ID: <...>\n\n--===============...==\nContent-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\nFirstname S=FCrname is a great guy.\n--===============...==\nContent-Type: text/html; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>\n--===============...==--'
+
 # Handle attachments within an multipart/alternative mail correctly (#9367)
 # (test is not as precise/clear as it could be w.r.t. email tree structure,
 #  but it's good enough.)
-
 >>> headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
 >>> subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
 >>> text_content = 'This is an important message.'
