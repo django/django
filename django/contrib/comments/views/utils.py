@@ -39,7 +39,7 @@ def confirmation_view(template, doc="Display a confirmation view."):
         if 'c' in request.GET:
             try:
                 comment = comments.get_model().objects.get(pk=request.GET['c'])
-            except ObjectDoesNotExist:
+            except (ObjectDoesNotExist, ValueError):
                 pass
         return render_to_response(template,
             {'comment': comment},
