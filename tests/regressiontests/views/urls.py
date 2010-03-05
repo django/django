@@ -95,7 +95,8 @@ urlpatterns += patterns('django.views.generic.create_update',
 
 # a view that raises an exception for the debug view
 urlpatterns += patterns('',
-    (r'^raises/$', views.raises)
+    (r'^raises/$', views.raises),
+    (r'^raises404/$', views.raises404),
 )
 
 # rediriects, both temporary and permanent, with non-ASCII targets

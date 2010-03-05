@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.views.debug import technical_500_response
 from django.views.generic.create_update import create_object
+from django.core.urlresolvers import get_resolver
 
 from models import Article
 
@@ -11,7 +12,6 @@ from models import Article
 def index_page(request):
     """Dummy index page"""
     return HttpResponse('<html><body>Dummy page</body></html>')
-
 
 def custom_create(request):
     """
@@ -37,6 +37,10 @@ def raises(request):
     except Exception:
         return technical_500_response(request, *sys.exc_info())
 
+def raises404(request):
+    resolver = get_resolver(None)
+    resolver.resolve('')
+        
 def redirect(request):
     """
     Forces an HTTP redirect.

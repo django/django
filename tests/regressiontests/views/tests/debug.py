@@ -19,3 +19,7 @@ class DebugViewTests(TestCase):
         response = self.client.post('/views/raises/', data)
         self.failUnless('file_data.txt' in response.content)
         self.failIf('haha' in response.content)
+
+    def test_404(self):
+        response = self.client.get('/views/raises404/')
+        self.assertEquals(response.status_code, 404)
