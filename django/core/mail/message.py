@@ -55,8 +55,8 @@ def make_msgid(idstring=None):
 
 
 def forbid_multi_line_headers(name, val, encoding):
-    encoding = encoding or settings.DEFAULT_CHARSET
     """Forbids multi-line headers, to prevent header injection."""
+    encoding = encoding or settings.DEFAULT_CHARSET
     val = force_unicode(val)
     if '\n' in val or '\r' in val:
         raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))

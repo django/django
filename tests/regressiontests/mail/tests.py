@@ -147,8 +147,10 @@ u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?='
 >>> msg = EmailMultiAlternatives('Subject', text_content, 'from@example.com', ['to@example.com'])
 >>> msg.encoding = 'iso-8859-1'
 >>> msg.attach_alternative(html_content, "text/html")
->>> msg.message().as_string()
-'Content-Type: multipart/alternative; boundary="===============...=="\nMIME-Version: 1.0\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nDate: ...\nMessage-ID: <...>\n\n--===============...==\nContent-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\nFirstname S=FCrname is a great guy.\n--===============...==\nContent-Type: text/html; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>\n--===============...==--'
+>>> msg.message().get_payload(0).as_string()
+'Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\nFirstname S=FCrname is a great guy.'
+>>> msg.message().get_payload(1).as_string()
+'Content-Type: text/html; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>'
 
 # Handle attachments within an multipart/alternative mail correctly (#9367)
 # (test is not as precise/clear as it could be w.r.t. email tree structure,
