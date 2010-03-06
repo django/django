@@ -69,8 +69,9 @@ def make_msgid(idstring=None):
 class BadHeaderError(ValueError):
     pass
 
-def forbid_multi_line_headers(name, val):
+def forbid_multi_line_headers(name, val, encoding):
     """Forbids multi-line headers, to prevent header injection."""
+    encoding = encoding or settings.DEFAULT_CHARSET
     val = force_unicode(val)
     if '\n' in val or '\r' in val:
         raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))
@@ -80,24 +81,34 @@ def forbid_multi_line_headers(name, val):
         if name.lower() in ('to', 'from', 'cc'):
             result = []
             for nm, addr in getaddresses((val,)):
-                nm = str(Header(nm, settings.DEFAULT_CHARSET))
+                nm = str(Header(nm.encode(encoding), encoding))
                 result.append(formataddr((nm, str(addr))))
             val = ', '.join(result)
         else:
-            val = Header(val, settings.DEFAULT_CHARSET)
+            val = Header(val.encode(encoding), encoding)
     else:
         if name.lower() == 'subject':
             val = Header(val)
     return name, val
 
 class SafeMIMEText(MIMEText):
+
+    def __init__(self, text, subtype, charset):
+        self.encoding = charset
+        MIMEText.__init__(self, text, subtype, charset)
+
     def __setitem__(self, name, val):
-        name, val = forbid_multi_line_headers(name, val)
+        name, val = forbid_multi_line_headers(name, val, self.encoding)
         MIMEText.__setitem__(self, name, val)
 
 class SafeMIMEMultipart(MIMEMultipart):
+
+    def __init__(self, _subtype='mixed', boundary=None, _subparts=None, encoding=None, **_params):
+        self.encoding = encoding
+        MIMEMultipart.__init__(self, _subtype, boundary, _subparts, **_params)
+
     def __setitem__(self, name, val):
-        name, val = forbid_multi_line_headers(name, val)
+        name, val = forbid_multi_line_headers(name, val, self.encoding)
         MIMEMultipart.__setitem__(self, name, val)
 
 class SMTPConnection(object):
@@ -234,7 +245,7 @@ class EmailMessage(object):
 
     def message(self):
         encoding = self.encoding or settings.DEFAULT_CHARSET
-        msg = SafeMIMEText(smart_str(self.body, settings.DEFAULT_CHARSET),
+        msg = SafeMIMEText(smart_str(self.body, encoding),
                            self.content_subtype, encoding)
         msg = self._create_message(msg)
         msg['Subject'] = self.subject
@@ -293,8 +304,9 @@ class EmailMessage(object):
 
     def _create_attachments(self, msg):
         if self.attachments:
+            encoding = self.encoding or settings.DEFAULT_CHARSET
             body_msg = msg
-            msg = SafeMIMEMultipart(_subtype=self.mixed_subtype)
+            msg = SafeMIMEMultipart(_subtype=self.mixed_subtype, encoding=encoding)
             if self.body:
                 msg.attach(body_msg)
             for attachment in self.attachments:
@@ -310,8 +322,8 @@ class EmailMessage(object):
         """
         basetype, subtype = mimetype.split('/', 1)
         if basetype == 'text':
-            attachment = SafeMIMEText(smart_str(content,
-                settings.DEFAULT_CHARSET), subtype, settings.DEFAULT_CHARSET)
+            encoding = self.encoding or settings.DEFAULT_CHARSET
+            attachment = SafeMIMEText(smart_str(content, encoding), subtype, encoding)
         else:
             # Encode non-text attachments with base64.
             attachment = MIMEBase(basetype, subtype)
@@ -365,9 +377,10 @@ class EmailMultiAlternatives(EmailMessage):
         return self._create_attachments(self._create_alternatives(msg))
 
     def _create_alternatives(self, msg):
+        encoding = self.encoding or settings.DEFAULT_CHARSET
         if self.alternatives:
             body_msg = msg
-            msg = SafeMIMEMultipart(_subtype=self.alternative_subtype)
+            msg = SafeMIMEMultipart(_subtype=self.alternative_subtype, encoding=encoding)
             if self.body:
                 msg.attach(body_msg)
             for alternative in self.alternatives:
