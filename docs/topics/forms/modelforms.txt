@@ -196,6 +196,19 @@ we'll discuss in a moment.)::
         name = forms.CharField(max_length=100)
         authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
 
+The ``is_valid()`` method and ``errors``
+----------------------------------------
+
+.. versionchanged:: 1.2
+
+The first time you call ``is_valid()`` or access the ``errors`` attribute of a
+``ModelForm`` has always triggered form validation, but as of Django 1.2, it
+will also trigger :ref:`model validation <validating-objects>`. This has the
+side-effect of cleaning the model you pass to the ``ModelForm`` constructor.
+For instance, calling ``is_valid()`` on your form will convert any date fields
+on your model to actual date objects.
+
+
 The ``save()`` method
 ---------------------
 

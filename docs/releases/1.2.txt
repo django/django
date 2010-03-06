@@ -299,6 +299,16 @@ For those following trunk, this change also applies to other decorators
 introduced since 1.1, including ``csrf_protect``, ``cache_control`` and anything
 created using ``decorator_from_middleware``.
 
+``ModelForm.is_valid()`` and ``ModelForm.errors``
+-------------------------------------------------
+
+Much of the validation work for ModelForms has been moved down to the model
+level. As a result, the first time you call ``ModelForm.is_valid()``, access
+``ModelForm.errors`` or otherwise trigger form validation, your model will be
+cleaned in-place. This conversion used to happen when the model was saved. If
+you need an unmodified instance of your model, you should pass a copy to the
+``ModelForm`` constructor.
+
 
 .. _deprecated-features-1.2:
 
