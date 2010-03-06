@@ -265,6 +265,7 @@ class BaseForm(StrAndUnicode):
             return
         self._clean_fields()
         self._clean_form()
+        self._post_clean()
         if self._errors:
             delattr(self, 'cleaned_data')
 
@@ -294,6 +295,13 @@ class BaseForm(StrAndUnicode):
             self.cleaned_data = self.clean()
         except ValidationError, e:
             self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
+
+    def _post_clean(self):
+        """
+        An internal hook for performing additional cleaning after form cleaning
+        is complete. Used for model validation in model forms.
+        """
+        pass
 
     def clean(self):
         """

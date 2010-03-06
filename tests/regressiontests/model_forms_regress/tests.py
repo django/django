@@ -72,6 +72,26 @@ class OverrideCleanTests(TestCase):
         # by form.full_clean().
         self.assertEquals(form.instance.left, 1)
 
+# Regression test for #12960.
+# Make sure the cleaned_data returned from ModelForm.clean() is applied to the
+# model instance.
+
+class PublicationForm(forms.ModelForm):
+    def clean(self):
+        print self.cleaned_data
+        self.cleaned_data['title'] = self.cleaned_data['title'].upper()
+        return self.cleaned_data
+
+    class Meta:
+        model = Publication
+
+class ModelFormCleanTest(TestCase):
+    def test_model_form_clean_applies_to_model(self):
+        data = {'title': 'test', 'date_published': '2010-2-25'}
+        form = PublicationForm(data)
+        publication = form.save()
+        self.assertEqual(publication.title, 'TEST')
+
 class FPForm(forms.ModelForm):
     class Meta:
         model = FilePathModel

@@ -245,6 +245,10 @@ class BaseModelForm(BaseForm):
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
+        # self._validate_unique will be set to True by BaseModelForm.clean().
+        # It is False by default so overriding self.clean() and failing to call
+        # super will stop validate_unique from being called.
+        self._validate_unique = False
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
 
@@ -299,34 +303,31 @@ class BaseModelForm(BaseForm):
         return exclude
 
     def clean(self):
-        self.validate_unique()
+        self._validate_unique = True
         return self.cleaned_data
 
-    def _clean_fields(self):
-        """
-        Cleans the form fields, constructs the instance, then cleans the model
-        fields.
-        """
-        super(BaseModelForm, self)._clean_fields()
-        opts = self._meta
-        self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
+    def _post_clean(self):
         exclude = self._get_validation_exclusions()
+        opts = self._meta
+
+        # Update the model instance with self.cleaned_data.
+        self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
+
+        # Clean the model instance's fields.
         try:
             self.instance.clean_fields(exclude=exclude)
         except ValidationError, e:
             self._update_errors(e.message_dict)
 
-    def _clean_form(self):
-        """
-        Runs the instance's clean method, then the form's. This is becuase the
-        form will run validate_unique() by default, and we should run the
-        model's clean method first.
-        """
+        # Call the model instance's clean method.
         try:
             self.instance.clean()
         except ValidationError, e:
             self._update_errors({NON_FIELD_ERRORS: e.messages})
-        super(BaseModelForm, self)._clean_form()
+
+        # Validate uniqueness if needed.
+        if self._validate_unique:
+            self.validate_unique()
 
     def validate_unique(self):
         """
