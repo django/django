@@ -78,7 +78,6 @@ class OverrideCleanTests(TestCase):
 
 class PublicationForm(forms.ModelForm):
     def clean(self):
-        print self.cleaned_data
         self.cleaned_data['title'] = self.cleaned_data['title'].upper()
         return self.cleaned_data
 
