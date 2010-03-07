@@ -26,6 +26,20 @@ if Image:
             TwoImageFieldTests
 
 
+class BasicFieldTests(django.test.TestCase):
+    def test_show_hidden_initial(self):
+        """
+        Regression test for #12913. Make sure fields with choices respect
+        show_hidden_initial as a kwarg to models.Field.formfield()
+        """
+        choices = [(0, 0), (1, 1)]
+        model_field = models.Field(choices=choices)
+        form_field = model_field.formfield(show_hidden_initial=True)
+        self.assertTrue(form_field.show_hidden_initial)
+
+        form_field = model_field.formfield(show_hidden_initial=False)
+        self.assertFalse(form_field.show_hidden_initial)
+
 class DecimalFieldTests(django.test.TestCase):
     def test_to_python(self):
         f = models.DecimalField(max_digits=4, decimal_places=2)
