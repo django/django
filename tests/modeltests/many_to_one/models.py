@@ -263,6 +263,13 @@ FieldError: Cannot resolve keyword 'reporter_id' into field. Choices are: headli
 >>> Reporter.objects.filter(article__reporter__exact=r).distinct()
 [<Reporter: John Smith>]
 
+# Regression for #12876 -- Model methods that include queries that
+# recursive don't cause recursion depth problems under deepcopy.
+>>> r.cached_query = Article.objects.filter(reporter=r)
+>>> from copy import deepcopy
+>>> deepcopy(r)
+<Reporter: John Smith>
+
 # Check that implied __exact also works.
 >>> Reporter.objects.filter(article__reporter=r).distinct()
 [<Reporter: John Smith>]
