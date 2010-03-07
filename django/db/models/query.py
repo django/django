@@ -267,7 +267,7 @@ class QuerySet(object):
         for row in compiler.results_iter():
             if fill_cache:
                 obj, _ = get_cached_row(self.model, row,
-                            index_start, max_depth,
+                            index_start, using=self.db, max_depth=max_depth,
                             requested=requested, offset=len(aggregate_select),
                             only_load=only_load)
             else:
@@ -279,15 +279,15 @@ class QuerySet(object):
                     # Omit aggregates in object creation.
                     obj = self.model(*row[index_start:aggregate_start])
 
+                # Store the source database of the object
+                obj._state.db = self.db
+
             for i, k in enumerate(extra_select):
                 setattr(obj, k, row[i])
 
             # Add the aggregates to the model
             for i, aggregate in enumerate(aggregate_select):
                 setattr(obj, aggregate, row[i+aggregate_start])
-
-            # Store the source database of the object
-            obj._state.db = self.db
 
             yield obj
 
@@ -1112,7 +1112,7 @@ class EmptyQuerySet(QuerySet):
     value_annotation = False
 
 
-def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
+def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
                    requested=None, offset=0, only_load=None):
     """
     Helper function that recursively returns an object with the specified
@@ -1126,6 +1126,7 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
      * row - the row of data returned by the database cursor
      * index_start - the index of the row at which data for this
        object is known to start
+     * using - the database alias on which the query is being executed.
      * max_depth - the maximum depth to which a select_related()
        relationship should be explored.
      * cur_depth - the current depth in the select_related() tree.
@@ -1170,6 +1171,7 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
             obj = klass(**dict(zip(init_list, fields)))
         else:
             obj = klass(*fields)
+
     else:
         # Load all fields on klass
         field_count = len(klass._meta.fields)
@@ -1182,6 +1184,10 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
         else:
             obj = klass(*fields)
 
+    # If an object was retrieved, set the database state.
+    if obj:
+        obj._state.db = using
+
     index_end = index_start + field_count + offset
     # Iterate over each related object, populating any
     # select_related() fields
@@ -1193,8 +1199,8 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
         else:
             next = None
         # Recursively retrieve the data for the related object
-        cached_row = get_cached_row(f.rel.to, row, index_end, max_depth,
-                cur_depth+1, next)
+        cached_row = get_cached_row(f.rel.to, row, index_end, using,
+                max_depth, cur_depth+1, next)
         # If the recursive descent found an object, populate the
         # descriptor caches relevant to the object
         if cached_row:
@@ -1222,8 +1228,8 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
                 continue
             next = requested[f.related_query_name()]
             # Recursively retrieve the data for the related object
-            cached_row = get_cached_row(model, row, index_end, max_depth,
-                cur_depth+1, next)
+            cached_row = get_cached_row(model, row, index_end, using,
+                max_depth, cur_depth+1, next)
             # If the recursive descent found an object, populate the
             # descriptor caches relevant to the object
             if cached_row:

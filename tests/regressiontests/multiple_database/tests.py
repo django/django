@@ -641,6 +641,20 @@ class QueryTestCase(TestCase):
         val = Book.objects.raw('SELECT id FROM "multiple_database_book"').using('other')
         self.assertEqual(map(lambda o: o.pk, val), [dive.pk])
 
+    def test_select_related(self):
+        "Database assignment is retained if an object is retrieved with select_related()"
+        # Create a book and author on the other database
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
+        dive = Book.objects.using('other').create(title="Dive into Python",
+                                                  published=datetime.date(2009, 5, 4),
+                                                  editor=mark)
+
+        # Retrieve the Person using select_related()
+        book = Book.objects.using('other').select_related('editor').get(title="Dive into Python")
+
+        # The editor instance should have a db state
+        self.assertEqual(book.editor._state.db, 'other')
+
 class TestRouter(object):
     # A test router. The behaviour is vaguely master/slave, but the
     # databases aren't assumed to propagate changes.
