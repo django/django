@@ -567,11 +567,11 @@ manually open the connection, you can control when it is closed. For example::
 Testing e-mail sending
 ======================
 
-The are times when you do not want Django to send e-mails at all. For example,
-while developing a website, you probably don't want to send out thousands of
-e-mails -- but you may want to validate that e-mails will be sent to the right
-people under the right conditions, and that those e-mails will contain the
-correct content.
+There are times when you do not want Django to send e-mails at
+all. For example, while developing a website, you probably don't want
+to send out thousands of e-mails -- but you may want to validate that
+e-mails will be sent to the right people under the right conditions,
+and that those e-mails will contain the correct content.
 
 The easiest way to test your project's use of e-mail is to use the ``console``
 e-mail backend. This backend redirects all e-mail to stdout, allowing you to
