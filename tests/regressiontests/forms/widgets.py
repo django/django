@@ -3,6 +3,7 @@ tests = r"""
 >>> from django.forms import *
 >>> from django.forms.widgets import RadioFieldRenderer
 >>> from django.utils.safestring import mark_safe
+>>> from django.utils.encoding import force_unicode
 >>> import datetime
 >>> import time
 >>> import re
@@ -1134,6 +1135,15 @@ u'<input type="text" name="date" value="17/09/2007 12:51" />'
 >>> w._has_changed(d, '17/09/2007 12:51')
 False
 
+Make sure a custom format works with _has_changed. The hidden input will use
+force_unicode to display the initial value.
+>>> data = datetime.datetime(2010, 3, 6, 12, 0, 0)
+>>> custom_format = '%d.%m.%Y %H:%M'
+>>> w = DateTimeInput(format=custom_format)
+>>> w._has_changed(force_unicode(data), data.strftime(custom_format))
+False
+
+
 # DateInput ###################################################################
 
 >>> w = DateInput()
@@ -1158,6 +1168,15 @@ Use 'format' to change the way a value is displayed.
 u'<input type="text" name="date" value="17/09/2007" />'
 >>> w._has_changed(d, '17/09/2007')
 False
+
+Make sure a custom format works with _has_changed. The hidden input will use
+force_unicode to display the initial value.
+>>> data = datetime.date(2010, 3, 6)
+>>> custom_format = '%d.%m.%Y'
+>>> w = DateInput(format=custom_format)
+>>> w._has_changed(force_unicode(data), data.strftime(custom_format))
+False
+
 
 # TimeInput ###################################################################
 
@@ -1186,6 +1205,15 @@ Use 'format' to change the way a value is displayed.
 u'<input type="text" name="time" value="12:51" />'
 >>> w._has_changed(t, '12:51')
 False
+
+Make sure a custom format works with _has_changed. The hidden input will use
+force_unicode to display the initial value.
+>>> data = datetime.time(13, 0)
+>>> custom_format = '%I:%M %p'
+>>> w = TimeInput(format=custom_format)
+>>> w._has_changed(force_unicode(data), data.strftime(custom_format))
+False
+
 
 # SplitHiddenDateTimeWidget ###################################################
 

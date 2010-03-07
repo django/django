@@ -16,7 +16,8 @@ from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe
-from datetime import time
+import time
+import datetime
 from util import flatatt
 from urlparse import urljoin
 
@@ -319,6 +320,14 @@ class DateInput(Input):
         return super(DateInput, self).render(name, value, attrs)
 
     def _has_changed(self, initial, data):
+        # If our field has show_hidden_initial=True, initial will be a string
+        # formatted by HiddenInput using formats.localize_input, which is not
+        # necessarily the format used for this widget. Attempt to convert it.
+        try:
+            input_format = '%Y-%m-%d'
+            initial = datetime.date(*time.strptime(initial, '%Y-%m-%d')[:3])
+        except (TypeError, ValueError):
+            pass
         return super(DateInput, self)._has_changed(self._format_value(initial), data)
 
 class DateTimeInput(Input):
@@ -343,6 +352,14 @@ class DateTimeInput(Input):
         return super(DateTimeInput, self).render(name, value, attrs)
 
     def _has_changed(self, initial, data):
+        # If our field has show_hidden_initial=True, initial will be a string
+        # formatted by HiddenInput using formats.localize_input, which is not
+        # necessarily the format used for this widget. Attempt to convert it.
+        try:
+            input_format = '%Y-%m-%d %H:%M:%S'
+            initial = datetime.datetime(*time.strptime(initial, input_format)[:6])
+        except (TypeError, ValueError):
+            pass
         return super(DateTimeInput, self)._has_changed(self._format_value(initial), data)
 
 class TimeInput(Input):
@@ -366,6 +383,14 @@ class TimeInput(Input):
         return super(TimeInput, self).render(name, value, attrs)
 
     def _has_changed(self, initial, data):
+        # If our field has show_hidden_initial=True, initial will be a string
+        # formatted by HiddenInput using formats.localize_input, which is not
+        # necessarily the format used for this  widget. Attempt to convert it.
+        try:
+            input_format = '%H:%M:%S'
+            initial = datetime.time(*time.strptime(initial, input_format)[3:6])
+        except (TypeError, ValueError):
+            pass
         return super(TimeInput, self)._has_changed(self._format_value(initial), data)
 
 class CheckboxInput(Widget):
