@@ -462,7 +462,7 @@ class Field(object):
             for k in kwargs.keys():
                 if k not in ('coerce', 'empty_value', 'choices', 'required',
                              'widget', 'label', 'initial', 'help_text',
-                             'error_messages'):
+                             'error_messages', 'show_hidden_initial'):
                     del kwargs[k]
         defaults.update(kwargs)
         return form_class(**defaults)
