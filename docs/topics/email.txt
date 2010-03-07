@@ -354,11 +354,11 @@ send out, you could send this with::
 Testing e-mail sending
 ----------------------
 
-The are times when you do not want Django to send e-mails at all. For example,
-while developing a website, you probably don't want to send out thousands of
-e-mails -- but you may want to validate that e-mails will be sent to the right
-people under the right conditions, and that those e-mails will contain the
-correct content.
+There are times when you do not want Django to send e-mails at
+all. For example, while developing a website, you probably don't want
+to send out thousands of e-mails -- but you may want to validate that
+e-mails will be sent to the right people under the right conditions,
+and that those e-mails will contain the correct content.
 
 The easiest way to test your project's use of e-mail is to use a "dumb" e-mail
 server that receives the e-mails locally and displays them to the terminal,
