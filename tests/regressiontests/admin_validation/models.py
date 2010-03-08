@@ -12,6 +12,7 @@ class Album(models.Model):
 class Song(models.Model):
     title = models.CharField(max_length=150)
     album = models.ForeignKey(Album)
+    original_release = models.DateField(editable=False)
 
     class Meta:
         ordering = ('title',)

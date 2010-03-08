@@ -245,6 +245,12 @@ def validate_base(cls, model):
                 if type(fields) != tuple:
                     fields = (fields,)
                 for field in fields:
+                    if field in cls.readonly_fields:
+                        # Stuff can be put in fields that isn't actually a
+                        # model field if it's in readonly_fields,
+                        # readonly_fields will handle the validation of such
+                        # things.
+                        continue
                     check_formfield(cls, model, opts, "fieldsets[%d][1]['fields']" % idx, field)
                     try:
                         f = opts.get_field(field)
