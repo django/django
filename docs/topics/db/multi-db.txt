@@ -535,3 +535,15 @@ This example sets up two admin sites. On the first site, the
 objects have an tabular inline showing books published by that
 publisher. The second site exposes just publishers, without the
 inlines.
+
+Using raw cursors with multiple databases
+=========================================
+
+If you are using more than one database you can use
+``django.db.connections`` to obtain the connection (and cursor) for a
+specific database. ``django.db.connections`` is a dictionary-like
+object that allows you to retrieve a specific connection using it's
+alias::
+
+    from django.db import connections
+    cursor = connections['my_db_alias'].cursor()

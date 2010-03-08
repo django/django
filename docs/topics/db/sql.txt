@@ -196,8 +196,8 @@ In these cases, you can always access the database directly, routing around
 the model layer entirely.
 
 The object ``django.db.connection`` represents the
-current database connection, and ``django.db.transaction`` represents the
-current database transaction. To use the database connection, call
+default database connection, and ``django.db.transaction`` represents the
+default database transaction. To use the database connection, call
 ``connection.cursor()`` to get a cursor object. Then, call
 ``cursor.execute(sql, [params])`` to execute the SQL and ``cursor.fetchone()``
 or ``cursor.fetchall()`` to return the resulting rows. After performing a data
@@ -219,6 +219,15 @@ is required. For example::
         row = cursor.fetchone()
 
         return row
+
+If you are using more than one database you can use
+``django.db.connections`` to obtain the connection (and cursor) for a
+specific database. ``django.db.connections`` is a dictionary-like
+object that allows you to retrieve a specific connection using it's
+alias::
+
+    from django.db import connections
+    cursor = connections['my_db_alias'].cursor()
 
 .. _transactions-and-raw-sql:
 
