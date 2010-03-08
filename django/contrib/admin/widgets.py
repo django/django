@@ -133,7 +133,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
     def base_url_parameters(self):
         params = {}
-        if self.rel.limit_choices_to:
+        if self.rel.limit_choices_to and hasattr(self.rel.limit_choices_to, 'items'):
             items = []
             for k, v in self.rel.limit_choices_to.items():
                 if isinstance(v, list):

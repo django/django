@@ -872,10 +872,10 @@ define the details of how the relation works.
     current date/time to be chosen.
 
     Instead of a dictionary this can also be a :class:`~django.db.models.Q`
-    object for more :ref:`complex queries <complex-lookups-with-q>`.
-
-    ``limit_choices_to`` has no effect on the inline FormSets that are created
-    to display related objects in the admin.
+    object for more :ref:`complex queries <complex-lookups-with-q>`. However, 
+    if ``limit_choices_to`` is a :class:`~django.db.models.Q` object then it 
+    will only have an effect on the choices available in the admin when the 
+    field is not listed in ``raw_id_fields`` in the ``ModelAdmin`` for the model.
 
 .. attribute:: ForeignKey.related_name
 
