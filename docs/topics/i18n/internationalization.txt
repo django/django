@@ -568,6 +568,7 @@ Here's example HTML template code:
 .. code-block:: html+django
 
     <form action="/i18n/setlang/" method="post">
+    {% csrf_token %}
     <input name="next" type="hidden" value="/next/page/" />
     <select name="language">
     {% for lang in LANGUAGES %}
