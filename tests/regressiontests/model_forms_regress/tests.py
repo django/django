@@ -2,7 +2,7 @@ from datetime import date
 
 from django import db
 from django import forms
-from django.forms.models import modelform_factory
+from django.forms.models import modelform_factory, ModelChoiceField
 from django.conf import settings
 from django.test import TestCase
 
@@ -203,3 +203,16 @@ class OneToOneFieldTests(TestCase):
         form = AuthorForm({'publication':u'', 'full_name':'John Doe'}, instance=author)
         self.assert_(not form.is_valid())
 
+
+class ModelChoiceForm(forms.Form):
+    person = ModelChoiceField(Person.objects.all())
+
+
+class TestTicket11183(TestCase):
+    def test_11183(self):
+        form1 = ModelChoiceForm()
+        field1 = form1.fields['person']
+        # To allow the widget to change the queryset of field1.widget.choices correctly, 
+        # without affecting other forms, the following must hold:
+        self.assert_(field1 is not ModelChoiceForm.base_fields['person'])
+        self.assert_(field1.widget.choices.field is field1)

@@ -923,6 +923,12 @@ class ModelChoiceField(ChoiceField):
         self.choice_cache = None
         self.to_field_name = to_field_name
 
+    def __deepcopy__(self, memo):
+        result = super(ChoiceField, self).__deepcopy__(memo)
+        # Need to force a new ModelChoiceIterator to be created, bug #11183
+        result.queryset = result.queryset
+        return result
+
     def _get_queryset(self):
         return self._queryset
 
