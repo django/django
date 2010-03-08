@@ -5,6 +5,7 @@ from django import forms
 from django.views.debug import technical_500_response
 from django.views.generic.create_update import create_object
 from django.core.urlresolvers import get_resolver
+from django.shortcuts import render_to_response
 
 from regressiontests.views import BrokenException, except_args
 
@@ -51,4 +52,8 @@ def redirect(request):
 
 def view_exception(request, n):
     raise BrokenException(except_args[int(n)])
+
+def template_exception(request, n):
+    return render_to_response('debug/template_exception.html',
+        {'arg': except_args[int(n)]})
 
