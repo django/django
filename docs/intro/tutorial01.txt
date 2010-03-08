@@ -656,8 +656,16 @@ Save these changes and start a new Python interactive shell by running
 
     # Give the Poll a couple of Choices. The create call constructs a new
     # choice object, does the INSERT statement, adds the choice to the set
-    # of available choices and returns the new Choice object.
+    # of available choices and returns the new Choice object. Django creates
+    # a set to hold the "other side" of a ForeignKey relation
+    # (e.g. a poll's choices) which can be accessed via the API.
     >>> p = Poll.objects.get(pk=1)
+
+    # Display any choices from the related object set -- none so far.
+    >>> p.choice_set.all()
+    []
+
+    # Create three choices.
     >>> p.choice_set.create(choice='Not much', votes=0)
     <Choice: Not much>
     >>> p.choice_set.create(choice='The sky', votes=0)
@@ -685,8 +693,9 @@ Save these changes and start a new Python interactive shell by running
     >>> c = p.choice_set.filter(choice__startswith='Just hacking')
     >>> c.delete()
 
-For full details on the database API, see our :ref:`Database API reference
-<topics-db-queries>`.
+For more information on model relations, see :ref:`Accessing related objects
+<ref-models-relations>`. For full details on the database API, see our
+:ref:`Database API reference <topics-db-queries>`.
 
 When you're comfortable with the API, read :ref:`part 2 of this tutorial
 <intro-tutorial02>` to get Django's automatic admin working.
