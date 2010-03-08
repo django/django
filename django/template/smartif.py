@@ -97,6 +97,7 @@ OPERATORS = {
     'and': infix(7, lambda x, y: x and y),
     'not': prefix(8, operator.not_),
     'in': infix(9, lambda x, y: x in y),
+    'not in': infix(9, lambda x, y: x not in y),
     '=': infix(10, operator.eq),
     '==': infix(10, operator.eq),
     '!=': infix(10, operator.ne),
@@ -150,11 +151,23 @@ class IfParser(object):
     error_class = ValueError
 
     def __init__(self, tokens):
-        self.tokens = map(self.translate_tokens, tokens)
+        # pre-pass necessary to turn  'not','in' into single token 
+        l = len(tokens)
+        mapped_tokens = []
+        i = 0
+        while i < l:
+            token = tokens[i]
+            if token == "not" and i + 1 < l and tokens[i+1] == "in":
+                token = "not in"
+                i += 1 # skip 'in'
+            mapped_tokens.append(self.translate_token(token))
+            i += 1
+
+        self.tokens = mapped_tokens
         self.pos = 0
         self.current_token = self.next()
 
-    def translate_tokens(self, token):
+    def translate_token(self, token):
         try:
             op = OPERATORS[token]
         except (KeyError, TypeError):

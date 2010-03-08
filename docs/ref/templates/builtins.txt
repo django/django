@@ -440,6 +440,11 @@ how ``x in y`` will be interpreted::
       instance that belongs to the QuerySet.
     {% endif %}
 
+``not in`` operator
+~~~~~~~~~~~~~~~~~~~~
+
+Not contained within.  This is the negation of the ``in`` operator.
+
 
 The comparison operators cannot be 'chained' like in Python or in mathematical
 notation. For example, instead of using::

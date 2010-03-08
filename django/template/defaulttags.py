@@ -806,8 +806,8 @@ def do_if(parser, token):
     Arguments and operators _must_ have a space between them, so
     ``{% if 1>2 %}`` is not a valid if tag.
 
-    All supported operators are: ``or``, ``and``, ``in``, ``==`` (or ``=``),
-    ``!=``, ``>``, ``>=``, ``<`` and ``<=``.
+    All supported operators are: ``or``, ``and``, ``in``, ``not in``
+    ``==`` (or ``=``), ``!=``, ``>``, ``>=``, ``<`` and ``<=``.
 
     Operator precedence follows Python.
     """

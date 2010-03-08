@@ -27,6 +27,13 @@ class SmartIfTests(unittest.TestCase):
         self.assertCalcEqual(False, [1, 'in', None])
         self.assertCalcEqual(False, [None, 'in', list_])
 
+    def test_not_in(self):
+        list_ = [1,2,3]
+        self.assertCalcEqual(False, [1, 'not', 'in', list_])
+        self.assertCalcEqual(True, [4, 'not', 'in', list_])
+        self.assertCalcEqual(False, [1, 'not', 'in', None])
+        self.assertCalcEqual(True, [None, 'not', 'in', list_])
+
     def test_precedence(self):
         # (False and False) or True == True   <- we want this one, like Python
         # False and (False or True) == False

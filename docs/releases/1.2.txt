@@ -636,9 +636,9 @@ You can now do this:
 There's really no reason to use ``{% ifequal %}`` or ``{% ifnotequal %}``
 anymore, unless you're the nostalgic type.
 
-The operators supported are ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=`` and
-``in``, all of which work like the Python operators, in addition to ``and``,
-``or`` and ``not``, which were already supported.
+The operators supported are ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=``,
+``in`` and ``not in``, all of which work like the Python operators, in addition
+ to ``and``, ``or`` and ``not``, which were already supported.
 
 Also, filters may now be used in the ``if`` expression. For example:
 
