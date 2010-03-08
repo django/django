@@ -645,6 +645,25 @@ when printed::
     >>> str(f['subject'].errors)
     ''
 
+.. versionadded:: 1.2
+
+When you use Django's rendering shortcuts, CSS classes are used to
+indicate required form fields or fields that contain errors. If you're
+manually rendering a form, you can access these CSS classes using the
+``css_classes`` method::
+
+	>>> f = ContactForm(data)
+	>>> f['message'].css_classes()
+	'required'
+
+If you want to provide some additional classes in addition to the
+error and required classes that may be required, you can provide
+those classes as an argument::
+
+	>>> f = ContactForm(data)
+	>>> f['message'].css_classes('foo bar')
+	'foo bar required'
+
 .. _binding-uploaded-files:
 
 Binding uploaded files to a form
