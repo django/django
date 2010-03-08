@@ -49,7 +49,7 @@ class Inventory(models.Model):
       return self.name
 
 class Event(models.Model):
-    band = models.ForeignKey(Band)
+    band = models.ForeignKey(Band, limit_choices_to=models.Q(pk__gt=0))
     start_date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     description = models.TextField(blank=True)
