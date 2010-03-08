@@ -6,6 +6,8 @@ from django.views.debug import technical_500_response
 from django.views.generic.create_update import create_object
 from django.core.urlresolvers import get_resolver
 
+from regressiontests.views import BrokenException, except_args
+
 from models import Article
 
 
@@ -40,10 +42,13 @@ def raises(request):
 def raises404(request):
     resolver = get_resolver(None)
     resolver.resolve('')
-        
+
 def redirect(request):
     """
     Forces an HTTP redirect.
     """
     return HttpResponseRedirect("target/")
+
+def view_exception(request, n):
+    raise BrokenException(except_args[int(n)])
 

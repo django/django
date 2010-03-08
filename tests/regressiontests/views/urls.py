@@ -107,3 +107,6 @@ urlpatterns += patterns('django.views.generic.simple',
         {'url': u'/views/中文/target/', 'permanent': True}),
 )
 
+urlpatterns += patterns('regressiontests.views.views',
+    url(r'view_exception/(?P<n>\d+)/$', 'view_exception', name='view_exception'),
+)
