@@ -216,7 +216,7 @@ class Templates(unittest.TestCase):
         except TemplateSyntaxError, e:
             # Assert that we are getting the template syntax error and not the
             # string encoding error.
-            self.assertEquals(e.args[0], "Caught an exception while rendering: Reverse for 'will_not_match' with arguments '()' and keyword arguments '{}' not found.")
+            self.assertEquals(e.args[0], "Caught NoReverseMatch while rendering: Reverse for 'will_not_match' with arguments '()' and keyword arguments '{}' not found.")
 
         settings.SETTINGS_MODULE = old_settings_module
         settings.TEMPLATE_DEBUG = old_template_debug

@@ -109,4 +109,5 @@ urlpatterns += patterns('django.views.generic.simple',
 
 urlpatterns += patterns('regressiontests.views.views',
     url(r'view_exception/(?P<n>\d+)/$', 'view_exception', name='view_exception'),
+    url(r'template_exception/(?P<n>\d+)/$', 'template_exception', name='template_exception'),
 )
