@@ -425,6 +425,13 @@ above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
 Then, just edit the file and replace the generic Django text with your own
 site's name as you see fit.
 
+This template file contains lots of text like ``{% block branding %}``
+and ``{{ title }}. The ``{%`` and ``{{`` tags are part of Django's
+template language. When Django renders ``admin/base_site.html``, this
+template language will be evaluated to produce the final HTML page.
+Don't worry if you can't make any sense of the template right now --
+we'll delve into Django's templating language in Tutorial 3.
+
 Note that any of Django's default admin templates can be overridden. To
 override a template, just do the same thing you did with ``base_site.html`` --
 copy it from the default directory into your custom directory, and make
@@ -452,7 +459,9 @@ The template to customize is ``admin/index.html``. (Do the same as with
 directory to your custom template directory.) Edit the file, and you'll see it
 uses a template variable called ``app_list``. That variable contains every
 installed Django app. Instead of using that, you can hard-code links to
-object-specific admin pages in whatever way you think is best.
+object-specific admin pages in whatever way you think is best. Again,
+don't worry if you can't understand the template language -- we'll cover that
+in more detail in Tutorial 3.
 
 When you're comfortable with the admin site, read :ref:`part 3 of this tutorial
 <intro-tutorial03>` to start working on public poll views.
