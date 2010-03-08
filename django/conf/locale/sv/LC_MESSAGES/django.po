@@ -8,7 +8,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-05-01 18:23+0200\n"
 "PO-Revision-Date: 2008-05-26 11:15+0200\n"
-"Last-Translator: Ludvig Ericson <ludvig.ericson@gmail.com>\n"
+"Last-Translator: Mikko Hellsing <mikko@aino.se>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4131,107 +4131,107 @@ msgstr "middag"
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr "Måndag"
+msgstr "måndag"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr "Tisdag"
+msgstr "tisdag"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr "Onsdag"
+msgstr "onsdag"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr "Torsdag"
+msgstr "torsdag"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr "Fredag"
+msgstr "fredag"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr "Lördag"
+msgstr "lördag"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr "Söndag"
+msgstr "söndag"
 
 #: utils/dates.py:10
 msgid "Mon"
-msgstr "Mån"
+msgstr "mån"
 
 #: utils/dates.py:10
 msgid "Tue"
-msgstr "Tis"
+msgstr "tis"
 
 #: utils/dates.py:10
 msgid "Wed"
-msgstr "Ons"
+msgstr "ons"
 
 #: utils/dates.py:10
 msgid "Thu"
-msgstr "Tors"
+msgstr "tors"
 
 #: utils/dates.py:10
 msgid "Fri"
-msgstr "Fre"
+msgstr "fre"
 
 #: utils/dates.py:11
 msgid "Sat"
-msgstr "Lör"
+msgstr "lör"
 
 #: utils/dates.py:11
 msgid "Sun"
-msgstr "Sön"
+msgstr "sön"
 
 #: utils/dates.py:18
 msgid "January"
-msgstr "Januari"
+msgstr "januari"
 
 #: utils/dates.py:18
 msgid "February"
-msgstr "Februari"
+msgstr "februari"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "April"
-msgstr "April"
+msgstr "april"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "May"
-msgstr "Maj"
+msgstr "maj"
 
 #: utils/dates.py:18 utils/dates.py:31
 msgid "June"
-msgstr "Juni"
+msgstr "juni"
 
 #: utils/dates.py:19 utils/dates.py:31
 msgid "July"
-msgstr "Juli"
+msgstr "juli"
 
 #: utils/dates.py:19
 msgid "August"
-msgstr "Augusti"
+msgstr "augusti"
 
 #: utils/dates.py:19
 msgid "September"
-msgstr "September"
+msgstr "september"
 
 #: utils/dates.py:19
 msgid "October"
-msgstr "Oktober"
+msgstr "oktober"
 
 #: utils/dates.py:19
 msgid "November"
-msgstr "November"
+msgstr "november"
 
 #: utils/dates.py:20
 msgid "December"
-msgstr "December"
+msgstr "december"
 
 #: utils/dates.py:23
 msgid "jan"
@@ -4283,31 +4283,31 @@ msgstr "dec"
 
 #: utils/dates.py:31
 msgid "Jan."
-msgstr "Jan."
+msgstr "jan."
 
 #: utils/dates.py:31
 msgid "Feb."
-msgstr "Feb."
+msgstr "feb."
 
 #: utils/dates.py:32
 msgid "Aug."
-msgstr "Aug."
+msgstr "aug."
 
 #: utils/dates.py:32
 msgid "Sept."
-msgstr "Sept."
+msgstr "sept."
 
 #: utils/dates.py:32
 msgid "Oct."
-msgstr "Okt."
+msgstr "okt."
 
 #: utils/dates.py:32
 msgid "Nov."
-msgstr "Nov."
+msgstr "nov."
 
 #: utils/dates.py:32
 msgid "Dec."
-msgstr "Dec."
+msgstr "dec."
 
 #: utils/text.py:128
 msgid "or"
