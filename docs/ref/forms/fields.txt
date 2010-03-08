@@ -777,15 +777,22 @@ for ``TimeField`` are used.
 Fields which handle relationships
 ---------------------------------
 
-For representing relationships between models, two fields are
-provided which can derive their choices from a ``QuerySet``:
+Two fields are available for representing relationships between
+models: :class:`ModelChoiceField` and
+:class:`ModelMultipleChoiceField`.  Both of these fields require a
+single ``queryset`` parameter that is used to create the choices for
+the field.  Upon form validation, these fields will place either one
+model object (in the case of ``ModelChoiceField``) or multiple model
+objects (in the case of ``ModelMultipleChoiceField``) into the
+``cleaned_data`` dictionary of the form.
+
+``ModelChoiceField``
+~~~~~~~~~~~~~~~~~~~~
 
 .. class:: ModelChoiceField(**kwargs)
-.. class:: ModelMultipleChoiceField(**kwargs)
 
-These fields place one or more model objects into the ``cleaned_data``
-dictionary of forms in which they're used. Both of these fields have an
-additional required argument:
+Allows the selection of a single model object, suitable for
+representing a foreign key.  A single argument is required:
 
 .. attribute:: ModelChoiceField.queryset
 
@@ -793,22 +800,7 @@ additional required argument:
     field will be derived, and which will be used to validate the
     user's selection.
 
-``ModelChoiceField``
-~~~~~~~~~~~~~~~~~~~~
-
-Allows the selection of a single model object, suitable for
-representing a foreign key.
-
-The ``__unicode__`` method of the model will be called to generate
-string representations of the objects for use in the field's choices;
-to provide customized representations, subclass ``ModelChoiceField``
-and override ``label_from_instance``. This method will receive a model
-object, and should return a string suitable for representing it. For
-example::
-
-    class MyModelChoiceField(ModelChoiceField):
-        def label_from_instance(self, obj):
-            return "My Object #%i" % obj.id
+``ModelChoiceField`` also takes one optional argument:
 
 .. attribute:: ModelChoiceField.empty_label
 
@@ -828,13 +820,32 @@ example::
    initial value, no empty choice is created (regardless of the value
    of ``empty_label``).
 
+The ``__unicode__`` method of the model will be called to generate
+string representations of the objects for use in the field's choices;
+to provide customized representations, subclass ``ModelChoiceField``
+and override ``label_from_instance``. This method will receive a model
+object, and should return a string suitable for representing it. For
+example::
+
+    class MyModelChoiceField(ModelChoiceField):
+        def label_from_instance(self, obj):
+            return "My Object #%i" % obj.id
+
 ``ModelMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. class:: ModelMultipleChoiceField(**kwargs)
+
 Allows the selection of one or more model objects, suitable for
-representing a many-to-many relation. As with ``ModelChoiceField``,
+representing a many-to-many relation. As with :class:`ModelChoiceField`,
 you can use ``label_from_instance`` to customize the object
-representations.
+representations, and ``queryset`` is a required parameter:
+
+.. attribute:: ModelMultipleChoiceField.queryset
+
+    A ``QuerySet`` of model objects from which the choices for the
+    field will be derived, and which will be used to validate the
+    user's selection.
 
 Creating custom fields
 ----------------------
