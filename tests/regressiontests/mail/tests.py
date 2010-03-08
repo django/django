@@ -112,8 +112,8 @@ BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection T
 >>> email.encoding = 'iso-8859-1'
 >>> email.message()['To']
 '=?iso-8859-1?q?S=FCrname=2C_Firstname?= <to@example.com>, other@example.com'
->>> email.message()['Subject'].encode()
-u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?='
+>>> email.message()['Subject'].encode() == u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?='
+True
 
 # Make sure headers can be set with a different encoding than utf-8 in SafeMIMEMultipart as well
 >>> headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
@@ -125,8 +125,8 @@ u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?='
 >>> msg.encoding = 'iso-8859-1'
 >>> msg.message()['To']
 '=?iso-8859-1?q?S=FCrname=2C_Firstname?= <to@example.com>'
->>> msg.message()['Subject'].encode()
-u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?='
+>>> msg.message()['Subject'].encode() == u'=?iso-8859-1?q?Message_from_Firstname_S=FCrname?='
+True
 
 # Regression for #12791  - Encode body correctly with other encodings than utf-8
 >>> email = EmailMessage('Subject', 'Firstname Sürname is a great guy.', 'from@example.com', ['other@example.com'])

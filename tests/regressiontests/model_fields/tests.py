@@ -35,10 +35,10 @@ class BasicFieldTests(django.test.TestCase):
         choices = [(0, 0), (1, 1)]
         model_field = models.Field(choices=choices)
         form_field = model_field.formfield(show_hidden_initial=True)
-        self.assertTrue(form_field.show_hidden_initial)
+        self.failUnless(form_field.show_hidden_initial)
 
         form_field = model_field.formfield(show_hidden_initial=False)
-        self.assertFalse(form_field.show_hidden_initial)
+        self.failIf(form_field.show_hidden_initial)
 
 class DecimalFieldTests(django.test.TestCase):
     def test_to_python(self):
@@ -168,7 +168,7 @@ class TypeCoercionTests(django.test.TestCase):
     """
     def test_lookup_integer_in_charfield(self):
         self.assertEquals(Post.objects.filter(title=9).count(), 0)
-        
+
     def test_lookup_integer_in_textfield(self):
         self.assertEquals(Post.objects.filter(body=24).count(), 0)
-        
+
