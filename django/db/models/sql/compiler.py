@@ -530,10 +530,7 @@ class SQLCompiler(object):
             avoid = avoid_set.copy()
             dupe_set = orig_dupe_set.copy()
             table = f.rel.to._meta.db_table
-            if nullable or f.null:
-                promote = True
-            else:
-                promote = False
+            promote = nullable or f.null
             if model:
                 int_opts = opts
                 alias = root_alias
@@ -584,10 +581,7 @@ class SQLCompiler(object):
                 next = requested.get(f.name, {})
             else:
                 next = False
-            if f.null is not None:
-                new_nullable = f.null
-            else:
-                new_nullable = None
+            new_nullable = f.null or promote
             for dupe_opts, dupe_col in dupe_set:
                 self.query.update_dupe_avoidance(dupe_opts, dupe_col, alias)
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
