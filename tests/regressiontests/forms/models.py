@@ -17,10 +17,17 @@ temp_storage = FileSystemStorage(location=temp_storage_location)
 class BoundaryModel(models.Model):
     positive_integer = models.PositiveIntegerField(null=True, blank=True)
 
+callable_default_value = 0
+def callable_default():
+    global callable_default_value
+    callable_default_value = callable_default_value + 1
+    return callable_default_value
+
 class Defaults(models.Model):
     name = models.CharField(max_length=255, default='class default value')
     def_date = models.DateField(default = datetime.date(1980, 1, 1))
     value = models.IntegerField(default=42)
+    callable_default = models.IntegerField(default=callable_default)
 
 class ChoiceModel(models.Model):
     """For ModelChoiceField and ModelMultipleChoiceField tests."""
@@ -112,6 +119,10 @@ u'class default value'
 datetime.date(1980, 1, 1)
 >>> DefaultsForm().fields['value'].initial
 42
+>>> r1 = DefaultsForm()['callable_default'].as_widget()
+>>> r2 = DefaultsForm()['callable_default'].as_widget()
+>>> r1 == r2
+False
 
 In a ModelForm that is passed an instance, the initial values come from the
 instance's values, not the model's defaults.
@@ -129,7 +140,7 @@ datetime.date(1969, 4, 4)
 ...     name = CharField(max_length=255)
 ...     class Meta:
 ...         model = Defaults
-...         exclude = ['name']
+...         exclude = ['name', 'callable_default']
 >>> f = ExcludingForm({'name': u'Hello', 'value': 99, 'def_date': datetime.date(1999, 3, 2)})
 >>> f.is_valid()
 True

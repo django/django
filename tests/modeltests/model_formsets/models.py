@@ -959,7 +959,7 @@ False
 # when determine what extra forms have changed to save.
 
 >>> form = formset.forms[0] # this formset only has one form
->>> now = form.fields['date_joined'].initial
+>>> now = form.fields['date_joined'].initial()
 >>> print form.as_p()
 <p><label for="id_membership_set-0-date_joined">Date joined:</label> <input type="text" name="membership_set-0-date_joined" value="..." id="id_membership_set-0-date_joined" /><input type="hidden" name="initial-membership_set-0-date_joined" value="..." id="initial-membership_set-0-id_membership_set-0-date_joined" /></p>
 <p><label for="id_membership_set-0-karma">Karma:</label> <input type="text" name="membership_set-0-karma" id="id_membership_set-0-karma" /><input type="hidden" name="membership_set-0-person" value="1" id="id_membership_set-0-person" /><input type="hidden" name="membership_set-0-id" id="id_membership_set-0-id" /></p>
