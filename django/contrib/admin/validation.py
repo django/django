@@ -220,6 +220,20 @@ def validate_base(cls, model):
         for field in flattened_fieldsets:
             check_formfield(cls, model, opts, "fieldsets[%d][1]['fields']" % idx, field)
 
+    # exclude
+    if cls.exclude: # default value is None
+        check_isseq(cls, 'exclude', cls.exclude)
+        for field in cls.exclude:
+            check_formfield(cls, model, opts, 'exclude', field)
+            try:
+                f = opts.get_field(field)
+            except models.FieldDoesNotExist:
+                # If we can't find a field on the model that matches,
+                # it could be an extra field on the form.
+                continue
+        if len(cls.exclude) > len(set(cls.exclude)):
+            raise ImproperlyConfigured('There are duplicate field(s) in %s.exclude' % cls.__name__)
+
     # form
     if hasattr(cls, 'form') and not issubclass(cls.form, BaseModelForm):
         raise ImproperlyConfigured("%s.form does not inherit from "

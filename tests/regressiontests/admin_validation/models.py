@@ -25,7 +25,8 @@ class TwoAlbumFKAndAnE(models.Model):
     album2 = models.ForeignKey(Album, related_name="album2_set")
     e = models.CharField(max_length=1)
 
-
+class Book(models.Model):
+    name = models.CharField(max_length=100)
 
 __test__ = {'API_TESTS':"""
 
@@ -51,6 +52,37 @@ __test__ = {'API_TESTS':"""
 Traceback (most recent call last):
     ...
 ImproperlyConfigured: 'InvalidFields.fields' refers to field 'spam' that is missing from the form.
+
+# Tests for basic validation of 'exclude' option values (#12689)
+
+>>> class ExcludedFields1(admin.ModelAdmin):
+...     exclude = ('foo')
+
+>>> validate(ExcludedFields1, Book)
+Traceback (most recent call last):
+    ...
+ImproperlyConfigured: 'ExcludedFields1.exclude' must be a list or tuple.
+
+>>> class ExcludedFields2(admin.ModelAdmin):
+...     exclude = ('name', 'name')
+
+>>> validate(ExcludedFields2, Book)
+Traceback (most recent call last):
+    ...
+ImproperlyConfigured: There are duplicate field(s) in ExcludedFields2.exclude
+
+>>> class ExcludedFieldsInline(admin.TabularInline):
+...     model = Song
+...     exclude = ('foo')
+
+>>> class ExcludedFieldsAlbumAdmin(admin.ModelAdmin):
+...     model = Album
+...     inlines = [ExcludedFieldsInline]
+
+>>> validate(ExcludedFieldsAlbumAdmin, Album)
+Traceback (most recent call last):
+    ...
+ImproperlyConfigured: 'ExcludedFieldsInline.exclude' must be a list or tuple.
 
 # Regression test for #9932 - exclude in InlineModelAdmin
 # should not contain the ForeignKey field used in ModelAdmin.model
