@@ -1269,3 +1269,43 @@ u'<input type="hidden" name="date_0" value="17.09.2007" /><input type="hidden" n
 
 """
 
+
+from django.utils import copycompat as copy
+from unittest import TestCase
+from django import forms
+
+
+class SelectAndTextWidget(forms.MultiWidget):
+    """
+    MultiWidget subclass
+    """
+    def __init__(self, choices=[]):
+        widgets = [
+            forms.RadioSelect(choices=choices),
+            forms.TextInput
+        ]
+        super(SelectAndTextWidget, self).__init__(widgets)
+    
+    def _set_choices(self, choices):
+        """
+        When choices are set for this widget, we want to pass those along to the Select widget
+        """
+        self.widgets[0].choices = choices
+    def _get_choices(self):
+        """
+        The choices for this widget are the Select widget's choices
+        """
+        return self.widgets[0].choices
+    choices = property(_get_choices, _set_choices)
+
+
+class WidgetTests(TestCase):
+
+    def test_12048(self):
+        # See ticket #12048.
+        w1 = SelectAndTextWidget(choices=[1,2,3])
+        w2 = copy.deepcopy(w1)
+        w2.choices = [4,5,6]
+        # w2 ought to be independent of w1, since MultiWidget ought
+        # to make a copy of its sub-widgets when it is copied.
+        self.assertEqual(w1.choices, [1,2,3])

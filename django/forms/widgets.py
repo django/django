@@ -738,6 +738,11 @@ class MultiWidget(Widget):
             media = media + w.media
         return media
     media = property(_get_media)
+    
+    def __deepcopy__(self, memo):
+        obj = super(MultiWidget, self).__deepcopy__(memo)
+        obj.widgets = copy.deepcopy(self.widgets)
+        return obj
 
 class SplitDateTimeWidget(MultiWidget):
     """
