@@ -336,6 +336,7 @@ name, the second will override the first. The default processors are explained
 below.
 
 .. admonition:: When context processors are applied
+
     When you use ``RequestContext``, the variables you supply directly
     are added first, followed any variables supplied by context
     processors. This means that a context processor may overwrite a
