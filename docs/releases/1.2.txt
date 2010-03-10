@@ -508,9 +508,14 @@ Using the new Feed class, these feeds can be deployed directly as views::
         # ...
     )
 
-If you currently use the ``feed()`` view, the ``LatestEntries`` class
-would not need to be modified apart from subclassing the new
-:class:`~django.contrib.syndication.views.Feed` class.
+If you currently use the ``feed()`` view, the ``LatestEntries`` class would
+often not need to be modified apart from subclassing the new
+:class:`~django.contrib.syndication.views.Feed` class. The exception is if
+Django was automatically working out the name of the template to use to render
+the feed's description and title elements (if you were not specifying the
+``title_template`` and ``description_template`` attributes). You should ensure
+that you always specify ``title_template`` and ``description_template``
+attributes, or provide ``item_title()`` and ``item_description()`` methods.
 
 However, ``LatestEntriesByCategory`` uses the ``get_object()`` method
 with the ``bits`` argument to specify a specific category to show. In
