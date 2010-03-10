@@ -361,8 +361,8 @@ query spans multiple tables, it's possible to get duplicate results when a
 ``values(*fields)``
 ~~~~~~~~~~~~~~~~~~~
 
-Returns a ``ValuesQuerySet`` -- a ``QuerySet`` that evaluates to a list of
-dictionaries instead of model-instance objects.
+Returns a ``ValuesQuerySet`` -- a ``QuerySet`` that returns dictionaries when
+used as an iterable, rather than model-instance objects.
 
 Each of those dictionaries represents an object, with the keys corresponding to
 the attribute names of model objects.
@@ -446,10 +446,10 @@ individualism.
 
 .. versionadded:: 1.0
 
-This is similar to ``values()`` except that instead of returning a list of
-dictionaries, it returns a list of tuples. Each tuple contains the value from
-the respective field passed into the ``values_list()`` call -- so the first
-item is the first field, etc. For example::
+This is similar to ``values()`` except that instead of returning dictionaries,
+it returns tuples when iterated over. Each tuple contains the value from the
+respective field passed into the ``values_list()`` call -- so the first item is
+the first field, etc. For example::
 
     >>> Entry.objects.values_list('id', 'headline')
     [(1, u'First entry'), ...]
