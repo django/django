@@ -7,6 +7,11 @@ from django.utils.encoding import smart_unicode, smart_str
 
 try:
     import cmemcache as memcache
+    import warnings
+    warnings.warn(
+        "Support for the 'cmemcache' library has been deprecated. Please use python-memcached instead.",
+        PendingDeprecationWarning
+    )
 except ImportError:
     try:
         import memcache
