@@ -63,7 +63,11 @@ class BigInt(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=100)
     body = models.TextField()
-    
+
+class NullBooleanModel(models.Model):
+    nbfield = models.NullBooleanField()
+
+
 ###############################################################################
 # ImageField
 

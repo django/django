@@ -6,7 +6,7 @@ from django import forms
 from django.db import models
 from django.core.exceptions import ValidationError
 
-from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post
+from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel
 
 try:
     from decimal import Decimal
@@ -39,6 +39,18 @@ class BasicFieldTests(django.test.TestCase):
 
         form_field = model_field.formfield(show_hidden_initial=False)
         self.assertFalse(form_field.show_hidden_initial)
+
+    def test_nullbooleanfield_blank(self):
+        """
+        Regression test for #13071: NullBooleanField should not throw
+        a validation error when given a value of None.
+        
+        """
+        nullboolean = NullBooleanModel(nbfield=None)
+        try:
+            nullboolean.full_clean()
+        except ValidationError, e:
+            self.fail("NullBooleanField failed validation with value of None: %s" % e.messages)
 
 class DecimalFieldTests(django.test.TestCase):
     def test_to_python(self):
