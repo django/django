@@ -260,7 +260,6 @@ class AdminViewBasicTest(TestCase):
         # Post model).
         response = self.client.get("/test_admin/admin/admin_views/post/")
         self.failUnless('icon-unknown.gif' in response.content)
-        print "Passed"
 
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
