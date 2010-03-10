@@ -464,11 +464,13 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     posted = models.DateField(default=datetime.date.today)
+    public = models.NullBooleanField()
 
     def awesomeness_level(self):
         return "Very awesome."
 
 class PostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'public']
     readonly_fields = ('posted', 'awesomeness_level', 'coolness', lambda obj: "foo")
 
     inlines = [

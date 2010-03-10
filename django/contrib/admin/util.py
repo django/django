@@ -337,12 +337,14 @@ def display_for_field(value, field):
 
     if field.flatchoices:
         return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
+    # NullBooleanField needs special-case null-handling, so it comes
+    # before the general null test.
+    elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):
+        return _boolean_icon(value)
     elif value is None:
         return EMPTY_CHANGELIST_VALUE
     elif isinstance(field, models.DateField) or isinstance(field, models.TimeField):
         return formats.localize(value)
-    elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):
-        return _boolean_icon(value)
     elif isinstance(field, models.DecimalField):
         return formats.number_format(value, field.decimal_places)
     elif isinstance(field, models.FloatField):

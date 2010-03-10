@@ -1,6 +1,7 @@
 from datetime import datetime
 import unittest
 
+from django.conf import settings
 from django.db import models
 from django.utils.formats import localize
 from django.test import TestCase
@@ -131,8 +132,11 @@ class UtilTests(unittest.TestCase):
         display_value = display_for_field(None, models.TimeField())
         self.assertEqual(display_value, EMPTY_CHANGELIST_VALUE)
 
+        # Regression test for #13071: NullBooleanField has special
+        # handling.
         display_value = display_for_field(None, models.NullBooleanField())
-        self.assertEqual(display_value, EMPTY_CHANGELIST_VALUE)
+        expected = u'<img src="%simg/admin/icon-unknown.gif" alt="None" />' % settings.ADMIN_MEDIA_PREFIX
+        self.assertEqual(display_value, expected)
 
         display_value = display_for_field(None, models.DecimalField())
         self.assertEqual(display_value, EMPTY_CHANGELIST_VALUE)

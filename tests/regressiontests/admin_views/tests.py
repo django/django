@@ -253,6 +253,15 @@ class AdminViewBasicTest(TestCase):
             "Changelist filter isn't showing options contained inside a model field 'choices' option named group."
         )
 
+    def testChangeListNullBooleanDisplay(self):
+        Post.objects.create(public=None)
+        # This hard-codes the URl because it'll fail if it runs
+        # against the 'admin2' custom admin (which doesn't have the
+        # Post model).
+        response = self.client.get("/test_admin/admin/admin_views/post/")
+        self.failUnless('icon-unknown.gif' in response.content)
+        print "Passed"
+
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
 
