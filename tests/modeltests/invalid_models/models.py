@@ -180,7 +180,27 @@ class AbstractRelationModel(models.Model):
 
 class UniqueM2M(models.Model):
     """ Model to test for unique ManyToManyFields, which are invalid. """
-    unique_people = models.ManyToManyField( Person, unique=True )
+    unique_people = models.ManyToManyField(Person, unique=True)
+
+class NonUniqueFKTarget1(models.Model):
+    """ Model to test for non-unique FK target in yet-to-be-defined model: expect an error """
+    tgt = models.ForeignKey('FKTarget', to_field='bad')
+
+class UniqueFKTarget1(models.Model):
+    """ Model to test for unique FK target in yet-to-be-defined model: expect no error """
+    tgt = models.ForeignKey('FKTarget', to_field='good')
+
+class FKTarget(models.Model):
+    bad = models.IntegerField()
+    good = models.IntegerField(unique=True)
+
+class NonUniqueFKTarget2(models.Model):
+    """ Model to test for non-unique FK target in previously seen model: expect an error """
+    tgt = models.ForeignKey(FKTarget, to_field='bad')
+
+class UniqueFKTarget2(models.Model):
+    """ Model to test for unique FK target in previously seen model: expect no error """
+    tgt = models.ForeignKey(FKTarget, to_field='good')
 
 
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute.
@@ -279,4 +299,6 @@ invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate t
 invalid_models.abstractrelationmodel: 'fk1' has a relation with model AbstractModel, which has either not been installed or is abstract.
 invalid_models.abstractrelationmodel: 'fk2' has an m2m relation with model AbstractModel, which has either not been installed or is abstract.
 invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the unique argument on 'unique_people'.
+invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
+invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 """

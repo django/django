@@ -80,6 +80,10 @@ def get_validation_errors(outfile, app=None):
                 if isinstance(f.rel.to, (str, unicode)):
                     continue
 
+                # Make sure the related field specified by a ForeignKey is unique
+                if not f.rel.to._meta.get_field(f.rel.field_name).unique:
+                    e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.rel.field_name, f.rel.to.__name__))
+
                 rel_opts = f.rel.to._meta
                 rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
                 rel_query_name = f.related_query_name()
