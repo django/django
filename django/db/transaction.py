@@ -257,79 +257,91 @@ def savepoint_commit(sid, using=None):
 # DECORATORS #
 ##############
 
-def autocommit(func_or_using=None):
+def autocommit(using=None):
     """
     Decorator that activates commit on save. This is Django's default behavior;
     this decorator is useful if you globally activated transaction management in
     your settings file and want the default behavior in some view functions.
     """
-    def inner_autocommit(func, using=None):
+    def inner_autocommit(func, db=None):
         def _autocommit(*args, **kw):
             try:
-                enter_transaction_management(managed=False, using=using)
-                managed(False, using=using)
+                enter_transaction_management(managed=False, using=db)
+                managed(False, using=db)
                 return func(*args, **kw)
             finally:
-                leave_transaction_management(using=using)
+                leave_transaction_management(using=db)
         return wraps(func)(_autocommit)
-    if func_or_using is None:
-        func_or_using = DEFAULT_DB_ALIAS
-    if callable(func_or_using):
-        return inner_autocommit(func_or_using, DEFAULT_DB_ALIAS)
-    return lambda func: inner_autocommit(func,  func_or_using)
+
+    # Note that although the first argument is *called* `using`, it
+    # may actually be a function; @autocommit and @autocommit('foo')
+    # are both allowed forms.
+    if using is None:
+        using = DEFAULT_DB_ALIAS
+    if callable(using):
+        return inner_autocommit(using, DEFAULT_DB_ALIAS)
+    return lambda func: inner_autocommit(func,  using)
 
 
-def commit_on_success(func_or_using=None):
+def commit_on_success(using=None):
     """
     This decorator activates commit on response. This way, if the view function
     runs successfully, a commit is made; if the viewfunc produces an exception,
     a rollback is made. This is one of the most common ways to do transaction
     control in web apps.
     """
-    def inner_commit_on_success(func, using=None):
+    def inner_commit_on_success(func, db=None):
         def _commit_on_success(*args, **kw):
             try:
-                enter_transaction_management(using=using)
-                managed(True, using=using)
+                enter_transaction_management(using=db)
+                managed(True, using=db)
                 try:
                     res = func(*args, **kw)
                 except:
                     # All exceptions must be handled here (even string ones).
-                    if is_dirty(using=using):
-                        rollback(using=using)
+                    if is_dirty(using=db):
+                        rollback(using=db)
                     raise
                 else:
-                    if is_dirty(using=using):
-                        commit(using=using)
+                    if is_dirty(using=db):
+                        commit(using=db)
                 return res
             finally:
-                leave_transaction_management(using=using)
+                leave_transaction_management(using=db)
         return wraps(func)(_commit_on_success)
-    if func_or_using is None:
-        func_or_using = DEFAULT_DB_ALIAS
-    if callable(func_or_using):
-        return inner_commit_on_success(func_or_using, DEFAULT_DB_ALIAS)
-    return lambda func: inner_commit_on_success(func, func_or_using)
 
-def commit_manually(func_or_using=None):
+    # Note that although the first argument is *called* `using`, it
+    # may actually be a function; @autocommit and @autocommit('foo')
+    # are both allowed forms.
+    if using is None:
+        using = DEFAULT_DB_ALIAS
+    if callable(using):
+        return inner_commit_on_success(using, DEFAULT_DB_ALIAS)
+    return lambda func: inner_commit_on_success(func, using)
+
+def commit_manually(using=None):
     """
     Decorator that activates manual transaction control. It just disables
     automatic transaction control and doesn't do any commit/rollback of its
     own -- it's up to the user to call the commit and rollback functions
     themselves.
     """
-    def inner_commit_manually(func, using=None):
+    def inner_commit_manually(func, db=None):
         def _commit_manually(*args, **kw):
             try:
-                enter_transaction_management(using=using)
-                managed(True, using=using)
+                enter_transaction_management(using=db)
+                managed(True, using=db)
                 return func(*args, **kw)
             finally:
-                leave_transaction_management(using=using)
+                leave_transaction_management(using=db)
 
         return wraps(func)(_commit_manually)
-    if func_or_using is None:
-        func_or_using = DEFAULT_DB_ALIAS
-    if callable(func_or_using):
-        return inner_commit_manually(func_or_using, DEFAULT_DB_ALIAS)
-    return lambda func: inner_commit_manually(func, func_or_using)
+
+    # Note that although the first argument is *called* `using`, it
+    # may actually be a function; @autocommit and @autocommit('foo')
+    # are both allowed forms.
+    if using is None:
+        using = DEFAULT_DB_ALIAS
+    if callable(using):
+        return inner_commit_manually(using, DEFAULT_DB_ALIAS)
+    return lambda func: inner_commit_manually(func, using)

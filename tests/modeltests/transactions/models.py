@@ -56,17 +56,39 @@ Exception: I meant to do that
 >>> Reporter.objects.all()
 [<Reporter: Alice Smith>, <Reporter: Ben Jones>]
 
-# With the commit_on_success decorator, the transaction is only comitted if the
+# the autocommit decorator also works with a using argument
+>>> using_autocomitted_create_then_fail = transaction.autocommit(using='default')(create_a_reporter_then_fail)
+>>> using_autocomitted_create_then_fail("Carol", "Doe")
+Traceback (most recent call last):
+    ...
+Exception: I meant to do that
+
+# Same behavior as before
+>>> Reporter.objects.all()
+[<Reporter: Alice Smith>, <Reporter: Ben Jones>, <Reporter: Carol Doe>]
+
+# With the commit_on_success decorator, the transaction is only committed if the
 # function doesn't throw an exception
 >>> committed_on_success = transaction.commit_on_success(create_a_reporter_then_fail)
->>> committed_on_success("Carol", "Doe")
+>>> committed_on_success("Dirk", "Gently")
 Traceback (most recent call last):
     ...
 Exception: I meant to do that
 
 # This time the object never got saved
 >>> Reporter.objects.all()
-[<Reporter: Alice Smith>, <Reporter: Ben Jones>]
+[<Reporter: Alice Smith>, <Reporter: Ben Jones>, <Reporter: Carol Doe>]
+
+# commit_on_success decorator also works with a using argument
+>>> using_committed_on_success = transaction.commit_on_success(using='default')(create_a_reporter_then_fail)
+>>> using_committed_on_success("Dirk", "Gently")
+Traceback (most recent call last):
+    ...
+Exception: I meant to do that
+
+# This time the object never got saved
+>>> Reporter.objects.all()
+[<Reporter: Alice Smith>, <Reporter: Ben Jones>, <Reporter: Carol Doe>]
 
 # If there aren't any exceptions, the data will get saved
 >>> def remove_a_reporter():
@@ -76,22 +98,22 @@ Exception: I meant to do that
 >>> remove_comitted_on_success = transaction.commit_on_success(remove_a_reporter)
 >>> remove_comitted_on_success()
 >>> Reporter.objects.all()
-[<Reporter: Ben Jones>]
+[<Reporter: Ben Jones>, <Reporter: Carol Doe>]
 
 # You can manually manage transactions if you really want to, but you
 # have to remember to commit/rollback
 >>> def manually_managed():
-...     r = Reporter(first_name="Carol", last_name="Doe")
+...     r = Reporter(first_name="Dirk", last_name="Gently")
 ...     r.save()
 ...     transaction.commit()
 >>> manually_managed = transaction.commit_manually(manually_managed)
 >>> manually_managed()
 >>> Reporter.objects.all()
-[<Reporter: Ben Jones>, <Reporter: Carol Doe>]
+[<Reporter: Ben Jones>, <Reporter: Carol Doe>, <Reporter: Dirk Gently>]
 
 # If you forget, you'll get bad errors
 >>> def manually_managed_mistake():
-...     r = Reporter(first_name="David", last_name="Davidson")
+...     r = Reporter(first_name="Edward", last_name="Woodward")
 ...     r.save()
 ...     # oops, I forgot to commit/rollback!
 >>> manually_managed_mistake = transaction.commit_manually(manually_managed_mistake)
@@ -99,4 +121,12 @@ Exception: I meant to do that
 Traceback (most recent call last):
     ...
 TransactionManagementError: Transaction managed block ended with pending COMMIT/ROLLBACK
+
+# commit_manually also works with a using argument
+>>> using_manually_managed_mistake = transaction.commit_manually(using='default')(manually_managed_mistake)
+>>> using_manually_managed_mistake()
+Traceback (most recent call last):
+    ...
+TransactionManagementError: Transaction managed block ended with pending COMMIT/ROLLBACK
+
 """
