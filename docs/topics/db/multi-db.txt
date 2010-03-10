@@ -74,7 +74,7 @@ Alternatively, if you want fine-grained control of synchronization,
 you can pipe all or part of the output of :djadmin:`sqlall` for a
 particular application directly into your database prompt, like this::
 
-	$ ./manage.py sqlall sales | ./manage.py dbshell
+    $ ./manage.py sqlall sales | ./manage.py dbshell
 
 Using other management commands
 -------------------------------
@@ -193,13 +193,13 @@ An example
     intentionally ignores some complex issues in order to
     demonstrate how routers are used.
 
-    The approach of splitting ``contrib.auth`` onto a different
-    database won't actually work on Postgres, Oracle, or MySQL with
-    InnoDB tables. ForeignKeys to a remote database won't work due as
-    they introduce referential integrity problems. If you're using
-    SQLite or MySQL with MyISAM tables, there is no referential
-    integrity checking, so you will be able to define cross-database
-    foreign keys.
+    This example won't work on Postgres, Oracle, or MySQL with InnoDB
+    tables if any of the models in ``myapp`` contain foreign keys to
+    models outside of the ``other`` database. ForeignKeys to a remote
+    database introduce referential integrity problems that Django can't
+    currently handle. However, if you're using SQLite or MySQL with MyISAM
+    tables, there is no referential integrity checking, so you will be
+    able to define cross-database foreign keys.
 
     The master/slave configuration described is also flawed -- it
     doesn't provide any solution for handling replication lag (i.e.,
@@ -207,38 +207,38 @@ An example
     write to propagate to the slaves). It also doesn't consider the
     interaction of transactions with the database utilization strategy.
 
-So - what does this mean in practice? Say you want ``contrib.auth`` to
-exist on the 'credentials' database, and you want all other models in a
-master/slave relationship between the databases 'master', 'slave1' and
-'slave2'. To implement this, you would need 2 routers::
+So - what does this mean in practice? Say you want ``myapp`` to
+exist on the ``other`` database, and you want all other models in a
+master/slave relationship between the databases ``master``, ``slave1`` and
+``slave2``. To implement this, you would need 2 routers::
 
-    class AuthRouter(object):
+    class MyAppRouter(object):
         """A router to control all database operations on models in
-        the contrib.auth application"""
+        the myapp application"""
 
         def db_for_read(self, model, **hints):
-            "Point all operations on auth models to 'credentials'"
-            if model._meta.app_label == 'auth':
-                return 'credentials'
+            "Point all operations on myapp models to 'other'"
+            if model._meta.app_label == 'myapp':
+                return 'other'
             return None
 
         def db_for_write(self, model, **hints):
-            "Point all operations on auth models to 'credentials'"
-            if model._meta.app_label == 'auth':
-                return 'credentials'
+            "Point all operations on myapp models to 'other'"
+            if model._meta.app_label == 'myapp':
+                return 'other'
             return None
 
         def allow_relation(self, obj1, obj2, **hints):
-            "Allow any relation if a model in Auth is involved"
-            if obj1._meta.app_label == 'auth' or obj2._meta.app_label == 'auth':
+            "Allow any relation if a model in myapp is involved"
+            if obj1._meta.app_label == 'myapp' or obj2._meta.app_label == 'myapp':
                 return True
             return None
 
         def allow_syncdb(self, db, model):
-            "Make sure the auth app only appears on the 'credentials' db"
-            if db == 'credentials':
-                return model._meta.app_label == 'auth'
-            elif model._meta.app_label == 'auth':
+            "Make sure the myapp app only appears on the 'other' db"
+            if db == 'other':
+                return model._meta.app_label == 'myapp'
+            elif model._meta.app_label == 'myapp':
                 return False
             return None
 
@@ -267,13 +267,13 @@ master/slave relationship between the databases 'master', 'slave1' and
 Then, in your settings file, add the following (substituting ``path.to.`` with
 the actual python path to the module where you define the routers)::
 
-    DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.MasterSlaveRouter']
+    DATABASE_ROUTERS = ['path.to.MyAppRouter', 'path.to.MasterSlaveRouter']
 
 The order in which routers are processed is significant. Routers will
 be queried in the order the are listed in the
 :setting:`DATABASE_ROUTERS` setting . In this example, the
-``AuthRouter`` is processed before the ``MasterSlaveRouter``, and as a
-result, decisions concerning the models in ``auth`` are processed
+``MyAppRouter`` is processed before the ``MasterSlaveRouter``, and as a
+result, decisions concerning the models in ``myapp`` are processed
 before any other decision is made. If the :setting:`DATABASE_ROUTERS`
 setting listed the two routers in the other order,
 ``MasterSlaveRouter.allow_syncdb()`` would be processed first. The
