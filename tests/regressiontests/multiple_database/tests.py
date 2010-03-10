@@ -655,6 +655,19 @@ class QueryTestCase(TestCase):
         # The editor instance should have a db state
         self.assertEqual(book.editor._state.db, 'other')
 
+    def test_subquery(self):
+        """Make sure as_sql works with subqueries and master/slave."""
+        sub = Person.objects.using('other').filter(name='fff')
+        qs = Book.objects.filter(editor__in=sub)
+
+        # When you call __str__ on the query object, it doesn't know about using
+        # so it falls back to the default. If the subquery explicitly uses a
+        # different database, an error should be raised.
+        self.assertRaises(ValueError, str, qs.query)
+
+        # Evaluating the query shouldn't work, either
+        self.assertRaises(ValueError, list, qs)
+
 class TestRouter(object):
     # A test router. The behaviour is vaguely master/slave, but the
     # databases aren't assumed to propagate changes.
@@ -1136,6 +1149,26 @@ class RouterTestCase(TestCase):
         # Dive comes from 'other', so review3 is set to use the source of 'other'...
         review3.content_object = dive
         self.assertEquals(review3._state.db, 'default')
+
+    def test_subquery(self):
+        """Make sure as_sql works with subqueries and master/slave."""
+        # Create a book and author on the other database
+
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
+        dive = Book.objects.using('other').create(title="Dive into Python",
+                                                  published=datetime.date(2009, 5, 4),
+                                                  editor=mark)
+
+        sub = Person.objects.filter(name='Mark Pilgrim')
+        qs = Book.objects.filter(editor__in=sub)
+
+        # When you call __str__ on the query object, it doesn't know about using
+        # so it falls back to the default. Don't let routing instructions
+        # force the subquery to an incompatible database.
+        str(qs.query)
+
+        # If you evaluate the query, it should work, running on 'other'
+        self.assertEquals(list(qs.values_list('title', flat=True)), [u'Dive into Python'])
 
 class AuthTestCase(TestCase):
     multi_db = True
