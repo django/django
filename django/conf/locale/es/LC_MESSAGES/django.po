@@ -86,9 +86,8 @@ msgid "French"
 msgstr "francés"
 
 #: conf/global_settings.py:62
-#, fuzzy
 msgid "Frisian"
-msgstr "Friesland"
+msgstr ""
 
 #: conf/global_settings.py:63
 msgid "Irish"
@@ -191,9 +190,8 @@ msgid "Slovenian"
 msgstr "esloveno"
 
 #: conf/global_settings.py:88
-#, fuzzy
 msgid "Albanian"
-msgstr "Alicante"
+msgstr "albanés"
 
 #: conf/global_settings.py:89
 msgid "Serbian"
@@ -229,9 +227,8 @@ msgid "Ukrainian"
 msgstr "ucraniano"
 
 #: conf/global_settings.py:97
-#, fuzzy
 msgid "Vietnamese"
-msgstr "Viena"
+msgstr "vietnamita"
 
 #: conf/global_settings.py:98
 msgid "Simplified Chinese"
@@ -435,15 +432,15 @@ msgstr[1] "%(count)s %(name)s fueron modificados con éxito."
 #, python-format
 msgid "of %(count)d selected"
 msgid_plural "of %(count)d selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "de %(count)d seleccionado"
+msgstr[1] "de %(count)d seleccionados"
 
 #: contrib/admin/options.py:1042
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(total_count)s seleccionado"
+msgstr[1] "Todos %(total_count)s seleccionados"
 
 #: contrib/admin/options.py:1094
 #, python-format
@@ -1798,9 +1795,8 @@ msgid "Multi polygon"
 msgstr "Polígono múltiple"
 
 #: contrib/gis/db/models/fields.py:293
-#, fuzzy
 msgid "Geometry collection"
-msgstr "Colección de Geometry"
+msgstr "Colección de \"Geometry\""
 
 #: contrib/gis/forms/fields.py:17
 msgid "No geometry value provided."
@@ -2632,9 +2628,8 @@ msgid "Enter a valid vehicle license plate number"
 msgstr "Introduzca un número de placa vehicular válido"
 
 #: contrib/localflavor/id/forms.py:170
-#, fuzzy
 msgid "Enter a valid NIK/KTP number"
-msgstr "Introduzca un número IC válido."
+msgstr "Introduzca un número NIK/KTP válido."
 
 #: contrib/localflavor/id/id_choices.py:9
 #: contrib/localflavor/id/id_choices.py:73
@@ -2648,9 +2643,8 @@ msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:11
 #: contrib/localflavor/id/id_choices.py:54
-#, fuzzy
 msgid "Bengkulu"
-msgstr "bengalí"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:12
 #: contrib/localflavor/id/id_choices.py:47
@@ -2664,15 +2658,13 @@ msgstr "Jacarta"
 
 #: contrib/localflavor/id/id_choices.py:14
 #: contrib/localflavor/id/id_choices.py:75
-#, fuzzy
 msgid "Gorontalo"
-msgstr "Gerona"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:15
 #: contrib/localflavor/id/id_choices.py:57
-#, fuzzy
 msgid "Jambi"
-msgstr "tamil"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:16
 msgid "Jawa Barat"
@@ -2717,15 +2709,13 @@ msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:25
 #: contrib/localflavor/id/id_choices.py:55
-#, fuzzy
 msgid "Lampung"
-msgstr "ago"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:26
 #: contrib/localflavor/id/id_choices.py:70
-#, fuzzy
 msgid "Maluku"
-msgstr "Malacky"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:27
 #: contrib/localflavor/id/id_choices.py:71
@@ -2798,27 +2788,24 @@ msgid "Sumatera Utara"
 msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:46
-#, fuzzy
 msgid "Magelang"
-msgstr "Málaga"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:48
 msgid "Surakarta - Solo"
 msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:49
-#, fuzzy
 msgid "Madiun"
-msgstr "Madrid"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:50
 msgid "Kediri"
 msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:53
-#, fuzzy
 msgid "Tapanuli"
-msgstr "Tamaulipas"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:61
 msgid "Kepulauan Bangka Belitung"
@@ -2833,9 +2820,8 @@ msgid "Corps Diplomatic"
 msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:65
-#, fuzzy
 msgid "Bandung"
-msgstr "Brandenburg"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:67
 msgid "Sulawesi Utara Daratan"
@@ -2858,9 +2844,8 @@ msgid "Papua dan Papua Barat"
 msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:80
-#, fuzzy
 msgid "Cirebon"
-msgstr "Gerona"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:81
 msgid "NTB - Sumbawa"
@@ -2875,43 +2860,36 @@ msgid "NTT - Sumba"
 msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:84
-#, fuzzy
 msgid "Bogor"
-msgstr "Hyogo"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:85
 msgid "Pekalongan"
 msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:86
-#, fuzzy
 msgid "Semarang"
-msgstr "serbio"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:87
-#, fuzzy
 msgid "Pati"
-msgstr "activo"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:91
-#, fuzzy
 msgid "Surabaya"
-msgstr "sábado"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:92
-#, fuzzy
 msgid "Madura"
-msgstr "Madrid"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:93
-#, fuzzy
 msgid "Malang"
-msgstr "Málaga"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:94
-#, fuzzy
 msgid "Jember"
-msgstr "noviembre"
+msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:95
 msgid "Banyumas"
@@ -2934,73 +2912,60 @@ msgid "Sidoarjo"
 msgstr ""
 
 #: contrib/localflavor/id/id_choices.py:100
-#, fuzzy
 msgid "Garut"
-msgstr "Glarus"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:8
-#, fuzzy
 msgid "Antrim"
-msgstr "Condado de Antrim"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:9
-#, fuzzy
 msgid "Armagh"
-msgstr "Aragón"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:10
 msgid "Carlow"
 msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:11
-#, fuzzy
 msgid "Cavan"
-msgstr "catalán"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:12
-#, fuzzy
 msgid "Clare"
-msgstr "Cáceres"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:13
-#, fuzzy
 msgid "Cork"
-msgstr "o"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:14
-#, fuzzy
 msgid "Derry"
-msgstr "febrero"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:15
-#, fuzzy
 msgid "Donegal"
-msgstr "uno"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:16
-#, fuzzy
 msgid "Down"
-msgstr "Devon"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:17
-#, fuzzy
 msgid "Dublin"
-msgstr "Lublin"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:18
-#, fuzzy
 msgid "Fermanagh"
-msgstr "Condado de Fermanagh"
+msgstr "de Fermanagh"
 
 #: contrib/localflavor/ie/ie_counties.py:19
-#, fuzzy
 msgid "Galway"
-msgstr "Galicia"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:20
-#, fuzzy
 msgid "Kerry"
-msgstr "febrero"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:21
 msgid "Kildare"
@@ -3027,61 +2992,52 @@ msgid "Longford"
 msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:27
-#, fuzzy
 msgid "Louth"
-msgstr "Terminar sesión"
+msgstr "sesión"
 
 #: contrib/localflavor/ie/ie_counties.py:28
-#, fuzzy
 msgid "Mayo"
-msgstr "mayo"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:29
-#, fuzzy
 msgid "Meath"
-msgstr "metadatos"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:30
-#, fuzzy
 msgid "Monaghan"
-msgstr "Iniciar sesión de nuevo"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:31
 msgid "Offaly"
 msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:32
-#, fuzzy
 msgid "Roscommon"
-msgstr "comentario"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:33
-#, fuzzy
 msgid "Sligo"
-msgstr "Shiga"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:34
 msgid "Tipperary"
 msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:35
-#, fuzzy
 msgid "Tyrone"
-msgstr "Tyrol"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:36
 msgid "Waterford"
 msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:37
-#, fuzzy
 msgid "Westmeath"
-msgstr "West Pomerania"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:38
-#, fuzzy
 msgid "Wexford"
-msgstr "mié"
+msgstr ""
 
 #: contrib/localflavor/ie/ie_counties.py:39
 msgid "Wicklow"
@@ -3307,9 +3263,8 @@ msgid "Okinawa"
 msgstr "Okinawa"
 
 #: contrib/localflavor/kw/forms.py:25
-#, fuzzy
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "Introduzca un ID surafricano válido"
+msgstr "Introduzca un ID Civil kuwaití válido"
 
 #: contrib/localflavor/mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -3605,9 +3560,8 @@ msgid "West Pomerania"
 msgstr "West Pomerania"
 
 #: contrib/localflavor/pt/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "Introduzca un código postal en el formato XXXX-XXXX."
+msgstr "Introduzca un código postal en el formato XXXX-XXX."
 
 #: contrib/localflavor/pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
@@ -3634,24 +3588,20 @@ msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "Introduzca un código postal válido en el formato XXXXXX"
 
 #: contrib/localflavor/se/forms.py:50
-#, fuzzy
 msgid "Enter a valid Swedish organisation number."
-msgstr "Introduzca un número de nacimiento válido."
+msgstr "Introduzca un número de organización sueca válido."
 
 #: contrib/localflavor/se/forms.py:107
-#, fuzzy
 msgid "Enter a valid Swedish personal identity number."
-msgstr "Introduzca un número de seguro social finlandés válido."
+msgstr "Introduzca un número de identidad personal sueco válido."
 
 #: contrib/localflavor/se/forms.py:108
-#, fuzzy
 msgid "Co-ordination numbers are not allowed."
-msgstr "No se admiten valores duplicados."
+msgstr "No se admiten número de Co-ordinación."
 
 #: contrib/localflavor/se/forms.py:150
-#, fuzzy
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "Introduzca un código postal en el formato XX-XXX."
+msgstr "Introduzca un código postal en el formato XXXXX."
 
 #: contrib/localflavor/se/se_counties.py:15
 msgid "Stockholm"
@@ -3670,9 +3620,8 @@ msgid "Uppsala"
 msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:19
-#, fuzzy
 msgid "Södermanland"
-msgstr "Gelderland"
+msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:20
 msgid "Östergötland"
@@ -3687,28 +3636,24 @@ msgid "Kronoberg"
 msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:23
-#, fuzzy
 msgid "Kalmar"
-msgstr "mar"
+msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:24
-#, fuzzy
 msgid "Gotland"
-msgstr "Escocia"
+msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:25
-#, fuzzy
 msgid "Blekinge"
-msgstr "Berne"
+msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:26
 msgid "Skåne"
 msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:27
-#, fuzzy
 msgid "Halland"
-msgstr "Saarland"
+msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:28
 msgid "Västra Götaland"
@@ -3727,9 +3672,8 @@ msgid "Västmanland"
 msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:32
-#, fuzzy
 msgid "Dalarna"
-msgstr "Galanta"
+msgstr ""
 
 #: contrib/localflavor/se/se_counties.py:33
 msgid "Gävleborg"
@@ -4389,9 +4333,8 @@ msgstr ""
 "Introduzca un Número Seguro Social de EEUU válido en el formato XXX-XX-XXXX"
 
 #: contrib/localflavor/us/forms.py:88
-#, fuzzy
 msgid "Enter a U.S. state or territory."
-msgstr "Introduzca una abreviatura válida de estado de los EEUU."
+msgstr "Introduzca un estado o territorio de los EEUU."
 
 #: contrib/localflavor/us/models.py:8
 msgid "U.S. state (two uppercase letters)"
@@ -4402,14 +4345,12 @@ msgid "Phone number"
 msgstr "Número de teléfono"
 
 #: contrib/localflavor/uy/forms.py:28
-#, fuzzy
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
-msgstr "Introduzca un CUIT válido en el formato XX-XXXXXXXX-X o XXXXXXXXXXXX."
+msgstr "Introduzca un número de CI válido en el formato X.XXX.XXX-X,XXXXXXX-X o XXXXXXXX."
 
 #: contrib/localflavor/uy/forms.py:30
-#, fuzzy
 msgid "Enter a valid CI number."
-msgstr "Introduzca un número IC válido."
+msgstr "Introduzca un número CI válido."
 
 #: contrib/localflavor/za/forms.py:21
 msgid "Enter a valid South African ID number"
@@ -4456,9 +4397,8 @@ msgid "Western Cape"
 msgstr "Western Cape"
 
 #: contrib/messages/tests/base.py:101
-#, fuzzy
 msgid "lazy message"
-msgstr "mensaje"
+msgstr "mensaje vago"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
