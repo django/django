@@ -935,6 +935,7 @@ class NullBooleanField(Field):
 
     def __init__(self, *args, **kwargs):
         kwargs['null'] = True
+        kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
 
     def get_internal_type(self):
