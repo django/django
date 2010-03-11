@@ -411,7 +411,7 @@ DATE_FORMAT
 Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 
 The default formatting to use for displaying date fields in any part of the
-system.  Note that if setting:`USE_L10N` is set to ``True``, then the
+system. Note that if setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
 :ttag:`allowed date format strings <now>`.
 
@@ -451,7 +451,7 @@ DATETIME_FORMAT
 Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 
 The default formatting to use for displaying datetime fields in any part of the
-system.  Note that if setting:`USE_L10N` is set to ``True``, then the
+system. Note that if setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
 :ttag:`allowed date format strings <now>`.
 
@@ -1353,7 +1353,7 @@ SHORT_DATE_FORMAT
 Default: ``m/d/Y`` (e.g. ``12/31/2003``)
 
 An available formatting that can be used for displaying date fields on
-templates.  Note that if ``USE_L10N`` is set to ``True``, then the corresponding
+templates. Note that if ``USE_L10N`` is set to ``True``, then the corresponding
 locale-dictated format has higher precedence and will be applied. See
 :ttag:`allowed date format strings <now>`.
 
@@ -1369,7 +1369,7 @@ SHORT_DATETIME_FORMAT
 Default: ``m/d/Y P`` (e.g. ``12/31/2003 4 p.m.``)
 
 An available formatting that can be used for displaying datetime fields on
-templates.  Note that if ``USE_L10N`` is set to ``True``, then the corresponding
+templates. Note that if ``USE_L10N`` is set to ``True``, then the corresponding
 locale-dictated format has higher precedence and will be applied. See
 :ttag:`allowed date format strings <now>`.
 
@@ -1509,7 +1509,7 @@ TIME_FORMAT
 Default: ``'P'`` (e.g. ``4 p.m.``)
 
 The default formatting to use for displaying time fields in any part of the
-system.  Note that if setting:`USE_L10N` is set to ``True``, then the
+system. Note that if setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
 :ttag:`allowed date format strings <now>`.
 

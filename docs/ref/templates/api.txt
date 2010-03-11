@@ -724,7 +724,7 @@ and :setting:`TEMPLATE_DEBUG`. All available settings are described in the
 Using an alternative template language
 ======================================
 
-.. versionadded 1.2
+.. versionadded:: 1.2
 
 The Django ``Template`` and ``Loader`` classes implement a simple API for
 loading and rendering templates. By providing some simple wrapper classes that
