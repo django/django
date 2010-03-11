@@ -1,10 +1,9 @@
 from django import template
- 
+
 from regressiontests.views import BrokenException
 
 register = template.Library()
 
-@register.simple_tag
 def go_boom(arg):
     raise BrokenException(arg)
-
+register.simple_tag(go_boom)
