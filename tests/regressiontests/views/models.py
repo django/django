@@ -39,6 +39,7 @@ class UrlArticle(BaseArticle):
 
     def get_absolute_url(self):
         return '/urlarticles/%s/' % self.slug
+    get_absolute_url.purge = True
 
 class DateArticle(BaseArticle):
     """
