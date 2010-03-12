@@ -304,7 +304,11 @@ def commit_on_success(using=None):
                     raise
                 else:
                     if is_dirty(using=db):
-                        commit(using=db)
+                        try:
+                            commit(using=db)
+                        except:
+                            rollback(using=db)
+                            raise
                 return res
             finally:
                 leave_transaction_management(using=db)

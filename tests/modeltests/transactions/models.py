@@ -130,3 +130,24 @@ Traceback (most recent call last):
 TransactionManagementError: Transaction managed block ended with pending COMMIT/ROLLBACK
 
 """
+
+# Regression for #11900: If a function wrapped by commit_on_success writes a
+# transaction that can't be committed, that transaction should be rolled back.
+# The bug is only visible using the psycopg2 backend, though
+# the fix is generally a good idea.
+pgsql_backends = ('django.db.backends.postgresql_psycopg2', 'postgresql_psycopg2',)
+if building_docs or settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] in pgsql_backends:
+    __test__['API_TESTS'] += """
+>>> def execute_bad_sql():
+...     cursor = connection.cursor()
+...     cursor.execute("INSERT INTO transactions_reporter (first_name, last_name) VALUES ('Douglas', 'Adams');")
+...     transaction.set_dirty()
+...
+>>> execute_bad_sql = transaction.commit_on_success(execute_bad_sql)
+>>> execute_bad_sql()
+Traceback (most recent call last):
+    ...
+IntegrityError: null value in column "email" violates not-null constraint
+<BLANKLINE>
+
+"""
