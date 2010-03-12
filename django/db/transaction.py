@@ -245,7 +245,11 @@ def commit_on_success(func):
                 raise
             else:
                 if is_dirty():
-                    commit()
+                    try:
+                        commit()
+                    except:
+                        rollback()
+                        raise
             return res
         finally:
             leave_transaction_management()
