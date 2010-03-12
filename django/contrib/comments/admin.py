@@ -36,18 +36,21 @@ class CommentsAdmin(admin.ModelAdmin):
         return actions
 
     def flag_comments(self, request, queryset):
-        self._bulk_flag(request, queryset, perform_flag, _("flagged"))
+        self._bulk_flag(request, queryset, perform_flag,
+                        lambda n: ungettext('flagged', 'flagged', n))
     flag_comments.short_description = _("Flag selected comments")
 
     def approve_comments(self, request, queryset):
-        self._bulk_flag(request, queryset, perform_approve, _('approved'))
+        self._bulk_flag(request, queryset, perform_approve,
+                        lambda n: ungettext('approved', 'approved', n))
     approve_comments.short_description = _("Approve selected comments")
 
     def remove_comments(self, request, queryset):
-        self._bulk_flag(request, queryset, perform_delete, _('removed'))
+        self._bulk_flag(request, queryset, perform_delete,
+                        lambda n: ungettext('removed', 'removed', n))
     remove_comments.short_description = _("Remove selected comments")
 
-    def _bulk_flag(self, request, queryset, action, description):
+    def _bulk_flag(self, request, queryset, action, done_message):
         """
         Flag, approve, or remove some comments from an admin action. Actually
         calls the `action` argument to perform the heavy lifting.
@@ -56,11 +59,11 @@ class CommentsAdmin(admin.ModelAdmin):
         for comment in queryset:
             action(request, comment)
             n_comments += 1
-        
+
         msg = ungettext(u'1 comment was successfully %(action)s.',
                         u'%(count)s comments were successfully %(action)s.',
                         n_comments)
-        self.message_user(request, msg % {'count': n_comments, 'action': description})
+        self.message_user(request, msg % {'count': n_comments, 'action': done_message(n_comments)})
 
 # Only register the default admin if the model is the built-in comment model
 # (this won't be true if there's a custom comment app).
