@@ -2,9 +2,9 @@
 
 import types
 try:
-    from functools import wraps, update_wrapper
+    from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
 except ImportError:
-    from django.utils.functional import wraps, update_wrapper  # Python 2.3, 2.4 fallback.
+    from django.utils.functional import wraps, update_wrapper, WRAPPER_ASSIGNMENTS  # Python 2.3, 2.4 fallback.
 
 
 def method_decorator(decorator):
@@ -50,6 +50,12 @@ def decorator_from_middleware(middleware_class):
     """
     return make_middleware_decorator(middleware_class)()
 
+def available_attrs(fn):
+    """
+    Return the list of functools-wrappable attributes on a callable.
+    This is required as a workaround for http://bugs.python.org/issue3445.
+    """
+    return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
 
 def make_middleware_decorator(middleware_class):
     def _make_decorator(*m_args, **m_kwargs):
@@ -77,6 +83,6 @@ def make_middleware_decorator(middleware_class):
                     if result is not None:
                         return result
                 return response
-            return wraps(view_func)(_wrapped_view)
+            return wraps(view_func, assigned=available_attrs(view_func))(_wrapped_view)
         return _decorator
     return _make_decorator

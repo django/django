@@ -11,3 +11,9 @@ class DecoratorFromMiddlewareTests(TestCase):
         Test a middleware that implements process_view.
         """
         self.client.get('/utils/xview/')
+
+    def test_callable_process_view_middleware(self):
+        """
+        Test a middleware that implements process_view, operating on a callable class.
+        """
+        self.client.get('/utils/class_xview/')
