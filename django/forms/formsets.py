@@ -163,7 +163,7 @@ class BaseFormSet(StrAndUnicode):
                 # if this is an extra form and hasn't changed, don't consider it
                 if i >= self.initial_form_count() and not form.has_changed():
                     continue
-                if form.cleaned_data[DELETION_FIELD_NAME]:
+                if self._should_delete_form(form):
                     self._deleted_form_indexes.append(i)
         return [self.forms[i] for i in self._deleted_form_indexes]
     deleted_forms = property(_get_deleted_forms)
@@ -187,7 +187,7 @@ class BaseFormSet(StrAndUnicode):
                 if i >= self.initial_form_count() and not form.has_changed():
                     continue
                 # don't add data marked for deletion to self.ordered_data
-                if self.can_delete and form.cleaned_data[DELETION_FIELD_NAME]:
+                if self.can_delete and self._should_delete_form(form):
                     continue
                 self._ordering.append((i, form.cleaned_data[ORDERING_FIELD_NAME]))
             # After we're done populating self._ordering, sort it.
@@ -231,6 +231,15 @@ class BaseFormSet(StrAndUnicode):
         return self._errors
     errors = property(_get_errors)
 
+    def _should_delete_form(self, form):
+        # The way we lookup the value of the deletion field here takes
+        # more code than we'd like, but the form's cleaned_data will
+        # not exist if the form is invalid.
+        field = form.fields[DELETION_FIELD_NAME]
+        raw_value = form._raw_value(DELETION_FIELD_NAME)
+        should_delete = field.clean(raw_value)
+        return should_delete
+
     def is_valid(self):
         """
         Returns True if form.errors is empty for every form in self.forms.
@@ -243,13 +252,7 @@ class BaseFormSet(StrAndUnicode):
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             if self.can_delete:
-                # The way we lookup the value of the deletion field here takes
-                # more code than we'd like, but the form's cleaned_data will
-                # not exist if the form is invalid.
-                field = form.fields[DELETION_FIELD_NAME]
-                raw_value = form._raw_value(DELETION_FIELD_NAME)
-                should_delete = field.clean(raw_value)
-                if should_delete:
+                if self._should_delete_form(form):
                     # This form is going to be deleted so any of its errors
                     # should not cause the entire formset to be invalid.
                     continue
