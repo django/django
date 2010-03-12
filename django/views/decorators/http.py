@@ -11,7 +11,7 @@ from calendar import timegm
 from datetime import timedelta
 from email.Utils import formatdate
 
-from django.utils.decorators import decorator_from_middleware
+from django.utils.decorators import decorator_from_middleware, available_attrs
 from django.utils.http import parse_etags, quote_etag
 from django.middleware.http import ConditionalGetMiddleware
 from django.http import HttpResponseNotAllowed, HttpResponseNotModified, HttpResponse
@@ -35,7 +35,7 @@ def require_http_methods(request_method_list):
             if request.method not in request_method_list:
                 return HttpResponseNotAllowed(request_method_list)
             return func(request, *args, **kwargs)
-        return wraps(func)(inner)
+        return wraps(func, assigned=available_attrs(func))(inner)
     return decorator
 
 require_GET = require_http_methods(["GET"])
