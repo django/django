@@ -8,7 +8,11 @@ from django.db import models
 
 class FieldErrors(models.Model):
     charfield = models.CharField()
+    charfield2 = models.CharField(max_length=-1)
+    charfield3 = models.CharField(max_length="bad")
     decimalfield = models.DecimalField()
+    decimalfield2 = models.DecimalField(max_digits=-1, decimal_places=-1)
+    decimalfield3 = models.DecimalField(max_digits="bad", decimal_places="bad")
     filefield = models.FileField()
     choices = models.CharField(max_length=10, choices='bad')
     choices2 = models.CharField(max_length=10, choices=[(1,2,3),(1,2,3)])
@@ -203,9 +207,15 @@ class UniqueFKTarget2(models.Model):
     tgt = models.ForeignKey(FKTarget, to_field='good')
 
 
-model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute.
-invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute.
-invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute.
+model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
+invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
+invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_places" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield2": DecimalFields require a "max_digits" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decimal_places" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits" attribute that is a positive integer.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
