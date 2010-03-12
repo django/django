@@ -4,7 +4,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 
-from regressiontests.views.models import Author, Article
+from regressiontests.views.models import Author, Article, UrlArticle
 
 class DefaultsTests(TestCase):
     """Test django views in django/views/defaults.py"""
@@ -15,7 +15,7 @@ class DefaultsTests(TestCase):
         for obj in Author.objects.all():
             short_url = '/views/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, obj.pk)
             response = self.client.get(short_url)
-            self.assertRedirects(response, 'http://testserver%s' % obj.get_absolute_url(), 
+            self.assertRedirects(response, 'http://testserver%s' % obj.get_absolute_url(),
                                  status_code=302, target_status_code=404)
 
     def test_shortcut_no_absolute_url(self):
@@ -59,3 +59,11 @@ class DefaultsTests(TestCase):
         "The server_error view raises a 500 status"
         response = self.client.get('/views/server_error/')
         self.assertEquals(response.status_code, 500)
+
+    def test_get_absolute_url_attributes(self):
+        "A model can set attributes on the get_absolute_url method"
+        self.assertTrue(getattr(UrlArticle.get_absolute_url, 'purge', False),
+                        'The attributes of the original get_absolute_url must be added.')
+        article = UrlArticle.objects.get(pk=1)
+        self.assertTrue(getattr(article.get_absolute_url, 'purge', False),
+                        'The attributes of the original get_absolute_url must be added.')

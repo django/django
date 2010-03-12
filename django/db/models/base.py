@@ -18,7 +18,7 @@ from django.db import connection, transaction, DatabaseError
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 import django.utils.copycompat as copy
-from django.utils.functional import curry
+from django.utils.functional import curry, update_wrapper
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings
 
@@ -236,7 +236,8 @@ class ModelBase(type):
             cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join([f.attname for f in opts.fields]))
 
         if hasattr(cls, 'get_absolute_url'):
-            cls.get_absolute_url = curry(get_absolute_url, opts, cls.get_absolute_url)
+            cls.get_absolute_url = update_wrapper(curry(get_absolute_url, opts, cls.get_absolute_url),
+                                                  cls.get_absolute_url)
 
         signals.class_prepared.send(sender=cls)
 
