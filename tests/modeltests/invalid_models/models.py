@@ -210,11 +210,11 @@ class UniqueFKTarget2(models.Model):
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
-invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute that is a positive integer.
-invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_places" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
 invalid_models.fielderrors: "decimalfield2": DecimalFields require a "max_digits" attribute that is a positive integer.
-invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decimal_places" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
 invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits" attribute that is a positive integer.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
