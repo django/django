@@ -16,7 +16,7 @@ try:
 except ImportError:
     from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
 
-from django.utils.decorators import decorator_from_middleware, available_attrs
+from django.utils.decorators import decorator_from_middleware
 from django.utils.cache import patch_cache_control, add_never_cache_headers
 from django.middleware.cache import CacheMiddleware
 
@@ -31,7 +31,7 @@ def cache_control(**kwargs):
             patch_cache_control(response, **kwargs)
             return response
 
-        return wraps(viewfunc, assigned=available_attrs(viewfunc))(_cache_controlled)
+        return wraps(viewfunc)(_cache_controlled)
 
     return _cache_controller
 
@@ -44,4 +44,4 @@ def never_cache(view_func):
         response = view_func(request, *args, **kwargs)
         add_never_cache_headers(response)
         return response
-    return wraps(view_func, assigned=available_attrs(view_func))(_wrapped_view_func)
+    return wraps(view_func)(_wrapped_view_func)
