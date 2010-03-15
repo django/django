@@ -158,21 +158,8 @@ class Feed(object):
 
             pubdate = self.__get_dynamic_attr('item_pubdate', item)
             if pubdate and not pubdate.tzinfo:
-                now = datetime.datetime.now()
-                utcnow = datetime.datetime.utcnow()
-
-                # Must always subtract smaller time from larger time here.
-                if utcnow > now:
-                    sign = -1
-                    tzDifference = (utcnow - now)
-                else:
-                    sign = 1
-                    tzDifference = (now - utcnow)
-
-                # Round the timezone offset to the nearest half hour.
-                tzOffsetMinutes = sign * ((tzDifference.seconds / 60 + 15) / 30) * 30
-                tzOffset = datetime.timedelta(minutes=tzOffsetMinutes)
-                pubdate = pubdate.replace(tzinfo=tzinfo.FixedOffset(tzOffset))
+                ltz = tzinfo.LocalTimezone(pubdate)
+                pubdate = pubdate.replace(tzinfo=ltz)
 
             feed.add_item(
                 title = title,

@@ -3,6 +3,7 @@ from django.contrib.syndication import feeds, views
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.utils import tzinfo
+from django.utils.feedgenerator import rfc2822_date, rfc3339_date
 from models import Entry
 from xml.dom import minidom
 
@@ -55,13 +56,19 @@ class SyndicationFeedTest(FeedTestCase):
         chan_elem = feed.getElementsByTagName('channel')
         self.assertEqual(len(chan_elem), 1)
         chan = chan_elem[0]
+
+        # Find the last build date
+        d = Entry.objects.latest('date').date
+        ltz = tzinfo.LocalTimezone(d)
+        last_build_date = rfc2822_date(d.replace(tzinfo=ltz))
+
         self.assertChildNodes(chan, ['title', 'link', 'description', 'language', 'lastBuildDate', 'item', 'atom:link', 'ttl', 'copyright', 'category'])
         self.assertChildNodeContent(chan, {
             'title': 'My blog',
             'description': 'A more thorough description of my blog.',
             'link': 'http://example.com/blog/',
             'language': 'en',
-            'lastBuildDate': 'Thu, 03 Jan 2008 13:30:00 -0600',
+            'lastBuildDate': last_build_date,
             #'atom:link': '',
             'ttl': '600',
             'copyright': 'Copyright (c) 2007, Sally Smith',
@@ -80,6 +87,11 @@ class SyndicationFeedTest(FeedTestCase):
             'http://example.com/syndication/rss2/'
         )
 
+        # Find the pubdate of the first feed item
+        d = Entry.objects.get(pk=1).date
+        ltz = tzinfo.LocalTimezone(d)
+        pub_date = rfc2822_date(d.replace(tzinfo=ltz))
+
         items = chan.getElementsByTagName('item')
         self.assertEqual(len(items), Entry.objects.count())
         self.assertChildNodeContent(items[0], {
@@ -87,7 +99,7 @@ class SyndicationFeedTest(FeedTestCase):
             'description': 'Overridden description: My first entry',
             'link': 'http://example.com/blog/1/',
             'guid': 'http://example.com/blog/1/',
-            'pubDate': 'Tue, 01 Jan 2008 12:30:00 -0600',
+            'pubDate': pub_date,
             'author': 'test@example.com (Sally Smith)',
         })
         self.assertCategories(items[0], ['python', 'testing']);
@@ -198,9 +210,12 @@ class SyndicationFeedTest(FeedTestCase):
         response = self.client.get('/syndication/naive-dates/')
         doc = minidom.parseString(response.content)
         updated = doc.getElementsByTagName('updated')[0].firstChild.wholeText
-        tz = tzinfo.LocalTimezone(datetime.datetime.now())
-        now = datetime.datetime.now(tz)
-        self.assertEqual(updated[-6:], str(now)[-6:])
+
+        d = Entry.objects.latest('date').date
+        ltz = tzinfo.LocalTimezone(d)
+        latest = rfc3339_date(d.replace(tzinfo=ltz))
+
+        self.assertEqual(updated, latest)
 
     def test_aware_datetime_conversion(self):
         """
