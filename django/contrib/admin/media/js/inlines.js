@@ -71,7 +71,7 @@
 					// last child element of the form's container:
 					$(row).children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
 				}
-				$(row).find("input,select,textarea,label").each(function() {
+				$(row).find("input,select,textarea,label,a").each(function() {
 					updateElementIndex(this, options.prefix, totalForms.val());
 				});
 				// Update number of total forms
@@ -100,7 +100,7 @@
 					// so they remain in sequence:
 					for (var i=0, formCount=forms.length; i<formCount; i++)
 					{
-						$(forms.get(i)).find("input,select,textarea,label").each(function() {
+						$(forms.get(i)).find("input,select,textarea,label,a").each(function() {
 							updateElementIndex(this, options.prefix, i);
 						});
 					}
