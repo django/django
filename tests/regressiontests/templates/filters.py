@@ -295,8 +295,8 @@ def get_filter_tests():
         'autoescape-stringfilter03': (r'{{ safe|capfirst }}', {'safe': SafeClass()}, 'You &gt; me'),
         'autoescape-stringfilter04': (r'{% autoescape off %}{{ safe|capfirst }}{% endautoescape %}', {'safe': SafeClass()}, 'You &gt; me'),
 
-        'escapejs01': (r'{{ a|escapejs }}', {'a': 'testing\r\njavascript \'string" <b>escaping</b>'}, 'testing\\x0D\\x0Ajavascript \\x27string\\x22 \\x3Cb\\x3Eescaping\\x3C/b\\x3E'),
-        'escapejs02': (r'{% autoescape off %}{{ a|escapejs }}{% endautoescape %}', {'a': 'testing\r\njavascript \'string" <b>escaping</b>'}, 'testing\\x0D\\x0Ajavascript \\x27string\\x22 \\x3Cb\\x3Eescaping\\x3C/b\\x3E'),
+        'escapejs01': (r'{{ a|escapejs }}', {'a': 'testing\r\njavascript \'string" <b>escaping</b>'}, 'testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E'),
+        'escapejs02': (r'{% autoescape off %}{{ a|escapejs }}{% endautoescape %}', {'a': 'testing\r\njavascript \'string" <b>escaping</b>'}, 'testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E'),
 
 
         # length filter.
