@@ -25,16 +25,34 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
             if verbosity >= 2:
                 print "Adding content type '%s | %s'" % (ct.app_label, ct.model)
     # The presence of any remaining content types means the supplied app has an
-    # undefined model and can safely be removed, which cascades to also remove
-    # related permissions.
-    for ct in content_types:
-        if verbosity >= 2:
-            print "Deleting stale content type '%s | %s'" % (ct.app_label, ct.model)
-        ct.delete()
+    # undefined model. Confirm that the content type is stale before deletion.
+    if content_types:
+        if kwargs.get('interactive', False):
+            content_type_display = '\n'.join(['    %s | %s' % (ct.app_label, ct.model) for ct in content_types])
+            ok_to_delete = raw_input("""The following content types are stale and need to be deleted:
 
-def update_all_contenttypes(verbosity=2):
+%s
+
+Any objects related to these content types by a foreign key will also
+be deleted. Are you sure you want to delete these content types?
+If you're unsure, answer 'no'.
+
+    Type 'yes' to continue, or 'no' to cancel: """ % content_type_display)
+        else:
+            ok_to_delete = False
+
+        if ok_to_delete == 'yes':
+            for ct in content_types:
+                if verbosity >= 2:
+                    print "Deleting stale content type '%s | %s'" % (ct.app_label, ct.model)
+                ct.delete()
+        else:
+            if verbosity >= 2:
+                print "Stale content types remain."
+
+def update_all_contenttypes(verbosity=2, **kwargs):
     for app in get_apps():
-        update_contenttypes(app, None, verbosity)
+        update_contenttypes(app, None, verbosity, **kwargs)
 
 signals.post_syncdb.connect(update_contenttypes)
 
