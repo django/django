@@ -249,8 +249,13 @@ Format localization
 
 .. versionadded:: 1.2
 
-Django's formatting system is disabled by default. To enable it, it's necessary
-to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
+Django's formatting system is disabled by default. To enable it, it's
+necessary to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
+
+.. note::
+    The default :file:`settings.py` file created by
+    :djadmin:`django-admin.py startproject <startproject>` includes
+    :setting:`USE_L10N = True <USE_L10N>` for convenience.
 
 When using Django's formatting system, dates and numbers on templates will be
 displayed using the format specified for the current locale. Two users
