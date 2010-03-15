@@ -906,8 +906,8 @@ use keyword syntax::
 
     {% url path.to.some_view arg1=v1,arg2=v2 %}
 
-Do not mix both positional and keyword syntax in a single call. All arguments 
-required by the URLconf should be present. 
+Do not mix both positional and keyword syntax in a single call. All arguments
+required by the URLconf should be present.
 
 For example, suppose you have a view, ``app_views.client``, whose URLconf
 takes a client ID (here, ``client()`` is a method inside the views file
@@ -1262,7 +1262,7 @@ For example::
     {{ value|escapejs }}
 
 If ``value`` is ``"testing\r\njavascript \'string" <b>escaping</b>"``,
-the output will be ``"testing\\x0D\\x0Ajavascript \\x27string\\x22 \\x3Cb\\x3Eescaping\\x3C/b\\x3E"``.
+the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E"``.
 
 .. templatefilter:: filesizeformat
 
