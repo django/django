@@ -221,10 +221,10 @@ u'jsmith3@example.com'
 
 # bug #5605, preserve the case of the user name (before the @ in the email address)
 # when creating a user.
->>> user = User.objects.create_user('test2', 'tesT@EXAMple.com', 'test')
+>>> user = User.objects.create_user('forms_test2', 'tesT@EXAMple.com', 'test')
 >>> user.email
 'tesT@example.com'
->>> user = User.objects.create_user('test3', 'tesT', 'test')
+>>> user = User.objects.create_user('forms_test3', 'tesT', 'test')
 >>> user.email
 'tesT'
 
