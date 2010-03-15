@@ -320,6 +320,8 @@ time, rather than ``CACHE_MIDDLEWARE_SECONDS``. Using the decorators in
 the ``never_cache`` decorator). See the `using other headers`__ section for
 more on these decorators.
 
+.. _i18n-cache-key:
+
 .. versionadded:: 1.2
 
 If :setting:`USE_I18N` is set to ``True`` then the generated cache key will
@@ -413,7 +415,9 @@ the ``cache`` template tag. To give your template access to this tag, put
 
 The ``{% cache %}`` template tag caches the contents of the block for a given
 amount of time. It takes at least two arguments: the cache timeout, in seconds,
-and the name to give the cache fragment. For example::
+and the name to give the cache fragment. For example:
+
+.. code-block:: html+django
 
     {% load cache %}
     {% cache 500 sidebar %}
@@ -424,7 +428,9 @@ Sometimes you might want to cache multiple copies of a fragment depending on
 some dynamic data that appears inside the fragment. For example, you might want a
 separate cached copy of the sidebar used in the previous example for every user
 of your site. Do this by passing additional arguments to the ``{% cache %}``
-template tag to uniquely identify the cache fragment::
+template tag to uniquely identify the cache fragment:
+
+.. code-block:: html+django
 
     {% load cache %}
     {% cache 500 sidebar request.user.username %}
@@ -434,10 +440,29 @@ template tag to uniquely identify the cache fragment::
 It's perfectly fine to specify more than one argument to identify the fragment.
 Simply pass as many arguments to ``{% cache %}`` as you need.
 
+If :setting:`USE_I18N` is set to ``True`` the per-site middleware cache will
+:ref:`respect the active language<i18n-cache-key>`. For the ``cache`` template
+tag you could use one of the
+:ref:`translation-specific variables<template-translation-vars>` available in
+templates to archieve the same result:
+
+.. code-block:: html+django
+
+    {% load i18n %}
+    {% load cache %}
+
+    {% get_current_language as LANGUAGE_CODE %}
+
+    {% cache 600 welcome LANGUAGE_CODE %}
+        {% trans "Welcome to example.com" %}
+    {% endcache %}
+
 The cache timeout can be a template variable, as long as the template variable
 resolves to an integer value. For example, if the template variable
 ``my_timeout`` is set to the value ``600``, then the following two examples are
-equivalent::
+equivalent:
+
+.. code-block:: html+django
 
     {% cache 600 sidebar %} ... {% endcache %}
     {% cache my_timeout sidebar %} ... {% endcache %}
@@ -447,6 +472,8 @@ timeout in a variable, in one place, and just reuse that value.
 
 The low-level cache API
 =======================
+
+.. highlight:: python
 
 Sometimes, caching an entire rendered page doesn't gain you very much and is,
 in fact, inconvenient overkill.

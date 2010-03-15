@@ -385,6 +385,8 @@ used, have in mind that the ``blocktrans`` construct is internally converted
 to an ``ungettext`` call. This means the same :ref:`notes regarding ungettext
 variables <pluralization-var-notes>` apply.
 
+.. _template-translation-vars:
+
 Each ``RequestContext`` has access to three translation-specific variables:
 
     * ``LANGUAGES`` is a list of tuples in which the first element is the
