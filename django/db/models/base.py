@@ -556,7 +556,7 @@ class Model(object):
 
         for related in self._meta.get_all_related_objects():
             rel_opts_name = related.get_accessor_name()
-            if isinstance(related.field.rel, OneToOneRel):
+            if not related.field.rel.multiple:
                 try:
                     sub_obj = getattr(self, rel_opts_name)
                 except ObjectDoesNotExist:
@@ -581,6 +581,30 @@ class Model(object):
                 delete_qs = rel_descriptor.delete_manager(self).all()
                 for sub_obj in delete_qs:
                     sub_obj._collect_sub_objects(seen_objs, self, related.field.null)
+
+        for related in self._meta.get_all_related_many_to_many_objects():
+            if related.field.rel.through:
+                opts = related.field.rel.through._meta
+                reverse_field_name = related.field.m2m_reverse_field_name()
+                nullable = opts.get_field(reverse_field_name).null
+                filters = {reverse_field_name: self}
+                for sub_obj in related.field.rel.through._base_manager.filter(**filters):
+                    sub_obj._collect_sub_objects(seen_objs, self, nullable)
+
+        for f in self._meta.many_to_many:
+            if f.rel.through:
+                opts = f.rel.through._meta
+                field_name = f.m2m_field_name()
+                nullable = opts.get_field(field_name).null
+                filters = {field_name: self}
+                for sub_obj in f.rel.through._base_manager.filter(**filters):
+                    sub_obj._collect_sub_objects(seen_objs, self, nullable)
+            else:
+                # m2m-ish but with no through table? GenericRelation: cascade delete
+                for sub_obj in f.value_from_object(self).all():
+                    # Generic relations not enforced by db constraints, thus we can set
+                    # nullable=True, order does not matter
+                    sub_obj._collect_sub_objects(seen_objs, self, True)
 
         # Handle any ancestors (for the model-inheritance case). We do this by
         # traversing to the most remote parent classes -- those with no parents

@@ -1278,8 +1278,6 @@ def delete_objects(seen_objs, using):
                     signals.pre_delete.send(sender=cls, instance=instance)
 
             pk_list = [pk for pk,instance in items]
-            del_query = sql.DeleteQuery(cls)
-            del_query.delete_batch_related(pk_list, using=using)
 
             update_query = sql.UpdateQuery(cls)
             for field, model in cls._meta.get_fields_with_model():

@@ -26,52 +26,9 @@ class DeleteQuery(Query):
         self.where = where
         self.get_compiler(using).execute_sql(None)
 
-    def delete_batch_related(self, pk_list, using):
-        """
-        Set up and execute delete queries for all the objects related to the
-        primary key values in pk_list. To delete the objects themselves, use
-        the delete_batch() method.
-
-        More than one physical query may be executed if there are a
-        lot of values in pk_list.
-        """
-        from django.contrib.contenttypes import generic
-        cls = self.model
-        for related in cls._meta.get_all_related_many_to_many_objects():
-            if not isinstance(related.field, generic.GenericRelation):
-                for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-                    where = self.where_class()
-                    where.add((Constraint(None,
-                            related.field.m2m_reverse_name(), related.field),
-                            'in',
-                            pk_list[offset : offset+GET_ITERATOR_CHUNK_SIZE]),
-                            AND)
-                    self.do_query(related.field.m2m_db_table(), where, using=using)
-
-        for f in cls._meta.many_to_many:
-            w1 = self.where_class()
-            db_prep_value = None
-            if isinstance(f, generic.GenericRelation):
-                from django.contrib.contenttypes.models import ContentType
-                ct_field = f.rel.to._meta.get_field(f.content_type_field_name)
-                w1.add((Constraint(None, ct_field.column, ct_field), 'exact',
-                        ContentType.objects.get_for_model(cls).id), AND)
-                id_field = f.rel.to._meta.get_field(f.object_id_field_name)
-                db_prep_value = id_field.get_db_prep_value
-            for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-                where = self.where_class()
-                where.add((Constraint(None, f.m2m_column_name(), f), 'in',
-                        map(db_prep_value,
-                            pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE])),
-                        AND)
-                if w1:
-                    where.add(w1, AND)
-                self.do_query(f.m2m_db_table(), where, using=using)
-
     def delete_batch(self, pk_list, using):
         """
-        Set up and execute delete queries for all the objects in pk_list. This
-        should be called after delete_batch_related(), if necessary.
+        Set up and execute delete queries for all the objects in pk_list.
 
         More than one physical query may be executed if there are a
         lot of values in pk_list.
