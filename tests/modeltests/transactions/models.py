@@ -150,4 +150,6 @@ Traceback (most recent call last):
 IntegrityError: null value in column "email" violates not-null constraint
 <BLANKLINE>
 
+>>> transaction.rollback()
+
 """
