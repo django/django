@@ -711,7 +711,6 @@ If no ``input_formats`` argument is provided, the default input formats are::
 
 Takes the following optional arguments:
 
-
 .. attribute:: URLField.max_length
 .. attribute:: URLField.min_length
 
@@ -736,11 +735,64 @@ Takes the following optional arguments:
 Slightly complex built-in ``Field`` classes
 -------------------------------------------
 
-The following are not yet documented.
+``ComboField``
+~~~~~~~~~~~~~~
 
 .. class:: ComboField(**kwargs)
 
+    * Default widget: ``TextInput``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Unicode object.
+    * Validates that the given value against each of the fields specified
+      as an argument to the ``ComboField``.
+    * Error message keys: ``required``, ``invalid``
+
+Takes one extra required argument:
+
+.. attribute:: ComboField.fields
+
+    The list of fields that should be used to validate the field's value (in
+    the order in which they are provided).
+
+        >>> f = ComboField(fields=[CharField(max_length=20), EmailField()])
+        >>> f.clean('test@example.com')
+        u'test@example.com'
+        >>> f.clean('longemailaddress@example.com')
+        Traceback (most recent call last):
+        ...
+        ValidationError: [u'Ensure this value has at most 20 characters (it has 28).']
+
+``MultiValuefield``
+~~~~~~~~~~~~~~~~~~~
+
 .. class:: MultiValueField(**kwargs)
+
+    * Default widget: ``TextInput``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: the type returned by the ``compress`` method of the subclass.
+    * Validates that the given value against each of the fields specified
+      as an argument to the ``MultiValueField``.
+    * Error message keys: ``required``, ``invalid``
+
+    This abstract field (must be subclassed) aggregates the logic of multiple
+    fields. Subclasses should not have to implement clean(). Instead, they must
+    implement compress(), which takes a list of valid values and returns a
+    "compressed" version of those values -- a single value.  For example,
+    :class:`SplitDateTimeField` is a subclass which combines a time field and
+    a date field into a datetime object.
+
+Takes one extra required argument:
+
+.. attribute:: MultiValueField.fields
+
+    A list of fields which are cleaned into a single field. Each value in
+    ``clean`` is cleaned by the corresponding field in ``fields`` -- the first
+    value is cleaned by the first field, the second value is cleaned by
+    the second field, etc.  Once all fields are cleaned, the list of clean
+    values is "compressed" into a single value.
+
+``SplitDateTimeField``
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: SplitDateTimeField(**kwargs)
 
@@ -804,11 +856,11 @@ representing a foreign key.  A single argument is required:
 
 .. attribute:: ModelChoiceField.empty_label
 
-   By default the ``<select>`` widget used by ``ModelChoiceField`` will have a
-   an empty choice at the top of the list. You can change the text of this label
-   (which is ``"---------"`` by default) with the ``empty_label`` attribute, or
-   you can disable the empty label entirely by setting ``empty_label`` to
-   ``None``::
+    By default the ``<select>`` widget used by ``ModelChoiceField`` will have a
+    an empty choice at the top of the list. You can change the text of this
+    label (which is ``"---------"`` by default) with the ``empty_label``
+    attribute, or you can disable the empty label entirely by setting
+    ``empty_label`` to ``None``::
 
         # A custom empty label
         field1 = forms.ModelChoiceField(queryset=..., empty_label="(Nothing)")
@@ -816,9 +868,9 @@ representing a foreign key.  A single argument is required:
         # No empty label
         field2 = forms.ModelChoiceField(queryset=..., empty_label=None)
 
-   Note that if a ``ModelChoiceField`` is required and has a default
-   initial value, no empty choice is created (regardless of the value
-   of ``empty_label``).
+    Note that if a ``ModelChoiceField`` is required and has a default
+    initial value, no empty choice is created (regardless of the value
+    of ``empty_label``).
 
 The ``__unicode__`` method of the model will be called to generate
 string representations of the objects for use in the field's choices;
