@@ -35,6 +35,7 @@ class Article(models.Model):
     def model_year(self):
         return self.date.year
     model_year.admin_order_field = 'date'
+    model_year.short_description = ''
 
 class Book(models.Model):
     """
@@ -103,6 +104,7 @@ class ArticleAdmin(admin.ModelAdmin):
     def modeladmin_year(self, obj):
         return obj.date.year
     modeladmin_year.admin_order_field = 'date'
+    modeladmin_year.short_description = None
 
 class CustomArticle(models.Model):
     content = models.TextField()
