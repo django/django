@@ -185,6 +185,13 @@ class ChangeList(object):
             if key.endswith('__in'):
                 lookup_params[key] = value.split(',')
 
+            # if key ends with __isnull, special case '' and false
+            if key.endswith('__isnull'):
+                if value.lower() in ('', 'false'):
+                    lookup_params[key] = False
+                else:
+                    lookup_params[key] = True
+
         # Apply lookup parameters from the query string.
         try:
             qs = qs.filter(**lookup_params)

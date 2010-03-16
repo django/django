@@ -217,6 +217,16 @@ class AdminViewBasicTest(TestCase):
         response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit, {'color__id__exact': 'StringNotInteger!'})
         self.assertRedirects(response, '/test_admin/%s/admin_views/thing/?e=1' % self.urlbit)
 
+    def testIsNullLookups(self):
+        """Ensure is_null is handled correctly."""
+        Article.objects.create(title="I Could Go Anywhere", content="Versatile", date=datetime.datetime.now())
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit)
+        self.assertTrue('4 articles' in response.content, '"4 articles" missing from response')
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': 'false'})
+        self.assertTrue('3 articles' in response.content, '"3 articles" missing from response')
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': 'true'})
+        self.assertTrue('1 article' in response.content, '"1 article" missing from response')
+
     def testLogoutAndPasswordChangeURLs(self):
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit)
         self.failIf('<a href="/test_admin/%s/logout/">' % self.urlbit not in response.content)
