@@ -97,10 +97,7 @@ class ExtendsNode(Node):
             raise TemplateSyntaxError(error_msg)
         if hasattr(parent, 'render'):
             return parent # parent is a Template object
-        try:
-            return get_template(parent)
-        except TemplateDoesNotExist:
-            raise TemplateSyntaxError("Template %r cannot be extended, because it doesn't exist" % parent)
+        return get_template(parent)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)

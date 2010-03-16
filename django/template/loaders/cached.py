@@ -37,7 +37,14 @@ class Loader(BaseLoader):
         if template_name not in self.template_cache:
             template, origin = self.find_template(template_name, template_dirs)
             if not hasattr(template, 'render'):
-                template = get_template_from_string(template, origin, template_name)
+                try:
+                    template = get_template_from_string(template, origin, template_name)
+                except TemplateDoesNotExist:
+                    # If compiling the template we found raises TemplateDoesNotExist, 
+                    # back off to returning the source and display name for the template 
+                    # we were asked to load. This allows for correct identification (later) 
+                    # of the actual template that does not exist.
+                    return template, origin
             self.template_cache[template_name] = template
         return self.template_cache[template_name], None
 
