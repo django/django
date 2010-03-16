@@ -707,37 +707,50 @@ class Model(object):
         if exclude is None:
             exclude = []
         unique_checks = []
-        for check in self._meta.unique_together:
-            for name in check:
-                # If this is an excluded field, don't add this check.
-                if name in exclude:
-                    break
-            else:
-                unique_checks.append(tuple(check))
+
+        unique_togethers = [(self.__class__, self._meta.unique_together)]
+        for parent_class in self._meta.parents.keys():
+            if parent_class._meta.unique_together:
+                unique_togethers.append((parent_class, parent_class._meta.unique_together))
+
+        for model_class, unique_together in unique_togethers:
+            for check in unique_together:
+                for name in check:
+                    # If this is an excluded field, don't add this check.
+                    if name in exclude:
+                        break
+                else:
+                    unique_checks.append((model_class, tuple(check)))
 
         # These are checks for the unique_for_<date/year/month>.
         date_checks = []
 
         # Gather a list of checks for fields declared as unique and add them to
         # the list of checks.
-        for f in self._meta.fields:
-            name = f.name
-            if name in exclude:
-                continue
-            if f.unique:
-                unique_checks.append((name,))
-            if f.unique_for_date:
-                date_checks.append(('date', name, f.unique_for_date))
-            if f.unique_for_year:
-                date_checks.append(('year', name, f.unique_for_year))
-            if f.unique_for_month:
-                date_checks.append(('month', name, f.unique_for_month))
+
+        fields_with_class = [(self.__class__, self._meta.local_fields)]
+        for parent_class in self._meta.parents.keys():
+            fields_with_class.append((parent_class, parent_class._meta.local_fields))
+
+        for model_class, fields in fields_with_class:
+            for f in fields:
+                name = f.name
+                if name in exclude:
+                    continue
+                if f.unique:
+                    unique_checks.append((model_class, (name,)))
+                if f.unique_for_date:
+                    date_checks.append((model_class, 'date', name, f.unique_for_date))
+                if f.unique_for_year:
+                    date_checks.append((model_class, 'year', name, f.unique_for_year))
+                if f.unique_for_month:
+                    date_checks.append((model_class, 'month', name, f.unique_for_month))
         return unique_checks, date_checks
 
     def _perform_unique_checks(self, unique_checks):
         errors = {}
 
-        for unique_check in unique_checks:
+        for model_class, unique_check in unique_checks:
             # Try to look up an existing object with the same values as this
             # object's values for all the unique field.
 
@@ -757,7 +770,7 @@ class Model(object):
             if len(unique_check) != len(lookup_kwargs.keys()):
                 continue
 
-            qs = self.__class__._default_manager.filter(**lookup_kwargs)
+            qs = model_class._default_manager.filter(**lookup_kwargs)
 
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
@@ -769,13 +782,13 @@ class Model(object):
                     key = unique_check[0]
                 else:
                     key = NON_FIELD_ERRORS
-                errors.setdefault(key, []).append(self.unique_error_message(unique_check))
+                errors.setdefault(key, []).append(self.unique_error_message(model_class, unique_check))
 
         return errors
 
     def _perform_date_checks(self, date_checks):
         errors = {}
-        for lookup_type, field, unique_for in date_checks:
+        for model_class, lookup_type, field, unique_for in date_checks:
             lookup_kwargs = {}
             # there's a ticket to add a date lookup, we can remove this special
             # case if that makes it's way in
@@ -788,7 +801,7 @@ class Model(object):
                 lookup_kwargs['%s__%s' % (unique_for, lookup_type)] = getattr(date, lookup_type)
             lookup_kwargs[field] = getattr(self, field)
 
-            qs = self.__class__._default_manager.filter(**lookup_kwargs)
+            qs = model_class._default_manager.filter(**lookup_kwargs)
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
             if not getattr(self, '_adding', False) and self.pk is not None:
@@ -808,8 +821,8 @@ class Model(object):
             'lookup': lookup_type,
         }
 
-    def unique_error_message(self, unique_check):
-        opts = self._meta
+    def unique_error_message(self, model_class, unique_check):
+        opts = model_class._meta
         model_name = capfirst(opts.verbose_name)
 
         # A unique field

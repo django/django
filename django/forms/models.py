@@ -488,7 +488,7 @@ class BaseModelFormSet(BaseFormSet):
 
         errors = []
         # Do each of the unique checks (unique and unique_together)
-        for unique_check in all_unique_checks:
+        for uclass, unique_check in all_unique_checks:
             seen_data = set()
             for form in self.forms:
                 # if the form doesn't have cleaned_data then we ignore it,
@@ -512,7 +512,7 @@ class BaseModelFormSet(BaseFormSet):
         # iterate over each of the date checks now
         for date_check in all_date_checks:
             seen_data = set()
-            lookup, field, unique_for = date_check
+            uclass, lookup, field, unique_for = date_check
             for form in self.forms:
                 # if the form doesn't have cleaned_data then we ignore it,
                 # it's already invalid
@@ -556,9 +556,9 @@ class BaseModelFormSet(BaseFormSet):
     def get_date_error_message(self, date_check):
         return ugettext("Please correct the duplicate data for %(field_name)s "
             "which must be unique for the %(lookup)s in %(date_field)s.") % {
-            'field_name': date_check[1],
-            'date_field': date_check[2],
-            'lookup': unicode(date_check[0]),
+            'field_name': date_check[2],
+            'date_field': date_check[3],
+            'lookup': unicode(date_check[1]),
         }
 
     def get_form_error(self):
