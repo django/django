@@ -1,5 +1,12 @@
 [
   {
+    "model" : "comment_tests.book",
+    "pk" : 1,
+    "fields" : {
+        "dewey_decimal" : "12.34"
+    }
+  },
+  {
     "model" : "comment_tests.author",
     "pk" : 1,
     "fields" : {
