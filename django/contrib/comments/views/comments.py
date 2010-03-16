@@ -1,7 +1,7 @@
 from django import http
 from django.conf import settings
 from utils import next_redirect, confirmation_view
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -62,6 +62,10 @@ def post_comment(request, next=None, using=None):
         return CommentPostBadRequest(
             "No object matching content-type %r and object PK %r exists." % \
                 (escape(ctype), escape(object_pk)))
+    except (ValueError, ValidationError), e:
+        return CommentPostBadRequest(
+            "Attempting go get content-type %r and object PK %r exists raised %s" % \
+                (escape(ctype), escape(object_pk), e.__class__.__name__))
 
     # Do we want to preview the comment?
     preview = "preview" in data
