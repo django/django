@@ -1,6 +1,7 @@
+from django import forms
 from django.forms import ModelForm
 
-from models import Product, Price, Book, DerivedBook, ExplicitPK, Post, DerivedPost
+from models import Product, Price, Book, DerivedBook, ExplicitPK, Post, DerivedPost, Writer
 
 class ProductForm(ModelForm):
     class Meta:
@@ -30,3 +31,9 @@ class PostForm(ModelForm):
 class DerivedPostForm(ModelForm):
     class Meta:
         model = DerivedPost
+
+class CustomWriterForm(ModelForm):
+   name = forms.CharField(required=False)
+
+   class Meta:
+       model = Writer

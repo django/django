@@ -292,13 +292,16 @@ class BaseModelForm(BaseForm):
             elif field in self._errors.keys():
                 exclude.append(f.name)
 
-            # Exclude empty fields that are not required by the form. The
-            # underlying model field may be required, so this keeps the model
-            # field from raising that error.
+            # Exclude empty fields that are not required by the form, if the
+            # underlying model field is required. This keeps the model field
+            # from raising a required error. Note: don't exclude the field from
+            # validaton if the model field allows blanks. If it does, the blank
+            # value may be included in a unique check, so cannot be excluded
+            # from validation.
             else:
                 form_field = self.fields[field]
                 field_value = self.cleaned_data.get(field, None)
-                if field_value is None and not form_field.required:
+                if not f.blank and not form_field.required and field_value in EMPTY_VALUES:
                     exclude.append(f.name)
         return exclude
 

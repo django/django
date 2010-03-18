@@ -2,7 +2,8 @@ import datetime
 from django.test import TestCase
 from django import forms
 from models import Category, Writer, Book, DerivedBook, Post
-from mforms import ProductForm, PriceForm, BookForm, DerivedBookForm, ExplicitPKForm, PostForm, DerivedPostForm
+from mforms import (ProductForm, PriceForm, BookForm, DerivedBookForm, 
+                   ExplicitPKForm, PostForm, DerivedPostForm, CustomWriterForm)
 
 
 class IncompleteCategoryFormWithFields(forms.ModelForm):
@@ -35,6 +36,10 @@ class ValidationTest(TestCase):
 
     def test_validates_with_replaced_field_excluded(self):
         form = IncompleteCategoryFormWithExclude(data={'name': 'some name', 'slug': 'some-slug'})
+        assert form.is_valid()
+
+    def test_notrequired_overrides_notblank(self):
+        form = CustomWriterForm({})
         assert form.is_valid()
 
 # unique/unique_together validation
