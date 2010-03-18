@@ -52,6 +52,9 @@ class Absolute(models.Model):
 class Parent(models.Model):
     name = models.CharField(max_length=10)
 
+    class Meta:
+        ordering = ('id',)
+
 class Child(Parent):
     data = models.CharField(max_length=10)
 
@@ -128,6 +131,32 @@ class Book(models.Model):
             self.name,
             self.author.name,
             ', '.join(s.name for s in self.stores.all())
+        )
+
+class NKManager(models.Manager):
+    def get_by_natural_key(self, data):
+        return self.get(data=data)
+
+class NKChild(Parent):
+    data = models.CharField(max_length=10, unique=True)
+    objects = NKManager()
+
+    def natural_key(self):
+        return self.data
+
+    def __unicode__(self):
+        return u'NKChild %s:%s' % (self.name, self.data)
+
+class RefToNKChild(models.Model):
+    text = models.CharField(max_length=10)
+    nk_fk = models.ForeignKey(NKChild, related_name='ref_fks')
+    nk_m2m = models.ManyToManyField(NKChild, related_name='ref_m2ms')
+
+    def __unicode__(self):
+        return u'%s: Reference to %s [%s]' % (
+            self.text,
+            self.nk_fk,
+            ', '.join(str(o) for o in self.nk_m2m.all())
         )
 
 # ome models with pathological circular dependencies
@@ -245,6 +274,27 @@ No fixture data found for 'bad_fixture2'. (File format may be invalid.)
 >>> management.call_command('loaddata', 'model-inheritance.json', verbosity=0)
 
 ###############################################
+# Test for ticket #13030 -- natural keys deserialize with fk to inheriting model
+
+# load data with natural keys
+>>> management.call_command('loaddata', 'nk-inheritance.json', verbosity=0)
+
+>>> NKChild.objects.get(pk=1)
+<NKChild: NKChild fred:apple>
+
+>>> RefToNKChild.objects.get(pk=1)
+<RefToNKChild: my text: Reference to NKChild fred:apple [NKChild fred:apple]>
+
+# ... and again in XML
+>>> management.call_command('loaddata', 'nk-inheritance2.xml', verbosity=0)
+
+>>> NKChild.objects.get(pk=2)
+<NKChild: NKChild james:banana>
+
+>>> RefToNKChild.objects.get(pk=2)
+<RefToNKChild: other text: Reference to NKChild fred:apple [NKChild fred:apple, NKChild james:banana]>
+
+###############################################
 # Test for ticket #7572 -- MySQL has a problem if the same connection is
 # used to create tables, load data, and then query over that data.
 # To compensate, we close the connection after running loaddata.
@@ -279,7 +329,7 @@ Weight = 1.2 (<type 'float'>)
 [{"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}}, {"pk": 2, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.2, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}, {"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}}]
 
 ###############################################
-# Regression for #11428 - Proxy models aren't included when you dumpdata 
+# Regression for #11428 - Proxy models aren't included when you dumpdata
 
 # Flush out the database first
 >>> management.call_command('reset', 'fixtures_regress', interactive=False, verbosity=0)

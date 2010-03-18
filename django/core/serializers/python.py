@@ -111,6 +111,10 @@ def Deserializer(object_list, **options):
                         if hasattr(field_value, '__iter__'):
                             obj = field.rel.to._default_manager.db_manager(db).get_by_natural_key(*field_value)
                             value = getattr(obj, field.rel.field_name)
+                            # If this is a natural foreign key to an object that
+                            # has a FK/O2O as the foreign key, use the FK value
+                            if field.rel.to._meta.pk.rel:
+                                value = value.pk
                         else:
                             value = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
                         data[field.attname] = value

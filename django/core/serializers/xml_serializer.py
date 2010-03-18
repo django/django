@@ -221,6 +221,10 @@ class Deserializer(base.Deserializer):
                     field_value = [getInnerText(k).strip() for k in keys]
                     obj = field.rel.to._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
                     obj_pk = getattr(obj, field.rel.field_name)
+                    # If this is a natural foreign key to an object that
+                    # has a FK/O2O as the foreign key, use the FK value
+                    if field.rel.to._meta.pk.rel:
+                        obj_pk = obj_pk.pk
                 else:
                     # Otherwise, treat like a normal PK
                     field_value = getInnerText(node).strip()
