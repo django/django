@@ -38,7 +38,6 @@ def colorize(text='', opts=(), **kwargs):
         print colorize('and so should this')
         print 'this should not be red'
     """
-    text = str(text)
     code_list = []
     if text == '' and len(opts) == 1 and opts[0] == 'reset':
         return '\x1b[%sm' % RESET
