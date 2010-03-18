@@ -48,9 +48,9 @@ class BaseLoader(object):
             template = get_template_from_string(source, origin, template_name)
             return template, None
         except TemplateDoesNotExist:
-            # If compiling the template we found raises TemplateDoesNotExist, back off to 
+            # If compiling the template we found raises TemplateDoesNotExist, back off to
             # returning the source and display name for the template we were asked to load.
-            # This allows for correct identification (later) of the actual template that does 
+            # This allows for correct identification (later) of the actual template that does
             # not exist.
             return source, display_name
 
@@ -85,7 +85,7 @@ def make_origin(display_name, loader, name, dirs):
         return None
 
 def find_template_loader(loader):
-    if hasattr(loader, '__iter__'):
+    if isinstance(loader, (tuple, list)):
         loader, args = loader[0], loader[1:]
     else:
         args = []
