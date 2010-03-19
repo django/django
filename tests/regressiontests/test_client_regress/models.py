@@ -493,6 +493,27 @@ class LoginTests(TestCase):
         # default client.
         self.assertRedirects(response, "http://testserver/test_client_regress/get_view/")
 
+
+class SessionEngineTests(TestCase):
+    fixtures = ['testdata']
+
+    def setUp(self):
+        self.old_SESSION_ENGINE = settings.SESSION_ENGINE
+        settings.SESSION_ENGINE = 'regressiontests.test_client_regress.session'
+
+    def tearDown(self):
+        settings.SESSION_ENGINE = self.old_SESSION_ENGINE
+
+    def test_login(self):
+        "A session engine that modifies the session key can be used to log in"
+        login = self.client.login(username='testclient', password='password')
+        self.failUnless(login, 'Could not log in')
+
+        # Try to access a login protected page.
+        response = self.client.get("/test_client/login_protected_view/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+
 class URLEscapingTests(TestCase):
     def test_simple_argument_get(self):
         "Get a view that has a simple string argument"

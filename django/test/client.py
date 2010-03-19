@@ -428,6 +428,9 @@ class Client(object):
                 request.session = engine.SessionStore()
             login(request, user)
 
+            # Save the session values.
+            request.session.save()
+
             # Set the cookie to represent the session.
             session_cookie = settings.SESSION_COOKIE_NAME
             self.cookies[session_cookie] = request.session.session_key
@@ -439,9 +442,6 @@ class Client(object):
                 'expires': None,
             }
             self.cookies[session_cookie].update(cookie_data)
-
-            # Save the session values.
-            request.session.save()
 
             return True
         else:
