@@ -1340,7 +1340,6 @@ class AdminActionsTest(TestCase):
         delete_confirmation_data = {
             ACTION_CHECKBOX_NAME: [1, 2],
             'action' : 'delete_selected',
-            'index': 0,
             'post': 'yes',
         }
         confirmation = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)

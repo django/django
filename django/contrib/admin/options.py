@@ -698,10 +698,6 @@ class ModelAdmin(BaseModelAdmin):
         changelist; it returns an HttpResponse if the action was handled, and
         None otherwise.
         """
-        if 'index' not in request.POST:
-            # If "Go" was not pushed then we can assume the POST was for
-            # an inline edit save and we do not need to validate the form.
-            return None
 
         # There can be multiple action forms on the page (at the top
         # and bottom of the change list, for example). Get the action
@@ -978,9 +974,9 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
 
         # If the request was POSTed, this might be a bulk action or a bulk edit.
-        # Try to look up an action first, but if this isn't an action the POST
-        # will fall through to the bulk edit check, below.
-        if actions and request.method == 'POST':
+        # Try to look up an action or confirmation first, but if this isn't an
+        # action the POST will fall through to the bulk edit check, below.
+        if actions and request.method == 'POST' and (helpers.ACTION_CHECKBOX_NAME in request.POST or 'index' in request.POST):
             response = self.response_action(request, queryset=cl.get_query_set())
             if response:
                 return response
