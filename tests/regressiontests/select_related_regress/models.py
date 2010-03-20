@@ -165,4 +165,13 @@ Exercising select_related() with multi-table model inheritance.
 >>> Item.objects.select_related("child").order_by("name")
 [<Item: item1>, <Item: item2>]
 
+# Regression for #12851 - Deferred fields are used correctly if you
+# select_related a subset of fields.
+>>> wa = State.objects.create(name="Western Australia", country=australia)
+>>> _ = Client.objects.create(name='Brian Burke', state=wa, status=active)
+>>> burke = Client.objects.select_related('state').defer('state__name').get(name='Brian Burke')
+>>> burke.state.name
+u'Western Australia'
+
 """}
+

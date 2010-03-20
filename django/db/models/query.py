@@ -996,7 +996,7 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
         else:
             next = None
         cached_row = get_cached_row(f.rel.to, row, index_end, max_depth,
-                cur_depth+1, next)
+                cur_depth+1, next, only_load=only_load)
         if cached_row:
             rel_obj, index_end = cached_row
             if obj is not None:
