@@ -2,6 +2,7 @@ import datetime
 import os
 import re
 import time
+import math
 
 import django.utils.copycompat as copy
 
@@ -721,6 +722,11 @@ class IntegerField(Field):
         if value is None:
             return None
         return int(value)
+
+    def get_db_prep_lookup(self, lookup_type, value):
+        if lookup_type == 'gte' or lookup_type == 'lt':
+            value = math.ceil(value)
+        return super(IntegerField, self).get_db_prep_lookup(lookup_type, value)
 
     def get_internal_type(self):
         return "IntegerField"
