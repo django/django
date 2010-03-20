@@ -1025,6 +1025,28 @@ class AdminViewListEditable(TestCase):
         # 1 select per object = 3 selects
         self.failUnlessEqual(response.content.count("<select"), 4)
 
+    def test_post_messages(self):
+        # Ticket 12707: Saving inline editable should not show admin
+        # action warnings
+        data = {
+            "form-TOTAL_FORMS": "3",
+            "form-INITIAL_FORMS": "3",
+            "form-MAX_NUM_FORMS": "0",
+
+            "form-0-gender": "1",
+            "form-0-id": "1",
+
+            "form-1-gender": "2",
+            "form-1-id": "2",
+
+            "form-2-alive": "checked",
+            "form-2-gender": "1",
+            "form-2-id": "3",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/person/',
+                                    data, follow=True)
+        self.assertEqual(len(response.context['messages']), 1)
+
     def test_post_submission(self):
         data = {
             "form-TOTAL_FORMS": "3",
@@ -1265,7 +1287,6 @@ class AdminActionsTest(TestCase):
         delete_confirmation_data = {
             ACTION_CHECKBOX_NAME: [1, 2],
             'action' : 'delete_selected',
-            'index': 0,
             'post': 'yes',
         }
         confirmation = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
