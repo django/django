@@ -277,6 +277,16 @@ class Plaything(models.Model):
 
 
 __test__ = {'API_TESTS':"""
+>>> # Regression for #13156 -- exists() queries have minimal SQL
+>>> from django.db import connection
+>>> settings.DEBUG = True
+>>> Tag.objects.exists()
+False
+>>> # Ok - so the exist query worked - but did it include too many columns?
+>>> "id" not in connection.queries[-1]['sql'] and "name" not in connection.queries[-1]['sql']
+True
+>>> settings.DEBUG = False
+
 >>> generic = NamedCategory.objects.create(name="Generic")
 >>> t1 = Tag.objects.create(name='t1', category=generic)
 >>> t2 = Tag.objects.create(name='t2', parent=t1, category=generic)

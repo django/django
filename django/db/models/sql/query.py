@@ -377,10 +377,13 @@ class Query(object):
     def has_results(self, using):
         q = self.clone()
         q.add_extra({'a': 1}, None, None, None, None, None)
-        q.add_fields(())
+        q.select = []
+        q.select_fields = []
+        q.default_cols = False
+        q.select_related = False
         q.set_extra_mask(('a',))
         q.set_aggregate_mask(())
-        q.clear_ordering()
+        q.clear_ordering(True)
         q.set_limits(high=1)
         compiler = q.get_compiler(using=using)
         return bool(compiler.execute_sql(SINGLE))
