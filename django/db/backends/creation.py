@@ -318,7 +318,7 @@ class BaseDatabaseCreation(object):
                 (style.SQL_KEYWORD('ALTER TABLE'),
                 style.SQL_TABLE(qn(table)),
                 style.SQL_KEYWORD(self.connection.ops.drop_foreignkey_sql()),
-                style.SQL_FIELD(truncate_name(r_name, self.connection.ops.max_name_length()))))
+                style.SQL_FIELD(qn(truncate_name(r_name, self.connection.ops.max_name_length())))))
         del references_to_delete[model]
         return output
 
