@@ -1208,7 +1208,7 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
             next = None
         # Recursively retrieve the data for the related object
         cached_row = get_cached_row(f.rel.to, row, index_end, using,
-                max_depth, cur_depth+1, next)
+                max_depth, cur_depth+1, next, only_load=only_load)
         # If the recursive descent found an object, populate the
         # descriptor caches relevant to the object
         if cached_row:
@@ -1237,7 +1237,7 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
             next = requested[f.related_query_name()]
             # Recursively retrieve the data for the related object
             cached_row = get_cached_row(model, row, index_end, using,
-                max_depth, cur_depth+1, next, local_only=True)
+                max_depth, cur_depth+1, next, only_load=only_load, local_only=True)
             # If the recursive descent found an object, populate the
             # descriptor caches relevant to the object
             if cached_row:
