@@ -1142,6 +1142,8 @@ specified as keyword arguments to the ``QuerySet`` methods ``filter()``,
 
 For an introduction, see :ref:`field-lookups-intro`.
 
+.. fieldlookup:: exact
+
 exact
 ~~~~~
 
@@ -1173,6 +1175,8 @@ SQL equivalents::
     information about this, see the :ref:`collation section <mysql-collation>`
     in the :ref:`databases <ref-databases>` documentation.
 
+.. fieldlookup:: iexact
+
 iexact
 ~~~~~~
 
@@ -1196,6 +1200,8 @@ BLoG'``, etc.
     comparisons. SQLite does not do case-insensitive matching for Unicode
     strings.
 
+.. fieldlookup:: contains
+
 contains
 ~~~~~~~~
 
@@ -1215,6 +1221,8 @@ Note this will match the headline ``'Today Lennon honored'`` but not
 SQLite doesn't support case-sensitive ``LIKE`` statements; ``contains`` acts
 like ``icontains`` for SQLite.
 
+.. fieldlookup:: icontains
+
 icontains
 ~~~~~~~~~
 
@@ -1233,6 +1241,8 @@ SQL equivalent::
     When using the SQLite backend and Unicode (non-ASCII) strings, bear in
     mind the :ref:`database note <sqlite-string-matching>` about string
     comparisons.
+
+.. fieldlookup:: in
 
 in
 ~~
@@ -1305,6 +1315,8 @@ extract two field values, where only one is expected::
                 name__contains='Cheddar').values_list('pk', flat=True)
         entries = Entry.objects.filter(blog__in=values)
 
+.. fieldlookup:: gt
+
 gt
 ~~
 
@@ -1318,20 +1330,28 @@ SQL equivalent::
 
     SELECT ... WHERE id > 4;
 
+.. fieldlookup:: gte 
+
 gte
 ~~~
 
 Greater than or equal to.
+
+.. fieldlookup:: lt
 
 lt
 ~~
 
 Less than.
 
+.. fieldlookup:: lte
+
 lte
 ~~~
 
 Less than or equal to.
+
+.. fieldlookup:: startswith
 
 startswith
 ~~~~~~~~~~
@@ -1348,6 +1368,8 @@ SQL equivalent::
 
 SQLite doesn't support case-sensitive ``LIKE`` statements; ``startswith`` acts
 like ``istartswith`` for SQLite.
+
+.. fieldlookup:: istartswith
 
 istartswith
 ~~~~~~~~~~~
@@ -1368,6 +1390,8 @@ SQL equivalent::
     mind the :ref:`database note <sqlite-string-matching>` about string
     comparisons.
 
+.. fieldlookup:: endswith
+
 endswith
 ~~~~~~~~
 
@@ -1383,6 +1407,8 @@ SQL equivalent::
 
 SQLite doesn't support case-sensitive ``LIKE`` statements; ``endswith`` acts
 like ``iendswith`` for SQLite.
+
+.. fieldlookup:: iendswith
 
 iendswith
 ~~~~~~~~~
@@ -1403,6 +1429,8 @@ SQL equivalent::
     mind the :ref:`database note <sqlite-string-matching>` about string
     comparisons.
 
+.. fieldlookup:: range
+
 range
 ~~~~~
 
@@ -1421,6 +1449,8 @@ SQL equivalent::
 You can use ``range`` anywhere you can use ``BETWEEN`` in SQL -- for dates,
 numbers and even characters.
 
+.. fieldlookup:: year
+
 year
 ~~~~
 
@@ -1435,6 +1465,8 @@ SQL equivalent::
     SELECT ... WHERE EXTRACT('year' FROM pub_date) = '2005';
 
 (The exact SQL syntax varies for each database engine.)
+
+.. fieldlookup:: month
 
 month
 ~~~~~
@@ -1451,6 +1483,8 @@ SQL equivalent::
     SELECT ... WHERE EXTRACT('month' FROM pub_date) = '12';
 
 (The exact SQL syntax varies for each database engine.)
+
+.. fieldlookup:: day
 
 day
 ~~~
@@ -1469,6 +1503,8 @@ SQL equivalent::
 
 Note this will match any record with a pub_date on the third day of the month,
 such as January 3, July 3, etc.
+
+.. fieldlookup:: week_day
 
 week_day
 ~~~~~~~~
@@ -1491,6 +1527,8 @@ Note this will match any record with a pub_date that falls on a Monday (day 2
 of the week), regardless of the month or year in which it occurs. Week days
 are indexed with day 1 being Sunday and day 7 being Saturday.
 
+.. fieldlookup:: isnull
+
 isnull
 ~~~~~~
 
@@ -1504,6 +1542,8 @@ Example::
 SQL equivalent::
 
     SELECT ... WHERE pub_date IS NULL;
+
+.. fieldlookup:: search
 
 search
 ~~~~~~
@@ -1523,6 +1563,8 @@ Note this is only available in MySQL and requires direct manipulation of the
 database to add the full-text index. By default Django uses BOOLEAN MODE for
 full text searches. `Please check MySQL documentation for additional details. <http://dev.mysql.com/doc/refman/5.1/en/fulltext-boolean.html>`_
 
+
+.. fieldlookup:: regex
 
 regex
 ~~~~~
@@ -1552,6 +1594,8 @@ SQL equivalents::
 
 Using raw strings (e.g., ``r'foo'`` instead of ``'foo'``) for passing in the
 regular expression syntax is recommended.
+
+.. fieldlookup:: iregex
 
 iregex
 ~~~~~~
