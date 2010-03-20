@@ -97,6 +97,10 @@ class OtherClass:
     def method(self):
         return "OtherClass.method"
 
+class SilentGetItemClass(object):
+    def __getitem__(self, key):
+        raise SomeException
+
 class UTF8Class:
     "Class whose __str__ returns non-ASCII data"
     def __str__(self):
@@ -464,6 +468,11 @@ class Templates(unittest.TestCase):
             'basic-syntax25': ('{{ "fred" }}', {}, "fred"),
             'basic-syntax26': (r'{{ "\"fred\"" }}', {}, "\"fred\""),
             'basic-syntax27': (r'{{ _("\"fred\"") }}', {}, "\"fred\""),
+
+            # regression test for ticket #12554
+            # make sure a silent_variable_failure Exception is supressed
+            # on dictionary lookup
+            'basic-syntax28': ("{{ a.b }}", {'a': SilentGetItemClass()}, ('', 'INVALID')),
 
             # List-index syntax allows a template to access a certain item of a subscriptable object.
             'list-index01': ("{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"),
