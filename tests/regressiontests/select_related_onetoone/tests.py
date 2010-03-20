@@ -2,7 +2,7 @@ from django import db
 from django.conf import settings
 from django.test import TestCase
 
-from models import (User, UserProfile, UserStat, UserStatResult, StatDetails, 
+from models import (User, UserProfile, UserStat, UserStatResult, StatDetails,
     AdvancedUserStat, Image, Product)
 
 class ReverseSelectRelatedTestCase(TestCase):
@@ -22,7 +22,7 @@ class ReverseSelectRelatedTestCase(TestCase):
 
         user2 = User.objects.create(username="bob")
         results2 = UserStatResult.objects.create(results='moar results')
-        advstat = AdvancedUserStat.objects.create(user=user2, posts=200,
+        advstat = AdvancedUserStat.objects.create(user=user2, posts=200, karma=5,
                                                   results=results2)
         StatDetails.objects.create(base_stats=advstat, comments=250)
 
@@ -74,18 +74,21 @@ class ReverseSelectRelatedTestCase(TestCase):
         self.assertQueries(2)
 
     def test_follow_from_child_class(self):
-        stat = AdvancedUserStat.objects.select_related("statdetails").get(posts=200)
+        stat = AdvancedUserStat.objects.select_related('user', 'statdetails').get(posts=200)
         self.assertEqual(stat.statdetails.comments, 250)
+        self.assertEqual(stat.user.username, 'bob')
         self.assertQueries(1)
 
     def test_follow_inheritance(self):
-        stat = UserStat.objects.select_related('advanceduserstat').get(posts=200)
+        stat = UserStat.objects.select_related('user', 'advanceduserstat').get(posts=200)
         self.assertEqual(stat.advanceduserstat.posts, 200)
+        self.assertEqual(stat.user.username, 'bob')
+        self.assertEqual(stat.advanceduserstat.user.username, 'bob')
         self.assertQueries(1)
-    
+
     def test_nullable_relation(self):
         im = Image.objects.create(name="imag1")
         p1 = Product.objects.create(name="Django Plushie", image=im)
         p2 = Product.objects.create(name="Talking Django Plushie")
-        
+
         self.assertEqual(len(Product.objects.select_related("image")), 2)

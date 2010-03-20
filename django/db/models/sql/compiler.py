@@ -215,7 +215,7 @@ class SQLCompiler(object):
         return result
 
     def get_default_columns(self, with_aliases=False, col_aliases=None,
-            start_alias=None, opts=None, as_pairs=False):
+            start_alias=None, opts=None, as_pairs=False, local_only=False):
         """
         Computes the default columns for selecting every field in the base
         model. Will sometimes be called to pull in related models (e.g. via
@@ -240,6 +240,8 @@ class SQLCompiler(object):
         if start_alias:
             seen = {None: start_alias}
         for field, model in opts.get_fields_with_model():
+            if local_only and model is not None:
+                continue
             if start_alias:
                 try:
                     alias = seen[model]
@@ -643,7 +645,7 @@ class SQLCompiler(object):
                 )
                 used.add(alias)
                 columns, aliases = self.get_default_columns(start_alias=alias,
-                    opts=model._meta, as_pairs=True)
+                    opts=model._meta, as_pairs=True, local_only=True)
                 self.query.related_select_cols.extend(columns)
                 self.query.related_select_fields.extend(model._meta.fields)
 
