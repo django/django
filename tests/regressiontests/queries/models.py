@@ -428,6 +428,45 @@ constraints.
 >>> Number.objects.filter(Q(num__gt=7) & Q(num__lt=12) | Q(num__lt=4))
 [<Number: 8>]
 
+Bug #12239
+Float was being rounded to integer on gte queries on integer field.  Tests
+show that gt, lt, gte, and lte work as desired.  Note that the fix changes
+get_prep_lookup for gte and lt queries only.
+>>> Number.objects.filter(num__gt=11.9)
+[<Number: 12>]
+>>> Number.objects.filter(num__gt=12)
+[]
+>>> Number.objects.filter(num__gt=12.0)
+[]
+>>> Number.objects.filter(num__gt=12.1)
+[]
+>>> Number.objects.filter(num__lt=12)
+[<Number: 4>, <Number: 8>]
+>>> Number.objects.filter(num__lt=12.0)
+[<Number: 4>, <Number: 8>]
+>>> Number.objects.filter(num__lt=12.1)
+[<Number: 4>, <Number: 8>, <Number: 12>]
+>>> Number.objects.filter(num__gte=11.9)
+[<Number: 12>]
+>>> Number.objects.filter(num__gte=12)
+[<Number: 12>]
+>>> Number.objects.filter(num__gte=12.0)
+[<Number: 12>]
+>>> Number.objects.filter(num__gte=12.1)
+[]
+>>> Number.objects.filter(num__gte=12.9)
+[]
+>>> Number.objects.filter(num__lte=11.9)
+[<Number: 4>, <Number: 8>]
+>>> Number.objects.filter(num__lte=12)
+[<Number: 4>, <Number: 8>, <Number: 12>]
+>>> Number.objects.filter(num__lte=12.0)
+[<Number: 4>, <Number: 8>, <Number: 12>]
+>>> Number.objects.filter(num__lte=12.1)
+[<Number: 4>, <Number: 8>, <Number: 12>]
+>>> Number.objects.filter(num__lte=12.9)
+[<Number: 4>, <Number: 8>, <Number: 12>]
+
 Bug #7872
 Another variation on the disjunctive filtering theme.
 
