@@ -6,9 +6,9 @@ import datetime
 
 from django.template import Template, Context
 from django.conf import settings
-from django.utils.formats import get_format, date_format, time_format, number_format, localize, localize_input
-from django.utils.numberformat import format
-from django.test import TestCase, client
+from django.utils.formats import get_format, date_format, time_format, localize, localize_input
+from django.utils.numberformat import format as nformat
+from django.test import TestCase
 from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, to_locale
 
 from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
@@ -106,6 +106,8 @@ class FormattingTests(TestCase):
         self.use_i18n = settings.USE_I18N
         self.use_l10n = settings.USE_L10N
         self.use_thousand_separator = settings.USE_THOUSAND_SEPARATOR
+        self.thousand_separator = settings.THOUSAND_SEPARATOR
+        self.number_grouping = settings.NUMBER_GROUPING
         self.n = decimal.Decimal('66666.666')
         self.f = 99999.999
         self.d = datetime.date(2009, 12, 31)
@@ -124,6 +126,8 @@ class FormattingTests(TestCase):
         settings.USE_I18N = self.use_i18n
         settings.USE_L10N = self.use_l10n
         settings.USE_THOUSAND_SEPARATOR = self.use_thousand_separator
+        settings.THOUSAND_SEPARATOR = self.thousand_separator
+        settings.NUMBER_GROUPING = self.number_grouping
 
     def test_locale_independent(self):
         """
@@ -131,14 +135,14 @@ class FormattingTests(TestCase):
         """
         settings.USE_L10N = True
         settings.USE_THOUSAND_SEPARATOR = False
-        self.assertEqual(u'66666.66', format(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
-        self.assertEqual(u'66666A6', format(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
+        self.assertEqual(u'66666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
+        self.assertEqual(u'66666A6', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
 
         settings.USE_THOUSAND_SEPARATOR = True
-        self.assertEqual(u'66,666.66', format(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
-        self.assertEqual(u'6B6B6B6B6A6', format(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
-        self.assertEqual(u'-66666.6', format(-66666.666, decimal_sep='.', decimal_pos=1))
-        self.assertEqual(u'-66666.0', format(int('-66666'), decimal_sep='.', decimal_pos=1))
+        self.assertEqual(u'66,666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
+        self.assertEqual(u'6B6B6B6B6A6', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
+        self.assertEqual(u'-66666.6', nformat(-66666.666, decimal_sep='.', decimal_pos=1))
+        self.assertEqual(u'-66666.0', nformat(int('-66666'), decimal_sep='.', decimal_pos=1))
 
         # date filter
         self.assertEqual(u'31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
@@ -200,6 +204,16 @@ class FormattingTests(TestCase):
                 u'<select name="mydate_month" id="id_mydate_month">\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
                 SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
+
+            # We shouldn't change the behavior of the floatformat filter re:
+            # thousand separator and grouping when USE_L10N is False even
+            # if the USE_THOUSAND_SEPARATOR, NUMBER_GROUPING and
+            # THOUSAND_SEPARATOR settings are specified
+            settings.USE_THOUSAND_SEPARATOR = True
+            settings.NUMBER_GROUPING = 1
+            settings.THOUSAND_SEPARATOR = '!'
+            self.assertEqual(u'66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
+            self.assertEqual(u'100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
         finally:
             deactivate()
 

@@ -30,7 +30,7 @@ def format(number, decimal_sep, decimal_pos, grouping=0, thousand_sep=''):
         dec_part = dec_part + ('0' * (decimal_pos - len(dec_part)))
     if dec_part: dec_part = decimal_sep + dec_part
     # grouping
-    if settings.USE_THOUSAND_SEPARATOR and grouping:
+    if settings.USE_L10N and settings.USE_THOUSAND_SEPARATOR and grouping:
         int_part_gd = ''
         for cnt, digit in enumerate(int_part[::-1]):
             if cnt and not cnt % grouping:
