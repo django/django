@@ -58,6 +58,7 @@ csrf_protect_m = method_decorator(csrf_protect)
 
 class BaseModelAdmin(object):
     """Functionality common to both ModelAdmin and InlineAdmin."""
+    __metaclass__ = forms.MediaDefiningClass
 
     raw_id_fields = ()
     fields = None
@@ -186,7 +187,6 @@ class BaseModelAdmin(object):
 
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
-    __metaclass__ = forms.MediaDefiningClass
 
     list_display = ('__str__',)
     list_display_links = ()

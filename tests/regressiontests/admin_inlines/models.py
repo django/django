@@ -45,8 +45,46 @@ class InnerInline(admin.StackedInline):
     can_delete = False
 
 
-# Test bug #12561
-admin.site.register(Holder, inlines=[InnerInline])
+class Holder2(models.Model):
+    dummy = models.IntegerField()
+
+
+class Inner2(models.Model):
+    dummy = models.IntegerField()
+    holder = models.ForeignKey(Holder2)
+
+class HolderAdmin(admin.ModelAdmin):
+
+    class Media:
+        js = ('my_awesome_admin_scripts.js',)
+
+class InnerInline2(admin.StackedInline):
+    model = Inner2
+
+    class Media:
+        js = ('my_awesome_inline_scripts.js',)
+
+class Holder3(models.Model):
+    dummy = models.IntegerField()
+
+
+class Inner3(models.Model):
+    dummy = models.IntegerField()
+    holder = models.ForeignKey(Holder3)
+
+class InnerInline3(admin.StackedInline):
+    model = Inner3
+
+    class Media:
+        js = ('my_awesome_inline_scripts.js',)
+
+# Test bug #12561 and #12778
+# only ModelAdmin media
+admin.site.register(Holder, HolderAdmin, inlines=[InnerInline])
+# ModelAdmin and Inline media
+admin.site.register(Holder2, HolderAdmin, inlines=[InnerInline2])
+# only Inline media
+admin.site.register(Holder3, inlines=[InnerInline3])
 
 __test__ = {'API_TESTS': """
 
