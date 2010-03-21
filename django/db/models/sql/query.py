@@ -240,10 +240,12 @@ class Query(object):
             obj.aggregate_select_mask = None
         else:
             obj.aggregate_select_mask = self.aggregate_select_mask.copy()
-        if self._aggregate_select_cache is None:
-            obj._aggregate_select_cache = None
-        else:
-            obj._aggregate_select_cache = self._aggregate_select_cache.copy()
+        # _aggregate_select_cache cannot be copied, as doing so breaks the
+        # (necessary) state in which both aggregates and
+        # _aggregate_select_cache point to the same underlying objects.
+        # It will get re-populated in the cloned queryset the next time it's
+        # used.
+        obj._aggregate_select_cache = None
         obj.max_depth = self.max_depth
         obj.extra = self.extra.copy()
         if self.extra_select_mask is None:
