@@ -76,7 +76,8 @@ class Command(NoArgsCommand):
                     print "Creating table %s" % model._meta.db_table
                 for statement in sql:
                     cursor.execute(statement)
-                tables.append(connection.introspection.table_name_converter(model._meta.db_table))
+                if sql:
+                    tables.append(connection.introspection.table_name_converter(model._meta.db_table))
 
         # Create the m2m tables. This must be done after all tables have been created
         # to ensure that all referred tables will exist.
