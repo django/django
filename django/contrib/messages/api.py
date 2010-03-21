@@ -4,6 +4,7 @@ from django.utils.functional import lazy, memoize
 
 __all__ = (
     'add_message', 'get_messages',
+    'get_level', 'set_level',
     'debug', 'info', 'success', 'warning', 'error',
 )
 

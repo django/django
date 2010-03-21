@@ -2,8 +2,8 @@ from django import http
 from django.test import TestCase
 from django.conf import settings
 from django.utils.translation import ugettext_lazy
-from django.contrib.messages import constants, utils
-from django.contrib.messages.api import MessageFailure, get_level, set_level
+from django.contrib.messages import constants, utils, get_level, set_level
+from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
