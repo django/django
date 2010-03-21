@@ -154,7 +154,7 @@ class AdminReadonlyField(object):
         field, obj, model_admin = self.field, self.form.instance, self.model_admin
         try:
             f, attr, value = lookup_field(field, obj, model_admin)
-        except (AttributeError, ObjectDoesNotExist):
+        except (AttributeError, ValueError, ObjectDoesNotExist):
             result_repr = EMPTY_CHANGELIST_VALUE
         else:
             if f is None:

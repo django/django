@@ -1986,6 +1986,11 @@ class ReadonlyTest(TestCase):
         p = Post.objects.order_by('-id')[0]
         self.assertEqual(p.posted, datetime.date.today())
 
+    def test_readonly_manytomany(self):
+        "Regression test for #13004"
+        response = self.client.get('/test_admin/admin/admin_views/pizza/add/')
+        self.assertEqual(response.status_code, 200)
+
 class IncompleteFormTest(TestCase):
     """
     Tests validation of a ModelForm that doesn't explicitly have all data

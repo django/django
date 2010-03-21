@@ -565,6 +565,16 @@ class CyclicTwo(models.Model):
     def __unicode__(self):
         return self.name
 
+class Topping(models.Model):
+    name = models.CharField(max_length=20) 
+
+class Pizza(models.Model):
+    name = models.CharField(max_length=20)
+    toppings = models.ManyToManyField('Topping')
+
+class PizzaAdmin(admin.ModelAdmin):
+    readonly_fields = ('toppings',)
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -609,3 +619,5 @@ admin.site.register(CyclicTwo)
 admin.site.register(Book, inlines=[ChapterInline])
 admin.site.register(Promo)
 admin.site.register(ChapterXtra1)
+admin.site.register(Pizza, PizzaAdmin)
+admin.site.register(Topping)
