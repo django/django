@@ -31,7 +31,7 @@ class DefaultsTests(TestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_shortcut_bad_pk(self):
-        short_url = '/views/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, '4242424242')
+        short_url = '/views/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, '42424242')
         response = self.client.get(short_url)
         self.assertEquals(response.status_code, 404)
 
@@ -43,7 +43,7 @@ class DefaultsTests(TestCase):
 
     def test_bad_content_type(self):
         an_author = Author.objects.all()[0]
-        short_url = '/views/shortcut/%s/%s/' % (4242424242, an_author.pk)
+        short_url = '/views/shortcut/%s/%s/' % (42424242, an_author.pk)
         response = self.client.get(short_url)
         self.assertEquals(response.status_code, 404)
 
