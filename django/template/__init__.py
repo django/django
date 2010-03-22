@@ -745,6 +745,11 @@ class Variable(object):
                             TypeError,  # unsubscriptable object
                             ):
                         raise VariableDoesNotExist("Failed lookup for key [%s] in %r", (bit, current)) # missing attribute
+                except Exception, e:
+                    if getattr(e, 'silent_variable_failure', False):
+                        current = settings.TEMPLATE_STRING_IF_INVALID
+                    else:
+                        raise
             except Exception, e:
                 if getattr(e, 'silent_variable_failure', False):
                     current = settings.TEMPLATE_STRING_IF_INVALID
