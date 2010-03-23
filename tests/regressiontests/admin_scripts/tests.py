@@ -101,8 +101,12 @@ class AdminScriptTestCase(unittest.TestCase):
         os.environ[python_path_var_name] = os.pathsep.join(python_path)
 
         # Build the command line
-        cmd = '%s "%s"' % (sys.executable, script)
-        cmd += ''.join([' %s' % arg for arg in args])
+        executable = sys.executable
+        arg_string = ' '.join(['%s' % arg for arg in args])
+        if ' ' in executable:
+            cmd = '""%s" "%s" %s"' % (executable, script, arg_string)
+        else:
+            cmd = '%s "%s" %s' % (executable, script, arg_string)
 
         # Move to the test directory and run
         os.chdir(test_dir)
