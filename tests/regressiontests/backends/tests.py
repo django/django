@@ -66,6 +66,19 @@ class DateQuotingTest(TestCase):
         classes = models.SchoolClass.objects.filter(last_updated__day=20)
         self.assertEqual(len(classes), 1)
 
+class ParameterHandlingTest(TestCase):
+    def test_bad_parameter_count(self):
+        "An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"
+        cursor = connection.cursor()
+        query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
+            connection.introspection.table_name_converter('backends_square'),
+            connection.ops.quote_name('root'),
+            connection.ops.quote_name('square')
+        ))
+        self.assertRaises(Exception, cursor.executemany, query, [(1,2,3),])
+        self.assertRaises(Exception, cursor.executemany, query, [(1,),])
+
+
 def connection_created_test(sender, **kwargs):
     print 'connection_created signal'
 

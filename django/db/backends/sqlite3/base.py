@@ -7,6 +7,8 @@ Python 2.5 and later can use a pysqlite2 module or the sqlite3 module in the
 standard library.
 """
 
+import re
+
 from django.db.backends import *
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.client import DatabaseClient
@@ -186,6 +188,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.settings_dict['DATABASE_NAME'] != ":memory:":
             BaseDatabaseWrapper.close(self)
 
+FORMAT_QMARK_REGEX = re.compile(r'(?![^%])%s')
+
 class SQLiteCursorWrapper(Database.Cursor):
     """
     Django uses "format" style placeholders, but pysqlite2 uses "qmark" style.
@@ -193,19 +197,15 @@ class SQLiteCursorWrapper(Database.Cursor):
     you'll need to use "%%s".
     """
     def execute(self, query, params=()):
-        query = self.convert_query(query, len(params))
+        query = self.convert_query(query)
         return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, param_list):
-        try:
-          query = self.convert_query(query, len(param_list[0]))
-          return Database.Cursor.executemany(self, query, param_list)
-        except (IndexError,TypeError):
-          # No parameter list provided
-          return None
+        query = self.convert_query(query)
+        return Database.Cursor.executemany(self, query, param_list)
 
-    def convert_query(self, query, num_params):
-        return query % tuple("?" * num_params)
+    def convert_query(self, query):
+        return FORMAT_QMARK_REGEX.sub('?', query).replace('%%','%')
 
 def _sqlite_extract(lookup_type, dt):
     if dt is None:
