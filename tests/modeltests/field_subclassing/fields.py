@@ -41,14 +41,14 @@ class SmallField(models.Field):
     def get_db_prep_save(self, value):
         return unicode(value)
 
-    def get_db_prep_lookup(self, lookup_type, value):
+    def get_prep_lookup(self, lookup_type, value):
         if lookup_type == 'exact':
             return force_unicode(value)
         if lookup_type == 'in':
             return [force_unicode(v) for v in value]
         if lookup_type == 'isnull':
             return []
-        raise FieldError('Invalid lookup type: %r' % lookup_type)
+        raise TypeError('Invalid lookup type: %r' % lookup_type)
 
 
 class JSONField(models.TextField):

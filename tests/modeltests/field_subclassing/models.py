@@ -51,7 +51,7 @@ True
 >>> MyModel.objects.filter(data__lt=s)
 Traceback (most recent call last):
 ...
-FieldError: Invalid lookup type: 'lt'
+TypeError: Invalid lookup type: 'lt'
 
 # Serialization works, too.
 >>> stream = serializers.serialize("json", MyModel.objects.all())
