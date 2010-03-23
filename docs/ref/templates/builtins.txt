@@ -113,9 +113,13 @@ You can use any number of values in a ``{% cycle %}`` tag, separated by spaces.
 Values enclosed in single (``'``) or double quotes (``"``) are treated as
 string literals, while values without quotes are treated as template variables.
 
-Note that the variables included in the cycle will not be escaped. This is
-because template tags do not escape their content. If you want to escape the
-variables in the cycle, you must do so explicitly::
+Note that the variables included in the cycle will not be escaped.
+This is because template tags do not escape their content. Any HTML or
+Javascript code contained in the printed variable will be rendered
+as-is, which could potentially lead to security issues.
+
+If you need to escape the variables in the cycle, you must do so
+explicitly::
 
     {% filter force_escape %}
         {% cycle var1 var2 var3 %}
@@ -203,9 +207,13 @@ passed variables are False::
 
     {% firstof var1 var2 var3 "fallback value" %}
 
-Note that the variables included in the firstof tag will not be escaped. This
-is because template tags do not escape their content. If you want to escape
-the variables in the firstof tag, you must do so explicitly::
+Note that the variables included in the firstof tag will not be
+escaped. This is because template tags do not escape their content.
+Any HTML or Javascript code contained in the printed variable will be
+rendered as-is, which could potentially lead to security issues.
+
+If you need to escape the variables in the firstof tag, you must do so
+explicitly::
 
     {% filter force_escape %}
         {% firstof var1 var2 var3 "fallback value" %}
