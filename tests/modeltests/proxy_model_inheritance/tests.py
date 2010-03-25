@@ -12,9 +12,9 @@ import sys
 from django.conf import settings, Settings
 from django.core.management import call_command
 from django.db.models.loading import load_app
-from django.test import TestCase
+from django.test import TransactionTestCase
 
-class ProxyModelInheritanceTests(TestCase):
+class ProxyModelInheritanceTests(TransactionTestCase):
 
     def setUp(self):
         self.old_sys_path = sys.path
