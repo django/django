@@ -198,5 +198,10 @@ CLEARING FIELD f
 
 # Put this back to normal
 >>> django.db.models.sql.UpdateQuery = original_class
+
+# Restore the app cache to previous condition so that all models are accounted for.
+>>> cache.app_models['delete'].keyOrder = ['a', 'b', 'c', 'd', 'e', 'f']
+>>> clear_rel_obj_caches([A, B, C, D, E, F])
+
 """
 }
