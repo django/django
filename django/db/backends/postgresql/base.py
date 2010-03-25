@@ -76,7 +76,7 @@ class UnicodeCursorWrapper(object):
             return getattr(self.cursor, attr)
 
     def __iter__(self):
-        return iter(self.cursor)
+        return iter(self.cursor.fetchall())
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     uses_savepoints = True
