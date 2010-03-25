@@ -1299,18 +1299,6 @@ See the :ref:`topics-http-sessions`.
 
 .. setting:: SESSION_EXPIRE_AT_BROWSER_CLOSE
 
-SESSION_DB_ALIAS
-----------------
-
-.. versionadded:: 1.2
-
-Default: ``None``
-
-If you're using database-backed session storage, this selects the database
-alias that will be used to store session data. By default, Django will use
-the ``default`` database, but you can store session data on any database
-you choose.
-
 SESSION_EXPIRE_AT_BROWSER_CLOSE
 -------------------------------
 

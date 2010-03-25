@@ -44,15 +44,8 @@ Using database-backed sessions
 If you want to use a database-backed session, you need to add
 ``'django.contrib.sessions'`` to your ``INSTALLED_APPS`` setting.
 
-If you want to store your session data on a database other than ``default``
-alias, you should set the :setting:`SESSION_DB_ALIAS` setting.
-
 Once you have configured your installation, run ``manage.py syncdb``
 to install the single database table that stores session data.
-
-.. versionadded:: 1.2
-   The :setting:`SESSION_DB_ALIAS` setting was added in Django 1.2. It
-   is not required in earlier versions.
 
 Using cached sessions
 ---------------------

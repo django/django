@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
-from django.db import IntegrityError, transaction, DEFAULT_DB_ALIAS
+from django.db import IntegrityError, transaction, router
 from django.utils.encoding import force_unicode
 
 class SessionStore(SessionBase):
@@ -11,7 +11,6 @@ class SessionStore(SessionBase):
     Implements database session store.
     """
     def __init__(self, session_key=None):
-        self.using = getattr(settings, "SESSION_DB_ALIAS", DEFAULT_DB_ALIAS)
         super(SessionStore, self).__init__(session_key)
 
     def load(self):
@@ -58,12 +57,13 @@ class SessionStore(SessionBase):
             session_data = self.encode(self._get_session(no_load=must_create)),
             expire_date = self.get_expiry_date()
         )
-        sid = transaction.savepoint(using=self.using)
+        using = router.db_for_write(Session, instance=obj)
+        sid = transaction.savepoint(using=using)
         try:
-            obj.save(force_insert=must_create)
+            obj.save(force_insert=must_create, using=using)
         except IntegrityError:
             if must_create:
-                transaction.savepoint_rollback(sid, using=self.using)
+                transaction.savepoint_rollback(sid, using=using)
                 raise CreateError
             raise
 
