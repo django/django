@@ -1,4 +1,4 @@
-import os, sys
+import os, re, sys
 from ctypes import c_char_p, CDLL
 from ctypes.util import find_library
 from django.contrib.gis.gdal.error import OGRException
@@ -81,3 +81,24 @@ def gdal_release_date(date=False):
     d = date_type(yy, mm, dd)
     if date: return d
     else: return d.strftime('%Y/%m/%d')
+
+version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
+def gdal_version_info():
+    ver = gdal_version()
+    m = version_regex.match(ver)
+    if not m: raise OGRException('Could not parse GDAL version string "%s"' % ver)
+    return dict([(key, m.group(key)) for key in ('major', 'minor', 'subminor')])
+
+_verinfo = gdal_version_info()
+GDAL_MAJOR_VERSION = int(_verinfo['major'])
+GDAL_MINOR_VERSION = int(_verinfo['minor'])
+GDAL_SUBMINOR_VERSION = _verinfo['subminor'] and int(_verinfo['subminor'])
+GDAL_VERSION = (GDAL_MAJOR_VERSION, GDAL_MINOR_VERSION, GDAL_SUBMINOR_VERSION)
+del _verinfo
+
+# GeoJSON support is available only in GDAL 1.5+.
+if GDAL_VERSION >= (1, 5):
+    GEOJSON = True
+else:
+    GEOJSON = False
+
