@@ -17,6 +17,7 @@ ImproperlyConfigured: The included urlconf regressiontests.urlpatterns_reverse.n
 import unittest
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, resolve, NoReverseMatch, Resolver404
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
@@ -276,3 +277,16 @@ class RequestURLconfTests(TestCase):
         response = self.client.get('/second_test/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, 'outer:,inner:/second_test/')
+
+    def test_urlconf_overridden_with_null(self):
+        settings.MIDDLEWARE_CLASSES += (
+            '%s.NullChangeURLconfMiddleware' % middleware.__name__,
+        )
+        self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
+
+class NoRootUrlConfTests(TestCase):
+    """Tests for handler404 and handler500 if urlconf is None"""
+    urls = None
+
+    def test_no_handler_exception(self):
+        self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
