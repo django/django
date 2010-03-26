@@ -1,0 +1,1114 @@
+.. _ref-gdal:
+
+========
+GDAL API
+========
+
+.. module:: django.contrib.gis.gdal
+   :synopsis: GeoDjango's high-level interface to the GDAL library.
+
+`GDAL`__ stands for **G**\ eospatial **D**\ ata **A**\ bstraction **L**\ ibrary,
+and is a veritable "swiss army knife" of GIS data functionality.  A subset
+of GDAL is the `OGR`__ Simple Features Library, which specializes
+in reading and writing vector geographic data in a variety of standard
+formats.
+
+GeoDjango provides a high-level Python interface for some of the 
+capabilities of OGR, including the reading and coordinate transformation
+of vector spatial data.
+
+.. note::
+
+     Although the module is named ``gdal``, GeoDjango only supports
+     some of the capabilities of OGR.  Thus, none of GDAL's features
+     with respect to raster (image) data are supported at this time.
+   
+__ http://www.gdal.org/
+__ http://www.gdal.org/ogr/
+
+Overview
+========
+
+Sample Data
+-----------
+
+The GDAL/OGR tools described here are designed to help you read in
+your geospatial data, in order for most of them to be useful you have
+to have some data to work with.  If you're starting out and don't yet
+have any data of your own to use, GeoDjango comes with a number of
+simple data sets that you can use for testing.  This snippet will
+determine where these sample files are installed on your computer::
+
+    >>> import os
+    >>> import django.contrib.gis
+    >>> GIS_PATH = os.path.dirname(django.contrib.gis.__file__)
+    >>> CITIES_PATH = os.path.join(GIS_PATH, 'tests/data/cities/cities.shp')
+
+Vector Data Source Objects
+==========================
+
+``DataSource``
+--------------
+
+:class:`DataSource` is a wrapper for the OGR data source object that
+supports reading data from a variety of OGR-supported geospatial file
+formats and data sources using a simple, consistent interface.  Each
+data source is represented by a :class:`DataSource` object which contains
+one or more layers of data.  Each layer, represented by a :class:`Layer`
+object, contains some number of geographic features (:class:`Feature`),
+information about the type of features contained in that layer (e.g.
+points, polygons, etc.), as well as the names and types of any
+additional fields (:class:`Field`) of data that may be associated with
+each feature in that layer.
+
+.. class:: DataSource(ds_input)
+
+   The constructor for ``DataSource`` just a single parameter: the path of
+   the file you want to read.  However, OGR
+   also supports a variety of more complex data sources, including
+   databases, that may be accessed by passing a special name string instead
+   of a path.  For more information, see the `OGR Vector Formats`__
+   documentation.  The :attr:`name` property of a ``DataSource`` 
+   instance gives the OGR name of the underlying data source that it is
+   using.
+
+   Once you've created your ``DataSource``, you can find out how many 
+   layers of data it contains by accessing the :attr:`layer_count` property, 
+   or (equivalently) by using the ``len()`` function.  For information on 
+   accessing the layers of data themselves, see the next section::
+
+       >>> from django.contrib.gis.gdal import DataSource
+       >>> ds = DataSource(CITIES_PATH)
+       >>> ds.name                         # The exact filename may be different on your computer
+       '/usr/local/lib/python2.6/site-packages/django/contrib/gis/tests/data/cities/cities.shp'
+       >>> ds.layer_count                  # This file only contains one layer
+       1
+
+   .. attribute:: layer_count
+
+   Returns the number of layers in the data source.
+
+   .. attribute:: name
+
+   Returns the name of the data source.
+
+__ http://www.gdal.org/ogr/ogr_formats.html
+
+``Layer``
+---------
+
+.. class:: Layer
+
+   ``Layer`` is a wrapper for a layer of data in a ``DataSource`` object.
+   You never create a ``Layer`` object directly.  Instead, you retrieve
+   them from a :class:`DataSource` object, which is essentially a standard
+   Python container of ``Layer`` objects.  For example, you can access a
+   specific layer by its index (e.g. ``ds[0]`` to access the first
+   layer), or you can iterate over all the layers in the container in a
+   ``for`` loop.  The ``Layer`` itself acts as a container for geometric 
+   features.
+
+   Typically, all the features in a given layer have the same geometry type.
+   The :attr:`geom_type` property of a layer is an :class:`OGRGeomType`
+   that identifies the feature type.  We can use it to print out some basic
+   information about each layer in a :class:`DataSource`::
+
+       >>> for layer in ds:
+       ...     print 'Layer "%s": %i %ss' % (layer.name, len(layer), layer.geom_type.name)
+       ...
+       Layer "cities": 3 Points
+
+   The example output is from the cities data source, loaded above, which
+   evidently contains one layer, called ``"cities"``, which contains three
+   point features.  For simplicity, the examples below assume that you've 
+   stored that layer in the variable ``layer``::
+
+       >>> layer = ds[0]
+
+   .. attribute:: name
+
+   Returns the name of this layer in the data source.
+
+       >>> layer.name
+       'cities'
+
+   .. attribute:: num_feat
+
+   Returns the number of features in the layer.  Same as ``len(layer)``::
+
+       >>> layer.num_feat
+       3
+
+   .. attribute:: geom_type
+
+   Returns the geometry type of the layer, as an :class:`OGRGeomType`
+   object::
+
+       >>> layer.geom_type.name
+       'Point'
+
+   .. attribute:: num_fields
+
+   Returns the number of fields in the layer, i.e the number of fields of
+   data associated with each feature in the layer::
+
+       >>> layer.num_fields
+       4
+
+   .. attribute:: fields
+
+   Returns a list of the names of each of the fields in this layer::
+
+       >>> layer.fields
+       ['Name', 'Population', 'Density', 'Created']
+
+   .. attribute field_types
+
+   Returns a list of the data types of each of the fields in this layer.
+   These are subclasses of ``Field``, discussed below::
+
+       >>> [ft.__name__ for ft in layer.field_types]
+       ['OFTString', 'OFTReal', 'OFTReal', 'OFTDate']
+ 
+   .. attribute:: field_widths
+
+   Returns a list of the maximum field widths for each of the fields in
+   this layer::
+
+      >>> layer.field_widths
+      [80, 11, 24, 10]
+
+   .. attribute:: field_precisions
+
+   Returns a list of the numeric precisions for each of the fields in
+   this layer.  This is meaningless (and set to zero) for non-numeric 
+   fields::
+
+       >>> layer.field_precisions
+       [0, 0, 15, 0]
+
+   .. attribute:: extent
+
+   Returns the spatial extent of this layer, as an :class:`Envelope` 
+   object::
+
+      >>> layer.extent.tuple
+      (-104.609252, 29.763374, -95.23506, 38.971823)
+
+   .. attribute:: srs
+
+   Property that returns the :class:`SpatialReference` associated
+   with this layer::
+
+       >>> print layer.srs
+       GEOGCS["GCS_WGS_1984",
+           DATUM["WGS_1984",
+               SPHEROID["WGS_1984",6378137,298.257223563]],
+           PRIMEM["Greenwich",0],
+           UNIT["Degree",0.017453292519943295]]
+
+   If the :class:`Layer` has no spatial reference information associated
+   with it, ``None`` is returned.
+
+   .. attribute:: spatial_filter
+
+   .. versionadded:: 1.2
+
+   Property that may be used to retrieve or set a spatial filter for this
+   layer.  A spatial filter can only be set with an :class:`OGRGeometry`
+   instance, a 4-tuple extent, or ``None``.  When set with something 
+   other than ``None``, only features that intersect the filter will be
+   returned when iterating over the layer::
+
+       >>> print layer.spatial_filter
+       None
+       >>> print len(layer)
+       3
+       >>> [feat.get('Name') for feat in layer]
+       ['Pueblo', 'Lawrence', 'Houston']
+       >>> ks_extent = (-102.051, 36.99, -94.59, 40.00) # Extent for state of Kansas
+       >>> layer.spatial_filter = ks_extent
+       >>> len(layer)
+       1
+       >>> [feat.get('Name') for feat in layer]
+       ['Lawrence']
+       >>> layer.spatial_filter = None
+       >>> len(layer)
+       3
+
+   .. method:: get_fields()
+
+   A method that returns a list of the values of a given field for each
+   feature in the layer::
+
+      >>> layer.get_fields('Name')
+      ['Pueblo', 'Lawrence', 'Houston']
+
+   .. method:: get_geoms([geos=False])
+
+   A method that returns a list containing the geometry of each feature
+   in the layer.  If the optional argument ``geos`` is set to ``True``
+   then the geometries are converted to :class:`~django.contrib.gis.geos.GEOSGeometry`
+   objects. Otherwise, they are returned as :class:`OGRGeometry` objects::
+
+       >>> [pt.tuple for pt in layer.get_geoms()]
+       [(-104.609252, 38.255001), (-95.23506, 38.971823), (-95.363151, 29.763374)]
+
+   .. method:: test_capability(capability)
+
+   Returns a boolean indicating whether this layer supports the
+   given capability (a string).  Examples of valid capability strings
+   include: ``'RandomRead'``, ``'SequentialWrite'``, ``'RandomWrite'``,
+   ``'FastSpatialFilter'``, ``'FastFeatureCount'``, ``'FastGetExtent'``,
+   ``'CreateField'``, ``'Transactions'``, ``'DeleteFeature'``, and 
+   ``'FastSetNextByIndex'``.
+   
+``Feature``
+-----------
+
+.. class:: Feature
+
+
+   ``Feature`` wraps an OGR feature.  You never create a ``Feature``
+   object directly.  Instead, you retrieve them from a :class:`Layer` object.
+   Each feature consists of a geometry and a set of fields containing
+   additional properties.  The geometry of a field is accessible via its
+   ``geom`` property, which returns an :class:`OGRGeometry` object.  A ``Feature``
+   behaves like a standard Python container for its fields, which it returns as
+   :class:`Field` objects: you can access a field directly by its index or name,
+   or you can iterate over a feature's fields, e.g. in a ``for`` loop.
+
+   .. attribute:: geom
+
+   Returns the geometry for this feature, as an ``OGRGeometry`` object::
+
+       >>> city.geom.tuple
+       (-104.609252, 38.255001)
+
+   .. attribute:: get
+
+   A method that returns the value of the given field (specified by name)
+   for this feature, **not** a ``Field`` wrapper object::
+
+       >>> city.get('Population')
+       102121
+
+   .. attribute:: geom_type
+
+   Returns the type of geometry for this feature, as an :class:`OGRGeomType`
+   object.  This will be the same for all features in a given layer, and
+   is equivalent to the :attr:`Layer.geom_type` property of the 
+   :class:`Layer`` object the feature came from.
+
+   .. attribute:: num_fields
+
+   Returns the number of fields of data associated with the feature.
+   This will be the same for all features in a given layer, and is
+   equivalent to the :attr:`Layer.num_fields` property of the 
+   :class:`Layer` object the feature came from.
+
+   .. attribute:: fields
+
+   Returns a list of the names of the fields of data associated with the
+   feature.  This will be the same for all features in a given layer, and
+   is equivalent to the :attr:`Layer.fields` property of the :class:`Layer`
+   object the feature came from.
+
+   .. attribute:: fid
+
+   Returns the feature identifier within the layer::
+
+       >>> city.fid
+       0
+
+   .. attribute:: layer_name
+
+   Returns the name of the :class:`Layer` that the feature came from.
+   This will be the same for all features in a given layer::
+
+       >>> city.layer_name
+       'cities'
+
+   .. attribute:: index
+
+   A method that returns the index of the given field name.  This will be
+   the same for all features in a given layer::
+
+       >>> city.index('Population')
+       1
+
+``Field``
+---------
+
+.. class:: Field
+
+   .. attribute:: name
+
+   Returns the name of this field::
+
+       >>> city['Name'].name
+       'Name'
+
+   .. attribute:: type
+
+   Returns the OGR type of this field, as an integer.  The
+   ``FIELD_CLASSES`` dictionary maps these values onto 
+   subclasses of ``Field``::
+
+       >>> city['Density'].type
+       2
+
+   .. attribute:: type_name
+
+   Returns a string with the name of the data type of this field::
+
+       >>> city['Name'].type_name
+       'String'
+
+   .. attribute:: value
+
+   Returns the value of this field.  The ``Field`` class itself 
+   returns the value as a string, but each subclass returns the 
+   value in the most appropriate form::
+
+       >>> city['Population'].value
+       102121
+
+   .. attribute:: width
+
+   Returns the width of this field::
+
+       >>> city['Name'].width
+       80
+
+   .. attribute:: precision
+
+   Returns the numeric precision of this field.  This is meaningless (and
+   set to zero) for non-numeric fields::
+
+       >>> city['Density'].precision
+       15
+
+   .. method:: as_double()
+
+   Returns the value of the field as a double (float)::
+
+       >>> city['Density'].as_double()
+       874.7
+
+   .. method:: as_int()
+
+   Returns the value of the field as an integer::
+
+       >>> city['Population'].as_int()
+       102121
+
+   .. method:: as_string()
+
+   Returns the value of the field as a string::
+
+       >>> city['Name'].as_string()
+       'Pueblo'
+
+   .. method:: as_datetime()
+
+   Returns the value of the field as a tuple of date and time components::
+
+       >>> city['Created'].as_datetime()
+       (c_long(1999), c_long(5), c_long(23), c_long(0), c_long(0), c_long(0), c_long(0))
+
+``Driver``
+----------
+
+.. class:: Driver(dr_input)
+
+   The ``Driver`` class is used internally to wrap an OGR :class:`DataSource` driver.
+
+   .. attribute:: driver_count
+
+   Returns the number of OGR vector drivers currently registered.
+
+
+OGR Geometries
+==============
+
+``OGRGeometry``
+---------------
+
+:class:`OGRGeometry` objects share similar functionality with 
+:class:`~django.contrib.gis.geos.GEOSGeometry` objects, and are thin
+wrappers around OGR's internal geometry representation.  Thus, 
+they allow for more efficient access to data when using :class:`DataSource`. 
+Unlike its GEOS counterpart, :class:`OGRGeometry` supports spatial reference
+systems and coordinate transformation::
+
+    >>> from django.contrib.gis.gdal import OGRGeometry
+    >>> polygon = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5))')
+
+.. class:: OGRGeometry(geom_input[, srs=None])
+
+   This object is a wrapper for the `OGR Geometry`__ class.
+   These objects are instantiated directly from the given ``geom_input`` 
+   parameter, which may be a string containing WKT or HEX, a ``buffer``
+   containing WKB data, or an :class:`OGRGeomType` object. These objects
+   are also returned from the :class:`Feature.geom` attribute, when 
+   reading vector data from :class:`Layer` (which is in turn a part of
+   a :class:`DataSource`).
+
+   __ http://www.gdal.org/ogr/classOGRGeometry.html
+
+   .. classmethod:: from_bbox(bbox)
+
+   .. versionadded:: 1.1
+
+   Constructs a :class:`Polygon` from the given bounding-box (a 4-tuple).
+
+   .. method:: __len__
+
+   Returns the number of points in a :class:`LineString`, the
+   number of rings in a :class:`Polygon`, or the number of geometries in a
+   :class:`GeometryCollection`. Not applicable to other geometry types.
+
+   .. method:: __iter__
+
+   Iterates over the points in a :class:`LineString`, the rings in a
+   :class:`Polygon`, or the geometries in a :class:`GeometryCollection`.
+   Not applicable to other geometry types.
+
+   .. method:: __getitem__
+
+   Returns the point at the specified index for a :class:`LineString`, the
+   interior ring at the specified index for a :class:`Polygon`, or the geometry
+   at the specified index in a :class:`GeometryCollection`.  Not applicable to
+   other geometry types.
+
+   .. attribute:: dimension
+
+   Returns the number of coordinated dimensions of the geometry, i.e. 0
+   for points, 1 for lines, and so forth::
+
+       >> polygon.dimension
+       2
+
+   .. attribute:: coord_dim
+
+   .. versionchanged:: 1.2
+
+   Returns or sets the coordinate dimension of this geometry.  For
+   example, the value would be 2 for two-dimensional geometries.
+
+   .. note::
+
+      Setting this property is only available in versions 1.2 and above.
+
+   .. attribute:: geom_count
+
+   Returns the number of elements in this geometry::
+
+       >>> polygon.geom_count
+       1
+
+   .. attribute:: point_count
+
+   Returns the number of points used to describe this geometry::
+
+      >>> polygon.point_count
+      4
+
+   .. attribute:: num_points
+
+   Alias for :attr:`point_count`.
+
+   .. attribute:: num_coords
+
+   Alias for :attr:`point_count`.
+
+   .. attribute:: geom_type
+
+   Returns the type of this geometry, as an :class:`OGRGeomType` object.
+
+   .. attribute:: geom_name
+
+   Returns the name of the type of this geometry::
+
+       >>> polygon.geom_name
+       'POLYGON'
+
+   .. attribute:: area
+
+   Returns the area of this geometry, or 0 for geometries that do not
+   contain an area::
+
+       >>> polygon.area
+       25.0
+
+   .. attribute:: envelope
+
+   Returns the envelope of this geometry, as an :class:`Envelope` object.
+
+   .. attribute:: extent
+
+   Returns the envelope of this geometry as a 4-tuple, instead of as an
+   :class:`Envelope` object::
+
+       >>> point.extent
+       (0.0, 0.0, 5.0, 5.0)
+
+   .. attribute:: srs
+
+   This property controls the spatial reference for this geometry, or
+   ``None`` if no spatial reference system has been assigned to it.
+   If assigned, accessing this property returns a :class:`SpatialReference`
+   object.  It may be set with another :class:`SpatialReference` object,
+   or any input that :class:`SpatialReference` accepts. Example::
+
+       >>> city.geom.srs.name
+       'GCS_WGS_1984'
+
+   .. attribute:: srid
+
+   Returns or sets the spatial reference identifier corresponding to 
+   :class:`SpatialReference` of this geometry.  Returns ``None`` if
+   there is no spatial reference information associated with this
+   geometry, or if an SRID cannot be determined.
+
+   .. attribute:: geos
+
+   Returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object 
+   corresponding to this geometry.
+
+   .. attribute:: gml
+
+   Returns a string representation of this geometry in GML format::
+
+       >>> OGRGeometry('POINT(1 2)').gml
+       '<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>'
+
+   .. attribute:: hex
+
+   Returns a string representation of this geometry in HEX WKB format::
+
+       >>> OGRGeometry('POINT(1 2)').hex
+       '0101000000000000000000F03F0000000000000040'
+
+   .. attribute:: json
+
+   Returns a string representation of this geometry in JSON format::
+
+       >>> OGRGeometry('POINT(1 2)').json
+       '{ "type": "Point", "coordinates": [ 1.000000, 2.000000 ] }'
+
+
+   .. attribute:: kml
+
+   .. versionadded:: 1.1
+
+   Returns a string representation of this geometry in KML format.
+
+   .. attribute:: wkb_size
+
+   Returns the size of the WKB buffer needed to hold a WKB representation
+   of this geometry::
+
+       >>> OGRGeometry('POINT(1 2)').wkb_size
+       21
+
+   .. attribute:: wkb
+
+   Returns a ``buffer`` containing a WKB representation of this geometry.
+
+   .. attribute:: wkt
+
+   Returns a string representation of this geometry in WKT format.
+
+   .. attribute:: ewkt
+
+   .. versionadded:: 1.2
+
+   Returns the EWKT representation of this geometry.
+
+   .. method:: clone()
+
+   Returns a new :class:`OGRGeometry` clone of this geometry object.
+
+   .. method:: close_rings()
+
+   If there are any rings within this geometry that have not been closed,
+   this routine will do so by adding the starting point to the end::
+
+       >>> triangle = OGRGeometry('LINEARRING (0 0,0 1,1 0)')
+       >>> triangle.close_rings()
+       >>> triangle.wkt
+       'LINEARRING (0 0,0 1,1 0,0 0)'
+
+   .. method:: transform(coord_trans, clone=False)
+
+   Transforms this geometry to a different spatial reference system.  May
+   take a :class:`CoordTransform` object, a :class:`SpatialReference` object,
+   or any other input accepted by :class:`SpatialReference` (including
+   spatial reference WKT and PROJ.4 strings, or an integer SRID).
+   By default nothing is returned and the geometry is transformed in-place.
+   However, if the `clone` keyword is set to ``True`` then a transformed clone
+   of this geometry is returned instead.
+
+   .. method:: intersects(other)
+
+   Returns ``True`` if this geometry intersects the other, otherwise returns
+   ``False``.
+
+   .. method:: equals(other)
+
+   Returns ``True`` if this geometry is equivalent to the other, otherwise returns
+   ``False``.
+
+   .. method:: disjoint(other)
+
+   Returns ``True`` if this geometry is spatially disjoint to (i.e. does
+   not intersect) the other, otherwise returns ``False``.
+
+   .. method:: touches(other)
+
+   Returns ``True`` if this geometry touches the other, otherwise returns
+   ``False``.
+
+   .. method:: crosses(other)
+
+   Returns ``True`` if this geometry crosses the other, otherwise returns
+   ``False``.
+
+   .. method:: within(other)
+
+   Returns ``True`` if this geometry is contained within the other, otherwise returns
+   ``False``.
+
+   .. method:: contains(other)
+
+   Returns ``True`` if this geometry contains the other, otherwise returns
+   ``False``.
+
+   .. method:: overlaps(other)
+
+   Returns ``True`` if this geometry overlaps the other, otherwise returns
+   ``False``.
+
+   .. method:: boundary
+
+   The boundary of this geometry, as a new :class:`OGRGeometry` object.
+
+   .. attribute:: convex_hull
+
+   The smallest convex polygon that contains this geometry, as a new
+   :class:`OGRGeometry` object.
+
+   .. method:: difference
+
+   Returns the region consisting of the difference of this geometry and
+   the other, as a new :class:`OGRGeometry` object.
+
+   .. method:: intersection
+
+   Returns the region consisting of the intersection of this geometry and
+   the other, as a new :class:`OGRGeometry` object.
+
+   .. method:: sym_difference
+
+   Returns the region consisting of the symmetric difference of this
+   geometry and the other, as a new :class:`OGRGeometry` object.
+
+   .. method:: union
+
+   Returns the region consisting of the union of this geometry and
+   the other, as a new :class:`OGRGeometry` object.
+
+   .. attribute:: tuple
+
+   Returns the coordinates of a point geometry as a tuple, the
+   coordinates of a line geometry as a tuple of tuples, and so forth::
+
+       >>> OGRGeometry('POINT (1 2)').tuple
+       (1.0, 2.0)
+       >>> OGRGeometry('LINESTRING (1 2,3 4)').tuple
+       ((1.0, 2.0), (3.0, 4.0))
+
+   .. attribute:: coords
+
+   An alias for :attr:`tuple`.
+
+.. class:: Point
+
+   .. attribute:: x
+
+   Returns the X coordinate of this point::
+
+       >>> OGRGeometry('POINT (1 2)').x
+       1.0
+
+   .. attribute:: y
+
+   Returns the Y coordinate of this point::
+
+       >>> OGRGeometry('POINT (1 2)').y
+       2.0
+
+   .. attribute:: z
+
+   Returns the Z coordinate of this point, or ``None`` if the
+   the point does not have a Z coordinate::
+
+       >>> OGRGeometry('POINT (1 2 3)').z
+       3.0
+
+.. class:: LineString
+
+   .. attribute:: x
+
+   Returns a list of X coordinates in this line::
+
+       >>> OGRGeometry('LINESTRING (1 2,3 4)').x
+       [1.0, 3.0]
+
+   .. attribute:: y
+
+   Returns a list of Y coordinates in this line::
+
+       >>> OGRGeometry('LINESTRING (1 2,3 4)').y
+       [2.0, 4.0]
+
+   .. attribute:: z
+
+   Returns a list of Z coordinates in this line, or ``None`` if the 
+   line does not have Z coordinates::
+ 
+       >>> OGRGeometry('LINESTRING (1 2 3,4 5 6)').z
+       [3.0, 6.0]
+
+
+.. class:: Polygon
+
+   .. attribute:: shell
+
+   Returns the shell or exterior ring of this polygon, as a ``LinearRing``
+   geometry.
+
+   .. attribute:: exterior_ring
+
+   An alias for :attr:`shell`.
+
+   .. attribute:: centroid
+
+   Returns a :class:`Point` representing the centroid of this polygon.
+
+.. class:: GeometryCollection
+
+   .. method:: add(geom)
+
+   Adds a geometry to this geometry collection.  Not applicable to other
+   geometry types.
+
+
+``OGRGeomType``
+---------------
+
+.. class:: OGRGeomType(type_input)
+
+   This class allows for the representation of an OGR geometry type
+   in any of several ways::
+
+       >>> from django.contrib.gis.gdal import OGRGeomType
+       >>> gt1 = OGRGeomType(3)             # Using an integer for the type
+       >>> gt2 = OGRGeomType('Polygon')     # Using a string
+       >>> gt3 = OGRGeomType('POLYGON')     # It's case-insensitive
+       >>> print gt1 == 3, gt1 == 'Polygon' # Equivalence works w/non-OGRGeomType objects
+       True True
+
+   .. attribute:: name
+
+   Returns a short-hand string form of the OGR Geometry type::
+
+       >>> gt1.name
+       'Polygon'
+
+   .. attribute:: num
+
+   Returns the number corresponding to the OGR geometry type::
+
+       >>> gt1.num
+       3
+
+   .. attribute:: django
+
+   Returns the Django field type (a subclass of GeometryField) to use for
+   storing this OGR type, or ``None`` if there is no appropriate Django
+   type::
+
+       >>> gt1.django
+       'PolygonField'
+
+``Envelope``
+------------
+
+.. class:: Envelope(*args)
+
+   Represents an OGR Envelope structure that contains the
+   minimum and maximum X, Y coordinates for a rectangle bounding box.
+   The naming of the variables is compatible with the OGR Envelope
+   C structure.
+
+   .. attribute:: min_x
+
+   The value of the minimum X coordinate.
+
+   .. attribute:: min_y
+
+   The value of the maximum X coordinate.
+
+   .. attribute:: max_x
+
+   The value of the minimum Y coordinate.
+
+   .. attribute:: max_y
+
+   The value of the maximum Y coordinate.
+
+   .. attribute:: ur
+
+   The upper-right coordinate, as a tuple.
+
+   .. attribute:: ll
+
+   The lower-left coordinate, as a tuple.
+
+   .. attribute:: tuple
+
+   A tuple representing the envelope.
+
+   .. attribute:: wkt
+
+   A string representing this envelope as a polygon in WKT format.
+
+
+   .. method:: expand_to_include(self, *args)
+
+   .. versionadded:: 1.1
+
+Coordinate System Objects
+=========================
+
+``SpatialReference``
+--------------------
+
+.. class:: SpatialReference(srs_input)
+
+   Spatial reference objects are initialized on the given ``srs_input``,
+   which may be one of the following:
+ 
+   * OGC Well Known Text (WKT) (a string)
+   * EPSG code (integer or string)
+   * PROJ.4 string
+   * A shorthand string for well-known standards (``'WGS84'``, ``'WGS72'``, ``'NAD27'``, ``'NAD83'``)
+
+   Example::
+
+       >>> wgs84 = SpatialReference('WGS84') # shorthand string
+       >>> wgs84 = SpatialReference(4326) # EPSG code
+       >>> wgs84 = SpatialReference('EPSG:4326') # EPSG string
+       >>> proj4 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+       >>> wgs84 = SpatialReference(proj4) # PROJ.4 string
+       >>> wgs84 = SpatialReference("""GEOGCS["WGS 84",
+       DATUM["WGS_1984",
+            SPHEROID["WGS 84",6378137,298.257223563,
+                AUTHORITY["EPSG","7030"]],
+            AUTHORITY["EPSG","6326"]],
+        PRIMEM["Greenwich",0,
+            AUTHORITY["EPSG","8901"]],
+        UNIT["degree",0.01745329251994328,
+            AUTHORITY["EPSG","9122"]],
+        AUTHORITY["EPSG","4326"]]""") # OGC WKT
+
+   .. method:: __getitem__(target)
+
+   Returns the value of the given string attribute node, ``None`` if the node
+   doesn't exist.  Can also take a tuple as a parameter, (target, child), 
+   where child is the index of the attribute in the WKT.  For example::
+
+       >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]')
+       >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
+       >>> print srs['GEOGCS']
+       WGS 84
+       >>> print srs['DATUM']
+       WGS_1984
+       >>> print srs['AUTHORITY']
+       EPSG
+       >>> print srs['AUTHORITY', 1] # The authority value
+       4326
+       >>> print srs['TOWGS84', 4] # the fourth value in this wkt
+       0
+       >>> print srs['UNIT|AUTHORITY'] # For the units authority, have to use the pipe symbole.
+       EPSG
+       >>> print srs['UNIT|AUTHORITY', 1] # The authority value for the untis
+       9122
+
+   .. method:: attr_value(target, index=0)
+
+   The attribute value for the given target node (e.g. ``'PROJCS'``).
+   The index keyword specifies an index of the child node to return.
+
+   .. method:: auth_name(target)
+
+   Returns the authority name for the given string target node.
+
+   .. method:: auth_code(target)
+
+   Returns the authority code for the given string target node.
+
+   .. method:: clone()
+
+   Returns a clone of this spatial reference object.
+
+   .. method:: identify_epsg()
+
+   This method inspects the WKT of this SpatialReference, and will
+   add EPSG authority nodes where an EPSG identifier is applicable.
+
+   .. method:: from_esri()
+
+   Morphs this SpatialReference from ESRI's format to EPSG
+
+   .. method:: to_esri()
+
+   Morphs this SpatialReference to ESRI's format.
+
+   .. method:: validate()
+
+   Checks to see if the given spatial reference is valid, if not
+   an exception will be raised.
+
+   .. method:: import_epsg(epsg)
+
+   Import spatial reference from EPSG code.
+
+   .. method:: import_proj(proj)
+
+   Import spatial reference from PROJ.4 string.
+
+   .. method:: import_user_input(user_input)
+  
+   .. versionadded:: 1.1
+
+   .. method:: import_wkt(wkt)
+
+   Import spatial reference from WKT.
+
+   .. method:: import_xml(xml)
+
+   Import spatial reference from XML.
+
+   .. attribute:: name
+
+   Returns the name of this Spatial Reference.
+
+   .. attribute:: srid
+
+   Returns the SRID of top-level authority, or ``None`` if undefined.
+
+   .. attribute:: linear_name
+
+   Returns the name of the linear units.
+
+   .. attribute:: linear_units
+
+   Returns the value of the linear units.
+
+   .. attribute:: angular_name
+
+   Returns the name of the angular units."
+
+   .. attribute:: angular_units
+
+   Returns the value of the angular units.
+
+   .. attribute:: units
+
+   Returns a 2-tuple of the units value and the units name, 
+   and will automatically determines whether to return the linear
+   or angular units.
+
+   .. attribute:: ellisoid
+
+   Returns a tuple of the ellipsoid parameters for this spatial
+   reference: (semimajor axis, semiminor axis, and inverse flattening)
+
+   .. attribute:: semi_major
+
+   Returns the semi major axis of the ellipsoid for this spatial reference.
+
+   .. attribute:: semi_minor
+
+   Returns the semi minor axis of the ellipsoid for this spatial reference.
+
+   .. attribute:: inverse_flattening
+
+   Returns the inverse flattening of the ellipsoid for this spatial reference.
+
+   .. attribute:: geographic
+
+   Returns ``True`` if this spatial reference is geographic
+   (root node is ``GEOGCS``).
+
+   .. attribute:: local
+
+   Returns ``True`` if this spatial reference is local
+   (root node is ``LOCAL_CS``).
+
+   .. attribute:: projected
+
+   Returns ``True`` if this spatial reference is a projected coordinate
+   system (root node is ``PROJCS``).
+
+   .. attribute:: wkt
+
+   Returns the WKT representation of this spatial reference.
+
+   .. attribute:: pretty_wkt
+
+   Returns the 'pretty' representation of the WKT.
+
+   .. attribute:: proj
+
+   Returns the PROJ.4 representation for this spatial reference.
+
+   .. attribute:: proj4
+
+   Alias for :attr:`SpatialReference.proj`.
+
+   .. attribute:: xml
+
+   Returns the XML representation of this spatial reference.
+
+
+``CoordTransform``
+------------------
+
+.. class:: CoordTransform(source, target)
+
+Represents a coordinate system transform.  It is initialized with two 
+:class:`SpatialReference`, representing the source and target coordinate
+systems, respectively.  These objects should be used when performing
+the same coordinate transformation repeatedly on different geometries::
+
+    >>> ct = CoordTransform(SpatialReference('WGS84'), SpatialReference('NAD83'))
+    >>> for feat in layer:
+    ...     geom = feat.geom # getting clone of feature geometry
+    ...     geom.transform(ct) # transforming
+
+Settings
+========
+
+.. setting:: GDAL_LIBRARY_PATH
+
+GDAL_LIBRARY_PATH
+-----------------
+
+A string specifying the location of the GDAL library.  Typically,
+this setting is only used if the GDAL library is in a non-standard
+location (e.g., ``/home/john/lib/libgdal.so``).

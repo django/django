@@ -32,6 +32,7 @@ those packages have.
    databrowse
    flatpages
    formtools/index
+   gis/index
    humanize
    localflavor
    messages
@@ -110,6 +111,14 @@ django.contrib.formtools.wizard
 Splits forms across multiple Web pages.
 
 See the :ref:`form wizard documentation <ref-contrib-formtools-form-wizard>`.
+
+gis
+====
+
+A world-class geospatial framework built on top of Django, that enables
+storage, manipulation and display of spatial data.
+
+See the :ref:`ref-contrib-gis` documentation for more. 
 
 humanize
 ========

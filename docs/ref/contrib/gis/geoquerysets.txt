@@ -1,0 +1,1256 @@
+.. _ref-geoquerysets:
+
+=========================
+GeoQuerySet API Reference
+=========================
+
+.. currentmodule:: django.contrib.gis.db.models
+
+.. class:: GeoQuerySet([model=None])
+
+
+.. _spatial-lookups:
+
+Spatial Lookups
+===============
+
+Just like when using the the :ref:`queryset-api`, interaction 
+with ``GeoQuerySet`` by :ref:`chaining filters <chaining-filters>`.
+Instead of the regular Django :ref:`field-lookups`, the
+spatial lookups in this section are available for :class:`GeometryField`.
+
+For an introduction, see the :ref:`spatial lookups introduction 
+<spatial-lookups-intro>`.  For an overview of what lookups are
+compatible with a particular spatial backend, refer to the
+:ref:`spatial lookup compatibility table <spatial-lookup-compatibility>`.
+
+.. fieldlookup:: bbcontains
+
+bbcontains
+----------
+
+*Availability*: PostGIS, MySQL, SpatiaLite
+
+Tests if the geometry field's bounding box completely contains the lookup 
+geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__bbcontains=geom)
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``poly ~ geom``
+MySQL       ``MBRContains(poly, geom)``
+SpatiaLite  ``MbrContains(poly, geom)``
+==========  ==========================
+
+.. fieldlookup:: bboverlaps
+
+bboverlaps
+----------
+
+*Availability*: PostGIS, MySQL, SpatiaLite
+
+Tests if the geometry field's bounding box overlaps the lookup geometry's 
+bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__bboverlaps=geom)
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``poly && geom``
+MySQL       ``MBROverlaps(poly, geom)``
+SpatiaLite  ``MbrOverlaps(poly, geom)``
+==========  ==========================
+
+.. fieldlookup:: contained
+
+contained
+---------
+
+*Availability*: PostGIS, MySQL, SpatiaLite
+
+Tests if the geometry field's bounding box is completely contained by the
+lookup geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__contained=geom)
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``poly @ geom``
+MySQL       ``MBRWithin(poly, geom)``
+SpatiaLite  ``MbrWithin(poly, geom)``
+==========  ==========================
+
+.. fieldlookup:: gis-contains
+
+contains
+--------
+
+*Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+
+Tests if the geometry field spatially contains the lookup geometry.
+
+Example::
+
+    Zipcode.objects.filter(poly__contains=geom)
+
+==========  ============================
+Backend     SQL Equivalent
+==========  ============================
+PostGIS     ``ST_Contains(poly, geom)``
+Oracle      ``SDO_CONTAINS(poly, geom)``
+MySQL       ``MBRContains(poly, geom)``
+SpatiaLite  ``Contains(poly, geom)``
+==========  ============================
+
+.. fieldlookup:: contains_properly
+
+contains_properly
+-----------------
+
+.. versionadded:: 1.2
+
+*Availability*: PostGIS
+
+Returns true if the lookup geometry intersects the interior of the
+geometry field, but not the boundary (or exterior). [#fncontainsproperly]_
+
+.. note::
+
+    Requires PostGIS 1.4 and above.
+
+Example::
+
+    Zipcode.objects.filter(poly__contains_properly=geom)
+
+==========  ===================================
+Backend     SQL Equivalent
+==========  ===================================
+PostGIS     ``ST_ContainsProperly(poly, geom)``
+==========  ===================================
+
+.. fieldlookup:: coveredby
+
+coveredby
+---------
+
+*Availability*: PostGIS, Oracle
+
+Tests if no point in the geometry field is outside the lookup geometry.
+[#fncovers]_
+
+Example::
+
+    Zipcode.objects.filter(poly__coveredby=geom)
+
+==========  =============================
+Backend     SQL Equivalent
+==========  =============================
+PostGIS     ``ST_CoveredBy(poly, geom)``
+Oracle      ``SDO_COVEREDBY(poly, geom)``
+==========  =============================
+
+.. fieldlookup:: covers
+
+covers
+------
+
+*Availability*: PostGIS, Oracle
+
+Tests if no point in the lookup geometry is outside the geometry field.
+[#fncovers]_
+
+Example::
+
+    Zipcode.objects.filter(poly__covers=geom)
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``ST_Covers(poly, geom)``
+Oracle      ``SDO_COVERS(poly, geom)``
+==========  ==========================
+
+.. fieldlookup:: crosses
+
+crosses
+-------
+
+*Availability*: PostGIS, SpatiaLite
+
+Tests if the geometry field spatially crosses the lookup geometry.
+
+Example::
+
+    Zipcode.objects.filter(poly__crosses=geom)
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``ST_Crosses(poly, geom)``
+SpatiaLite  ``Crosses(poly, geom)``
+==========  ==========================
+
+.. fieldlookup:: disjoint
+
+disjoint
+--------
+
+*Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+
+Tests if the geometry field is spatially disjoint from the lookup geometry.
+
+Example::
+
+    Zipcode.objects.filter(poly__disjoint=geom)
+
+==========  =================================================
+Backend     SQL Equivalent
+==========  =================================================
+PostGIS     ``ST_Disjoint(poly, geom)``
+Oracle      ``SDO_GEOM.RELATE(poly, 'DISJOINT', geom, 0.05)``
+MySQL       ``MBRDisjoint(poly, geom)``
+SpatiaLite  ``Disjoint(poly, geom)``
+==========  =================================================
+
+equals
+------
+
+*Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+
+.. fieldlookup:: exact
+.. fieldlookup:: same_as
+
+exact, same_as
+--------------
+
+*Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+
+.. fieldlookup:: intersects
+
+intersects
+----------
+
+*Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+
+Tests if the geometry field spatially intersects the lookup geometry.
+
+Example::
+
+    Zipcode.objects.filter(poly__intersects=geom)
+
+==========  =================================================
+Backend     SQL Equivalent
+==========  =================================================
+PostGIS     ``ST_Intersects(poly, geom)``
+Oracle      ``SDO_OVERLAPBDYINTERSECT(poly, geom)``
+MySQL       ``MBRIntersects(poly, geom)``
+SpatiaLite  ``Intersects(poly, geom)``
+==========  =================================================
+
+.. fieldlookup:: overlaps
+
+overlaps
+--------
+
+*Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+
+.. fieldlookup:: relate
+
+relate
+------
+
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+Tests if the geometry field is spatially related to the the lookup geometry by
+the values given in the given pattern.  This lookup requires a tuple parameter,
+``(geom, pattern)``; the form of ``pattern`` will depend on the spatial backend:
+
+PostGIS & SpatiaLite
+~~~~~~~~~~~~~~~~~~~~
+On these spatial backends the intersection pattern is a string comprising 
+nine characters, which  define intersections between  the interior, boundary, 
+and exterior of the geometry field and the lookup geometry.  
+The intersection pattern matrix may only use the following characters:
+``1``, ``2``, ``T``, ``F``, or ``*``.  This lookup type allows users to "fine tune"
+a specific geometric relationship consistent with the DE-9IM model. [#fnde9im]_
+
+Example::
+
+    # A tuple lookup parameter is used to specify the geometry and
+    # the intersection pattern (the pattern here is for 'contains').
+    Zipcode.objects.filter(poly__relate(geom, 'T*T***FF*'))
+
+PostGIS SQL equivalent::
+
+    SELECT ... WHERE ST_Relate(poly, geom, 'T*T***FF*')
+
+SpatiaLite SQL equivalent::
+
+    SELECT ... WHERE Relate(poly, geom, 'T*T***FF*')
+
+Oracle
+~~~~~~
+
+Here the relation pattern is compreised at least one of the nine relation
+strings: ``TOUCH``, ``OVERLAPBDYDISJOINT``, ``OVERLAPBDYINTERSECT``, 
+``EQUAL``, ``INSIDE``, ``COVEREDBY``, ``CONTAINS``, ``COVERS``, ``ON``, and
+``ANYINTERACT``.   Multiple strings may be combined with the logical Boolean
+operator OR, for example, ``'inside+touch'``. [#fnsdorelate]_  The relation
+strings are case-insensitive.
+
+Example::
+
+    Zipcode.objects.filter(poly__relate(geom, 'anyinteract'))
+
+Oracle SQL equivalent:: 
+
+    SELECT ... WHERE SDO_RELATE(poly, geom, 'anyinteract')
+
+.. fieldlookup:: touches
+
+touches
+-------
+
+*Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+
+Tests if the geometry field spatially touches the lookup geometry.
+
+Example::
+
+    Zipcode.objects.filter(poly__touches=geom)
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``ST_Touches(poly, geom)``
+MySQL       ``MBRTouches(poly, geom)``
+Oracle      ``SDO_TOUCH(poly, geom)``
+SpatiaLite  ``Touches(poly, geom)``
+==========  ==========================
+
+.. fieldlookup:: within
+
+within
+------
+
+*Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+
+Tests if the geometry field is spatially within the lookup geometry.
+
+Example::
+
+    Zipcode.objects.filter(poly__within=geom)
+
+==========  ==========================
+Backend     SQL Equivalent
+==========  ==========================
+PostGIS     ``ST_Within(poly, geom)``
+MySQL       ``MBRWithin(poly, geom)``
+Oracle      ``SDO_INSIDE(poly, geom)``
+SpatiaLite  ``Within(poly, geom)``
+==========  ==========================
+
+.. fieldlookup:: left
+
+left
+----
+
+*Availability*: PostGIS
+
+Tests if the geometry field's bounding box is strictly to the left of the
+lookup geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__left=geom)
+
+PostGIS equivalent::
+
+    SELECT ... WHERE poly << geom
+
+.. fieldlookup:: right
+
+right
+-----
+
+*Availability*: PostGIS
+
+Tests if the geometry field's bounding box is strictly to the right of the
+lookup geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__right=geom)
+
+PostGIS equivalent::
+
+    SELECT ... WHERE poly >> geom
+
+.. fieldlookup:: overlaps_left
+
+overlaps_left
+-------------
+
+*Availability*: PostGIS
+
+Tests if the geometry field's bounding box overlaps or is to the left of the lookup 
+geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__overlaps_left=geom)
+
+PostGIS equivalent::
+
+    SELECT ... WHERE poly &< geom
+
+
+.. fieldlookup:: overlaps_right
+
+overlaps_right
+--------------
+
+*Availability*: PostGIS
+
+Tests if the geometry field's bounding box overlaps or is to the right of the lookup 
+geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__overlaps_right=geom)
+
+PostGIS equivalent::
+
+    SELECT ... WHERE poly &> geom
+
+.. fieldlookup:: overlaps_above
+
+overlaps_above
+--------------
+
+*Availability*: PostGIS
+
+Tests if the geometry field's bounding box overlaps or is above the lookup 
+geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__overlaps_above=geom)
+
+PostGIS equivalent::
+
+    SELECT ... WHERE poly |&> geom
+
+.. fieldlookup:: overlaps_below
+
+overlaps_below
+--------------
+
+*Availability*: PostGIS
+
+Tests if the geometry field's bounding box overlaps or is below the lookup 
+geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__overlaps_below=geom)
+
+PostGIS equivalent::
+
+    SELECT ... WHERE poly &<| geom
+
+.. fieldlookup:: strictly_above
+
+strictly_above
+--------------
+
+*Availability*: PostGIS
+
+Tests if the geometry field's bounding box is strictly above the lookup 
+geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__strictly_above=geom)
+
+PostGIS equivalent::
+
+    SELECT ... WHERE poly |>> geom
+
+.. fieldlookup:: strictly_below
+
+strictly_below
+--------------
+
+*Availability*: PostGIS
+
+Tests if the geometry field's bounding box is strictly above the lookup 
+geometry's bounding box.
+
+Example::
+
+    Zipcode.objects.filter(poly__strictly_above=geom)
+
+PostGIS equivalent::
+
+    SELECT ... WHERE poly |>> geom
+
+
+.. _distance-lookups:
+
+Distance Lookups
+================
+
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+For an overview on performing distance queries, please refer to
+the :ref:`distance queries introduction <distance-queries>`.
+
+Distance lookups take the following form::
+
+    <field>__<distance lookup>=(<geometry>, <distance value>[, 'spheroid'])
+
+The value passed into a distance lookup is a tuple; the first two
+values are mandatory, and are the geometry to calculate distances to,
+and a distance value (either a number in units of the field or a
+:class:`~django.contrib.gis.measure.Distance` object).  On every
+distance lookup but :lookup:`dwithin`, an optional
+third element, ``'spheroid'``, may be included to tell GeoDjango
+to use the more accurate spheroid distance calculation functions on
+fields with a geodetic coordinate system (e.g., ``ST_Distance_Spheroid``
+would be used instead of ``ST_Distance_Sphere``).
+
+.. fieldlookup:: distance_gt
+
+distance_gt
+-----------
+
+Returns models where the distance to the geometry field from the lookup
+geometry is greater than the given distance value.
+
+Example::
+
+    Zipcode.objects.filter(poly__distance_gt=(geom, D(m=5)))
+
+==========  ===============================================
+Backend     SQL Equivalent
+==========  ===============================================
+PostGIS     ``ST_Distance(poly, geom) > 5``
+Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) > 5``
+SpatiaLite  ``Distance(poly, geom) > 5``
+==========  ===============================================
+
+.. fieldlookup:: distance_gte
+
+distance_gte
+------------
+
+Returns models where the distance to the geometry field from the lookup
+geometry is greater than or equal to the given distance value.
+
+Example::
+
+    Zipcode.objects.filter(poly__distance_gte=(geom, D(m=5)))
+
+==========  ================================================
+Backend     SQL Equivalent
+==========  ================================================
+PostGIS     ``ST_Distance(poly, geom) >= 5``
+Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) >= 5``
+SpatiaLite  ``Distance(poly, geom) >= 5``
+==========  ================================================
+
+.. fieldlookup:: distance_lt
+
+distance_lt
+-----------
+
+Returns models where the distance to the geometry field from the lookup
+geometry is less than the given distance value.
+
+Example::
+
+    Zipcode.objects.filter(poly__distance_lt=(geom, D(m=5)))
+
+==========  ===============================================
+Backend     SQL Equivalent
+==========  ===============================================
+PostGIS     ``ST_Distance(poly, geom) < 5``
+Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) < 5``
+SpatiaLite  ``Distance(poly, geom) < 5``
+==========  ===============================================
+
+.. fieldlookup:: distance_lte
+
+distance_lte
+------------
+
+Returns models where the distance to the geometry field from the lookup
+geometry is less than or equal to the given distance value.
+
+Example::
+
+    Zipcode.objects.filter(poly__distance_lte=(geom, D(m=5)))
+
+==========  ================================================
+Backend     SQL Equivalent
+==========  ================================================
+PostGIS     ``ST_Distance(poly, geom) <= 5``
+Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) <= 5``
+SpatiaLite  ``Distance(poly, geom) <= 5``
+==========  ================================================
+
+.. fieldlookup:: dwithin
+
+dwithin
+-------
+
+Returns models where the distance to the geometry field from the
+lookup geometry are within the given distance from one another.
+
+Example::
+
+    Zipcode.objects.filter(poly__dwithin=(geom, D(m=5)))
+
+==========  ======================================
+Backend     SQL Equivalent
+==========  ======================================
+PostGIS     ``ST_DWithin(poly, geom, 5)``
+Oracle      ``SDO_WITHIN_DISTANCE(poly, geom, 5)``
+==========  ======================================
+
+.. note::
+
+    This lookup is not available on SpatiaLite.
+
+.. fieldlookup:: equals
+
+
+``GeoQuerySet`` Methods
+=======================
+
+``GeoQuerySet`` methods specify that a spatial operation be performed
+on each patial operation on each geographic
+field in the queryset and store its output in a new attribute on the model
+(which is generally the name of the ``GeoQuerySet`` method).
+
+There are also aggregate ``GeoQuerySet`` methods which return a single value
+instead of a queryset.  This section will describe the API and availability
+of every ``GeoQuerySet`` method available in GeoDjango.
+
+.. note::
+
+    What methods are available depend on your spatial backend.  See
+    the :ref:`compatibility table <geoqueryset-method-compatibility>`
+    for more details.
+
+With a few exceptions, the following keyword arguments may be used with all
+``GeoQuerySet`` methods:
+
+=====================  =====================================================
+Keyword Argument       Description
+=====================  =====================================================
+``field_name``         By default, ``GeoQuerySet`` methods use the first
+                       geographic field encountered in the model.  This
+                       keyword should be used to specify another 
+                       geographic field (e.g., ``field_name='point2'``)
+                       when there are multiple geographic fields in a model.
+
+                       On PostGIS, the ``field_name`` keyword may also be
+                       used on geometry fields in models that are related
+                       via a ``ForeignKey`` relation (e.g.,
+                       ``field_name='related__point'``).
+    
+``model_att``          By default, ``GeoQuerySet`` methods typically attach
+                       their output in an attribute with the same name as
+                       the ``GeoQuerySet`` method.  Setting this keyword
+                       with the desired attribute name will override this
+                       default behavior.  For example,
+                       ``qs = Zipcode.objects.centroid(model_att='c')`` will
+                       attach the centroid of the ``Zipcode`` geometry field
+                       in a ``c`` attribute on every model rather than in a
+                       ``centroid`` attribute.  
+
+                       This keyword is required if 
+                       a method name clashes with an existing 
+                       ``GeoQuerySet`` method -- if you wanted to use the 
+                       ``area()`` method on model with a ``PolygonField`` 
+		       named ``area``, for example.
+=====================  =====================================================
+
+Measurement
+-----------
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+``area``
+~~~~~~~~
+
+.. method:: GeoQuerySet.area(**kwargs)
+
+Returns the area of the geographic field in an ``area`` attribute on
+each element of this GeoQuerySet.
+
+``distance``
+~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.distance(geom, **kwargs)
+
+This method takes a geometry as a parameter, and attaches a ``distance`` 
+attribute to every model in the returned queryset that contains the 
+distance (as a :class:`~django.contrib.gis.measure.Distance` object) to the given geometry.
+
+In the following example (taken from the `GeoDjango distance tests`__), 
+the distance from the `Tasmanian`__ city of Hobart to every other 
+:class:`PointField` in the ``AustraliaCity`` queryset is calculated::
+
+    >>> pnt = AustraliaCity.objects.get(name='Hobart').point
+    >>> for city in AustraliaCity.objects.distance(pnt): print city.name, city.distance
+    Wollongong 990071.220408 m
+    Shellharbour 972804.613941 m
+    Thirroul 1002334.36351 m
+    Mittagong 975691.632637 m
+    Batemans Bay 834342.185561 m
+    Canberra 598140.268959 m
+    Melbourne 575337.765042 m
+    Sydney 1056978.87363 m
+    Hobart 0.0 m
+    Adelaide 1162031.83522 m
+    Hillsdale 1049200.46122 m
+
+.. note::
+
+    Because the ``distance`` attribute is a
+    :class:`~django.contrib.gis.measure.Distance` object, you can easily express
+    the value in the units of your choice.  For example, ``city.distance.mi`` is
+    the distance value in miles and ``city.distance.km`` is the distance value 
+    in kilometers.  See the :ref:`ref-measure` for usage details and the list of
+    :ref:`supported_units`.
+
+__ http://code.djangoproject.com/browser/django/trunk/django/contrib/gis/tests/distapp/models.py
+__ http://en.wikipedia.org/wiki/Tasmania
+
+``length``
+~~~~~~~~~~
+
+.. method:: GeoQuerySet.length(**kwargs)
+
+Returns the length of the geometry field in a ``length`` attribute
+(a :class:`~django.contrib.gis.measure.Distance` object) on each model in
+the queryset.
+
+``perimeter``
+~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.perimeter(**kwargs)
+
+Returns the perimeter of the geometry field in a ``perimeter`` attribute
+(a :class:`~django.contrib.gis.measure.Distance` object) on each model in
+the queryset.
+
+Geometry Relationships
+----------------------
+
+The following methods take no arguments, and attach geometry objects
+each element of the :class:`GeoQuerySet` that is the result of relationship
+function evaluated on the the geometry field.
+
+``centroid``
+~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.centroid(**kwargs)
+
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+Returns the ``centroid`` value for the geographic field in a ``centroid``
+attribute on each element of the ``GeoQuerySet``.
+
+``envelope``
+~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.envelope(**kwargs)
+
+*Availability*: PostGIS, SpatiaLite
+
+Returns a geometry representing the bounding box of the geometry field in
+an ``envelope`` attribute on each element of the ``GeoQuerySet``.
+
+``point_on_surface``
+~~~~~~~~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.point_on_surface(**kwargs)
+
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+Returns a Point geometry guaranteed to lie on the surface of the
+geometry field in a ``point_on_surface`` attribute on each element
+of the queryset; otherwise sets with None.
+
+Geometry Editors
+----------------
+
+``force_rhr``
+~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.force_rhr(**kwargs)
+
+.. versionadded:: 1.2
+
+*Availability*: PostGIS
+
+Returns a modified version of the polygon/multipolygon in which all
+of the vertices follow the Right-Hand-Rule, and attaches as a
+``force_rhr`` attribute on each element of the queryset.
+
+``reverse_geom``
+~~~~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.reverse_geom(**kwargs)
+
+.. versionadded:: 1.2
+
+*Availability*: PostGIS, Oracle
+
+Reverse the coordinate order of the geometry field, and attaches as a
+``reverse`` attribute on each element of the queryset.
+
+``scale``
+~~~~~~~~~
+
+.. method:: GeoQuerySet.scale(x, y, z=0.0, **kwargs)
+
+*Availability*: PostGIS, SpatiaLite
+
+``snap_to_grid``
+~~~~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.snap_to_grid(*args, **kwargs)
+
+.. versionadded:: 1.1
+
+Snap all points of the input geometry to the grid.  How the
+geometry is snapped to the grid depends on how many numeric
+(either float, integer, or long) arguments are given.
+
+===================  =====================================================
+Number of Arguments  Description
+===================  =====================================================
+1                    A single size to snap bot the X and Y grids to.
+2                    X and Y sizes to snap the grid to.
+4                    X, Y sizes and the corresponding X, Y origins.
+===================  =====================================================
+
+``transform``
+~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.transform(srid=4326, **kwargs)
+
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+The ``transform`` method transforms the geometry field of a model to the spatial
+reference system specified by the ``srid`` parameter.  If no ``srid`` is given,
+then 4326 (WGS84) is used by default.
+
+.. note::
+
+    Unlike other ``GeoQuerySet`` methods, ``transform`` stores its output
+    "in-place".  In other words, no new attribute for the transformed
+    geometry is placed on the models.
+
+.. note::
+    
+    What spatial reference system an integer SRID corresponds to may depend on 
+    the spatial database used.  In other words, the SRID numbers used for Oracle 
+    are not necessarily the same as those used by PostGIS.
+
+Example::
+
+    >>> qs = Zipcode.objects.all().transform() # Transforms to WGS84
+    >>> qs = Zipcode.objects.all().transform(32140) # Transforming to "NAD83 / Texas South Central"
+    >>> print qs[0].poly.srid
+    32140
+    >>> print qs[0].poly
+    POLYGON ((234055.1698884720099159 4937796.9232223574072123 ...
+
+``translate``
+~~~~~~~~~~~~~
+.. method:: GeoQuerySet.translate(x, y, z=0.0, **kwargs)
+
+*Availability*: PostGIS, SpatiaLite
+
+Translates the geometry field to a new location using the given numeric
+parameters as offsets.
+
+Geometry Operations
+-------------------
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+The following methods all take a geometry as a parameter and attach a geometry
+to each element of the ``GeoQuerySet`` that is the result of the operation.
+
+``difference``
+~~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.difference(geom)
+
+Returns the spatial difference of the geographic field with the given
+geometry in a ``difference`` attribute on each element of the 
+``GeoQuerySet``.
+
+
+``intersection``
+~~~~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.intersection(geom)
+
+Returns the spatial intersection of the geographic field with the
+given geometry in an ``intersection`` attribute on each element of the 
+``GeoQuerySet``.
+
+``sym_difference``
+~~~~~~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.sym_difference(geom)
+
+Returns the symmetric difference of the geographic field with the
+given geometry in a ``sym_difference`` attribute on each element of the
+``GeoQuerySet``.
+
+``union``
+~~~~~~~~~
+
+.. method:: GeoQuerySet.union(geom)
+
+Returns the union of the geographic field with the given
+geometry in an ``union`` attribute on each element of the
+``GeoQuerySet``.
+
+Geometry Output
+---------------
+
+The following ``GeoQuerySet`` methods will return an attribute that has the value 
+of the geometry field in each model converted to the requested output format.
+
+``geohash``
+~~~~~~~~~~~
+
+.. method:: GeoQuerySet.geohash(preceision=20, **kwargs)
+
+.. versionadded:: 1.2
+
+Attaches a ``geohash`` attribute to every model the the queryset
+containing the `GeoHash`__ representation of the geometry.
+
+__ http://geohash.org/
+
+``geojson``
+~~~~~~~~~~~
+
+.. method:: GeoQuerySet.geojson(**kwargs)
+
+.. versionadded:: 1.1
+
+*Availability*: PostGIS
+
+Attaches a ``geojson`` attribute to every model in the queryset that contains the
+`GeoJSON`__ representation of the geometry.
+
+=====================  =====================================================
+Keyword Argument       Description
+=====================  =====================================================
+``precision``          It may be used to specify the number of significant 
+                       digits for the coordinates in the GeoJSON 
+                       representation -- the default value is 8.
+
+``crs``                Set this to ``True`` if you want the coordinate
+                       reference system to be included in the returned
+                       GeoJSON.
+
+``bbox``               Set this to ``True`` if you want the bounding box
+                       to be included in the returned GeoJSON.
+=====================  =====================================================
+
+__ http://geojson.org/
+
+``gml``
+~~~~~~~
+
+.. method:: GeoQuerySet.gml(**kwargs)
+
+*Availability*: PostGIS, Oracle
+
+Attaches a ``gml`` attribute to every model in the queryset that contains the 
+`Geographic Markup Language (GML)`__ representation of the geometry. 
+
+Example::
+
+    >>> qs = Zipcode.objects.all().gml()
+    >>> print qs[0].gml
+    <gml:Polygon srsName="EPSG:4326"><gml:OuterBoundaryIs>-147.78711,70.245363 ...  -147.78711,70.245363</gml:OuterBoundaryIs></gml:Polygon>
+
+=====================  =====================================================
+Keyword Argument       Description
+=====================  =====================================================
+``precision``          This keyword is for PostGIS only.  It may be used 
+                       to specify the number of significant digits for the 
+                       coordinates in the GML representation -- the default 
+                       value is 8.
+
+``version``            This keyword is for PostGIS only.  It may be used to
+                       specify the GML version used, and may only be values
+                       of 2 or 3.  The default value is 2.
+=====================  =====================================================
+
+__ http://en.wikipedia.org/wiki/Geography_Markup_Language
+
+``kml``
+~~~~~~~
+
+.. method:: GeoQuerySet.kml(**kwargs)
+
+*Availability*: PostGIS
+
+Attaches a ``kml`` attribute to every model in the queryset that contains the 
+`Keyhole Markup Language (KML)`__ representation of the geometry fields. It 
+should be noted that the contents of the KML are transformed to WGS84 if 
+necessary.
+
+Example::
+
+    >>> qs = Zipcode.objects.all().kml()
+    >>> print qs[0].kml
+    <Polygon><outerBoundaryIs><LinearRing><coordinates>-103.04135,36.217596,0 ... -103.04135,36.217596,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
+
+=====================  =====================================================
+Keyword Argument       Description
+=====================  =====================================================
+``precision``          This keyword may be used to specify the number of 
+                       significant digits for the coordinates in the KML 
+                       representation -- the default value is 8.
+=====================  =====================================================
+
+__ http://code.google.com/apis/kml/documentation/
+
+``svg``
+~~~~~~~
+
+.. method:: GeoQuerySet.svg(**kwargs)
+
+*Availability*: PostGIS, SpatiaLite
+
+Attaches a ``svg`` attribute to every model in the queryset that contains
+the `Scalable Vector Graphics (SVG)`__ path data of the geometry fields.
+
+=====================  =====================================================
+Keyword Argument       Description
+=====================  =====================================================
+``relative``           If set to ``True``, the path data will be implemented
+                       in terms of relative moves.  Defaults to ``False``, 
+		       meaning that absolute moves are used instead.
+
+``precision``          This keyword may be used to specify the number of 
+                       significant digits for the coordinates in the SVG 
+                       representation -- the default value is 8.
+=====================  =====================================================
+
+__ http://www.w3.org/Graphics/SVG/
+
+Miscellaneous
+-------------
+
+``mem_size``
+~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.mem_size(**kwargs)
+
+*Availability*: PostGIS
+
+Returns the memory size (number of bytes) that the geometry field takes
+in a ``mem_size`` attribute  on each element of the ``GeoQuerySet``.
+
+``num_geom``
+~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.num_geom(**kwargs)
+
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+Returns the number of geometries in a ``num_geom`` attribute on
+each element of the ``GeoQuerySet`` if the geometry field is a
+collection (e.g., a ``GEOMETRYCOLLECTION`` or ``MULTI*`` field);
+otherwise sets with ``None``.
+
+``num_points``
+~~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.num_points(**kwargs)
+
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+Returns the number of points in the first linestring in the
+geometry field in a ``num_points`` attribute on each element of
+the ``GeoQuerySet``; otherwise sets with ``None``.
+
+Spatial Aggregates
+==================
+.. versionadded:: 1.1
+
+Aggregate Methods
+-----------------
+
+``collect``
+~~~~~~~~~~~
+
+.. method:: GeoQuerySet.collect(**kwargs)
+
+.. versionadded:: 1.1
+
+*Availability*: PostGIS
+
+Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
+column.  This is analagous to a simplified version of the :meth:`GeoQuerySet.unionagg` method,
+except it can be several orders of magnitude faster than peforming a union because
+it simply rolls up geometries into a collection or multi object, not caring about
+dissolving boundaries.
+
+``extent``
+~~~~~~~~~~
+
+.. method:: GeoQuerySet.extent(**kwargs)
+
+*Availability*: PostGIS, Oracle
+
+Returns the extent of the ``GeoQuerySet`` as a four-tuple, comprising the 
+lower left coordinate and the upper right coordinate.
+
+Example::
+
+    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
+    >>> print qs.extent()
+    (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
+
+``extent3d``
+~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.extent3d(**kwargs)
+
+.. versionadded:: 1.2
+
+*Availability*: PostGIS
+
+Returns the 3D extent of the ``GeoQuerySet`` as a six-tuple, comprising
+the lower left coordinate and upper right coordinate.
+
+Example::
+
+    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
+    >>> print qs.extent3d()
+    (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
+
+``make_line``
+~~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.make_line(**kwargs)
+
+*Availability*: PostGIS
+
+Returns a ``LineString`` constructed from the point field geometries in the 
+``GeoQuerySet``.  Currently, ordering the queryset has no effect.
+
+Example::
+
+     >>> print City.objects.filter(name__in=('Houston', 'Dallas')).make_line()
+     LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
+
+``unionagg``
+~~~~~~~~~~~~
+
+.. method:: GeoQuerySet.unionagg(**kwargs)
+
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+This method returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object
+comprising the union of every geometry in the queryset.  Please note that
+use of ``unionagg`` is processor intensive and may take a significant amount
+of time on large querysets.
+
+.. note::
+  
+    If the computation time for using this method is too expensive,
+    consider using :meth:`GeoQuerySet.collect` instead.
+
+Example::
+    
+    >>> u = Zipcode.objects.unionagg() # This may take a long time.
+    >>> u = Zipcode.objects.filter(poly__within=bbox).unionagg() # A more sensible approach.
+
+=====================  =====================================================
+Keyword Argument       Description
+=====================  =====================================================
+``tolerance``          This keyword is for Oracle only.  It is for the 
+                       tolerance value used by the ``SDOAGGRTYPE``
+                       procedure; the  `Oracle documentation`__ has more 
+                       details.
+=====================  =====================================================
+
+__ http://download.oracle.com/docs/html/B14255_01/sdo_intro.htm#sthref150 
+
+Aggregate Functions
+-------------------
+
+Example::
+
+    >>> from django.contrib.gis.db.models import Extent, Union
+    >>> WorldBorders.objects.aggregate(Extent('mpoly'), Union('mpoly'))
+
+``Collect``
+~~~~~~~~~~~
+
+.. class:: Collect(geo_field)
+
+Returns the same as the :meth:`GeoQuerySet.collect` aggregate method.
+
+``Extent``
+~~~~~~~~~~
+.. class:: Extent(geo_field)
+
+
+Returns the same as the :meth:`GeoQuerySet.extent` aggregate method.
+
+``Extent3D``
+~~~~~~~~~~~~
+
+.. class:: Extent3D(geo_field)
+
+.. versionadded:: 1.2
+
+Returns the same as the :meth:`GeoQuerySet.extent3d` aggregate method.
+
+``MakeLine``
+~~~~~~~~~~~~
+
+.. class:: MakeLine(geo_field)
+
+Returns the same as the :meth:`GeoQuerySet.make_line` aggregate method.
+
+``Union``
+~~~~~~~~~
+
+.. class:: Union(geo_field)
+
+Returns the same as the :meth:`GeoQuerySet.union` aggregate method.
+
+.. rubric:: Footnotes
+.. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
+.. [#fnsdorelate] *See* `SDO_RELATE documentation <http://download.oracle.com/docs/cd/B19306_01/appdev.102/b14255/sdo_operat.htm#sthref845>`_, from Ch. 11 of the Oracle Spatial User's Guide and Manual.
+.. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <http://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).
+.. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <http://postgis.refractions.net/documentation/manual-1.4/ST_ContainsProperly.html>`_ for more details.

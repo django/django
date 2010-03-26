@@ -1,0 +1,83 @@
+.. ref-geodjango-admin:
+
+=============================
+GeoDjango Management Commands
+=============================
+
+inspectdb
+=========
+
+.. describe:: django-admin.py inspectdb
+
+When :mod:`django.contrib.gis` is in your :setting:`INSTALLED_APPS`, the
+:djadmin:`inspectdb` management command is overridden with one from GeoDjango.
+The overridden command is spatially-aware, and places geometry fields in the
+auto-generated model definition, where appropriate.
+
+ogrinspect <data_source> <model_name>
+=====================================
+
+.. django-admin:: ogrinspect
+
+The ``ogrinpsect`` management command will inspect the given OGR-compatible
+:class:`~django.contrib.gis.gdal.DataSource` (e.g., a shapefile) and will
+output a GeoDjango model with the given model name.  There's a detailed example
+of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
+
+.. django-admin-option:: --blank <blank_field(s)>
+
+   Use a comma separated list of OGR field names to add the ``blank=True``
+   keyword option to the field definition.  Set with ``true`` to apply
+   to all applicable fields.
+
+.. django-admin-option:: --decimal <decimal_field(s)>
+
+   Use a comma separated list of OGR float fields to generate
+   :class:`~django.db.models.DecimalField` instead of the default
+   :class:`~django.db.models.FloatField`. Set to ``true`` to apply to all
+   OGR float fields.
+
+.. django-admin-option:: --geom-name <name>
+
+   Specifies the model attribute name to use for the geometry field.
+   Defaults to ``'geom'``.
+
+.. django-admin-option:: --layer <layer>
+
+   The key for specifying which layer in the OGR
+   :class:`~django.contrib.gis.gdal.DataSource` source to use.
+   Defaults to 0 (the first layer). May be an integer or a string identifier
+   for the :class:`~django.contrib.gis.gdal.Layer`.
+
+.. django-admin-option:: --mapping
+
+   Automatically generate a mapping dictionary for use with
+   :class:`~django.contrib.gis.utils.LayerMapping`.
+
+.. django-admin-option:: --multi-geom
+
+   When generating the geometry field, treat it as a geometry collection.
+   For example, if this setting is enabled then a
+   :class:`~django.contrib.gis.db.models.MultiPolygonField` will be placed
+   in the generated model rather than
+   :class:`~django.contrib.gis.db.models.PolygonField`.
+
+.. django-admin-option:: --name-field <name_field>
+
+   Generates a ``__unicode__`` routine on the model that will return the
+   the given field name.
+
+.. django-admin-option:: --no-imports
+
+   Suppresses the ``from django.contrib.gis.db import models`` import statement.
+
+.. django-admin-option:: --null <null_field(s)>
+
+   Use a comma separated list of OGR field names to add the ``null=True``
+   keyword option to the field definition.  Set with ``true`` to apply to
+   all applicable fields.
+
+.. django-admin-option:: --srid
+   
+   The SRID to use for the geometry field.  If not set, ``ogrinspect`` attempts
+   to automatically determine of the SRID of the data source.

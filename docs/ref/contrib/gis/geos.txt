@@ -1,0 +1,911 @@
+.. _ref-geos:
+
+========
+GEOS API
+========
+
+.. module:: django.contrib.gis.geos
+   :synopsis: GeoDjango's high-level interface to the GEOS library.
+
+Background
+==========
+
+What is GEOS?
+-------------
+
+`GEOS`__ stands for **G**\ eometry **E**\ ngine - **O**\ pen **S**\ ource,
+and is a C++ library, ported from the  `Java Topology Suite`__.  GEOS
+implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
+and spatial operators. GEOS, now an OSGeo project, was initially developed and
+maintained by `Refractions Research`__ of Victoria, Canada.
+
+__ http://trac.osgeo.org/geos/
+__ http://sourceforge.net/projects/jts-topo-suite/
+__ http://www.opengeospatial.org/standards/sfs
+__ http://www.refractions.net/
+
+Features
+--------
+
+GeoDjango implements a high-level Python wrapper for the GEOS library, its
+features include:
+
+* A BSD-licensed interface to the GEOS geometry routines, implemented purely
+  in Python using ``ctypes``.
+* Loosely-coupled to GeoDjango.  For example, :class:`GEOSGeometry` objects
+  may be used outside of a django project/application.  In other words, 
+  no need to have ``DJANGO_SETTINGS_MODULE`` set or use a database, etc.
+* Mutability: :class:`GEOSGeometry` objects may be modified.
+* Cross-platform and tested; compatible with Windows, Linux, Solaris, and Mac 
+  OS X platforms.
+
+.. _geos-tutorial:
+
+Tutorial
+========
+
+This section contains a brief introduction and tutorial to using 
+:class:`GEOSGeometry` objects.
+
+Creating a Geometry
+-------------------
+
+:class:`GEOSGeometry` objects may be created in a few ways.  The first is
+to simply instantiate the object on some spatial input -- the following
+are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON::
+
+    >>> from django.contrib.gis.geos import GEOSGeometry
+    >>> pnt = GEOSGeometry('POINT(5 23)') # WKT
+    >>> pnt = GEOSGeometry('010100000000000000000014400000000000003740') # HEX
+    >>> pnt = GEOSGeometry(buffer('\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14@\x00\x00\x00\x00\x00\x007@'))
+    >>> pnt = GEOSGeometry('{ "type": "Point", "coordinates": [ 5.000000, 23.000000 ] }') # GeoJSON
+
+Another option is to use the constructor for the specific geometry type
+that you wish to create.  For example, a :class:`Point` object may be
+created by passing in the X and Y coordinates into its constructor::
+
+    >>> from django.contrib.gis.geos import Point
+    >>> pnt = Point(5, 23)
+
+Finally, there are :func:`fromstr` and :func:`fromfile` factory methods, which
+return a :class:`GEOSGeometry` object from an input string or a file::
+
+    >>> from django.contrib.gis.geos import fromstr, fromfile
+    >>> pnt = fromstr('POINT(5 23)')
+    >>> pnt = fromfile('/path/to/pnt.wkt')
+    >>> pnt = fromfile(open('/path/to/pnt.wkt'))
+
+Geometries are Pythonic 
+-----------------------
+:class:`GEOSGeometry` objects are 'Pythonic', in other words components may
+be accessed, modified, and iterated over using standard Python conventions.
+For example, you can iterate over the coordinates in a :class:`Point`::
+
+    >>> pnt = Point(5, 23)
+    >>> [coord for coord in pnt]
+    [5.0, 23.0]
+
+With any geometry object, the :attr:`GEOSGeometry.coords` property
+may be used to get the geometry coordinates as a Python tuple::
+
+    >>> pnt.coords
+    (5.0, 23.0)
+
+You can get/set geometry components using standard Python indexing
+techniques.  However, what is returned depends on the geometry type
+of the object.  For example, indexing on a :class:`LineString`
+returns a coordinate tuple::
+
+    >>> from django.contrib.gis.geos import LineString
+    >>> line = LineString((0, 0), (0, 50), (50, 50), (50, 0), (0, 0))
+    >>> line[0]
+    (0.0, 0.0)
+    >>> line[-2]
+    (50.0, 0.0)
+
+Whereas indexing on a :class:`Polygon` will return the ring
+(a :class:`LinearRing` object) corresponding to the index::
+
+    >>> from django.contrib.gis.geos import Polygon
+    >>> poly = Polygon( ((0.0, 0.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (0.0, 0.0)) )
+    >>> poly[0]
+    <LinearRing object at 0x1044395b0>
+    >>> poly[0][-2] # second-to-last coordinate of external ring
+    (50.0, 0.0)
+
+In addition, coordinates/components of the geometry may added or modified,
+just like a Python list::
+
+    >>> line[0] = (1.0, 1.0)
+    >>> line.pop()
+    (0.0, 0.0)
+    >>> line.append((1.0, 1.0))
+    >>> line.coords
+    ((1.0, 1.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (1.0, 1.0))
+
+Geometry Objects
+================
+
+``GEOSGeometry``
+----------------
+
+.. class:: GEOSGeometry(geo_input[, srid=None])
+
+  :param geo_input: Geometry input value
+  :type geo_input: string or buffer
+  :param srid: spatial reference identifier
+  :type srid: integer
+
+This is the base class for all GEOS geometry objects.  It initializes on the
+given ``geo_input`` argument, and then assumes the proper geometry subclass
+(e.g., ``GEOSGeometry('POINT(1 1)')`` will create a :class:`Point` object).
+
+The following input formats, along with their corresponding Python types,
+are accepted:
+
+=============  ======================
+Format         Input Type
+=============  ======================
+WKT / EWKT     ``str`` or ``unicode`` 
+HEX / HEXEWKB  ``str`` or ``unicode``
+WKB / EWKB     ``buffer``
+GeoJSON        ``str`` or ``unicode``
+=============  ======================
+
+Properties
+~~~~~~~~~~
+
+.. attribute:: GEOSGeometry.coords
+
+Returns the coordinates of the geometry as a tuple.
+
+.. attribute:: GEOSGeometry.empty
+
+Returns whether or not the set of points in the geometry is empty. 
+
+.. attribute:: GEOSGeometry.geom_type
+
+Returns a string corresponding to the type of geometry.  For example::
+
+    >>> pnt = GEOSGeometry('POINT(5 23)')
+    >>> pnt.geom_type
+    'Point'
+
+.. attribute:: GEOSGeometry.geom_typeid
+
+Returns the GEOS geometry type identification number.  The following table
+shows the value for each geometry type:
+
+===========================  ========
+Geometry                     ID
+===========================  ========
+:class:`Point`               0
+:class:`LineString`          1
+:class:`LinearRing`          2
+:class:`Polygon`             3
+:class:`MultiPoint`          4
+:class:`MultiLineString`     5
+:class:`MultiPolygon`        6
+:class:`GeometryCollection`  7
+===========================  ========
+
+.. attribute:: GEOSGeometry.num_coords
+
+Returns the number of coordinates in the geometry.
+
+.. attribute:: GEOSGeometry.num_geom
+
+Returns the number of geometries in this geometry.  In other words, will
+return 1 on anything but geometry collections.
+
+.. attribute:: GEOSGeometry.hasz
+
+Returns a boolean indicating whether the geometry is three-dimensional.
+
+.. attribute:: GEOSGeometry.ring
+
+Returns a boolean indicating whether the geometry is a ``LinearRing``.
+
+.. attribute:: GEOSGeometry.simple
+
+Returns a boolean indicating whether the geometry is 'simple'. A geometry
+is simple if and only if it does not intersect itself (except at boundary
+points).  For example, a :class:`LineString` object is not simple if it
+intersects itself. Thus, :class:`LinearRing` and :class`Polygon` objects
+are always simple because they do cannot intersect themselves, by
+definition.
+
+.. attribute:: GEOSGeometry.valid
+
+Returns a boolean indicating whether the geometry is valid.
+
+.. attribute:: GEOSGeometry.srid
+
+Property that may be used to retrieve or set the SRID associated with the
+geometry.  For example::
+
+    >>> pnt = Point(5, 23)
+    >>> print pnt.srid
+    None
+    >>> pnt.srid = 4326
+    >>> pnt.srid
+    4326
+
+Output Properties
+~~~~~~~~~~~~~~~~~
+
+The properties in this section export the :class:`GEOSGeometry` object into
+a different.  This output may be in the form of a string, buffer, or even
+another object.
+
+.. attribute:: GEOSGeometry.ewkt
+
+Returns the "extended" Well-Known Text of the geometry.  This representation
+is specific to PostGIS and is a super set of the OGC WKT standard. [#fnogc]_
+Essentially the SRID is prepended to the WKT representation, for example 
+``SRID=4326;POINT(5 23)``. 
+
+.. note::
+
+   The output from this property does not include the 3dm, 3dz, and 4d 
+   information that PostGIS supports in its EWKT representations.
+
+.. attribute:: GEOSGeometry.hex
+
+Returns the WKB of this Geometry in hexadecimal form.  Please note
+that the SRID and Z values are not included in this representation
+because it is not a part of the OGC specification (use the 
+:attr:`GEOSGeometry.hexewkb` property instead).
+
+.. attribute:: GEOSGeometry.hexewkb
+
+.. versionadded:: 1.2
+
+Returns the EWKB of this Geometry in hexadecimal form.  This is an 
+extension of the WKB specification that includes SRID and Z values 
+that are a part of this geometry.
+
+.. note::
+
+   GEOS 3.1 is *required* if you want valid 3D HEXEWKB.
+
+.. attribute:: GEOSGeometry.json
+
+Returns the GeoJSON representation of the geometry.
+
+.. note::
+
+    Requires GDAL.
+
+.. attribute:: GEOSGeometry.geojson
+
+Alias for :attr:`GEOSGeometry.json`.
+
+.. attribute:: GEOSGeometry.kml
+
+Returns a `KML`__ (Keyhole Markup Language) representation of the
+geometry.  This should only be used for geometries with an SRID of 
+4326 (WGS84), but this restriction is not enforced.
+
+.. attribute:: GEOSGeometry.ogr
+
+Returns an :class:`~django.contrib.gis.gdal.OGRGeometry` object 
+correspondg to the GEOS geometry.
+
+.. note::
+
+    Requires GDAL.
+
+.. _wkb:
+
+.. attribute:: GEOSGeometry.wkb
+
+Returns the WKB (Well-Known Binary) representation of this Geometry
+as a Python buffer.  SRID and Z values are not included, use the
+:attr:`GEOSGeometry.ewkb` property instead.
+
+.. _ewkb:
+
+.. attribute:: GEOSGeometry.ewkb
+
+.. versionadded:: 1.2
+
+Return the EWKB representation of this Geometry as a Python buffer.
+This is an extension of the WKB specification that includes any SRID
+and Z values that are a part of this geometry.
+
+.. note::
+
+   GEOS 3.1 is *required* if you want valid 3D EWKB.
+
+.. attribute:: GEOSGeometry.wkt
+
+Returns the Well-Known Text of the geometry (an OGC standard).
+
+__ http://code.google.com/apis/kml/documentation/
+
+Spatial Predicate Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All of the following spatial predicate methods take another
+:class:`GEOSGeometry` instance (``other``) as a parameter, and
+return a boolean.
+
+.. method:: GEOSGeometry.contains(other)
+
+Returns ``True`` if :meth:`GEOSGeometry.within` is ``False``.
+
+.. method:: GEOSGeometry.crosses(other)
+
+Returns ``True`` if the DE-9IM intersection matrix for the two Geometries
+is ``T*T******`` (for a point and a curve,a point and an area or a line 
+and an area) ``0********`` (for two curves).
+
+.. method:: GEOSGeometry.disjoint(other)
+
+Returns ``True`` if the DE-9IM intersection matrix for the two geometries
+is ``FF*FF****``.
+
+.. method:: GEOSGeometry.equals(other)
+
+Returns ``True`` if the DE-9IM intersection matrix for the two geometries 
+is ``T*F**FFF*``.
+
+.. method:: GEOSGeometry.equals_exact(other, tolerance=0)
+
+Returns true if the two geometries are exactly equal, up to a
+specified tolerance.  The ``tolerance`` value should be a floating
+point number representing the error tolerance in the comparison, e.g.,
+``poly1.equals_exact(poly2, 0.001)`` will compare equality to within
+one thousandth of a unit.
+
+.. method:: GEOSGeometry.intersects(other)
+
+Returns ``True`` if :meth:`GEOSGeometry.disjoint` is ``False``.
+
+.. method:: GEOSGeometry.overlaps(other)
+
+Returns true if the DE-9IM intersection matrix for the two geometries
+is ``T*T***T**`` (for two points or two surfaces) ``1*T***T**``
+(for two curves).
+
+.. method:: GEOSGeometry.relate_pattern(other, pattern)
+
+Returns ``True`` if the elements in the DE-9IM intersection matrix 
+for this geometry and the other matches the given ``pattern`` -- 
+a string of nine characters from the alphabet: {``T``, ``F``, ``*``, ``0``}.
+
+.. method:: GEOSGeometry.touches(other)
+
+Returns ``True`` if the DE-9IM intersection matrix for the two geometries
+is ``FT*******``, ``F**T*****`` or ``F***T****``.
+
+.. method:: GEOSGeometry.within(other)
+
+Returns ``True`` if the DE-9IM intersection matrix for the two geometries
+is ``T*F**F***``.
+
+Topological Methods
+~~~~~~~~~~~~~~~~~~~
+
+.. method:: GEOSGeometry.buffer(width, quadsegs=8)
+
+Returns a :class:`GEOSGeometry` that represents all points whose distance
+from this geometry is less than or equal to the given ``width``. The optional 
+``quadsegs`` keyword sets the number of segments used to approximate a 
+quarter circle (defaults is 8).
+
+.. method:: GEOSGeometry.difference(other)
+
+Returns a :class:`GEOSGeometry` representing the points making up this
+geometry that do not make up other.
+
+.. method:: GEOSGeometry:intersection(other)
+
+Returns a :class:`GEOSGeometry` representing the points shared by this
+geometry and other.
+
+.. method:: GEOSGeometry.relate(other)
+
+Returns the DE-9IM intersection matrix (a string) representing the
+topological relationship between this geometry and the other.
+
+.. method:: GEOSGeometry.simplify(tolerance=0.0, preserve_topology=False)
+
+Returns a new :class:`GEOSGeometry`, simplified using the Douglas-Peucker
+algorithm to the specified tolerance.  A higher tolerance value implies
+less points in the output.  If no tolerance is tolerance provided,
+it defaults to 0.
+
+By default, this function does not preserve topology - e.g., 
+:class:`Polygon` objects can be split, collapsed into lines or disappear.
+:class:`Polygon` holes can be created or disappear, and lines can cross.
+By specifying ``preserve_topology=True``, the result will have the same
+dimension and number of components as the input, however, this is 
+significantly slower.   
+
+.. method:: GEOSGeometry.sym_difference(other)
+
+Returns a :class:`GEOSGeometry` combining the points in this geometry 
+not in other, and the points in other not in this geometry.
+
+.. method:: GEOSGeometry.union(other)
+
+Returns a :class:`GEOSGeometry` representing all the points in this 
+geometry and the other.
+
+Topological Properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. attribute:: GEOSGeometry.boundary
+
+Returns the boundary as a newly allocated Geometry object.
+
+.. attribute:: GEOSGeometry.centroid
+
+Returns a :class:`Point` object representing the geometric center of
+the geometry.  The point is not guaranteed to be on the interior
+of the geometry.
+
+.. attribute:: GEOSGeometry.convex_hull
+
+Returns the smallest :class:`Polygon` that contains all the points in
+the geometry.
+
+.. attribute:: GEOSGeometry.envelope
+
+Returns a :class:`Polygon` that represents the bounding envelope of
+this geometry.
+
+.. attribute:: GEOSGeometry.point_on_surface
+
+Computes and returns a :class:`Point` guaranteed to be on the interior
+of this geometry.
+
+Other Properties & Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. attribute:: GEOSGeometry.area
+
+This property returns the area of the Geometry.
+
+.. attribute:: GEOSGeometry.extent
+
+This property returns the extent of this geometry as a 4-tuple, 
+consisting of (xmin, ymin, xmax, ymax).
+
+.. method:: GEOSGeometry.clone()
+
+This method returns a :class:`GEOSGeometry` that is a clone of the original.
+
+.. method:: GEOSGeometry.distance(geom)
+
+Returns the distance between the closest points on this geometry and the given
+``geom`` (another :class:`GEOSGeometry` object).
+
+.. note::
+
+    GEOS distance calculations are  linear -- in other words, GEOS does not
+    perform a spherical calculation even if the SRID specifies a geographic 
+    coordinate system.
+
+.. attribute:: GEOSGeometry.length
+
+Returns the length of this geometry (e.g., 0 for a :class:`Point`, 
+the length of a :class:`LineString`, or the circumference of 
+a :class:`Polygon`).
+
+.. attribute:: GEOSGeometry.prepared
+
+.. versionadded:: 1.1
+
+.. note::
+
+    Support for prepared geometries requires GEOS 3.1.
+
+Returns a GEOS ``PreparedGeometry`` for the contents of this geometry.  
+``PreparedGeometry`` objects are optimized for the contains, intersects,
+and covers operations.  Refer to the :ref:`prepared-geometries` documentation
+for more information.
+
+.. attribute:: GEOSGeometry.srs
+
+Returns a :class:`~django.contrib.gis.gdal.SpatialReference` object
+corresponding to the SRID of the geometry or ``None``.
+
+.. note::
+
+    Requires GDAL.
+
+.. method:: transform(ct, clone=False)
+
+Transforms the geometry according to the given coordinate transformation paramter
+(``ct``), which may be an integer SRID, spatial reference WKT string,
+a PROJ.4 string, a :class:`~django.contrib.gis.gdal.SpatialReference` object, or a 
+:class:`~django.contrib.gis.gdal.CoordTransform` object. By default, the geometry
+is transformed in-place and nothing is returned. However if the ``clone`` keyword
+is set, then the geometry is not modified and a transformed clone of the geometry
+is returned instead.
+
+.. note::
+
+    Requires GDAL.
+
+``Point``
+---------
+
+.. class:: Point(x, y, z=None, srid=None)
+
+   ``Point`` objects are instantiated using arguments that represent
+   the component coordinates of the point or with a single sequence
+   coordinates.  For example, the following are equivalent::
+
+       >>> pnt = Point(5, 23)
+       >>> pnt = Point([5, 23])
+
+``LineString``
+--------------
+
+.. class:: LineString(*args, **kwargs)
+
+   ``LineString`` objects are instantiated using arguments that are
+   either a sequence of coordinates or :class:`Point` objects.
+   For example, the following are equivalent::
+
+       >>> ls = LineString((0, 0), (1, 1))
+       >>> ls = LineString(Point(0, 0), Point(1, 1))
+
+   In addition, ``LineString`` objects may also be created by passing
+   in a single sequence of coordinate or :class:`Point` objects::
+
+       >>> ls = LineString( ((0, 0), (1, 1)) )
+       >>> ls = LineString( [Point(0, 0), Point(1, 1)] )
+
+``LinearRing``
+--------------
+
+.. class:: LinearRing(*args, **kwargs)
+
+   ``LinearRing`` objects are constructed in the exact same way as
+   :class:`LineString` objects, however the coordinates must be
+   *closed*, in other words, the first coordinates must be the
+   same as the last coordinates.  For example::
+
+       >>> ls = LinearRing((0, 0), (0, 1), (1, 1), (0, 0))
+
+   Notice that ``(0, 0)`` is the first and last coordinate -- if
+   they were not equal, an error would be raised.
+
+``Polygon``
+-----------
+
+.. class:: Polygon(*args, **kwargs)
+
+   ``Polygon`` objects may be instantiated by passing in one or
+   more parameters that represent the rings of the polygon.  The
+   parameters must either be :class:`LinearRing` instances, or
+   a sequence that may be used to construct a :class:`LinearRing`::
+
+       >>> ext_coords = ((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))
+       >>> int_coords = ((0.4, 0.4), (0.4, 0.6), (0.6, 0.6), (0.6, 0.4), (0.4, 0.4))
+       >>> poly = Polygon(ext_coords, int_coords)
+       >>> poly = Polygon(LinearRing(ext_coords), LinearRing(int_coords))
+
+   .. classmethod:: from_bbox(bbox)
+
+   .. versionadded:: 1.1
+
+   Returns a polygon object from the given bounding-box, a 4-tuple
+   comprising (xmin, ymin, xmax, ymax).
+
+   .. attribute:: num_interior_rings
+
+   Returns the number of interior rings in this geometry.
+
+Geometry Collections
+====================
+
+``MultiPoint``
+--------------
+
+.. class:: MultiPoint(*args, **kwargs)
+
+   ``MultiPoint`` objects may be instantiated by passing in one
+   or more :class:`Point` objects as arguments, or a single
+   sequence of :class:`Point` objects::
+
+       >>> mp = MultiPoint(Point(0, 0), Point(1, 1))
+       >>> mp = MultiPoint( (Point(0, 0), Point(1, 1)) )
+
+``MultiLineString``
+-------------------
+
+.. class:: MultiLineString(*args, **kwargs)
+
+   ``MultiLineString`` objects may be instantiated by passing in one
+   or more :class:`LineString` objects as arguments, or a single
+   sequence of :class:`LineString` objects::
+
+       >>> ls1 = LineString((0, 0), (1, 1))
+       >>> ls2 = LineString((2, 2), (3, 3))
+       >>> mls = MultiLineString(ls1, ls2)
+       >>> mls = MultiLineString([ls1, ls2])
+
+   .. attribute:: merged
+
+   .. versionadded:: 1.1
+
+   Returns a :class:`LineString` representing the line merge of
+   all the components in this ``MultiLineString``.
+       
+
+``MultiPolygon``
+----------------
+
+.. class:: MultiPolygon(*args, **kwargs)
+
+   ``MultiPolygon`` objects may be instantiated by passing one or
+   more :class:`Polygon` objects as arguments, or a single sequence
+   of :class:`Polygon` objects::
+
+       >>> p1 = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
+       >>> p2 = Polygon( ((1, 1), (1, 2), (2, 2), (1, 1)) )
+       >>> mp = MultiPolygon(p1, p2)
+       >>> mp = MultiPolygon([p1, p2])
+
+   .. attribute:: cascaded_union
+
+   .. versionadded:: 1.1
+
+   Returns a :class:`Polygon` that is the union of all of the component
+   polygons in this collection.  The algorithm employed is significantly
+   more efficient (faster) than trying to union the geometries together
+   individually. [#fncascadedunion]_
+
+   .. note::
+
+       GEOS 3.1 is *required* to peform cascaded unions.
+
+``GeometryCollection``
+----------------------
+
+.. class:: GeometryCollection(*args, **kwargs)
+
+   ``GeometryCollection`` objects may be instantiated by passing in
+   one or more other :class:`GEOSGeometry` as arguments, or a single
+   sequence of :class:`GEOSGeometry` objects::
+
+       >>> poly = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
+       >>> gc = GeometryCollection(Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly)
+       >>> gc = GeometryCollection((Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly))
+
+.. _prepared-geometries:
+
+Prepared Geometries
+===================
+
+.. versionadded: 1.1
+
+In order to obtain a prepared geometry, just access the
+:attr:`GEOSGeometry.prepared` property.  Once you have a
+``PreparedGeometry`` instance its spatial predicate methods, listed below,
+may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
+geometry can be orders of magnitude faster -- the more complex the geometry 
+that is prepared, the larger the speedup in the operation.  For more information,
+please consult the `GEOS wiki page on prepared geometries <http://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
+
+.. note::
+
+   GEOS 3.1 is *required* in order to use prepared geometries.
+
+For example::
+
+    >>> from django.contrib.gis.geos import Point, Polygon
+    >>> poly = Polygon.from_bbox((0, 0, 5, 5))
+    >>> prep_poly = poly.prepared
+    >>> prep_poly.contains(Point(2.5, 2.5))
+    True
+
+``PreparedGeometry``
+--------------------
+
+.. class:: PreparedGeometry
+
+  All methods on ``PreparedGeometry`` take an ``other`` argument, which
+  must be a :class:`GEOSGeometry` instance.
+
+  .. method:: contains(other)
+
+  .. method:: contains_properly(other)
+
+  .. method:: covers(other)
+
+  .. method:: intersects(other)
+
+Geometry Factories
+==================
+
+.. function:: fromfile(file_h)
+
+   :param file_h: input file that contains spatial data
+   :type file_h: a Python ``file`` object or a string path to the file
+   :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the file
+
+Example::
+
+    >>> from django.contrib.gis.geos import fromfile
+    >>> g = fromfile('/home/bob/geom.wkt')
+
+.. function:: fromstr(string, [,srid=None])
+
+   :param string: string that contains spatial data
+   :type string: string
+   :param srid: spatial reference identifier
+   :type srid: integer
+   :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the string
+
+Example::
+
+    >>> from django.contrib.gis.geos import fromstr
+    >>> pnt = fromstr('POINT(-90.5 29.5)', srid=4326)
+
+I/O Objects
+===========
+
+.. versionadded: 1.1
+
+Reader Objects
+--------------
+
+The reader I/O classes simply return a :class:`GEOSGeometry` instance from the
+WKB and/or WKT input given to their ``read(geom)`` method.
+
+.. class:: WKBReader
+
+Example::
+
+    >>> from django.contrib.gis.geos import WKBReader
+    >>> wkb_r = WKBReader()
+    >>> wkb_r.read('0101000000000000000000F03F000000000000F03F')
+    <Point object at 0x103a88910>
+
+.. class:: WKTReader
+
+Example::
+
+    >>> from django.contrib.gis.geos import WKTReader
+    >>> wkt_r = WKTReader()
+    >>> wkt_r.read('POINT(1 1)')
+    <Point object at 0x103a88b50>
+
+Writer Objects
+--------------
+
+All writer objects have a ``write(geom)`` method that returns either the
+WKB or WKT of the given geometry.  In addition, :class:`WKBWriter` objects
+also have properties that may be used to change the byte order, and or
+include the SRID and 3D values (in other words, EWKB).
+
+.. class:: WKBWriter
+
+``WKBWriter`` provides the most control over its output.  By default it
+returns OGC-compliant WKB when it's ``write`` method is called.  However, 
+it has properties that allow for the creation of EWKB, a superset of the
+WKB standard that includes additional information.
+
+.. method:: WKBWriter.write(geom)
+
+Returns the WKB of the given geometry as a Python ``buffer`` object.
+Example::
+
+    >>> from django.contrib.gis.geos import Point, WKBWriter
+    >>> pnt = Point(1, 1)
+    >>> wkb_w = WKBWriter()
+    >>> wkb_w.write(pnt)
+    <read-only buffer for 0x103a898f0, size -1, offset 0 at 0x103a89930>
+
+.. method:: WKBWriter.write_hex(geom)
+
+Returns WKB of the geometry in hexadecimal.  Example::
+
+    >>> from django.contrib.gis.geos import Point, WKBWriter
+    >>> pnt = Point(1, 1)
+    >>> wkb_w = WKBWriter()
+    >>> wkb_w.write_hex(pnt)
+    '0101000000000000000000F03F000000000000F03F'
+
+.. attribute:: WKBWriter.byteorder
+
+This property may be be set to change the byte-order of the geometry
+representation.
+
+=============== =================================================
+Byteorder Value Description
+=============== =================================================
+0               Big Endian (e.g., compatible with RISC systems)
+1               Little Endian (e.g., compatible with x86 systems)
+=============== =================================================
+
+Example::
+
+    >>> from django.contrib.gis.geos import Point, WKBWriter
+    >>> wkb_w = WKBWriter()
+    >>> pnt = Point(1, 1)
+    >>> wkb_w.write_hex(pnt)
+    '0101000000000000000000F03F000000000000F03F'
+    >>> wkb_w.byteorder = 0
+    '00000000013FF00000000000003FF0000000000000'
+
+.. attribute:: WKBWriter.outdim
+
+This property may be set to change the output dimension of the geometry
+representation.  In other words, if you have a 3D geometry then set to 3
+so that the Z value is included in the WKB.
+
+============ ===========================
+Outdim Value Description
+============ ===========================
+2            The default, output 2D WKB.
+3            Output 3D EWKB.
+============ ===========================
+
+Example::
+
+    >>> from django.contrib.gis.geos import Point, WKBWriter
+    >>> wkb_w = WKBWriter()
+    >>> wkb_w.outdim
+    2
+    >>> pnt = Point(1, 1, 1)
+    >>> wkb_w.write_hex(pnt) # By default, no Z value included:
+    '0101000000000000000000F03F000000000000F03F'
+    >>> wkb_w.outdim = 3 # Tell writer to include Z values
+    >>> wkb_w.write_hex(pnt)
+    '0101000080000000000000F03F000000000000F03F000000000000F03F'
+
+.. attribute:: WKBWriter.srid
+
+Set this property with a boolean to indicate whether the SRID of the
+geometry should be included with the WKB representation.  Example::
+
+    >>> from django.contrib.gis.geos import Point, WKBWriter
+    >>> wkb_w = WKBWriter()
+    >>> pnt = Point(1, 1, srid=4326)
+    >>> wkb_w.write_hex(pnt) # By default, no SRID included:
+    '0101000000000000000000F03F000000000000F03F'
+    >>> wkb_w.srid = True # Tell writer to include SRID
+    >>> wkb_w.write_hex(pnt)
+    '0101000020E6100000000000000000F03F000000000000F03F'
+
+.. class:: WKTWriter
+
+.. method:: WKTWriter.write(geom)
+
+Returns the WKT of the given geometry. Example::
+
+    >>> from django.contrib.gis.geos import Point, WKTWriter
+    >>> pnt = Point(1, 1)
+    >>> wkt_w = WKTWriter()
+    >>> wkt_w.write(pnt)
+    'POINT (1.0000000000000000 1.0000000000000000)'
+
+
+.. rubric:: Footnotes
+.. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.refractions.net/docs/ch04.html#id2591381>`_, PostGIS documentation at Ch. 4.1.2.
+.. [#fncascadedunion] For more information, read Paul Ramsey's blog post about `(Much) Faster Unions in PostGIS 1.4 <http://blog.cleverelephant.ca/2009/01/must-faster-unions-in-postgis-14.html>`_ and Martin Davis' blog post on `Fast polygon merging in JTS using Cascaded Union <http://lin-ear-th-inking.blogspot.com/2007/11/fast-polygon-merging-in-jts-using.html>`_.
+
+Settings
+========
+
+.. setting:: GEOS_LIBRARY_PATH
+
+GEOS_LIBRARY_PATH
+-----------------
+
+A string specifying the location of the GEOS C library.  Typically,
+this setting is only used if the GEOS C library is in a non-standard
+location (e.g., ``/home/bob/lib/libgeos_c.so``).
+
+.. note::
+
+    The setting must be the *full* path to the **C** shared library; in 
+    other words you want to use ``libgeos_c.so``, not ``libgeos.so``.

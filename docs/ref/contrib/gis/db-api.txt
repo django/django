@@ -1,0 +1,304 @@
+.. _ref-gis-db-api:
+
+======================
+GeoDjango Database API
+======================
+
+.. module:: django.contrib.gis.db.models
+   :synopsis: GeoDjango's database API.
+
+.. _spatial-backends:
+
+Spatial Backends
+================
+
+.. versionadded:: 1.2
+
+In Django 1.2, support for :ref:`multiple databases <topics-db-multi-db>` was
+introduced.  In order to support multiple databases, GeoDjango has segregated
+its functionality into full-fledged spatial database backends:
+
+* :mod:`django.contrib.gis.db.backends.postgis`
+* :mod:`django.contrib.gis.db.backends.mysql`
+* :mod:`django.contrib.gis.db.backends.oracle`
+* :mod:`django.contrib.gis.db.backends.spatialite`
+
+Backwards-Compatibility
+-----------------------
+
+For those using the old database settings (e.g., the ``DATABASE_*`` settings)
+Django 1.2 will automatically use the appropriate spatial backend as long
+as :mod:`django.contrib.gis` is in your :setting:`INSTALLED_APPS`.  For
+example, if you have the following in your settings::
+
+    DATABASE_ENGINE='postgresql_psycopg2'
+
+    ...
+
+    INSTALLED_APPS = (
+      ...
+      'django.contrib.gis',
+      ...
+    )
+
+Then, :mod:`django.contrib.gis.db.backends.postgis` will automatically be used as your
+spatial backend.
+
+Creating and Saving Geographic Models
+=====================================
+Here is an example of how to create a geometry object (assuming the ``Zipcode``
+model)::
+
+    >>> from zipcode.models import Zipcode
+    >>> z = Zipcode(code=77096, poly='POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
+    >>> z.save()
+
+:class:`~django.contrib.gis.geos.GEOSGeometry` objects may also be used to save geometric models::
+
+    >>> from django.contrib.gis.geos import GEOSGeometry
+    >>> poly = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
+    >>> z = Zipcode(code=77096, poly=poly)
+    >>> z.save()
+
+Moreover, if the ``GEOSGeometry`` is in a different coordinate system (has a
+different SRID value) than that of the field, then it will be implicitly 
+transformed into the SRID of the model's field, using the spatial database's 
+transform procedure::
+
+    >>> poly_3084 = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))', srid=3084)  # SRID 3084 is 'NAD83(HARN) / Texas Centric Lambert Conformal'
+    >>> z = Zipcode(code=78212, poly=poly_3084)
+    >>> z.save()
+    >>> from django.db import connection
+    >>> print connection.queries[-1]['sql'] # printing the last SQL statement executed (requires DEBUG=True)
+    INSERT INTO "geoapp_zipcode" ("code", "poly") VALUES (78212, ST_Transform(ST_GeomFromWKB('\\001 ... ', 3084), 4326))
+
+Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT
+(Well Known Text [#fnwkt]_), HEXEWKB (PostGIS specific -- a WKB geometry in
+hexadecimal [#fnewkb]_), and GeoJSON [#fngeojson]_ (requires GDAL). Essentially,
+if the input is not a ``GEOSGeometry`` object, the geometry field will attempt to
+create a ``GEOSGeometry`` instance from the input.
+
+For more information creating :class:`~django.contrib.gis.geos.GEOSGeometry`
+objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.
+
+.. _spatial-lookups-intro:
+
+Spatial Lookups
+===============
+
+GeoDjango's lookup types may be used with any manager method like
+``filter()``, ``exclude()``, etc.  However, the lookup types unique to
+GeoDjango are only available on geometry fields.
+Filters on 'normal' fields (e.g. :class:`~django.db.models.CharField`)
+may be chained with those on geographic fields.  Thus, geographic queries
+take the following general form (assuming  the ``Zipcode`` model used in the
+:ref:`ref-gis-model-api`)::
+
+    >>> qs = Zipcode.objects.filter(<field>__<lookup_type>=<parameter>)
+    >>> qs = Zipcode.objects.exclude(...)
+
+For example::
+
+    >>> qs = Zipcode.objects.filter(poly__contains=pnt)
+
+In this case, ``poly`` is the geographic field, :lookup:`contains <gis-contains>`
+is the spatial lookup type, and ``pnt`` is the parameter (which may be a 
+:class:`~django.contrib.gis.geos.GEOSGeometry` object or a string of
+GeoJSON , WKT, or HEXEWKB).
+
+A complete reference can be found in the :ref:`spatial lookup reference 
+<spatial-lookups>`.
+
+.. note::
+
+    GeoDjango constructs spatial SQL with the :class:`GeoQuerySet`, a 
+    subclass of :class:`~django.db.models.QuerySet`.  The 
+    :class:`GeoManager` instance attached to your model is what
+    enables use of :class:`GeoQuerySet`.
+
+.. _distance-queries:
+
+Distance Queries
+================
+
+Introduction
+------------
+Distance calculations with spatial data is tricky because, unfortunately,
+the Earth is not flat.  Some distance queries with fields in a geographic
+coordinate system may have to be expressed differently because of 
+limitations in PostGIS.  Please see the :ref:`selecting-an-srid` section 
+in the :ref:`ref-gis-model-api` documentation for more details.
+
+.. _distance-lookups-intro:
+
+Distance Lookups
+----------------
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+The following distance lookups are available:
+
+* :lookup:`distance_lt`
+* :lookup:`distance_lte`
+* :lookup:`distance_gt`
+* :lookup:`distance_gte`
+* :lookup:`dwithin`
+
+.. note::
+
+    For *measuring*, rather than querying on distances, use the
+    :meth:`GeoQuerySet.distance` method.
+
+Distance lookups take a tuple parameter comprising:
+
+#. A geometry to base calculations from; and 
+#. A number or :class:`~django.contrib.gis.measure.Distance` object containing the distance.
+
+If a :class:`~django.contrib.gis.measure.Distance` object is used,
+it may be expressed in any units (the SQL generated will use units
+converted to those of the field); otherwise, numeric parameters are assumed
+to be in the units of the field.
+
+.. note::
+
+    For PostGIS users, the routine ``ST_distance_sphere`` 
+    is used by default for calculating distances on geographic coordinate systems 
+    -- which may only be called with point geometries [#fndistsphere]_.  Thus, 
+    geographic distance lookups on traditional PostGIS geometry columns are
+    only allowed on :class:`PointField` model fields using a point for the
+    geometry parameter.
+
+.. note::
+
+    PostGIS 1.5 introduced :ref:`geography columns <geography-type>`, which
+    is limited on what geometry types distance queries are performed with.  In
+    other words, if you have ``geography=True`` in your geometry field
+    definition you'll be allowed to peform arbitrary distance queries with your
+    data in geodetic units of WGS84.
+
+
+For example, let's say we have a ``SouthTexasCity`` model (from the 
+`GeoDjango distance tests`__ ) on a *projected* coordinate system valid for cities 
+in southern Texas::
+
+    from django.contrib.gis.db import models
+    
+    class SouthTexasCity(models.Model):
+        name = models.CharField(max_length=30)
+        # A projected coordinate system (only valid for South Texas!) 
+        # is used, units are in meters.
+        point = models.PointField(srid=32140) 
+        objects = models.GeoManager()
+
+Then distance queries may be performed as follows::
+
+    >>> from django.contrib.gis.geos import *
+    >>> from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
+    >>> from geoapp import SouthTexasCity 
+    # Distances will be calculated from this point, which does not have to be projected.
+    >>> pnt = fromstr('POINT(-96.876369 29.905320)', srid=4326)
+    # If numeric parameter, units of field (meters in this case) are assumed.
+    >>> qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, 7000))
+    # Find all Cities within 7 km, > 20 miles away, and > 100 chains  away (an obscure unit)
+    >>> qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, D(km=7)))
+    >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
+    >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))
+
+__ http://code.djangoproject.com/browser/django/trunk/django/contrib/gis/tests/distapp/models.py
+
+.. _compatibility-table:
+
+Compatibility Tables
+====================
+
+.. _spatial-lookup-compatibility:
+
+Spatial Lookups
+---------------
+
+The following table provides a summary of what spatial lookups are available
+for each spatial database backend.
+
+=================================  =========  ========  ============ ==========
+Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite
+=================================  =========  ========  ============ ==========
+:lookup:`bbcontains`               X                    X            X
+:lookup:`bboverlaps`               X                    X            X
+:lookup:`contained`                X                    X            X
+:lookup:`contains <gis-contains>`  X          X         X            X
+:lookup:`contains_properly`        X
+:lookup:`coveredby`                X          X
+:lookup:`covers`                   X          X
+:lookup:`crosses`                  X                                 X
+:lookup:`disjoint`                 X          X         X            X
+:lookup:`distance_gt`              X          X                      X
+:lookup:`distance_gte`             X          X                      X
+:lookup:`distance_lt`              X          X                      X
+:lookup:`distance_lte`             X          X                      X
+:lookup:`dwithin`                  X          X
+:lookup:`equals`                   X          X         X            X
+:lookup:`exact`                    X          X         X            X
+:lookup:`intersects`               X          X         X            X
+:lookup:`overlaps`                 X          X         X            X
+:lookup:`relate`                   X          X                      X
+:lookup:`same_as`                  X          X         X            X
+:lookup:`touches`                  X          X         X            X
+:lookup:`within`                   X          X         X            X
+:lookup:`left`                     X
+:lookup:`right`                    X
+:lookup:`overlaps_left`            X
+:lookup:`overlaps_right`           X
+:lookup:`overlaps_above`           X
+:lookup:`overlaps_below`           X
+:lookup:`strictly_above`           X
+:lookup:`strictly_below`           X
+=================================  =========  ========  ============ ==========
+
+.. _geoqueryset-method-compatibility:
+
+``GeoQuerySet`` Methods
+-----------------------
+The following table provides a summary of what :class:`GeoQuerySet` methods
+are available on each spatial backend.  Please note that MySQL does not 
+support any of these methods, and is thus excluded from the table.
+
+====================================  =======  ======  ==========
+Method                                PostGIS  Oracle  SpatiaLite
+====================================  =======  ======  ==========
+:meth:`GeoQuerySet.area`              X        X       X
+:meth:`GeoQuerySet.centroid`          X        X       X
+:meth:`GeoQuerySet.collect`           X
+:meth:`GeoQuerySet.difference`        X        X       X
+:meth:`GeoQuerySet.distance`          X        X       X
+:meth:`GeoQuerySet.envelope`          X                X
+:meth:`GeoQuerySet.extent`            X        X
+:meth:`GeoQuerySet.extent3d`          X
+:meth:`GeoQuerySet.force_rhr`         X
+:meth:`GeoQuerySet.geohash`           X
+:meth:`GeoQuerySet.geojson`           X
+:meth:`GeoQuerySet.gml`               X        X
+:meth:`GeoQuerySet.intersection`      X        X       X
+:meth:`GeoQuerySet.kml`               X
+:meth:`GeoQuerySet.length`            X        X       X
+:meth:`GeoQuerySet.make_line`         X
+:meth:`GeoQuerySet.mem_size`          X
+:meth:`GeoQuerySet.num_geom`          X        X       X
+:meth:`GeoQuerySet.num_points`        X        X       X
+:meth:`GeoQuerySet.perimeter`         X        X
+:meth:`GeoQuerySet.point_on_surface`  X        X       X
+:meth:`GeoQuerySet.reverse_geom`      X        X
+:meth:`GeoQuerySet.scale`             X                X
+:meth:`GeoQuerySet.snap_to_grid`      X
+:meth:`GeoQuerySet.svg`               X                X
+:meth:`GeoQuerySet.sym_difference`    X        X       X
+:meth:`GeoQuerySet.transform`         X        X       X
+:meth:`GeoQuerySet.translate`         X                X
+:meth:`GeoQuerySet.union`             X        X       X
+:meth:`GeoQuerySet.unionagg`          X        X       X
+====================================  =======  ======  ==========    
+
+.. rubric:: Footnotes
+.. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
+.. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.refractions.net/documentation/manual-1.5/ch04.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
+.. [#fngeojson] *See* Howard Butler, Martin Daly, Allan Doyle, Tim Schaub, & Christopher Schmidt, `The GeoJSON Format Specification <http://geojson.org/geojson-spec.html>`_, Revision 1.0 (June 16, 2008).
+.. [#fndistsphere] *See* PostGIS 1.5 ``ST_distance_sphere`` `documentation <http://postgis.refractions.net/documentation/manual-1.5/ST_Distance_Sphere.html>`_.
+.. [#] MySQL only supports bounding box operations (known as minimum bounding rectangles, or MBR, in MySQL).  Thus, spatial lookups such as :lookup:`contains <gis-contains>` are really equivalent to :lookup:`bbcontains`.

@@ -1,0 +1,99 @@
+===================
+Deploying GeoDjango
+===================
+
+.. warning::
+
+    GeoDjango uses the GDAL geospatial library which is
+    not thread safe at this time.  Thus, it is *highly* recommended
+    to not use threading when deploying -- in other words, use a 
+    an appropriate configuration of Apache or the prefork method
+    when using FastCGI through another web server.
+
+Apache
+======
+In this section there are some example ``VirtualHost`` directives for 
+when deploying using either ``mod_python`` or ``mod_wsgi``.  At this
+time, we recommend ``mod_wsgi``, as it is now officially recommended 
+way to deploy Django applications with Apache.  Moreover, if
+``mod_python`` is used, then a prefork version of Apache must also be
+used.  As long as ``mod_wsgi`` is configured correctly, it does not
+matter whether the version of Apache is prefork or worker.
+
+.. note::
+
+    The ``Alias`` and ``Directory`` configurations in the the examples
+    below use an example path to a system-wide installation folder of Django.  
+    Substitute in an appropriate location, if necessary, as it may be
+    different than the path on your system.
+
+``mod_wsgi``
+------------
+
+Example::
+
+    <VirtualHost *:80>
+      WSGIDaemonProcess geodjango user=geo group=geo processes=5 threads=1
+      WSGIProcessGroup geodjango
+      WSGIScriptAlias / /home/geo/geodjango/world.wsgi
+  
+      Alias /media/ "/usr/lib/python2.5/site-packages/django/contrib/admin/media/"
+      <Directory "/usr/lib/python2.5/site-packages/django/contrib/admin/media/">
+        Order allow,deny
+        Options Indexes
+        Allow from all
+        IndexOptions FancyIndexing
+      </Directory>
+    
+    </VirtualHost>
+
+.. warning::
+
+    If the ``WSGIDaemonProcess`` attribute ``threads`` is not set to ``1``, then
+    Apache may crash when running your GeoDjango application.  Increase the 
+    number of ``processes`` instead.
+
+For more information, please consult Django's
+:ref:`mod_wsgi documentation <howto-deployment-modwsgi>`.
+
+``mod_python``
+--------------
+
+Example::
+
+    <VirtualHost *:80>
+    
+      <Location "/">
+        SetHandler mod_python
+        PythonHandler django.core.handlers.modpython
+        SetEnv DJANGO_SETTINGS_MODULE world.settings
+        PythonDebug On
+        PythonPath "['/var/www/apps'] + sys.path"
+      </Location>
+    
+      Alias /media/ "/usr/lib/python2.5/site-packages/django/contrib/admin/media/"
+      <Location "/media">
+        SetHandler None
+      </Location>
+    
+    </VirtualHost>
+
+.. warning::
+
+   When using ``mod_python`` you *must* be using a prefork version of Apache, or
+   else your GeoDjango application may crash Apache.
+
+For more information, please consult Django's
+:ref:`mod_python documentation <howto-deployment-modpython>`.
+
+Lighttpd
+========
+
+FastCGI
+-------
+
+Nginx
+=====
+
+FastCGI
+-------

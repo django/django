@@ -1,0 +1,181 @@
+======================
+Testing GeoDjango Apps
+======================
+
+.. versionchanged:: 1.2
+
+In Django 1.2, the addition of :ref:`spatial-backends`
+simplified the process of testing GeoDjango applications.  Specifically, testing
+GeoDjango applications is now the same as :ref:`topics-testing`.
+
+Included in this documentation are some additional notes and settings
+for :ref:`testing-postgis` and :ref:`testing-spatialite` users.
+
+.. note::
+
+    Django 1.1 users are still required to use a custom :setting:`TEST_RUNNER`.
+    See the :ref:`testing-1.1` section for more details.
+
+.. _testing-postgis:
+
+PostGIS
+=======
+
+Settings
+--------
+
+.. note::
+
+    The settings below have sensible defaults, and shouldn't require manual setting.
+
+.. setting:: POSTGIS_TEMPLATE
+
+``POSTGIS_TEMPLATE``
+^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 1.1
+
+.. versionchanged:: 1.2
+
+This setting may be used to customize the name of the PostGIS template
+database to use.  In Django versions 1.2 and above, it automatically
+defaults to ``'template_postgis'`` (the same name used in the
+:ref:`installation documentation <spatialdb_template>`).
+
+.. note::
+
+    Django 1.1 users will still have to define the :setting:`POSTGIS_TEMPLATE`
+    with a value, for example::
+
+        POSTGIS_TEMPLATE='template_postgis'
+
+.. setting:: POSTGIS_VERSION
+
+``POSTGIS_VERSION``
+^^^^^^^^^^^^^^^^^^^
+.. versionadded:: 1.1
+
+When GeoDjango's spatial backend initializes on PostGIS, it has to perform
+a SQL query to determine the version.  Setting the version manually
+prevents this query to the database::
+
+    POSTGIS_VERSION=('1.3.6', 1, 3, 6)
+
+Obtaining Sufficient Privileges
+-------------------------------
+
+Depending on your configuration, this section describes several methods to
+configure a database user with sufficient privileges to run tests for
+GeoDjango applications on PostgreSQL.  If your
+:ref:`spatial database template <spatialdb_template>`
+was created like in the instructions, then your testing database user
+only needs to have the ability to create databases.  In other configurations,
+you may be required to use a database superuser.
+
+Create Database User
+^^^^^^^^^^^^^^^^^^^^
+To make database user with the ability to create databases, use the
+following command::
+
+    $ createuser --createdb -R -S <user_name>
+
+The ``-R -S`` flags indicate that we do not want the user to have the ability
+to create additional users (roles) or to be a superuser, respectively.
+
+Alternatively, you may alter an existing user's role from the SQL shell
+(assuming this is done from an existing superuser account)::
+
+    postgres# ALTER ROLE <user_name> CREATEDB NOSUPERUSER NOCREATEROLE;
+
+Create Database Superuser
+^^^^^^^^^^^^^^^^^^^^^^^^^
+This may be done at the time the user is created, for example::
+
+    $ createuser --superuser <user_name>
+
+Or you may alter the user's role from the SQL shell (assuming this
+is done from an existing superuser account)::
+
+    postgres# ALTER ROLE <user_name> SUPERUSER;
+
+
+Create Local PostgreSQL Database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Initialize database: ``initdb -D /path/to/user/db``
+
+2. If there's already a Postgres instance on the machine, it will need
+   to use a different TCP port than 5432. Edit ``postgresql.conf`` (in
+   ``/path/to/user/db``) to change the database port (e.g. ``port = 5433``).
+
+3. Start this database ``pg_ctl -D /path/to/user/db start``
+
+Windows
+-------
+On Windows platforms the pgAdmin III utility may also be used as
+a simple way to add superuser privileges to your database user.
+
+By default, the PostGIS installer on Windows includes a template
+spatial database entitled ``template_postgis``.
+
+.. _testing-spatialite:
+
+SpatiaLite
+==========
+
+.. versionadded:: 1.1
+
+You will need to download the `initialization SQL`__ script for SpatiaLite::
+
+    $ wget http://www.gaia-gis.it/spatialite/init_spatialite-2.3.zip
+    $ unzip init_spatialite-2.3.zip
+
+If ``init_spatialite-2.3.sql`` is in the same path as your project's ``manage.py``,
+then all you have to do is::
+
+    $ python manage.py test 
+
+Settings
+--------
+
+.. setting:: SPATIALITE_SQL
+
+``SPATIALITE_SQL``
+^^^^^^^^^^^^^^^^^^
+.. versionadded:: 1.1
+
+By default, the GeoDjango test runner looks for the SpatiaLite SQL in the
+same directory where it was invoked (by default the same directory where
+``manage.py`` is located).  If you want to use a different location, then
+you may add the following to your settings::
+
+    SPATIALITE_SQL='/path/to/init_spatialite-2.3.sql'
+
+__ http://www.gaia-gis.it/spatialite/init_spatialite-2.3.zip
+
+.. _testing-1.1:
+
+Testing GeoDjango Applications in 1.1
+=====================================
+
+In Django 1.1, to accommodate the extra steps required to scaffalod a
+spatial database automatically, a test runner customized for GeoDjango
+must be used.  To use this runner, configure :setting:`TEST_RUNNER` as follows::
+
+    TEST_RUNNER='django.contrib.gis.tests.run_tests'
+
+.. note::
+
+    In order to create a spatial database, the :setting:`DATABASE_USER` setting
+    (or :setting:`TEST_DATABASE_USER`, if optionally defined on Oracle) requires
+    elevated privileges.  When using PostGIS or MySQL, the database user 
+    must have at least the ability to create databases.  When testing on Oracle,
+    the user should be a superuser.
+
+GeoDjango Test Suite
+====================
+
+To run GeoDjango's own internal test suite, configure the
+:setting:`TEST_RUNNER` setting as follows::
+
+    TEST_RUNNER='django.contrib.gis.tests.run_gis_tests'

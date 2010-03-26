@@ -1,0 +1,266 @@
+.. _ref-gis-model-api:
+
+===================
+GeoDjango Model API
+===================
+
+.. module:: django.contrib.gis.db.models
+   :synopsis: GeoDjango model and field API.
+
+This document explores the details of the GeoDjango Model API.  Throughout this
+section, we'll be using the following geographic model of a `ZIP code`__ as our 
+example::
+
+    from django.contrib.gis.db import models
+    
+    class Zipcode(models.Model):
+        code = models.CharField(max_length=5)
+        poly = models.PolygonField()
+        objects = models.GeoManager()
+
+__ http://en.wikipedia.org/wiki/ZIP_code
+
+Geometry Field Types
+====================
+
+Each of the following geometry field types correspond with the 
+OpenGIS Simple Features specification [#fnogc]_.
+
+``GeometryField``
+-----------------
+
+.. class:: GeometryField
+
+``PointField``
+--------------
+
+.. class:: PointField
+
+``LineStringField``
+-------------------
+
+.. class:: LineStringField
+
+``PolygonField``
+----------------
+
+.. class:: PolygonField
+
+``MultiPointField``
+-------------------
+
+.. class:: MultiPointField
+
+``MultiLineStringField``
+------------------------
+
+.. class:: MultiLineStringField
+
+``MultiPolygonField``
+---------------------
+
+.. class:: MultiPolygonField
+
+``GeometryCollectionField``
+---------------------------
+
+.. class:: GeometryCollectionField
+
+.. _geometry-field-options:
+
+Geometry Field Options
+======================
+
+In addition to the regular :ref:`common-model-field-options` available for
+Django model fields, geometry fields have the following additional options.
+All are optional.
+
+``srid``
+--------
+
+.. attribute:: GeometryField.srid
+
+Sets the SRID [#fnogcsrid]_ (Spatial Reference System Identity) of the geometry field to
+the given value. Defaults to 4326 (also known as `WGS84`__, units are in degrees
+of longitude and latitude).
+
+__ http://en.wikipedia.org/wiki/WGS84
+
+.. _selecting-an-srid:
+
+Selecting an SRID
+^^^^^^^^^^^^^^^^^
+
+Choosing an appropriate SRID for your model is an important decision that the
+developer should consider carefully.  The SRID is an integer specifier that 
+corresponds to the projection system that will be used to interpret the data
+in the spatial database. [#fnsrid]_  Projection systems give the context to the
+coordinates that specify a location.  Although the details of `geodesy`__ are
+beyond the scope of this documentation, the general problem is that the earth
+is spherical and representations of the earth (e.g., paper maps, web maps)
+are not.
+
+Most people are familiar with using latitude and longitude to reference a
+location on the earth's surface.  However, latitude and longitude are angles,
+not distances. [#fnharvard]_  In other words, while the shortest path between two points on
+a flat surface is a straight line, the shortest path between two points on a curved
+surface (such as the earth) is an *arc* of a `great circle`__. [#fnthematic]_  Thus,
+additional computation is required to obtain distances in planar units (e.g., 
+kilometers and miles).  Using a geographic coordinate system may introduce
+complications for the developer later on.  For example, PostGIS does not
+have the capability to perform distance calculations between non-point
+geometries using geographic coordinate systems, e.g., constructing a query to 
+find all points within 5 miles of a county boundary stored as WGS84. [#fndist]_
+
+Portions of the earth's surface may projected onto a two-dimensional, or 
+Cartesian, plane.  Projected coordinate systems are especially convenient
+for region-specific applications, e.g., if you know that your database will
+only cover geometries in `North Kansas`__, then you may consider using projection 
+system specific to that region.  Moreover, projected coordinate systems are 
+defined in Cartesian units (such as meters or feet), easing distance 
+calculations.
+
+.. note::
+
+    If you wish to peform arbitrary distance queries using non-point
+    geometries, consider using PostGIS 1.5 and enabling the
+    :attr:`GeometryField.geography` keyword to use the
+    :ref:`geography database type <geography-type>` instead.
+
+Additional Resources:
+
+* `spatialreference.org`__: A Django-powered database of spatial reference 
+  systems.
+* `The State Plane Coordinate System`__: A website covering the various
+  projection systems used in the United States.  Much of the U.S. spatial
+  data encountered will be in one of these coordinate systems rather than
+  in a geographic coordinate system such as WGS84.
+
+__ http://en.wikipedia.org/wiki/Geodesy
+__ http://en.wikipedia.org/wiki/Great_circle
+__ http://www.spatialreference.org/ref/epsg/2796/
+__ http://spatialreference.org/
+__ http://welcome.warnercnr.colostate.edu/class_info/nr502/lg3/datums_coordinates/spcs.html
+
+``spatial_index``
+-----------------
+
+.. attribute:: GeometryField.spatial_index
+
+Defaults to ``True``.  Creates a spatial index for the given geometry
+field. 
+
+.. note::
+
+    This is different from the ``db_index`` field option because spatial
+    indexes are created in a different manner than regular database
+    indexes.  Specifically, spatial indexes are typically created using
+    a variant of the R-Tree, while regular database indexes typically
+    use B-Trees.
+
+``dim``
+-------
+
+.. versionadded:: 1.2
+
+.. attribute:: GeometryField.dim
+
+This option may be used for customizing the coordinate dimension of the
+geometry field.  By default, it is set to 2, for representing two-dimensional
+geometries.  For spatial backends that support it, it may be set to 3 for
+three-dimensonal support.
+
+.. note::
+
+    At this time 3D support requires that GEOS 3.1 be installed, and is
+    limited only to the PostGIS spatial backend.
+
+``geography``
+-------------
+
+.. versionadded:: 1.2
+
+.. attribute:: GeometryField.geography
+
+If set to ``True``, this option will use create a database column of
+type geography, rather than geometry.  Please refer to the 
+:ref:`geography type <geography-type>` section below for more
+details.
+
+.. note::
+
+    Geography support is limited only to PostGIS 1.5+, and will
+    force the SRID to be 4326.
+
+.. _geography-type:
+
+Geography Type
+^^^^^^^^^^^^^^
+
+In PostGIS 1.5, the geography type was introduced -- it provides
+provides native support for spatial features represented with geographic
+coordinates (e.g., WGS84 longitude/latitude). [#fngeography]_
+Unlike the plane used by a geometry type, the geography type uses a spherical
+representation of its data.  Distance and measurement operations
+performed on a geography column automatically employ great circle arc
+calculations and return linear units.  In other words, when ``ST_Distance``
+is called on two geographies, a value in meters is returned (as opposed
+to degrees if called on a geometry column in WGS84).
+
+Because geography calculations involve more mathematics, only a subset of the
+PostGIS spatial lookups are available for the geography type. Practically,
+this means that in addition to the :ref:`distance lookups <distance-lookups>`
+only the following additional :ref:`spatial lookups <spatial-lookups>` are 
+available for geography columns:
+
+* :lookup:`bboverlaps`
+* :lookup:`exact`, and :lookup:`same_as`
+* :lookup:`coveredby`
+* :lookup:`covers`
+* :lookup:`intersects`
+
+For more information, the PostGIS documentation contains a helpful section on
+determining `when to use geography data type over geometry data type
+<http://postgis.refractions.net/documentation/manual-1.5/ch04.html#PostGIS_GeographyVSGeometry>`_.
+
+
+
+``GeoManager``
+==============
+
+.. currentmodule:: django.contrib.gis.db.models
+.. class:: GeoManager
+
+In order to conduct geographic queries, each geographic model requires 
+a ``GeoManager`` model manager.  This manager allows for the proper SQL
+construction for geographic queries; thus, without it, all geographic filters 
+will fail.  It should also be noted that ``GeoManager`` is required even if the
+model does not have a geographic field itself, e.g., in the case of a 
+``ForeignKey`` relation to a model with a geographic field.  For example, 
+if we had an ``Address`` model with a ``ForeignKey`` to our ``Zipcode`` 
+model::
+
+    from django.contrib.gis.db import models
+    from django.contrib.localflavor.us.models import USStateField
+
+    class Address(models.Model):
+        num = models.IntegerField()
+        street = models.CharField(max_length=100)
+        city = models.CharField(max_length=100)
+        state = USStateField()
+        zipcode = models.ForeignKey(Zipcode)
+        objects = models.GeoManager()
+
+The geographic manager is needed to do spatial queries on related ``Zipcode`` objects, 
+for example::
+
+    qs = Address.objects.filter(zipcode__poly__contains='POINT(-104.590948 38.319914)')
+
+.. rubric:: Footnotes
+.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999).
+.. [#fnogcsrid] *See id.* at Ch. 2.3.8, p. 39 (Geometry Values and Spatial Reference Systems).
+.. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <http://www.epsg.org>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
+.. [#fnharvard] Harvard Graduate School of Design, `An Overview of Geodesy and Geographic Referencing Systems <http://www.gsd.harvard.edu/gis/manual/projections/fundamentals/>`_.  This is an excellent resource for an overview of principles relating to geographic and Cartesian coordinate systems. 
+.. [#fnthematic] Terry A. Slocum, Robert B. McMaster, Fritz C. Kessler, & Hugh H. Howard, *Thematic Cartography and Geographic Visualization* (Prentice Hall, 2nd edition), at Ch. 7.1.3.
+.. [#fndist] This isn't impossible using GeoDjango; you could for example, take a known point in a projected coordinate system, buffer it to the appropriate radius, and then perform an intersection operation with the buffer transformed to the geographic coordinate system.
+.. [#fngeography] Please refer to the `PostGIS Geography Type <http://postgis.refractions.net/documentation/manual-1.5/ch04.html#PostGIS_Geography>`_ documentation for more details.

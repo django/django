@@ -296,11 +296,12 @@ manager that Django creates for you -- either as a default manager on a model
 with no managers, or to use temporarily when accessing related objects.
 
 Sometimes this default class won't be the right choice. One example is in the
-`django.contrib.gis` application that ships with Django itself. All `gis`
-models must use a special manager class (``GeoManager``) because they need a
-special queryset (``GeoQuerySet``) to be used for interacting with the
-database.  It turns out that models which require a special manager like this
-need to use the same manager class wherever an automatic manager is created.
+:mod:`django.contrib.gis` application that ships with Django itself. All ``gis``
+models must use a special manager class (:class:`~django.contrib.gis.db.models.GeoManager`)
+because they need a special queryset (:class:`~django.contrib.gis.db.models.GeoQuerySet`)
+to be used for interacting with the database.  It turns out that models which require
+a special manager like this need to use the same manager class wherever an automatic
+manager is created.
 
 Django provides a way for custom manager developers to say that their manager
 class should be used for automatic managers whenever it is the default manager

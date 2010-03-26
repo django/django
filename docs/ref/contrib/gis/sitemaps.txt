@@ -1,0 +1,27 @@
+===================
+Geographic Sitemaps
+===================
+
+Google's sitemap protocol has been recently extended to support geospatial
+content. [#]_   This includes the addition of the ``<url>`` child element
+``<geo:geo>``, which tells Google that the content located at the URL is
+geographic in nature. [#]_ 
+
+Example
+=======
+
+Reference
+=========
+
+``KMLSitemap``
+--------------
+
+``KMZSitemap``
+--------------
+
+``GeoRSSSitemap``
+-----------------
+
+.. rubric:: Footnotes
+.. [#] Google, Inc., `What is a Geo Sitemap? <http://www.google.com/support/webmasters/bin/answer.py?answer=94554>`_.
+.. [#] Google, Inc., `Submit Your Geo Content to Google <http://code.google.com/apis/kml/documentation/kmlSearch.html>`_.
