@@ -4,6 +4,7 @@ from django.test import TestCase
 from models import Holder, Inner, InnerInline
 from models import Holder2, Inner2, Holder3, Inner3
 
+
 class TestInline(TestCase):
     fixtures = ['admin-views-users.xml']
 
@@ -28,6 +29,15 @@ class TestInline(TestCase):
         expected = InnerInline.can_delete
         actual = inner_formset.can_delete
         self.assertEqual(expected, actual, 'can_delete must be equal')
+
+    def test_readonly_stacked_inline_label(self):
+        """Bug #13174."""
+        holder = Holder.objects.create(dummy=42)
+        inner = Inner.objects.create(holder=holder, dummy=42, readonly='')
+        response = self.client.get('/test_admin/admin/admin_inlines/holder/%i/'
+                                   % holder.id)
+        self.assertContains(response, '<label>Inner readonly label:</label>')
+
 
 class TestInlineMedia(TestCase):
     fixtures = ['admin-views-users.xml']

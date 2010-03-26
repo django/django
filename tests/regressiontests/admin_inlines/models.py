@@ -38,11 +38,13 @@ class Holder(models.Model):
 class Inner(models.Model):
     dummy = models.IntegerField()
     holder = models.ForeignKey(Holder)
+    readonly = models.CharField("Inner readonly label", max_length=1)
 
 
 class InnerInline(admin.StackedInline):
     model = Inner
     can_delete = False
+    readonly_fields = ('readonly',) # For bug #13174 tests.
 
 
 class Holder2(models.Model):

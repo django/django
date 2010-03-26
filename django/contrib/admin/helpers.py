@@ -140,7 +140,7 @@ class AdminReadonlyField(object):
         if not self.is_first:
             attrs["class"] = "inline"
         name = forms.forms.pretty_name(
-            label_for_field(self.field, self.model_admin.model, self.model_admin)
+            label_for_field(self.field, self.form._meta.model, self.model_admin)
         )
         contents = force_unicode(escape(name)) + u":"
         return mark_safe('<label%(attrs)s>%(contents)s</label>' % {
@@ -232,7 +232,7 @@ class InlineAdminForm(AdminForm):
             self.original_content_type_id = ContentType.objects.get_for_model(original).pk
         self.show_url = original and hasattr(original, 'get_absolute_url')
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields,
-            readonly_fields)
+            readonly_fields, model_admin)
 
     def __iter__(self):
         for name, options in self.fieldsets:
