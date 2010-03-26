@@ -9,9 +9,6 @@ markup syntaxes to HTML; currently there is support for:
       http://www.freewisdom.org/projects/python-markdown
 
     * ReStructuredText, which requires docutils from http://docutils.sf.net/
-
-In each case, if the required library is not installed, the filter will
-silently fail and return the un-marked-up text.
 """
 
 from django import template
