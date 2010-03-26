@@ -173,6 +173,9 @@ class BaseHandler(object):
             request_repr = "Request repr() unavailable"
         message = "%s\n\n%s" % (self._get_traceback(exc_info), request_repr)
         mail_admins(subject, message, fail_silently=True)
+        # If Http500 handler is not installed, re-raise last exception
+        if resolver.urlconf_module is None:
+            raise exc_info[1], None, exc_info[2]
         # Return an HttpResponse that displays a friendly error message.
         callback, param_dict = resolver.resolve500()
         return callback(request, **param_dict)
