@@ -678,42 +678,30 @@ Controls where on the page the actions bar appears. By default, the admin
 changelist displays actions at the top of the page (``actions_on_top = True;
 actions_on_bottom = False``).
 
-.. attribute:: ModelAdmin.change_list_template
+Custom template options
+~~~~~~~~~~~~~~~~~~~~~~~
 
-Path to a custom template that will be used by the model objects "change list"
-view. Templates can override or extend base admin templates as described in
-`Overriding Admin Templates`_.
-
-If you don't specify this attribute, a default template shipped with Django
-that provides the standard appearance is used.
+The `Overriding Admin Templates`_ section describes how to override or extend
+the default admin templates.  Use the following options to override the default
+templates used by the :class:`ModelAdmin` views:
 
 .. attribute:: ModelAdmin.change_form_template
 
-Path to a custom template that will be used by both the model object creation
-and change views. Templates can override or extend base admin templates as
-described in `Overriding Admin Templates`_.
+    Path to a custom template, used by :meth:`change_view`.
 
-If you don't specify this attribute, a default template shipped with Django
-that provides the standard appearance is used.
+.. attribute:: ModelAdmin.change_list_template
 
-.. attribute:: ModelAdmin.object_history_template
-
-Path to a custom template that will be used by the model object change history
-display view. Templates can override or extend base admin templates as
-described in `Overriding Admin Templates`_.
-
-If you don't specify this attribute, a default template shipped with Django
-that provides the standard appearance is used.
+    Path to a custom template, used by :meth:`changelist_view`.
 
 .. attribute:: ModelAdmin.delete_confirmation_template
 
-Path to a custom template that will be used by the view responsible of showing
-the confirmation page when the user decides to delete one or more model
-objects. Templates can override or extend base admin templates as described in
-`Overriding Admin Templates`_.
+    Path to a custom template, used by :meth:`delete_view` for displaying a
+    confirmation page when deleting one or more objects.
 
-If you don't specify this attribute, a default template shipped with Django
-that provides the standard appearance is used.
+.. attribute:: ModelAdmin.object_history_template
+
+    Path to a custom template, used by :meth:`history_view`.
+
 
 .. _model-admin-methods:
 
