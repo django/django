@@ -5,6 +5,7 @@ Various complex queries that have been problematic in the past.
 import datetime
 import pickle
 import sys
+import threading
 
 from django.conf import settings
 from django.db import models, DEFAULT_DB_ALIAS
@@ -44,6 +45,13 @@ class Note(models.Model):
 
     def __unicode__(self):
         return self.note
+
+    def __init__(self, *args, **kwargs):
+        super(Note, self).__init__(*args, **kwargs)
+        # Regression for #13227 -- having an attribute that
+        # is unpickleable doesn't stop you from cloning queries
+        # that use objects of that type as an argument.
+        self.lock = threading.Lock()
 
 class Annotation(models.Model):
     name = models.CharField(max_length=10)
