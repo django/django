@@ -13,7 +13,6 @@ from django.utils.safestring import mark_safe
 from django.utils import formats
 import time
 import datetime
-from django.utils.formats import get_format
 from util import flatatt
 from urlparse import urljoin
 
@@ -214,7 +213,7 @@ class Input(Widget):
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_unicode(formats.localize_input(value))
+            final_attrs['value'] = force_unicode(value)
         return mark_safe(u'<input%s />' % flatatt(final_attrs))
 
 class TextInput(Input):
@@ -319,7 +318,7 @@ class DateInput(Input):
         # formatted by HiddenInput using formats.localize_input, which is not
         # necessarily the format used for this widget. Attempt to convert it.
         try:
-            input_format = get_format('DATE_INPUT_FORMATS')[0]
+            input_format = formats.get_format('DATE_INPUT_FORMATS')[0]
             initial = datetime.date(*time.strptime(initial, input_format)[:3])
         except (TypeError, ValueError):
             pass
@@ -350,7 +349,7 @@ class DateTimeInput(Input):
         # formatted by HiddenInput using formats.localize_input, which is not
         # necessarily the format used for this widget. Attempt to convert it.
         try:
-            input_format = get_format('DATETIME_INPUT_FORMATS')[0]
+            input_format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
             initial = datetime.datetime(*time.strptime(initial, input_format)[:6])
         except (TypeError, ValueError):
             pass
@@ -381,7 +380,7 @@ class TimeInput(Input):
         # formatted by HiddenInput using formats.localize_input, which is not
         # necessarily the format used for this  widget. Attempt to convert it.
         try:
-            input_format = get_format('TIME_INPUT_FORMATS')[0]
+            input_format = formats.get_format('TIME_INPUT_FORMATS')[0]
             initial = datetime.time(*time.strptime(initial, input_format)[3:6])
         except (TypeError, ValueError):
             pass
@@ -771,6 +770,8 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """
     is_hidden = True
 
-    def __init__(self, attrs=None):
-        widgets = (HiddenInput(attrs=attrs), HiddenInput(attrs=attrs))
-        super(SplitDateTimeWidget, self).__init__(widgets, attrs)
+    def __init__(self, attrs=None, date_format=None, time_format=None):
+        super(SplitHiddenDateTimeWidget, self).__init__(attrs, date_format, time_format)
+        for widget in self.widgets:
+            widget.input_type = 'hidden'
+            widget.is_hidden = True

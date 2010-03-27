@@ -259,6 +259,7 @@ error message keys it uses.
 
 ``validators``
 ~~~~~~~~~~~~~~
+
 .. versionadded:: 1.2
 
 .. attribute:: Field.validators
@@ -267,6 +268,20 @@ The ``validators`` argument lets you provide a list of validation functions
 for this field.
 
 See the :ref:`validators documentation <ref-validators>` for more information.
+
+``localize``
+~~~~~~~~~~~~
+
+.. versionadded:: 1.2
+
+.. attribute:: Field.localize
+
+The ``localize`` argument enables the localization of form data, input as well
+as the rendered output.
+
+See the :ref:`format localization <format-localization>` documentation for
+more information.
+
 
 Built-in ``Field`` classes
 --------------------------

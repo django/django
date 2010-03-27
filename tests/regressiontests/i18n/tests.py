@@ -409,7 +409,8 @@ class FormattingTests(TestCase):
             self.assertEqual(localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)), '31.12.2009 06:00:00')
             self.assertEqual(datetime.datetime(2009, 12, 31, 6, 0, 0), form6.cleaned_data['date_added'])
             settings.USE_THOUSAND_SEPARATOR = True
-            self.assert_(u'12.000' in form6.as_ul())
+            # Checking for the localized "products_delivered" field
+            self.assert_(u'<input type="text" name="products_delivered" value="12.000" id="id_products_delivered" />' in form6.as_ul())
         finally:
             deactivate()
 

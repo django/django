@@ -268,6 +268,13 @@ Django uses different formats for different locales when guessing the format
 used by the user when inputting data on forms. Note that Django uses different
 formats for displaying data, and for parsing it.
 
+To enable a form field to localize input and output data simply use its
+``localize`` argument::
+
+    class CashRegisterForm(forms.Form):
+       product = forms.CharField()
+       revenue = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
+
 Creating custom format files
 ----------------------------
 
