@@ -488,7 +488,7 @@ Using the JavaScript translation catalog
 
 To use the catalog, just pull in the dynamically generated script like this::
 
-    <script type="text/javascript" src={% url django.views.i18n.javascript_catalog %}"></script>
+    <script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
 
 This uses reverse URL lookup to find the URL of the JavaScript catalog view.
 When the catalog is loaded, your JavaScript code can use the standard
