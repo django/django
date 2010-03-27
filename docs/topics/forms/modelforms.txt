@@ -369,7 +369,7 @@ Overriding the default field types or widgets
 The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
 want that to be represented as a ``DateField`` in your form. But
-``ModelForm`` gives you the flexibility of changing the form field type and 
+``ModelForm`` gives you the flexibility of changing the form field type and
 widget for a given model field.
 
 To specify a custom widget for a field, use the ``widgets`` attribute of the
@@ -401,7 +401,7 @@ field, you could do the following::
 
     class ArticleForm(ModelForm):
         pub_date = MyDateFormField()
-    
+
         class Meta:
             model = Article
 
@@ -557,7 +557,7 @@ with the ``Author`` model. It works just like a regular formset::
 
     >>> formset = AuthorFormSet()
     >>> print formset
-    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS" /><input type="hidden" name="form-MAX_NUM_FORMS" value="0" id="id_form-MAX_NUM_FORMS" />
+    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS" /><input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS" />
     <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" /></td></tr>
     <tr><th><label for="id_form-0-title">Title:</label></th><td><select name="form-0-title" id="id_form-0-title">
     <option value="" selected="selected">---------</option>
@@ -653,22 +653,24 @@ are saved properly.
 Limiting the number of editable objects
 ---------------------------------------
 
+.. versionchanged:: 1.2
+
 As with regular formsets, you can use the ``max_num`` parameter to
-``modelformset_factory`` to limit the number of forms displayed. With
-model formsets, this property limits the query to select only the maximum
-number of objects needed::
+``modelformset_factory`` to limit the number of extra forms displayed.
+
+``max_num`` does not prevent existing objects from being displayed::
 
     >>> Author.objects.order_by('name')
     [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
 
-    >>> AuthorFormSet = modelformset_factory(Author, max_num=2, extra=1)
+    >>> AuthorFormSet = modelformset_factory(Author, max_num=1)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
-    >>> formset.initial
-    [{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
+    >>> [x.name for x in formset.get_queryset()]
+    [u'Charles Baudelaire', u'Paul Verlaine', u'Walt Whitman']
 
-If the value of ``max_num`` is higher than the number of objects returned, up to
-``extra`` additional blank forms will be added to the formset, so long as the
-total number of forms does not exceed ``max_num``::
+If the value of ``max_num`` is geater than the number of existing related
+objects, up to ``extra`` additional blank forms will be added to the formset,
+so long as the total number of forms does not exceed ``max_num``::
 
     >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=2)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
@@ -678,6 +680,11 @@ total number of forms does not exceed ``max_num``::
     <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100" /><input type="hidden" name="form-1-id" value="3" id="id_form-1-id" /></td></tr>
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
     <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
+
+.. versionchanged:: 1.2
+
+A ``max_num`` value of ``None`` (the default) puts no limit on the number of
+forms displayed.
 
 Using a model formset in a view
 -------------------------------

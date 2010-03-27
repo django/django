@@ -919,7 +919,7 @@ ImproperlyConfigured: 'ValidationTestInline.extra' should be a integer.
 >>> validate(ValidationTestModelAdmin, ValidationTestModel)
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: 'ValidationTestInline.max_num' should be a integer.
+ImproperlyConfigured: 'ValidationTestInline.max_num' should be an integer or None (default).
 
 >>> class ValidationTestInline(TabularInline):
 ...     model = ValidationTestInlineModel

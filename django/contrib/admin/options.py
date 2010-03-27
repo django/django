@@ -1179,7 +1179,7 @@ class InlineModelAdmin(BaseModelAdmin):
     fk_name = None
     formset = BaseInlineFormSet
     extra = 3
-    max_num = 0
+    max_num = None
     template = None
     verbose_name = None
     verbose_name_plural = None

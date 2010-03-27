@@ -20,7 +20,7 @@ but we'll look at how to do so later.
 
 >>> formset = ChoiceFormSet(auto_id=False, prefix='choices')
 >>> print formset
-<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" /></td></tr>
 <tr><th>Votes:</th><td><input type="text" name="choices-0-votes" /></td></tr>
 

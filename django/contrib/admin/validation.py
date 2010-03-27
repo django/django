@@ -170,11 +170,15 @@ def validate_inline(cls, parent, parent_model):
     fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
 
     # extra = 3
-    # max_num = 0
-    for attr in ('extra', 'max_num'):
-        if not isinstance(getattr(cls, attr), int):
-            raise ImproperlyConfigured("'%s.%s' should be a integer."
-                    % (cls.__name__, attr))
+    if not isinstance(getattr(cls, 'extra'), int):
+        raise ImproperlyConfigured("'%s.extra' should be a integer."
+                % cls.__name__)
+
+    # max_num = None
+    max_num = getattr(cls, 'max_num', None)
+    if max_num is not None and not isinstance(max_num, int):
+        raise ImproperlyConfigured("'%s.max_num' should be an integer or None (default)."
+                % cls.__name__)
 
     # formset
     if hasattr(cls, 'formset') and not issubclass(cls.formset, BaseModelFormSet):

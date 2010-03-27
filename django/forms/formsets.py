@@ -25,7 +25,7 @@ class ManagementForm(Form):
     def __init__(self, *args, **kwargs):
         self.base_fields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
         self.base_fields[INITIAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
-        self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(widget=HiddenInput)
+        self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
 
 class BaseFormSet(StrAndUnicode):
@@ -69,8 +69,13 @@ class BaseFormSet(StrAndUnicode):
         if self.data or self.files:
             return self.management_form.cleaned_data[TOTAL_FORM_COUNT]
         else:
-            total_forms = self.initial_form_count() + self.extra
-            if total_forms > self.max_num > 0:
+            initial_forms = self.initial_form_count()
+            total_forms = initial_forms + self.extra
+            # Allow all existing related objects/inlines to be displayed,
+            # but don't allow extra beyond max_num.
+            if initial_forms > self.max_num >= 0:
+                total_forms = initial_forms
+            elif total_forms > self.max_num >= 0:
                 total_forms = self.max_num
         return total_forms
 
@@ -81,7 +86,7 @@ class BaseFormSet(StrAndUnicode):
         else:
             # Use the length of the inital data if it's there, 0 otherwise.
             initial_forms = self.initial and len(self.initial) or 0
-            if initial_forms > self.max_num > 0:
+            if initial_forms > self.max_num >= 0:
                 initial_forms = self.max_num
         return initial_forms
 
@@ -324,7 +329,7 @@ class BaseFormSet(StrAndUnicode):
         return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
-                    can_delete=False, max_num=0):
+                    can_delete=False, max_num=None):
     """Return a FormSet for the given form class."""
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,

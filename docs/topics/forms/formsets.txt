@@ -71,7 +71,7 @@ Limiting the maximum number of forms
 ------------------------------------
 
 The ``max_num`` parameter to ``formset_factory`` gives you the ability to
-force the maximum number of forms the formset will display::
+limit the maximum number of empty forms the formset will display::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
     >>> formset = ArticleFormset()
@@ -80,8 +80,20 @@ force the maximum number of forms the formset will display::
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-A ``max_num`` value of ``0`` (the default) puts no limit on the number forms
-displayed.
+.. versionchanged:: 1.2
+
+If the value of ``max_num`` is geater than the number of existing related
+objects, up to ``extra`` additional blank forms will be added to the formset,
+so long as the total number of forms does not exceed ``max_num``.
+
+A ``max_num`` value of ``None`` (the default) puts no limit on the number of
+forms displayed. Please note that the default value of ``max_num`` was changed
+from ``0`` to ``None`` in version 1.2 to allow ``0`` as a valid value.
+
+.. versionadded:: 1.2
+
+The dynamic "Add Another" link in the Django admin will not appear if
+``max_num`` is less than the number of currently displayed forms.
 
 Formset validation
 ------------------
@@ -102,7 +114,7 @@ provide an invalid article::
     >>> data = {
     ...     'form-TOTAL_FORMS': u'2',
     ...     'form-INITIAL_FORMS': u'0',
-    ...     'form-MAX_NUM_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Test',
     ...     'form-0-pub_date': u'16 June 1904',
     ...     'form-1-title': u'Test',
@@ -190,7 +202,7 @@ is where you define your own validation that works at the formset level::
     >>> data = {
     ...     'form-TOTAL_FORMS': u'2',
     ...     'form-INITIAL_FORMS': u'0',
-    ...     'form-MAX_NUM_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Test',
     ...     'form-0-pub_date': u'16 June 1904',
     ...     'form-1-title': u'Test',
@@ -249,7 +261,7 @@ happen when the user changes these values::
     >>> data = {
     ...     'form-TOTAL_FORMS': u'3',
     ...     'form-INITIAL_FORMS': u'2',
-    ...     'form-MAX_NUM_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Article #1',
     ...     'form-0-pub_date': u'2008-05-10',
     ...     'form-0-ORDER': u'2',
@@ -287,7 +299,7 @@ Lets create a formset with the ability to delete::
     ... ])
     >>> for form in formset.forms:
     ....    print form.as_table()
-    <input type="hidden" name="form-TOTAL_FORMS" value="3" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="2" id="id_form-INITIAL_FORMS" /><input type="hidden" name="form-MAX_NUM_FORMS" value="0" id="id_form-MAX_NUM_FORMS" />
+    <input type="hidden" name="form-TOTAL_FORMS" value="3" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="2" id="id_form-INITIAL_FORMS" /><input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS" />
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
     <tr><th><label for="id_form-0-DELETE">Delete:</label></th><td><input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE" /></td></tr>
@@ -305,7 +317,7 @@ delete fields you can access them with ``deleted_forms``::
     >>> data = {
     ...     'form-TOTAL_FORMS': u'3',
     ...     'form-INITIAL_FORMS': u'2',
-    ...     'form-MAX_NUM_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Article #1',
     ...     'form-0-pub_date': u'2008-05-10',
     ...     'form-0-DELETE': u'on',
