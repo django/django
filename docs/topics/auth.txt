@@ -821,7 +821,7 @@ the following line to your URLconf::
     :ref:`authentication-backends`) you can pass a custom authentication form
     to the login view via the ``authentication_form`` parameter. This form must
     accept a ``request`` keyword argument in its ``__init__`` method, and
-    provide a ``get_user`` argument which returns the authenticated user object
+    provide a ``get_user`` method which returns the authenticated user object
     (this method is only ever called after successful form validation).
 
     .. _forms documentation: ../forms/
