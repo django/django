@@ -52,12 +52,12 @@
 			}
 			addButton.click(function() {
 				var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
-				var nextIndex = parseInt(totalForms.val()) + 1;
+				var nextIndex = parseInt(totalForms.val());
 				var template = $("#" + options.prefix + "-empty");
 				var row = template.clone(true).get(0);
 				$(row).removeClass(options.emptyCssClass).removeAttr("id").insertBefore($(template));
 				$(row).html($(row).html().replace(/__prefix__/g, nextIndex));
-				$(row).addClass(options.formCssClass).attr("id", options.prefix + nextIndex);
+				$(row).addClass(options.formCssClass).attr("id", options.prefix + (nextIndex + 1));
 				if ($(row).is("TR")) {
 					// If the forms are laid out in table rows, insert
 					// the remove button into the last table cell:
@@ -75,7 +75,7 @@
 					updateElementIndex(this, options.prefix, totalForms.val());
 				});
 				// Update number of total forms
-				$(totalForms).val(nextIndex);
+				$(totalForms).val(nextIndex + 1);
 				// Hide add button in case we've hit the max, except we want to add infinitely
 				if ((maxForms.val() != 0) && (maxForms.val() <= totalForms.val())) {
 					addButton.parent().hide();
