@@ -88,8 +88,8 @@ class RelatedField(object):
     def contribute_to_class(self, cls, name):
         sup = super(RelatedField, self)
 
-        # Add an accessor to allow easy determination of the related query path for this field
-        self.related_query_name = curry(self._get_related_query_name, cls._meta)
+        # Store the opts for related_query_name()
+        self.opts = cls._meta
 
         if hasattr(sup, 'contribute_to_class'):
             sup.contribute_to_class(cls, name)
@@ -198,12 +198,12 @@ class RelatedField(object):
             v = v[0]
         return v
 
-    def _get_related_query_name(self, opts):
+    def related_query_name(self):
         # This method defines the name that can be used to identify this
         # related object in a table-spanning query. It uses the lower-cased
         # object_name by default, but this can be overridden with the
         # "related_name" option.
-        return self.rel.related_name or opts.object_name.lower()
+        return self.rel.related_name or self.opts.object_name.lower()
 
 class SingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object

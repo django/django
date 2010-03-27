@@ -1,8 +1,11 @@
 """
 Internationalization support.
 """
-from django.utils.functional import lazy
+from django.conf import settings
 from django.utils.encoding import force_unicode
+from django.utils.functional import lazy, curry
+from django.utils.translation import trans_real, trans_null
+
 
 __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
         'ngettext_lazy', 'string_concat', 'activate', 'deactivate',
@@ -19,32 +22,23 @@ __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
 # replace the functions with their real counterparts (once we do access the
 # settings).
 
-def delayed_loader(*args, **kwargs):
+def delayed_loader(real_name, *args, **kwargs):
     """
-    Replace each real_* function with the corresponding function from either
-    trans_real or trans_null (e.g. real_gettext is replaced with
-    trans_real.gettext or trans_null.gettext). This function is run once, the
-    first time any i18n method is called. It replaces all the i18n methods at
-    once at that time.
+    Call the real, underlying function.  We have a level of indirection here so
+    that modules can use the translation bits without actually requiring
+    Django's settings bits to be configured before import.
     """
-    import traceback
-    from django.conf import settings
     if settings.USE_I18N:
-        import trans_real as trans
+        trans = trans_real
     else:
-        import trans_null as trans
-    caller = traceback.extract_stack(limit=2)[0][2]
-    g = globals()
-    for name in __all__:
-        if hasattr(trans, name):
-            g['real_%s' % name] = getattr(trans, name)
+        trans = trans_null
 
     # Make the originally requested function call on the way out the door.
-    return g['real_%s' % caller](*args, **kwargs)
+    return getattr(trans, real_name)(*args, **kwargs)
 
 g = globals()
 for name in __all__:
-    g['real_%s' % name] = delayed_loader
+    g['real_%s' % name] = curry(delayed_loader, name)
 del g, delayed_loader
 
 def gettext_noop(message):
@@ -102,10 +96,10 @@ def templatize(src):
 def deactivate_all():
     return real_deactivate_all()
 
-def string_concat(*strings):
+def _string_concat(*strings):
     """
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.
     """
     return u''.join([force_unicode(s) for s in strings])
-string_concat = lazy(string_concat, unicode)
+string_concat = lazy(_string_concat, unicode)

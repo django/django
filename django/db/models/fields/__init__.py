@@ -119,34 +119,6 @@ class Field(object):
         messages.update(error_messages or {})
         self.error_messages = messages
 
-    def __getstate__(self):
-        """
-        Pickling support.
-        """
-        from django.utils.functional import Promise
-        obj_dict = self.__dict__.copy()
-        items = []
-        translated_keys = []
-        for k, v in self.error_messages.items():
-            if isinstance(v, Promise):
-                args = getattr(v, '_proxy____args', None)
-                if args:
-                    translated_keys.append(k)
-                    v = args[0]
-            items.append((k,v))
-        obj_dict['_translated_keys'] = translated_keys
-        obj_dict['error_messages'] = dict(items)
-        return obj_dict
-
-    def __setstate__(self, obj_dict):
-        """
-        Unpickling support.
-        """
-        translated_keys = obj_dict.pop('_translated_keys')
-        self.__dict__.update(obj_dict)
-        for k in translated_keys:
-            self.error_messages[k] = _(self.error_messages[k])
-
     def __cmp__(self, other):
         # This is needed because bisect does not take a comparison function.
         return cmp(self.creation_counter, other.creation_counter)

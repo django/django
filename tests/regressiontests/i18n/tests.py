@@ -46,7 +46,6 @@ class TranslationTests(TestCase):
         unicode(string_concat(...)) should not raise a TypeError - #4796
         """
         import django.utils.translation
-        self.assertEqual(django.utils.translation, reload(django.utils.translation))
         self.assertEqual(u'django', unicode(django.utils.translation.string_concat("dja", "ngo")))
 
     def test_safe_status(self):
