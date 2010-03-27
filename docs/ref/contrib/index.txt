@@ -118,7 +118,7 @@ gis
 A world-class geospatial framework built on top of Django, that enables
 storage, manipulation and display of spatial data.
 
-See the :ref:`ref-contrib-gis` documentation for more. 
+See the :ref:`ref-contrib-gis` documentation for more.
 
 humanize
 ========
@@ -143,22 +143,27 @@ markup
 
 A collection of template filters that implement common markup languages:
 
-    * ``textile`` -- implements `Textile`_
-    * ``markdown`` -- implements `Markdown`_
+    * ``textile`` -- implements `Textile`_ -- requires `PyTextile`_
+    * ``markdown`` -- implements `Markdown`_ -- requires `Python-markdown`_
     * ``restructuredtext`` -- implements `ReST (ReStructured Text)`_
+      -- requires `doc-utils`_
 
 In each case, the filter expects formatted markup as a string and returns a
 string representing the marked-up text. For example, the ``textile`` filter
 converts text that is marked-up in Textile format to HTML.
 
 To activate these filters, add ``'django.contrib.markup'`` to your
-:setting:`INSTALLED_APPS` setting. Once you've done that, use ``{% load markup %}`` in
-a template, and you'll have access to these filters. For more documentation,
-read the source code in django/contrib/markup/templatetags/markup.py.
+:setting:`INSTALLED_APPS` setting. Once you've done that, use
+``{% load markup %}`` in a template, and you'll have access to these filters.
+For more documentation, read the source code in
+:file:`django/contrib/markup/templatetags/markup.py`.
 
 .. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
 .. _Markdown: http://en.wikipedia.org/wiki/Markdown
 .. _ReST (ReStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
+.. _PyTextile: http://loopcore.com/python-textile/
+.. _Python-markdown: http://www.freewisdom.org/projects/python-markdown
+.. _doc-utils: http://docutils.sf.net/
 
 messages
 ========
