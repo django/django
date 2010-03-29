@@ -245,7 +245,11 @@ class GeoQuery(sql.Query):
             # Running through Oracle's first.
             value = super(GeoQuery, self).convert_values(value, field or GeomField())
 
-        if isinstance(field, DistanceField):
+        if value is None:
+            # Output from spatial function is NULL (e.g., called
+            # function on a geometry field with NULL value).
+            pass
+        elif isinstance(field, DistanceField):
             # Using the field's distance attribute, can instantiate
             # `Distance` with the right context.
             value = Distance(**{field.distance_att : value})

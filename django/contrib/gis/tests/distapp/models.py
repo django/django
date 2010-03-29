@@ -26,11 +26,12 @@ class CensusZipcode(models.Model):
     name = models.CharField(max_length=5)
     poly = models.PolygonField(srid=4269)
     objects = models.GeoManager()
+    def __unicode__(self): return self.name
 
 class SouthTexasZipcode(models.Model):
     "Model for a few South Texas ZIP codes."
     name = models.CharField(max_length=5)
-    poly = models.PolygonField(srid=32140)
+    poly = models.PolygonField(srid=32140, null=True)
     objects = models.GeoManager()
     def __unicode__(self): return self.name
 
