@@ -48,11 +48,11 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.libgdal import GEOJSON, GDAL_VERSION
 from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 
 # Getting the ctypes prototype functions that interface w/the GDAL C library.
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
-GEOJSON = capi.GEOJSON
 
 # For recognizing geometry input.
 from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
@@ -400,7 +400,8 @@ class OGRGeometry(GDALBase):
         # afterwards.  This is done because of GDAL bug (in versions prior
         # to 1.7) that turns geometries 3D after transformation, see:
         #  http://trac.osgeo.org/gdal/changeset/17792
-        orig_dim = self.coord_dim
+        if GDAL_VERSION < (1, 7):
+            orig_dim = self.coord_dim
 
         # Depending on the input type, use the appropriate OGR routine
         # to perform the transformation.
@@ -412,11 +413,22 @@ class OGRGeometry(GDALBase):
             sr = SpatialReference(coord_trans)
             capi.geom_transform_to(self.ptr, sr.ptr)
         else:
-            raise TypeError('Transform only accepts CoordTransform, SpatialReference, string, and integer objects.')
+            raise TypeError('Transform only accepts CoordTransform, '
+                            'SpatialReference, string, and integer objects.')
 
         # Setting with original dimension, see comment above.
-        if self.coord_dim != orig_dim:
-            self.coord_dim = orig_dim
+        if GDAL_VERSION < (1, 7):
+            if isinstance(self, GeometryCollection):
+                # With geometry collections have to set dimension on
+                # each internal geometry reference, as the collection
+                # dimension isn't affected.
+                for i in xrange(len(self)):
+                    internal_ptr = capi.get_geom_ref(self.ptr, i)
+                    if orig_dim != capi.get_coord_dim(internal_ptr):
+                        capi.set_coord_dim(internal_ptr, orig_dim)
+            else:
+                if self.coord_dim != orig_dim:
+                    self.coord_dim = orig_dim
 
     def transform_to(self, srs):
         "For backwards-compatibility."
