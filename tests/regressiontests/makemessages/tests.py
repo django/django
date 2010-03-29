@@ -37,3 +37,4 @@ if xgettext_cmd:
         xversion = (int(match.group('major')), int(match.group('minor')))
         if xversion >= (0, 15):
             from extraction import *
+    del p
