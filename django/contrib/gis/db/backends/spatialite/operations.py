@@ -8,6 +8,7 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.base import DatabaseOperations
+from django.db.utils import DatabaseError
 
 class SpatiaLiteOperator(SpatialOperation):
     "For SpatiaLite operators (e.g. `&&`, `~`)."
@@ -115,9 +116,9 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         try:
             vtup = self.spatialite_version_tuple()
             version = vtup[1:]
-            if version < (2, 3, 1):
+            if version < (2, 3, 0):
                 raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions '
-                                           '2.3.1 and above')
+                                           '2.3.0 and above')
             self.spatial_version = version
         except ImproperlyConfigured:
             raise
@@ -203,12 +204,13 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
 
     def _get_spatialite_func(self, func):
         """
-        Helper routine for calling PostGIS functions and returning their result.
+        Helper routine for calling SpatiaLite functions and returning
+        their result.
         """
         cursor = self.connection._cursor()
         try:
             try:
-                cursor.execute('SELECT %s()' % func)
+                cursor.execute('SELECT %s' % func)
                 row = cursor.fetchone()
             except:
                 # Responsibility of caller to perform error handling.
@@ -219,25 +221,39 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
 
     def geos_version(self):
         "Returns the version of GEOS used by SpatiaLite as a string."
-        return self._get_spatialite_func('geos_version')
+        return self._get_spatialite_func('geos_version()')
 
     def proj4_version(self):
         "Returns the version of the PROJ.4 library used by SpatiaLite."
-        return self._get_spatialite_func('proj4_version')
+        return self._get_spatialite_func('proj4_version()')
 
     def spatialite_version(self):
         "Returns the SpatiaLite library version as a string."
-        return self._get_spatialite_func('spatialite_version')
+        return self._get_spatialite_func('spatialite_version()')
 
     def spatialite_version_tuple(self):
         """
         Returns the SpatiaLite version as a tuple (version string, major,
         minor, subminor).
         """
-        # Getting the PostGIS version
-        version = self.spatialite_version()
-        m = self.version_regex.match(version)
+        # Getting the SpatiaLite version.
+        try:
+            version = self.spatialite_version()
+        except DatabaseError:
+            # The `spatialite_version` function first appeared in version 2.3.1
+            # of SpatiaLite, so doing a fallback test for 2.3.0 (which is
+            # used by popular Debian/Ubuntu packages).
+            version = None
+            try:
+                tmp = self._get_spatialite_func("X(GeomFromText('POINT(1 1)'))")
+                if tmp == 1.0: version = '2.3.0'
+            except DatabaseError:
+                pass
+            # If no version string defined, then just re-raise the original
+            # exception.
+            if version is None: raise
 
+        m = self.version_regex.match(version)
         if m:
             major = int(m.group('major'))
             minor1 = int(m.group('minor1'))
