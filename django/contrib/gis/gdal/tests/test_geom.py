@@ -125,7 +125,7 @@ class OGRGeomTest(unittest.TestCase):
             self.assertEqual(mgeom1, mgeom3)
             self.assertEqual(mp.points, mgeom2.tuple)
             self.assertEqual(mp.n_p, mgeom2.point_count)
-                                                                            
+
     def test04_linestring(self):
         "Testing LineString objects."
         prev = OGRGeometry('POINT(0 0)')
@@ -161,7 +161,7 @@ class OGRGeomTest(unittest.TestCase):
             for ls in mlinestr:
                 self.assertEqual(2, ls.geom_type)
                 self.assertEqual('LINESTRING', ls.geom_name)
-            self.assertRaises(OGRIndexError, mlinestr.__getitem__, len(mlinestr)) 
+            self.assertRaises(OGRIndexError, mlinestr.__getitem__, len(mlinestr))
 
     def test06_linearring(self):
         "Testing LinearRing objects."
@@ -179,7 +179,7 @@ class OGRGeomTest(unittest.TestCase):
         "Testing Polygon objects."
 
         # Testing `from_bbox` class method
-        bbox =  (-180,-90,180,90) 
+        bbox =  (-180,-90,180,90)
         p = OGRGeometry.from_bbox( bbox )
         self.assertEqual(bbox, p.extent)
 
@@ -200,13 +200,13 @@ class OGRGeomTest(unittest.TestCase):
             # Testing equivalence
             self.assertEqual(True, poly == OGRGeometry(p.wkt))
             self.assertEqual(True, poly != prev)
-            
+
             if p.ext_ring_cs:
                 ring = poly[0]
                 self.assertEqual(p.ext_ring_cs, ring.tuple)
                 self.assertEqual(p.ext_ring_cs, poly[0].tuple)
                 self.assertEqual(len(p.ext_ring_cs), ring.point_count)
-            
+
             for r in poly:
                 self.assertEqual('LINEARRING', r.geom_name)
 
@@ -258,11 +258,11 @@ class OGRGeomTest(unittest.TestCase):
             sr = SpatialReference('WGS84')
             mpoly = OGRGeometry(mp.wkt, sr)
             self.assertEqual(sr.wkt, mpoly.srs.wkt)
-          
+
             # Ensuring that SRS is propagated to clones.
             klone = mpoly.clone()
             self.assertEqual(sr.wkt, klone.srs.wkt)
-  
+
             # Ensuring all children geometries (polygons and their rings) all
             # return the assigned spatial reference as well.
             for poly in mpoly:
@@ -284,7 +284,7 @@ class OGRGeomTest(unittest.TestCase):
             mpoly.srs = SpatialReference(4269)
             self.assertEqual(4269, mpoly.srid)
             self.assertEqual('NAD83', mpoly.srs.name)
-          
+
             # Incrementing through the multipolyogn after the spatial reference
             # has been re-assigned.
             for poly in mpoly:
@@ -330,7 +330,7 @@ class OGRGeomTest(unittest.TestCase):
         "Testing coordinate dimension is the same on transformed geometries."
         ls_orig = OGRGeometry('LINESTRING(-104.609 38.255)', 4326)
         ls_trans = OGRGeometry('LINESTRING(992385.4472045 481455.4944650)', 2774)
-        
+
         prec = 3
         ls_orig.transform(ls_trans.srs)
         # Making sure the coordinate dimension is still 2D.
@@ -377,7 +377,7 @@ class OGRGeomTest(unittest.TestCase):
             self.assertEqual(d1, a ^ b) # __xor__ is symmetric difference operator
             a ^= b # testing __ixor__
             self.assertEqual(d1, a)
-            
+
     def test13_union(self):
         "Testing union()."
         for i in xrange(len(topology_geoms)):
@@ -435,6 +435,31 @@ class OGRGeomTest(unittest.TestCase):
         self.assertEqual('LineString25D', ls_25d.geom_type.name)
         self.assertEqual([1.0, 2.0, 3.0], ls_25d.z)
         self.assertEqual(3, ls_25d.coord_dim)
+
+    def test18_ogrgeometry_transform_workaround(self):
+        "Testing coordinate dimensions on geometries after transformation."
+        # A bug in GDAL versions prior to 1.7 changes the coordinate
+        # dimension of a geometry after it has been transformed.
+        # This test ensures that the bug workarounds employed within
+        # `OGRGeometry.transform` indeed work.
+        wkt_2d = "MULTILINESTRING ((0 0,1 1,2 2))"
+        wkt_3d = "MULTILINESTRING ((0 0 0,1 1 1,2 2 2))"
+        srid = 4326
+
+        # For both the 2D and 3D MultiLineString, ensure _both_ the dimension
+        # of the collection and the component LineString have the expected
+        # coordinate dimension after transform.
+        geom = OGRGeometry(wkt_2d, srid)
+        geom.transform(srid)
+        self.assertEqual(2, geom.coord_dim)
+        self.assertEqual(2, geom[0].coord_dim)
+        self.assertEqual(wkt_2d, geom.wkt)
+
+        geom = OGRGeometry(wkt_3d, srid)
+        geom.transform(srid)
+        self.assertEqual(3, geom.coord_dim)
+        self.assertEqual(3, geom[0].coord_dim)
+        self.assertEqual(wkt_3d, geom.wkt)
 
 def suite():
     s = unittest.TestSuite()
