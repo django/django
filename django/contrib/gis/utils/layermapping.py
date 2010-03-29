@@ -290,7 +290,8 @@ class LayerMapping(object):
                 # Making sure that the OGR Layer's Geometry is compatible.
                 ltype = self.layer.geom_type
                 if not (gtype == ltype or self.make_multi(ltype, model_field)):
-                    raise LayerMapError('Invalid mapping geometry; model has %s, feature has %s.' % (fld_name, gtype))
+                    raise LayerMapError('Invalid mapping geometry; model has %s, '
+                                        'layer geometry type is %s.' % (fld_name, ltype))
 
                 # Setting the `geom_field` attribute w/the name of the model field
                 # that is a Geometry.
