@@ -198,6 +198,14 @@ class OGRGeometry(GDALBase):
 
     def _get_coord_dim(self):
         "Returns the coordinate dimension of the Geometry."
+        if isinstance(self, GeometryCollection) and GDAL_VERSION < (1, 5, 2):
+            # On GDAL versions prior to 1.5.2, there exists a bug in which
+            # the coordinate dimension of geometry collections is always 2:
+            #   http://trac.osgeo.org/gdal/ticket/2334
+            # Here we workaround by returning the coordinate dimension of the
+            # first geometry in the collection instead.
+            if len(self):
+                return capi.get_coord_dim(capi.get_geom_ref(self.ptr, 0))
         return capi.get_coord_dim(self.ptr)
 
     def _set_coord_dim(self, dim):
