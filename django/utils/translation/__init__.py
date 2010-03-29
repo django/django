@@ -1,10 +1,8 @@
 """
 Internationalization support.
 """
-from django.conf import settings
 from django.utils.encoding import force_unicode
 from django.utils.functional import lazy, curry
-from django.utils.translation import trans_real, trans_null
 
 
 __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
@@ -28,10 +26,11 @@ def delayed_loader(real_name, *args, **kwargs):
     that modules can use the translation bits without actually requiring
     Django's settings bits to be configured before import.
     """
+    from django.conf import settings
     if settings.USE_I18N:
-        trans = trans_real
+        from django.utils.translation import trans_real as trans
     else:
-        trans = trans_null
+        from django.utils.translation import trans_null as trans
 
     # Make the originally requested function call on the way out the door.
     return getattr(trans, real_name)(*args, **kwargs)
