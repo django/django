@@ -362,6 +362,17 @@ class DistanceTest(unittest.TestCase):
         for i, c in enumerate(SouthTexasCity.objects.perimeter(model_att='perim')):
             self.assertEqual(0, c.perim.m)
 
+    def test09_measurement_null_fields(self):
+        "Testing the measurement GeoQuerySet methods on fields with NULL values."
+        # Creating SouthTexasZipcode w/NULL value.
+        SouthTexasZipcode.objects.create(name='78212')
+        # Performing distance/area queries against the NULL PolygonField,
+        # and ensuring the result of the operations is None.
+        htown = SouthTexasCity.objects.get(name='Downtown Houston')
+        z = SouthTexasZipcode.objects.distance(htown.point).area().get(name='78212')
+        self.assertEqual(None, z.distance)
+        self.assertEqual(None, z.area)
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(DistanceTest))
