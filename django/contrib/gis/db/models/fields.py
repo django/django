@@ -241,7 +241,8 @@ class GeometryField(Field):
 
             return params
         else:
-            raise TypeError("Field has invalid lookup: %s" % lookup_type)
+            raise ValueError('%s is not a valid spatial lookup for %s.' %
+                             (lookup_type, self.__class__.__name__))
 
     def get_prep_lookup(self, lookup_type, value):
         if lookup_type == 'isnull':
