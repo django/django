@@ -904,7 +904,7 @@ Returns an absolute URL (i.e., a URL without the domain name) matching a given
 view function and optional parameters. This is a way to output links without
 violating the DRY principle by having to hard-code URLs in your templates::
 
-    {% url path.to.some_view v1,v2 %}
+    {% url path.to.some_view v1 v2 %}
 
 The first argument is a path to a view function in the format
 ``package.package.module.function``. Additional arguments are optional and
@@ -912,7 +912,7 @@ should be comma-separated values that will be used as arguments in the URL.
 The example above shows passing positional arguments. Alternatively you may
 use keyword syntax::
 
-    {% url path.to.some_view arg1=v1,arg2=v2 %}
+    {% url path.to.some_view arg1=v1 arg2=v2 %}
 
 Do not mix both positional and keyword syntax in a single call. All arguments
 required by the URLconf should be present.
@@ -954,7 +954,7 @@ If you'd like to retrieve a URL without displaying it, you can use a slightly
 different call::
 
 
-    {% url path.to.view arg, arg2 as the_url %}
+    {% url path.to.view arg arg2 as the_url %}
 
     <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
 
@@ -975,6 +975,20 @@ If you'd like to retrieve a namespaced URL, specify the fully qualified name::
 This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
+
+.. versionchanged:: 1.2
+
+For backwards compatibility, the ``{% url %}`` tag also supports the
+use of commas to separate arguments. You shouldn't use this in any new
+projects, but for the sake of the people who are still using it,
+here's what it looks like::
+
+    {% url path.to.view arg,arg2 %}
+    {% url path.to.view arg, arg2 %}
+
+This syntax doesn't support the use of literal commas, or or equals
+signs. Did we mention you shouldn't use this syntax in any new
+projects?
 
 .. templatetag:: widthratio
 

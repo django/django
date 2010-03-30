@@ -205,20 +205,20 @@ class Templates(unittest.TestCase):
 
     def test_extends_include_missing_baseloader(self):
         """
-        Tests that the correct template is identified as not existing 
-        when {% extends %} specifies a template that does exist, but 
+        Tests that the correct template is identified as not existing
+        when {% extends %} specifies a template that does exist, but
         that template has an {% include %} of something that does not
         exist. See #12787.
         """
 
-        # TEMPLATE_DEBUG must be true, otherwise the exception raised 
+        # TEMPLATE_DEBUG must be true, otherwise the exception raised
         # during {% include %} processing will be suppressed.
         old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
-            # Test the base loader class via the app loader. load_template 
-            # from base is used by all shipped loaders excepting cached, 
+            # Test the base loader class via the app loader. load_template
+            # from base is used by all shipped loaders excepting cached,
             # which has its own test.
             loader.template_source_loaders = (app_directories.Loader(),)
 
@@ -237,7 +237,7 @@ class Templates(unittest.TestCase):
 
     def test_extends_include_missing_cachedloader(self):
         """
-        Same as test_extends_include_missing_baseloader, only tests 
+        Same as test_extends_include_missing_baseloader, only tests
         behavior of the cached loader instead of BaseLoader.
         """
 
@@ -1173,9 +1173,15 @@ class Templates(unittest.TestCase):
 
             ### URL TAG ########################################################
             # Successes
+            'legacyurl02': ('{% url regressiontests.templates.views.client_action id=client.id,action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'legacyurl02a': ('{% url regressiontests.templates.views.client_action client.id,"update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'legacyurl10': ('{% url regressiontests.templates.views.client_action id=client.id,action="two words" %}', {'client': {'id': 1}}, '/url_tag/client/1/two%20words/'),
+            'legacyurl13': ('{% url regressiontests.templates.views.client_action id=client.id, action=arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
+            'legacyurl14': ('{% url regressiontests.templates.views.client_action client.id, arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
+
             'url01': ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
-            'url02': ('{% url regressiontests.templates.views.client_action id=client.id,action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
-            'url02a': ('{% url regressiontests.templates.views.client_action client.id,"update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'url02': ('{% url regressiontests.templates.views.client_action id=client.id action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'url02a': ('{% url regressiontests.templates.views.client_action client.id "update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
             'url03': ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
             'url04': ('{% url named.client client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
             'url05': (u'{% url метка_оператора v %}', {'v': u'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
@@ -1183,10 +1189,12 @@ class Templates(unittest.TestCase):
             'url07': (u'{% url regressiontests.templates.views.client2 tag=v %}', {'v': u'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
             'url08': (u'{% url метка_оператора v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
             'url09': (u'{% url метка_оператора_2 tag=v %}', {'v': 'Ω'}, '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
-            'url10': ('{% url regressiontests.templates.views.client_action id=client.id,action="two words" %}', {'client': {'id': 1}}, '/url_tag/client/1/two%20words/'),
-            'url11': ('{% url regressiontests.templates.views.client_action id=client.id,action="==" %}', {'client': {'id': 1}}, '/url_tag/client/1/==/'),
-            'url12': ('{% url regressiontests.templates.views.client_action id=client.id,action="," %}', {'client': {'id': 1}}, '/url_tag/client/1/,/'),
-            'url12': ('{% url regressiontests.templates.views.client_action id=client.id,action=arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
+            'url10': ('{% url regressiontests.templates.views.client_action id=client.id action="two words" %}', {'client': {'id': 1}}, '/url_tag/client/1/two%20words/'),
+            'url11': ('{% url regressiontests.templates.views.client_action id=client.id action="==" %}', {'client': {'id': 1}}, '/url_tag/client/1/==/'),
+            'url12': ('{% url regressiontests.templates.views.client_action id=client.id action="," %}', {'client': {'id': 1}}, '/url_tag/client/1/,/'),
+            'url13': ('{% url regressiontests.templates.views.client_action id=client.id action=arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
+            'url14': ('{% url regressiontests.templates.views.client_action client.id arg|join:"-" %}', {'client': {'id': 1}, 'arg':['a','b']}, '/url_tag/client/1/a-b/'),
+            'url15': ('{% url regressiontests.templates.views.client_action 12 "test" %}', {}, '/url_tag/client/12/test/'),
 
             # Failures
             'url-fail01': ('{% url %}', {}, template.TemplateSyntaxError),
