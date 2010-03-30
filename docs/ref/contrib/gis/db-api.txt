@@ -160,21 +160,26 @@ to be in the units of the field.
 
 .. note::
 
-    For PostGIS users, the routine ``ST_distance_sphere`` 
+    For users of PostGIS 1.4 and below, the routine ``ST_Distance_Sphere`` 
     is used by default for calculating distances on geographic coordinate systems 
-    -- which may only be called with point geometries [#fndistsphere]_.  Thus, 
-    geographic distance lookups on traditional PostGIS geometry columns are
+    (e.g., WGS84) -- which may only be called with point geometries [#fndistsphere14]_.
+    Thus, geographic distance lookups on traditional PostGIS geometry columns are
     only allowed on :class:`PointField` model fields using a point for the
     geometry parameter.
 
 .. note::
 
-    PostGIS 1.5 introduced :ref:`geography columns <geography-type>`, which
-    is limited on what geometry types distance queries are performed with.  In
-    other words, if you have ``geography=True`` in your geometry field
-    definition you'll be allowed to peform arbitrary distance queries with your
-    data in geodetic units of WGS84.
+    In PostGIS 1.5, ``ST_Distance_Sphere`` does *not* limit the geometry types
+    geographic distance queries are performed with. [#fndistsphere15]_  However,
+    these queries may take a long time, as great-circle distances must be
+    calculated on the fly for *every* row in the query.  This is because the
+    spatial index on traditional geometry fields cannot be used.
 
+    For much better performance on WGS84 distance queries, consider using
+    :ref:`geography columns <geography-type>` in your database instead because
+    they are able to use their spatial index in distance queries.
+    You can tell GeoDjango to use a geography column by setting ``geography=True``
+    in your field definition.
 
 For example, let's say we have a ``SouthTexasCity`` model (from the 
 `GeoDjango distance tests`__ ) on a *projected* coordinate system valid for cities 
@@ -300,5 +305,6 @@ Method                                PostGIS  Oracle  SpatiaLite
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
 .. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.refractions.net/documentation/manual-1.5/ch04.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 .. [#fngeojson] *See* Howard Butler, Martin Daly, Allan Doyle, Tim Schaub, & Christopher Schmidt, `The GeoJSON Format Specification <http://geojson.org/geojson-spec.html>`_, Revision 1.0 (June 16, 2008).
-.. [#fndistsphere] *See* PostGIS 1.5 ``ST_distance_sphere`` `documentation <http://postgis.refractions.net/documentation/manual-1.5/ST_Distance_Sphere.html>`_.
+.. [#fndistsphere14] *See* `PostGIS 1.4 documentation <http://postgis.refractions.net/documentation/manual-1.4/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
+.. [#fndistsphere15] *See* `PostGIS 1.5 documentation <http://postgis.refractions.net/documentation/manual-1.5/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
 .. [#] MySQL only supports bounding box operations (known as minimum bounding rectangles, or MBR, in MySQL).  Thus, spatial lookups such as :lookup:`contains <gis-contains>` are really equivalent to :lookup:`bbcontains`.

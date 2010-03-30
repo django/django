@@ -107,10 +107,11 @@ a flat surface is a straight line, the shortest path between two points on a cur
 surface (such as the earth) is an *arc* of a `great circle`__. [#fnthematic]_  Thus,
 additional computation is required to obtain distances in planar units (e.g., 
 kilometers and miles).  Using a geographic coordinate system may introduce
-complications for the developer later on.  For example, PostGIS does not
-have the capability to perform distance calculations between non-point
-geometries using geographic coordinate systems, e.g., constructing a query to 
-find all points within 5 miles of a county boundary stored as WGS84. [#fndist]_
+complications for the developer later on.  For example, PostGIS versions 1.4
+and below do not have the capability to perform distance calculations between
+non-point geometries using geographic coordinate systems, e.g., constructing a
+query to  find all points within 5 miles of a county boundary stored as WGS84.
+[#fndist]_
 
 Portions of the earth's surface may projected onto a two-dimensional, or 
 Cartesian, plane.  Projected coordinate systems are especially convenient
@@ -123,9 +124,10 @@ calculations.
 .. note::
 
     If you wish to peform arbitrary distance queries using non-point
-    geometries, consider using PostGIS 1.5 and enabling the
-    :attr:`GeometryField.geography` keyword to use the
-    :ref:`geography database type <geography-type>` instead.
+    geometries in WGS84, consider upgrading to PostGIS 1.5. For
+    better performance, enable the :attr:`GeometryField.geography`
+    keyword so that :ref:`geography database type <geography-type>`
+    is used instead.
 
 Additional Resources:
 
@@ -182,7 +184,7 @@ three-dimensonal support.
 
 .. attribute:: GeometryField.geography
 
-If set to ``True``, this option will use create a database column of
+If set to ``True``, this option will create a database column of
 type geography, rather than geometry.  Please refer to the 
 :ref:`geography type <geography-type>` section below for more
 details.
@@ -223,8 +225,6 @@ For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type
 <http://postgis.refractions.net/documentation/manual-1.5/ch04.html#PostGIS_GeographyVSGeometry>`_.
 
-
-
 ``GeoManager``
 ==============
 
@@ -262,5 +262,5 @@ for example::
 .. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <http://www.epsg.org>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
 .. [#fnharvard] Harvard Graduate School of Design, `An Overview of Geodesy and Geographic Referencing Systems <http://www.gsd.harvard.edu/gis/manual/projections/fundamentals/>`_.  This is an excellent resource for an overview of principles relating to geographic and Cartesian coordinate systems. 
 .. [#fnthematic] Terry A. Slocum, Robert B. McMaster, Fritz C. Kessler, & Hugh H. Howard, *Thematic Cartography and Geographic Visualization* (Prentice Hall, 2nd edition), at Ch. 7.1.3.
-.. [#fndist] This isn't impossible using GeoDjango; you could for example, take a known point in a projected coordinate system, buffer it to the appropriate radius, and then perform an intersection operation with the buffer transformed to the geographic coordinate system.
+.. [#fndist] This limitation does not apply to PostGIS 1.5.  It should be noted that even in previous versions of PostGIS, this isn't impossible using GeoDjango; you could for example, take a known point in a projected coordinate system, buffer it to the appropriate radius, and then perform an intersection operation with the buffer transformed to the geographic coordinate system.
 .. [#fngeography] Please refer to the `PostGIS Geography Type <http://postgis.refractions.net/documentation/manual-1.5/ch04.html#PostGIS_Geography>`_ documentation for more details.
