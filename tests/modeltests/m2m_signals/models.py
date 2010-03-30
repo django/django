@@ -73,7 +73,13 @@ __test__ = {'API_TESTS':"""
 >>> c1.default_parts.add(p1, p2, p3)
 m2m_changed signal
 instance: VW
-action: add
+action: pre_add
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Part'>
+objects: [<Part: Doors>, <Part: Engine>, <Part: Wheelset>]
+m2m_changed signal
+instance: VW
+action: post_add
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Part'>
 objects: [<Part: Doors>, <Part: Engine>, <Part: Wheelset>]
@@ -82,7 +88,13 @@ objects: [<Part: Doors>, <Part: Engine>, <Part: Wheelset>]
 >>> p2.car_set.add(c2, c3)
 m2m_changed signal
 instance: Doors
-action: add
+action: pre_add
+reverse: True
+model: <class 'modeltests.m2m_signals.models.Car'>
+objects: [<Car: BMW>, <Car: Toyota>]
+m2m_changed signal
+instance: Doors
+action: post_add
 reverse: True
 model: <class 'modeltests.m2m_signals.models.Car'>
 objects: [<Car: BMW>, <Car: Toyota>]
@@ -91,7 +103,13 @@ objects: [<Car: BMW>, <Car: Toyota>]
 >>> c1.default_parts.remove(p3, p4)
 m2m_changed signal
 instance: VW
-action: remove
+action: pre_remove
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Part'>
+objects: [<Part: Airbag>, <Part: Engine>]
+m2m_changed signal
+instance: VW
+action: post_remove
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Part'>
 objects: [<Part: Airbag>, <Part: Engine>]
@@ -100,7 +118,13 @@ objects: [<Part: Airbag>, <Part: Engine>]
 >>> c1.optional_parts.add(p4,p5)
 m2m_changed signal
 instance: VW
-action: add
+action: pre_add
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Part'>
+objects: [<Part: Airbag>, <Part: Sunroof>]
+m2m_changed signal
+instance: VW
+action: post_add
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Part'>
 objects: [<Part: Airbag>, <Part: Sunroof>]
@@ -109,7 +133,13 @@ objects: [<Part: Airbag>, <Part: Sunroof>]
 >>> p4.cars_optional.add(c1, c2, c3)
 m2m_changed signal
 instance: Airbag
-action: add
+action: pre_add
+reverse: True
+model: <class 'modeltests.m2m_signals.models.Car'>
+objects: [<Car: BMW>, <Car: Toyota>]
+m2m_changed signal
+instance: Airbag
+action: post_add
 reverse: True
 model: <class 'modeltests.m2m_signals.models.Car'>
 objects: [<Car: BMW>, <Car: Toyota>]
@@ -118,7 +148,13 @@ objects: [<Car: BMW>, <Car: Toyota>]
 >>> p4.cars_optional.remove(c1)
 m2m_changed signal
 instance: Airbag
-action: remove
+action: pre_remove
+reverse: True
+model: <class 'modeltests.m2m_signals.models.Car'>
+objects: [<Car: VW>]
+m2m_changed signal
+instance: Airbag
+action: post_remove
 reverse: True
 model: <class 'modeltests.m2m_signals.models.Car'>
 objects: [<Car: VW>]
@@ -127,7 +163,12 @@ objects: [<Car: VW>]
 >>> c1.default_parts.clear()
 m2m_changed signal
 instance: VW
-action: clear
+action: pre_clear
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Part'>
+m2m_changed signal
+instance: VW
+action: post_clear
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Part'>
 
@@ -135,7 +176,12 @@ model: <class 'modeltests.m2m_signals.models.Part'>
 >>> p2.car_set.clear()
 m2m_changed signal
 instance: Doors
-action: clear
+action: pre_clear
+reverse: True
+model: <class 'modeltests.m2m_signals.models.Car'>
+m2m_changed signal
+instance: Doors
+action: post_clear
 reverse: True
 model: <class 'modeltests.m2m_signals.models.Car'>
 
@@ -143,7 +189,12 @@ model: <class 'modeltests.m2m_signals.models.Car'>
 >>> p4.cars_optional.clear()
 m2m_changed signal
 instance: Airbag
-action: clear
+action: pre_clear
+reverse: True
+model: <class 'modeltests.m2m_signals.models.Car'>
+m2m_changed signal
+instance: Airbag
+action: post_clear
 reverse: True
 model: <class 'modeltests.m2m_signals.models.Car'>
 
@@ -152,7 +203,13 @@ model: <class 'modeltests.m2m_signals.models.Car'>
 >>> c1.default_parts.create(name='Windows')
 m2m_changed signal
 instance: VW
-action: add
+action: pre_add
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Part'>
+objects: [<Part: Windows>]
+m2m_changed signal
+instance: VW
+action: post_add
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Part'>
 objects: [<Part: Windows>]
@@ -162,12 +219,23 @@ objects: [<Part: Windows>]
 >>> c1.default_parts = [p1,p2,p3]
 m2m_changed signal
 instance: VW
-action: clear
+action: pre_clear
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Part'>
 m2m_changed signal
 instance: VW
-action: add
+action: post_clear
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Part'>
+m2m_changed signal
+instance: VW
+action: pre_add
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Part'>
+objects: [<Part: Doors>, <Part: Engine>, <Part: Wheelset>]
+m2m_changed signal
+instance: VW
+action: post_add
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Part'>
 objects: [<Part: Doors>, <Part: Engine>, <Part: Wheelset>]
@@ -177,12 +245,23 @@ objects: [<Part: Doors>, <Part: Engine>, <Part: Wheelset>]
 >>> c4.default_parts = [p2]
 m2m_changed signal
 instance: Bugatti
-action: clear
+action: pre_clear
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Part'>
 m2m_changed signal
 instance: Bugatti
-action: add
+action: post_clear
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Part'>
+m2m_changed signal
+instance: Bugatti
+action: pre_add
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Part'>
+objects: [<Part: Doors>]
+m2m_changed signal
+instance: Bugatti
+action: post_add
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Part'>
 objects: [<Part: Doors>]
@@ -190,7 +269,13 @@ objects: [<Part: Doors>]
 >>> p3.car_set.add(c4)
 m2m_changed signal
 instance: Engine
-action: add
+action: pre_add
+reverse: True
+model: <class 'modeltests.m2m_signals.models.Car'>
+objects: [<Car: Bugatti>]
+m2m_changed signal
+instance: Engine
+action: post_add
 reverse: True
 model: <class 'modeltests.m2m_signals.models.Car'>
 objects: [<Car: Bugatti>]
@@ -207,12 +292,23 @@ objects: [<Car: Bugatti>]
 >>> p1.friends = [p2, p3]
 m2m_changed signal
 instance: Alice
-action: clear
+action: pre_clear
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Person'>
 m2m_changed signal
 instance: Alice
-action: add
+action: post_clear
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Person'>
+m2m_changed signal
+instance: Alice
+action: pre_add
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Person'>
+objects: [<Person: Bob>, <Person: Chuck>]
+m2m_changed signal
+instance: Alice
+action: post_add
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Person'>
 objects: [<Person: Bob>, <Person: Chuck>]
@@ -220,12 +316,23 @@ objects: [<Person: Bob>, <Person: Chuck>]
 >>> p1.fans = [p4]
 m2m_changed signal
 instance: Alice
-action: clear
+action: pre_clear
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Person'>
 m2m_changed signal
 instance: Alice
-action: add
+action: post_clear
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Person'>
+m2m_changed signal
+instance: Alice
+action: pre_add
+reverse: False
+model: <class 'modeltests.m2m_signals.models.Person'>
+objects: [<Person: Daisy>]
+m2m_changed signal
+instance: Alice
+action: post_add
 reverse: False
 model: <class 'modeltests.m2m_signals.models.Person'>
 objects: [<Person: Daisy>]
@@ -233,12 +340,23 @@ objects: [<Person: Daisy>]
 >>> p3.idols = [p1,p2]
 m2m_changed signal
 instance: Chuck
-action: clear
+action: pre_clear
 reverse: True
 model: <class 'modeltests.m2m_signals.models.Person'>
 m2m_changed signal
 instance: Chuck
-action: add
+action: post_clear
+reverse: True
+model: <class 'modeltests.m2m_signals.models.Person'>
+m2m_changed signal
+instance: Chuck
+action: pre_add
+reverse: True
+model: <class 'modeltests.m2m_signals.models.Person'>
+objects: [<Person: Alice>, <Person: Bob>]
+m2m_changed signal
+instance: Chuck
+action: post_add
 reverse: True
 model: <class 'modeltests.m2m_signals.models.Person'>
 objects: [<Person: Alice>, <Person: Bob>]
