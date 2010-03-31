@@ -220,6 +220,22 @@ class BigInt(models.Model):
     def __unicode__(self):
         return unicode(self.biggie)
 
+class MarkupField(models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs["max_length"] = 20
+        super(MarkupField, self).__init__(*args, **kwargs)
+
+    def formfield(self, **kwargs):
+        # don't allow this field to be used in form (real use-case might be
+        # that you know the markup will always be X, but it is among an app
+        # that allows the user to say it could be something else)
+        # regressed at r10062
+        return None
+
+class CustomFieldForExclusionModel(models.Model):
+    name = models.CharField(max_length=10)
+    markup = MarkupField()
+
 __test__ = {'API_TESTS': """
 >>> from django import forms
 >>> from django.forms.models import ModelForm, model_to_dict
@@ -1539,6 +1555,19 @@ ValidationError: [u'Select a valid choice. z is not one of the available choices
 >>> print CategoryForm()
 <tr><th><label for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
 <tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
+
+# Model field that returns None to exclude itself with explicit fields ########
+
+>>> class CustomFieldForExclusionForm(ModelForm):
+...     class Meta:
+...         model = CustomFieldForExclusionModel
+...         fields = ['name', 'markup']
+
+>>> CustomFieldForExclusionForm.base_fields.keys()
+['name']
+
+>>> print CustomFieldForExclusionForm()
+<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>
 
 # Clean up
 >>> import shutil

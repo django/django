@@ -167,6 +167,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
     in the ``fields`` argument.
     """
     field_list = []
+    ignored = []
     opts = model._meta
     for f in opts.fields + opts.many_to_many:
         if not f.editable:
@@ -182,9 +183,14 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
         formfield = formfield_callback(f, **kwargs)
         if formfield:
             field_list.append((f.name, formfield))
+        else:
+            ignored.append(f.name)
     field_dict = SortedDict(field_list)
     if fields:
-        field_dict = SortedDict([(f, field_dict.get(f)) for f in fields if (not exclude) or (exclude and f not in exclude)])
+        field_dict = SortedDict(
+            [(f, field_dict.get(f)) for f in fields
+                if ((not exclude) or (exclude and f not in exclude)) and (f not in ignored)]
+        )
     return field_dict
 
 class ModelFormOptions(object):
