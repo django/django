@@ -484,7 +484,7 @@ class SQLCompiler(object):
                 elif hasattr(col, 'as_sql'):
                     result.append(col.as_sql(qn))
                 else:
-                    result.append(str(col))
+                    result.append('(%s)' % str(col))
         return result, params
 
     def fill_related_selections(self, opts=None, root_alias=None, cur_depth=1,
