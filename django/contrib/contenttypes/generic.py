@@ -5,7 +5,7 @@ Classes allowing "generic" relations through ContentType and object-id fields.
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import signals
-from django.db import models
+from django.db import models, router
 from django.db.models.fields.related import RelatedField, Field, ManyToManyRel
 from django.db.models.loading import get_model
 from django.forms import ModelForm
@@ -271,7 +271,8 @@ def create_generic_related_manager(superclass):
         def create(self, **kwargs):
             kwargs[self.content_type_field_name] = self.content_type
             kwargs[self.object_id_field_name] = self.pk_val
-            return super(GenericRelatedObjectManager, self).create(**kwargs)
+            db = router.db_for_write(self.model, instance=self.instance)
+            return super(GenericRelatedObjectManager, self).using(db).create(**kwargs)
         create.alters_data = True
 
     return GenericRelatedObjectManager

@@ -971,6 +971,19 @@ class RouterTestCase(TestCase):
         water = Book(title="Dive into Water", published=datetime.date(2001, 1, 1), editor=mark)
         self.assertEquals(water._state.db, 'default')
 
+        # If you create an object through a FK relation, it will be
+        # written to the write database, even if the original object
+        # was on the read database
+        cheesecake = mark.edited.create(title='Dive into Cheesecake', published=datetime.date(2010, 3, 15))
+        self.assertEquals(cheesecake._state.db, 'default')
+
+        # Same goes for get_or_create, regardless of whether getting or creating
+        cheesecake, created = mark.edited.get_or_create(title='Dive into Cheesecake', published=datetime.date(2010, 3, 15))
+        self.assertEquals(cheesecake._state.db, 'default')
+
+        puddles, created = mark.edited.get_or_create(title='Dive into Puddles', published=datetime.date(2010, 3, 15))
+        self.assertEquals(puddles._state.db, 'default')
+
     def test_m2m_cross_database_protection(self):
         "M2M relations can cross databases if the database share a source"
         # Create books and authors on the inverse to the usual database
@@ -1074,6 +1087,19 @@ class RouterTestCase(TestCase):
         self.assertEquals(Book.authors.through.objects.using('default').count(), 1)
         self.assertEquals(Book.authors.through.objects.using('other').count(), 0)
 
+        # If you create an object through a M2M relation, it will be
+        # written to the write database, even if the original object
+        # was on the read database
+        alice = dive.authors.create(name='Alice')
+        self.assertEquals(alice._state.db, 'default')
+
+        # Same goes for get_or_create, regardless of whether getting or creating
+        alice, created = dive.authors.get_or_create(name='Alice')
+        self.assertEquals(alice._state.db, 'default')
+
+        bob, created = dive.authors.get_or_create(name='Bob')
+        self.assertEquals(bob._state.db, 'default')
+
     def test_generic_key_cross_database_protection(self):
         "Generic Key operations can span databases if they share a source"
         # Create a book and author on the default database
@@ -1149,6 +1175,13 @@ class RouterTestCase(TestCase):
         # Dive comes from 'other', so review3 is set to use the source of 'other'...
         review3.content_object = dive
         self.assertEquals(review3._state.db, 'default')
+
+        # If you create an object through a M2M relation, it will be
+        # written to the write database, even if the original object
+        # was on the read database
+        dive = Book.objects.using('other').get(title='Dive into Python')
+        nyt = dive.reviews.create(source="New York Times", content_object=dive)
+        self.assertEquals(nyt._state.db, 'default')
 
     def test_subquery(self):
         """Make sure as_sql works with subqueries and master/slave."""

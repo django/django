@@ -419,7 +419,8 @@ class ForeignRelatedObjectsDescriptor(object):
 
             def create(self, **kwargs):
                 kwargs.update({rel_field.name: instance})
-                return super(RelatedManager, self).create(**kwargs)
+                db = router.db_for_write(rel_model, instance=instance)
+                return super(RelatedManager, self).using(db).create(**kwargs)
             create.alters_data = True
 
             def get_or_create(self, **kwargs):
