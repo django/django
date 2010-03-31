@@ -21,7 +21,7 @@ class Command(BaseCommand):
             help='Use natural keys if they are available.'),
     )
     help = 'Output the contents of the database as a fixture of the given format.'
-    args = '[appname ...]'
+    args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
         from django.db.models import get_app, get_apps, get_models, get_model
