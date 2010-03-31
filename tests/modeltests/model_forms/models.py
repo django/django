@@ -205,6 +205,22 @@ class Post(models.Model):
     def __unicode__(self):
         return self.name
 
+class MarkupField(models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs["max_length"] = 20
+        super(MarkupField, self).__init__(*args, **kwargs)
+
+    def formfield(self, **kwargs):
+        # don't allow this field to be used in form (real use-case might be
+        # that you know the markup will always be X, but it is among an app
+        # that allows the user to say it could be something else)
+        # regressed at r10062
+        return None
+
+class CustomFieldForExclusionModel(models.Model):
+    name = models.CharField(max_length=10)
+    markup = MarkupField()
+
 __test__ = {'API_TESTS': """
 >>> from django import forms
 >>> from django.forms.models import ModelForm, model_to_dict
@@ -1546,6 +1562,19 @@ False
 >>> f = PostForm({'subtitle': "Finally", "title": "Django 1.0 is released", "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
 >>> f.is_valid()
 True
+
+# Model field that returns None to exclude itself with explicit fields ########
+
+>>> class CustomFieldForExclusionForm(ModelForm):
+...     class Meta:
+...         model = CustomFieldForExclusionModel
+...         fields = ['name', 'markup']
+
+>>> CustomFieldForExclusionForm.base_fields.keys()
+['name']
+
+>>> print CustomFieldForExclusionForm()
+<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>
 
 # Clean up
 >>> import shutil
