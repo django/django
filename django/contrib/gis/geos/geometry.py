@@ -143,7 +143,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def __setstate__(self, state):
         # Instantiating from the tuple state that was pickled.
         wkb, srid = state
-        ptr = capi.from_wkb(wkb, len(wkb))
+        ptr = wkb_r().read(buffer(wkb))
         if not ptr: raise GEOSException('Invalid Geometry loaded from pickled state.')
         self.ptr = ptr
         self._post_init(srid)
