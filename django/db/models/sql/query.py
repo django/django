@@ -875,7 +875,7 @@ class BaseQuery(object):
                 elif hasattr(col, 'as_sql'):
                     result.append(col.as_sql(qn))
                 else:
-                    result.append(str(col))
+                    result.append('(%s)' % str(col))
         return result, params
 
     def get_ordering(self):
