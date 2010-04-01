@@ -143,7 +143,7 @@ class EmailMessage(object):
                            self.content_subtype, encoding)
         msg = self._create_message(msg)
         msg['Subject'] = self.subject
-        msg['From'] = self.extra_headers.pop('From', self.from_email)
+        msg['From'] = self.extra_headers.get('From', self.from_email)
         msg['To'] = ', '.join(self.to)
 
         # Email header names are case-insensitive (RFC 2045), so we have to
@@ -154,6 +154,8 @@ class EmailMessage(object):
         if 'message-id' not in header_names:
             msg['Message-ID'] = make_msgid()
         for name, value in self.extra_headers.items():
+            if name.lower() == 'from':  # From is already handled
+                continue
             msg[name] = value
         return msg
 

@@ -101,6 +101,16 @@ BadHeaderError: Header values can't contain newlines (got u'Subject\nInjection T
 >>> message['From']
 'from@example.com'
 
+# Regression for #13259 - Make sure that headers are not changed
+# when calling EmailMessage.message()
+>>> email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+>>> message = email.message()
+>>> message['From']
+'from@example.com'
+>>> message = email.message()
+>>> message['From']
+'from@example.com'
+
 # Regression for #11144 - When a to/from/cc header contains unicode,
 # make sure the email addresses are parsed correctly (especially
 # with regards to commas)
