@@ -481,6 +481,11 @@ class OGRGeomTest(unittest.TestCase):
         self.assertEqual(3, geom[0].coord_dim)
         self.assertEqual(wkt_3d, geom.wkt)
 
+    def test19_equivalence_regression(self):
+        "Testing equivalence methods with non-OGRGeometry instances."
+        self.assertNotEqual(None, OGRGeometry('POINT(0 0)'))
+        self.assertEqual(False, OGRGeometry('LINESTRING(0 0, 1 1)') == 3)
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(OGRGeomTest))

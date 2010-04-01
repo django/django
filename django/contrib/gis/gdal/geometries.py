@@ -180,11 +180,14 @@ class OGRGeometry(GDALBase):
 
     def __eq__(self, other):
         "Is this Geometry equal to the other?"
-        return self.equals(other)
+        if isinstance(other, OGRGeometry):
+            return self.equals(other)
+        else:
+            return False
 
     def __ne__(self, other):
         "Tests for inequality."
-        return not self.equals(other)
+        return not (self == other)
 
     def __str__(self):
         "WKT is used for the string representation."
