@@ -7,6 +7,7 @@ from models import Author, Book, Coffee, Reviewer, FriendlyAuthor
 
 
 class RawQueryTests(TestCase):
+    fixtures = ['raw_query_books.json']
 
     def assertSuccessfulRawQuery(self, model, query, expected_results,
             expected_annotations=(), params=[], translations=None):
@@ -14,10 +15,10 @@ class RawQueryTests(TestCase):
         Execute the passed query against the passed model and check the output
         """
         results = list(model.objects.raw(query, params=params, translations=translations))
-        self.assertProcessed(results, expected_results, expected_annotations)
+        self.assertProcessed(model, results, expected_results, expected_annotations)
         self.assertAnnotations(results, expected_annotations)
 
-    def assertProcessed(self, results, orig, expected_annotations=()):
+    def assertProcessed(self, model, results, orig, expected_annotations=()):
         """
         Compare the results of a raw query against expected results
         """
@@ -27,7 +28,13 @@ class RawQueryTests(TestCase):
             for annotation in expected_annotations:
                 setattr(orig_item, *annotation)
 
-            self.assertEqual(item.id, orig_item.id)
+            for field in model._meta.fields:
+                # Check that all values on the model are equal
+                self.assertEquals(getattr(item,field.attname),
+                                  getattr(orig_item,field.attname))
+                # This includes checking that they are the same type
+                self.assertEquals(type(getattr(item,field.attname)),
+                                  type(getattr(orig_item,field.attname)))
 
     def assertNoAnnotations(self, results):
         """
@@ -115,7 +122,7 @@ class RawQueryTests(TestCase):
         author = Author.objects.all()[2]
         params = [author.first_name]
         results = list(Author.objects.raw(query, params=params))
-        self.assertProcessed(results, [author])
+        self.assertProcessed(Author, results, [author])
         self.assertNoAnnotations(results)
         self.assertEqual(len(results), 1)
 

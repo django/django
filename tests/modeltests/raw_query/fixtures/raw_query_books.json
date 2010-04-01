@@ -40,7 +40,9 @@
         "model": "raw_query.book",
         "fields": {
             "author": 1,
-            "title": "The awesome book"
+            "title": "The awesome book",
+            "paperback": false,
+            "opening_line": "It was a bright cold day in April and the clocks were striking thirteen."
         }
     },
     {
@@ -48,7 +50,9 @@
         "model": "raw_query.book",
         "fields": {
             "author": 1,
-            "title": "The horrible book"
+            "title": "The horrible book",
+            "paperback": true,
+            "opening_line": "On an evening in the latter part of May a middle-aged man was walking homeward from Shaston to the village of Marlott, in the adjoining Vale of Blakemore, or Blackmoor."
         }
     },
     {
@@ -56,7 +60,9 @@
         "model": "raw_query.book",
         "fields": {
             "author": 1,
-            "title": "Another awesome book"
+            "title": "Another awesome book",
+            "paperback": false,
+            "opening_line": "A squat grey building of only thirty-four stories."
         }
     },
     {
@@ -64,7 +70,9 @@
         "model": "raw_query.book",
         "fields": {
             "author": 3,
-            "title": "Some other book"
+            "title": "Some other book",
+            "paperback": true,
+            "opening_line": "It was the day my grandmother exploded."
         }
     },
     {

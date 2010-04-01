@@ -1407,12 +1407,19 @@ class RawQuerySet(object):
             self._model_fields = {}
             for field in self.model._meta.fields:
                 name, column = field.get_attname_column()
-                self._model_fields[converter(column)] = name
+                self._model_fields[converter(column)] = field
         return self._model_fields
 
     def transform_results(self, values):
         model_init_kwargs = {}
         annotations = ()
+
+        # Perform database backend type resolution
+        connection = connections[self.db]
+        compiler = connection.ops.compiler('SQLCompiler')(self.query, connection, self.db)
+        if hasattr(compiler, 'resolve_columns'):
+            fields = [self.model_fields.get(c,None) for c in self.columns]
+            values = compiler.resolve_columns(values, fields)
 
         # Associate fields to values
         for pos, value in enumerate(values):
@@ -1420,7 +1427,7 @@ class RawQuerySet(object):
 
             # Separate properties from annotations
             if column in self.model_fields.keys():
-                model_init_kwargs[self.model_fields[column]] = value
+                model_init_kwargs[self.model_fields[column].attname] = value
             else:
                 annotations += (column, value),
 

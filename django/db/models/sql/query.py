@@ -189,6 +189,11 @@ class Query(object):
             raise ValueError("Need either using or connection")
         if using:
             connection = connections[using]
+
+        # Check that the compiler will be able to execute the query
+        for alias, aggregate in self.aggregate_select.items():
+            connection.ops.check_aggregate_support(aggregate)
+
         return connection.ops.compiler(self.compiler)(self, connection, using)
 
     def get_meta(self):

@@ -14,10 +14,6 @@ class SQLCompiler(object):
         self.using = using
         self.quote_cache = {}
 
-        # Check that the compiler will be able to execute the query
-        for alias, aggregate in self.query.aggregate_select.items():
-            self.connection.ops.check_aggregate_support(aggregate)
-
     def pre_sql_setup(self):
         """
         Does any necessary class setup immediately prior to producing SQL. This
