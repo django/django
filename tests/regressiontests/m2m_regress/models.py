@@ -17,6 +17,13 @@ class Tag(models.Model):
     def __unicode__(self):
         return self.name
 
+# Regression for #11956 -- a many to many to the base class
+class TagCollection(Tag):
+    tags = models.ManyToManyField(Tag, related_name='tag_collections')
+
+    def __unicode__(self):
+        return self.name
+
 # A related_name is required on one of the ManyToManyField entries here because
 # they are both addressable as reverse relations from Tag.
 class Entry(models.Model):
@@ -101,6 +108,18 @@ FieldError: Cannot resolve keyword 'porcupine' into field. Choices are: id, name
 >>> w = Worksheet(id='abc')
 >>> w.save()
 >>> w.delete()
+
+# Regression for #11956 -- You can add an object to a m2m with the
+# base class without causing integrity errors
+>>> c1 = TagCollection.objects.create(name='c1')
+>>> c1.tags = [t1,t2]
+
+>>> c1 = TagCollection.objects.get(name='c1')
+>>> c1.tags.all()
+[<Tag: t1>, <Tag: t2>]
+
+>>> t1.tag_collections.all()
+[<TagCollection: c1>]
 
 """
 }
