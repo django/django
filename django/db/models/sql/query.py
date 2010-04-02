@@ -37,8 +37,23 @@ class RawQuery(object):
         self.using = using
         self.cursor = None
 
+        # Mirror some properties of a normal query so that
+        # the compiler can be used to process results.
+        self.low_mark, self.high_mark = 0, None  # Used for offset/limit
+        self.extra_select = {}
+        self.aggregate_select = {}
+
     def clone(self, using):
         return RawQuery(self.sql, using, params=self.params)
+
+    def convert_values(self, value, field, connection):
+        """Convert the database-returned value into a type that is consistent
+        across database backends.
+
+        By default, this defers to the underlying backend operations, but
+        it can be overridden by Query classes for specific backends.
+        """
+        return connection.ops.convert_values(value, field)
 
     def get_columns(self):
         if self.cursor is None:
