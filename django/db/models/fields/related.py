@@ -710,7 +710,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
             model=rel_model,
             core_filters={'%s__pk' % self.field.related_query_name(): instance._get_pk_val()},
             instance=instance,
-            symmetrical=(self.field.rel.symmetrical and isinstance(instance, rel_model)),
+            symmetrical=self.field.rel.symmetrical,
             source_field_name=self.field.m2m_field_name(),
             target_field_name=self.field.m2m_reverse_field_name(),
             reverse=False
@@ -991,7 +991,7 @@ class ManyToManyField(RelatedField, Field):
         kwargs['rel'] = ManyToManyRel(to,
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
-            symmetrical=kwargs.pop('symmetrical', True),
+            symmetrical=kwargs.pop('symmetrical', to==RECURSIVE_RELATIONSHIP_CONSTANT),
             through=kwargs.pop('through', None))
 
         self.db_table = kwargs.pop('db_table', None)
