@@ -21,6 +21,19 @@ class RelatedPoint(models.Model):
         return unicode(self.name)
 
 
+class A(models.Model):
+    x = models.IntegerField(default=10)
+
+class B(models.Model):
+    a = models.ForeignKey(A)
+    y = models.IntegerField(default=10)
+
+class C(models.Model):
+    y = models.IntegerField(default=10)
+
+class D(C):
+    a = models.ForeignKey(A)
+
 __test__ = {'API_TESTS': """
 >>> DataPoint(name="d0", value="apple").save()
 >>> DataPoint(name="d2", value="banana").save()
