@@ -284,7 +284,7 @@ class UpdateQuery(Query):
         for model, values in self.related_updates.iteritems():
             query = UpdateQuery(model, self.connection)
             query.values = values
-            if self.related_ids:
+            if self.related_ids is not None:
                 query.add_filter(('pk__in', self.related_ids))
             result.append(query)
         return result
