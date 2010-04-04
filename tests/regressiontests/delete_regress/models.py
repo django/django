@@ -30,7 +30,7 @@ class Child(models.Model):
 class PlayedWith(models.Model):
     child = models.ForeignKey(Child)
     toy = models.ForeignKey(Toy)
-    date = models.DateField()
+    date = models.DateField(db_column='date_col')
 
 class PlayedWithNote(models.Model):
     played = models.ForeignKey(PlayedWith)
