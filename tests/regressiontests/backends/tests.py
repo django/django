@@ -34,8 +34,8 @@ class LongString(unittest.TestCase):
             c.execute('INSERT INTO ltext VALUES (%s)',[long_str])
             c.execute('SELECT text FROM ltext')
             row = c.fetchone()
-            c.execute('DROP TABLE ltext')
             self.assertEquals(long_str, row[0].read())
+            c.execute('DROP TABLE ltext')
 
 class DateQuotingTest(TestCase):
 
