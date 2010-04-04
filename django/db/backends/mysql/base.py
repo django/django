@@ -113,6 +113,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     update_can_self_select = False
     allows_group_by_pk = True
     related_fields_match_type = True
+    allow_sliced_subqueries = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):

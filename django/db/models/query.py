@@ -7,6 +7,8 @@ try:
 except NameError:
     from sets import Set as set     # Python 2.3 fallback
 
+from itertools import izip
+
 from django.db import connection, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
@@ -387,11 +389,13 @@ class QuerySet(object):
         # becoming too long.
         seen_objs = None
         while 1:
-            # Collect all the objects to be deleted in this chunk, and all the
+            # Collect a chunk of objects to be deleted, and then all the
             # objects that are related to the objects that are to be deleted.
+            # The chunking *isn't* done by slicing the del_query because we
+            # need to maintain the query cache on del_query (see #12328)
             seen_objs = CollectedObjects(seen_objs)
-            for object in del_query[:CHUNK_SIZE]:
-                object._collect_sub_objects(seen_objs)
+            for i, obj in izip(xrange(CHUNK_SIZE), del_query):
+                obj._collect_sub_objects(seen_objs)
 
             if not seen_objs:
                 break
