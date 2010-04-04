@@ -52,6 +52,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
     can_return_id_from_insert = True
+    allow_sliced_subqueries = False
 
 
 class DatabaseOperations(BaseDatabaseOperations):

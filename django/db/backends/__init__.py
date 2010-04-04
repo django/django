@@ -95,6 +95,7 @@ class BaseDatabaseFeatures(object):
     # If True, don't use integer foreign keys referring to, e.g., positive
     # integer primary keys.
     related_fields_match_type = False
+    allow_sliced_subqueries = True
 
 class BaseDatabaseOperations(object):
     """

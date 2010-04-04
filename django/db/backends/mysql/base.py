@@ -123,6 +123,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     update_can_self_select = False
     allows_group_by_pk = True
     related_fields_match_type = True
+    allow_sliced_subqueries = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"

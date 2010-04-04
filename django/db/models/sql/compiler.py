@@ -120,13 +120,15 @@ class SQLCompiler(object):
         """
         Perform the same functionality as the as_sql() method, returning an
         SQL string and parameters. However, the alias prefixes are bumped
-        beforehand (in a copy -- the current query isn't changed) and any
-        ordering is removed.
+        beforehand (in a copy -- the current query isn't changed), and any
+        ordering is removed if the query is unsliced.
 
         Used when nesting this query inside another.
         """
         obj = self.query.clone()
-        obj.clear_ordering(True)
+        if obj.low_mark == 0 and obj.high_mark is None:
+            # If there is no slicing in use, then we can safely drop all ordering
+            obj.clear_ordering(True)
         obj.bump_prefix()
         return obj.get_compiler(connection=self.connection).as_sql()
 
