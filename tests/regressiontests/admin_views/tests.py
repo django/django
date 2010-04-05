@@ -1967,6 +1967,11 @@ class ReadonlyTest(TestCase):
             formats.localize(datetime.date.today() - datetime.timedelta(days=7))
         )
 
+        self.assertContains(response, '<div class="form-row coolness">')
+        self.assertContains(response, '<div class="form-row awesomeness_level">')
+        self.assertContains(response, '<div class="form-row posted">')
+        self.assertContains(response, '<div class="form-row ">')
+
         p = Post.objects.create(title="I worked on readonly_fields", content="Its good stuff")
         response = self.client.get('/test_admin/admin/admin_views/post/%d/' % p.pk)
         self.assertContains(response, "%d amount of cool" % p.pk)

@@ -128,7 +128,15 @@ class AdminField(object):
 
 class AdminReadonlyField(object):
     def __init__(self, form, field, is_first, model_admin=None):
-        self.field = field
+        label = label_for_field(field, form._meta.model, model_admin)
+        # Make self.field look a little bit like a field. This means that
+        # {{ field.name }} must be a useful class name to identify the field.
+        # For convenience, store other field-related data here too.
+        self.field = {
+            'name': force_unicode(label != '--' and label or ''),
+            'label': label,
+            'field': field,
+        }
         self.form = form
         self.model_admin = model_admin
         self.is_first = is_first
@@ -139,10 +147,8 @@ class AdminReadonlyField(object):
         attrs = {}
         if not self.is_first:
             attrs["class"] = "inline"
-        name = forms.forms.pretty_name(
-            label_for_field(self.field, self.form._meta.model, self.model_admin)
-        )
-        contents = force_unicode(escape(name)) + u":"
+        label = forms.forms.pretty_name(self.field['label'])
+        contents = force_unicode(escape(label)) + u":"
         return mark_safe('<label%(attrs)s>%(contents)s</label>' % {
             "attrs": flatatt(attrs),
             "contents": contents,
@@ -151,7 +157,7 @@ class AdminReadonlyField(object):
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
         from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
-        field, obj, model_admin = self.field, self.form.instance, self.model_admin
+        field, obj, model_admin = self.field['field'], self.form.instance, self.model_admin
         try:
             f, attr, value = lookup_field(field, obj, model_admin)
         except (AttributeError, ValueError, ObjectDoesNotExist):
@@ -323,4 +329,3 @@ def normalize_dictionary(data_dict):
             del data_dict[key]
             data_dict[str(key)] = value
     return data_dict
-
