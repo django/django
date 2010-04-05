@@ -103,7 +103,7 @@ Now, our ``my_callback`` function will be called each time a request finishes.
 Connecting to signals sent by specific senders
 ----------------------------------------------
 
-Some signals get sent many times, but you'll only be interested in recieving a
+Some signals get sent many times, but you'll only be interested in receiving a
 certain subset of those signals. For example, consider the
 :data:`django.db.models.signals.pre_save` signal sent before a model gets saved.
 Most of the time, you don't need to know when *any* model gets saved -- just
