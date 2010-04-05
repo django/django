@@ -579,6 +579,12 @@ class AdminViewPermissionsTest(TestCase):
         # Test custom delete and object history templates
         request = self.client.get('/test_admin/admin/admin_views/customarticle/1/delete/')
         self.assertTemplateUsed(request, 'custom_admin/delete_confirmation.html')
+        request = self.client.post('/test_admin/admin/admin_views/customarticle/', data={
+                'index': 0,
+                'action': ['delete_selected'],
+                '_selected_action': ['1'],
+            })
+        self.assertTemplateUsed(request, 'custom_admin/delete_selected_confirmation.html')
         request = self.client.get('/test_admin/admin/admin_views/customarticle/1/history/')
         self.assertTemplateUsed(request, 'custom_admin/object_history.html')
 
