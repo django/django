@@ -419,7 +419,7 @@ models doesn't have a value that meets the filter condition, Django will treat
 it as if there is an empty (all values are ``NULL``), but valid, object there.
 All this means is that no error will be raised. For example, in this filter::
 
-    Blog.objects.filter(entry__author__name='Lennon')
+    Blog.objects.filter(entry__authors__name='Lennon')
 
 (if there was a related ``Author`` model), if there was no ``author``
 associated with an entry, it would be treated as if there was also no ``name``
@@ -427,14 +427,14 @@ attached, rather than raising an error because of the missing ``author``.
 Usually this is exactly what you want to have happen. The only case where it
 might be confusing is if you are using ``isnull``. Thus::
 
-    Blog.objects.filter(entry__author__name__isnull=True)
+    Blog.objects.filter(entry__authors__name__isnull=True)
 
 will return ``Blog`` objects that have an empty ``name`` on the ``author`` and
 also those which have an empty ``author`` on the ``entry``. If you don't want
 those latter objects, you could write::
 
-    Blog.objects.filter(entry__author__isnull=False,
-            entry__author__name__isnull=True)
+    Blog.objects.filter(entry__authors__isnull=False,
+            entry__authors__name__isnull=True)
 
 Spanning multi-valued relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -532,7 +532,7 @@ any joins needed to access the related object. For example, to retrieve all
 the entries where the author's name is the same as the blog name, we could
 issue the query:
 
-    >>> Entry.objects.filter(author__name=F('blog__name'))
+    >>> Entry.objects.filter(authors__name=F('blog__name'))
 
 The pk lookup shortcut
 ----------------------
