@@ -737,6 +737,15 @@ templates used by the :class:`ModelAdmin` views:
     Path to a custom template, used by :meth:`delete_view` for displaying a
     confirmation page when deleting one or more objects.
 
+.. attribute:: ModelAdmin.delete_selected_confirmation_template
+
+    .. versionadded:: 1.2
+
+    Path to a custom template, used by the :meth:`delete_selected`
+    action method for displaying a confirmation page when deleting one
+    or more objects. See the :ref:`actions
+    documentation<ref-contrib-admin-actions>`.
+
 .. attribute:: ModelAdmin.object_history_template
 
     Path to a custom template, used by :meth:`history_view`.

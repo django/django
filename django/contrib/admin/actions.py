@@ -68,7 +68,7 @@ def delete_selected(modeladmin, request, queryset):
     }
 
     # Display the confirmation page
-    return render_to_response(modeladmin.delete_confirmation_template or [
+    return render_to_response(modeladmin.delete_selected_confirmation_template or [
         "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
         "admin/%s/delete_selected_confirmation.html" % app_label,
         "admin/delete_selected_confirmation.html"
