@@ -112,6 +112,13 @@ div.breadcrumbs {
     margin-right: -10px;
 }
 
+.filtered .actions {
+    border-left:1px solid #DDDDDD;
+    margin-left:160px !important;
+    border-right: 0 none;
+    margin-right:0 !important;
+}
+
 /* FORMS */
 
 .aligned label {
