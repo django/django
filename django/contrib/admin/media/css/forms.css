@@ -67,6 +67,12 @@ form ul.inline li {
     width: 8em;
 }
 
+.aligned ul label {
+    display: inline;
+    float: none;
+    width: auto;
+}
+
 .colMS .aligned .vLargeTextField, .colMS .aligned .vXMLLargeTextField {
     width: 350px;
 }
