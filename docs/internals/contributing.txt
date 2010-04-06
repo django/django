@@ -454,7 +454,7 @@ follows::
     settings.configure({}, SOME_SETTING='foo')
 
 However, if any setting is accessed before the ``settings.configure`` line, this
-will not work. (Internally, ``setttings`` is a ``LazyObject`` which configures
+will not work. (Internally, ``settings`` is a ``LazyObject`` which configures
 itself automatically when the settings are accessed if it has not already been
 configured).
 
@@ -827,7 +827,7 @@ following is a minimal settings file that can be used to test SQLite::
     }
 
 As a convenience, this settings file is included in your Django
-distribution. It is called ``test_sqlite`, and is included in
+distribution. It is called ``test_sqlite``, and is included in
 the ``tests`` directory. This allows you to get started running
 the tests against the sqlite database without doing anything on
 your filesystem. However it should be noted that running against
