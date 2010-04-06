@@ -167,15 +167,14 @@ For example::
 This example allows you to request ``Person.men.all()``, ``Person.women.all()``,
 and ``Person.people.all()``, yielding predictable results.
 
-If you use custom ``Manager`` objects, take note that the first
-``Manager`` Django encounters (in the order in which they're defined
-in the model) has a special status. Django interprets this first
-``Manager`` defined in a class as the "default" ``Manager``, and
-several parts of Django (though not the admin application) will use
-that ``Manager`` exclusively for that model. As a result, it's often a
-good idea to be careful in your choice of default manager, in order to
-avoid a situation where overriding of ``get_query_set()`` results in
-an inability to retrieve objects you'd like to work with.
+If you use custom ``Manager`` objects, take note that the first ``Manager``
+Django encounters (in the order in which they're defined in the model) has a
+special status. Django interprets the first ``Manager`` defined in a class as
+the "default" ``Manager``, and several parts of Django will use that ``Manager``
+exclusively for that model. As a result, it's a good idea to be careful in
+your choice of default manager in order to avoid a situation where overriding
+``get_query_set()`` results in an inability to retrieve objects you'd like to
+work with.
 
 .. _managers-for-related-objects:
 
