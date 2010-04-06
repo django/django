@@ -80,10 +80,10 @@ class ValidM2M(models.Model):
     # M2M fields are symmetrical by default. Symmetrical M2M fields
     # on self don't require a related accessor, so many potential
     # clashes are avoided.
-    validm2m_set = models.ManyToManyField("ValidM2M")
+    validm2m_set = models.ManyToManyField("self")
 
-    m2m_1 = models.ManyToManyField("ValidM2M", related_name='id')
-    m2m_2 = models.ManyToManyField("ValidM2M", related_name='src_safe')
+    m2m_1 = models.ManyToManyField("self", related_name='id')
+    m2m_2 = models.ManyToManyField("self", related_name='src_safe')
 
     m2m_3 = models.ManyToManyField('self')
     m2m_4 = models.ManyToManyField('self')
@@ -94,10 +94,10 @@ class SelfClashM2M(models.Model):
 
     # Non-symmetrical M2M fields _do_ have related accessors, so
     # there is potential for clashes.
-    selfclashm2m_set = models.ManyToManyField("SelfClashM2M", symmetrical=False)
+    selfclashm2m_set = models.ManyToManyField("self", symmetrical=False)
 
-    m2m_1 = models.ManyToManyField("SelfClashM2M", related_name='id', symmetrical=False)
-    m2m_2 = models.ManyToManyField("SelfClashM2M", related_name='src_safe', symmetrical=False)
+    m2m_1 = models.ManyToManyField("self", related_name='id', symmetrical=False)
+    m2m_2 = models.ManyToManyField("self", related_name='src_safe', symmetrical=False)
 
     m2m_3 = models.ManyToManyField('self', symmetrical=False)
     m2m_4 = models.ManyToManyField('self', symmetrical=False)
