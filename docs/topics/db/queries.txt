@@ -442,7 +442,7 @@ Spanning multi-valued relationships
 .. versionadded:: 1.0
 
 When you are filtering an object based on a ``ManyToManyField`` or a reverse
-``ForeignKeyField``, there are two different sorts of filter you may be
+``ForeignKey``, there are two different sorts of filter you may be
 interested in. Consider the ``Blog``/``Entry`` relationship (``Blog`` to
 ``Entry`` is a one-to-many relation). We might be interested in finding blogs
 that have an entry which has both *"Lennon"* in the headline and was published
