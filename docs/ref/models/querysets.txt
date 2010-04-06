@@ -174,7 +174,7 @@ In SQL terms, that evaluates to::
 
     SELECT ...
     WHERE NOT pub_date > '2005-1-3'
-    OR NOT headline = 'Hello'
+    AND NOT headline = 'Hello'
 
 Note the second example is more restrictive.
 
