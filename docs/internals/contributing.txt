@@ -450,7 +450,7 @@ follows::
     settings.configure({}, SOME_SETTING='foo')
 
 However, if any setting is accessed before the ``settings.configure`` line, this
-will not work. (Internally, ``setttings`` is a ``LazyObject`` which configures
+will not work. (Internally, ``settings`` is a ``LazyObject`` which configures
 itself automatically when the settings are accessed if it has not already been
 configured).
 
