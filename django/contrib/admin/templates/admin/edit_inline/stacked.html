@@ -48,6 +48,17 @@
                 })
             }
         }
+        var initPrepopulatedFields = function(row) {
+            row.find('.prepopulated_field').each(function() {
+                var field = $(this);
+                var input = field.find('input, select, textarea');
+                var dependency_list = input.data('dependency_list') || [];
+                var dependencies = row.find(dependency_list.join(',')).find('input, select, textarea');
+                if (dependencies.length) {
+                    input.prepopulate(dependencies, input.attr('maxlength'));
+                }
+            });
+        }
         $(rows).formset({
             prefix: "{{ inline_admin_formset.formset.prefix }}",
             addText: "{% blocktrans with inline_admin_formset.opts.verbose_name|title as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
@@ -57,6 +68,7 @@
             emptyCssClass: "empty-form",
             removed: updateInlineLabel,
             added: (function(row) {
+                initPrepopulatedFields(row);
                 reinitDateTimeShortCuts();
                 updateSelectFilter();
                 updateInlineLabel(row);

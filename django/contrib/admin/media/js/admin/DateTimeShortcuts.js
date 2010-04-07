@@ -120,6 +120,7 @@ var DateTimeShortcuts = {
     },
     handleClockQuicklink: function(num, val) {
        DateTimeShortcuts.clockInputs[num].value = val;
+       DateTimeShortcuts.clockInputs[num].focus();
        DateTimeShortcuts.dismissClock(num);
     },
     // Add calendar widget to a given field.
@@ -247,12 +248,21 @@ var DateTimeShortcuts = {
         format = format.replace('\n', '\\n');
         format = format.replace('\t', '\\t');
         format = format.replace("'", "\\'");
-        return "function(y, m, d) { DateTimeShortcuts.calendarInputs["+num+"].value = new Date(y, m-1, d).strftime('"+format+"');document.getElementById(DateTimeShortcuts.calendarDivName1+"+num+").style.display='none';}";
+        return ["function(y, m, d) { DateTimeShortcuts.calendarInputs[",
+               num,
+               "].value = new Date(y, m-1, d).strftime('",
+               format,
+               "');DateTimeShortcuts.calendarInputs[",
+               num,
+               "].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+",
+               num,
+               ").style.display='none';}"].join('');
     },
     handleCalendarQuickLink: function(num, offset) {
        var d = new Date();
        d.setDate(d.getDate() + offset)
        DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
+       DateTimeShortcuts.calendarInputs[num].focus();
        DateTimeShortcuts.dismissCalendar(num);
     },
     cancelEventPropagation: function(e) {

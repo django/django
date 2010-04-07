@@ -55,24 +55,41 @@
 				var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
 				var nextIndex = parseInt(totalForms.val());
 				var template = $("#" + options.prefix + "-empty");
-				var row = template.clone(true).get(0);
-				$(row).removeClass(options.emptyCssClass).removeAttr("id").insertBefore($(template));
-				$(row).html($(row).html().replace(/__prefix__/g, nextIndex));
-				$(row).addClass(options.formCssClass).attr("id", options.prefix + (nextIndex + 1));
-				if ($(row).is("TR")) {
+				var row = template.clone(true);
+				row.removeClass(options.emptyCssClass)
+				    .addClass(options.formCssClass)
+				    .attr("id", options.prefix + nextIndex)
+				    .insertBefore($(template));
+				row.find("*")
+				    .filter(function() {
+				        var el = $(this);
+				        return el.attr("id") && el.attr("id").search(/__prefix__/) >= 0;
+				    }).each(function() {
+				        var el = $(this);
+				        el.attr("id", el.attr("id").replace(/__prefix__/g, nextIndex));
+				    })
+				    .end()
+				    .filter(function() {
+				        var el = $(this);
+				        return el.attr("name") && el.attr("name").search(/__prefix__/) >= 0;
+				    }).each(function() {
+				        var el = $(this);
+				        el.attr("name", el.attr("name").replace(/__prefix__/g, nextIndex));
+				    });
+				if (row.is("tr")) {
 					// If the forms are laid out in table rows, insert
 					// the remove button into the last table cell:
-					$(row).children(":last").append('<div><a class="' + options.deleteCssClass +'" href="javascript:void(0)">' + options.deleteText + "</a></div>");
-				} else if ($(row).is("UL") || $(row).is("OL")) {
+					row.children(":last").append('<div><a class="' + options.deleteCssClass +'" href="javascript:void(0)">' + options.deleteText + "</a></div>");
+				} else if (row.is("ul") || row.is("ol")) {
 					// If they're laid out as an ordered/unordered list,
 					// insert an <li> after the last list item:
-					$(row).append('<li><a class="' + options.deleteCssClass +'" href="javascript:void(0)">' + options.deleteText + "</a></li>");
+					row.append('<li><a class="' + options.deleteCssClass +'" href="javascript:void(0)">' + options.deleteText + "</a></li>");
 				} else {
 					// Otherwise, just insert the remove button as the
 					// last child element of the form's container:
-					$(row).children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
+					row.children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
 				}
-				$(row).find("input,select,textarea,label,a").each(function() {
+				row.find("input,select,textarea,label,a").each(function() {
 					updateElementIndex(this, options.prefix, totalForms.val());
 				});
 				// Update number of total forms
@@ -82,7 +99,7 @@
 					addButton.parent().hide();
 				}
 				// The delete button of each row triggers a bunch of other things
-				$(row).find("a." + options.deleteCssClass).click(function() {
+				row.find("a." + options.deleteCssClass).click(function() {
 					// Remove the parent form containing this button:
 					var row = $(this).parents("." + options.formCssClass);
 					row.remove();
@@ -109,7 +126,7 @@
 				});
 				// If a post-add callback was supplied, call it with the added form:
 				if (options.added) {
-					options.added($(row));
+					options.added(row);
 				}
 				return false;
 			});
