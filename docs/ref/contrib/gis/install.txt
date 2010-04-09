@@ -89,7 +89,7 @@ Program                   Description                           Required        
 ========================  ====================================  ================================  ==========================
 :ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.2, 3.1, 3.0
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.7, 4.6, 4.5, 4.4
-:ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.6, 1.5, 1.4
+:ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.7, 1.6, 1.5, 1.4
 :ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             1.5, 1.4, 1.3
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 2.4, 2.3
@@ -150,13 +150,13 @@ directly from Python using ctypes.
 First, download GEOS 3.2 from the refractions website and untar the source 
 archive::
 
-    $ wget http://download.osgeo.org/geos/geos-3.2.0.tar.bz2
-    $ tar xjf geos-3.2.0.tar.bz2
+    $ wget http://download.osgeo.org/geos/geos-3.2.1.tar.bz2
+    $ tar xjf geos-3.2.1.tar.bz2
 
 Next, change into the directory where GEOS was unpacked, run the configure 
 script, compile, and install::
 
-    $ cd geos-3.2.0
+    $ cd geos-3.2.1
     $ ./configure
     $ make
     $ sudo make install
@@ -465,11 +465,11 @@ pysqlite2
 
 Because SpatiaLite must be loaded as an external extension, it requires the
 ``enable_load_extension`` method, which is only available in versions 2.5+.
-Thus, download pysqlite2 2.5, and untar::
+Thus, download pysqlite2 2.6, and untar::
   
-    $ wget http://pysqlite.googlecode.com/files/pysqlite-2.5.6.tar.gz
-    $ tar xzf pysqlite-2.5.6.tar.gz
-    $ cd pysqlite-2.5.6
+    $ wget http://pysqlite.googlecode.com/files/pysqlite-2.6.0.tar.gz
+    $ tar xzf pysqlite-2.6.0.tar.gz
+    $ cd pysqlite-2.6.0
 
 Next, use a text editor (e.g., ``emacs`` or ``vi``) to edit the ``setup.cfg`` file
 to look like the following::
@@ -520,7 +520,7 @@ user.  For example, you can use the following to become the ``postgres`` user::
    versions 1.4 and 1.5 use ``<sharedir>/contrib/postgis-1.4/postgis.sql`` and
    ``<sharedir>/contrib/postgis-1.5/postgis.sql``, respectively.
 
-   The example below assumes 1.5, thus you may need to modify
+   The example below assumes PostGIS 1.5, thus you may need to modify
    ``POSTGIS_SQL_PATH`` and the name of the SQL file for the specific 
    version of PostGIS you are using.
 
@@ -540,10 +540,8 @@ modifications to these commands::
     $ psql -d template_postgis -f $POSTGIS_SQL_PATH/spatial_ref_sys.sql
     # Enabling users to alter spatial tables.
     $ psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;"
+    $ psql -d template_postgis -c "GRANT ALL ON geography_columns TO PUBLIC;"
     $ psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
-
-
-
 
 These commands may be placed in a shell script for later use; for convenience
 the following scripts are available:
@@ -551,9 +549,9 @@ the following scripts are available:
 ===============  ==========================================
 PostGIS Version  Shell Script
 ===============  ==========================================
-1.3              :download:`create_template_postgis-1.3.sh`
-1.4              :download:`create_template_postgis-1.4.sh`
-1.5              :download:`create_template_postgis-1.5.sh`
+1.3              `create_template_postgis-1.3.sh`_
+1.4              `create_template_postgis-1.4.sh`_
+1.5              `create_template_postgis-1.5.sh`_
 ===============  ==========================================
 
 Afterwards, you may create a spatial database by simply specifying
@@ -568,6 +566,11 @@ Afterwards, you may create a spatial database by simply specifying
     You can create such a user with the following command::
 
         $ createuser --createdb <user>
+
+.. _create_template_postgis-1.3.sh: http://geodjango.org/docs/create_template_postgis-1.3.sh
+.. _create_template_postgis-1.4.sh: http://geodjango.org/docs/create_template_postgis-1.4.sh
+.. _create_template_postgis-1.5.sh: http://geodjango.org/docs/create_template_postgis-1.5.sh
+.. _create_template_postgis-debian.sh: http://geodjango.org/docs/create_template_postgis-debian.sh
 
 .. _create_spatialite_db:
 
@@ -991,7 +994,7 @@ Optional packages to consider:
 .. note::
 
     The PostGIS SQL files are not placed the PostgreSQL share directory in the
-    Ubuntu packages.  Use the :download:`create_template_postgis-debian.sh` script
+    Ubuntu packages.  Use the `create_template_postgis-debian.sh`_ script
     instead when :ref:`spatialdb_template`.
 
 .. _debian:
@@ -1075,7 +1078,7 @@ Debian 5.0 . Thus when :ref:`spatialdb_template` either:
 
   If not running PostgreSQL 8.3, then  replace ``8.3`` in the command above with the correct version.
 
-* Or use the :download:`create_template_postgis-debian.sh` to create the spatial database.
+* Or use the `create_template_postgis-debian.sh`_ to create the spatial database.
 
 .. _windows:
 

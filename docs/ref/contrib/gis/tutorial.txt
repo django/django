@@ -313,7 +313,7 @@ may also use the following to populate your spatial database:
 * `shp2pgsql`_: This utility is included with PostGIS and only supports
   ESRI shapefiles.
 
-.. _ogr2ogr: http://www.gdal.org/ogr/ogr2ogr.html
+.. _ogr2ogr: http://www.gdal.org/ogr2ogr.html
 .. _shp2pgsql: http://postgis.refractions.net/documentation/manual-1.5/ch04.html#shp2pgsql_usage
 
 .. _gdalinterface:

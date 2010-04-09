@@ -25,9 +25,10 @@ then inserting into a GeoDjango model.
 
     GIS data sources, like shapefiles, may be very large.  If you find
     that :class:`LayerMapping` is using too much memory, set
-    ``DEBUG=False`` in your settings.  When ``DEBUG=True`` Django automatically
-    logs *every* SQL query -- thus, when SQL statements contain geometries, it is 
-    easy to consume more memory than usual.
+    :setting:`DEBUG` to ``False`` in your settings.  When :setting:`DEBUG`
+    is set to ``True``, Django :ref:`automatically logs <faq-see-raw-sql-queries>`
+    *every* SQL query -- thus, when SQL statements contain geometries, it is 
+    easy to consume more memory than is typical.
 
 Example
 =======
@@ -80,7 +81,7 @@ Here, :class:`LayerMapping` just transformed the three geometries from the
 shapefile in their original spatial reference system (WGS84) to the spatial
 reference system of the GeoDjango model (NAD83).  If no spatial reference 
 system is defined for the layer, use the ``source_srs`` keyword with a 
-:class:`django.contrib.gis.gdal.SpatialReference` object to specify one.
+:class:`~django.contrib.gis.gdal.SpatialReference` object to specify one.
 
 ``LayerMapping`` API
 ====================

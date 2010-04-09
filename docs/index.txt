@@ -168,6 +168,7 @@ Other batteries included
     * :ref:`Databrowse <ref-contrib-databrowse>`
     * :ref:`E-mail (sending) <topics-email>`
     * :ref:`Flatpages <ref-contrib-flatpages>`
+    * :ref:`GeoDjango <ref-contrib-gis>`
     * :ref:`Humanize <ref-contrib-humanize>`
     * :ref:`Internationalization <topics-i18n>`
     * :ref:`Jython support <howto-jython>`
