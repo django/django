@@ -1,7 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.utils.datastructures import SortedDict
 
 from optparse import make_option
@@ -79,7 +79,7 @@ class Command(BaseCommand):
         # Now collate the objects to be serialized.
         objects = []
         for model in sort_dependencies(app_list.items()):
-            if not model._meta.proxy:
+            if not model._meta.proxy and router.allow_syncdb(using, model):
                 objects.extend(model._default_manager.using(using).all())
 
         try:

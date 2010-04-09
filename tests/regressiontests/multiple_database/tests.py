@@ -1,8 +1,11 @@
 import datetime
 import pickle
+import sys
+from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.utils import ConnectionRouter
 from django.test import TestCase
@@ -1211,9 +1214,18 @@ class AuthTestCase(TestCase):
         self.old_routers = router.routers
         router.routers = [AuthRouter()]
 
+        # Redirect stdout to a buffer so we can test
+        # the output of a management command
+        self.old_stdout = sys.stdout
+        self.stdout = StringIO()
+        sys.stdout = self.stdout
+
     def tearDown(self):
         # Restore the 'other' database as an independent database
         router.routers = self.old_routers
+
+        # Restore stdout
+        sys.stdout = self.old_stdout
 
     def test_auth_manager(self):
         "The methods on the auth manager obey database hints"
@@ -1242,6 +1254,22 @@ class AuthTestCase(TestCase):
         # That is... there is one user on each database
         self.assertEquals(User.objects.using('default').count(), 1)
         self.assertEquals(User.objects.using('other').count(), 1)
+
+    def test_dumpdata(self):
+        "Check that dumpdata honors allow_syncdb restrictions on the router"
+        User.objects.create_user('alice', 'alice@example.com')
+        User.objects.db_manager('default').create_user('bob', 'bob@example.com')
+
+        # Check that dumping the default database doesn't try to include auth
+        # because allow_syncdb prohibits auth on default
+        self.stdout.flush()
+        management.call_command('dumpdata', 'auth', format='json', database='default')
+        self.assertEquals(self.stdout.getvalue(), '[]\n')
+
+        # Check that dumping the other database does include auth
+        self.stdout.flush()
+        management.call_command('dumpdata', 'auth', format='json', database='other')
+        self.assertTrue('alice@example.com' in self.stdout.getvalue())
 
 class UserProfileTestCase(TestCase):
     def setUp(self):
@@ -1306,7 +1334,6 @@ class FixtureTestCase(TestCase):
             Book.objects.using('other').get(title="The Definitive Guide to Django")
         except Book.DoesNotExist:
             self.fail('"The Definitive Guide to Django" should exist on both databases')
-
 
 class PickleQuerySetTestCase(TestCase):
     multi_db = True
