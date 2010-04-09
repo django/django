@@ -191,6 +191,13 @@ class BooleanFieldTests(unittest.TestCase):
         self.assertTrue(isinstance(b4.nbfield, bool))
         self.assertEqual(b4.nbfield, False)
 
+        # http://code.djangoproject.com/ticket/13293
+        # Verify that when an extra clause exists, the boolean
+        # conversions are applied with an offset
+        b5 = BooleanModel.objects.all().extra(
+            select={'string_length': 'LENGTH(string)'})[0]
+        self.assertFalse(isinstance(b5.pk, bool))
+
 class ChoicesTests(django.test.TestCase):
     def test_choices_and_field_display(self):
         """
