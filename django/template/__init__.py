@@ -48,6 +48,7 @@ u'<html><h1>Hello</h1></html>'
 >>> t.render(c)
 u'<html></html>'
 """
+import imp
 import re
 from inspect import getargspec
 
@@ -979,10 +980,19 @@ def import_library(taglib_module):
     Verifies that the library contains a 'register' attribute, and
     returns that attribute as the representation of the library
     """
+    # We need to be able to tell the difference between a tag library that
+    # doesn't exist, and a tag library with errors in it.
+    # find_module() finds, but doesn't actually load the module requested.
+    # If it raises ImportError, it means the module doesn't exist.
+    # If you then use load_module(), any ImportError is guaranteed to be
+    # an actual import problem with the module.
+    app_path, taglib = taglib_module.rsplit('.',1)
+    app_module = import_module(app_path)
     try:
-        mod = import_module(taglib_module)
-    except ImportError:
+        imp.find_module(taglib, app_module.__path__)
+    except ImportError,e:
         return None
+    mod = import_module(taglib_module)
     try:
         return mod.register
     except AttributeError:
