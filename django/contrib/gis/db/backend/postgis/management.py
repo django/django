@@ -12,7 +12,8 @@ def _get_postgis_func(func):
     cursor = connection.cursor()
     cursor.execute('SELECT %s()' % func)
     row = cursor.fetchone()
-    cursor.close()
+    # Close out the connection.  See #9437.
+    connection.close()
     return row[0]
 
 ### PostGIS management functions ###
