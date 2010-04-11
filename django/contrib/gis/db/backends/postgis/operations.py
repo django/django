@@ -413,7 +413,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                 # Responsibility of callers to perform error handling.
                 raise
         finally:
-            cursor.close()
+            # Close out the connection.  See #9437.
+            self.connection.close()
         return row[0]
 
     def postgis_geos_version(self):
