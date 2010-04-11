@@ -16,7 +16,7 @@ class Article(models.Model):
 
     def test_from_model_with_override(self):
         return "nothing"
-    test_from_model_with_override.short_description = "not what you expect"
+    test_from_model_with_override.short_description = "not What you Expect"
 
 class Count(models.Model):
     num = models.PositiveSmallIntegerField()

@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
 from django.forms.util import flatatt
+from django.template.defaultfilters import capfirst
 from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape, conditional_escape
 from django.utils.safestring import mark_safe
@@ -132,8 +133,12 @@ class AdminReadonlyField(object):
         # Make self.field look a little bit like a field. This means that
         # {{ field.name }} must be a useful class name to identify the field.
         # For convenience, store other field-related data here too.
+        if callable(field):
+            class_name = field.__name__ != '<lambda>' and field.__name__ or ''
+        else:
+            class_name = field
         self.field = {
-            'name': force_unicode(label != '--' and label or ''),
+            'name': class_name,
             'label': label,
             'field': field,
         }
@@ -147,8 +152,8 @@ class AdminReadonlyField(object):
         attrs = {}
         if not self.is_first:
             attrs["class"] = "inline"
-        label = forms.forms.pretty_name(self.field['label'])
-        contents = force_unicode(escape(label)) + u":"
+        label = self.field['label']
+        contents = capfirst(force_unicode(escape(label))) + u":"
         return mark_safe('<label%(attrs)s>%(contents)s</label>' % {
             "attrs": flatatt(attrs),
             "contents": contents,
@@ -213,7 +218,7 @@ class InlineAdminFormSet(object):
                 continue
             if field in self.readonly_fields:
                 label = label_for_field(field, self.opts.model, self.model_admin)
-                yield (False, forms.forms.pretty_name(label))
+                yield (False, label)
             else:
                 field = self.formset.form.base_fields[field]
                 yield (field.widget.is_hidden, field.label)

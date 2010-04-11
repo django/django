@@ -157,7 +157,7 @@ class UtilTests(unittest.TestCase):
             "another name"
         )
         self.assertEquals(
-            label_for_field("title2", Article, return_attr=True), 
+            label_for_field("title2", Article, return_attr=True),
             ("another name", None)
         )
 
@@ -179,24 +179,24 @@ class UtilTests(unittest.TestCase):
             return "nothing"
         self.assertEquals(
             label_for_field(test_callable, Article),
-            "test_callable"
+            "Test callable"
         )
         self.assertEquals(
             label_for_field(test_callable, Article, return_attr=True),
-            ("test_callable", test_callable)
+            ("Test callable", test_callable)
         )
 
         self.assertEquals(
             label_for_field("test_from_model", Article),
-            "test_from_model"
+            "Test from model"
         )
         self.assertEquals(
             label_for_field("test_from_model", Article, return_attr=True),
-            ("test_from_model", Article.test_from_model)
+            ("Test from model", Article.test_from_model)
         )
         self.assertEquals(
             label_for_field("test_from_model_with_override", Article),
-            "not what you expect"
+            "not What you Expect"
         )
 
         self.assertEquals(
@@ -207,15 +207,16 @@ class UtilTests(unittest.TestCase):
         class MockModelAdmin(object):
             def test_from_model(self, obj):
                 return "nothing"
-            test_from_model.short_description = "not really the model"
+            test_from_model.short_description = "not Really the Model"
+
         self.assertEquals(
             label_for_field("test_from_model", Article, model_admin=MockModelAdmin),
-            "not really the model"
+            "not Really the Model"
         )
         self.assertEquals(
             label_for_field("test_from_model", Article,
                 model_admin = MockModelAdmin,
                 return_attr = True
             ),
-            ("not really the model", MockModelAdmin.test_from_model)
+            ("not Really the Model", MockModelAdmin.test_from_model)
         )

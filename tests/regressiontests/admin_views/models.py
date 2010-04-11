@@ -474,7 +474,7 @@ class Post(models.Model):
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'public']
-    readonly_fields = ('posted', 'awesomeness_level', 'coolness', lambda obj: "foo")
+    readonly_fields = ('posted', 'awesomeness_level', 'coolness', 'value', lambda obj: "foo")
 
     inlines = [
         LinkInline
@@ -486,6 +486,9 @@ class PostAdmin(admin.ModelAdmin):
         else:
             return "Unkown coolness."
 
+    def value(self, instance):
+        return 1000
+    value.short_description = 'Value in $US'
 
 class Gadget(models.Model):
     name = models.CharField(max_length=100)
@@ -567,7 +570,7 @@ class CyclicTwo(models.Model):
         return self.name
 
 class Topping(models.Model):
-    name = models.CharField(max_length=20) 
+    name = models.CharField(max_length=20)
 
 class Pizza(models.Model):
     name = models.CharField(max_length=20)

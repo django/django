@@ -1970,6 +1970,7 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, '<div class="form-row coolness">')
         self.assertContains(response, '<div class="form-row awesomeness_level">')
         self.assertContains(response, '<div class="form-row posted">')
+        self.assertContains(response, '<div class="form-row value">')
         self.assertContains(response, '<div class="form-row ">')
 
         p = Post.objects.create(title="I worked on readonly_fields", content="Its good stuff")

@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.forms.forms import pretty_name
 from django.utils import formats
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -303,9 +304,9 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
                 if attr.__name__ == "<lambda>":
                     label = "--"
                 else:
-                    label = attr.__name__
+                    label = pretty_name(attr.__name__)
             else:
-                label = name
+                label = pretty_name(name)
     if return_attr:
         return (label, attr)
     else:

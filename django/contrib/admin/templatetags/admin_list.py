@@ -88,7 +88,6 @@ def result_headers(cl):
                     "class_attrib": mark_safe(' class="action-checkbox-column"')
                 }
                 continue
-            header = pretty_name(header)
 
             # It is a non-field, but perhaps one that is sortable
             admin_order_field = getattr(attr, "admin_order_field", None)
