@@ -216,7 +216,7 @@ class Command(BaseCommand):
             transaction.leave_transaction_management(using=using)
 
         if object_count == 0:
-            if verbosity > 1:
+            if verbosity > 0:
                 print "No fixtures found."
         else:
             if verbosity > 0:
