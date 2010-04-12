@@ -18,6 +18,13 @@ class Bug8245Test(TestCase):
         else:
             self.fail(
                 'autodiscover should have raised a "Bad admin module" error.')
-        # Calling autodiscover again should bail out early and not raise an
-        # AlreadyRegistered error.
-        admin.autodiscover()
+
+        # Calling autodiscover again should raise the very same error it did
+        # the first time, not an AlreadyRegistered error.
+        try:
+            admin.autodiscover()
+        except Exception, e:
+            self.failUnlessEqual(str(e), "Bad admin module")
+        else:
+            self.fail( 
+                'autodiscover should have raised a "Bad admin module" error.')
