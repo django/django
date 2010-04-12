@@ -948,6 +948,12 @@ class EmptyQuerySet(QuerySet):
         # (it raises StopIteration immediately).
         yield iter([]).next()
 
+    def update(self, **kwargs):
+        """
+        Don't update anything.
+        """
+        return 0
+
     # EmptyQuerySet is always an empty result in where-clauses (and similar
     # situations).
     value_annotation = False
