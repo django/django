@@ -1,4 +1,8 @@
 import unittest
+try:
+    set
+except NameError:
+    from sets import Set as set
 
 from django.db import DatabaseError, connection
 from django.db.models import Count
