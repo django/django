@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
 
+import imp
 import sys
 import os
 import threading
@@ -71,8 +72,9 @@ class AppCache(object):
         """
         self.handled[app_name] = None
         self.nesting_level += 1
+        app_module = import_module(app_name)
         try:
-            models = import_module('.models', app_name)
+            imp.find_module('models', app_module.__path__)
         except ImportError:
             self.nesting_level -= 1
             if can_postpone:
@@ -82,6 +84,7 @@ class AppCache(object):
                 # populate).
                 self.postponed.append(app_name)
             return None
+        models = import_module('.models', app_name)
         self.nesting_level -= 1
         if models not in self.app_store:
             self.app_store[models] = len(self.app_store)

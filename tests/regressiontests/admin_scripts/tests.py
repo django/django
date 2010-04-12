@@ -13,7 +13,7 @@ from django import conf, bin, get_version
 from django.conf import settings
 
 class AdminScriptTestCase(unittest.TestCase):
-    def write_settings(self, filename, apps=None, is_dir=False):
+    def write_settings(self, filename, apps=None, is_dir=False, sdict=None):
         test_dir = os.path.dirname(os.path.dirname(__file__))
         if is_dir:
             settings_dir = os.path.join(test_dir,filename)
@@ -38,6 +38,10 @@ class AdminScriptTestCase(unittest.TestCase):
 
         if apps:
             settings_file.write("INSTALLED_APPS = %s\n" % apps)
+
+        if sdict:
+            for k, v in sdict.items():
+                settings_file.write("%s = %s\n" % (k, v))
 
         settings_file.close()
 
@@ -951,6 +955,28 @@ class ManageMultipleSettings(AdminScriptTestCase):
         out, err = self.run_manage(args,'alternate_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
+
+
+class ManageValidateImportErrorsReported(AdminScriptTestCase):
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_nonexistent_app(self):
+        "manage.py validate reports an error on a non-existent app in INSTALLED_APPS"
+        self.write_settings('settings.py', apps=['admin_scriptz.broken_app'], sdict={'USE_I18N': False})
+        args = ['validate']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, 'No module named admin_scriptz.broken_app')
+
+    def test_broken_app(self):
+        "manage.py validate reports an ImportError if an app's models.py raises one on import"
+        self.write_settings('settings.py', apps=['admin_scripts.broken_app'])
+        args = ['validate']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, 'ImportError')
+       
 
 ##########################################################################
 # COMMAND PROCESSING TESTS
