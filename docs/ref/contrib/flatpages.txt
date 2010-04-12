@@ -84,7 +84,7 @@ other status code.
 
    Because the ``FlatpageFallbackMiddleware`` is applied only after
    URL resolution has failed and produced a 404, the response it
-   returns will not apply any :ref:`view middleware <view-middlware>`
+   returns will not apply any :ref:`view middleware <view-middleware>`
    methods. Only requests which are successfully routed to a view via
    normal URL resolution apply view middleware.
 
