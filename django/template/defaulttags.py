@@ -243,7 +243,12 @@ class IfNode(Node):
             yield node
 
     def render(self, context):
-        if self.var.eval(context):
+        try:
+            var = self.var.eval(context)
+        except VariableDoesNotExist:
+            var = None
+
+        if var:
             return self.nodelist_true.render(context)
         else:
             return self.nodelist_false.render(context)

@@ -782,6 +782,12 @@ class Templates(unittest.TestCase):
             'if-tag-error11': ("{% if 1 == %}yes{% endif %}", {}, template.TemplateSyntaxError),
             'if-tag-error12': ("{% if a not b %}yes{% endif %}", {}, template.TemplateSyntaxError),
 
+            # Non-existent args
+            'if-tag-badarg01':("{% if x|default_if_none:y %}yes{% endif %}", {}, ''),
+            'if-tag-badarg02':("{% if x|default_if_none:y %}yes{% endif %}", {'y': 0}, ''),
+            'if-tag-badarg03':("{% if x|default_if_none:y %}yes{% endif %}", {'y': 1}, 'yes'),
+            'if-tag-badarg04':("{% if x|default_if_none:y %}yes{% else %}no{% endif %}", {}, 'no'),
+
             # Additional, more precise parsing tests are in SmartIfTests
 
             ### IFCHANGED TAG #########################################################
