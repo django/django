@@ -76,7 +76,8 @@ class Fieldset(object):
 
     def _media(self):
         if 'collapse' in self.classes:
-            return forms.Media(js=['%sjs/collapse.min.js' % settings.ADMIN_MEDIA_PREFIX])
+            js = ['js/jquery.min.js', 'js/jquery.init.js', 'js/collapse.min.js']
+            return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
         return forms.Media()
     media = property(_media)
 

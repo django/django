@@ -271,7 +271,7 @@ class ModelAdmin(BaseModelAdmin):
 
         js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
         if self.actions is not None:
-            js.extend(['js/jquery.min.js', 'js/actions.min.js'])
+            js.extend(['js/jquery.min.js', 'js/jquery.init.js', 'js/actions.min.js'])
         if self.prepopulated_fields:
             js.append('js/urlify.js')
             js.append('js/prepopulate.js')
@@ -1199,7 +1199,7 @@ class InlineModelAdmin(BaseModelAdmin):
 
     def _media(self):
         from django.conf import settings
-        js = ['js/jquery.min.js', 'js/inlines.min.js']
+        js = ['js/jquery.min.js', 'js/jquery.init.js', 'js/inlines.min.js']
         if self.prepopulated_fields:
             js.append('js/urlify.js')
             js.append('js/prepopulate.js')

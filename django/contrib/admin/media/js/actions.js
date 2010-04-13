@@ -108,4 +108,4 @@
 		allToggle: "#action-toggle",
 		selectedClass: "selected"
 	}
-})(jQuery);
+})(django.jQuery);

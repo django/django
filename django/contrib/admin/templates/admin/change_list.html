@@ -9,7 +9,7 @@
     {% url admin:jsi18n as jsi18nurl %}
     <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/' }}"></script>
   {% endif %}
-  {{ media }}
+  {{ media.css }}
   {% if not actions_on_top and not actions_on_bottom %}
     <style>
       #changelist table thead th:first-child {width: inherit}
@@ -19,13 +19,14 @@
 
 {% block extrahead %}
 {{ block.super }}
+{{ media.js }}
 {% if action_form %}{% if actions_on_top or actions_on_bottom %}
 <script type="text/javascript">
 (function($) {
     $(document).ready(function($) {
         $("tr input.action-select").actions();
     });
-})(jQuery.noConflict());
+})(django.jQuery);
 </script>
 {% endif %}{% endif %}
 {% endblock %}
