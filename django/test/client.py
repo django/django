@@ -221,53 +221,57 @@ class Client(object):
         # callback function.
         data = {}
         on_template_render = curry(store_rendered_templates, data)
-        signals.template_rendered.connect(on_template_render)
-
+        signals.template_rendered.connect(on_template_render, dispatch_uid="template-render")
         # Capture exceptions created by the handler.
-        got_request_exception.connect(self.store_exc_info)
-
+        got_request_exception.connect(self.store_exc_info, dispatch_uid="request-exception")
         try:
-            response = self.handler(environ)
-        except TemplateDoesNotExist, e:
-            # If the view raises an exception, Django will attempt to show
-            # the 500.html template. If that template is not available,
-            # we should ignore the error in favor of re-raising the
-            # underlying exception that caused the 500 error. Any other
-            # template found to be missing during view error handling
-            # should be reported as-is.
-            if e.args != ('500.html',):
-                raise
 
-        # Look for a signalled exception, clear the current context
-        # exception data, then re-raise the signalled exception.
-        # Also make sure that the signalled exception is cleared from
-        # the local cache!
-        if self.exc_info:
-            exc_info = self.exc_info
-            self.exc_info = None
-            raise exc_info[1], None, exc_info[2]
+            try:
+                response = self.handler(environ)
+            except TemplateDoesNotExist, e:
+                # If the view raises an exception, Django will attempt to show
+                # the 500.html template. If that template is not available,
+                # we should ignore the error in favor of re-raising the
+                # underlying exception that caused the 500 error. Any other
+                # template found to be missing during view error handling
+                # should be reported as-is.
+                if e.args != ('500.html',):
+                    raise
 
-        # Save the client and request that stimulated the response.
-        response.client = self
-        response.request = request
+            # Look for a signalled exception, clear the current context
+            # exception data, then re-raise the signalled exception.
+            # Also make sure that the signalled exception is cleared from
+            # the local cache!
+            if self.exc_info:
+                exc_info = self.exc_info
+                self.exc_info = None
+                raise exc_info[1], None, exc_info[2]
 
-        # Add any rendered template detail to the response.
-        # If there was only one template rendered (the most likely case),
-        # flatten the list to a single element.
-        for detail in ('template', 'context'):
-            if data.get(detail):
-                if len(data[detail]) == 1:
-                    setattr(response, detail, data[detail][0]);
+            # Save the client and request that stimulated the response.
+            response.client = self
+            response.request = request
+
+            # Add any rendered template detail to the response.
+            # If there was only one template rendered (the most likely case),
+            # flatten the list to a single element.
+            for detail in ('template', 'context'):
+                if data.get(detail):
+                    if len(data[detail]) == 1:
+                        setattr(response, detail, data[detail][0]);
+                    else:
+                        setattr(response, detail, data[detail])
                 else:
-                    setattr(response, detail, data[detail])
-            else:
-                setattr(response, detail, None)
+                    setattr(response, detail, None)
 
-        # Update persistent cookie data.
-        if response.cookies:
-            self.cookies.update(response.cookies)
+            # Update persistent cookie data.
+            if response.cookies:
+                self.cookies.update(response.cookies)
 
-        return response
+            return response
+        finally:
+            signals.template_rendered.disconnect(dispatch_uid="template-render")
+            got_request_exception.disconnect(dispatch_uid="request-exception")
+
 
     def get(self, path, data={}, follow=False, **extra):
         """
