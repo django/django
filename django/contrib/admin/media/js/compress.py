@@ -21,12 +21,13 @@ compress all jQuery based files of the admin app."""
 
     compiler = os.path.expanduser(options.compiler)
     if not os.path.exists(compiler):
-        sys.exit("Compiler jar file %s not found. Please use the -c option to specify the path." % compiler)
+        sys.exit("Closure compiler jar file %s not found. Please use the -c option to specify the path." % compiler)
 
     if not args:
         if options.verbose:
             sys.stdout.write("No filenames given; defaulting to admin scripts\n")
-        args = [os.path.join(here, f) for f in ["actions.js", "collapse.js", "inlines.js"]]
+        args = [os.path.join(here, f) for f in [
+            "actions.js", "collapse.js", "inlines.js", "prepopulate.js"]]
 
     for arg in args:
         if not arg.endswith(".js"):

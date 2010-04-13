@@ -274,7 +274,7 @@ class ModelAdmin(BaseModelAdmin):
             js.extend(['js/jquery.min.js', 'js/jquery.init.js', 'js/actions.min.js'])
         if self.prepopulated_fields:
             js.append('js/urlify.js')
-            js.append('js/prepopulate.js')
+            js.append('js/prepopulate.min.js')
         if self.opts.get_ordered_objects():
             js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
 
@@ -1202,7 +1202,7 @@ class InlineModelAdmin(BaseModelAdmin):
         js = ['js/jquery.min.js', 'js/jquery.init.js', 'js/inlines.min.js']
         if self.prepopulated_fields:
             js.append('js/urlify.js')
-            js.append('js/prepopulate.js')
+            js.append('js/prepopulate.min.js')
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
         return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
