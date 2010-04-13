@@ -9,10 +9,11 @@ here = os.path.dirname(__file__)
 def main():
     usage = "usage: %prog [file1..fileN]"
     description = """With no file paths given this script will automatically
-compress all jQuery based files of the admin app."""
+compress all jQuery-based files of the admin app. Requires the Google Closure
+Compiler library and Java version 6 or later."""
     parser = optparse.OptionParser(usage, description=description)
     parser.add_option("-c", dest="compiler", default="~/bin/compiler.jar",
-                      help="path to closure compiler jar file")
+                      help="path to Closure Compiler jar file")
     parser.add_option("-v", "--verbose",
                       action="store_true", dest="verbose")
     parser.add_option("-q", "--quiet",
@@ -21,7 +22,7 @@ compress all jQuery based files of the admin app."""
 
     compiler = os.path.expanduser(options.compiler)
     if not os.path.exists(compiler):
-        sys.exit("Closure compiler jar file %s not found. Please use the -c option to specify the path." % compiler)
+        sys.exit("Google Closure compiler jar file %s not found. Please use the -c option to specify the path." % compiler)
 
     if not args:
         if options.verbose:

@@ -433,6 +433,44 @@ translated, here's what to do:
 
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
 
+Submitting javascript patches
+=============================
+
+.. versionadded:: 1.2
+
+Django's admin system leverages the jQuery framework to increase the
+capabilities of the admin interface. In conjunction, there is an emphasis on
+admin javascript performance and minimizing overall admin media file size.
+Serving compressed or "minified" versions of javascript files is considered
+best practice in this regard.
+
+To that end, patches for javascript files should include both the original
+code for future development (e.g. "foo.js"), and a compressed version for
+production use (e.g. "foo.min.js"). Any links to the file in the codebase
+should point to the compressed version.
+
+To simplify the process of providing optimized javascript code, Django
+includes a handy script which should be used to create a "minified" version.
+This script is located at ``/contrib/admin/media/js/compress.py``.
+
+Behind the scenes, ``compress.py`` is a front-end for Google's
+`Closure Compiler`_ which is written in Java. However, the Closure Compiler
+library is not bundled with Django directly, so those wishing to contribute
+complete javascript patches will need to download and install the library
+independently.
+
+The Closure Compiler library requires Java version 6 or higher (Java 1.6 or
+higher on Mac OS X). Note that Mac OS X 10.5 and earlier did not ship with Java
+1.6 by default, so it may be necessary to upgrade your Java installation before
+the tool will be functional. Also note that even after upgrading Java, the
+default `/usr/bin/java` command may remain linked to the previous Java
+binary, so relinking that command may be necessary as well.
+
+Please don't forget to run ``compress.py`` and include the ``diff`` of the
+minified scripts when submitting patches for Django's javascript.
+
+.. _Closure Compiler: http://code.google.com/closure/compiler/
+
 Django conventions
 ==================
 
