@@ -4,7 +4,7 @@ from django.db import DatabaseError, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count
 from django.test import TestCase
 
-from models import Tag, Annotation, DumbCategory
+from models import Tag, Annotation, DumbCategory, Note, ExtraInfo
 
 class QuerysetOrderedTests(unittest.TestCase):
     """
@@ -63,3 +63,21 @@ class SubqueryTests(TestCase):
             # This prevents us from even evaluating this test case at all.
             # Refs #10099
             self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries)
+
+class CloneTests(TestCase):
+    def test_evaluated_queryset_as_argument(self):
+        "#13227 -- If a queryset is already evaluated, it can still be used as a query arg"
+        n = Note(note='Test1', misc='misc')
+        n.save()
+        e = ExtraInfo(info='good', note=n)
+        e.save()
+
+        n_list = Note.objects.all()
+        # Evaluate the Note queryset, populating the query cache
+        list(n_list)
+        # Use the note queryset in a query, and evalute
+        # that query in a way that involves cloning.
+        try:
+            self.assertEquals(ExtraInfo.objects.filter(note__in=n_list)[0].info, 'good')
+        except:
+            self.fail('Query should be clonable')
