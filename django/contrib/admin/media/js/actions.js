@@ -12,17 +12,21 @@
 				.parent().parent().toggleClass(options.selectedClass, checked);
 		}
 		updateCounter = function() {
-			var count = $(actionCheckboxes).filter(":checked").length;
-			$("span._acnt").html(count);
+			var sel = $(actionCheckboxes).filter(":checked").length;
+			$(options.counterContainer).html(interpolate(
+			ngettext('%(sel)s of %(cnt)s selected', '%(sel)s of %(cnt)s selected', sel), {
+				sel: sel,
+				cnt: _actions_icnt
+			}, true));
 			$(options.allToggle).attr("checked", function() {
-				if (count == actionCheckboxes.length) {
+				if (sel == actionCheckboxes.length) {
 					value = true;
 					showQuestion();
 				} else {
 					value = false;
 					clearAcross();
 				}
-				return value
+				return value;
 			});
 		}
 		showQuestion = function() {
