@@ -152,7 +152,8 @@ class Q(tree.Node):
     def _combine(self, other, conn):
         if not isinstance(other, Q):
             raise TypeError(other)
-        obj = deepcopy(self)
+        obj = type(self)()
+        obj.add(self, conn)
         obj.add(other, conn)
         return obj
 
@@ -163,7 +164,8 @@ class Q(tree.Node):
         return self._combine(other, self.AND)
 
     def __invert__(self):
-        obj = deepcopy(self)
+        obj = type(self)()
+        obj.add(self, self.AND)
         obj.negate()
         return obj
 
