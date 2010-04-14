@@ -957,7 +957,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
 
-class ManageValidateImportErrorsReported(AdminScriptTestCase):
+class ManageValidate(AdminScriptTestCase):
     def tearDown(self):
         self.remove_settings('settings.py')
 
@@ -976,7 +976,17 @@ class ManageValidateImportErrorsReported(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'ImportError')
-       
+
+    def test_complex_app(self):
+        "manage.py validate does not raise an ImportError validating a complex app with nested calls to load_app"
+        self.write_settings('settings.py',
+            apps=['admin_scripts.complex_app', 'admin_scripts.simple_app'],
+            sdict={'DEBUG': True})
+        args = ['validate']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, '0 errors found')
+
 
 ##########################################################################
 # COMMAND PROCESSING TESTS
