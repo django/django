@@ -21,6 +21,8 @@ CONTRIB_DIR = os.path.dirname(contrib.__file__)
 MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
 REGRESSION_TEST_DIR = os.path.join(os.path.dirname(__file__), REGRESSION_TESTS_DIR_NAME)
 
+REGRESSION_SUBDIRS_TO_SKIP = ['locale']
+
 ALWAYS_INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.auth',
@@ -37,7 +39,9 @@ def get_test_models():
     models = []
     for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR), (CONTRIB_DIR_NAME, CONTRIB_DIR):
         for f in os.listdir(dirpath):
-            if f.startswith('__init__') or f.startswith('.') or f.startswith('sql') or f.startswith('invalid'):
+            if f.startswith('__init__') or f.startswith('.') or \
+               f.startswith('sql') or f.startswith('invalid') or \
+               os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP:
                 continue
             models.append((loc, f))
     return models
