@@ -132,6 +132,19 @@ class Field(object):
         memodict[id(self)] = obj
         return obj
 
+    def __getstate__(self):
+        "Don't try to pickle a callable default value"
+        obj_dict = self.__dict__.copy()
+        del obj_dict['default']
+        return obj_dict
+
+    def __setstate__(self, data):
+        "When unpickling, restore the callable default"
+        self.__dict__.update(data)
+
+        # Restore the default
+        self.default = self.model._meta.get_field_by_name(self.name)[0].default
+
     def to_python(self, value):
         """
         Converts the input value into the expected Python data type, raising
@@ -233,6 +246,7 @@ class Field(object):
 
     def contribute_to_class(self, cls, name):
         self.set_attributes_from_name(name)
+        self.model = cls
         cls._meta.add_field(self)
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name, curry(cls._get_FIELD_display, field=self))

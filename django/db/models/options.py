@@ -104,11 +104,11 @@ class Options(object):
             self.db_table = "%s_%s" % (self.app_label, self.module_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
 
-
     def _prepare(self, model):
         if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(self.order_with_respect_to)
             self.ordering = ('_order',)
+            self._order = OrderWrt(model)
         else:
             self.order_with_respect_to = None
 
@@ -331,7 +331,7 @@ class Options(object):
         for f, model in self.get_fields_with_model():
             cache[f.name] = (f, model, True, False)
         if self.order_with_respect_to:
-            cache['_order'] = OrderWrt(), None, True, False
+            cache['_order'] = self._order, None, True, False
         if app_cache_ready():
             self._name_map = cache
         return cache

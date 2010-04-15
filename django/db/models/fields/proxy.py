@@ -10,7 +10,10 @@ class OrderWrt(fields.IntegerField):
     A proxy for the _order database field that is used when
     Meta.order_with_respect_to is specified.
     """
-    name = '_order'
-    attname = '_order'
-    column = '_order'
 
+    def __init__(self, model, *args, **kwargs):
+        super(OrderWrt, self).__init__(*args, **kwargs)
+        self.model = model
+        self.attname = '_order'
+        self.column = '_order'
+        self.name = '_order'
