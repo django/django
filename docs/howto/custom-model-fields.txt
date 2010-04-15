@@ -261,6 +261,28 @@ For example::
 This ensures that the :meth:`to_python` method, documented below, will always be
 called when the attribute is initialized.
 
+ModelForms and custom fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you use :class:`~django.db.models.SubfieldBase`, :meth:`to_python`
+will be called every time an instance of the field is assigned a
+value. This means that whenever a value may be assigned to the field,
+you need to ensure that it will be of the correct datatype, or that
+you handle any exceptions.
+
+This is especially important if you use :ref:`ModelForms
+<topics-forms-modelforms>`. When saving a ModelForm, Django will use
+form values to instantiate model instances. However, if the cleaned
+form data can't be used as valid input to the field, the normal form
+validation process will break.
+
+Therefore, you must ensure that the form field used to represent your
+custom field performs whatever input validation and data cleaning is
+necessary to convert user-provided form input into a
+`to_python()`-compatible model field value. This may require writing a
+custom form field, and/or implementing the :meth:`formfield` method on
+your field to return a form field class whose `to_python()` returns the
+correct datatype.
 
 Documenting your Custom Field
 -----------------------------
