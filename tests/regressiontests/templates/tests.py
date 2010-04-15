@@ -1287,5 +1287,48 @@ class Templates(unittest.TestCase):
             'autoescape-filtertag01': ("{{ first }}{% filter safe %}{{ first }} x<y{% endfilter %}", {"first": "<a>"}, template.TemplateSyntaxError),
         }
 
+
+class TemplateTagLoading(unittest.TestCase):
+
+    def setUp(self):
+        self.old_path = sys.path
+        self.old_apps = settings.INSTALLED_APPS
+        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
+        self.old_tag_modules = template.templatetags_modules
+        template.templatetags_modules = []
+
+    def tearDown(self):
+        settings.INSTALLED_APPS = self.old_apps
+        sys.path = self.old_path
+        template.templatetags_modules = self.old_tag_modules
+
+    def test_load_error(self):
+        ttext = "{% load broken_tag %}"
+        self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
+        try:
+            template.Template(ttext)
+        except template.TemplateSyntaxError, e:
+            self.assertTrue('ImportError' in e.args[0])
+            self.assertTrue('Xtemplate' in e.args[0])
+
+    def test_load_error_egg(self):
+        ttext = "{% load broken_egg %}"
+        egg_name = '%s/tagsegg.egg' % self.egg_dir
+        sys.path.append(egg_name)
+        settings.INSTALLED_APPS = ('tagsegg',)
+        self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
+        try:
+            template.Template(ttext)
+        except template.TemplateSyntaxError, e:
+            self.assertTrue('ImportError' in e.args[0])
+            self.assertTrue('Xtemplate' in e.args[0])
+
+    def test_load_working_egg(self):
+        ttext = "{% load working_egg %}"
+        egg_name = '%s/tagsegg.egg' % self.egg_dir
+        sys.path.append(egg_name)
+        settings.INSTALLED_APPS = ('tagsegg',)
+        t = template.Template(ttext)
+
 if __name__ == "__main__":
     unittest.main()
