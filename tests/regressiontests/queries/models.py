@@ -302,9 +302,9 @@ True
 >>> t4 = Tag.objects.create(name='t4', parent=t3)
 >>> t5 = Tag.objects.create(name='t5', parent=t3)
 
->>> n1 = Note.objects.create(note='n1', misc='foo')
->>> n2 = Note.objects.create(note='n2', misc='bar')
->>> n3 = Note.objects.create(note='n3', misc='foo')
+>>> n1 = Note.objects.create(note='n1', misc='foo', id=1)
+>>> n2 = Note.objects.create(note='n2', misc='bar', id=2)
+>>> n3 = Note.objects.create(note='n3', misc='foo', id=3)
 
 >>> ann1 = Annotation.objects.create(name='a1', tag=t1)
 >>> ann1.notes.add(n1)
