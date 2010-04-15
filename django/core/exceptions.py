@@ -64,6 +64,11 @@ class ValidationError(Exception):
             return repr(self.message_dict)
         return repr(self.messages)
 
+    def __repr__(self):
+        if hasattr(self, 'message_dict'):
+            return 'ValidationError(%s)' % repr(self.message_dict)
+        return 'ValidationError(%s)' % repr(self.messages)
+
     def update_error_dict(self, error_dict):
         if hasattr(self, 'message_dict'):
             if error_dict:
