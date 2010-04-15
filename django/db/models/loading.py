@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
+from django.utils.module_loading import module_has_submodule
 
 import imp
 import sys
@@ -74,24 +75,27 @@ class AppCache(object):
         self.nesting_level += 1
         app_module = import_module(app_name)
         try:
-            imp.find_module('models', app_module.__path__)
-        except ImportError: 
-            self.nesting_level -= 1
-            # App has no models module, that's not a problem.
-            return None
-        try:
             models = import_module('.models', app_name)
         except ImportError:
             self.nesting_level -= 1
-            if can_postpone:
-                # Either the app has an error, or the package is still being
-                # imported by Python and the model module isn't available yet.
-                # We will check again once all the recursion has finished (in
-                # populate).
-                self.postponed.append(app_name)
+            # If the app doesn't have a models module, we can just ignore the
+            # ImportError and return no models for it.
+            if not module_has_submodule(app_module, 'models'):
                 return None
+            # But if the app does have a models module, we need to figure out
+            # whether to suppress or propagate the error. If can_postpone is
+            # True then it may be that the package is still being imported by
+            # Python and the models module isn't available yet. So we add the
+            # app to the postponed list and we'll try it again after all the
+            # recursion has finished (in populate). If can_postpone is False
+            # then it's time to raise the ImportError.
             else:
-                raise
+                if can_postpone:
+                    self.postponed.append(app_name)
+                    return None
+                else:
+                    raise
+
         self.nesting_level -= 1
         if models not in self.app_store:
             self.app_store[models] = len(self.app_store)

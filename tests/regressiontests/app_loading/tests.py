@@ -1,8 +1,10 @@
 import os
 import sys
 import time
+from unittest import TestCase
 
 from django.conf import Settings
+from django.db.models.loading import load_app
 
 __test__ = {"API_TESTS": """
 Test the globbing of INSTALLED_APPS.
@@ -25,3 +27,51 @@ Test the globbing of INSTALLED_APPS.
 
 """}
 
+class EggLoadingTest(TestCase):
+
+    def setUp(self):
+        self.old_path = sys.path
+        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
+
+    def tearDown(self):
+        sys.path = self.old_path
+
+    def test_egg1(self):
+        """Models module can be loaded from an app in an egg"""
+        egg_name = '%s/modelapp.egg' % self.egg_dir
+        sys.path.append(egg_name)
+        models = load_app('app_with_models')
+        self.failIf(models is None)
+
+    def test_egg2(self):
+        """Loading an app from an egg that has no models returns no models (and no error)"""
+        egg_name = '%s/nomodelapp.egg' % self.egg_dir
+        sys.path.append(egg_name)
+        models = load_app('app_no_models')
+        self.failUnless(models is None)
+
+    def test_egg3(self):
+        """Models module can be loaded from an app located under an egg's top-level package"""
+        egg_name = '%s/omelet.egg' % self.egg_dir
+        sys.path.append(egg_name)
+        models = load_app('omelet.app_with_models')
+        self.failIf(models is None)
+
+    def test_egg4(self):
+        """Loading an app with no models from under the top-level egg package generates no error"""
+        egg_name = '%s/omelet.egg' % self.egg_dir
+        sys.path.append(egg_name)
+        models = load_app('omelet.app_no_models')
+        self.failUnless(models is None)
+ 
+    def test_egg5(self):
+        """Loading an app from an egg that has an import error in its models module raises that error"""
+        egg_name = '%s/brokenapp.egg' % self.egg_dir
+        sys.path.append(egg_name)
+        self.assertRaises(ImportError, load_app, 'broken_app')
+        try:
+            load_app('broken_app')
+        except ImportError, e:
+            # Make sure the message is indicating the actual
+            # problem in the broken app.
+            self.failUnless("modelz" in e.args[0])
