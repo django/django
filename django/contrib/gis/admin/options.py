@@ -64,7 +64,7 @@ class GeoModelAdmin(ModelAdmin):
     def get_map_widget(self, db_field):
         """
         Returns a subclass of the OpenLayersWidget (or whatever was specified
-        in the `widget` attribute) using the settings from the attributes set 
+        in the `widget` attribute) using the settings from the attributes set
         in this class.
         """
         is_collection = db_field.geom_type in ('MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON', 'GEOMETRYCOLLECTION')
@@ -111,12 +111,6 @@ class GeoModelAdmin(ModelAdmin):
                       }
         return OLMap
 
-# Using the Beta OSM in the admin requires the following:
-#  (1) The Google Maps Mercator projection needs to be added
-#      to your `spatial_ref_sys` table.  You'll need at least GDAL 1.5:
-#      >>> from django.contrib.gis.gdal import SpatialReference
-#      >>> from django.contrib.gis.utils import add_postgis_srs
-#      >>> add_postgis_srs(SpatialReference(900913)) # Adding the Google Projection 
 from django.contrib.gis import gdal
 if gdal.HAS_GDAL:
     class OSMGeoAdmin(GeoModelAdmin):
