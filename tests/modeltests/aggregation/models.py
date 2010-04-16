@@ -191,7 +191,7 @@ u'The Definitive Guide to Django: Web Development Done Right'
 
 # Calling values on a queryset that has annotations returns the output
 # as a dictionary
->>> [sorted(o.iteritems()) for o in Book.objects.filter(pk=1).annotate(mean_age=Avg('authors__age')).values()]
+>>> [sorted(o.items()) for o in Book.objects.filter(pk=1).annotate(mean_age=Avg('authors__age')).values()]
 [[('contact_id', 1), ('id', 1), ('isbn', u'159059725'), ('mean_age', 34.5), ('name', u'The Definitive Guide to Django: Web Development Done Right'), ('pages', 447), ('price', Decimal("30...")), ('pubdate', datetime.date(2007, 12, 6)), ('publisher_id', 1), ('rating', 4.5)]]
 
 >>> Book.objects.filter(pk=1).annotate(mean_age=Avg('authors__age')).values('pk', 'isbn', 'mean_age')
@@ -203,7 +203,7 @@ u'The Definitive Guide to Django: Web Development Done Right'
 
 # An empty values() call before annotating has the same effect as an
 # empty values() call after annotating
->>> [sorted(o.iteritems()) for o in Book.objects.filter(pk=1).values().annotate(mean_age=Avg('authors__age'))]
+>>> [sorted(o.items()) for o in Book.objects.filter(pk=1).values().annotate(mean_age=Avg('authors__age'))]
 [[('contact_id', 1), ('id', 1), ('isbn', u'159059725'), ('mean_age', 34.5), ('name', u'The Definitive Guide to Django: Web Development Done Right'), ('pages', 447), ('price', Decimal("30...")), ('pubdate', datetime.date(2007, 12, 6)), ('publisher_id', 1), ('rating', 4.5)]]
 
 # Calling annotate() on a ValuesQuerySet annotates over the groups of

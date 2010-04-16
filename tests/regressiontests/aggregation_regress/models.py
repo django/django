@@ -174,7 +174,7 @@ FieldError: Cannot resolve keyword 'foo' into field. Choices are: authors, conta
 {'number': 1132, 'select': 1132}
 
 # Regression for #10064: select_related() plays nice with aggregates
->>> sorted(Book.objects.select_related('publisher').annotate(num_authors=Count('authors')).values()[0].iteritems())
+>>> sorted(Book.objects.select_related('publisher').annotate(num_authors=Count('authors')).values()[0].items())
 [('contact_id', 8), ('id', 5), ('isbn', u'013790395'), ('name', u'Artificial Intelligence: A Modern Approach'), ('num_authors', 2), ('pages', 1132), ('price', Decimal("82.8...")), ('pubdate', datetime.date(1995, 1, 15)), ('publisher_id', 3), ('rating', 4.0)]
 
 # Regression for #10010: exclude on an aggregate field is correctly negated
