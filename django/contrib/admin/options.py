@@ -63,7 +63,9 @@ class BaseModelAdmin(object):
     formfield_overrides = {}
 
     def __init__(self):
-        self.formfield_overrides = dict(FORMFIELD_FOR_DBFIELD_DEFAULTS, **self.formfield_overrides)
+        overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
+        overrides.update(self.formfield_overrides)
+        self.formfield_overrides = overrides
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
