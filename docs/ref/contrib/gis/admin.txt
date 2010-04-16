@@ -47,11 +47,26 @@ GeoDjango's admin site
    Link to the URL of the OpenLayers JavaScript.  Defaults to
    ``'http://openlayers.org/api/2.8/OpenLayers.js'``.
 
+
+   .. attribute:: modifiable
+
+   Defaults to ``False``.  When set to to ``True``, disables editing of
+   existing geometry fields in the admin.
+
+   .. note::
+   
+       This is different from adding the geometry field to
+       :attr:`~django.contrib.admin.ModelAdmin.readonly_fields`,
+       which will only display the WKT of the geometry. Setting
+       ``modifiable=False``, actually displays the geometry in a map,
+       but disables the ability to edit its vertices.
+
 ``OSMGeoAdmin``
 ===============
 
 .. class:: OSMGeoAdmin
 
    A subclass of :class:`GeoModelAdmin` that uses a spherical mercator projection
-   with OpenStreetMap street data tiles.  See the :ref:`OSMGeoAdmin introduction <osmgeoadmin-intro>`
+   with `OpenStreetMap <http://openstreetmap.org/>`_ street data tiles.
+   See the :ref:`OSMGeoAdmin introduction <osmgeoadmin-intro>`
    in the tutorial for a usage example.
