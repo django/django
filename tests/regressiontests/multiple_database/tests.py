@@ -1186,6 +1186,45 @@ class RouterTestCase(TestCase):
         nyt = dive.reviews.create(source="New York Times", content_object=dive)
         self.assertEquals(nyt._state.db, 'default')
 
+    def test_m2m_managers(self):
+        "M2M relations are represented by managers, and can be controlled like managers"
+        pro = Book.objects.using('other').create(pk=1, title="Pro Django",
+                                                 published=datetime.date(2008, 12, 16))
+
+        marty = Person.objects.using('other').create(pk=1, name="Marty Alchin")
+        pro.authors = [marty]
+
+        self.assertEquals(pro.authors.db, 'other')
+        self.assertEquals(pro.authors.db_manager('default').db, 'default')
+        self.assertEquals(pro.authors.db_manager('default').all().db, 'default')
+
+        self.assertEquals(marty.book_set.db, 'other')
+        self.assertEquals(marty.book_set.db_manager('default').db, 'default')
+        self.assertEquals(marty.book_set.db_manager('default').all().db, 'default')
+
+    def test_foreign_key_managers(self):
+        "FK reverse relations are represented by managers, and can be controlled like managers"
+        marty = Person.objects.using('other').create(pk=1, name="Marty Alchin")
+        pro = Book.objects.using('other').create(pk=1, title="Pro Django",
+                                                 published=datetime.date(2008, 12, 16),
+                                                 editor=marty)
+
+        self.assertEquals(marty.edited.db, 'other')
+        self.assertEquals(marty.edited.db_manager('default').db, 'default')
+        self.assertEquals(marty.edited.db_manager('default').all().db, 'default')
+
+    def test_generic_key_managers(self):
+        "Generic key relations are represented by managers, and can be controlled like managers"
+        pro = Book.objects.using('other').create(title="Pro Django",
+                                                 published=datetime.date(2008, 12, 16))
+
+        review1 = Review.objects.using('other').create(source="Python Monthly",
+                                                       content_object=pro)
+
+        self.assertEquals(pro.reviews.db, 'other')
+        self.assertEquals(pro.reviews.db_manager('default').db, 'default')
+        self.assertEquals(pro.reviews.db_manager('default').all().db, 'default')
+
     def test_subquery(self):
         """Make sure as_sql works with subqueries and master/slave."""
         # Create a book and author on the other database

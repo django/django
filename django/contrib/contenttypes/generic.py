@@ -243,11 +243,12 @@ def create_generic_related_manager(superclass):
             self.pk_val = self.instance._get_pk_val()
 
         def get_query_set(self):
+            db = self._db or router.db_for_read(self.model, instance=self.instance)
             query = {
                 '%s__pk' % self.content_type_field_name : self.content_type.id,
                 '%s__exact' % self.object_id_field_name : self.pk_val,
             }
-            return superclass.get_query_set(self).using(self.instance._state.db).filter(**query)
+            return superclass.get_query_set(self).using(db).filter(**query)
 
         def add(self, *objs):
             for obj in objs:
@@ -259,13 +260,15 @@ def create_generic_related_manager(superclass):
         add.alters_data = True
 
         def remove(self, *objs):
+            db = router.db_for_write(self.model, instance=self.instance)
             for obj in objs:
-                obj.delete(using=self.instance._state.db)
+                obj.delete(using=db)
         remove.alters_data = True
 
         def clear(self):
+            db = router.db_for_write(self.model, instance=self.instance)
             for obj in self.all():
-                obj.delete(using=self.instance._state.db)
+                obj.delete(using=db)
         clear.alters_data = True
 
         def create(self, **kwargs):
