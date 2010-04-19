@@ -1,8 +1,9 @@
 # -*- encoding: utf-8 -*-
+import datetime
+import decimal
 import os
 import sys
-import decimal
-import datetime
+import pickle
 
 from django.template import Template, Context
 from django.conf import settings
@@ -40,6 +41,12 @@ class TranslationTests(TestCase):
         self.assertEqual(True, s == s2)
         s4 = ugettext_lazy('Some other string')
         self.assertEqual(False, s == s4)
+
+    def test_lazy_pickle(self):
+        s1 = ugettext_lazy("test")
+        self.assertEqual(unicode(s1), "test")
+        s2 = pickle.loads(pickle.dumps(s1))
+        self.assertEqual(unicode(s2), "test")
 
     def test_string_concat(self):
         """

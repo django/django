@@ -147,11 +147,6 @@ def lazy(func, *resultclasses):
     the lazy evaluation code is triggered. Results are not memoized; the
     function is evaluated on every access.
     """
-    # When lazy() is called by the __reduce_ex__ machinery to reconstitute the
-    # __proxy__ class it can't call with *args, so the first item will just be
-    # a tuple.
-    if len(resultclasses) == 1 and isinstance(resultclasses[0], tuple):
-        resultclasses = resultclasses[0]
 
     class __proxy__(Promise):
         """
@@ -168,8 +163,11 @@ def lazy(func, *resultclasses):
             if self.__dispatch is None:
                 self.__prepare_class__()
 
-        def __reduce_ex__(self, protocol):
-            return (lazy, (self.__func, resultclasses), self.__dict__)
+        def __reduce__(self):
+            return (
+                _lazy_proxy_unpickle,
+                (self.__func, self.__args, self.__kw) + resultclasses
+            )
 
         def __prepare_class__(cls):
             cls.__dispatch = {}
@@ -248,6 +246,9 @@ def lazy(func, *resultclasses):
         return __proxy__(args, kw)
 
     return wraps(func)(__wrapper__)
+
+def _lazy_proxy_unpickle(func, args, kwargs, *resultclasses):
+    return lazy(func, *resultclasses)(*args, **kwargs)
 
 def allow_lazy(func, *resultclasses):
     """
