@@ -125,7 +125,11 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                 src = open(os.path.join(dirpath, file), "rU").read()
                 src = pythonize_re.sub('\n#', src)
                 thefile = '%s.py' % file
-                open(os.path.join(dirpath, thefile), "w").write(src)
+                f = open(os.path.join(dirpath, thefile), "w")
+                try:
+                    f.write(src)
+                finally:
+                    f.close()
                 cmd = 'xgettext -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (domain, os.path.join(dirpath, thefile))
                 (stdin, stdout, stderr) = os.popen3(cmd, 't')
                 msgs = stdout.read()
@@ -141,7 +145,11 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                 else:
                     msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
                 if msgs:
-                    open(potfile, 'ab').write(msgs)
+                    f = open(potfile, 'ab')
+                    try:
+                        f.write(msgs)
+                    finally:
+                        f.close()
                 os.unlink(os.path.join(dirpath, thefile))
             elif domain == 'django' and (file_ext == '.py' or file_ext in extensions):
                 thefile = file
@@ -149,7 +157,11 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                     src = open(os.path.join(dirpath, file), "rU").read()
                     thefile = '%s.py' % file
                     try:
-                        open(os.path.join(dirpath, thefile), "w").write(templatize(src))
+                        f = open(os.path.join(dirpath, thefile), "w")
+                        try:
+                            f.write(templatize(src))
+                        finally:
+                            f.close()
                     except SyntaxError, msg:
                         msg = "%s (file: %s)" % (msg, os.path.join(dirpath, file))
                         raise SyntaxError(msg)
@@ -176,7 +188,11 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False, extens
                 else:
                     msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
                 if msgs:
-                    open(potfile, 'ab').write(msgs)
+                    f = open(potfile, 'ab')
+                    try:
+                        f.write(msgs)
+                    finally:
+                        f.close()
                 if thefile != file:
                     os.unlink(os.path.join(dirpath, thefile))
 
