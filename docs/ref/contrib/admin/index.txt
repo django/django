@@ -938,6 +938,14 @@ on your ``ModelAdmin``::
 Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
 apply as :ref:`regular media definitions on forms <topics-forms-media>`.
 
+Django admin Javascript makes use of the `jQuery`_ library. To avoid
+conflict with user scripts, Django's jQuery is namespaced as
+``django.jQuery``. If you want to use jQuery in your own admin
+JavaScript without including a second copy, you can use the
+``django.jQuery`` object on changelist and add/edit views.
+
+.. _jQuery: http://jquery.com
+
 Adding custom validation to the admin
 -------------------------------------
 
