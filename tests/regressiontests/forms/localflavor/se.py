@@ -12,7 +12,7 @@ tests = r"""
 >>> olddate = datetime.date
 >>> datetime.date = MockDate
 >>> datetime.date.today()
-MockDate(2008, 5, 14)
+...MockDate(2008, 5, 14)
 
 
 # SECountySelect #####################################################
