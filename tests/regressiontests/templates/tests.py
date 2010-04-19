@@ -7,6 +7,7 @@ if __name__ == '__main__':
     settings.configure()
 
 from datetime import datetime, timedelta
+import time
 import os
 import sys
 import traceback
@@ -96,6 +97,17 @@ class SomeClass:
 class OtherClass:
     def method(self):
         return "OtherClass.method"
+
+class TestObj(object):
+    def is_true(self):
+        return True
+
+    def is_false(self):
+        return False
+
+    def is_bad(self):
+        time.sleep(0.3)
+        return True
 
 class SilentGetItemClass(object):
     def __getitem__(self, key):
@@ -342,6 +354,11 @@ class Templates(unittest.TestCase):
         old_invalid = settings.TEMPLATE_STRING_IF_INVALID
         expected_invalid_str = 'INVALID'
 
+        # Warm the URL reversing cache. This ensures we don't pay the cost
+        # warming the cache during one of the tests.
+        urlresolvers.reverse('regressiontests.templates.views.client_action',
+                             kwargs={'id':0,'action':"update"})
+
         for name, vals in tests:
             if isinstance(vals[2], tuple):
                 normal_string_result = vals[2][0]
@@ -367,9 +384,14 @@ class Templates(unittest.TestCase):
                         start = datetime.now()
                         test_template = loader.get_template(name)
                         end = datetime.now()
-                        output = self.render(test_template, vals)
                         if end-start > timedelta(seconds=0.2):
                             failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Took too long to parse test" % (is_cached, invalid_str, name))
+
+                        start = datetime.now()
+                        output = self.render(test_template, vals)
+                        end = datetime.now()
+                        if end-start > timedelta(seconds=0.2):
+                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Took too long to render test" % (is_cached, invalid_str, name))
                     except ContextStackException:
                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Context stack was left imbalanced" % (is_cached, invalid_str, name))
                         continue
@@ -781,6 +803,13 @@ class Templates(unittest.TestCase):
             'if-tag-error10': ("{% if == %}yes{% endif %}", {}, template.TemplateSyntaxError),
             'if-tag-error11': ("{% if 1 == %}yes{% endif %}", {}, template.TemplateSyntaxError),
             'if-tag-error12': ("{% if a not b %}yes{% endif %}", {}, template.TemplateSyntaxError),
+
+            # If evaluations are shortcircuited where possible
+            # These tests will fail by taking too long to run. When the if clause
+            # is shortcircuiting correctly, the is_bad() function shouldn't be
+            # evaluated, and the deliberate sleep won't happen.
+            'if-tag-shortcircuit01': ('{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "yes"),
+            'if-tag-shortcircuit02': ('{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "no"),
 
             # Non-existent args
             'if-tag-badarg01':("{% if x|default_if_none:y %}yes{% endif %}", {}, ''),
