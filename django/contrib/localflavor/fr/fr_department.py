@@ -97,8 +97,6 @@ DEPARTMENT_ASCII_CHOICES = (
     ('93', '93 - Seine-Saint-Denis'),
     ('94', '94 - Val-de-Marne'),
     ('95', '95 - Val-d\'Oise'),
-    ('2A', '2A - Corse du sud'),
-    ('2B', '2B - Haute Corse'),
     ('971', '971 - Guadeloupe'),
     ('972', '972 - Martinique'),
     ('973', '973 - Guyane'),
