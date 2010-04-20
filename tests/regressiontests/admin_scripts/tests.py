@@ -967,7 +967,7 @@ class ManageValidate(AdminScriptTestCase):
         args = ['validate']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'No module named admin_scriptz.broken_app')
+        self.assertOutput(err, 'No module named admin_scriptz')
 
     def test_broken_app(self):
         "manage.py validate reports an ImportError if an app's models.py raises one on import"
