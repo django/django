@@ -143,7 +143,10 @@ class Field(object):
         self.__dict__.update(data)
 
         # Restore the default
-        self.default = self.model._meta.get_field_by_name(self.name)[0].default
+        try:
+            self.default = self.model._meta.get_field(self.name).default
+        except FieldDoesNotExist:
+            self.default = NOT_PROVIDED
 
     def to_python(self, value):
         """
