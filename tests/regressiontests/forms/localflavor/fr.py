@@ -208,8 +208,6 @@ including DOM TOM
 <option value="93">93 - Seine-Saint-Denis</option>
 <option value="94">94 - Val-de-Marne</option>
 <option value="95">95 - Val-d&#39;Oise</option>
-<option value="2A">2A - Corse du sud</option>
-<option value="2B">2B - Haute Corse</option>
 <option value="971">971 - Guadeloupe</option>
 <option value="972">972 - Martinique</option>
 <option value="973">973 - Guyane</option>
