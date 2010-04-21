@@ -8,12 +8,11 @@ tests = r"""
 ...     def today(cls):
 ...         return datetime.date(2008, 5, 14)
 ...     today = classmethod(today)
-... 
+...
 >>> olddate = datetime.date
 >>> datetime.date = MockDate
->>> datetime.date.today()
-MockDate(2008, 5, 14)
-
+>>> datetime.date.today() == olddate(2008, 5, 14)
+True
 
 # SECountySelect #####################################################
 >>> from django.contrib.localflavor.se.forms import SECountySelect
@@ -245,7 +244,7 @@ Traceback (most recent call last):
 ValidationError: [u'Enter a valid Swedish personal identity number.']
 
 
-# Check valid co-ordination numbers, that should not be accepted 
+# Check valid co-ordination numbers, that should not be accepted
 # because of coordination_number=False
 >>> f = SEPersonalIdentityNumberField(coordination_number=False)
 
