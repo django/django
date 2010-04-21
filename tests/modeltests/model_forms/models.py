@@ -523,10 +523,10 @@ Traceback (most recent call last):
 ValueError: The Category could not be created because the data didn't validate.
 
 Create a couple of Writers.
->>> w = Writer(name='Mike Royko')
->>> w.save()
->>> w = Writer(name='Bob Woodward')
->>> w.save()
+>>> w_royko = Writer(name='Mike Royko')
+>>> w_royko.save()
+>>> w_woodward = Writer(name='Bob Woodward')
+>>> w_woodward.save()
 
 ManyToManyFields are represented by a MultipleChoiceField, ForeignKeys and any
 fields with the 'choices' attribute are represented by a ChoiceField.
@@ -540,8 +540,8 @@ fields with the 'choices' attribute are represented by a ChoiceField.
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
 <tr><th>Writer:</th><td><select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="1">Mike Royko</option>
-<option value="2">Bob Woodward</option>
+<option value="...">Mike Royko</option>
+<option value="...">Bob Woodward</option>
 </select></td></tr>
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article"></textarea></td></tr>
 <tr><th>Status:</th><td><select name="status">
@@ -595,8 +595,8 @@ inserted as 'initial' data in each Field.
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
 <option value="">---------</option>
-<option value="1" selected="selected">Mike Royko</option>
-<option value="2">Bob Woodward</option>
+<option value="..." selected="selected">Mike Royko</option>
+<option value="...">Bob Woodward</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
 <li>Status: <select name="status">
@@ -610,7 +610,7 @@ inserted as 'initial' data in each Field.
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
->>> f = TestArticleForm({'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': u'1', 'article': 'Hello.'}, instance=art)
+>>> f = TestArticleForm({'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': unicode(w_royko.pk), 'article': 'Hello.'}, instance=art)
 >>> f.errors
 {}
 >>> f.is_valid()
@@ -658,8 +658,8 @@ Add some categories and test the many-to-many form output.
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
 <option value="">---------</option>
-<option value="1" selected="selected">Mike Royko</option>
-<option value="2">Bob Woodward</option>
+<option value="..." selected="selected">Mike Royko</option>
+<option value="...">Bob Woodward</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
 <li>Status: <select name="status">
@@ -682,8 +682,8 @@ Initial values can be provided for model forms
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="1">Mike Royko</option>
-<option value="2">Bob Woodward</option>
+<option value="...">Mike Royko</option>
+<option value="...">Bob Woodward</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Status: <select name="status">
@@ -699,7 +699,7 @@ Initial values can be provided for model forms
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
 
 >>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
-...     'writer': u'1', 'article': u'Hello.', 'categories': [u'1', u'2']}, instance=new_art)
+...     'writer': unicode(w_royko.pk), 'article': u'Hello.', 'categories': [u'1', u'2']}, instance=new_art)
 >>> new_art = f.save()
 >>> new_art.id
 1
@@ -709,7 +709,7 @@ Initial values can be provided for model forms
 
 Now, submit form data with no categories. This deletes the existing categories.
 >>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
-...     'writer': u'1', 'article': u'Hello.'}, instance=new_art)
+...     'writer': unicode(w_royko.pk), 'article': u'Hello.'}, instance=new_art)
 >>> new_art = f.save()
 >>> new_art.id
 1
@@ -722,7 +722,7 @@ Create a new article, with categories, via the form.
 ...     class Meta:
 ...         model = Article
 >>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
-...     'writer': u'1', 'article': u'Test.', 'categories': [u'1', u'2']})
+...     'writer': unicode(w_royko.pk), 'article': u'Test.', 'categories': [u'1', u'2']})
 >>> new_art = f.save()
 >>> new_art.id
 2
@@ -735,7 +735,7 @@ Create a new article, with no categories, via the form.
 ...     class Meta:
 ...         model = Article
 >>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
-...     'writer': u'1', 'article': u'Test.'})
+...     'writer': unicode(w_royko.pk), 'article': u'Test.'})
 >>> new_art = f.save()
 >>> new_art.id
 3
@@ -749,7 +749,7 @@ The m2m data won't be saved until save_m2m() is invoked on the form.
 ...     class Meta:
 ...         model = Article
 >>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': u'1967-11-01',
-...     'writer': u'1', 'article': u'Test.', 'categories': [u'1', u'2']})
+...     'writer': unicode(w_royko.pk), 'article': u'Test.', 'categories': [u'1', u'2']})
 >>> new_art = f.save(commit=False)
 
 # Manually save the instance
@@ -798,8 +798,8 @@ the data in the database when the form is instantiated.
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="1">Mike Royko</option>
-<option value="2">Bob Woodward</option>
+<option value="...">Mike Royko</option>
+<option value="...">Bob Woodward</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Status: <select name="status">
@@ -823,9 +823,9 @@ the data in the database when the form is instantiated.
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="1">Mike Royko</option>
-<option value="2">Bob Woodward</option>
-<option value="3">Carl Bernstein</option>
+<option value="...">Mike Royko</option>
+<option value="...">Bob Woodward</option>
+<option value="...">Carl Bernstein</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Status: <select name="status">
@@ -1047,15 +1047,15 @@ True
 >>> print form.as_p()
 <p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="" selected="selected">---------</option>
-<option value="1">Mike Royko</option>
-<option value="2">Bob Woodward</option>
-<option value="3">Carl Bernstein</option>
-<option value="4">Joe Better</option>
+<option value="...">Mike Royko</option>
+<option value="...">Bob Woodward</option>
+<option value="...">Carl Bernstein</option>
+<option value="...">Joe Better</option>
 </select></p>
 <p><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>
 
 >>> data = {
-...     'writer': u'2',
+...     'writer': unicode(w_woodward.pk),
 ...     'age': u'65',
 ... }
 >>> form = WriterProfileForm(data)
@@ -1067,10 +1067,10 @@ True
 >>> print form.as_p()
 <p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="">---------</option>
-<option value="1">Mike Royko</option>
-<option value="2" selected="selected">Bob Woodward</option>
-<option value="3">Carl Bernstein</option>
-<option value="4">Joe Better</option>
+<option value="...">Mike Royko</option>
+<option value="..." selected="selected">Bob Woodward</option>
+<option value="...">Carl Bernstein</option>
+<option value="...">Joe Better</option>
 </select></p>
 <p><label for="id_age">Age:</label> <input type="text" name="age" value="65" id="id_age" /></p>
 
