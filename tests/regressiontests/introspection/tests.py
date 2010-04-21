@@ -5,11 +5,6 @@ from django.utils import functional
 
 from models import Reporter, Article
 
-try:
-    set
-except NameError:
-    from sets import Set as set     # Python 2.3 fallback
-
 #
 # The introspection module is optional, so methods tested here might raise
 # NotImplementedError. This is perfectly acceptable behavior for the backend
@@ -76,8 +71,10 @@ class IntrospectionTests(TestCase):
     def test_get_table_description_types(self):
         cursor = connection.cursor()
         desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
-        self.assertEqual([datatype(r[1], r) for r in desc],
-                          ['IntegerField', 'CharField', 'CharField', 'CharField', 'BigIntegerField'])
+        self.assertEqual(
+            [datatype(r[1], r) for r in desc],
+            ['IntegerField', 'CharField', 'CharField', 'CharField', 'BigIntegerField']
+        )
 
     # Regression test for #9991 - 'real' types in postgres
     if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].startswith('django.db.backends.postgresql'):
