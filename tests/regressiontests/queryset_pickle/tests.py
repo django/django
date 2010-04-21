@@ -30,7 +30,7 @@ class PickleabilityTestCase(TestCase):
         self.assert_pickles(Happening.objects.filter(number2=1))
 
     def test_classmethod_as_default(self):
-        self.assert_pickles(Happening.objects.filter(number2=1))
+        self.assert_pickles(Happening.objects.filter(number3=1))
 
     def test_membermethod_as_default(self):
-        self.assert_pickles(Happening.objects.filter(number2=1))
+        self.assert_pickles(Happening.objects.filter(number4=1))
