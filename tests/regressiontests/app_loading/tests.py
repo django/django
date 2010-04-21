@@ -1,10 +1,11 @@
+import copy
 import os
 import sys
 import time
 from unittest import TestCase
 
 from django.conf import Settings
-from django.db.models.loading import load_app
+from django.db.models.loading import cache, load_app
 
 __test__ = {"API_TESTS": """
 Test the globbing of INSTALLED_APPS.
@@ -33,8 +34,16 @@ class EggLoadingTest(TestCase):
         self.old_path = sys.path
         self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
 
+        # This test adds dummy applications to the app cache. These
+        # need to be removed in order to prevent bad interactions
+        # with the flush operation in other tests.
+        self.old_app_models = copy.deepcopy(cache.app_models)
+        self.old_app_store = copy.deepcopy(cache.app_store)
+
     def tearDown(self):
         sys.path = self.old_path
+        cache.app_models = self.old_app_models
+        cache.app_store = self.old_app_store
 
     def test_egg1(self):
         """Models module can be loaded from an app in an egg"""
@@ -63,7 +72,7 @@ class EggLoadingTest(TestCase):
         sys.path.append(egg_name)
         models = load_app('omelet.app_no_models')
         self.failUnless(models is None)
- 
+
     def test_egg5(self):
         """Loading an app from an egg that has an import error in its models module raises that error"""
         egg_name = '%s/brokenapp.egg' % self.egg_dir
