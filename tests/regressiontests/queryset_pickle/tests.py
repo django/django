@@ -23,5 +23,14 @@ class PickleabilityTestCase(TestCase):
     def test_lambda_as_default(self):
         self.assert_pickles(Happening.objects.filter(name="test"))
 
-    def test_callable_as_default(self):
-        self.assert_pickles(Happening.objects.filter(number=1))
+    def test_standalone_method_as_default(self):
+        self.assert_pickles(Happening.objects.filter(number1=1))
+
+    def test_staticmethod_as_default(self):
+        self.assert_pickles(Happening.objects.filter(number2=1))
+
+    def test_classmethod_as_default(self):
+        self.assert_pickles(Happening.objects.filter(number2=1))
+
+    def test_membermethod_as_default(self):
+        self.assert_pickles(Happening.objects.filter(number2=1))

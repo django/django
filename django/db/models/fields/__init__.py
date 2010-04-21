@@ -132,22 +132,6 @@ class Field(object):
         memodict[id(self)] = obj
         return obj
 
-    def __getstate__(self):
-        "Don't try to pickle a callable default value"
-        obj_dict = self.__dict__.copy()
-        del obj_dict['default']
-        return obj_dict
-
-    def __setstate__(self, data):
-        "When unpickling, restore the callable default"
-        self.__dict__.update(data)
-
-        # Restore the default
-        try:
-            self.default = self.model._meta.get_field(self.name).default
-        except FieldDoesNotExist:
-            self.default = NOT_PROVIDED
-
     def to_python(self, value):
         """
         Converts the input value into the expected Python data type, raising

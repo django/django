@@ -504,6 +504,13 @@ class Model(object):
                 else:
                     record_exists = False
             if not pk_set or not record_exists:
+                if meta.order_with_respect_to:
+                    # If this is a model with an order_with_respect_to
+                    # autopopulate the _order field
+                    field = meta.order_with_respect_to
+                    order_value = manager.using(using).filter(**{field.name: getattr(self, field.attname)}).count()
+                    setattr(self, '_order', order_value)
+
                 if not pk_set:
                     if force_update:
                         raise ValueError("Cannot force an update in save() with no primary key.")
@@ -513,9 +520,6 @@ class Model(object):
                     values = [(f, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True), connection=connection))
                         for f in meta.local_fields]
 
-                if meta.order_with_respect_to:
-                    field = meta.order_with_respect_to
-                    values.append((meta.get_field_by_name('_order')[0], manager.using(using).filter(**{field.name: getattr(self, field.attname)}).count()))
                 record_exists = False
 
                 update_pk = bool(meta.has_auto_field and not pk_set)

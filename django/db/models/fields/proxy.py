@@ -11,9 +11,7 @@ class OrderWrt(fields.IntegerField):
     Meta.order_with_respect_to is specified.
     """
 
-    def __init__(self, model, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        kwargs['name'] = '_order'
+        kwargs['editable'] = False
         super(OrderWrt, self).__init__(*args, **kwargs)
-        self.model = model
-        self.attname = '_order'
-        self.column = '_order'
-        self.name = '_order'

@@ -258,7 +258,7 @@ class ExtraWhere(object):
     def __init__(self, sqls, params):
         self.sqls = sqls
         self.params = params
-    
+
     def as_sql(self, qn=None, connection=None):
         return " AND ".join(self.sqls), tuple(self.params or ())
 
@@ -269,6 +269,30 @@ class Constraint(object):
     """
     def __init__(self, alias, col, field):
         self.alias, self.col, self.field = alias, col, field
+
+    def __getstate__(self):
+        """Save the state of the Constraint for pickling.
+
+        Fields aren't necessarily pickleable, because they can have
+        callable default values. So, instead of pickling the field
+        store a reference so we can restore it manually
+        """
+        obj_dict = self.__dict__.copy()
+        if self.field:
+            obj_dict['model'] = self.field.model
+            obj_dict['field_name'] = self.field.name
+        del obj_dict['field']
+        return obj_dict
+
+    def __setstate__(self, data):
+        """Restore the constraint """
+        model = data.pop('model', None)
+        field_name = data.pop('field_name', None)
+        self.__dict__.update(data)
+        if model is not None:
+            self.field = model._meta.get_field(field_name)
+        else:
+            self.field = None
 
     def prepare(self, lookup_type, value):
         if self.field:

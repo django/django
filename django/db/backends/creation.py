@@ -73,9 +73,6 @@ class BaseDatabaseCreation(object):
                 else:
                     field_output.extend(ref_output)
             table_output.append(' '.join(field_output))
-        if opts.order_with_respect_to:
-            table_output.append(style.SQL_FIELD(qn('_order')) + ' ' + \
-                style.SQL_COLTYPE(models.IntegerField().db_type(connection=self.connection)))
         for field_constraints in opts.unique_together:
             table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
                 ", ".join([style.SQL_FIELD(qn(opts.get_field(f).column)) for f in field_constraints]))
