@@ -5,6 +5,11 @@ from django.utils import functional
 
 from models import Reporter, Article
 
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
+
 #
 # The introspection module is optional, so methods tested here might raise
 # NotImplementedError. This is perfectly acceptable behavior for the backend
