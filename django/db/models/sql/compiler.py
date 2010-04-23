@@ -546,8 +546,8 @@ class SQLCompiler(object):
                     lhs_col = int_opts.parents[int_model].column
                     dedupe = lhs_col in opts.duplicate_targets
                     if dedupe:
-                        avoid.update(self.query.dupe_avoidance.get(id(opts), lhs_col),
-                                ())
+                        avoid.update(self.query.dupe_avoidance.get((id(opts), lhs_col),
+                                ()))
                         dupe_set.add((opts, lhs_col))
                     int_opts = int_model._meta
                     alias = self.query.join((alias, int_opts.db_table, lhs_col,
@@ -620,8 +620,8 @@ class SQLCompiler(object):
                         lhs_col = int_opts.parents[int_model].column
                         dedupe = lhs_col in opts.duplicate_targets
                         if dedupe:
-                            avoid.update(self.query.dupe_avoidance.get(id(opts), lhs_col),
-                                ())
+                            avoid.update((self.query.dupe_avoidance.get(id(opts), lhs_col),
+                                ()))
                             dupe_set.add((opts, lhs_col))
                         int_opts = int_model._meta
                         alias = self.query.join(
