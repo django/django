@@ -7,43 +7,51 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-15 14:38+0200\n"
+"POT-Creation-Date: 2010-04-26 15:36+0200\n"
 "PO-Revision-Date: 2008-06-23 21:02+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: contrib/admin/media/js/SelectFilter2.js:33
+#: contrib/admin/media/js/SelectFilter2.js:37
 #, perl-format
 msgid "Available %s"
 msgstr "Verfügbare %s"
 
-#: contrib/admin/media/js/SelectFilter2.js:41
+#: contrib/admin/media/js/SelectFilter2.js:45
 msgid "Choose all"
 msgstr "Alles auswählen"
 
-#: contrib/admin/media/js/SelectFilter2.js:46
+#: contrib/admin/media/js/SelectFilter2.js:50
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: contrib/admin/media/js/SelectFilter2.js:48
+#: contrib/admin/media/js/SelectFilter2.js:52
 msgid "Remove"
 msgstr "Entfernen"
 
-#: contrib/admin/media/js/SelectFilter2.js:53
+#: contrib/admin/media/js/SelectFilter2.js:57
 #, perl-format
 msgid "Chosen %s"
 msgstr "Ausgewählte %s"
 
-#: contrib/admin/media/js/SelectFilter2.js:54
+#: contrib/admin/media/js/SelectFilter2.js:58
 msgid "Select your choice(s) and click "
 msgstr "Auswahl treffen und Klick auf"
 
-#: contrib/admin/media/js/SelectFilter2.js:59
+#: contrib/admin/media/js/SelectFilter2.js:63
 msgid "Clear all"
 msgstr "Alles abwählen"
+
+#: contrib/admin/media/js/actions.js:17
+#: contrib/admin/media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s von %(cnt)s ausgewählt"
+msgstr[1] "%(sel)s von %(cnt)s ausgewählt"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
@@ -58,62 +66,63 @@ msgstr ""
 msgid "S M T W T F S"
 msgstr "S M D M D F S"
 
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr "Einblenden"
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Ausblenden"
+
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag"
 
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "Einblenden"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "Ausblenden"
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:49
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Now"
 msgstr "Jetzt"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "Uhr"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
 msgid "Choose a time"
 msgstr "Uhrzeit"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
 msgid "Midnight"
 msgstr "Mitternacht"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
 msgid "6 a.m."
 msgstr "6 Uhr"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 msgid "Noon"
 msgstr "Mittag"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:91
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:182
 msgid "Today"
 msgstr "Heute"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:137
 msgid "Calendar"
 msgstr "Kalender"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
 msgid "Yesterday"
 msgstr "Gestern"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
 msgstr "Morgen"
