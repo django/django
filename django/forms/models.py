@@ -316,11 +316,22 @@ class BaseModelForm(BaseForm):
         return self.cleaned_data
 
     def _post_clean(self):
-        exclude = self._get_validation_exclusions()
         opts = self._meta
-
         # Update the model instance with self.cleaned_data.
         self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
+
+        exclude = self._get_validation_exclusions()
+
+        # Foreign Keys being used to represent inline relationships
+        # are excluded from basic field value validation. This is for two
+        # reasons: firstly, the value may not be supplied (#12507; the
+        # case of providing new values to the admin); secondly the
+        # object being referred to may not yet fully exist (#12749).
+        # However, these fields *must* be included in uniqueness checks,
+        # so this can't be part of _get_validation_exclusions().
+        for f_name, field in self.fields.items():
+            if isinstance(field, InlineForeignKeyField):
+                exclude.append(f_name)
 
         # Clean the model instance's fields.
         try:
@@ -761,6 +772,7 @@ class BaseInlineFormSet(BaseModelFormSet):
     def get_unique_error_message(self, unique_check):
         unique_check = [field for field in unique_check if field != self.fk.name]
         return super(BaseInlineFormSet, self).get_unique_error_message(unique_check)
+
 
 def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
     """

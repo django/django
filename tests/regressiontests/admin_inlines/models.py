@@ -102,6 +102,29 @@ admin.site.register(Holder2, HolderAdmin, inlines=[InnerInline2])
 # only Inline media
 admin.site.register(Holder3, inlines=[InnerInline3])
 
+# Models for #12749
+
+class Person(models.Model):
+    firstname = models.CharField(max_length=15)
+
+class OutfitItem(models.Model):
+    name = models.CharField(max_length=15)
+
+class Fashionista(models.Model):
+    person = models.OneToOneField(Person, primary_key=True)
+    weaknesses = models.ManyToManyField(OutfitItem, through='ShoppingWeakness', blank=True)
+
+class ShoppingWeakness(models.Model):
+    fashionista = models.ForeignKey(Fashionista)
+    item = models.ForeignKey(OutfitItem)
+
+class InlineWeakness(admin.TabularInline):
+    model = ShoppingWeakness
+    extra = 1
+
+admin.site.register(Fashionista, inlines=[InlineWeakness])
+
+
 __test__ = {'API_TESTS': """
 
 # Regression test for #9362
