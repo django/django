@@ -6,7 +6,7 @@ def module_has_submodule(mod, submod_name):
     # its find_module must be used to search for submodules.
     loader = getattr(mod, '__loader__', None)
     if loader:
-        mod_path = "%s.%s" % (mod.__name__.rsplit('.',1)[-1], submod_name)
+        mod_path = "%s.%s" % (mod.__name__[mod.__name__.rfind('.')+1:], submod_name)
         x = loader.find_module(mod_path)
         if x is None:
             # zipimport.zipimporter.find_module is documented to take
