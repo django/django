@@ -6,6 +6,7 @@ from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
+from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
 
 
@@ -57,21 +58,21 @@ class Command(NoArgsCommand):
         pending_references = {}
 
         # Build the manifest of apps and models that are to be synchronized
-        manifest = dict(
+        all_models = [
             (app.__name__.split('.')[-2],
                 [m for m in models.get_models(app, include_auto_created=True)
                 if router.allow_syncdb(db, m)])
             for app in models.get_apps()
-        )
+        ]
         def model_installed(model):
             opts = model._meta
             converter = connection.introspection.table_name_converter
             return not ((converter(opts.db_table) in tables) or
                 (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables))
 
-        manifest = dict(
+        manifest = SortedDict(
             (app_name, filter(model_installed, model_list))
-            for app_name, model_list in manifest.iteritems()
+            for app_name, model_list in all_models
         )
 
         # Create the tables for each model
