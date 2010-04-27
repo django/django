@@ -531,7 +531,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
     A series of tests for django-admin.py when the settings file is in a
     directory. (see #9751).
     """
-    
+
     def setUp(self):
         self.write_settings('settings', is_dir=True)
 
@@ -973,10 +973,15 @@ class ManageValidate(AdminScriptTestCase):
     def test_broken_app(self):
         "manage.py validate reports an ImportError if an app's models.py raises one on import"
         self.write_settings('settings.py', apps=['admin_scripts.broken_app'])
-        args = ['validate']
-        out, err = self.run_manage(args)
-        self.assertNoOutput(out)
-        self.assertOutput(err, 'ImportError')
+        # Skip this test on Python 2.3, where a 2nd attempt to import a broken module won't raise
+        # an error. Due to the way models modules are loaded and re-tried if the first attempt
+        # fails, Django needs the 2nd attempt to fail, but on Python 2.3 that does not happen, thus
+        # this function only works on higher levels of Python.
+        if sys.version_info >= (2, 4):
+            args = ['validate']
+            out, err = self.run_manage(args)
+            self.assertNoOutput(out)
+            self.assertOutput(err, 'ImportError')
 
     def test_complex_app(self):
         "manage.py validate does not raise an ImportError validating a complex app with nested calls to load_app"
