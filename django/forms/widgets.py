@@ -438,7 +438,7 @@ class Select(Widget):
         options = self.render_options(choices, [value])
         if options:
             output.append(options)
-        output.append('</select>')
+        output.append(u'</select>')
         return mark_safe(u'\n'.join(output))
 
     def render_options(self, choices, selected_choices):
@@ -737,7 +737,7 @@ class MultiWidget(Widget):
             media = media + w.media
         return media
     media = property(_get_media)
-    
+
     def __deepcopy__(self, memo):
         obj = super(MultiWidget, self).__deepcopy__(memo)
         obj.widgets = copy.deepcopy(self.widgets)
