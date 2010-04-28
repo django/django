@@ -45,6 +45,9 @@ class Book(models.Model):
         ordering = ('title',)
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, null=True)
     flavor = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ('flavor',)
 

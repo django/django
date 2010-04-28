@@ -498,6 +498,115 @@ class QueryTestCase(TestCase):
         self.assertEquals(list(Book.objects.using('other').values_list('title',flat=True)),
                           [u'Dive into HTML5', u'Dive into Python', u'Dive into Water'])
 
+    def test_o2o_separation(self):
+        "OneToOne fields are constrained to a single database"
+        # Create a user and profile on the default database
+        alice = User.objects.db_manager('default').create_user('alice', 'alice@example.com')
+        alice_profile = UserProfile.objects.using('default').create(user=alice, flavor='chocolate')
+
+        # Create a user and profile on the other database
+        bob = User.objects.db_manager('other').create_user('bob', 'bob@example.com')
+        bob_profile = UserProfile.objects.using('other').create(user=bob, flavor='crunchy frog')
+
+        # Retrieve related objects; queries should be database constrained
+        alice = User.objects.using('default').get(username="alice")
+        self.assertEquals(alice.userprofile.flavor, "chocolate")
+
+        bob = User.objects.using('other').get(username="bob")
+        self.assertEquals(bob.userprofile.flavor, "crunchy frog")
+
+        # Check that queries work across joins
+        self.assertEquals(list(User.objects.using('default').filter(userprofile__flavor='chocolate').values_list('username', flat=True)),
+                          [u'alice'])
+        self.assertEquals(list(User.objects.using('other').filter(userprofile__flavor='chocolate').values_list('username', flat=True)),
+                          [])
+
+        self.assertEquals(list(User.objects.using('default').filter(userprofile__flavor='crunchy frog').values_list('username', flat=True)),
+                          [])
+        self.assertEquals(list(User.objects.using('other').filter(userprofile__flavor='crunchy frog').values_list('username', flat=True)),
+                          [u'bob'])
+
+        # Reget the objects to clear caches
+        alice_profile = UserProfile.objects.using('default').get(flavor='chocolate')
+        bob_profile = UserProfile.objects.using('other').get(flavor='crunchy frog')
+
+        # Retrive related object by descriptor. Related objects should be database-baound
+        self.assertEquals(alice_profile.user.username, 'alice')
+        self.assertEquals(bob_profile.user.username, 'bob')
+
+    def test_o2o_cross_database_protection(self):
+        "Operations that involve sharing FK objects across databases raise an error"
+        # Create a user and profile on the default database
+        alice = User.objects.db_manager('default').create_user('alice', 'alice@example.com')
+
+        # Create a user and profile on the other database
+        bob = User.objects.db_manager('other').create_user('bob', 'bob@example.com')
+
+        # Set a one-to-one relation with an object from a different database
+        alice_profile = UserProfile.objects.using('default').create(user=alice, flavor='chocolate')
+        try:
+            bob.userprofile = alice_profile
+            self.fail("Shouldn't be able to assign across databases")
+        except ValueError:
+            pass
+
+        # BUT! if you assign a FK object when the base object hasn't
+        # been saved yet, you implicitly assign the database for the
+        # base object.
+        bob_profile = UserProfile.objects.using('other').create(user=bob, flavor='crunchy frog')
+
+        new_bob_profile = UserProfile(flavor="spring surprise")
+
+        charlie = User(username='charlie',email='charlie@example.com')
+        charlie.set_unusable_password()
+
+        # initially, no db assigned
+        self.assertEquals(new_bob_profile._state.db, None)
+        self.assertEquals(charlie._state.db, None)
+
+        # old object comes from 'other', so the new object is set to use 'other'...
+        new_bob_profile.user = bob
+        charlie.userprofile = bob_profile
+        self.assertEquals(new_bob_profile._state.db, 'other')
+        self.assertEquals(charlie._state.db, 'other')
+
+        # ... but it isn't saved yet
+        self.assertEquals(list(User.objects.using('other').values_list('username',flat=True)),
+                          [u'bob'])
+        self.assertEquals(list(UserProfile.objects.using('other').values_list('flavor',flat=True)),
+                           [u'crunchy frog'])
+
+        # When saved (no using required), new objects goes to 'other'
+        charlie.save()
+        bob_profile.save()
+        new_bob_profile.save()
+        self.assertEquals(list(User.objects.using('default').values_list('username',flat=True)),
+                          [u'alice'])
+        self.assertEquals(list(User.objects.using('other').values_list('username',flat=True)),
+                          [u'bob', u'charlie'])
+        self.assertEquals(list(UserProfile.objects.using('default').values_list('flavor',flat=True)),
+                           [u'chocolate'])
+        self.assertEquals(list(UserProfile.objects.using('other').values_list('flavor',flat=True)),
+                           [u'crunchy frog', u'spring surprise'])
+
+        # This also works if you assign the O2O relation in the constructor
+        denise = User.objects.db_manager('other').create_user('denise','denise@example.com')
+        denise_profile = UserProfile(flavor="tofu", user=denise)
+
+        self.assertEquals(denise_profile._state.db, 'other')
+        # ... but it isn't saved yet
+        self.assertEquals(list(UserProfile.objects.using('default').values_list('flavor',flat=True)),
+                           [u'chocolate'])
+        self.assertEquals(list(UserProfile.objects.using('other').values_list('flavor',flat=True)),
+                           [u'crunchy frog', u'spring surprise'])
+
+        # When saved, the new profile goes to 'other'
+        denise_profile.save()
+        self.assertEquals(list(UserProfile.objects.using('default').values_list('flavor',flat=True)),
+                           [u'chocolate'])
+        self.assertEquals(list(UserProfile.objects.using('other').values_list('flavor',flat=True)),
+                           [u'crunchy frog', u'spring surprise', u'tofu'])
+
     def test_generic_key_separation(self):
         "Generic fields are constrained to a single database"
         # Create a book and author on the default database
@@ -1101,6 +1210,30 @@ class RouterTestCase(TestCase):
         self.assertEquals(alice._state.db, 'default')
 
         bob, created = dive.authors.get_or_create(name='Bob')
+        self.assertEquals(bob._state.db, 'default')
+
+    def test_o2o_cross_database_protection(self):
+        "Operations that involve sharing FK objects across databases raise an error"
+        # Create a user and profile on the default database
+        alice = User.objects.db_manager('default').create_user('alice', 'alice@example.com')
+
+        # Create a user and profile on the other database
+        bob = User.objects.db_manager('other').create_user('bob', 'bob@example.com')
+
+        # Set a one-to-one relation with an object from a different database
+        alice_profile = UserProfile.objects.create(user=alice, flavor='chocolate')
+        try:
+            bob.userprofile = alice_profile
+        except ValueError:
+            self.fail("Assignment across master/slave databases with a common source should be ok")
+
+        # Database assignments of original objects haven't changed...
+        self.assertEquals(alice._state.db, 'default')
+        self.assertEquals(alice_profile._state.db, 'default')
+        self.assertEquals(bob._state.db, 'other')
+
+        # ... but they will when the affected object is saved.
+        bob.save()
         self.assertEquals(bob._state.db, 'default')
 
     def test_generic_key_cross_database_protection(self):

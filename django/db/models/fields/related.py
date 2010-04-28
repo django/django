@@ -222,7 +222,7 @@ class SingleRelatedObjectDescriptor(object):
             return getattr(instance, self.cache_name)
         except AttributeError:
             params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
-            db = router.db_for_read(instance.__class__, instance=instance)
+            db = router.db_for_read(self.related.model, instance=instance)
             rel_obj = self.related.model._base_manager.using(db).get(**params)
             setattr(instance, self.cache_name, rel_obj)
             return rel_obj
