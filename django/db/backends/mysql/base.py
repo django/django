@@ -227,6 +227,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         second = '%s-12-31 23:59:59.99'
         return [first % value, second % value]
 
+    def max_name_length(self):
+        return 64
+
 class DatabaseWrapper(BaseDatabaseWrapper):
 
     operators = {
