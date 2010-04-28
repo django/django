@@ -8,10 +8,10 @@ SHORT_DATETIME_FORMAT = 'd.m.Y H:i'
 FIRST_DAY_OF_WEEK = 1 # Monday
 DATE_INPUT_FORMATS = (
     '%Y-%m-%d', '%j.%m.%Y', '%j.%m.%y', # '2006-10-25', '25.10.2006', '25.10.06'
-    '%Y-%m-%j',                         # '2006-10-25', 
-    '%j. %b %Y', '%j %b %Y',            # '25. okt 2006', '25 okt 2006'
-    '%j. %b. %Y', '%j %b. %Y',          # '25. okt. 2006', '25 okt. 2006'
-    '%j. %B %Y', '%j %B %Y',            # '25. oktober 2006', '25 oktober 2006'
+    '%Y-%m-%j',                         # '2006-10-25',
+    # '%j. %b %Y', '%j %b %Y',            # '25. okt 2006', '25 okt 2006'
+    # '%j. %b. %Y', '%j %b. %Y',          # '25. okt. 2006', '25 okt. 2006'
+    # '%j. %B %Y', '%j %B %Y',            # '25. oktober 2006', '25 oktober 2006'
 )
 TIME_INPUT_FORMATS = (
     '%H:%M:%S',     # '14:30:59'

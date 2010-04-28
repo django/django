@@ -265,8 +265,14 @@ current locale.
 
 Django will also use localized formats when parsing data in forms. That means
 Django uses different formats for different locales when guessing the format
-used by the user when inputting data on forms. Note that Django uses different
-formats for displaying data, and for parsing it.
+used by the user when inputting data on forms.
+
+.. note::
+    Django uses different formats for displaying data to those it uses for
+    parsing data. Most notably, the formats for parsing dates can't use the
+    ``%a`` (abbreviated weekday name), ``%A`` (full weekday name),
+    ``%b`` (abbreviated month name), ``%B`` (full month name),
+    or ``%p`` (AM/PM).
 
 To enable a form field to localize input and output data simply use its
 ``localize`` argument::

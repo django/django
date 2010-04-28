@@ -13,7 +13,7 @@ FIRST_DAY_OF_WEEK = 1 # Monday
 DATE_INPUT_FORMATS = (
     '%d.%m.%Y', '%d.%m.%y',     # '25.10.2006', '25.10.06'
     '%Y-%m-%d', '%y-%m-%d',     # '2006-10-25', '06-10-25'
-    '%d. %B %Y', '%d. %b. %Y',  # '25. October 2006', '25. Oct. 2006'
+    # '%d. %B %Y', '%d. %b. %Y',  # '25. October 2006', '25. Oct. 2006'
 )
 TIME_INPUT_FORMATS = (
     '%H:%M:%S', # '14:30:59'
