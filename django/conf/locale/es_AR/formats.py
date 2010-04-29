@@ -2,13 +2,13 @@
 # This file is distributed under the same license as the Django package.
 #
 
-DATE_FORMAT = 'j \\de F \\de Y'
-TIME_FORMAT = 'H:i:s'
-DATETIME_FORMAT = 'j \\de F \\de Y \\a \\l\\a\s H:i'
-YEAR_MONTH_FORMAT = 'F \\de Y'
-MONTH_DAY_FORMAT = 'j \\de F'
-SHORT_DATE_FORMAT = 'd/m/Y'
-SHORT_DATETIME_FORMAT = 'd/m/Y H:i'
+DATE_FORMAT = r'j N Y'
+TIME_FORMAT = r'H:i:s'
+DATETIME_FORMAT = r'j N Y H:i:s'
+YEAR_MONTH_FORMAT = r'F Y'
+MONTH_DAY_FORMAT = r'j \de F'
+SHORT_DATE_FORMAT = r'd/m/Y'
+SHORT_DATETIME_FORMAT = r'd/m/Y H:i'
 FIRST_DAY_OF_WEEK = 0 # 0: Sunday, 1: Monday
 DATE_INPUT_FORMATS = (
     '%d/%m/%Y', # '31/12/2009'
