@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Django package.
 #
 
-DATE_FORMAT = 'Yeko M\re\n d\a'
+DATE_FORMAT = r'Yeko M\re\n d\a'
 TIME_FORMAT = 'H:i:s'
 # DATETIME_FORMAT = 
 # YEAR_MONTH_FORMAT = 
