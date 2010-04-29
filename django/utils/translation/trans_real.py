@@ -184,6 +184,12 @@ def activate(language):
     language and installs it as the current translation object for the current
     thread.
     """
+    if isinstance(language, basestring) and language == 'no':
+        warnings.warn(
+            "The use of the language code 'no' is deprecated. "
+            "Please use the 'nb' translation instead.",
+            PendingDeprecationWarning
+        )
     _active[currentThread()] = translation(language)
 
 def deactivate():
@@ -504,8 +510,8 @@ def get_date_formats():
     formats provided in the settings will be used.
     """
     warnings.warn(
-        '`django.utils.translation.get_date_formats` is deprecated. '
-        'Please update your code to use the new i18n aware formatting.',
+        "'django.utils.translation.get_date_formats' is deprecated. "
+        "Please update your code to use the new i18n aware formatting.",
         PendingDeprecationWarning
     )
     from django.conf import settings
@@ -527,8 +533,8 @@ def get_partial_date_formats():
     formats provided in the settings will be used.
     """
     warnings.warn(
-        '`django.utils.translation.get_partial_date_formats` is deprecated. '
-        'Please update your code to use the new i18n aware formatting.',
+        "'django.utils.translation.get_partial_date_formats' is deprecated. "
+        "Please update your code to use the new i18n aware formatting.",
         PendingDeprecationWarning
     )
     from django.conf import settings

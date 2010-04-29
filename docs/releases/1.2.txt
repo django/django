@@ -764,3 +764,10 @@ Relaxed requirements for usernames
 The built-in :class:`~django.contrib.auth.models.User` model's
 :attr:`~django.contrib.auth.models.User.username` field now allows a wider range
 of characters, including ``@``, ``+``, ``.`` and ``-`` characters.
+
+Deprecation of old language code ``no``
+---------------------------------------
+
+The currently used language code for Norwegian Bokmål ``no`` is being
+replaced by the more common language code ``nb``, which should be updated
+by translators from now on.

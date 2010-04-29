@@ -1,5 +1,4 @@
-# This is the *old* Norwegian (Bokmål) translation of Django
-# For future updates please use the translation in the "nb" directory.
+# Norwegian (Bokmål) translation of Django
 # Copyright (C) 2005-2010
 # This file is distributed under the same license as the Django package.
 #

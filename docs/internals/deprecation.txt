@@ -94,6 +94,9 @@ their deprecation, as per the :ref:`Django deprecation policy
         * The ``postgresql`` database backend has been deprecated in favor of
           the ``postgresql_psycopg2`` backend.
 
+        * The ``no`` language code has been deprecated in favor of the ``nb``
+          language code.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the

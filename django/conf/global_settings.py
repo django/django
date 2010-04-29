@@ -78,6 +78,7 @@ LANGUAGES = (
     ('mk', gettext_noop('Macedonian')),
     ('nl', gettext_noop('Dutch')),
     ('no', gettext_noop('Norwegian')),
+    ('nb', gettext_noop('Norwegian Bokmal')),
     ('nn', gettext_noop('Norwegian Nynorsk')),
     ('pl', gettext_noop('Polish')),
     ('pt', gettext_noop('Portuguese')),
