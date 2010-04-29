@@ -163,3 +163,17 @@ class DatabaseOperations(BaseDatabaseOperations):
             if self.postgres_version[0:2] == (8,2):
                 if self.postgres_version[2] is None or self.postgres_version[2] <= 4:
                     raise NotImplementedError('PostgreSQL 8.2 to 8.2.4 is known to have a faulty implementation of %s. Please upgrade your version of PostgreSQL.' % aggregate.sql_function)
+
+    def max_name_length(self):
+        """
+        Returns the maximum length of an identifier.
+
+        Note that the maximum length of an identifier is 63 by default, but can
+        be changed by recompiling PostgreSQL after editing the NAMEDATALEN
+        macro in src/include/pg_config_manual.h .
+
+        This implementation simply returns 63, but can easily be overridden by a
+        custom database backend that inherits most of its behavior from this one.
+        """
+
+        return 63
