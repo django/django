@@ -218,11 +218,15 @@ class InlineAdminFormSet(object):
             if fk and fk.name == field:
                 continue
             if field in self.readonly_fields:
-                label = label_for_field(field, self.opts.model, self.model_admin)
-                yield (False, label)
+                yield {
+                    'label': label_for_field(field, self.opts.model, self.model_admin),
+                    'widget': {
+                        'is_hidden': False
+                    },
+                    'required': False
+                }
             else:
-                field = self.formset.form.base_fields[field]
-                yield (field.widget.is_hidden, field.label)
+                yield self.formset.form.base_fields[field]
 
     def _media(self):
         media = self.opts.media + self.formset.media
