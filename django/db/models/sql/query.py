@@ -556,7 +556,7 @@ class Query(object):
             # models.
             workset = {}
             for model, values in seen.iteritems():
-                for field in model._meta.local_fields:
+                for field in model._meta.fields:
                     if field in values:
                         continue
                     add_to_dict(workset, model, field)
