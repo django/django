@@ -251,7 +251,7 @@ class Model(object):
     def __init__(self, *args, **kwargs):
         signals.pre_init.send(sender=self.__class__, args=args, kwargs=kwargs)
 
-        # Set up the storage for instane state
+        # Set up the storage for instance state
         self._state = ModelState()
 
         # There is a rather weird disparity here; if kwargs, it's set, then args
