@@ -197,4 +197,13 @@ u'Troy Buswell'
 >>> troy.state.name
 u'Western Australia'
 
+# Also works if you use only, rather than defer
+>>> troy = SpecialClient.objects.select_related('state').only('name').get(name='Troy Buswell')
+>>> troy.name
+u'Troy Buswell'
+>>> troy.value
+42
+>>> troy.state.name
+u'Western Australia'
+
 """}

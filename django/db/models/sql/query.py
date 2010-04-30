@@ -556,10 +556,10 @@ class Query(object):
             # models.
             workset = {}
             for model, values in seen.iteritems():
-                for field in model._meta.fields:
+                for field, m in model._meta.get_fields_with_model():
                     if field in values:
                         continue
-                    add_to_dict(workset, model, field)
+                    add_to_dict(workset, m or model, field)
             for model, values in must_include.iteritems():
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an

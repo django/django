@@ -1154,7 +1154,17 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
         return None
 
     restricted = requested is not None
-    load_fields = only_load and only_load.get(klass) or None
+    if only_load:
+        load_fields = only_load.get(klass)
+        # When we create the object, we will also be creating populating
+        # all the parent classes, so traverse the parent classes looking
+        # for fields that must be included on load.
+        for parent in klass._meta.get_parent_list():
+            fields = only_load.get(parent)
+            if fields:
+                load_fields.update(fields)
+    else:
+        load_fields = None
     if load_fields:
         # Handle deferred fields.
         skip = set()
