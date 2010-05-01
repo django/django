@@ -18,7 +18,7 @@ class CacheNode(Node):
         try:
             expire_time = self.expire_time_var.resolve(context)
         except VariableDoesNotExist:
-            raise TemplateSyntaxError('"cache" tag got an unknkown variable: %r' % self.expire_time_var.var)
+            raise TemplateSyntaxError('"cache" tag got an unknown variable: %r' % self.expire_time_var.var)
         try:
             expire_time = int(expire_time)
         except (ValueError, TypeError):
