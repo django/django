@@ -230,6 +230,34 @@ party packages, or from your own code, you should ensure that the
 information, see
 :ref:`template tag thread safety considerations<template_tag_thread_safety>`.
 
+You may also need to update your templates if you were relying on the
+implementation of Django's template tags *not* being thread safe. The
+:ttag:`cycle` tag is the most likely to be affected in this way,
+especially when used in conjunction with the :ttag:`include` tag.
+Consider the following template fragment::
+
+    {% for object in object_list %}
+        {% include "subtemplate.html" %}
+    {% endfor %}
+
+with a ``subtemplate.html`` that reads::
+
+    {% cycle 'even' 'odd' %}
+
+Using the non thread-safe, pre-Django 1.2 renderer, this would output::
+
+    even odd even odd ...
+
+Using the thread-safe Django 1.2 renderer, you will instead get::
+
+    even even even even ...
+
+This is because the each rendering of the :ttag:`include` tag is an
+independent rendering. When the :ttag:`cycle` tag was not thread safe,
+the state of the :ttag:`cycle` tag would leak between multiple renderings
+of the same :ttag:`include`. Now that the :ttag:`cycle` tag is thread safe,
+this leakage no longer occurs.
+
 Test runner exit status code
 ----------------------------
 

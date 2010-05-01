@@ -619,6 +619,13 @@ including it. This example produces the output ``"Hello, John"``:
 
 See also: ``{% ssi %}``.
 
+.. note::
+    The :ttag:`include` tag should be considered as an implementation of
+    "render this subtemplate and include the HTML", not as "parse this
+    subtemplate and include its contents as if it were part of the parent".
+    This means that there is no shared state between included templates --
+    each include is a completely independent rendering process.
+
 .. templatetag:: load
 
 load
