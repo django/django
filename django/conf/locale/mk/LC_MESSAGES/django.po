@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-24 21:56+0200\n"
-"PO-Revision-Date: 2008-09-03 11:20+0200\n"
+"POT-Creation-Date: 2010-05-01 21:49+0200\n"
+"PO-Revision-Date: 2010-04-05 15:53+0100\n"
 "Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian <ossm-members@hedona.on.net.mk>\n"
 "MIME-Version: 1.0\n"
@@ -18,215 +18,247 @@ msgid "Arabic"
 msgstr "Арапски"
 
 #: conf/global_settings.py:45
-msgid "Bengali"
-msgstr "Бенгалски"
-
-#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "Бугарски"
 
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "Бенгалски"
+
 #: conf/global_settings.py:47
+msgid "Bosnian"
+msgstr "Босански"
+
+#: conf/global_settings.py:48
 msgid "Catalan"
 msgstr "Каталански"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Czech"
 msgstr "Чешки"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Welsh"
 msgstr "Велшки"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Danish"
 msgstr "Дански"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "German"
 msgstr "Германски"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Greek"
 msgstr "Грчки"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "English"
 msgstr "Англиски"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
+msgid "British English"
+msgstr "Британскиот англиски"
+
+#: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "Шпански"
 
-#: conf/global_settings.py:55
-msgid "Estonian"
-msgstr "Естонски"
-
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Argentinean Spanish"
 msgstr "Аргентиско шпански"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
+msgid "Estonian"
+msgstr "Естонски"
+
+#: conf/global_settings.py:59
 msgid "Basque"
 msgstr "Баскиски"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:60
 msgid "Persian"
 msgstr "Персиски"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:61
 msgid "Finnish"
 msgstr "Фински"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:62
 msgid "French"
 msgstr "Француски"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:63
+msgid "Frisian"
+msgstr "Фризиски"
+
+#: conf/global_settings.py:64
 msgid "Irish"
 msgstr "Ирски"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:65
 msgid "Galician"
 msgstr "Галски"
 
-#: conf/global_settings.py:63
-msgid "Hungarian"
-msgstr "Унгарски"
-
-#: conf/global_settings.py:64
+#: conf/global_settings.py:66
 msgid "Hebrew"
 msgstr "Еврејски"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:67
 msgid "Hindi"
 msgstr "Хинди"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:68
 msgid "Croatian"
 msgstr "Хрватски"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr "Унгарски"
+
+#: conf/global_settings.py:70
 msgid "Icelandic"
 msgstr "Исландски"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:71
 msgid "Italian"
 msgstr "Италијански"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:72
 msgid "Japanese"
 msgstr "Јапонски"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:73
 msgid "Georgian"
 msgstr "Грузиски"
 
-#: conf/global_settings.py:71
-msgid "Korean"
-msgstr "Корејски"
-
-#: conf/global_settings.py:72
+#: conf/global_settings.py:74
 msgid "Khmer"
 msgstr "Кмер"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:75
 msgid "Kannada"
 msgstr "Канада"
 
-#: conf/global_settings.py:74
-msgid "Latvian"
-msgstr "Латвиски"
+#: conf/global_settings.py:76
+msgid "Korean"
+msgstr "Корејски"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:77
 msgid "Lithuanian"
 msgstr "Литвански"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:78
+msgid "Latvian"
+msgstr "Латвиски"
+
+#: conf/global_settings.py:79
 msgid "Macedonian"
 msgstr "Македонски"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:80
 msgid "Dutch"
 msgstr "Холандски"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:81
 msgid "Norwegian"
 msgstr "Норвешки"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:82
+msgid "Norwegian Bokmal"
+msgstr "Норвешка bokmål"
+
+#: conf/global_settings.py:83
+msgid "Norwegian Nynorsk"
+msgstr "Норвешки Нинорск"
+
+#: conf/global_settings.py:84
 msgid "Polish"
 msgstr "Полски"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:85
 msgid "Portuguese"
 msgstr "Португалкски"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:86
 msgid "Brazilian Portuguese"
 msgstr "Бразилско португалски"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:87
 msgid "Romanian"
 msgstr "Романски"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:88
 msgid "Russian"
 msgstr "Руски"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:89
 msgid "Slovak"
 msgstr "Словачки"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:90
 msgid "Slovenian"
 msgstr "Словенечки"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:91
+msgid "Albanian"
+msgstr "Албански"
+
+#: conf/global_settings.py:92
 msgid "Serbian"
 msgstr "Српски"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:93
+msgid "Serbian Latin"
+msgstr "Српски Латиница"
+
+#: conf/global_settings.py:94
 msgid "Swedish"
 msgstr "Шведски"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:95
 msgid "Tamil"
 msgstr "Тамил"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:96
 msgid "Telugu"
 msgstr "Телугу"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:97
 msgid "Thai"
 msgstr "Тајландски"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:98
 msgid "Turkish"
 msgstr "Турски"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:99
 msgid "Ukrainian"
 msgstr "Украински"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:100
+msgid "Vietnamese"
+msgstr "Виетнамски"
+
+#: conf/global_settings.py:101
 msgid "Simplified Chinese"
 msgstr "Упростен кинески"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:102
 msgid "Traditional Chinese"
 msgstr "Традиционален кинески"
 
-#: contrib/admin/actions.py:60
+#: contrib/admin/actions.py:52
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Успешно беа избришани %(count)d %(items)s."
 
-#: contrib/admin/actions.py:67 contrib/admin/options.py:1027
+#: contrib/admin/actions.py:59 contrib/admin/options.py:1100
 msgid "Are you sure?"
 msgstr "Сигурни сте?"
 
-#: contrib/admin/actions.py:85
+#: contrib/admin/actions.py:77
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Избриши ги избраните %(verbose_name_plural)s"
@@ -265,19 +297,19 @@ msgstr "Овој месец"
 msgid "This year"
 msgstr "Оваа година"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:434
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
 msgid "Yes"
 msgstr "Да"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:434
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
 msgid "No"
 msgstr "Не"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:434
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:469
 msgid "Unknown"
 msgstr "Непознато"
 
-#: contrib/admin/helpers.py:14
+#: contrib/admin/helpers.py:20
 msgid "Action:"
 msgstr "Акција:"
 
@@ -309,61 +341,60 @@ msgstr "ставка во записникот"
 msgid "log entries"
 msgstr "ставки во записникот"
 
-#: contrib/admin/options.py:133 contrib/admin/options.py:147
+#: contrib/admin/options.py:142 contrib/admin/options.py:157
 msgid "None"
 msgstr "Ништо"
 
-#: contrib/admin/options.py:519
+#: contrib/admin/options.py:563
 #, python-format
 msgid "Changed %s."
 msgstr "Изменета %s."
 
-#: contrib/admin/options.py:519 contrib/admin/options.py:529
-#: contrib/comments/templates/comments/preview.html:16 forms/models.py:388
-#: forms/models.py:600
+#: contrib/admin/options.py:563 contrib/admin/options.py:573
+#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:844
+#: forms/models.py:573
 msgid "and"
 msgstr "и"
 
-#: contrib/admin/options.py:524
+#: contrib/admin/options.py:568
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Додадено %(name)s „%(object)s“."
 
-#: contrib/admin/options.py:528
+#: contrib/admin/options.py:572
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr " Изменето %(list)s за %(name)s „%(object)s“."
+msgstr "Изменето %(list)s за %(name)s „%(object)s“."
 
-#: contrib/admin/options.py:533
+#: contrib/admin/options.py:577
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Избришан  %(name)s „%(object)s“."
 
-#: contrib/admin/options.py:537
+#: contrib/admin/options.py:581
 msgid "No fields changed."
 msgstr "Не беше изменето ниедно поле."
 
-#: contrib/admin/options.py:599 contrib/auth/admin.py:67
+#: contrib/admin/options.py:647
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Ставката %(name)s \"%(obj)s\" беше успешно додадена."
 
-#: contrib/admin/options.py:603 contrib/admin/options.py:636
-#: contrib/auth/admin.py:75
+#: contrib/admin/options.py:651 contrib/admin/options.py:684
 msgid "You may edit it again below."
 msgstr "Подолу можете повторно да го уредите."
 
-#: contrib/admin/options.py:613 contrib/admin/options.py:646
+#: contrib/admin/options.py:661 contrib/admin/options.py:694
 #, python-format
 msgid "You may add another %s below."
 msgstr "Подолу можете да додате уште еден %s."
 
-#: contrib/admin/options.py:634
+#: contrib/admin/options.py:682
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" беше успешно изменета."
 
-#: contrib/admin/options.py:642
+#: contrib/admin/options.py:690
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -371,44 +402,68 @@ msgstr ""
 "Ставката %(name)s \"%(obj)s\" беше успешно додадена. Подолу можете повторно "
 "да ја уредите."
 
-#: contrib/admin/options.py:773
+#: contrib/admin/options.py:744
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Мора да се одберат предмети за да се изврши акција врз нив. Ниеден предмет "
+"не беше променет."
+
+#: contrib/admin/options.py:762
+msgid "No action selected."
+msgstr "Ниедна акција не е одбрана."
+
+#: contrib/admin/options.py:842
 #, python-format
 msgid "Add %s"
 msgstr "Додади %s"
 
-#: contrib/admin/options.py:804 contrib/admin/options.py:1005
+#: contrib/admin/options.py:868 contrib/admin/options.py:1080
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "објект %(name)s со примарен клуч %(key)r не постои."
 
-#: contrib/admin/options.py:861
+#: contrib/admin/options.py:933
 #, python-format
 msgid "Change %s"
 msgstr "Измени %s"
 
-#: contrib/admin/options.py:905
+#: contrib/admin/options.py:978
 msgid "Database error"
 msgstr "Грешка во базата на податоци"
 
-#: contrib/admin/options.py:941
+#: contrib/admin/options.py:1014
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s ставка %(name)s беше успешно изменета."
 msgstr[1] "%(count)s ставки %(name)s беа успешно изменети."
 
-#: contrib/admin/options.py:1020
+#: contrib/admin/options.py:1041
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s одбран"
+msgstr[1] "Сите %(total_count)s одбрани"
+
+#: contrib/admin/options.py:1046
+#, fuzzy, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "од одбраниот %(count)d"
+
+#: contrib/admin/options.py:1093
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Ставаката %(name)s \"%(obj)s\" беше избришана успешно."
 
-#: contrib/admin/options.py:1057
+#: contrib/admin/options.py:1130
 #, python-format
 msgid "Change history: %s"
 msgstr "Историја на измени: %s"
 
-#: contrib/admin/sites.py:21 contrib/admin/views/decorators.py:14
-#: contrib/auth/forms.py:80
+#: contrib/admin/sites.py:22 contrib/admin/views/decorators.py:14
+#: contrib/auth/forms.py:81
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -416,11 +471,11 @@ msgstr ""
 "Ве молам внесете точно корисничко име и лозинка. Имајте на ум дека и во "
 "двете полиња се битни големите и малите букви."
 
-#: contrib/admin/sites.py:285 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:311 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Ве молам најавете се повторно бидејќи вашата сесија е истечена."
 
-#: contrib/admin/sites.py:292 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:318 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -428,62 +483,52 @@ msgstr ""
 "Изгледа дека вашиот прелистувач не е конфигуриран да прифаќа колачиња. Ве "
 "молам овозможете ги колачињата, превчитајте ја страта и пробајте повторно."
 
-#: contrib/admin/sites.py:308 contrib/admin/sites.py:314
+#: contrib/admin/sites.py:334 contrib/admin/sites.py:340
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Корисничките имиња неможе да го содржат „@“ знакот."
 
-#: contrib/admin/sites.py:311 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:337 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Вашата е-пошта не е вашето корисничко име. Пробајте со „%s“."
 
-#: contrib/admin/sites.py:367
+#: contrib/admin/sites.py:393
 msgid "Site administration"
 msgstr "Администрација на сајт"
 
-#: contrib/admin/sites.py:381 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:407 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Најава"
 
-#: contrib/admin/sites.py:426
+#: contrib/admin/sites.py:452
 #, python-format
 msgid "%s administration"
 msgstr "%s администрација"
 
-#: contrib/admin/util.py:168
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Еден или повеќе %(fieldname)s во %(name)s: %(obj)s"
-
-#: contrib/admin/util.py:173
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Еден или повеќе %(fieldname)s во %(name)s:"
-
-#: contrib/admin/widgets.py:71
+#: contrib/admin/widgets.py:75
 msgid "Date:"
 msgstr "Датум:"
 
-#: contrib/admin/widgets.py:71
+#: contrib/admin/widgets.py:75
 msgid "Time:"
 msgstr "Време:"
 
-#: contrib/admin/widgets.py:95
+#: contrib/admin/widgets.py:99
 msgid "Currently:"
 msgstr "Моментално:"
 
-#: contrib/admin/widgets.py:95
+#: contrib/admin/widgets.py:99
 msgid "Change:"
 msgstr "Измена:"
 
-#: contrib/admin/widgets.py:124
+#: contrib/admin/widgets.py:129
 msgid "Lookup"
 msgstr "Побарај"
 
-#: contrib/admin/widgets.py:236
+#: contrib/admin/widgets.py:244
 msgid "Add Another"
 msgstr "Додади друго"
 
@@ -498,17 +543,17 @@ msgstr "Се извинуваме, но неможе да ја најдеме с
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:54
-#: contrib/admin/templates/admin/change_form.html:17
-#: contrib/admin/templates/admin/change_list.html:25
+#: contrib/admin/templates/admin/base.html:55
+#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_list.html:42
 #: contrib/admin/templates/admin/delete_confirmation.html:6
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
 #: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/admin/auth/user/change_password.html:10
+#: contrib/admin/templates/admin/auth/user/change_password.html:11
 #: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:5
 #: contrib/admin/templates/registration/password_reset_complete.html:4
 #: contrib/admin/templates/registration/password_reset_confirm.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
@@ -545,34 +590,47 @@ msgstr "Изврши ја избраната акција"
 msgid "Go"
 msgstr "Оди"
 
+#: contrib/admin/templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Кликнете тука за да изберете објекти низ повеќе страници"
+
+#: contrib/admin/templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Избери ги сите %(total_count)s %(module_name)s"
+
+#: contrib/admin/templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "Откажи го изборот"
+
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:27
+#: contrib/admin/templates/admin/base.html:28
 msgid "Welcome,"
 msgstr "Добредојдовте,"
 
-#: contrib/admin/templates/admin/base.html:32
+#: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Документација"
 
-#: contrib/admin/templates/admin/base.html:40
-#: contrib/admin/templates/admin/auth/user/change_password.html:14
-#: contrib/admin/templates/admin/auth/user/change_password.html:47
+#: contrib/admin/templates/admin/base.html:41
+#: contrib/admin/templates/admin/auth/user/change_password.html:15
+#: contrib/admin/templates/admin/auth/user/change_password.html:48
 #: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Промени лозинка"
 
-#: contrib/admin/templates/admin/base.html:47
+#: contrib/admin/templates/admin/base.html:48
 #: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Одјава"
 
@@ -584,41 +642,42 @@ msgstr "Џанго администрација на сајт"
 msgid "Django administration"
 msgstr "Џанго администрација"
 
-#: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/admin/change_form.html:21
 #: contrib/admin/templates/admin/index.html:29
 msgid "Add"
 msgstr "Додади"
 
-#: contrib/admin/templates/admin/change_form.html:27
+#: contrib/admin/templates/admin/change_form.html:28
 #: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Историја"
 
-#: contrib/admin/templates/admin/change_form.html:28
-#: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:27
+#: contrib/admin/templates/admin/change_form.html:29
+#: contrib/admin/templates/admin/edit_inline/stacked.html:9
+#: contrib/admin/templates/admin/edit_inline/tabular.html:28
 msgid "View on site"
 msgstr "Погледни на сајтот"
 
-#: contrib/admin/templates/admin/change_form.html:38
-#: contrib/admin/templates/admin/change_list.html:54
-#: contrib/admin/templates/admin/auth/user/change_password.html:23
+#: contrib/admin/templates/admin/change_form.html:39
+#: contrib/admin/templates/admin/change_list.html:71
+#: contrib/admin/templates/admin/auth/user/change_password.html:24
+#: contrib/admin/templates/registration/password_change_form.html:15
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Ве молам поправете ја грешката подолу."
 msgstr[1] "Ве молам поправете ги грешките подолу."
 
-#: contrib/admin/templates/admin/change_list.html:46
+#: contrib/admin/templates/admin/change_list.html:63
 #, python-format
 msgid "Add %(name)s"
 msgstr "Додади %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:65
+#: contrib/admin/templates/admin/change_list.html:82
 msgid "Filter"
 msgstr "Филтер"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:275
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:302
 msgid "Delete"
 msgstr "Избриши"
 
@@ -652,23 +711,24 @@ msgid "Delete multiple objects"
 msgstr "Избриши повеќе ставки"
 
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:15
+#, python-format
 msgid ""
 "Deleting the %(object_name)s would result in deleting related objects, but "
 "your account doesn't have permission to delete the following types of "
 "objects:"
 msgstr ""
-"Бришење на %(object_name)s би резултирало со бришење на "
-"поврзаните објекти, но вие како корисник немате доволно привилегии да ги "
-"бришете следните типови на објекти:"
+"Бришење на %(object_name)s би резултирало со бришење на поврзаните објекти, "
+"но вие како корисник немате доволно привилегии да ги бришете следните типови "
+"на објекти:"
 
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:22
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and it's related items will be deleted:"
+"the following objects and their related items will be deleted:"
 msgstr ""
 "Сигурне сте дека сакате да ги избришете избраните %(object_name)s? Сите овие "
-"ставки и ставките поврзани со нив ќе бидат избришани:"
+"објекти и објектите поврзани со нив ќе бидат избришани:"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -731,14 +791,8 @@ msgid "User"
 msgstr "Корисник"
 
 #: contrib/admin/templates/admin/object_history.html:24
-#: contrib/comments/templates/comments/moderation_queue.html:33
 msgid "Action"
 msgstr "Акција"
-
-#: contrib/admin/templates/admin/object_history.html:30
-#: utils/translation/trans_real.py:400
-msgid "DATETIME_FORMAT"
-msgstr "j M Y, P"
 
 #: contrib/admin/templates/admin/object_history.html:38
 msgid ""
@@ -785,7 +839,7 @@ msgstr "Сними и додади уште"
 msgid "Save and continue editing"
 msgstr "Сними и продолжи со уредување"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
+#: contrib/admin/templates/admin/auth/user/add_form.html:5
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -793,32 +847,38 @@ msgstr ""
 "Прво, внесете корисничко име и лозинка. Потоа ќе можете да уредувате повеќе "
 "кориснички опции."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:13
-#: contrib/auth/forms.py:14 contrib/auth/forms.py:47 contrib/auth/forms.py:59
-msgid "Username"
-msgstr "Корисник"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:20
-#: contrib/admin/templates/admin/auth/user/change_password.html:34
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:185
-msgid "Password"
-msgstr "Лозинка"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:26
-#: contrib/admin/templates/admin/auth/user/change_password.html:40
-#: contrib/auth/forms.py:186
-msgid "Password (again)"
-msgstr "Лозинка (повторно)"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:27
-#: contrib/admin/templates/admin/auth/user/change_password.html:41
-msgid "Enter the same password as above, for verification."
-msgstr "Заради верификација внесете ја истата лозинка како и горе."
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/auth/user/change_password.html:28
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Внесете нова лозинка за корисникот <strong>%(username)s</strong>."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:35
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:61 contrib/auth/forms.py:186
+msgid "Password"
+msgstr "Лозинка"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:41
+#: contrib/admin/templates/registration/password_change_form.html:37
+#: contrib/auth/forms.py:187
+msgid "Password (again)"
+msgstr "Лозинка (повторно)"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:42
+#: contrib/auth/forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Заради верификација внесете ја истата лозинка како и горе."
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:64
+#: contrib/admin/templates/admin/edit_inline/tabular.html:110
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Додадете уште %(verbose_name)s"
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:67
+#: contrib/admin/templates/admin/edit_inline/tabular.html:113
+#: contrib/comments/templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Отстрани"
 
 #: contrib/admin/templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
@@ -834,9 +894,9 @@ msgid "Log in again"
 msgstr "Најавете се повторно"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
+#: contrib/admin/templates/registration/password_change_form.html:5
+#: contrib/admin/templates/registration/password_change_form.html:7
+#: contrib/admin/templates/registration/password_change_form.html:19
 msgid "Password change"
 msgstr "Измена на лозинка"
 
@@ -849,7 +909,7 @@ msgstr "Успешна промена на лозинката"
 msgid "Your password was changed."
 msgstr "Вашата лозинка беше сменета."
 
-#: contrib/admin/templates/registration/password_change_form.html:12
+#: contrib/admin/templates/registration/password_change_form.html:21
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -857,21 +917,17 @@ msgstr ""
 "Заради сигурност ве молам внесете ја вашата стара лозинка и потоа внесете ја "
 "новата двапати за да може да се потврди дека правилно сте ја искуцале."
 
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "Стара лозинка:"
+#: contrib/admin/templates/registration/password_change_form.html:27
+#: contrib/auth/forms.py:170
+msgid "Old password"
+msgstr "Стара лозинка"
 
-#: contrib/admin/templates/registration/password_change_form.html:19
-#: contrib/admin/templates/registration/password_reset_confirm.html:18
-msgid "New password:"
-msgstr "Нова лозинка:"
+#: contrib/admin/templates/registration/password_change_form.html:32
+#: contrib/auth/forms.py:144
+msgid "New password"
+msgstr "Нова лозинка"
 
-#: contrib/admin/templates/registration/password_change_form.html:21
-#: contrib/admin/templates/registration/password_reset_confirm.html:20
-msgid "Confirm password:"
-msgstr "Потврди лозинка:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
+#: contrib/admin/templates/registration/password_change_form.html:43
 #: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "Change my password"
 msgstr "Промени ја мојата лозинка"
@@ -909,6 +965,14 @@ msgid ""
 msgstr ""
 "Ве молам внесете ја вашата нова лозинка двапати за да може да бидете сигурни "
 "дека правилно сте ја внеле."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "Нова лозинка:"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "Потврди лозинка:"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
@@ -978,7 +1042,7 @@ msgstr "Е-пошта:"
 msgid "Reset my password"
 msgstr "Ресетирај ја мојата лозинка"
 
-#: contrib/admin/templatetags/admin_list.py:299
+#: contrib/admin/templatetags/admin_list.py:239
 msgid "All dates"
 msgstr "Сите датуми"
 
@@ -992,11 +1056,11 @@ msgstr "Изберете %s"
 msgid "Select %s to change"
 msgstr "Изберете %s за измена"
 
-#: contrib/admin/views/template.py:37 contrib/sites/models.py:38
+#: contrib/admin/views/template.py:38 contrib/sites/models.py:38
 msgid "site"
 msgstr "сајт"
 
-#: contrib/admin/views/template.py:39
+#: contrib/admin/views/template.py:40
 msgid "template"
 msgstr "шаблон"
 
@@ -1056,89 +1120,7 @@ msgstr "број на %s"
 msgid "Fields on %s objects"
 msgstr "Полиња на %s објекти"
 
-#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:345
-#: contrib/admindocs/views.py:347 contrib/admindocs/views.py:353
-#: contrib/admindocs/views.py:354 contrib/admindocs/views.py:356
-msgid "Integer"
-msgstr "Цел број"
-
-#: contrib/admindocs/views.py:335
-msgid "Boolean (Either True or False)"
-msgstr "Логичка (или точно или неточно)"
-
-#: contrib/admindocs/views.py:336 contrib/admindocs/views.py:355
-#, python-format
-msgid "String (up to %(max_length)s)"
-msgstr "Збор (до %(max_length)s)"
-
-#: contrib/admindocs/views.py:337
-msgid "Comma-separated integers"
-msgstr "Целобројни вредности одделени со запирка"
-
-#: contrib/admindocs/views.py:338
-msgid "Date (without time)"
-msgstr "Датум (без час)"
-
-#: contrib/admindocs/views.py:339
-msgid "Date (with time)"
-msgstr "Датум (со час)"
-
-#: contrib/admindocs/views.py:340
-msgid "Decimal number"
-msgstr "Децимален број"
-
-#: contrib/admindocs/views.py:341
-msgid "E-mail address"
-msgstr "Адреса на е-пошта"
-
-#: contrib/admindocs/views.py:342 contrib/admindocs/views.py:343
-#: contrib/admindocs/views.py:346
-msgid "File path"
-msgstr "Патека на датотека"
-
-#: contrib/admindocs/views.py:344
-msgid "Floating point number"
-msgstr "Децимален број"
-
-#: contrib/admindocs/views.py:348 contrib/comments/models.py:60
-msgid "IP address"
-msgstr "ИП адреса"
-
-#: contrib/admindocs/views.py:350
-msgid "Boolean (Either True, False or None)"
-msgstr "Логичка (точно,неточно или празно)"
-
-#: contrib/admindocs/views.py:351
-msgid "Relation to parent model"
-msgstr "Релација со родителскиот модел"
-
-#: contrib/admindocs/views.py:352
-msgid "Phone number"
-msgstr "Телефонски број"
-
-#: contrib/admindocs/views.py:357
-msgid "Text"
-msgstr "Текст"
-
-#: contrib/admindocs/views.py:358
-msgid "Time"
-msgstr "Час"
-
-#: contrib/admindocs/views.py:359 contrib/comments/forms.py:95
-#: contrib/comments/templates/comments/moderation_queue.html:37
-#: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admindocs/views.py:360
-msgid "U.S. state (two uppercase letters)"
-msgstr "Држава во САД (две големи букви)"
-
 #: contrib/admindocs/views.py:361
-msgid "XML text"
-msgstr "XML текст"
-
-#: contrib/admindocs/views.py:387
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s не изгледа дека е url објект"
@@ -1213,66 +1195,62 @@ msgstr "Уреди го овој објект (во нов прозорец)"
 msgid "As above, but opens the admin page in a new window."
 msgstr "Како погоре, но ја отвара админ страницата во нов прозорец."
 
-#: contrib/auth/admin.py:21
+#: contrib/auth/admin.py:29
 msgid "Personal info"
 msgstr "Лични информации"
 
-#: contrib/auth/admin.py:22
+#: contrib/auth/admin.py:30
 msgid "Permissions"
 msgstr "Привилегии"
 
-#: contrib/auth/admin.py:23
+#: contrib/auth/admin.py:31
 msgid "Important dates"
 msgstr "Важни датуми"
 
-#: contrib/auth/admin.py:24
+#: contrib/auth/admin.py:32
 msgid "Groups"
 msgstr "Групи"
 
-#: contrib/auth/admin.py:80
-msgid "Add user"
-msgstr "Додади корисник"
-
-#: contrib/auth/admin.py:106
+#: contrib/auth/admin.py:114
 msgid "Password changed successfully."
 msgstr "Успешна промена на лозинката."
 
-#: contrib/auth/admin.py:112
+#: contrib/auth/admin.py:124
 #, python-format
 msgid "Change password: %s"
 msgstr "Промени лозинка: %s"
 
-#: contrib/auth/forms.py:15 contrib/auth/forms.py:48
-#: contrib/auth/models.py:128
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr ""
-"Дозволени се најмногу 30 знаци. Дозволени се само алфанумерички знаци "
-"(букви, цифри и долна црта)."
+#: contrib/auth/forms.py:14 contrib/auth/forms.py:48 contrib/auth/forms.py:60
+msgid "Username"
+msgstr "Корисник"
 
-#: contrib/auth/forms.py:16 contrib/auth/forms.py:49
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Оваа вредност смее да има само букви, бројки или долни црти."
+#: contrib/auth/forms.py:15 contrib/auth/forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Задолжително. 30 или помалку знаци. Единствено букви, бројки и  @/./+/-/_ ."
+
+#: contrib/auth/forms.py:16 contrib/auth/forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Оваа вредност смее да содржи само букви, бројки и @/./+/-/_ знаци."
 
 #: contrib/auth/forms.py:18
 msgid "Password confirmation"
 msgstr "Потврда на лозинка"
 
-#: contrib/auth/forms.py:30
+#: contrib/auth/forms.py:31
 msgid "A user with that username already exists."
 msgstr "Веќе постои корисник со тоа корисничко име."
 
-#: contrib/auth/forms.py:36 contrib/auth/forms.py:155
-#: contrib/auth/forms.py:197
+#: contrib/auth/forms.py:37 contrib/auth/forms.py:156
+#: contrib/auth/forms.py:198
 msgid "The two password fields didn't match."
 msgstr "Двете полиња со лозинките не се совпаѓаат."
 
-#: contrib/auth/forms.py:82
+#: contrib/auth/forms.py:83
 msgid "This account is inactive."
 msgstr "Оваа сметка е неактивна."
 
-#: contrib/auth/forms.py:87
+#: contrib/auth/forms.py:88
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -1280,11 +1258,11 @@ msgstr ""
 "Не изгледа дека вашиот прелистувач има овозможено колачиња. Колачињата се "
 "потребни за да се најавите."
 
-#: contrib/auth/forms.py:100
+#: contrib/auth/forms.py:101
 msgid "E-mail"
 msgstr "Е-пошта"
 
-#: contrib/auth/forms.py:109
+#: contrib/auth/forms.py:110
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -1292,73 +1270,70 @@ msgstr ""
 "Нема регистрирано корисник со оваа адреса за е-пошта. Сигурни ли сте дека "
 "сте регистрирани?"
 
-#: contrib/auth/forms.py:135
+#: contrib/auth/forms.py:136
 #, python-format
 msgid "Password reset on %s"
 msgstr "Ресетирање на лозинка на %s"
 
-#: contrib/auth/forms.py:143
-msgid "New password"
-msgstr "Нова лозинка"
-
-#: contrib/auth/forms.py:144
+#: contrib/auth/forms.py:145
 msgid "New password confirmation"
 msgstr "Потврда за нова лозинка"
 
-#: contrib/auth/forms.py:169
-msgid "Old password"
-msgstr "Стара лозинка"
-
-#: contrib/auth/forms.py:177
+#: contrib/auth/forms.py:178
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "Не ја внесовте точно вашата стара лозинка. Ве молам внесете ја повторно."
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:86
+#: contrib/auth/models.py:66 contrib/auth/models.py:94
 msgid "name"
 msgstr "име"
 
-#: contrib/auth/models.py:65
+#: contrib/auth/models.py:68
 msgid "codename"
 msgstr "кодно име"
 
-#: contrib/auth/models.py:68
+#: contrib/auth/models.py:72
 msgid "permission"
 msgstr "привилегија"
 
-#: contrib/auth/models.py:69 contrib/auth/models.py:87
+#: contrib/auth/models.py:73 contrib/auth/models.py:95
 msgid "permissions"
 msgstr "привилегии"
 
-#: contrib/auth/models.py:90
+#: contrib/auth/models.py:98
 msgid "group"
 msgstr "група"
 
-#: contrib/auth/models.py:91 contrib/auth/models.py:138
+#: contrib/auth/models.py:99 contrib/auth/models.py:206
 msgid "groups"
 msgstr "групи"
 
-#: contrib/auth/models.py:128
+#: contrib/auth/models.py:196
 msgid "username"
 msgstr "корисничко име"
 
-#: contrib/auth/models.py:129
+#: contrib/auth/models.py:196
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "Задолжително. 30 или помалку знаци. Букви, бројки и  @/./+/-/_ знаци"
+
+#: contrib/auth/models.py:197
 msgid "first name"
 msgstr "име"
 
-#: contrib/auth/models.py:130
+#: contrib/auth/models.py:198
 msgid "last name"
 msgstr "презиме"
 
-#: contrib/auth/models.py:131
+#: contrib/auth/models.py:199
 msgid "e-mail address"
 msgstr "е-пошта"
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:200
 msgid "password"
 msgstr "лозинка"
 
-#: contrib/auth/models.py:132
+#: contrib/auth/models.py:200
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1366,20 +1341,20 @@ msgstr ""
 "Користете '[algo]$[salt]$[hexdigest]' или користете ја <a href=\"password/"
 "\">формата за промена на лозинката</a>."
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:201
 msgid "staff status"
 msgstr "статус на администраторите"
 
-#: contrib/auth/models.py:133
+#: contrib/auth/models.py:201
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Означува дали корисникот може да се логира во сајтот за администрација."
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:202
 msgid "active"
 msgstr "активен"
 
-#: contrib/auth/models.py:134
+#: contrib/auth/models.py:202
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -1387,11 +1362,11 @@ msgstr ""
 "Означува дали корисникот треба да биде активен. Одштиклирајте го ова наместо "
 "да бришете корисници."
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:203
 msgid "superuser status"
 msgstr "статус на суперкорисник"
 
-#: contrib/auth/models.py:135
+#: contrib/auth/models.py:203
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -1399,15 +1374,15 @@ msgstr ""
 "Означува дека овој корисник ги има сите привилегии без експлицитно да се "
 "доделуваат сите."
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:204
 msgid "last login"
 msgstr "последна најава"
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:205
 msgid "date joined"
 msgstr "датум на зачленување"
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:207
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1415,38 +1390,76 @@ msgstr ""
 "Како дополнување на рачно доделени привилегии, овој корисник ќе ги добие "
 "автоматски и сите привилегии за секоја група во која тој/таа членува."
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:208
 msgid "user permissions"
 msgstr "кориснички привилегии"
 
-#: contrib/auth/models.py:144 contrib/comments/models.py:50
+#: contrib/auth/models.py:212 contrib/comments/models.py:50
 #: contrib/comments/models.py:168
 msgid "user"
 msgstr "корисник"
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:213
 msgid "users"
 msgstr "корисници"
 
-#: contrib/auth/models.py:301
+#: contrib/auth/models.py:394
 msgid "message"
 msgstr "порака"
 
-#: contrib/auth/views.py:56
+#: contrib/auth/views.py:79
 msgid "Logged out"
 msgstr "Одјавен"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:429
+#: contrib/auth/management/commands/createsuperuser.py:23
+#: core/validators.py:120 forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Внесeте правилна адреса за е-пошта."
 
-#: contrib/comments/admin.py:11
+#: contrib/comments/admin.py:12
 msgid "Content"
 msgstr "Содржина"
 
-#: contrib/comments/admin.py:14
+#: contrib/comments/admin.py:15
 msgid "Metadata"
 msgstr "Метаподатоци"
+
+#: contrib/comments/admin.py:40
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "обележан"
+msgstr[1] "обележани"
+
+#: contrib/comments/admin.py:41
+msgid "Flag selected comments"
+msgstr "Обележи го одбраните коментари"
+
+#: contrib/comments/admin.py:45
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "одобрен"
+msgstr[1] "одобрени"
+
+#: contrib/comments/admin.py:46
+msgid "Approve selected comments"
+msgstr "Одобри ги одбраните коментари"
+
+#: contrib/comments/admin.py:50
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "отстранет"
+msgstr[1] "отстранети"
+
+#: contrib/comments/admin.py:51
+msgid "Remove selected comments"
+msgstr "Отстрани ги избраните коментари"
+
+#: contrib/comments/admin.py:63
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "1 коментар беше успешно %(action)s."
+msgstr[1] "%(count)s коментари беа успешно %(action)s."
 
 #: contrib/comments/feeds.py:13
 #, python-format
@@ -1459,7 +1472,6 @@ msgid "Latest comments on %(site_name)s"
 msgstr "Последни коментари за %(site_name)s"
 
 #: contrib/comments/forms.py:93
-#: contrib/comments/templates/comments/moderation_queue.html:34
 msgid "Name"
 msgstr "Име"
 
@@ -1467,25 +1479,29 @@ msgstr "Име"
 msgid "Email address"
 msgstr "Е-пошта"
 
+#: contrib/comments/forms.py:95 contrib/flatpages/admin.py:8
+#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1101
+msgid "URL"
+msgstr "URL"
+
 #: contrib/comments/forms.py:96
-#: contrib/comments/templates/comments/moderation_queue.html:35
 msgid "Comment"
 msgstr "Коментар"
 
-#: contrib/comments/forms.py:173
+#: contrib/comments/forms.py:175
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Внимавајте на јазикот. Тука не е дозволен зборот %s."
 msgstr[1] "Внимавајте на јазикот. Тука не се дозволени зборовите %s."
 
-#: contrib/comments/forms.py:180
+#: contrib/comments/forms.py:182
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
 "Ако внесете нешто во ова поле вашиот коментар ќе биде означен како спам"
 
-#: contrib/comments/models.py:22 contrib/contenttypes/models.py:74
+#: contrib/comments/models.py:22 contrib/contenttypes/models.py:81
 msgid "content type"
 msgstr "тип на содржина"
 
@@ -1513,6 +1529,10 @@ msgstr "коментар"
 #: contrib/comments/models.py:59
 msgid "date/time submitted"
 msgstr "датум/време пријавен"
+
+#: contrib/comments/models.py:60 db/models/fields/__init__.py:896
+msgid "IP address"
+msgstr "ИП адреса"
 
 #: contrib/comments/models.py:61
 msgid "is public"
@@ -1596,7 +1616,6 @@ msgid "Really make this comment public?"
 msgstr "Навистина ли сакате овој коментар да биде објавен?"
 
 #: contrib/comments/templates/comments/approve.html:12
-#: contrib/comments/templates/comments/moderation_queue.html:49
 msgid "Approve"
 msgstr "Одобри"
 
@@ -1620,11 +1639,6 @@ msgstr "Избриши коментар"
 #: contrib/comments/templates/comments/delete.html:7
 msgid "Really remove this comment?"
 msgstr "Навистина ли сакате да го отстраните овој коментар?"
-
-#: contrib/comments/templates/comments/delete.html:12
-#: contrib/comments/templates/comments/moderation_queue.html:53
-msgid "Remove"
-msgstr "Отстрани"
 
 #: contrib/comments/templates/comments/deleted.html:4
 msgid "Thanks for removing"
@@ -1656,39 +1670,6 @@ msgstr "Објави"
 msgid "Preview"
 msgstr "Преглед"
 
-#: contrib/comments/templates/comments/moderation_queue.html:4
-#: contrib/comments/templates/comments/moderation_queue.html:19
-msgid "Comment moderation queue"
-msgstr "Редица за модерирање коментари"
-
-#: contrib/comments/templates/comments/moderation_queue.html:26
-msgid "No comments to moderate"
-msgstr "Нема коменатари за модерирање"
-
-#: contrib/comments/templates/comments/moderation_queue.html:36
-msgid "Email"
-msgstr "Е-пошта"
-
-#: contrib/comments/templates/comments/moderation_queue.html:38
-msgid "Authenticated?"
-msgstr "Автентициран?"
-
-#: contrib/comments/templates/comments/moderation_queue.html:39
-msgid "IP Address"
-msgstr "ИП адреса"
-
-#: contrib/comments/templates/comments/moderation_queue.html:40
-msgid "Date posted"
-msgstr "Датум на објава"
-
-#: contrib/comments/templates/comments/moderation_queue.html:63
-msgid "yes"
-msgstr "да"
-
-#: contrib/comments/templates/comments/moderation_queue.html:63
-msgid "no"
-msgstr "не"
-
 #: contrib/comments/templates/comments/posted.html:4
 msgid "Thanks for commenting"
 msgstr "Ви благодариме за коментарот"
@@ -1716,11 +1697,11 @@ msgstr "Објавете го вашиот коментар"
 msgid "or make changes"
 msgstr "или направете измени"
 
-#: contrib/contenttypes/models.py:70
+#: contrib/contenttypes/models.py:77
 msgid "python model class name"
 msgstr "име на класата за python моделoт"
 
-#: contrib/contenttypes/models.py:75
+#: contrib/contenttypes/models.py:82
 msgid "content types"
 msgstr "типови содржини"
 
@@ -1784,13 +1765,47 @@ msgstr "статична страница"
 msgid "flat pages"
 msgstr "статични страници"
 
-#: contrib/formtools/wizard.py:130
+#: contrib/formtools/wizard.py:140
 msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."
 msgstr ""
 "Се извинуваме но вашата форма истече. Ве молам продолжете пополнувајќи ја "
 "формата од оваа страница."
+
+#: contrib/gis/db/models/fields.py:50
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Базичното GIS поле -- соодветствува на геометриски тип од OpenGIS "
+"спецификацијата."
+
+#: contrib/gis/db/models/fields.py:270
+msgid "Point"
+msgstr "Точка"
+
+#: contrib/gis/db/models/fields.py:274
+msgid "Line string"
+msgstr "Линиска нишка"
+
+#: contrib/gis/db/models/fields.py:278
+msgid "Polygon"
+msgstr "Полигон"
+
+#: contrib/gis/db/models/fields.py:282
+msgid "Multi-point"
+msgstr "Повеќе точки"
+
+#: contrib/gis/db/models/fields.py:286
+msgid "Multi-line string"
+msgstr "Повеќе-линиска нишка"
+
+#: contrib/gis/db/models/fields.py:290
+msgid "Multi polygon"
+msgstr "Повеќе полигони"
+
+#: contrib/gis/db/models/fields.py:294
+msgid "Geometry collection"
+msgstr "Колекција од геометриски објекти"
 
 #: contrib/gis/forms/fields.py:17
 msgid "No geometry value provided."
@@ -1897,25 +1912,25 @@ msgstr "утре"
 msgid "yesterday"
 msgstr "вчера"
 
-#: contrib/localflavor/ar/forms.py:27
+#: contrib/localflavor/ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "Внесете поштенски број во форматот NNNN или ANNNNAAA."
 
-#: contrib/localflavor/ar/forms.py:49 contrib/localflavor/br/forms.py:96
-#: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
-#: contrib/localflavor/pe/forms.py:51
+#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:97
+#: contrib/localflavor/br/forms.py:136 contrib/localflavor/pe/forms.py:24
+#: contrib/localflavor/pe/forms.py:52
 msgid "This field requires only numbers."
 msgstr "Во ова поле смее да бидат само бројки."
 
-#: contrib/localflavor/ar/forms.py:50
+#: contrib/localflavor/ar/forms.py:51
 msgid "This field requires 7 or 8 digits."
 msgstr "Во ова поле смее да има 7 или 8 цифри."
 
-#: contrib/localflavor/ar/forms.py:79
+#: contrib/localflavor/ar/forms.py:80
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr "Внесете правилен CUIT во XX-XXXXXXXX-X or XXXXXXXXXXXX формат."
 
-#: contrib/localflavor/ar/forms.py:80
+#: contrib/localflavor/ar/forms.py:81
 msgid "Invalid CUIT."
 msgstr "Неправилен CUIT."
 
@@ -1955,8 +1970,8 @@ msgstr "Ворарлберг"
 msgid "Vienna"
 msgstr "Виена"
 
-#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
-#: contrib/localflavor/no/forms.py:12
+#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:17
+#: contrib/localflavor/no/forms.py:13
 msgid "Enter a zip code in the format XXXX."
 msgstr "Внесете правилен поштенски број во форматот XXXX."
 
@@ -1966,46 +1981,46 @@ msgstr ""
 "Внесете правилен број за социјално осигурување на Австрија во XXXX-XXXXXX "
 "формат."
 
-#: contrib/localflavor/au/forms.py:16
+#: contrib/localflavor/au/forms.py:17
 msgid "Enter a 4 digit post code."
 msgstr "Внесете 4 цифрен поштенски број."
 
-#: contrib/localflavor/br/forms.py:21
+#: contrib/localflavor/br/forms.py:22
 msgid "Enter a zip code in the format XXXXX-XXX."
 msgstr "Внесете правилен поштенски број во форматот XXXXX-XXX."
 
-#: contrib/localflavor/br/forms.py:30
+#: contrib/localflavor/br/forms.py:31
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "Телефонските броеви мора да бидат во XX-XXXX-XXXX форматот."
 
-#: contrib/localflavor/br/forms.py:58
+#: contrib/localflavor/br/forms.py:59
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
 msgstr ""
 "Изберете правилна бразилска држава. Оваа држава не е од достапните држави."
 
-#: contrib/localflavor/br/forms.py:94
+#: contrib/localflavor/br/forms.py:95
 msgid "Invalid CPF number."
 msgstr "Неправилен CPF број."
 
-#: contrib/localflavor/br/forms.py:95
+#: contrib/localflavor/br/forms.py:96
 msgid "This field requires at most 11 digits or 14 characters."
 msgstr "Во ова поле смее да има најмногу 11 цифри или 14 знаци."
 
-#: contrib/localflavor/br/forms.py:134
+#: contrib/localflavor/br/forms.py:135
 msgid "Invalid CNPJ number."
 msgstr "Неправилен CNPJ број."
 
-#: contrib/localflavor/br/forms.py:136
+#: contrib/localflavor/br/forms.py:137
 msgid "This field requires at least 14 digits"
 msgstr "Во ова поле треба да има најмалку 14 цифри"
 
-#: contrib/localflavor/ca/forms.py:17
+#: contrib/localflavor/ca/forms.py:25
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "Внесете правилен поштенски број во формат XXX XXX."
 
-#: contrib/localflavor/ca/forms.py:88
+#: contrib/localflavor/ca/forms.py:96
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr "Внесте правилен канадски број за осигурување во XXX-XXX-XXX форматот."
 
@@ -2113,7 +2128,7 @@ msgstr "Zug"
 msgid "Zurich"
 msgstr "Цирих"
 
-#: contrib/localflavor/ch/forms.py:64
+#: contrib/localflavor/ch/forms.py:65
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
@@ -2121,15 +2136,15 @@ msgstr ""
 "Внесете правилен швајцарски број на пасош во X1234567<0 или  1234567890 "
 "формат."
 
-#: contrib/localflavor/cl/forms.py:29
+#: contrib/localflavor/cl/forms.py:30
 msgid "Enter a valid Chilean RUT."
 msgstr "Внесете правилeн RUT за Чиле."
 
-#: contrib/localflavor/cl/forms.py:30
+#: contrib/localflavor/cl/forms.py:31
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr "Внесете правилен RUT за Чиле. Форматот е Xx.XXX.XXX-X."
 
-#: contrib/localflavor/cl/forms.py:31
+#: contrib/localflavor/cl/forms.py:32
 msgid "The Chilean RUT is not valid."
 msgstr "RUT бројот за Чиле е невалиден."
 
@@ -2189,25 +2204,25 @@ msgstr "Зилина регион"
 msgid "Moravian-Silesian Region"
 msgstr "Моравско-Силесански регион"
 
-#: contrib/localflavor/cz/forms.py:27 contrib/localflavor/sk/forms.py:30
+#: contrib/localflavor/cz/forms.py:28 contrib/localflavor/sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
 msgstr "Внесете поштенски број во форматот XXXXX или XXX XX."
 
-#: contrib/localflavor/cz/forms.py:47
+#: contrib/localflavor/cz/forms.py:48
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
 msgstr "Внесете даночен број (NIP) во форматот XXXXXX/XXXX или XXXXXXXXXX."
 
-#: contrib/localflavor/cz/forms.py:48
+#: contrib/localflavor/cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
 msgstr ""
 "Невалидна вредност за опционален параметар пол, валидни вредности се 'f' и "
 "'m'"
 
-#: contrib/localflavor/cz/forms.py:49
+#: contrib/localflavor/cz/forms.py:50
 msgid "Enter a valid birth number."
 msgstr "Внесете правилен даночен број."
 
-#: contrib/localflavor/cz/forms.py:106
+#: contrib/localflavor/cz/forms.py:107
 msgid "Enter a valid IC number."
 msgstr "Внесете правилен даночен број."
 
@@ -2275,12 +2290,12 @@ msgstr "Шлесвиг-Холштајн"
 msgid "Thuringia"
 msgstr "Турингиа"
 
-#: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
-#: contrib/localflavor/fr/forms.py:15
+#: contrib/localflavor/de/forms.py:15 contrib/localflavor/fi/forms.py:13
+#: contrib/localflavor/fr/forms.py:16
 msgid "Enter a zip code in the format XXXXX."
 msgstr "Внесете правилен поштенски број во формат XXXXXX."
 
-#: contrib/localflavor/de/forms.py:41
+#: contrib/localflavor/de/forms.py:42
 msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
@@ -2555,11 +2570,11 @@ msgstr "Foral Community of Navarre"
 msgid "Valencian Community"
 msgstr "Valencian Community"
 
-#: contrib/localflavor/es/forms.py:19
+#: contrib/localflavor/es/forms.py:20
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
 msgstr "Внесете поштенски број во опсег и формат 01XXX - 52XXX."
 
-#: contrib/localflavor/es/forms.py:39
+#: contrib/localflavor/es/forms.py:40
 msgid ""
 "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
 "9XXXXXXXX."
@@ -2567,62 +2582,494 @@ msgstr ""
 "Внесете правилен телефонски број во еден од формативе 6XXXXXXXX, 8XXXXXXXX "
 "или 9XXXXXXXX."
 
-#: contrib/localflavor/es/forms.py:66
+#: contrib/localflavor/es/forms.py:67
 msgid "Please enter a valid NIF, NIE, or CIF."
 msgstr "Ве молам внесете правиелн NIF, NIE или CIF."
 
-#: contrib/localflavor/es/forms.py:67
+#: contrib/localflavor/es/forms.py:68
 msgid "Please enter a valid NIF or NIE."
 msgstr "Ве молам внесете валиден NIF или NIE."
 
-#: contrib/localflavor/es/forms.py:68
+#: contrib/localflavor/es/forms.py:69
 msgid "Invalid checksum for NIF."
 msgstr "Неправилна контролна сума за NIF."
 
-#: contrib/localflavor/es/forms.py:69
+#: contrib/localflavor/es/forms.py:70
 msgid "Invalid checksum for NIE."
 msgstr "Неправилна контролна сума за NIE."
 
-#: contrib/localflavor/es/forms.py:70
+#: contrib/localflavor/es/forms.py:71
 msgid "Invalid checksum for CIF."
 msgstr "Неправилна контролна сум за CIF."
 
-#: contrib/localflavor/es/forms.py:142
+#: contrib/localflavor/es/forms.py:143
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr "Внесете правилна банкарска сметка во формат XXXX-XXXX-XX-XXXXXXXXXX."
 
-#: contrib/localflavor/es/forms.py:143
+#: contrib/localflavor/es/forms.py:144
 msgid "Invalid checksum for bank account number."
 msgstr "Неправилна контролна сума за бројот на банкарската сметка."
 
-#: contrib/localflavor/fi/forms.py:28
+#: contrib/localflavor/fi/forms.py:29
 msgid "Enter a valid Finnish social security number."
 msgstr "Внесте правилен фински матичен број."
 
-#: contrib/localflavor/in_/forms.py:14
+#: contrib/localflavor/fr/forms.py:31
+msgid "Phone numbers must be in 0X XX XX XX XX format."
+msgstr "Телефонските броеви мора да бидат во 0X XX XX XX XX форматот."
+
+#: contrib/localflavor/id/forms.py:28
+msgid "Enter a valid post code"
+msgstr "Внесете правилен поштенски код"
+
+#: contrib/localflavor/id/forms.py:68 contrib/localflavor/nl/forms.py:53
+msgid "Enter a valid phone number"
+msgstr "Внесете валиден телефонски број"
+
+#: contrib/localflavor/id/forms.py:107
+msgid "Enter a valid vehicle license plate number"
+msgstr "Внесете валидна регистарска табличка."
+
+#: contrib/localflavor/id/forms.py:170
+msgid "Enter a valid NIK/KTP number"
+msgstr "Внесете правилен NIK/KTP број."
+
+#: contrib/localflavor/id/id_choices.py:9
+#: contrib/localflavor/id/id_choices.py:73
+msgid "Bali"
+msgstr "Бали"
+
+#: contrib/localflavor/id/id_choices.py:10
+#: contrib/localflavor/id/id_choices.py:45
+msgid "Banten"
+msgstr "Бантен"
+
+#: contrib/localflavor/id/id_choices.py:11
+#: contrib/localflavor/id/id_choices.py:54
+msgid "Bengkulu"
+msgstr "Бенгкулу"
+
+#: contrib/localflavor/id/id_choices.py:12
+#: contrib/localflavor/id/id_choices.py:47
+msgid "Yogyakarta"
+msgstr "Јогјакарта"
+
+#: contrib/localflavor/id/id_choices.py:13
+#: contrib/localflavor/id/id_choices.py:51
+msgid "Jakarta"
+msgstr "Џакарта"
+
+#: contrib/localflavor/id/id_choices.py:14
+#: contrib/localflavor/id/id_choices.py:75
+msgid "Gorontalo"
+msgstr "Горонтало"
+
+#: contrib/localflavor/id/id_choices.py:15
+#: contrib/localflavor/id/id_choices.py:57
+msgid "Jambi"
+msgstr "Џамби"
+
+#: contrib/localflavor/id/id_choices.py:16
+msgid "Jawa Barat"
+msgstr "Јава Барат"
+
+#: contrib/localflavor/id/id_choices.py:17
+msgid "Jawa Tengah"
+msgstr "Јава Тенга"
+
+#: contrib/localflavor/id/id_choices.py:18
+msgid "Jawa Timur"
+msgstr "Јава Тимур"
+
+#: contrib/localflavor/id/id_choices.py:19
+#: contrib/localflavor/id/id_choices.py:88
+msgid "Kalimantan Barat"
+msgstr "Калинмантан Барат"
+
+#: contrib/localflavor/id/id_choices.py:20
+#: contrib/localflavor/id/id_choices.py:66
+msgid "Kalimantan Selatan"
+msgstr "Калимантан Селатан"
+
+#: contrib/localflavor/id/id_choices.py:21
+#: contrib/localflavor/id/id_choices.py:89
+msgid "Kalimantan Tengah"
+msgstr "Калимантан Тенга"
+
+#: contrib/localflavor/id/id_choices.py:22
+#: contrib/localflavor/id/id_choices.py:90
+msgid "Kalimantan Timur"
+msgstr "Калимантан Тимур"
+
+#: contrib/localflavor/id/id_choices.py:23
+msgid "Kepulauan Bangka-Belitung"
+msgstr "Кепулуан Банга-Белитунг"
+
+#: contrib/localflavor/id/id_choices.py:24
+#: contrib/localflavor/id/id_choices.py:62
+msgid "Kepulauan Riau"
+msgstr "Кепулуан Риау"
+
+#: contrib/localflavor/id/id_choices.py:25
+#: contrib/localflavor/id/id_choices.py:55
+msgid "Lampung"
+msgstr "Лампунг"
+
+#: contrib/localflavor/id/id_choices.py:26
+#: contrib/localflavor/id/id_choices.py:70
+msgid "Maluku"
+msgstr "Малуку"
+
+#: contrib/localflavor/id/id_choices.py:27
+#: contrib/localflavor/id/id_choices.py:71
+msgid "Maluku Utara"
+msgstr "Малуку Утара"
+
+#: contrib/localflavor/id/id_choices.py:28
+#: contrib/localflavor/id/id_choices.py:59
+msgid "Nanggroe Aceh Darussalam"
+msgstr "Нангоре Аце Дарусалам"
+
+#: contrib/localflavor/id/id_choices.py:29
+msgid "Nusa Tenggara Barat"
+msgstr "Нуса Тенгара Барат"
+
+#: contrib/localflavor/id/id_choices.py:30
+msgid "Nusa Tenggara Timur"
+msgstr "Нуса Тенгара Тимур"
+
+#: contrib/localflavor/id/id_choices.py:31
+msgid "Papua"
+msgstr "Папуа"
+
+#: contrib/localflavor/id/id_choices.py:32
+msgid "Papua Barat"
+msgstr "Папуа Барат"
+
+#: contrib/localflavor/id/id_choices.py:33
+#: contrib/localflavor/id/id_choices.py:60
+msgid "Riau"
+msgstr "Риау"
+
+#: contrib/localflavor/id/id_choices.py:34
+#: contrib/localflavor/id/id_choices.py:68
+msgid "Sulawesi Barat"
+msgstr "Сулавеси Барат"
+
+#: contrib/localflavor/id/id_choices.py:35
+#: contrib/localflavor/id/id_choices.py:69
+msgid "Sulawesi Selatan"
+msgstr "Сулавеси Селатан"
+
+#: contrib/localflavor/id/id_choices.py:36
+#: contrib/localflavor/id/id_choices.py:76
+msgid "Sulawesi Tengah"
+msgstr "Сулавеси Тенга"
+
+#: contrib/localflavor/id/id_choices.py:37
+#: contrib/localflavor/id/id_choices.py:79
+msgid "Sulawesi Tenggara"
+msgstr "Сулавеси Тенгара"
+
+#: contrib/localflavor/id/id_choices.py:38
+msgid "Sulawesi Utara"
+msgstr "Сулавеси Утара"
+
+#: contrib/localflavor/id/id_choices.py:39
+#: contrib/localflavor/id/id_choices.py:52
+msgid "Sumatera Barat"
+msgstr "Суматера Барат"
+
+#: contrib/localflavor/id/id_choices.py:40
+#: contrib/localflavor/id/id_choices.py:56
+msgid "Sumatera Selatan"
+msgstr "Суматера Селатан"
+
+#: contrib/localflavor/id/id_choices.py:41
+#: contrib/localflavor/id/id_choices.py:58
+msgid "Sumatera Utara"
+msgstr "Суматера Утара"
+
+#: contrib/localflavor/id/id_choices.py:46
+msgid "Magelang"
+msgstr "Магеланг"
+
+#: contrib/localflavor/id/id_choices.py:48
+msgid "Surakarta - Solo"
+msgstr "Суракарта - Соло"
+
+#: contrib/localflavor/id/id_choices.py:49
+msgid "Madiun"
+msgstr "Мадиун"
+
+#: contrib/localflavor/id/id_choices.py:50
+msgid "Kediri"
+msgstr "Кедири"
+
+#: contrib/localflavor/id/id_choices.py:53
+msgid "Tapanuli"
+msgstr "Тапанули"
+
+#: contrib/localflavor/id/id_choices.py:61
+msgid "Kepulauan Bangka Belitung"
+msgstr "Кепулуан Банга Белитунг"
+
+#: contrib/localflavor/id/id_choices.py:63
+msgid "Corps Consulate"
+msgstr "Corps Consulate"
+
+#: contrib/localflavor/id/id_choices.py:64
+msgid "Corps Diplomatic"
+msgstr "Corps Diplomatic"
+
+#: contrib/localflavor/id/id_choices.py:65
+msgid "Bandung"
+msgstr "Бандунг"
+
+#: contrib/localflavor/id/id_choices.py:67
+msgid "Sulawesi Utara Daratan"
+msgstr "Сулавеси Утара Даратан"
+
+#: contrib/localflavor/id/id_choices.py:72
+msgid "NTT - Timor"
+msgstr "NTT - Timor"
+
+#: contrib/localflavor/id/id_choices.py:74
+msgid "Sulawesi Utara Kepulauan"
+msgstr "Сулавеси Утара Кепулуан"
+
+#: contrib/localflavor/id/id_choices.py:77
+msgid "NTB - Lombok"
+msgstr "NTB - Lombok"
+
+#: contrib/localflavor/id/id_choices.py:78
+msgid "Papua dan Papua Barat"
+msgstr "Папуа дан Папуа Барат"
+
+#: contrib/localflavor/id/id_choices.py:80
+msgid "Cirebon"
+msgstr "Циребон"
+
+#: contrib/localflavor/id/id_choices.py:81
+msgid "NTB - Sumbawa"
+msgstr "NTB - Sumbawa"
+
+#: contrib/localflavor/id/id_choices.py:82
+msgid "NTT - Flores"
+msgstr "NTT - Flores"
+
+#: contrib/localflavor/id/id_choices.py:83
+msgid "NTT - Sumba"
+msgstr "NTT - Sumba"
+
+#: contrib/localflavor/id/id_choices.py:84
+msgid "Bogor"
+msgstr "Богор"
+
+#: contrib/localflavor/id/id_choices.py:85
+msgid "Pekalongan"
+msgstr "Пекалонган"
+
+#: contrib/localflavor/id/id_choices.py:86
+msgid "Semarang"
+msgstr "Семаранг"
+
+#: contrib/localflavor/id/id_choices.py:87
+msgid "Pati"
+msgstr "Пати"
+
+#: contrib/localflavor/id/id_choices.py:91
+msgid "Surabaya"
+msgstr "Сурабаја"
+
+#: contrib/localflavor/id/id_choices.py:92
+msgid "Madura"
+msgstr "Мадура"
+
+#: contrib/localflavor/id/id_choices.py:93
+msgid "Malang"
+msgstr "Маланг"
+
+#: contrib/localflavor/id/id_choices.py:94
+msgid "Jember"
+msgstr "Џембер"
+
+#: contrib/localflavor/id/id_choices.py:95
+msgid "Banyumas"
+msgstr "Банјумас"
+
+#: contrib/localflavor/id/id_choices.py:96
+msgid "Federal Government"
+msgstr "Федерална Влада"
+
+#: contrib/localflavor/id/id_choices.py:97
+msgid "Bojonegoro"
+msgstr "Бојонегоро"
+
+#: contrib/localflavor/id/id_choices.py:98
+msgid "Purwakarta"
+msgstr "Пурвакарта"
+
+#: contrib/localflavor/id/id_choices.py:99
+msgid "Sidoarjo"
+msgstr "Сидоарџо"
+
+#: contrib/localflavor/id/id_choices.py:100
+msgid "Garut"
+msgstr "Гарут"
+
+#: contrib/localflavor/ie/ie_counties.py:8
+msgid "Antrim"
+msgstr "Антрим"
+
+#: contrib/localflavor/ie/ie_counties.py:9
+msgid "Armagh"
+msgstr "Армаг"
+
+#: contrib/localflavor/ie/ie_counties.py:10
+msgid "Carlow"
+msgstr "Карлов"
+
+#: contrib/localflavor/ie/ie_counties.py:11
+msgid "Cavan"
+msgstr "Каван"
+
+#: contrib/localflavor/ie/ie_counties.py:12
+msgid "Clare"
+msgstr "Кларе"
+
+#: contrib/localflavor/ie/ie_counties.py:13
+msgid "Cork"
+msgstr "Корк"
+
+#: contrib/localflavor/ie/ie_counties.py:14
+msgid "Derry"
+msgstr "Дери"
+
+#: contrib/localflavor/ie/ie_counties.py:15
+msgid "Donegal"
+msgstr "Донегал"
+
+#: contrib/localflavor/ie/ie_counties.py:16
+msgid "Down"
+msgstr "Даун"
+
+#: contrib/localflavor/ie/ie_counties.py:17
+msgid "Dublin"
+msgstr "Даблин"
+
+#: contrib/localflavor/ie/ie_counties.py:18
+msgid "Fermanagh"
+msgstr "Ферманаг"
+
+#: contrib/localflavor/ie/ie_counties.py:19
+msgid "Galway"
+msgstr "Галвеј"
+
+#: contrib/localflavor/ie/ie_counties.py:20
+msgid "Kerry"
+msgstr "Кери"
+
+#: contrib/localflavor/ie/ie_counties.py:21
+msgid "Kildare"
+msgstr "Килдаре"
+
+#: contrib/localflavor/ie/ie_counties.py:22
+msgid "Kilkenny"
+msgstr "Килкени"
+
+#: contrib/localflavor/ie/ie_counties.py:23
+msgid "Laois"
+msgstr "Лаоис"
+
+#: contrib/localflavor/ie/ie_counties.py:24
+msgid "Leitrim"
+msgstr "Лајтрим"
+
+#: contrib/localflavor/ie/ie_counties.py:25
+msgid "Limerick"
+msgstr "Лимерик"
+
+#: contrib/localflavor/ie/ie_counties.py:26
+msgid "Longford"
+msgstr "Лонгфорд"
+
+#: contrib/localflavor/ie/ie_counties.py:27
+msgid "Louth"
+msgstr "Лут"
+
+#: contrib/localflavor/ie/ie_counties.py:28
+msgid "Mayo"
+msgstr "Мајо"
+
+#: contrib/localflavor/ie/ie_counties.py:29
+msgid "Meath"
+msgstr "Мит"
+
+#: contrib/localflavor/ie/ie_counties.py:30
+msgid "Monaghan"
+msgstr "Монаган"
+
+#: contrib/localflavor/ie/ie_counties.py:31
+msgid "Offaly"
+msgstr "Офали"
+
+#: contrib/localflavor/ie/ie_counties.py:32
+msgid "Roscommon"
+msgstr "Росомон"
+
+#: contrib/localflavor/ie/ie_counties.py:33
+msgid "Sligo"
+msgstr "Слиго"
+
+#: contrib/localflavor/ie/ie_counties.py:34
+msgid "Tipperary"
+msgstr "Типерари"
+
+#: contrib/localflavor/ie/ie_counties.py:35
+msgid "Tyrone"
+msgstr "Тајрон"
+
+#: contrib/localflavor/ie/ie_counties.py:36
+msgid "Waterford"
+msgstr "Вотерфорд"
+
+#: contrib/localflavor/ie/ie_counties.py:37
+msgid "Westmeath"
+msgstr "Вестмит"
+
+#: contrib/localflavor/ie/ie_counties.py:38
+msgid "Wexford"
+msgstr "Вексфорд"
+
+#: contrib/localflavor/ie/ie_counties.py:39
+msgid "Wicklow"
+msgstr "Виклоу"
+
+#: contrib/localflavor/in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
 msgstr "Внесете правилен поштенски број во форматот  XXXXXXXX."
 
-#: contrib/localflavor/is_/forms.py:17
+#: contrib/localflavor/is_/forms.py:18
 msgid ""
 "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
 "Внесете валиден идентификационен број од Исланд. Форматот е XXXXXX-XXXX."
 
-#: contrib/localflavor/is_/forms.py:18
+#: contrib/localflavor/is_/forms.py:19
 msgid "The Icelandic identification number is not valid."
 msgstr "Исландскиот идентификационент број е невалиден."
 
-#: contrib/localflavor/it/forms.py:14
+#: contrib/localflavor/it/forms.py:15
 msgid "Enter a valid zip code."
 msgstr "Внесете правилен поштенски број."
 
-#: contrib/localflavor/it/forms.py:43
+#: contrib/localflavor/it/forms.py:44
 msgid "Enter a valid Social Security number."
 msgstr "Внесете правилен осигурителен број."
 
-#: contrib/localflavor/it/forms.py:68
+#: contrib/localflavor/it/forms.py:69
 msgid "Enter a valid VAT number."
 msgstr "Внесете правилен даночен број."
 
@@ -2818,6 +3265,10 @@ msgstr "Кагошима"
 msgid "Okinawa"
 msgstr "Окинава"
 
+#: contrib/localflavor/kw/forms.py:25
+msgid "Enter a valid Kuwaiti Civil ID number"
+msgstr "Внесете правилен кувајтски број за идентификација"
+
 #: contrib/localflavor/mx/mx_states.py:12
 msgid "Aguascalientes"
 msgstr "Aguascalientes"
@@ -2946,15 +3397,11 @@ msgstr "Јукатан"
 msgid "Zacatecas"
 msgstr "Зацатекас"
 
-#: contrib/localflavor/nl/forms.py:21
+#: contrib/localflavor/nl/forms.py:22
 msgid "Enter a valid postal code"
 msgstr "Внесете правилен поштенски код"
 
-#: contrib/localflavor/nl/forms.py:52
-msgid "Enter a valid phone number"
-msgstr "Внесете валиден телефонски број"
-
-#: contrib/localflavor/nl/forms.py:78
+#: contrib/localflavor/nl/forms.py:79
 msgid "Enter a valid SoFi number"
 msgstr "Внесете валиден осигурителен број"
 
@@ -3006,15 +3453,15 @@ msgstr "Зиланд"
 msgid "Zuid-Holland"
 msgstr "Zuid-Holland"
 
-#: contrib/localflavor/no/forms.py:33
+#: contrib/localflavor/no/forms.py:34
 msgid "Enter a valid Norwegian social security number."
 msgstr "Ве молам внесете правилен норвешки матичен број."
 
-#: contrib/localflavor/pe/forms.py:24
+#: contrib/localflavor/pe/forms.py:25
 msgid "This field requires 8 digits."
 msgstr "Во ова поле мора да се внесат 8 цифри."
 
-#: contrib/localflavor/pe/forms.py:52
+#: contrib/localflavor/pe/forms.py:53
 msgid "This field requires 11 digits."
 msgstr "Во ова поле се потребни 11 цифри."
 
@@ -3114,6 +3561,15 @@ msgstr "Greater Poland"
 msgid "West Pomerania"
 msgstr "Западна Померанија"
 
+#: contrib/localflavor/pt/forms.py:17
+msgid "Enter a zip code in the format XXXX-XXX."
+msgstr "Внесете поштенски број во форматот XXXX-XXX."
+
+#: contrib/localflavor/pt/forms.py:37
+msgid "Phone numbers must have 9 digits, or start by + or 00."
+msgstr ""
+"Телефонските броеви мора да се со 9 цифри, или да почнуваат со + или 00."
+
 #: contrib/localflavor/ro/forms.py:19
 msgid "Enter a valid CIF."
 msgstr "Внесете правилен CIF."
@@ -3133,6 +3589,106 @@ msgstr "Телефонските броеви мора да бидат во XXXX
 #: contrib/localflavor/ro/forms.py:194
 msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "Внесете правилен поштенски код во формат XXXXXX"
+
+#: contrib/localflavor/se/forms.py:50
+msgid "Enter a valid Swedish organisation number."
+msgstr "Внесете број на шведска организација."
+
+#: contrib/localflavor/se/forms.py:107
+msgid "Enter a valid Swedish personal identity number."
+msgstr "Внесте правилен шведски матичен број."
+
+#: contrib/localflavor/se/forms.py:108
+msgid "Co-ordination numbers are not allowed."
+msgstr "Координациски броеви не се дозволени."
+
+#: contrib/localflavor/se/forms.py:150
+msgid "Enter a Swedish postal code in the format XXXXX."
+msgstr "Внесете правилен шведски поштенски број во формат XXXXX."
+
+#: contrib/localflavor/se/se_counties.py:15
+msgid "Stockholm"
+msgstr "Стокхолм"
+
+#: contrib/localflavor/se/se_counties.py:16
+msgid "Västerbotten"
+msgstr "Вестерботен"
+
+#: contrib/localflavor/se/se_counties.py:17
+msgid "Norrbotten"
+msgstr "Норботен"
+
+#: contrib/localflavor/se/se_counties.py:18
+msgid "Uppsala"
+msgstr "Упсала"
+
+#: contrib/localflavor/se/se_counties.py:19
+msgid "Södermanland"
+msgstr "Содерманланд"
+
+#: contrib/localflavor/se/se_counties.py:20
+msgid "Östergötland"
+msgstr "Остерготланд"
+
+#: contrib/localflavor/se/se_counties.py:21
+msgid "Jönköping"
+msgstr "Јонкопинг"
+
+#: contrib/localflavor/se/se_counties.py:22
+msgid "Kronoberg"
+msgstr "Кроненберг"
+
+#: contrib/localflavor/se/se_counties.py:23
+msgid "Kalmar"
+msgstr "Калмар"
+
+#: contrib/localflavor/se/se_counties.py:24
+msgid "Gotland"
+msgstr "Готланд"
+
+#: contrib/localflavor/se/se_counties.py:25
+msgid "Blekinge"
+msgstr "Блекинге"
+
+#: contrib/localflavor/se/se_counties.py:26
+msgid "Skåne"
+msgstr "Скане"
+
+#: contrib/localflavor/se/se_counties.py:27
+msgid "Halland"
+msgstr "Халанд"
+
+#: contrib/localflavor/se/se_counties.py:28
+msgid "Västra Götaland"
+msgstr "Вестра Готаланд"
+
+#: contrib/localflavor/se/se_counties.py:29
+msgid "Värmland"
+msgstr "Вермленд"
+
+#: contrib/localflavor/se/se_counties.py:30
+msgid "Örebro"
+msgstr "Оребро"
+
+#: contrib/localflavor/se/se_counties.py:31
+msgid "Västmanland"
+msgstr "Вестменланд"
+
+#: contrib/localflavor/se/se_counties.py:32
+msgid "Dalarna"
+msgstr "Даларна"
+
+#: contrib/localflavor/se/se_counties.py:33
+msgid "Gävleborg"
+msgstr "Гевлеборг"
+
+#: contrib/localflavor/se/se_counties.py:34
+msgid "Västernorrland"
+msgstr "Вестернорланд"
+
+#: contrib/localflavor/se/se_counties.py:35
+msgid "Jämtland"
+msgstr "Јемтланд"
 
 #: contrib/localflavor/sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -3766,19 +4322,43 @@ msgstr "Шкотска"
 msgid "Wales"
 msgstr "Велс"
 
-#: contrib/localflavor/us/forms.py:16
+#: contrib/localflavor/us/forms.py:17
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "Внесете поштенски број во форматот XXXXX или XXXXX-XXXX."
 
-#: contrib/localflavor/us/forms.py:54
+#: contrib/localflavor/us/forms.py:26
+msgid "Phone numbers must be in XXX-XXX-XXXX format."
+msgstr "Телефонските броеви мора да бидат во XXX-XXX-XXXX форматот."
+
+#: contrib/localflavor/us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr "Внесте правилен матичен број за САД во XXX-XX-XXXX форматот."
 
-#: contrib/localflavor/za/forms.py:20
+#: contrib/localflavor/us/forms.py:88
+msgid "Enter a U.S. state or territory."
+msgstr "Внесете држава или територија од САД."
+
+#: contrib/localflavor/us/models.py:8
+msgid "U.S. state (two uppercase letters)"
+msgstr "Држава во САД (две големи букви)"
+
+#: contrib/localflavor/us/models.py:17
+msgid "Phone number"
+msgstr "Телефонски број"
+
+#: contrib/localflavor/uy/forms.py:28
+msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
+msgstr "Внесете правилен CI во X.XXX.XXX-X,XXXXXXX-X или XXXXXXXX формат."
+
+#: contrib/localflavor/uy/forms.py:30
+msgid "Enter a valid CI number."
+msgstr "Внесете правилен CI број."
+
+#: contrib/localflavor/za/forms.py:21
 msgid "Enter a valid South African ID number"
 msgstr "Внесете правилен јужно афрички број за идентификација"
 
-#: contrib/localflavor/za/forms.py:54
+#: contrib/localflavor/za/forms.py:55
 msgid "Enter a valid South African postal code"
 msgstr "Внесете правилен јужно афрички поштенски код"
 
@@ -3817,6 +4397,10 @@ msgstr "North West"
 #: contrib/localflavor/za/za_provinces.py:12
 msgid "Western Cape"
 msgstr "Western Cape"
+
+#: contrib/messages/tests/base.py:101
+msgid "lazy message"
+msgstr "мрзлива порака"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -3882,59 +4466,224 @@ msgstr "име кое се прикажува"
 msgid "sites"
 msgstr "сајтови"
 
-#: db/models/fields/__init__.py:356 db/models/fields/__init__.py:710
-msgid "This value must be an integer."
-msgstr "Оваа вредност мора да биде цел број."
+#: core/validators.py:20 forms/fields.py:66
+msgid "Enter a valid value."
+msgstr "Внесете правилна вредност."
 
-#: db/models/fields/__init__.py:388
-msgid "This value must be either True or False."
-msgstr "Оваа вредност мора да биде или точно или неточно."
+#: core/validators.py:87 forms/fields.py:529
+msgid "Enter a valid URL."
+msgstr "Внесете правилна адреса."
 
-#: db/models/fields/__init__.py:427
-msgid "This field cannot be null."
-msgstr "Оваа вредност неможе да биде null."
+#: core/validators.py:89 forms/fields.py:530
+msgid "This URL appears to be a broken link."
+msgstr "Оваа адреса изгледа дека не е достапна."
 
-#: db/models/fields/__init__.py:443
+#: core/validators.py:123 forms/fields.py:873
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Внесете правилно кратко име (slug) кое се соддржи од букви, цифри, долна "
+"црта или тире."
+
+#: core/validators.py:126 forms/fields.py:866
+msgid "Enter a valid IPv4 address."
+msgstr "Внесeте правилна IPv4 адреса."
+
+#: core/validators.py:129 db/models/fields/__init__.py:572
 msgid "Enter only digits separated by commas."
 msgstr "Внесете само цифри одделени со запирки."
 
-#: db/models/fields/__init__.py:474
+#: core/validators.py:135
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"Осигурајте се дека оваа вредност е %(limit_value)s (моментално е %"
+"(show_value)s)."
+
+#: core/validators.py:153 forms/fields.py:205 forms/fields.py:257
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+"Осигурајте се дека оваа вредност е помала или еднаква со %(limit_value)s."
+
+#: core/validators.py:158 forms/fields.py:206 forms/fields.py:258
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+"Осигурајте се дека оваа вредност е поголема или еднаква со %(limit_value)s."
+
+#: core/validators.py:164
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+"Осигурајте се дека оваа вредност има најмалку %(limit_value)d знаци (има %"
+"(show_value)d)."
+
+#: core/validators.py:170
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+"Осигурајте се дека оваа вредност има најмногу %(limit_value)d знаци (има %"
+"(show_value)d)."
+
+#: db/models/base.py:822
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "%(field_name)s мора да биде уникатно за %(date_field)s %(lookup)s."
+
+#: db/models/base.py:837 db/models/base.py:845
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s со %(field_label)s веќе постои."
+
+#: db/models/fields/__init__.py:63
+#, python-format
+msgid "Value %r is not a valid choice."
+msgstr "Вредноста %r не е валиден избор."
+
+#: db/models/fields/__init__.py:64
+msgid "This field cannot be null."
+msgstr "Оваа вредност неможе да биде null."
+
+#: db/models/fields/__init__.py:65
+msgid "This field cannot be blank."
+msgstr "Ова поле не може да биде празно"
+
+#: db/models/fields/__init__.py:70
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Поле од тип: %(field_type)s"
+
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:852
+#: db/models/fields/__init__.py:961 db/models/fields/__init__.py:972
+#: db/models/fields/__init__.py:999
+msgid "Integer"
+msgstr "Цел број"
+
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:850
+msgid "This value must be an integer."
+msgstr "Оваа вредност мора да биде цел број."
+
+#: db/models/fields/__init__.py:490
+msgid "This value must be either True or False."
+msgstr "Оваа вредност мора да биде или точно или неточно."
+
+#: db/models/fields/__init__.py:492
+msgid "Boolean (Either True or False)"
+msgstr "Логичка (или точно или неточно)"
+
+#: db/models/fields/__init__.py:539 db/models/fields/__init__.py:982
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Збор (до %(max_length)s)"
+
+#: db/models/fields/__init__.py:567
+msgid "Comma-separated integers"
+msgstr "Целобројни вредности одделени со запирка"
+
+#: db/models/fields/__init__.py:581
+msgid "Date (without time)"
+msgstr "Датум (без час)"
+
+#: db/models/fields/__init__.py:585
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Внесете правилен датум во форматот ГГГГ-ММ-ДД."
 
-#: db/models/fields/__init__.py:483
+#: db/models/fields/__init__.py:586
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Неправилен датум: %s"
 
-#: db/models/fields/__init__.py:547 db/models/fields/__init__.py:565
+#: db/models/fields/__init__.py:667
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Внесете правилен датум/време во YYYY-MM-DD HH:MM[:ss[.uuuuuu]] формат."
 
-#: db/models/fields/__init__.py:601
+#: db/models/fields/__init__.py:669
+msgid "Date (with time)"
+msgstr "Датум (со час)"
+
+#: db/models/fields/__init__.py:735
 msgid "This value must be a decimal number."
 msgstr "Оваа вредност мора да биде децимален број."
 
-#: db/models/fields/__init__.py:686
+#: db/models/fields/__init__.py:737
+msgid "Decimal number"
+msgstr "Децимален број"
+
+#: db/models/fields/__init__.py:792
+msgid "E-mail address"
+msgstr "Адреса на е-пошта"
+
+#: db/models/fields/__init__.py:799 db/models/fields/files.py:220
+#: db/models/fields/files.py:331
+msgid "File path"
+msgstr "Патека на датотека"
+
+#: db/models/fields/__init__.py:822
 msgid "This value must be a float."
 msgstr "Оваа вредност мора да биде број со подвижна запирка."
 
-#: db/models/fields/__init__.py:746
+#: db/models/fields/__init__.py:824
+msgid "Floating point number"
+msgstr "Децимален број"
+
+#: db/models/fields/__init__.py:883
+msgid "Big (8 byte) integer"
+msgstr "Голем (8 бајти) цел број"
+
+#: db/models/fields/__init__.py:912
 msgid "This value must be either None, True or False."
 msgstr "Оваа вредност мора да биде празна, точно или неточно."
 
-#: db/models/fields/__init__.py:849 db/models/fields/__init__.py:863
+#: db/models/fields/__init__.py:914
+msgid "Boolean (Either True, False or None)"
+msgstr "Логичка (точно,неточно или празно)"
+
+#: db/models/fields/__init__.py:1005
+msgid "Text"
+msgstr "Текст"
+
+#: db/models/fields/__init__.py:1021
+msgid "Time"
+msgstr "Час"
+
+#: db/models/fields/__init__.py:1025
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Внесете правилно време во HH:MM[:ss[.uuuuuu]] формат."
 
-#: db/models/fields/related.py:816
+#: db/models/fields/__init__.py:1109
+msgid "XML text"
+msgstr "XML текст"
+
+#: db/models/fields/related.py:799
+#, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr "Модел %(model)s со примарен клуч %(pk)r не постои."
+
+#: db/models/fields/related.py:801
+msgid "Foreign Key (type determined by related field)"
+msgstr "Надворешен клуч (типот е одреден според сврзаното поле)"
+
+#: db/models/fields/related.py:918
+msgid "One-to-one relationship"
+msgstr "Еден-према-еден релација"
+
+#: db/models/fields/related.py:980
+msgid "Many-to-many relationship"
+msgstr "Повеќе-према-повеќе релација"
+
+#: db/models/fields/related.py:1000
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Држете го „Control“, или „Command“ на Мекинтош, за да изберете повеќе од "
 "едно."
 
-#: db/models/fields/related.py:894
+#: db/models/fields/related.py:1061
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -3946,84 +4695,58 @@ msgstr[1] ""
 "Ве молам внесете правилен %(self)s идентификацион број. Вредностите %(value)"
 "r се неправилни."
 
-#: forms/fields.py:54
+#: forms/fields.py:65
 msgid "This field is required."
 msgstr "Ова поле е задолжително."
 
-#: forms/fields.py:55
-msgid "Enter a valid value."
-msgstr "Внесете правилна вредност."
-
-#: forms/fields.py:138
-#, python-format
-msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr ""
-"Осигурајте се дека оваа вредност има најмногу %(max)d знаци (има %(length)d)."
-
-#: forms/fields.py:139
-#, python-format
-msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr ""
-"Осигурајте се дека оваа вредност има најмалку %(min)d знаци (има %(length)d)."
-
-#: forms/fields.py:166
+#: forms/fields.py:204
 msgid "Enter a whole number."
 msgstr "Внеси цел број."
 
-#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
-#, python-format
-msgid "Ensure this value is less than or equal to %s."
-msgstr "Осигурајте се дека оваа вредност е помала или еднаква со %s."
-
-#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
-#, python-format
-msgid "Ensure this value is greater than or equal to %s."
-msgstr "Осигурајте се дека оваа вредност е поголема или еднаква со %s."
-
-#: forms/fields.py:195 forms/fields.py:224
+#: forms/fields.py:235 forms/fields.py:256
 msgid "Enter a number."
 msgstr "Внесете број."
 
-#: forms/fields.py:227
+#: forms/fields.py:259
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Осигурајте се дека вкупно нема повеќе од %s цифри."
 
-#: forms/fields.py:228
+#: forms/fields.py:260
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Осигурајте се дека нема повеќе од %s децимални места."
 
-#: forms/fields.py:229
+#: forms/fields.py:261
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Осигурајте се дека нема повеќе од %s цифри пред децималната запирка."
 
-#: forms/fields.py:288 forms/fields.py:863
+#: forms/fields.py:323 forms/fields.py:838
 msgid "Enter a valid date."
 msgstr "Внесете правилен датум."
 
-#: forms/fields.py:322 forms/fields.py:864
+#: forms/fields.py:351 forms/fields.py:839
 msgid "Enter a valid time."
 msgstr "Внесете правилно време."
 
-#: forms/fields.py:361
+#: forms/fields.py:377
 msgid "Enter a valid date/time."
 msgstr "Внесете правилен датум со време."
 
-#: forms/fields.py:447
+#: forms/fields.py:435
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Не беше пратена датотека. Проверете го типот на енкодирање на формата."
 
-#: forms/fields.py:448
+#: forms/fields.py:436
 msgid "No file was submitted."
 msgstr "Не беше пратена датотека."
 
-#: forms/fields.py:449
+#: forms/fields.py:437
 msgid "The submitted file is empty."
 msgstr "Пратената датотека е празна."
 
-#: forms/fields.py:450
+#: forms/fields.py:438
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -4031,69 +4754,40 @@ msgstr ""
 "Осигурајте се дека ова име на датотека има најмногу %(max)d знаци (има %"
 "(length)d)."
 
-#: forms/fields.py:483
+#: forms/fields.py:473
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Качете валидна фотографија. Датотеката која ја качивте или не беше "
-"фотографија или беше расипана датотеката."
+"Качете валидна слика. Датотеката која ја качивте или не беше слика или беше "
+"расипана датотеката."
 
-#: forms/fields.py:544
-msgid "Enter a valid URL."
-msgstr "Внесете правилна адреса."
-
-#: forms/fields.py:545
-msgid "This URL appears to be a broken link."
-msgstr "Оваа адреса изгледа дека не е достапна."
-
-#: forms/fields.py:625 forms/fields.py:703
+#: forms/fields.py:596 forms/fields.py:671
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Внесете валиден избор. %(value)s не е еден од можните избори."
 
-#: forms/fields.py:704 forms/fields.py:765 forms/models.py:1003
+#: forms/fields.py:672 forms/fields.py:734 forms/models.py:1007
 msgid "Enter a list of values."
 msgstr "Внесете листа на вредности."
 
-#: forms/fields.py:892
-msgid "Enter a valid IPv4 address."
-msgstr "Внесeте правилна IPv4 адреса."
-
-#: forms/fields.py:902
-msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr ""
-"Внесете правилно кратко име (slug) кое се соддржи од букви, цифри, долна "
-"црта или тире."
-
-#: forms/formsets.py:271 forms/formsets.py:273
+#: forms/formsets.py:298 forms/formsets.py:300
 msgid "Order"
 msgstr "Редослед"
 
-#: forms/models.py:367
-#, python-format
-msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
-msgstr "%(field_name)s мора да биде уникатно за %(date_field)s %(lookup)s."
-
-#: forms/models.py:381 forms/models.py:389
-#, python-format
-msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "%(model_name)s со %(field_label)s веќе постои."
-
-#: forms/models.py:594
+#: forms/models.py:567
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Ве молам поправете ја дуплираната вредност за  %(field)s."
 
-#: forms/models.py:598
+#: forms/models.py:571
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "Ве молам поправете ја дуплираната вредност за %(field)s, која мора да биде "
 "уникатна."
 
-#: forms/models.py:604
+#: forms/models.py:577
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -4102,52 +4796,52 @@ msgstr ""
 "Ве молам поправете ја дуплираната вредност за %(field_name)s која мора да "
 "биде уникатна за %(lookup)s во %(date_field)s."
 
-#: forms/models.py:612
+#: forms/models.py:585
 msgid "Please correct the duplicate values below."
 msgstr "Ве молам поправете ги дуплираните вредности подолу."
 
-#: forms/models.py:867
+#: forms/models.py:860
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 "Надворешниот клуч на вгезденото поле не се совпаѓа со примарниот клуч на "
 "родителската инстанца."
 
-#: forms/models.py:930
+#: forms/models.py:926
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Изберете правилно. Тоа не е еден од можните избори."
 
-#: forms/models.py:1004
+#: forms/models.py:1008
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Внесете правилно. %s не е еден од достапните вредности."
 
-#: forms/models.py:1006
+#: forms/models.py:1010
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" не е правилна вредност за примарен клуч."
 
-#: template/defaultfilters.py:767
+#: template/defaultfilters.py:781
 msgid "yes,no,maybe"
 msgstr "да, не, можеби"
 
-#: template/defaultfilters.py:798
+#: template/defaultfilters.py:812
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d бајт"
 msgstr[1] "%(size)d бајти"
 
-#: template/defaultfilters.py:800
+#: template/defaultfilters.py:814
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f КБ"
 
-#: template/defaultfilters.py:802
+#: template/defaultfilters.py:816
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f МБ"
 
-#: template/defaultfilters.py:803
+#: template/defaultfilters.py:817
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f ГБ"
@@ -4356,7 +5050,7 @@ msgstr "ное."
 msgid "Dec."
 msgstr "дек."
 
-#: utils/text.py:128
+#: utils/text.py:130
 msgid "or"
 msgstr "или"
 
@@ -4410,33 +5104,37 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:399
+#: utils/translation/trans_real.py:518
 msgid "DATE_FORMAT"
 msgstr "j M Y"
 
-#: utils/translation/trans_real.py:401
+#: utils/translation/trans_real.py:519
+msgid "DATETIME_FORMAT"
+msgstr "j M Y, P"
+
+#: utils/translation/trans_real.py:520
 msgid "TIME_FORMAT"
 msgstr "P"
 
-#: utils/translation/trans_real.py:417
+#: utils/translation/trans_real.py:541
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:418
+#: utils/translation/trans_real.py:542
 msgid "MONTH_DAY_FORMAT"
 msgstr "F j"
 
-#: views/generic/create_update.py:114
+#: views/generic/create_update.py:115
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "Ставка %(verbose_name)s беше успешно создадена."
 
-#: views/generic/create_update.py:156
+#: views/generic/create_update.py:158
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "Ставка %(verbose_name)s беше успешно ажурирана."
 
-#: views/generic/create_update.py:198
+#: views/generic/create_update.py:201
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "Ставка %(verbose_name)s беше избришана."
