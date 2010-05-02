@@ -4,7 +4,7 @@
 
 DATE_FORMAT = 'd F Y' # 25 Ottobre 2006
 TIME_FORMAT = 'H:i:s' # 14:30:59
-DATETIME_FORMAT = 'w d F Y H:i:s' # Mercoledì 25 Ottobre 2006 14:30:59
+DATETIME_FORMAT = 'l d F Y H:i:s' # Mercoledì 25 Ottobre 2006 14:30:59
 YEAR_MONTH_FORMAT = 'F Y' # Ottobre 2006
 MONTH_DAY_FORMAT = 'j/F' # 10/2006
 SHORT_DATE_FORMAT = 'd/M/Y' # 25/12/2009
