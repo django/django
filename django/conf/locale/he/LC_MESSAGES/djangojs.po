@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-06 16:49+0300\n"
-"PO-Revision-Date: 2010-04-06 17:29+0300\n"
-"Last-Translator: Shai Berger <shai@platonix.com>\n"
+"POT-Creation-Date: 2010-05-01 20:22+0200\n"
+"PO-Revision-Date: 2010-05-01 14:20-0500\n"
+"Last-Translator: Alex <alex.gaynor@gmail.com>\n"
 "Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -48,6 +48,13 @@ msgstr "יש לסמן את ההרשאות המבוקשות וללחוץ על "
 #: contrib/admin/media/js/SelectFilter2.js:63
 msgid "Clear all"
 msgstr "איפוס הכל"
+
+#: contrib/admin/media/js/actions.js:17
+#: contrib/admin/media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s מ %(cnt)s נבחרות"
+msgstr[1] "%(sel)s מ %(cnt)s נבחרות"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
@@ -101,27 +108,23 @@ msgid "Noon"
 msgstr "12 בצהריים"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:91
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:187
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
 msgstr "ביטול"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:181
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:182
 msgid "Today"
 msgstr "היום"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:136
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:137
 msgid "Calendar"
 msgstr "לוח שנה"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
 msgid "Yesterday"
 msgstr "אתמול"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
 msgstr "מחר"
-
-# 0 is sunday
-#~ msgid "FIRST_DAY_OF_WEEK"
-#~ msgstr "0"
