@@ -737,11 +737,12 @@ class ModelAdmin(BaseModelAdmin):
 
             # Get the list of selected PKs. If nothing's selected, we can't
             # perform an action on it, so bail. Except we want to perform
-            # the action explicitely on all objects.
+            # the action explicitly on all objects.
             selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
             if not selected and not select_across:
                 # Reminder that something needs to be selected or nothing will happen
-                msg = _("Items must be selected in order to perform actions on them. No items have been changed.")
+                msg = _("Items must be selected in order to perform "
+                        "actions on them. No items have been changed.")
                 self.message_user(request, msg)
                 return None
 
@@ -761,6 +762,7 @@ class ModelAdmin(BaseModelAdmin):
         else:
             msg = _("No action selected.")
             self.message_user(request, msg)
+            return None
 
     @csrf_protect_m
     @transaction.commit_on_success
@@ -971,20 +973,46 @@ class ModelAdmin(BaseModelAdmin):
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
-            # parameter via the query string. If wacky parameters were given and
-            # the 'invalid=1' parameter was already in the query string, something
-            # is screwed up with the database, so display an error page.
+            # parameter via the query string. If wacky parameters were given
+            # and the 'invalid=1' parameter was already in the query string,
+            # something is screwed up with the database, so display an error
+            # page.
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
 
-        # If the request was POSTed, this might be a bulk action or a bulk edit.
-        # Try to look up an action or confirmation first, but if this isn't an
-        # action the POST will fall through to the bulk edit check, below.
-        if actions and request.method == 'POST' and (helpers.ACTION_CHECKBOX_NAME in request.POST or 'index' in request.POST):
-            response = self.response_action(request, queryset=cl.get_query_set())
-            if response:
-                return response
+        # If the request was POSTed, this might be a bulk action or a bulk
+        # edit. Try to look up an action or confirmation first, but if this
+        # isn't an action the POST will fall through to the bulk edit check,
+        # below.
+        action_failed = False
+        selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
+
+        # Actions with no confirmation
+        if (actions and request.method == 'POST' and
+                'index' in request.POST and '_save' not in request.POST):
+            if selected:
+                response = self.response_action(request, queryset=cl.get_query_set())
+                if response:
+                    return response
+                else:
+                    action_failed = True
+            else:
+                msg = _("Items must be selected in order to perform "
+                        "actions on them. No items have been changed.")
+                self.message_user(request, msg)
+                action_failed = True
+
+        # Actions with confirmation
+        if (actions and request.method == 'POST' and
+                helpers.ACTION_CHECKBOX_NAME in request.POST and
+                'index' not in request.POST and '_save' not in request.POST):
+            if selected:
+                response = self.response_action(request, queryset=cl.get_query_set())
+                if response:
+                    return response
+                else:
+                    action_failed = True
 
         # If we're allowing changelist editing, we need to construct a formset
         # for the changelist given all the fields to be edited. Then we'll
@@ -992,7 +1020,8 @@ class ModelAdmin(BaseModelAdmin):
         formset = cl.formset = None
 
         # Handle POSTed bulk-edit data.
-        if request.method == "POST" and self.list_editable:
+        if (request.method == "POST" and self.list_editable and
+                '_save' in request.POST and not action_failed):
             FormSet = self.get_changelist_formset(request)
             formset = cl.formset = FormSet(request.POST, request.FILES, queryset=cl.result_list)
             if formset.is_valid():
