@@ -219,7 +219,7 @@ def javascript_catalog(request, domain='djangojs', packages=None):
                 except IOError:
                     catalog = None
                 if catalog is not None:
-                    t.update(catalog._catalog)
+                    t = catalog._catalog
     src = [LibHead]
     plural = None
     if '' in t:

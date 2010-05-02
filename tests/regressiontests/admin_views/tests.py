@@ -2,6 +2,7 @@
 
 import re
 import datetime
+from django.conf import settings
 from django.core.files import temp as tempfile
 from django.test import TestCase
 from django.contrib.auth import admin # Register auth models with the admin.
@@ -15,7 +16,7 @@ from django.forms.util import ErrorList
 from django.utils import formats
 from django.utils.cache import get_max_age
 from django.utils.html import escape
-from django.utils.translation import get_date_formats
+from django.utils.translation import get_date_formats, activate, deactivate
 from django.utils.encoding import iri_to_uri
 
 # local test models
@@ -270,6 +271,34 @@ class AdminViewBasicTest(TestCase):
         # Post model).
         response = self.client.get("/test_admin/admin/admin_views/post/")
         self.failUnless('icon-unknown.gif' in response.content)
+
+    def testI18NLanguageNonEnglishDefault(self):
+        """
+        Check if the Javascript i18n view returns an empty language catalog
+        if the default language is non-English but the selected language
+        is English. See #13388 and #3594 for more details.
+        """
+        old_language_code = settings.LANGUAGE_CODE
+        settings.LANGUAGE_CODE = 'fr'
+        activate('en-us')
+        response = self.client.get('/test_admin/admin/jsi18n/')
+        self.assertNotContains(response, 'Choisir une heure')
+        deactivate()
+        settings.LANGUAGE_CODE = old_language_code
+
+    def testI18NLanguageNonEnglishFallback(self):
+        """
+        Makes sure that the fallback language is still working properly
+        in cases where the selected language cannot be found.
+        """
+        old_language_code = settings.LANGUAGE_CODE
+        settings.LANGUAGE_CODE = 'fr'
+        activate('none')
+        response = self.client.get('/test_admin/admin/jsi18n/')
+        self.assertContains(response, 'Choisir une heure')
+        deactivate()
+        settings.LANGUAGE_CODE = old_language_code
+
 
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
@@ -1945,7 +1974,7 @@ class NeverCacheTests(TestCase):
 
     def testJsi18n(self):
         "Check the never-cache status of the Javascript i18n view"
-        response = self.client.get('/test_admin/jsi18n/')
+        response = self.client.get('/test_admin/admin/jsi18n/')
         self.failUnlessEqual(get_max_age(response), None)
 
 
