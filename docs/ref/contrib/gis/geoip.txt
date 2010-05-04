@@ -203,7 +203,7 @@ existing Python API.
 This classmethod instantiates the GeoIP object from the given database path
 and given cache setting.
 
-.. method:: GeoIP.regioin_by_addr(query)
+.. method:: GeoIP.region_by_addr(query)
 
 .. method:: GeoIP.region_by_name(query)
 
