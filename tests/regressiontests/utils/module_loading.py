@@ -12,16 +12,16 @@ class DefaultLoader(TestCase):
         test_module = import_module('regressiontests.utils.test_module')
 
         # An importable child
-        self.assertTrue(module_has_submodule(test_module, 'good_module'))
+        self.failUnless(module_has_submodule(test_module, 'good_module'))
         mod = import_module('regressiontests.utils.test_module.good_module')
         self.assertEqual(mod.content, 'Good Module')
 
         # A child that exists, but will generate an import error if loaded
-        self.assertTrue(module_has_submodule(test_module, 'bad_module'))
+        self.failUnless(module_has_submodule(test_module, 'bad_module'))
         self.assertRaises(ImportError, import_module, 'regressiontests.utils.test_module.bad_module')
 
         # A child that doesn't exist
-        self.assertFalse(module_has_submodule(test_module, 'no_such_module'))
+        self.failIf(module_has_submodule(test_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'regressiontests.utils.test_module.no_such_module')
 
 class EggLoader(TestCase):
@@ -39,16 +39,16 @@ class EggLoader(TestCase):
         egg_module = import_module('egg_module')
 
         # An importable child
-        self.assertTrue(module_has_submodule(egg_module, 'good_module'))
+        self.failUnless(module_has_submodule(egg_module, 'good_module'))
         mod = import_module('egg_module.good_module')
         self.assertEqual(mod.content, 'Good Module')
 
         # A child that exists, but will generate an import error if loaded
-        self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
+        self.failUnless(module_has_submodule(egg_module, 'bad_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.bad_module')
 
         # A child that doesn't exist
-        self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
+        self.failIf(module_has_submodule(egg_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.no_such_module')
 
     def test_deep_loader(self):
@@ -58,16 +58,16 @@ class EggLoader(TestCase):
         egg_module = import_module('egg_module.sub1.sub2')
 
         # An importable child
-        self.assertTrue(module_has_submodule(egg_module, 'good_module'))
+        self.failUnless(module_has_submodule(egg_module, 'good_module'))
         mod = import_module('egg_module.sub1.sub2.good_module')
         self.assertEqual(mod.content, 'Deep Good Module')
 
         # A child that exists, but will generate an import error if loaded
-        self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
+        self.failUnless(module_has_submodule(egg_module, 'bad_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.bad_module')
 
         # A child that doesn't exist
-        self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
+        self.failIf(module_has_submodule(egg_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
 
 class TestFinder(object):
@@ -107,16 +107,16 @@ class CustomLoader(TestCase):
         egg_module = import_module('egg_module')
 
         # An importable child
-        self.assertTrue(module_has_submodule(egg_module, 'good_module'))
+        self.failUnless(module_has_submodule(egg_module, 'good_module'))
         mod = import_module('egg_module.good_module')
         self.assertEqual(mod.content, 'Good Module')
 
         # A child that exists, but will generate an import error if loaded
-        self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
+        self.failUnless(module_has_submodule(egg_module, 'bad_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.bad_module')
 
         # A child that doesn't exist
-        self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
+        self.failIf(module_has_submodule(egg_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.no_such_module')
 
     def test_deep_loader(self):
@@ -126,14 +126,14 @@ class CustomLoader(TestCase):
         egg_module = import_module('egg_module.sub1.sub2')
 
         # An importable child
-        self.assertTrue(module_has_submodule(egg_module, 'good_module'))
+        self.failUnless(module_has_submodule(egg_module, 'good_module'))
         mod = import_module('egg_module.sub1.sub2.good_module')
         self.assertEqual(mod.content, 'Deep Good Module')
 
         # A child that exists, but will generate an import error if loaded
-        self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
+        self.failUnless(module_has_submodule(egg_module, 'bad_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.bad_module')
 
         # A child that doesn't exist
-        self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
+        self.failIf(module_has_submodule(egg_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
