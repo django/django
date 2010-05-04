@@ -1,11 +1,6 @@
 from django.contrib.messages.storage.base import BaseStorage
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.contrib.messages.storage.session import SessionStorage
-try:
-    set
-except NameError:
-    from sets import Set as set   # Python 2.3
-
 
 class FallbackStorage(BaseStorage):
     """

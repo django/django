@@ -7,10 +7,7 @@ tests = r"""
 >>> import datetime
 >>> import time
 >>> import re
->>> try:
-...     from decimal import Decimal
-... except ImportError:
-...     from django.utils._decimal import Decimal
+>>> from decimal import Decimal
 >>> from django.utils.translation import activate, deactivate
 >>> from django.conf import settings
 

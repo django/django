@@ -3,7 +3,7 @@ from sys import version_info
 try:
     from functools import wraps
 except ImportError:
-    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
+    from django.utils.functional import wraps  # Python 2.4 fallback.
 
 from django.http import HttpResponse, HttpRequest
 from django.utils.functional import allow_lazy, lazy, memoize

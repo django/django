@@ -5,10 +5,7 @@ tests = r"""
 >>> import datetime
 >>> import time
 >>> import re
->>> try:
-...     from decimal import Decimal
-... except ImportError:
-...     from django.utils._decimal import Decimal
+>>> from decimal import Decimal
 
 ###############
 # Extra stuff #

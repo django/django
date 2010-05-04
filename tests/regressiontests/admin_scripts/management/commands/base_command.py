@@ -1,10 +1,5 @@
 from django.core.management.base import BaseCommand
 from optparse import make_option
-# Python 2.3 doesn't have sorted()
-try:
-    sorted
-except NameError:
-    from django.utils.itercompat import sorted
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (

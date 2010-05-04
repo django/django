@@ -28,17 +28,13 @@ import datetime
 import time
 import re
 import os
+from decimal import Decimal
 
 from unittest import TestCase
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.forms.widgets import RadioFieldRenderer
-
-try:
-    from decimal import Decimal
-except ImportError:
-    from django.utils._decimal import Decimal
 
 
 def fix_os_paths(x):

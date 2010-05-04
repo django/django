@@ -2,7 +2,7 @@ import base64
 try:
     from functools import wraps
 except ImportError:
-    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
+    from django.utils.functional import wraps  # Python 2.4 fallback.
 
 from django import http, template
 from django.conf import settings

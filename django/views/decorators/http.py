@@ -5,7 +5,7 @@ Decorators for views based on HTTP headers.
 try:
     from functools import wraps
 except ImportError:
-    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
+    from django.utils.functional import wraps  # Python 2.4 fallback.
 
 from calendar import timegm
 from datetime import timedelta

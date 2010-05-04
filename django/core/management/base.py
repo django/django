@@ -13,11 +13,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.utils.encoding import smart_str
 
-try:
-    set
-except NameError:
-    from sets import Set as set     # For Python 2.3
-
 class CommandError(Exception):
     """
     Exception class indicating a problem while executing a management

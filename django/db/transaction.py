@@ -19,7 +19,7 @@ except ImportError:
 try:
     from functools import wraps
 except ImportError:
-    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
+    from django.utils.functional import wraps  # Python 2.4 fallback.
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.conf import settings
 

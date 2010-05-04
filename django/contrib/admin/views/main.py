@@ -9,11 +9,6 @@ from django.utils.translation import ugettext
 from django.utils.http import urlencode
 import operator
 
-try:
-    set
-except NameError:
-    from sets import Set as set   # Python 2.3 fallback
-
 # The system will display a "Show all" link on the change list only if the
 # total result count is less than or equal to this setting.
 MAX_SHOW_ALL_ALLOWED = 200

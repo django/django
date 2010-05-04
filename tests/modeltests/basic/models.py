@@ -4,18 +4,6 @@
 
 This is a basic model with only two non-primary-key fields.
 """
-# Python 2.3 doesn't have set as a builtin
-try:
-    set
-except NameError:
-    from sets import Set as set
-
-# Python 2.3 doesn't have sorted()
-try:
-    sorted
-except NameError:
-    from django.utils.itercompat import sorted
-
 from django.db import models, DEFAULT_DB_ALIAS
 
 class Article(models.Model):

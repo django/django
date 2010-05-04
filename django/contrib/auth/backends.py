@@ -1,8 +1,3 @@
-try:
-    set
-except NameError:
-    from sets import Set as set # Python 2.3 fallback
-
 from django.db import connection
 from django.contrib.auth.models import User, Permission
 

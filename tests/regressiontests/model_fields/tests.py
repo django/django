@@ -1,5 +1,6 @@
 import datetime
 import unittest
+from decimal import Decimal
 
 import django.test
 from django import forms
@@ -7,12 +8,6 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel, BooleanModel
-
-try:
-    from decimal import Decimal
-except ImportError:
-    from django.utils._decimal import Decimal
-
 
 # If PIL available, do these tests.
 if Image:

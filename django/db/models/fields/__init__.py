@@ -3,6 +3,7 @@ import decimal
 import re
 import time
 import math
+from itertools import tee
 
 import django.utils.copycompat as copy
 
@@ -14,7 +15,6 @@ from django import forms
 from django.core import exceptions, validators
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import curry
-from django.utils.itercompat import tee
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str

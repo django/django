@@ -9,11 +9,6 @@ from django.db import models
 from django.db.models import get_models
 from django.db.backends.util import truncate_name
 
-try:
-    set
-except NameError:
-    from sets import Set as set   # Python 2.3 fallback
-
 def sql_create(app, style, connection):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
 

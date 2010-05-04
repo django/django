@@ -3,14 +3,9 @@ import urllib
 import locale
 import datetime
 import codecs
+from decimal import Decimal
 
 from django.utils.functional import Promise
-
-try:
-    from decimal import Decimal
-except ImportError:
-    from django.utils._decimal import Decimal # Python 2.3 fallback
-
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):

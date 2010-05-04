@@ -2,7 +2,7 @@
 
 import sys
 import re
-from itertools import cycle as itertools_cycle
+from itertools import groupby, cycle as itertools_cycle
 
 from django.template import Node, NodeList, Template, Context, Variable
 from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
@@ -10,7 +10,6 @@ from django.template import get_library, Library, InvalidTemplateLibrary
 from django.template.smartif import IfParser, Literal
 from django.conf import settings
 from django.utils.encoding import smart_str, smart_unicode
-from django.utils.itercompat import groupby
 from django.utils.safestring import mark_safe
 
 register = Library()

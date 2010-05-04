@@ -5,12 +5,6 @@ import unittest
 
 import django.contrib as contrib
 
-try:
-    set
-except NameError:
-    from sets import Set as set     # For Python 2.3
-
-
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
 REGRESSION_TESTS_DIR_NAME = 'regressiontests'

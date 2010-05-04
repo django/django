@@ -1,7 +1,7 @@
 """
 SQLite3 backend for django.
 
-Python 2.3 and 2.4 require pysqlite2 (http://pysqlite.org/).
+Python 2.4 requires pysqlite2 (http://pysqlite.org/).
 
 Python 2.5 and later can use a pysqlite2 module or the sqlite3 module in the
 standard library.

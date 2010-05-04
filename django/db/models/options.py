@@ -1,9 +1,5 @@
 import re
 from bisect import bisect
-try:
-    set
-except NameError:
-    from sets import Set as set     # Python 2.3 fallback
 
 from django.conf import settings
 from django.db.models.related import RelatedObject

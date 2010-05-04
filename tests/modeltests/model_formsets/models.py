@@ -2,11 +2,6 @@ import datetime
 from django import forms
 from django.db import models
 
-try:
-    sorted
-except NameError:
-    from django.utils.itercompat import sorted
-
 class Author(models.Model):
     name = models.CharField(max_length=100)
 

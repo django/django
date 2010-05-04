@@ -4,11 +4,6 @@ import pickle
 from django.db import connection, models, DEFAULT_DB_ALIAS
 from django.conf import settings
 
-try:
-    sorted
-except NameError:
-    from django.utils.itercompat import sorted      # For Python 2.3
-
 class Author(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()

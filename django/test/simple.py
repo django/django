@@ -185,14 +185,6 @@ def build_test(label):
     # Construct a suite out of the tests that matched.
     return unittest.TestSuite(tests)
 
-# Python 2.3 compatibility: TestSuites were made iterable in 2.4.
-# We need to iterate over them, so we add the missing method when
-# necessary.
-try:
-    getattr(unittest.TestSuite, '__iter__')
-except AttributeError:
-    setattr(unittest.TestSuite, '__iter__', lambda s: iter(s._tests))
-
 def partition_suite(suite, classes, bins):
     """
     Partitions a test suite by test type.

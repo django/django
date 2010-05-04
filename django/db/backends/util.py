@@ -1,12 +1,8 @@
 import datetime
+import decimal
 from time import time
 
 from django.utils.hashcompat import md5_constructor
-
-try:
-    import decimal
-except ImportError:
-    from django.utils import _decimal as decimal    # for Python 2.3
 
 class CursorDebugWrapper(object):
     def __init__(self, cursor, db):

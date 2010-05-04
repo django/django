@@ -3,17 +3,13 @@ Serialize data to/from JSON
 """
 
 import datetime
+import decimal
 from StringIO import StringIO
 
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils import datetime_safe
 from django.utils import simplejson
-
-try:
-    import decimal
-except ImportError:
-    from django.utils import _decimal as decimal    # Python 2.3 fallback
 
 class Serializer(PythonSerializer):
     """

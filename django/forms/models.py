@@ -18,11 +18,6 @@ from widgets import SelectMultiple, HiddenInput, MultipleHiddenInput
 from widgets import media_property
 from formsets import BaseFormSet, formset_factory, DELETION_FIELD_NAME
 
-try:
-    set
-except NameError:
-    from sets import Set as set     # Python 2.3 fallback
-
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
     'save_instance', 'form_for_fields', 'ModelChoiceField',

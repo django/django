@@ -1,17 +1,12 @@
 """Default variable filters."""
 
 import re
-
-try:
-    from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
-except ImportError:
-    from django.utils._decimal import Decimal, InvalidOperation, ROUND_HALF_UP
-
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import random as random_module
 try:
     from functools import wraps
 except ImportError:
-    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
+    from django.utils.functional import wraps  # Python 2.4 fallback.
 
 from django.template import Variable, Library
 from django.conf import settings

@@ -12,10 +12,6 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
-try:
-    set
-except NameError:
-    from sets import Set as set     # Python 2.3 fallback
 
 def delete_selected(modeladmin, request, queryset):
     """

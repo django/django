@@ -1,10 +1,5 @@
 import sys
 import time
-try:
-    set
-except NameError:
-    # Python 2.3 compat
-    from sets import Set as set
 
 from django.conf import settings
 from django.core.management import call_command

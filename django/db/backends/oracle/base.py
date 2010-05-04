@@ -9,10 +9,7 @@ import datetime
 import os
 import sys
 import time
-try:
-    from decimal import Decimal
-except ImportError:
-    from django.utils._decimal import Decimal
+from decimal import Decimal
 
 # Oracle takes client-side character set encoding from the environment.
 os.environ['NLS_LANG'] = '.UTF8'

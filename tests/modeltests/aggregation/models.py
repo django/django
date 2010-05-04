@@ -1,11 +1,6 @@
 # coding: utf-8
 from django.db import models
 
-try:
-    sorted
-except NameError:
-    from django.utils.itercompat import sorted      # For Python 2.3
-
 class Author(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()
@@ -48,10 +43,7 @@ class Store(models.Model):
 # Different backends and numbers.
 __test__ = {'API_TESTS': """
 >>> from django.core import management
->>> try:
-...     from decimal import Decimal
-... except:
-...     from django.utils._decimal import Decimal
+>>> from decimal import Decimal
 >>> from datetime import date
 
 # Reset the database representation of this app.

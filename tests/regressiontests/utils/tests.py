@@ -10,25 +10,16 @@ from django.utils.functional import SimpleLazyObject
 import timesince
 import datastructures
 import datetime_safe
-import itercompat
 import tzinfo
 
 from decorators import DecoratorFromMiddlewareTests
 from functional import FunctionalTestCase
-
-# We need this because "datastructures" uses sorted() and the tests are run in
-# the scope of this module.
-try:
-    sorted
-except NameError:
-    from django.utils.itercompat import sorted  # For Python 2.3
 
 # Extra tests
 __test__ = {
     'timesince': timesince,
     'datastructures': datastructures,
     'datetime_safe': datetime_safe,
-    'itercompat': itercompat,
     'tzinfo': tzinfo,
 }
 

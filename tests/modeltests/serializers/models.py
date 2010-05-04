@@ -6,11 +6,7 @@
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
 
-try:
-    from decimal import Decimal
-except ImportError:
-    from django.utils._decimal import Decimal # Python 2.3 fallback
-
+from decimal import Decimal
 from django.db import models
 
 class Category(models.Model):
