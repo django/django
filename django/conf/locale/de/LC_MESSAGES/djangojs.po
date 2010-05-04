@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-26 15:36+0200\n"
+"POT-Creation-Date: 2010-05-05 00:38+0200\n"
 "PO-Revision-Date: 2008-06-23 21:02+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: \n"
@@ -46,12 +46,44 @@ msgstr "Auswahl treffen und Klick auf"
 msgid "Clear all"
 msgstr "Alles abwählen"
 
-#: contrib/admin/media/js/actions.js:17
+#: contrib/admin/media/js/actions.js:18
 #: contrib/admin/media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s von %(cnt)s ausgewählt"
 msgstr[1] "%(sel)s von %(cnt)s ausgewählt"
+
+#: contrib/admin/media/js/actions.js:109
+#: contrib/admin/media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Sie haben Änderungen an editierbaren Feldern vorgenommen und nicht "
+"gespeichert. Wollen Sie die Aktion trotzdem ausführen und Ihre Änderungen "
+"verwerfen?"
+
+#: contrib/admin/media/js/actions.js:121
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Sie haben eine Aktion ausgewählt, aber ihre vorgenommenen Änderungen nicht "
+"gespeichert. Klicken Sie OK, um dennoch zu speichern. Danach müssen Sie die "
+"Aktion erneut ausführen."
+
+#: contrib/admin/media/js/actions.js:123
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Sie haben eine Aktion ausgewählt, aber keine Änderungen an editierbaren "
+"Feldern vorgenommen. Sie wollten wahrscheinlich auf 'Ausführen' und nicht "
+"auf 'Speichern' klicken."
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
