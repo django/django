@@ -32,6 +32,7 @@ __test__ = {
 
 from dateformat import *
 from feedgenerator import *
+from module_loading import *
 
 class TestUtilsHtml(TestCase):
 
