@@ -53,12 +53,12 @@
 			}
 			addButton.click(function() {
 				var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
-				var nextIndex = parseInt(totalForms.val()) + 1;
+				var nextIndex = parseInt(totalForms.val());
 				var template = $("#" + options.prefix + "-empty");
 				var row = template.clone(true);
 				row.removeClass(options.emptyCssClass)
 				    .addClass(options.formCssClass)
-				    .attr("id", options.prefix + nextIndex)
+				    .attr("id", options.prefix + "-" + nextIndex)
 				    .insertBefore($(template));
 				row.find("*")
 				    .filter(function() {
@@ -93,7 +93,7 @@
 					updateElementIndex(this, options.prefix, totalForms.val());
 				});
 				// Update number of total forms
-				$(totalForms).val(nextIndex);
+				$(totalForms).val(nextIndex + 1);
 				// Hide add button in case we've hit the max, except we want to add infinitely
 				if ((maxForms.val() != '') && (maxForms.val() <= totalForms.val())) {
 					addButton.parent().hide();
