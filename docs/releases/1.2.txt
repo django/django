@@ -604,7 +604,7 @@ To allow support for multiple databases, the GeoDjango database internals were
 changed substantially.  The largest backwards-incompatible change is that
 the module ``django.contrib.gis.db.backend`` was renamed to
 :mod:`django.contrib.gis.db.backends`, where the full-fledged
-:ref:`spatial databased backends <spatial-backends>` now exist.  The
+:ref:`spatial database backends <spatial-backends>` now exist.  The
 following sections provide information on the most-popular APIs that
 were affected by these changes.
 
@@ -881,9 +881,9 @@ of characters, including ``@``, ``+``, ``.`` and ``-`` characters.
 GeoDjango
 ---------
 
-In 1.2, :ref:`GeoDjango <ref-contrib-gis>` was upgraded to provide
-support for multiple spatial databases.  As a result, the following 
-:ref:`spatial database backends <spatial-backends>`
+The most significant new feature for ref:`GeoDjango <ref-contrib-gis>`
+in 1.2 is support for multiple spatial databases.  As a result,
+the following :ref:`spatial database backends <spatial-backends>`
 are now included:
 
 * :mod:`django.contrib.gis.db.backends.postgis`
@@ -914,9 +914,9 @@ methods are new in 1.2:
 The :ref:`GEOS interface <ref-geos>` was updated to use
 thread-safe C library functions when available on the platform.
 
-The :ref:`GDAL interface <ref-gdal>` now allows the user to place
+The :ref:`GDAL interface <ref-gdal>` now allows the user to
 set a :attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on
-the features returned from a :class:`~django.contrib.gis.gdal.DataSource`
+the features returned when iterating over a
 :class:`~django.contrib.gis.gdal.Layer`.
 
 Finally, :ref:`GeoDjango's documentation <ref-contrib-gis>` is now
