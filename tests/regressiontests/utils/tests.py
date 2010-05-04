@@ -34,6 +34,7 @@ __test__ = {
 
 from dateformat import *
 from feedgenerator import *
+from module_loading import *
 from termcolors import *
 
 class TestUtilsHtml(TestCase):
