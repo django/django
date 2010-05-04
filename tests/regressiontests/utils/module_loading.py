@@ -31,6 +31,15 @@ class EggLoader(TestCase):
 
     def tearDown(self):
         sys.path = self.old_path
+        sys.path_importer_cache.clear()
+
+        sys.modules.pop('egg_module.sub1.sub2.bad_module', None)
+        sys.modules.pop('egg_module.sub1.sub2.good_module', None)
+        sys.modules.pop('egg_module.sub1.sub2', None)
+        sys.modules.pop('egg_module.sub1', None)
+        sys.modules.pop('egg_module.bad_module', None)
+        sys.modules.pop('egg_module.good_module', None)
+        sys.modules.pop('egg_module', None)
 
     def test_shallow_loader(self):
         "Module existence can be tested inside eggs"
@@ -89,51 +98,17 @@ class TestLoader(object):
         mod.__loader__ = self
         return mod
 
-class CustomLoader(TestCase):
+class CustomLoader(EggLoader):
+    """The Custom Loader test is exactly the same as the EggLoader, but
+    it uses a custom defined Loader and Finder that is intentionally
+    split into two classes. Although the EggLoader combines both functions
+    into one class, this isn't required.
+    """
     def setUp(self):
-        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
-        self.old_path = sys.path
+        super(CustomLoader, self).setUp()
         sys.path_hooks.insert(0, TestFinder)
         sys.path_importer_cache.clear()
 
     def tearDown(self):
-        sys.path = self.old_path
+        super(CustomLoader, self).tearDown()
         sys.path_hooks.pop(0)
-
-    def test_shallow_loader(self):
-        "Module existence can be tested with a custom loader"
-        egg_name = '%s/test_egg.egg' % self.egg_dir
-        sys.path.append(egg_name)
-        egg_module = import_module('egg_module')
-
-        # An importable child
-        self.assertTrue(module_has_submodule(egg_module, 'good_module'))
-        mod = import_module('egg_module.good_module')
-        self.assertEqual(mod.content, 'Good Module')
-
-        # A child that exists, but will generate an import error if loaded
-        self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
-        self.assertRaises(ImportError, import_module, 'egg_module.bad_module')
-
-        # A child that doesn't exist
-        self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
-        self.assertRaises(ImportError, import_module, 'egg_module.no_such_module')
-
-    def test_deep_loader(self):
-        "Modules existence can be tested deep inside a custom loader"
-        egg_name = '%s/test_egg.egg' % self.egg_dir
-        sys.path.append(egg_name)
-        egg_module = import_module('egg_module.sub1.sub2')
-
-        # An importable child
-        self.assertTrue(module_has_submodule(egg_module, 'good_module'))
-        mod = import_module('egg_module.sub1.sub2.good_module')
-        self.assertEqual(mod.content, 'Deep Good Module')
-
-        # A child that exists, but will generate an import error if loaded
-        self.assertTrue(module_has_submodule(egg_module, 'bad_module'))
-        self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.bad_module')
-
-        # A child that doesn't exist
-        self.assertFalse(module_has_submodule(egg_module, 'no_such_module'))
-        self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
