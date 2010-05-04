@@ -18,7 +18,6 @@ class GeometryColumns(models.Model):
     srid = models.IntegerField(primary_key=True)
     # TODO: Add support for `diminfo` column (type MDSYS.SDO_DIM_ARRAY).
     class Meta:
-        app_label = 'gis'
         db_table = 'USER_SDO_GEOM_METADATA'
         managed = False
 
@@ -54,7 +53,6 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
     objects = models.GeoManager()
 
     class Meta:
-        app_label = 'gis'
         db_table = 'CS_SRS'
         managed = False
 

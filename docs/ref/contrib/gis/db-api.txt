@@ -23,13 +23,16 @@ its functionality into full-fledged spatial database backends:
 * :mod:`django.contrib.gis.db.backends.oracle`
 * :mod:`django.contrib.gis.db.backends.spatialite`
 
-Backwards-Compatibility
------------------------
+Database Settings Backwards-Compatibility
+-----------------------------------------
 
-For those using the old database settings (e.g., the ``DATABASE_*`` settings)
-Django 1.2 will automatically use the appropriate spatial backend as long
-as :mod:`django.contrib.gis` is in your :setting:`INSTALLED_APPS`.  For
-example, if you have the following in your settings::
+In :ref:`Django 1.2 <releases-1.2>`, the way 
+to :ref:`specify databases <specifying-databases>` in your settings was changed.
+The old database settings format (e.g., the ``DATABASE_*`` settings)
+is backwards compatible with GeoDjango, and  will automatically use the
+appropriate spatial backend as long as :mod:`django.contrib.gis` is in
+your :setting:`INSTALLED_APPS`.  For example, if you have the following in
+your settings::
 
     DATABASE_ENGINE='postgresql_psycopg2'
 
@@ -41,8 +44,36 @@ example, if you have the following in your settings::
       ...
     )
 
-Then, :mod:`django.contrib.gis.db.backends.postgis` will automatically be used as your
+Then, :mod:`django.contrib.gis.db.backends.postgis` is automatically used as your
 spatial backend.
+
+.. _mysql-spatial-limitations:
+
+MySQL Spatial Limitations
+-------------------------
+
+MySQL's spatial extensions only support bounding box operations
+(what MySQL calls minimum bounding rectangles, or MBR).  Specifically,
+`MySQL does not conform to the OGC standard <http://dev.mysql.com/doc/refman/5.1/en/functions-that-test-spatial-relationships-between-geometries.html>`_:
+
+    Currently, MySQL does not implement these functions
+    [``Contains``, ``Crosses``, ``Disjoint``, ``Intersects``, ``Overlaps``,
+    ``Touches``, ``Within``]
+    according to the specification.  Those that are implemented return
+    the same result as the corresponding MBR-based functions. 
+
+In other words, while spatial lookups such as :lookup:`contains <gis-contains>`
+are available in GeoDjango when using MySQL, the results returned are really
+equivalent to what would be returned when using :lookup:`bbcontains`
+on a different spatial backend.
+
+.. warning::
+
+    True spatial indexes (R-trees) are only supported with
+    MyISAM tables on MySQL. [#fnmysqlidx]_ In other words, when using
+    MySQL spatial extensions you have to choose between fast spatial
+    lookups and the integrity of your data -- MyISAM tables do
+    not support transactions or foreign key constraints.
 
 Creating and Saving Geographic Models
 =====================================
@@ -307,4 +338,12 @@ Method                                PostGIS  Oracle  SpatiaLite
 .. [#fngeojson] *See* Howard Butler, Martin Daly, Allan Doyle, Tim Schaub, & Christopher Schmidt, `The GeoJSON Format Specification <http://geojson.org/geojson-spec.html>`_, Revision 1.0 (June 16, 2008).
 .. [#fndistsphere14] *See* `PostGIS 1.4 documentation <http://postgis.refractions.net/documentation/manual-1.4/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
 .. [#fndistsphere15] *See* `PostGIS 1.5 documentation <http://postgis.refractions.net/documentation/manual-1.5/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
-.. [#] MySQL only supports bounding box operations (known as minimum bounding rectangles, or MBR, in MySQL).  Thus, spatial lookups such as :lookup:`contains <gis-contains>` are really equivalent to :lookup:`bbcontains`.
+.. [#fnmysqlidx] *See* `Creating Spatial Indexes <http://dev.mysql.com/doc/refman/5.1/en/creating-spatial-indexes.html>`_
+   in the MySQL 5.1 Reference Manual:
+
+       For MyISAM tables, ``SPATIAL INDEX`` creates an R-tree index. For storage
+       engines that support nonspatial indexing of spatial columns, the engine
+       creates a B-tree index. A B-tree index on spatial values will be useful
+       for exact-value lookups, but not for range scans.
+
+.. [#] Refer :ref:`mysql-spatial-limitations` section for more details.

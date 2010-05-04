@@ -77,6 +77,9 @@ changes:
 
        __members__ = property(lambda self: self.__dir__())
 
+
+.. _specifying-databases:
+
 Specifying databases
 --------------------
 
@@ -338,8 +341,6 @@ you need an unmodified instance of your model, you should pass a copy to the
 ``ModelForm`` constructor.
 
 
-.. _deprecated-features-1.2:
-
 ``BooleanField`` on MySQL
 --------------------------
 
@@ -349,6 +350,8 @@ people this shouldn't have been a problem because ``bool`` is a subclass of
 ``int``, however in Django 1.2 MySQL correctly returns a real ``bool``.  The
 only time this should ever be an issue is if you were expecting printing the
 ``repr`` of a ``BooleanField`` to print ``1`` or ``0``.
+
+.. _deprecated-features-1.2:
 
 Features deprecated in 1.2
 ==========================
@@ -363,7 +366,7 @@ library, has been deprecated.
 If you are currently using the ``postgresql`` backend, you should
 migrate to using the ``postgresql_psycopg2`` backend. To update your
 code, install the ``psycopg2`` library and change the
-``DATABASE_ENGINE`` setting to read ``postgresql_psycopg2``.
+:setting:`DATABASE_ENGINE` setting to read ``postgresql_psycopg2``.
 
 CSRF response-rewriting middleware
 ----------------------------------
@@ -594,6 +597,88 @@ deprecated in favor of the new :ref:`Format localization
 information in a ``formats.py`` file in the corresponding
 ``django/conf/locale/<locale name>/`` directory.
 
+GeoDjango
+---------
+
+To allow support for multiple databases, the GeoDjango database internals were
+changed substantially.  The largest backwards-incompatible change is that
+the module ``django.contrib.gis.db.backend`` was renamed to
+:mod:`django.contrib.gis.db.backends`, where the full-fledged
+:ref:`spatial databased backends <spatial-backends>` now exist.  The
+following sections provide information on the most-popular APIs that
+were affected by these changes.
+
+``SpatialBackend``
+^^^^^^^^^^^^^^^^^^
+
+Prior to the creation of the separate spatial backends, the 
+``django.contrib.gis.db.backend.SpatialBackend`` object was
+provided as an abstraction to introspect on the capabilities of
+the spatial database.  All of the attributes and routines provided by
+``SpatialBackend`` are now a part of the ``ops`` attribute of the
+database backend.
+
+The old module ``django.contrib.gis.db.backend`` is still provided
+for backwards-compatibility access to a ``SpatialBackend`` object,
+which is just an alias to the ``ops`` module of the
+*default* spatial database connection.
+
+Users that were relying on undocumented modules and objects
+within ``django.contrib.gis.db.backend``, rather the abstractions
+provided by ``SpatialBackend``, are required to modify their code.
+For example, the following import which would work in 1.1 and
+below::
+
+    from django.contrib.gis.db.backend.postgis import PostGISAdaptor
+
+Would need to be changed::
+
+    from django.db import connection
+    PostGISAdaptor = connection.ops.Adapter
+
+``SpatialRefSys`` and ``GeometryColumns`` models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In previous versions of GeoDjango, :mod:`django.contrib.gis.db.models`
+had ``SpatialRefSys`` and ``GeometryColumns`` models for querying
+the OGC spatial metadata tables ``spatial_ref_sys`` and ``geometry_columns``,
+respectively.
+
+While these aliases are still provided, they are only for the
+*default* database connection and exist only if the default connection
+is using a supported spatial database backend.
+
+.. note::
+
+    Because the table structure of the OGC spatial metadata tables
+    differs across spatial databases, the ``SpatialRefSys`` and
+    ``GeometryColumns`` models can no longer be associated with
+    the ``gis`` application name.  Thus, no models will be returned
+    when using the ``get_models`` method in the following example::
+
+        >>> from django.db.models import get_app, get_models
+        >>> get_models(get_app('gis'))
+        []
+
+To get the correct ``SpatialRefSys`` and ``GeometryColumns``
+for your spatial database use the methods provided by the spatial backend::
+
+     >>> from django.db import connections
+     >>> SpatialRefSys = connections['my_spatialite'].ops.spatial_ref_sys()
+     >>> GeometryColumns = connections['my_postgis'].ops.geometry_columns()
+
+.. note::
+
+    When using the models returned from the ``spatial_ref_sys()`` and
+    ``geometry_columns()`` method, you'll still need to use the
+    correct database alias when querying on the non-default connection.
+    In other words, to ensure that the models in the example above
+    use the correct database::
+
+        sr_qs = SpatialRefSys.objects.using('my_spatialite').filter(...)
+        gc_qs = GeometryColumns.objects.using('my_postgis').filter(...)
+
+
 What's new in Django 1.2
 ========================
 
@@ -792,6 +877,51 @@ Relaxed requirements for usernames
 The built-in :class:`~django.contrib.auth.models.User` model's
 :attr:`~django.contrib.auth.models.User.username` field now allows a wider range
 of characters, including ``@``, ``+``, ``.`` and ``-`` characters.
+
+GeoDjango
+---------
+
+In 1.2, :ref:`GeoDjango <ref-contrib-gis>` was upgraded to provide
+support for multiple spatial databases.  As a result, the following 
+:ref:`spatial database backends <spatial-backends>`
+are now included:
+
+* :mod:`django.contrib.gis.db.backends.postgis`
+* :mod:`django.contrib.gis.db.backends.mysql`
+* :mod:`django.contrib.gis.db.backends.oracle`
+* :mod:`django.contrib.gis.db.backends.spatialite`
+
+GeoDjango now supports the rich capabilities added
+in the `PostGIS 1.5 release <http://postgis.refractions.net/documentation/manual-1.5/>`_.
+New features include suppport for the the :ref:`geography type <geography-type>`
+and enabling of :ref:`distance queries <distance-queries>`
+with non-point geometries on geographic coordinate systems.
+
+Support for 3D geometry fields was added, and may be enabled
+by setting the :attr:`~django.contrib.gis.db.models.GeometryField.dim`
+keyword to 3 in your :class:`~django.contrib.gis.db.models.GeometryField`.
+The :class:`~django.contrib.gis.db.models.Extent3D` aggregate
+and :meth:`~django.contrib.gis.db.models.GeoQuerySet.extent3d` ``GeoQuerySet``
+method were added as a part of this feature.
+
+The following :class:`~django.contrib.gis.db.models.GeoQeurySet`
+methods are new in 1.2:
+
+* :meth:`~django.contrib.gis.db.models.GeoQuerySet.force_rhr`
+* :meth:`~django.contrib.gis.db.models.GeoQuerySet.reverse_geom`
+* :meth:`~django.contrib.gis.db.models.GeoQuerySet.geohash`
+
+The :ref:`GEOS interface <ref-geos>` was updated to use
+thread-safe C library functions when available on the platform.
+
+The :ref:`GDAL interface <ref-gdal>` now allows the user to place
+set a :attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on
+the features returned from a :class:`~django.contrib.gis.gdal.DataSource`
+:class:`~django.contrib.gis.gdal.Layer`.
+
+Finally, :ref:`GeoDjango's documentation <ref-contrib-gis>` is now
+included with Django's and is no longer
+hosted separately at `geodjango.org <http://geodjango.org/>`_.
 
 Deprecation of old language code ``no``
 ---------------------------------------

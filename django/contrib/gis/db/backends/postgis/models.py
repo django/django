@@ -18,7 +18,6 @@ class GeometryColumns(models.Model):
     type = models.CharField(max_length=30)
 
     class Meta:
-        app_label = 'gis'
         db_table = 'geometry_columns'
         managed = False
 
@@ -55,7 +54,6 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
     proj4text = models.CharField(max_length=2048)
 
     class Meta:
-        app_label = 'gis'
         db_table = 'spatial_ref_sys'
         managed = False
 

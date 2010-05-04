@@ -55,6 +55,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     valid_aggregates = dict([(k, None) for k in ('Extent', 'Union')])
 
     Adapter = SpatiaLiteAdapter
+    Adaptor = Adapter # Backwards-compatibility alias.
 
     area = 'Area'
     centroid = 'Centroid'

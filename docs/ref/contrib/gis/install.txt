@@ -150,13 +150,13 @@ directly from Python using ctypes.
 First, download GEOS 3.2 from the refractions website and untar the source 
 archive::
 
-    $ wget http://download.osgeo.org/geos/geos-3.2.1.tar.bz2
-    $ tar xjf geos-3.2.1.tar.bz2
+    $ wget http://download.osgeo.org/geos/geos-3.2.2.tar.bz2
+    $ tar xjf geos-3.2.2.tar.bz2
 
 Next, change into the directory where GEOS was unpacked, run the configure 
 script, compile, and install::
 
-    $ cd geos-3.2.1
+    $ cd geos-3.2.2
     $ ./configure
     $ make
     $ sudo make install
@@ -273,9 +273,9 @@ supports :ref:`GDAL's vector data <ref-gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/gdal-1.7.1.tar.gz
-    $ tar xzf gdal-1.7.1.tar.gz
-    $ cd gdal-1.7.1
+    $ wget http://download.osgeo.org/gdal/gdal-1.7.2.tar.gz
+    $ tar xzf gdal-1.7.2.tar.gz
+    $ cd gdal-1.7.2
 
 Configure, make and install::
 
@@ -516,9 +516,9 @@ user.  For example, you can use the following to become the ``postgres`` user::
 
    The location *and* name of the PostGIS SQL files (e.g., from
    ``POSTGIS_SQL_PATH`` below) depends on the version of PostGIS.
-   PostGIS versions 1.3 and below use ``<sharedir>/contrib/lwpostgis.sql``, whereas
-   versions 1.4 and 1.5 use ``<sharedir>/contrib/postgis-1.4/postgis.sql`` and
-   ``<sharedir>/contrib/postgis-1.5/postgis.sql``, respectively.
+   PostGIS versions 1.3 and below use ``<pg_sharedir>/contrib/lwpostgis.sql``;
+   whereas version 1.4 uses ``<sharedir>/contrib/postgis.sql`` and
+   version 1.5 uses ``<sharedir>/contrib/postgis-1.5/postgis.sql``.
 
    The example below assumes PostGIS 1.5, thus you may need to modify
    ``POSTGIS_SQL_PATH`` and the name of the SQL file for the specific 

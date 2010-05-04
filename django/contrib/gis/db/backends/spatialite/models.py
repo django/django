@@ -16,7 +16,6 @@ class GeometryColumns(models.Model):
     spatial_index_enabled = models.IntegerField()
 
     class Meta:
-        app_label = 'gis'
         db_table = 'geometry_columns'
         managed = False
 
@@ -57,6 +56,5 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
         return SpatialReference(self.proj4text).wkt
 
     class Meta:
-        app_label = 'gis'
         db_table = 'spatial_ref_sys'
         managed = False

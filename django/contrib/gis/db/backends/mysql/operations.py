@@ -13,6 +13,7 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
     from_text = 'GeomFromText'
 
     Adapter = WKTAdapter
+    Adaptor = Adapter # Backwards-compatibility alias.
 
     geometry_functions = {
         'bbcontains' : 'MBRContains', # For consistency w/PostGIS API

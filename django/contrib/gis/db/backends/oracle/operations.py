@@ -75,6 +75,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     valid_aggregates = dict([(a, None) for a in ('Union', 'Extent')])
 
     Adapter = OracleSpatialAdapter
+    Adaptor = Adapter # Backwards-compatibility alias.
 
     area = 'SDO_GEOM.SDO_AREA'
     gml= 'SDO_UTIL.TO_GMLGEOMETRY'

@@ -66,6 +66,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                              ('Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union')])
 
     Adapter = PostGISAdapter
+    Adaptor = Adapter # Backwards-compatibility alias.
 
     def __init__(self, connection):
         super(PostGISOperations, self).__init__(connection)
