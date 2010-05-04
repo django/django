@@ -1282,7 +1282,7 @@ msgstr "メールアドレスの一致するユーザはいません。本当に
 #: contrib/auth/forms.py:135
 #, python-format
 msgid "Password reset on %s"
-msgstr "%s にパスワードをリセット"
+msgstr "%s のパスワードのリセット"
 
 #: contrib/auth/forms.py:143
 msgid "New password"
