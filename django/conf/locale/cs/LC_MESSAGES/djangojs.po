@@ -2,119 +2,119 @@
 # Copyright (C) 2005 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the DJANGO package.
 # Radek Svarz <translate@svarz.cz>, 2005,
-# Vláďa Macek <macek@sandbox.cz>, 2009.
+# Vlada Macek <macek@sandbox.cz>, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-20 12:52+0200\n"
-"PO-Revision-Date: 2009-10-12 11:25+0200\n"
+"POT-Creation-Date: 2010-04-07 13:17+0200\n"
+"PO-Revision-Date: 2010-04-07 13:33+0100\n"
+"Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>1 && n<5 ? 1 : 2;\n"
 
-#: contrib/admin/media/js/SelectFilter2.js:33
+#: contrib/admin/media/js/SelectFilter2.js:37
 #, perl-format
 msgid "Available %s"
 msgstr "Dostupné položky: %s"
 
-#: contrib/admin/media/js/SelectFilter2.js:41
+#: contrib/admin/media/js/SelectFilter2.js:45
 msgid "Choose all"
 msgstr "Vybrat vše"
 
-#: contrib/admin/media/js/SelectFilter2.js:46
+#: contrib/admin/media/js/SelectFilter2.js:50
 msgid "Add"
 msgstr "Přidat"
 
-#: contrib/admin/media/js/SelectFilter2.js:48
+#: contrib/admin/media/js/SelectFilter2.js:52
 msgid "Remove"
 msgstr "Odebrat"
 
-#: contrib/admin/media/js/SelectFilter2.js:53
+#: contrib/admin/media/js/SelectFilter2.js:57
 #, perl-format
 msgid "Chosen %s"
 msgstr "Vybrané položky: %s"
 
-#: contrib/admin/media/js/SelectFilter2.js:54
+#: contrib/admin/media/js/SelectFilter2.js:58
 msgid "Select your choice(s) and click "
 msgstr "Vyberte si a klikněte "
 
-#: contrib/admin/media/js/SelectFilter2.js:59
+#: contrib/admin/media/js/SelectFilter2.js:63
 msgid "Clear all"
-msgstr "Vymazat vše"
+msgstr "Odebrat vše"
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"leden únor březen duben květen červen červenec srpen září říjen listopad "
-"prosinec"
+msgid "January February March April May June July August September October November December"
+msgstr "leden únor březen duben květen červen červenec srpen září říjen listopad prosinec"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
 msgstr "n p ú s č p s"
 
+#: contrib/admin/media/js/collapse.js:9
+#: contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr "Zobrazit"
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Skrýt"
+
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "Neděle Pondělí Úterý Středa Čtvrtek Pátek Sobota"
 
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "Zobrazit"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "Skrýt"
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:50
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
 msgid "Now"
 msgstr "Nyní"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:54
 msgid "Clock"
 msgstr "Hodiny"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Choose a time"
 msgstr "Vyberte čas"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
 msgid "Midnight"
 msgstr "Půlnoc"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 msgid "6 a.m."
 msgstr "6h ráno"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 msgid "Noon"
 msgstr "Poledne"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:92
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
 msgstr "Storno"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:182
 msgid "Today"
 msgstr "Dnes"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:137
 msgid "Calendar"
 msgstr "Kalendář"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
 msgid "Yesterday"
 msgstr "Včera"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
 msgstr "Zítra"
+
