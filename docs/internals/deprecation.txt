@@ -17,6 +17,9 @@ their deprecation, as per the :ref:`Django deprecation policy
           ``supports_object_permissions`` and ``supports_anonymous_user``.
           The old backend style is deprecated since the 1.2 release.
 
+        * The :mod:`django.contrib.gis.db.backend` module, including the
+          ``SpatialBackend`` interface, is deprecated since the 1.2 release.
+
     * 1.4
         * ``CsrfResponseMiddleware``.  This has been deprecated since the 1.2
           release, in favour of the template tag method for inserting the CSRF
