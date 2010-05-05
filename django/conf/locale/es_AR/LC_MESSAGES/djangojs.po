@@ -6,43 +6,84 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-10-06 14:18-0300\n"
-"PO-Revision-Date: 2007-07-14 14:36-0300\n"
+"POT-Creation-Date: 2010-05-04 22:01-0300\n"
+"PO-Revision-Date: 2010-05-04 22:10-0300\n"
 "Last-Translator: Ramiro Morales <rm0@gmx.net>\n"
 "Language-Team: Django-I18N <django-i18n@googlegroups.com>\n"
+"Language: es_AR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Pootle 2.0.1\n"
 
-#: contrib/admin/media/js/SelectFilter2.js:33
+#: contrib/admin/media/js/SelectFilter2.js:37
 #, perl-format
 msgid "Available %s"
 msgstr "%s disponibles"
 
-#: contrib/admin/media/js/SelectFilter2.js:41
+#: contrib/admin/media/js/SelectFilter2.js:45
 msgid "Choose all"
 msgstr "Seleccionar todos"
 
-#: contrib/admin/media/js/SelectFilter2.js:46
+#: contrib/admin/media/js/SelectFilter2.js:50
 msgid "Add"
 msgstr "Agregar"
 
-#: contrib/admin/media/js/SelectFilter2.js:48
+#: contrib/admin/media/js/SelectFilter2.js:52
 msgid "Remove"
 msgstr "Eliminar"
 
-#: contrib/admin/media/js/SelectFilter2.js:53
+#: contrib/admin/media/js/SelectFilter2.js:57
 #, perl-format
 msgid "Chosen %s"
 msgstr "%s elegidos"
 
-#: contrib/admin/media/js/SelectFilter2.js:54
+#: contrib/admin/media/js/SelectFilter2.js:58
 msgid "Select your choice(s) and click "
 msgstr "Seleccione los items a agregar y haga click en "
 
-#: contrib/admin/media/js/SelectFilter2.js:59
+#: contrib/admin/media/js/SelectFilter2.js:63
 msgid "Clear all"
 msgstr "Eliminar todos"
+
+#: contrib/admin/media/js/actions.js:18
+#: contrib/admin/media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s de %(cnt)s seleccionado/a"
+msgstr[1] "%(sel)s de %(cnt)s seleccionados/as"
+
+#: contrib/admin/media/js/actions.js:109
+#: contrib/admin/media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Tiene modificaciones sin guardar en campos modificables individuales. Si "
+"ejecuta una acción las mismas se perderán."
+
+#: contrib/admin/media/js/actions.js:121
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Ha seleccionado una acción, pero todavía no ha grabado las modificaciones "
+"que ha realizado en campos individuales. Por favor haga click en Aceptar "
+"para grabarlas. Necesitará ejecutar la acción nuevamente."
+
+#: contrib/admin/media/js/actions.js:123
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Ha seleccionado una acción pero no ha realizado ninguna modificación en "
+"campos individuales. Es probable que lo que necesite usar en realidad sea el "
+"botón Ejecutar y no el botón Guardar."
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
@@ -57,62 +98,63 @@ msgstr ""
 msgid "S M T W T F S"
 msgstr "D L M M J V S"
 
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr "Mostrar"
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Ocultar"
+
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "Domingo Lunes Martes Miércoles Jueves Viernes Sábado"
 
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "Mostrar"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "Ocultar"
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:49
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Now"
 msgstr "Ahora"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "Reloj"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
 msgid "Choose a time"
 msgstr "Elija una hora"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
 msgid "Midnight"
 msgstr "Medianoche"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
 msgid "6 a.m."
 msgstr "6 a.m."
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 msgid "Noon"
 msgstr "Mediodía"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:91
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:182
 msgid "Today"
 msgstr "Hoy"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:137
 msgid "Calendar"
 msgstr "Calendario"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
 msgid "Yesterday"
 msgstr "Ayer"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
 msgstr "Mañana"
