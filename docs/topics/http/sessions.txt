@@ -194,6 +194,10 @@ It also has these methods:
             * If ``value`` is ``None``, the session reverts to using the global
               session expiry policy.
 
+      Reading a session is not considered activity for expiration
+      purposes. Session expiration is computed from the last time the
+      session was *modified*.
+
     * ``get_expiry_age()``
 
       .. versionadded:: 1.0
