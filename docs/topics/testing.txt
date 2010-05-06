@@ -1136,7 +1136,7 @@ Multi-database support
 .. versionadded:: 1.2
 
 Django sets up a test database corresponding to every database that is
-defined in the :setting:``DATABASES`` definition in your settings
+defined in the :setting:`DATABASES` definition in your settings
 file. However, a big part of the time taken to run a Django TestCase
 is consumed by the call to ``flush`` that ensures that you have a
 clean database at the start of each test run. If you have multiple
