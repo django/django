@@ -1,0 +1,103 @@
+.. _releases-1.2-rc-1:
+
+=============================
+Django 1.2 RC 1 release notes
+=============================
+
+
+May 5, 2010
+
+Welcome to the first Django 1.2 release candidate!
+
+This is the third -- and likely last -- in a series of
+preview/development releases leading up to the eventual release of
+Django 1.2. This release is targeted primarily at developers who are
+interested in trying out new features and testing the Django codebase
+to help identify and resolve any critical bugs prior to the final 1.2
+release.
+
+As such, this release is not yet intended for production use, and any
+such use is discouraged.
+
+Django has been feature frozen since the 1.2 beta release, so this
+release candidate contains no new features, only bugfixes; for a
+summary of features new to Django 1.2, consult the :ref:`1.2 alpha
+<releases-1.2-alpha-1>` and :ref:`1.2 beta <releases-1.2-beta-1>`
+release notes.
+
+
+Python compatibility
+====================
+
+While not a new feature, it's important to note that Django 1.2
+introduces the first shift in our Python compatibility policy since
+Django's initial public debut. Previous Django releases were tested
+and supported on 2.x Python versions from 2.3 up; Django 1.2, however,
+drops official support for Python 2.3. As such, the minimum Python
+version required for Django is now 2.4, and Django is tested and
+supported on Python 2.4, 2.5 and 2.6, and will be supported on the
+as-yet-unreleased Python 2.7.
+
+This change should affect only a small number of Django users, as most
+operating-system vendors today are shipping Python 2.4 or newer as
+their default version. If you're still using Python 2.3, however,
+you'll need to stick to Django 1.1 until you can upgrade; per
+:ref:`our support policy <internals-release-process>`, Django 1.1 will
+continue to receive security support until the release of Django 1.3.
+
+A roadmap for Django's overall 2.x Python support, and eventual
+transition to Python 3.x, is currently being developed, and will be
+announced prior to the release of Django 1.3.
+
+
+The Django 1.2 roadmap
+======================
+
+As of this release candidate, Django 1.2 is in both feature freeze and
+"string freeze" -- all strings marked for translation in the Django
+codebase will retain their current form in the final Django 1.2
+release. Only critical release-blocking bugs and updated translation
+files will receive attention between now and the final 1.2
+release. Note that Django's localization infrastructure has been
+expanded for 1.2, and translation packages should now include a
+``formats.py`` file containing data for localized formatting of
+numbers and dates.
+
+If no critical bugs are discovered, Django 1.2 will be released
+approximately one week after this release candidate, on or about May
+12, 2010.
+
+
+What you can do to help
+=======================
+
+In order to provide a high-quality 1.2 release, we need your
+help. Although this release candidate is, again, *not* intended for
+production use, you can help the Django team by trying out this
+release candidate in a safe testing environment and reporting any bugs
+or issues you encounter. The Django ticket tracker is the central
+place to search for open issues:
+
+    * http://code.djangoproject.com/timeline
+
+Please open a new ticket only if no existing ticket corresponds to a
+problem you're running into.
+
+Additionally, discussion of Django development, including progress
+toward the 1.2 release, takes place daily on the django-developers
+mailing list:
+
+    * http://groups.google.com/group/django-developers
+
+... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Django's development, feel free to join the
+discussions there.
+
+Django's online documentation also includes pointers on how to contribute to
+Django: 
+
+    * :ref:`How to contribute to Django <internals-contributing>`
+
+Contributions on any level -- developing code, writing documentation or simply
+triaging tickets and helping to test proposed bugfixes -- are always welcome and
+appreciated.
