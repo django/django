@@ -56,10 +56,10 @@ The Django 1.2 roadmap
 As of this release candidate, Django 1.2 is in both feature freeze and
 "string freeze" -- all strings marked for translation in the Django
 codebase will retain their current form in the final Django 1.2
-release. Only critical release-blocking bugs and updated translation
-files will receive attention between now and the final 1.2
-release. Note that Django's localization infrastructure has been
-expanded for 1.2, and translation packages should now include a
+release. Only critical release-blocking bugs, documentation and
+updated translation files will receive attention between now and the
+final 1.2 release. Note that Django's localization infrastructure has
+been expanded for 1.2, and translation packages should now include a
 ``formats.py`` file containing data for localized formatting of
 numbers and dates.
 
