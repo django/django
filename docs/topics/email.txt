@@ -340,7 +340,7 @@ able to read the e-mail, regardless of their mail client. However, if you are
 confident that your recipients can handle an alternative content type, you can
 use the ``content_subtype`` attribute on the
 :class:`~django.core.mail.EmailMessage` class to change the main content type.
-The major type will always be ``"text"``, but you can change it to the
+The major type will always be ``"text"``, but you can change the
 subtype. For example::
 
     msg = EmailMessage(subject, html_content, from_email, [to])
