@@ -47,7 +47,7 @@ not "months"), and will probably represent major, sweeping changes to Django.
 Minor releases
 --------------
 
-Minor release (1.1, 1.2, etc.) will happen roughly every six months -- see
+Minor release (1.1, 1.2, etc.) will happen roughly every nine months -- see
 `release process`_, below for details.
 
 .. _internal-release-deprecation-policy:
@@ -119,7 +119,7 @@ Release process
 ===============
 
 Django uses a time-based release schedule, with minor (i.e. 1.1, 1.2, etc.)
-releases every six months, or more, depending on features.
+releases every nine months, or more, depending on features.
 
 After each previous release (and after a suitable cooling-off period of a week
 or two), the core development team will examine the landscape and announce a
