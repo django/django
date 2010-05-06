@@ -67,22 +67,15 @@ fast interface for adding, retrieving and deleting arbitrary data in the cache.
 All data is stored directly in memory, so there's no overhead of database or
 filesystem usage.
 
-After installing Memcached itself, you'll need to install the Memcached Python
-bindings, which are not bundled with Django directly. Two versions of this are
-available. Choose and install *one* of the following modules:
+After installing Memcached itself, you'll need to install
+``python-memcached``, which provides Python bindings to Memcached.
+This is available at ftp://ftp.tummy.com/pub/python-memcached/
 
-    * The fastest available option is a module called ``cmemcache``, available
-      at http://gijsbert.org/cmemcache/ .
-
-    * If you can't install ``cmemcache``, you can install ``python-memcached``,
-      available at ftp://ftp.tummy.com/pub/python-memcached/ . If that URL is
-      no longer valid, just go to the Memcached Web site
-      (http://www.danga.com/memcached/) and get the Python bindings from the
-      "Client APIs" section.
-
-.. versionadded:: 1.0
-    The ``cmemcache`` option is new in 1.0. Previously, only
-    ``python-memcached`` was supported.
+.. versionchanged:: 1.2
+    In Django 1.0 and 1.1, you could also use ``cmemcache`` as a binding.
+    However, support for this library was deprecated in 1.2 due to
+    a lack of maintenence on the ``cmemcache`` library itself. Support for
+    ``cmemcache`` will be removed completely in Django 1.4.
 
 To use Memcached with Django, set ``CACHE_BACKEND`` to
 ``memcached://ip:port/``, where ``ip`` is the IP address of the Memcached
