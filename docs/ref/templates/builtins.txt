@@ -915,7 +915,7 @@ violating the DRY principle by having to hard-code URLs in your templates::
 
 The first argument is a path to a view function in the format
 ``package.package.module.function``. Additional arguments are optional and
-should be comma-separated values that will be used as arguments in the URL.
+should be space-separated values that will be used as arguments in the URL.
 The example above shows passing positional arguments. Alternatively you may
 use keyword syntax::
 
