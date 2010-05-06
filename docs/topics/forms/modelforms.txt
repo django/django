@@ -366,6 +366,9 @@ Since the Author model has only 3 fields, 'name', 'title', and
 Overriding the default field types or widgets
 ---------------------------------------------
 
+.. versionadded:: 1.2
+ 	The ``widgets`` attribute is new in Django 1.2.
+
 The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
 want that to be represented as a ``DateField`` in your form. But
