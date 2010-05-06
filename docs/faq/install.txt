@@ -53,7 +53,7 @@ own version requirements.
 
 Over the next year or two Django will begin dropping support for older Python
 versions as part of a migration which will end with Django running on Python 3
-(see below for details). 
+(see below for details).
 
 All else being equal, we recommend that you use the latest 2.x release
 (currently Python 2.6). This will let you take advantage of the numerous
@@ -92,11 +92,13 @@ See our `Django-friendly Web hosts`_ page.
 
 .. _`Django-friendly Web hosts`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
 
-Should I use the official version or development version?
+Should I use the stable version or development version?
 ---------------------------------------------------------
 
-The Django developers improve Django every day and are pretty good about not
-checking in broken code. We use the development code (from the Subversion
-repository) directly on our servers, so we consider it stable. With that in
-mind, we recommend that you use the latest development code, because it
-generally contains more features and fewer bugs than the "official" releases.
+Generally, if you're using code in production, you should be using a
+stable release. The Django project publishes a full stable release
+every nine months or so, with bugfix updates in between. These stable
+releases contain the API that is covered by our backwards
+compatibility guarantees; if you write code against stable releases,
+you shouldn't have any problems upgrading when the next official
+version is released.
