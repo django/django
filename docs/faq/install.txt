@@ -93,7 +93,7 @@ See our `Django-friendly Web hosts`_ page.
 .. _`Django-friendly Web hosts`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
 
 Should I use the stable version or development version?
----------------------------------------------------------
+-------------------------------------------------------
 
 Generally, if you're using code in production, you should be using a
 stable release. The Django project publishes a full stable release
