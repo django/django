@@ -1407,7 +1407,7 @@ For example::
 
 If ``value`` is ``123456789``, the output will be ``8``.
 
-.. templatefilter:: iriendcode
+.. templatefilter:: iriencode
 
 iriencode
 ~~~~~~~~~

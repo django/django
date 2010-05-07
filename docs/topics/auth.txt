@@ -787,7 +787,7 @@ the following line to your URLconf::
     starting point. It assumes you have a :file:`base.html` template that
     defines a ``content`` block:
 
-    .. code-block:: html
+    .. code-block:: html+django
 
         {% extends "base.html" %}
 
