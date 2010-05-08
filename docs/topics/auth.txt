@@ -1253,7 +1253,7 @@ currently logged-in user, either a  :class:`~django.contrib.auth.models.User`
 instance or an :class:`~django.contrib.auth.models.AnonymousUser` instance, is
 stored in the template variable ``{{ user }}``:
 
-.. code-block:: html
+.. code-block:: html+django
 
     {% if user.is_authenticated %}
         <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
@@ -1288,7 +1288,7 @@ would display ``True`` if the logged-in user had the permission
 
 Thus, you can check permissions in template ``{% if %}`` statements:
 
-.. code-block:: html
+.. code-block:: html+django
 
     {% if perms.foo %}
         <p>You have permission to do something in the foo app.</p>
@@ -1361,7 +1361,7 @@ logged-in user and his/her messages are made available in the
 :ref:`template context <ref-templates-api>` as the template variable
 ``{{ messages }}``. Here's an example of template code that displays messages:
 
-.. code-block:: html
+.. code-block:: html+django
 
     {% if messages %}
     <ul>
