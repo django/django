@@ -4,12 +4,28 @@ Sphinx plugins for Django documentation.
 
 import docutils.nodes
 import docutils.transforms
+try:
+    import json
+except ImportError:
+    try:
+        import simplejson as json
+    except ImportError:
+        try:
+            from django.utils import simplejson as json
+        except ImportError:
+            json = None
+import os
 import sphinx
 import sphinx.addnodes
 try:
     from sphinx import builders
 except ImportError:
     import sphinx.builder as builders
+try:
+    import sphinx.builders.html as builders_html
+except ImportError:
+    builders_html = builders
+from sphinx.util.console import bold
 import sphinx.directives
 import sphinx.environment
 try:
@@ -56,7 +72,8 @@ def setup(app):
     app.add_directive('versionadded', parse_version_directive, 1, (1, 1, 1))
     app.add_directive('versionchanged', parse_version_directive, 1, (1, 1, 1))
     app.add_transform(SuppressBlockquotes)
-    
+    app.add_builder(DjangoStandaloneHTMLBuilder)
+
     # Monkeypatch PickleHTMLBuilder so that it doesn't die in Sphinx 0.4.2
     if sphinx.__version__ == '0.4.2':
         monkeypatch_pickle_builder()
@@ -218,7 +235,6 @@ def monkeypatch_pickle_builder():
         import cPickle as pickle
     except ImportError:
         import pickle
-    from sphinx.util.console import bold
     
     def handle_finish(self):
         # dump the global context
@@ -248,3 +264,26 @@ def monkeypatch_pickle_builder():
 
     builders.PickleHTMLBuilder.handle_finish = handle_finish
 
+
+class DjangoStandaloneHTMLBuilder(builders_html.StandaloneHTMLBuilder):
+    """
+    Subclass to add some extra things we need.
+    """
+
+    name = 'djangohtml'
+
+    def finish(self):
+        super(DjangoStandaloneHTMLBuilder, self).finish()
+        if json is None:
+            self.warn("cannot create templatebuiltins.js due to missing simplejson dependency")
+            return
+        self.info(bold("writing templatebuiltins.js..."))
+        xrefs = self.env.reftargets.keys()
+        templatebuiltins = dict([('ttags', [n for (t,n) in xrefs if t == 'ttag']),
+                                 ('tfilters', [n for (t,n) in xrefs if t == 'tfilter'])])
+        outfilename = os.path.join(self.outdir, "templatebuiltins.js")
+        f = open(outfilename, 'wb')
+        f.write('var django_template_builtins = ')
+        json.dump(templatebuiltins, f)
+        f.write(';\n')
+        f.close();
