@@ -224,8 +224,9 @@ def get_language():
 def get_language_bidi():
     """
     Returns selected language's BiDi layout.
-    False = left-to-right layout
-    True = right-to-left layout
+    
+    * False = left-to-right layout
+    * True = right-to-left layout
     """
     from django.conf import settings
     

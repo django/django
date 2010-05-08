@@ -96,7 +96,8 @@ of 1.0. This includes these APIs:
 ``django.utils``
 ----------------
 
-Most of the modules in ``django.utils`` are designed for internal use. Only the following parts of ``django.utils`` can be considered stable:
+Most of the modules in ``django.utils`` are designed for internal use. Only
+the following parts of :ref:`django.utils <ref-utils>` can be considered stable:
 
     - ``django.utils.cache``
     - ``django.utils.datastructures.SortedDict`` -- only this single class; the

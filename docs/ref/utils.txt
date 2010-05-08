@@ -1,0 +1,506 @@
+.. _ref-utils:
+
+============
+Django Utils
+============
+
+.. module:: django.utils
+   :synopsis: Django's built-in utilities.
+
+This document covers all stable modules in ``django.utils``. Most of the
+modules in ``django.utils`` are designed for internal use and only the
+following parts can be considered stable and thus backwards compatible as per
+the :ref:`internal release deprecation policy <internal-release-deprecation-policy>`.
+
+``django.utils.cache``
+======================
+
+.. module:: django.utils.cache
+   :synopsis: Helper functions for controlling caching.
+
+This module contains helper functions for controlling caching. It does so by
+managing the ``Vary`` header of responses. It includes functions to patch the
+header of response objects directly and decorators that change functions to do
+that header-patching themselves.
+
+For information on the ``Vary`` header, see `RFC 2616 section 14.44`_.
+
+.. _RFC 2616 section 14.44: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+
+Essentially, the ``Vary`` HTTP header defines which headers a cache should take
+into account when building its cache key. Requests with the same path but
+different header content for headers named in ``Vary`` need to get different
+cache keys to prevent delivery of wrong content.
+
+For example, :ref:`internationalization <topics-i18n>` middleware would need
+to distinguish caches by the ``Accept-language`` header.
+
+.. function:: patch_cache_control(response, **kwargs)
+
+This function patches the ``Cache-Control`` header by adding all keyword
+arguments to it. The transformation is as follows:
+
+ * All keyword parameter names are turned to lowercase, and underscores
+   are converted to hyphens.
+ * If the value of a parameter is ``True`` (exactly ``True``, not just a
+   true value), only the parameter name is added to the header.
+ * All other parameters are added with their value, after applying
+   ``str()`` to it.
+
+.. function:: get_max_age(response)
+
+Returns the max-age from the response Cache-Control header as an integer (or
+``None`` if it wasn't found or wasn't an integer).
+
+.. function:: patch_response_headers(response, cache_timeout=None)
+
+Adds some useful headers to the given ``HttpResponse`` object:
+
+ * ``ETag``
+ * ``Last-Modified``
+ * ``Expires``
+ * ``Cache-Control``
+
+Each header is only added if it isn't already set.
+
+``cache_timeout`` is in seconds. The ``CACHE_MIDDLEWARE_SECONDS`` setting is
+used by default.
+
+.. function:: add_never_cache_headers(response)
+
+Adds headers to a response to indicate that a page should never be cached.
+
+.. function:: patch_vary_headers(response, newheaders)
+
+Adds (or updates) the ``Vary`` header in the given ``HttpResponse`` object.
+``newheaders`` is a list of header names that should be in ``Vary``. Existing
+headers in ``Vary`` aren't removed.
+
+.. function:: get_cache_key(request, key_prefix=None)
+
+Returns a cache key based on the request path. It can be used in the request
+phase because it pulls the list of headers to take into account from the
+global path registry and uses those to build a cache key to check against.
+
+If there is no headerlist stored, the page needs to be rebuilt, so this
+function returns ``None``.
+
+.. function:: learn_cache_key(request, response, cache_timeout=None, key_prefix=None)
+
+Learns what headers to take into account for some request path from the
+response object. It stores those headers in a global path registry so that
+later access to that path will know what headers to take into account without
+building the response object itself. The headers are named in the ``Vary``
+header of the response, but we want to prevent response generation.
+
+The list of headers to use for cache key generation is stored in the same cache
+as the pages themselves. If the cache ages some data out of the cache, this
+just means that we have to build the response once to get at the Vary header
+and so at the list of headers to use for the cache key.
+
+SortedDict
+==========
+
+.. module:: django.utils.datastructures
+   :synopsis: A dictionary that keeps its keys in the order in which they're inserted.
+
+.. class:: django.utils.datastructures.SortedDict
+
+Methods
+-------
+
+Extra methods that ``SortedDict`` adds to the standard Python ``dict`` class.
+
+.. method:: insert(index, key, value)
+
+Inserts the key, value pair before the item with the given index.
+
+.. method:: value_for_index(index)
+
+Returns the value of the item at the given zero-based index.
+
+Creating new SortedDict
+-----------------------
+
+Creating a new ``SortedDict`` must be done in a way where ordering is
+guaranteed. For example::
+
+    SortedDict({'b': 1, 'a': 2, 'c': 3})
+
+will not work. Passing in a basic Python ``dict`` could produce unreliable
+results. Instead do::
+
+    SortedDict([('b', 1), ('a', 2), ('c', 3)])
+
+``django.utils.encoding``
+=========================
+
+.. module:: django.utils.encoding
+   :synopsis: A series of helper classes and function to manage character encoding.
+
+.. class:: StrAndUnicode
+
+A class whose ``__str__`` returns its ``__unicode__`` as a UTF-8 bytestring.
+Useful as a mix-in.
+
+.. function:: smart_unicode(s, encoding='utf-8', strings_only=False, errors='strict')
+
+Returns a ``unicode`` object representing ``s``. Treats bytestrings using the
+'encoding' codec.
+
+If ``strings_only`` is ``True``, don't convert (some) non-string-like objects.
+
+.. function:: is_protected_type(obj)
+
+Determine if the object instance is of a protected type.
+
+Objects of protected types are preserved as-is when passed to
+``force_unicode(strings_only=True)``.
+
+.. function:: force_unicode(s, encoding='utf-8', strings_only=False, errors='strict')
+
+Similar to ``smart_unicode``, except that lazy instances are resolved to strings,
+rather than kept as lazy objects.
+
+If ``strings_only`` is ``True``, don't convert (some) non-string-like objects.
+
+.. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
+
+Returns a bytestring version of ``s``, encoded as specified in ``encoding``.
+
+If ``strings_only`` is ``True``, don't convert (some) non-string-like objects.
+
+.. function:: iri_to_uri(iri)
+
+Convert an Internationalized Resource Identifier (IRI) portion to a URI portion
+that is suitable for inclusion in a URL.
+
+This is the algorithm from section 3.1 of `RFC 3987`_.  However, since we are
+assuming input is either UTF-8 or unicode already, we can simplify things a
+little from the full method.
+
+.. _RFC 3987: http://www.ietf.org/rfc/rfc3987.txt
+
+Returns an ASCII string containing the encoded result.
+
+``django.utils.feedgenerator``
+==============================
+
+.. module:: django.utils.feedgenerator
+   :synopsis: Syndication feed generation library -- used for generating RSS, etc.
+
+Sample usage::
+
+    >>> from django.utils import feedgenerator
+    >>> feed = feedgenerator.Rss201rev2Feed(
+    ...     title=u"Poynter E-Media Tidbits",
+    ...     link=u"http://www.poynter.org/column.asp?id=31",
+    ...     description=u"A group weblog by the sharpest minds in online media/journalism/publishing.",
+    ...     language=u"en",
+    ... )
+    >>> feed.add_item(
+    ...     title="Hello",
+    ...     link=u"http://www.holovaty.com/test/",
+    ...     description="Testing."
+    ... )
+    >>> fp = open('test.rss', 'w')
+    >>> feed.write(fp, 'utf-8')
+    >>> fp.close()
+
+For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
+which is currently ``Rss201rev2Feed``
+
+For definitions of the different versions of RSS, see:
+http://diveintomark.org/archives/2004/02/04/incompatible-rss
+
+.. function:: get_tag_uri(url, date)
+
+Creates a TagURI.
+
+See http://diveintomark.org/archives/2004/05/28/howto-atom-id
+
+SyndicationFeed
+---------------
+
+.. class:: SyndicationFeed
+
+Base class for all syndication feeds. Subclasses should provide write().
+
+Methods
+~~~~~~~
+
+.. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, **kwargs])
+
+Adds an item to the feed. All args are expected to be Python ``unicode``
+objects except ``pubdate``, which is a ``datetime.datetime`` object, and
+``enclosure``, which is an instance of the ``Enclosure`` class.
+
+.. method:: num_items()
+
+.. method:: root_attributes()
+
+Return extra attributes to place on the root (i.e. feed/channel) element.
+Called from write().
+
+.. method:: add_root_elements(handler)
+
+Add elements in the root (i.e. feed/channel) element. Called from write().
+
+.. method:: item_attributes(item)
+
+Return extra attributes to place on each item (i.e. item/entry) element.
+
+.. method:: add_item_elements(handler, item)
+
+Add elements on each item (i.e. item/entry) element.
+
+.. method:: write(outfile, encoding)
+
+Outputs the feed in the given encoding to ``outfile``, which is a file-like
+object. Subclasses should override this.
+
+.. method:: writeString(encoding)
+
+Returns the feed in the given encoding as a string.
+
+.. method:: latest_post_date()
+
+Returns the latest item's ``pubdate``. If none of them have a ``pubdate``,
+this returns the current date/time.
+
+Enclosure
+---------
+
+.. class:: Enclosure
+
+Represents an RSS enclosure
+
+RssFeed
+-------
+
+.. class:: RssFeed(SyndicationFeed)
+
+Rss201rev2Feed
+--------------
+
+.. class:: Rss201rev2Feed(RssFeed)
+
+Spec: http://blogs.law.harvard.edu/tech/rss
+
+Atom1Feed
+---------
+
+.. class:: Atom1Feed(SyndicationFeed)
+
+Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html
+
+``django.utils.http``
+=====================
+
+.. module:: django.utils.http
+   :synopsis: HTTP helper functions. (URL encoding, cookie handling, ...)
+
+.. function:: urlquote(url, safe='/')
+
+A version of Python's ``urllib.quote()`` function that can operate on unicode
+strings. The url is first UTF-8 encoded before quoting. The returned string
+can safely be used as part of an argument to a subsequent ``iri_to_uri()``
+call without double-quoting occurring. Employs lazy execution.
+
+.. function:: urlquote_plus(url, safe='')
+
+A version of Python's urllib.quote_plus() function that can operate on unicode
+strings. The url is first UTF-8 encoded before quoting. The returned string can
+safely be used as part of an argument to a subsequent iri_to_uri() call without
+double-quoting occurring. Employs lazy execution.
+
+.. function:: urlencode(query, doseq=0)
+
+A version of Python's urllib.urlencode() function that can operate on unicode
+strings. The parameters are first case to UTF-8 encoded strings and then
+encoded as per normal.
+
+.. function:: cookie_date(epoch_seconds=None)
+
+Formats the time to ensure compatibility with Netscape's cookie standard.
+
+Accepts a floating point number expressed in seconds since the epoch, in UTC -
+such as that outputted by ``time.time()``. If set to ``None``, defaults to the current
+time.
+
+Outputs a string in the format ``Wdy, DD-Mon-YYYY HH:MM:SS GMT``.
+
+.. function:: http_date(epoch_seconds=None)
+
+Formats the time to match the RFC 1123 date format as specified by HTTP
+`RFC 2616`_ section 3.3.1.
+
+.. _RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616.txt
+
+Accepts a floating point number expressed in seconds since the epoch, in UTC -
+such as that outputted by ``time.time()``. If set to ``None``, defaults to the current
+time.
+
+Outputs a string in the format ``Wdy, DD Mon YYYY HH:MM:SS GMT``.
+
+.. function:: base36_to_int(s)
+
+Converted a base 36 string to an integer
+
+.. function:: int_to_base36(i)
+
+Converts an integer to a base36 string
+
+``django.utils.safestring``
+===========================
+
+.. module:: django.utils.safestring
+   :synopsis: Functions and classes for working with strings that can be displayed safely without further escaping in HTML.
+
+Functions and classes for working with "safe strings": strings that can be
+displayed safely without further escaping in HTML. Marking something as a "safe
+string" means that the producer of the string has already turned characters
+that should not be interpreted by the HTML engine (e.g. '<') into the
+appropriate entities.
+
+.. class:: SafeString
+
+A string subclass that has been specifically marked as "safe" (requires no
+further escaping) for HTML output purposes.
+
+.. class:: SafeUnicode
+
+A unicode subclass that has been specifically marked as "safe" for HTML output
+purposes.
+
+.. function:: mark_safe(s)
+
+Explicitly mark a string as safe for (HTML) output purposes. The returned
+object can be used everywhere a string or unicode object is appropriate.
+
+Can be called multiple times on a single string.
+
+.. function:: mark_for_escaping(s)
+
+Explicitly mark a string as requiring HTML escaping upon output. Has no effect
+on ``SafeData`` subclasses.
+
+Can be called multiple times on a single string (the resulting escaping is only
+applied once).
+
+``django.utils.translation``
+============================
+
+.. module:: django.utils.translation
+   :synopsis: Internationalization support.
+
+For a complete discussion on the usage of the following see the
+:ref:`Internationalization documentation <topics-i18n-internationalization>`.
+
+.. function:: gettext(message)
+
+Translates ``message`` and returns it in a UTF-8 bytestring
+
+.. function:: ugettext(message)
+
+Translates ``message`` and returns it in a unicode string
+
+.. function:: gettext_lazy(message)
+.. function:: ugettext_lazy(message)
+
+Same as the non-lazy versions above, but using lazy execution.
+
+See :ref:`lazy translations documentation <lazy-translations>`.
+
+.. function:: gettext_noop(message)
+
+Marks strings for translation but doesn't translate them now. This can be used
+to store strings in global variables that should stay in the base language
+(because they might be used externally) and will be translated later.
+
+.. function:: ngettext(singular, plural, number)
+
+Translates ``singular`` and ``plural`` and returns the appropriate string
+based on ``number`` in a UTF-8 bytestring
+
+.. function:: ungettext(singular, plural, number)
+
+Translates ``singular`` and ``plural`` and returns the appropriate string based
+on ``number`` in a unicode string
+
+.. function:: ngettext_lazy(singular, plural, number)
+.. function:: ungettext_lazy(singular, plural, number)
+
+Same as the non-lazy versions above, but using lazy execution.
+
+See :ref:`lazy translations documentation <lazy-translations>`.
+
+.. function:: string_concat(*strings)
+
+Lazy variant of string concatenation, needed for translations that are
+constructed from multiple parts.
+
+.. function:: activate(language)
+
+Fetches the translation object for a given tuple of application name and
+language and installs it as the current translation object for the current
+thread.
+
+.. function:: deactivate()
+
+De-installs the currently active translation object so that further _ calls will
+resolve against the default translation object, again.
+
+.. function:: deactivate_all()
+
+Makes the active translation object a NullTranslations() instance. This is
+useful when we want delayed translations to appear as the original string for
+some reason.
+
+.. function:: get_language()
+
+Returns the currently selected language code.
+
+.. function:: get_language_bidi()
+
+Returns selected language's BiDi layout:
+
+ * ``False`` = left-to-right layout
+ * ``True`` = right-to-left layout
+
+.. function:: get_date_formats()
+
+Checks whether translation files provide a translation for some technical
+message ID to store date and time formats. If it doesn't contain one, the
+formats provided in the settings will be used.
+
+.. function:: get_language_from_request(request)
+
+Analyzes the request to find what language the user wants the system to show.
+Only languages listed in settings.LANGUAGES are taken into account. If the user
+requests a sublanguage where we have a main language, we send out the main
+language.
+
+.. function:: to_locale(language)
+
+Turns a language name (en-us) into a locale name (en_US).
+
+.. function:: templatize(src)
+
+Turns a Django template into something that is understood by xgettext. It does
+so by translating the Django translation tags into standard gettext function
+invocations.
+
+``django.utils.tzinfo``
+=======================
+
+.. module:: django.utils.tzinfo
+   :synopsis: Implementation of ``tzinfo`` classes for use with ``datetime.datetime``.
+
+.. class:: FixedOffset
+
+Fixed offset in minutes east from UTC.
+
+.. class:: LocalTimezone
+
+Proxy timezone information from time module.

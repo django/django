@@ -10,7 +10,11 @@ Sample usage:
 ...     description=u"A group weblog by the sharpest minds in online media/journalism/publishing.",
 ...     language=u"en",
 ... )
->>> feed.add_item(title="Hello", link=u"http://www.holovaty.com/test/", description="Testing.")
+>>> feed.add_item(
+...     title="Hello",
+...     link=u"http://www.holovaty.com/test/",
+...     description="Testing."
+... )
 >>> fp = open('test.rss', 'w')
 >>> feed.write(fp, 'utf-8')
 >>> fp.close()
