@@ -58,6 +58,7 @@ notes.
 .. toctree::
    :maxdepth: 1
 
+   1.2-rc-1
    1.2-beta-1
    1.2-alpha-1
    1.1-rc-1
