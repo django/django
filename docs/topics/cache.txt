@@ -74,7 +74,7 @@ This is available at ftp://ftp.tummy.com/pub/python-memcached/
 .. versionchanged:: 1.2
     In Django 1.0 and 1.1, you could also use ``cmemcache`` as a binding.
     However, support for this library was deprecated in 1.2 due to
-    a lack of maintenence on the ``cmemcache`` library itself. Support for
+    a lack of maintenance on the ``cmemcache`` library itself. Support for
     ``cmemcache`` will be removed completely in Django 1.4.
 
 To use Memcached with Django, set ``CACHE_BACKEND`` to
