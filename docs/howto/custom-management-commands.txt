@@ -1,5 +1,6 @@
 .. _howto-custom-management-commands:
 
+====================================
 Writing custom django-admin commands
 ====================================
 
@@ -7,27 +8,248 @@ Writing custom django-admin commands
 
 Applications can register their own actions with ``manage.py``. For example,
 you might want to add a ``manage.py`` action for a Django app that you're
-distributing.
+distributing. In this document, we will be building a custom ``closepoll`` 
+command for the ``polls`` application from the
+:ref:`tutorial<intro-tutorial01>`.
 
-To do this, just add a ``management/commands`` directory to your application.
+To do this, just add a ``management/commands`` directory to the application.
 Each Python module in that directory will be auto-discovered and registered as
 a command that can be executed as an action when you run ``manage.py``::
 
-    blog/
+    polls/
         __init__.py
         models.py
         management/
             __init__.py
             commands/
                 __init__.py
-                explode.py
+                closepoll.py
+        tests.py
         views.py
 
-In this example, the ``explode`` command will be made available to any project
-that includes the ``blog`` application in ``settings.INSTALLED_APPS``.
+In this example, the ``closepoll`` command will be made available to any project
+that includes the ``polls`` application in :setting:`INSTALLED_APPS`.
 
-The ``explode.py`` module has only one requirement -- it must define a class
-called ``Command`` that extends ``django.core.management.base.BaseCommand``.
+The ``closepoll.py`` module has only one requirement -- it must define a class
+``Command`` that extends :class:`BaseCommand` or one of its
+:ref:`subclasses<ref-basecommand-subclasses>`.
 
-For more details on how to define your own commands, look at the code for the
-existing ``django-admin.py`` commands, in ``/django/core/management/commands``.
+.. admonition:: Standalone scripts
+
+  Custom management commands are especially useful for running standalone
+  scripts or for scripts that are periodically executed from the UNIX crontab
+  or from Windows scheduled tasks control panel.
+
+To implement the command, edit ``polls/management/commands/closepoll.py`` to
+look like this:
+
+.. code-block:: python
+
+    from django.core.management.base import BaseCommand, CommandError
+    from example.polls.models import Poll
+
+    class Command(BaseCommand):
+        args = '<poll_id poll_id ...>'
+        help = 'Closes the specified poll for voting'
+
+        def handle(self, *args, **options):
+            for poll_id in args:
+                try:
+                    poll = Poll.objects.get(pk=int(poll_id))
+                except Poll.DoesNotExist:
+                    raise CommandError('Poll "%s" does not exist' % poll_id)
+
+                poll.opened = False
+                poll.save()
+
+                print 'Successfully closed poll "%s"' % poll_id
+
+The new custom command can be called using ``python manage.py closepoll 
+<poll_id>``.
+
+The ``handle()`` method takes zero or more ``poll_ids`` and sets ``poll.opened``
+to ``False`` for each one. If the user referenced any nonexistant polls, a
+:class:`CommandError` is raised. The ``poll.opened`` attribute does not exist
+in the :ref:`tutorial<intro-tutorial01>` and was added to
+``polls.models.Poll`` for this example.
+
+The same ``closepoll`` could be easily modified to delete a given poll instead
+of closing it by accepting additional command line options. These custom options
+must be added to :attr:`~BaseCommand.option_list` like this:
+
+.. code-block:: python
+
+    from optparse import make_option
+
+    class Command(BaseCommand):
+        option_list = BaseCommand.option_list + (
+            make_option('--delete',
+                action='store_true',
+                dest='delete',
+                default=False,
+                help='Delete poll instead of closing it'),
+            )
+        # ...
+
+In addition to being able to add custom command line options, all 
+:ref:`management commands<ref-django-admin>` can accept some 
+default options such as :djadminopt:`--verbosity` and :djadminopt:`--traceback`.
+
+Command objects
+===============
+
+.. class:: BaseCommand
+
+The base class from which all management commands ultimately derive.
+
+Use this class if you want access to all of the mechanisms which
+parse the command-line arguments and work out what code to call in
+response; if you don't need to change any of that behavior,
+consider using one of its :ref:`subclasses<ref-basecommand-subclasses>`.
+
+Subclassing the :class:`BaseCommand` class requires that you implement the
+:meth:`~BaseCommand.handle` method.
+
+Attributes
+----------
+
+All attributes can be set in your derived class and can be used in 
+:class:`BaseCommand`'s :ref:`subclasses<ref-basecommand-subclasses>`.
+
+.. attribute:: BaseCommand.args
+
+  A string listing the arguments accepted by the command,
+  suitable for use in help messages; e.g., a command which takes
+  a list of application names might set this to '<appname
+  appname ...>'.
+
+.. attribute:: BaseCommand.can_import_settings
+
+  A boolean indicating whether the command needs to be able to
+  import Django settings; if ``True``, ``execute()`` will verify
+  that this is possible before proceeding. Default value is
+  ``True``.
+
+.. attribute:: BaseCommand.help
+
+  A short description of the command, which will be printed in the
+  help message when the user runs the command 
+  ``python manage.py help <command>``.
+
+.. attribute:: BaseCommand.option_list
+
+  This is the list of ``optparse`` options which will be fed
+  into the command's ``OptionParser`` for parsing arguments.
+
+.. attribute:: BaseCommand.output_transaction
+
+  A boolean indicating whether the command outputs SQL
+  statements; if ``True``, the output will automatically be
+  wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
+  ``False``.
+
+.. attribute:: BaseCommand.requires_model_validation
+
+  A boolean; if ``True``, validation of installed models will be
+  performed prior to executing the command. Default value is
+  ``True``. To validate an individual application's models
+  rather than all applications' models, call
+  :meth:`~BaseCommand.validate` from :meth:`~BaseCommand.handle`.
+
+Methods
+-------
+
+:class:`BaseCommand` has a few methods that can be overridden but only
+the :meth:`~BaseCommand.handle` method must be implemented.
+
+.. admonition:: Implementing a constructor in a subclass
+
+  If you implement ``__init__`` in your subclass of :class:`BaseCommand`,
+  you must call :class:`BaseCommand`'s ``__init__``.
+
+  .. code-block:: python
+
+    class Command(BaseCommand):
+        def __init__(self, *args, **kwargs):
+            super(Command, self).__init__(*args, **kwargs)
+            # ...
+
+.. method:: BaseCommand.get_version()
+
+    Return the Django version, which should be correct for all
+    built-in Django commands. User-supplied commands can
+    override this method to return their own version.
+
+.. method:: BaseCommand.execute(*args, **options)
+
+    Try to execute this command, performing model validation if
+    needed (as controlled by the attribute
+    :attr:`requires_model_validation`). If the command raises a
+    :class:`CommandError`, intercept it and print it sensibly to
+    stderr.
+
+.. method:: BaseCommand.handle(*args, **options)
+
+    The actual logic of the command. Subclasses must implement this method.
+
+.. _ref-basecommand-subclasses:
+
+BaseCommand subclasses
+----------------------
+
+.. class:: AppCommand
+
+A management command which takes one or more installed application
+names as arguments, and does something with each of them.
+
+Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
+:meth:`~AppCommand.handle_app`, which will be called once for each application.
+
+.. method:: AppCommand.handle_app(app, **options)
+
+    Perform the command's actions for ``app``, which will be the
+    Python module corresponding to an application name given on
+    the command line.
+
+.. class:: LabelCommand
+
+A management command which takes one or more arbitrary arguments
+(labels) on the command line, and does something with each of
+them.
+
+Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
+:meth:`~LabelCommand.handle_label`, which will be called once for each label.
+
+.. method:: LabelCommand.handle_label(label, **options)
+
+    Perform the command's actions for ``label``, which will be the
+    string as given on the command line.
+
+.. class:: NoArgsCommand
+
+A command which takes no arguments on the command line.
+
+Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
+:meth:`~NoArgsCommand.handle_noargs`; :meth:`~BaseCommand.handle` itself is 
+overridden to ensure no arguments are passed to the command.
+
+.. method:: NoArgsCommand.handle_noargs(**options)
+
+    Perform this command's actions
+
+.. _ref-command-exceptions:
+
+Command exceptions
+------------------
+
+.. class:: CommandError
+
+Exception class indicating a problem while executing a management
+command.
+
+If this exception is raised during the execution of a management
+command, it will be caught and turned into a nicely-printed error
+message to the appropriate output stream (i.e., stderr); as a
+result, raising this exception (with a sensible description of the
+error) is the preferred way to indicate that something has gone
+wrong in the execution of a command.
