@@ -91,6 +91,14 @@ As in :meth:`~django.core.mail.send_mail()`, recipients in the same
 ``recipient_list`` will all see the other addresses in the e-mail messages'
 "To:" field.
 
+For example, the following code would send two different messages to
+two different sets of recipients; however, only one connection to the
+mail server would be opened::
+
+    message1 = ('Subject here', 'Here is the message', 'from@example.com, ['first@example.com', 'other@example.com'])
+    message2 = ('Another Subject', 'Here is another message', 'from@example.com', ['second@test.com'])
+    send_mass_mail((message1, message2), fail_silently=False)
+
 send_mass_mail() vs. send_mail()
 --------------------------------
 
