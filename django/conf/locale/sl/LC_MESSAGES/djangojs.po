@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-02 13:55+0200\n"
-"PO-Revision-Date: 2008-09-03 09:44+0200\n"
-"Last-Translator: Gasper Zejn <zejn@kiberpipa.org>\n"
+"POT-Creation-Date: 2010-05-08 14:41+0200\n"
+"PO-Revision-Date: 2010-05-06 01:12+0100\n"
+"Last-Translator: Jure Cuhalev <gandalf@owca.info>\n"
 "Language-Team:  <sl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,104 +17,149 @@ msgstr ""
 "X-Poedit-Language: Slovenian\n"
 "X-Poedit-Country: SLOVENIA\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:37
+#, perl-format
+msgid "Available %s"
+msgstr "Možne %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:45
+msgid "Choose all"
+msgstr "Izberi vse"
+
+#: contrib/admin/media/js/SelectFilter2.js:50
+msgid "Add"
+msgstr "Dodaj"
+
+#: contrib/admin/media/js/SelectFilter2.js:52
+msgid "Remove"
+msgstr "Odstrani"
+
+#: contrib/admin/media/js/SelectFilter2.js:57
+#, perl-format
+msgid "Chosen %s"
+msgstr "Izbran %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:58
+msgid "Select your choice(s) and click "
+msgstr "Izberite in kliknite "
+
+#: contrib/admin/media/js/SelectFilter2.js:63
+msgid "Clear all"
+msgstr "Izbriši vse"
+
+#: contrib/admin/media/js/actions.js:18
+#: contrib/admin/media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s od %(cnt)s izbran"
+msgstr[1] "%(sel)s od %(cnt)s izbrana"
+msgstr[2] "%(sel)s od %(cnt)s izbrani"
+msgstr[3] "%(sel)s od %(cnt)s izbranih"
+
+#: contrib/admin/media/js/actions.js:109
+#: contrib/admin/media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Na posameznih poljih, ki imajo omogočeno urejanje, imate neshranjene "
+"spremembe. Če boste izvedli dejanje, bodo vaše neshranjene spremembe "
+"izgubljene."
+
+#: contrib/admin/media/js/actions.js:121
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Izbrali ste dejanje, vendar niste shranili sprememb na posameznih poljih. "
+"Kliknite na 'V redu', da boste shranili. Dejanje boste morali ponovno "
+"izvesti."
+
+#: contrib/admin/media/js/actions.js:123
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Izbrali ste dejanje, vendar niste naredili nobenih sprememb na posameznih "
+"poljih. Verjetno iščete gumb Pojdi namesto Shrani."
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
-msgid "January February March April May June July August September October November December"
-msgstr "Januar Februar Marec April Maj Junij Julij Avgust September Oktober November December"
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Januar Februar Marec April Maj Junij Julij Avgust September Oktober November "
+"December"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
 msgstr "N P T S Č P S"
 
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr "Prikaži"
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Skrij"
+
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "Nedelja Ponedeljek Torek Sreda Četrtek Petek Sobota"
 
-#: contrib/admin/media/js/SelectFilter2.js:33
-#, perl-format
-msgid "Available %s"
-msgstr "Možne %s"
-
-#: contrib/admin/media/js/SelectFilter2.js:41
-msgid "Choose all"
-msgstr "Izberi vse"
-
-#: contrib/admin/media/js/SelectFilter2.js:46
-msgid "Add"
-msgstr "Dodaj"
-
-#: contrib/admin/media/js/SelectFilter2.js:48
-msgid "Remove"
-msgstr "Odstrani"
-
-#: contrib/admin/media/js/SelectFilter2.js:53
-#, perl-format
-msgid "Chosen %s"
-msgstr "Izbran %s"
-
-#: contrib/admin/media/js/SelectFilter2.js:54
-msgid "Select your choice(s) and click "
-msgstr "Izberite in kliknite "
-
-#: contrib/admin/media/js/SelectFilter2.js:59
-msgid "Clear all"
-msgstr "Izbriši vse"
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:49
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Now"
 msgstr "Sedaj"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "URA"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
 msgid "Choose a time"
 msgstr "Izberite čas"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
 msgid "Midnight"
 msgstr "Polnoč"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
 msgid "6 a.m."
 msgstr "Ob 6h"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 msgid "Noon"
 msgstr "Opoldne"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:91
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
 msgstr "Prekliči"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:182
 msgid "Today"
 msgstr "Danes"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:137
 msgid "Calendar"
 msgstr "Koledar"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
 msgid "Yesterday"
 msgstr "Včeraj"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
 msgstr "Jutri"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "Prikaži"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "Skrij"
-
