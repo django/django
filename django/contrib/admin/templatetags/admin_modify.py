@@ -20,6 +20,9 @@ def prepopulated_fields_js(context):
 prepopulated_fields_js = register.inclusion_tag('admin/prepopulated_fields_js.html', takes_context=True)(prepopulated_fields_js)
 
 def submit_row(context):
+    """
+    Displays the row of buttons for delete and save. 
+    """
     opts = context['opts']
     change = context['change']
     is_popup = context['is_popup']
