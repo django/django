@@ -1,0 +1,157 @@
+# Translation of django.po to Indonesian
+# This file is distributed under the same license as the Django package.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-09 20:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Selwin Ong <selwin@ui.co.id>\n"
+"Language-Team: Indonesian <id@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:37
+#, perl-format
+msgid "Available %s"
+msgstr "Tersedia %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:45
+msgid "Choose all"
+msgstr "Pilih semua"
+
+#: contrib/admin/media/js/SelectFilter2.js:50
+msgid "Add"
+msgstr "Tambah"
+
+#: contrib/admin/media/js/SelectFilter2.js:52
+msgid "Remove"
+msgstr "Hapus"
+
+#: contrib/admin/media/js/SelectFilter2.js:57
+#, perl-format
+msgid "Chosen %s"
+msgstr "%s terpilih"
+
+#: contrib/admin/media/js/SelectFilter2.js:58
+msgid "Select your choice(s) and click "
+msgstr "Masukkan pilihan anda dan klik"
+
+#: contrib/admin/media/js/SelectFilter2.js:63
+msgid "Clear all"
+msgstr "Hapus semua"
+
+#: contrib/admin/media/js/actions.js:18
+#: contrib/admin/media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s dari %(cnt)s terpilih"
+msgstr[1] "%(sel)s dari %(cnt)s terpilih"
+
+#: contrib/admin/media/js/actions.js:109
+#: contrib/admin/media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Beberapa perubahan field yang Anda lakukan belum tersimpan. Perubahan yang "
+"telah anda lakukan akan hilang."
+
+#: contrib/admin/media/js/actions.js:121
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Anda memilih sebuah aksi, tetapi belum menyimpan perubahan ke field yang "
+"ada. Klik OK untuk menyimpan perubahan ini. Anda akan perlu melakukan aksi "
+"itu lagi."
+
+#: contrib/admin/media/js/actions.js:123
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Anda telah memilih sebuah aksi, tetapi belum mengubah field apapun. "
+"Kemungkinan Anda mencari tombol Go dan bukan tombol Save ."
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Januari Februari Maret April Mei Juni Juli Agustus September Oktober "
+"November Desember"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "M S S R K J S"
+
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr "Keluarkan"
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Sembunyikan"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Minggu Senin Selasa Rabu Kamis Jumat Sabtu"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:49
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+msgid "Now"
+msgstr "Sekarang"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Jam"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+msgid "Choose a time"
+msgstr "Pilih waktu"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
+msgid "Midnight"
+msgstr "Tengah malam"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
+msgid "6 a.m."
+msgstr "6 pagi"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
+msgid "Noon"
+msgstr "Siang"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:91
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
+msgid "Cancel"
+msgstr "Batal"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:182
+msgid "Today"
+msgstr "Hari ini"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:137
+msgid "Calendar"
+msgstr "Kalender"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
+msgid "Yesterday"
+msgstr "Kemarin"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
+msgid "Tomorrow"
+msgstr "Besok"
