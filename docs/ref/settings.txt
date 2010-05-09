@@ -1226,7 +1226,7 @@ SESSION_ENGINE
 .. versionadded:: 1.0
 
 .. versionchanged:: 1.1
-   The ``cache_db`` backend was added
+   The ``cached_db`` backend was added
 
 Default: ``django.contrib.sessions.backends.db``
 
@@ -1235,7 +1235,7 @@ Controls where Django stores session data. Valid values are:
     * ``'django.contrib.sessions.backends.db'``
     * ``'django.contrib.sessions.backends.file'``
     * ``'django.contrib.sessions.backends.cache'``
-    * ``'django.contrib.sessions.backends.cache_db'``
+    * ``'django.contrib.sessions.backends.cached_db'``
 
 See :ref:`topics-http-sessions`.
 
