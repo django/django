@@ -871,6 +871,20 @@ return a subset of objects for this foreign key field based on the user::
 This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key field
 to only the cars owned by the ``User`` instance.
 
+.. method:: ModelAdmin.queryset(self, request):
+
+The ``queryset`` method on a ``ModelAdmin`` returns a
+:class:`~django.db.models.QuerySet` of all model instances that can be
+edited by the admin site. One use case for overriding this method is
+to show objects owned by the logged-in user::
+
+    class MyModelAdmin(admin.ModelAdmin):
+        def queryset(self, request):
+            qs = super(self, MyModelAdmin).queryset(request)
+            if request.user.is_superuser:
+                return qs
+            return qs.filter(author=request.user)
+
 Other methods
 ~~~~~~~~~~~~~
 
