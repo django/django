@@ -197,6 +197,7 @@ Natural keys
 ------------
 
 .. versionadded:: 1.2
+
    The ability to use natural keys when serializing/deserializing data was
    added in the 1.2 release.
 
@@ -219,12 +220,12 @@ There is also the matter of convenience. An integer id isn't always
 the most convenient way to refer to an object; sometimes, a
 more natural reference would be helpful.
 
-Deserialization of natural keys
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-It is for these reasons that Django provides `natural keys`. A natural
+It is for these reasons that Django provides *natural keys*. A natural
 key is a tuple of values that can be used to uniquely identify an
 object instance without using the primary key value.
+
+Deserialization of natural keys
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Consider the following two models::
 
@@ -235,6 +236,9 @@ Consider the following two models::
         last_name = models.CharField(max_length=100)
 
         birthdate = models.DateField()
+
+        class Meta:
+            unique_together = (('first_name', 'last_name'),)
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
@@ -278,6 +282,9 @@ name::
 
         birthdate = models.DateField()
 
+        class Meta:
+            unique_together = (('first_name', 'last_name'),)
+
 Now books can use that natural key to refer to ``Person`` objects::
 
     ...
@@ -294,6 +301,17 @@ Now books can use that natural key to refer to ``Person`` objects::
 When you try to load this serialized data, Django will use the
 ``get_by_natural_key()`` method to resolve ``["Douglas", "Adams"]``
 into the primary key of an actual ``Person`` object.
+
+.. note::
+
+    Whatever fields you use for a natural key must be able to uniquely
+    identify an object. This will usually mean that your model will
+    have a uniqueness clause (either unique=True on a single field, or
+    ``unique_together`` over multiple fields) for the field or fields
+    in your natural key. However, uniqueness doesn't need to be
+    enforced at the database level. If you are certain that a set of
+    fields will be effectively unique, you can still use those fields
+    as a natural key.
 
 Serialization of natural keys
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -312,8 +330,13 @@ Firstly, you need to add another method -- this time to the model itself::
         def natural_key(self):
             return (self.first_name, self.last_name)
 
-Then, when you call ``serializers.serialize()``, you provide a
-``use_natural_keys=True`` argument::
+        class Meta:
+            unique_together = (('first_name', 'last_name'),)
+
+That method should always return a natural key tuple -- in this
+example, ``(first name, last name)``. Then, when you call
+``serializers.serialize()``, you provide a ``use_natural_keys=True``
+argument::
 
     >>> serializers.serialize([book1, book2], format='json', indent=2, use_natural_keys=True)
 
