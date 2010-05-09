@@ -283,7 +283,7 @@ is included in a string. For example::
     ...
     name = ugettext_lazy(u'John Lennon')
     instrument = ugettext_lazy(u'guitar')
-    result = string_concat([name, ': ', instrument])
+    result = string_concat(name, ': ', instrument)
 
 In this case, the lazy translations in ``result`` will only be converted to
 strings when ``result`` itself is used in a string (usually at template
