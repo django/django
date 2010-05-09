@@ -165,6 +165,15 @@ For more documentation, read the source code in
 .. _Python-markdown: http://www.freewisdom.org/projects/python-markdown
 .. _doc-utils: http://docutils.sf.net/
 
+ReStructured Text
+-----------------
+
+When using the `restructuredtext` markup fiilter you can define a :setting:`RESTRUCTUREDTEXT_FORMAT_SETTINGS`
+in your django settings to override the default writer settings. See the `restructuredtext writer settings`_ for
+details on what these settings are.
+
+.. _restructuredtext writer settings: http://docutils.sourceforge.net/docs/user/config.html#html4css1-writer
+
 messages
 ========
 
