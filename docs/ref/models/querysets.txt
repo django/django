@@ -1571,15 +1571,15 @@ week_day
 
 For date/datetime fields, a 'day of the week' match.
 
+Takes an integer value representing the day of week from 1 (Sunday) to 7
+(Saturday).
+
 Example::
 
     Entry.objects.filter(pub_date__week_day=2)
 
-SQL equivalent::
-
-    SELECT ... WHERE EXTRACT('dow' FROM pub_date) = '2';
-
-(The exact SQL syntax varies for each database engine.)
+(No equivalent SQL code fragment is included for this lookup because
+implementation of the relevant query varies among different database engines.)
 
 Note this will match any record with a pub_date that falls on a Monday (day 2
 of the week), regardless of the month or year in which it occurs. Week days
