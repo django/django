@@ -138,6 +138,8 @@ executed.
 ``filter(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~
 
+.. method:: filter(**kwargs)
+
 Returns a new ``QuerySet`` containing objects that match the given lookup
 parameters.
 
@@ -147,6 +149,8 @@ underlying SQL statement.
 
 ``exclude(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: exclude(**kwargs)
 
 Returns a new ``QuerySet`` containing objects that do *not* match the given
 lookup parameters.
@@ -180,6 +184,8 @@ Note the second example is more restrictive.
 
 ``annotate(*args, **kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: annotate(*args, **kwargs)
 
 .. versionadded:: 1.1
 
@@ -222,6 +228,8 @@ Aggregation <topics-db-aggregation>`.
 
 ``order_by(*fields)``
 ~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: order_by(*fields)
 
 By default, results returned by a ``QuerySet`` are ordered by the ordering
 tuple given by the ``ordering`` option in the model's ``Meta``. You can
@@ -297,6 +305,8 @@ You can tell if a query is ordered or not by checking the
 ``reverse()``
 ~~~~~~~~~~~~~
 
+.. method:: reverse()
+
 .. versionadded:: 1.0
 
 Use the ``reverse()`` method to reverse the order in which a queryset's
@@ -326,6 +336,8 @@ undefined afterward).
 
 ``distinct()``
 ~~~~~~~~~~~~~~
+
+.. method:: distinct()
 
 Returns a new ``QuerySet`` that uses ``SELECT DISTINCT`` in its SQL query. This
 eliminates duplicate rows from the query results.
@@ -360,6 +372,8 @@ query spans multiple tables, it's possible to get duplicate results when a
 
 ``values(*fields)``
 ~~~~~~~~~~~~~~~~~~~
+
+.. method:: values(*fields)
 
 Returns a ``ValuesQuerySet`` -- a ``QuerySet`` that returns dictionaries when
 used as an iterable, rather than model-instance objects.
@@ -449,6 +463,8 @@ individualism.
 ``values_list(*fields)``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. method:: values_list(*fields)
+
 .. versionadded:: 1.0
 
 This is similar to ``values()`` except that instead of returning dictionaries,
@@ -476,6 +492,8 @@ fields in the model, in the order they were declared.
 
 ``dates(field, kind, order='ASC')``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: dates(field, kind, order='ASC')
 
 Returns a ``DateQuerySet`` -- a ``QuerySet`` that evaluates to a list of
 ``datetime.datetime`` objects representing all available dates of a particular
@@ -511,6 +529,8 @@ Examples::
 ``none()``
 ~~~~~~~~~~
 
+.. method:: none()
+
 .. versionadded:: 1.0
 
 Returns an ``EmptyQuerySet`` -- a ``QuerySet`` that always evaluates to
@@ -524,7 +544,9 @@ Examples::
     []
 
 ``all()``
-~~~~~~~~~~
+~~~~~~~~~
+
+.. method:: all()
 
 .. versionadded:: 1.0
 
@@ -538,6 +560,8 @@ definitely have a ``QuerySet`` to work with.
 
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
+
+.. method:: select_related()
 
 Returns a ``QuerySet`` that will automatically "follow" foreign-key
 relationships, selecting that additional related-object data when it executes
@@ -659,6 +683,8 @@ are performing a depth-based ``select_related``.
 
 ``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)
 
 Sometimes, the Django query syntax by itself can't easily express a complex
 ``WHERE`` clause. For these edge cases, Django provides the ``extra()``
@@ -822,6 +848,8 @@ of the arguments is required, but you should use at least one of them.
 ``defer(*fields)``
 ~~~~~~~~~~~~~~~~~~
 
+.. method:: defer(*fields)
+
 .. versionadded:: 1.1
 
 In some complex data-modeling situations, your models might contain a lot of
@@ -878,7 +906,9 @@ eventually).
     settled down and you understand where the hot-points are.
 
 ``only(*fields)``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+
+.. method:: only(*fields)
 
 .. versionadded:: 1.1
 
@@ -914,7 +944,9 @@ logically::
     Entry.objects.defer("body").only("headline", "body")
 
 ``using(alias)``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+
+.. method:: using(alias)
 
 .. versionadded:: 1.2
 
@@ -946,6 +978,8 @@ they query the database each time they're called.
 ``get(**kwargs)``
 ~~~~~~~~~~~~~~~~~
 
+.. method:: get(**kwargs)
+
 Returns the object matching the given lookup parameters, which should be in
 the format described in `Field lookups`_.
 
@@ -973,6 +1007,8 @@ The ``DoesNotExist`` exception inherits from
 ``create(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~
 
+.. method:: create(**kwargs)
+
 A convenience method for creating an object and saving it all in one step.  Thus::
 
     p = Person.objects.create(first_name="Bruce", last_name="Springsteen")
@@ -994,6 +1030,8 @@ exception if you are using manual primary keys.
 
 ``get_or_create(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: get_or_create(**kwargs)
 
 A convenience method for looking up an object with the given kwargs, creating
 one if necessary.
@@ -1063,6 +1101,8 @@ has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
 ``count()``
 ~~~~~~~~~~~
 
+.. method:: count()
+
 Returns an integer representing the number of objects in the database matching
 the ``QuerySet``. ``count()`` never raises exceptions.
 
@@ -1087,6 +1127,8 @@ problems.
 ``in_bulk(id_list)``
 ~~~~~~~~~~~~~~~~~~~~
 
+.. method:: in_bulk(id_list)
+
 Takes a list of primary-key values and returns a dictionary mapping each
 primary-key value to an instance of the object with the given ID.
 
@@ -1106,6 +1148,8 @@ If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 ``iterator()``
 ~~~~~~~~~~~~~~
 
+.. method:: iterator()
+
 Evaluates the ``QuerySet`` (by performing the query) and returns an
 `iterator`_ over the results. A ``QuerySet`` typically caches its
 results internally so that repeated evaluations do not result in
@@ -1121,6 +1165,8 @@ been evaluated will force it to evaluate again, repeating the query.
 
 ``latest(field_name=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: latest(field_name=None)
 
 Returns the latest object in the table, by date, using the ``field_name``
 provided as the date field.
@@ -1141,6 +1187,8 @@ Note ``latest()`` exists purely for convenience and readability.
 
 ``aggregate(*args, **kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: aggregate(*args, **kwargs)
 
 .. versionadded:: 1.1
 
@@ -1173,6 +1221,8 @@ Aggregation <topics-db-aggregation>`.
 
 ``exists()``
 ~~~~~~~~~~~~
+
+.. method:: exists()
 
 .. versionadded:: 1.2
 
