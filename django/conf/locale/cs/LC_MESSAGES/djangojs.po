@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-07 13:17+0200\n"
-"PO-Revision-Date: 2010-04-07 13:33+0100\n"
+"POT-Creation-Date: 2010-05-09 14:30+0200\n"
+"PO-Revision-Date: 2010-05-09 14:04+0100\n"
 "Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech\n"
 "MIME-Version: 1.0\n"
@@ -47,17 +47,57 @@ msgstr "Vyberte si a klikněte "
 msgid "Clear all"
 msgstr "Odebrat vše"
 
+#: contrib/admin/media/js/actions.js:18
+#: contrib/admin/media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "Vybrána je %(sel)s položka z celkem %(cnt)s."
+msgstr[1] "Vybrány jsou %(sel)s položky z celkem %(cnt)s."
+msgstr[2] "Vybraných je %(sel)s položek z celkem %(cnt)s."
+
+#: contrib/admin/media/js/actions.js:109
+#: contrib/admin/media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"V jednotlivých polích jsou neuložené změny, které budou ztraceny, pokud "
+"operaci provedete."
+
+#: contrib/admin/media/js/actions.js:121
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Byla vybrána operace, ale dosud nedošlo k uložení změn jednotlivých polí. "
+"Uložíte klepnutím na tlačítko OK. Pak bude třeba operaci spustit znovu."
+
+#: contrib/admin/media/js/actions.js:123
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Byla vybrána operace a jednotlivá pole nejsou změněná. Patrně hledáte "
+"tlačítko Provést spíše než Uložit."
+
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
-msgid "January February March April May June July August September October November December"
-msgstr "leden únor březen duben květen červen červenec srpen září říjen listopad prosinec"
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"leden únor březen duben květen červen červenec srpen září říjen listopad "
+"prosinec"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
 msgstr "n p ú s č p s"
 
-#: contrib/admin/media/js/collapse.js:9
-#: contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
 #: contrib/admin/media/js/collapse.min.js:1
 msgid "Show"
 msgstr "Zobrazit"
@@ -71,32 +111,32 @@ msgstr "Skrýt"
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "Neděle Pondělí Úterý Středa Čtvrtek Pátek Sobota"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:50
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:49
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Now"
 msgstr "Nyní"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:54
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "Hodiny"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
 msgid "Choose a time"
 msgstr "Vyberte čas"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
 msgid "Midnight"
 msgstr "Půlnoc"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
 msgid "6 a.m."
 msgstr "6h ráno"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 msgid "Noon"
 msgstr "Poledne"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:92
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:91
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
 msgstr "Storno"
@@ -117,4 +157,3 @@ msgstr "Včera"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
 msgstr "Zítra"
-
