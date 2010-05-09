@@ -92,6 +92,11 @@ overridden:
       errors to a specific field in the form, you will need to access the
       ``_errors`` attribute on the form, which is `described later`_.
 
+      Also note that there are special considerations when overriding
+      the ``clean()`` method of a ``ModelForm`` subclass. (see the
+      :ref:`ModelForm documentation
+      <overriding-modelform-clean-method>` for more information)
+
 These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
 definition), the ``Field.clean()`` method (or its override) is run, then
