@@ -140,6 +140,9 @@ The development process
       :ref:`Overview <topics-settings>` |
       :ref:`Full list of settings <ref-settings>`
 
+    * **Exceptions:**
+      :ref:`Overview <ref-exceptions>`
+
     * **django-admin.py and manage.py:**
       :ref:`Overview <ref-django-admin>` |
       :ref:`Adding custom commands <howto-custom-management-commands>`
