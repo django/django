@@ -449,11 +449,15 @@ JavaScript.
 The ``javascript_catalog`` view
 -------------------------------
 
-The main solution to these problems is the ``javascript_catalog`` view, which
-sends out a JavaScript code library with functions that mimic the ``gettext``
-interface, plus an array of translation strings. Those translation strings are
-taken from the application, project or Django core, according to what you
-specify in either the info_dict or the URL.
+.. module:: django.views.i18n
+
+.. function:: javascript_catalog(request, domain='djangojs', packages=None)
+
+The main solution to these problems is the :meth:`django.views.i18n.javascript_catalog`
+view, which sends out a JavaScript code library with functions that mimic the
+``gettext`` interface, plus an array of translation strings. Those translation
+strings are taken from the application, project or Django core, according to what
+you specify in either the info_dict or the URL.
 
 You hook it up like this::
 
@@ -470,6 +474,9 @@ same format as the strings in ``INSTALLED_APPS``) and should refer to a package
 that contains a ``locale`` directory. If you specify multiple packages, all
 those catalogs are merged into one catalog. This is useful if you have
 JavaScript that uses strings from different applications.
+
+By default, the view uses the ``djangojs`` gettext domain. This can be
+changed by altering the ``domain`` argument.
 
 You can make the view dynamic by putting the packages into the URL pattern::
 
@@ -541,7 +548,9 @@ to produce proper pluralizations).
 The ``set_language`` redirect view
 ==================================
 
-As a convenience, Django comes with a view, ``django.views.i18n.set_language``,
+.. function:: set_language(request)
+
+As a convenience, Django comes with a view, :meth:`django.views.i18n.set_language`,
 that sets a user's language preference and redirects back to the previous page.
 
 Activate this view by adding the following line to your URLconf::
