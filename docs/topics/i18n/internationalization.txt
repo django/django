@@ -325,6 +325,8 @@ Using this decorator means you can write your function and assume that the
 input is a proper string, then add support for lazy translation objects at the
 end.
 
+.. _specifying-translation-strings-in-template-code:
+
 Specifying translation strings: In template code
 ================================================
 
@@ -333,6 +335,9 @@ Specifying translation strings: In template code
 Translations in :ref:`Django templates <topics-templates>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
+
+``trans`` template tag
+----------------------
 
 The ``{% trans %}`` template tag translates either a constant string
 (enclosed in single or double quotes) or variable content::
@@ -348,15 +353,30 @@ require translation in the future::
 
 Internally, inline translations use an ``ugettext`` call.
 
+In case a template var (``myvar`` above) is passed to the tag, the tag will
+first resolve such variable to a string at run-time and then look up that
+string in the message catalogs.
+
 It's not possible to mix a template variable inside a string within ``{% trans
 %}``. If your translations require strings with variables (placeholders), use
-``{% blocktrans %}``::
+``{% blocktrans %}`` instead.
+
+``blocktrans`` template tag
+---------------------------
+
+Contrarily to the ``trans`` tag, the ``blocktrans`` tag allows you to mark
+complex sentences consisting of literals and variable content for translation
+by making use of placeholders::
 
     {% blocktrans %}This string will have {{ value }} inside.{% endblocktrans %}
 
-To translate a template expression -- say, using template filters -- you need
-to bind the expression to a local variable for use within the translation
-block::
+To translate a template expression -- say, accessing object attributes or
+using template filters -- you need to bind the expression to a local variable
+for use within the translation block. Examples::
+
+    {% blocktrans with article.price as amount %}
+    That will cost $ {{ amount }}.
+    {% endblocktrans %}
 
     {% blocktrans with value|filter as myvar %}
     This will have {{ myvar }} inside.
@@ -369,9 +389,17 @@ separate the pieces with ``and``::
     This is {{ book_t }} by {{ author_t }}
     {% endblocktrans %}
 
-To pluralize, specify both the singular and plural forms with the
-``{% plural %}`` tag, which appears within ``{% blocktrans %}`` and
-``{% endblocktrans %}``. Example::
+This tag is also in charge of handling another functionality: Pluralization.
+To make use of it you should:
+
+    * Designate and bind a counter value by using ``count``, such value will
+      be the one used to select the right plural form.
+
+    * Specify both the singular and plural forms separating them with the
+      ``{% plural %}`` tag, which appears within ``{% blocktrans %}`` and
+      ``{% endblocktrans %}``.
+
+An example::
 
     {% blocktrans count list|length as counter %}
     There is only one {{ name }} object.
@@ -379,13 +407,24 @@ To pluralize, specify both the singular and plural forms with the
     There are {{ counter }} {{ name }} objects.
     {% endblocktrans %}
 
-When you use the pluralization feature and bind additional values to local
-variables apart from the counter value that selects the translated literal to be
-used, have in mind that the ``blocktrans`` construct is internally converted
-to an ``ungettext`` call. This means the same :ref:`notes regarding ungettext
-variables <pluralization-var-notes>` apply.
+A more complex example::
+
+    {% blocktrans with article.price as amount count i.length as years %}
+    That will cost $ {{ amount }} per year.
+    {% plural %}
+    That will cost $ {{ amount }} per {{ years }} years.
+    {% endblocktrans %}
+
+When you both use the pluralization feature and bind values to local variables
+in addition to the counter value, have in mind that the ``blocktrans``
+construct is internally converted to an ``ungettext`` call. This means the
+same :ref:`notes regarding ungettext variables <pluralization-var-notes>`
+apply.
 
 .. _template-translation-vars:
+
+Other tags
+----------
 
 Each ``RequestContext`` has access to three translation-specific variables:
 
@@ -399,7 +438,6 @@ Each ``RequestContext`` has access to three translation-specific variables:
     * ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
       right-to-left language, e.g.: Hebrew, Arabic. If False it's a
       left-to-right language, e.g.: English, French, German etc.
-
 
 If you don't use the ``RequestContext`` extension, you can get those values with
 three tags::

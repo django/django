@@ -2071,3 +2071,12 @@ django.contrib.webdesign
 
 A collection of template tags that can be useful while designing a website,
 such as a generator of Lorem Ipsum text. See :ref:`ref-contrib-webdesign`.
+
+i18n
+~~~~
+
+Provides a couple of templatetags that allow specifying translatable text in
+Django templates. It is slightly different from the libraries described
+above because you don't need to add any application to the ``INSTALLED_APPS``
+setting but rather set :setting:`USE_I18N` to True, then loading it with
+``{% load i18n %}``. See :ref:`specifying-translation-strings-in-template-code`.
