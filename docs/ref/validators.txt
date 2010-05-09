@@ -16,7 +16,7 @@ for re-using validation logic between different types of fields.
 For example, here's a validator that only allows even numbers::
 
     from django.core.exceptions import ValidationError
-    
+
     def validate_even(value):
         if value % 2 != 0:
             raise ValidationError(u'%s is not an even number' % value)
@@ -63,16 +63,19 @@ methods.
 
 .. attribute:: regex=None
 
-The regular expression to search for the provided ``value``. Raises a
-``ValidationError`` if no match was found.
-
-.. attribute:: code='invalid'
-
-The error code to use if validation fails. Defaults to ``'invalid'``.
+The regular expression pattern to search for the provided ``value``. Raises a
+``ValidationError`` with ``message`` and ``code`` if no match is found. If
+no regex is specified, an empty string is used.
 
 .. attribute:: message=None
 
-The error message to use if ``regex`` doesn't match the provided ``value``.
+The error message used by ``ValidationError`` if validation fails. If no
+``message`` is specified, a generic ``"Enter a valid value"`` message is used.
+
+.. attribute:: code=None
+
+The error code used by ``ValidationError`` if validation fails. If ``code``
+is not specified, ``"invalid"`` is used.
 
 ``URLValidator``
 ----------------
