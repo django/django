@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-01 11:28+0000\n"
-"PO-Revision-Date: 2010-03-01 11:30+0100\n"
+"POT-Creation-Date: 2010-05-07 17:14+0100\n"
+"PO-Revision-Date: 2010-05-07 17:33+0100\n"
 "Last-Translator: Michael Thornhill <michael@maithu.com>\n"
 "Language-Team: Irish <gaeilge-gnulinux@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -58,196 +58,212 @@ msgid "English"
 msgstr "Béarla"
 
 #: conf/global_settings.py:55
+msgid "British English"
+msgstr "Béarla na Breataine"
+
+#: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "Spáinneach"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Argentinean Spanish"
 msgstr "Spáinnis Airgintín"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Estonian"
 msgstr "Eastóinis"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:59
 msgid "Basque"
 msgstr "Bascais"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Persian"
 msgstr "Peirsis"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Finnish"
 msgstr "Fionlainnis"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "French"
 msgstr "Francach"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Frisian"
 msgstr "Frisian"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Irish"
 msgstr "Gaeilge"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Galician"
 msgstr "Gailísis"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Hebrew"
 msgstr "Eabhrach"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hindi"
 msgstr "Hiondúis"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Croatian"
 msgstr "Cróitis"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Hungarian"
 msgstr "Ungáiris"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Icelandic"
 msgstr "Mórlainnis"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Italian"
 msgstr "Iodáilis"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Japanese"
 msgstr "Seapáinis"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Georgian"
 msgstr "Seoirseach"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Khmer"
 msgstr "Ciméiris"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Kannada"
 msgstr "Cannadais"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Korean"
 msgstr "Cóiréis"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Lithuanian"
 msgstr "Liotuáinis"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Latvian"
 msgstr "Laitvis"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Macedonian"
 msgstr "Macadóinis"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
+msgid "Mongolian"
+msgstr "Mongóilis"
+
+#: conf/global_settings.py:81
 msgid "Dutch"
 msgstr "Ollannach"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:82
 msgid "Norwegian"
 msgstr "Ioruais"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:83
+msgid "Norwegian Bokmal"
+msgstr "Bokmal Ioruais"
+
+#: conf/global_settings.py:84
+msgid "Norwegian Nynorsk"
+msgstr "Nynorsk Ioruais"
+
+#: conf/global_settings.py:85
 msgid "Polish"
 msgstr "Polainnis"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:86
 msgid "Portuguese"
 msgstr "Portaingéilis"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:87
 msgid "Brazilian Portuguese"
 msgstr "Portaingéilis Bhrasaíleach"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:88
 msgid "Romanian"
 msgstr "Rómáinis"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:89
 msgid "Russian"
 msgstr "Rúiseach"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:90
 msgid "Slovak"
 msgstr "Slóvaicis"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:91
 msgid "Slovenian"
 msgstr "Slóivéinis"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:92
 msgid "Albanian"
 msgstr "Albanian"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:93
 msgid "Serbian"
 msgstr "Seirbiach"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:94
 msgid "Serbian Latin"
 msgstr "Laidin Seirbiach"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:95
 msgid "Swedish"
 msgstr "Sualainnis"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:96
 msgid "Tamil"
 msgstr "Tamailis"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:97
 msgid "Telugu"
 msgstr "Teileagúis"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:98
 msgid "Thai"
 msgstr "Tamailis"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:99
 msgid "Turkish"
 msgstr "Tuircis"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:100
 msgid "Ukrainian"
 msgstr "Úcráinis"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:101
 msgid "Vietnamese"
 msgstr "Vitneaimis"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:102
 msgid "Simplified Chinese"
 msgstr "Sínis"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:103
 msgid "Traditional Chinese"
 msgstr "Sínis Tradisúinta"
 
-#: contrib/admin/actions.py:52
+#: contrib/admin/actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "D'éirigh le scriosadh %(count)d %(items)s."
 
-#: contrib/admin/actions.py:59
-#: contrib/admin/options.py:1099
+#: contrib/admin/actions.py:55
+#: contrib/admin/options.py:1125
 msgid "Are you sure?"
 msgstr "An bhfuil tú cinnte?"
 
-#: contrib/admin/actions.py:77
+#: contrib/admin/actions.py:73
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Scrios %(verbose_name_plural) roghnaithe"
@@ -289,21 +305,21 @@ msgid "This year"
 msgstr "An blian seo"
 
 #: contrib/admin/filterspecs.py:147
-#: forms/widgets.py:440
+#: forms/widgets.py:469
 msgid "Yes"
 msgstr "Tá"
 
 #: contrib/admin/filterspecs.py:147
-#: forms/widgets.py:440
+#: forms/widgets.py:469
 msgid "No"
 msgstr "Níl"
 
 #: contrib/admin/filterspecs.py:154
-#: forms/widgets.py:440
+#: forms/widgets.py:469
 msgid "Unknown"
 msgstr "Gan aithne"
 
-#: contrib/admin/helpers.py:19
+#: contrib/admin/helpers.py:20
 msgid "Action:"
 msgstr "Aicsean:"
 
@@ -335,89 +351,90 @@ msgstr "loga iontráil"
 msgid "log entries"
 msgstr "loga iontrálacha"
 
-#: contrib/admin/options.py:139
-#: contrib/admin/options.py:154
+#: contrib/admin/options.py:138
+#: contrib/admin/options.py:153
 msgid "None"
 msgstr "Dada"
 
-#: contrib/admin/options.py:558
+#: contrib/admin/options.py:559
 #, python-format
 msgid "Changed %s."
 msgstr "Athraithe %s"
 
-#: contrib/admin/options.py:558
-#: contrib/admin/options.py:568
+#: contrib/admin/options.py:559
+#: contrib/admin/options.py:569
 #: contrib/comments/templates/comments/preview.html:16
-#: db/models/base.py:802
-#: forms/models.py:552
+#: db/models/base.py:844
+#: forms/models.py:568
 msgid "and"
 msgstr "agus"
 
-#: contrib/admin/options.py:563
+#: contrib/admin/options.py:564
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Suimithe %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:567
+#: contrib/admin/options.py:568
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Athraithe %(list)s le %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:572
+#: contrib/admin/options.py:573
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Scriosaithe %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:576
+#: contrib/admin/options.py:577
 msgid "No fields changed."
 msgstr "Dada réimse aithraithe"
 
-#: contrib/admin/options.py:642
+#: contrib/admin/options.py:643
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Bhí  %(name)s \"%(obj)s\" breisithe go rathúil"
 
-#: contrib/admin/options.py:646
-#: contrib/admin/options.py:679
+#: contrib/admin/options.py:647
+#: contrib/admin/options.py:680
 msgid "You may edit it again below."
 msgstr "Is féidir leat é a cuir in eagar thíos."
 
-#: contrib/admin/options.py:656
-#: contrib/admin/options.py:689
+#: contrib/admin/options.py:657
+#: contrib/admin/options.py:690
 #, python-format
 msgid "You may add another %s below."
 msgstr "Is féidir le ceann eile %s a cuir le thíos."
 
-#: contrib/admin/options.py:677
+#: contrib/admin/options.py:678
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Bhí an %(name)s \"%(obj)s\" aithraithe to rathúil"
 
-#: contrib/admin/options.py:685
+#: contrib/admin/options.py:686
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "Chuir an %(name)s·\"%(obj)s\"·go rathúil.·Is féidir leat é a cuir in eagar thíos."
 
-#: contrib/admin/options.py:743
+#: contrib/admin/options.py:740
+#: contrib/admin/options.py:997
 msgid "Items must be selected in order to perform actions on them. No items have been changed."
 msgstr "Ní mór Míreanna a roghnú chun caingne a dhéanamh orthu. Níl aon mhíreanna a athrú."
 
-#: contrib/admin/options.py:761
+#: contrib/admin/options.py:759
 msgid "No action selected."
 msgstr "Uimh gníomh roghnaithe."
 
-#: contrib/admin/options.py:841
+#: contrib/admin/options.py:840
 #, python-format
 msgid "Add %s"
 msgstr "Cuir %s le"
 
-#: contrib/admin/options.py:867
-#: contrib/admin/options.py:1079
+#: contrib/admin/options.py:866
+#: contrib/admin/options.py:1105
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Níl réad le hainm %(name)s agus eochair %(key)r ann."
 
-#: contrib/admin/options.py:932
+#: contrib/admin/options.py:931
 #, python-format
 msgid "Change %s"
 msgstr "Aithrigh %s"
@@ -426,66 +443,81 @@ msgstr "Aithrigh %s"
 msgid "Database error"
 msgstr "Botún bunachar sonraí"
 
-#: contrib/admin/options.py:1013
+#: contrib/admin/options.py:1039
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "Bhí  %(count)s %(name)s aithraithe go rathúil"
+msgstr[0] "Bhí  %(count)s %(name)s aithraithe go rathúil."
 msgstr[1] "Bhí  %(count)s %(name)s aithraithe to rathúil"
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
+msgstr[2] "Bhí  %(count)s %(name)s aithraithe to rathúil"
+msgstr[3] "Bhí  %(count)s %(name)s aithraithe to rathúil"
+msgstr[4] "Bhí  %(count)s %(name)s aithraithe to rathúil"
 
-#: contrib/admin/options.py:1092
+#: contrib/admin/options.py:1066
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "Gach %(total_count)s roghnaithe"
+msgstr[1] "Gach %(total_count)s roghnaithe"
+msgstr[2] "Gach %(total_count)s roghnaithe"
+msgstr[3] "Gach %(total_count)s roghnaithe"
+msgstr[4] "Gach %(total_count)s roghnaithe"
+
+#: contrib/admin/options.py:1071
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 as %(cnt)s roghnaithe."
+
+#: contrib/admin/options.py:1118
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Bhí %(name)s \"%(obj)s\" scrioste go rathúil."
 
-#: contrib/admin/options.py:1129
+#: contrib/admin/options.py:1155
 #, python-format
 msgid "Change history: %s"
 msgstr "Athraigh stáir %s"
 
-#: contrib/admin/sites.py:22
+#: contrib/admin/sites.py:18
 #: contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:81
 msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
 msgstr "Le do thoil, iontráil aihm úsaideora agus focal faire ceart. Bí cúramach go bhfuil an beirt acu cásíogair."
 
-#: contrib/admin/sites.py:311
+#: contrib/admin/sites.py:307
 #: contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Le do thoil, logáil isteach arís cé go bhfuil to seisúin críochnaithe."
 
-#: contrib/admin/sites.py:318
+#: contrib/admin/sites.py:314
 #: contrib/admin/views/decorators.py:47
 msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
 msgstr "Feictear nach bhfuil do brabhsálaí réidh le cuaiche a glacadh. Le do thoil, cumasaigh cuaiche, athlódáil an leathanach seo, agus déan iarracht arís."
 
-#: contrib/admin/sites.py:334
-#: contrib/admin/sites.py:340
+#: contrib/admin/sites.py:330
+#: contrib/admin/sites.py:336
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Níl an carachtar '@' ceadaithe in ainmeacha úsaideora."
 
-#: contrib/admin/sites.py:337
+#: contrib/admin/sites.py:333
 #: contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Níl do ríomhseoladh do ainm úsaideora. Bain trial as '%s'."
 
-#: contrib/admin/sites.py:393
+#: contrib/admin/sites.py:389
 msgid "Site administration"
 msgstr "Riaracháin an suíomh"
 
-#: contrib/admin/sites.py:407
+#: contrib/admin/sites.py:403
 #: contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Logáil isteach"
 
-#: contrib/admin/sites.py:452
+#: contrib/admin/sites.py:448
 #, python-format
 msgid "%s administration"
 msgstr "%s riaracháin"
@@ -510,7 +542,7 @@ msgstr "Athraigh:"
 msgid "Lookup"
 msgstr "Cuardach"
 
-#: contrib/admin/widgets.py:241
+#: contrib/admin/widgets.py:244
 msgid "Add Another"
 msgstr "Cuir le"
 
@@ -525,9 +557,9 @@ msgstr "Tá brón orainn, ach ní bhfuarthas an leathanach iarraite."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:54
+#: contrib/admin/templates/admin/base.html:55
 #: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:39
+#: contrib/admin/templates/admin/change_list.html:42
 #: contrib/admin/templates/admin/delete_confirmation.html:6
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
@@ -568,26 +600,16 @@ msgstr "Rith an gníomh roghnaithe"
 msgid "Go"
 msgstr "Té"
 
-#: contrib/admin/templates/admin/actions.html:7
-#, python-format
-msgid "<span class=\"_acnt\">0</span> of %(total_count)s %(module_name)s selected"
-msgstr "<span class=\"_acnt\">0</span> de%(total_count)s %(module_name)s roghnaithe"
+#: contrib/admin/templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Cliceáil anseo chun na hobiacht go léir a roghnú ar fud gach leathanach"
 
 #: contrib/admin/templates/admin/actions.html:11
-#, python-format
-msgid "All %(total_count)s %(module_name)s selected"
-msgstr "Gach %(total_count)s %(module_name)s roghnaithe"
-
-#: contrib/admin/templates/admin/actions.html:14
-msgid "Click here to select all objects across all pages"
-msgstr "Cliceáil anseo chun an roghnú ábhair go léir ar fud gach leathanach"
-
-#: contrib/admin/templates/admin/actions.html:14
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Roghnaigh gach %(total_count)s %(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:16
+#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Scroiseadh modhnóir"
 
@@ -597,18 +619,18 @@ msgstr "Scroiseadh modhnóir"
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:27
+#: contrib/admin/templates/admin/base.html:28
 msgid "Welcome,"
 msgstr "Fáilte"
 
-#: contrib/admin/templates/admin/base.html:32
+#: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Doiciméadúchán"
 
-#: contrib/admin/templates/admin/base.html:40
+#: contrib/admin/templates/admin/base.html:41
 #: contrib/admin/templates/admin/auth/user/change_password.html:15
 #: contrib/admin/templates/admin/auth/user/change_password.html:48
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -616,7 +638,7 @@ msgstr "Doiciméadúchán"
 msgid "Change password"
 msgstr "Athraigh focal faire"
 
-#: contrib/admin/templates/admin/base.html:47
+#: contrib/admin/templates/admin/base.html:48
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
@@ -647,26 +669,29 @@ msgid "View on site"
 msgstr "Breath ar suíomh"
 
 #: contrib/admin/templates/admin/change_form.html:39
-#: contrib/admin/templates/admin/change_list.html:68
+#: contrib/admin/templates/admin/change_list.html:71
 #: contrib/admin/templates/admin/auth/user/change_password.html:24
 #: contrib/admin/templates/registration/password_change_form.html:15
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Le do thoil ceartaigh an botún thíos."
 msgstr[1] "Le do thoil ceartaigh na botúin thíos."
+msgstr[2] "Le do thoil ceartaigh na botúin thíos."
+msgstr[3] "Le do thoil ceartaigh na botúin thíos."
+msgstr[4] "Le do thoil ceartaigh na botúin thíos."
 
-#: contrib/admin/templates/admin/change_list.html:60
+#: contrib/admin/templates/admin/change_list.html:63
 #, python-format
 msgid "Add %(name)s"
 msgstr "Cuir %(name)s le"
 
-#: contrib/admin/templates/admin/change_list.html:79
+#: contrib/admin/templates/admin/change_list.html:82
 msgid "Filter"
 msgstr "Scagaire"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
 #: contrib/admin/templates/admin/submit_line.html:4
-#: forms/formsets.py:294
+#: forms/formsets.py:302
 msgid "Delete"
 msgstr "Cealaigh"
 
@@ -780,6 +805,9 @@ msgid "1 result"
 msgid_plural "%(counter)s results"
 msgstr[0] "toradh 1"
 msgstr[1] "%(counter)s torthaí"
+msgstr[2] "%(counter)s torthaí"
+msgstr[3] "%(counter)s torthaí"
+msgstr[4] "%(counter)s torthaí"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -825,14 +853,14 @@ msgstr "Focal faire (arís)"
 msgid "Enter the same password as above, for verification."
 msgstr "Iontráíl an focal faire céanna mar thuas, le fíorúchán."
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:53
-#: contrib/admin/templates/admin/edit_inline/tabular.html:99
+#: contrib/admin/templates/admin/edit_inline/stacked.html:64
+#: contrib/admin/templates/admin/edit_inline/tabular.html:110
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Cuir eile %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:56
-#: contrib/admin/templates/admin/edit_inline/tabular.html:102
+#: contrib/admin/templates/admin/edit_inline/stacked.html:67
+#: contrib/admin/templates/admin/edit_inline/tabular.html:113
 #: contrib/comments/templates/comments/delete.html:12
 msgid "Remove"
 msgstr "Tóg amach"
@@ -977,16 +1005,16 @@ msgstr "R-phost:"
 msgid "Reset my password"
 msgstr "Athsocraigh mo focal faire"
 
-#: contrib/admin/templatetags/admin_list.py:240
+#: contrib/admin/templatetags/admin_list.py:239
 msgid "All dates"
 msgstr "Gach dáta"
 
-#: contrib/admin/views/main.py:70
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s"
 msgstr "Roghnaigh %s"
 
-#: contrib/admin/views/main.py:70
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s to change"
 msgstr "Roghnaigh %s a athrú"
@@ -1159,14 +1187,13 @@ msgstr "Ainm úsaideoir"
 
 #: contrib/auth/forms.py:15
 #: contrib/auth/forms.py:49
-#: contrib/auth/models.py:180
-msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
-msgstr "Riachtanach. 30 carachtair nó níos lú. Alfa-uimhriúil amhain (litreacha, digite agus fostríce)."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Riachtanach. 30 carachtair nó níos lú. Litreacha, digite agus @/./+/-/_ amháin."
 
 #: contrib/auth/forms.py:16
 #: contrib/auth/forms.py:50
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Cathaigh litreacha, digite agus fostríce amhain le hadhaigh an méid seo."
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Cathaigh litreacha, digite agus na carachtair @/./+/-/_ amhain le hadhaigh an méid seo."
 
 #: contrib/auth/forms.py:18
 msgid "Password confirmation"
@@ -1234,95 +1261,99 @@ msgid "group"
 msgstr "grúpa"
 
 #: contrib/auth/models.py:99
-#: contrib/auth/models.py:190
+#: contrib/auth/models.py:206
 msgid "groups"
 msgstr "grúpa"
 
-#: contrib/auth/models.py:180
+#: contrib/auth/models.py:196
 msgid "username"
 msgstr "Ainm úsáideoir"
 
-#: contrib/auth/models.py:181
+#: contrib/auth/models.py:196
+msgid "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "Riachtanach. 30 carachtair nó níos lú. Litreacha, digite agus na carachtair @/./+/-/_"
+
+#: contrib/auth/models.py:197
 msgid "first name"
 msgstr "ainm baiste"
 
-#: contrib/auth/models.py:182
+#: contrib/auth/models.py:198
 msgid "last name"
 msgstr "sloinne"
 
-#: contrib/auth/models.py:183
+#: contrib/auth/models.py:199
 msgid "e-mail address"
 msgstr "seoladh r-phost"
 
-#: contrib/auth/models.py:184
+#: contrib/auth/models.py:200
 msgid "password"
 msgstr "focal faire"
 
-#: contrib/auth/models.py:184
+#: contrib/auth/models.py:200
 msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
 msgstr "Úsáid '[algo]$[salt]$[hexdigest]' nó <a href=\"password/\">athraigh focal faire foirm</a>."
 
-#: contrib/auth/models.py:185
+#: contrib/auth/models.py:201
 msgid "staff status"
 msgstr "stádas foirne"
 
-#: contrib/auth/models.py:185
+#: contrib/auth/models.py:201
 msgid "Designates whether the user can log into this admin site."
 msgstr "Sainigh an bhfuil cead ag an úsáideoir logáil isteach go dtí an suíomh riaracháin seo."
 
-#: contrib/auth/models.py:186
+#: contrib/auth/models.py:202
 msgid "active"
 msgstr "gníomhach"
 
-#: contrib/auth/models.py:186
+#: contrib/auth/models.py:202
 msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
 msgstr "Sainíonn an bhfuil an úsáideoir gníomhach. Míroghnaigh seo in aineonn de scriseadh cuntasí."
 
-#: contrib/auth/models.py:187
+#: contrib/auth/models.py:203
 msgid "superuser status"
 msgstr "stádas forúsáideoir"
 
-#: contrib/auth/models.py:187
+#: contrib/auth/models.py:203
 msgid "Designates that this user has all permissions without explicitly assigning them."
 msgstr "Sainíonn go bhfuil gach ceada ag an úsáideoir seo gan iad a cur le go díreach."
 
-#: contrib/auth/models.py:188
+#: contrib/auth/models.py:204
 msgid "last login"
 msgstr "logáil deirneach"
 
-#: contrib/auth/models.py:189
+#: contrib/auth/models.py:205
 msgid "date joined"
 msgstr "Dáta teacht isteach"
 
-#: contrib/auth/models.py:191
+#: contrib/auth/models.py:207
 msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
 msgstr "Breis leis na ceada sannta láimhe, faigheann an úsáideoir seo gach ceada sannta do na grúpaí a bhfuil sé/sí isteach in."
 
-#: contrib/auth/models.py:192
+#: contrib/auth/models.py:208
 msgid "user permissions"
 msgstr "ceada úsáideoira"
 
-#: contrib/auth/models.py:196
+#: contrib/auth/models.py:212
 #: contrib/comments/models.py:50
 #: contrib/comments/models.py:168
 msgid "user"
 msgstr "úsáideoir"
 
-#: contrib/auth/models.py:197
+#: contrib/auth/models.py:213
 msgid "users"
 msgstr "úsáideora"
 
-#: contrib/auth/models.py:378
+#: contrib/auth/models.py:394
 msgid "message"
 msgstr "teachtaireacht"
 
-#: contrib/auth/views.py:60
+#: contrib/auth/views.py:79
 msgid "Logged out"
 msgstr "Logáilte amach"
 
 #: contrib/auth/management/commands/createsuperuser.py:23
 #: core/validators.py:120
-#: forms/fields.py:416
+#: forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Cuir isteach seoladh ríomhphoist bhailí."
 
@@ -1334,39 +1365,54 @@ msgstr "Inneachar"
 msgid "Metadata"
 msgstr "Meiteashonraí"
 
-#: contrib/comments/admin.py:39
-msgid "flagged"
-msgstr "bratach curtha leis"
-
 #: contrib/comments/admin.py:40
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "bratach curtha leis"
+msgstr[1] "bratach curtha leis"
+msgstr[2] "bratach curtha leis"
+msgstr[3] "bratach curtha leis"
+msgstr[4] "bratach curtha leis"
+
+#: contrib/comments/admin.py:41
 msgid "Flag selected comments"
 msgstr "Bratach nótaí tráchta roghnaithe"
 
-#: contrib/comments/admin.py:43
+#: contrib/comments/admin.py:45
 msgid "approved"
-msgstr "ceadaithe"
+msgid_plural "approved"
+msgstr[0] "ceadaithe"
+msgstr[1] "ceadaithe"
+msgstr[2] "ceadaithe"
+msgstr[3] "ceadaithe"
+msgstr[4] "ceadaithe"
 
-#: contrib/comments/admin.py:44
+#: contrib/comments/admin.py:46
 msgid "Approve selected comments"
 msgstr "Cheadú nótaí tráchta roghnaithe"
 
-#: contrib/comments/admin.py:47
+#: contrib/comments/admin.py:50
 msgid "removed"
-msgstr "baineadh"
+msgid_plural "removed"
+msgstr[0] "baineadh"
+msgstr[1] "baineadh"
+msgstr[2] "baineadh"
+msgstr[3] "baineadh"
+msgstr[4] "baineadh"
 
-#: contrib/comments/admin.py:48
+#: contrib/comments/admin.py:51
 msgid "Remove selected comments"
 msgstr "Bain nótaí tráchta roghnaithe"
 
-#: contrib/comments/admin.py:60
+#: contrib/comments/admin.py:63
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 nóta tráchta bhí rathúil %(action)s."
+msgstr[0] "bhí nóta tráchta %(action)s go rathúil."
 msgstr[1] "nótaí tráchta %(count)s a bhí sásúil %(action)s."
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
+msgstr[2] "nótaí tráchta %(count)s a bhí sásúil %(action)s."
+msgstr[3] "nótaí tráchta %(count)s a bhí sásúil %(action)s."
+msgstr[4] "nótaí tráchta %(count)s a bhí sásúil %(action)s."
 
 #: contrib/comments/feeds.py:13
 #, python-format
@@ -1389,7 +1435,7 @@ msgstr "R-phost"
 #: contrib/comments/forms.py:95
 #: contrib/flatpages/admin.py:8
 #: contrib/flatpages/models.py:7
-#: db/models/fields/__init__.py:1118
+#: db/models/fields/__init__.py:1101
 msgid "URL"
 msgstr "URL"
 
@@ -1403,6 +1449,9 @@ msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Féach ar do bhéal! Níl an focal %s ceadaithe anseo."
 msgstr[1] "Féach ar do bhéal! Níl na focail %s ceadaithe anseo."
+msgstr[2] "Féach ar do bhéal! Níl na focail %s ceadaithe anseo."
+msgstr[3] "Féach ar do bhéal! Níl na focail %s ceadaithe anseo."
+msgstr[4] "Féach ar do bhéal! Níl na focail %s ceadaithe anseo."
 
 #: contrib/comments/forms.py:182
 msgid "If you enter anything in this field your comment will be treated as spam"
@@ -1440,7 +1489,7 @@ msgid "date/time submitted"
 msgstr "Dáta/am curtha isteach"
 
 #: contrib/comments/models.py:60
-#: db/models/fields/__init__.py:914
+#: db/models/fields/__init__.py:896
 msgid "IP address"
 msgstr "Seol IP"
 
@@ -1581,6 +1630,9 @@ msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
 msgstr[0] "Le do thoil ceartaigh an botún thíos."
 msgstr[1] "Le do thoil ceartaigh na botúin thíos."
+msgstr[2] "Le do thoil ceartaigh na botúin thíos."
+msgstr[3] "Le do thoil ceartaigh na botúin thíos."
+msgstr[4] "Le do thoil ceartaigh na botúin thíos."
 
 #: contrib/comments/templates/comments/preview.html:16
 msgid "Post your comment"
@@ -1646,7 +1698,7 @@ msgstr "leacleathanach"
 msgid "flat pages"
 msgstr "leacleathanaigh"
 
-#: contrib/formtools/wizard.py:134
+#: contrib/formtools/wizard.py:140
 msgid "We apologize, but your form has expired. Please continue filling out the form from this page."
 msgstr "Gabh ár leithscéal, ach tá do fhoirm in éag. Lean ar aghaidh le do thoil líonadh amach an fhoirm ón leathanach seo."
 
@@ -1654,31 +1706,31 @@ msgstr "Gabh ár leithscéal, ach tá do fhoirm in éag. Lean ar aghaidh le do t
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "GIS an bonn réimse - léarscáileanna chun an Sonraíocht OpenGIS cineál Céimseata."
 
-#: contrib/gis/db/models/fields.py:269
+#: contrib/gis/db/models/fields.py:270
 msgid "Point"
 msgstr "Pointe"
 
-#: contrib/gis/db/models/fields.py:273
+#: contrib/gis/db/models/fields.py:274
 msgid "Line string"
 msgstr "Líne teaghrán"
 
-#: contrib/gis/db/models/fields.py:277
+#: contrib/gis/db/models/fields.py:278
 msgid "Polygon"
 msgstr "Polagán"
 
-#: contrib/gis/db/models/fields.py:281
+#: contrib/gis/db/models/fields.py:282
 msgid "Multi-point"
 msgstr "Il-phointe"
 
-#: contrib/gis/db/models/fields.py:285
+#: contrib/gis/db/models/fields.py:286
 msgid "Multi-line string"
 msgstr "Il-líne teaghrán"
 
-#: contrib/gis/db/models/fields.py:289
+#: contrib/gis/db/models/fields.py:290
 msgid "Multi polygon"
 msgstr "Il polagán"
 
-#: contrib/gis/db/models/fields.py:293
+#: contrib/gis/db/models/fields.py:294
 msgid "Geometry collection"
 msgstr "Céimseata bhailiú"
 
@@ -1720,6 +1772,9 @@ msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f milliún"
 msgstr[1] "%(value).1f milliún"
+msgstr[2] "%(value).1f milliún"
+msgstr[3] "%(value).1f milliún"
+msgstr[4] "%(value).1f milliún"
 
 #: contrib/humanize/templatetags/humanize.py:54
 #, python-format
@@ -1727,6 +1782,9 @@ msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f billiún"
 msgstr[1] "%(value).1f billiún"
+msgstr[2] "%(value).1f billiún"
+msgstr[3] "%(value).1f billiún"
+msgstr[4] "%(value).1f billiún"
 
 #: contrib/humanize/templatetags/humanize.py:57
 #, python-format
@@ -1734,6 +1792,9 @@ msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f trilliún"
 msgstr[1] "%(value).1f trilliún"
+msgstr[2] "%(value).1f trilliún"
+msgstr[3] "%(value).1f trilliún"
+msgstr[4] "%(value).1f trilliún"
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
@@ -1788,8 +1849,8 @@ msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "Cuir isteach cód póstal ins an formáid NNNN nó ANNNNAAA"
 
 #: contrib/localflavor/ar/forms.py:50
-#: contrib/localflavor/br/forms.py:97
-#: contrib/localflavor/br/forms.py:136
+#: contrib/localflavor/br/forms.py:92
+#: contrib/localflavor/br/forms.py:131
 #: contrib/localflavor/pe/forms.py:24
 #: contrib/localflavor/pe/forms.py:52
 msgid "This field requires only numbers."
@@ -1857,31 +1918,31 @@ msgstr "Iontráil uimhir Ostaire Slándáil Shóisialta bailí i bhformáid XXXX
 msgid "Enter a 4 digit post code."
 msgstr "Iontráil cód poist 4 dhigit."
 
-#: contrib/localflavor/br/forms.py:22
+#: contrib/localflavor/br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
 msgstr "Iontráil zip-cód i bhformáid XXXXX-XXX."
 
-#: contrib/localflavor/br/forms.py:31
+#: contrib/localflavor/br/forms.py:26
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "Ní mór Uimhreacha teileafóin a chur i XX-XXXX-XXXX format."
 
-#: contrib/localflavor/br/forms.py:59
+#: contrib/localflavor/br/forms.py:54
 msgid "Select a valid brazilian state. That state is not one of the available states."
 msgstr "Roghnaigh stát na Brasaíle bailí. Ní thugann an Stát sin ar cheann de na stáit atá ar fáil."
 
-#: contrib/localflavor/br/forms.py:95
+#: contrib/localflavor/br/forms.py:90
 msgid "Invalid CPF number."
 msgstr "Uimhir CPF neamhbhailí."
 
-#: contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/br/forms.py:91
 msgid "This field requires at most 11 digits or 14 characters."
 msgstr "Éilíonn an réimse seo ag an chuid is mó dhigit 11 nó 14 de charachtair."
 
-#: contrib/localflavor/br/forms.py:135
+#: contrib/localflavor/br/forms.py:130
 msgid "Invalid CNPJ number."
 msgstr "Neamhbhailí CNPJ uimhir."
 
-#: contrib/localflavor/br/forms.py:137
+#: contrib/localflavor/br/forms.py:132
 msgid "This field requires at least 14 digits"
 msgstr "Éilíonn an réimse seo ar a laghad 14 digití"
 
@@ -4314,27 +4375,27 @@ msgid "Enter a valid value."
 msgstr "Cuir luach bailí isteach."
 
 #: core/validators.py:87
-#: forms/fields.py:517
+#: forms/fields.py:529
 msgid "Enter a valid URL."
 msgstr "Cuir URL bailí isteach."
 
 #: core/validators.py:89
-#: forms/fields.py:518
+#: forms/fields.py:530
 msgid "This URL appears to be a broken link."
 msgstr "Dealraíonn sé gur nasc briste é an URL seo."
 
 #: core/validators.py:123
-#: forms/fields.py:861
+#: forms/fields.py:873
 msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "Cuir 'slug' bailí isteach atá déanta as litreacha, uimhreacha, fostríoca nó fleiscíní."
 
 #: core/validators.py:126
-#: forms/fields.py:854
+#: forms/fields.py:866
 msgid "Enter a valid IPv4 address."
 msgstr "Cuir seoladh bailí IPv4 isteach."
 
 #: core/validators.py:129
-#: db/models/fields/__init__.py:596
+#: db/models/fields/__init__.py:572
 msgid "Enter only digits separated by commas."
 msgstr "Ná cuir isteach ach digití scartha ag camóga."
 
@@ -4344,15 +4405,15 @@ msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "Bí cinnte nach bhfuil níos lú ná %(limit_value)s (it is %(show_value)s)."
 
 #: core/validators.py:153
-#: forms/fields.py:196
-#: forms/fields.py:246
+#: forms/fields.py:205
+#: forms/fields.py:257
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Bí cinnte go bhfuil an luach seo cothrom le nó níos lú ná %(limit_value)s."
 
 #: core/validators.py:158
-#: forms/fields.py:197
-#: forms/fields.py:247
+#: forms/fields.py:206
+#: forms/fields.py:258
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Bí cinnte go bhfuil an luach seo cothrom le nó níos mó ná %(limit_value)s."
@@ -4367,163 +4428,163 @@ msgstr "Bí cinnte nach bhfuil níos lú ná %(limit_value)d carachtar sa luach 
 msgid "Ensure this value has at most %(limit_value)d characters (it has %(show_value)d)."
 msgstr "Bí cinnte nach bhfuil níos mó ná %(limit_value)d carachtar sa luach seo %(show_value)d)."
 
-#: db/models/base.py:780
+#: db/models/base.py:822
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "Ní mór a bheith %(field_name)s uathúil don %(date_field)s %(lookup)s."
 
-#: db/models/base.py:795
-#: db/models/base.py:803
+#: db/models/base.py:837
+#: db/models/base.py:845
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Tá %(model_name)s leis an %(field_label)s seo ann cheana."
 
-#: db/models/fields/__init__.py:62
+#: db/models/fields/__init__.py:63
 #, python-format
 msgid "Value %r is not a valid choice."
 msgstr "Níl %r luach rogha bailí."
 
-#: db/models/fields/__init__.py:63
+#: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
 msgstr "Ní cheadaítear luach nialasach sa réimse seo."
 
-#: db/models/fields/__init__.py:64
+#: db/models/fields/__init__.py:65
 msgid "This field cannot be blank."
 msgstr "Ní cheadaítear luach nialasach sa réimse seo."
 
-#: db/models/fields/__init__.py:69
+#: db/models/fields/__init__.py:70
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Réimse de Cineál: %(field_type)s"
 
-#: db/models/fields/__init__.py:475
-#: db/models/fields/__init__.py:876
-#: db/models/fields/__init__.py:978
-#: db/models/fields/__init__.py:989
-#: db/models/fields/__init__.py:1016
+#: db/models/fields/__init__.py:451
+#: db/models/fields/__init__.py:852
+#: db/models/fields/__init__.py:961
+#: db/models/fields/__init__.py:972
+#: db/models/fields/__init__.py:999
 msgid "Integer"
 msgstr "Slánuimhir"
 
-#: db/models/fields/__init__.py:479
+#: db/models/fields/__init__.py:455
+#: db/models/fields/__init__.py:850
 msgid "This value must be an integer."
 msgstr "Ní mór don luach seo a bheith ina shlánuimhir."
 
-#: db/models/fields/__init__.py:514
+#: db/models/fields/__init__.py:490
 msgid "This value must be either True or False."
 msgstr "Ní mór don luach seo a bheith Fíor nó Bréagach."
 
-#: db/models/fields/__init__.py:516
+#: db/models/fields/__init__.py:492
 msgid "Boolean (Either True or False)"
 msgstr "Boole"
 
-#: db/models/fields/__init__.py:563
-#: db/models/fields/__init__.py:999
+#: db/models/fields/__init__.py:539
+#: db/models/fields/__init__.py:982
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Teaghrán (suas go %(max_length)s)"
 
-#: db/models/fields/__init__.py:591
+#: db/models/fields/__init__.py:567
 msgid "Comma-separated integers"
 msgstr "Slánuimhireacha camóg-scartha"
 
-#: db/models/fields/__init__.py:605
+#: db/models/fields/__init__.py:581
 msgid "Date (without time)"
 msgstr "Dáta (gan am)"
 
-#: db/models/fields/__init__.py:609
+#: db/models/fields/__init__.py:585
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Cuir dáta bailí isteach, san fhormáid BBBB-MM-LL."
 
-#: db/models/fields/__init__.py:610
+#: db/models/fields/__init__.py:586
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Dáta neamhbhailí: %s"
 
-#: db/models/fields/__init__.py:691
+#: db/models/fields/__init__.py:667
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Cuir dáta/am bailí isteach, san fhormáid BBBB-MM-LL UU:NN[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:693
+#: db/models/fields/__init__.py:669
 msgid "Date (with time)"
 msgstr "Dáta (le am)"
 
-#: db/models/fields/__init__.py:759
+#: db/models/fields/__init__.py:735
 msgid "This value must be a decimal number."
 msgstr "Ní mór don luach seo a bheith ina uimhir dheachúlach."
 
-#: db/models/fields/__init__.py:761
+#: db/models/fields/__init__.py:737
 msgid "Decimal number"
 msgstr "Uimhir deachúlach"
 
-#: db/models/fields/__init__.py:816
+#: db/models/fields/__init__.py:792
 msgid "E-mail address"
 msgstr "R-phost"
 
-#: db/models/fields/__init__.py:823
+#: db/models/fields/__init__.py:799
 #: db/models/fields/files.py:220
 #: db/models/fields/files.py:331
 msgid "File path"
 msgstr "Conair comhaid"
 
-#: db/models/fields/__init__.py:846
-#: db/models/fields/__init__.py:874
+#: db/models/fields/__init__.py:822
 msgid "This value must be a float."
 msgstr "Ní mór go mbeadh an luach snámhpointe."
 
-#: db/models/fields/__init__.py:848
+#: db/models/fields/__init__.py:824
 msgid "Floating point number"
 msgstr "Snámhphointe"
 
-#: db/models/fields/__init__.py:901
+#: db/models/fields/__init__.py:883
 msgid "Big (8 byte) integer"
 msgstr "Mór (8 byte) slánuimhi"
 
-#: db/models/fields/__init__.py:930
+#: db/models/fields/__init__.py:912
 msgid "This value must be either None, True or False."
 msgstr "Ní mór don luach seo a bheith Faic, Fíor nó Bréagach."
 
-#: db/models/fields/__init__.py:932
+#: db/models/fields/__init__.py:914
 msgid "Boolean (Either True, False or None)"
 msgstr "Boole (Fíor, Bréagach nó Dada)"
 
-#: db/models/fields/__init__.py:1022
+#: db/models/fields/__init__.py:1005
 msgid "Text"
 msgstr "téacs"
 
-#: db/models/fields/__init__.py:1038
+#: db/models/fields/__init__.py:1021
 msgid "Time"
 msgstr "am"
 
-#: db/models/fields/__init__.py:1042
+#: db/models/fields/__init__.py:1025
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Cuir am bailí isteach san fhormáid UU:NN[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:1126
+#: db/models/fields/__init__.py:1109
 msgid "XML text"
 msgstr "Téacs XML"
 
-#: db/models/fields/related.py:755
+#: db/models/fields/related.py:799
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "Níl %(model)s le eochair %(pk)r ann."
 
-#: db/models/fields/related.py:757
+#: db/models/fields/related.py:801
 msgid "Foreign Key (type determined by related field)"
 msgstr "Eochair Eachtracha (cineál a chinnfear de réir réimse a bhaineann)"
 
-#: db/models/fields/related.py:879
+#: db/models/fields/related.py:918
 msgid "One-to-one relationship"
 msgstr "Duine-le-duine caidreamh"
 
-#: db/models/fields/related.py:939
+#: db/models/fields/related.py:980
 msgid "Many-to-many relationship"
 msgstr "Go leor le go leor caidreamh"
 
-#: db/models/fields/related.py:959
+#: db/models/fields/related.py:1000
 msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "Ar ríomhaire Mac, coinnigh an eochair \"Control\" nó \"Command\" síos chun níos mó ná rud amháin a roghnú."
 
-#: db/models/fields/related.py:1020
+#: db/models/fields/related.py:1061
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
@@ -4537,141 +4598,144 @@ msgstr[4] "Cuir aitheantas bailí %(self)s isteach. Tá na luachanna %(value)r n
 msgid "This field is required."
 msgstr "Tá an réimse seo riachtanach."
 
-#: forms/fields.py:195
+#: forms/fields.py:204
 msgid "Enter a whole number."
 msgstr "Cuir slánuimhir isteach."
 
-#: forms/fields.py:225
-#: forms/fields.py:245
+#: forms/fields.py:235
+#: forms/fields.py:256
 msgid "Enter a number."
 msgstr "Cuir uimhir isteach."
 
-#: forms/fields.py:248
+#: forms/fields.py:259
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Bí cinnte nach bhfuil níos mó ná %s digit ann."
 
-#: forms/fields.py:249
+#: forms/fields.py:260
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Bí cinnte nach bhfuil níos mó ná %s ionad deachúlach ann."
 
-#: forms/fields.py:250
+#: forms/fields.py:261
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Bí cinnte nach bhfuil níos mó ná %s digit roimh an bpointe deachúlach."
 
-#: forms/fields.py:311
-#: forms/fields.py:826
+#: forms/fields.py:323
+#: forms/fields.py:838
 msgid "Enter a valid date."
 msgstr "Cuir dáta bailí isteach."
 
-#: forms/fields.py:339
-#: forms/fields.py:827
+#: forms/fields.py:351
+#: forms/fields.py:839
 msgid "Enter a valid time."
 msgstr "Cuir am bailí isteach."
 
-#: forms/fields.py:365
+#: forms/fields.py:377
 msgid "Enter a valid date/time."
 msgstr "Cuir dáta/am bailí isteach."
 
-#: forms/fields.py:423
+#: forms/fields.py:435
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Níor seoladh comhad. Deimhnigh cineál an ionchódaithe ar an bhfoirm."
 
-#: forms/fields.py:424
+#: forms/fields.py:436
 msgid "No file was submitted."
 msgstr "Níor seoladh aon chomhad."
 
-#: forms/fields.py:425
+#: forms/fields.py:437
 msgid "The submitted file is empty."
 msgstr "Tá an comhad a seoladh folamh."
 
-#: forms/fields.py:426
+#: forms/fields.py:438
 #, python-format
 msgid "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr "Cinntiú go bhfuil níos lú ná %(max)d carachtair (tá sé %(length)d) ag ainm an chomhaid seo."
 
-#: forms/fields.py:461
+#: forms/fields.py:473
 msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
 msgstr "Uasluchtaigh íomhá bhailí. Níorbh íomhá é an comhad a d'uasluchtaigh tú, nó b'íomhá thruaillithe é."
 
-#: forms/fields.py:584
-#: forms/fields.py:659
+#: forms/fields.py:596
+#: forms/fields.py:671
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Déan rogha bhailí. Ní ceann de na roghanna é %(value)s."
 
-#: forms/fields.py:660
-#: forms/fields.py:722
-#: forms/models.py:979
+#: forms/fields.py:672
+#: forms/fields.py:734
+#: forms/models.py:1002
 msgid "Enter a list of values."
 msgstr "Cuir liosta de luachanna isteach."
 
-#: forms/formsets.py:290
-#: forms/formsets.py:292
+#: forms/formsets.py:298
+#: forms/formsets.py:300
 msgid "Order"
 msgstr "Ord"
 
-#: forms/models.py:546
+#: forms/models.py:562
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Le do thoil ceartaigh an sonra dúbail le %(field)s."
 
-#: forms/models.py:550
+#: forms/models.py:566
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "Ceart le do thoil na sonraí a dhúbailt le haghaidh %(field)s, chaithfidh a bheith uathúil."
 
-#: forms/models.py:556
+#: forms/models.py:572
 #, python-format
 msgid "Please correct the duplicate data for %(field_name)s which must be unique for the %(lookup)s in %(date_field)s."
 msgstr "Ceart le do thoil na sonraí a dhúbailt le haghaidh %(field_name)s ní mór a bheith uaithúil le haghaidh an %(lookup)s i %(date_field)s."
 
-#: forms/models.py:564
+#: forms/models.py:580
 msgid "Please correct the duplicate values below."
 msgstr "Le do thoil ceartaigh na luachanna dúbail thíos."
 
-#: forms/models.py:838
+#: forms/models.py:855
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Ní raibh an eochair eachtrach comhoiriúnach leis an tuismitheoir ásc príomh-eochair."
 
-#: forms/models.py:904
+#: forms/models.py:921
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Déan rogha bhailí. Ní ceann de na roghanna é do roghasa."
 
-#: forms/models.py:980
+#: forms/models.py:1003
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Déan rogha bhailí. Ní ceann de na roghanna é %s."
 
-#: forms/models.py:982
+#: forms/models.py:1005
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "Níl \"%s\" luach bailí le príomh-eochair."
 
-#: template/defaultfilters.py:781
+#: template/defaultfilters.py:776
 msgid "yes,no,maybe"
 msgstr "tá, níl, b'fhéidir"
 
-#: template/defaultfilters.py:812
+#: template/defaultfilters.py:807
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d beart"
 msgstr[1] "%(size)d bearta"
+msgstr[2] "%(size)d bearta"
+msgstr[3] "%(size)d bearta"
+msgstr[4] "%(size)d bearta"
 
-#: template/defaultfilters.py:814
+#: template/defaultfilters.py:809
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:816
+#: template/defaultfilters.py:811
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:817
+#: template/defaultfilters.py:812
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -4894,36 +4958,54 @@ msgid "year"
 msgid_plural "years"
 msgstr[0] "blian"
 msgstr[1] "blianta"
+msgstr[2] "blianta"
+msgstr[3] "blianta"
+msgstr[4] "blianta"
 
 #: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "mí"
 msgstr[1] "mhí"
+msgstr[2] "mhí"
+msgstr[3] "mhí"
+msgstr[4] "mhí"
 
 #: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "seachtain"
 msgstr[1] "seachtain"
+msgstr[2] "seachtain"
+msgstr[3] "seachtain"
+msgstr[4] "seachtain"
 
 #: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "lá"
 msgstr[1] "laethanta"
+msgstr[2] "laethanta"
+msgstr[3] "laethanta"
+msgstr[4] "laethanta"
 
 #: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "uair"
 msgstr[1] "uair"
+msgstr[2] "uair"
+msgstr[3] "uair"
+msgstr[4] "uair"
 
 #: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "nóiméad"
 msgstr[1] "nóiméad"
+msgstr[2] "nóiméad"
+msgstr[3] "nóiméad"
+msgstr[4] "nóiméad"
 
 #: utils/timesince.py:45
 msgid "minutes"
@@ -4939,23 +5021,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:512
+#: utils/translation/trans_real.py:518
 msgid "DATE_FORMAT"
 msgstr "N j, Y"
 
-#: utils/translation/trans_real.py:513
+#: utils/translation/trans_real.py:519
 msgid "DATETIME_FORMAT"
 msgstr "DATETIME_FORMAT"
 
-#: utils/translation/trans_real.py:514
+#: utils/translation/trans_real.py:520
 msgid "TIME_FORMAT"
 msgstr "P"
 
-#: utils/translation/trans_real.py:535
+#: utils/translation/trans_real.py:541
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:536
+#: utils/translation/trans_real.py:542
 msgid "MONTH_DAY_FORMAT"
 msgstr "F j"
 
@@ -4974,6 +5056,11 @@ msgstr "D'éirigh le nuashonrú %(verbose_name)s."
 msgid "The %(verbose_name)s was deleted."
 msgstr "Scriosadh %(verbose_name)s."
 
+#~ msgid ""
+#~ "<span class=\"_acnt\">0</span> of %(total_count)s %(module_name)s selected"
+#~ msgstr ""
+#~ "<span class=\"_acnt\">0</span> de%(total_count)s %(module_name)s "
+#~ "roghnaithe"
 #~ msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 #~ msgstr "Ceann amhain nó níos mó  %(fieldname)s in %(name)s: %(obj)s"
 #~ msgid "One or more %(fieldname)s in %(name)s:"
