@@ -193,13 +193,11 @@ An example
     intentionally ignores some complex issues in order to
     demonstrate how routers are used.
 
-    This example won't work on Postgres, Oracle, or MySQL with InnoDB
-    tables if any of the models in ``myapp`` contain foreign keys to
-    models outside of the ``other`` database. ForeignKeys to a remote
-    database introduce referential integrity problems that Django can't
-    currently handle. However, if you're using SQLite or MySQL with MyISAM
-    tables, there is no referential integrity checking, so you will be
-    able to define cross-database foreign keys.
+    This example won't work if any of the models in ``myapp`` contain
+    relationships to models outside of the ``other`` database.
+    :ref:`Cross-database relationships <no_cross_database_relations>`
+    introduce referential integrity problems that Django can't
+    currently handle.
 
     The master/slave configuration described is also flawed -- it
     doesn't provide any solution for handling replication lag (i.e.,
@@ -547,3 +545,32 @@ alias::
 
     from django.db import connections
     cursor = connections['my_db_alias'].cursor()
+
+Limitations of multiple databases
+=================================
+
+.. _no_cross_database_relations:
+
+Cross-database relations
+------------------------
+
+Django doesn't currently provide any support for foreign key or
+many-to-many relationships spanning multiple databases. If you
+have used a router to partition models to different databases,
+any foreign key and many-to-many relationships defined by those
+models must be internal to a single database.
+
+This is because of referential integrity. In order to maintain a
+relationship between two objects, Django needs to know that the
+primary key of the related object is valid. If the primary key is
+stored on a separate database, it's not possible to easily evaluate
+the validity of a primary key.
+
+If you're using Postgres, Oracle, or MySQL with InnoDB, this is
+enforced at the database integrity level -- database level key
+constraints prevent the creation of relations that can't be validated.
+
+However, if you're using SQLite or MySQL with MyISAM tables, there is
+no enforced referential integrity; as a result, you may be able to
+'fake' cross database foreign keys. However, this configuration is not
+officially supported by Django.
