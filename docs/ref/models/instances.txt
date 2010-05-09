@@ -34,11 +34,22 @@ Validating objects
 
 .. versionadded:: 1.2
 
-There are three steps in validating a model, and all three are called by a
-model's ``full_clean()`` method. Most of the time, this method will be called
-automatically by a ``ModelForm``. (See the :ref:`ModelForm documentation
-<topics-forms-modelforms>` for more information.) You should only need to call
-``full_clean()`` if you plan to handle validation errors yourself.
+There are three steps involved in validating a model:
+
+    1. Validate the model fields
+    2. Validate the model as a whole
+    3. Validate the field uniqueness
+
+All three steps are performed when you call by a model's
+``full_clean()`` method.
+
+When you use a ``ModelForm``, the call to ``is_valid()`` will perform
+these validation steps for all the fields that are included on the
+form. (See the :ref:`ModelForm documentation
+<topics-forms-modelforms>` for more information.) You should only need
+to call a model's ``full_clean()`` method if you plan to handle
+validation errors yourself, or if you have excluded fields from the
+ModelForm that require validation.
 
 .. method:: Model.full_clean(exclude=None)
 
@@ -51,10 +62,10 @@ that can be excluded from validation and cleaning. ``ModelForm`` uses this
 argument to exclude fields that aren't present on your form from being
 validated since any errors raised could not be corrected by the user.
 
-Note that ``full_clean()`` will NOT be called automatically when you call
-your model's ``save()`` method. You'll need to call it manually if you want
-to run model validation outside of a ``ModelForm``. (This is for backwards
-compatibility.)
+Note that ``full_clean()`` will *not* be called automatically when you
+call your model's ``save()`` method, nor as a result of ``ModelForm``
+validation. You'll need to call it manually when you want to run model
+validation outside of a ``ModelForm``.
 
 Example::
 
