@@ -257,12 +257,12 @@ The ``CurrentSiteManager``
 
 .. class:: django.contrib.sites.managers.CurrentSiteManager
 
-If :class:`~django.contrib.sites.models.Site`\s play a key role in your application,
-consider using the helpful
-:class:`~django.contrib.sites.managers.CurrentSiteManager` in your model(s).
-It's a model :ref:`manager <topics-db-managers>` that automatically filters
-its queries to include only objects associated with the current
-:class:`~django.contrib.sites.models.Site`.
+If :class:`~django.contrib.sites.models.Site` plays a key role in your
+application, consider using the helpful
+:class:`~django.contrib.sites.managers.CurrentSiteManager` in your
+model(s). It's a model :ref:`manager <topics-db-managers>` that
+automatically filters its queries to include only objects associated
+with the current :class:`~django.contrib.sites.models.Site`.
 
 Use :class:`~django.contrib.sites.managers.CurrentSiteManager` by adding it to
 your model explicitly. For example::
@@ -288,16 +288,21 @@ Put another way, these two statements are equivalent::
     Photo.objects.filter(site=settings.SITE_ID)
     Photo.on_site.all()
 
-How did :class:`~django.contrib.sites.managers.CurrentSiteManager` know which
-field of ``Photo`` was the :class:`~django.contrib.sites.models.Site`? It
-defaults to looking for a field called
-:class:`~django.contrib.sites.models.Site`. If your model has a
-:class:`~django.db.models.fields.related.ForeignKey` or
-:class:`~django.db.models.fields.related.ManyToManyField` called something
-*other* than :class:`~django.contrib.sites.models.Site`, you need to explicitly
-pass that as the parameter to
-:class:`~django.contrib.sites.managers.CurrentSiteManager`. The following model,
-which has a field called ``publish_on``, demonstrates this::
+How did :class:`~django.contrib.sites.managers.CurrentSiteManager`
+know which field of ``Photo`` was the
+:class:`~django.contrib.sites.models.Site`? By default,
+:class:`~django.contrib.sites.managers.CurrentSiteManager` looks for a
+either a :class:`~django.db.models.fields.related.ForeignKey` called
+``site`` or a
+:class:`~django.db.models.fields.related.ManyToManyField` called
+``sites`` to filter on. If you use a field named something other than
+``site`` or ``sites`` to identify which
+:class:`~django.contrib.sites.models.Site` objects your object is
+related to, then you need to explicitly pass the custom field name as
+a parameter to
+:class:`~django.contrib.sites.managers.CurrentSiteManager` on your
+model. The following model, which has a field called ``publish_on``,
+demonstrates this::
 
     from django.db import models
     from django.contrib.sites.models import Site
@@ -314,16 +319,17 @@ which has a field called ``publish_on``, demonstrates this::
 If you attempt to use :class:`~django.contrib.sites.managers.CurrentSiteManager`
 and pass a field name that doesn't exist, Django will raise a :exc:`ValueError`.
 
-Finally, note that you'll probably want to keep a normal (non-site-specific)
-``Manager`` on your model, even if you use
-:class:`~django.contrib.sites.managers.CurrentSiteManager`. As explained
-in the :ref:`manager documentation <topics-db-managers>`, if you define a manager
-manually, then Django won't create the automatic ``objects = models.Manager()``
-manager for you.Also, note that certain parts of Django -- namely, the Django admin site and
-generic views -- use whichever manager is defined *first* in the model, so if
-you want your admin site to have access to all objects (not just site-specific
-ones), put ``objects = models.Manager()`` in your model, before you define
-:class:`~django.contrib.sites.managers.CurrentSiteManager`.
+Finally, note that you'll probably want to keep a normal
+(non-site-specific) ``Manager`` on your model, even if you use
+:class:`~django.contrib.sites.managers.CurrentSiteManager`. As
+explained in the :ref:`manager documentation <topics-db-managers>`, if
+you define a manager manually, then Django won't create the automatic
+``objects = models.Manager()`` manager for you. Also note that certain
+parts of Django -- namely, the Django admin site and generic views --
+use whichever manager is defined *first* in the model, so if you want
+your admin site to have access to all objects (not just site-specific
+ones), put ``objects = models.Manager()`` in your model, before you
+define :class:`~django.contrib.sites.managers.CurrentSiteManager`.
 
 How Django uses the sites framework
 ===================================
@@ -345,7 +351,7 @@ Here's how Django uses the sites framework:
   :class:`~django.contrib.sites.models.Site` is set to the current
   :setting:`SITE_ID`, and when comments are listed via the appropriate
   template tag, only the comments for the current site are displayed.
-  
+
 * In the :mod:`flatpages framework <django.contrib.flatpages>`, each
   flatpage is associated with a particular site. When a flatpage is created,
   you specify its :class:`~django.contrib.sites.models.Site`, and the
