@@ -869,13 +869,17 @@ They share this interface:
 For example, to create an Atom 1.0 feed and print it to standard output::
 
     >>> from django.utils import feedgenerator
+    >>> from datetime import datetime
     >>> f = feedgenerator.Atom1Feed(
     ...     title=u"My Weblog",
     ...     link=u"http://www.example.com/",
     ...     description=u"In which I write about what I ate today.",
-    ...     language=u"en")
+    ...     language=u"en",
+    ...     author_name=u"Myself",
+    ...     feed_url=u"http://example.com/atom.xml")
     >>> f.add_item(title=u"Hot dog today",
     ...     link=u"http://www.example.com/entries/1/",
+    ...     pubdate=datetime.now(),
     ...     description=u"<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")
     >>> print f.writeString('UTF-8')
     <?xml version="1.0" encoding="UTF-8"?>
