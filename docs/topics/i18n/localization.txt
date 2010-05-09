@@ -57,7 +57,7 @@ creation and upkeep of these files.
 .. admonition:: Gettext utilities
 
     The ``makemessages`` command (and ``compilemessages`` discussed later) use
-    commands from the GNU gettext toolset: ``xgetetxt``, ``msgfmt``,
+    commands from the GNU gettext toolset: ``xgettext``, ``msgfmt``,
     ``msgmerge`` and ``msguniq``.
 
     .. versionchanged:: 1.2
