@@ -393,8 +393,8 @@ Submitting and maintaining translations
 Various parts of Django, such as the admin site and validation error messages,
 are internationalized. This means they display different text depending on a
 user's language setting. For this, Django uses the same internationalization
-infrastructure that is available to Django applications that is described
-in the :ref:`i18n documentation<topics-i18n>`.
+infrastructure available to Django applications described in the
+:ref:`i18n documentation<topics-i18n>`.
 
 These translations are contributed by Django users worldwide. If you find an
 incorrect translation, or if you'd like to add a language that isn't yet
