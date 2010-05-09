@@ -124,8 +124,6 @@ Notes:
       selection to German and English (and any sublanguage, like de-ch or
       en-us).
 
-      .. _LANGUAGES setting: ../settings/#languages
-
     * If you define a custom ``LANGUAGES`` setting, as explained in the
       previous bullet, it's OK to mark the languages as translation strings
       -- but use a "dummy" ``ugettext()`` function, not the one in

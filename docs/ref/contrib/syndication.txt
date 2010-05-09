@@ -271,7 +271,7 @@ Language
 
 Feeds created by the syndication framework automatically include the
 appropriate ``<language>`` tag (RSS 2.0) or ``xml:lang`` attribute (Atom). This
-comes directly from your :setting:`LANGUAGE_CODE setting`.
+comes directly from your :setting:`LANGUAGE_CODE` setting.
 
 URLs
 ----
