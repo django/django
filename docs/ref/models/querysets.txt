@@ -418,6 +418,11 @@ A couple of subtleties that are worth mentioning:
     * When using ``values()`` together with ``distinct()``, be aware that
       ordering can affect the results. See the note in the `distinct()`_
       section, above, for details.
+    * If you use a ``values()`` clause after an ``extra()`` clause,
+      any fields defined by a ``select`` argument in the ``extra()``
+      must be explicitly included in the ``values()`` clause. However,
+      if the ``extra()`` clause is used after the ``values()``, the
+      fields added by the select will be included automatically.
 
 .. versionadded:: 1.0
 
@@ -1383,7 +1388,7 @@ SQL equivalent::
 
     SELECT ... WHERE id > 4;
 
-.. fieldlookup:: gte 
+.. fieldlookup:: gte
 
 gte
 ~~~
