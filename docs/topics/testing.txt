@@ -668,8 +668,16 @@ arguments at time of construction:
         (The name ``attachment`` here is not relevant; use whatever name your
         file-processing code expects.)
 
-        Note that you should manually close the file after it has been provided
-        to ``post()``.
+        Note that if you wish to use the same file handle for multiple
+        ``post()`` calls then you will need to manually reset the file
+        pointer between posts. The easiest way to do this is to
+        manually close the file after it has been provided to
+        ``post()``, as demonstrated above.
+
+        You should also ensure that the file is opened in a way that
+        allows the data to be read. If your file contains binary data
+        such as an image, this means you will need to open the file in
+        ``rb`` (read binary) mode.
 
         The ``extra`` argument acts the same as for :meth:`Client.get`.
 
