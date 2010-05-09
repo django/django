@@ -25,8 +25,16 @@ of dictionaries in order of query execution. Each dictionary has the following::
 ``connection.queries`` includes all SQL statements -- INSERTs, UPDATES,
 SELECTs, etc. Each time your app hits the database, the query will be recorded.
 Note that the raw SQL logged in ``connection.queries`` may not include
-parameter quoting.  Parameter quoting is performed by the database-specific 
+parameter quoting.  Parameter quoting is performed by the database-specific
 backend, and not all backends provide a way to retrieve the SQL after quoting.
+
+.. versionadded:: 1.2
+
+If you are using :ref:`multiple databases<topics-db-multi-db>`, you can use the
+same interface on each member of the ``connections`` dictionary::
+
+    >>> from django.db import connections
+    >>> connections['my_db_alias'].queries
 
 Can I use Django with a pre-existing database?
 ----------------------------------------------
