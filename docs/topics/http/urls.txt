@@ -728,7 +728,7 @@ the fully qualified name into parts, and then tries the following lookup:
        that has an instance namespace matching the application namespace (in
        this example, an instance of the ``myapp`` called ``myapp``).
 
-    4. If there is no default application instance, Django will pick the first
+    4. If there is no default application instance, Django will pick the last
        deployed instance of the application, whatever its instance name may be.
 
     5. If the provided namespace doesn't match an application namespace in
@@ -749,9 +749,9 @@ possible:
       the instance ``bar``.
 
     * If there is no current instance - say, if we were rendering a page
-      somewhere else on the site - ``myapp:index`` will resolve to the first
+      somewhere else on the site - ``myapp:index`` will resolve to the last
       registered instance of ``myapp``. Since there is no default instance,
-      the first instance of ``myapp`` that is registered will be used. This could
+      the last instance of ``myapp`` that is registered will be used. This could
       be ``foo`` or ``bar``, depending on the order they are introduced into the
       urlpatterns of the project.
 
