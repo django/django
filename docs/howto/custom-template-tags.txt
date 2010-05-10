@@ -827,7 +827,7 @@ like so:
 
 .. code-block:: html+django
 
-    {% get_current_time "%Y-%M-%d %I:%M %p" as my_current_time %}
+    {% current_time "%Y-%M-%d %I:%M %p" as my_current_time %}
     <p>The current time is {{ my_current_time }}.</p>
 
 To do that, you'll need to refactor both the compilation function and ``Node``
