@@ -11,6 +11,7 @@ API Reference
    contrib/index
    databases
    django-admin
+   exceptions
    files/index
    forms/index
    generic-views
