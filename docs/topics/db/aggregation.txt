@@ -96,7 +96,7 @@ Generating aggregates for each item in a QuerySet
 =================================================
 
 The second way to generate summary values is to generate an independent
-summary for each object in a ``Queryset``. For example, if you are retrieving
+summary for each object in a ``QuerySet``. For example, if you are retrieving
 a list of books, you may want to know how many authors contributed to
 each book. Each Book has a many-to-many relationship with the Author; we
 want to summarize this relationship for each book in the ``QuerySet``.
@@ -257,7 +257,7 @@ that have contributed to the book, you could use the following query::
 
 Ordinarily, annotations are generated on a per-object basis - an annotated
 ``QuerySet`` will return one result for each object in the original
-``Queryset``. However, when a ``values()`` clause is used to constrain the
+``QuerySet``. However, when a ``values()`` clause is used to constrain the
 columns that are returned in the result set, the method for evaluating
 annotations is slightly different. Instead of returning an annotated result
 for each result in the original ``QuerySet``, the original results are
