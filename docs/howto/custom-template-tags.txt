@@ -7,12 +7,13 @@ Custom template tags and filters
 Introduction
 ============
 
-Django's template system comes a wide variety of :ref:`built-in tags and filters
-<ref-templates-builtins>` designed to address the presentation logic needs of
-your application. Nevertheless, you may find yourself needing functionality that
-is not covered by the core set of template primitives. You can extend the
-template engine by defining custom tags and filters using Python, and then make
-them available to your templates using the ``{% load %}`` tag.
+Django's template system comes with a wide variety of :ref:`built-in
+tags and filters <ref-templates-builtins>` designed to address the
+presentation logic needs of your application. Nevertheless, you may
+find yourself needing functionality that is not covered by the core
+set of template primitives. You can extend the template engine by
+defining custom tags and filters using Python, and then make them
+available to your templates using the ``{% load %}`` tag.
 
 Code layout
 -----------
