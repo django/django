@@ -29,9 +29,10 @@ would with a regular form::
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-As you can see it only displayed one form. This is because by default the
-``formset_factory`` defines one extra form. This can be controlled with the
-``extra`` parameter::
+As you can see it only displayed one empty form. The number of empty forms
+that is displayed is controlled by the ``extra`` parameter. By default,
+``formset_factory`` defines one extra form; the following example will
+display two blank forms::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
