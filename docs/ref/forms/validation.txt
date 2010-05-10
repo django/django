@@ -326,8 +326,6 @@ here and leaving it up to you and your designers to work out what works
 effectively in your particular situation. Our new code (replacing the previous
 sample) looks like this::
 
-    from django.forms.util import ErrorList
-
     class ContactForm(forms.Form):
         # Everything as before.
         ...
@@ -341,8 +339,8 @@ sample) looks like this::
                 # We know these are not in self._errors now (see discussion
                 # below).
                 msg = u"Must put 'help' in subject when cc'ing yourself."
-                self._errors["cc_myself"] = ErrorList([msg])
-                self._errors["subject"] = ErrorList([msg])
+                self._errors["cc_myself"] = self.error_class([msg])
+                self._errors["subject"] = self.error_class([msg])
 
                 # These fields are no longer valid. Remove them from the
                 # cleaned data.
