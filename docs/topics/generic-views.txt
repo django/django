@@ -453,7 +453,7 @@ custom view:
 
     urlpatterns = patterns('',
         #...
-        **(r'^authors/(?P<author_id>\d+)/$', author_detail),**
+        **(r'^authors/(?P<author_id>\\d+)/$', author_detail),**
     )
 
 Then we'd write our wrapper function::
