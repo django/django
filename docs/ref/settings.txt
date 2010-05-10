@@ -880,6 +880,14 @@ installation. Each string should be a full Python path to a Python package that
 contains a Django application, as created by :djadmin:`django-admin.py startapp
 <startapp>`.
 
+.. admonition:: App names must be unique
+
+    The application names (that is, the final dotted part of the
+    path to the module containing ``models.py``) defined in
+    :setting:`INSTALLED_APPS` *must* be unique. For example, you can't
+    include both ``django.contrib.auth`` and ``myproject.auth`` in
+    INSTALLED_APPS.
+
 .. setting:: INTERNAL_IPS
 
 INTERNAL_IPS
