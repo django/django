@@ -7,43 +7,79 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-20 00:51+0900\n"
+"POT-Creation-Date: 2010-05-10 12:07+0200\n"
 "PO-Revision-Date: 2007-04-06 11:15+0900\n"
-"Last-Translator: Hyun Mi Ae <happyhyun@gmail.com>\n"
+"Last-Translator: Joongi Kim (me@daybreaker.info)\n"
 "Language-Team: Korean\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/admin/media/js/SelectFilter2.js:33
+#: contrib/admin/media/js/SelectFilter2.js:37
 #, perl-format
 msgid "Available %s"
 msgstr "이용 가능한 %s"
 
-#: contrib/admin/media/js/SelectFilter2.js:41
+#: contrib/admin/media/js/SelectFilter2.js:45
 msgid "Choose all"
 msgstr "모두 선택"
 
-#: contrib/admin/media/js/SelectFilter2.js:46
+#: contrib/admin/media/js/SelectFilter2.js:50
 msgid "Add"
 msgstr "추가"
 
-#: contrib/admin/media/js/SelectFilter2.js:48
+#: contrib/admin/media/js/SelectFilter2.js:52
 msgid "Remove"
 msgstr "삭제"
 
-#: contrib/admin/media/js/SelectFilter2.js:53
+#: contrib/admin/media/js/SelectFilter2.js:57
 #, perl-format
 msgid "Chosen %s"
 msgstr "선택된 %s"
 
-#: contrib/admin/media/js/SelectFilter2.js:54
+#: contrib/admin/media/js/SelectFilter2.js:58
 msgid "Select your choice(s) and click "
 msgstr "선택한 후 클릭하세요"
 
-#: contrib/admin/media/js/SelectFilter2.js:59
+#: contrib/admin/media/js/SelectFilter2.js:63
 msgid "Clear all"
 msgstr "모두 삭제"
+
+#: contrib/admin/media/js/actions.js:18
+#: contrib/admin/media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/media/js/actions.js:109
+#: contrib/admin/media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"개별 편집 가능한 필드에 저장되지 않은 값이 있습니다. 액션을 수행하면 저장되"
+"지 않은 값들을 잃어버리게 됩니다."
+
+#: contrib/admin/media/js/actions.js:121
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"개별 필드의 값들을 저장하지 않고 액션을 선택했습니다. OK를 누르면 저장되며, "
+"액션을 한 번 더 실행해야 합니다."
+
+#: contrib/admin/media/js/actions.js:123
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"개별 필드에 아무런 변경이 없는 상태로 액션을 선택했습니다. 저장 버튼이 아니"
+"라 진행 버튼을 찾아보세요."
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
@@ -56,62 +92,63 @@ msgstr "1월 2월 3월 4월 5월 6월 7월 8월 9월 10월 11월 12월"
 msgid "S M T W T F S"
 msgstr "일 월 화 수 목 금 토"
 
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr "보기"
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "감추기"
+
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "일요일 월요일 화요일 수요일 목요일 금요일 토요일"
 
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
-msgid "Show"
-msgstr "보기"
-
-#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
-msgid "Hide"
-msgstr "감추기"
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:49
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Now"
 msgstr "현재"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "시계"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
 msgid "Choose a time"
 msgstr "시간 선택"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
 msgid "Midnight"
 msgstr "자정"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
 msgid "6 a.m."
 msgstr "오전 6시"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 msgid "Noon"
 msgstr "정오"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:91
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
 msgstr "취소"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:182
 msgid "Today"
 msgstr "오늘"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:137
 msgid "Calendar"
 msgstr "달력"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
 msgid "Yesterday"
 msgstr "어제"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
 msgstr "내일"
