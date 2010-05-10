@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-01 20:22+0200\n"
-"PO-Revision-Date: 2010-05-01 14:20-0500\n"
+"POT-Creation-Date: 2010-05-10 12:16+0200\n"
+"PO-Revision-Date: 2010-05-09 15:22-0500\n"
 "Last-Translator: Alex <alex.gaynor@gmail.com>\n"
 "Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -49,12 +49,41 @@ msgstr "יש לסמן את ההרשאות המבוקשות וללחוץ על "
 msgid "Clear all"
 msgstr "איפוס הכל"
 
-#: contrib/admin/media/js/actions.js:17
+#: contrib/admin/media/js/actions.js:18
 #: contrib/admin/media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s מ %(cnt)s נבחרות"
 msgstr[1] "%(sel)s מ %(cnt)s נבחרות"
+
+#: contrib/admin/media/js/actions.js:109
+#: contrib/admin/media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"יש לך שינויים שלא נשמרו על שדות יחידות.  אם אתה מפעיל פעולה, שינויים שלא "
+"נשמרו יאבדו."
+
+#: contrib/admin/media/js/actions.js:121
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"בחרת פעולה, אבל עוד לא שמרת את השינויים לשדות בודדים. אנא לחץ על אישור כדי "
+"לשמור. יהיה עליך להפעיל את הפעולה עוד פעם."
+
+#: contrib/admin/media/js/actions.js:123
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"בחרת פעולה, ולא עשיתה שינויימ על שדות. אתה כנראה מחפש את הכפתור ללכת במקום "
+"הכפתור לשמור."
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
