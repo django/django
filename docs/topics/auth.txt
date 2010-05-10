@@ -71,7 +71,7 @@ Fields
 
         Required. 30 characters or fewer. Alphanumeric characters only
         (letters, digits and underscores).
-        
+
         .. versionchanged:: 1.2
            Usernames may now contain ``@``, ``+``, ``.`` and ``-`` characters.
 
@@ -293,7 +293,7 @@ Manager functions
     .. method:: models.UserManager.create_user(username, email, password=None)
 
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
-        
+
         The :attr:`~django.contrib.auth.models.User.username` and
         :attr:`~django.contrib.auth.models.User.password` are set as given. The
         domain portion of :attr:`~django.contrib.auth.models.User.email` is
@@ -486,12 +486,13 @@ If you'd like to store additional information related to your users, Django
 provides a method to specify a site-specific related model -- termed a "user
 profile" -- for this purpose.
 
-To make use of this feature, define a model with fields for the additional
-information you'd like to store, or additional methods you'd like to have
-available, and also add a :class:`~django.db.models.Field.ForeignKey` from your
-model to the :class:`~django.contrib.auth.models.User` model, specified with
-``unique=True`` to ensure only one instance of your model can be created for
-each :class:`~django.contrib.auth.models.User`.
+To make use of this feature, define a model with fields for the
+additional information you'd like to store, or additional methods
+you'd like to have available, and also add a
+:class:`~django.db.models.Field.OneToOneField` from your model to the
+:class:`~django.contrib.auth.models.User` model. This will ensure only
+one instance of your model can be created for each
+:class:`~django.contrib.auth.models.User`.
 
 To indicate that this model is the user profile model for a given site, fill in
 the setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
