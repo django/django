@@ -59,13 +59,13 @@ methods.
 ``RegexValidator``
 ------------------
 
-.. class:: RegexValidator(regex=None, message=None, code=None)
+.. class:: RegexValidator(regex, message=None, code=None)
 
-.. attribute:: regex=None
+.. attribute:: regex
 
-The regular expression pattern to search for the provided ``value``. Raises a
-``ValidationError`` with ``message`` and ``code`` if no match is found. If
-no regex is specified, an empty string is used.
+The regular expression pattern to search for the provided ``value``,
+or a pre-compiled regular expression. Raises a ``ValidationError``
+with ``message`` and ``code`` if no match is found.
 
 .. attribute:: message=None
 

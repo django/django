@@ -21,16 +21,22 @@ class RegexValidator(object):
     code = 'invalid'
 
     def __init__(self, regex=None, message=None, code=None):
+        print 'test'
         if regex is not None:
+            print 1
             self.regex = regex
         if message is not None:
+            print 2
             self.message = message
         if code is not None:
+            print 3
             self.code = code
 
+        print 4
         if isinstance(self.regex, basestring):
+            print 5
             self.regex = re.compile(regex)
-
+        print 'REGEX', type(self.regex), self.regex
     def __call__(self, value):
         """
         Validates that the input matches the regular expression.
