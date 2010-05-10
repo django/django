@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-03 07:53+0200\n"
-"PO-Revision-Date: 2010-05-03 08:23+0200\n"
+"POT-Creation-Date: 2010-05-10 14:40+0200\n"
+"PO-Revision-Date: 2010-05-10 14:44+0200\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italian <django-it@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -121,147 +121,155 @@ msgid "Hungarian"
 msgstr "ungherese"
 
 #: conf/global_settings.py:70
+msgid "Indonesian"
+msgstr "Indonesiano"
+
+#: conf/global_settings.py:71
 msgid "Icelandic"
 msgstr "islandese"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Italian"
 msgstr "italiano"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Japanese"
 msgstr "giapponese"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Georgian"
 msgstr "georgiano"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Khmer"
 msgstr "khmer"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Kannada"
 msgstr "kannada"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Korean"
 msgstr "coreano"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Lithuanian"
 msgstr "lituano"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Latvian"
 msgstr "lettone"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Macedonian"
 msgstr "macedone"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
+msgid "Mongolian"
+msgstr "Mongolo"
+
+#: conf/global_settings.py:82
 msgid "Dutch"
 msgstr "olandese"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:83
 msgid "Norwegian"
 msgstr "norvegese"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:84
 msgid "Norwegian Bokmal"
 msgstr "norvegese bokmal"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:85
 msgid "Norwegian Nynorsk"
 msgstr "norvegese nynorsk"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:86
 msgid "Polish"
 msgstr "polacco"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:87
 msgid "Portuguese"
 msgstr "portoghese"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:88
 msgid "Brazilian Portuguese"
 msgstr "brasiliano portoghese"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:89
 msgid "Romanian"
 msgstr "rumeno"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:90
 msgid "Russian"
 msgstr "russo"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:91
 msgid "Slovak"
 msgstr "slovacco"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:92
 msgid "Slovenian"
 msgstr "sloveno"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:93
 msgid "Albanian"
 msgstr "albanese"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:94
 msgid "Serbian"
 msgstr "serbo"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:95
 msgid "Serbian Latin"
 msgstr "serbo latino"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:96
 msgid "Swedish"
 msgstr "svedese"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:97
 msgid "Tamil"
 msgstr "tamil"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:98
 msgid "Telugu"
 msgstr "telugu"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:99
 msgid "Thai"
 msgstr "tailandese"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:100
 msgid "Turkish"
 msgstr "turco"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:101
 msgid "Ukrainian"
 msgstr "ucraino"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:102
 msgid "Vietnamese"
 msgstr "vietnamita"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:103
 msgid "Simplified Chinese"
 msgstr "cinese semplificato"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:104
 msgid "Traditional Chinese"
 msgstr "cinese tradizionale"
 
-#: contrib/admin/actions.py:52
+#: contrib/admin/actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Cancellati/e con successo %(count)d %(items)s."
 
-#: contrib/admin/actions.py:59 contrib/admin/options.py:1129
+#: contrib/admin/actions.py:55 contrib/admin/options.py:1125
 msgid "Are you sure?"
 msgstr "Sei sicuro?"
 
-#: contrib/admin/actions.py:77
+#: contrib/admin/actions.py:73
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Cancella %(verbose_name_plural)s selezionati/e"
@@ -344,67 +352,67 @@ msgstr "voce di log"
 msgid "log entries"
 msgstr "voci di log"
 
-#: contrib/admin/options.py:142 contrib/admin/options.py:157
+#: contrib/admin/options.py:138 contrib/admin/options.py:153
 msgid "None"
 msgstr "Nessuno"
 
-#: contrib/admin/options.py:563
+#: contrib/admin/options.py:559
 #, python-format
 msgid "Changed %s."
 msgstr "%s modificato/a."
 
-#: contrib/admin/options.py:563 contrib/admin/options.py:573
+#: contrib/admin/options.py:559 contrib/admin/options.py:569
 #: contrib/comments/templates/comments/preview.html:16 db/models/base.py:844
-#: forms/models.py:573
+#: forms/models.py:568
 msgid "and"
 msgstr "e"
 
-#: contrib/admin/options.py:568
+#: contrib/admin/options.py:564
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Aggiunto/a %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:572
+#: contrib/admin/options.py:568
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Cambiato/i %(list)s per %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:577
+#: contrib/admin/options.py:573
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Cancellato/a %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:581
+#: contrib/admin/options.py:577
 msgid "No fields changed."
 msgstr "Nessun campo modificato."
 
-#: contrib/admin/options.py:647
+#: contrib/admin/options.py:643
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" aggiunto/a correttamente."
 
-#: contrib/admin/options.py:651 contrib/admin/options.py:684
+#: contrib/admin/options.py:647 contrib/admin/options.py:680
 msgid "You may edit it again below."
 msgstr "È possibile modificare nuovamente qui sotto."
 
-#: contrib/admin/options.py:661 contrib/admin/options.py:694
+#: contrib/admin/options.py:657 contrib/admin/options.py:690
 #, python-format
 msgid "You may add another %s below."
 msgstr "Puoi aggiungere un altro/a %s qui sotto."
 
-#: contrib/admin/options.py:682
+#: contrib/admin/options.py:678
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" modificato/a correttamente."
 
-#: contrib/admin/options.py:690
+#: contrib/admin/options.py:686
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" aggiunto/a correttamente. Puoi modificare ancora qui "
 "sotto."
 
-#: contrib/admin/options.py:744 contrib/admin/options.py:1001
+#: contrib/admin/options.py:740 contrib/admin/options.py:997
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -412,59 +420,59 @@ msgstr ""
 "Occorre selezionare degli oggetti per potervi eseguire azioni. Nessun "
 "oggetto è stato cambiato."
 
-#: contrib/admin/options.py:763
+#: contrib/admin/options.py:759
 msgid "No action selected."
 msgstr "Nessuna azione selezionata."
 
-#: contrib/admin/options.py:844
+#: contrib/admin/options.py:840
 #, python-format
 msgid "Add %s"
 msgstr "Aggiungi %s"
 
-#: contrib/admin/options.py:870 contrib/admin/options.py:1109
+#: contrib/admin/options.py:866 contrib/admin/options.py:1105
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "L'oggetto %(name)s con chiave primaria %(key)r non esiste."
 
-#: contrib/admin/options.py:935
+#: contrib/admin/options.py:931
 #, python-format
 msgid "Change %s"
 msgstr "Modifica %s"
 
-#: contrib/admin/options.py:981
+#: contrib/admin/options.py:977
 msgid "Database error"
 msgstr "Errore nel database"
 
-#: contrib/admin/options.py:1043
+#: contrib/admin/options.py:1039
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s modificato/a correttamente."
 msgstr[1] "%(count)s %(name)s modificati/e correttamente."
 
-#: contrib/admin/options.py:1070
+#: contrib/admin/options.py:1066
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s selezionati/e"
 msgstr[1] "Nessuna azione selezionata."
 
-#: contrib/admin/options.py:1075
+#: contrib/admin/options.py:1071
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 di %(cnt)s selezionati/e"
 
-#: contrib/admin/options.py:1122
+#: contrib/admin/options.py:1118
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" cancellato/a correttamente."
 
-#: contrib/admin/options.py:1159
+#: contrib/admin/options.py:1155
 #, python-format
 msgid "Change history: %s"
 msgstr "Tracciato delle modifiche: %s"
 
-#: contrib/admin/sites.py:22 contrib/admin/views/decorators.py:14
+#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:81
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -473,11 +481,11 @@ msgstr ""
 "Inserisci nome utente e password corretti. In entrambi i campi le maiuscole "
 "sono significative."
 
-#: contrib/admin/sites.py:311 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:307 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Effettua di nuovo l'accesso, perché la tua sessione è scaduta."
 
-#: contrib/admin/sites.py:318 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:314 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -485,27 +493,27 @@ msgstr ""
 "Il browser non sembra configurato per accettare i cookie. Una volta "
 "abilitati, ricarica la pagina e riprova."
 
-#: contrib/admin/sites.py:334 contrib/admin/sites.py:340
+#: contrib/admin/sites.py:330 contrib/admin/sites.py:336
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "I nomi utente non possono contenere il carattere '@'."
 
-#: contrib/admin/sites.py:337 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:333 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Il nome utente non è costituito dall'indirizzo e-mail. Prova con '%s'."
 
-#: contrib/admin/sites.py:393
+#: contrib/admin/sites.py:389
 msgid "Site administration"
 msgstr "Amministrazione sito"
 
-#: contrib/admin/sites.py:407 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:403 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Accedi"
 
-#: contrib/admin/sites.py:452
+#: contrib/admin/sites.py:448
 #, python-format
 msgid "%s administration"
 msgstr "Amministrazione %s"
@@ -1042,16 +1050,16 @@ msgstr "Indirizzo e-mail:"
 msgid "Reset my password"
 msgstr "Reimposta la mia password"
 
-#: contrib/admin/templatetags/admin_list.py:239
+#: contrib/admin/templatetags/admin_list.py:257
 msgid "All dates"
 msgstr "Tutte le date"
 
-#: contrib/admin/views/main.py:70
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s"
 msgstr "Scegli %s"
 
-#: contrib/admin/views/main.py:70
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s to change"
 msgstr "Scegli %s da modificare"
@@ -1409,7 +1417,7 @@ msgid "Logged out"
 msgstr "Accesso annullato"
 
 #: contrib/auth/management/commands/createsuperuser.py:23
-#: core/validators.py:120 forms/fields.py:428
+#: core/validators.py:126 forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Inserisci un indirizzo e-mail valido."
 
@@ -1906,8 +1914,8 @@ msgstr "ieri"
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "Inserisci un codice postale nel formato NNNN o ANNNNAAA."
 
-#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:97
-#: contrib/localflavor/br/forms.py:136 contrib/localflavor/pe/forms.py:24
+#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:92
+#: contrib/localflavor/br/forms.py:131 contrib/localflavor/pe/forms.py:24
 #: contrib/localflavor/pe/forms.py:52
 msgid "This field requires only numbers."
 msgstr "Questo campo può contenere solo numeri."
@@ -1975,15 +1983,15 @@ msgstr ""
 msgid "Enter a 4 digit post code."
 msgstr "Inserisci un codice postale di 4 cifre."
 
-#: contrib/localflavor/br/forms.py:22
+#: contrib/localflavor/br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
 msgstr "Inserisci un codice postale nel formato XXXXX-XXX ."
 
-#: contrib/localflavor/br/forms.py:31
+#: contrib/localflavor/br/forms.py:26
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "I numeri di telefono devono essere in formato XX-XXXX-XXXX ."
 
-#: contrib/localflavor/br/forms.py:59
+#: contrib/localflavor/br/forms.py:54
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
@@ -1991,19 +1999,19 @@ msgstr ""
 "Scegliere uno stato brasiliano valido. Questo stato non è uno di quelli "
 "disponibili."
 
-#: contrib/localflavor/br/forms.py:95
+#: contrib/localflavor/br/forms.py:90
 msgid "Invalid CPF number."
 msgstr "Numero CPF non valido."
 
-#: contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/br/forms.py:91
 msgid "This field requires at most 11 digits or 14 characters."
 msgstr "Questo campo richiede non più di 11 cifre, o 14 caratteri."
 
-#: contrib/localflavor/br/forms.py:135
+#: contrib/localflavor/br/forms.py:130
 msgid "Invalid CNPJ number."
 msgstr "Numero CNPJ non valido."
 
-#: contrib/localflavor/br/forms.py:137
+#: contrib/localflavor/br/forms.py:132
 msgid "This field requires at least 14 digits"
 msgstr "Questo campo richiede almeno 14 cifre"
 
@@ -4463,56 +4471,60 @@ msgstr "siti"
 msgid "Enter a valid value."
 msgstr "Inserisci un valore valido."
 
-#: core/validators.py:87 forms/fields.py:529
+#: core/validators.py:93 forms/fields.py:529
 msgid "Enter a valid URL."
 msgstr "Inserisci una URL valida."
 
-#: core/validators.py:89 forms/fields.py:530
+#: core/validators.py:95 forms/fields.py:530
 msgid "This URL appears to be a broken link."
 msgstr "Questa URL non sembra funzionare."
 
-#: core/validators.py:123 forms/fields.py:873
+#: core/validators.py:129 forms/fields.py:873
 msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Inserisci uno 'slug' valido contenente lettere, cifre, sottolineati o "
 "trattini."
 
-#: core/validators.py:126 forms/fields.py:866
+#: core/validators.py:132 forms/fields.py:866
 msgid "Enter a valid IPv4 address."
 msgstr "Inserisci un indirizzo IPv4 valido."
 
-#: core/validators.py:129 db/models/fields/__init__.py:572
+#: core/validators.py:135 db/models/fields/__init__.py:572
 msgid "Enter only digits separated by commas."
 msgstr "Inserisci solo cifre separate da virgole."
 
-#: core/validators.py:135
+#: core/validators.py:141
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "Assicurarsi che questo valore sia %(limit_value)s (ora è %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:205 forms/fields.py:257
+#: core/validators.py:159 forms/fields.py:205 forms/fields.py:257
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Assicurarsi che questo valore sia minore o uguale a %(limit_value)s."
 
-#: core/validators.py:158 forms/fields.py:206 forms/fields.py:258
+#: core/validators.py:164 forms/fields.py:206 forms/fields.py:258
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Assicurarsi che questo valore sia maggiore o uguale a %(limit_value)s."
 
-#: core/validators.py:164
+#: core/validators.py:170
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
-msgstr "Assicurarsi che questo valore contenga almeno %(limit_value)d caratteri (ne ha %(show_value)d)."
+msgstr ""
+"Assicurarsi che questo valore contenga almeno %(limit_value)d caratteri (ne "
+"ha %(show_value)d)."
 
-#: core/validators.py:170
+#: core/validators.py:176
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
-msgstr "Assicurarsi che questo valore non contenga più di %(limit_value)d caratteri (ne ha %(show_value)d)."
+msgstr ""
+"Assicurarsi che questo valore non contenga più di %(limit_value)d caratteri "
+"(ne ha %(show_value)d)."
 
 #: db/models/base.py:822
 #, python-format
@@ -4740,7 +4752,7 @@ msgstr "Carica un'immagine valida. Il file caricato non è un'immagine o è corr
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Scegli un'opzione valida. '%(value)s non compare tra quelle disponibili."
 
-#: forms/fields.py:672 forms/fields.py:734 forms/models.py:1007
+#: forms/fields.py:672 forms/fields.py:734 forms/models.py:1002
 msgid "Enter a list of values."
 msgstr "Inserisci una lista di valori."
 
@@ -4748,17 +4760,17 @@ msgstr "Inserisci una lista di valori."
 msgid "Order"
 msgstr "Ordine"
 
-#: forms/models.py:567
+#: forms/models.py:562
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Correggi i dati duplicati di %(field)s."
 
-#: forms/models.py:571
+#: forms/models.py:566
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "Correggi i dati duplicati di %(field)s, che deve essere unico."
 
-#: forms/models.py:577
+#: forms/models.py:572
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -4767,52 +4779,52 @@ msgstr ""
 "Correggi i dati duplicati di %(field_name)s che deve essere unico/a per %"
 "(lookup)s in %(date_field)s."
 
-#: forms/models.py:585
+#: forms/models.py:580
 msgid "Please correct the duplicate values below."
 msgstr "Correggi i dati duplicati qui sotto."
 
-#: forms/models.py:860
+#: forms/models.py:855
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "La foreign key inline non concorda con la chiave primaria dell'istanza padre."
 
-#: forms/models.py:926
+#: forms/models.py:921
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Scegli un'opzione valida. La scelta effettuata non compare tra quelle "
 "disponibili."
 
-#: forms/models.py:1008
+#: forms/models.py:1003
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Scegli un'opzione valida. %s non compare tra quelle disponibili."
 
-#: forms/models.py:1010
+#: forms/models.py:1005
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" non è un valore valido per una chiave primaria."
 
-#: template/defaultfilters.py:781
+#: template/defaultfilters.py:776
 msgid "yes,no,maybe"
 msgstr "sì,no,forse"
 
-#: template/defaultfilters.py:812
+#: template/defaultfilters.py:807
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d byte"
 
-#: template/defaultfilters.py:814
+#: template/defaultfilters.py:809
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:816
+#: template/defaultfilters.py:811
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:817
+#: template/defaultfilters.py:812
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -5075,23 +5087,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:518
+#: utils/translation/trans_real.py:519
 msgid "DATE_FORMAT"
 msgstr "j F Y"
 
-#: utils/translation/trans_real.py:519
+#: utils/translation/trans_real.py:520
 msgid "DATETIME_FORMAT"
 msgstr "j F Y, H:i"
 
-#: utils/translation/trans_real.py:520
+#: utils/translation/trans_real.py:521
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:541
+#: utils/translation/trans_real.py:542
 msgid "YEAR_MONTH_FORMAT"
 msgstr "Y F"
 
-#: utils/translation/trans_real.py:542
+#: utils/translation/trans_real.py:543
 msgid "MONTH_DAY_FORMAT"
 msgstr "F j"
 
