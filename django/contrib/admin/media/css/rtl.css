@@ -200,7 +200,7 @@ fieldset .field-box {
 
 /* MISC */
 
-.inline-related h2 {
+.inline-related h2, .inline-group h2 {
     text-align: right
 }
 
