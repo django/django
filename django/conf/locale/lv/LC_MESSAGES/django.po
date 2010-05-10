@@ -7,209 +7,278 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-03 23:21+0300\n"
-"PO-Revision-Date: 2008-09-03 23:13+0300\n"
-"Last-Translator: Edgars Jēkabsons <edgars.jekabsons@gmail.com>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2010-05-10 23:47+0200\n"
+"PO-Revision-Date: 2010-05-10 20:18+0200\n"
+"Last-Translator: Reinis Veips <reinis.veips@wot.lv>\n"
+"Language-Team: Latvian translators' team <reinis.veips@wot.lv>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "arābu"
 
 #: conf/global_settings.py:45
-msgid "Bengali"
-msgstr "bengāļu"
-
-#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "bulgāru"
 
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "bengāļu"
+
 #: conf/global_settings.py:47
+msgid "Bosnian"
+msgstr "bosniešu"
+
+#: conf/global_settings.py:48
 msgid "Catalan"
 msgstr "katalāņu"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Czech"
 msgstr "čehu"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Welsh"
 msgstr "velsiešu"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Danish"
 msgstr "dāņu"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "German"
 msgstr "vācu"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Greek"
 msgstr "grieķu"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "English"
 msgstr "angļu"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "British English"
+msgstr "angļu"
+
+#: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "spāņu"
 
-#: conf/global_settings.py:55
-msgid "Estonian"
-msgstr "igauņu"
-
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Argentinean Spanish"
 msgstr "Argentīnas spāņu"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
+msgid "Estonian"
+msgstr "igauņu"
+
+#: conf/global_settings.py:59
 msgid "Basque"
 msgstr "basku"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:60
 msgid "Persian"
 msgstr "persiešu"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:61
 msgid "Finnish"
 msgstr "somu"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:62
 msgid "French"
 msgstr "franču"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:63
+msgid "Frisian"
+msgstr "frīzu"
+
+#: conf/global_settings.py:64
 msgid "Irish"
 msgstr "īru"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:65
 msgid "Galician"
 msgstr "galīciešu"
 
-#: conf/global_settings.py:63
-msgid "Hungarian"
-msgstr "ungāru"
-
-#: conf/global_settings.py:64
+#: conf/global_settings.py:66
 msgid "Hebrew"
 msgstr "ebreju"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:67
+msgid "Hindi"
+msgstr "Hindi"
+
+#: conf/global_settings.py:68
 msgid "Croatian"
 msgstr "horvātu"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr "ungāru"
+
+#: conf/global_settings.py:70
+#, fuzzy
+msgid "Indonesian"
+msgstr "maķedoniešu"
+
+#: conf/global_settings.py:71
 msgid "Icelandic"
 msgstr "islandiešu"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:72
 msgid "Italian"
 msgstr "itāļu"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:73
 msgid "Japanese"
 msgstr "Japāņu"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:74
 msgid "Georgian"
 msgstr "vācu"
 
-#: conf/global_settings.py:70
-msgid "Korean"
-msgstr "korejiešu"
-
-#: conf/global_settings.py:71
+#: conf/global_settings.py:75
 msgid "Khmer"
 msgstr "khmeru"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:76
 msgid "Kannada"
 msgstr "kannādiešu"
 
-#: conf/global_settings.py:73
-msgid "Latvian"
-msgstr "Latviešu"
+#: conf/global_settings.py:77
+msgid "Korean"
+msgstr "korejiešu"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:78
 msgid "Lithuanian"
 msgstr "lietuviešu"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:79
+msgid "Latvian"
+msgstr "latviešu"
+
+#: conf/global_settings.py:80
 msgid "Macedonian"
 msgstr "maķedoniešu"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:81
+#, fuzzy
+msgid "Mongolian"
+msgstr "maķedoniešu"
+
+#: conf/global_settings.py:82
 msgid "Dutch"
 msgstr "holandiešu"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:83
 msgid "Norwegian"
 msgstr "norvēģu"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:84
+#, fuzzy
+msgid "Norwegian Bokmal"
+msgstr "norvēģu"
+
+#: conf/global_settings.py:85
+#, fuzzy
+msgid "Norwegian Nynorsk"
+msgstr "norvēģu"
+
+#: conf/global_settings.py:86
 msgid "Polish"
 msgstr "poļu"
 
-#: conf/global_settings.py:79
-msgid "Portugese"
+#: conf/global_settings.py:87
+msgid "Portuguese"
 msgstr "portugāļu"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:88
 msgid "Brazilian Portuguese"
 msgstr "Brazīlijas portugāļu"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:89
 msgid "Romanian"
 msgstr "rumāņu"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:90
 msgid "Russian"
 msgstr "krievu"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:91
 msgid "Slovak"
 msgstr "slovāku"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:92
 msgid "Slovenian"
 msgstr "slovēņu"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:93
+msgid "Albanian"
+msgstr "albāņu"
+
+#: conf/global_settings.py:94
 msgid "Serbian"
 msgstr "serbu"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:95
+msgid "Serbian Latin"
+msgstr "serbu latīņu"
+
+#: conf/global_settings.py:96
 msgid "Swedish"
 msgstr "zviedru"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:97
 msgid "Tamil"
 msgstr "tamilu"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:98
 msgid "Telugu"
 msgstr "telugu"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:99
+msgid "Thai"
+msgstr "taizemiešu"
+
+#: conf/global_settings.py:100
 msgid "Turkish"
 msgstr "turku"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:101
 msgid "Ukrainian"
 msgstr "ukraiņu"
 
-#: conf/global_settings.py:91
-msgid "Simplified Chinese"
-msgstr "Vienkāršā ķīniešu"
+#: conf/global_settings.py:102
+msgid "Vietnamese"
+msgstr "vjetnamiešu"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:103
+msgid "Simplified Chinese"
+msgstr "vienkāršā ķīniešu"
+
+#: conf/global_settings.py:104
 msgid "Traditional Chinese"
-msgstr "Tradicionālā ķīniešu"
+msgstr "tradicionālā ķīniešu"
+
+#: contrib/admin/actions.py:48
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Veiksmīgi izdzēsti %(count)d %(items)s."
+
+#: contrib/admin/actions.py:55 contrib/admin/options.py:1125
+msgid "Are you sure?"
+msgstr "Vai esat pārliecināts?"
+
+#: contrib/admin/actions.py:73
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Izdzēst izvēlēto %(verbose_name_plural)s"
 
 #: contrib/admin/filterspecs.py:44
 #, python-format
@@ -220,7 +289,7 @@ msgstr ""
 "<h3>Pēc %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:92
+#: contrib/admin/filterspecs.py:75 contrib/admin/filterspecs.py:92
 #: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
 msgid "All"
 msgstr "Visi"
@@ -245,17 +314,21 @@ msgstr "Šomēnes"
 msgid "This year"
 msgstr "Šogad"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
 msgid "Yes"
 msgstr "Jā"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
 msgid "No"
 msgstr "Nē"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:391
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:469
 msgid "Unknown"
 msgstr "Nezināms"
+
+#: contrib/admin/helpers.py:20
+msgid "Action:"
+msgstr "Darbība:"
 
 #: contrib/admin/models.py:19
 msgid "action time"
@@ -267,7 +340,7 @@ msgstr "objekta id"
 
 #: contrib/admin/models.py:23
 msgid "object repr"
-msgstr "objekta attēlojunms"
+msgstr "objekta attēlojums"
 
 #: contrib/admin/models.py:24
 msgid "action flag"
@@ -285,170 +358,192 @@ msgstr "žurnāla ieraksts"
 msgid "log entries"
 msgstr "žurnāla ieraksti"
 
-#: contrib/admin/options.py:60 contrib/admin/options.py:121
+#: contrib/admin/options.py:138 contrib/admin/options.py:153
 msgid "None"
 msgstr "nekas"
 
-#: contrib/admin/options.py:338
+#: contrib/admin/options.py:559
 #, python-format
 msgid "Changed %s."
 msgstr "Izmainīts %s."
 
-#: contrib/admin/options.py:338 contrib/admin/options.py:348
-#: forms/models.py:275
+#: contrib/admin/options.py:559 contrib/admin/options.py:569
+#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:844
+#: forms/models.py:568
 msgid "and"
 msgstr "un"
 
-#: contrib/admin/options.py:343
+#: contrib/admin/options.py:564
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Pievienots %(name)s \"%(object)s\""
 
-#: contrib/admin/options.py:347
+#: contrib/admin/options.py:568
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Izmainīts %(list)s priekš %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:352
+#: contrib/admin/options.py:573
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Dzēsts %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:356
+#: contrib/admin/options.py:577
 msgid "No fields changed."
-msgstr "Neviens lauks nav mainīts"
+msgstr "Lauki nav izmainīti"
 
-#: contrib/admin/options.py:417 contrib/auth/admin.py:51
+#: contrib/admin/options.py:643
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" pievienots sekmīgi."
 
-#: contrib/admin/options.py:421 contrib/admin/options.py:454
-#: contrib/auth/admin.py:59
+#: contrib/admin/options.py:647 contrib/admin/options.py:680
 msgid "You may edit it again below."
-msgstr "Jūs varat labot to atkal zemāk."
+msgstr "Zemāk varat labot to atkal"
 
-#: contrib/admin/options.py:431 contrib/admin/options.py:464
+#: contrib/admin/options.py:657 contrib/admin/options.py:690
 #, python-format
 msgid "You may add another %s below."
-msgstr "Jūs varat pievienot vēl vienu %s zemāk."
+msgstr "Zemāk varat pievienot vēl vienu %s."
 
-#: contrib/admin/options.py:452
+#: contrib/admin/options.py:678
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" nomainīts sekmīgi."
 
-#: contrib/admin/options.py:460
+#: contrib/admin/options.py:686
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" pievienots sekmīgi. Jūs to varat regiģēt zemāk."
+msgstr "%(name)s \"%(obj)s\" pievienots sekmīgi. Zemāk varat to labot."
 
-#: contrib/admin/options.py:536
+#: contrib/admin/options.py:740 contrib/admin/options.py:997
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr "Lai veiktu darbību, jāizvēlas rindas. Rindas nav izmainītas."
+
+#: contrib/admin/options.py:759
+msgid "No action selected."
+msgstr "Nav izvēlēta darbība."
+
+#: contrib/admin/options.py:840
 #, python-format
 msgid "Add %s"
 msgstr "Pievienot %s"
 
-#: contrib/admin/options.py:614
+#: contrib/admin/options.py:866 contrib/admin/options.py:1105
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s objekts ar primāro atslēgu %(key)r neeksistē."
+
+#: contrib/admin/options.py:931
 #, python-format
 msgid "Change %s"
-msgstr "Rediģēt %s"
+msgstr "Labot %s"
 
-#: contrib/admin/options.py:646
+#: contrib/admin/options.py:977
 msgid "Database error"
 msgstr "Datubāzes kļūda"
 
-#: contrib/admin/options.py:696
+#: contrib/admin/options.py:1039
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s ir labots sekmīgi"
+msgstr[1] "%(count)s %(name)s ir rediģēti sekmīgi"
+msgstr[2] "%(count)s %(name)s nav rediģēts."
+
+#: contrib/admin/options.py:1066
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s izvēlēts"
+msgstr[1] "%(total_count)s izvēlēti"
+msgstr[2] "%(total_count)s izvēlēti"
+
+#: contrib/admin/options.py:1071
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 no %(cnt)s izvēlēti"
+
+#: contrib/admin/options.py:1118
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" sekmīgi izdzēsts."
 
-#: contrib/admin/options.py:703
-msgid "Are you sure?"
-msgstr "Vai esat pārliecināts?"
-
-#: contrib/admin/options.py:732
+#: contrib/admin/options.py:1155
 #, python-format
 msgid "Change history: %s"
 msgstr "Izmaiņu vēsture: %s"
 
-#: contrib/admin/sites.py:16 contrib/admin/views/decorators.py:14
-#: contrib/auth/forms.py:80
+#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:14
+#: contrib/auth/forms.py:81
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Lūdzu ievadiet lietotājvārdu un paroli. Atceraties, ka abi lauki ir "
+"Lūdzu ievadiet lietotājvārdu un paroli. Ievērojiet, ka abi lauki ir "
 "reģistrjūtīgi."
 
-#: contrib/admin/sites.py:227 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:307 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
-msgstr "Lūdzu pieslēdzieties vēlreiz, jo jūsu sesija ir beigusies."
+msgstr "Lūdzu pieslēdzieties vēlreiz, jūsu sesija ir beigusies."
 
-#: contrib/admin/sites.py:234 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:314 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
-"Izskatās, ka Jūsu pārlūks neatbalsta sīkdatnes (cookies). Lūdzu ieslēdziet "
-"sīkdatņu atbalstu, pārlādējiet lapu un mēģiniet vēlreiz."
+"Izskatās, ka izmantotais pārlūks neatbalsta sīkdatnes (cookies). Lūdzu "
+"ieslēdziet sīkdatņu atbalstu, pārlādējiet lapu un mēģiniet vēlreiz."
 
-#: contrib/admin/sites.py:250 contrib/admin/sites.py:256
+#: contrib/admin/sites.py:330 contrib/admin/sites.py:336
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Lietotājvārdi nevar saturēt simbolu '@'."
 
-#: contrib/admin/sites.py:253 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:333 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Jūsu e-pasta adrese nav jūsu lietotājvārds. Lietojiet '%s' tās vietā."
+msgstr "Jūsu e-pasta adrese nav jūsu lietotājvārds. Izmēģiniet '%s'."
 
-#: contrib/admin/sites.py:313
+#: contrib/admin/sites.py:389
 msgid "Site administration"
 msgstr "Lapas administrācija"
 
-#: contrib/admin/sites.py:326 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:403 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
-msgstr "Pieslēdzieties"
+msgstr "Pieslēgties"
 
-#: contrib/admin/sites.py:373
+#: contrib/admin/sites.py:448
 #, python-format
 msgid "%s administration"
 msgstr "%s administrācija"
 
-#: contrib/admin/util.py:138
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Viens vai vairāki %(fieldname)s objektos %(name)s: %(obj)s"
-
-#: contrib/admin/util.py:143
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Viens vai vairāki %(fieldname)s %(name)s:"
-
-#: contrib/admin/widgets.py:70
+#: contrib/admin/widgets.py:75
 msgid "Date:"
 msgstr "Datums:"
 
-#: contrib/admin/widgets.py:70
+#: contrib/admin/widgets.py:75
 msgid "Time:"
 msgstr "Laiks:"
 
-#: contrib/admin/widgets.py:94
+#: contrib/admin/widgets.py:99
 msgid "Currently:"
 msgstr "Pašreiz:"
 
-#: contrib/admin/widgets.py:94
+#: contrib/admin/widgets.py:99
 msgid "Change:"
 msgstr "Nomainīt:"
 
-#: contrib/admin/widgets.py:121
+#: contrib/admin/widgets.py:129
 msgid "Lookup"
 msgstr "Pārlūkot"
 
-#: contrib/admin/widgets.py:228
+#: contrib/admin/widgets.py:244
 msgid "Add Another"
 msgstr "Pievienot vēl vienu"
 
@@ -459,20 +554,21 @@ msgstr "Lapa nav atrasta"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Mēs atvainojamies, bet pieprasītā lapa neeksistē."
+msgstr "Atvainojiet, pieprasītā lapa neeksistē."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/change_form.html:17
-#: contrib/admin/templates/admin/change_list.html:8
+#: contrib/admin/templates/admin/base.html:55
+#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_list.html:42
 #: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
 #: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/admin/auth/user/change_password.html:10
+#: contrib/admin/templates/admin/auth/user/change_password.html:11
 #: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:5
 #: contrib/admin/templates/registration/password_reset_complete.html:4
 #: contrib/admin/templates/registration/password_reset_confirm.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
@@ -501,36 +597,57 @@ msgstr ""
 "Ir notikusi kļūda. Tā ir paziņota lapas administratoriem ar e-pasta "
 "starpniecību un visdrīzākajā laikā tiks izlabota. Paldies par sapratni."
 
+#: contrib/admin/templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Izpildīt izvēlēto darbību"
+
+#: contrib/admin/templates/admin/actions.html:4
+msgid "Go"
+msgstr "Aiziet!"
+
+#: contrib/admin/templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Spiest šeit, lai iezīmētu objektus no visām lapām"
+
+#: contrib/admin/templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Izvēlēties visus %(total_count)s %(module_name)s"
+
+#: contrib/admin/templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "Atcelt iezīmēto"
+
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:28
 msgid "Welcome,"
 msgstr "Sveicināti,"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Dokumentācija"
 
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/auth/user/change_password.html:46
+#: contrib/admin/templates/admin/base.html:41
+#: contrib/admin/templates/admin/auth/user/change_password.html:15
+#: contrib/admin/templates/admin/auth/user/change_password.html:48
 #: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Paroles maiņa"
 
-#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/base.html:48
 #: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
-msgstr "Izlogoties"
+msgstr "Atslēgties"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
@@ -538,43 +655,45 @@ msgstr "Django administrācijas lapa"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Django administrēšana"
+msgstr "Django administrācija"
 
-#: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/admin/change_form.html:21
 #: contrib/admin/templates/admin/index.html:29
 msgid "Add"
 msgstr "Pievienot"
 
-#: contrib/admin/templates/admin/change_form.html:27
+#: contrib/admin/templates/admin/change_form.html:28
 #: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Vēsture"
 
-#: contrib/admin/templates/admin/change_form.html:28
-#: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:25
+#: contrib/admin/templates/admin/change_form.html:29
+#: contrib/admin/templates/admin/edit_inline/stacked.html:9
+#: contrib/admin/templates/admin/edit_inline/tabular.html:28
 msgid "View on site"
 msgstr "Apskatīt lapā"
 
-#: contrib/admin/templates/admin/change_form.html:38
-#: contrib/admin/templates/admin/auth/user/change_password.html:22
-#, fuzzy
+#: contrib/admin/templates/admin/change_form.html:39
+#: contrib/admin/templates/admin/change_list.html:71
+#: contrib/admin/templates/admin/auth/user/change_password.html:24
+#: contrib/admin/templates/registration/password_change_form.html:15
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Lūdzu izlabojiet kļūdu zemāk."
-msgstr[1] "Lūdzu izlabojiet kļūdu zemāk."
+msgstr[0] "Lūdzu, izlabojiet kļūdu zemāk."
+msgstr[1] "Lūdzu, izlabojiet kļūdas zemāk."
+msgstr[2] "Lūdzu, izlabojiet kļūdas zemāk."
 
-#: contrib/admin/templates/admin/change_list.html:16
+#: contrib/admin/templates/admin/change_list.html:63
 #, python-format
 msgid "Add %(name)s"
 msgstr "Pievienot %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:26
+#: contrib/admin/templates/admin/change_list.html:82
 msgid "Filter"
 msgstr "Filtrs"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:302
 msgid "Delete"
 msgstr "Dzēst"
 
@@ -586,7 +705,7 @@ msgid ""
 "following types of objects:"
 msgstr ""
 "Izdzēšot objektu %(object_name)s '%(escaped_object)s', tiks dzēsti visi "
-"saistītie objekti , bet Jums nav tiesību dzēst sekojošus objektu tipus:"
+"saistītie objekti, bet jums nav tiesību dzēst sekojošus objektu tipus:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:23
 #, python-format
@@ -595,11 +714,35 @@ msgid ""
 "All of the following related items will be deleted:"
 msgstr ""
 "Vai esat pārliecināts, ka vēlaties dzēst %(object_name)s \"%(escaped_object)s"
-"\"? Tiks dzēsti  asrī sekojoši saistītie objekti:"
+"\"? Tiks dzēsti arī sekojoši saistītie objekti:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:28
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:33
 msgid "Yes, I'm sure"
-msgstr "Jā, es esmu pārliecināts"
+msgstr "Jā, esmu pārliecināts"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:9
+msgid "Delete multiple objects"
+msgstr "Dzēst vairākus objektus"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:15
+#, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+"Izdzēšot objektu %(object_name)s, tiks dzēsti visi saistītie objekti , bet "
+"jums nav tiesību dzēst sekojošus objektu tipus:"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+"Vai esat pārliecināts, ka vēlaties dzēst %(object_name)s? Tiks dzēsti arī "
+"sekojoši saistītie objekti:"
 
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
@@ -617,7 +760,7 @@ msgstr "Izmainīt"
 
 #: contrib/admin/templates/admin/index.html:45
 msgid "You don't have permission to edit anything."
-msgstr "Jums nav tiesības jebko labot."
+msgstr "Jums nav tiesības neko labot."
 
 #: contrib/admin/templates/admin/index.html:53
 msgid "Recent Actions"
@@ -631,14 +774,18 @@ msgstr "Manas darbības"
 msgid "None available"
 msgstr "Nav pieejams"
 
+#: contrib/admin/templates/admin/index.html:72
+msgid "Unknown content"
+msgstr "Nezināms saturs"
+
 #: contrib/admin/templates/admin/invalid_setup.html:7
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Problēma ar datubāzes instalāciju. Pārliecinieties vai attiecīgās tabulas ir "
-"izveidotas un attiecīgajam lietotājam ir tiesības lasīt datubāzi."
+"Problēma ar datubāzes instalāciju. Pārliecinieties, ka attiecīgās tabulas ir "
+"izveidotas un attiecīgajam lietotājam ir tiesības tai piekļūt."
 
 #: contrib/admin/templates/admin/login.html:19
 msgid "Username:"
@@ -660,42 +807,39 @@ msgstr "Lietotājs"
 msgid "Action"
 msgstr "Darbība"
 
-#: contrib/admin/templates/admin/object_history.html:30
-#: utils/translation/trans_real.py:404
-msgid "DATETIME_FORMAT"
-msgstr "d.m.Y H:i:s"
-
 #: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Šim objektam nav izmaiņu vēsture. Tas visdrīzāk nav pievienots, izmantojot "
-"šo administrācijas rīku."
+"Šim objektam nav izmaiņu vēstures. Tas visdrīzāk netika pievienots, "
+"izmantojot šo administrācijas rīku."
 
 #: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Rādīt visu"
 
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Saglabāt"
+
 #: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "Aiziet!"
+msgid "Search"
+msgstr "Meklēt"
 
 #: contrib/admin/templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] "1 rezultāts"
-msgstr[1] "1 rezultāts"
+msgstr[0] "%(counter)s rezultāts"
+msgstr[1] "%(counter)s rezultāti"
+msgstr[2] "%(counter)s rezultātu"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr "kopā ir %(full_result_count)s"
-
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Save"
-msgstr "Saglabāt"
+msgstr "kopā - %(full_result_count)s"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save as new"
@@ -709,40 +853,46 @@ msgstr "Saglabāt un pievienot vēl vienu"
 msgid "Save and continue editing"
 msgstr "Saglabāt un turpināt labošanu"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
+#: contrib/admin/templates/admin/auth/user/add_form.html:5
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"Vispirms ievadiet lietotāja vārdu un paroli. Pēc tam varēsiet rediģēt "
-"pārējos lietotāja uzstādījumus."
+"Vispirms ievadiet lietotāja vārdu un paroli. Tad varēsiet labot pārējos "
+"lietotāja uzstādījumus."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:13
-#: contrib/auth/forms.py:14 contrib/auth/forms.py:47 contrib/auth/forms.py:59
-msgid "Username"
-msgstr "Lietotāja vārds"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:20
-#: contrib/admin/templates/admin/auth/user/change_password.html:33
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:184
-msgid "Password"
-msgstr "Parole"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:26
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
-#: contrib/auth/forms.py:185
-msgid "Password (again)"
-msgstr "Parole (vēlreiz)"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:27
-#: contrib/admin/templates/admin/auth/user/change_password.html:40
-msgid "Enter the same password as above, for verification."
-msgstr "Pārbaudei atkārtoti ievadiet to pašu paroli kā augstāk."
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:26
+#: contrib/admin/templates/admin/auth/user/change_password.html:28
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ievadiet jaunu paroli lietotājam <strong>%(username)s</strong>."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:35
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:61 contrib/auth/forms.py:186
+msgid "Password"
+msgstr "Parole"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:41
+#: contrib/admin/templates/registration/password_change_form.html:37
+#: contrib/auth/forms.py:187
+msgid "Password (again)"
+msgstr "Parole (vēlreiz)"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:42
+#: contrib/auth/forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Pārbaudei atkārtoti ievadiet to pašu paroli kā augstāk."
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:64
+#: contrib/admin/templates/admin/edit_inline/tabular.html:110
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Pievienot vēl %(verbose_name)s"
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:67
+#: contrib/admin/templates/admin/edit_inline/tabular.html:113
+#: contrib/comments/templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Dzēst"
 
 #: contrib/admin/templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
@@ -757,9 +907,9 @@ msgid "Log in again"
 msgstr "Pieslēgties vēlreiz"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
+#: contrib/admin/templates/registration/password_change_form.html:5
+#: contrib/admin/templates/registration/password_change_form.html:7
+#: contrib/admin/templates/registration/password_change_form.html:19
 msgid "Password change"
 msgstr "Paroles maiņa"
 
@@ -770,31 +920,27 @@ msgstr "Paroles nomaiņa sekmīga"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "Jūsu parole ir nomainīta."
+msgstr "Jūsu parole tika nomainīta."
 
-#: contrib/admin/templates/registration/password_change_form.html:12
+#: contrib/admin/templates/registration/password_change_form.html:21
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Drošības nolūkos ievadiet veco paroli un pēc tam ievadiet jauno paroli "
-"divreiz, lai varētu pārbaudīt, vai tā ir uzrakstīta pareizi."
+"divreiz, lai varētu pārbaudīt, ka tā ir uzrakstīta pareizi."
 
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "Vecā parole:"
+#: contrib/admin/templates/registration/password_change_form.html:27
+#: contrib/auth/forms.py:170
+msgid "Old password"
+msgstr "Vecā parole"
 
-#: contrib/admin/templates/registration/password_change_form.html:19
-#: contrib/admin/templates/registration/password_reset_confirm.html:18
-msgid "New password:"
-msgstr "Jaunā parole:"
+#: contrib/admin/templates/registration/password_change_form.html:32
+#: contrib/auth/forms.py:144
+msgid "New password"
+msgstr "Jaunā parole"
 
-#: contrib/admin/templates/registration/password_change_form.html:21
-#: contrib/admin/templates/registration/password_reset_confirm.html:20
-msgid "Confirm password:"
-msgstr "Apstiprināt paroli:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
+#: contrib/admin/templates/registration/password_change_form.html:43
 #: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "Change my password"
 msgstr "Nomainīt manu paroli"
@@ -830,8 +976,16 @@ msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"Lūdzu ievadiet Jūsu jauno paroli divreiz lai varētu pārbaudīt, vai tā ir "
+"Lūdzu ievadiet jauno paroli divreiz, lai varētu pārbaudīt, ka tā ir "
 "uzrakstīta pareizi."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "Jaunā parole:"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "Apstiprināt paroli:"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
@@ -842,7 +996,7 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"Paroles parstatīšanas saite bija nekorekta, iespējams tā jau ir izmantota. "
+"Paroles pārstatīšanas saite bija nekorekta, iespējams, tā jau ir izmantota. "
 "Lūdzu pieprasiet paroles pārstatīšanu vēlreiz."
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
@@ -855,22 +1009,21 @@ msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"Uz pa e-pastu aizsūtītas instrukcijas paroles uzstādīšanai. Jūs to drīzumā "
-"saņemsiet."
+"Uz e-pastu aizsūtītas instrukcijas paroles uzstādīšanai. Jums to drīzumā "
+"vajadzētu saņemt."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
-"Jūs esat saņēmuši šo e-pastu sakarā ar Jūsu pieprasīto paroles pārstatīšanu"
+msgstr "Jūs esat saņēmuši šo e-pastu sakarā ar pieprasīto paroles pārstatīšanu"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr "Jūsu lietotāja kontam %(site_name)s saitā"
+msgstr "lietotāja kontam %(site_name)s mājaslapā"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
-msgstr "Lūdzu apmeklējiet sekojošo lapu un izvēlieties jaunu paroli:"
+msgstr "Lūdzu apmeklējiet sekojošo lapu un ievadiet jaunu paroli:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
@@ -890,8 +1043,8 @@ msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
-"Aizmirsāt savu paroli? Ievadiet e-pasta adresi zemāk un Jums pienāks e-pasts "
-"ar instrukcijām jaunas paroles uzstādīšanai."
+"Aizmirsāt savu paroli? Ievadiet e-pasta adresi zemāk un saņemsiet e-pastu ar "
+"instrukcijām jaunas paroles uzstādīšanai."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -901,165 +1054,85 @@ msgstr "E-pasta adrese:"
 msgid "Reset my password"
 msgstr "Paroles pārstatīšana"
 
-#: contrib/admin/templatetags/admin_list.py:288
+#: contrib/admin/templatetags/admin_list.py:257
 msgid "All dates"
 msgstr "Visi datumi"
 
-#: contrib/admin/views/main.py:69
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s"
 msgstr "Izvēlēties %s"
 
-#: contrib/admin/views/main.py:69
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s to change"
-msgstr "Izvēlēties %s lai izmainītu"
+msgstr "Izvēlēties %s, lai izmainītu"
 
-#: contrib/admin/views/template.py:36 contrib/sites/models.py:38
+#: contrib/admin/views/template.py:38 contrib/sites/models.py:38
 msgid "site"
-msgstr "saits"
+msgstr "mājaslapa"
 
-#: contrib/admin/views/template.py:38
+#: contrib/admin/views/template.py:40
 msgid "template"
 msgstr "šablons"
 
-#: contrib/admindocs/views.py:57 contrib/admindocs/views.py:59
-#: contrib/admindocs/views.py:61
+#: contrib/admindocs/views.py:61 contrib/admindocs/views.py:63
+#: contrib/admindocs/views.py:65
 msgid "tag:"
 msgstr "tags:"
 
-#: contrib/admindocs/views.py:90 contrib/admindocs/views.py:92
-#: contrib/admindocs/views.py:94
+#: contrib/admindocs/views.py:94 contrib/admindocs/views.py:96
+#: contrib/admindocs/views.py:98
 msgid "filter:"
 msgstr "filtrs:"
 
-#: contrib/admindocs/views.py:154 contrib/admindocs/views.py:156
-#: contrib/admindocs/views.py:158
+#: contrib/admindocs/views.py:158 contrib/admindocs/views.py:160
+#: contrib/admindocs/views.py:162
 msgid "view:"
 msgstr "skats:"
 
-#: contrib/admindocs/views.py:186
+#: contrib/admindocs/views.py:190
 #, python-format
 msgid "App %r not found"
 msgstr "Lietotne %r netika atrasta"
 
-#: contrib/admindocs/views.py:193
+#: contrib/admindocs/views.py:197
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Modelis  %(model_name)r lietotnē %(app_label)r nav atrasts"
 
-#: contrib/admindocs/views.py:205
+#: contrib/admindocs/views.py:209
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "saistītais `%(app_label)s.%(data_type)s` objekts"
 
-#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
-#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
+#: contrib/admindocs/views.py:209 contrib/admindocs/views.py:228
+#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:247
+#: contrib/admindocs/views.py:261 contrib/admindocs/views.py:266
 msgid "model:"
 msgstr "modelis:"
 
-#: contrib/admindocs/views.py:236
+#: contrib/admindocs/views.py:224 contrib/admindocs/views.py:256
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "saistītie `%(app_label)s.%(object_name)s` objekti"
 
-#: contrib/admindocs/views.py:241
+#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:261
 #, python-format
 msgid "all %s"
 msgstr "visi %s"
 
-#: contrib/admindocs/views.py:246
+#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:266
 #, python-format
 msgid "number of %s"
 msgstr "%s skaits"
 
-#: contrib/admindocs/views.py:251
+#: contrib/admindocs/views.py:271
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Lauki %s objektiem"
 
-#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
-#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
-#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
-msgid "Integer"
-msgstr "Vesels skaitlis"
-
-#: contrib/admindocs/views.py:315
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (jā vai nē)"
-
-#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
-#, python-format
-msgid "String (up to %(max_length)s)"
-msgstr "Simbolu virkne (līdz pat %(max_length)s)"
-
-#: contrib/admindocs/views.py:317
-msgid "Comma-separated integers"
-msgstr "Ar komatu atdalīti veselie skaitļi"
-
-#: contrib/admindocs/views.py:318
-msgid "Date (without time)"
-msgstr "Datums (bez laika)"
-
-#: contrib/admindocs/views.py:319
-msgid "Date (with time)"
-msgstr "Datums (ar laiku)"
-
-#: contrib/admindocs/views.py:320
-msgid "Decimal number"
-msgstr "Decimāls skaitlis"
-
-#: contrib/admindocs/views.py:321
-msgid "E-mail address"
-msgstr "E-pasta adrese"
-
-#: contrib/admindocs/views.py:322 contrib/admindocs/views.py:323
-#: contrib/admindocs/views.py:326
-msgid "File path"
-msgstr "Faila ceļš"
-
-#: contrib/admindocs/views.py:324
-msgid "Floating point number"
-msgstr "Plūstošā punkta skaitlis"
-
-#: contrib/admindocs/views.py:328 contrib/comments/models.py:58
-msgid "IP address"
-msgstr "IP adrese"
-
-#: contrib/admindocs/views.py:330
-msgid "Boolean (Either True, False or None)"
-msgstr "Boolean (jā, nē vai neviens)"
-
-#: contrib/admindocs/views.py:331
-msgid "Relation to parent model"
-msgstr "Relācija uz vecāka modeli"
-
-#: contrib/admindocs/views.py:332
-msgid "Phone number"
-msgstr "Telefona numurs"
-
-#: contrib/admindocs/views.py:337
-msgid "Text"
-msgstr "Teksts"
-
-#: contrib/admindocs/views.py:338
-msgid "Time"
-msgstr "Laiks"
-
-#: contrib/admindocs/views.py:339 contrib/comments/forms.py:22
-#: contrib/flatpages/admin.py:8 contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admindocs/views.py:340
-msgid "U.S. state (two uppercase letters)"
-msgstr "ASV štats (divi augšējā reģistra burti)"
-
-#: contrib/admindocs/views.py:341
-msgid "XML text"
-msgstr "XML teksts"
-
-#: contrib/admindocs/views.py:367
+#: contrib/admindocs/views.py:361
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s nav urlpattern objekts"
@@ -1083,14 +1156,15 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Lai uzstādītu grāmatzīmes, aizvelciet saiti uz Jūsu "
+"<p class=\"help\">Lai uzstādītu grāmatzīmes, aizvelciet saiti uz pārlūka "
 "grāmatzīmju\n"
-"rīkjoslur, vai arī veiciet labo klikšķi un pievienojiet to savām "
-"grāmatzīmēm. Tagad varat \n"
-"izvēlēties grāmatzīmi no jebkuras lapas.  Ievērojiet, ka, lai lietotu dažas "
-"no šīm\n"
+"rīkjoslu vai arī veiciet labo klikšķi un pievienojiet to savām grāmatzīmēm. "
+"Tagad varat \n"
+"izvēlēties grāmatzīmi no jebkuras lapas šajā mājaslapā.  Ievērojiet, ka, lai "
+"lietotu dažas no šīm\n"
 "grāmatzīmēm, jums jālieto dators, kura IP adrese reģistrēta kā \"iekšēja\"\n"
-"(ja ir neskaidrības, runājiet ar sistēmas administratoru).</p>\n"
+"(ja ir neskaidrības, vai dators ir \"iekšējais\", runājiet ar sistēmas "
+"administratoru).</p>\n"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
@@ -1101,7 +1175,7 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Pārvieto jūs no jebkuras lapas dokumentācijā uz skatu, kas ģenerē šo lapu."
+"Pārvieto no jebkuras lapas uz tā skata dokumentāciju, kas ģenerē šo lapu."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
@@ -1115,320 +1189,384 @@ msgstr "Parāda content-type un unikālo ID lapām, kas atbilst vienam objektam.
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
-msgstr "Labot šo objektu (patreizējā logā)"
+msgstr "Labot šo objektu (pašreizējā logā)"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Pāriet uz admininstrācijas lapu tām lapām, kas atspoguļo vientuļu objektu."
+msgstr "Pārvieto uz admininstrācijas lapu tām lapām, kas attēlo vienu objektu."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
-msgstr "Labot šo lapu (jaunā logā)"
+msgstr "Labot šo objektu (jaunā logā)"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
-msgstr "Tāpat kā iepriekš, tikai atver administrācijas lapu jaunā logā."
+msgstr "Tāpat kā augstāk, tikai atver administrācijas lapu jaunā logā."
 
-#: contrib/auth/admin.py:21
+#: contrib/auth/admin.py:29
 msgid "Personal info"
 msgstr "Personīgā informācija"
 
-#: contrib/auth/admin.py:22
+#: contrib/auth/admin.py:30
 msgid "Permissions"
-msgstr "Atļaujas"
+msgstr "Tiesības"
 
-#: contrib/auth/admin.py:23
+#: contrib/auth/admin.py:31
 msgid "Important dates"
 msgstr "Svarīgi datumi"
 
-#: contrib/auth/admin.py:24
+#: contrib/auth/admin.py:32
 msgid "Groups"
 msgstr "Grupas"
 
-#: contrib/auth/admin.py:64
-msgid "Add user"
-msgstr "Pievienot lietotāju"
-
-#: contrib/auth/admin.py:90
+#: contrib/auth/admin.py:114
 msgid "Password changed successfully."
 msgstr "Paroles nomainīta sekmīgi."
 
-#: contrib/auth/admin.py:96
+#: contrib/auth/admin.py:124
 #, python-format
 msgid "Change password: %s"
 msgstr "Paroles maiņa: %s"
 
-#: contrib/auth/forms.py:15 contrib/auth/forms.py:48
-#: contrib/auth/models.py:136
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr "Nepieciešamas 30 vai mazāk zīmes. Tikai burti, cipari un apakšsvītras."
+#: contrib/auth/forms.py:14 contrib/auth/forms.py:48 contrib/auth/forms.py:60
+msgid "Username"
+msgstr "Lietotāja vārds"
 
-#: contrib/auth/forms.py:16 contrib/auth/forms.py:49
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Šī vērtība var saturēt tikai burtus, numurus un apakšsvītras."
+#: contrib/auth/forms.py:15 contrib/auth/forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Obligāts. 30 vai mazāk zīmes. Tikai burti, cipari un  @/./+/-/_ ."
+
+#: contrib/auth/forms.py:16 contrib/auth/forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Šī vērtība var saturēt tikai burtus, ciparus un @/./+/-/_ simbolus"
 
 #: contrib/auth/forms.py:18
 msgid "Password confirmation"
 msgstr "Paroles apstiprinājums"
 
-#: contrib/auth/forms.py:30
+#: contrib/auth/forms.py:31
 msgid "A user with that username already exists."
 msgstr "Lietotājs ar šādu lietotāja vārdu jau eksistē."
 
-#: contrib/auth/forms.py:36 contrib/auth/forms.py:154
-#: contrib/auth/forms.py:196
+#: contrib/auth/forms.py:37 contrib/auth/forms.py:156
+#: contrib/auth/forms.py:198
 msgid "The two password fields didn't match."
 msgstr "Paroles lauki nesakrita."
 
-#: contrib/auth/forms.py:82
+#: contrib/auth/forms.py:83
 msgid "This account is inactive."
-msgstr "Šis konts ir neaktīvs."
+msgstr "Šis konts nav aktīvs."
 
-#: contrib/auth/forms.py:87
+#: contrib/auth/forms.py:88
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
-"Izskatās, ka Jūsu pārlūks neatbalsta cookies. Cookies ir obligātas, lai "
-"pieslēgtos."
+"Izskatās, ka izmantotajam pārlūkam nav ieslēgtas sīkdatnes (cookies). Tās ir "
+"obligātas, lai pieslēgtos."
 
-#: contrib/auth/forms.py:100
+#: contrib/auth/forms.py:101
 msgid "E-mail"
 msgstr "E-pasts"
 
-#: contrib/auth/forms.py:109
+#: contrib/auth/forms.py:110
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
-"Šai epasta parolei nav registrēts lietotāja konts. Vai tiešām esat "
+"Šim e-pastam nav registrēta lietotāja konta. Vai tiešām esat "
 "piereģistrējušies?"
 
-#: contrib/auth/forms.py:134
+#: contrib/auth/forms.py:136
 #, python-format
 msgid "Password reset on %s"
 msgstr "Paroles pārstatīšana(reset) uz %s"
 
-#: contrib/auth/forms.py:142
-msgid "New password"
-msgstr "Jaunā parole"
-
-#: contrib/auth/forms.py:143
+#: contrib/auth/forms.py:145
 msgid "New password confirmation"
-msgstr "Jaunās parole vēlreiz:"
+msgstr "Jaunās parole vēlreiz"
 
-#: contrib/auth/forms.py:168
-msgid "Old password"
-msgstr "Vecā parole"
-
-#: contrib/auth/forms.py:176
+#: contrib/auth/forms.py:178
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
-"Jūsu iepriekšējā parole tika ievadīta nekorekti. Lūdzu ievadiet to atkārtoti."
+"Jūsu iepriekšējā parole netika ievadīta korekti. Lūdzu ievadiet to atkārtoti."
 
-#: contrib/auth/models.py:72 contrib/auth/models.py:95
+#: contrib/auth/models.py:66 contrib/auth/models.py:94
 msgid "name"
 msgstr "nosaukums"
 
-#: contrib/auth/models.py:74
+#: contrib/auth/models.py:68
 msgid "codename"
 msgstr "kods"
 
-#: contrib/auth/models.py:77
+#: contrib/auth/models.py:72
 msgid "permission"
 msgstr "tiesība"
 
-#: contrib/auth/models.py:78 contrib/auth/models.py:96
+#: contrib/auth/models.py:73 contrib/auth/models.py:95
 msgid "permissions"
 msgstr "tiesības"
 
-#: contrib/auth/models.py:99
+#: contrib/auth/models.py:98
 msgid "group"
 msgstr "grupa"
 
-#: contrib/auth/models.py:100 contrib/auth/models.py:146
+#: contrib/auth/models.py:99 contrib/auth/models.py:206
 msgid "groups"
 msgstr "grupas"
 
-#: contrib/auth/models.py:136
+#: contrib/auth/models.py:196
 msgid "username"
 msgstr "lietotāja vārds"
 
-#: contrib/auth/models.py:137
+#: contrib/auth/models.py:196
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "Obligāts. 30 vai mazāk zīmes. Tikai burti, cipari un @/./+/-/_ simboli"
+
+#: contrib/auth/models.py:197
 msgid "first name"
 msgstr "vārds"
 
-#: contrib/auth/models.py:138
+#: contrib/auth/models.py:198
 msgid "last name"
 msgstr "uzvārds"
 
-#: contrib/auth/models.py:139
+#: contrib/auth/models.py:199
 msgid "e-mail address"
 msgstr "e-pasta adrese"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:200
 msgid "password"
 msgstr "parole"
 
-#: contrib/auth/models.py:140
+#: contrib/auth/models.py:200
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
 msgstr ""
-"Lietojiet '[algo]$[salt]$[hexdigest]' vai arī <a href=\"password/\">paroles "
+"Lietojiet '[algo]$[salt]$[hexdigest]', vai arī <a href=\"password/\">paroles "
 "maiņas formu</a>."
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:201
 msgid "staff status"
 msgstr "personāla statuss"
 
-#: contrib/auth/models.py:141
+#: contrib/auth/models.py:201
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Atzīmējiet, ja vēlaties, lai lietotājs var pieslēgties administrācijas lapā."
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:202
 msgid "active"
 msgstr "aktīvs"
 
-#: contrib/auth/models.py:142
+#: contrib/auth/models.py:202
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "Nosaka, vai lietotājs ir aktīvs. Atceliet šo kontu dzēšanas vietā."
+msgstr "Nosaka, vai lietotājs ir aktīvs. Atceliet šo konta dzēšanas vietā."
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:203
 msgid "superuser status"
 msgstr "superlietotāja statuss"
 
-#: contrib/auth/models.py:143
+#: contrib/auth/models.py:203
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
-msgstr "Lietotājam ir visas tiesības, bez atsevišķas to piešķiršanas."
+msgstr "Lietotājam ir visas tiesības arī bez to atsevišķas piešķiršanas."
 
-#: contrib/auth/models.py:144
+#: contrib/auth/models.py:204
 msgid "last login"
 msgstr "pēdējoreiz pieslēdzies"
 
-#: contrib/auth/models.py:145
+#: contrib/auth/models.py:205
 msgid "date joined"
 msgstr "datums, kad pievienojies"
 
-#: contrib/auth/models.py:147
+#: contrib/auth/models.py:207
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
-"Papildus manuāli piešķirtajām atļaujām, šis lietotājs papildus iegūs visas "
-"tiesības, kas piešķirtas grupām, kurās lietotājs atrodas."
+"Papildus manuāli piešķirtajām atļaujām, šis lietotājs papildus iegūs arī "
+"visas tiesības, kas piešķirtas arī lietotāja grupām."
 
-#: contrib/auth/models.py:148
+#: contrib/auth/models.py:208
 msgid "user permissions"
 msgstr "lietotāja tiesības"
 
-#: contrib/auth/models.py:152
+#: contrib/auth/models.py:212 contrib/comments/models.py:50
+#: contrib/comments/models.py:168
 msgid "user"
 msgstr "lietotājs"
 
-#: contrib/auth/models.py:153
+#: contrib/auth/models.py:213
 msgid "users"
 msgstr "lietotāji"
 
-#: contrib/auth/models.py:308
+#: contrib/auth/models.py:394
 msgid "message"
-msgstr "ziņojums"
+msgstr "ziņa"
 
-#: contrib/auth/views.py:50
+#: contrib/auth/views.py:79
 msgid "Logged out"
-msgstr "Izlogojies"
+msgstr "Atslēdzies"
 
-#: contrib/auth/management/commands/createsuperuser.py:23 forms/fields.py:428
+#: contrib/auth/management/commands/createsuperuser.py:23
+#: core/validators.py:120 forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Ievadiet korektu e-pasta adresi."
 
-#: contrib/comments/admin.py:11
+#: contrib/comments/admin.py:12
 msgid "Content"
 msgstr "Saturs"
 
-#: contrib/comments/admin.py:14
+#: contrib/comments/admin.py:15
 msgid "Metadata"
 msgstr "Metadati"
 
-#: contrib/comments/forms.py:20
+#: contrib/comments/admin.py:40
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "atzīmēts"
+msgstr[1] "atzīmēti"
+msgstr[2] "atzīmēts"
+
+#: contrib/comments/admin.py:41
+msgid "Flag selected comments"
+msgstr "Atzīmēt izvēlētos komentārus"
+
+#: contrib/comments/admin.py:45
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "apstiprināts"
+msgstr[1] "apstiprināti"
+msgstr[2] "apstiprināti"
+
+#: contrib/comments/admin.py:46
+msgid "Approve selected comments"
+msgstr "Apstiprināt izvēlētos komentārus"
+
+#: contrib/comments/admin.py:50
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "dzēsts"
+msgstr[1] "dzēsti"
+msgstr[2] "dzēsts"
+
+#: contrib/comments/admin.py:51
+msgid "Remove selected comments"
+msgstr "Dzēst izvēlētos komentārus"
+
+#: contrib/comments/admin.py:63
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "%(count)s komentārs tika veiksmīgi %(action)s."
+msgstr[1] "%(count)s komentāri tika veiksmīgi %(action)s."
+msgstr[2] "%(count)s komentāru tika veiksmīgi %(action)s."
+
+#: contrib/comments/feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s komentāri"
+
+#: contrib/comments/feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Pēdējie komentāri lapā %(site_name)s"
+
+#: contrib/comments/forms.py:93
 msgid "Name"
 msgstr "Vārds"
 
-#: contrib/comments/forms.py:21
+#: contrib/comments/forms.py:94
 msgid "Email address"
 msgstr "E-pasta adrese"
 
-#: contrib/comments/forms.py:23
+#: contrib/comments/forms.py:95 contrib/flatpages/admin.py:8
+#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1101
+msgid "URL"
+msgstr "URL"
+
+#: contrib/comments/forms.py:96
 msgid "Comment"
 msgstr "Komentārs"
 
-#: contrib/comments/forms.py:26
-msgid ""
-"If you enter anything in this field your comment will be treated as spam"
-msgstr ""
-"Ja ierakstīsiet kaut ko šajā laukā, tad komentārs tiks uzskatīts par spamu"
-
-#: contrib/comments/forms.py:126
-#, fuzzy, python-format
+#: contrib/comments/forms.py:175
+#, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Seko saviem vārdiem! Vārds %s šeit nav atļauts."
-msgstr[1] "Seko saviem vārdiem! Vārds %s šeit nav atļauts."
+msgstr[0] "Lūdzam ievērot pieklājību! Vārds %s šeit nav atļauts."
+msgstr[1] "Lūdzam ievērot pieklājību! Vārdi %s šeit nav atļauti."
+msgstr[2] "Lūdzam ievērot pieklājību! Vārdi %s šeit nav atļauti."
 
-#: contrib/comments/models.py:23
+#: contrib/comments/forms.py:182
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Ja aizpildīsiet šo lauku, tad komentārs tiks uzskatīts par spamu"
+
+#: contrib/comments/models.py:22 contrib/contenttypes/models.py:81
+msgid "content type"
+msgstr "satura tips"
+
+#: contrib/comments/models.py:24
 msgid "object ID"
 msgstr "objekta ID"
 
-#: contrib/comments/models.py:50
+#: contrib/comments/models.py:52
 msgid "user's name"
 msgstr "lietotāja vārds"
 
-#: contrib/comments/models.py:51
+#: contrib/comments/models.py:53
 msgid "user's email address"
 msgstr "lietotāja e-pasta adrese"
 
-#: contrib/comments/models.py:52
+#: contrib/comments/models.py:54
 msgid "user's URL"
 msgstr "lietotāja URL"
 
-#: contrib/comments/models.py:54
+#: contrib/comments/models.py:56 contrib/comments/models.py:76
+#: contrib/comments/models.py:169
 msgid "comment"
 msgstr "komentārs"
 
-#: contrib/comments/models.py:57
+#: contrib/comments/models.py:59
 msgid "date/time submitted"
 msgstr "nosūtīšanas datums/laiks"
 
-#: contrib/comments/models.py:59
+#: contrib/comments/models.py:60 db/models/fields/__init__.py:896
+msgid "IP address"
+msgstr "IP adrese"
+
+#: contrib/comments/models.py:61
 msgid "is public"
 msgstr "publisks"
 
-#: contrib/comments/models.py:60
+#: contrib/comments/models.py:62
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Noņemiet ķeksīti, lai komentārs pazustu no lapas."
+msgstr "Noņemiet ķeksi, lai komentārs neparādītos lapā."
 
-#: contrib/comments/models.py:62
+#: contrib/comments/models.py:64
 msgid "is removed"
 msgstr "dzēsts"
 
-#: contrib/comments/models.py:63
+#: contrib/comments/models.py:65
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Atķeksējiet, ja komentārs ir neatbilstošs. Tā vietā tiks rādīts paziņojums "
-"\"Šis komentārs ir izdzēsts\"."
+"Atķeksējiet, ja komentārs ir neatbilstošs (nepieklājīgs). Tā vietā tiks "
+"rādīts paziņojums \"Šis komentārs ir izdzēsts\"."
 
-#: contrib/comments/models.py:115
+#: contrib/comments/models.py:77
+msgid "comments"
+msgstr "komentāri"
+
+#: contrib/comments/models.py:119
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -1436,15 +1574,15 @@ msgstr ""
 "Šo komentāru rakstīja autentificēts lietotājs, tāpēc vārds ir tikai "
 "lasīšanas režīmā."
 
-#: contrib/comments/models.py:124
+#: contrib/comments/models.py:128
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Šo komentāru rakstīja autentificēts lietotājs, tapēc e-pasts ir tikai "
+"Šo komentāru rakstīja autentificēts lietotājs, tāpēc e-pasts ir tikai "
 "lasīšanas režīmā."
 
-#: contrib/comments/models.py:149
+#: contrib/comments/models.py:153
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -1459,15 +1597,117 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: contrib/contenttypes/models.py:67
+#: contrib/comments/models.py:170
+msgid "flag"
+msgstr "atzīmēt"
+
+#: contrib/comments/models.py:171
+msgid "date"
+msgstr "datums"
+
+#: contrib/comments/models.py:181
+msgid "comment flag"
+msgstr "komentāra atzīmējums"
+
+#: contrib/comments/models.py:182
+msgid "comment flags"
+msgstr "komentāra atzīmējumi"
+
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Apstiprināt komentāru"
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Patiešām padarīt šo komentāru publisku?"
+
+#: contrib/comments/templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Apstiprināt"
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Paldies par apstiprināšanu"
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Paldies par laika veltīšanu mūsu lapas diskusiju kvalitātes uzlabošanai"
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Dzēst komentāru"
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Patiešām dzēst šo komentāru?"
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Paldies par dzēšanu"
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Atzīmēt šo komentāru"
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Patiešām atzīmēt šo komentāru?"
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Atzīmējums"
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Paldies par komentāra atzīmēšanu"
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Post"
+msgstr "Iesūtīt"
+
+#: contrib/comments/templates/comments/form.html:18
+#: contrib/comments/templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Priekšskats"
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Paldies par komentēšanu"
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Paldies par Jūsu komentāru"
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:13
+msgid "Preview your comment"
+msgstr "Pirmsskatīt komentāru"
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Lūdzu izlabojiet kļūdu zemāk."
+msgstr[1] "Lūdzu izlabojiet kļūdas zemāk."
+msgstr[2] "Lūdzu, izlabojiet kļūdu zemāk."
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Iesūtīt komentāru"
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "vai veikt izmaiņas"
+
+#: contrib/contenttypes/models.py:77
 msgid "python model class name"
 msgstr "python modeļa klases nosaukums"
 
-#: contrib/contenttypes/models.py:71
-msgid "content type"
-msgstr "satura tips"
-
-#: contrib/contenttypes/models.py:72
+#: contrib/contenttypes/models.py:82
 msgid "content types"
 msgstr "satura tipi"
 
@@ -1483,7 +1723,7 @@ msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
 msgstr ""
-"Šī vērtība var saturēt tikai burtus, numurus un apakšsvītras, svītras vai "
+"Šī vērtība var saturēt tikai burtus, ciparus, apakšsvītras, svītras un "
 "šķērssvītras."
 
 #: contrib/flatpages/admin.py:22
@@ -1521,8 +1761,7 @@ msgstr "reģistrācija obligāta"
 #: contrib/flatpages/models.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
-"Ja tas ir atzīmēts, tikai lietotāji, kas ir pieslēgušies sistēmās redzēs šo "
-"lapu."
+"Ja šis ir atzīmēts, tikai pieslēgušies lietotāji, varēs piekļūt šai lapu."
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
@@ -1532,25 +1771,64 @@ msgstr "vienkārša lapa"
 msgid "flat pages"
 msgstr "vienkāršas lapas"
 
-#: contrib/formtools/wizard.py:130
+#: contrib/formtools/wizard.py:140
 msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."
 msgstr ""
-"Atvainojiet, formai beidzies derīguma termiņš. Lūdzu turpiniet aizpildīt "
+"Atvainojiet, formai beidzies derīguma termiņš. Lūdzu, turpiniet aizpildīt "
 "formu no šīs lapas."
 
-#: contrib/gis/forms/fields.py:14
+#: contrib/gis/db/models/fields.py:50
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr "Bāzes ĢIS lauks -- atbilst OpenGIS specifikācijas Geometry tipam."
+
+#: contrib/gis/db/models/fields.py:270
+msgid "Point"
+msgstr "Punkts"
+
+#: contrib/gis/db/models/fields.py:274
+msgid "Line string"
+msgstr "Līniju virkne"
+
+#: contrib/gis/db/models/fields.py:278
+msgid "Polygon"
+msgstr "Daudzstūris"
+
+#: contrib/gis/db/models/fields.py:282
+msgid "Multi-point"
+msgstr "Vairāki punkti"
+
+#: contrib/gis/db/models/fields.py:286
+msgid "Multi-line string"
+msgstr "Vairāku rindu virkne"
+
+#: contrib/gis/db/models/fields.py:290
+msgid "Multi polygon"
+msgstr "Vairāki daudzstūri"
+
+#: contrib/gis/db/models/fields.py:294
+msgid "Geometry collection"
+msgstr "Ģeometrijas kolekcija"
+
+#: contrib/gis/forms/fields.py:17
 msgid "No geometry value provided."
 msgstr "Nav norādīta ģeometrijas vērtība."
 
-#: contrib/gis/forms/fields.py:15
+#: contrib/gis/forms/fields.py:18
 msgid "Invalid geometry value."
 msgstr "Nekorekta ģeometrijas vērtība."
 
-#: contrib/gis/forms/fields.py:16
+#: contrib/gis/forms/fields.py:19
 msgid "Invalid geometry type."
 msgstr "Nekorekts ģeometrijas tips."
+
+#: contrib/gis/forms/fields.py:20
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Sastapta kļūda, pārveidojot ģeometriju uz ģeometriskās formas lauka SRID."
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
@@ -1569,25 +1847,28 @@ msgid "rd"
 msgstr "rd"
 
 #: contrib/humanize/templatetags/humanize.py:51
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f miljons"
-msgstr[1] "%(value).1f miljons"
+msgstr[1] "%(value).1f miljoni"
+msgstr[2] "%(value).1f miljonu"
 
 #: contrib/humanize/templatetags/humanize.py:54
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f miljards"
-msgstr[1] "%(value).1f miljards"
+msgstr[1] "%(value).1f miljardi"
+msgstr[2] "%(value).1f miljardu"
 
 #: contrib/humanize/templatetags/humanize.py:57
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f triljons"
-msgstr[1] "%(value).1f triljons"
+msgstr[1] "%(value).1f triljoni"
+msgstr[2] "%(value).1f triljonu"
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
@@ -1637,35 +1918,35 @@ msgstr "rīt"
 msgid "yesterday"
 msgstr "vakar"
 
-#: contrib/localflavor/ar/forms.py:27
+#: contrib/localflavor/ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "Ievadiet pasta indeksu NNNN vai ANNNNAAA formātā."
 
-#: contrib/localflavor/ar/forms.py:49 contrib/localflavor/br/forms.py:96
-#: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
-#: contrib/localflavor/pe/forms.py:51
+#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:92
+#: contrib/localflavor/br/forms.py:131 contrib/localflavor/pe/forms.py:24
+#: contrib/localflavor/pe/forms.py:52
 msgid "This field requires only numbers."
-msgstr "Šis lauks drīkst saturēt tikai skaitļus."
+msgstr "Šis lauks drīkst saturēt tikai ciparus."
 
-#: contrib/localflavor/ar/forms.py:50
+#: contrib/localflavor/ar/forms.py:51
 msgid "This field requires 7 or 8 digits."
 msgstr "Šim laukam jasastāv no 7 vai 8 cipariem."
 
-#: contrib/localflavor/ar/forms.py:79
+#: contrib/localflavor/ar/forms.py:80
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr "Ievadiet korektu CUIT XX-XXXXXXXX-X vai XXXXXXXXXXXX formātos."
 
-#: contrib/localflavor/ar/forms.py:80
+#: contrib/localflavor/ar/forms.py:81
 msgid "Invalid CUIT."
 msgstr "Nekorekts CUIT."
 
 #: contrib/localflavor/at/at_states.py:5
 msgid "Burgenland"
-msgstr ""
+msgstr "Burgenlande"
 
 #: contrib/localflavor/at/at_states.py:6
 msgid "Carinthia"
-msgstr ""
+msgstr "Karintija"
 
 #: contrib/localflavor/at/at_states.py:7
 msgid "Lower Austria"
@@ -1681,7 +1962,7 @@ msgstr "Zalcburga"
 
 #: contrib/localflavor/at/at_states.py:10
 msgid "Styria"
-msgstr "Styria"
+msgstr "Stīrija"
 
 #: contrib/localflavor/at/at_states.py:11
 msgid "Tyrol"
@@ -1695,60 +1976,60 @@ msgstr ""
 msgid "Vienna"
 msgstr "Vīne"
 
-#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
-#: contrib/localflavor/no/forms.py:12
+#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:17
+#: contrib/localflavor/no/forms.py:13
 msgid "Enter a zip code in the format XXXX."
 msgstr "Ievadiet pasta indeksu formātā XXXX."
 
 #: contrib/localflavor/at/forms.py:48
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+msgstr ""
+"Ievadiet korektu Austrijas sociālās drošības numuru XXXX XXXXXX formātā."
 
-#: contrib/localflavor/au/forms.py:16
+#: contrib/localflavor/au/forms.py:17
 msgid "Enter a 4 digit post code."
-msgstr "Ievadiet pasta indeksu, kurš sastāv no 4 cipariem."
+msgstr "Ievadiet pasta indeksu no 4 cipariem."
 
-#: contrib/localflavor/br/forms.py:21
+#: contrib/localflavor/br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
 msgstr "Ievadiet pasta indeksu XXXXX-XXX formātā."
 
-#: contrib/localflavor/br/forms.py:30
+#: contrib/localflavor/br/forms.py:26
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "Telefona numuriem jābūt XXX-XXXX-XXXX formātā."
+msgstr "Tālruņa numuriem jābūt XXX-XXXX-XXXX formātā."
 
-#: contrib/localflavor/br/forms.py:58
+#: contrib/localflavor/br/forms.py:54
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
 msgstr ""
-"Select a valid brazilian state. That state is not one of the available "
-"states."
+"Izvēlēties derīgu Brazīlijas pavalsti. Šī pavalsts nav no pieejamajām "
+"pavalstīm."
 
-#: contrib/localflavor/br/forms.py:94
+#: contrib/localflavor/br/forms.py:90
 msgid "Invalid CPF number."
-msgstr ""
+msgstr "Nekorekts CPF numurs"
 
-#: contrib/localflavor/br/forms.py:95
+#: contrib/localflavor/br/forms.py:91
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Šī lauka vērtībai jabūt vismaz 11 cipariem vai 14 simboliem."
+msgstr "Šī lauka vērtībai jābūt ne vairāk kā 11 cipariem vai 14 simboliem."
 
-#: contrib/localflavor/br/forms.py:134
+#: contrib/localflavor/br/forms.py:130
 msgid "Invalid CNPJ number."
-msgstr ""
+msgstr "Nekorekts CNPJ numurs"
 
-#: contrib/localflavor/br/forms.py:136
+#: contrib/localflavor/br/forms.py:132
 msgid "This field requires at least 14 digits"
-msgstr "Šim laukam jasastāv vismaz no 14 cipariem."
+msgstr "Šim laukam jasastāv ne vairāk kā no 14 cipariem."
 
-#: contrib/localflavor/ca/forms.py:17
+#: contrib/localflavor/ca/forms.py:25
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "Ievadiet pasta indeksu formātā XXX XXX."
 
-#: contrib/localflavor/ca/forms.py:88
+#: contrib/localflavor/ca/forms.py:96
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr ""
-"Ievadiet korektu kanādiešu sociālās apdrošināšanas numuru XXX-XXX-XXX "
-"formātā."
+"Ievadiet korektu Kanādas sociālās apdrošināšanas numuru XXX-XXX-XXX formātā."
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
@@ -1784,7 +2065,7 @@ msgstr "Ženēva"
 
 #: contrib/localflavor/ch/ch_states.py:13
 msgid "Glarus"
-msgstr "Glarus"
+msgstr "Glarusa"
 
 #: contrib/localflavor/ch/ch_states.py:14
 msgid "Graubuenden"
@@ -1832,7 +2113,7 @@ msgstr "Thurgau"
 
 #: contrib/localflavor/ch/ch_states.py:25
 msgid "Ticino"
-msgstr ""
+msgstr "Ticino"
 
 #: contrib/localflavor/ch/ch_states.py:26
 msgid "Uri"
@@ -1840,7 +2121,7 @@ msgstr ""
 
 #: contrib/localflavor/ch/ch_states.py:27
 msgid "Valais"
-msgstr ""
+msgstr "Valē"
 
 #: contrib/localflavor/ch/ch_states.py:28
 msgid "Vaud"
@@ -1852,9 +2133,9 @@ msgstr "Zug"
 
 #: contrib/localflavor/ch/ch_states.py:30
 msgid "Zurich"
-msgstr ""
+msgstr "Cīrige"
 
-#: contrib/localflavor/ch/forms.py:64
+#: contrib/localflavor/ch/forms.py:65
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
@@ -1862,21 +2143,98 @@ msgstr ""
 "Lūdzu ievadiet korektu šveiciešu identifikācijas vai pases nummuru "
 "X1234567<0 vai 1234567890 formātā."
 
-#: contrib/localflavor/cl/forms.py:29
+#: contrib/localflavor/cl/forms.py:30
 msgid "Enter a valid Chilean RUT."
 msgstr "Ievadiet korektu čīliešu RUT"
 
-#: contrib/localflavor/cl/forms.py:30
+#: contrib/localflavor/cl/forms.py:31
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr "Ievadiet korektu čīliešu RUT XX.XXX.XXX-X formātā."
 
-#: contrib/localflavor/cl/forms.py:31
+#: contrib/localflavor/cl/forms.py:32
 msgid "The Chilean RUT is not valid."
 msgstr "Čīles RUT ir nekorekts."
 
+#: contrib/localflavor/cz/cz_regions.py:8
+msgid "Prague"
+msgstr "Prāga"
+
+#: contrib/localflavor/cz/cz_regions.py:9
+msgid "Central Bohemian Region"
+msgstr "Centrālbohēmijas reģions"
+
+#: contrib/localflavor/cz/cz_regions.py:10
+msgid "South Bohemian Region"
+msgstr "Dienvidbohēmijas reģions"
+
+#: contrib/localflavor/cz/cz_regions.py:11
+msgid "Pilsen Region"
+msgstr "Pilzenes reģions"
+
+#: contrib/localflavor/cz/cz_regions.py:12
+msgid "Carlsbad Region"
+msgstr "Karslbādes reģions"
+
+#: contrib/localflavor/cz/cz_regions.py:13
+msgid "Usti Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:14
+msgid "Liberec Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:15
+msgid "Hradec Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:16
+msgid "Pardubice Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:17
+msgid "Vysocina Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:18
+msgid "South Moravian Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:19
+msgid "Olomouc Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:20
+msgid "Zlin Region"
+msgstr ""
+
+#: contrib/localflavor/cz/cz_regions.py:21
+msgid "Moravian-Silesian Region"
+msgstr ""
+
+#: contrib/localflavor/cz/forms.py:28 contrib/localflavor/sk/forms.py:30
+msgid "Enter a postal code in the format XXXXX or XXX XX."
+msgstr "Ievadiet pasta indeksu XXXXX vai XXX XX formātos."
+
+#: contrib/localflavor/cz/forms.py:48
+msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
+msgstr "Ievadiet dzimšanas numuru XXXXXX/XXXX vai XXXXXXXXXX formātā."
+
+#: contrib/localflavor/cz/forms.py:49
+msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
+msgstr ""
+"Nekorekts neobligatais parametrs dzimums, korektās vērtības ir 'f' un 'm'."
+
+#: contrib/localflavor/cz/forms.py:50
+msgid "Enter a valid birth number."
+msgstr "Ievadiet korektu dzimšanas numuru."
+
+#: contrib/localflavor/cz/forms.py:107
+msgid "Enter a valid IC number."
+msgstr "Ievadiet korektu IC numuru."
+
 #: contrib/localflavor/de/de_states.py:5
 msgid "Baden-Wuerttemberg"
-msgstr ""
+msgstr "Bādene-Virtemburga"
 
 #: contrib/localflavor/de/de_states.py:6
 msgid "Bavaria"
@@ -1904,7 +2262,7 @@ msgstr "Hesene"
 
 #: contrib/localflavor/de/de_states.py:12
 msgid "Mecklenburg-Western Pomerania"
-msgstr ""
+msgstr "Meklenburga-Rietumpomerānija"
 
 #: contrib/localflavor/de/de_states.py:13
 msgid "Lower Saxony"
@@ -1912,11 +2270,11 @@ msgstr "Lejassaksija"
 
 #: contrib/localflavor/de/de_states.py:14
 msgid "North Rhine-Westphalia"
-msgstr ""
+msgstr "Ziemeļreina-Vestfālija"
 
 #: contrib/localflavor/de/de_states.py:15
 msgid "Rhineland-Palatinate"
-msgstr ""
+msgstr "Reinaszeme-Pfalca"
 
 #: contrib/localflavor/de/de_states.py:16
 msgid "Saarland"
@@ -1924,36 +2282,36 @@ msgstr ""
 
 #: contrib/localflavor/de/de_states.py:17
 msgid "Saxony"
-msgstr ""
+msgstr "Saksija"
 
 #: contrib/localflavor/de/de_states.py:18
 msgid "Saxony-Anhalt"
-msgstr ""
+msgstr "Saksija-Anhalte"
 
 #: contrib/localflavor/de/de_states.py:19
 msgid "Schleswig-Holstein"
-msgstr ""
+msgstr "Šlesviga-Holšteina"
 
 #: contrib/localflavor/de/de_states.py:20
 msgid "Thuringia"
-msgstr ""
+msgstr "Tīringene"
 
-#: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
-#: contrib/localflavor/fr/forms.py:15
+#: contrib/localflavor/de/forms.py:15 contrib/localflavor/fi/forms.py:13
+#: contrib/localflavor/fr/forms.py:16
 msgid "Enter a zip code in the format XXXXX."
 msgstr "Ievadiet pasta indeksu formātā XXXXX."
 
-#: contrib/localflavor/de/forms.py:41
+#: contrib/localflavor/de/forms.py:42
 msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
 msgstr ""
-"Ievadiet korektu vāciešu identifikācijas nummuru XXXXXXXXXXX-XXXXXXX-XXXXXXX-"
-"X formātā."
+"Ievadiet korektu Vācijas identifikācijas kartes numuru XXXXXXXXXXX-XXXXXXX-"
+"XXXXXXX-X formātā."
 
 #: contrib/localflavor/es/es_provinces.py:5
 msgid "Arava"
-msgstr ""
+msgstr "Arava"
 
 #: contrib/localflavor/es/es_provinces.py:6
 msgid "Albacete"
@@ -1965,7 +2323,7 @@ msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:8
 msgid "Almeria"
-msgstr ""
+msgstr "Almērija"
 
 #: contrib/localflavor/es/es_provinces.py:9
 msgid "Avila"
@@ -1993,7 +2351,7 @@ msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:15
 msgid "Cadiz"
-msgstr ""
+msgstr "Kadisa"
 
 #: contrib/localflavor/es/es_provinces.py:16
 msgid "Castello"
@@ -2017,15 +2375,15 @@ msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:21
 msgid "Girona"
-msgstr ""
+msgstr "Hirona"
 
 #: contrib/localflavor/es/es_provinces.py:22
 msgid "Granada"
-msgstr "Granada"
+msgstr "Granāda"
 
 #: contrib/localflavor/es/es_provinces.py:23
 msgid "Guadalajara"
-msgstr ""
+msgstr "Gvadalahara"
 
 #: contrib/localflavor/es/es_provinces.py:24
 msgid "Guipuzkoa"
@@ -2071,48 +2429,48 @@ msgstr "Malaga"
 
 #: contrib/localflavor/es/es_provinces.py:34
 msgid "Murcia"
-msgstr ""
+msgstr "Mursija"
 
 #: contrib/localflavor/es/es_provinces.py:35
 msgid "Navarre"
-msgstr ""
+msgstr "Navarra"
 
 #: contrib/localflavor/es/es_provinces.py:36
 msgid "Ourense"
-msgstr ""
+msgstr "Orense"
 
 #: contrib/localflavor/es/es_provinces.py:37
 msgid "Asturias"
-msgstr ""
+msgstr "Astūrija"
 
 #: contrib/localflavor/es/es_provinces.py:38
 msgid "Palencia"
-msgstr ""
+msgstr "Palensija"
 
 #: contrib/localflavor/es/es_provinces.py:39
 msgid "Las Palmas"
-msgstr ""
+msgstr "Laspalmasa"
 
 #: contrib/localflavor/es/es_provinces.py:40
 msgid "Pontevedra"
-msgstr ""
+msgstr "Pontevedra"
 
 #: contrib/localflavor/es/es_provinces.py:41
 msgid "Salamanca"
-msgstr ""
+msgstr "Salamanka"
 
 #: contrib/localflavor/es/es_provinces.py:42
 msgid "Santa Cruz de Tenerife"
-msgstr ""
+msgstr "Tenerifes Santa Kruza"
 
 #: contrib/localflavor/es/es_provinces.py:43
 #: contrib/localflavor/es/es_regions.py:11
 msgid "Cantabria"
-msgstr ""
+msgstr "Kantabrija"
 
 #: contrib/localflavor/es/es_provinces.py:44
 msgid "Segovia"
-msgstr ""
+msgstr "Segovija"
 
 #: contrib/localflavor/es/es_provinces.py:45
 msgid "Seville"
@@ -2120,11 +2478,11 @@ msgstr "Seviļa"
 
 #: contrib/localflavor/es/es_provinces.py:46
 msgid "Soria"
-msgstr ""
+msgstr "Sorija"
 
 #: contrib/localflavor/es/es_provinces.py:47
 msgid "Tarragona"
-msgstr ""
+msgstr "Taragona"
 
 #: contrib/localflavor/es/es_provinces.py:48
 msgid "Teruel"
@@ -2140,11 +2498,11 @@ msgstr "Valensija"
 
 #: contrib/localflavor/es/es_provinces.py:51
 msgid "Valladolid"
-msgstr ""
+msgstr "Valadolida"
 
 #: contrib/localflavor/es/es_provinces.py:52
 msgid "Bizkaia"
-msgstr ""
+msgstr "Biskaja"
 
 #: contrib/localflavor/es/es_provinces.py:53
 msgid "Zamora"
@@ -2152,7 +2510,7 @@ msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:54
 msgid "Zaragoza"
-msgstr ""
+msgstr "Saragosa"
 
 #: contrib/localflavor/es/es_provinces.py:55
 msgid "Ceuta"
@@ -2164,35 +2522,35 @@ msgstr ""
 
 #: contrib/localflavor/es/es_regions.py:5
 msgid "Andalusia"
-msgstr ""
+msgstr "Andalūzija"
 
 #: contrib/localflavor/es/es_regions.py:6
 msgid "Aragon"
-msgstr ""
+msgstr "Aragona"
 
 #: contrib/localflavor/es/es_regions.py:7
 msgid "Principality of Asturias"
-msgstr ""
+msgstr "Astūrijas novads"
 
 #: contrib/localflavor/es/es_regions.py:8
 msgid "Balearic Islands"
-msgstr ""
+msgstr "Baleāru salas"
 
 #: contrib/localflavor/es/es_regions.py:9
 msgid "Basque Country"
-msgstr ""
+msgstr "Basku zeme"
 
 #: contrib/localflavor/es/es_regions.py:10
 msgid "Canary Islands"
-msgstr ""
+msgstr "Kanāriju salas"
 
 #: contrib/localflavor/es/es_regions.py:12
 msgid "Castile-La Mancha"
-msgstr ""
+msgstr "Kastīlija La Manša"
 
 #: contrib/localflavor/es/es_regions.py:13
 msgid "Castile and Leon"
-msgstr ""
+msgstr "Kastīlija Leona"
 
 #: contrib/localflavor/es/es_regions.py:14
 msgid "Catalonia"
@@ -2200,7 +2558,7 @@ msgstr "Katalonija"
 
 #: contrib/localflavor/es/es_regions.py:15
 msgid "Extremadura"
-msgstr ""
+msgstr "Ekstremadūra"
 
 #: contrib/localflavor/es/es_regions.py:16
 msgid "Galicia"
@@ -2208,7 +2566,7 @@ msgstr "Galīcija"
 
 #: contrib/localflavor/es/es_regions.py:19
 msgid "Region of Murcia"
-msgstr ""
+msgstr "Mursijas reģions"
 
 #: contrib/localflavor/es/es_regions.py:20
 msgid "Foral Community of Navarre"
@@ -2218,83 +2576,517 @@ msgstr ""
 msgid "Valencian Community"
 msgstr ""
 
-#: contrib/localflavor/es/forms.py:19
+#: contrib/localflavor/es/forms.py:20
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
 msgstr ""
+"Ievadiet korektu pasta indeksu sekojošajā formātā un robežās 01XXX - 52XXX"
 
-#: contrib/localflavor/es/forms.py:39
+#: contrib/localflavor/es/forms.py:40
 msgid ""
 "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
 "9XXXXXXXX."
 msgstr ""
-
-#: contrib/localflavor/es/forms.py:66
-msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr ""
+"Ievadiet korektu tālruņa numuru vienā no sekojošajiem formātiem 6XXXXXXXX, "
+"8XXXXXXXX vai 9XXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:67
+msgid "Please enter a valid NIF, NIE, or CIF."
+msgstr "Ievadiet korektu NIF, NIE vai CIF."
+
+#: contrib/localflavor/es/forms.py:68
 msgid "Please enter a valid NIF or NIE."
 msgstr "Lūdzu ievadiet korektu NIF vai NIE."
 
-#: contrib/localflavor/es/forms.py:68
-msgid "Invalid checksum for NIF."
-msgstr ""
-
 #: contrib/localflavor/es/forms.py:69
-msgid "Invalid checksum for NIE."
-msgstr ""
+msgid "Invalid checksum for NIF."
+msgstr "Nekorekta NIF kontrolsumma."
 
 #: contrib/localflavor/es/forms.py:70
-msgid "Invalid checksum for CIF."
-msgstr ""
+msgid "Invalid checksum for NIE."
+msgstr "Nekorekta NIE kontrolsumma."
 
-#: contrib/localflavor/es/forms.py:142
-msgid ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr ""
+#: contrib/localflavor/es/forms.py:71
+msgid "Invalid checksum for CIF."
+msgstr "Nekorekta CIF kontrolsumma."
 
 #: contrib/localflavor/es/forms.py:143
+msgid ""
+"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgstr "Ievadiet korektu bankas konta numuru formātā XXXX-XXXX-XX-XXXXXXXXXX."
+
+#: contrib/localflavor/es/forms.py:144
 msgid "Invalid checksum for bank account number."
+msgstr "Nekorekta bankas konta numura kontrolsumma."
+
+#: contrib/localflavor/fi/forms.py:29
+msgid "Enter a valid Finnish social security number."
+msgstr "Ievadiet korektu Somijas sociālās drošības nummuru."
+
+#: contrib/localflavor/fr/forms.py:31
+msgid "Phone numbers must be in 0X XX XX XX XX format."
+msgstr "Telefona numuriem jābūt  0X XX XX XX XX formātā."
+
+#: contrib/localflavor/id/forms.py:28
+msgid "Enter a valid post code"
+msgstr "Ievadiet korektu pasta indeksu."
+
+#: contrib/localflavor/id/forms.py:68 contrib/localflavor/nl/forms.py:53
+msgid "Enter a valid phone number"
+msgstr "Ievadiet korektu tālruņa numuru."
+
+#: contrib/localflavor/id/forms.py:107
+msgid "Enter a valid vehicle license plate number"
+msgstr "Ievadiet korektu transportlīdzekļa numuru."
+
+#: contrib/localflavor/id/forms.py:170
+msgid "Enter a valid NIK/KTP number"
+msgstr "Ievadiet korektu NIK/KTP  numuru."
+
+#: contrib/localflavor/id/id_choices.py:9
+#: contrib/localflavor/id/id_choices.py:73
+msgid "Bali"
+msgstr "Bali"
+
+#: contrib/localflavor/id/id_choices.py:10
+#: contrib/localflavor/id/id_choices.py:45
+msgid "Banten"
 msgstr ""
 
-#: contrib/localflavor/fi/forms.py:28
-msgid "Enter a valid Finnish social security number."
-msgstr "Ievadiet korektu somu sociālās drošības nummuru."
+#: contrib/localflavor/id/id_choices.py:11
+#: contrib/localflavor/id/id_choices.py:54
+msgid "Bengkulu"
+msgstr ""
 
-#: contrib/localflavor/in_/forms.py:14
+#: contrib/localflavor/id/id_choices.py:12
+#: contrib/localflavor/id/id_choices.py:47
+msgid "Yogyakarta"
+msgstr "Jogiakarta"
+
+#: contrib/localflavor/id/id_choices.py:13
+#: contrib/localflavor/id/id_choices.py:51
+msgid "Jakarta"
+msgstr "Džakarta"
+
+#: contrib/localflavor/id/id_choices.py:14
+#: contrib/localflavor/id/id_choices.py:75
+msgid "Gorontalo"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:15
+#: contrib/localflavor/id/id_choices.py:57
+msgid "Jambi"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:16
+msgid "Jawa Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:17
+msgid "Jawa Tengah"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:18
+msgid "Jawa Timur"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:19
+#: contrib/localflavor/id/id_choices.py:88
+msgid "Kalimantan Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:20
+#: contrib/localflavor/id/id_choices.py:66
+msgid "Kalimantan Selatan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:21
+#: contrib/localflavor/id/id_choices.py:89
+msgid "Kalimantan Tengah"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:22
+#: contrib/localflavor/id/id_choices.py:90
+msgid "Kalimantan Timur"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:23
+msgid "Kepulauan Bangka-Belitung"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:24
+#: contrib/localflavor/id/id_choices.py:62
+msgid "Kepulauan Riau"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:25
+#: contrib/localflavor/id/id_choices.py:55
+msgid "Lampung"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:26
+#: contrib/localflavor/id/id_choices.py:70
+msgid "Maluku"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:27
+#: contrib/localflavor/id/id_choices.py:71
+msgid "Maluku Utara"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:28
+#: contrib/localflavor/id/id_choices.py:59
+msgid "Nanggroe Aceh Darussalam"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:29
+msgid "Nusa Tenggara Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:30
+msgid "Nusa Tenggara Timur"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:31
+msgid "Papua"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:32
+msgid "Papua Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:33
+#: contrib/localflavor/id/id_choices.py:60
+msgid "Riau"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:34
+#: contrib/localflavor/id/id_choices.py:68
+msgid "Sulawesi Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:35
+#: contrib/localflavor/id/id_choices.py:69
+msgid "Sulawesi Selatan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:36
+#: contrib/localflavor/id/id_choices.py:76
+msgid "Sulawesi Tengah"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:37
+#: contrib/localflavor/id/id_choices.py:79
+msgid "Sulawesi Tenggara"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:38
+msgid "Sulawesi Utara"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:39
+#: contrib/localflavor/id/id_choices.py:52
+msgid "Sumatera Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:40
+#: contrib/localflavor/id/id_choices.py:56
+msgid "Sumatera Selatan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:41
+#: contrib/localflavor/id/id_choices.py:58
+msgid "Sumatera Utara"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:46
+msgid "Magelang"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:48
+msgid "Surakarta - Solo"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:49
+msgid "Madiun"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:50
+msgid "Kediri"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:53
+msgid "Tapanuli"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:61
+msgid "Kepulauan Bangka Belitung"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:63
+msgid "Corps Consulate"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:64
+msgid "Corps Diplomatic"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:65
+msgid "Bandung"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:67
+msgid "Sulawesi Utara Daratan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:72
+msgid "NTT - Timor"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:74
+msgid "Sulawesi Utara Kepulauan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:77
+msgid "NTB - Lombok"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:78
+msgid "Papua dan Papua Barat"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:80
+msgid "Cirebon"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:81
+msgid "NTB - Sumbawa"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:82
+msgid "NTT - Flores"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:83
+msgid "NTT - Sumba"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:84
+msgid "Bogor"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:85
+msgid "Pekalongan"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:86
+msgid "Semarang"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:87
+msgid "Pati"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:91
+msgid "Surabaya"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:92
+msgid "Madura"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:93
+msgid "Malang"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:94
+msgid "Jember"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:95
+msgid "Banyumas"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:96
+msgid "Federal Government"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:97
+msgid "Bojonegoro"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:98
+msgid "Purwakarta"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:99
+msgid "Sidoarjo"
+msgstr ""
+
+#: contrib/localflavor/id/id_choices.py:100
+msgid "Garut"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:8
+msgid "Antrim"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:9
+msgid "Armagh"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:10
+msgid "Carlow"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:11
+msgid "Cavan"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:12
+msgid "Clare"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:13
+msgid "Cork"
+msgstr "Korka"
+
+#: contrib/localflavor/ie/ie_counties.py:14
+msgid "Derry"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:15
+msgid "Donegal"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:16
+msgid "Down"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:17
+msgid "Dublin"
+msgstr "Dublina"
+
+#: contrib/localflavor/ie/ie_counties.py:18
+msgid "Fermanagh"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:19
+msgid "Galway"
+msgstr "Galveja"
+
+#: contrib/localflavor/ie/ie_counties.py:20
+msgid "Kerry"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:21
+msgid "Kildare"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:22
+msgid "Kilkenny"
+msgstr "Kilkenija"
+
+#: contrib/localflavor/ie/ie_counties.py:23
+msgid "Laois"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:24
+msgid "Leitrim"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:25
+msgid "Limerick"
+msgstr "Limerika"
+
+#: contrib/localflavor/ie/ie_counties.py:26
+msgid "Longford"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:27
+msgid "Louth"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:28
+msgid "Mayo"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:29
+msgid "Meath"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:30
+msgid "Monaghan"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:31
+msgid "Offaly"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:32
+msgid "Roscommon"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:33
+msgid "Sligo"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:34
+msgid "Tipperary"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:35
+msgid "Tyrone"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:36
+msgid "Waterford"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:37
+msgid "Westmeath"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:38
+msgid "Wexford"
+msgstr ""
+
+#: contrib/localflavor/ie/ie_counties.py:39
+msgid "Wicklow"
+msgstr ""
+
+#: contrib/localflavor/in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
 msgstr "Ievadiet pasta indeksu XXXXXXX formātā."
 
-#: contrib/localflavor/is_/forms.py:17
+#: contrib/localflavor/is_/forms.py:18
 msgid ""
 "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
-"Lūdzu ievadiet korektu islandiešu identifikācijas nummuru XXXXXX-XXXX "
-"formātā."
+"Lūdzu ievadiet korektu Islandes identifikācijas nummuru XXXXXX-XXXX formātā."
 
-#: contrib/localflavor/is_/forms.py:18
+#: contrib/localflavor/is_/forms.py:19
 msgid "The Icelandic identification number is not valid."
-msgstr "Islandiešu identifikācijas nummurs nav korekts."
+msgstr "Islandes identifikācijas nummurs nav korekts."
 
-#: contrib/localflavor/it/forms.py:14
+#: contrib/localflavor/it/forms.py:15
 msgid "Enter a valid zip code."
 msgstr "Ievadiet korektu pasta indeksu."
 
-#: contrib/localflavor/it/forms.py:43
+#: contrib/localflavor/it/forms.py:44
 msgid "Enter a valid Social Security number."
 msgstr "Ievadiet korektu sociālās drošības nummuru."
 
-#: contrib/localflavor/it/forms.py:68
+#: contrib/localflavor/it/forms.py:69
 msgid "Enter a valid VAT number."
-msgstr "Ievadiet korektu VAT nummuru."
+msgstr "Ievadiet korektu PVN numuru."
 
 #: contrib/localflavor/jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "Ievadiet pasta indeksu XXXXXXX vai XXX-XXXX formātā."
+msgstr "Ievadiet pasta indeksu XXXXXXX vai XXX-XXXX formātos."
 
 #: contrib/localflavor/jp/jp_prefectures.py:4
 msgid "Hokkaido"
-msgstr ""
+msgstr "Hokaido"
 
 #: contrib/localflavor/jp/jp_prefectures.py:5
 msgid "Aomori"
@@ -2302,7 +3094,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:6
 msgid "Iwate"
-msgstr "Iwate"
+msgstr "Ivate"
 
 #: contrib/localflavor/jp/jp_prefectures.py:7
 msgid "Miyagi"
@@ -2318,7 +3110,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:10
 msgid "Fukushima"
-msgstr ""
+msgstr "Fukušima"
 
 #: contrib/localflavor/jp/jp_prefectures.py:11
 msgid "Ibaraki"
@@ -2354,7 +3146,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:19
 msgid "Nagano"
-msgstr ""
+msgstr "Nagano"
 
 #: contrib/localflavor/jp/jp_prefectures.py:20
 msgid "Niigata"
@@ -2366,7 +3158,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:22
 msgid "Ishikawa"
-msgstr ""
+msgstr "Išikava"
 
 #: contrib/localflavor/jp/jp_prefectures.py:23
 msgid "Fukui"
@@ -2378,7 +3170,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:25
 msgid "Shizuoka"
-msgstr ""
+msgstr "Šizuka"
 
 #: contrib/localflavor/jp/jp_prefectures.py:26
 msgid "Aichi"
@@ -2394,11 +3186,11 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:29
 msgid "Kyoto"
-msgstr ""
+msgstr "Kioto"
 
 #: contrib/localflavor/jp/jp_prefectures.py:30
 msgid "Osaka"
-msgstr ""
+msgstr "Osaka"
 
 #: contrib/localflavor/jp/jp_prefectures.py:31
 msgid "Hyogo"
@@ -2418,7 +3210,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:35
 msgid "Shimane"
-msgstr "Shimane"
+msgstr "Šimane"
 
 #: contrib/localflavor/jp/jp_prefectures.py:36
 msgid "Okayama"
@@ -2426,7 +3218,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:37
 msgid "Hiroshima"
-msgstr ""
+msgstr "Hirošima"
 
 #: contrib/localflavor/jp/jp_prefectures.py:38
 msgid "Yamaguchi"
@@ -2458,11 +3250,11 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:45
 msgid "Nagasaki"
-msgstr ""
+msgstr "Nagasaki"
 
 #: contrib/localflavor/jp/jp_prefectures.py:46
 msgid "Kumamoto"
-msgstr ""
+msgstr "Kumamoto"
 
 #: contrib/localflavor/jp/jp_prefectures.py:47
 msgid "Oita"
@@ -2474,11 +3266,15 @@ msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:49
 msgid "Kagoshima"
-msgstr ""
+msgstr "Kagošima"
 
 #: contrib/localflavor/jp/jp_prefectures.py:50
 msgid "Okinawa"
 msgstr "Okinava"
+
+#: contrib/localflavor/kw/forms.py:25
+msgid "Enter a valid Kuwaiti Civil ID number"
+msgstr "Ievadiet korektu Kuveitas pilsoņu ID numuru."
 
 #: contrib/localflavor/mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -2494,7 +3290,7 @@ msgstr ""
 
 #: contrib/localflavor/mx/mx_states.py:15
 msgid "Campeche"
-msgstr ""
+msgstr "Kampeče"
 
 #: contrib/localflavor/mx/mx_states.py:16
 msgid "Chihuahua"
@@ -2510,7 +3306,7 @@ msgstr ""
 
 #: contrib/localflavor/mx/mx_states.py:19
 msgid "Colima"
-msgstr ""
+msgstr "Kolima"
 
 #: contrib/localflavor/mx/mx_states.py:20
 msgid "Distrito Federal"
@@ -2598,27 +3394,23 @@ msgstr ""
 
 #: contrib/localflavor/mx/mx_states.py:41
 msgid "Veracruz"
-msgstr ""
+msgstr "Verakrusa"
 
 #: contrib/localflavor/mx/mx_states.py:42
 msgid "Yucatán"
-msgstr ""
+msgstr "Jukatana"
 
 #: contrib/localflavor/mx/mx_states.py:43
 msgid "Zacatecas"
 msgstr ""
 
-#: contrib/localflavor/nl/forms.py:21
+#: contrib/localflavor/nl/forms.py:22
 msgid "Enter a valid postal code"
 msgstr "Ievadiet korektu pasta indeksu."
 
-#: contrib/localflavor/nl/forms.py:52
-msgid "Enter a valid phone number"
-msgstr ""
-
-#: contrib/localflavor/nl/forms.py:78
+#: contrib/localflavor/nl/forms.py:79
 msgid "Enter a valid SoFi number"
-msgstr ""
+msgstr "Ievadiet korektu SoFi numuru."
 
 #: contrib/localflavor/nl/nl_provinces.py:4
 msgid "Drenthe"
@@ -2630,7 +3422,7 @@ msgstr ""
 
 #: contrib/localflavor/nl/nl_provinces.py:6
 msgid "Friesland"
-msgstr ""
+msgstr "Frīzlande"
 
 #: contrib/localflavor/nl/nl_provinces.py:7
 msgid "Gelderland"
@@ -2638,19 +3430,19 @@ msgstr ""
 
 #: contrib/localflavor/nl/nl_provinces.py:8
 msgid "Groningen"
-msgstr ""
+msgstr "Groningena"
 
 #: contrib/localflavor/nl/nl_provinces.py:9
 msgid "Limburg"
-msgstr ""
+msgstr "Limburga"
 
 #: contrib/localflavor/nl/nl_provinces.py:10
 msgid "Noord-Brabant"
-msgstr ""
+msgstr "Ziemeļbrabante"
 
 #: contrib/localflavor/nl/nl_provinces.py:11
 msgid "Noord-Holland"
-msgstr ""
+msgstr "Ziemeļholande"
 
 #: contrib/localflavor/nl/nl_provinces.py:12
 msgid "Overijssel"
@@ -2658,60 +3450,61 @@ msgstr ""
 
 #: contrib/localflavor/nl/nl_provinces.py:13
 msgid "Utrecht"
-msgstr ""
+msgstr "Utrehta"
 
 #: contrib/localflavor/nl/nl_provinces.py:14
 msgid "Zeeland"
-msgstr ""
+msgstr "Zēlande"
 
 #: contrib/localflavor/nl/nl_provinces.py:15
 msgid "Zuid-Holland"
-msgstr ""
+msgstr "Dienvidholande"
 
-#: contrib/localflavor/no/forms.py:33
+#: contrib/localflavor/no/forms.py:34
 msgid "Enter a valid Norwegian social security number."
-msgstr "Lūdzu ievadiet korektu norvēģu sociālās drošības nummuru."
+msgstr "Lūdzu ievadiet korektu Norvēģijas sociālās drošības nummuru."
 
-#: contrib/localflavor/pe/forms.py:24
+#: contrib/localflavor/pe/forms.py:25
 msgid "This field requires 8 digits."
 msgstr "Šim laukam jasastāv no 8 cipariem."
 
-#: contrib/localflavor/pe/forms.py:52
+#: contrib/localflavor/pe/forms.py:53
 msgid "This field requires 11 digits."
 msgstr "Šim laukam jasastāv no 11 cipariem."
 
 #: contrib/localflavor/pl/forms.py:38
 msgid "National Identification Number consists of 11 digits."
-msgstr ""
+msgstr "Nacionālais identifikācijas numurs sastāv no 11 cipariem."
 
 #: contrib/localflavor/pl/forms.py:39
 msgid "Wrong checksum for the National Identification Number."
-msgstr ""
+msgstr "Nekorekta kontrolsumma nacionālajam identifikācijas numuram."
 
 #: contrib/localflavor/pl/forms.py:71
 msgid ""
 "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr ""
+msgstr "Ievadiet nodokļa numuru (NIP) formātā XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 
 #: contrib/localflavor/pl/forms.py:72
 msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr ""
+msgstr "Nekorekta nodokļu numura (NIP) kontrolsumma."
 
-#: contrib/localflavor/pl/forms.py:111
-msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
+#: contrib/localflavor/pl/forms.py:109
+msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
 msgstr ""
+"Nacionālais biznesa reģistra numurs (REGON) sastāv no 9 vai 14 cipariem."
 
-#: contrib/localflavor/pl/forms.py:112
+#: contrib/localflavor/pl/forms.py:110
 msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr ""
+msgstr "Nekorekta nacionālā biznesa reģistra numura (REGON) kontrolsumma."
 
-#: contrib/localflavor/pl/forms.py:155
+#: contrib/localflavor/pl/forms.py:148
 msgid "Enter a postal code in the format XX-XXX."
 msgstr "Ievadiet pasta indeksu formātā XX-XXX."
 
 #: contrib/localflavor/pl/pl_voivodeships.py:8
 msgid "Lower Silesia"
-msgstr ""
+msgstr "Apakšsilēzija"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:9
 msgid "Kuyavia-Pomerania"
@@ -2727,7 +3520,7 @@ msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:12
 msgid "Lodz"
-msgstr ""
+msgstr "Lodza"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:13
 msgid "Lesser Poland"
@@ -2751,11 +3544,11 @@ msgstr ""
 
 #: contrib/localflavor/pl/pl_voivodeships.py:18
 msgid "Pomerania"
-msgstr ""
+msgstr "Pomerānija"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:19
 msgid "Silesia"
-msgstr ""
+msgstr "Silēzija"
 
 #: contrib/localflavor/pl/pl_voivodeships.py:20
 msgid "Swietokrzyskie"
@@ -2773,6 +3566,14 @@ msgstr ""
 msgid "West Pomerania"
 msgstr ""
 
+#: contrib/localflavor/pt/forms.py:17
+msgid "Enter a zip code in the format XXXX-XXX."
+msgstr "Ievadiet pasta indeksu XXXX-XXX formātā."
+
+#: contrib/localflavor/pt/forms.py:37
+msgid "Phone numbers must have 9 digits, or start by + or 00."
+msgstr "Tālruņa numuriem jābūt 9 cipariem vai jāsākas ar + vai 00"
+
 #: contrib/localflavor/ro/forms.py:19
 msgid "Enter a valid CIF."
 msgstr "Ievadiet korektu CIF."
@@ -2787,15 +3588,111 @@ msgstr "Ievadiet korektu IBAN ROXX-XXXX-XXXX-XXXX-XXXX-XXXX formātā."
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "Telefona numuriem jābūt XXXX-XXXXXX formātā."
+msgstr "Tālruņa numuriem jābūt XXXX-XXXXXX formātā."
 
 #: contrib/localflavor/ro/forms.py:194
 msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "Ievadiet pasta indeksu formātā XXXXXX."
 
-#: contrib/localflavor/sk/forms.py:30
-msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Ievadiet pasta indeksu XXXXX vai XXX XX formātos."
+#: contrib/localflavor/se/forms.py:50
+msgid "Enter a valid Swedish organisation number."
+msgstr "Ievadiet korektu Zviedrijas organizācijas numuru."
+
+#: contrib/localflavor/se/forms.py:107
+msgid "Enter a valid Swedish personal identity number."
+msgstr "Ievadiet korektu Zviedrijas ID numuru."
+
+#: contrib/localflavor/se/forms.py:108
+msgid "Co-ordination numbers are not allowed."
+msgstr ""
+
+#: contrib/localflavor/se/forms.py:150
+msgid "Enter a Swedish postal code in the format XXXXX."
+msgstr "Ievadiet Zviedrijas pasta indeksu formātā XXXXX."
+
+#: contrib/localflavor/se/se_counties.py:15
+msgid "Stockholm"
+msgstr "Stokholma"
+
+#: contrib/localflavor/se/se_counties.py:16
+msgid "Västerbotten"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:17
+msgid "Norrbotten"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:18
+msgid "Uppsala"
+msgstr "Upsala"
+
+#: contrib/localflavor/se/se_counties.py:19
+msgid "Södermanland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:20
+msgid "Östergötland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:21
+msgid "Jönköping"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:22
+msgid "Kronoberg"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:23
+msgid "Kalmar"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:24
+msgid "Gotland"
+msgstr "Gotlande"
+
+#: contrib/localflavor/se/se_counties.py:25
+msgid "Blekinge"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:26
+msgid "Skåne"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:27
+msgid "Halland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:28
+msgid "Västra Götaland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:29
+msgid "Värmland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:30
+msgid "Örebro"
+msgstr "Ērebro"
+
+#: contrib/localflavor/se/se_counties.py:31
+msgid "Västmanland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:32
+msgid "Dalarna"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:33
+msgid "Gävleborg"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:34
+msgid "Västernorrland"
+msgstr ""
+
+#: contrib/localflavor/se/se_counties.py:35
+msgid "Jämtland"
+msgstr "Jemtlande"
 
 #: contrib/localflavor/sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -3159,7 +4056,7 @@ msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:14
 msgid "Cheshire"
-msgstr ""
+msgstr "Češīra"
 
 #: contrib/localflavor/uk/uk_regions.py:15
 msgid "Cornwall and Isles of Scilly"
@@ -3167,7 +4064,7 @@ msgstr ""
 
 #: contrib/localflavor/uk/uk_regions.py:16
 msgid "Cumbria"
-msgstr ""
+msgstr "Kumbrija"
 
 #: contrib/localflavor/uk/uk_regions.py:17
 msgid "Derbyshire"
@@ -3429,19 +4326,45 @@ msgstr "Skotija"
 msgid "Wales"
 msgstr "Velsa"
 
-#: contrib/localflavor/us/forms.py:16
+#: contrib/localflavor/us/forms.py:17
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr ""
+msgstr "Ievadiet pasta indeksu XXXXX vai XXXXX-XXXX formātos."
 
-#: contrib/localflavor/us/forms.py:54
+#: contrib/localflavor/us/forms.py:26
+msgid "Phone numbers must be in XXX-XXX-XXXX format."
+msgstr "Telefona numuriem jābūt XXX-XXXX-XXXX formātā."
+
+#: contrib/localflavor/us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr ""
+"Ievadiet korektu ASV sociālās apdrošināšanas numuru XXX-XX-XXXX formātā."
 
-#: contrib/localflavor/za/forms.py:20
+#: contrib/localflavor/us/forms.py:88
+msgid "Enter a U.S. state or territory."
+msgstr "Ievadiet ASV štatu vai teritoriju."
+
+#: contrib/localflavor/us/models.py:8
+msgid "U.S. state (two uppercase letters)"
+msgstr "ASV štats (divi augšējā reģistra burti)"
+
+#: contrib/localflavor/us/models.py:17
+msgid "Phone number"
+msgstr "Tālruņa numurs"
+
+#: contrib/localflavor/uy/forms.py:28
+msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
+msgstr ""
+"Ievadiet korektu CI numuru X.XXX.XXX-X,XXXXXXX-X vai XXXXXXXX formātos."
+
+#: contrib/localflavor/uy/forms.py:30
+msgid "Enter a valid CI number."
+msgstr "Ievadiet korektu CI numuru."
+
+#: contrib/localflavor/za/forms.py:21
 msgid "Enter a valid South African ID number"
-msgstr "Ievadiet DĀR ID numuru."
+msgstr "Ievadiet korektu DĀR ID numuru."
 
-#: contrib/localflavor/za/forms.py:54
+#: contrib/localflavor/za/forms.py:55
 msgid "Enter a valid South African postal code"
 msgstr "Ievadiet korektu DĀR pasta indeksu."
 
@@ -3481,37 +4404,41 @@ msgstr ""
 msgid "Western Cape"
 msgstr ""
 
+#: contrib/messages/tests/base.py:101
+msgid "lazy message"
+msgstr "ziņojums (slinkais)"
+
 #: contrib/redirects/models.py:7
 msgid "redirect from"
-msgstr "novirzīt(redirect) no"
+msgstr "pārvirzīt(redirect) no"
 
 #: contrib/redirects/models.py:8
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Tam jābūt absolūtajam ceļam, ieskaitot domēna vārdu. Piemēram: '/events/"
-"search/'."
+"Tam jābūt absolūtajam ceļam, atskaitot domēna vārdu. Piemēram: '/notikumi/"
+"meklet/'."
 
 #: contrib/redirects/models.py:9
 msgid "redirect to"
-msgstr "novirzīt(redirect) uz"
+msgstr "pārvirzīt(redirect) uz"
 
 #: contrib/redirects/models.py:10
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Tas ir vai nu absolūtais ceļš (kā pirms tam) vai pilnais URL, kas sākas ar "
-"'http://'."
+"Šis var būt vai nu absolūtais ceļš (kā augstāk) vai pilnais URL, kas sākas "
+"ar 'http://'."
 
 #: contrib/redirects/models.py:13
 msgid "redirect"
-msgstr "novirzīt"
+msgstr "pārvirzīt"
 
 #: contrib/redirects/models.py:14
 msgid "redirects"
-msgstr "novirzījumi"
+msgstr "pārvirzījumi"
 
 #: contrib/sessions/models.py:45
 msgid "session key"
@@ -3523,7 +4450,7 @@ msgstr "sesijas dati"
 
 #: contrib/sessions/models.py:48
 msgid "expire date"
-msgstr "beigu datums"
+msgstr "izbeigšanās datums"
 
 #: contrib/sessions/models.py:53
 msgid "session"
@@ -3539,251 +4466,404 @@ msgstr "domēna vārds"
 
 #: contrib/sites/models.py:33
 msgid "display name"
-msgstr "izvadāmais vārds"
+msgstr "attēlojamais vārds"
 
 #: contrib/sites/models.py:39
 msgid "sites"
-msgstr "saiti"
+msgstr "vietnes"
 
-#: db/models/fields/__init__.py:348 db/models/fields/__init__.py:683
-msgid "This value must be an integer."
-msgstr "Vērtībai ir jābūt veselam skaitlim."
-
-#: db/models/fields/__init__.py:379
-msgid "This value must be either True or False."
-msgstr "Vērtībai jābūt True vai False."
-
-#: db/models/fields/__init__.py:412
-msgid "This field cannot be null."
-msgstr "Šis lauks nevar būt null"
-
-#: db/models/fields/__init__.py:428
-msgid "Enter only digits separated by commas."
-msgstr "Ievadiet tikai numurus, kas atdalīti ar komatiem."
-
-#: db/models/fields/__init__.py:459
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Ievadiet korektu datumu YYYY-MM-DD formātā."
-
-#: db/models/fields/__init__.py:468
-#, python-format
-msgid "Invalid date: %s"
-msgstr "Nekorekts datums: %s"
-
-#: db/models/fields/__init__.py:532 db/models/fields/__init__.py:550
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "Ievadiet korektu datumu/laiku YYYY-MM-DD HH:MM[:ss[.uuuuuu]] formātā."
-
-#: db/models/fields/__init__.py:586
-msgid "This value must be a decimal number."
-msgstr "Vērtībai ir jābūt decimālskaitlim."
-
-#: db/models/fields/__init__.py:719
-msgid "This value must be either None, True or False."
-msgstr "Šai vērtībai jābūt None, True vai False."
-
-#: db/models/fields/__init__.py:817 db/models/fields/__init__.py:831
-msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "Ievadiet korektu laiku HH:MM[:ss[.uuuuuu]] formātā"
-
-#: db/models/fields/related.py:761
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Lai iezīmētu vairak par vietu, pieturiet \"Ctrl\" (\"Command\" uz Maka) "
-"taustiņu."
-
-#: db/models/fields/related.py:838
-#, fuzzy, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"Ievadiet korektus %(self)s ID. Vērtība %(value)r ir nekorekta.Ievadiet "
-"korektus %(self)s ID. Vērtības %(value)r ir nekorektas."
-msgstr[1] ""
-"Ievadiet korektus %(self)s ID. Vērtība %(value)r ir nekorekta.Ievadiet "
-"korektus %(self)s ID. Vērtības %(value)r ir nekorektas."
-
-#: forms/fields.py:54
-msgid "This field is required."
-msgstr "Šis lauks ir obligāts."
-
-#: forms/fields.py:55
+#: core/validators.py:20 forms/fields.py:66
 msgid "Enter a valid value."
 msgstr "Ievadiet korektu vērtību."
 
-#: forms/fields.py:138
-#, python-format
-msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr ""
-"Vērtībai jasatur ne vairāk kā %(max)d rakstzīmju (garums %(length)d zīmes)."
-
-#: forms/fields.py:139
-#, python-format
-msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr "Vērtībai jasatur vismaz %(min)d rakstzīmju (garums %(length)d zīmes)."
-
-#: forms/fields.py:166
-msgid "Enter a whole number."
-msgstr "Ievadiet veselu skaitli."
-
-#: forms/fields.py:167 forms/fields.py:196 forms/fields.py:225
-#, python-format
-msgid "Ensure this value is less than or equal to %s."
-msgstr "Šai vērtībai jabūt mazākai vai vienādai ar %s."
-
-#: forms/fields.py:168 forms/fields.py:197 forms/fields.py:226
-#, python-format
-msgid "Ensure this value is greater than or equal to %s."
-msgstr "Vērtībai jabūt lielākai vai vienādai ar %s."
-
-#: forms/fields.py:195 forms/fields.py:224
-msgid "Enter a number."
-msgstr "Ievadiet skaitli."
-
-#: forms/fields.py:227
-#, python-format
-msgid "Ensure that there are no more than %s digits in total."
-msgstr "Pārliecinieties, ka kopā nav vairāk par %s cipariem."
-
-#: forms/fields.py:228
-#, python-format
-msgid "Ensure that there are no more than %s decimal places."
-msgstr "Pārliecinieties, ka aiz decimālās zīmes nav vairāk par %s cipariem."
-
-#: forms/fields.py:229
-#, python-format
-msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr "Pārliecinieties, ka pirms decimālās zīmes nav vairāk par %s cipariem."
-
-#: forms/fields.py:287 forms/fields.py:848
-msgid "Enter a valid date."
-msgstr "Ievadiet korektu datumu."
-
-#: forms/fields.py:321 forms/fields.py:849
-msgid "Enter a valid time."
-msgstr "Ievadiet korektu laiku."
-
-#: forms/fields.py:360
-msgid "Enter a valid date/time."
-msgstr "Ievadiet korektu datumu/laiku."
-
-#: forms/fields.py:446
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Nav nosūtīts fails. Pārbaudiet formas kodējuma tipu."
-
-#: forms/fields.py:447
-msgid "No file was submitted."
-msgstr "Netika nosūtīts fails."
-
-#: forms/fields.py:448
-msgid "The submitted file is empty."
-msgstr "Jūsu norādītais fails ir tukšs."
-
-#: forms/fields.py:477
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr ""
-"Augšupielādējiet korektu attēlu. Fails, ko Jūs augšupielādējāt vai nu nav "
-"attēls, vai arī ir bojāts."
-
-#: forms/fields.py:538
+#: core/validators.py:87 forms/fields.py:529
 msgid "Enter a valid URL."
-msgstr "Ievadiet korektu adresi."
+msgstr "Ievadiet korektu URL adresi."
 
-#: forms/fields.py:539
+#: core/validators.py:89 forms/fields.py:530
 msgid "This URL appears to be a broken link."
-msgstr "Šī adrese ir bojāta."
+msgstr "Šī URL adrese šķiet bojāta."
 
-#: forms/fields.py:618 forms/fields.py:696
-#, python-format
-msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Izvēlieties korektu izvēli. %(value)s nav pieejamo izvēļu sarakstā."
-
-#: forms/fields.py:697 forms/fields.py:758 forms/models.py:654
-msgid "Enter a list of values."
-msgstr "Ievadiet sarakstu ar vērtībām."
-
-#: forms/fields.py:877
-msgid "Enter a valid IPv4 address."
-msgstr "Ievadiet korektu IPv4 adresi."
-
-#: forms/fields.py:887
+#: core/validators.py:123 forms/fields.py:873
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Šī vērtība var saturēt tikai burtus, numurus un apakšsvītras vai "
+"Ievadiet korektu vērtību, kas satur tikai burtus, numurus, apakšsvītras vai "
 "šķērssvītras."
 
-#: forms/formsets.py:242 forms/formsets.py:244
-msgid "Order"
-msgstr "Sakārtojums"
+#: core/validators.py:126 forms/fields.py:866
+msgid "Enter a valid IPv4 address."
+msgstr "Ievadiet korektu IPv4 adresi."
 
-#: forms/models.py:268 forms/models.py:277
+#: core/validators.py:129 db/models/fields/__init__.py:572
+msgid "Enter only digits separated by commas."
+msgstr "Ievadiet tikai numurus, atdalītus ar komatiem."
+
+#: core/validators.py:135
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "Nodrošiniet, ka vērtība ir %(limit_value)s (tā satur %(show_value)s)."
+
+#: core/validators.py:153 forms/fields.py:205 forms/fields.py:257
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Šai vērtībai jabūt mazākai vai vienādai ar %(limit_value)s."
+
+#: core/validators.py:158 forms/fields.py:206 forms/fields.py:258
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Vērtībai jābūt lielākai vai vienādai ar %(limit_value)s."
+
+#: core/validators.py:164
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+"Vērtībai jāsatur vismaz %(limit_value)d rakstu zīmes (tā satur %(show_value)"
+"d)."
+
+#: core/validators.py:170
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+"Vērtībai jāsatur ne vairāk kā %(limit_value)d rakstu zīmes (tā satur %"
+"(show_value)d)."
+
+#: db/models/base.py:822
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "%(field_name)s jābūt unikālam %(date_field)s %(lookup)s."
+
+#: db/models/base.py:837 db/models/base.py:845
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s ar nosaukumu %(field_label)s jau eksistē."
 
-#: forms/models.py:584
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr ""
-"Izvēlaties pareizu izvēli. Jūsu izvēlētais objekts neietilpst pieejamo "
-"sarakstā."
+#: db/models/fields/__init__.py:63
+#, python-format
+msgid "Value %r is not a valid choice."
+msgstr "Nederīga izvēle: %r."
 
-#: forms/models.py:655
+#: db/models/fields/__init__.py:64
+msgid "This field cannot be null."
+msgstr "Šis lauks nevar neksistēt (būt null)."
+
+#: db/models/fields/__init__.py:65
+msgid "This field cannot be blank."
+msgstr "Šis lauks nevar būt tukšs"
+
+#: db/models/fields/__init__.py:70
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Lauks ar tipu: %(field_type)s"
+
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:852
+#: db/models/fields/__init__.py:961 db/models/fields/__init__.py:972
+#: db/models/fields/__init__.py:999
+msgid "Integer"
+msgstr "Vesels skaitlis"
+
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:850
+msgid "This value must be an integer."
+msgstr "Vērtībai ir jābūt veselam skaitlim."
+
+#: db/models/fields/__init__.py:490
+msgid "This value must be either True or False."
+msgstr "Vērtībai jābūt True vai False."
+
+#: db/models/fields/__init__.py:492
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (True vai False)"
+
+#: db/models/fields/__init__.py:539 db/models/fields/__init__.py:982
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Simbolu virkne (līdz pat %(max_length)s)"
+
+#: db/models/fields/__init__.py:567
+msgid "Comma-separated integers"
+msgstr "Ar komatu atdalīti veselie skaitļi"
+
+#: db/models/fields/__init__.py:581
+msgid "Date (without time)"
+msgstr "Datums (bez laika)"
+
+#: db/models/fields/__init__.py:585
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Ievadiet korektu datumu YYYY-MM-DD formātā."
+
+#: db/models/fields/__init__.py:586
+#, python-format
+msgid "Invalid date: %s"
+msgstr "Nekorekts datums: %s"
+
+#: db/models/fields/__init__.py:667
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "Ievadiet korektu datumu/laiku YYYY-MM-DD HH:MM[:ss[.uuuuuu]] formātā."
+
+#: db/models/fields/__init__.py:669
+msgid "Date (with time)"
+msgstr "Datums (ar laiku)"
+
+#: db/models/fields/__init__.py:735
+msgid "This value must be a decimal number."
+msgstr "Vērtībai ir jābūt decimālskaitlim."
+
+#: db/models/fields/__init__.py:737
+msgid "Decimal number"
+msgstr "Decimāls skaitlis"
+
+#: db/models/fields/__init__.py:792
+msgid "E-mail address"
+msgstr "E-pasta adrese"
+
+#: db/models/fields/__init__.py:799 db/models/fields/files.py:220
+#: db/models/fields/files.py:331
+msgid "File path"
+msgstr "Faila ceļš"
+
+#: db/models/fields/__init__.py:822
+msgid "This value must be a float."
+msgstr "Šai vērtībai jābūt decimāldaļskaitlim."
+
+#: db/models/fields/__init__.py:824
+msgid "Floating point number"
+msgstr "Plūstošā punkta skaitlis"
+
+#: db/models/fields/__init__.py:883
+msgid "Big (8 byte) integer"
+msgstr "Liels (8 baitu) vesels skaitlis"
+
+#: db/models/fields/__init__.py:912
+msgid "This value must be either None, True or False."
+msgstr "Šai vērtībai jābūt None, True vai False."
+
+#: db/models/fields/__init__.py:914
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolean (jā, nē vai neviens)"
+
+#: db/models/fields/__init__.py:1005
+msgid "Text"
+msgstr "Teksts"
+
+#: db/models/fields/__init__.py:1021
+msgid "Time"
+msgstr "Laiks"
+
+#: db/models/fields/__init__.py:1025
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "Ievadiet korektu laiku HH:MM[:ss[.uuuuuu]] formātā"
+
+#: db/models/fields/__init__.py:1109
+msgid "XML text"
+msgstr "XML teksts"
+
+#: db/models/fields/related.py:799
+#, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr "Modelis %(model)s ar primāro atslēgu %(pk)r neeksistē."
+
+#: db/models/fields/related.py:801
+msgid "Foreign Key (type determined by related field)"
+msgstr "Ārējā atslēga (tipu nosaka lauks uz kuru attiecas)"
+
+#: db/models/fields/related.py:918
+msgid "One-to-one relationship"
+msgstr "Attiecība viens pret vienu"
+
+#: db/models/fields/related.py:980
+msgid "Many-to-many relationship"
+msgstr "Attiecība daudzi pret daudziem"
+
+#: db/models/fields/related.py:1000
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Lai iezīmētu vairāk par vienu, pieturiet \"Ctrl\" (\"Command\" uz Mac "
+"datora) taustiņu."
+
+#: db/models/fields/related.py:1061
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "Ievadiet korektu %(self)s ID. Vērtība %(value)r ir nekorekta."
+msgstr[1] "Ievadiet korektus %(self)s ID. Vērtības %(value)r ir nekorektas."
+msgstr[2] "Ievadiet korektus %(self)s ID. Vērtības %(value)r ir nekorektas."
+
+#: forms/fields.py:65
+msgid "This field is required."
+msgstr "Šis lauks ir obligāts."
+
+#: forms/fields.py:204
+msgid "Enter a whole number."
+msgstr "Ievadiet veselu skaitli."
+
+#: forms/fields.py:235 forms/fields.py:256
+msgid "Enter a number."
+msgstr "Ievadiet skaitli."
+
+#: forms/fields.py:259
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Pārliecinieties, ka kopā nav vairāk par %s cipariem."
+
+#: forms/fields.py:260
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Pārliecinieties, ka aiz decimālās zīmes nav vairāk par %s cipariem."
+
+#: forms/fields.py:261
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr "Pārliecinieties, ka pirms decimālās zīmes nav vairāk par %s cipariem."
+
+#: forms/fields.py:323 forms/fields.py:838
+msgid "Enter a valid date."
+msgstr "Ievadiet korektu datumu."
+
+#: forms/fields.py:351 forms/fields.py:839
+msgid "Enter a valid time."
+msgstr "Ievadiet korektu laiku."
+
+#: forms/fields.py:377
+msgid "Enter a valid date/time."
+msgstr "Ievadiet korektu datumu/laiku."
+
+#: forms/fields.py:435
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Nav nosūtīts fails. Pārbaudiet formas kodējuma tipu."
+
+#: forms/fields.py:436
+msgid "No file was submitted."
+msgstr "Netika nosūtīts fails."
+
+#: forms/fields.py:437
+msgid "The submitted file is empty."
+msgstr "Jūsu nosūtītais fails ir tukšs."
+
+#: forms/fields.py:438
+#, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+"Faila nosaukuma garums nedrīkst pārsniegt %(max)d rakstu zīmes (tas satur %"
+"(length)d)."
+
+#: forms/fields.py:473
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Augšupielādējiet korektu attēlu. Fails, ko augšupielādējāt, vai nu nav "
+"attēls, vai arī ir bojāts."
+
+#: forms/fields.py:596 forms/fields.py:671
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Izvēlieties korektu izvēli. %(value)s nav pieejamo izvēļu sarakstā."
+
+#: forms/fields.py:672 forms/fields.py:734 forms/models.py:1002
+msgid "Enter a list of values."
+msgstr "Ievadiet sarakstu ar vērtībām."
+
+#: forms/formsets.py:298 forms/formsets.py:300
+msgid "Order"
+msgstr "Sakārtojums"
+
+#: forms/models.py:562
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Lūdzu izlabojiet dublicētos datus priekš %(field)s."
+
+#: forms/models.py:566
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+"Lūdzu izlabojiet dublicētos datus laukam %(field)s, kam jābūt unikālam."
+
+#: forms/models.py:572
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Lūdzu izlabojiet dublicētos datus laukam %(field_name)s, kam jābūt unikālam "
+"priekš %(lookup)s iekš %(date_field)s."
+
+#: forms/models.py:580
+msgid "Please correct the duplicate values below."
+msgstr "Lūdzu izlabojiet dublicētās vērtības zemāk."
+
+#: forms/models.py:855
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr "Iekļautā ārējā atslēga nesakrita ar vecāka elementa primāro atslēgu"
+
+#: forms/models.py:921
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Izvēlaties pareizu izvēli. Jūsu izvēlele neietilpst pieejamo sarakstā."
+
+#: forms/models.py:1003
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Izvēlieties pareizu izvēli. %s nav pieejamo izvēļu sarakstā."
 
-#: template/defaultfilters.py:706
+#: forms/models.py:1005
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr "\"%s\" ir nederīga vērtība priekš primārās atslēgas."
+
+#: template/defaultfilters.py:776
 msgid "yes,no,maybe"
 msgstr "jā,nē,varbūt"
 
-#: template/defaultfilters.py:737
-#, fuzzy, python-format
+#: template/defaultfilters.py:807
+#, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d baits"
-msgstr[1] "%(size)d baits"
+msgstr[1] "%(size)d baiti"
+msgstr[2] "%(size)d baitu"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:809
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:811
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:812
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: utils/dateformat.py:41
+#: utils/dateformat.py:42
 msgid "p.m."
 msgstr "p.m."
 
-#: utils/dateformat.py:42
+#: utils/dateformat.py:43
 msgid "a.m."
 msgstr "a.m."
 
-#: utils/dateformat.py:47
+#: utils/dateformat.py:48
 msgid "PM"
 msgstr "PM"
 
-#: utils/dateformat.py:48
+#: utils/dateformat.py:49
 msgid "AM"
 msgstr "AM"
 
-#: utils/dateformat.py:97
+#: utils/dateformat.py:98
 msgid "midnight"
 msgstr "pusnakts"
 
-#: utils/dateformat.py:99
+#: utils/dateformat.py:100
 msgid "noon"
 msgstr "dienasvidus"
 
@@ -3967,96 +5047,115 @@ msgstr "Nov."
 msgid "Dec."
 msgstr "Dec."
 
-#: utils/text.py:128
+#: utils/text.py:130
 msgid "or"
 msgstr "vai"
 
 #: utils/timesince.py:21
-#, fuzzy
 msgid "year"
 msgid_plural "years"
 msgstr[0] "gads"
-msgstr[1] "gads"
+msgstr[1] "gadi"
+msgstr[2] "gadu"
 
 #: utils/timesince.py:22
-#, fuzzy
 msgid "month"
 msgid_plural "months"
 msgstr[0] "mēnesis"
-msgstr[1] "mēnesis"
+msgstr[1] "mēneši"
+msgstr[2] "mēnesu"
 
 #: utils/timesince.py:23
-#, fuzzy
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "nedēļa"
-msgstr[1] "nedēļa"
+msgstr[1] "nedēļas"
+msgstr[2] "nedēļu"
 
 #: utils/timesince.py:24
-#, fuzzy
 msgid "day"
 msgid_plural "days"
 msgstr[0] "diena"
-msgstr[1] "diena"
+msgstr[1] "dienas"
+msgstr[2] "dienu"
 
 #: utils/timesince.py:25
-#, fuzzy
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "stunda"
-msgstr[1] "stunda"
+msgstr[1] "stundas"
+msgstr[2] "stundu"
 
 #: utils/timesince.py:26
-#, fuzzy
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minūte"
-msgstr[1] "minūte"
+msgstr[1] "minūtes"
+msgstr[2] "minūšu"
 
-#: utils/timesince.py:43
+#: utils/timesince.py:45
 msgid "minutes"
 msgstr "minūtes"
 
-#: utils/timesince.py:48
+#: utils/timesince.py:50
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:54
+#: utils/timesince.py:56
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:403
+#: utils/translation/trans_real.py:519
 msgid "DATE_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:405
+#: utils/translation/trans_real.py:520
+msgid "DATETIME_FORMAT"
+msgstr "d.m.Y H:i:s"
+
+#: utils/translation/trans_real.py:521
 msgid "TIME_FORMAT"
 msgstr "H:i:s"
 
-#: utils/translation/trans_real.py:421
+#: utils/translation/trans_real.py:542
 msgid "YEAR_MONTH_FORMAT"
 msgstr "m.Y"
 
-#: utils/translation/trans_real.py:422
+#: utils/translation/trans_real.py:543
 msgid "MONTH_DAY_FORMAT"
 msgstr "d.m"
 
-#: views/generic/create_update.py:114
+#: views/generic/create_update.py:115
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s tika veiksmīgi izveidots."
 
-#: views/generic/create_update.py:156
+#: views/generic/create_update.py:158
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s tika veiksmīgi dzēsts."
 
-#: views/generic/create_update.py:198
+#: views/generic/create_update.py:201
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s tika dzēsts."
+
+#~ msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+#~ msgstr "Viens vai vairāki %(fieldname)s objektos %(name)s: %(obj)s"
+
+#~ msgid "One or more %(fieldname)s in %(name)s:"
+#~ msgstr "Viens vai vairāki %(fieldname)s %(name)s:"
+
+#~ msgid "Old password:"
+#~ msgstr "Vecā parole:"
+
+#~ msgid "Relation to parent model"
+#~ msgstr "Relācija uz vecāka modeli"
+
+#~ msgid "Add user"
+#~ msgstr "Pievienot lietotāju"
 
 #~ msgid "Line breaks are not allowed here."
 #~ msgstr "Pārnešana jaunā rindā šeit nav atļauta."
@@ -4128,9 +5227,6 @@ msgstr "%(verbose_name)s tika dzēsts."
 #~ msgid "The URL %s is a broken link."
 #~ msgstr "URL %s ir salauzta saite."
 
-#~ msgid "Enter a valid U.S. state abbreviation."
-#~ msgstr "Ievadiet korektu ASV štata abreviatūru."
-
 #~ msgid "This field must match the '%s' field."
 #~ msgstr "Šim laukam jāsakrīt ar '%s' lauku."
 
@@ -4140,20 +5236,11 @@ msgstr "%(verbose_name)s tika dzēsts."
 #~ msgid "Please enter both fields or leave them both empty."
 #~ msgstr "Lūdzu aizpildiet abus laukus vai atstājiet abus tukšus."
 
-#~ msgid "This field must be given if %(field)s is %(value)s"
-#~ msgstr "Šis lauks ir jāaizpilda, ja %(field)s ir vienāds %(value)s"
-
 #~ msgid "This field must be given if %(field)s is not %(value)s"
 #~ msgstr "Šis lauks ir jāaizpilda, ja %(field)s nav vienāds %(value)s"
 
-#~ msgid "Duplicate values are not allowed."
-#~ msgstr "Duplicētas vērtības nav atļautas."
-
 #~ msgid "This value must be between %(lower)s and %(upper)s."
 #~ msgstr "Šai vērtībai jābūt starp %(lower)s un %(upper)s."
-
-#~ msgid "This value must be at least %s."
-#~ msgstr "Šai vērtībai jābūt vismaz %s."
 
 #~ msgid "This value must be no more than %s."
 #~ msgstr "Šai vērtība nedrīkst pārsniegt %s."
@@ -4237,9 +5324,6 @@ msgstr "%(verbose_name)s tika dzēsts."
 #~ msgid "is valid rating"
 #~ msgstr "korekts reitings"
 
-#~ msgid "comments"
-#~ msgstr "komentāri"
-
 #~ msgid "Content object"
 #~ msgstr "Satura objekts"
 
@@ -4248,15 +5332,6 @@ msgstr "%(verbose_name)s tika dzēsts."
 
 #~ msgid "ip address"
 #~ msgstr "ip adrese"
-
-#~ msgid "approved by staff"
-#~ msgstr "apstiprinājusi administrācija"
-
-#~ msgid "free comment"
-#~ msgstr "brīvais komentārs"
-
-#~ msgid "free comments"
-#~ msgstr "brīvie komentāri"
 
 #~ msgid "score"
 #~ msgstr "rezultāts"
@@ -4293,9 +5368,6 @@ msgstr "%(verbose_name)s tika dzēsts."
 
 #~ msgid "deletion date"
 #~ msgstr "dzēšanas datums"
-
-#~ msgid "moderator deletion"
-#~ msgstr "moderācijas dzēšana"
 
 #~ msgid "moderator deletions"
 #~ msgstr "moderācijas dzēšanas"
@@ -4361,9 +5433,6 @@ msgstr "%(verbose_name)s tika dzēsts."
 
 #~ msgid "Post a photo"
 #~ msgstr "Ievietojiet fotogrāfiju"
-
-#~ msgid "Preview comment"
-#~ msgstr "Pirmsskatīt komentāru"
 
 #~ msgid "Your name:"
 #~ msgstr "Jūsu vārds:"
