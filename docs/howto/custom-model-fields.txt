@@ -582,7 +582,7 @@ accepted lookup types to ``exact`` and ``in``::
         def get_prep_lookup(self, lookup_type, value):
             # We only handle 'exact' and 'in'. All others are errors.
             if lookup_type == 'exact':
-                return [self.get_prep_value(value)]
+                return self.get_prep_value(value)
             elif lookup_type == 'in':
                 return [self.get_prep_value(v) for v in value]
             else:
