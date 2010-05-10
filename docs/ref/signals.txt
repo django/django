@@ -131,7 +131,7 @@ Arguments sent with this signal:
         The actual instance being saved.
 
     ``created``
-        A boolean; ``True`` if a new record was create.
+        A boolean; ``True`` if a new record was created.
 
 pre_delete
 ----------
