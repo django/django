@@ -136,10 +136,12 @@ the expected error message appears for the second item.
 Understanding the ManagementForm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may have noticed the additional data that was required in the formset's
-data above. This data is coming from the ``ManagementForm``. This form is
-dealt with internally to the formset. If you don't use it, it will result in
-an exception::
+You may have noticed the additional data (``form-TOTAL_FORMS``,
+``form-INITIAL_FORMS`` and ``form-MAX_NUM_FORMS``) that was required
+in the formset's data above. This data is required for the
+``ManagementForm``. This form is used by the formset to manage the
+collection of forms contained in the formset. If you don't provide
+this management data, an exception will be raised::
 
     >>> data = {
     ...     'form-0-title': u'Test',
@@ -153,6 +155,11 @@ an exception::
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
 in this form as well.
+
+The management form is available as an attribute of the formset
+itself. When rendering a formset in a template, you can include all
+the management data by rendering ``{{ my_formset.management_form }}``
+(substituting the name of your formset as appropriate).
 
 .. versionadded:: 1.1
 
