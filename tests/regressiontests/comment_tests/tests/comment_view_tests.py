@@ -174,12 +174,13 @@ class CommentViewTests(CommentTestCase):
         actually getting saved
         """
         def receive(sender, **kwargs): return False
-        signals.comment_will_be_posted.connect(receive)
+        signals.comment_will_be_posted.connect(receive, dispatch_uid="comment-test")
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)
         response = self.client.post("/post/", data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Comment.objects.count(), 0)
+        signals.comment_will_be_posted.disconnect(dispatch_uid="comment-test")
 
     def testWillBePostedSignalModifyComment(self):
         """
