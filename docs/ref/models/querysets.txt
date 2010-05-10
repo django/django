@@ -92,7 +92,7 @@ time, defeating the purpose of caching). This means that when you unpickle a
 than the results that are currently in the database.
 
 If you only want to pickle the necessary information to recreate the
-``Queryset`` from the database at a later time, pickle the ``query`` attribute
+``QuerySet`` from the database at a later time, pickle the ``query`` attribute
 of the ``QuerySet``. You can then recreate the original ``QuerySet`` (without
 any results loaded) using some code like this::
 

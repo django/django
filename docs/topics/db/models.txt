@@ -1081,7 +1081,7 @@ attribute when you use the proxy. This is easy::
 Now normal ``User`` queries will be unorderd and ``OrderedUser`` queries will
 be ordered by ``username``.
 
-Querysets still return the model that was requested
+QuerySets still return the model that was requested
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There is no way to have Django return, say, a ``MyUser`` object whenever you
