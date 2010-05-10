@@ -572,6 +572,45 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 .. _`strftime formatting`: http://docs.python.org/library/time.html#time.strftime
 
+FileField and FieldFile
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When you access a :class:`FileField` on a model, you are given an instance
+of :class:`FieldFile` as a proxy for accessing the underlying file. This
+class has several methods that can be used to interact with file data:
+
+.. method:: FieldFile.open(mode='rb')
+
+Behaves like the standard Python ``open()`` method and opens the file
+associated with this instance in the mode specified by ``mode``.
+
+.. method:: FieldFile.close()
+
+Behaves like the standard Python ``file.close()`` method and closes the file
+associated with this instance.
+
+.. method:: FieldFile.save(name, content, save=True)
+
+This method takes a filename and file contents and passes them to the storage
+class for the field, then associates the stored file with the model field.
+If you want to manually associate file data with :class:`FileField`
+instances on your model, the ``save()`` method is used to persist that file
+data.
+
+Takes two required arguments: ``name`` which is the name of the file, and
+``content`` which is a file-like object containing the file's contents. The
+optional ``save`` argument controls whether or not the instance is saved after
+the file has been altered. Defaults to ``True``.
+
+.. method:: FieldFile.delete(save=True)
+
+Deletes the file associated with this instance and clears all attributes on
+the field. Note: This method will close the file if it happens to be open when
+``delete()`` is called.
+
+The optional ``save`` argument controls whether or not the instance is saved
+after the file has been deleted. Defaults to ``True``.
+
 ``FilePathField``
 -----------------
 
@@ -632,8 +671,15 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 
 .. class:: ImageField(upload_to=None, [height_field=None, width_field=None, max_length=100, **options])
 
-Like :class:`FileField`, but validates that the uploaded object is a valid
-image. Has two extra optional arguments:
+Inherits all attributes and methods from :class:`FileField`, but also
+validates that the uploaded object is a valid image.
+
+In addition to the special attributes that are available for :class:`FileField`,
+an :class:`ImageField` also has :attr:`~django.core.files.File.height` and
+:attr:`~django.core.files.File.width` attributes.
+
+To facilitate querying on those attributes, :class:`ImageField` has two extra
+optional arguments:
 
 .. attribute:: ImageField.height_field
 
@@ -645,10 +691,6 @@ image. Has two extra optional arguments:
     Name of a model field which will be auto-populated with the width of the
     image each time the model instance is saved.
 
-In addition to the special attributes that are available for :class:`FileField`,
-an :class:`ImageField` also has :attr:`~django.core.files.File.height` and
-:attr:`~django.core.files.File.width` attributes.
-
 Requires the `Python Imaging Library`_.
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
@@ -656,9 +698,9 @@ Requires the `Python Imaging Library`_.
 .. versionadded:: 1.0
    The ``max_length`` argument was added in this version.
 
-By default, :class:`ImageField` instances are
-created as ``varchar(100)`` columns in your database. As with other fields, you
-can change the maximum length using the :attr:`~CharField.max_length` argument.
+By default, :class:`ImageField` instances are created as ``varchar(100)``
+columns in your database. As with other fields, you can change the maximum
+length using the :attr:`~CharField.max_length` argument.
 
 ``IntegerField``
 ----------------
@@ -872,9 +914,9 @@ define the details of how the relation works.
     current date/time to be chosen.
 
     Instead of a dictionary this can also be a :class:`~django.db.models.Q`
-    object for more :ref:`complex queries <complex-lookups-with-q>`. However, 
-    if ``limit_choices_to`` is a :class:`~django.db.models.Q` object then it 
-    will only have an effect on the choices available in the admin when the 
+    object for more :ref:`complex queries <complex-lookups-with-q>`. However,
+    if ``limit_choices_to`` is a :class:`~django.db.models.Q` object then it
+    will only have an effect on the choices available in the admin when the
     field is not listed in ``raw_id_fields`` in the ``ModelAdmin`` for the model.
 
 .. attribute:: ForeignKey.related_name
