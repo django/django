@@ -41,14 +41,14 @@ different needs:
       to Django -- or to web development in general. It doesn't cover anything
       in depth, but instead gives a high-level overview of how developing in
       Django "feels".
-      
+
     * The :ref:`topic guides <topics-index>`, on the other hand, dive deep into
       individual parts of Django. There are complete guides to Django's
       :ref:`model system <topics-db-index>`, :ref:`template engine
       <topics-templates>`, :ref:`forms framework <topics-forms-index>`, and much
       more.
-      
-      This is probably where you'll want to spent most of your time; if you work
+
+      This is probably where you'll want to spend most of your time; if you work
       your way through these guides you should come out knowing pretty much
       everything there is to know about Django.
 
@@ -67,14 +67,14 @@ different needs:
       methods, and modules are kept in the :ref:`reference <ref-index>`. This is
       where you'll turn to find the details of a particular function or
       whathaveyou.
-    
+
     * Finally, there's some "specialized" documentation not usually relevant to
       most developers. This includes the :ref:`release notes <releases-index>`,
       :ref:`documentation of obsolete features <obsolete-index>`,
       :ref:`internals documentation <internals-index>` for those who want to add
       code to Django itself, and a :ref:`few other things that simply don't fit
       elsewhere <misc-index>`.
-      
+
 
 How documentation is updated
 ============================
@@ -160,7 +160,7 @@ Django document:
 .. code-block:: bash
 
     $ grep -r max_length /path/to/django/docs/
-    
+
 As HTML, locally
 ----------------
 
@@ -170,29 +170,29 @@ You can get a local copy of the HTML documentation following a few easy steps:
       plain text to HTML. You'll need to install Sphinx by either downloading
       and installing the package from the Sphinx website, or by Python's
       ``easy_install``:
-      
+
       .. code-block:: bash
-        
+
             $ easy_install Sphinx
-    
+
     * Then, just use the included ``Makefile`` to turn the documentation into
       HTML:
-      
+
       .. code-block:: bash
-      
+
             $ cd path/to/django/docs
             $ make html
-    
+
       You'll need `GNU Make`__ installed for this.
-      
+
     * The HTML documentation will be placed in ``docs/_build/html``.
-    
+
 .. warning::
 
     At the time of this writing, Django's using a version of Sphinx not
     yet released, so you'll currently need to install Sphinx from the
     source. We'll fix this shortly.
-    
+
 __ http://sphinx.pocoo.org/
 __ http://www.gnu.org/software/make/
 
