@@ -475,7 +475,7 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Mohon masukkan nama dan sandi yang benar. Kedua field inicase-sensitive."
+"Mohon masukkan nama dan sandi yang benar. Kedua field ini case-sensitive."
 
 #: contrib/admin/sites.py:307 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
@@ -638,7 +638,7 @@ msgstr "Ganti sandi"
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
-msgstr "Keluar"
+msgstr "Log out"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
@@ -894,7 +894,7 @@ msgstr "Terima kasih telah menggunakan situs ini hari ini."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr "Masuk kembali"
+msgstr "Log in kembali"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:5
@@ -1146,11 +1146,11 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Untuk menginstal bookmarklet, drag pautan ini ke toolbar\n"
+"<p class=\"help\">Untuk menginstal bookmarklet, drag tautan ini ke toolbar\n"
 "bookmark Anda atau klik kanan di pautan tersebut dan tambahkan ke bookmark "
 "Anda. Kini Anda dapat\n"
 "memilih bookmarklet dari halaman apapun di situs. Jangan lupa beberapa\n"
-"bookmarklet ini hanya bisa digunakan dari komputer yang tercatat \n"
+"bookmarklet ini hanya bisa digunakan dari komputer yang terdaftar \n"
 "sebagai \"internal\" (hubungi administrator sistem Anda apabila tidak yakin "
 "apakah\n"
 "komputer Anda termasuk \"internal\").</p>\n"
@@ -1327,7 +1327,7 @@ msgstr "nama depan"
 
 #: contrib/auth/models.py:198
 msgid "last name"
-msgstr "nama keluarga"
+msgstr "nama belakang"
 
 #: contrib/auth/models.py:199
 msgid "e-mail address"
@@ -1568,7 +1568,7 @@ msgid ""
 "only."
 msgstr ""
 "Komentar ini dikirim oleh seorang pengguna yang ter-otentikasi sehingga nama "
-"penggunatidak dapat diubah."
+"pengguna tidak dapat diubah."
 
 #: contrib/comments/models.py:128
 msgid ""
@@ -1576,7 +1576,7 @@ msgid ""
 "only."
 msgstr ""
 "Komentar ini dikirim oleh seorang pengguna yang ter-otentikasi sehingga "
-"alamat emailtidak dapat diubah."
+"alamat email tidak dapat diubah."
 
 #: contrib/comments/models.py:153
 #, python-format
@@ -1824,8 +1824,8 @@ msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
-"An error occurred when transforming the geometry to the SRID of the geometry "
-"form field."
+"Telah terjadi kesalahan ketika merubah geometri ke SRID dari field formulir"
+"geometri."
 
 #: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
@@ -4660,7 +4660,7 @@ msgstr "Model %(model)s dengan pk %(pk)r tidak ada."
 
 #: db/models/fields/related.py:801
 msgid "Foreign Key (type determined by related field)"
-msgstr "Kunci asing (tipe tergantung dari field yang berhubungan)"
+msgstr "Foreign Key (tipe tergantung dari field yang berhubungan)"
 
 #: db/models/fields/related.py:918
 msgid "One-to-one relationship"
@@ -4789,7 +4789,7 @@ msgstr "Mohon perbaiki nilai duplikat di bawah ini."
 
 #: forms/models.py:855
 msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Kunci asing inline tidak cocok dengan primary key milik parent."
+msgstr "Foreign key inline tidak cocok dengan primary key milik parent."
 
 #: forms/models.py:921
 msgid "Select a valid choice. That choice is not one of the available choices."
