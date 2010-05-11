@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-27 16:17+0200\n"
+"POT-Creation-Date: 2010-05-11 06:00+0300\n"
 "PO-Revision-Date: 2007-09-15 00:34+0300\n"
-"Last-Translator: Ville Säävuori <ville@syneus.fi>\n"
+"Last-Translator: Aku Kotkavuo <aku.kotkavuo@norfello.com>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,195 +62,215 @@ msgid "English"
 msgstr "englanti"
 
 #: conf/global_settings.py:55
+msgid "British English"
+msgstr "brittienglanti"
+
+#: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "espanja"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Argentinean Spanish"
 msgstr "Argentiinan espanja"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Estonian"
 msgstr "viro"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:59
 msgid "Basque"
 msgstr "baski"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Persian"
 msgstr "persia"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Finnish"
 msgstr "suomi"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "French"
 msgstr "ranska"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Frisian"
 msgstr "friisi"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Irish"
 msgstr "irlanti"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Galician"
 msgstr "galicia"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Hebrew"
 msgstr "heprea"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hindi"
 msgstr "hindi"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Croatian"
 msgstr "kroatia"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Hungarian"
 msgstr "unkari"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
+msgid "Indonesian"
+msgstr "indonesia"
+
+#: conf/global_settings.py:71
 msgid "Icelandic"
 msgstr "islanti"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:72
 msgid "Italian"
 msgstr "italia"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:73
 msgid "Japanese"
 msgstr "japani"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:74
 msgid "Georgian"
 msgstr "georgia"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:75
 msgid "Khmer"
 msgstr "khmer"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:76
 msgid "Kannada"
 msgstr "kannada"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:77
 msgid "Korean"
 msgstr "korea"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:78
 msgid "Lithuanian"
 msgstr "liettua"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:79
 msgid "Latvian"
 msgstr "latvia"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:80
 msgid "Macedonian"
 msgstr "makedonia"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:81
+msgid "Mongolian"
+msgstr "mongolia"
+
+#: conf/global_settings.py:82
 msgid "Dutch"
 msgstr "hollanti"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:83
 msgid "Norwegian"
 msgstr "norja"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:84
+msgid "Norwegian Bokmal"
+msgstr "norja (kirjanorja)"
+
+#: conf/global_settings.py:85
+msgid "Norwegian Nynorsk"
+msgstr "norja (uusnorja)"
+
+#: conf/global_settings.py:86
 msgid "Polish"
 msgstr "puola"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:87
 msgid "Portuguese"
 msgstr "portugali"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:88
 msgid "Brazilian Portuguese"
 msgstr "brasilian portugali"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:89
 msgid "Romanian"
 msgstr "romania"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:90
 msgid "Russian"
 msgstr "venäjä"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:91
 msgid "Slovak"
 msgstr "slovakia"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:92
 msgid "Slovenian"
 msgstr "slovenia"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:93
 msgid "Albanian"
 msgstr "albaani"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:94
 msgid "Serbian"
 msgstr "serbia"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:95
 msgid "Serbian Latin"
 msgstr "serbian latina"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:96
 msgid "Swedish"
 msgstr "ruotsi"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:97
 msgid "Tamil"
 msgstr "tamili"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:98
 msgid "Telugu"
 msgstr "telugu"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:99
 msgid "Thai"
 msgstr "thain kieli"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:100
 msgid "Turkish"
 msgstr "turkki"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:101
 msgid "Ukrainian"
 msgstr "ukraina"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:102
 msgid "Vietnamese"
 msgstr "vietnam"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:103
 msgid "Simplified Chinese"
 msgstr "kiina (yksinkertaistettu)"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:104
 msgid "Traditional Chinese"
 msgstr "kiina (perinteinen)"
 
-#: contrib/admin/actions.py:52
+#: contrib/admin/actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Onnistuneesti poistettu %(count)d \"%(items)s\"-kohdetta."
 
-#: contrib/admin/actions.py:59 contrib/admin/options.py:1097
+#: contrib/admin/actions.py:55 contrib/admin/options.py:1125
 msgid "Are you sure?"
 msgstr "Oletko varma?"
 
-#: contrib/admin/actions.py:77
+#: contrib/admin/actions.py:73
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Poista valitut \"%(verbose_name_plural)s\"-kohteet"
@@ -289,19 +309,19 @@ msgstr "Tässä kuussa"
 msgid "This year"
 msgstr "Tänä vuonna"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:470
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
 msgid "Yes"
 msgstr "Kyllä"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:470
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
 msgid "No"
 msgstr "Ei"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:470
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:469
 msgid "Unknown"
 msgstr "Tuntematon"
 
-#: contrib/admin/helpers.py:19
+#: contrib/admin/helpers.py:20
 msgid "Action:"
 msgstr "Toiminto:"
 
@@ -333,126 +353,126 @@ msgstr "lokimerkintä"
 msgid "log entries"
 msgstr "lokimerkinnät"
 
-#: contrib/admin/options.py:140 contrib/admin/options.py:155
+#: contrib/admin/options.py:138 contrib/admin/options.py:153
 msgid "None"
 msgstr "Ei arvoa"
 
-#: contrib/admin/options.py:558
+#: contrib/admin/options.py:559
 #, python-format
 msgid "Changed %s."
 msgstr "Muokattu: %s."
 
-#: contrib/admin/options.py:558 contrib/admin/options.py:568
-#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:840
-#: forms/models.py:556
+#: contrib/admin/options.py:559 contrib/admin/options.py:569
+#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:844
+#: forms/models.py:568
 msgid "and"
 msgstr "ja"
 
-#: contrib/admin/options.py:563
+#: contrib/admin/options.py:564
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lisätty %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:567
+#: contrib/admin/options.py:568
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Muutettu %(list)s kohteelle %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:572
+#: contrib/admin/options.py:573
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Poistettu %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:576
+#: contrib/admin/options.py:577
 msgid "No fields changed."
 msgstr "Ei muutoksia kenttiin."
 
-#: contrib/admin/options.py:642
+#: contrib/admin/options.py:643
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" on lisätty."
 
-#: contrib/admin/options.py:646 contrib/admin/options.py:679
+#: contrib/admin/options.py:647 contrib/admin/options.py:680
 msgid "You may edit it again below."
 msgstr "Voit muokata sitä edelleen alla."
 
-#: contrib/admin/options.py:656 contrib/admin/options.py:689
+#: contrib/admin/options.py:657 contrib/admin/options.py:690
 #, python-format
 msgid "You may add another %s below."
 msgstr "Uusi %s on lisättävissä alla."
 
-#: contrib/admin/options.py:677
+#: contrib/admin/options.py:678
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" on muutettu."
 
-#: contrib/admin/options.py:685
+#: contrib/admin/options.py:686
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" on lisätty. Voit muokata sitä uudelleen alla."
 
-#: contrib/admin/options.py:739
+#: contrib/admin/options.py:740 contrib/admin/options.py:997
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Kohteiden täytyy olla valittuna, jotta niihin voi kohdistaa toimintoja. "
+"Kohteita ei ole muutettu."
 
-#: contrib/admin/options.py:757
+#: contrib/admin/options.py:759
 msgid "No action selected."
 msgstr "Ei toimintoa valittuna."
 
-#: contrib/admin/options.py:837
+#: contrib/admin/options.py:840
 #, python-format
 msgid "Add %s"
 msgstr "Lisää %s"
 
-#: contrib/admin/options.py:863 contrib/admin/options.py:1077
+#: contrib/admin/options.py:866 contrib/admin/options.py:1105
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s perusavaimella %(key)r ei ole olemassa."
 
-#: contrib/admin/options.py:928
+#: contrib/admin/options.py:931
 #, python-format
 msgid "Change %s"
 msgstr "Muokkaa %s"
 
-#: contrib/admin/options.py:973
+#: contrib/admin/options.py:977
 msgid "Database error"
 msgstr "Tietokantavirhe"
 
-#: contrib/admin/options.py:1009
+#: contrib/admin/options.py:1039
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s on muokattu."
 msgstr[1] "%(count)s \"%(name)s\"-kohdetta on muokattu."
 
-#: contrib/admin/options.py:1036
-#, python-format
-msgid "of %(count)d selected"
-msgid_plural "of %(count)d selected"
-msgstr[0] "valittuna (%(count)d mahdollisesta)"
-msgstr[1] "valittuna (%(count)d mahdollisesta)"
-
-#: contrib/admin/options.py:1038
+#: contrib/admin/options.py:1066
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s valittu"
 msgstr[1] "Kaikki %(total_count)s valittu"
 
-#: contrib/admin/options.py:1090
+#: contrib/admin/options.py:1071
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 valittuna %(cnt)s mahdollisesta"
+
+#: contrib/admin/options.py:1118
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" on poistettu."
 
-#: contrib/admin/options.py:1127
+#: contrib/admin/options.py:1155
 #, python-format
 msgid "Change history: %s"
 msgstr "Muokkaushistoria: %s"
 
-#: contrib/admin/sites.py:22 contrib/admin/views/decorators.py:14
+#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:14
 #: contrib/auth/forms.py:81
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
@@ -461,11 +481,11 @@ msgstr ""
 "Käyttäjätunnus tai salasana ei kelpaa. Huomaa, että isot ja pienet kirjaimet "
 "ovat merkitseviä."
 
-#: contrib/admin/sites.py:311 contrib/admin/views/decorators.py:40
+#: contrib/admin/sites.py:307 contrib/admin/views/decorators.py:40
 msgid "Please log in again, because your session has expired."
 msgstr "Kirjaudu uudelleen sisään, sillä istuntosi on vanhentunut."
 
-#: contrib/admin/sites.py:318 contrib/admin/views/decorators.py:47
+#: contrib/admin/sites.py:314 contrib/admin/views/decorators.py:47
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -473,27 +493,27 @@ msgstr ""
 "Selaimesi ei vaikuta sallivan evästeitä. Muuta asetukset sallimaan evästeet, "
 "lataa tämä sivu uudelleen ja yritä uudestaan."
 
-#: contrib/admin/sites.py:334 contrib/admin/sites.py:340
+#: contrib/admin/sites.py:330 contrib/admin/sites.py:336
 #: contrib/admin/views/decorators.py:66
 msgid "Usernames cannot contain the '@' character."
 msgstr "Käyttäjätunnuksessa ei saa olla '@'-merkkiä."
 
-#: contrib/admin/sites.py:337 contrib/admin/views/decorators.py:62
+#: contrib/admin/sites.py:333 contrib/admin/views/decorators.py:62
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Sähköpostiosoitteesi ei ole käyttäjätunnuksesi. Kokeile '%s'."
 
-#: contrib/admin/sites.py:393
+#: contrib/admin/sites.py:389
 msgid "Site administration"
 msgstr "Sivuston ylläpito"
 
-#: contrib/admin/sites.py:407 contrib/admin/templates/admin/login.html:26
+#: contrib/admin/sites.py:403 contrib/admin/templates/admin/login.html:26
 #: contrib/admin/templates/registration/password_reset_complete.html:14
 #: contrib/admin/views/decorators.py:20
 msgid "Log in"
 msgstr "Kirjaudu sisään"
 
-#: contrib/admin/sites.py:452
+#: contrib/admin/sites.py:448
 #, python-format
 msgid "%s administration"
 msgstr "%s ylläpito"
@@ -533,9 +553,9 @@ msgstr "Pahoittelemme, pyydettyä sivua ei löytynyt."
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:54
+#: contrib/admin/templates/admin/base.html:55
 #: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:39
+#: contrib/admin/templates/admin/change_list.html:42
 #: contrib/admin/templates/admin/delete_confirmation.html:6
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:6
 #: contrib/admin/templates/admin/invalid_setup.html:4
@@ -580,16 +600,16 @@ msgstr "Suorita valittu toiminto"
 msgid "Go"
 msgstr "Suorita"
 
-#: contrib/admin/templates/admin/actions.html:10
+#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Klikkaa tästä valitaksesi kohteet kaikilta sivuilta"
 
-#: contrib/admin/templates/admin/actions.html:10
+#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Valitse kaikki %(total_count)s %(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:12
+#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Tyhjennä valinta"
 
@@ -599,18 +619,18 @@ msgstr "Tyhjennä valinta"
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/base.html:27
+#: contrib/admin/templates/admin/base.html:28
 msgid "Welcome,"
 msgstr "Tervetuloa,"
 
-#: contrib/admin/templates/admin/base.html:32
+#: contrib/admin/templates/admin/base.html:33
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
 msgstr "Ohjeita"
 
-#: contrib/admin/templates/admin/base.html:40
+#: contrib/admin/templates/admin/base.html:41
 #: contrib/admin/templates/admin/auth/user/change_password.html:15
 #: contrib/admin/templates/admin/auth/user/change_password.html:48
 #: contrib/admin/templates/registration/password_change_done.html:3
@@ -618,7 +638,7 @@ msgstr "Ohjeita"
 msgid "Change password"
 msgstr "Vaihda salasana"
 
-#: contrib/admin/templates/admin/base.html:47
+#: contrib/admin/templates/admin/base.html:48
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
@@ -649,7 +669,7 @@ msgid "View on site"
 msgstr "Näytä lopputulos"
 
 #: contrib/admin/templates/admin/change_form.html:39
-#: contrib/admin/templates/admin/change_list.html:68
+#: contrib/admin/templates/admin/change_list.html:71
 #: contrib/admin/templates/admin/auth/user/change_password.html:24
 #: contrib/admin/templates/registration/password_change_form.html:15
 msgid "Please correct the error below."
@@ -657,17 +677,17 @@ msgid_plural "Please correct the errors below."
 msgstr[0] "Korjaa allaoleva virhe."
 msgstr[1] "Korjaa allaolevat virheet."
 
-#: contrib/admin/templates/admin/change_list.html:60
+#: contrib/admin/templates/admin/change_list.html:63
 #, python-format
 msgid "Add %(name)s"
 msgstr "Lisää %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:79
+#: contrib/admin/templates/admin/change_list.html:82
 msgid "Filter"
 msgstr "Suodatin"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:297
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:302
 msgid "Delete"
 msgstr "Poista"
 
@@ -856,14 +876,14 @@ msgstr "Salasana toistamiseen"
 msgid "Enter the same password as above, for verification."
 msgstr "Syötä sama salasana tarkistuksen vuoksi toistamiseen."
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:53
-#: contrib/admin/templates/admin/edit_inline/tabular.html:99
+#: contrib/admin/templates/admin/edit_inline/stacked.html:64
+#: contrib/admin/templates/admin/edit_inline/tabular.html:110
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Lisää toinen %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:56
-#: contrib/admin/templates/admin/edit_inline/tabular.html:102
+#: contrib/admin/templates/admin/edit_inline/stacked.html:67
+#: contrib/admin/templates/admin/edit_inline/tabular.html:113
 #: contrib/comments/templates/comments/delete.html:12
 msgid "Remove"
 msgstr "Poista"
@@ -1028,16 +1048,16 @@ msgstr "Sähköpostiosoite:"
 msgid "Reset my password"
 msgstr "Nollaa salasanani"
 
-#: contrib/admin/templatetags/admin_list.py:240
+#: contrib/admin/templatetags/admin_list.py:257
 msgid "All dates"
 msgstr "Kaikki päivät"
 
-#: contrib/admin/views/main.py:70
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s"
 msgstr "Valitse %s"
 
-#: contrib/admin/views/main.py:70
+#: contrib/admin/views/main.py:65
 #, python-format
 msgid "Select %s to change"
 msgstr "Valitse muokattava %s"
@@ -1209,12 +1229,12 @@ msgstr "Käyttäjätunnus"
 #: contrib/auth/forms.py:15 contrib/auth/forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-" Vaaditaan. Enintään 30 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja."
+" Vaaditaan. Enintään 30 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat "
+"sallittuja."
 
 #: contrib/auth/forms.py:16 contrib/auth/forms.py:50
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"Tässä voidaan käyttää vain kirjaimia, numeroita ja @/./+/-/_ merkkejä."
+msgstr "Tässä voidaan käyttää vain kirjaimia, numeroita ja @/./+/-/_ merkkejä."
 
 #: contrib/auth/forms.py:18
 msgid "Password confirmation"
@@ -1297,7 +1317,8 @@ msgstr "käyttäjätunnus"
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
-" Vaaditaan. Enintään 30 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja."
+" Vaaditaan. Enintään 30 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat "
+"sallittuja."
 
 #: contrib/auth/models.py:197
 msgid "first name"
@@ -1392,7 +1413,7 @@ msgid "Logged out"
 msgstr "Kirjautunut ulos"
 
 #: contrib/auth/management/commands/createsuperuser.py:23
-#: core/validators.py:120 forms/fields.py:416
+#: core/validators.py:120 forms/fields.py:428
 msgid "Enter a valid e-mail address."
 msgstr "Syötä kelvollinen sähköpostiosoite."
 
@@ -1460,7 +1481,7 @@ msgid "Email address"
 msgstr "Sähköpostiosoite"
 
 #: contrib/comments/forms.py:95 contrib/flatpages/admin.py:8
-#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1128
+#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1101
 msgid "URL"
 msgstr "URL-osoite"
 
@@ -1510,7 +1531,7 @@ msgstr "kommentti"
 msgid "date/time submitted"
 msgstr "lähettämishetki"
 
-#: contrib/comments/models.py:60 db/models/fields/__init__.py:923
+#: contrib/comments/models.py:60 db/models/fields/__init__.py:896
 msgid "IP address"
 msgstr "IP-osoite"
 
@@ -1755,33 +1776,33 @@ msgstr ""
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:269
+#: contrib/gis/db/models/fields.py:270
 msgid "Point"
 msgstr "Piste"
 
-#: contrib/gis/db/models/fields.py:273
+#: contrib/gis/db/models/fields.py:274
 msgid "Line string"
-msgstr ""
+msgstr "Murtoviiva"
 
-#: contrib/gis/db/models/fields.py:277
+#: contrib/gis/db/models/fields.py:278
 msgid "Polygon"
-msgstr ""
+msgstr "Polygoni"
 
-#: contrib/gis/db/models/fields.py:281
+#: contrib/gis/db/models/fields.py:282
 msgid "Multi-point"
-msgstr ""
+msgstr "Monipiste"
 
-#: contrib/gis/db/models/fields.py:285
+#: contrib/gis/db/models/fields.py:286
 msgid "Multi-line string"
-msgstr ""
+msgstr "Monimurtoviiva"
 
-#: contrib/gis/db/models/fields.py:289
+#: contrib/gis/db/models/fields.py:290
 msgid "Multi polygon"
-msgstr ""
+msgstr "Monipolygoni"
 
-#: contrib/gis/db/models/fields.py:293
+#: contrib/gis/db/models/fields.py:294
 msgid "Geometry collection"
-msgstr ""
+msgstr "Geometriakokoelma"
 
 #: contrib/gis/forms/fields.py:17
 msgid "No geometry value provided."
@@ -1890,8 +1911,8 @@ msgstr "eilen"
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "Syötä postinumero muodossa NNNN tai ANNNNAAA."
 
-#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:97
-#: contrib/localflavor/br/forms.py:136 contrib/localflavor/pe/forms.py:24
+#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:92
+#: contrib/localflavor/br/forms.py:131 contrib/localflavor/pe/forms.py:24
 #: contrib/localflavor/pe/forms.py:52
 msgid "This field requires only numbers."
 msgstr "Tähän kenttään kelpaavat vain numerot."
@@ -1902,7 +1923,7 @@ msgstr "Tähän kenttään vaaditaan 7 tai 8 numeroa."
 
 #: contrib/localflavor/ar/forms.py:80
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Syötä validi CUIT joko XX-XXXXXXXX-X tai XXXXXXXXXXXX -muodossa."
+msgstr "Syötä oikea CUIT joko XX-XXXXXXXX-X tai XXXXXXXXXXXX -muodossa."
 
 #: contrib/localflavor/ar/forms.py:81
 msgid "Invalid CUIT."
@@ -1951,41 +1972,41 @@ msgstr "Syötä postinumero muodossa XXXX."
 
 #: contrib/localflavor/at/forms.py:48
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+msgstr "Syötä oikea itävaltalainen henkilötunnus muodossa XXXX XXXXXX."
 
 #: contrib/localflavor/au/forms.py:17
 msgid "Enter a 4 digit post code."
 msgstr "Syötä nelinumeroinen postinumero."
 
-#: contrib/localflavor/br/forms.py:22
+#: contrib/localflavor/br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
 msgstr "Syötä postinumero muodossa XXXXX-XXX."
 
-#: contrib/localflavor/br/forms.py:31
+#: contrib/localflavor/br/forms.py:26
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "Puhelinnumeron tulee olla muodossa XX-XXXX-XXXX."
 
-#: contrib/localflavor/br/forms.py:59
+#: contrib/localflavor/br/forms.py:54
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
 msgstr ""
-"Select a valid brazilian state. That state is not one of the available "
-"states."
+"Valitse oikea brasilialainen osavaltio. Valitsemasi osavaltio ei ole yksi "
+"sallituista osavaltiosta."
 
-#: contrib/localflavor/br/forms.py:95
+#: contrib/localflavor/br/forms.py:90
 msgid "Invalid CPF number."
 msgstr "Virheellinen CPF-numero."
 
-#: contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/br/forms.py:91
 msgid "This field requires at most 11 digits or 14 characters."
 msgstr "Tämä kenttä vaatii vähintään 11 ja enintään 14 merkkiä."
 
-#: contrib/localflavor/br/forms.py:135
+#: contrib/localflavor/br/forms.py:130
 msgid "Invalid CNPJ number."
 msgstr "Virheellinen CNPJ-numero."
 
-#: contrib/localflavor/br/forms.py:137
+#: contrib/localflavor/br/forms.py:132
 msgid "This field requires at least 14 digits"
 msgstr "Tähän kenttään vaaditaan ainakin 14 numeroa."
 
@@ -1995,7 +2016,7 @@ msgstr "Syötä postinumero muodossa XXX XXX."
 
 #: contrib/localflavor/ca/forms.py:96
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
+msgstr "Syötä oikea kanadalainen henkilötunnus muodossa XXX-XXX-XXX."
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
@@ -2272,12 +2293,11 @@ msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
 msgstr ""
-"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"format."
+"Syötä oikea saksalainen henkilötunnus muodossa XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
 
 #: contrib/localflavor/es/es_provinces.py:5
 msgid "Arava"
-msgstr "Arava"
+msgstr "Álava"
 
 #: contrib/localflavor/es/es_provinces.py:6
 msgid "Albacete"
@@ -2285,15 +2305,15 @@ msgstr "Albacete"
 
 #: contrib/localflavor/es/es_provinces.py:7
 msgid "Alacant"
-msgstr "Alacant"
+msgstr "Alicante"
 
 #: contrib/localflavor/es/es_provinces.py:8
 msgid "Almeria"
-msgstr "Almeria"
+msgstr "Almería"
 
 #: contrib/localflavor/es/es_provinces.py:9
 msgid "Avila"
-msgstr "Avila"
+msgstr "Ávila"
 
 #: contrib/localflavor/es/es_provinces.py:10
 msgid "Badajoz"
@@ -2301,7 +2321,7 @@ msgstr "Badajoz"
 
 #: contrib/localflavor/es/es_provinces.py:11
 msgid "Illes Balears"
-msgstr "Illes Balears"
+msgstr "Baleaarit"
 
 #: contrib/localflavor/es/es_provinces.py:12
 msgid "Barcelona"
@@ -2313,15 +2333,15 @@ msgstr "Burgos"
 
 #: contrib/localflavor/es/es_provinces.py:14
 msgid "Caceres"
-msgstr "Caceres"
+msgstr "Cáceres"
 
 #: contrib/localflavor/es/es_provinces.py:15
 msgid "Cadiz"
-msgstr "Cadiz"
+msgstr "Cádiz"
 
 #: contrib/localflavor/es/es_provinces.py:16
 msgid "Castello"
-msgstr "Castello"
+msgstr "Castellón"
 
 #: contrib/localflavor/es/es_provinces.py:17
 msgid "Ciudad Real"
@@ -2329,11 +2349,11 @@ msgstr "Ciudad Real"
 
 #: contrib/localflavor/es/es_provinces.py:18
 msgid "Cordoba"
-msgstr "Cordoba"
+msgstr "Córdoba"
 
 #: contrib/localflavor/es/es_provinces.py:19
 msgid "A Coruna"
-msgstr "A Coruna"
+msgstr "A Coruña"
 
 #: contrib/localflavor/es/es_provinces.py:20
 msgid "Cuenca"
@@ -2353,7 +2373,7 @@ msgstr "Guadalajara"
 
 #: contrib/localflavor/es/es_provinces.py:24
 msgid "Guipuzkoa"
-msgstr "Guipuzkoa"
+msgstr "Guipúzcoa"
 
 #: contrib/localflavor/es/es_provinces.py:25
 msgid "Huelva"
@@ -2365,11 +2385,11 @@ msgstr "Huesca"
 
 #: contrib/localflavor/es/es_provinces.py:27
 msgid "Jaen"
-msgstr "Jaen"
+msgstr "Jaén"
 
 #: contrib/localflavor/es/es_provinces.py:28
 msgid "Leon"
-msgstr "Leon"
+msgstr "León"
 
 #: contrib/localflavor/es/es_provinces.py:29
 msgid "Lleida"
@@ -2391,7 +2411,7 @@ msgstr "Madrid"
 
 #: contrib/localflavor/es/es_provinces.py:33
 msgid "Malaga"
-msgstr "Malaga"
+msgstr "Málaga"
 
 #: contrib/localflavor/es/es_provinces.py:34
 msgid "Murcia"
@@ -2399,7 +2419,7 @@ msgstr "Murcia"
 
 #: contrib/localflavor/es/es_provinces.py:35
 msgid "Navarre"
-msgstr "Navarre"
+msgstr "Navarra"
 
 #: contrib/localflavor/es/es_provinces.py:36
 msgid "Ourense"
@@ -2407,7 +2427,7 @@ msgstr "Ourense"
 
 #: contrib/localflavor/es/es_provinces.py:37
 msgid "Asturias"
-msgstr "Asturias"
+msgstr "Asturia"
 
 #: contrib/localflavor/es/es_provinces.py:38
 msgid "Palencia"
@@ -2468,7 +2488,7 @@ msgstr "Valladolid"
 
 #: contrib/localflavor/es/es_provinces.py:52
 msgid "Bizkaia"
-msgstr "Bizkaia"
+msgstr "Vizcaya"
 
 #: contrib/localflavor/es/es_provinces.py:53
 msgid "Zamora"
@@ -2492,35 +2512,35 @@ msgstr "Andalusia"
 
 #: contrib/localflavor/es/es_regions.py:6
 msgid "Aragon"
-msgstr "Aragon"
+msgstr "Aragonia"
 
 #: contrib/localflavor/es/es_regions.py:7
 msgid "Principality of Asturias"
-msgstr "Principality of Asturias"
+msgstr "Asturian ruhtinaskunta"
 
 #: contrib/localflavor/es/es_regions.py:8
 msgid "Balearic Islands"
-msgstr "Balearic Islands"
+msgstr "Baleaarit"
 
 #: contrib/localflavor/es/es_regions.py:9
 msgid "Basque Country"
-msgstr "Basque Country"
+msgstr "Baskimaa"
 
 #: contrib/localflavor/es/es_regions.py:10
 msgid "Canary Islands"
-msgstr "Canary Islands"
+msgstr "Kanariansaaret"
 
 #: contrib/localflavor/es/es_regions.py:12
 msgid "Castile-La Mancha"
-msgstr "Castile-La Mancha"
+msgstr "Kastilia-La Mancha"
 
 #: contrib/localflavor/es/es_regions.py:13
 msgid "Castile and Leon"
-msgstr "Castile and Leon"
+msgstr "Kastilia ja León"
 
 #: contrib/localflavor/es/es_regions.py:14
 msgid "Catalonia"
-msgstr "Catalonia"
+msgstr "Katalonia"
 
 #: contrib/localflavor/es/es_regions.py:15
 msgid "Extremadura"
@@ -2532,57 +2552,56 @@ msgstr "Galicia"
 
 #: contrib/localflavor/es/es_regions.py:19
 msgid "Region of Murcia"
-msgstr "Region of Murcia"
+msgstr "Murcia"
 
 #: contrib/localflavor/es/es_regions.py:20
 msgid "Foral Community of Navarre"
-msgstr "Foral Community of Navarre"
+msgstr "Navarra"
 
 #: contrib/localflavor/es/es_regions.py:21
 msgid "Valencian Community"
-msgstr "Valencian Community"
+msgstr "Valencia"
 
 #: contrib/localflavor/es/forms.py:20
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Syötä validi postinumero väliltä ja muodossa 01XXX-52XXX."
+msgstr "Syötä oikea postinumero väliltä ja muodossa 01XXX-52XXX."
 
 #: contrib/localflavor/es/forms.py:40
 msgid ""
 "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
 "9XXXXXXXX."
 msgstr ""
-"Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
-"9XXXXXXXX."
+"Syötä oikea puhelinnumero muodoissa 6XXXXXXXX, 8XXXXXXXX tai 9XXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:67
 msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Please enter a valid NIF, NIE, or CIF."
+msgstr "Syötä oikea NIF, NIE tai CIF."
 
 #: contrib/localflavor/es/forms.py:68
 msgid "Please enter a valid NIF or NIE."
-msgstr "Please enter a valid NIF or NIE."
+msgstr "Syötä oikea NIF tai NIE."
 
 #: contrib/localflavor/es/forms.py:69
 msgid "Invalid checksum for NIF."
-msgstr "Invalid checksum for NIF."
+msgstr "Väärä tarkistusnumero NIF:lle."
 
 #: contrib/localflavor/es/forms.py:70
 msgid "Invalid checksum for NIE."
-msgstr "Invalid checksum for NIE."
+msgstr "Väärä tarkistusnumero NIE:lle."
 
 #: contrib/localflavor/es/forms.py:71
 msgid "Invalid checksum for CIF."
-msgstr "Invalid checksum for CIF."
+msgstr "Väärä tarkistusnumero CIF:lle."
 
 #: contrib/localflavor/es/forms.py:143
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+"Syötä oikea pankin tilinumero muodossa XXXX-XXXX-XX-XXXXXXXXXX."
 
 #: contrib/localflavor/es/forms.py:144
 msgid "Invalid checksum for bank account number."
-msgstr "Invalid checksum for bank account number."
+msgstr "Väärä tarkistusnumero pankin tilinumerolle."
 
 #: contrib/localflavor/fi/forms.py:29
 msgid "Enter a valid Finnish social security number."
@@ -2590,11 +2609,11 @@ msgstr "Syötä oikea suomalainen henkilötunnus."
 
 #: contrib/localflavor/fr/forms.py:31
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "Phone numbers must be in 0X XX XX XX XX format."
+msgstr "Puhelinnumeroiden on ontava muodossa 0X XX XX XX XX."
 
 #: contrib/localflavor/id/forms.py:28
 msgid "Enter a valid post code"
-msgstr "Enter a valid post code"
+msgstr "Syötä oikea postinumero"
 
 #: contrib/localflavor/id/forms.py:68 contrib/localflavor/nl/forms.py:53
 msgid "Enter a valid phone number"
@@ -2602,11 +2621,11 @@ msgstr "Syötä oikea puhelinnumero"
 
 #: contrib/localflavor/id/forms.py:107
 msgid "Enter a valid vehicle license plate number"
-msgstr "Enter a valid vehicle license plate number"
+msgstr "Syötä oikea rekisterikilpi"
 
 #: contrib/localflavor/id/forms.py:170
 msgid "Enter a valid NIK/KTP number"
-msgstr "Enter a valid NIK/KTP number"
+msgstr "Syötä oikea NIK/KTP numero"
 
 #: contrib/localflavor/id/id_choices.py:9
 #: contrib/localflavor/id/id_choices.py:73
@@ -3028,11 +3047,11 @@ msgstr "Syötä postinumero muodossa XXXXXXX."
 msgid ""
 "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+"Syötä oikea islantilainen henkilötunnus muodossa XXXXXX-XXXX."
 
 #: contrib/localflavor/is_/forms.py:19
 msgid "The Icelandic identification number is not valid."
-msgstr "The Icelandic identification number is not valid."
+msgstr "Islantilainen henkilötunnus on virheellinen."
 
 #: contrib/localflavor/it/forms.py:15
 msgid "Enter a valid zip code."
@@ -3048,7 +3067,7 @@ msgstr "Syötä oikea ALV-tunnus."
 
 #: contrib/localflavor/jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "Enter a postal code in the format XXXXXXX or XXX-XXXX."
+msgstr "Syötä postinumero muodossa XXXXXXX tai XXX-XXXX."
 
 #: contrib/localflavor/jp/jp_prefectures.py:4
 msgid "Hokkaido"
@@ -3100,7 +3119,7 @@ msgstr "Chiba"
 
 #: contrib/localflavor/jp/jp_prefectures.py:16
 msgid "Tokyo"
-msgstr "Tokyo"
+msgstr "Tokio"
 
 #: contrib/localflavor/jp/jp_prefectures.py:17
 msgid "Kanagawa"
@@ -3152,7 +3171,7 @@ msgstr "Shiga"
 
 #: contrib/localflavor/jp/jp_prefectures.py:29
 msgid "Kyoto"
-msgstr "Kyoto"
+msgstr "Kioto"
 
 #: contrib/localflavor/jp/jp_prefectures.py:30
 msgid "Osaka"
@@ -3240,7 +3259,7 @@ msgstr "Okinawa"
 
 #: contrib/localflavor/kw/forms.py:25
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "Enter a valid Kuwaiti Civil ID number"
+msgstr "Syötä oikea kuwaitilainen henkilötunnus"
 
 #: contrib/localflavor/mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -3440,21 +3459,21 @@ msgstr "Tähän kenttään vaaditaan 11 numeroa."
 
 #: contrib/localflavor/pl/forms.py:38
 msgid "National Identification Number consists of 11 digits."
-msgstr "National Identification Number consists of 11 digits."
+msgstr "Henkilötunnus koostuu 11 numerosta."
 
 #: contrib/localflavor/pl/forms.py:39
 msgid "Wrong checksum for the National Identification Number."
-msgstr "Wrong checksum for the National Identification Number."
+msgstr "Virheellinen tarkistusnumero henkilötunnukselle."
 
 #: contrib/localflavor/pl/forms.py:71
 msgid ""
 "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+"Syötä verotusnumero (NIP) muodossa XXX-XXX-XX-XX tai XX-XX-XXX-XXX."
 
 #: contrib/localflavor/pl/forms.py:72
 msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr "Wrong checksum for the Tax Number (NIP)."
+msgstr "Väärä tarkistusnumero veronumerolle (NIP)."
 
 #: contrib/localflavor/pl/forms.py:109
 msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
@@ -3534,23 +3553,25 @@ msgstr "West Pomerania"
 
 #: contrib/localflavor/pt/forms.py:17
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "Enter a zip code in the format XXXX-XXX."
+msgstr "Syötä postinumero muodossa XXXX-XXX."
 
 #: contrib/localflavor/pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
-msgstr "Phone numbers must have 9 digits, or start by + or 00."
+msgstr ""
+"Puhelinnumeroissa tulee olla 9 numeroa tai niiden kuuluu alkaa +:lla tai "
+" 00:lla."
 
 #: contrib/localflavor/ro/forms.py:19
 msgid "Enter a valid CIF."
-msgstr "Enter a valid CIF."
+msgstr "Syötä oikea CIF."
 
 #: contrib/localflavor/ro/forms.py:56
 msgid "Enter a valid CNP."
-msgstr "Enter a valid CNP."
+msgstr "Syötä oikea CNP."
 
 #: contrib/localflavor/ro/forms.py:141
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
+msgstr "Syötä oikea IBAN muodossa ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
 
 #: contrib/localflavor/ro/forms.py:171
 msgid "Phone numbers must be in XXXX-XXXXXX format."
@@ -3562,11 +3583,11 @@ msgstr "Syötä postinumero muodossa XXXXXX."
 
 #: contrib/localflavor/se/forms.py:50
 msgid "Enter a valid Swedish organisation number."
-msgstr "Enter a valid Swedish organisation number."
+msgstr "Syötä oikea ruotsalainen yritystunnus."
 
 #: contrib/localflavor/se/forms.py:107
 msgid "Enter a valid Swedish personal identity number."
-msgstr "Enter a valid Swedish personal identity number."
+msgstr "Syötä oikea ruotsalainen henkilötunnus."
 
 #: contrib/localflavor/se/forms.py:108
 msgid "Co-ordination numbers are not allowed."
@@ -3574,11 +3595,11 @@ msgstr "Co-ordination numbers are not allowed."
 
 #: contrib/localflavor/se/forms.py:150
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "Enter a Swedish postal code in the format XXXXX."
+msgstr "Syötä ruotsalainen postinumero muodossa XXXXX."
 
 #: contrib/localflavor/se/se_counties.py:15
 msgid "Stockholm"
-msgstr "Stockholm"
+msgstr "Tukholma"
 
 #: contrib/localflavor/se/se_counties.py:16
 msgid "Västerbotten"
@@ -4440,26 +4461,26 @@ msgstr "sivustot"
 msgid "Enter a valid value."
 msgstr "Syötä oikea arvo."
 
-#: core/validators.py:87 forms/fields.py:517
+#: core/validators.py:87 forms/fields.py:529
 msgid "Enter a valid URL."
 msgstr "Syötä oikea URL-osoite."
 
-#: core/validators.py:89 forms/fields.py:518
+#: core/validators.py:89 forms/fields.py:530
 msgid "This URL appears to be a broken link."
 msgstr "Tämä URL-osoite on rikkinäinen linkki."
 
-#: core/validators.py:123 forms/fields.py:861
+#: core/validators.py:123 forms/fields.py:873
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) sekä ala- ja "
 "tavuviivoja (_ -)."
 
-#: core/validators.py:126 forms/fields.py:854
+#: core/validators.py:126 forms/fields.py:866
 msgid "Enter a valid IPv4 address."
 msgstr "Syötä kelvollinen IPv4-osoite."
 
-#: core/validators.py:129 db/models/fields/__init__.py:599
+#: core/validators.py:129 db/models/fields/__init__.py:572
 msgid "Enter only digits separated by commas."
 msgstr "Vain pilkulla erotetut kokonaisluvut kelpaavat tässä."
 
@@ -4468,12 +4489,12 @@ msgstr "Vain pilkulla erotetut kokonaisluvut kelpaavat tässä."
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "Tämän arvon on oltava %(limit_value)s (nyt %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:196 forms/fields.py:246
+#: core/validators.py:153 forms/fields.py:205 forms/fields.py:257
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Tämän arvon on oltava enintään %(limit_value)s."
 
-#: core/validators.py:158 forms/fields.py:197 forms/fields.py:247
+#: core/validators.py:158 forms/fields.py:206 forms/fields.py:258
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Tämän luvun on oltava vähintään %(limit_value)s."
@@ -4483,7 +4504,9 @@ msgstr "Tämän luvun on oltava vähintään %(limit_value)s."
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
-msgstr "Tähän tarvitaan vähintään %(limit_value)d merkkiä (nyt on vain %(show_value)d)."
+msgstr ""
+"Tähän tarvitaan vähintään %(limit_value)d merkkiä (nyt on vain %(show_value)"
+"d)."
 
 #: core/validators.py:170
 #, python-format
@@ -4492,14 +4515,14 @@ msgid ""
 "(show_value)d)."
 msgstr "Tähän kelpaa enintään %(limit_value)d merkkiä (nyt on %(show_value)d)."
 
-#: db/models/base.py:818
+#: db/models/base.py:822
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 "\"%(field_name)s\"-kentän on oltava uniikki suhteessa: %(date_field)s %"
 "(lookup)s."
 
-#: db/models/base.py:833 db/models/base.py:841
+#: db/models/base.py:837 db/models/base.py:845
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s jolla on tämä %(field_label)s, on jo olemassa."
@@ -4522,132 +4545,132 @@ msgstr "Tämän kenttä ei voi olla tyhjä."
 msgid "Field of type: %(field_type)s"
 msgstr "Kenttä tyyppiä: %(field_type)s"
 
-#: db/models/fields/__init__.py:478 db/models/fields/__init__.py:879
-#: db/models/fields/__init__.py:988 db/models/fields/__init__.py:999
-#: db/models/fields/__init__.py:1026
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:852
+#: db/models/fields/__init__.py:961 db/models/fields/__init__.py:972
+#: db/models/fields/__init__.py:999
 msgid "Integer"
 msgstr "Kokonaisluku"
 
-#: db/models/fields/__init__.py:482 db/models/fields/__init__.py:877
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:850
 msgid "This value must be an integer."
 msgstr "Tarvitaan kokonaisluku."
 
-#: db/models/fields/__init__.py:517
+#: db/models/fields/__init__.py:490
 msgid "This value must be either True or False."
 msgstr "Tarvitaan tosi (True) tai epätosi (False)."
 
-#: db/models/fields/__init__.py:519
+#: db/models/fields/__init__.py:492
 msgid "Boolean (Either True or False)"
 msgstr "Totuusarvo: joko tosi (True) tai epätosi (False)"
 
-#: db/models/fields/__init__.py:566 db/models/fields/__init__.py:1009
+#: db/models/fields/__init__.py:539 db/models/fields/__init__.py:982
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Merkkijono (enintään %(max_length)s merkkiä)"
 
-#: db/models/fields/__init__.py:594
+#: db/models/fields/__init__.py:567
 msgid "Comma-separated integers"
 msgstr "Pilkulla erotetut kokonaisluvut"
 
-#: db/models/fields/__init__.py:608
+#: db/models/fields/__init__.py:581
 msgid "Date (without time)"
 msgstr "Päivämäärä (ilman kellonaikaa)"
 
-#: db/models/fields/__init__.py:612
+#: db/models/fields/__init__.py:585
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Päivämäärän pitää olla muodossa VVVV-KK-PP."
 
-#: db/models/fields/__init__.py:613
+#: db/models/fields/__init__.py:586
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Päivämäärä %s ei kelpaa"
 
-#: db/models/fields/__init__.py:694
+#: db/models/fields/__init__.py:667
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Ajankohdan pitää olla muodossa VVVV-KK-PP TT:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:696
+#: db/models/fields/__init__.py:669
 msgid "Date (with time)"
 msgstr "Päivämäärä ja kellonaika"
 
-#: db/models/fields/__init__.py:762
+#: db/models/fields/__init__.py:735
 msgid "This value must be a decimal number."
 msgstr "Tähän tarvitaan desimaaliluku."
 
-#: db/models/fields/__init__.py:764
+#: db/models/fields/__init__.py:737
 msgid "Decimal number"
 msgstr "Desimaaliluku"
 
-#: db/models/fields/__init__.py:819
+#: db/models/fields/__init__.py:792
 msgid "E-mail address"
 msgstr "Sähköpostiosoite"
 
-#: db/models/fields/__init__.py:826 db/models/fields/files.py:220
+#: db/models/fields/__init__.py:799 db/models/fields/files.py:220
 #: db/models/fields/files.py:331
 msgid "File path"
 msgstr "Tiedostopolku"
 
-#: db/models/fields/__init__.py:849
+#: db/models/fields/__init__.py:822
 msgid "This value must be a float."
 msgstr "Tämän luvun on oltava liukuluku."
 
-#: db/models/fields/__init__.py:851
+#: db/models/fields/__init__.py:824
 msgid "Floating point number"
 msgstr "Liukuluku"
 
-#: db/models/fields/__init__.py:910
+#: db/models/fields/__init__.py:883
 msgid "Big (8 byte) integer"
 msgstr "Suuri (8-tavuinen) kokonaisluku"
 
-#: db/models/fields/__init__.py:939
+#: db/models/fields/__init__.py:912
 msgid "This value must be either None, True or False."
 msgstr "Tähän tarvitaan tyhjä (None), tosi (True) tai epätosi (False)."
 
-#: db/models/fields/__init__.py:941
+#: db/models/fields/__init__.py:914
 msgid "Boolean (Either True, False or None)"
 msgstr "Totuusarvo: joko tosi (True), epätosi (False) tai ei mikään (None)"
 
-#: db/models/fields/__init__.py:1032
+#: db/models/fields/__init__.py:1005
 msgid "Text"
 msgstr "Tekstiä"
 
-#: db/models/fields/__init__.py:1048
+#: db/models/fields/__init__.py:1021
 msgid "Time"
 msgstr "Kellonaika"
 
-#: db/models/fields/__init__.py:1052
+#: db/models/fields/__init__.py:1025
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Ajan täytyy olla muodossa TT:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:1136
+#: db/models/fields/__init__.py:1109
 msgid "XML text"
 msgstr "XML-teksti"
 
-#: db/models/fields/related.py:755
+#: db/models/fields/related.py:799
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "Mallia %(model)s pääavaimella %(pk)r ei ole olemassa."
 
-#: db/models/fields/related.py:757
+#: db/models/fields/related.py:801
 msgid "Foreign Key (type determined by related field)"
 msgstr "Vierasavain (tyyppi määräytyy liittyvän kentän mukaan)"
 
-#: db/models/fields/related.py:879
+#: db/models/fields/related.py:918
 msgid "One-to-one relationship"
 msgstr "Yksi-yhteen relaatio"
 
-#: db/models/fields/related.py:939
+#: db/models/fields/related.py:980
 msgid "Many-to-many relationship"
 msgstr "Moni-moneen relaatio"
 
-#: db/models/fields/related.py:959
+#: db/models/fields/related.py:1000
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 " Pidä \"Ctrl\"-näppäin (tai Macin \"Command\") pohjassa valitaksesi useita "
 "vaihtoehtoja."
 
-#: db/models/fields/related.py:1020
+#: db/models/fields/related.py:1061
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4659,54 +4682,54 @@ msgstr[1] "Syöttämäsi %(self)s-tunnisteet %(value)r eivät kelpaa."
 msgid "This field is required."
 msgstr "Tämä kenttä vaaditaan."
 
-#: forms/fields.py:195
+#: forms/fields.py:204
 msgid "Enter a whole number."
 msgstr "Syötä kokonaisluku."
 
-#: forms/fields.py:225 forms/fields.py:245
+#: forms/fields.py:235 forms/fields.py:256
 msgid "Enter a number."
 msgstr "Syötä kokonaisluku."
 
-#: forms/fields.py:248
+#: forms/fields.py:259
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Tässä luvussa voi olla yhteensä enintään %s numeroa."
 
-#: forms/fields.py:249
+#: forms/fields.py:260
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Tässä luvussa saa olla enintään %s desimaalia."
 
-#: forms/fields.py:250
+#: forms/fields.py:261
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Tässä luvussa saa olla enintään %s numeroa ennen desimaalipilkkua."
 
-#: forms/fields.py:311 forms/fields.py:826
+#: forms/fields.py:323 forms/fields.py:838
 msgid "Enter a valid date."
 msgstr "Syötä oikea päivämäärä."
 
-#: forms/fields.py:339 forms/fields.py:827
+#: forms/fields.py:351 forms/fields.py:839
 msgid "Enter a valid time."
 msgstr "Syötä oikea kellonaika."
 
-#: forms/fields.py:365
+#: forms/fields.py:377
 msgid "Enter a valid date/time."
 msgstr "Syötä oikea pvm/kellonaika."
 
-#: forms/fields.py:423
+#: forms/fields.py:435
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tiedostoa ei lähetetty. Tarkista lomakkeen koodaus (encoding)."
 
-#: forms/fields.py:424
+#: forms/fields.py:436
 msgid "No file was submitted."
 msgstr "Yhtään tiedostoa ei ole lähetetty."
 
-#: forms/fields.py:425
+#: forms/fields.py:437
 msgid "The submitted file is empty."
 msgstr "Lähetetty tiedosto on tyhjä."
 
-#: forms/fields.py:426
+#: forms/fields.py:438
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -4714,37 +4737,37 @@ msgstr ""
 "Tähän tiedostonimeen kelpaa enintään %(max)d merkkiä (nyt niitä on %(length)"
 "d)."
 
-#: forms/fields.py:461
+#: forms/fields.py:473
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
 "Kuva ei kelpaa. Lähettämäsi tiedosto ei ole kuva, tai tiedosto on vioittunut."
 
-#: forms/fields.py:584 forms/fields.py:659
+#: forms/fields.py:596 forms/fields.py:671
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. %(value)s ei ole vaihtoehtojen joukossa."
 
-#: forms/fields.py:660 forms/fields.py:722 forms/models.py:989
+#: forms/fields.py:672 forms/fields.py:734 forms/models.py:1002
 msgid "Enter a list of values."
 msgstr "Syötä lista."
 
-#: forms/formsets.py:293 forms/formsets.py:295
+#: forms/formsets.py:298 forms/formsets.py:300
 msgid "Order"
 msgstr "Järjestys"
 
-#: forms/models.py:550
+#: forms/models.py:562
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Korjaa kaksoisarvo kentälle %(field)s."
 
-#: forms/models.py:554
+#: forms/models.py:566
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "Ole hyvä ja korjaa uniikin kentän %(field)s kaksoisarvo."
 
-#: forms/models.py:560
+#: forms/models.py:572
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -4753,50 +4776,50 @@ msgstr ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 
-#: forms/models.py:568
+#: forms/models.py:580
 msgid "Please correct the duplicate values below."
 msgstr "Korjaa allaolevat kaksoisarvot."
 
-#: forms/models.py:842
+#: forms/models.py:855
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Liittyvä perusavain ei vastannut vanhemman perusavainta."
 
-#: forms/models.py:908
+#: forms/models.py:921
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. Valintasi ei löydy vaihtoehtojen joukosta."
 
-#: forms/models.py:990
+#: forms/models.py:1003
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. %s ei löydy vaihtoehtojen joukosta."
 
-#: forms/models.py:992
+#: forms/models.py:1005
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" ei kelpaa perusavaimeksi."
 
-#: template/defaultfilters.py:781
+#: template/defaultfilters.py:776
 msgid "yes,no,maybe"
 msgstr "kyllä,ei,ehkä"
 
-#: template/defaultfilters.py:812
+#: template/defaultfilters.py:807
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d tavu"
 msgstr[1] "%(size)d tavua"
 
-#: template/defaultfilters.py:814
+#: template/defaultfilters.py:809
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f Kt"
 
-#: template/defaultfilters.py:816
+#: template/defaultfilters.py:811
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f Mt"
 
-#: template/defaultfilters.py:817
+#: template/defaultfilters.py:812
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f Gt"
@@ -5059,23 +5082,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:512
+#: utils/translation/trans_real.py:519
 msgid "DATE_FORMAT"
 msgstr "j.n.Y"
 
-#: utils/translation/trans_real.py:513
+#: utils/translation/trans_real.py:520
 msgid "DATETIME_FORMAT"
 msgstr "j.n.Y H:i"
 
-#: utils/translation/trans_real.py:514
+#: utils/translation/trans_real.py:521
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:535
+#: utils/translation/trans_real.py:542
 msgid "YEAR_MONTH_FORMAT"
 msgstr "N Y"
 
-#: utils/translation/trans_real.py:536
+#: utils/translation/trans_real.py:543
 msgid "MONTH_DAY_FORMAT"
 msgstr "N j, Y"
 
