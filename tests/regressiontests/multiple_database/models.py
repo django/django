@@ -44,6 +44,16 @@ class Book(models.Model):
     class Meta:
         ordering = ('title',)
 
+class Pet(models.Model):
+    name = models.CharField(max_length=100)
+    owner = models.ForeignKey(Person)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('name',)
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, null=True)
     flavor = models.CharField(max_length=100)

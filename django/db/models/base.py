@@ -588,20 +588,22 @@ class Model(object):
 
         for related in self._meta.get_all_related_many_to_many_objects():
             if related.field.rel.through:
+                db = router.db_for_write(related.field.rel.through.__class__, instance=self)
                 opts = related.field.rel.through._meta
                 reverse_field_name = related.field.m2m_reverse_field_name()
                 nullable = opts.get_field(reverse_field_name).null
                 filters = {reverse_field_name: self}
-                for sub_obj in related.field.rel.through._base_manager.filter(**filters):
+                for sub_obj in related.field.rel.through._base_manager.using(db).filter(**filters):
                     sub_obj._collect_sub_objects(seen_objs, self, nullable)
 
         for f in self._meta.many_to_many:
             if f.rel.through:
+                db = router.db_for_write(f.rel.through.__class__, instance=self)
                 opts = f.rel.through._meta
                 field_name = f.m2m_field_name()
                 nullable = opts.get_field(field_name).null
                 filters = {field_name: self}
-                for sub_obj in f.rel.through._base_manager.filter(**filters):
+                for sub_obj in f.rel.through._base_manager.using(db).filter(**filters):
                     sub_obj._collect_sub_objects(seen_objs, self, nullable)
             else:
                 # m2m-ish but with no through table? GenericRelation: cascade delete
@@ -627,7 +629,6 @@ class Model(object):
 
     def delete(self, using=None):
         using = using or router.db_for_write(self.__class__, instance=self)
-        connection = connections[using]
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 
         # Find all the objects than need to be deleted.

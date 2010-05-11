@@ -10,7 +10,7 @@ from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.utils import ConnectionRouter
 from django.test import TestCase
 
-from models import Book, Person, Review, UserProfile
+from models import Book, Person, Pet, Review, UserProfile
 
 try:
     # we only have these models if the user is using multi-db, it's safe the
@@ -321,6 +321,66 @@ class QueryTestCase(TestCase):
         except ValueError:
             pass
 
+    def test_m2m_deletion(self):
+        "Cascaded deletions of m2m relations issue queries on the right database"
+        # Create a book and author on the other database
+        dive = Book.objects.using('other').create(title="Dive into Python",
+                                                  published=datetime.date(2009, 5, 4))
+
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
+        dive.authors = [mark]
+
+        # Check the initial state
+        self.assertEquals(Person.objects.using('default').count(), 0)
+        self.assertEquals(Book.objects.using('default').count(), 0)
+        self.assertEquals(Book.authors.through.objects.using('default').count(), 0)
+
+        self.assertEquals(Person.objects.using('other').count(), 1)
+        self.assertEquals(Book.objects.using('other').count(), 1)
+        self.assertEquals(Book.authors.through.objects.using('other').count(), 1)
+
+        # Delete the object on the other database
+        dive.delete(using='other')
+
+        self.assertEquals(Person.objects.using('default').count(), 0)
+        self.assertEquals(Book.objects.using('default').count(), 0)
+        self.assertEquals(Book.authors.through.objects.using('default').count(), 0)
+
+        # The person still exists ...
+        self.assertEquals(Person.objects.using('other').count(), 1)
+        # ... but the book has been deleted
+        self.assertEquals(Book.objects.using('other').count(), 0)
+        # ... and the relationship object has also been deleted.
+        self.assertEquals(Book.authors.through.objects.using('other').count(), 0)
+
+        # Now try deletion in the reverse direction. Set up the relation again
+        dive = Book.objects.using('other').create(title="Dive into Python",
+                                                  published=datetime.date(2009, 5, 4))
+        dive.authors = [mark]
+
+        # Check the initial state
+        self.assertEquals(Person.objects.using('default').count(), 0)
+        self.assertEquals(Book.objects.using('default').count(), 0)
+        self.assertEquals(Book.authors.through.objects.using('default').count(), 0)
+
+        self.assertEquals(Person.objects.using('other').count(), 1)
+        self.assertEquals(Book.objects.using('other').count(), 1)
+        self.assertEquals(Book.authors.through.objects.using('other').count(), 1)
+
+        # Delete the object on the other database
+        mark.delete(using='other')
+
+        self.assertEquals(Person.objects.using('default').count(), 0)
+        self.assertEquals(Book.objects.using('default').count(), 0)
+        self.assertEquals(Book.authors.through.objects.using('default').count(), 0)
+
+        # The person has been deleted ...
+        self.assertEquals(Person.objects.using('other').count(), 0)
+        # ... but the book still exists
+        self.assertEquals(Book.objects.using('other').count(), 1)
+        # ... and the relationship object has been deleted.
+        self.assertEquals(Book.authors.through.objects.using('other').count(), 0)
+
     def test_foreign_key_separation(self):
         "FK fields are constrained to a single database"
         # Create a book and author on the default database
@@ -497,6 +557,28 @@ class QueryTestCase(TestCase):
                           [u'Pro Django'])
         self.assertEquals(list(Book.objects.using('other').values_list('title',flat=True)),
                           [u'Dive into HTML5', u'Dive into Python', u'Dive into Water'])
+
+    def test_foreign_key_deletion(self):
+        "Cascaded deletions of Foreign Key relations issue queries on the right database"
+        mark = Person.objects.using('other').create(name="Mark Pilgrim")
+        fido = Pet.objects.using('other').create(name="Fido", owner=mark)
+
+        # Check the initial state
+        self.assertEquals(Person.objects.using('default').count(), 0)
+        self.assertEquals(Pet.objects.using('default').count(), 0)
+
+        self.assertEquals(Person.objects.using('other').count(), 1)
+        self.assertEquals(Pet.objects.using('other').count(), 1)
+
+        # Delete the person object, which will cascade onto the pet
+        mark.delete(using='other')
+
+        self.assertEquals(Person.objects.using('default').count(), 0)
+        self.assertEquals(Pet.objects.using('default').count(), 0)
+
+        # Both the pet and the person have been deleted from the right database
+        self.assertEquals(Person.objects.using('other').count(), 0)
+        self.assertEquals(Pet.objects.using('other').count(), 0)
 
     def test_o2o_separation(self):
         "OneToOne fields are constrained to a single database"
@@ -728,6 +810,29 @@ class QueryTestCase(TestCase):
                           [u'Python Monthly'])
         self.assertEquals(list(Review.objects.using('other').filter(object_id=dive.pk).values_list('source',flat=True)),
                           [u'Python Daily', u'Python Weekly'])
+
+    def test_generic_key_deletion(self):
+        "Cascaded deletions of Generic Key relations issue queries on the right database"
+        dive = Book.objects.using('other').create(title="Dive into Python",
+                                                  published=datetime.date(2009, 5, 4))
+        review = Review.objects.using('other').create(source="Python Weekly", content_object=dive)
+
+        # Check the initial state
+        self.assertEquals(Book.objects.using('default').count(), 0)
+        self.assertEquals(Review.objects.using('default').count(), 0)
+
+        self.assertEquals(Book.objects.using('other').count(), 1)
+        self.assertEquals(Review.objects.using('other').count(), 1)
+
+        # Delete the Book object, which will cascade onto the pet
+        dive.delete(using='other')
+
+        self.assertEquals(Book.objects.using('default').count(), 0)
+        self.assertEquals(Review.objects.using('default').count(), 0)
+
+        # Both the pet and the person have been deleted from the right database
+        self.assertEquals(Book.objects.using('other').count(), 0)
+        self.assertEquals(Review.objects.using('other').count(), 0)
 
     def test_ordering(self):
         "get_next_by_XXX commands stick to a single database"
