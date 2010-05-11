@@ -4,33 +4,33 @@
 Related objects reference
 =========================
 
-.. currentmodule:: django.db.models
+.. currentmodule:: django.db.models.fields.related
 
 This document describes extra methods available on managers when used in a one-to-many or many-to-many related context. This happens in two cases:
 
     * The "other side" of a ``ForeignKey`` relation. That is::
-    
+
             class Reporter(models.Model):
                 ...
-                
+
             class Article(models.Model):
                 reporter = models.ForeignKey(Reporter)
-            
+
       In the above example, the methods below will be available on
       the manager ``reporter.article_set``.
-      
+
     * Both sides of a ``ManyToManyField`` relation::
-    
+
             class Topping(models.Model):
                 ...
-                
+
             class Pizza(models.Model):
                 toppings = models.ManyToManyField(Topping)
-                
+
       In this example, the methods below will be available both on
       ``topping.pizza_set`` and on ``pizza.toppings``.
 
-.. method:: QuerySet.add(obj1, [obj2, ...])
+.. method:: add(obj1, [obj2, ...])
 
     Adds the specified model objects to the related object set.
 
@@ -40,27 +40,27 @@ This document describes extra methods available on managers when used in a one-t
         >>> e = Entry.objects.get(id=234)
         >>> b.entry_set.add(e) # Associates Entry e with Blog b.
 
-.. method:: QuerySet.create(**kwargs)
+.. method:: create(**kwargs)
 
     Creates a new object, saves it and puts it in the related object set.
     Returns the newly created object::
 
         >>> b = Blog.objects.get(id=1)
         >>> e = b.entry_set.create(
-        ...     headline='Hello', 
-        ...     body_text='Hi', 
+        ...     headline='Hello',
+        ...     body_text='Hi',
         ...     pub_date=datetime.date(2005, 1, 1)
         ... )
-        
+
         # No need to call e.save() at this point -- it's already been saved.
 
     This is equivalent to (but much simpler than)::
 
         >>> b = Blog.objects.get(id=1)
         >>> e = Entry(
-        ....     blog=b, 
-        ....     headline='Hello', 
-        ....     body_text='Hi', 
+        ....     blog=b,
+        ....     headline='Hello',
+        ....     body_text='Hi',
         ....     pub_date=datetime.date(2005, 1, 1)
         .... )
         >>> e.save(force_insert=True)
@@ -70,10 +70,10 @@ This document describes extra methods available on managers when used in a one-t
     ``blog`` to ``create()``. Django figures out that the new ``Entry`` object's
     ``blog`` field should be set to ``b``.
 
-.. method:: QuerySet.remove(obj1, [obj2, ...])
+.. method:: remove(obj1, [obj2, ...])
 
     Removes the specified model objects from the related object set::
-    
+
         >>> b = Blog.objects.get(id=1)
         >>> e = Entry.objects.get(id=234)
         >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
@@ -85,7 +85,7 @@ This document describes extra methods available on managers when used in a one-t
     ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because the
     ``blog`` ``ForeignKey`` doesn't have ``null=True``, this is invalid.
 
-.. method:: QuerySet.clear()
+.. method:: clear()
 
     Removes all objects from the related object set::
 
