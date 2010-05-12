@@ -674,7 +674,7 @@ to ``modelformset_factory`` to limit the number of extra forms displayed.
     >>> [x.name for x in formset.get_queryset()]
     [u'Charles Baudelaire', u'Paul Verlaine', u'Walt Whitman']
 
-If the value of ``max_num`` is geater than the number of existing related
+If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``::
 

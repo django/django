@@ -351,8 +351,8 @@ people this shouldn't have been a problem because ``bool`` is a subclass of
 only time this should ever be an issue is if you were expecting printing the
 ``repr`` of a ``BooleanField`` to print ``1`` or ``0``.
 
-Changes to the interpretation of``max_num`` in FormSets
--------------------------------------------------------
+Changes to the interpretation of ``max_num`` in FormSets
+--------------------------------------------------------
 
 As part of enhancements made to the handling of FormSets, the default
 value and interpretation of the ``max_num`` parameter to the

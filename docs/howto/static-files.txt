@@ -40,7 +40,7 @@ How to do it
 
 Here's the formal definition of the :func:`~django.views.static.serve` view:
 
-.. function:: def serve(request, path, document_root, show_indexes=False):
+.. function:: def serve(request, path, document_root, show_indexes=False)
 
 To use it, just put this in your :ref:`URLconf <topics-http-urls>`::
 
