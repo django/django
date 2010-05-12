@@ -880,7 +880,7 @@ to show objects owned by the logged-in user::
 
     class MyModelAdmin(admin.ModelAdmin):
         def queryset(self, request):
-            qs = super(self, MyModelAdmin).queryset(request)
+            qs = super(MyModelAdmin, self).queryset(request)
             if request.user.is_superuser:
                 return qs
             return qs.filter(author=request.user)
