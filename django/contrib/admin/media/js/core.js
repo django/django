@@ -78,7 +78,7 @@ function findPosX(obj) {
             curleft += obj.offsetLeft - ((isOpera) ? 0 : obj.scrollLeft);
             obj = obj.offsetParent;
         }
-        // IE offsetParent does not include the top-level 
+        // IE offsetParent does not include the top-level
         if (isIE && obj.parentElement){
             curleft += obj.offsetLeft - obj.scrollLeft;
         }
@@ -95,7 +95,7 @@ function findPosY(obj) {
             curtop += obj.offsetTop - ((isOpera) ? 0 : obj.scrollTop);
             obj = obj.offsetParent;
         }
-        // IE offsetParent does not include the top-level 
+        // IE offsetParent does not include the top-level
         if (isIE && obj.parentElement){
             curtop += obj.offsetTop - obj.scrollTop;
         }
@@ -116,7 +116,13 @@ Date.prototype.getCorrectYear = function() {
 }
 
 Date.prototype.getTwelveHours = function() {
-    return (this.getHours() <= 12) ? this.getHours() : 24 - this.getHours();
+    hours = this.getHours();
+    if (hours == 0) {
+        return 12;
+    }
+    else {
+        return hours <= 12 ? hours : hours-12
+    }
 }
 
 Date.prototype.getTwoDigitMonth = function() {
