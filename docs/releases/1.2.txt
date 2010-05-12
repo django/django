@@ -351,6 +351,39 @@ people this shouldn't have been a problem because ``bool`` is a subclass of
 only time this should ever be an issue is if you were expecting printing the
 ``repr`` of a ``BooleanField`` to print ``1`` or ``0``.
 
+Changes to the interpretation of``max_num`` in FormSets
+-------------------------------------------------------
+
+As part of enhancements made to the handling of FormSets, the default
+value and interpretation of the ``max_num`` parameter to the
+:ref:`django.forms.formsets.formset_factory() <formsets-max-num>` and
+:ref:`django.forms.models.modelformset_factory()
+<model-formsets-max-num>` functions has changed slightly. This
+change also affects the way the ``max_num`` argument is :ref:`used for
+inline admin objects <ref-contrib-admin-inline-max-num>`
+
+Previously, the default value for ``max_num`` was ``0`` (zero).
+FormSets then used the boolean value of ``max_num`` to determine if a
+limit was to be imposed on the number of generated forms. The default
+value of ``0`` meant that there was no default limit on the number of
+forms in a FormSet.
+
+Starting with 1.2, the default value for ``max_num`` has been changed
+to ``None``, and FormSets will differentiate between a value of
+``None`` and a value of ``0``. A value of ``None`` indicates that no
+limit on the number of forms is to be imposed; a value of ``0``
+indicates that a maximum of 0 forms should be imposed. This doesn't
+necessarily mean that no forms will be displayed -- see the
+:ref:`ModelFormSet documentation <model-formsets-max-num>` for more
+details.
+
+If you were manually specifying a value of ``0`` for ``max_num``, you
+will need to update your FormSet and/or admin definitions.
+
+.. seealso::
+
+    :ref:`1.2-js-assisted-inlines`
+
 .. _deprecated-features-1.2:
 
 Features deprecated in 1.2
@@ -611,7 +644,7 @@ were affected by these changes.
 ``SpatialBackend``
 ^^^^^^^^^^^^^^^^^^
 
-Prior to the creation of the separate spatial backends, the 
+Prior to the creation of the separate spatial backends, the
 ``django.contrib.gis.db.backend.SpatialBackend`` object was
 provided as an abstraction to introspect on the capabilities of
 the spatial database.  All of the attributes and routines provided by
@@ -678,6 +711,11 @@ for your spatial database use the methods provided by the spatial backend::
         sr_qs = SpatialRefSys.objects.using('my_spatialite').filter(...)
         gc_qs = GeometryColumns.objects.using('my_postgis').filter(...)
 
+Language code ``no``
+--------------------
+
+The currently used language code for Norwegian Bokmål ``no`` is being
+replaced by the more common language code ``nb``.
 
 What's new in Django 1.2
 ========================
@@ -923,9 +961,12 @@ Finally, :ref:`GeoDjango's documentation <ref-contrib-gis>` is now
 included with Django's and is no longer
 hosted separately at `geodjango.org <http://geodjango.org/>`_.
 
-Deprecation of old language code ``no``
----------------------------------------
+.. _1.2-js-assisted-inlines:
 
-The currently used language code for Norwegian Bokmål ``no`` is being
-replaced by the more common language code ``nb``, which should be updated
-by translators from now on.
+JavaScript-assisted handling of inline related objects in the admin
+-------------------------------------------------------------------
+
+If a user has JavaScript enabled in their browser, the interface for
+inline objects in the admin now allows inline objects to be
+dynamically added and removed. Users without JavaScript-enabled
+browsers will see no change in the behavior of inline objects.

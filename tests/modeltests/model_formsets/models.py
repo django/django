@@ -368,16 +368,22 @@ the creation of new inlines beyond max_num.
 
 >>> AuthorFormSet = modelformset_factory(Author, max_num=None, extra=3)
 >>> formset = AuthorFormSet(queryset=qs)
+>>> len(formset.forms)
+6
 >>> len(formset.extra_forms)
 3
 
 >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=3)
 >>> formset = AuthorFormSet(queryset=qs)
+>>> len(formset.forms)
+4
 >>> len(formset.extra_forms)
 1
 
 >>> AuthorFormSet = modelformset_factory(Author, max_num=0, extra=3)
 >>> formset = AuthorFormSet(queryset=qs)
+>>> len(formset.forms)
+3
 >>> len(formset.extra_forms)
 0
 

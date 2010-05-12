@@ -1053,6 +1053,8 @@ The value for ``form`` defaults to ``ModelForm``. This is what is
 passed through to ``inlineformset_factory`` when creating the formset for this
 inline.
 
+.. _ref-contrib-admin-inline-extra:
+
 ``extra``
 ~~~~~~~~~
 
@@ -1062,8 +1064,15 @@ to the initial forms. See the
 
 .. versionadded:: 1.2
 
-Extra forms for inlines will be hidden and replaced with a link to dynamically
-add any number of new inlines for users with Javascript enabled.
+For users with JavaScript-enabled browsers, an "Add another" link is
+provided to enable any number of additional inlines to be added in
+addition to those provided as a result of the ``extra`` argument.
+
+The dynamic link will not appear if the number of currently displayed
+forms exceeds ``max_num``, or if the user does not have JavaScript
+enabled.
+
+.. _ref-contrib-admin-inline-max-num:
 
 ``max_num``
 ~~~~~~~~~~~

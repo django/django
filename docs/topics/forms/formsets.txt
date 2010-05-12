@@ -68,6 +68,8 @@ list of dictionaries as the initial data.
 
     :ref:`Creating formsets from models with model formsets <model-formsets>`.
 
+.. _formsets-max-num:
+
 Limiting the maximum number of forms
 ------------------------------------
 
@@ -83,18 +85,13 @@ limit the maximum number of empty forms the formset will display::
 
 .. versionchanged:: 1.2
 
-If the value of ``max_num`` is geater than the number of existing related
+If the value of ``max_num`` is greater than the number of existing
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``.
 
 A ``max_num`` value of ``None`` (the default) puts no limit on the number of
 forms displayed. Please note that the default value of ``max_num`` was changed
 from ``0`` to ``None`` in version 1.2 to allow ``0`` as a valid value.
-
-.. versionadded:: 1.2
-
-The dynamic "Add Another" link in the Django admin will not appear if
-``max_num`` is less than the number of currently displayed forms.
 
 Formset validation
 ------------------

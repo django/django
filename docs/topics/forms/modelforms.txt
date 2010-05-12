@@ -661,8 +661,8 @@ Limiting the number of editable objects
 
 .. versionchanged:: 1.2
 
-As with regular formsets, you can use the ``max_num`` parameter to
-``modelformset_factory`` to limit the number of extra forms displayed.
+As with regular formsets, you can use the ``max_num`` and ``extra`` parameters
+to ``modelformset_factory`` to limit the number of extra forms displayed.
 
 ``max_num`` does not prevent existing objects from being displayed::
 
