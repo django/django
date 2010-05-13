@@ -22,7 +22,7 @@ def method_decorator(decorator):
         return wraps(func)(_wrapper)
     update_wrapper(_dec, decorator)
     # Change the name to aid debugging.
-    _dec.__name__ = 'method_dec(%s)' % decorator.__name__
+    _dec.__name__ = 'method_decorator(%s)' % decorator.__name__
     return _dec
 
 
@@ -50,12 +50,14 @@ def decorator_from_middleware(middleware_class):
     """
     return make_middleware_decorator(middleware_class)()
 
+
 def available_attrs(fn):
     """
     Return the list of functools-wrappable attributes on a callable.
     This is required as a workaround for http://bugs.python.org/issue3445.
     """
     return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
+
 
 def make_middleware_decorator(middleware_class):
     def _make_decorator(*m_args, **m_kwargs):
