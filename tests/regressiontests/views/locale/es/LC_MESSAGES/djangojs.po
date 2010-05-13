@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-09-15 16:45+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2010-05-12 12:57-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,3 +19,7 @@ msgstr ""
 #: media/js/translate.js:1
 msgid "this is to be translated"
 msgstr "esto tiene que ser traducido"
+
+
+msgid "Choose a time"
+msgstr "Elige una hora"

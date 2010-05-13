@@ -1,8 +1,9 @@
+# -*- coding:utf-8 -*-
 import gettext
 
 from django.conf import settings
 from django.test import TestCase
-from django.utils.translation import activate
+from django.utils.translation import activate, deactivate
 from django.utils.text import javascript_quote
 
 from regressiontests.views.urls import locale_dir
@@ -29,6 +30,7 @@ class I18NTests(TestCase):
             # catalog['this is to be translated'] = 'same_that_trans_txt'
             # javascript_quote is used to be able to check unicode strings
             self.assertContains(response, javascript_quote(trans_txt), 1)
+
 
 class JsI18NTests(TestCase):
     """
@@ -66,3 +68,68 @@ class JsI18NTests(TestCase):
         activate('fi')
         response = self.client.get('/views/jsi18n/')
         self.assertContains(response, 'il faut le traduire')
+
+    def testI18NLanguageNonEnglishDefault(self):
+        """
+        Check if the Javascript i18n view returns an empty language catalog
+        if the default language is non-English but the selected language
+        is English. See #13388 and #3594 for more details.
+        """
+        settings.LANGUAGE_CODE = 'fr'
+        activate('en-us')
+        response = self.client.get('/views/jsi18n/')
+        self.assertNotContains(response, 'Choisir une heure')
+        deactivate()
+
+    def testI18NLanguageNonEnglishFallback(self):
+        """
+        Makes sure that the fallback language is still working properly
+        in cases where the selected language cannot be found.
+        """
+        settings.LANGUAGE_CODE = 'fr'
+        activate('none')
+        response = self.client.get('/views/jsi18n/')
+        self.assertContains(response, 'Choisir une heure')
+        deactivate()
+
+
+class JsI18NTestsMultiPackage(TestCase):
+    """
+    Tests for django views in django/views/i18n.py that need to change
+    settings.LANGUAGE_CODE and merge JS translation from several packages.
+    """
+
+    def setUp(self):
+        self.old_language_code = settings.LANGUAGE_CODE
+        self.old_installed_apps = settings.INSTALLED_APPS
+
+    def tearDown(self):
+        settings.LANGUAGE_CODE = self.old_language_code
+        settings.INSTALLED_APPS = self.old_installed_apps
+
+    def testI18NLanguageEnglishDefault(self):
+        """
+        Check if the JavaScript i18n view returns a complete language catalog
+        if the default language is en-us, the selected language has a
+        translation available and a catalog composed by djangojs domain
+        translations of multiple Python packages is requested. See #13388,
+        #3594 and #13514 for more details.
+        """
+        settings.LANGUAGE_CODE = 'en-us'
+        settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ['regressiontests.views.app1', 'regressiontests.views.app2']
+        activate('fr')
+        response = self.client.get('/views/jsi18n_multi_packages1/')
+        self.assertContains(response, javascript_quote('il faut traduire cette chaîne de caractères de app1'))
+        deactivate()
+
+    def testI18NDifferentNonEnLangs(self):
+        """
+        Similar to above but with neither default or requested language being
+        English.
+        """
+        settings.LANGUAGE_CODE = 'fr'
+        settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ['regressiontests.views.app3', 'regressiontests.views.app4']
+        activate('es-ar')
+        response = self.client.get('/views/jsi18n_multi_packages2/')
+        self.assertContains(response, javascript_quote('este texto de app3 debe ser traducido'))
+        deactivate()

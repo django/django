@@ -213,13 +213,16 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         if en_catalog_missing:
             t = {}
         else:
+            locale_t = {}
             for path in paths:
                 try:
                     catalog = gettext_module.translation(domain, path, [locale])
                 except IOError:
                     catalog = None
                 if catalog is not None:
-                    t = catalog._catalog
+                    locale_t.update(catalog._catalog)
+            if locale_t:
+                t = locale_t
     src = [LibHead]
     plural = None
     if '' in t:

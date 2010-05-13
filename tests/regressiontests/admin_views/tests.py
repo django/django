@@ -4,7 +4,6 @@ import re
 import datetime
 from django.conf import settings
 from django.core.files import temp as tempfile
-from django.test import TestCase
 from django.contrib.auth import admin # Register auth models with the admin.
 from django.contrib.auth.models import User, Permission, UNUSABLE_PASSWORD
 from django.contrib.contenttypes.models import ContentType
@@ -13,15 +12,16 @@ from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.forms.util import ErrorList
+from django.test import TestCase
 from django.utils import formats
 from django.utils.cache import get_max_age
+from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.translation import get_date_formats, activate, deactivate
-from django.utils.encoding import iri_to_uri
 
 # local test models
 from models import Article, BarAccount, CustomArticle, EmptyModel, \
-    ExternalSubscriber, FooAccount, Gallery, ModelWithStringPrimaryKey, \
+    FooAccount, Gallery, ModelWithStringPrimaryKey, \
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast, \
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit, \
     Category, Post, Plot, FunkyTag
@@ -36,9 +36,11 @@ class AdminViewBasicTest(TestCase):
     urlbit = 'admin'
 
     def setUp(self):
+        self.old_language_code = settings.LANGUAGE_CODE
         self.client.login(username='super', password='secret')
 
     def tearDown(self):
+        settings.LANGUAGE_CODE = self.old_language_code
         self.client.logout()
 
     def testTrailingSlashRequired(self):
@@ -278,26 +280,22 @@ class AdminViewBasicTest(TestCase):
         if the default language is non-English but the selected language
         is English. See #13388 and #3594 for more details.
         """
-        old_language_code = settings.LANGUAGE_CODE
         settings.LANGUAGE_CODE = 'fr'
         activate('en-us')
         response = self.client.get('/test_admin/admin/jsi18n/')
         self.assertNotContains(response, 'Choisir une heure')
         deactivate()
-        settings.LANGUAGE_CODE = old_language_code
 
     def testI18NLanguageNonEnglishFallback(self):
         """
         Makes sure that the fallback language is still working properly
         in cases where the selected language cannot be found.
         """
-        old_language_code = settings.LANGUAGE_CODE
         settings.LANGUAGE_CODE = 'fr'
         activate('none')
         response = self.client.get('/test_admin/admin/jsi18n/')
         self.assertContains(response, 'Choisir une heure')
         deactivate()
-        settings.LANGUAGE_CODE = old_language_code
 
 
 class SaveAsTests(TestCase):
