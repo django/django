@@ -16,6 +16,16 @@ js_info_dict = {
     'packages': ('regressiontests.views',),
 }
 
+js_info_dict_multi_packages1 = {
+    'domain': 'djangojs',
+    'packages': ('regressiontests.views.app1', 'regressiontests.views.app2'),
+}
+
+js_info_dict_multi_packages2 = {
+    'domain': 'djangojs',
+    'packages': ('regressiontests.views.app3', 'regressiontests.views.app4'),
+}
+
 date_based_info_dict = {
     'queryset': Article.objects.all(),
     'date_field': 'date_created',
@@ -36,6 +46,8 @@ urlpatterns = patterns('',
     # i18n views
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    (r'^jsi18n_multi_packages1/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages1),
+    (r'^jsi18n_multi_packages2/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages2),
 
     # Static views
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': media_dir}),

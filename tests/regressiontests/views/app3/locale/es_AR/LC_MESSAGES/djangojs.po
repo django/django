@@ -16,9 +16,5 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "this is to be translated"
-msgstr "il faut le traduire"
-
-
-msgid "Choose a time"
-msgstr "Choisir une heure"
+msgid "il faut traduire cette chaîne de caractères de app3"
+msgstr "este texto de app3 debe ser traducido"
