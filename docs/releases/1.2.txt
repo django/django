@@ -12,7 +12,7 @@ Welcome to Django 1.2!
 Nearly a year in the making, Django 1.2 packs an impressive list of
 `new features`_, and lots of bugfixes. These release notes cover the
 new features, as well as important changes you'll want to be aware of
-when upgrading from Djagno 1.1 or older versions.
+when upgrading from Django 1.1 or older versions.
 
 .. _new features: `What's new in Django 1.2`_
 
