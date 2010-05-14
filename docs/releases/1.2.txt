@@ -1,15 +1,18 @@
 .. _releases-1.2:
 
-============================================
-Django 1.2 release notes — UNDER DEVELOPMENT
-============================================
+========================
+Django 1.2 release notes
+========================
 
-This page documents release notes for the as-yet-unreleased Django 1.2. As such,
-it's tentative and subject to change. It provides up-to-date information for
-those who are following trunk.
 
-Django 1.2 includes a number of nifty `new features`_, lots of bug
-fixes and an easy upgrade path from Django 1.1.
+May 14, 2010
+
+Welcome to Django 1.2!
+
+Nearly a year in the making, Django 1.2 packs an impressive list of
+`new features`_, and lots of bugfixes. These release notes cover the
+new features, as well as important changes you'll want to be aware of
+when upgrading from Djagno 1.1 or older versions.
 
 .. _new features: `What's new in Django 1.2`_
 
@@ -17,6 +20,19 @@ fixes and an easy upgrade path from Django 1.1.
 
 Backwards-incompatible changes in 1.2
 =====================================
+
+There are a number of changes in Django 1.2 which will be
+backwards-incompatible; per :ref:`our API stability policy
+<misc-api-stability>`, most such changes are being introduced
+gradually to allow adequate time to upgrade existing code. For most of
+the changes listed below, code written for Django 1.1 or older will
+simply raise a ``PendingDeprecationWarning`` in Django 1.2, followed
+by a ``DeprecationWarning`` in Django 1.3 before such code finally
+stops working entirely in Django 1.4.
+
+Do note, however, that some of the items listed below may require
+immediate changes; we encourage you to read these notes carefully to
+determine how they'll impact your code.
 
 CSRF Protection
 ---------------
@@ -30,7 +46,7 @@ should be aware of:
    should be inserted into forms.
 
  * All contrib apps use a ``csrf_protect`` decorator to protect the view. This
-   requires the use of the csrf_token template tag in the template. If you
+   requires the use of the ``csrf_token`` template tag in the template. If you
    have used custom templates for contrib views, you MUST READ THE :ref:`UPGRADE
    INSTRUCTIONS <ref-csrf-upgrading-notes>` to fix those templates.
 
@@ -39,8 +55,9 @@ should be aware of:
    POST requests need to be written to work with the middleware. Instructions
    on how to do this are found in the CSRF docs.
 
- * All of the CSRF has moved from contrib to core (with backwards compatible
-   imports in the old locations, which are deprecated).
+ * All of the CSRF has moved from contrib to core (with backwards
+   compatible imports in the old locations, which are deprecated and
+   will cease to be supported in Django 1.4).
 
 :ttag:`if` tag changes
 ----------------------
@@ -50,19 +67,21 @@ Due to new features in the :ttag:`if` template tag, it no longer accepts 'and',
 cases even though these strings were normally treated as keywords. Now, the
 keyword status is always enforced, and template code such as ``{% if not %}`` or
 ``{% if and %}`` will throw a ``TemplateSyntaxError``. Also, ``in`` is a new
-keyword and so is not a valid variable name in this context.
+keyword and so is not a valid variable name in this tag.
 
 ``LazyObject``
 --------------
 
-``LazyObject`` is an undocumented utility class used for lazily wrapping other
-objects of unknown type. In Django 1.1 and earlier, it handled introspection in
-a non-standard way, depending on wrapped objects implementing a public method
-``get_all_members()``. Since this could easily lead to name clashes, it has been
-changed to use the standard method, involving ``__members__`` and ``__dir__()``.
-If you used ``LazyObject`` in your own code and implemented the
-``get_all_members()`` method for wrapped objects, you need to make the following
-changes:
+``LazyObject`` is an undocumented utility class used for lazily
+wrapping other objects of unknown type. In Django 1.1 and earlier, it
+handled introspection in a non-standard way, depending on wrapped
+objects implementing a public method named
+``get_all_members()``. Since this could easily lead to name clashes,
+it has been changed to use the standard Python introspection method,
+involving ``__members__`` and ``__dir__()``.  If you used
+``LazyObject`` in your own code and implemented the
+``get_all_members()`` method for wrapped objects, you need to make the
+following changes:
 
  * If your class does not have special requirements for introspection (i.e., you
    have not implemented ``__getattr__()`` or other methods that allow for
@@ -70,39 +89,41 @@ changes:
    ``get_all_members()`` method. The default implementation on ``LazyObject``
    will do the right thing.
 
- * If you have more complex requirements for introspection, first rename the
-   ``get_all_members()`` method to ``__dir__()``. This is the standard method,
-   from Python 2.6 onwards, for supporting introspection. If you require
-   support for Python < 2.6, add the following code to the class::
+ * If you have more complex requirements for introspection, first
+   rename the ``get_all_members()`` method to ``__dir__()``. This is
+   the standard method, from Python 2.6 onwards, for supporting
+   introspection. If you require support for Python versions earlier
+   than 2.6, add the following code to the class::
 
        __members__ = property(lambda self: self.__dir__())
-
 
 .. _specifying-databases:
 
 Specifying databases
 --------------------
 
-Prior to Django 1.1, Django used a number of settings to control access to a
-single database. Django 1.2 introduces support for multiple databases, and as
-a result, the way you define database settings has changed.
+Prior to Django 1.1, Django used a number of settings to control
+access to a single database. Django 1.2 introduces support for
+multiple databases, and as a result the way you define database
+settings has changed.
 
-Any existing Django settings file will continue to work as expected until
-Django 1.4. Until then, old-style database settings will be automatically
-translated to the new-style format.
+Any existing Django settings file will continue to work as expected
+until Django 1.4. Until then, old-style database settings will be
+automatically translated to the new-style format.
 
-In the old-style (pre 1.2) format, you had a number of ``DATABASE_`` settings
-in your settings file. For example::
+In the old-style (pre 1.2) format, you had a number of ``DATABASE_``
+settings in your settings file. For example::
 
     DATABASE_NAME = 'test_db'
     DATABASE_ENGINE = 'postgresql_psycopg2'
     DATABASE_USER = 'myusername'
     DATABASE_PASSWORD = 's3krit'
 
-These settings are now in a dictionary named :setting:`DATABASES`. Each item in
-the dictionary corresponds to a single database connection, with the name
-``'default'`` describing the default database connection. The setting names
-have also been shortened. The previous sample settings would now look like this::
+These settings are now in a dictionary named
+:setting:`DATABASES`. Each item in the dictionary corresponds to a
+single database connection, with the name ``'default'`` describing the
+default database connection. The setting names have also been
+shortened. The previous sample settings would now look like this::
 
     DATABASES = {
         'default': {
@@ -148,14 +169,14 @@ attributes corresponding to the fields on a model.
 In order to support multiple database configurations, Django 1.2 has
 added a ``_state`` attribute to object instances. This attribute will
 appear in ``__dict__`` for a model instance. If your code relies on
-iterating over __dict__ to obtain a list of fields, you must now
-filter the ``_state`` attribute out of ``__dict__``.
+iterating over ``__dict__`` to obtain a list of fields, you must now
+be prepared to handle or filter out the ``_state`` attribute.
 
 ``get_db_prep_*()`` methods on ``Field``
 ----------------------------------------
 
-Prior to 1.2, a custom ``Field`` had the option of defining several
-functions to support conversion of Python values into
+Prior to Django 1.2, a custom ``Field`` had the option of defining
+several functions to support conversion of Python values into
 database-compatible values. A custom field might look something like::
 
     class CustomModelField(models.Field):
@@ -209,7 +230,7 @@ We've provided conversion functions that will transparently
 convert functions adhering to the old prototype into functions
 compatible with the new prototype. However, these conversion functions
 will be removed in Django 1.4, so you should upgrade your ``Field``
-definitions to use the new prototype now, just to get it over with.
+definitions to use the new prototype as soon as possible.
 
 If your ``get_db_prep_*()`` methods made no use of the database
 connection, you should be able to upgrade by renaming
@@ -222,8 +243,8 @@ argument to resolve database-specific values.
 Stateful template tags
 ----------------------
 
-Template tags that store rendering state on the node itself may experience
-problems if they are used with the new :ref:`cached
+Template tags that store rendering state on their ``Node`` subclass
+may experience problems if they are used with the new :ref:`cached
 template loader<template-loaders>`.
 
 All of the built-in Django template tags are safe to use with the cached
@@ -247,7 +268,7 @@ with a ``subtemplate.html`` that reads::
 
     {% cycle 'even' 'odd' %}
 
-Using the non thread-safe, pre-Django 1.2 renderer, this would output::
+Using the non-thread-safe, pre-Django 1.2 renderer, this would output::
 
     even odd even odd ...
 
@@ -255,11 +276,11 @@ Using the thread-safe Django 1.2 renderer, you will instead get::
 
     even even even even ...
 
-This is because the each rendering of the :ttag:`include` tag is an
+This is because each rendering of the :ttag:`include` tag is an
 independent rendering. When the :ttag:`cycle` tag was not thread safe,
-the state of the :ttag:`cycle` tag would leak between multiple renderings
-of the same :ttag:`include`. Now that the :ttag:`cycle` tag is thread safe,
-this leakage no longer occurs.
+the state of the :ttag:`cycle` tag would leak between multiple
+renderings of the same :ttag:`include`. Now that the :ttag:`cycle` tag
+is thread safe, this leakage no longer occurs.
 
 Test runner exit status code
 ----------------------------
@@ -274,29 +295,32 @@ found at the end of the test runner's output.
 Cookie encoding
 ---------------
 
-To fix bugs with cookies in Internet Explorer, Safari, and possibly other
-browsers, our encoding of cookie values was changed so that the characters
-comma and semi-colon are treated as non-safe characters, and are therefore
-encoded as ``\054`` and ``\073`` respectively.  This could produce backwards
-incompatibilities, especially if you are storing comma or semi-colon in
-cookies and have javascript code that parses and manipulates cookie values
-client-side.
+To fix bugs with cookies in Internet Explorer, Safari, and possibly
+other browsers, our encoding of cookie values was changed so that the
+comma and semicolon are treated as non-safe characters, and are
+therefore encoded as ``\054`` and ``\073`` respectively.  This could
+produce backwards incompatibilities, especially if you are storing
+comma or semi-colon in cookies and have javascript code that parses
+and manipulates cookie values client-side.
 
 ``user_passes_test``, ``login_required`` and ``permission_required``
 --------------------------------------------------------------------
 
-``django.contrib.auth.decorators`` provides the decorators ``login_required``,
-``permission_required`` and ``user_passes_test``. Previously it was possible to
-use these decorators both on functions (where the first argument is 'request')
-and on methods (where the first argument is 'self', and the second argument is
-'request'). However, we have found that the trick which enabled this is
-flawed. It only works in limited circumstances, and produces errors that are
-very difficult to debug when it does not work.
+``django.contrib.auth.decorators`` provides the decorators
+``login_required``, ``permission_required`` and
+``user_passes_test``. Previously it was possible to use these
+decorators both on functions (where the first argument is 'request')
+and on methods (where the first argument is 'self', and the second
+argument is 'request'). Unfortunately, flaws were discovered in the
+code supporting this: it only works in limited circumstances, and
+produces errors that are very difficult to debug when it does not
+work.
 
-For this reason, the 'auto adapt' behaviour has been removed, and if you are
-using these decorators on methods, you will need to manually apply
-:func:`django.utils.decorators.method_decorator` to convert the decorator to one
-that works with methods. You would change code from this::
+For this reason, the 'auto adapt' behavior has been removed, and if
+you are using these decorators on methods, you will need to manually
+apply :func:`django.utils.decorators.method_decorator` to convert the
+decorator to one that works with methods. For example, you would
+change code from this::
 
     class MyClass(object):
 
@@ -326,9 +350,10 @@ or::
         def my_view(self, request):
             pass
 
-For those following trunk, this change also applies to other decorators
-introduced since 1.1, including ``csrf_protect``, ``cache_control`` and anything
-created using ``decorator_from_middleware``.
+For those of you who've been following the development trunk, this
+change also applies to other decorators introduced since 1.1,
+including ``csrf_protect``, ``cache_control`` and anything created
+using ``decorator_from_middleware``.
 
 ``ModelForm.is_valid()`` and ``ModelForm.errors``
 -------------------------------------------------
@@ -340,15 +365,15 @@ cleaned in-place. This conversion used to happen when the model was saved. If
 you need an unmodified instance of your model, you should pass a copy to the
 ``ModelForm`` constructor.
 
-
 ``BooleanField`` on MySQL
 --------------------------
 
-In previous versions of Django ``BoleanFields`` under MySQL would return their
-values as either ``1`` or ``0``, instead of ``True`` or ``False``.  For most
-people this shouldn't have been a problem because ``bool`` is a subclass of
-``int``, however in Django 1.2 MySQL correctly returns a real ``bool``.  The
-only time this should ever be an issue is if you were expecting printing the
+In previous versions of Django, a model's ``BooleanField`` under MySQL
+would return its value as either ``1`` or ``0``, instead of ``True``
+or ``False``; for most people this wasn't a problem because ``bool``
+is a subclass of ``int`` in Python. In Django 1.2, however,
+``BooleanField`` on MySQL correctly returns a real ``bool``.  The only
+time this should ever be an issue is if you were expecting the
 ``repr`` of a ``BooleanField`` to print ``1`` or ``0``.
 
 Changes to the interpretation of ``max_num`` in FormSets
@@ -393,26 +418,28 @@ Features deprecated in 1.2
 -------------------------------
 
 The ``psycopg1`` library has not been updated since October 2005. As a
-result, the ``postgresql`` database backend, which depends on this
-library, has been deprecated.
+result, the ``postgresql`` database backend, which uses this library,
+has been deprecated.
 
 If you are currently using the ``postgresql`` backend, you should
 migrate to using the ``postgresql_psycopg2`` backend. To update your
 code, install the ``psycopg2`` library and change the
-:setting:`DATABASE_ENGINE` setting to read ``postgresql_psycopg2``.
+:setting:`DATABASE_ENGINE` setting to use
+``django.db.backends.postgresql_psycopg2``.
 
 CSRF response-rewriting middleware
 ----------------------------------
 
-``CsrfResponseMiddleware``, the middleware that automatically inserted CSRF
-tokens into POST forms in outgoing pages, has been deprecated in favor of a
-template tag method (see above), and will be removed completely in Django
-1.4. ``CsrfMiddleware``, which includes the functionality of
-``CsrfResponseMiddleware`` and ``CsrfViewMiddleware``, has likewise been
-deprecated.
+``CsrfResponseMiddleware``, the middleware that automatically inserted
+CSRF tokens into ``POST`` forms in outgoing pages, has been deprecated
+in favor of a template tag method (see above), and will be removed
+completely in Django 1.4. ``CsrfMiddleware``, which includes the
+functionality of ``CsrfResponseMiddleware`` and
+``CsrfViewMiddleware``, has likewise been deprecated.
 
-Also, the CSRF module has moved from contrib to core, and the old imports are
-deprecated, as described in the :ref:`upgrading notes <ref-csrf-upgrading-notes>`.
+Also, the CSRF module has moved from contrib to core, and the old
+imports are deprecated, as described in the :ref:`upgrading notes
+<ref-csrf-upgrading-notes>`.
 
 ``SMTPConnection``
 ------------------
@@ -720,8 +747,8 @@ replaced by the more common language code ``nb``.
 What's new in Django 1.2
 ========================
 
-CSRF support
-------------
+Improved CSRF protection
+------------------------
 
 Django now has much improved protection against :ref:`Cross-Site
 Request Forgery (CSRF) attacks<ref-contrib-csrf>`. This type of attack
@@ -769,8 +796,8 @@ issued at a specific database with the `using()` method on
 ``QuerySet`` objects. Individual objects can be saved to a specific database
 by providing a ``using`` argument when you call ``save()``.
 
-'Smart' if tag
---------------
+"Smart" :ttag:`if` tag
+----------------------
 
 The :ttag:`if` tag has been upgraded to be much more powerful. First, we've
 added support for comparison operators. No longer will you have to type:
