@@ -512,17 +512,18 @@ than pingbacks, we construct an ``F()`` object to reference the comment count,
 and use that ``F()`` object in the query::
 
     >>> from django.db.models import F
-    >>> Entry.objects.filter(n_pingbacks__lt=F('n_comments'))
+    >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks'))
 
 Django supports the use of addition, subtraction, multiplication,
 division and modulo arithmetic with ``F()`` objects, both with constants
-and with other ``F()`` objects. To find all the blog entries with *twice* as
-many comments as pingbacks, we modify the query::
+and with other ``F()`` objects. To find all the blog entries with more than
+*twice* as many comments as pingbacks, we modify the query::
 
-    >>> Entry.objects.filter(n_pingbacks__lt=F('n_comments') * 2)
+    >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks') * 2)
 
-To find all the entries where the sum of the pingback count and comment count
-is greater than the rating of the entry, we would issue the query::
+To find all the entries where the rating of the entry is less than the
+sum of the pingback count and comment count, we would issue the
+query::
 
     >>> Entry.objects.filter(rating__lt=F('n_comments') + F('n_pingbacks'))
 
