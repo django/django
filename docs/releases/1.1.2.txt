@@ -1,12 +1,10 @@
 .. _releases-1.1.2:
 
-==============================================
-Django 1.1.2 release notes — UNDER DEVELOPMENT
-==============================================
+==========================
+Django 1.1.2 release notes
+==========================
 
-This page documents release notes for the as-yet-unreleased Django
-1.1.2. As such it is tentative and subject to change. It provides
-up-to-date information for those who are following the 1.1.X branch.
+Welcome to Django 1.1.2!
 
 This is the second "bugfix" release in the Django 1.1 series,
 improving the stability and performance of the Django 1.1 codebase.
