@@ -62,12 +62,12 @@ should be aware of:
 :ttag:`if` tag changes
 ----------------------
 
-Due to new features in the :ttag:`if` template tag, it no longer accepts 'and',
-'or' and 'not' as valid **variable** names. Previously, that worked in some
-cases even though these strings were normally treated as keywords. Now, the
-keyword status is always enforced, and template code such as ``{% if not %}`` or
-``{% if and %}`` will throw a ``TemplateSyntaxError``. Also, ``in`` is a new
-keyword and so is not a valid variable name in this tag.
+Due to new features in the :ttag:`if` template tag, it no longer
+accepts 'and', 'or' and 'not' as valid **variable** names. Previously,
+these strings could be used as variable names. Now, the keyword status
+is always enforced, and template code such as ``{% if not %}`` or ``{%
+if and %}`` will throw a ``TemplateSyntaxError``. Also, ``in`` is a
+new keyword and so is not a valid variable name in this tag.
 
 ``LazyObject``
 --------------
@@ -102,7 +102,7 @@ following changes:
 Specifying databases
 --------------------
 
-Prior to Django 1.1, Django used a number of settings to control
+Prior to Django 1.2, Django used a number of settings to control
 access to a single database. Django 1.2 introduces support for
 multiple databases, and as a result the way you define database
 settings has changed.
