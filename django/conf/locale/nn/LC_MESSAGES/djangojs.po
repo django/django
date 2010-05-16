@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-28 17:42+0200\n"
+"POT-Creation-Date: 2010-05-16 22:30+0200\n"
 "PO-Revision-Date: 2010-03-04 12:13+0200\n"
 "Last-Translator: Håvard Grimelid\n"
 "Language-Team: Norsk <no@li.org>\n"
@@ -44,12 +44,41 @@ msgstr "Velg valet og klikk "
 msgid "Clear all"
 msgstr "Fjern alle"
 
-#: contrib/admin/media/js/actions.js:17
+#: contrib/admin/media/js/actions.js:18
 #: contrib/admin/media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(sel)s av %(cnt)s vald"
+msgstr[1] "%(sel)s av %(cnt)s valde"
+
+#: contrib/admin/media/js/actions.js:109
+#: contrib/admin/media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Det er endringar som ikkje er lagra i individuelt redigerbare felt. "
+"Endringar som ikkje er lagra vil gå tapt."
+
+#: contrib/admin/media/js/actions.js:121
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Du har vald ei handling, men du har framleis ikkje lagra endringar for "
+"individuelle felt. Klikk OK for å lagre. Du må gjere handlinga på nytt."
+
+#: contrib/admin/media/js/actions.js:123
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Du har vald ei handling og du har ikkje gjort endringar i individuelle felt. "
+"Du ser sannsynlegvis etter Gå vidare-knappen - ikkje Lagre-knappen."
 
 #: contrib/admin/media/js/calendar.js:24
 #: contrib/admin/media/js/dateparse.js:32
