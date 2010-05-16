@@ -723,6 +723,10 @@ escaped, because it's not a format character::
 
 This would display as "It is the 4th of September".
 
+.. versionadded:: 1.2
+
+The ``c`` and ``u`` format specification characters were added in Django 1.2.
+
 .. templatetag:: regroup
 
 regroup
@@ -1132,8 +1136,8 @@ Formats a date according to the given format.
 
 Given format can be one of the predefined ones ``DATE_FORMAT``,
 ``DATETIME_FORMAT``, ``SHORT_DATE_FORMAT`` or ``SHORT_DATETIME_FORMAT``,
-or a custom format, same as the `now`_ tag. Note that predefined formats may
-vary depending on the current locale.
+or a custom format, same as the :ttag:`now` tag. Note that predefined formats
+may vary depending on the current locale.
 
 For example::
 
@@ -1780,11 +1784,12 @@ time
 Formats a time according to the given format.
 
 Given format can be the predefined one ``TIME_FORMAT``, or a custom format,
-same as the `now`_ tag. Note that the predefined format is locale depending.
+same as the :ttag:`now` tag. Note that the predefined format is locale-
+dependant.
 
 The time filter will only accept parameters in the format string that relate
 to the time of day, not the date (for obvious reasons). If you need to
-format a date, use the `date`_ filter.
+format a date, use the :tfilter:`date` filter.
 
 For example::
 

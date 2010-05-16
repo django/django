@@ -235,7 +235,7 @@ definitions to use the new prototype as soon as possible.
 If your ``get_db_prep_*()`` methods made no use of the database
 connection, you should be able to upgrade by renaming
 ``get_db_prep_value()`` to ``get_prep_value()`` and
-``get_db_prep_lookup()`` to ``get_prep_lookup()`. If you require
+``get_db_prep_lookup()`` to ``get_prep_lookup()``. If you require
 database specific conversions, then you will need to provide an
 implementation ``get_db_prep_*`` that uses the ``connection``
 argument to resolve database-specific values.
@@ -997,3 +997,17 @@ If a user has JavaScript enabled in their browser, the interface for
 inline objects in the admin now allows inline objects to be
 dynamically added and removed. Users without JavaScript-enabled
 browsers will see no change in the behavior of inline objects.
+
+New ``now`` template tag format specifier characters: ``c`` and ``u``
+---------------------------------------------------------------------
+
+The argument to the :ttag:`now` has gained two new format characters:
+``c`` to specify that a datetime value should be formatted in ISO 8601
+format, and ``u`` that allows output of the microseconds part of a
+datetime or time value.
+
+These are also available in others parts like the :tfilter:`date` and
+:tfilter:`time` template filters, the ``humanize`` template tag library
+and the new `format localization`_ framework.
+
+.. _format localization: `Improved localization`_
