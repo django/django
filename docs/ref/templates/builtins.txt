@@ -657,7 +657,7 @@ Available format strings:
     A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
     b                 Month, textual, 3 letters, lowercase.     ``'jan'``
     B                 Not implemented.
-    c                 ISO 8601 Format.                          ``2008-01-02 10:30:00.000123``
+    c                 ISO 8601 Format.                          ``2008-01-02T10:30:00.000123``
     d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
                       leading zeros.
     D                 Day of the week, textual, 3 letters.      ``'Fri'``

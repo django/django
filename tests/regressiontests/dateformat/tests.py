@@ -42,7 +42,7 @@ class DateFormatTests(TestCase):
         timestamp = datetime.datetime(2008, 5, 19, 11, 45, 23, 123456)
 
         self.assertEquals(dateformat.format(my_birthday, 'A'), u'PM')
-        self.assertEquals(dateformat.format(timestamp, 'c'), u'2008-05-19 11:45:23.123456')
+        self.assertEquals(dateformat.format(timestamp, 'c'), u'2008-05-19T11:45:23.123456')
         self.assertEquals(dateformat.format(my_birthday, 'd'), u'08')
         self.assertEquals(dateformat.format(my_birthday, 'j'), u'8')
         self.assertEquals(dateformat.format(my_birthday, 'l'), u'Sunday')

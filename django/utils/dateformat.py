@@ -128,7 +128,7 @@ class DateFormat(TimeFormat):
         ISO 8601 Format
         Example : '2008-01-02T10:30:00.000123'
         """
-        return self.data.isoformat(' ')
+        return self.data.isoformat()
 
     def d(self):
         "Day of the month, 2 digits with leading zeros; i.e. '01' to '31'"
