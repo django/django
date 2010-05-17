@@ -62,7 +62,7 @@ backwards-incompatible. The big changes are:
 
     * The new CSRF protection framework is not backwards-compatible with
       the old system. Users of the old system will not be affected until
-      the old system is removed in Django 1.4
+      the old system is removed in Django 1.4.
       
       However, upgrading to the new CSRF protection framework requires a few
       important backwards-incompatible changes, detailed in `CSRF Protection`_,
@@ -366,10 +366,13 @@ Backwards-incompatible changes in 1.2
 
 Wherever possible the new features above have been introduced in a
 backwards-compatible manner per :ref:`our API stability policy
-<misc-api-stability>` policy.
+<misc-api-stability>` policy. This means that existing code which
+worked with Django 1.1 will continue to work with Django 1.2; such
+code will, however, begin issuing warnings (see below for details).
 
-However, a handful of features *have* changed in ways that, for some users, will be
-backwards-incompatible. Those changes are detailed below.
+However, a handful of features *have* changed in ways that, for some
+users, will be backwards-incompatible. Those changes are detailed
+below.
 
 CSRF Protection
 ---------------
@@ -468,8 +471,9 @@ Stateful template tags
 ----------------------
 
 Template tags that store rendering state on their ``Node`` subclass
-may experience problems if they are used with the new :ref:`cached
-template loader<template-loaders>`.
+have always been vulnerable to thread-safety and other issues; as of
+Django 1.2, however, they may also cause problems when used with the
+new :ref:`cached template loader<template-loaders>`.
 
 All of the built-in Django template tags are safe to use with the cached
 loader, but if you're using custom template tags that come from third
@@ -693,15 +697,16 @@ Finally, Django 1.2 deprecates some features from earlier releases.
 These features are still supported, but will be gradually phased out
 over the next few release cycles.
 
-Code take advantage of any of the features below will raise a
-``PendingDeprecationWarning`` in Django 1.2. This warning will be silent by
-default, but may be turned on using Python's `warnings module`_, or by running
-Python with a ``-Wd`` or `-Wall` flag.
+Code taking advantage of any of the features below will raise a
+``PendingDeprecationWarning`` in Django 1.2. This warning will be
+silent by default, but may be turned on using Python's `warnings
+module`_, or by running Python with a ``-Wd`` or `-Wall` flag.
 
 .. _warnings module: http://docs.python.org/library/warnings.html
 
-In Django 1.3, these warnings will become a ``DeprecationWarning``, which is *not* silent. In Django 1.4
-support for these features will be removed entirely. 
+In Django 1.3, these warnings will become a ``DeprecationWarning``,
+which is *not* silent. In Django 1.4 support for these features will
+be removed entirely.
 
 .. seealso::
 
