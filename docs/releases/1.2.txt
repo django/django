@@ -4,35 +4,372 @@
 Django 1.2 release notes
 ========================
 
-
-May 14, 2010
+*May 17, 2010.*
 
 Welcome to Django 1.2!
 
-Nearly a year in the making, Django 1.2 packs an impressive list of
-`new features`_, and lots of bugfixes. These release notes cover the
-new features, as well as important changes you'll want to be aware of
-when upgrading from Django 1.1 or older versions.
+Nearly a year in the making, Django 1.2 packs an impressive list of `new
+features`_ and lots of bug fixes. These release notes cover the new features,
+as well as important changes you'll want to be aware of when upgrading from
+Django 1.1 or older versions.
 
 .. _new features: `What's new in Django 1.2`_
+
+Overview
+========
+
+Django 1.2 introduces several large, important new features, including:
+
+    * Support for `multiple database connections`_ in a single Django instance.
+    
+    * `Model validation`_ inspired by Django's form validation.
+    
+    * Vastly `improved protection against Cross-Site Request Forgery`_ (CSRF).
+    
+    * A new `user "messages" framework`_ with support for cookie- and session-based
+      message for both anonymous and authenticated users.
+
+    * Hooks for `object-level permissions`_, `permissions for anonymous users`_,
+      and `more flexible username requirements`_.
+
+    * Customization of e-mail sending via `e-mail backends`_.
+
+    * New :ref:`"smart" if template tag <new-in-1.2-smart-if>` which supports
+      comparison operators.
+
+.. _multiple database connections: `support for multiple databases`_
+.. _improved protection against Cross-Site Request Forgery: `improved CSRF protection`_
+.. _user "messages" framework: `messages framework`_
+.. _more flexible username requirements: `relaxed requirements for usernames`_
+
+These are just the highlights; full details and a complete list of features `may
+be found below`_.
+
+.. _may be found below: `what's new in django 1.2`
+
+.. seealso::
+
+    `Django Advent`_ covered the release of Django 1.2 with a series of 
+    articles and tutorials that cover some of the new features in depth.
+        
+.. _django advent: http://djangoadvent.com/
+
+Wherever possible these features have been introduced in a backwards-compatible
+manner per :ref:`our API stability policy <misc-api-stability>` policy.
+
+However, a handful of features *have* changed in ways that, for some users, will be
+backwards-incompatible. The big changes are:
+
+    * The new CSRF protection framework is not backwards-compatible with
+      the old system. Users of the old system will not be affected until
+      the old system is removed in Django 1.4
+      
+      However, upgrading to the new CSRF protection framework requires a few
+      important backwards-incompatible changes, detailed in `CSRF Protection`_,
+      below.
+
+    * Authors of custom :class:`~django.db.models.Field` subclasses should be
+      aware that a number of methods have had a change in prototype, detailed
+      under `get_db_prep_*() methods on Field`_, below.
+      
+    * The internals of template tags have changed somewhat; authors of custom
+      template tags that need to store state (e.g. custom control flow tags)
+      should ensure that their code follows the new rules for `stateful template
+      tags`_
+    
+    * The :func:`~django.contrib.auth.decorators.user_passes_test`,
+      :func:`~django.contrib.auth.decorators.login_required`, and
+      :func:`~django.contrib.auth.decorators.permission_required`, decorators
+      from :mod:`django.contrib.auth` only apply to functions and no longer
+      work on methods. There's a simple one-line fix `detailed below`_.
+
+.. _detailed below: `user_passes_test, login_required and permission_required`_
+
+Again, these are just the big features that will affect the most users. Users
+upgrading from previous versions of Django are heavily encouraged to consult
+the complete list of :ref:`backwards-incompatible changes
+<backwards-incompatible-changes-1.2>` and the list of :ref:`deprecated
+features <deprecated-features-1.2>`.
+
+What's new in Django 1.2
+========================
+
+Support for multiple databases
+------------------------------
+
+Django 1.2 adds the ability to use :ref:`more than one database
+<topics-db-multi-db>` in your Django project. Queries can be issued at a
+specific database with the `using()` method on ``QuerySet`` objects. Individual
+objects can be saved to a specific database by providing a ``using`` argument
+when you call ``save()``.
+
+Model validation
+----------------
+
+Model instances now have support for :ref:`validating their own data
+<validating-objects>`, and both model and form fields now accept configurable
+lists of :ref:`validators <ref-validators>` specifying reusable, encapsulated
+validation behavior. Note, however, that validation must still be performed
+explicitly. Simply invoking a model instance's ``save()`` method will not
+perform any validation of the instance's data.
+
+Improved CSRF protection
+------------------------
+
+Django now has much improved protection against :ref:`Cross-Site Request Forgery
+(CSRF) attacks<ref-contrib-csrf>`. This type of attack occurs when a malicious
+Web site contains a link, a form button or some JavaScript that is intended to
+perform some action on your Web site, using the credentials of a logged-in user
+who visits the malicious site in their browser. A related type of attack, "login
+CSRF," where an attacking site tricks a user's browser into logging into a site
+with someone else's credentials, is also covered.
+
+Messages framework
+------------------
+
+Django now includes a robust and configurable :ref:`messages framework
+<ref-contrib-messages>` with built-in support for cookie- and session-based
+messaging, for both anonymous and authenticated clients. The messages framework
+replaces the deprecated user message API and allows you to temporarily store
+messages in one request and retrieve them for display in a subsequent request
+(usually the next one).
+
+Object-level permissions
+------------------------
+
+A foundation for specifying permissions at the per-object level has been added.
+Although there is no implementation of this in core, a custom authentication
+backend can provide this implementation and it will be used by
+:class:`django.contrib.auth.models.User`. See the :ref:`authentication docs
+<topics-auth>` for more information.
+
+Permissions for anonymous users
+-------------------------------
+
+If you provide a custom auth backend with ``supports_anonymous_user`` set to
+``True``, AnonymousUser will check the backend for permissions, just like
+User already did.  This is useful for centralizing permission handling - apps
+can always delegate the question of whether something is allowed or not to
+the authorization/authentication backend. See the :ref:`authentication
+docs <topics-auth>` for more details.
+
+Relaxed requirements for usernames
+----------------------------------
+
+The built-in :class:`~django.contrib.auth.models.User` model's
+:attr:`~django.contrib.auth.models.User.username` field now allows a wider range
+of characters, including ``@``, ``+``, ``.`` and ``-`` characters.
+
+E-mail backends
+---------------
+
+You can now :ref:`configure the way that Django sends e-mail
+<topic-email-backends>`. Instead of using SMTP to send all e-mail, you
+can now choose a configurable e-mail backend to send messages. If your
+hosting provider uses a sandbox or some other non-SMTP technique for
+sending mail, you can now construct an e-mail backend that will allow
+Django's standard :ref:`mail sending methods<topics-email>` to use
+those facilities.
+
+This also makes it easier to debug mail sending. Django ships with
+backend implementations that allow you to send e-mail to a
+:ref:`file<topic-email-file-backend>`, to the
+:ref:`console<topic-email-console-backend>`, or to
+:ref:`memory<topic-email-memory-backend>`. You can even configure all
+e-mail to be :ref:`thrown away<topic-email-dummy-backend>`.
+
+.. _new-in-1.2-smart-if:
+
+"Smart" :ttag:`if` tag
+----------------------
+
+The :ttag:`if` tag has been upgraded to be much more powerful. First, we've
+added support for comparison operators. No longer will you have to type:
+
+.. code-block:: html+django
+
+    {% ifnotequal a b %}
+     ...
+    {% endifnotequal %}
+
+You can now do this:
+
+.. code-block:: html+django
+
+    {% if a != b %}
+     ...
+    {% endif %}
+
+There's really no reason to use ``{% ifequal %}`` or ``{% ifnotequal %}``
+anymore, unless you're the nostalgic type.
+
+The operators supported are ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=``,
+``in`` and ``not in``, all of which work like the Python operators, in addition
+to ``and``, ``or`` and ``not``, which were already supported.
+
+Also, filters may now be used in the ``if`` expression. For example:
+
+.. code-block:: html+django
+
+      <div
+        {% if user.email|lower == message.recipient|lower %}
+          class="highlight"
+        {% endif %}
+      >{{ message }}</div>
+
+Template caching
+----------------
+
+In previous versions of Django, every time you rendered a template, it
+would be reloaded from disk. In Django 1.2, you can use a :ref:`cached
+template loader <template-loaders>` to load templates once, then
+cache the result for every subsequent render. This can lead to a
+significant performance improvement if your templates are broken into
+lots of smaller subtemplates (using the ``{% extends %}`` or ``{%
+include %}`` tags).
+
+As a side effect, it is now much easier to support non-Django template
+languages. For more details, see the :ref:`notes on supporting
+non-Django template languages<topic-template-alternate-language>`.
+
+Natural keys in fixtures
+------------------------
+
+Fixtures can now refer to remote objects using
+:ref:`topics-serialization-natural-keys`. This lookup scheme is an
+alternative to the normal primary-key based object references in a
+fixture, improving readability and resolving problems referring to
+objects whose primary key value may not be predictable or known.
+
+Fast failure for tests
+----------------------
+
+Both the :djadmin:`test` subcommand of ``django-admin.py`` and the
+``runtests.py`` script used to run Django's own test suite now support a
+``--failfast`` option. When specified, this option causes the test runner to
+exit after encountering a failure instead of continuing with the test run. In
+addition, the handling of ``Ctrl-C`` during a test run has been improved to
+trigger a graceful exit from the test run that reports details of the tests that
+were run before the interruption.
+
+``BigIntegerField``
+-------------------
+
+Models can now use a 64-bit :class:`~django.db.models.BigIntegerField` type.
+
+Improved localization
+---------------------
+
+Django's :ref:`internationalization framework <topics-i18n>` has been expanded
+with locale-aware formatting and form processing. That means, if enabled, dates
+and numbers on templates will be displayed using the format specified for the
+current locale. Django will also use localized formats when parsing data in
+forms. See :ref:`Format localization <format-localization>` for more details.
+
+``readonly_fields`` in ``ModelAdmin``
+-------------------------------------
+
+:attr:`django.contrib.admin.ModelAdmin.readonly_fields` has been added to
+enable non-editable fields in add/change pages for models and inlines. Field
+and calculated values can be displayed alongside editable fields.
+
+Customizable syntax highlighting
+--------------------------------
+
+You can now use a ``DJANGO_COLORS`` environment variable to modify or disable
+the colors used by ``django-admin.py`` to provide :ref:`syntax highlighting
+<syntax-coloring>`.
+
+Syndication feeds as views
+--------------------------
+
+:ref:`Syndication feeds <ref-contrib-syndication>` can now be used directly as
+views in your :ref:`URLconf <topics-http-urls>`. This means that you can
+maintain complete control over the URL structure of your feeds. Like any other
+view, feeds views are passed a ``request`` object, so you can do anything you
+would normally do with a view, like user based access control, or making a feed
+a named URL.
+
+GeoDjango
+---------
+
+The most significant new feature for ref:`GeoDjango <ref-contrib-gis>`
+in 1.2 is support for multiple spatial databases.  As a result,
+the following :ref:`spatial database backends <spatial-backends>`
+are now included:
+
+* :mod:`django.contrib.gis.db.backends.postgis`
+* :mod:`django.contrib.gis.db.backends.mysql`
+* :mod:`django.contrib.gis.db.backends.oracle`
+* :mod:`django.contrib.gis.db.backends.spatialite`
+
+GeoDjango now supports the rich capabilities added
+in the `PostGIS 1.5 release <http://postgis.refractions.net/documentation/manual-1.5/>`_.
+New features include suppport for the the :ref:`geography type <geography-type>`
+and enabling of :ref:`distance queries <distance-queries>`
+with non-point geometries on geographic coordinate systems.
+
+Support for 3D geometry fields was added, and may be enabled
+by setting the :attr:`~django.contrib.gis.db.models.GeometryField.dim`
+keyword to 3 in your :class:`~django.contrib.gis.db.models.GeometryField`.
+The :class:`~django.contrib.gis.db.models.Extent3D` aggregate
+and :meth:`~django.contrib.gis.db.models.GeoQuerySet.extent3d` ``GeoQuerySet``
+method were added as a part of this feature.
+
+The following :class:`~django.contrib.gis.db.models.GeoQeurySet`
+methods are new in 1.2:
+
+* :meth:`~django.contrib.gis.db.models.GeoQuerySet.force_rhr`
+* :meth:`~django.contrib.gis.db.models.GeoQuerySet.reverse_geom`
+* :meth:`~django.contrib.gis.db.models.GeoQuerySet.geohash`
+
+The :ref:`GEOS interface <ref-geos>` was updated to use
+thread-safe C library functions when available on the platform.
+
+The :ref:`GDAL interface <ref-gdal>` now allows the user to
+set a :attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on
+the features returned when iterating over a
+:class:`~django.contrib.gis.gdal.Layer`.
+
+Finally, :ref:`GeoDjango's documentation <ref-contrib-gis>` is now
+included with Django's and is no longer
+hosted separately at `geodjango.org <http://geodjango.org/>`_.
+
+.. _1.2-js-assisted-inlines:
+
+JavaScript-assisted handling of inline related objects in the admin
+-------------------------------------------------------------------
+
+If a user has JavaScript enabled in their browser, the interface for
+inline objects in the admin now allows inline objects to be
+dynamically added and removed. Users without JavaScript-enabled
+browsers will see no change in the behavior of inline objects.
+
+New ``now`` template tag format specifier characters: ``c`` and ``u``
+---------------------------------------------------------------------
+
+The argument to the :ttag:`now` has gained two new format characters:
+``c`` to specify that a datetime value should be formatted in ISO 8601
+format, and ``u`` that allows output of the microseconds part of a
+datetime or time value.
+
+These are also available in others parts like the :tfilter:`date` and
+:tfilter:`time` template filters, the ``humanize`` template tag library
+and the new `format localization`_ framework.
+
+.. _format localization: `Improved localization`_
 
 .. _backwards-incompatible-changes-1.2:
 
 Backwards-incompatible changes in 1.2
 =====================================
 
-There are a number of changes in Django 1.2 which will be
-backwards-incompatible; per :ref:`our API stability policy
-<misc-api-stability>`, most such changes are being introduced
-gradually to allow adequate time to upgrade existing code. For most of
-the changes listed below, code written for Django 1.1 or older will
-simply raise a ``PendingDeprecationWarning`` in Django 1.2, followed
-by a ``DeprecationWarning`` in Django 1.3 before such code finally
-stops working entirely in Django 1.4.
+Wherever possible the new features above have been introduced in a
+backwards-compatible manner per :ref:`our API stability policy
+<misc-api-stability>` policy.
 
-Do note, however, that some of the items listed below may require
-immediate changes; we encourage you to read these notes carefully to
-determine how they'll impact your code.
+However, a handful of features *have* changed in ways that, for some users, will be
+backwards-incompatible. Those changes are detailed below.
 
 CSRF Protection
 ---------------
@@ -58,119 +395,6 @@ should be aware of:
  * All of the CSRF has moved from contrib to core (with backwards
    compatible imports in the old locations, which are deprecated and
    will cease to be supported in Django 1.4).
-
-:ttag:`if` tag changes
-----------------------
-
-Due to new features in the :ttag:`if` template tag, it no longer
-accepts 'and', 'or' and 'not' as valid **variable** names. Previously,
-these strings could be used as variable names. Now, the keyword status
-is always enforced, and template code such as ``{% if not %}`` or ``{%
-if and %}`` will throw a ``TemplateSyntaxError``. Also, ``in`` is a
-new keyword and so is not a valid variable name in this tag.
-
-``LazyObject``
---------------
-
-``LazyObject`` is an undocumented utility class used for lazily
-wrapping other objects of unknown type. In Django 1.1 and earlier, it
-handled introspection in a non-standard way, depending on wrapped
-objects implementing a public method named
-``get_all_members()``. Since this could easily lead to name clashes,
-it has been changed to use the standard Python introspection method,
-involving ``__members__`` and ``__dir__()``.  If you used
-``LazyObject`` in your own code and implemented the
-``get_all_members()`` method for wrapped objects, you need to make the
-following changes:
-
- * If your class does not have special requirements for introspection (i.e., you
-   have not implemented ``__getattr__()`` or other methods that allow for
-   attributes not discoverable by normal mechanisms), you can simply remove the
-   ``get_all_members()`` method. The default implementation on ``LazyObject``
-   will do the right thing.
-
- * If you have more complex requirements for introspection, first
-   rename the ``get_all_members()`` method to ``__dir__()``. This is
-   the standard method, from Python 2.6 onwards, for supporting
-   introspection. If you require support for Python versions earlier
-   than 2.6, add the following code to the class::
-
-       __members__ = property(lambda self: self.__dir__())
-
-.. _specifying-databases:
-
-Specifying databases
---------------------
-
-Prior to Django 1.2, Django used a number of settings to control
-access to a single database. Django 1.2 introduces support for
-multiple databases, and as a result the way you define database
-settings has changed.
-
-Any existing Django settings file will continue to work as expected
-until Django 1.4. Until then, old-style database settings will be
-automatically translated to the new-style format.
-
-In the old-style (pre 1.2) format, you had a number of ``DATABASE_``
-settings in your settings file. For example::
-
-    DATABASE_NAME = 'test_db'
-    DATABASE_ENGINE = 'postgresql_psycopg2'
-    DATABASE_USER = 'myusername'
-    DATABASE_PASSWORD = 's3krit'
-
-These settings are now in a dictionary named
-:setting:`DATABASES`. Each item in the dictionary corresponds to a
-single database connection, with the name ``'default'`` describing the
-default database connection. The setting names have also been
-shortened. The previous sample settings would now look like this::
-
-    DATABASES = {
-        'default': {
-            'NAME': 'test_db',
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'USER': 'myusername',
-            'PASSWORD': 's3krit',
-        }
-    }
-
-This affects the following settings:
-
-    =========================================  ==========================
-     Old setting                                New Setting
-    =========================================  ==========================
-    :setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
-    :setting:`DATABASE_HOST`                   :setting:`HOST`
-    :setting:`DATABASE_NAME`                   :setting:`NAME`
-    :setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
-    :setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
-    :setting:`DATABASE_PORT`                   :setting:`PORT`
-    :setting:`DATABASE_USER`                   :setting:`USER`
-    :setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
-    :setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
-    :setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
-    =========================================  ==========================
-
-These changes are also required if you have manually created a database
-connection using ``DatabaseWrapper()`` from your database backend of choice.
-
-In addition to the change in structure, Django 1.2 removes the special
-handling for the built-in database backends. All database backends
-must now be specified by a fully qualified module name (i.e.,
-``django.db.backends.postgresql_psycopg2``, rather than just
-``postgresql_psycopg2``).
-
-``__dict__`` on model instances
--------------------------------
-
-Historically, the ``__dict__`` attribute of a model instance has only contained
-attributes corresponding to the fields on a model.
-
-In order to support multiple database configurations, Django 1.2 has
-added a ``_state`` attribute to object instances. This attribute will
-appear in ``__dict__`` for a model instance. If your code relies on
-iterating over ``__dict__`` to obtain a list of fields, you must now
-be prepared to handle or filter out the ``_state`` attribute.
 
 ``get_db_prep_*()`` methods on ``Field``
 ----------------------------------------
@@ -282,27 +506,6 @@ the state of the :ttag:`cycle` tag would leak between multiple
 renderings of the same :ttag:`include`. Now that the :ttag:`cycle` tag
 is thread safe, this leakage no longer occurs.
 
-Test runner exit status code
-----------------------------
-
-The exit status code of the test runners (``tests/runtests.py`` and ``python
-manage.py test``) no longer represents the number of failed tests, because a
-failure of 256 or more tests resulted in a wrong exit status code. The exit
-status code for the test runner is now 0 for success (no failing tests) and 1
-for any number of test failures. If needed, the number of test failures can be
-found at the end of the test runner's output.
-
-Cookie encoding
----------------
-
-To fix bugs with cookies in Internet Explorer, Safari, and possibly
-other browsers, our encoding of cookie values was changed so that the
-comma and semicolon are treated as non-safe characters, and are
-therefore encoded as ``\054`` and ``\073`` respectively.  This could
-produce backwards incompatibilities, especially if you are storing
-comma or semi-colon in cookies and have javascript code that parses
-and manipulates cookie values client-side.
-
 ``user_passes_test``, ``login_required`` and ``permission_required``
 --------------------------------------------------------------------
 
@@ -354,6 +557,78 @@ For those of you who've been following the development trunk, this
 change also applies to other decorators introduced since 1.1,
 including ``csrf_protect``, ``cache_control`` and anything created
 using ``decorator_from_middleware``.
+
+:ttag:`if` tag changes
+----------------------
+
+Due to new features in the :ttag:`if` template tag, it no longer
+accepts 'and', 'or' and 'not' as valid **variable** names. Previously,
+these strings could be used as variable names. Now, the keyword status
+is always enforced, and template code such as ``{% if not %}`` or ``{%
+if and %}`` will throw a ``TemplateSyntaxError``. Also, ``in`` is a
+new keyword and so is not a valid variable name in this tag.
+
+``LazyObject``
+--------------
+
+``LazyObject`` is an undocumented-but-often-used utility class used for lazily
+wrapping other objects of unknown type. 
+
+In Django 1.1 and earlier, it handled introspection in a non-standard way,
+depending on wrapped objects implementing a public method named
+``get_all_members()``. Since this could easily lead to name clashes, it has been
+changed to use the standard Python introspection method, involving
+``__members__`` and ``__dir__()``. 
+
+If you used ``LazyObject`` in your own code
+and implemented the ``get_all_members()`` method for wrapped objects, you'll need
+to make a couple of changes:
+
+First, if your class does not have special requirements for introspection (i.e.,
+you have not implemented ``__getattr__()`` or other methods that allow for
+attributes not discoverable by normal mechanisms), you can simply remove the
+``get_all_members()`` method. The default implementation on ``LazyObject`` will
+do the right thing.
+
+If you have more complex requirements for introspection, first rename the
+``get_all_members()`` method to ``__dir__()``. This is the standard
+introspection method for Python 2.6 and above. If you require support for Python
+versions earlier than 2.6, add the following code to the class::
+
+    __members__ = property(lambda self: self.__dir__())
+
+``__dict__`` on model instances
+-------------------------------
+
+Historically, the ``__dict__`` attribute of a model instance has only contained
+attributes corresponding to the fields on a model.
+
+In order to support multiple database configurations, Django 1.2 has
+added a ``_state`` attribute to object instances. This attribute will
+appear in ``__dict__`` for a model instance. If your code relies on
+iterating over ``__dict__`` to obtain a list of fields, you must now
+be prepared to handle or filter out the ``_state`` attribute.
+
+Test runner exit status code
+----------------------------
+
+The exit status code of the test runners (``tests/runtests.py`` and ``python
+manage.py test``) no longer represents the number of failed tests, because a
+failure of 256 or more tests resulted in a wrong exit status code. The exit
+status code for the test runner is now 0 for success (no failing tests) and 1
+for any number of test failures. If needed, the number of test failures can be
+found at the end of the test runner's output.
+
+Cookie encoding
+---------------
+
+To fix bugs with cookies in Internet Explorer, Safari, and possibly
+other browsers, our encoding of cookie values was changed so that the
+comma and semicolon are treated as non-safe characters, and are
+therefore encoded as ``\054`` and ``\073`` respectively.  This could
+produce backwards incompatibilities, especially if you are storing
+comma or semi-colon in cookies and have javascript code that parses
+and manipulates cookie values client-side.
 
 ``ModelForm.is_valid()`` and ``ModelForm.errors``
 -------------------------------------------------
@@ -413,6 +688,89 @@ will need to update your FormSet and/or admin definitions.
 
 Features deprecated in 1.2
 ==========================
+
+Finally, Django 1.2 deprecates some features from earlier releases.
+These features are still supported, but will be gradually phased out
+over the next few release cycles.
+
+Code take advantage of any of the features below will raise a
+``PendingDeprecationWarning`` in Django 1.2. This warning will be silent by
+default, but may be turned on using Python's `warnings module`_, or by running
+Python with a ``-Wd`` or `-Wall` flag.
+
+.. _warnings module: http://docs.python.org/library/warnings.html
+
+In Django 1.3, these warnings will become a ``DeprecationWarning``, which is *not* silent. In Django 1.4
+support for these features will be removed entirely. 
+
+.. seealso::
+
+    For more details, see the documentation :ref:`Django's release process
+    <internals-release-process>` and our :ref:`deprecation timeline
+    <internals-deprecation>`.`
+
+.. _specifying-databases:
+
+Specifying databases
+--------------------
+
+Prior to Django 1.2, Django used a number of settings to control
+access to a single database. Django 1.2 introduces support for
+multiple databases, and as a result the way you define database
+settings has changed.
+
+Any existing Django settings file will continue to work as expected
+until Django 1.4. Until then, old-style database settings will be
+automatically translated to the new-style format.
+
+In the old-style (pre 1.2) format, you had a number of ``DATABASE_``
+settings in your settings file. For example::
+
+    DATABASE_NAME = 'test_db'
+    DATABASE_ENGINE = 'postgresql_psycopg2'
+    DATABASE_USER = 'myusername'
+    DATABASE_PASSWORD = 's3krit'
+
+These settings are now in a dictionary named
+:setting:`DATABASES`. Each item in the dictionary corresponds to a
+single database connection, with the name ``'default'`` describing the
+default database connection. The setting names have also been
+shortened. The previous sample settings would now look like this::
+
+    DATABASES = {
+        'default': {
+            'NAME': 'test_db',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'USER': 'myusername',
+            'PASSWORD': 's3krit',
+        }
+    }
+
+This affects the following settings:
+
+    =========================================  ==========================
+     Old setting                                New Setting
+    =========================================  ==========================
+    :setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
+    :setting:`DATABASE_HOST`                   :setting:`HOST`
+    :setting:`DATABASE_NAME`                   :setting:`NAME`
+    :setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
+    :setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
+    :setting:`DATABASE_PORT`                   :setting:`PORT`
+    :setting:`DATABASE_USER`                   :setting:`USER`
+    :setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
+    :setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
+    :setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+    =========================================  ==========================
+
+These changes are also required if you have manually created a database
+connection using ``DatabaseWrapper()`` from your database backend of choice.
+
+In addition to the change in structure, Django 1.2 removes the special
+handling for the built-in database backends. All database backends
+must now be specified by a fully qualified module name (i.e.,
+``django.db.backends.postgresql_psycopg2``, rather than just
+``postgresql_psycopg2``).
 
 ``postgresql`` database backend
 -------------------------------
@@ -543,12 +901,12 @@ The same applies to the globals found in ``django.forms.fields``:
 
 Use ``django.utils.formats.get_format()`` to get the appropriate formats.
 
-email_re
---------
+``email_re``
+------------
 
-An undocumented regex for validating email addresses has been moved from
-django.form.fields to django.core.validators. You will need to update
-your imports if you are using it.
+An undocumented regular expression for validating email addresses has been moved
+from ``django.form.fields`` to ``django.core.validators``. You will need to
+update your imports if you are using it.
 
 Function-based test runners
 ---------------------------
@@ -744,270 +1102,3 @@ Language code ``no``
 The currently used language code for Norwegian Bokmål ``no`` is being
 replaced by the more common language code ``nb``.
 
-What's new in Django 1.2
-========================
-
-Improved CSRF protection
-------------------------
-
-Django now has much improved protection against :ref:`Cross-Site
-Request Forgery (CSRF) attacks<ref-contrib-csrf>`. This type of attack
-occurs when a malicious Web site contains a link, a form button or
-some JavaScript that is intended to perform some action on your Web
-site, using the credentials of a logged-in user who visits the
-malicious site in their browser. A related type of attack, "login
-CSRF," where an attacking site tricks a user's browser into logging
-into a site with someone else's credentials, is also covered.
-
-E-mail backends
----------------
-
-You can now :ref:`configure the way that Django sends e-mail
-<topic-email-backends>`. Instead of using SMTP to send all e-mail, you
-can now choose a configurable e-mail backend to send messages. If your
-hosting provider uses a sandbox or some other non-SMTP technique for
-sending mail, you can now construct an e-mail backend that will allow
-Django's standard :ref:`mail sending methods<topics-email>` to use
-those facilities.
-
-This also makes it easier to debug mail sending. Django ships with
-backend implementations that allow you to send e-mail to a
-:ref:`file<topic-email-file-backend>`, to the
-:ref:`console<topic-email-console-backend>`, or to
-:ref:`memory<topic-email-memory-backend>`. You can even configure all
-e-mail to be :ref:`thrown away<topic-email-dummy-backend>`.
-
-Messages framework
-------------------
-
-Django now includes a robust and configurable :ref:`messages framework
-<ref-contrib-messages>` with built-in support for cookie- and session-based
-messaging, for both anonymous and authenticated clients. The messages framework
-replaces the deprecated user message API and allows you to temporarily store
-messages in one request and retrieve them for display in a subsequent request
-(usually the next one).
-
-Support for multiple databases
-------------------------------
-
-Django 1.2 adds the ability to use :ref:`more than one database
-<topics-db-multi-db>` in your Django project. Queries can be
-issued at a specific database with the `using()` method on
-``QuerySet`` objects. Individual objects can be saved to a specific database
-by providing a ``using`` argument when you call ``save()``.
-
-"Smart" :ttag:`if` tag
-----------------------
-
-The :ttag:`if` tag has been upgraded to be much more powerful. First, we've
-added support for comparison operators. No longer will you have to type:
-
-.. code-block:: html+django
-
-    {% ifnotequal a b %}
-     ...
-    {% endifnotequal %}
-
-You can now do this:
-
-.. code-block:: html+django
-
-    {% if a != b %}
-     ...
-    {% endif %}
-
-There's really no reason to use ``{% ifequal %}`` or ``{% ifnotequal %}``
-anymore, unless you're the nostalgic type.
-
-The operators supported are ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=``,
-``in`` and ``not in``, all of which work like the Python operators, in addition
-to ``and``, ``or`` and ``not``, which were already supported.
-
-Also, filters may now be used in the ``if`` expression. For example:
-
-.. code-block:: html+django
-
-      <div
-        {% if user.email|lower == message.recipient|lower %}
-          class="highlight"
-        {% endif %}
-      >{{ message }}</div>
-
-Template caching
-----------------
-
-In previous versions of Django, every time you rendered a template, it
-would be reloaded from disk. In Django 1.2, you can use a :ref:`cached
-template loader <template-loaders>` to load templates once, then
-cache the result for every subsequent render. This can lead to a
-significant performance improvement if your templates are broken into
-lots of smaller subtemplates (using the ``{% extends %}`` or ``{%
-include %}`` tags).
-
-As a side effect, it is now much easier to support non-Django template
-languages. For more details, see the :ref:`notes on supporting
-non-Django template languages<topic-template-alternate-language>`.
-
-Natural keys in fixtures
-------------------------
-
-Fixtures can now refer to remote objects using
-:ref:`topics-serialization-natural-keys`. This lookup scheme is an
-alternative to the normal primary-key based object references in a
-fixture, improving readability and resolving problems referring to
-objects whose primary key value may not be predictable or known.
-
-``BigIntegerField``
--------------------
-
-Models can now use a 64-bit :class:`~django.db.models.BigIntegerField` type.
-
-Fast failure for tests
-----------------------
-
-Both the :djadmin:`test` subcommand of ``django-admin.py`` and the ``runtests.py``
-script used to run Django's own test suite now support a ``--failfast`` option.
-When specified, this option causes the test runner to exit after encountering
-a failure instead of continuing with the test run. In addition, the handling
-of ``Ctrl-C`` during a test run has been improved to trigger a graceful exit
-from the test run that reports details of the tests that were run before the
-interruption.
-
-Improved localization
----------------------
-
-Django's :ref:`internationalization framework <topics-i18n>` has been
-expanded with locale-aware formatting and form processing. That means, if
-enabled, dates and numbers on templates will be displayed using the format
-specified for the current locale. Django will also use localized formats
-when parsing data in forms. See
-:ref:`Format localization <format-localization>` for more details.
-
-``readonly_fields`` in ``ModelAdmin``
--------------------------------------
-
-:attr:`django.contrib.admin.ModelAdmin.readonly_fields` has been added to
-enable non-editable fields in add/change pages for models and inlines. Field
-and calculated values can be displayed alongside editable fields.
-
-Customizable syntax highlighting
---------------------------------
-
-You can now use a ``DJANGO_COLORS`` environment variable to modify
-or disable the colors used by ``django-admin.py`` to provide
-:ref:`syntax highlighting <syntax-coloring>`.
-
-Model validation
-----------------
-
-Model instances now have support for :ref:`validating their own data
-<validating-objects>`, and both model and form fields now accept
-configurable lists of :ref:`validators <ref-validators>` specifying
-reusable, encapsulated validation behavior. Note, however, that
-validation must still be performed explicitly. Simply invoking a model
-instance's ``save()`` method will not perform any validation of the
-instance's data.
-
-Object-level permissions
-------------------------
-
-A foundation for specifying permissions at the per-object level has been added.
-Although there is no implementation of this in core, a custom authentication
-backend can provide this implementation and it will be used by
-:class:`django.contrib.auth.models.User`. See the :ref:`authentication docs
-<topics-auth>` for more information.
-
-Permissions for anonymous users
--------------------------------
-
-If you provide a custom auth backend with ``supports_anonymous_user`` set to
-``True``, AnonymousUser will check the backend for permissions, just like
-User already did.  This is useful for centralizing permission handling - apps
-can always delegate the question of whether something is allowed or not to
-the authorization/authentication backend. See the :ref:`authentication
-docs <topics-auth>` for more details.
-
-Syndication feeds as views
---------------------------
-
-:ref:`Syndication feeds <ref-contrib-syndication>` can now be used directly as
-views in your :ref:`URLconf <topics-http-urls>`. This means that you can
-maintain complete control over the URL structure of your feeds. Like any other view, feeds views are passed a ``request`` object, so you can
-do anything you would normally do with a view, like user based access control,
-or making a feed a named URL.
-
-Relaxed requirements for usernames
-----------------------------------
-
-The built-in :class:`~django.contrib.auth.models.User` model's
-:attr:`~django.contrib.auth.models.User.username` field now allows a wider range
-of characters, including ``@``, ``+``, ``.`` and ``-`` characters.
-
-GeoDjango
----------
-
-The most significant new feature for ref:`GeoDjango <ref-contrib-gis>`
-in 1.2 is support for multiple spatial databases.  As a result,
-the following :ref:`spatial database backends <spatial-backends>`
-are now included:
-
-* :mod:`django.contrib.gis.db.backends.postgis`
-* :mod:`django.contrib.gis.db.backends.mysql`
-* :mod:`django.contrib.gis.db.backends.oracle`
-* :mod:`django.contrib.gis.db.backends.spatialite`
-
-GeoDjango now supports the rich capabilities added
-in the `PostGIS 1.5 release <http://postgis.refractions.net/documentation/manual-1.5/>`_.
-New features include suppport for the the :ref:`geography type <geography-type>`
-and enabling of :ref:`distance queries <distance-queries>`
-with non-point geometries on geographic coordinate systems.
-
-Support for 3D geometry fields was added, and may be enabled
-by setting the :attr:`~django.contrib.gis.db.models.GeometryField.dim`
-keyword to 3 in your :class:`~django.contrib.gis.db.models.GeometryField`.
-The :class:`~django.contrib.gis.db.models.Extent3D` aggregate
-and :meth:`~django.contrib.gis.db.models.GeoQuerySet.extent3d` ``GeoQuerySet``
-method were added as a part of this feature.
-
-The following :class:`~django.contrib.gis.db.models.GeoQeurySet`
-methods are new in 1.2:
-
-* :meth:`~django.contrib.gis.db.models.GeoQuerySet.force_rhr`
-* :meth:`~django.contrib.gis.db.models.GeoQuerySet.reverse_geom`
-* :meth:`~django.contrib.gis.db.models.GeoQuerySet.geohash`
-
-The :ref:`GEOS interface <ref-geos>` was updated to use
-thread-safe C library functions when available on the platform.
-
-The :ref:`GDAL interface <ref-gdal>` now allows the user to
-set a :attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on
-the features returned when iterating over a
-:class:`~django.contrib.gis.gdal.Layer`.
-
-Finally, :ref:`GeoDjango's documentation <ref-contrib-gis>` is now
-included with Django's and is no longer
-hosted separately at `geodjango.org <http://geodjango.org/>`_.
-
-.. _1.2-js-assisted-inlines:
-
-JavaScript-assisted handling of inline related objects in the admin
--------------------------------------------------------------------
-
-If a user has JavaScript enabled in their browser, the interface for
-inline objects in the admin now allows inline objects to be
-dynamically added and removed. Users without JavaScript-enabled
-browsers will see no change in the behavior of inline objects.
-
-New ``now`` template tag format specifier characters: ``c`` and ``u``
----------------------------------------------------------------------
-
-The argument to the :ttag:`now` has gained two new format characters:
-``c`` to specify that a datetime value should be formatted in ISO 8601
-format, and ``u`` that allows output of the microseconds part of a
-datetime or time value.
-
-These are also available in others parts like the :tfilter:`date` and
-:tfilter:`time` template filters, the ``humanize`` template tag library
-and the new `format localization`_ framework.
-
-.. _format localization: `Improved localization`_
