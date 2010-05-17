@@ -60,6 +60,9 @@ manner per :ref:`our API stability policy <misc-api-stability>` policy.
 However, a handful of features *have* changed in ways that, for some users, will be
 backwards-incompatible. The big changes are:
 
+    * Support for Python 2.3 has been dropped. See the full notes
+      below.
+
     * The new CSRF protection framework is not backwards-compatible with
       the old system. Users of the old system will not be affected until
       the old system is removed in Django 1.4.
@@ -90,6 +93,29 @@ upgrading from previous versions of Django are heavily encouraged to consult
 the complete list of :ref:`backwards-incompatible changes
 <backwards-incompatible-changes-1.2>` and the list of :ref:`deprecated
 features <deprecated-features-1.2>`.
+
+Python compatibility
+====================
+
+While not a new feature, it's important to note that Django 1.2
+introduces the first shift in our Python compatibility policy since
+Django's initial public debut. Previous Django releases were tested
+and supported on 2.x Python versions from 2.3 up; Django 1.2, however,
+drops official support for Python 2.3. As such, the minimum Python
+version required for Django is now 2.4, and Django is tested and
+supported on Python 2.4, 2.5 and 2.6, and will be supported on the
+as-yet-unreleased Python 2.7.
+
+This change should affect only a small number of Django users, as most
+operating-system vendors today are shipping Python 2.4 or newer as
+their default version. If you're still using Python 2.3, however,
+you'll need to stick to Django 1.1 until you can upgrade; per
+:ref:`our support policy <internals-release-process>`, Django 1.1 will
+continue to receive security support until the release of Django 1.3.
+
+A roadmap for Django's overall 2.x Python support, and eventual
+transition to Python 3.x, is currently being developed, and will be
+announced prior to the release of Django 1.3.
 
 What's new in Django 1.2
 ========================
