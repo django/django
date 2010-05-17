@@ -384,7 +384,7 @@ attribute of ``Author`` to be represented by a ``<textarea>`` instead
 of its default ``<input type="text">``, you can override the field's
 widget::
 
-    from django.forms import ModelForm, TextArea
+    from django.forms import ModelForm, Textarea
 
     class AuthorForm(ModelForm):
         class Meta:
