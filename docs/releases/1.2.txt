@@ -366,13 +366,14 @@ Backwards-incompatible changes in 1.2
 
 Wherever possible the new features above have been introduced in a
 backwards-compatible manner per :ref:`our API stability policy
-<misc-api-stability>` policy. This means that existing code which
-worked with Django 1.1 will continue to work with Django 1.2; such
-code will, however, begin issuing warnings (see below for details).
+<misc-api-stability>` policy. This means that practically all existing
+code which worked with Django 1.1 will continue to work with Django
+1.2; such code will, however, begin issuing warnings (see below for
+details).
 
 However, a handful of features *have* changed in ways that, for some
-users, will be backwards-incompatible. Those changes are detailed
-below.
+users, will be immediately backwards-incompatible. Those changes are
+detailed below.
 
 CSRF Protection
 ---------------
