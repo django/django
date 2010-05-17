@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-11 08:35-0300\n"
-"PO-Revision-Date: 2010-05-11 17:53-0300\n"
+"PO-Revision-Date: 2010-05-17 10:52-0300\n"
 "Last-Translator: Ramiro <rm0@gmx.net>\n"
 "Language-Team: Django-I18N <django-i18n@googlegroups.com>\n"
 "Language: es_AR\n"
@@ -456,8 +456,8 @@ msgstr[1] "Se han modificado con éxito %(count)s %(name)s."
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] "%(total_count) seleccionados/as"
-msgstr[1] "Los/as %(total_count)s han sido seleccionados/as"
+msgstr[0] "%(total_count)s seleccionados/as"
+msgstr[1] "Todos/as (%(total_count)s en total) han sido seleccionados/as"
 
 #: contrib/admin/options.py:1071
 #, python-format
@@ -493,7 +493,7 @@ msgid ""
 "cookies, reload this page, and try again."
 msgstr ""
 "Parece que su navegador no está configurado para aceptar cookies. Por favor "
-"actívelas, recargue esta página, e inténtelo de nuevo."
+"actívelas, recargue esta página e inténtelo de nuevo."
 
 #: contrib/admin/sites.py:330 contrib/admin/sites.py:336
 #: contrib/admin/views/decorators.py:66
@@ -1483,7 +1483,7 @@ msgstr "Eliminar comentarios seleccionados"
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "un comentario fue %(action)s satisfactoriamente."
-msgstr[1] "%(count)s comentarios fueros %(action)s satisfactoriamente"
+msgstr[1] "%(count)s comentarios fueron %(action)s satisfactoriamente"
 
 #: contrib/comments/feeds.py:13
 #, python-format
