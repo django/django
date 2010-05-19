@@ -342,7 +342,7 @@ The :class:`~django.contrib.gis.db.models.Extent3D` aggregate
 and :meth:`~django.contrib.gis.db.models.GeoQuerySet.extent3d` ``GeoQuerySet``
 method were added as a part of this feature.
 
-The following :class:`~django.contrib.gis.db.models.GeoQeurySet`
+The following :class:`~django.contrib.gis.db.models.GeoQuerySet`
 methods are new in 1.2:
 
 * :meth:`~django.contrib.gis.db.models.GeoQuerySet.force_rhr`
