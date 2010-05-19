@@ -708,8 +708,8 @@ as follows::
     admin.autodiscover()
 
     urlpatterns = patterns('',
-                           (r'^admin/(.*)', include(admin.site.urls)),
-                           )
+        (r'^admin/', include(admin.site.urls)),
+    )
 
 Start up the Django development server::
 
