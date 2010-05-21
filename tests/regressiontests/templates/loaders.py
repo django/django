@@ -16,8 +16,9 @@ import imp
 import StringIO
 import os.path
 
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import load_template_source as lts_egg
+from django.template import loader
 
 # Mock classes and objects for pkg_resources functions.
 class MockProvider(pkg_resources.NullProvider):
@@ -88,6 +89,28 @@ class EggLoader(unittest.TestCase):
         "Loading an existent template from an egg not included in INSTALLED_APPS should fail"
         settings.INSTALLED_APPS = []
         self.assertRaises(TemplateDoesNotExist, lts_egg, "y.html")
+
+class CachedLoader(unittest.TestCase):
+    def setUp(self):
+        self.old_TEMPLATE_LOADERS = settings.TEMPLATE_LOADERS
+        settings.TEMPLATE_LOADERS = (
+            ('django.template.loaders.cached.Loader', (
+                    'django.template.loaders.filesystem.Loader',
+                )
+            ),
+        )
+    def tearDown(self):
+        settings.TEMPLATE_LOADERS = self.old_TEMPLATE_LOADERS
+
+    def test_templatedir_caching(self):
+        "Check that the template directories form part of the template cache key. Refs #13573"
+        # Retrive a template specifying a template directory to check
+        t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(__file__), 'templates', 'first'),))
+        # Now retrieve the same template name, but from a different directory
+        t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(__file__), 'templates', 'second'),))
+
+        # The two templates should not have the same content
+        self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
 
 if __name__ == "__main__":
     unittest.main()

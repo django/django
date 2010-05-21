@@ -34,19 +34,22 @@ class Loader(BaseLoader):
         raise TemplateDoesNotExist(name)
 
     def load_template(self, template_name, template_dirs=None):
-        if template_name not in self.template_cache:
+        # Use hash(..) to avoid saving potentially large template_dirs values
+        key = hash((template_name, template_dirs))
+
+        if key not in self.template_cache:
             template, origin = self.find_template(template_name, template_dirs)
             if not hasattr(template, 'render'):
                 try:
                     template = get_template_from_string(template, origin, template_name)
                 except TemplateDoesNotExist:
-                    # If compiling the template we found raises TemplateDoesNotExist, 
-                    # back off to returning the source and display name for the template 
-                    # we were asked to load. This allows for correct identification (later) 
+                    # If compiling the template we found raises TemplateDoesNotExist,
+                    # back off to returning the source and display name for the template
+                    # we were asked to load. This allows for correct identification (later)
                     # of the actual template that does not exist.
                     return template, origin
-            self.template_cache[template_name] = template
-        return self.template_cache[template_name], None
+            self.template_cache[key] = template
+        return self.template_cache[key], None
 
     def reset(self):
         "Empty the template cache."
