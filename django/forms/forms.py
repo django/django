@@ -443,8 +443,6 @@ class BoundField(StrAndUnicode):
             name = self.html_name
         else:
             name = self.html_initial_name
-        if self.field.localize:
-            data = self.field.localize_value(data)
         return widget.render(name, data, attrs=attrs)
 
     def as_text(self, attrs=None, **kwargs):

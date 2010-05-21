@@ -10,7 +10,7 @@ from django.utils.html import escape, conditional_escape
 from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
-from django.utils import formats
+from django.utils import datetime_safe, formats
 import time
 import datetime
 from util import flatatt
@@ -133,6 +133,7 @@ class Widget(object):
     __metaclass__ = MediaDefiningClass
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
     needs_multipart_form = False # Determines does this widget need multipart-encrypted form
+    is_localized = False
 
     def __init__(self, attrs=None):
         if attrs is not None:
@@ -208,12 +209,18 @@ class Input(Widget):
     """
     input_type = None # Subclasses must define this.
 
+    def _format_value(self, value):
+        if self.is_localized:
+            return formats.localize_input(value)
+        return value
+
     def render(self, name, value, attrs=None):
-        if value is None: value = ''
+        if value is None:
+            value = ''
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_unicode(value)
+            final_attrs['value'] = force_unicode(self._format_value(value))
         return mark_safe(u'<input%s />' % flatatt(final_attrs))
 
 class TextInput(Input):
@@ -295,7 +302,7 @@ class Textarea(Widget):
 
 class DateInput(Input):
     input_type = 'text'
-    format = None
+    format = '%Y-%m-%d'     # '2006-10-25'
 
     def __init__(self, attrs=None, format=None):
         super(DateInput, self).__init__(attrs)
@@ -303,15 +310,12 @@ class DateInput(Input):
             self.format = format
 
     def _format_value(self, value):
-        if value is None:
-            return ''
+        if self.is_localized:
+            return formats.localize_input(value)
         elif hasattr(value, 'strftime'):
-            return formats.localize_input(value, self.format)
+            value = datetime_safe.new_date(value)
+            return value.strftime(self.format)
         return value
-
-    def render(self, name, value, attrs=None):
-        value = self._format_value(value)
-        return super(DateInput, self).render(name, value, attrs)
 
     def _has_changed(self, initial, data):
         # If our field has show_hidden_initial=True, initial will be a string
@@ -326,7 +330,7 @@ class DateInput(Input):
 
 class DateTimeInput(Input):
     input_type = 'text'
-    format = None
+    format = '%Y-%m-%d %H:%M:%S'     # '2006-10-25 14:30:59'
 
     def __init__(self, attrs=None, format=None):
         super(DateTimeInput, self).__init__(attrs)
@@ -334,15 +338,12 @@ class DateTimeInput(Input):
             self.format = format
 
     def _format_value(self, value):
-        if value is None:
-            return ''
+        if self.is_localized:
+            return formats.localize_input(value)
         elif hasattr(value, 'strftime'):
-            return formats.localize_input(value, self.format)
+            value = datetime_safe.new_datetime(value)
+            return value.strftime(self.format)
         return value
-
-    def render(self, name, value, attrs=None):
-        value = self._format_value(value)
-        return super(DateTimeInput, self).render(name, value, attrs)
 
     def _has_changed(self, initial, data):
         # If our field has show_hidden_initial=True, initial will be a string
@@ -357,7 +358,7 @@ class DateTimeInput(Input):
 
 class TimeInput(Input):
     input_type = 'text'
-    format = None
+    format = '%H:%M:%S'     # '14:30:59'
 
     def __init__(self, attrs=None, format=None):
         super(TimeInput, self).__init__(attrs)
@@ -365,15 +366,11 @@ class TimeInput(Input):
             self.format = format
 
     def _format_value(self, value):
-        if value is None:
-            return ''
+        if self.is_localized:
+            return formats.localize_input(value)
         elif hasattr(value, 'strftime'):
-            return formats.localize_input(value, self.format)
+            return value.strftime(self.format)
         return value
-
-    def render(self, name, value, attrs=None):
-        value = self._format_value(value)
-        return super(TimeInput, self).render(name, value, attrs)
 
     def _has_changed(self, initial, data):
         # If our field has show_hidden_initial=True, initial will be a string
@@ -674,6 +671,9 @@ class MultiWidget(Widget):
         super(MultiWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
+        if self.is_localized:
+            for widget in self.widgets:
+                widget.is_localized = self.is_localized
         # value is a list of values, each corresponding to a widget
         # in self.widgets.
         if not isinstance(value, list):

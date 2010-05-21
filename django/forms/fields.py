@@ -105,6 +105,8 @@ class Field(object):
 
         # Trigger the localization machinery if needed.
         self.localize = localize
+        if self.localize:
+            widget.is_localized = True
 
         # Hook into self.widget_attrs() for any Field-specific HTML attributes.
         extra_attrs = self.widget_attrs(widget)
@@ -124,9 +126,6 @@ class Field(object):
         self.error_messages = messages
 
         self.validators = self.default_validators + validators
-
-    def localize_value(self, value):
-        return formats.localize_input(value)
 
     def to_python(self, value):
         return value
@@ -843,9 +842,14 @@ class SplitDateTimeField(MultiValueField):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
+        localize = kwargs.get('localize', False)
         fields = (
-            DateField(input_formats=input_date_formats, error_messages={'invalid': errors['invalid_date']}),
-            TimeField(input_formats=input_time_formats, error_messages={'invalid': errors['invalid_time']}),
+            DateField(input_formats=input_date_formats,
+                      error_messages={'invalid': errors['invalid_date']},
+                      localize=localize),
+            TimeField(input_formats=input_time_formats,
+                      error_messages={'invalid': errors['invalid_time']},
+                      localize=localize),
         )
         super(SplitDateTimeField, self).__init__(fields, *args, **kwargs)
 

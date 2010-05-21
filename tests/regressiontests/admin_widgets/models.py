@@ -105,6 +105,7 @@ HTML escaped.
 <p class="datetime">Date: <input value="2007-12-01" type="text" class="vDateField" name="test_0" size="10" /><br />Time: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>
 >>> activate('de-at')
 >>> settings.USE_L10N = True
+>>> w.is_localized = True
 >>> print conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30)))
 <p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>
 >>> deactivate()

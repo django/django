@@ -44,7 +44,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
             (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked), settings.ADMIN_MEDIA_PREFIX))
         return mark_safe(u''.join(output))
 
-class AdminDateWidget(forms.DateTimeInput):
+class AdminDateWidget(forms.DateInput):
     class Media:
         js = (settings.ADMIN_MEDIA_PREFIX + "js/calendar.js",
               settings.ADMIN_MEDIA_PREFIX + "js/admin/DateTimeShortcuts.js")

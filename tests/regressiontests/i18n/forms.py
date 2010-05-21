@@ -16,6 +16,7 @@ class SelectDateForm(forms.Form):
 class CompanyForm(forms.ModelForm):
     cents_payed = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
     products_delivered = forms.IntegerField(localize=True)
+    date_added = forms.DateTimeField(localize=True)
 
     class Meta:
         model = Company
