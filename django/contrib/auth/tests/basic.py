@@ -66,4 +66,12 @@ Superuser created successfully.
 u'joe@somewhere.org'
 >>> u.password
 u'!'
+>>> call_command("createsuperuser", interactive=False, username="joe+admin@somewhere.org", email="joe@somewhere.org")
+Superuser created successfully.
+
+>>> u = User.objects.get(username="joe+admin@somewhere.org")
+>>> u.email
+u'joe@somewhere.org'
+>>> u.password
+u'!'
 """
