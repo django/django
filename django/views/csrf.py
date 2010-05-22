@@ -11,12 +11,30 @@ CSRF_FAILRE_TEMPLATE = """
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="robots" content="NONE,NOARCHIVE">
   <title>403 Forbidden</title>
+  <style type="text/css">
+    html * { padding:0; margin:0; }
+    body * { padding:10px 20px; }
+    body * * { padding:0; }
+    body { font:small sans-serif; background:#eee; }
+    body>div { border-bottom:1px solid #ddd; }
+    h1 { font-weight:normal; margin-bottom:.4em; }
+    h1 span { font-size:60%; color:#666; font-weight:normal; }
+    #info { background:#f6f6f6; }
+    #info ul { margin: 0.5em 4em; }
+    #info p { padding-top:10px; }
+    #summary { background: #ffc; }
+    #explanation { background:#eee; border-bottom: 0px none; }
+  </style>
 </head>
 <body>
-  <h1>403 Forbidden</h1>
+<div id="summary">
+  <h1>Forbidden <span>(403)</span></h1>
   <p>CSRF verification failed. Request aborted.</p>
-  {% if DEBUG %}
+</div>
+{% if DEBUG %}
+<div id="info">
   <h2>Help</h2>
     {% if reason %}
     <p>Reason given for failure:</p>
@@ -51,10 +69,12 @@ CSRF_FAILRE_TEMPLATE = """
   and only the initial error message will be displayed.  </p>
 
   <p>You can customize this page using the CSRF_FAILURE_VIEW setting.</p>
-  {% else %}
+</div>
+{% else %}
+<div id="explanation">
   <p><small>More information is available with DEBUG=True.</small></p>
-
-  {% endif %}
+</div>
+{% endif %}
 </body>
 </html>
 """
