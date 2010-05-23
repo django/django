@@ -435,6 +435,11 @@ USE_L10N tests
 <option value="2016">2016</option>
 </select>
 
+Years before 1900 work
+>>> w = SelectDateWidget(years=('1899',))
+>>> w.value_from_datadict({'date_year': '1899', 'date_month': '8', 'date_day': '13'}, {}, 'date')
+'13-08-1899'
+
 >>> translation.deactivate()
 
 # MultiWidget and MultiValueField #############################################

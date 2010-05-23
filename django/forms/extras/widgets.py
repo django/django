@@ -7,6 +7,7 @@ import datetime
 import re
 
 from django.forms.widgets import Widget, Select
+from django.utils import datetime_safe
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.utils.formats import get_format
@@ -100,6 +101,7 @@ class SelectDateWidget(Widget):
                 except ValueError:
                     pass
                 else:
+                    date_value = datetime_safe.new_date(date_value)
                     return date_value.strftime(input_format)
             else:
                 return '%s-%s-%s' % (y, m, d)
