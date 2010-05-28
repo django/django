@@ -1248,6 +1248,19 @@ cause of an failure in your test suite.
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
 
+.. method:: TestCase.assertQuerysetEqual(response, qs, values, transform=repr)
+
+    Asserts that a queryset ``qs`` returns a particular list of values ``values``.
+
+    The comparison of the contents of ``qs`` and ``values`` is performed using
+    the function ``transform``; by default, this means that the ``repr()`` of
+    each value is compared. Any other callable can be used if ``repr()`` doesn't
+    provide a unique or helpful comparison.
+
+    The comparison is also ordering dependent. If ``qs`` doesn't provide an
+    implicit ordering, you will need to apply a ``order_by()`` clause to your
+    queryset to ensure that the test will pass reliably.
+
 .. _topics-testing-email:
 
 E-mail services
