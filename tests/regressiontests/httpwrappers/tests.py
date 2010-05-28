@@ -1,5 +1,6 @@
-import unittest
+import copy
 import pickle
+import unittest
 from django.http import QueryDict, HttpResponse, CompatCookie, BadHeaderError
 
 class QueryDictTests(unittest.TestCase):
@@ -182,6 +183,19 @@ class QueryDictTests(unittest.TestCase):
         x.update(y)
         self.assertEqual(x.getlist('a'), [u'1', u'2', u'3', u'4'])    
 
+    def test_non_default_encoding(self):
+        """#13572 - QueryDict with a non-default encoding"""
+        q = QueryDict('sbb=one', encoding='rot_13') 
+        self.assertEqual(q.encoding , 'rot_13' )
+        self.assertEqual(q.items() , [(u'foo', u'bar')] )
+        self.assertEqual(q.urlencode() , 'sbb=one' )
+        q = q.copy() 
+        self.assertEqual(q.encoding , 'rot_13' )
+        self.assertEqual(q.items() , [(u'foo', u'bar')] )
+        self.assertEqual(q.urlencode() , 'sbb=one' )
+        self.assertEqual(copy.copy(q).encoding , 'rot_13' )
+        self.assertEqual(copy.deepcopy(q).encoding , 'rot_13')
+        
 class HttpResponseTests(unittest.TestCase):
     def test_unicode_headers(self):
         r = HttpResponse()
