@@ -494,8 +494,9 @@ A boolean that turns on/off debug mode.
 
 If you define custom settings, `django/views/debug.py`_ has a ``HIDDEN_SETTINGS``
 regular expression which will hide from the DEBUG view anything that contains
-``'SECRET'``, ``'PASSWORD'``, or ``'PROFANITIES'``. This allows untrusted users to
-be able to give backtraces without seeing sensitive (or offensive) settings.
+``'SECRET'``, ``'PASSWORD'``, ``'PROFANITIES'``, or ``'SIGNATURE'``. This allows
+untrusted users to be able to give backtraces without seeing sensitive (or
+offensive) settings.
 
 Still, note that there are always going to be sections of your debug output that
 are inappropriate for public consumption. File paths, configuration options, and
