@@ -616,7 +616,7 @@ EMAIL_BACKEND
 
 .. versionadded:: 1.2
 
-Default: ``'django.core.mail.backends.smtp'``
+Default: ``'django.core.mail.backends.smtp.EmailBackend'``
 
 The backend to use for sending emails. For the list of available backends see
 :ref:`topics-email`.
