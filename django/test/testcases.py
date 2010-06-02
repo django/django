@@ -466,6 +466,9 @@ class TransactionTestCase(unittest.TestCase):
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)
 
+    def assertQuerysetEqual(self, qs, values, transform=repr):
+        return self.assertEqual(map(transform, qs), values)
+
 def connections_support_transactions():
     """
     Returns True if all connections support transactions.  This is messy

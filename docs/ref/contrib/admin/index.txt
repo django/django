@@ -1189,7 +1189,7 @@ your admin page for managing the relation.
 
 In all other respects, the ``InlineModelAdmin`` is exactly the same as any
 other. You can customize the appearance using any of the normal
-``InlineModelAdmin`` properties.
+``ModelAdmin`` properties.
 
 Working with Many-to-Many Intermediary Models
 ----------------------------------------------

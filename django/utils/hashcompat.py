@@ -1,17 +1,17 @@
 """
 The md5 and sha modules are deprecated since Python 2.5, replaced by the
 hashlib module containing both hash algorithms. Here, we provide a common
-interface to the md5 and sha constructors, preferring the hashlib module when
-available.
+interface to the md5 and sha constructors, depending on system version.
 """
 
-try:
+import sys
+if sys.version_info >= (2, 5):
     import hashlib
     md5_constructor = hashlib.md5
     md5_hmac = md5_constructor
     sha_constructor = hashlib.sha1
     sha_hmac = sha_constructor
-except ImportError:
+else:
     import md5
     md5_constructor = md5.new
     md5_hmac = md5

@@ -353,6 +353,11 @@ class BaseDatabaseOperations(object):
         """
         return "BEGIN;"
 
+    def end_transaction_sql(self, success=True):
+        if not success:
+            return "ROLLBACK;"
+        return "COMMIT;"
+
     def tablespace_sql(self, tablespace, inline=False):
         """
         Returns the SQL that will be appended to tables or rows to define
