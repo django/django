@@ -213,6 +213,8 @@ class BaseCommand(object):
                 sys.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
                 sys.exit(1)
         try:
+            self.stdout = options.get('stdout', sys.stdout)
+            self.stderr = options.get('stderr', sys.stderr)
             if self.requires_model_validation:
                 self.validate()
             output = self.handle(*args, **options)
@@ -223,12 +225,12 @@ class BaseCommand(object):
                     from django.db import connections, DEFAULT_DB_ALIAS
                     connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
                     if connection.ops.start_transaction_sql():
-                        print self.style.SQL_KEYWORD(connection.ops.start_transaction_sql())
-                print output
+                        self.stdout.write(self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()))
+                self.stdout.write(output)
                 if self.output_transaction:
-                    print self.style.SQL_KEYWORD(connection.ops.end_transaction_sql())
+                    self.stdout.write(self.style.SQL_KEYWORD("COMMIT;") + '\n')
         except CommandError, e:
-            sys.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
+            self.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
             sys.exit(1)
 
     def validate(self, app=None, display_num_errors=False):
@@ -250,7 +252,7 @@ class BaseCommand(object):
             error_text = s.read()
             raise CommandError("One or more models did not validate:\n%s" % error_text)
         if display_num_errors:
-            print "%s error%s found" % (num_errors, num_errors != 1 and 's' or '')
+            self.stdout.write("%s error%s found\n" % (num_errors, num_errors != 1 and 's' or ''))
 
     def handle(self, *args, **options):
         """

@@ -8,7 +8,7 @@ Writing custom django-admin commands
 
 Applications can register their own actions with ``manage.py``. For example,
 you might want to add a ``manage.py`` action for a Django app that you're
-distributing. In this document, we will be building a custom ``closepoll`` 
+distributing. In this document, we will be building a custom ``closepoll``
 command for the ``polls`` application from the
 :ref:`tutorial<intro-tutorial01>`.
 
@@ -62,9 +62,16 @@ look like this:
                 poll.opened = False
                 poll.save()
 
-                print 'Successfully closed poll "%s"' % poll_id
+                self.stdout.write('Successfully closed poll "%s"\n' % poll_id)
 
-The new custom command can be called using ``python manage.py closepoll 
+.. note::
+    When you are using management commands and wish to provide console
+    output, you should write to ``self.stdout`` and ``self.stderr``,
+    instead of printing to ``stdout`` and ``stderr`` directly. By
+    using these proxies, it becomes much easier to test your custom
+    command.
+
+The new custom command can be called using ``python manage.py closepoll
 <poll_id>``.
 
 The ``handle()`` method takes zero or more ``poll_ids`` and sets ``poll.opened``
@@ -91,8 +98,8 @@ must be added to :attr:`~BaseCommand.option_list` like this:
             )
         # ...
 
-In addition to being able to add custom command line options, all 
-:ref:`management commands<ref-django-admin>` can accept some 
+In addition to being able to add custom command line options, all
+:ref:`management commands<ref-django-admin>` can accept some
 default options such as :djadminopt:`--verbosity` and :djadminopt:`--traceback`.
 
 Command objects
@@ -113,7 +120,7 @@ Subclassing the :class:`BaseCommand` class requires that you implement the
 Attributes
 ----------
 
-All attributes can be set in your derived class and can be used in 
+All attributes can be set in your derived class and can be used in
 :class:`BaseCommand`'s :ref:`subclasses<ref-basecommand-subclasses>`.
 
 .. attribute:: BaseCommand.args
@@ -133,7 +140,7 @@ All attributes can be set in your derived class and can be used in
 .. attribute:: BaseCommand.help
 
   A short description of the command, which will be printed in the
-  help message when the user runs the command 
+  help message when the user runs the command
   ``python manage.py help <command>``.
 
 .. attribute:: BaseCommand.option_list
@@ -230,7 +237,7 @@ Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
 A command which takes no arguments on the command line.
 
 Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
-:meth:`~NoArgsCommand.handle_noargs`; :meth:`~BaseCommand.handle` itself is 
+:meth:`~NoArgsCommand.handle_noargs`; :meth:`~BaseCommand.handle` itself is
 overridden to ensure no arguments are passed to the command.
 
 .. method:: NoArgsCommand.handle_noargs(**options)
