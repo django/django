@@ -1491,18 +1491,9 @@ class AuthTestCase(TestCase):
         self.old_routers = router.routers
         router.routers = [AuthRouter()]
 
-        # Redirect stdout to a buffer so we can test
-        # the output of a management command
-        self.old_stdout = sys.stdout
-        self.stdout = StringIO()
-        sys.stdout = self.stdout
-
     def tearDown(self):
         # Restore the 'other' database as an independent database
         router.routers = self.old_routers
-
-        # Restore stdout
-        sys.stdout = self.old_stdout
 
     def test_auth_manager(self):
         "The methods on the auth manager obey database hints"
@@ -1539,14 +1530,16 @@ class AuthTestCase(TestCase):
 
         # Check that dumping the default database doesn't try to include auth
         # because allow_syncdb prohibits auth on default
-        self.stdout.flush()
-        management.call_command('dumpdata', 'auth', format='json', database='default')
-        self.assertEquals(self.stdout.getvalue(), '[]\n')
+        new_io = StringIO()
+        management.call_command('dumpdata', 'auth', format='json', database='default', stdout=new_io)
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, '[]')
 
         # Check that dumping the other database does include auth
-        self.stdout.flush()
-        management.call_command('dumpdata', 'auth', format='json', database='other')
-        self.assertTrue('alice@example.com' in self.stdout.getvalue())
+        new_io = StringIO()
+        management.call_command('dumpdata', 'auth', format='json', database='other', stdout=new_io)
+        command_output = new_io.getvalue().strip()
+        self.assertTrue('"email": "alice@example.com",' in command_output)
 
 class UserProfileTestCase(TestCase):
     def setUp(self):
