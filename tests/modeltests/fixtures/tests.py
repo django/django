@@ -25,7 +25,7 @@ class FixtureLoadingTests(TestCase):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False):
         new_io = StringIO.StringIO()
-        management.call_command('dumpdata', *args, format=format, stdout=new_io, use_natural_keys=natural_keys)
+        management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io, 'use_natural_keys':natural_keys})
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, output)
 
@@ -236,7 +236,7 @@ if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
     class FixtureTransactionTests(TransactionTestCase):
         def _dumpdata_assert(self, args, output, format='json'):
             new_io = StringIO.StringIO()
-            management.call_command('dumpdata', *args, format=format, stdout=new_io)
+            management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io})
             command_output = new_io.getvalue().strip()
             self.assertEqual(command_output, output)
 
