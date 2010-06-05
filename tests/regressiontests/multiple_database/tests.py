@@ -883,7 +883,13 @@ class QueryTestCase(TestCase):
         self.assertRaises(ValueError, str, qs.query)
 
         # Evaluating the query shouldn't work, either
-        self.assertRaises(ValueError, list, qs)
+        try:
+            for obj in qs:
+                pass
+            self.fail('Iterating over query should raise ValueError')
+        except ValueError:
+            pass
+
 
 class TestRouter(object):
     # A test router. The behaviour is vaguely master/slave, but the
