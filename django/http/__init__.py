@@ -177,14 +177,14 @@ class QueryDict(MultiValueDict):
         super(QueryDict, self).__delitem__(key)
 
     def __copy__(self):
-        result = self.__class__('', mutable=True)
+        result = self.__class__('', mutable=True, encoding=self.encoding)
         for key, value in dict.items(self):
             dict.__setitem__(result, key, value)
         return result
 
     def __deepcopy__(self, memo):
         import django.utils.copycompat as copy
-        result = self.__class__('', mutable=True)
+        result = self.__class__('', mutable=True, encoding=self.encoding)
         memo[id(self)] = result
         for key, value in dict.items(self):
             dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))

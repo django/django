@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
 import datetime
-import models
 import unittest
+
+from django.conf import settings
+from django.core import management
+from django.core.management.color import no_style
 from django.db import backend, connection, DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
-from django.conf import settings
 from django.test import TestCase
+
+from regressiontests.backends import models
 
 class Callproc(unittest.TestCase):
 
@@ -76,6 +80,7 @@ class DateQuotingTest(TestCase):
         classes = models.SchoolClass.objects.filter(last_updated__day=20)
         self.assertEqual(len(classes), 1)
 
+
 class ParameterHandlingTest(TestCase):
     def test_bad_parameter_count(self):
         "An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"
@@ -87,6 +92,50 @@ class ParameterHandlingTest(TestCase):
         ))
         self.assertRaises(Exception, cursor.executemany, query, [(1,2,3),])
         self.assertRaises(Exception, cursor.executemany, query, [(1,),])
+
+# Unfortunately, the following tests would be a good test to run on all
+# backends, but it breaks MySQL hard. Until #13711 is fixed, it can't be run
+# everywhere (although it would be an effective test of #13711).
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
+    class LongNameTest(TestCase):
+        """Long primary keys and model names can result in a sequence name
+        that exceeds the database limits, which will result in truncation
+        on certain databases (e.g., Postgres). The backend needs to use
+        the correct sequence name in last_insert_id and other places, so
+        check it is. Refs #8901.
+        """
+
+        def test_sequence_name_length_limits_create(self):
+            """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
+            models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+
+        def test_sequence_name_length_limits_m2m(self):
+            """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Django >=1.2 this now uses object saves. Ref #8901"""
+            obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+            rel_obj = models.Person.objects.create(first_name='Django', last_name='Reinhardt')
+            obj.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.add(rel_obj)
+
+        def test_sequence_name_length_limits_flush(self):
+            """Test that sequence resetting as part of a flush with model with long name and long pk name doesn't error. Ref #8901"""
+            # A full flush is expensive to the full test, so we dig into the
+            # internals to generate the likely offending SQL and run it manually
+
+            # Some convenience aliases
+            VLM = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+            VLM_m2m = VLM.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.through
+            tables = [
+                VLM._meta.db_table,
+                VLM_m2m._meta.db_table,
+            ]
+            sequences = [
+                {
+                    'column': VLM._meta.pk.column,
+                    'table': VLM._meta.db_table
+                },
+            ]
+            cursor = connection.cursor()
+            for statement in connection.ops.sql_flush(no_style(), tables, sequences):
+                cursor.execute(statement)
 
 
 def connection_created_test(sender, **kwargs):

@@ -12,7 +12,7 @@ from django.utils.importlib import import_module
 from django.utils.encoding import smart_unicode, smart_str
 
 
-HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
+HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST|SIGNATURE')
 
 def linebreak_iter(template_source):
     yield 0

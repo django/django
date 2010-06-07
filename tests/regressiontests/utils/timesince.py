@@ -88,11 +88,11 @@ u'0 minutes'
 u'0 minutes'
 
 # Timesince should work with both date objects (#9672)
->>> today = datetime.date.today() 
->>> timeuntil(today+oneday, today) 
-u'1 day' 
->>> timeuntil(today-oneday, today) 
-u'0 minutes' 
->>> timeuntil(today+oneweek, today) 
-u'1 week' 
+>>> today = datetime.date.today()
+>>> timeuntil(today+oneday, today)
+u'1 day'
+>>> timeuntil(today-oneday, today)
+u'0 minutes'
+>>> timeuntil(today+oneweek, today)
+u'1 week'
 """
