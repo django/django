@@ -493,7 +493,7 @@ class QuerySet(object):
 
     def exists(self):
         if self._result_cache is None:
-            return self.query.has_results(using=self.db)
+            return self.query.get_compiler(self.db).has_results()
         return bool(self._result_cache)
 
     ##################################################
