@@ -1476,4 +1476,4 @@ def insert_query(model, values, return_id=False, raw_values=False, using=None):
     """
     query = sql.InsertQuery(model)
     query.insert_values(values, raw_values)
-    return query.get_compiler(using=using).execute_sql(return_id)
+    return query.get_compiler(using=using).insert(return_id)

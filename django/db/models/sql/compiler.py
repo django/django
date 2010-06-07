@@ -787,6 +787,9 @@ class SQLInsertCompiler(SQLCompiler):
             return self.connection.ops.fetch_returned_insert_id(cursor)
         return self.connection.ops.last_insert_id(cursor,
                 self.query.model._meta.db_table, self.query.model._meta.pk.column)
+    
+    def insert(self, *args, **kwargs):
+        return self.execute_sql(*args, **kwargs)
 
 
 class SQLDeleteCompiler(SQLCompiler):
