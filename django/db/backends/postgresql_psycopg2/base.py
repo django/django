@@ -78,7 +78,7 @@ class DatabaseOperations(PostgresqlDatabaseOperations):
     def return_insert_id(self):
         return "RETURNING %s", ()
 
-class DatabaseWrapper(BaseDatabaseWrapper):
+class DatabaseWrapper(BaseSQLDatabaseWrapper):
     operators = {
         'exact': '= %s',
         'iexact': '= UPPER(%s)',

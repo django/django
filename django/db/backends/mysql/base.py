@@ -230,7 +230,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def max_name_length(self):
         return 64
 
-class DatabaseWrapper(BaseDatabaseWrapper):
+class DatabaseWrapper(BaseSQLDatabaseWrapper):
 
     operators = {
         'exact': '= %s',
@@ -303,7 +303,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _rollback(self):
         try:
-            BaseDatabaseWrapper._rollback(self)
+            super(DatabaseWrapper, self)._rollback()
         except Database.NotSupportedError:
             pass
 

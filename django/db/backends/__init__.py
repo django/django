@@ -10,13 +10,10 @@ class BaseDatabaseWrapper(local):
     """
     Represents a database connection.
     """
-    ops = None
-
     def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         # `settings_dict` should be a dictionary containing keys such as
         # NAME, USER, etc. It's called `settings_dict` instead of `settings`
         # to disambiguate it from Django settings modules.
-        self.connection = None
         self.queries = []
         self.settings_dict = settings_dict
         self.alias = alias
@@ -26,6 +23,14 @@ class BaseDatabaseWrapper(local):
 
     def __ne__(self, other):
         return not self == other
+
+
+class BaseSQLDatabaseWrapper(BaseDatabaseWrapper):
+    ops = None
+    
+    def __init__(self, *args, **kwargs):
+        self.connection = None
+        super(BaseSQLDatabaseWrapper, self).__init__(*args, **kwargs)
 
     def _commit(self):
         if self.connection is not None:
@@ -79,6 +84,7 @@ class BaseDatabaseWrapper(local):
 
     def make_debug_cursor(self, cursor):
         return util.CursorDebugWrapper(cursor, self)
+
 
 class BaseDatabaseFeatures(object):
     allows_group_by_pk = False

@@ -310,7 +310,7 @@ WHEN (new.%(col_name)s IS NULL)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
 
-class DatabaseWrapper(BaseDatabaseWrapper):
+class DatabaseWrapper(BaseSQLDatabaseWrapper):
 
     operators = {
         'exact': '= %s',

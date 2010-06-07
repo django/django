@@ -81,7 +81,7 @@ class UnicodeCursorWrapper(object):
 class DatabaseFeatures(BaseDatabaseFeatures):
     uses_savepoints = True
 
-class DatabaseWrapper(BaseDatabaseWrapper):
+class DatabaseWrapper(BaseSQLDatabaseWrapper):
     operators = {
         'exact': '= %s',
         'iexact': '= UPPER(%s)',

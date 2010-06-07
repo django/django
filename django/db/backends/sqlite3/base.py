@@ -128,7 +128,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # No field, or the field isn't known to be a decimal or integer
         return value
 
-class DatabaseWrapper(BaseDatabaseWrapper):
+class DatabaseWrapper(BaseSQLDatabaseWrapper):
 
     # SQLite requires LIKE statements to include an ESCAPE clause if the value
     # being escaped has a percent or underscore in it.
@@ -184,7 +184,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # database. To prevent accidental data loss, ignore close requests on
         # an in-memory db.
         if self.settings_dict['NAME'] != ":memory:":
-            BaseDatabaseWrapper.close(self)
+            super(DatabaseWrapper, self).close()
 
 FORMAT_QMARK_REGEX = re.compile(r'(?![^%])%s')
 
