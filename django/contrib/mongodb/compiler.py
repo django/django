@@ -12,4 +12,6 @@ class SQLInsertCompiler(SQLCompiler):
             (c, v)
             for c, v in zip(self.query.columns, self.query.params)
         ])
+        if self.query.model._meta.pk.column in values:
+            values["_id"] = values.pop(self.query.model._meta.pk.column)
         return self.connection.db[self.query.model._meta.db_table].insert(values)
