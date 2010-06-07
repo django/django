@@ -664,18 +664,17 @@ class SQLCompiler(object):
         return columns
     
     def has_results(self):
-        q = self.query.clone()
-        q.add_extra({'a': 1}, None, None, None, None, None)
-        q.select = []
-        q.select_fields = []
-        q.default_cols = False
-        q.select_related = False
-        q.set_extra_mask(('a',))
-        q.set_aggregate_mask(())
-        q.clear_ordering(True)
-        q.set_limits(high=1)
-        compiler = q.get_compiler(using=self.using)
-        return bool(compiler.execute_sql(SINGLE))
+        self.query = self.query.clone()
+        self.query.add_extra({'a': 1}, None, None, None, None, None)
+        self.query.select = []
+        self.query.select_fields = []
+        self.query.default_cols = False
+        self.query.select_related = False
+        self.query.set_extra_mask(('a',))
+        self.query.set_aggregate_mask(())
+        self.query.clear_ordering(True)
+        self.query.set_limits(high=1)
+        return bool(self.execute_sql(SINGLE))
 
     def results_iter(self):
         """
