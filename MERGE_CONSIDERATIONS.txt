@@ -1,0 +1,5 @@
+The following is a list of things that must be fixed before merging.
+
+ * Is ``NativeAutoField`` the correct approach?
+ * Can we use native upsert where supported?
+ * Deal with all the ``# TODO``.
