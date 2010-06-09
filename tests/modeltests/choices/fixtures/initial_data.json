@@ -1,0 +1,18 @@
+[
+    {
+        "pk": 1, 
+        "model": "choices.person", 
+        "fields": {
+            "gender": "M", 
+            "name": "Adrian"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "choices.person", 
+        "fields": {
+            "gender": "F", 
+            "name": "Sara"
+        }
+    }
+]
