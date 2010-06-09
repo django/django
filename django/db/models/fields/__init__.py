@@ -447,17 +447,32 @@ class Field(object):
         "Returns the value of this field in the given model instance."
         return getattr(obj, self.attname)
 
-class AutoField(Field):
+class BaseAutoField(Field):
+    empty_strings_allowed = False
+
+    def __init__(self, *args, **kwargs):
+        assert kwargs.get('primary_key'), "%ss must have primary_key=True." % self.__class__.__name__
+        kwargs['blank'] = True
+        super(BaseAutoField, self).__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name):
+        assert not cls._meta.has_auto_field, "A model can't have more than one AutoField."
+        super(BaseAutoField, self).contribute_to_class(cls, name)
+        cls._meta.has_auto_field = True
+        cls._meta.auto_field = self
+    
+    def get_internal_type(self):
+        return "AutoField"
+    
+    def formfield(self, **kwargs):
+        return None
+
+class AutoField(BaseAutoField):
     description = _("Integer")
 
-    empty_strings_allowed = False
     default_error_messages = {
         'invalid': _(u'This value must be an integer.'),
     }
-    def __init__(self, *args, **kwargs):
-        assert kwargs.get('primary_key', False) is True, "%ss must have primary_key=True." % self.__class__.__name__
-        kwargs['blank'] = True
-        Field.__init__(self, *args, **kwargs)
 
     def to_python(self, value):
         if value is None:
@@ -475,14 +490,10 @@ class AutoField(Field):
             return None
         return int(value)
 
-    def contribute_to_class(self, cls, name):
-        assert not cls._meta.has_auto_field, "A model can't have more than one AutoField."
-        super(AutoField, self).contribute_to_class(cls, name)
-        cls._meta.has_auto_field = True
-        cls._meta.auto_field = self
-
-    def formfield(self, **kwargs):
-        return None
+class NativeAutoField(BaseAutoField):
+    # TODO: eventually delegate validation and other such things to the
+    # backends.  For now it's enough that this class exists.
+    pass
 
 class BooleanField(Field):
     empty_strings_allowed = False

@@ -1,8 +1,9 @@
 from pymongo import Connection
 
-from django.db.backends import BaseDatabaseWrapper
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseValidation
 from django.db.backends.signals import connection_created
 from django.contrib.mongodb.creation import DatabaseCreation
+from django.contrib.mongodb.introspection import DatabaseIntrospection
 from django.utils.importlib import import_module
 
 
@@ -12,9 +13,11 @@ class DatabaseFeatures(object):
 
 class DatabaseOperations(object):
     compiler_module = "django.contrib.mongodb.compiler"
+    sql_ddl = False
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, connection):
         self._cache = {}
+        self.connection = connection
     
     def max_name_length(self):
         return 254
@@ -34,13 +37,23 @@ class DatabaseOperations(object):
                 import_module(self.compiler_module), compiler_name
             )
         return self._cache[compiler_name]
+    
+    def flush(self, only_django=False):
+        if only_django:
+            tables = self.connection.introspection.django_table_names(only_existing=True)
+        else:
+            tables = self.connection.introspection.table_names()
+        for table in tables:
+            self.connection.db.drop_collection(table)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
         self.features = DatabaseFeatures()
-        self.ops = DatabaseOperations()
+        self.ops = DatabaseOperations(self)
         self.creation = DatabaseCreation(self)
+        self.validation = BaseDatabaseValidation(self)
+        self.introspection = DatabaseIntrospection(self)
         self._connection = None
     
     @property

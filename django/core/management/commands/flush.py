@@ -35,9 +35,7 @@ class Command(NoArgsCommand):
                 import_module('.management', app_name)
             except ImportError:
                 pass
-
-        sql_list = sql_flush(self.style, connection, only_django=True)
-
+        
         if interactive:
             confirm = raw_input("""You have requested a flush of the database.
 This will IRREVERSIBLY DESTROY all data currently in the %r database,
@@ -49,6 +47,11 @@ Are you sure you want to do this?
             confirm = 'yes'
 
         if confirm == 'yes':
+            # TODO: HACK, make this more OO.
+            if not getattr(connection.ops, "sql_ddl", True):
+                connection.ops.flush(only_django=True)
+                return
+            sql_list = sql_flush(self.style, connection, only_django=True)
             try:
                 cursor = connection.cursor()
                 for sql in sql_list:

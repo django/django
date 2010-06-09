@@ -11,6 +11,7 @@ class DatabaseCreation(object):
         else:
             test_database_name = TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
         self.connection.settings_dict["NAME"] = test_database_name
+        self.connection.settings_dict["SUPPORTS_TRANSACTIONS"] = False
         return test_database_name
     
     def destroy_test_db(self, old_database_name, verbosity=1):
