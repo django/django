@@ -3,7 +3,7 @@ from django.test import TestCase
 from models import Person
 
 class ChoicesFieldTestCase(TestCase):
-    fixtures = ['initial_data.json']
+    fixtures = ['choices_testdata.json']
 
     def setUp(self):
         self.a = Person.objects.get(name='Adrian')
