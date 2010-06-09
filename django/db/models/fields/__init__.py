@@ -215,6 +215,8 @@ class Field(object):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
+        if not getattr(connection.features, "typed_columns", True):
+            return None
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
             return connection.creation.data_types[self.get_internal_type()] % data
