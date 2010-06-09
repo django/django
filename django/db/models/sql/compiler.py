@@ -866,6 +866,9 @@ class SQLUpdateCompiler(SQLCompiler):
         if where:
             result.append('WHERE %s' % where)
         return ' '.join(result), tuple(update_params + params)
+    
+    def update(self, *args, **kwargs):
+        return self.execute_sql(*args, **kwargs)
 
     def execute_sql(self, result_type):
         """

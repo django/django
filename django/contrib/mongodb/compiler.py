@@ -75,4 +75,13 @@ class SQLInsertCompiler(SQLCompiler):
         return self.connection.db[self.query.model._meta.db_table].insert(values)
 
 class SQLUpdateCompiler(SQLCompiler):
-    pass
+    def update(self, result_type):
+        # TODO: more asserts
+        filters = self.get_filters(self.query.where)
+        # TODO: Don't use set for everything, use INC and such where
+        # appropriate.
+        return self.connection.db[self.query.model._meta.db_table].update(
+            filters,
+            {"$set": dict((f.column, val) for f, o, val in self.query.values)},
+            multi=True
+        )
