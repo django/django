@@ -45,6 +45,14 @@ class SQLCompiler(object):
         filters = self.get_filters(self.query.where)
         return self.connection.db[self.query.model._meta.db_table].find(filters)
     
+    def results_iter(self):
+        query = self.build_query()
+        for row in query:
+            yield tuple(
+                row[f.column if f is not self.query.model._meta.pk else "_id"]
+                for f in self.query.model._meta.fields
+            )
+    
     def has_results(self):
         try:
             self.build_query()[0]
@@ -62,4 +70,9 @@ class SQLInsertCompiler(SQLCompiler):
         ])
         if self.query.model._meta.pk.column in values:
             values["_id"] = values.pop(self.query.model._meta.pk.column)
+        if "_id" in values and not values["_id"]:
+            del values["_id"]
         return self.connection.db[self.query.model._meta.db_table].insert(values)
+
+class SQLUpdateCompiler(SQLCompiler):
+    pass

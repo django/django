@@ -9,6 +9,10 @@ class MongoTestCase(TestCase):
         self.assertTrue(b.pk is not None)
         self.assertEqual(b.name, "Bruce Springsteen")
         self.assertTrue(b.good)
+        b2 = Artist.objects.get(pk=b.pk)
+        self.assertEqual(b.pk, b2.pk)
+        self.assertEqual(b.name, b2.name)
+        self.assertEqual(b.good, b2.good)
     
     def test_update(self):
         l = Artist.objects.create(name="Lady Gaga", good=True)
@@ -18,3 +22,6 @@ class MongoTestCase(TestCase):
         l.good = False
         l.save()
         self.assertEqual(l.pk, pk)
+        
+        l = Artist.objects.get(pk=pk)
+        self.assertTrue(not l.good)
