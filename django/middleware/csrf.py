@@ -62,9 +62,6 @@ class CsrfViewMiddleware(object):
     tag.
     """
     def process_view(self, request, callback, callback_args, callback_kwargs):
-        if getattr(callback, 'csrf_exempt', False):
-            return None
-
         if getattr(request, 'csrf_processing_done', False):
             return None
 
@@ -89,6 +86,11 @@ class CsrfViewMiddleware(object):
             # Set a flag to allow us to fall back and allow the session id in
             # place of a CSRF cookie for this request only.
             cookie_is_new = True
+
+        # Wait until request.META["CSRF_COOKIE"] has been manipulated before
+        # bailing out, so that get_token still works
+        if getattr(callback, 'csrf_exempt', False):
+            return None
 
         if request.method == 'POST':
             if getattr(request, '_dont_enforce_csrf_checks', False):

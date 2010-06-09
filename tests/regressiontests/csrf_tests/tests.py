@@ -3,7 +3,7 @@
 from django.test import TestCase
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfMiddleware, CsrfViewMiddleware
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_view_exempt
 from django.core.context_processors import csrf
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils.importlib import import_module
@@ -122,6 +122,23 @@ class CsrfMiddlewareTest(TestCase):
         self._check_token_present(resp2, csrf_cookie.value)
         # Check the Vary header got patched correctly
         self.assert_('Cookie' in resp2.get('Vary',''))
+
+    def test_process_response_for_exempt_view(self):
+        """
+        Check that a view decorated with 'csrf_view_exempt' is still
+        post-processed to add the CSRF token.
+        """
+        req = self._get_GET_no_csrf_cookie_request()
+        CsrfMiddleware().process_view(req, csrf_view_exempt(post_form_view), (), {})
+
+        resp = post_form_response()
+        resp_content = resp.content # needed because process_response modifies resp
+        resp2 = CsrfMiddleware().process_response(req, resp)
+
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False)
+        self.assertNotEqual(csrf_cookie, False)
+        self.assertNotEqual(resp_content, resp2.content)
+        self._check_token_present(resp2, csrf_cookie.value)
 
     def test_process_response_no_csrf_cookie_view_only_get_token_used(self):
         """
@@ -276,6 +293,15 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_GET_csrf_cookie_request()
         CsrfViewMiddleware().process_view(req, token_view, (), {})
+        resp = token_view(req)
+        self._check_token_present(resp)
+
+    def test_get_token_for_exempt_view(self):
+        """
+        Check that get_token still works for a view decorated with 'csrf_view_exempt'.
+        """
+        req = self._get_GET_csrf_cookie_request()
+        CsrfViewMiddleware().process_view(req, csrf_view_exempt(token_view), (), {})
         resp = token_view(req)
         self._check_token_present(resp)
 

@@ -441,7 +441,7 @@ to be displayed.
 
 See also ``DATETIME_INPUT_FORMATS`` and ``TIME_INPUT_FORMATS``.
 
-.. _datetime: http://docs.python.org/library/datetime.html#strftime-behavior
+.. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: DATETIME_FORMAT
 
@@ -481,7 +481,7 @@ to be displayed.
 
 See also ``DATE_INPUT_FORMATS`` and ``TIME_INPUT_FORMATS``.
 
-.. _datetime: http://docs.python.org/library/datetime.html#strftime-behavior
+.. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: DEBUG
 
@@ -1532,7 +1532,7 @@ to be displayed.
 
 See also ``DATE_INPUT_FORMATS`` and ``DATETIME_INPUT_FORMATS``.
 
-.. _datetime: http://docs.python.org/library/datetime.html#strftime-behavior
+.. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
 
