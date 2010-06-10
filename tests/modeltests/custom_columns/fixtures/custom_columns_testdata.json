@@ -1,0 +1,29 @@
+[
+    {
+        "pk": 2, 
+        "model": "custom_columns.author", 
+        "fields": {
+            "first_name": "Peter", 
+            "last_name": "Jones"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "custom_columns.author", 
+        "fields": {
+            "first_name": "John", 
+            "last_name": "Smith"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "custom_columns.article", 
+        "fields": {
+            "headline": "Django lets you build web apps easily", 
+            "authors": [
+                2, 
+                1
+            ]
+        }
+    }
+]
