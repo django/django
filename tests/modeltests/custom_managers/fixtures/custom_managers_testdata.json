@@ -1,0 +1,48 @@
+[
+    {
+        "pk": 1, 
+        "model": "custom_managers.person", 
+        "fields": {
+            "fun": true, 
+            "first_name": "Bugs", 
+            "last_name": "Bunny"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "custom_managers.person", 
+        "fields": {
+            "fun": false, 
+            "first_name": "Droopy", 
+            "last_name": "Dog"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "custom_managers.book", 
+        "fields": {
+            "authors": [], 
+            "is_published": true, 
+            "author": "Rodney Dangerfield", 
+            "title": "How to program"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "custom_managers.car", 
+        "fields": {
+            "mileage": 21, 
+            "top_speed": 180, 
+            "name": "Corvette"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "custom_managers.car", 
+        "fields": {
+            "mileage": 31, 
+            "top_speed": 100, 
+            "name": "Neon"
+        }
+    }
+]
