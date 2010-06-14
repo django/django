@@ -47,25 +47,20 @@ Are you sure you want to do this?
             confirm = 'yes'
 
         if confirm == 'yes':
-            # TODO: HACK, make this more OO.
-            if not getattr(connection.ops, "sql_ddl", True):
-                connection.ops.flush(only_django=True)
-                return
-            sql_list = sql_flush(self.style, connection, only_django=True)
             try:
-                cursor = connection.cursor()
-                for sql in sql_list:
-                    cursor.execute(sql)
+                connection.ops.flush(self.style, only_django=True)
             except Exception, e:
                 transaction.rollback_unless_managed(using=db)
+                raise
                 raise CommandError("""Database %s couldn't be flushed. Possible reasons:
-  * The database isn't running or isn't configured correctly.
-  * At least one of the expected database tables doesn't exist.
-  * The SQL was invalid.
-Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.
-The full error: %s""" % (connection.settings_dict['NAME'], e))
-            transaction.commit_unless_managed(using=db)
-
+      * The database isn't running or isn't configured correctly.
+      * At least one of the expected database tables doesn't exist.
+      * The SQL was invalid.
+    Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.
+    The full error: %s""" % (connection.settings_dict['NAME'], e))
+            else:
+                transaction.commit_unless_managed(using=db)
+            
             # Emit the post sync signal. This allows individual
             # applications to respond as if the database had been
             # sync'd from scratch.

@@ -43,7 +43,7 @@ class DatabaseWrapper(object):
 
     def __init__(self, settings_dict, alias, *args, **kwargs):
         self.features = BaseDatabaseFeatures()
-        self.ops = DatabaseOperations()
+        self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = BaseDatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)

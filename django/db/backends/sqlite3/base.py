@@ -154,7 +154,7 @@ class DatabaseWrapper(BaseSQLDatabaseWrapper):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
         self.features = DatabaseFeatures()
-        self.ops = DatabaseOperations()
+        self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)

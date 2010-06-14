@@ -34,7 +34,7 @@ class SQLCompiler(object):
     
     def build_query(self):
         assert not self.query.aggregates
-        assert len(self.query.alias_map) == 1
+        assert len([a for a in self.query.alias_map if self.query.alias_refcount[a]]) == 1
         assert self.query.default_cols
         assert not self.query.distinct
         assert not self.query.extra

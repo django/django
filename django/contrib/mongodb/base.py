@@ -39,7 +39,7 @@ class DatabaseOperations(object):
             )
         return self._cache[compiler_name]
     
-    def flush(self, only_django=False):
+    def flush(self, style, only_django=False):
         if only_django:
             tables = self.connection.introspection.django_table_names(only_existing=True)
         else:
@@ -68,11 +68,30 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @property
     def db(self):
         return self.connection[self.settings_dict["NAME"]]
+
+    def close(self):
+        self._connection.disconnect()
+        self._connection = None
     
-    def _rollback(self):
-        # TODO: ???
+    
+    ###########################
+    # TODO: Transaction stuff #
+    ###########################
+    
+    def _enter_transaction_management(self, managed):
+        pass
+
+    def _leave_transaction_management(self, managed):
         pass
     
     def _commit(self):
-        # TODO: ???
+        pass
+    
+    def _rollback(self):
+        pass
+    
+    def _savepoint(self, sid):
+        pass
+    
+    def _savepoint_commit(self, sid):
         pass

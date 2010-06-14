@@ -55,7 +55,8 @@ class Command(BaseCommand):
         # Get a cursor (even though we don't need one yet). This has
         # the side effect of initializing the test database (if
         # it isn't already initialized).
-        cursor = connection.cursor()
+        if hasattr(connection, "cursor"):
+            cursor = connection.cursor()
 
         # Start transaction management. All fixtures are installed in a
         # single transaction to ensure that all references are resolved.

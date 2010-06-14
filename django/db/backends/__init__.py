@@ -111,7 +111,8 @@ class BaseDatabaseOperations(object):
     """
     compiler_module = "django.db.models.sql.compiler"
 
-    def __init__(self):
+    def __init__(self, connection):
+        self.connection = connection
         self._cache = {}
 
     def autoinc_sql(self, table, column):
@@ -473,6 +474,14 @@ class BaseDatabaseOperations(object):
         """
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
+    
+    def flush(self, style, only_django=False):
+        from django.core.management.sql import sql_flush
+        sql_list = sql_flush(style, self.connection, only_django=True)
+        cursor = self.connection.cursor()
+        for sql in sql_list:
+            cursor.execute(sql)
+
 
 class BaseDatabaseIntrospection(object):
     """

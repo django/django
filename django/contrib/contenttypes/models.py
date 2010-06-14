@@ -72,6 +72,7 @@ class ContentTypeManager(models.Manager):
         self.__class__._cache.setdefault(using, {})[ct.id] = ct
 
 class ContentType(models.Model):
+    id = models.NativeAutoField(primary_key=100)
     name = models.CharField(max_length=100)
     app_label = models.CharField(max_length=100)
     model = models.CharField(_('python model class name'), max_length=100)

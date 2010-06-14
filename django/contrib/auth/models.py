@@ -63,6 +63,7 @@ class Permission(models.Model):
 
     Three basic permissions -- add, change and delete -- are automatically created for each Django model.
     """
+    id = models.NativeAutoField(primary_key=True)
     name = models.CharField(_('name'), max_length=50)
     content_type = models.ForeignKey(ContentType)
     codename = models.CharField(_('codename'), max_length=100)
