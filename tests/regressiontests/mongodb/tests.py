@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.test import TestCase
 
 from models import Artist
@@ -25,3 +26,21 @@ class MongoTestCase(TestCase):
         
         l = Artist.objects.get(pk=pk)
         self.assertTrue(not l.good)
+    
+    def test_count(self):
+        Artist.objects.create(name="Billy Joel", good=True)
+        Artist.objects.create(name="John Mellencamp", good=True)
+        Artist.objects.create(name="Warren Zevon", good=True)
+        Artist.objects.create(name="Matisyahu", good=True)
+        Artist.objects.create(name="Gary US Bonds", good=True)
+        
+        self.assertEqual(Artist.objects.count(), 5)
+        self.assertEqual(Artist.objects.filter(good=True).count(), 5)
+        
+        Artist.objects.create(name="Bon Iver", good=False)
+        
+        self.assertEqual(Artist.objects.count(), 6)
+        self.assertEqual(Artist.objects.filter(good=True).count(), 5)
+        self.assertEqual(Artist.objects.filter(good=False).count(), 1)
+        
+        self.assertEqual(Artist.objects.aggregate(c=Count("pk")), {"c": 6})

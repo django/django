@@ -32,10 +32,10 @@ class SQLCompiler(object):
             column = "_id"
         return column, params[0]
     
-    def build_query(self):
-        assert not self.query.aggregates
-        assert len([a for a in self.query.alias_map if self.query.alias_refcount[a]]) == 1
-        assert self.query.default_cols
+    def build_query(self, aggregates=False):
+        assert len([a for a in self.query.alias_map if self.query.alias_refcount[a]]) <= 1
+        if not aggregates:
+            assert self.query.default_cols
         assert not self.query.distinct
         assert not self.query.extra
         assert not self.query.having
@@ -60,6 +60,17 @@ class SQLCompiler(object):
             return False
         else:
             return True
+    
+    def get_aggregates(self):
+        assert len(self.query.aggregates) == 1
+        agg = self.query.aggregates.values()[0]
+        assert (
+            isinstance(agg, self.query.aggregates_module.Count) and (
+                agg.col == "*" or 
+                isinstance(agg.col, tuple) and agg.col == (self.query.model._meta.db_table, self.query.model._meta.pk.column)
+            )
+        )
+        return [self.build_query(aggregates=True).count()]
 
 
 class SQLInsertCompiler(SQLCompiler):

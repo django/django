@@ -675,7 +675,10 @@ class SQLCompiler(object):
         self.query.clear_ordering(True)
         self.query.set_limits(high=1)
         return bool(self.execute_sql(SINGLE))
-
+    
+    def get_aggregates(self):
+        return self.execute_sql(SINGLE)
+    
     def results_iter(self):
         """
         Returns an iterator over the results from executing this query.

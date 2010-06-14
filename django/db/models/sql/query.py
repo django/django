@@ -363,7 +363,7 @@ class Query(object):
         query.related_select_cols = []
         query.related_select_fields = []
 
-        result = query.get_compiler(using).execute_sql(SINGLE)
+        result = query.get_compiler(using).get_aggregates()
         if result is None:
             result = [None for q in query.aggregate_select.items()]
 

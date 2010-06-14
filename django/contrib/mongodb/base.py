@@ -46,6 +46,11 @@ class DatabaseOperations(object):
             tables = self.connection.introspection.table_names()
         for table in tables:
             self.connection.db.drop_collection(table)
+    
+    def check_aggregate_support(self, aggregate):
+        # TODO: this really should use the generic aggregates, not the SQL ones
+        from django.db.models.sql.aggregates import Count
+        return isinstance(aggregate, Count)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
