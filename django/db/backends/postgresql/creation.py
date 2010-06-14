@@ -1,5 +1,4 @@
 from django.db.backends.creation import BaseDatabaseCreation
-from django.db.backends.util import truncate_name
 
 class DatabaseCreation(BaseDatabaseCreation):
     # This dictionary maps Field objects to their associated PostgreSQL column
@@ -52,7 +51,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
             def get_index_sql(index_name, opclass=''):
                 return (style.SQL_KEYWORD('CREATE INDEX') + ' ' +
-                        style.SQL_TABLE(qn(truncate_name(index_name,self.connection.ops.max_name_length()))) + ' ' +
+                        style.SQL_TABLE(qn(index_name)) + ' ' +
                         style.SQL_KEYWORD('ON') + ' ' +
                         style.SQL_TABLE(qn(db_table)) + ' ' +
                         "(%s%s)" % (style.SQL_FIELD(qn(f.column)), opclass) +

@@ -21,11 +21,11 @@ Overview
 Django 1.2 introduces several large, important new features, including:
 
     * Support for `multiple database connections`_ in a single Django instance.
-    
+
     * `Model validation`_ inspired by Django's form validation.
-    
+
     * Vastly `improved protection against Cross-Site Request Forgery`_ (CSRF).
-    
+
     * A new `user "messages" framework`_ with support for cookie- and session-based
       message for both anonymous and authenticated users.
 
@@ -49,9 +49,9 @@ be found below`_.
 
 .. seealso::
 
-    `Django Advent`_ covered the release of Django 1.2 with a series of 
+    `Django Advent`_ covered the release of Django 1.2 with a series of
     articles and tutorials that cover some of the new features in depth.
-        
+
 .. _django advent: http://djangoadvent.com/
 
 Wherever possible these features have been introduced in a backwards-compatible
@@ -66,7 +66,7 @@ backwards-incompatible. The big changes are:
     * The new CSRF protection framework is not backwards-compatible with
       the old system. Users of the old system will not be affected until
       the old system is removed in Django 1.4.
-      
+
       However, upgrading to the new CSRF protection framework requires a few
       important backwards-incompatible changes, detailed in `CSRF Protection`_,
       below.
@@ -74,12 +74,12 @@ backwards-incompatible. The big changes are:
     * Authors of custom :class:`~django.db.models.Field` subclasses should be
       aware that a number of methods have had a change in prototype, detailed
       under `get_db_prep_*() methods on Field`_, below.
-      
+
     * The internals of template tags have changed somewhat; authors of custom
       template tags that need to store state (e.g. custom control flow tags)
       should ensure that their code follows the new rules for `stateful template
       tags`_
-    
+
     * The :func:`~django.contrib.auth.decorators.user_passes_test`,
       :func:`~django.contrib.auth.decorators.login_required`, and
       :func:`~django.contrib.auth.decorators.permission_required`, decorators
@@ -435,6 +435,8 @@ database-compatible values. A custom field might look something like::
 
     class CustomModelField(models.Field):
         # ...
+        def db_type(self):
+            # ...
 
         def get_db_prep_save(self, value):
             # ...
@@ -450,6 +452,9 @@ two extra methods have been introduced::
 
     class CustomModelField(models.Field):
         # ...
+
+        def db_type(self, connection):
+            # ...
 
         def get_prep_value(self, value):
             # ...
@@ -467,10 +472,10 @@ two extra methods have been introduced::
             # ...
 
 These changes are required to support multiple databases --
-``get_db_prep_*`` can no longer make any assumptions regarding the
-database for which it is preparing. The ``connection`` argument now
-provides the preparation methods with the specific connection for
-which the value is being prepared.
+``db_type`` and ``get_db_prep_*`` can no longer make any assumptions
+regarding the database for which it is preparing. The ``connection``
+argument now provides the preparation methods with the specific
+connection for which the value is being prepared.
 
 The two new methods exist to differentiate general data-preparation
 requirements from requirements that are database-specific. The
@@ -603,13 +608,13 @@ new keyword and so is not a valid variable name in this tag.
 --------------
 
 ``LazyObject`` is an undocumented-but-often-used utility class used for lazily
-wrapping other objects of unknown type. 
+wrapping other objects of unknown type.
 
 In Django 1.1 and earlier, it handled introspection in a non-standard way,
 depending on wrapped objects implementing a public method named
 ``get_all_members()``. Since this could easily lead to name clashes, it has been
 changed to use the standard Python introspection method, involving
-``__members__`` and ``__dir__()``. 
+``__members__`` and ``__dir__()``.
 
 If you used ``LazyObject`` in your own code
 and implemented the ``get_all_members()`` method for wrapped objects, you'll need
