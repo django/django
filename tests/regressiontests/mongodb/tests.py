@@ -1,7 +1,7 @@
 from django.db.models import Count
 from django.test import TestCase
 
-from models import Artist
+from models import Artist, Group
 
 
 class MongoTestCase(TestCase):
@@ -44,3 +44,16 @@ class MongoTestCase(TestCase):
         self.assertEqual(Artist.objects.filter(good=False).count(), 1)
         
         self.assertEqual(Artist.objects.aggregate(c=Count("pk")), {"c": 6})
+    
+    def test_foreignkey(self):
+        e = Group.objects.create(name="The E Street Band")
+        b = Artist.objects.create(name="Clarence Clemons", good=True,
+            current_group=e)
+        
+        self.assertEqual(b.current_group, e)
+        self.assertEqual(b.current_group_id, e.pk)
+        
+        b = Artist.objects.get(name="Clarence Clemons")
+        self.assertEqual(b.current_group_id, e.pk)
+        self.assertFalse(hasattr(b, "_current_group_cache"))
+        self.assertEqual(b.current_group, e)
