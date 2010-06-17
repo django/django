@@ -109,7 +109,7 @@ of to a specific field. You can access these errors with ``NON_FIELD_ERRORS``::
 
     from django.core.validators import ValidationError, NON_FIELD_ERRORS
     try:
-        article.full_clean():
+        article.full_clean()
     except ValidationError, e:
         non_field_errors = e.message_dict[NON_FIELD_ERRORS]
 
