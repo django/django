@@ -286,7 +286,7 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.setdefault(key, default)
 
     Just like the standard dictionary ``setdefault()`` method, except it uses
-    ``__setitem__`` internally.
+    ``__setitem__()`` internally.
 
 .. method:: QueryDict.update(other_dict)
 
@@ -305,7 +305,7 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.items()
 
     Just like the standard dictionary ``items()`` method, except this uses the
-    same last-value logic as ``__getitem()__``. For example::
+    same last-value logic as ``__getitem__()``. For example::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.items()
@@ -315,7 +315,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Just like the standard dictionary ``iteritems()`` method. Like
     :meth:`QueryDict.items()` this uses the same last-value logic as
-    :meth:`QueryDict.__getitem()__`.
+    :meth:`QueryDict.__getitem__()`.
 
 .. method:: QueryDict.iterlists()
 
@@ -325,7 +325,7 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.values()
 
     Just like the standard dictionary ``values()`` method, except this uses the
-    same last-value logic as ``__getitem()__``. For example::
+    same last-value logic as ``__getitem__()``. For example::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.values()
