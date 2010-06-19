@@ -15,3 +15,5 @@ class Artist(models.Model):
 class Group(models.Model):
     id = models.NativeAutoField(primary_key=True)
     name = models.CharField(max_length=255)
+    year_formed = models.IntegerField(null=True)
+
