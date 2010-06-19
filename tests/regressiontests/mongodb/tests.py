@@ -58,7 +58,7 @@ class MongoTestCase(TestCase):
         self.assertFalse(hasattr(b, "_current_group_cache"))
         self.assertEqual(b.current_group, e)
     
-    def test_lookup(self):
+    def test_not_equals(self):
         q = Group.objects.create(name="Queen", year_formed=1971)
         e = Group.objects.create(name="The E Street Band", year_formed=1972)
         
@@ -80,3 +80,29 @@ class MongoTestCase(TestCase):
             ],
             lambda g: g.name,
         )
+    
+    def test_less_than(self):
+        q = Group.objects.create(name="Queen", year_formed=1971)
+        e = Group.objects.create(name="The E Street Band", year_formed=1972)
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(year_formed__lt=1980), [
+                "Queen",
+                "The E Street Band",
+            ],
+            lambda g: g.name
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(year_formed__lt=1972), [
+                "Queen",
+            ],
+            lambda g: g.name
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(year_formed__lt=1971),
+            [],
+            lambda g: g.name
+        )
+

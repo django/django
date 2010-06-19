@@ -25,7 +25,7 @@ class SQLCompiler(object):
         return filters
     
     def make_atom(self, lhs, lookup_type, value_annotation, params_or_value, negated):
-        assert lookup_type in ["exact", "isnull"], lookup_type
+        assert lookup_type in ["exact", "isnull", "lt"], lookup_type
         if hasattr(lhs, "process"):
             lhs, params = lhs.process(lookup_type, params_or_value, self.connection)
         else:
@@ -47,6 +47,8 @@ class SQLCompiler(object):
             if value_annotation == negated:
                 val = {"$not": val}
             return column, val
+        elif lookup_type == "lt":
+            return column, {"$lt": params[0]}
     
     def correct_filters(self, filters):
         for k, v in filters.items():
