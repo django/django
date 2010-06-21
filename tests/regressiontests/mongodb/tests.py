@@ -113,6 +113,37 @@ class MongoTestCase(TestCase):
             artists[2:],
             lambda a: a,
         )
+    
+    def test_values(self):
+        a = Artist.objects.create(name="Steve Perry", good=True)
+        
+        self.assertQuerysetEqual(
+            Artist.objects.values(), [
+                {"name": "Steve Perry", "good": True, "current_group_id": None, "id": a.pk},
+            ],
+            lambda a: a,
+        )
+        
+        self.assertQuerysetEqual(
+            Artist.objects.values("name"), [
+                {"name": "Steve Perry"},
+            ],
+            lambda a: a,
+        )
+        
+        self.assertQuerysetEqual(
+            Artist.objects.values_list("name"), [
+                ("Steve Perry",)
+            ],
+            lambda a: a,
+        )
+        
+        self.assertQuerysetEqual(
+            Artist.objects.values_list("name", flat=True), [
+                "Steve Perry",
+            ],
+            lambda a: a,
+        )
 
     def test_not_equals(self):
         q = Group.objects.create(name="Queen", year_formed=1971)

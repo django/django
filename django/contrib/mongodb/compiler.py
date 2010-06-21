@@ -56,16 +56,28 @@ class SQLCompiler(object):
             return {k: {"$not": v}}
         return {k: {"$ne": v}}
     
-    def build_query(self, aggregates=False):
-        assert len([a for a in self.query.alias_map if self.query.alias_refcount[a]]) <= 1
+    def get_fields(self, aggregates):
+        if self.query.select:
+            fields = []
+            for alias, field in self.query.select:
+                assert alias == self.query.model._meta.db_table
+                if field == self.query.model._meta.pk.column:
+                    field = "_id"
+                fields.append(field)
+            return fields
         if not aggregates:
             assert self.query.default_cols
+        return None
+    
+    def build_query(self, aggregates=False):
+        assert len([a for a in self.query.alias_map if self.query.alias_refcount[a]]) <= 1
         assert not self.query.distinct
         assert not self.query.extra
         assert not self.query.having
         
         filters = self.get_filters(self.query.where)
-        cursor = self.connection.db[self.query.model._meta.db_table].find(filters)
+        fields = self.get_fields(aggregates=aggregates)
+        cursor = self.connection.db[self.query.model._meta.db_table].find(filters, fields=fields)
         if self.query.order_by:
             cursor = cursor.sort([
                 (ordering.lstrip("-"), DESCENDING if ordering.startswith("-") else ASCENDING)
@@ -79,10 +91,15 @@ class SQLCompiler(object):
     
     def results_iter(self):
         query = self.build_query()
+        fields = self.get_fields(aggregates=False)
+        if fields is None:
+            fields = [
+                f.column if f is not self.query.model._meta.pk else "_id"
+                for f in self.query.model._meta.fields
+            ]
         for row in query:
             yield tuple(
-                row[f.column if f is not self.query.model._meta.pk else "_id"]
-                for f in self.query.model._meta.fields
+                row[f] for f in fields
             )
     
     def has_results(self):

@@ -843,12 +843,12 @@ class ValuesQuerySet(QuerySet):
         if self._fields:
             self.extra_names = []
             self.aggregate_names = []
+            self.query.default_cols = False
             if not self.query.extra and not self.query.aggregates:
                 # Short cut - if there are no extra or aggregates, then
                 # the values() clause must be just field names.
                 self.field_names = list(self._fields)
             else:
-                self.query.default_cols = False
                 self.field_names = []
                 for f in self._fields:
                     # we inspect the full extra_select list since we might
