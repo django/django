@@ -3,6 +3,12 @@ from django.db.models.sql.datastructures import FullResultSet
 
 # TODO: ...
 class SQLCompiler(object):
+    LOOKUP_TYPES = {
+        "exact": lambda params: params[0],
+        "lt": lambda params: {"$lt": params[0]},
+        "isnull": lambda params: params[0]
+    }
+    
     def __init__(self, query, connection, using):
         self.query = query
         self.connection = connection
@@ -15,8 +21,7 @@ class SQLCompiler(object):
             if isinstance(child, self.query.where_class):
                 child_filters = self.get_filters(child)
                 for k, v in child_filters.iteritems():
-                    if k in filters:
-                        v = {"$and": [filters[k], v]}
+                    assert k not in filters
                     if where.negated:
                         filters.update(self.negate(k, v))
                     else:
@@ -30,7 +35,7 @@ class SQLCompiler(object):
         return filters
     
     def make_atom(self, lhs, lookup_type, value_annotation, params_or_value, negated):
-        assert lookup_type in ["exact", "isnull", "lt"], lookup_type
+        assert lookup_type in self.LOOKUP_TYPES, lookup_type
         if hasattr(lhs, "process"):
             lhs, params = lhs.process(lookup_type, params_or_value, self.connection)
         else:
@@ -42,25 +47,10 @@ class SQLCompiler(object):
         if column == self.query.model._meta.pk.column:
             column = "_id"
         
-        if lookup_type == "exact":
-            val = params[0]
-            if negated:
-                val = {"$ne": val}
-            return column, val
-        elif lookup_type == "isnull":
-            val = None
-            if value_annotation == negated:
-                val = {"$not": val}
-            return column, val
-        elif lookup_type == "lt":
-            if negated:
-                return {"$gte": params[0]}
-            return column, {"$lt": params[0]}
+        return column, self.LOOKUP_TYPES[lookup_type](params)
     
     def negate(self, k, v):
         if isinstance(v, dict):
-            if v.keys() == ["$not"]:
-                return {k: v["$not"]}
             return {k: {"$not": v}}
         return {k: {"$ne": v}}
     

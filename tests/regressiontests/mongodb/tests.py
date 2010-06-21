@@ -58,13 +58,20 @@ class MongoTestCase(TestCase):
         self.assertFalse(hasattr(b, "_current_group_cache"))
         self.assertEqual(b.current_group, e)
     
+    def test_exists(self):
+        self.assertFalse(Artist.objects.filter(name="Brian May").exists())
+        Artist.objects.create(name="Brian May")
+        self.assertTrue(Artist.objects.filter(name="Brian May").exists())
+    
     def test_not_equals(self):
         q = Group.objects.create(name="Queen", year_formed=1971)
         e = Group.objects.create(name="The E Street Band", year_formed=1972)
+        b = Group.objects.create(name="The Beetles")
         
         self.assertQuerysetEqual(
             Group.objects.exclude(year_formed=1972), [
                 "Queen",
+                "The Beetles",
             ],
             lambda g: g.name,
         )
