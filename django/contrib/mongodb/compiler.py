@@ -63,7 +63,6 @@ class SQLCompiler(object):
         assert not self.query.distinct
         assert not self.query.extra
         assert not self.query.having
-        assert self.query.high_mark is None
         
         filters = self.get_filters(self.query.where)
         cursor = self.connection.db[self.query.model._meta.db_table].find(filters)
@@ -72,6 +71,10 @@ class SQLCompiler(object):
                 (ordering.lstrip("-"), DESCENDING if ordering.startswith("-") else ASCENDING)
                 for ordering in self.query.order_by
             ])
+        if self.query.low_mark:
+            cursor = cursor.skip(self.query.low_mark)
+        if self.query.high_mark is not None:
+            cursor = cursor.limit(self.query.high_mark - self.query.low_mark)
         return cursor
     
     def results_iter(self):

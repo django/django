@@ -85,8 +85,35 @@ class MongoTestCase(TestCase):
             ],
             lambda g: g.name,
         )
-        
     
+    def test_slicing(self):
+        artists = [
+            Artist.objects.create(name="Huey Lewis"),
+            Artist.objects.create(name="John Hiatt"),
+            Artist.objects.create(name="Jackson Browne"),
+            Artist.objects.create(name="Rick Springfield"),
+        ]
+        
+        for i in xrange(5):
+            # TODO: should be i, but Mongo falls over with limit(0)
+            for j in xrange(i+1, 5):
+                self.assertQuerysetEqual(
+                    Artist.objects.all()[i:j],
+                    artists[i:j],
+                    lambda a: a,
+                )
+        self.assertQuerysetEqual(
+            Artist.objects.all()[:3],
+            artists[:3],
+            lambda a: a,
+        )
+        
+        self.assertQuerysetEqual(
+            Artist.objects.all()[2:],
+            artists[2:],
+            lambda a: a,
+        )
+
     def test_not_equals(self):
         q = Group.objects.create(name="Queen", year_formed=1971)
         e = Group.objects.create(name="The E Street Band", year_formed=1972)
