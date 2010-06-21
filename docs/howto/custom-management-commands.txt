@@ -62,14 +62,7 @@ look like this:
                 poll.opened = False
                 poll.save()
 
-                self.stdout.write('Successfully closed poll "%s"\n' % poll_id)
-
-.. note::
-    When you are using management commands and wish to provide console
-    output, you should write to ``self.stdout`` and ``self.stderr``,
-    instead of printing to ``stdout`` and ``stderr`` directly. By
-    using these proxies, it becomes much easier to test your custom
-    command.
+                print 'Successfully closed poll "%s"' % poll_id
 
 The new custom command can be called using ``python manage.py closepoll
 <poll_id>``.
