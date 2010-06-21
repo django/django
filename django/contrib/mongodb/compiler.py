@@ -1,3 +1,6 @@
+from django.db.models.sql.datastructures import FullResultSet
+
+
 # TODO: ...
 class SQLCompiler(object):
     def __init__(self, query, connection, using):
@@ -5,7 +8,7 @@ class SQLCompiler(object):
         self.connection = connection
         self.using = using
     
-    def get_filters(self, where, correct=False):
+    def get_filters(self, where):
         assert where.connector == "AND"
         filters = {}
         for child in where.children:
@@ -15,13 +18,15 @@ class SQLCompiler(object):
                     if k in filters:
                         v = {"$and": [filters[k], v]}
                     if where.negated:
-                        v = {"$not": v}
-                    filters[k] = v
+                        filters.update(self.negate(k, v))
+                    else:
+                        filters[k] = v
             else:
-                field, val = self.make_atom(*child, **{"negated": where.negated})
-                filters[field] = val
-        if correct:
-            self.correct_filters(filters)
+                try:
+                    field, val = self.make_atom(*child, **{"negated": where.negated})
+                    filters[field] = val
+                except FullResultSet:
+                    pass
         return filters
     
     def make_atom(self, lhs, lookup_type, value_annotation, params_or_value, negated):
@@ -48,16 +53,9 @@ class SQLCompiler(object):
                 val = {"$not": val}
             return column, val
         elif lookup_type == "lt":
+            if negated:
+                return {"$gte": params[0]}
             return column, {"$lt": params[0]}
-    
-    def correct_filters(self, filters):
-        for k, v in filters.items():
-            if isinstance(v, dict) and v.keys() == ["$not"]:
-                if isinstance(v["$not"], dict) and v["$not"].keys() == ["$and"]:
-                    del filters[k]
-                    or_vals = [self.negate(k, v) for v in v["$not"]["$and"]]
-                    assert "$or" not in filters
-                    filters["$or"] = or_vals
     
     def negate(self, k, v):
         if isinstance(v, dict):
@@ -76,7 +74,7 @@ class SQLCompiler(object):
         assert self.query.high_mark is None
         assert not self.query.order_by
         
-        filters = self.get_filters(self.query.where, correct=True)
+        filters = self.get_filters(self.query.where)
         return self.connection.db[self.query.model._meta.db_table].find(filters)
     
     def results_iter(self):

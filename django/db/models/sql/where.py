@@ -267,8 +267,9 @@ class Constraint(object):
     An object that can be passed to WhereNode.add() and knows how to
     pre-process itself prior to including in the WhereNode.
     """
-    def __init__(self, alias, col, field):
+    def __init__(self, alias, col, field, eliminatable_if=None):
         self.alias, self.col, self.field = alias, col, field
+        self.elimintable_if = eliminatable_if
 
     def __getstate__(self):
         """Save the state of the Constraint for pickling.
@@ -320,6 +321,9 @@ class Constraint(object):
                 db_type = None
         except ObjectDoesNotExist:
             raise EmptyShortCircuit
+
+        if self.elimintable_if and self.elimintable_if(connection):
+            raise FullResultSet
 
         return (self.alias, self.col, db_type), params
 

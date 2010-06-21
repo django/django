@@ -1077,7 +1077,11 @@ class Query(object):
                     # it's short-circuited in the Where class.
                     # We also need to handle the case where a subquery is provided
                     entry = self.where_class()
-                    entry.add((Constraint(alias, col, None), 'isnull', True), AND)
+                    entry.add((
+                        Constraint(alias, col, None, eliminatable_if=lambda connection: not getattr(connection.features, "sql_nulls", True)),
+                        'isnull',
+                        True
+                    ), AND)
                     entry.negate()
                     self.where.add(entry, AND)
 

@@ -62,20 +62,8 @@ class MongoTestCase(TestCase):
         q = Group.objects.create(name="Queen", year_formed=1971)
         e = Group.objects.create(name="The E Street Band", year_formed=1972)
         
-        qs = Group.objects.exclude(year_formed=1972)
-        v = qs.query.get_compiler(qs.db).get_filters(qs.query.where, correct=True)
-        self.assertEqual(v, {
-            "$or": [
-                {"year_formed": {"$ne": 1972}},
-                {"year_formed": None},
-            ]
-        })
-        # A bug in MongoDB prevents this query from actually working, but test
-        # that we're at least generating the right query.
-        return
-        
         self.assertQuerysetEqual(
-            qs, [
+            Group.objects.exclude(year_formed=1972), [
                 "Queen",
             ],
             lambda g: g.name,
@@ -105,4 +93,10 @@ class MongoTestCase(TestCase):
             [],
             lambda g: g.name
         )
-
+        
+        self.assertQuerysetEqual(
+            Group.objects.exclude(year_formed__lt=1972), [
+                "The E Street Band"
+            ],
+            lambda g: g.name,
+        )
