@@ -1,3 +1,5 @@
+from pymongo import ASCENDING, DESCENDING
+
 from django.db.models.sql.datastructures import FullResultSet
 
 
@@ -62,10 +64,15 @@ class SQLCompiler(object):
         assert not self.query.extra
         assert not self.query.having
         assert self.query.high_mark is None
-        assert not self.query.order_by
         
         filters = self.get_filters(self.query.where)
-        return self.connection.db[self.query.model._meta.db_table].find(filters)
+        cursor = self.connection.db[self.query.model._meta.db_table].find(filters)
+        if self.query.order_by:
+            cursor = cursor.sort([
+                (ordering.lstrip("-"), DESCENDING if ordering.startswith("-") else ASCENDING)
+                for ordering in self.query.order_by
+            ])
+        return cursor
     
     def results_iter(self):
         query = self.build_query()

@@ -63,15 +63,39 @@ class MongoTestCase(TestCase):
         Artist.objects.create(name="Brian May")
         self.assertTrue(Artist.objects.filter(name="Brian May").exists())
     
+    def test_orderby(self):
+        Group.objects.create(name="Queen", year_formed=1971)
+        Group.objects.create(name="The E Street Band", year_formed=1972)
+        Group.objects.create(name="The Beatles", year_formed=1960)
+        
+        self.assertQuerysetEqual(
+            Group.objects.order_by("year_formed"), [
+                "The Beatles",
+                "Queen",
+                "The E Street Band",
+            ],
+            lambda g: g.name
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.order_by("-year_formed"), [
+                "The E Street Band",
+                "Queen",
+                "The Beatles",
+            ],
+            lambda g: g.name,
+        )
+        
+    
     def test_not_equals(self):
         q = Group.objects.create(name="Queen", year_formed=1971)
         e = Group.objects.create(name="The E Street Band", year_formed=1972)
-        b = Group.objects.create(name="The Beetles")
+        b = Group.objects.create(name="The Beatles")
         
         self.assertQuerysetEqual(
             Group.objects.exclude(year_formed=1972), [
                 "Queen",
-                "The Beetles",
+                "The Beatles",
             ],
             lambda g: g.name,
         )
