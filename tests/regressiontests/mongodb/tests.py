@@ -95,8 +95,7 @@ class MongoTestCase(TestCase):
         ]
         
         for i in xrange(5):
-            # TODO: should be i, but Mongo falls over with limit(0)
-            for j in xrange(i+1, 5):
+            for j in xrange(i, 5):
                 self.assertQuerysetEqual(
                     Artist.objects.all()[i:j],
                     artists[i:j],

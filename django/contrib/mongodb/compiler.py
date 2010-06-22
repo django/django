@@ -1,6 +1,6 @@
 from pymongo import ASCENDING, DESCENDING
 
-from django.db.models.sql.datastructures import FullResultSet
+from django.db.models.sql.datastructures import FullResultSet, EmptyResultSet
 
 
 # TODO: ...
@@ -87,11 +87,16 @@ class SQLCompiler(object):
         if self.query.low_mark:
             cursor = cursor.skip(self.query.low_mark)
         if self.query.high_mark is not None:
+            if self.query.high_mark - self.query.low_mark == 0:
+                raise EmptyResultSet
             cursor = cursor.limit(self.query.high_mark - self.query.low_mark)
         return cursor
     
     def results_iter(self):
-        query = self.build_query()
+        try:
+            query = self.build_query()
+        except EmptyResultSet:
+            return
         fields = self.get_fields(aggregates=False)
         if fields is None:
             fields = [
