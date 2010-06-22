@@ -1,0 +1,19 @@
+[
+ {
+        "pk": 1, 
+        "model": "defer.secondary", 
+        "fields": {
+            "second": "y1", 
+            "first": "x1"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "defer.primary", 
+        "fields": {
+            "related": 1, 
+            "name": "p1", 
+            "value": "xx"
+        }
+    }
+]
