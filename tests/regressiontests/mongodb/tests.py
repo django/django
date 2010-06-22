@@ -44,6 +44,9 @@ class MongoTestCase(TestCase):
         self.assertEqual(Artist.objects.filter(good=False).count(), 1)
         
         self.assertEqual(Artist.objects.aggregate(c=Count("pk")), {"c": 6})
+        
+        self.assertEqual(Artist.objects.all()[:3].count(), 3)
+        self.assertEqual(Artist.objects.all()[3:].count(), 3)
     
     def test_foreignkey(self):
         e = Group.objects.create(name="The E Street Band")
