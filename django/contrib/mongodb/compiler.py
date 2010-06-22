@@ -1,3 +1,5 @@
+import re
+
 from pymongo import ASCENDING, DESCENDING
 
 from django.db.models.sql.datastructures import FullResultSet, EmptyResultSet
@@ -11,6 +13,8 @@ class SQLCompiler(object):
         "isnull": lambda params, value_annotation, negated: {"$ne": None} if value_annotation == negated else None,
         "gt": lambda params, value_annotation, negated: {"$gt": params[0]},
         "in": lambda params, value_annotation, negated: {"$in": params},
+        "regex": lambda params, value_annotation, negated: re.compile(params[0]),
+        "iregex": lambda params, value_annotations, negated: re.compile(params[0], re.I)
     }
     
     def __init__(self, query, connection, using):
@@ -54,7 +58,9 @@ class SQLCompiler(object):
         return column, self.LOOKUP_TYPES[lookup_type](params, value_annotation, negated)
     
     def negate(self, k, v):
-        if isinstance(v, dict):
+        # Regex lookups are of the form {"field": re.compile("pattern") and
+        # need to be negated with $not, not $ne.
+        if isinstance(v, dict) or isinstance(v, re._pattern_type):
             return {k: {"$not": v}}
         return {k: {"$ne": v}}
     

@@ -284,3 +284,31 @@ class MongoTestCase(TestCase):
             ],
             lambda g: g.name,
         )
+    
+    def test_regex(self):
+        q = Group.objects.create(name="Queen")
+        e = Group.objects.create(name="The E Street Band")
+        b = Group.objects.create(name="The Beatles")
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(name__regex="^The"), [
+                "The E Street Band",
+                "The Beatles",
+            ],
+            lambda g: g.name
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(name__iregex="^the"), [
+                "The E Street Band",
+                "The Beatles",
+            ],
+            lambda g: g.name
+        )
+
+        self.assertQuerysetEqual(
+            Group.objects.exclude(name__regex="^The"), [
+                "Queen",
+            ],
+            lambda g: g.name,
+        )
