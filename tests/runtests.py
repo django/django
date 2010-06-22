@@ -114,11 +114,9 @@ def django_tests(verbosity, interactive, failfast, test_labels):
     # in our tests.
     settings.MANAGERS = ("admin@djangoproject.com",)
 
-    # Load all the ALWAYS_INSTALLED_APPS.
-    # (This import statement is intentionally delayed until after we
-    # access settings because of the USE_I18N dependency.)
-    from django.db.models.loading import get_apps, load_app
-    get_apps()
+    # This import statement is intentionally delayed until after we
+    # access settings because of the USE_I18N dependency.
+    from django.db.models.loading import load_app
 
     # Load all the test model apps.
     for model_dir, model_name in get_test_models():
