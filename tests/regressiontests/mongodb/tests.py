@@ -189,3 +189,38 @@ class MongoTestCase(TestCase):
             ],
             lambda g: g.name,
         )
+    
+    def test_isnull(self):
+        q = Group.objects.create(name="Queen", year_formed=1971)
+        e = Group.objects.create(name="The E Street Band", year_formed=1972)
+        b = Group.objects.create(name="The Beatles")
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(year_formed__isnull=True), [
+                "The Beatles",
+            ],
+            lambda g: g.name,
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(year_formed__isnull=False), [
+                "Queen",
+                "The E Street Band",
+            ],
+            lambda g: g.name
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.exclude(year_formed__isnull=True), [
+                "Queen",
+                "The E Street Band",
+            ],
+            lambda g: g.name
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.exclude(year_formed__isnull=False), [
+                "The Beatles",
+            ],
+            lambda g: g.name
+        )

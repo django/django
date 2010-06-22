@@ -6,9 +6,9 @@ from django.db.models.sql.datastructures import FullResultSet
 # TODO: ...
 class SQLCompiler(object):
     LOOKUP_TYPES = {
-        "exact": lambda params: params[0],
-        "lt": lambda params: {"$lt": params[0]},
-        "isnull": lambda params: params[0]
+        "exact": lambda params, value_annotation, negated: params[0],
+        "lt": lambda params, value_annotation, negated: {"$lt": params[0]},
+        "isnull": lambda params, value_annotation, negated: {"$ne": None} if value_annotation == negated else None,
     }
     
     def __init__(self, query, connection, using):
@@ -49,7 +49,7 @@ class SQLCompiler(object):
         if column == self.query.model._meta.pk.column:
             column = "_id"
         
-        return column, self.LOOKUP_TYPES[lookup_type](params)
+        return column, self.LOOKUP_TYPES[lookup_type](params, value_annotation, negated)
     
     def negate(self, k, v):
         if isinstance(v, dict):
