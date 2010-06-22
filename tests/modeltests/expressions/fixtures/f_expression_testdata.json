@@ -1,0 +1,67 @@
+[
+    {
+	"pk": 1, 
+	"model": "expressions.employee", 
+	"fields": {
+	    "lastname": "Smith", 
+	    "firstname": "Joe"
+	}
+    }, 
+    {
+	"pk": 2, 
+	"model": "expressions.employee", 
+	"fields": {
+	    "lastname": "Meyer", 
+	    "firstname": "Frank"
+	}
+    }, 
+    {
+	"pk": 3, 
+	"model": "expressions.employee", 
+	"fields": {
+	    "lastname": "Mustermann", 
+	    "firstname": "Max"
+	}
+    }, 
+    {
+	"pk": 4, 
+	"model": "expressions.employee", 
+	"fields": {
+	    "lastname": "van Rossum", 
+	    "firstname": "Guido"
+	}
+    }, 
+    {
+	"pk": 1, 
+	"model": "expressions.company", 
+	"fields": {
+	    "ceo": 1, 
+	    "num_chairs": 5, 
+	    "point_of_contact": 4, 
+	    "name": "Example Inc.", 
+	    "num_employees": 2300
+	}
+    }, 
+    {
+	"pk": 2, 
+	"model": "expressions.company", 
+	"fields": {
+	    "ceo": 2, 
+	    "num_chairs": 3, 
+	    "point_of_contact": 2, 
+	    "name": "Foobar Ltd.", 
+	    "num_employees": 3
+	}
+    }, 
+    {
+	"pk": 3, 
+	"model": "expressions.company", 
+	"fields": {
+	    "ceo": 3, 
+	    "num_chairs": 1, 
+	    "point_of_contact": 3, 
+	    "name": "Test GmbH", 
+	    "num_employees": 32
+	}
+    }
+]
