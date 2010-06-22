@@ -10,6 +10,7 @@ class SQLCompiler(object):
         "lt": lambda params, value_annotation, negated: {"$lt": params[0]},
         "isnull": lambda params, value_annotation, negated: {"$ne": None} if value_annotation == negated else None,
         "gt": lambda params, value_annotation, negated: {"$gt": params[0]},
+        "in": lambda params, value_annotation, negated: {"$in": params},
     }
     
     def __init__(self, query, connection, using):
