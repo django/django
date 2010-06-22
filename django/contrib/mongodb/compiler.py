@@ -9,6 +9,7 @@ class SQLCompiler(object):
         "exact": lambda params, value_annotation, negated: params[0],
         "lt": lambda params, value_annotation, negated: {"$lt": params[0]},
         "isnull": lambda params, value_annotation, negated: {"$ne": None} if value_annotation == negated else None,
+        "gt": lambda params, value_annotation, negated: {"$gt": params[0]},
     }
     
     def __init__(self, query, connection, using):

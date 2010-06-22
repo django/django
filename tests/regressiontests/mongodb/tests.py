@@ -224,3 +224,35 @@ class MongoTestCase(TestCase):
             ],
             lambda g: g.name
         )
+    
+    def test_gt(self):
+        q = Group.objects.create(name="Queen", year_formed=1971)
+        e = Group.objects.create(name="The E Street Band", year_formed=1972)
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(year_formed__gt=1970), [
+                "Queen",
+                "The E Street Band",
+            ],
+            lambda g: g.name
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(year_formed__gt=1971), [
+                "The E Street Band",
+            ],
+            lambda g: g.name
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.filter(year_formed__gt=1972),
+            [],
+            lambda g: g.name
+        )
+        
+        self.assertQuerysetEqual(
+            Group.objects.exclude(year_formed__gt=1971), [
+                "Queen",
+            ],
+            lambda g: g.name,
+        )
