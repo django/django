@@ -195,6 +195,8 @@ class RegisterModelsTests(AppCacheTestCase):
         cache.register_models('foo', *(FlatPage, Site,))
         self.assertFalse(cache.app_cache_ready())
         rv = cache.get_models()
+        # we have 4 models since the above import will trigger the
+        # ModelBase.__new__, which will call the register_models function
         self.assertEqual(len(rv), 4)
         self.assertEqual(rv[0], Site)
         self.assertEqual(rv[1], FlatPage)

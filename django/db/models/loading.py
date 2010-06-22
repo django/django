@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
+from django.core.apps import App
 
 import imp
 import sys
@@ -22,6 +23,9 @@ class AppCache(object):
     # Use the Borg pattern to share state between all instances. Details at
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531.
     __shared_state = dict(
+        # List of App instances
+        app_instances = [],
+
         # Keys of app_store are the model modules for each application.
         app_store = SortedDict(),
 
@@ -99,6 +103,7 @@ class AppCache(object):
         self.nesting_level -= 1
         if models not in self.app_store:
             self.app_store[models] = len(self.app_store)
+            self.app_instances.append(App(app_name, models))
         return models
 
     def app_cache_ready(self):
