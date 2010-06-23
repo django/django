@@ -18,6 +18,22 @@ documentation or reference manuals.
 PostgreSQL notes
 ================
 
+.. versionchanged:: 1.3
+
+Django supports PostgreSQL 8.0 and higher. If you want to use
+:ref:`database-level autocommit <postgresql-autocommit-mode>`, a
+minimum version of PostgreSQL 8.2 is required.
+
+.. admonition:: Improvements in recent PostgreSQL versions
+
+    PostgreSQL 8.0 and 8.1 `will soon reach end-of-life`_; there have
+    also been a number of significant performance improvements added
+    in recent PostgreSQL versions. Although PostgreSQL 8.0 is the minimum
+    supported version, you would be well advised to use a more recent
+    version if at all possible.
+
+.. _will soon reach end-of-life: http://wiki.postgresql.org/wiki/PostgreSQL_Release_Support_Policy
+
 PostgreSQL 8.2 to 8.2.4
 -----------------------
 
@@ -38,6 +54,8 @@ Transaction handling
 database connection is first used and commits the result at the end of the
 request/response handling. The PostgreSQL backends normally operate the same
 as any other Django backend in this respect.
+
+.. _postgresql-autocommit-mode:
 
 Autocommit mode
 ~~~~~~~~~~~~~~~
@@ -84,6 +102,7 @@ protection for multi-call operations.
 
 Indexes for ``varchar`` and ``text`` columns
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. versionadded:: 1.1.2
 
 When specifying ``db_index=True`` on your model fields, Django typically

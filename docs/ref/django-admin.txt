@@ -804,8 +804,6 @@ with an appropriate extension (e.g. ``json`` or ``xml``). See the
 documentation for ``loaddata`` for details on the specification of fixture
 data files.
 
---noinput
-~~~~~~~~~
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 
@@ -888,6 +886,11 @@ arguments.)
 To run on 1.2.3.4:7000 with a ``test`` fixture::
 
     django-admin.py testserver --addrport 1.2.3.4:7000 test
+
+.. versionadded:: 1.3
+
+The :djadminopt:`--noinput` option may be provided to suppress all user
+prompts.
 
 validate
 --------

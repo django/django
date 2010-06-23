@@ -22,7 +22,7 @@ Paragraph 2 with "quotes" and @code@"""
         t = Template("{{ textile_content|textile }}")
         rendered = t.render(Context(locals())).strip()
         if textile:
-            self.assertEqual(rendered, """<p>Paragraph 1</p>
+            self.assertEqual(rendered.replace('\t', ''), """<p>Paragraph 1</p>
 
 <p>Paragraph 2 with &#8220;quotes&#8221; and <code>code</code></p>""")
         else:
