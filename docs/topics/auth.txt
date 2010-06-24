@@ -435,8 +435,6 @@ Anonymous users
       instead of ``False``.
     * :meth:`~django.contrib.auth.models.User.is_authenticated()` returns
       ``False`` instead of ``True``.
-    * :meth:`~django.contrib.auth.models.User.has_perm()` always returns
-      ``False``.
     * :meth:`~django.contrib.auth.models.User.set_password()`,
       :meth:`~django.contrib.auth.models.User.check_password()`,
       :meth:`~django.contrib.auth.models.User.save()`,
