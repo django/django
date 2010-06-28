@@ -46,6 +46,9 @@ class AppCache(object):
 
     def __init__(self):
         self.__dict__ = self.__shared_state
+        # Create App instances for the apps in INSTALLED_APPS
+        for app_name in settings.INSTALLED_APPS:
+            self.app_instances.append(App(app_name))
 
     def _populate(self):
         """
@@ -103,8 +106,16 @@ class AppCache(object):
         self.nesting_level -= 1
         if models not in self.app_store:
             self.app_store[models] = len(self.app_store)
-            self.app_instances.append(App(app_name, models))
+            app = self.find_app(app_name.split('.')[-1])
+            if app:
+                app.models_module = models
         return models
+
+    def find_app(self, app_label):
+        "Returns the App instance that matches app_label"
+        for app in self.app_instances:
+            if app.label == app_label:
+                return app
 
     def app_cache_ready(self):
         """
@@ -149,7 +160,9 @@ class AppCache(object):
     def get_app_errors(self):
         "Returns the map of known problems with the INSTALLED_APPS."
         self._populate()
-        return self.app_errors
+        for app in app_instances:
+            self.app_errors.update(app.errors)
+        return errors
 
     def get_models(self, app_mod=None, include_auto_created=False, include_deferred=False):
         """
@@ -173,11 +186,13 @@ class AppCache(object):
         if app_mod:
             app_list = [self.app_models.get(app_mod.__name__.split('.')[-2], SortedDict())]
         else:
-            app_list = self.app_models.itervalues()
+            #app_list = self.app_models.itervalues()
+            app_list = self.app_instances
         model_list = []
         for app in app_list:
+            models = app.models
             model_list.extend(
-                model for model in app.values()
+                model for model in models#app.values()
                 if ((not model._deferred or include_deferred)
                     and (not model._meta.auto_created or include_auto_created))
             )
@@ -193,12 +208,22 @@ class AppCache(object):
         """
         if seed_cache:
             self._populate()
-        return self.app_models.get(app_label, SortedDict()).get(model_name.lower())
+        app = self.find_app(app_label)
+        if app:
+            for model in app.models:
+                if model_name.lower() == model._meta.object_name.lower():
+                    return model
 
     def register_models(self, app_label, *models):
         """
         Register a set of models as belonging to an app.
         """
+        # Create a new App instance if an app in INSTALLED_APPS
+        # imports another package that has models
+        app = self.find_app(app_label)
+        if not app:
+            app = App(app_label)
+            self.app_instances.append(app)
         for model in models:
             # Store as 'name: model' pair in a dictionary
             # in the app_models dictionary
@@ -216,6 +241,7 @@ class AppCache(object):
                 if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
                     continue
             model_dict[model_name] = model
+            app.models.append(model)
         self._get_models_cache.clear()
 
 cache = AppCache()

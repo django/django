@@ -1,9 +1,11 @@
 class App(object):
-    def __init__(self, name, models):
-        # fully qualified name (e.g. 'django.contrib.auth')
-        self.name = name
-        self.label = name.split('.')[-1]
-        self.models = models
+    def __init__(self, label):
+        if '.' in label:
+            label = label.split('.')[-1]
+        self.label = label
+        self.errors = {}
+        self.models = []
+        self.models_module = None
 
     def __repr__(self):
-        return '<App: %s>' % self.name
+        return '<App: %s>' % self.label
