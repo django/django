@@ -26,9 +26,6 @@ class AppCache(object):
         # List of App instances
         app_instances = [],
 
-        # Keys of app_store are the model modules for each application.
-        app_store = SortedDict(),
-
         # Mapping of app_labels to a dictionary of model names to model code.
         app_models = SortedDict(),
 
@@ -104,11 +101,9 @@ class AppCache(object):
                     raise
 
         self.nesting_level -= 1
-        if models not in self.app_store:
-            self.app_store[models] = len(self.app_store)
-            app = self.find_app(app_name.split('.')[-1])
-            if app:
-                app.models_module = models
+        app = self.find_app(app_name.split('.')[-1])
+        if app and models is not app.models_module:
+            app.models_module = models
         return models
 
     def find_app(self, app_label):
@@ -133,9 +128,8 @@ class AppCache(object):
         # Ensure the returned list is always in the same order (with new apps
         # added at the end). This avoids unstable ordering on the admin app
         # list page, for example.
-        apps = [(v, k) for k, v in self.app_store.items()]
-        apps.sort()
-        return [elt[1] for elt in apps]
+        return [app.models_module for app in self.app_instances\
+                if app.models_module]
 
     def get_app(self, app_label, emptyOK=False):
         """
@@ -184,15 +178,17 @@ class AppCache(object):
             pass
         self._populate()
         if app_mod:
-            app_list = [self.app_models.get(app_mod.__name__.split('.')[-2], SortedDict())]
+            app_label = app_mod.__name__.split('.')[-2]
+            app = self.find_app(app_label)
+            if app:
+                app_list = [app]
         else:
-            #app_list = self.app_models.itervalues()
             app_list = self.app_instances
         model_list = []
         for app in app_list:
             models = app.models
             model_list.extend(
-                model for model in models#app.values()
+                model for model in models
                 if ((not model._deferred or include_deferred)
                     and (not model._meta.auto_created or include_auto_created))
             )
@@ -226,7 +222,7 @@ class AppCache(object):
             self.app_instances.append(app)
         for model in models:
             # Store as 'name: model' pair in a dictionary
-            # in the app_models dictionary
+            # in the models list of the App instance
             model_name = model._meta.object_name.lower()
             model_dict = self.app_models.setdefault(app_label, SortedDict())
             if model_name in model_dict:
