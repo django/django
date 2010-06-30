@@ -1,5 +1,5 @@
 import re
-import unittest
+import unittest2 as unittest
 from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
 
