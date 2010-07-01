@@ -6,10 +6,9 @@ from django.db.backends import BaseDatabaseOperations
 # used by both the 'postgresql' and 'postgresql_psycopg2' backends.
 
 class DatabaseOperations(BaseDatabaseOperations):
-    def __init__(self, connection):
-        super(DatabaseOperations, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(DatabaseOperations, self).__init__(*args, **kwargs)
         self._postgres_version = None
-        self.connection = connection
 
     def _get_postgres_version(self):
         if self._postgres_version is None:
@@ -117,7 +116,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # and column name (available since PostgreSQL 8)
 
             for f in model._meta.local_fields:
-                if isinstance(f, models.AutoField):
+                if isinstance(f, models.BaseAutoField):
                     output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
                         (style.SQL_KEYWORD('SELECT'),
                         style.SQL_TABLE(model._meta.db_table),

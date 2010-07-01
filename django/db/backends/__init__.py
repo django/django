@@ -560,7 +560,7 @@ class BaseDatabaseIntrospection(object):
                 if not router.allow_syncdb(self.connection.alias, model):
                     continue
                 for f in model._meta.local_fields:
-                    if isinstance(f, models.AutoField):
+                    if isinstance(f, models.BaseAutoField):
                         sequence_list.append({'table': model._meta.db_table, 'column': f.column})
                         break # Only one AutoField is allowed per model, so don't bother continuing.
 
