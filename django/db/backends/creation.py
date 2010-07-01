@@ -3,6 +3,8 @@ import time
 
 from django.conf import settings
 from django.core.management import call_command
+from django.utils.datastructures import DictWrapper
+
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -26,6 +28,13 @@ class BaseDatabaseCreation(object):
         shorten identifying names.
         """
         return '%x' % (abs(hash(args)) % 4294967296L)  # 2**32
+    
+    def db_type(self, field):
+        data = DictWrapper(field.__dict__, self.connection.ops.quote_name, "qn_")
+        try:
+            return self.connection.creation.data_types[field.get_internal_type()] % data
+        except KeyError:
+            return None
 
     def sql_create_model(self, model, style, known_models=set()):
         """

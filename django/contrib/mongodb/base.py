@@ -9,7 +9,6 @@ from django.utils.importlib import import_module
 
 class DatabaseFeatures(object):
     interprets_empty_strings_as_nulls = False
-    typed_columns = False
     sql_nulls = False
 
 

@@ -5,6 +5,9 @@ class DatabaseCreation(object):
     def __init__(self, connection):
         self.connection = connection
     
+    def db_type(self, field):
+        return None
+    
     def create_test_db(self, verbosity, autoclobber):
         if self.connection.settings_dict['TEST_NAME']:
             test_database_name = self.connection.settings_dict['TEST_NAME']

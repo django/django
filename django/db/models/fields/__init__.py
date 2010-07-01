@@ -13,7 +13,6 @@ from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
 from django.core import exceptions, validators
-from django.utils.datastructures import DictWrapper
 from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
@@ -215,13 +214,7 @@ class Field(object):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
-        if not getattr(connection.features, "typed_columns", True):
-            return None
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
-        try:
-            return connection.creation.data_types[self.get_internal_type()] % data
-        except KeyError:
-            return None
+        return connection.creation.db_type(self)
 
     def unique(self):
         return self._unique or self.primary_key
