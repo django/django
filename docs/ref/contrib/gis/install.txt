@@ -383,9 +383,9 @@ Typically, SQLite packages are not compiled to include the `R*Tree module`__ --
 thus it must be compiled from source.  First download the latest amalgamation 
 source archive from the `SQLite download page`__, and extract::
 
-    $ wget http://www.sqlite.org/sqlite-amalgamation-3.6.22.tar.gz
-    $ tar xzf sqlite-amalgamation-3.6.22.tar.gz
-    $ cd sqlite-3.6.22
+    $ wget http://sqlite.org/sqlite-amalgamation-3.6.23.1.tar.gz
+    $ tar xzf sqlite-amalgamation-3.6.23.1.tar.gz
+    $ cd sqlite-3.6.23.1
 
 Next, run the ``configure`` script -- however the ``CFLAGS`` environment variable
 needs to be customized so that SQLite knows to build the R*Tree module::
@@ -449,12 +449,9 @@ Finally, do the same for the SpatiaLite tools::
 .. note::
 
     For Mac OS X users building from source, the SpatiaLite library *and* tools 
-    need to be linked into the existing ``iconv`` library. While this happens 
-    automatically on Linux, the ``configure`` scripts need to know about the 
-    specific location on Mac OS X (via modification of the ``CFLAGS`` and 
-    ``LDFLAGS`` environment variables prior to configuration)::
+    need to have their ``target`` configured::
 
-        $ CFLAGS=-I/usr/include LDFLAGS="-L/usr/lib -liconv" ./configure
+        $ ./configure --target=macosx
 
 __ http://www.gaia-gis.it/spatialite/sources.html
 
@@ -804,8 +801,8 @@ your ``.profile`` to be able to run the package programs from the command-line::
     export PATH=/Library/Frameworks/GDAL.framework/Programs:$PATH
     export PATH=/usr/local/pgsql/bin:$PATH
 
-__ http://www.kyngchaos.com/wiki/software:frameworks
-__ http://www.kyngchaos.com/wiki/software:postgres
+__ http://www.kyngchaos.com/software/frameworks
+__ http://www.kyngchaos.com/software/postgres
 
 .. note::
 

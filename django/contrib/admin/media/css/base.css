@@ -445,6 +445,14 @@ ul.messagelist li {
     background: #ffc url(../img/admin/icon_success.gif) 5px .3em no-repeat;
 }
 
+ul.messagelist li.warning{
+    background-image: url(../img/admin/icon_alert.gif);
+}
+
+ul.messagelist li.error{
+    background-image: url(../img/admin/icon_error.gif);
+}
+
 .errornote {
     font-size: 12px !important;
     display: block;
