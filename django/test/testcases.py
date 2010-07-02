@@ -2,8 +2,6 @@ import re
 from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
 
-#from django.utils import unittest
-
 from django.conf import settings
 from django.core import mail
 from django.core.management import call_command
