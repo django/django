@@ -1,5 +1,5 @@
 # coding: utf-8
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.test import TestCase
 from django.utils.safestring import SafeUnicode, SafeString
@@ -29,9 +29,7 @@ class FieldDefaultsTestCase(TestCase):
         self.assertEqual(a.headline, u'Default headline')
 
         # make sure the two dates are sufficiently close
-        #fixme, use the new unittest2 function
-        d = now - a.pub_date
-        self.assertTrue(d.seconds < 5)
+        self.assertAlmostEqual(now, a.pub_date, delta=timedelta(5))
 
         # make sure that SafeString/SafeUnicode fields work
         a.headline = SafeUnicode(u'Iñtërnâtiônàlizætiøn1')
