@@ -8,10 +8,6 @@ from models import Employee, Company
 class ExpressionsTestCase(TestCase):
     fixtures = ['f_expression_testdata.json']
 
-    def assertItemsEqual(self, a, b):
-        #fixme, replace with unittest2 function
-        return self.assertEqual(sorted(a), sorted(b))
-
     def test_basic_f_expression(self):
         company_query = Company.objects.values('name','num_employees',
                                                'num_chairs'
