@@ -230,7 +230,6 @@ class FixtureLoadingTests(TestCase):
         self._dumpdata_assert(['fixtures'], """<?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0"><object pk="1" model="fixtures.category"><field type="CharField" name="title">News Stories</field><field type="TextField" name="description">Latest news stories</field></object><object pk="3" model="fixtures.article"><field type="CharField" name="headline">Time to reform copyright</field><field type="DateTimeField" name="pub_date">2006-06-16 13:00:00</field></object><object pk="2" model="fixtures.article"><field type="CharField" name="headline">Poker has no place on ESPN</field><field type="DateTimeField" name="pub_date">2006-06-16 12:00:00</field></object><object pk="1" model="fixtures.article"><field type="CharField" name="headline">Python program becomes self aware</field><field type="DateTimeField" name="pub_date">2006-06-16 11:00:00</field></object><object pk="1" model="fixtures.tag"><field type="CharField" name="name">copyright</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="2" model="fixtures.tag"><field type="CharField" name="name">law</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="1" model="fixtures.person"><field type="CharField" name="name">Django Reinhardt</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">Prince</field></object><object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane Grappelli</field></object></django-objects>""", format='xml', natural_keys=True)
 
-@skipIfDBEngine('django.db.backends.mysql')
 class FixtureTransactionTests(TransactionTestCase):
     def _dumpdata_assert(self, args, output, format='json'):
         new_io = StringIO.StringIO()
@@ -238,6 +237,7 @@ class FixtureTransactionTests(TransactionTestCase):
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, output)
 
+    @skipIfDBEngine('django.db.backends.mysql')
     def test_format_discovery(self):
         # Load fixture 1 again, using format discovery
         management.call_command('loaddata', 'fixture1', verbosity=0, commit=False)
