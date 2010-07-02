@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
-
+from django.utils.unittest import skipIf
 from django.conf import settings
 from django.db import transaction, IntegrityError, DEFAULT_DB_ALIAS
 
@@ -116,10 +116,10 @@ class CustomPkTestCase(TestCase):
     # SQLite lets objects be saved with an empty primary key, even though an
     # integer is expected. So we can't check for an error being raised in that case
     # for SQLite. Remove it from the suite for this next bit.
+    @skipIf(settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.sqlite3',
+            "SQLite lets objects be saved with empty pk")
     def test_empty_pk_error(self):
-        #fixme, improve this skiping with unittest2
-        if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.sqlite3':
-            self.assertRaises(IntegrityError,
-                              Employee.objects.create,
-                              first_name='Tom', last_name='Smith')
+        self.assertRaises(IntegrityError,
+                          Employee.objects.create,
+                          first_name='Tom', last_name='Smith')
             
