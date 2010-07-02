@@ -898,7 +898,7 @@ class TestCase(unittest.TestCase):
             expected.sort()
             actual = actual_seq[:]
             actual.sort()
-        except TypeError:
+        except (TypeError, AttributeError):
             # Unsortable items (example: set(), complex(), ...)
             expected = list(expected_seq)
             actual = list(actual_seq)
