@@ -2,9 +2,11 @@ import sys, time, os
 from django.conf import settings
 from django.core import mail
 from django.core.mail.backends import locmem
+from django.db import DEFAULT_DB_ALIAS
 from django.test import signals
 from django.template import Template
 from django.utils.translation import deactivate
+from django.utils.unittest import skipIf
 
 class ContextList(list):
     """A wrapper that provides direct key access to context items contained
@@ -77,3 +79,14 @@ def get_runner(settings):
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
     return test_runner
+
+def skipIfDBEngine(engine, reason=None):
+    """
+    Decorator to skip tests on a given database engine.
+
+    Note that you can pass a single engine or an iterable here
+    """
+    if not reason:
+        reason = "not supported on this database"
+    return skipIf(settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] in engine,
+                  reason)
