@@ -1,7 +1,8 @@
 import re
-import unittest2 as unittest
 from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
+
+#from django.utils import unittest
 
 from django.conf import settings
 from django.core import mail
@@ -11,7 +12,7 @@ from django.db import transaction, connections, DEFAULT_DB_ALIAS
 from django.http import QueryDict
 from django.test import _doctest as doctest
 from django.test.client import Client
-from django.utils import simplejson
+from django.utils import simplejson, unittest
 from django.utils.encoding import smart_str
 
 try:

@@ -1,12 +1,12 @@
 import sys
 import signal
-import unittest
 
 from django.conf import settings
 from django.db.models import get_app, get_apps
 from django.test import _doctest as doctest
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.testcases import OutputChecker, DocTestRunner, TestCase
+from django.utils import unittest
 
 # The module name for tests outside models.py
 TEST_MODULE = 'tests'
