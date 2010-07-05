@@ -11,7 +11,7 @@ Install Python
 
 Being a Python Web framework, Django requires Python.
 
-It works with any Python version from 2.4 to 2.6 (due to backwards
+It works with any Python version from 2.4 to 2.7 (due to backwards
 incompatibilities in Python 3.0, Django does not currently work with
 Python 3.0; see :ref:`the Django FAQ <faq-install>` for more
 information on supported Python versions and the 3.0 transition).
