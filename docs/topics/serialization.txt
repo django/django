@@ -169,7 +169,7 @@ For example::
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 The Django source code includes the simplejson_ module. However, if you're
-using Python 2.6 (which includes a builtin version of the module), Django will
+using Python 2.6 or later (which includes a builtin version of the module), Django will
 use the builtin ``json`` module automatically. If you have a system installed
 version that includes the C-based speedup extension, or your system version is
 more recent than the version shipped with Django (currently, 2.0.7), the
