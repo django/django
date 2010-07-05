@@ -5,7 +5,7 @@ Database access optimization
 ============================
 
 Django's database layer provides various ways to help developers get the most
-out of their databases. This documents gathers together links to the relevant
+out of their databases. This document gathers together links to the relevant
 documentation, and adds various tips, organized under an number of headings that
 outline the steps to take when attempting to optimize your database usage.
 
@@ -108,9 +108,8 @@ Do database work in the database rather than in Python
 
 For instance:
 
-* At the most basic level, use :ref:`filter and exclude <queryset-api>` to
-  filtering in the database to avoid loading data into your Python process, only
-  to throw much of it away.
+* At the most basic level, use :ref:`filter and exclude <queryset-api>` to do
+  filtering in the database.
 
 * Use :ref:`F() object query expressions <query-expressions>` to do filtering
   against other fields within the same model.
@@ -244,9 +243,6 @@ Note, however, that these bulk update methods cannot call the ``save()`` or ``de
 methods of individual instances, which means that any custom behaviour you have
 added for these methods will not be executed, including anything driven from the
 normal database object :ref:`signals <ref-signals>`.
-
-Don't retrieve things you already have
-======================================
 
 Use foreign key values directly
 -------------------------------
