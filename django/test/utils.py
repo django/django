@@ -88,5 +88,7 @@ def skipIfDBEngine(engine, reason=None):
     """
     if not reason:
         reason = "not supported on this database"
-    return skipIf(settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] in engine,
-                  reason)
+    settings_engine = settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE']
+    if isinstance(engine, basestring):
+        return skipIf(settings_engine == engine, reason)
+    return skipIf(settings_engine in engine, reason)
