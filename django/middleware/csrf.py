@@ -126,13 +126,27 @@ class CsrfViewMiddleware(object):
                 return accept()
 
             if request.is_secure():
-                # Strict referer checking for HTTPS
+                # Suppose user visits http://example.com/
+                # An active network attacker,(man-in-the-middle, MITM) sends a
+                # POST form which targets https://example.com/detonate-bomb/ and
+                # submits it via javascript.
+                #
+                # The attacker will need to provide a CSRF cookie and token, but
+                # that is no problem for a MITM and the session independent
+                # nonce we are using. So the MITM can circumvent the CSRF
+                # protection. This is true for any HTTP connection, but anyone
+                # using HTTPS expects better!  For this reason, for
+                # https://example.com/ we need additional protection that treats
+                # http://example.com/ as completely untrusted.  Under HTTPS,
+                # Barth et al. found that the Referer header is missing for
+                # same-domain requests in only about 0.2% of cases or less, so
+                # we can use strict Referer checking.
                 referer = request.META.get('HTTP_REFERER')
                 if referer is None:
                     return reject("Referer checking failed - no Referer.")
 
                 # The following check ensures that the referer is HTTPS,
-                # the domains match and the ports match.  This might be too strict.
+                # the domains match and the ports match - the same origin policy.
                 good_referer = 'https://%s/' % request.get_host()
                 if not referer.startswith(good_referer):
                     return reject("Referer checking failed - %s does not match %s." %
