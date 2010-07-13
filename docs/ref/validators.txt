@@ -5,6 +5,8 @@ Validators
 ==========
 
 .. versionadded:: 1.2
+.. module:: django.core.validators
+    :synopsis: Validation utilities and base classes
 
 Writing validators
 ==================
