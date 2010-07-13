@@ -5,6 +5,7 @@ class Artist(models.Model):
     id = models.NativeAutoField(primary_key=True)
     name = models.CharField(max_length=255)
     good = models.BooleanField()
+    age = models.IntegerField(null=True)
     
     current_group = models.ForeignKey("Group", null=True)
     

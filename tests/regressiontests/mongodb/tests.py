@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, F
 from django.test import TestCase
 
 from models import Artist, Group
@@ -26,6 +26,28 @@ class MongoTestCase(TestCase):
         
         l = Artist.objects.get(pk=pk)
         self.assertTrue(not l.good)
+    
+    def test_bulk_update(self):
+        # Doesn't actually do an op on more than 1 item, but it's the bulk
+        # update syntax nonetheless
+        v = Artist.objects.create(name="Van Morrison", good=False)
+        # How do you make a mistake like this, I don't know...
+        Artist.objects.filter(pk=v.pk).update(good=True)
+        self.assertTrue(Artist.objects.get(pk=v.pk).good)
+    
+    def test_f_expressions(self):
+        k = Artist.objects.create(name="Keb' Mo'", age=57, good=True)
+        # Birthday!
+        Artist.objects.filter(pk=k.pk).update(age=F("age") + 1)
+        self.assertEqual(Artist.objects.get(pk=k.pk).age, 58)
+        
+        # Backwards birthday
+        Artist.objects.filter(pk=k.pk).update(age=F("age") - 1)
+        self.assertEqual(Artist.objects.get(pk=k.pk).age, 57)
+        
+        # Birthday again!
+        Artist.objects.filter(pk=k.pk).update(age=1 + F("age"))
+        self.assertEqual(Artist.objects.get(pk=k.pk).age, 58)
     
     def test_count(self):
         Artist.objects.create(name="Billy Joel", good=True)
@@ -121,7 +143,7 @@ class MongoTestCase(TestCase):
         
         self.assertQuerysetEqual(
             Artist.objects.values(), [
-                {"name": "Steve Perry", "good": True, "current_group_id": None, "id": a.pk},
+                {"name": "Steve Perry", "good": True, "current_group_id": None, "id": a.pk, "age": None},
             ],
             lambda a: a,
         )

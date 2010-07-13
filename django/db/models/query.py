@@ -8,7 +8,8 @@ from itertools import izip
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
-from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory, InvalidQuery
+from django.db.models.query_utils import (Q, select_related_descend,
+    CollectedObjects, CyclicDependency, deferred_class_factory, InvalidQuery)
 from django.db.models import signals, sql
 from django.utils.copycompat import deepcopy
 
@@ -464,7 +465,7 @@ class QuerySet(object):
         else:
             forced_managed = False
         try:
-            rows = query.get_compiler(self.db).execute_sql(None)
+            rows = query.get_compiler(self.db).update(None)
             if forced_managed:
                 transaction.commit(using=self.db)
             else:

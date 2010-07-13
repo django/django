@@ -2,6 +2,7 @@ import re
 
 from pymongo import ASCENDING, DESCENDING
 
+from django.db.models import F
 from django.db.models.sql.datastructures import FullResultSet, EmptyResultSet
 
 
@@ -153,8 +154,25 @@ class SQLUpdateCompiler(SQLCompiler):
         filters = self.get_filters(self.query.where)
         # TODO: Don't use set for everything, use INC and such where
         # appropriate.
+        vals = {}
+        for field, o, value in self.query.values:
+            if hasattr(value, "evaluate"):
+                assert value.connector in (value.ADD, value.SUB)
+                assert not value.negated
+                assert not value.subtree_parents
+                lhs, rhs = value.children
+                if isinstance(lhs, F):
+                    assert not isinstance(rhs, F)
+                    if value.connector == value.SUB:
+                        rhs = -rhs
+                else:
+                    assert value.connector == value.ADD
+                    rhs, lhs = lhs, rhs
+                vals.setdefault("$inc", {})[lhs.name] = rhs
+            else:
+                vals.setdefault("$set", {})[field.column] = value
         return self.connection.db[self.query.model._meta.db_table].update(
             filters,
-            {"$set": dict((f.column, val) for f, o, val in self.query.values)},
+            vals,
             multi=True
         )
