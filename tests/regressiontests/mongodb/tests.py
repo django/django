@@ -82,6 +82,9 @@ class MongoTestCase(TestCase):
         self.assertEqual(b.current_group_id, e.pk)
         self.assertFalse(hasattr(b, "_current_group_cache"))
         self.assertEqual(b.current_group, e)
+        
+        self.assertEqual(Artist.objects.get(current_group=e), b)
+        self.assertEqual(Artist.objects.get(current_group__id=e.pk), b)
     
     def test_exists(self):
         self.assertFalse(Artist.objects.filter(name="Brian May").exists())

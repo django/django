@@ -10,6 +10,7 @@ from django.utils.importlib import import_module
 class DatabaseFeatures(object):
     interprets_empty_strings_as_nulls = False
     sql_nulls = False
+    related_fields_match_type = False
 
 
 class DatabaseOperations(object):
