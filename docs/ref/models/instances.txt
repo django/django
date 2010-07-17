@@ -107,7 +107,7 @@ special key that is used for errors that are tied to the entire model instead
 of to a specific field. You can access these errors with ``NON_FIELD_ERRORS``::
 
 
-    from django.core.validators import ValidationError, NON_FIELD_ERRORS
+    from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
     try:
         article.full_clean()
     except ValidationError, e:
