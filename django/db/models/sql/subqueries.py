@@ -24,7 +24,7 @@ class DeleteQuery(Query):
     def do_query(self, table, where, using):
         self.tables = [table]
         self.where = where
-        self.get_compiler(using).execute_sql(None)
+        self.get_compiler(using).delete(None)
 
     def delete_batch(self, pk_list, using):
         """
@@ -36,7 +36,7 @@ class DeleteQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             field = self.model._meta.pk
-            where.add((Constraint(None, field.column, field), 'in',
+            where.add((Constraint(self.model._meta.db_table, field.column, field), 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
 

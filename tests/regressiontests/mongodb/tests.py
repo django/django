@@ -50,6 +50,22 @@ class MongoTestCase(TestCase):
         Artist.objects.filter(pk=k.pk).update(age=1 + F("age"))
         self.assertEqual(Artist.objects.get(pk=k.pk).age, 58)
     
+    def test_delete(self):
+        o = Artist.objects.create(name="O.A.R.", good=True)
+        self.assertEqual(Artist.objects.count(), 1)
+        
+        o.delete()
+        self.assertEqual(Artist.objects.count(), 0)
+    
+    def test_bulk_delete(self):
+        d = Artist.objects.create(name="Dispatch", good=True)
+        b = Artist.objects.create(name="Backstreet Boys", good=False)
+        
+        # Good riddance.
+        Artist.objects.filter(good=False).delete()
+        self.assertEqual(Artist.objects.count(), 1)
+        self.assertEqual(Artist.objects.get(), d)
+    
     def test_count(self):
         Artist.objects.create(name="Billy Joel", good=True)
         Artist.objects.create(name="John Mellencamp", good=True)

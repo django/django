@@ -821,6 +821,9 @@ class SQLDeleteCompiler(SQLCompiler):
         where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
         result.append('WHERE %s' % where)
         return ' '.join(result), tuple(params)
+    
+    def delete(self, *args, **kwargs):
+        return self.execute_sql(*args, **kwargs)
 
 class SQLUpdateCompiler(SQLCompiler):
     def as_sql(self):

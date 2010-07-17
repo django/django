@@ -176,3 +176,9 @@ class SQLUpdateCompiler(SQLCompiler):
             vals,
             multi=True
         )
+
+
+class SQLDeleteCompiler(SQLCompiler):
+    def delete(self, result_type):
+        filters = self.get_filters(self.query.where)
+        self.connection.db[self.query.model._meta.db_table].remove(filters)
