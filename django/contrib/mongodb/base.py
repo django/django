@@ -76,8 +76,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return self.connection[self.settings_dict["NAME"]]
 
     def close(self):
-        self._connection.disconnect()
-        self._connection = None
+        if self._connection is not None:
+            self._connection.disconnect()
+            self._connection = None
     
     
     ###########################

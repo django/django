@@ -1,3 +1,4 @@
+from django.db import connection
 from django.db.models import Count, F
 from django.test import TestCase
 
@@ -337,3 +338,8 @@ class MongoTestCase(TestCase):
             ],
             lambda g: g.name,
         )
+    
+    def test_close(self):
+        # Ensure that closing a connection that was never established doesn't
+        # blow up.
+        connection.close()
