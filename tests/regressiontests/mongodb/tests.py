@@ -1,5 +1,5 @@
 from django.db import connection, UnsupportedDatabaseOperation
-from django.db.models import Count, Sum, F
+from django.db.models import Count, Sum, F, Q
 from django.test import TestCase
 
 from models import Artist, Group
@@ -391,4 +391,8 @@ class MongoTestCase(TestCase):
         
         self.assert_unsupported(
             lambda: Artist.objects.aggregate(Count("id"), Count("pk"))
+        )
+        
+        self.assert_unsupported(
+            Artist.objects.filter(Q(pk=0) | Q(pk=1))
         )

@@ -25,6 +25,9 @@ class SQLCompiler(object):
         self.using = using
     
     def get_filters(self, where):
+        if where.connector != "AND":
+            raise UnsupportedDatabaseOperation("MongoDB only supports joining "
+                "filters with and, not or.")
         assert where.connector == "AND"
         filters = {}
         for child in where.children:
