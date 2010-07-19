@@ -6,7 +6,7 @@ from django.db.utils import ConnectionHandler, ConnectionRouter, load_backend, D
 from django.utils.functional import curry
 
 __all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
-    'IntegrityError', 'DEFAULT_DB_ALIAS')
+    'IntegrityError', 'UnsupportedDatabaseOperation', 'DEFAULT_DB_ALIAS')
 
 
 # For backwards compatibility - Port any old database settings over to
@@ -74,6 +74,12 @@ router = ConnectionRouter(settings.DATABASE_ROUTERS)
 # connections['default'] instead.
 connection = connections[DEFAULT_DB_ALIAS]
 backend = load_backend(connection.settings_dict['ENGINE'])
+
+class UnsupportedDatabaseOperation(Exception):
+    """
+    Raised when an operation attempted on a QuerySet is unsupported on the
+    database for it's execution.
+    """
 
 # Register an event that closes the database connection
 # when a Django request is finished.

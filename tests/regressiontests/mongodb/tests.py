@@ -1,5 +1,5 @@
-from django.db import connection
-from django.db.models import Count, F
+from django.db import connection, UnsupportedDatabaseOperation
+from django.db.models import Count, Sum, F
 from django.test import TestCase
 
 from models import Artist, Group
@@ -359,3 +359,36 @@ class MongoTestCase(TestCase):
         # Ensure that closing a connection that was never established doesn't
         # blow up.
         connection.close()
+    
+    def assert_unsupported(self, obj):
+        if callable(obj):
+            # Queryset wrapped in a function (for aggregates and such)
+            self.assertRaises(UnsupportedDatabaseOperation, obj)
+        else:
+            # Just a queryset that blows up on evaluation
+            self.assertRaises(UnsupportedDatabaseOperation, list, obj)
+    
+    def test_unsupported_ops(self):
+        self.assert_unsupported(
+            Artist.objects.filter(current_group__name="The Beatles")
+        )
+        
+        self.assert_unsupported(
+            Artist.objects.extra(select={"a": "1.0"})
+        )
+        
+        self.assert_unsupported(
+            Group.objects.annotate(artists=Count("current_artists"))
+        )
+        
+        self.assert_unsupported(
+            lambda: Artist.objects.aggregate(Sum("age"))
+        )
+        
+        self.assert_unsupported(
+            lambda: Artist.objects.aggregate(Count("age"))
+        )
+        
+        self.assert_unsupported(
+            lambda: Artist.objects.aggregate(Count("id"), Count("pk"))
+        )

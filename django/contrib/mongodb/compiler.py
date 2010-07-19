@@ -2,6 +2,7 @@ import re
 
 from pymongo import ASCENDING, DESCENDING
 
+from django.db import UnsupportedDatabaseOperation
 from django.db.models import F
 from django.db.models.sql.datastructures import FullResultSet, EmptyResultSet
 
@@ -43,10 +44,13 @@ class SQLCompiler(object):
                     pass
         return filters
     
-    def make_atom(self, lhs, lookup_type, value_annotation, params_or_value, negated):
+    def make_atom(self, lhs, lookup_type, value_annotation, params_or_value,
+        negated):
         assert lookup_type in self.LOOKUP_TYPES, lookup_type
         if hasattr(lhs, "process"):
-            lhs, params = lhs.process(lookup_type, params_or_value, self.connection)
+            lhs, params = lhs.process(
+                lookup_type, params_or_value, self.connection
+            )
         else:
             params = Field().get_db_prep_lookup(lookup_type, params_or_value, 
                 connection=self.connection, prepared=True)
@@ -56,7 +60,8 @@ class SQLCompiler(object):
         if column == self.query.model._meta.pk.column:
             column = "_id"
         
-        return column, self.LOOKUP_TYPES[lookup_type](params, value_annotation, negated)
+        val = self.LOOKUP_TYPES[lookup_type](params, value_annotation, negated)
+        return column, val
     
     def negate(self, k, v):
         # Regex lookups are of the form {"field": re.compile("pattern") and
@@ -79,14 +84,18 @@ class SQLCompiler(object):
         return None
     
     def build_query(self, aggregates=False):
-        assert len([a for a in self.query.alias_map if self.query.alias_refcount[a]]) <= 1
+        if len([a for a in self.query.alias_map if self.query.alias_refcount[a]]) > 1:
+            raise UnsupportedDatabaseOperation("MongoDB does not support "
+                "operations across relations.")
+        if self.query.extra:
+            raise UnsupportedDatabaseOperation("MongoDB does not support extra().")
         assert not self.query.distinct
-        assert not self.query.extra
         assert not self.query.having
         
         filters = self.get_filters(self.query.where)
         fields = self.get_fields(aggregates=aggregates)
-        cursor = self.connection.db[self.query.model._meta.db_table].find(filters, fields=fields)
+        collection = self.connection.db[self.query.model._meta.db_table]
+        cursor = collection.find(filters, fields=fields)
         if self.query.order_by:
             cursor = cursor.sort([
                 (ordering.lstrip("-"), DESCENDING if ordering.startswith("-") else ASCENDING)
@@ -125,14 +134,19 @@ class SQLCompiler(object):
             return True
     
     def get_aggregates(self):
+        if len(self.query.aggregates) != 1:
+            raise UnsupportedDatabaseOperation("MongoDB doesn't support "
+                "multiple aggregates in a single query.")
         assert len(self.query.aggregates) == 1
         agg = self.query.aggregates.values()[0]
-        assert (
-            isinstance(agg, self.query.aggregates_module.Count) and (
-                agg.col == "*" or 
-                isinstance(agg.col, tuple) and agg.col == (self.query.model._meta.db_table, self.query.model._meta.pk.column)
-            )
-        )
+        if not isinstance(agg, self.query.aggregates_module.Count):
+            raise UnsupportedDatabaseOperation("MongoDB does not support "
+                "aggregates other than Count.")
+        opts = self.query.model._meta
+        if not (agg.col == "*" or agg.col == (opts.db_table, opts.pk.column)):
+            raise UnsupportedDatabaseOperation("MongoDB does not support "
+                "aggregation over fields besides the primary key.")
+
         return [self.build_query(aggregates=True).count()]
 
 
@@ -152,8 +166,7 @@ class SQLUpdateCompiler(SQLCompiler):
     def update(self, result_type):
         # TODO: more asserts
         filters = self.get_filters(self.query.where)
-        # TODO: Don't use set for everything, use INC and such where
-        # appropriate.
+
         vals = {}
         for field, o, value in self.query.values:
             if hasattr(value, "evaluate"):

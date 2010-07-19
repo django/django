@@ -7,7 +7,8 @@ class Artist(models.Model):
     good = models.BooleanField()
     age = models.IntegerField(null=True)
     
-    current_group = models.ForeignKey("Group", null=True)
+    current_group = models.ForeignKey("Group", null=True,
+        related_name="current_artists")
     
     def __unicode__(self):
         return self.name
