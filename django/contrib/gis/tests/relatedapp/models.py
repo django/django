@@ -38,6 +38,11 @@ class Author(models.Model):
     name = models.CharField(max_length=100)
     objects = models.GeoManager()
 
+class Article(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.ForeignKey(Author, unique=True)
+    objects = models.GeoManager()
+
 class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, related_name='books', null=True)

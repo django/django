@@ -95,7 +95,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         return result
 
     def get_default_columns(self, with_aliases=False, col_aliases=None,
-                            start_alias=None, opts=None, as_pairs=False):
+            start_alias=None, opts=None, as_pairs=False, local_only=False):
         """
         Computes the default columns for selecting every field in the base
         model. Will sometimes be called to pull in related models (e.g. via
@@ -121,6 +121,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         if start_alias:
             seen = {None: start_alias}
         for field, model in opts.get_fields_with_model():
+            if local_only and model is not None:
+                continue
             if start_alias:
                 try:
                     alias = seen[model]
