@@ -2,10 +2,18 @@ from django.db import connection, UnsupportedDatabaseOperation
 from django.db.models import Count, Sum, F, Q
 from django.test import TestCase
 
-from models import Artist, Group
+from models import Artist, Group, Post
 
 
 class MongoTestCase(TestCase):
+    def assert_unsupported(self, obj):
+        if callable(obj):
+            # Queryset wrapped in a function (for aggregates and such)
+            self.assertRaises(UnsupportedDatabaseOperation, obj)
+        else:
+            # Just a queryset that blows up on evaluation
+            self.assertRaises(UnsupportedDatabaseOperation, list, obj)
+
     def test_create(self):
         b = Artist.objects.create(name="Bruce Springsteen", good=True)
         self.assertTrue(b.pk is not None)
@@ -359,15 +367,7 @@ class MongoTestCase(TestCase):
         # Ensure that closing a connection that was never established doesn't
         # blow up.
         connection.close()
-    
-    def assert_unsupported(self, obj):
-        if callable(obj):
-            # Queryset wrapped in a function (for aggregates and such)
-            self.assertRaises(UnsupportedDatabaseOperation, obj)
-        else:
-            # Just a queryset that blows up on evaluation
-            self.assertRaises(UnsupportedDatabaseOperation, list, obj)
-    
+
     def test_unsupported_ops(self):
         self.assert_unsupported(
             Artist.objects.filter(current_group__name="The Beatles")
@@ -395,4 +395,56 @@ class MongoTestCase(TestCase):
         
         self.assert_unsupported(
             Artist.objects.filter(Q(pk=0) | Q(pk=1))
+        )
+    
+    def test_list_field(self):
+        p = Post.objects.create(
+            title="Django ORM grows MongoDB support",
+            tags=["python", "django", "mongodb", "web"]
+        )
+        
+        self.assertEqual(p.tags, ["python", "django", "mongodb", "web"])
+        
+        p = Post.objects.get(pk=p.pk)
+        self.assertEqual(p.tags, ["python", "django", "mongodb", "web"])
+        
+        p = Post.objects.create(
+            title="Rails 3.0 Released",
+            tags=["ruby", "rails", "release", "web"],
+        )
+        
+        self.assertQuerysetEqual(
+            Post.objects.filter(tags="web"), [
+                "Django ORM grows MongoDB support",
+                "Rails 3.0 Released",
+            ],
+            lambda p: p.title,
+        )
+        
+        self.assertQuerysetEqual(
+            Post.objects.filter(tags="python"), [
+                "Django ORM grows MongoDB support",
+            ],
+            lambda p: p.title
+        )
+        
+        self.assertRaises(ValueError,
+            lambda: Post.objects.create(magic_numbers=["a"])
+        )
+        
+        p = Post.objects.create(
+            title="Simon the Wizard",
+            magic_numbers=["42"]
+        )
+        self.assertQuerysetEqual(
+            Post.objects.filter(magic_numbers=42), [
+                "Simon the Wizard",
+            ],
+            lambda p: p.title,
+        )
+        self.assertQuerysetEqual(
+            Post.objects.filter(magic_numbers="42"), [
+                "Simon the Wizard",
+            ],
+            lambda p: p.title,
         )

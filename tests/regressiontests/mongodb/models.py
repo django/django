@@ -19,3 +19,15 @@ class Group(models.Model):
     name = models.CharField(max_length=255)
     year_formed = models.IntegerField(null=True)
 
+
+class Post(models.Model):
+    id = models.NativeAutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    
+    tags = models.ListField(
+        models.CharField(max_length=255)
+    )
+    
+    magic_numbers = models.ListField(
+        models.IntegerField()
+    )
