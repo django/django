@@ -88,7 +88,10 @@ def parse_version_directive(name, arguments, options, content, lineno,
     if not is_nextversion:
         if len(arguments) == 1:
             linktext = 'Please, see the release notes <releases-%s>' % (arguments[0])
-            xrefs = sphinx.roles.xfileref_role('ref', linktext, linktext, lineno, state)
+            try:
+                xrefs = sphinx.roles.XRefRole()('ref', linktext, linktext, lineno, state) # Sphinx >= 1.0
+            except:
+                xrefs = sphinx.roles.xfileref_role('ref', linktext, linktext, lineno, state) # Sphinx < 1.0
             node.extend(xrefs[0])
         node['version'] = arguments[0]
     else:
@@ -159,7 +162,7 @@ class DjangoHTMLTranslator(sphinx_htmlwriter.SmartyPantsHTMLTranslator):
     # better callout -- the Sphinx default is just a little span,
     # which is a bit less obvious that I'd like.
     #
-    # FIXME: these messages are all hardcoded in English. We need to chanage 
+    # FIXME: these messages are all hardcoded in English. We need to change
     # that to accomodate other language docs, but I can't work out how to make
     # that work and I think it'll require Sphinx 0.5 anyway.
     #
@@ -212,7 +215,10 @@ def parse_django_admin_node(env, sig, signode):
 def parse_django_adminopt_node(env, sig, signode):
     """A copy of sphinx.directives.CmdoptionDesc.parse_signature()"""
     from sphinx import addnodes
-    from sphinx.directives.desc import option_desc_re
+    try:
+        from sphinx.domains.std import option_desc_re # Sphinx >= 1.0
+    except:
+        from sphinx.directives.desc import option_desc_re # Sphinx < 1.0
     count = 0
     firstname = ''
     for m in option_desc_re.finditer(sig):
@@ -278,9 +284,14 @@ class DjangoStandaloneHTMLBuilder(builders_html.StandaloneHTMLBuilder):
             self.warn("cannot create templatebuiltins.js due to missing simplejson dependency")
             return
         self.info(bold("writing templatebuiltins.js..."))
-        xrefs = self.env.reftargets.keys()
-        templatebuiltins = dict([('ttags', [n for (t,n) in xrefs if t == 'ttag']),
-                                 ('tfilters', [n for (t,n) in xrefs if t == 'tfilter'])])
+        try:
+            xrefs = self.env.reftargets.keys()
+            templatebuiltins = dict([('ttags', [n for (t,n) in xrefs if t == 'ttag']),
+                                     ('tfilters', [n for (t,n) in xrefs if t == 'tfilter'])])
+        except AttributeError:
+            xrefs = self.env.domaindata["std"]["objects"]
+            templatebuiltins = dict([('ttags', [n for (t,n) in xrefs if t == 'templatetag']),
+                                     ('tfilters', [n for (t,n) in xrefs if t == 'templatefilter'])])
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")
         f = open(outfilename, 'wb')
         f.write('var django_template_builtins = ')
