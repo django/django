@@ -1090,10 +1090,7 @@ class Query(object):
                     # exclude the "foo__in=[]" case from this handling, because
                     # it's short-circuited in the Where class.
                     # We also need to handle the case where a subquery is provided
-                    entry = self.where_class()
-                    entry.add((Constraint(alias, col, None), 'isnull', True), AND)
-                    entry.negate()
-                    self.where.add(entry, AND)
+                    self.where.add((Constraint(alias, col, None), 'isnull', False), AND)
 
         if can_reuse is not None:
             can_reuse.update(join_list)
