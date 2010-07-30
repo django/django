@@ -1027,90 +1027,88 @@ The difference between these two is merely the template used to render them.
 The ``InlineModelAdmin`` class is a subclass of ``ModelAdmin`` so it inherits
 all the same functionality as well as some of its own:
 
-``model``
-~~~~~~~~~
+.. attribute:: InlineModelAdmin.model
 
-The model in which the inline is using. This is required.
+    The model in which the inline is using. This is required.
 
-``fk_name``
-~~~~~~~~~~~
+.. attribute:: InlineModelAdmin.fk_name
 
-The name of the foreign key on the model. In most cases this will be dealt
-with automatically, but ``fk_name`` must be specified explicitly if there are
-more than one foreign key to the same parent model.
+    The name of the foreign key on the model. In most cases this will be dealt
+    with automatically, but ``fk_name`` must be specified explicitly if there
+    are more than one foreign key to the same parent model.
 
-``formset``
-~~~~~~~~~~~
+.. attribute:: InlineModelAdmin.formset
 
-This defaults to ``BaseInlineFormSet``. Using your own formset can give you
-many possibilities of customization. Inlines are built around
-:ref:`model formsets <model-formsets>`.
+    This defaults to ``BaseInlineFormSet``. Using your own formset can give you
+    many possibilities of customization. Inlines are built around
+    :ref:`model formsets <model-formsets>`.
 
-``form``
-~~~~~~~~
+.. attribute:: InlineModelAdmin.form
 
-The value for ``form`` defaults to ``ModelForm``. This is what is
-passed through to ``inlineformset_factory`` when creating the formset for this
-inline.
+    The value for ``form`` defaults to ``ModelForm``. This is what is passed
+    through to ``inlineformset_factory`` when creating the formset for this
+    inline.
 
 .. _ref-contrib-admin-inline-extra:
 
-``extra``
-~~~~~~~~~
+.. attribute:: InlineModelAdmin.extra
 
-This controls the number of extra forms the formset will display in addition
-to the initial forms. See the
-:ref:`formsets documentation <topics-forms-formsets>` for more information.
 
-.. versionadded:: 1.2
+    This controls the number of extra forms the formset will display in addition
+    to the initial forms. See the
+    :ref:`formsets documentation <topics-forms-formsets>` for more information.
 
-For users with JavaScript-enabled browsers, an "Add another" link is
-provided to enable any number of additional inlines to be added in
-addition to those provided as a result of the ``extra`` argument.
+    .. versionadded:: 1.2
 
-The dynamic link will not appear if the number of currently displayed
-forms exceeds ``max_num``, or if the user does not have JavaScript
-enabled.
+    For users with JavaScript-enabled browsers, an "Add another" link is
+    provided to enable any number of additional inlines to be added in addition
+    to those provided as a result of the ``extra`` argument.
+
+    The dynamic link will not appear if the number of currently displayed forms
+    exceeds ``max_num``, or if the user does not have JavaScript enabled.
 
 .. _ref-contrib-admin-inline-max-num:
 
-``max_num``
-~~~~~~~~~~~
+.. attribute:: InlineModelAdmin.max_num
 
-This controls the maximum number of forms to show in the inline. This doesn't
-directly correlate to the number of objects, but can if the value is small
-enough. See :ref:`model-formsets-max-num` for more information.
+    This controls the maximum number of forms to show in the inline. This
+    doesn't directly correlate to the number of objects, but can if the value
+    is small enough. See :ref:`model-formsets-max-num` for more information.
 
-``raw_id_fields``
-~~~~~~~~~~~~~~~~~
+.. attribute:: InlineModelAdmin.raw_id_fields
 
-By default, Django's admin uses a select-box interface (<select>) for
-fields that are ``ForeignKey``. Sometimes you don't want to incur the
-overhead of having to select all the related instances to display in the
-drop-down.
+    By default, Django's admin uses a select-box interface (<select>) for
+    fields that are ``ForeignKey``. Sometimes you don't want to incur the
+    overhead of having to select all the related instances to display in the
+    drop-down.
 
-``raw_id_fields`` is a list of fields you would like to change
-into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
+    ``raw_id_fields`` is a list of fields you would like to change into a
+    ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
 
-    class BookInline(admin.TabularInline):
-        model = Book
-        raw_id_fields = ("pages",)
+        class BookInline(admin.TabularInline):
+            model = Book
+            raw_id_fields = ("pages",)
 
-``template``
-~~~~~~~~~~~~
 
-The template used to render the inline on the page.
+.. attribute:: InlineModelAdmin.template
 
-``verbose_name``
-~~~~~~~~~~~~~~~~
+    The template used to render the inline on the page.
 
-An override to the ``verbose_name`` found in the model's inner ``Meta`` class.
+.. attribute:: InlineModelAdmin.verbose_name
 
-``verbose_name_plural``
-~~~~~~~~~~~~~~~~~~~~~~~
+    An override to the ``verbose_name`` found in the model's inner ``Meta``
+    class.
 
-An override to the ``verbose_name_plural`` found in the model's inner ``Meta``
-class.
+.. attribute:: InlineModelAdmin.verbose_name_plural
+
+    An override to the ``verbose_name_plural`` found in the model's inner
+    ``Meta`` class.
+
+.. attribute:: InlineModelAdmin.can_delete
+
+    Specifies whether or not inline objects can be deleted in the inline.
+    Defaults to ``True``.
+
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
