@@ -64,7 +64,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             # a second index that specifies their operator class, which is
             # needed when performing correct LIKE queries outside the
             # C locale. See #12234.
-            db_type = f.db_type()
+            db_type = f.db_type(connection=self.connection)
             if db_type.startswith('varchar'):
                 output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
                                             ' varchar_pattern_ops'))
