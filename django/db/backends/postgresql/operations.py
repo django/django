@@ -56,7 +56,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     def last_insert_id(self, cursor, table_name, pk_name):
         # Use pg_get_serial_sequence to get the underlying sequence name
         # from the table name and column name (available since PostgreSQL 8)
-        cursor.execute("SELECT CURRVAL(pg_get_serial_sequence('%s','%s'))" % (table_name, pk_name))
+        cursor.execute("SELECT CURRVAL(pg_get_serial_sequence('%s','%s'))" % (
+            self.quote_name(table_name), pk_name))
         return cursor.fetchone()[0]
 
     def no_limit_value(self):
@@ -98,7 +99,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                     column_name = 'id'
                 sql.append("%s setval(pg_get_serial_sequence('%s','%s'), 1, false);" % \
                     (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_TABLE(table_name),
+                    style.SQL_TABLE(self.quote_name(table_name)),
                     style.SQL_FIELD(column_name))
                 )
             return sql
@@ -120,7 +121,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 if isinstance(f, models.AutoField):
                     output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
                         (style.SQL_KEYWORD('SELECT'),
-                        style.SQL_TABLE(model._meta.db_table),
+                        style.SQL_TABLE(qn(model._meta.db_table)),
                         style.SQL_FIELD(f.column),
                         style.SQL_FIELD(qn(f.column)),
                         style.SQL_FIELD(qn(f.column)),
@@ -132,7 +133,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 if not f.rel.through:
                     output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
                         (style.SQL_KEYWORD('SELECT'),
-                        style.SQL_TABLE(f.m2m_db_table()),
+                        style.SQL_TABLE(qn(f.m2m_db_table())),
                         style.SQL_FIELD('id'),
                         style.SQL_FIELD(qn('id')),
                         style.SQL_FIELD(qn('id')),

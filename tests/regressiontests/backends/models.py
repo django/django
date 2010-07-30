@@ -51,6 +51,8 @@ class Post(models.Model):
     text = models.TextField()
     tags = generic.GenericRelation('Tag')
 
+    class Meta:
+        db_table = 'CaseSensitive_Post'
 
 qn = connection.ops.quote_name
 
