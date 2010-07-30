@@ -1,3 +1,5 @@
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.db import models
 from django.db import connection, DEFAULT_DB_ALIAS
@@ -35,6 +37,19 @@ if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
         primary_key_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.AutoField(primary_key=True)
         charfield_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.CharField(max_length=100)
         m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.ManyToManyField(Person,blank=True)
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=30)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+
+class Post(models.Model):
+    name = models.CharField(max_length=30)
+    text = models.TextField()
+    tags = generic.GenericRelation('Tag')
 
 
 qn = connection.ops.quote_name

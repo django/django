@@ -132,7 +132,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 if not f.rel.through:
                     output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
                         (style.SQL_KEYWORD('SELECT'),
-                        style.SQL_TABLE(model._meta.db_table),
+                        style.SQL_TABLE(f.m2m_db_table()),
                         style.SQL_FIELD('id'),
                         style.SQL_FIELD(qn('id')),
                         style.SQL_FIELD(qn('id')),
