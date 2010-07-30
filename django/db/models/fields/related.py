@@ -812,14 +812,15 @@ class ForeignKey(RelatedField, Field):
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
 
+        if 'db_index' not in kwargs:
+            kwargs['db_index'] = True
+
         kwargs['rel'] = rel_class(to, to_field,
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
             parent_link=kwargs.pop('parent_link', False))
         Field.__init__(self, **kwargs)
-
-        self.db_index = True
 
     def validate(self, value, model_instance):
         if self.rel.parent_link:
