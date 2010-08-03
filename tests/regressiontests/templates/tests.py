@@ -603,7 +603,7 @@ class Templates(unittest.TestCase):
 
             #filters should accept empty string constants
             'filter-syntax20': ('{{ ""|default_if_none:"was none" }}', {}, ""),
-
+            
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
             'comment-syntax02': ("{# this is hidden #}hello{# foo #}", {}, "hello"),
@@ -1296,7 +1296,8 @@ class Templates(unittest.TestCase):
 
             # Regression test for #11270.
             'cache17': ('{% load cache %}{% cache 10 long_cache_key poem %}Some Content{% endcache %}', {'poem': 'Oh freddled gruntbuggly/Thy micturations are to me/As plurdled gabbleblotchits/On a lurgid bee/That mordiously hath bitled out/Its earted jurtles/Into a rancid festering/Or else I shall rend thee in the gobberwarts with my blurglecruncheon/See if I dont.'}, 'Some Content'),
-
+                                    
+            
             ### AUTOESCAPE TAG ##############################################
             'autoescape-tag01': ("{% autoescape off %}hello{% endautoescape %}", {}, "hello"),
             'autoescape-tag02': ("{% autoescape off %}{{ first }}{% endautoescape %}", {"first": "<b>hello</b>"}, "<b>hello</b>"),
@@ -1325,6 +1326,23 @@ class Templates(unittest.TestCase):
             # implementation details (fortunately, the (no)autoescape block
             # tags can be used in those cases)
             'autoescape-filtertag01': ("{{ first }}{% filter safe %}{{ first }} x<y{% endfilter %}", {"first": "<a>"}, template.TemplateSyntaxError),
+        
+            # ifqeual compares unescaped vales.
+            'autoescape-ifequal01': ('{% ifequal var "this & that" %}yes{% endifequal %}', { "var": "this & that" }, "yes" ), 
+            
+            # Arguments to filters are 'safe' and manipulate their input unescaped. 
+            'autoescape-filters01': ('{{ var|cut:"&" }}', { "var": "this & that" }, "this  that" ), 
+            'autoescape-filters02': ('{{ var|join:" & \" }}', { "var": ("Tom", "Dick", "Harry") }, "Tom & Dick & Harry" ), 
+            
+            # Literal strings are safe. 
+            'autoescape-literals01': ('{{ "this & that" }}',{}, "this & that" ), 
+            
+            # Iterating over strings outputs safe characters. 
+            'autoescape-stringiterations01': ('{% for l in var %}{{ l }},{% endfor %}', {'var': 'K&R'}, "K,&amp;,R," ), 
+            
+            # Escape requirement survives lookup. 
+            'autoescape-lookup01': ('{{ var.key }}', { "var": {"key": "this & that" }}, "this &amp; that" ), 
+                    
         }
 
 
