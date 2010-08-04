@@ -1,7 +1,7 @@
 from optparse import make_option
 
 from django.conf import settings
-from django.db import connections, transaction, models, DEFAULT_DB_ALIAS
+from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.core.management import call_command
 from django.core.management.base import NoArgsCommand, CommandError
 from django.core.management.color import no_style
@@ -66,7 +66,13 @@ The full error: %s""" % (connection.settings_dict['NAME'], e))
             # Emit the post sync signal. This allows individual
             # applications to respond as if the database had been
             # sync'd from scratch.
-            emit_post_sync_signal(models.get_models(), verbosity, interactive, db)
+            all_models = [
+                (app.__name__.split('.')[-2],
+                    [m for m in models.get_models(app, include_auto_created=True)
+                    if router.allow_syncdb(db, m)])
+                for app in models.get_apps()
+            ]
+            emit_post_sync_signal(all_models, verbosity, interactive, db)
 
             # Reinstall the initial_data fixture.
             kwargs = options.copy()

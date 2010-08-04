@@ -6,7 +6,7 @@ import unittest
 from django.conf import settings
 from django.core import management
 from django.core.management.color import no_style
-from django.db import backend, connection, DEFAULT_DB_ALIAS
+from django.db import backend, connection, connections, DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
 from django.test import TestCase
 
@@ -136,6 +136,23 @@ if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
             cursor = connection.cursor()
             for statement in connection.ops.sql_flush(no_style(), tables, sequences):
                 cursor.execute(statement)
+
+class SequenceResetTest(TestCase):
+    def test_generic_relation(self):
+        "Sequence names are correct when resetting generic relations (Ref #13941)"
+        # Create an object with a manually specified PK
+        models.Post.objects.create(id=10, name='1st post', text='hello world')
+
+        # Reset the sequences for the database
+        cursor = connection.cursor()
+        commands = connections[DEFAULT_DB_ALIAS].ops.sequence_reset_sql(no_style(), [models.Post])
+        for sql in commands:
+            cursor.execute(sql)
+
+        # If we create a new object now, it should have a PK greater
+        # than the PK we specified manually.
+        obj = models.Post.objects.create(name='New post', text='goodbye world')
+        self.assertTrue(obj.pk > 10)
 
 
 def connection_created_test(sender, **kwargs):

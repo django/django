@@ -15,6 +15,11 @@ __ http://docutils.sourceforge.net/
 To actually build the documentation locally, you'll currently need to install
 Sphinx -- ``easy_install Sphinx`` should do the trick.
 
+.. note::
+
+    Generation of the Django documentation will work with Sphinx version 0.6
+    or newer, but we recommend going straigh to Sphinx 1.0 or newer.
+
 Then, building the html is easy; just ``make html`` from the ``docs`` directory.
 
 To get started contributing, you'll want to read the `ReStructuredText

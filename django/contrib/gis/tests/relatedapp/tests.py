@@ -4,7 +4,7 @@ from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.tests.utils import mysql, oracle, postgis, spatialite, no_mysql, no_oracle, no_spatialite
 from django.conf import settings
-from models import City, Location, DirectoryEntry, Parcel, Book, Author
+from models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
 
 cities = (('Aurora', 'TX', -97.516111, 33.058333),
           ('Roswell', 'NM', -104.528056, 33.387222),
@@ -291,6 +291,14 @@ class RelatedGeoModelTest(unittest.TestCase):
             self.assertEqual(4, len(coll))
             self.assertEqual(ref_geom, coll)
 
+    def test15_invalid_select_related(self):
+        "Testing doing select_related on the related name manager of a unique FK. See #13934."
+        qs = Article.objects.select_related('author__article')
+        # This triggers TypeError when `get_default_columns` has no `local_only`
+        # keyword.  The TypeError is swallowed if QuerySet is actually
+        # evaluated as list generation swallows TypeError in CPython.
+        sql = str(qs.query)
+        
     # TODO: Related tests for KML, GML, and distance lookups.
 
 def suite():
