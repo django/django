@@ -353,9 +353,11 @@ class BaseDatabaseCreation(object):
         call_command('syncdb', verbosity=verbosity, interactive=False, database=self.connection.alias)
 
         if settings.CACHE_BACKEND.startswith('db://'):
-            from django.core.cache import parse_backend_uri
-            _, cache_name, _ = parse_backend_uri(settings.CACHE_BACKEND)
-            call_command('createcachetable', cache_name)
+            from django.core.cache import parse_backend_uri, cache
+            from django.db import router
+            if router.allow_syncdb(self.connection.alias, cache.cache_model_class):
+                _, cache_name, _ = parse_backend_uri(settings.CACHE_BACKEND)
+                call_command('createcachetable', cache_name, database=self.connection.alias)
 
         # Get a cursor (even though we don't need one yet). This has
         # the side effect of initializing the test database.

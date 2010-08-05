@@ -20,7 +20,8 @@ class Command(BaseCommand):
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
             help='Use natural keys if they are available.'),
     )
-    help = 'Output the contents of the database as a fixture of the given format.'
+    help = ("Output the contents of the database as a fixture of the given "
+            "format (using each model's default manager).")
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
