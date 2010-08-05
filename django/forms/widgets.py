@@ -308,9 +308,13 @@ class DateInput(Input):
         super(DateInput, self).__init__(attrs)
         if format:
             self.format = format
+            self.manual_format = True
+        else:
+            self.format = formats.get_format('DATE_INPUT_FORMATS')[0]
+            self.manual_format = False
 
     def _format_value(self, value):
-        if self.is_localized:
+        if self.is_localized and not self.manual_format:
             return formats.localize_input(value)
         elif hasattr(value, 'strftime'):
             value = datetime_safe.new_date(value)
@@ -336,9 +340,13 @@ class DateTimeInput(Input):
         super(DateTimeInput, self).__init__(attrs)
         if format:
             self.format = format
+            self.manual_format = True
+        else:
+            self.format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
+            self.manual_format = False
 
     def _format_value(self, value):
-        if self.is_localized:
+        if self.is_localized and not self.manual_format:
             return formats.localize_input(value)
         elif hasattr(value, 'strftime'):
             value = datetime_safe.new_datetime(value)
@@ -364,9 +372,13 @@ class TimeInput(Input):
         super(TimeInput, self).__init__(attrs)
         if format:
             self.format = format
+            self.manual_format = True
+        else:
+            self.format = formats.get_format('TIME_INPUT_FORMATS')[0]
+            self.manual_format = False
 
     def _format_value(self, value):
-        if self.is_localized:
+        if self.is_localized and not self.manual_format:
             return formats.localize_input(value)
         elif hasattr(value, 'strftime'):
             return value.strftime(self.format)
@@ -751,12 +763,8 @@ class SplitDateTimeWidget(MultiWidget):
     time_format = TimeInput.format
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
-        if date_format:
-            self.date_format = date_format
-        if time_format:
-            self.time_format = time_format
-        widgets = (DateInput(attrs=attrs, format=self.date_format),
-                   TimeInput(attrs=attrs, format=self.time_format))
+        widgets = (DateInput(attrs=attrs, format=date_format),
+                   TimeInput(attrs=attrs, format=time_format))
         super(SplitDateTimeWidget, self).__init__(widgets, attrs)
 
     def decompress(self, value):
