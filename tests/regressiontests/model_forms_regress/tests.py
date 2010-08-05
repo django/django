@@ -6,7 +6,8 @@ from django.forms.models import modelform_factory, ModelChoiceField
 from django.conf import settings
 from django.test import TestCase
 
-from models import Person, RealPerson, Triple, FilePathModel, Article, Publication, CustomFF, Author, Author1
+from models import Person, RealPerson, Triple, FilePathModel, Article, \
+    Publication, CustomFF, Author, Author1, Homepage
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
@@ -212,7 +213,40 @@ class TestTicket11183(TestCase):
     def test_11183(self):
         form1 = ModelChoiceForm()
         field1 = form1.fields['person']
-        # To allow the widget to change the queryset of field1.widget.choices correctly, 
+        # To allow the widget to change the queryset of field1.widget.choices correctly,
         # without affecting other forms, the following must hold:
         self.assert_(field1 is not ModelChoiceForm.base_fields['person'])
         self.assert_(field1.widget.choices.field is field1)
+
+class HomepageForm(forms.ModelForm):
+    class Meta:
+        model = Homepage
+
+class URLFieldTests(TestCase):
+    def test_url_on_modelform(self):
+        "Check basic URL field validation on model forms"
+        self.assertFalse(HomepageForm({'url': 'foo'}).is_valid())
+        self.assertFalse(HomepageForm({'url': 'http://'}).is_valid())
+        self.assertFalse(HomepageForm({'url': 'http://example'}).is_valid())
+        self.assertFalse(HomepageForm({'url': 'http://example.'}).is_valid())
+        self.assertFalse(HomepageForm({'url': 'http://com.'}).is_valid())
+
+        self.assertTrue(HomepageForm({'url': 'http://localhost'}).is_valid())
+        self.assertTrue(HomepageForm({'url': 'http://example.com'}).is_valid())
+        self.assertTrue(HomepageForm({'url': 'http://www.example.com'}).is_valid())
+        self.assertTrue(HomepageForm({'url': 'http://www.example.com:8000'}).is_valid())
+        self.assertTrue(HomepageForm({'url': 'http://www.example.com/test'}).is_valid())
+        self.assertTrue(HomepageForm({'url': 'http://www.example.com:8000/test'}).is_valid())
+        self.assertTrue(HomepageForm({'url': 'http://example.com/foo/bar'}).is_valid())
+
+    def test_http_prefixing(self):
+        "If the http:// prefix is omitted on form input, the field adds it again. (Refs #13613)"
+        form = HomepageForm({'url': 'example.com'})
+        form.is_valid()
+        # self.assertTrue(form.is_valid())
+        # self.assertEquals(form.cleaned_data['url'], 'http://example.com/')
+
+        form = HomepageForm({'url': 'example.com/test'})
+        form.is_valid()
+        # self.assertTrue(form.is_valid())
+        # self.assertEquals(form.cleaned_data['url'], 'http://example.com/test')
