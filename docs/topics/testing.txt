@@ -52,9 +52,9 @@ frameworks are:
               return a_list[idx]
 
     * **Unit tests** -- tests that are expressed as methods on a Python class
-      that subclasses ``unittest.TestCase``. For example::
+      that subclasses ``django.utils.unittest.TestCase``. For example::
 
-          import unittest
+          from django.utils import unittest
 
           class MyFuncTestCase(unittest.TestCase):
               def testBasic(self):
@@ -157,6 +157,8 @@ Like doctests, Django's unit tests use a standard library module: unittest_.
 This module uses a different way of defining tests, taking a class-based
 approach.
 
+.. versionchanged:: 1.3 Django bundles the Python 2.7 unittest library as ``django.utils.unittest``. You can still use the system ``unittest`` package, but the the bundled package includes more verbose error reporting and additional assertions for versions of Python below 2.7.
+
 As with doctests, for a given Django application, the test runner looks for
 unit tests in two places:
 
@@ -170,7 +172,7 @@ unit tests in two places:
 This example ``unittest.TestCase`` subclass is equivalent to the example given
 in the doctest section above::
 
-    import unittest
+    from django.utils import unittest
     from myapp.models import Animal
 
     class AnimalTestCase(unittest.TestCase):
@@ -232,6 +234,8 @@ you:
       common methods. The framework also supports explicit setup and/or cleanup
       routines, which give you a high level of control over the environment
       in which your test cases are run.
+
+    * If you're writing tests for Django itself, you should use ``unittest``.
 
 Again, remember that you can use both systems side-by-side (even in the same
 app). In the end, most projects will eventually end up using both. Each shines
@@ -913,7 +917,7 @@ Example
 
 The following is a simple unit test using the test client::
 
-    import unittest
+    from django.utils import unittest
     from django.test.client import Client
 
     class SimpleTest(unittest.TestCase):
@@ -1010,7 +1014,7 @@ worry about state (such as cookies) carrying over from one test to another.
 
 This means, instead of instantiating a ``Client`` in each test::
 
-    import unittest
+    from django.utils import unittest
     from django.test.client import Client
 
     class SimpleTest(unittest.TestCase):

@@ -825,9 +825,10 @@ The tests cover:
 We appreciate any and all contributions to the test suite!
 
 The Django tests all use the testing infrastructure that ships with
-Django for testing applications. New tests should use the unittest
-framework. See :ref:`Testing Django applications <topics-testing>` for
-an explanation of how to write new tests.
+Django for testing applications. New tests should use
+``django.utils.unittest``, and should not include doctests. See
+:ref:`Testing Django applications <topics-testing>` for an explanation
+of how to write new tests.
 
 Running the unit tests
 ----------------------
