@@ -50,7 +50,7 @@ u''
 ## AUPhoneNumberField ########################################################
 
 A field that accepts a 10 digit Australian phone number.
-llows spaces and parentheses around area code.
+Allows spaces and parentheses around area code.
 
 >>> from django.contrib.localflavor.au.forms import AUPhoneNumberField
 >>> f = AUPhoneNumberField()
