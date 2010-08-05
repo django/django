@@ -136,6 +136,49 @@ settings file. You can't use a different database backend for your cache table.
 
 Database caching works best if you've got a fast, well-indexed database server.
 
+Database caching and multiple databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you use database caching with multiple databases, you'll also need
+to set up routing instructions for your database cache table. For the
+purposes of routing, the database cache table appears as a model named
+``CacheEntry``, in an application named ``django_cache``. This model
+won't appear in the models cache, but the model details can be used
+for routing purposes.
+
+For example, the following router would direct all cache read
+operations to ``cache_slave``, and all write operations to
+``cache_master``. The cache table will only be synchronized onto
+``cache_master``::
+
+    class CacheRouter(object):
+        """A router to control all database cache operations"""
+
+        def db_for_read(self, model, **hints):
+            "All cache read operations go to the slave"
+            if model._meta.app_label in ('django_cache',):
+                return 'cache_slave'
+            return None
+
+        def db_for_write(self, model, **hints):
+            "All cache write operations go to master"
+            if model._meta.app_label in ('django_cache',):
+                return 'cache_master'
+            return None
+
+        def allow_syncdb(self, db, model):
+            "Only synchronize the cache model on master"
+            if model._meta.app_label in ('django_cache',):
+                return db == 'cache_master'
+            return None
+
+If you don't specify routing directions for the database cache model,
+the cache backend will use the ``default`` database.
+
+Of course, if you don't use the database cache backend, you don't need
+to worry about providing routing instructions for the database cache
+model.
+
 Filesystem caching
 ------------------
 
