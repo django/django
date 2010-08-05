@@ -54,3 +54,6 @@ class Author(models.Model):
 class Author1(models.Model):
     publication = models.OneToOneField(Publication, null=False)
     full_name = models.CharField(max_length=255)
+
+class Homepage(models.Model):
+    url = models.URLField(verify_exists=False)
