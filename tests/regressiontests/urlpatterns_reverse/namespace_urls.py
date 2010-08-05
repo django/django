@@ -23,6 +23,9 @@ urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
     url(r'^normal/$', 'empty_view', name='normal-view'),
     url(r'^normal/(?P<arg1>\d+)/(?P<arg2>\d+)/$', 'empty_view', name='normal-view'),
 
+    url(r'^mixed_args/(\d+)/(?P<arg2>\d+)/$', 'empty_view', name='mixed-args'),
+    url(r'^no_kwargs/(\d+)/(\d+)/$', 'empty_view', name='no-kwargs'),
+
     (r'^test1/', include(testobj1.urls)),
     (r'^test2/', include(testobj2.urls)),
     (r'^default/', include(default_testobj.urls)),
