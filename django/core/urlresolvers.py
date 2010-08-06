@@ -217,7 +217,8 @@ class RegexURLResolver(object):
             else:
                 bits = normalize(p_pattern)
                 lookups.appendlist(pattern.callback, (bits, p_pattern))
-                lookups.appendlist(pattern.name, (bits, p_pattern))
+                if pattern.name is not None:
+                    lookups.appendlist(pattern.name, (bits, p_pattern))
         self._reverse_dict = lookups
         self._namespace_dict = namespaces
         self._app_dict = apps

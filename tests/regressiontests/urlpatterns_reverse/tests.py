@@ -154,6 +154,10 @@ class URLPatternReverse(TestCase):
             else:
                 self.assertEquals(got, expected)
 
+    def test_reverse_none(self):
+        # Reversing None should raise an error, not return the last un-named view.
+        self.assertRaises(NoReverseMatch, reverse, None)
+
 class ResolverTests(unittest.TestCase):
     def test_non_regex(self):
         """
