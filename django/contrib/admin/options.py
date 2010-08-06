@@ -501,7 +501,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Convert the actions into a SortedDict keyed by name
         # and sorted by description.
-        actions.sort(lambda a,b: cmp(a[2].lower(), b[2].lower()))
+        actions.sort(key=lambda k: k[2].lower())
         actions = SortedDict([
             (name, (func, name, desc))
             for func, name, desc in actions

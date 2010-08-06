@@ -35,7 +35,7 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     Also integrates any additional media definitions
     """
     fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
-    fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
+    fields.sort(key=lambda x: x[1].creation_counter)
 
     # If this class is subclassing another Form, add that Form's fields.
     # Note that we loop over the bases in *reverse*. This is necessary in
