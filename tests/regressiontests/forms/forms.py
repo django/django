@@ -705,13 +705,13 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> print f.as_table()
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><input type="text" name="username" value="adrian" maxlength="10" /></td></tr>
-<tr><th>Password1:</th><td><input type="password" name="password1" value="foo" /></td></tr>
-<tr><th>Password2:</th><td><input type="password" name="password2" value="bar" /></td></tr>
+<tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
+<tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>
 >>> print f.as_ul()
 <li><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></li>
 <li>Username: <input type="text" name="username" value="adrian" maxlength="10" /></li>
-<li>Password1: <input type="password" name="password1" value="foo" /></li>
-<li>Password2: <input type="password" name="password2" value="bar" /></li>
+<li>Password1: <input type="password" name="password1" /></li>
+<li>Password2: <input type="password" name="password2" /></li>
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'}, auto_id=False)
 >>> f.errors
 {}
@@ -1589,8 +1589,8 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters (it has 23).</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
-<tr><th>Password1:</th><td><input type="password" name="password1" value="foo" /></td></tr>
-<tr><th>Password2:</th><td><input type="password" name="password2" value="bar" /></td></tr>
+<tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
+<tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>
 </table>
 <input type="submit" />
 </form>
@@ -1719,8 +1719,8 @@ the list of errors is empty). You can also use it in {% if %} statements.
 >>> print t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)}))
 <form action="">
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
-<p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
-<p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
+<p><label>Password: <input type="password" name="password1" /></label></p>
+<p><label>Password (again): <input type="password" name="password2" /></label></p>
 <input type="submit" />
 </form>
 >>> t = Template('''<form action="">
@@ -1734,8 +1734,8 @@ the list of errors is empty). You can also use it in {% if %} statements.
 <form action="">
 <ul class="errorlist"><li>Please make sure your passwords match.</li></ul>
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
-<p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
-<p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
+<p><label>Password: <input type="password" name="password1" /></label></p>
+<p><label>Password (again): <input type="password" name="password2" /></label></p>
 <input type="submit" />
 </form>
 

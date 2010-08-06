@@ -6,7 +6,7 @@ Widgets
 
 .. module:: django.forms.widgets
    :synopsis: Django's built-in form widgets.
-   
+
 .. currentmodule:: django.forms
 
 A widget is Django's representation of a HTML input element. The widget
@@ -29,7 +29,12 @@ commonly used groups of widgets:
     .. attribute:: PasswordInput.render_value
 
         Determines whether the widget will have a value filled in when the
-        form is re-displayed after a validation error (default is ``True``).
+        form is re-displayed after a validation error (default is ``False``).
+
+.. versionchanged:: 1.3
+    The default value for
+    :attr:`~PasswordInput.render_value` was
+    changed from ``True`` to ``False``
 
 .. class:: HiddenInput
 
@@ -50,7 +55,7 @@ commonly used groups of widgets:
     Date input as a simple text box: ``<input type='text' ...>``
 
     Takes one optional argument:
-    
+
     .. attribute:: DateInput.format
 
         The format in which this field's initial value will be displayed.
@@ -64,11 +69,11 @@ commonly used groups of widgets:
     Date/time input as a simple text box: ``<input type='text' ...>``
 
     Takes one optional argument:
-    
+
     .. attribute:: DateTimeInput.format
-    
+
         The format in which this field's initial value will be displayed.
-    
+
     If no ``format`` argument is provided, the default format is ``'%Y-%m-%d
     %H:%M:%S'``.
 
@@ -77,11 +82,11 @@ commonly used groups of widgets:
     Time input as a simple text box: ``<input type='text' ...>``
 
     Takes one optional argument:
-    
+
     .. attribute:: TimeInput.format
-    
+
         The format in which this field's initial value will be displayed.
-    
+
     If no ``format`` argument is provided, the default format is ``'%H:%M:%S'``.
 
     .. versionchanged:: 1.1
@@ -98,15 +103,15 @@ commonly used groups of widgets:
     Takes one optional argument:
 
     .. attribute:: CheckboxInput.check_test
-     
-        A callable that takes the value of the CheckBoxInput 
+
+        A callable that takes the value of the CheckBoxInput
         and returns ``True`` if the checkbox should be checked for
-        that value. 
+        that value.
 
 .. class:: Select
 
     Select widget: ``<select><option ...>...</select>``
-    
+
     Requires that your field provides :attr:`~Field.choices`.
 
 .. class:: NullBooleanSelect
@@ -123,22 +128,22 @@ commonly used groups of widgets:
 .. class:: RadioSelect
 
     A list of radio buttons:
-    
+
     .. code-block:: html
-    
+
         <ul>
           <li><input type='radio' ...></li>
           ...
         </ul>
-        
+
     Requires that your field provides :attr:`~Field.choices`.
 
 .. class:: CheckboxSelectMultiple
 
     A list of checkboxes:
-    
+
     .. code-block:: html
-    
+
         <ul>
           <li><input type='checkbox' ...></li>
           ...
@@ -155,7 +160,7 @@ commonly used groups of widgets:
 
     Takes two optional arguments, ``date_format`` and ``time_format``, which
     work just like the ``format`` argument for ``DateInput`` and ``TimeInput``.
-    
+
     .. versionchanged:: 1.1
        The ``date_format`` and ``time_format`` arguments were not supported in Django 1.0.
 

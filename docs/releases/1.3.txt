@@ -18,6 +18,31 @@ fixes and an easy upgrade path from Django 1.2.
 Backwards-incompatible changes in 1.3
 =====================================
 
+PasswordInput default rendering behavior
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to Django 1.3, a :class:`~django.forms.PasswordInput` would render
+data values like any other form. If a form submission raised an error,
+the password that was submitted would be reflected to the client as form
+data populating the form for resubmission.
+
+This had the potential to leak passwords, as any failed password
+attempt would cause the password that was typed to be sent back to the
+client.
+
+In Django 1.3, the default behavior of
+:class:`~django.forms.PasswordInput` is to suppress the display of
+password values. This change doesn't alter the way form data is
+validated or handled. It only affects the user experience with
+passwords on a form when they make an error submitting form data (such
+as on unsuccessful logins, or when completing a registration form).
+
+If you want restore the pre-Django 1.3 behavior, you need to pass in a
+custom widget to your form that sets the ``render_value`` argument::
+
+    class LoginForm(forms.Form):
+        username = forms.CharField(max_length=100)
+        password = forms.PasswordField(widget=forms.PasswordInput(render_value=True))
 
 
 Features deprecated in 1.3

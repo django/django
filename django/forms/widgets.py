@@ -229,7 +229,7 @@ class TextInput(Input):
 class PasswordInput(Input):
     input_type = 'password'
 
-    def __init__(self, attrs=None, render_value=True):
+    def __init__(self, attrs=None, render_value=False):
         super(PasswordInput, self).__init__(attrs)
         self.render_value = render_value
 
