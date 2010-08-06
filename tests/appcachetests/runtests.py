@@ -5,6 +5,7 @@ import threading
 from django.conf import settings
 from django.utils.datastructures import SortedDict
 from django.core.exceptions import ImproperlyConfigured
+from django.core.apps import MultipleInstancesReturned
 
 # remove when tests are integrated into the django testsuite
 settings.configure()
@@ -15,6 +16,7 @@ class AppCacheTestCase(unittest.TestCase):
     """
     TestCase that resets the AppCache after each test.
     """
+
     def setUp(self):
         self.old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = ()
@@ -48,12 +50,15 @@ class AppCacheTestCase(unittest.TestCase):
         cache.nesting_level = 0
         cache.write_lock = threading.RLock()
         cache._get_models_cache = {}
+        
+        cache.app_instances = []
 
 class AppCacheReadyTests(AppCacheTestCase):
     """
     Tests for the app_cache_ready function that indicates if the cache
     is fully populated.
     """
+
     def test_not_initialized(self):
         """Should return False if the AppCache hasn't been initialized"""
         self.assertFalse(cache.app_cache_ready())
@@ -67,6 +72,7 @@ class AppCacheReadyTests(AppCacheTestCase):
 
 class GetAppsTests(AppCacheTestCase):
     """Tests for the get_apps function"""
+
     def test_get_apps(self):
         """Test that the correct models modules are returned"""
         settings.INSTALLED_APPS = ('django.contrib.auth',
@@ -85,6 +91,7 @@ class GetAppsTests(AppCacheTestCase):
 
 class GetAppTests(AppCacheTestCase):
     """Tests for the get_app function"""
+
     def test_get_app(self):
         """Test that the correct module is returned"""
         settings.INSTALLED_APPS = ('django.contrib.auth',)
@@ -123,6 +130,7 @@ class GetAppTests(AppCacheTestCase):
 
 class GetAppErrorsTests(AppCacheTestCase):
     """Tests for the get_app_errors function"""
+
     def test_get_app_errors(self):
         """Test that the function returns an empty dict"""
         self.assertEqual(cache.get_app_errors(), {})
@@ -130,6 +138,7 @@ class GetAppErrorsTests(AppCacheTestCase):
 
 class GetModelsTests(AppCacheTestCase):
     """Tests for the get_models function"""
+
     def test_get_models(self):
         """Test that the correct model classes are returned"""
         settings.INSTALLED_APPS = ('django.contrib.flatpages',) 
@@ -169,6 +178,7 @@ class GetModelsTests(AppCacheTestCase):
 
 class GetModelTests(AppCacheTestCase):
     """Tests for the get_model function"""
+
     def test_get_model(self):
         """Test that the correct model is returned"""
         settings.INSTALLED_APPS = ('django.contrib.flatpages',)
@@ -188,20 +198,98 @@ class GetModelTests(AppCacheTestCase):
         self.assertEqual(rv, None)
         self.assertFalse(cache.app_cache_ready())
 
+class LoadAppTests(AppCacheTestCase):
+    """Tests for the load_app function"""
+
+    def test_with_models(self):
+        """
+        Test that an app instance is created and the models
+        module is returned
+        """
+        rv = cache.load_app('model_app')
+        app = cache.app_instances[0]
+        self.assertEqual(len(cache.app_instances), 1)
+        self.assertEqual(app.name, 'model_app')
+        self.assertEqual(app.models_module.__name__, 'model_app.models')
+        self.assertEqual(rv.__name__, 'model_app.models')
+
+    def test_without_models(self):
+        """
+        Test that an app instance is created when there are no models
+        """
+        rv = cache.load_app('nomodel_app')
+        app = cache.app_instances[0]
+        self.assertEqual(len(cache.app_instances), 1)
+        self.assertEqual(app.name, 'nomodel_app')
+        self.assertEqual(app.models_module, None)
+        self.assertEqual(rv, None)
+
+    def test_load_app_custom(self):
+        """
+        Test that a custom app instance is created if the function
+        gets passed a classname
+        """
+        from nomodel_app import MyApp
+        rv = cache.load_app('nomodel_app.MyApp')
+        app = cache.app_instances[0]
+        self.assertEqual(len(cache.app_instances), 1)
+        self.assertEqual(app.name, 'nomodel_app')
+        self.assertTrue(isinstance(app, MyApp))
+        self.assertEqual(app.models_module, None)
+        self.assertEqual(rv, None)
+
+    def test_load_app_twice(self):
+        """
+        Test that loading an app twice results in only one app instance
+        """
+        rv = cache.load_app('model_app')
+        rv2 = cache.load_app('model_app')
+        self.assertEqual(len(cache.app_instances), 1)
+        self.assertEqual(rv.__name__, 'model_app.models')
+        self.assertEqual(rv2.__name__, 'model_app.models')
+
+    def test_load_app_importerror(self):
+        """
+        Test that an ImportError exception is raised if a package cannot
+        be imported
+        """
+        self.assertRaises(ImportError, cache.load_app, 'garageland')
+
 class RegisterModelsTests(AppCacheTestCase):
     """Tests for the register_models function"""
+
     def test_register_models(self):
-        from django.contrib.flatpages.models import FlatPage, Site
-        cache.register_models('foo', *(FlatPage, Site,))
-        self.assertFalse(cache.app_cache_ready())
-        rv = cache.get_models()
-        # we have 4 models since the above import will trigger the
-        # ModelBase.__new__, which will call the register_models function
-        self.assertEqual(len(rv), 4)
-        self.assertEqual(rv[0], Site)
-        self.assertEqual(rv[1], FlatPage)
-        self.assertEqual(rv[2], FlatPage)
-        self.assertEqual(rv[3], Site)
+        """
+        Test that register_models attaches the models to an existing
+        app instance
+        """
+        # We don't need to call the register_models method. Importing the 
+        # models.py file will suffice. This is done in the load_app function
+        # The ModelBase will call the register_models method
+        cache.load_app('model_app')
+        app = cache.app_instances[0]
+        self.assertEqual(len(cache.app_instances), 1)
+        self.assertEqual(app.models[0].__name__, 'Person')
+
+    def test_new_instance(self):
+        """
+        Test a new app instance is created if one doesn't exist, and the
+        models are attached to it.
+        """
+        from model_app.models import Person
+        app = cache.app_instances[0]
+        self.assertEqual(len(cache.app_instances), 1)
+        self.assertEqual(app.name, 'model_app')
+        self.assertEqual(app.models[0].__name__, 'Person')
+
+    def test_multiple_apps_with_same_label(self):
+        """
+        Test that an exception is raised when the function gets passed an
+        app label but there are multiple app instances with that label
+        """
+        cache.load_app('model_app')
+        self.assertRaises(MultipleInstancesReturned, cache.load_app,
+                'same_label.model_app')
 
 if __name__ == '__main__':
     unittest.main()
