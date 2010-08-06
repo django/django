@@ -3,6 +3,7 @@ from urlparse import urlparse, urlunparse, urlsplit
 import sys
 import os
 import re
+import mimetypes
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -138,11 +139,14 @@ def encode_multipart(boundary, data):
 
 def encode_file(boundary, key, file):
     to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
+    content_type = mimetypes.guess_type(file.name)[0]
+    if content_type is None:
+        content_type = 'application/octet-stream'
     return [
         '--' + boundary,
         'Content-Disposition: form-data; name="%s"; filename="%s"' \
             % (to_str(key), to_str(os.path.basename(file.name))),
-        'Content-Type: application/octet-stream',
+        'Content-Type: %s' % content_type,
         '',
         file.read()
     ]
