@@ -2113,11 +2113,9 @@ class ReadonlyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/pizza/add/')
         self.assertEqual(response.status_code, 200)
 
-class IncompleteFormTest(TestCase):
+class UserAdminTest(TestCase):
     """
-    Tests validation of a ModelForm that doesn't explicitly have all data
-    corresponding to model fields. Model validation shouldn't fail
-    such a forms.
+    Tests user CRUD functionality.
     """
     fixtures = ['admin-views-users.xml']
 
@@ -2149,3 +2147,11 @@ class IncompleteFormTest(TestCase):
         self.assert_('password' not in adminform.form.errors)
         self.assertEquals(adminform.form.errors['password2'],
                           [u"The two password fields didn't match."])
+
+    def test_user_fk_popup(self):
+        response = self.client.get('/test_admin/admin/admin_views/album/add/')
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertContains(response, '/test_admin/admin/auth/user/add')
+        self.assertContains(response, 'class="add-another" id="add_id_owner" onclick="return showAddAnotherPopup(this);"')
+        response = self.client.get('/test_admin/admin/auth/user/add/?_popup=1')
+        self.assertNotContains(response, 'name="_continue"')

@@ -10,6 +10,7 @@ from django.core.mail import EmailMessage
 from django.db import models
 from django import forms
 from django.forms.models import BaseModelFormSet
+from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
@@ -579,6 +580,10 @@ class Pizza(models.Model):
 class PizzaAdmin(admin.ModelAdmin):
     readonly_fields = ('toppings',)
 
+class Album(models.Model):
+    owner = models.ForeignKey(User)
+    title = models.CharField(max_length=30)
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -625,3 +630,4 @@ admin.site.register(Promo)
 admin.site.register(ChapterXtra1)
 admin.site.register(Pizza, PizzaAdmin)
 admin.site.register(Topping)
+admin.site.register(Album)
