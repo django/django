@@ -32,11 +32,17 @@ resolve_test_data = (
     # These entries are in the format: (path, url_name, app_name, namespace, view_func, args, kwargs)
     # Simple case
     ('/normal/42/37/', 'normal-view', None, '', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}),
+    ('/view_class/42/37/', 'view-class', None, '', views.view_class_instance, tuple(), {'arg1': '42', 'arg2': '37'}),
     ('/included/normal/42/37/', 'inc-normal-view', None, '', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}),
+    ('/included/view_class/42/37/', 'inc-view-class', None, '', views.view_class_instance, tuple(), {'arg1': '42', 'arg2': '37'}),
 
     # Unnamed args are dropped if you have *any* kwargs in a pattern
     ('/mixed_args/42/37/', 'mixed-args', None, '', views.empty_view, tuple(), {'arg2': '37'}),
     ('/included/mixed_args/42/37/', 'inc-mixed-args', None, '', views.empty_view, tuple(), {'arg2': '37'}),
+
+    # Unnamed views will be resolved to the function/class name
+    ('/unnamed/normal/42/37/', 'regressiontests.urlpatterns_reverse.views.empty_view', None, '', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}),
+    ('/unnamed/view_class/42/37/', 'regressiontests.urlpatterns_reverse.views.ViewClass', None, '', views.view_class_instance, tuple(), {'arg1': '42', 'arg2': '37'}),
 
     # If you have no kwargs, you get an args list.
     ('/no_kwargs/42/37/', 'no-kwargs', None, '', views.empty_view, ('42','37'), {}),

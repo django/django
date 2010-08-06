@@ -41,7 +41,12 @@ class ResolverMatch(object):
         else:
             self.namespaces = []
         if not url_name:
-            url_name = '.'.join([ func.__module__, func.__name__ ])
+            if not hasattr(func, '__name__'):
+                # An instance of a callable class
+                url_name = '.'.join([func.__class__.__module__, func.__class__.__name__])
+            else:
+                # A function
+                url_name = '.'.join([func.__module__, func.__name__])
         self.url_name = url_name
 
     def namespace(self):

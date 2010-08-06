@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from views import view_class_instance
 
 class URLObject(object):
     def __init__(self, app_name, namespace):
@@ -25,6 +26,11 @@ urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
 
     url(r'^mixed_args/(\d+)/(?P<arg2>\d+)/$', 'empty_view', name='mixed-args'),
     url(r'^no_kwargs/(\d+)/(\d+)/$', 'empty_view', name='no-kwargs'),
+
+    url(r'^view_class/(?P<arg1>\d+)/(?P<arg2>\d+)/$', view_class_instance, name='view-class'),
+
+    (r'^unnamed/normal/(?P<arg1>\d+)/(?P<arg2>\d+)/$', 'empty_view'),
+    (r'^unnamed/view_class/(?P<arg1>\d+)/(?P<arg2>\d+)/$', view_class_instance),
 
     (r'^test1/', include(testobj1.urls)),
     (r'^test2/', include(testobj2.urls)),
