@@ -3,7 +3,8 @@ class App(object):
         if '.' in label:
             label = label.split('.')[-1]
         self.label = label
-        self.errors = {}
+        # errors raised when trying to import the app
+        self.errors = []
         self.models = []
         self.models_module = None
 

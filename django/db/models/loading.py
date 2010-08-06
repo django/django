@@ -29,9 +29,6 @@ class AppCache(object):
         # Mapping of app_labels to a dictionary of model names to model code.
         app_models = SortedDict(),
 
-        # Mapping of app_labels to errors raised when trying to import the app.
-        app_errors = {},
-
         # -- Everything below here is only used when populating the cache --
         loaded = False,
         handled = {},
@@ -154,8 +151,10 @@ class AppCache(object):
     def get_app_errors(self):
         "Returns the map of known problems with the INSTALLED_APPS."
         self._populate()
-        for app in app_instances:
-            self.app_errors.update(app.errors)
+        errors = {}
+        for app in self.app_instances:
+            if app.errors:
+                errors.update({app.label: app.errors})
         return errors
 
     def get_models(self, app_mod=None, include_auto_created=False, include_deferred=False):
