@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-11 08:35-0300\n"
-"PO-Revision-Date: 2010-05-17 10:52-0300\n"
+"POT-Creation-Date: 2010-08-06 15:38-0300\n"
+"PO-Revision-Date: 2010-08-06 15:58-0300\n"
 "Last-Translator: Ramiro <rm0@gmx.net>\n"
 "Language-Team: Django-I18N <django-i18n@googlegroups.com>\n"
 "Language: es_AR\n"
@@ -70,7 +70,8 @@ msgid "Spanish"
 msgstr "español"
 
 #: conf/global_settings.py:57
-msgid "Argentinean Spanish"
+#, fuzzy
+msgid "Argentinian Spanish"
 msgstr "español de Argentina"
 
 #: conf/global_settings.py:58
@@ -166,98 +167,102 @@ msgid "Macedonian"
 msgstr "macedonio"
 
 #: conf/global_settings.py:81
+msgid "Malayalam"
+msgstr "Malayalam"
+
+#: conf/global_settings.py:82
 msgid "Mongolian"
 msgstr "mongol"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Dutch"
 msgstr "holandés"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Norwegian"
 msgstr "noruego"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian Bokmal"
 msgstr "bokmål"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Norwegian Nynorsk"
 msgstr "nynorsk"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Polish"
 msgstr "polaco"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Portuguese"
 msgstr "portugués"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Brazilian Portuguese"
 msgstr "portugués de Brasil"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
 msgid "Romanian"
 msgstr "rumano"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Russian"
 msgstr "ruso"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Slovak"
 msgstr "eslovaco"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Slovenian"
 msgstr "esloveno"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Albanian"
 msgstr "albanés"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Serbian"
 msgstr "serbio"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Serbian Latin"
 msgstr "Latín de Serbia"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Swedish"
 msgstr "sueco"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Tamil"
 msgstr "tamil"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Telugu"
 msgstr "telugu"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Thai"
 msgstr "tailandés"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Turkish"
 msgstr "turco"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Ukrainian"
 msgstr "ucraniano"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Vietnamese"
 msgstr "vietnamita"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Simplified Chinese"
 msgstr "chino simplificado"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
 msgid "Traditional Chinese"
 msgstr "chino tradicional"
 
@@ -309,15 +314,15 @@ msgstr "Este mes"
 msgid "This year"
 msgstr "Este año"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:478
 msgid "Yes"
 msgstr "Sí"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:478
 msgid "No"
 msgstr "No"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:469
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:478
 msgid "Unknown"
 msgstr "Desconocido"
 
@@ -363,7 +368,7 @@ msgid "Changed %s."
 msgstr "Modifica %s."
 
 #: contrib/admin/options.py:559 contrib/admin/options.py:569
-#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:844
+#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:845
 #: forms/models.py:568
 msgid "and"
 msgstr "y"
@@ -692,7 +697,7 @@ msgid "Filter"
 msgstr "Filtrar"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:302
+#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:300
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -855,13 +860,17 @@ msgstr "Guardar y agregar otro"
 msgid "Save and continue editing"
 msgstr "Guardar y continuar editando"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:5
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"Primero, introduzca un nombre de usuario y una contraseña. Luego podrá "
-"configurar opciones adicionales."
+"Primero introduzca un nombre de usuario y una contraseña. Luego podrá "
+"configurar opciones adicionales acerca del usuario."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Introduzca un nombre de usuario y una contraseña."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:28
 #, python-format
@@ -1435,8 +1444,8 @@ msgstr "mensaje"
 msgid "Logged out"
 msgstr "Sesión cerrada"
 
-#: contrib/auth/management/commands/createsuperuser.py:23
-#: core/validators.py:120 forms/fields.py:428
+#: contrib/auth/management/commands/createsuperuser.py:24
+#: core/validators.py:120 forms/fields.py:427
 msgid "Enter a valid e-mail address."
 msgstr "Introduzca una dirección de correo electrónico válida"
 
@@ -1504,7 +1513,7 @@ msgid "Email address"
 msgstr "Dirección de correo electrónico"
 
 #: contrib/comments/forms.py:95 contrib/flatpages/admin.py:8
-#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1101
+#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1109
 msgid "URL"
 msgstr "URL"
 
@@ -1553,7 +1562,7 @@ msgstr "comentario"
 msgid "date/time submitted"
 msgstr "fecha/hora de envío"
 
-#: contrib/comments/models.py:60 db/models/fields/__init__.py:896
+#: contrib/comments/models.py:60 db/models/fields/__init__.py:904
 msgid "IP address"
 msgstr "Dirección IP"
 
@@ -4503,20 +4512,20 @@ msgstr "sitios"
 msgid "Enter a valid value."
 msgstr "Introduzca un valor válido."
 
-#: core/validators.py:87 forms/fields.py:529
+#: core/validators.py:87 forms/fields.py:528
 msgid "Enter a valid URL."
 msgstr "Introduzca una URL válida."
 
-#: core/validators.py:89 forms/fields.py:530
+#: core/validators.py:89 forms/fields.py:529
 msgid "This URL appears to be a broken link."
 msgstr "La URL parece ser un enlace roto."
 
-#: core/validators.py:123 forms/fields.py:873
+#: core/validators.py:123 forms/fields.py:877
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "Introduzca un 'slug' válido consistente de letras, números o guiones."
 
-#: core/validators.py:126 forms/fields.py:866
+#: core/validators.py:126 forms/fields.py:870
 msgid "Enter a valid IPv4 address."
 msgstr "Introduzca una dirección IPv4 válida"
 
@@ -4528,15 +4537,15 @@ msgstr "Introduzca sólo dígitos separados por comas."
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
-"Asegúrese de que este valor sea %(limit_value)s (actualmente es %(show_value)"
-"s)."
+"Asegúrese de que este valor sea %(limit_value)s (actualmente es "
+"%(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:205 forms/fields.py:257
+#: core/validators.py:153 forms/fields.py:204 forms/fields.py:256
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Asegúrese de que este valor sea menor o igual a %(limit_value)s."
 
-#: core/validators.py:158 forms/fields.py:206 forms/fields.py:258
+#: core/validators.py:158 forms/fields.py:205 forms/fields.py:257
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Asegúrese de que este valor sea mayor o igual a %(limit_value)s."
@@ -4544,8 +4553,8 @@ msgstr "Asegúrese de que este valor sea mayor o igual a %(limit_value)s."
 #: core/validators.py:164
 #, python-format
 msgid ""
-"Ensure this value has at least %(limit_value)d characters (it has %"
-"(show_value)d)."
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
 msgstr ""
 "Asegúrese de que este valor tenga al menos %(limit_value)d caracteres (tiene "
 "%(show_value)d)."
@@ -4553,20 +4562,20 @@ msgstr ""
 #: core/validators.py:170
 #, python-format
 msgid ""
-"Ensure this value has at most %(limit_value)d characters (it has %"
-"(show_value)d)."
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
 msgstr ""
 "Asegúrese de que este valor tenga como máximo %(limit_value)d caracteres "
 "(tiene %(show_value)d)."
 
-#: db/models/base.py:822
+#: db/models/base.py:823
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 "%(field_name)s debe ser único/a para un %(lookup)s %(date_field)s "
 "determinado."
 
-#: db/models/base.py:837 db/models/base.py:845
+#: db/models/base.py:838 db/models/base.py:846
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ya existe un/a %(model_name)s con este/a %(field_label)s."
@@ -4589,13 +4598,13 @@ msgstr "Este campo no puede estar en blanco."
 msgid "Field of type: %(field_type)s"
 msgstr "Campo tipo: %(field_type)s"
 
-#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:852
-#: db/models/fields/__init__.py:961 db/models/fields/__init__.py:972
-#: db/models/fields/__init__.py:999
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:860
+#: db/models/fields/__init__.py:969 db/models/fields/__init__.py:980
+#: db/models/fields/__init__.py:1007
 msgid "Integer"
 msgstr "Entero"
 
-#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:850
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:858
 msgid "This value must be an integer."
 msgstr "Este valor debe ser un número entero."
 
@@ -4607,7 +4616,7 @@ msgstr "Este valor debe ser True o False."
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (Verdadero o Falso)"
 
-#: db/models/fields/__init__.py:539 db/models/fields/__init__.py:982
+#: db/models/fields/__init__.py:539 db/models/fields/__init__.py:990
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Cadena (máximo %(max_length)s)"
@@ -4651,44 +4660,44 @@ msgstr "Número decimal"
 msgid "E-mail address"
 msgstr "Dirección de correo electrónico"
 
-#: db/models/fields/__init__.py:799 db/models/fields/files.py:220
+#: db/models/fields/__init__.py:807 db/models/fields/files.py:220
 #: db/models/fields/files.py:331
 msgid "File path"
 msgstr "Ruta de archivo"
 
-#: db/models/fields/__init__.py:822
+#: db/models/fields/__init__.py:830
 msgid "This value must be a float."
 msgstr "Este valor debe ser un valor en representación de punto flotante."
 
-#: db/models/fields/__init__.py:824
+#: db/models/fields/__init__.py:832
 msgid "Floating point number"
 msgstr "Número de punto flotante"
 
-#: db/models/fields/__init__.py:883
+#: db/models/fields/__init__.py:891
 msgid "Big (8 byte) integer"
 msgstr "Entero grande (8 bytes)"
 
-#: db/models/fields/__init__.py:912
+#: db/models/fields/__init__.py:920
 msgid "This value must be either None, True or False."
 msgstr "Este valor debe ser None, True o False."
 
-#: db/models/fields/__init__.py:914
+#: db/models/fields/__init__.py:922
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleano (Verdadero, Falso o Nulo)"
 
-#: db/models/fields/__init__.py:1005
+#: db/models/fields/__init__.py:1013
 msgid "Text"
 msgstr "Texto"
 
-#: db/models/fields/__init__.py:1021
+#: db/models/fields/__init__.py:1029
 msgid "Time"
 msgstr "Hora"
 
-#: db/models/fields/__init__.py:1025
+#: db/models/fields/__init__.py:1033
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Introduzca un valor de hora válido en formato HH:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:1109
+#: db/models/fields/__init__.py:1125
 msgid "XML text"
 msgstr "Texto XML"
 
@@ -4701,22 +4710,22 @@ msgstr "No existe un modelo %(model)s con una clave primaria %(pk)r."
 msgid "Foreign Key (type determined by related field)"
 msgstr "Clave foránea (el tipo está determinado por el campo relacionado)"
 
-#: db/models/fields/related.py:918
+#: db/models/fields/related.py:919
 msgid "One-to-one relationship"
 msgstr "Relación uno-a-uno"
 
-#: db/models/fields/related.py:980
+#: db/models/fields/related.py:981
 msgid "Many-to-many relationship"
 msgstr "Relación muchos-a-muchos"
 
-#: db/models/fields/related.py:1000
+#: db/models/fields/related.py:1001
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Mantenga presionada \"Control\" (\"Command\" en una Mac) para seleccionar "
 "más de uno."
 
-#: db/models/fields/related.py:1061
+#: db/models/fields/related.py:1062
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4732,55 +4741,55 @@ msgstr[1] ""
 msgid "This field is required."
 msgstr "Este campo es obligatorio."
 
-#: forms/fields.py:204
+#: forms/fields.py:203
 msgid "Enter a whole number."
 msgstr "Introduzca un número entero."
 
-#: forms/fields.py:235 forms/fields.py:256
+#: forms/fields.py:234 forms/fields.py:255
 msgid "Enter a number."
 msgstr "Introduzca un número."
 
-#: forms/fields.py:259
+#: forms/fields.py:258
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Asegúrese de que no existan en total mas de %s dígitos."
 
-#: forms/fields.py:260
+#: forms/fields.py:259
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Asegúrese de que no existan mas de %s lugares decimales."
 
-#: forms/fields.py:261
+#: forms/fields.py:260
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Asegúrese de que no existan mas de %s dígitos antes del punto decimal."
 
-#: forms/fields.py:323 forms/fields.py:838
+#: forms/fields.py:322 forms/fields.py:837
 msgid "Enter a valid date."
 msgstr "Introduzca una fecha válida."
 
-#: forms/fields.py:351 forms/fields.py:839
+#: forms/fields.py:350 forms/fields.py:838
 msgid "Enter a valid time."
 msgstr "Introduzca un valor de hora válido."
 
-#: forms/fields.py:377
+#: forms/fields.py:376
 msgid "Enter a valid date/time."
 msgstr "Introduzca un valor de fecha/hora válido."
 
-#: forms/fields.py:435
+#: forms/fields.py:434
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "No se envió un archivo. Verifique el tipo de codificación en el formulario."
 
-#: forms/fields.py:436
+#: forms/fields.py:435
 msgid "No file was submitted."
 msgstr "No se envió ningún archivo."
 
-#: forms/fields.py:437
+#: forms/fields.py:436
 msgid "The submitted file is empty."
 msgstr "El archivo enviado está vacío."
 
-#: forms/fields.py:438
+#: forms/fields.py:437
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -4788,7 +4797,7 @@ msgstr ""
 "Asegúrese de que este nombre de archivo tenga como máximo %(max)d caracteres "
 "(tiene %(length)d)."
 
-#: forms/fields.py:473
+#: forms/fields.py:472
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -4796,18 +4805,18 @@ msgstr ""
 "Seleccione una imagen válida. El archivo que ha seleccionado no es una "
 "imagen o es un un archivo de imagen corrupto."
 
-#: forms/fields.py:596 forms/fields.py:671
+#: forms/fields.py:595 forms/fields.py:670
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Seleccione una opción válida. %(value)s no es una de las opciones "
 "disponibles."
 
-#: forms/fields.py:672 forms/fields.py:734 forms/models.py:1002
+#: forms/fields.py:671 forms/fields.py:733 forms/models.py:1002
 msgid "Enter a list of values."
 msgstr "Introduzca una lista de valores."
 
-#: forms/formsets.py:298 forms/formsets.py:300
+#: forms/formsets.py:296 forms/formsets.py:298
 msgid "Order"
 msgstr "Ordenar"
 
