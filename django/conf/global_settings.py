@@ -78,6 +78,7 @@ LANGUAGES = (
     ('lt', gettext_noop('Lithuanian')),
     ('lv', gettext_noop('Latvian')),
     ('mk', gettext_noop('Macedonian')),
+    ('ml', gettext_noop('Malayalam')),
     ('mn', gettext_noop('Mongolian')),
     ('nl', gettext_noop('Dutch')),
     ('no', gettext_noop('Norwegian')),
