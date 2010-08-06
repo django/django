@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import SuspiciousOperation
 from django.template import TemplateDoesNotExist, TemplateSyntaxError, Context
 from django.template import loader
+from django.test.client import encode_file
 
 class AssertContainsTests(TestCase):
     def setUp(self):
@@ -823,3 +824,26 @@ class UnicodePayloadTests(TestCase):
         response = self.client.post("/test_client_regress/parse_unicode_json/", json,
                                     content_type="application/json; charset=koi8-r")
         self.assertEqual(response.content, json.encode('koi8-r'))
+
+class DummyFile(object):
+    def __init__(self, filename):
+        self.name = filename
+    def read(self):
+        return 'TEST_FILE_CONTENT'
+
+class UploadedFileEncodingTest(TestCase):
+    def test_file_encoding(self):
+        encoded_file = encode_file('TEST_BOUNDARY', 'TEST_KEY', DummyFile('test_name.bin'))
+        self.assertEqual('--TEST_BOUNDARY', encoded_file[0])
+        self.assertEqual('Content-Disposition: form-data; name="TEST_KEY"; filename="test_name.bin"', encoded_file[1])
+        self.assertEqual('TEST_FILE_CONTENT', encoded_file[-1])
+
+    def test_guesses_content_type_on_file_encoding(self):
+        self.assertEqual('Content-Type: application/octet-stream',
+                         encode_file('IGNORE', 'IGNORE', DummyFile("file.bin"))[2])
+        self.assertEqual('Content-Type: text/plain',
+                         encode_file('IGNORE', 'IGNORE', DummyFile("file.txt"))[2])
+        self.assertEqual('Content-Type: application/zip',
+                         encode_file('IGNORE', 'IGNORE', DummyFile("file.zip"))[2])
+        self.assertEqual('Content-Type: application/octet-stream',
+                         encode_file('IGNORE', 'IGNORE', DummyFile("file.unknown"))[2])
