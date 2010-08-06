@@ -227,6 +227,11 @@ pretty-print the output with a number of indentation spaces.
 The :djadminopt:`--exclude` option may be provided to prevent specific
 applications from being dumped.
 
+.. versionadded:: 1.3
+
+The :djadminopt:`--exclude` option may also be provided to prevent specific
+models (specified as in the form of ``appname.ModelName``) from being dumped.
+
 .. versionadded:: 1.1
 
 In addition to specifying application names, you can provide a list of

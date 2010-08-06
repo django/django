@@ -23,9 +23,14 @@ class TestCaseFixtureLoadingTests(TestCase):
 
 class FixtureLoadingTests(TestCase):
 
-    def _dumpdata_assert(self, args, output, format='json', natural_keys=False):
+    def _dumpdata_assert(self, args, output, format='json', natural_keys=False,
+                         exclude_list=[]):
         new_io = StringIO.StringIO()
-        management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io, 'use_natural_keys':natural_keys})
+        management.call_command('dumpdata', *args, **{'format':format,
+                                                      'stdout':new_io,
+                                                      'stderr':new_io,
+                                                      'use_natural_keys':natural_keys,
+                                                      'exclude': exclude_list})
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, output)
 
@@ -149,6 +154,48 @@ class FixtureLoadingTests(TestCase):
         # Dump the current contents of the database as an XML fixture
         self._dumpdata_assert(['fixtures'], """<?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0"><object pk="1" model="fixtures.category"><field type="CharField" name="title">News Stories</field><field type="TextField" name="description">Latest news stories</field></object><object pk="5" model="fixtures.article"><field type="CharField" name="headline">XML identified as leading cause of cancer</field><field type="DateTimeField" name="pub_date">2006-06-16 16:00:00</field></object><object pk="4" model="fixtures.article"><field type="CharField" name="headline">Django conquers world!</field><field type="DateTimeField" name="pub_date">2006-06-16 15:00:00</field></object><object pk="3" model="fixtures.article"><field type="CharField" name="headline">Copyright is fine the way it is</field><field type="DateTimeField" name="pub_date">2006-06-16 14:00:00</field></object><object pk="2" model="fixtures.article"><field type="CharField" name="headline">Poker on TV is great!</field><field type="DateTimeField" name="pub_date">2006-06-16 11:00:00</field></object><object pk="1" model="fixtures.article"><field type="CharField" name="headline">Python program becomes self aware</field><field type="DateTimeField" name="pub_date">2006-06-16 11:00:00</field></object><object pk="1" model="fixtures.tag"><field type="CharField" name="name">copyright</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="2" model="fixtures.tag"><field type="CharField" name="name">legal</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="3" model="fixtures.tag"><field type="CharField" name="name">django</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">4</field></object><object pk="4" model="fixtures.tag"><field type="CharField" name="name">world domination</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">4</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">Artist formerly known as "Prince"</field></object><object pk="1" model="fixtures.person"><field type="CharField" name="name">Django Reinhardt</field></object><object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane Grappelli</field></object><object pk="1" model="fixtures.visa"><field to="fixtures.person" name="person" rel="ManyToOneRel"><natural>Django Reinhardt</natural></field><field to="auth.permission" name="permissions" rel="ManyToManyRel"><object><natural>add_user</natural><natural>auth</natural><natural>user</natural></object><object><natural>change_user</natural><natural>auth</natural><natural>user</natural></object><object><natural>delete_user</natural><natural>auth</natural><natural>user</natural></object></field></object><object pk="2" model="fixtures.visa"><field to="fixtures.person" name="person" rel="ManyToOneRel"><natural>Stephane Grappelli</natural></field><field to="auth.permission" name="permissions" rel="ManyToManyRel"><object><natural>add_user</natural><natural>auth</natural><natural>user</natural></object><object><natural>delete_user</natural><natural>auth</natural><natural>user</natural></object></field></object><object pk="3" model="fixtures.visa"><field to="fixtures.person" name="person" rel="ManyToOneRel"><natural>Artist formerly known as "Prince"</natural></field><field to="auth.permission" name="permissions" rel="ManyToManyRel"><object><natural>change_user</natural><natural>auth</natural><natural>user</natural></object></field></object><object pk="1" model="fixtures.book"><field type="CharField" name="name">Music for all ages</field><field to="fixtures.person" name="authors" rel="ManyToManyRel"><object><natural>Artist formerly known as "Prince"</natural></object><object><natural>Django Reinhardt</natural></object></field></object></django-objects>""", format='xml', natural_keys=True)
+
+    def test_dumpdata_with_excludes(self):
+        # Load fixture1 which has a site, two articles, and a category
+        management.call_command('loaddata', 'fixture1.json', verbosity=0, commit=False)
+
+        # Excluding fixtures app should only leave sites
+        self._dumpdata_assert(
+            ['sites', 'fixtures'],
+            '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}]',
+            exclude_list=['fixtures'])
+
+        # Excluding fixtures.Article should leave fixtures.Category
+        self._dumpdata_assert(
+            ['sites', 'fixtures'],
+            '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}, {"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}]',
+            exclude_list=['fixtures.Article'])
+
+        # Excluding fixtures and fixtures.Article should be a no-op
+        self._dumpdata_assert(
+            ['sites', 'fixtures'],
+            '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}, {"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}]',
+            exclude_list=['fixtures.Article'])
+
+        # Excluding sites and fixtures.Article should only leave fixtures.Category
+        self._dumpdata_assert(
+            ['sites', 'fixtures'],
+            '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}]',
+            exclude_list=['fixtures.Article', 'sites'])
+
+        # Excluding a bogus app should throw an error
+        self.assertRaises(SystemExit,
+                          self._dumpdata_assert,
+                          ['fixtures', 'sites'],
+                          '',
+                          exclude_list=['foo_app'])
+
+        # Excluding a bogus model should throw an error
+        self.assertRaises(SystemExit,
+                          self._dumpdata_assert,
+                          ['fixtures', 'sites'],
+                          '',
+                          exclude_list=['fixtures.FooModel'])
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
