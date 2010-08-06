@@ -1,7 +1,7 @@
 from django.forms import ModelForm
-from models import Place
+from models import USPlace
 
-class PlaceForm(ModelForm):
+class USPlaceForm(ModelForm):
     """docstring for PlaceForm"""
     class Meta:
-        model = Place
+        model = USPlace
