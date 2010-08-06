@@ -2126,6 +2126,7 @@ class UserAdminTest(TestCase):
         self.client.logout()
 
     def test_user_creation(self):
+        user_count = User.objects.count()
         response = self.client.post('/test_admin/admin/auth/user/add/', {
             'username': 'newuser',
             'password1': 'newpassword',
@@ -2134,6 +2135,7 @@ class UserAdminTest(TestCase):
         })
         new_user = User.objects.order_by('-id')[0]
         self.assertRedirects(response, '/test_admin/admin/auth/user/%s/' % new_user.pk)
+        self.assertEquals(User.objects.count(), user_count + 1)
         self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
 
     def test_password_mismatch(self):
@@ -2155,3 +2157,16 @@ class UserAdminTest(TestCase):
         self.assertContains(response, 'class="add-another" id="add_id_owner" onclick="return showAddAnotherPopup(this);"')
         response = self.client.get('/test_admin/admin/auth/user/add/?_popup=1')
         self.assertNotContains(response, 'name="_continue"')
+
+    def test_user_add_another(self):
+        user_count = User.objects.count()
+        response = self.client.post('/test_admin/admin/auth/user/add/', {
+            'username': 'newuser',
+            'password1': 'newpassword',
+            'password2': 'newpassword',
+            '_addanother': '1',
+        })
+        new_user = User.objects.order_by('-id')[0]
+        self.assertRedirects(response, '/test_admin/admin/auth/user/add/')
+        self.assertEquals(User.objects.count(), user_count + 1)
+        self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)

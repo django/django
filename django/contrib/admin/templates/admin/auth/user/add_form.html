@@ -4,7 +4,6 @@
 {% block form_top %}
   {% if not is_popup %}
     <p>{% trans "First, enter a username and password. Then, you'll be able to edit more user options." %}</p>
-    <input type="hidden" name="_continue" value="1" />
   {% else %}
     <p>{% trans "Enter a username and password." %}</p>
   {% endif %}
