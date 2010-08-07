@@ -498,11 +498,11 @@ Methods
 .. method:: HttpResponse.__delitem__(header)
 
     Deletes the header with the given name. Fails silently if the header
-    doesn't exist. Case-sensitive.
+    doesn't exist. Case-insensitive.
 
 .. method:: HttpResponse.__getitem__(header)
 
-    Returns the value for the given header name. Case-sensitive.
+    Returns the value for the given header name. Case-insensitive.
 
 .. method:: HttpResponse.has_header(header)
 
