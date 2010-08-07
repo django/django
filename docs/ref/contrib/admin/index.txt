@@ -594,8 +594,8 @@ This should be set to a list of field names that will be searched whenever
 somebody submits a search query in that text box.
 
 These fields should be some kind of text field, such as ``CharField`` or
-``TextField``. You can also perform a related lookup on a ``ForeignKey`` with
-the lookup API "follow" notation::
+``TextField``. You can also perform a related lookup on a ``ForeignKey`` or
+``ManyToManyField`` with the lookup API "follow" notation::
 
     search_fields = ['foreign_key__related_fieldname']
 
