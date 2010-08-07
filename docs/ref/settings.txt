@@ -152,18 +152,6 @@ Default: ``600``
 The default number of seconds to cache a page when the caching middleware or
 ``cache_page()`` decorator is used.
 
-.. setting:: CSRF_COOKIE_NAME
-
-CSRF_COOKIE_NAME
-----------------
-
-.. versionadded:: 1.2
-
-Default: ``'csrftoken'``
-
-The name of the cookie to use for the CSRF authentication token. This can be whatever you
-want.  See :ref:`ref-contrib-csrf`.
-
 .. setting:: CSRF_COOKIE_DOMAIN
 
 CSRF_COOKIE_DOMAIN
@@ -178,6 +166,18 @@ allowing cross-subdomain requests to be exluded from the normal cross site
 request forgery protection.  It should be set to a string such as
 ``".lawrence.com"`` to allow a POST request from a form on one subdomain to be
 accepted by accepted by a view served from another subdomain.
+
+.. setting:: CSRF_COOKIE_NAME
+
+CSRF_COOKIE_NAME
+----------------
+
+.. versionadded:: 1.2
+
+Default: ``'csrftoken'``
+
+The name of the cookie to use for the CSRF authentication token. This can be whatever you
+want.  See :ref:`ref-contrib-csrf`.
 
 .. setting:: CSRF_FAILURE_VIEW
 
@@ -573,18 +573,6 @@ Default: ``'webmaster@localhost'``
 Default e-mail address to use for various automated correspondence from the
 site manager(s).
 
-.. setting:: DEFAULT_TABLESPACE
-
-DEFAULT_TABLESPACE
-------------------
-
-.. versionadded:: 1.0
-
-Default: ``''`` (Empty string)
-
-Default tablespace to use for models that don't specify one, if the
-backend supports it.
-
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
 DEFAULT_INDEX_TABLESPACE
@@ -596,6 +584,18 @@ Default: ``''`` (Empty string)
 
 Default tablespace to use for indexes on fields that don't specify
 one, if the backend supports it.
+
+.. setting:: DEFAULT_TABLESPACE
+
+DEFAULT_TABLESPACE
+------------------
+
+.. versionadded:: 1.0
+
+Default: ``''`` (Empty string)
+
+Default tablespace to use for models that don't specify one, if the
+backend supports it.
 
 .. setting:: DISALLOWED_USER_AGENTS
 
@@ -738,21 +738,6 @@ Default: ``2621440`` (i.e. 2.5 MB).
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :ref:`topics-files` for details.
 
-.. setting:: FILE_UPLOAD_TEMP_DIR
-
-FILE_UPLOAD_TEMP_DIR
---------------------
-
-.. versionadded:: 1.0
-
-Default: ``None``
-
-The directory to store data temporarily while uploading files. If ``None``,
-Django will use the standard temporary directory for the operating system. For
-example, this will default to '/tmp' on \*nix-style operating systems.
-
-See :ref:`topics-files` for details.
-
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
 FILE_UPLOAD_PERMISSIONS
@@ -780,6 +765,21 @@ system's standard umask.
 
 
 .. _documentation for os.chmod: http://docs.python.org/library/os.html#os.chmod
+
+.. setting:: FILE_UPLOAD_TEMP_DIR
+
+FILE_UPLOAD_TEMP_DIR
+--------------------
+
+.. versionadded:: 1.0
+
+Default: ``None``
+
+The directory to store data temporarily while uploading files. If ``None``,
+Django will use the standard temporary directory for the operating system. For
+example, this will default to '/tmp' on \*nix-style operating systems.
+
+See :ref:`topics-files` for details.
 
 .. setting:: FIRST_DAY_OF_WEEK
 
@@ -1227,27 +1227,6 @@ Default: ``'root@localhost'``
 The e-mail address that error messages come from, such as those sent to
 ``ADMINS`` and ``MANAGERS``.
 
-.. setting:: SESSION_ENGINE
-
-SESSION_ENGINE
---------------
-
-.. versionadded:: 1.0
-
-.. versionchanged:: 1.1
-   The ``cached_db`` backend was added
-
-Default: ``django.contrib.sessions.backends.db``
-
-Controls where Django stores session data. Valid values are:
-
-    * ``'django.contrib.sessions.backends.db'``
-    * ``'django.contrib.sessions.backends.file'``
-    * ``'django.contrib.sessions.backends.cache'``
-    * ``'django.contrib.sessions.backends.cached_db'``
-
-See :ref:`topics-http-sessions`.
-
 .. setting:: SESSION_COOKIE_AGE
 
 SESSION_COOKIE_AGE
@@ -1305,6 +1284,27 @@ Whether to use a secure cookie for the session cookie. If this is set to
 ``True``, the cookie will be marked as "secure," which means browsers may
 ensure that the cookie is only sent under an HTTPS connection.
 See the :ref:`topics-http-sessions`.
+
+.. setting:: SESSION_ENGINE
+
+SESSION_ENGINE
+--------------
+
+.. versionadded:: 1.0
+
+.. versionchanged:: 1.1
+   The ``cached_db`` backend was added
+
+Default: ``django.contrib.sessions.backends.db``
+
+Controls where Django stores session data. Valid values are:
+
+    * ``'django.contrib.sessions.backends.db'``
+    * ``'django.contrib.sessions.backends.file'``
+    * ``'django.contrib.sessions.backends.cache'``
+    * ``'django.contrib.sessions.backends.cached_db'``
+
+See :ref:`topics-http-sessions`.
 
 .. setting:: SESSION_EXPIRE_AT_BROWSER_CLOSE
 
@@ -1601,6 +1601,20 @@ A boolean that specifies whether to output the "Etag" header. This saves
 bandwidth but slows down performance. This is only used if ``CommonMiddleware``
 is installed (see :ref:`topics-http-middleware`).
 
+.. setting:: USE_I18N
+
+USE_I18N
+--------
+
+Default: ``True``
+
+A boolean that specifies whether Django's internationalization system should be
+enabled. This provides an easy way to turn it off, for performance. If this is
+set to ``False``, Django will make some optimizations so as not to load the
+internationalization machinery.
+
+See also ``USE_L10N``
+
 .. setting:: USE_L10N
 
 USE_L10N
@@ -1615,20 +1629,6 @@ is set to ``True``, e.g. Django will display numbers and dates using the
 format of the current locale.
 
 See also ``USE_I18N`` and ``LANGUAGE_CODE``
-
-.. setting:: USE_I18N
-
-USE_I18N
---------
-
-Default: ``True``
-
-A boolean that specifies whether Django's internationalization system should be
-enabled. This provides an easy way to turn it off, for performance. If this is
-set to ``False``, Django will make some optimizations so as not to load the
-internationalization machinery.
-
-See also ``USE_L10N``
 
 .. setting:: USE_THOUSAND_SEPARATOR
 
