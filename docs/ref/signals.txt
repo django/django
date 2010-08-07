@@ -33,9 +33,9 @@ module system.
     If you override these methods on your model, you must call the parent class'
     methods for this signals to be sent.
 
-	Note also that Django stores signal handlers as weak references by default,
-	so if your handler is a local function, it may be garbage collected.  To
-	prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
+    Note also that Django stores signal handlers as weak references by default,
+    so if your handler is a local function, it may be garbage collected.  To
+    prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
 
 pre_init
 --------
@@ -113,6 +113,9 @@ Arguments sent with this signal:
     ``instance``
         The actual instance being saved.
 
+    ``using``
+        The database alias being used.
+
 post_save
 ---------
 
@@ -133,6 +136,9 @@ Arguments sent with this signal:
     ``created``
         A boolean; ``True`` if a new record was created.
 
+    ``using``
+        The database alias being used.
+
 pre_delete
 ----------
 
@@ -149,6 +155,9 @@ Arguments sent with this signal:
 
     ``instance``
         The actual instance being deleted.
+
+    ``using``
+        The database alias being used.
 
 post_delete
 -----------
@@ -169,6 +178,9 @@ Arguments sent with this signal:
 
         Note that the object will no longer be in the database, so be very
         careful what you do with this instance.
+
+    ``using``
+        The database alias being used.
 
 m2m_changed
 -----------
@@ -215,8 +227,8 @@ Arguments sent with this signal:
             Sent *after* the relation is cleared
 
     ``reverse``
-    	Indicates which side of the relation is updated (i.e., if it is the
-    	forward or reverse relation that is being modified).
+        Indicates which side of the relation is updated (i.e., if it is the
+        forward or reverse relation that is being modified).
 
     ``model``
         The class of the objects that are added to, removed from or cleared
@@ -227,6 +239,9 @@ Arguments sent with this signal:
         primary key values that have been added to or removed from the relation.
 
         For the ``"clear"`` action, this is ``None``.
+
+    ``using``
+        The database alias being used.
 
 For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
 like this:
@@ -266,6 +281,8 @@ the arguments sent to a :data:`m2m_changed` handler would be:
                     ``Pizza``)
 
     ``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
+
+    ``using``       ``"default"`` (since the default router sends writes here)
     ==============  ============================================================
 
 And if we would then do something like this:
@@ -293,6 +310,8 @@ the arguments sent to a :data:`m2m_changed` handler would be:
 
     ``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
                     relation)
+
+    ``using``       ``"default"`` (since the default router sends writes here)
     ==============  ============================================================
 
 class_prepared

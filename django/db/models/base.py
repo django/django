@@ -456,7 +456,7 @@ class Model(object):
             meta = cls._meta
 
         if origin and not meta.auto_created:
-            signals.pre_save.send(sender=origin, instance=self, raw=raw)
+            signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using)
 
         # If we are in a raw save, save the object exactly as presented.
         # That means that we don't try to be smart about saving attributes
@@ -540,7 +540,7 @@ class Model(object):
         # Signal that the save is complete
         if origin and not meta.auto_created:
             signals.post_save.send(sender=origin, instance=self,
-                created=(not record_exists), raw=raw)
+                created=(not record_exists), raw=raw, using=using)
 
     save_base.alters_data = True
 
