@@ -128,7 +128,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
             # no models were named (i.e., run all), import
             # this model and add it to the list to test.
             if not test_labels or model_name in set([label.split('.')[0] for label in test_labels]):
-                if verbosity >= 1:
+                if verbosity >= 2:
                     print "Importing model %s" % model_name
                 mod = load_app(model_label)
                 if mod:
@@ -187,8 +187,8 @@ if __name__ == "__main__":
     from optparse import OptionParser
     usage = "%prog [options] [model model model ...]"
     parser = OptionParser(usage=usage)
-    parser.add_option('-v','--verbosity', action='store', dest='verbosity', default='0',
-        type='choice', choices=['0', '1', '2'],
+    parser.add_option('-v','--verbosity', action='store', dest='verbosity', default='1',
+        type='choice', choices=['0', '1', '2', '3'],
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
     parser.add_option('--noinput', action='store_false', dest='interactive', default=True,
         help='Tells Django to NOT prompt the user for input of any kind.')

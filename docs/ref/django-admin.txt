@@ -962,6 +962,7 @@ that ``django-admin.py`` should print to the console.
     * ``0`` means no output.
     * ``1`` means normal output (default).
     * ``2`` means verbose output.
+    * ``3`` means *very* verbose output.
 
 Common options
 ==============
