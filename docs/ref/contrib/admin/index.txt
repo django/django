@@ -474,17 +474,16 @@ change list page. By default, this is set to ``100``.
 
 .. attribute:: ModelAdmin.list_select_related
 
-Set ``list_select_related`` to tell Django to use ``select_related()`` in
-retrieving the list of objects on the admin change list page. This can save you
-a bunch of database queries.
+Set ``list_select_related`` to tell Django to use
+:meth:`~django.db.models.QuerySet.select_related` in retrieving the list of
+objects on the admin change list page. This can save you a bunch of database
+queries.
 
 The value should be either ``True`` or ``False``. Default is ``False``.
 
-Note that Django will use ``select_related()``, regardless of this setting,
-if one of the ``list_display`` fields is a ``ForeignKey``.
-
-For more on ``select_related()``, see
-:ref:`the select_related() docs <select-related>`.
+Note that Django will use :meth:`~django.db.models.QuerySet.select_related`,
+regardless of this setting, if one of the ``list_display`` fields is a
+``ForeignKey``.
 
 .. attribute:: ModelAdmin.inlines
 
