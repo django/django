@@ -600,6 +600,11 @@ the lookup API "follow" notation::
 
     search_fields = ['foreign_key__related_fieldname']
 
+For example, if you have a blog entry with an author, the following definition
+would enable search blog entries by the email address of the author::
+
+    search_fields = ['user__email']
+
 When somebody does a search in the admin search box, Django splits the search
 query into words and returns all objects that contain each of the words, case
 insensitive, where each word must be in at least one of ``search_fields``. For
