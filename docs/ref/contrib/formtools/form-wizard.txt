@@ -189,8 +189,10 @@ for the wizard to work properly.
 Hooking the wizard into a URLconf
 =================================
 
-Finally, give your new :class:`FormWizard` object a URL in ``urls.py``. The
-wizard takes a list of your :class:`~django.forms.Form` objects as arguments::
+Finally, we need to specify which forms to use in the wizard, and then
+deploy the new :class:`FormWizard` object a URL in ``urls.py``. The
+wizard takes a list of your :class:`~django.forms.Form` objects as
+arguments when you instantiate the Wizard::
 
     from django.conf.urls.defaults import *
     from mysite.testapp.forms import ContactForm1, ContactForm2, ContactWizard
