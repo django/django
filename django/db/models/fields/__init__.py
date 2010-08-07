@@ -459,6 +459,9 @@ class AutoField(Field):
         kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
 
+    def get_internal_type(self):
+        return "AutoField"
+
     def to_python(self, value):
         if value is None:
             return value
