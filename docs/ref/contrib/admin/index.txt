@@ -869,11 +869,26 @@ return a subset of objects for this foreign key field based on the user::
         def formfield_for_foreignkey(self, db_field, request, **kwargs):
             if db_field.name == "car":
                 kwargs["queryset"] = Car.objects.filter(owner=request.user)
-                return db_field.formfield(**kwargs)
             return super(MyModelAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key field
-to only the cars owned by the ``User`` instance.
+to only display the cars owned by the ``User`` instance.
+
+.. method:: ModelAdmin.formfield_for_manytomany(self, db_field, request, **kwargs)
+
+.. versionadded:: 1.1
+
+Like the ``formfield_for_foreignkey`` method, the ``formfield_for_manytomany``
+method can be overridden to change the default formfield for a many to many
+field. For example, if an owner can own multiple cars and cars can belong
+to multiple owners -- a many to many relationship -- you could filter the
+``Car`` foreign key field to only display the cars owned by the ``User``::
+
+    class MyModelAdmin(admin.ModelAdmin):
+        def formfield_for_manytomany(self, db_field, request, **kwargs):
+            if db_field.name == "cars":
+                kwargs["queryset"] = Car.objects.filter(owner=request.user)
+            return super(MyModelAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
 .. method:: ModelAdmin.queryset(self, request)
 
