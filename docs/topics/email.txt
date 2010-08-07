@@ -501,7 +501,7 @@ convenience that can be used during development.
 Defining a custom e-mail backend
 --------------------------------
 
-If you need to change how e-mails are send you can write your own e-mail
+If you need to change how e-mails are sent you can write your own e-mail
 backend. The ``EMAIL_BACKEND`` setting in your settings file is then the
 Python import path for your backend class.
 
