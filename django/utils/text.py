@@ -39,7 +39,10 @@ wrap = allow_lazy(wrap, unicode)
 def truncate_words(s, num, end_text='...'):
     """Truncates a string after a certain number of words. Takes an optional
     argument of what should be used to notify that the string has been
-    truncated, defaults to ellipsis (...)"""
+    truncated, defaulting to ellipsis (...)
+
+    Newlines in the string will be stripped.
+    """
     s = force_unicode(s)
     length = int(num)
     words = s.split()
@@ -51,10 +54,13 @@ def truncate_words(s, num, end_text='...'):
 truncate_words = allow_lazy(truncate_words, unicode)
 
 def truncate_html_words(s, num, end_text='...'):
-    """Truncates html to a certain number of words (not counting tags and
+    """Truncates HTML to a certain number of words (not counting tags and
     comments). Closes opened tags if they were correctly closed in the given
     html. Takes an optional argument of what should be used to notify that the
-    string has been truncated, defaults to ellipsis (...)."""
+    string has been truncated, defaulting to ellipsis (...).
+
+    Newlines in the HTML are preserved.
+    """
     s = force_unicode(s)
     length = int(num)
     if length <= 0:
