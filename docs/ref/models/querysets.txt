@@ -332,8 +332,6 @@ a model which defines a default ordering, or when using
 ordering was undefined prior to calling ``reverse()``, and will remain
 undefined afterward).
 
-.. _queryset-distinct:
-
 ``distinct()``
 ~~~~~~~~~~~~~~
 
@@ -366,9 +364,6 @@ query spans multiple tables, it's possible to get duplicate results when a
     ordering by related models. Similarly, when using ``distinct()`` and
     ``values()`` together, be careful when ordering by fields not in the
     ``values()`` call.
-
-
-.. _queryset-values:
 
 ``values(*fields)``
 ~~~~~~~~~~~~~~~~~~~
@@ -679,8 +674,6 @@ related object.
 ``OneToOneFields`` will not be traversed in the reverse direction if you
 are performing a depth-based ``select_related``.
 
-.. _queryset-extra:
-
 ``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -842,8 +835,6 @@ of the arguments is required, but you should use at least one of them.
     Good::
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
-
-.. _queryset-defer:
 
 ``defer(*fields)``
 ~~~~~~~~~~~~~~~~~~
@@ -1142,8 +1133,6 @@ Example::
     {}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
-
-.. _queryset-iterator:
 
 ``iterator()``
 ~~~~~~~~~~~~~~
