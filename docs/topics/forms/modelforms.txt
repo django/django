@@ -595,8 +595,8 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 
     class BaseAuthorFormSet(BaseModelFormSet):
         def __init__(self, *args, **kwargs):
-            self.queryset = Author.objects.filter(name__startswith='O')
             super(BaseAuthorFormSet, self).__init__(*args, **kwargs)
+            self.queryset = Author.objects.filter(name__startswith='O')
 
 Then, pass your ``BaseAuthorFormSet`` class to the factory function::
 
