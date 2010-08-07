@@ -898,8 +898,9 @@ includes a few other useful built-in views located in
 
 .. function:: views.password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect])
 
-    Allows a user to reset their password, and sends them the new password
-    in an e-mail.
+    Allows a user to reset their password by generating a one-time use link
+    that can be used to reset the password, and sending that link to the
+    user's registered e-mail address.
 
     **Optional arguments:**
 
@@ -1005,8 +1006,8 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: PasswordResetForm
 
-    A form for resetting a user's password and e-mailing the new password to
-    them.
+    A form for generating and e-mailing a one-time use link to reset a
+    user's password.
 
 .. class:: SetPasswordForm
 
