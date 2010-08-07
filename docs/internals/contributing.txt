@@ -145,7 +145,11 @@ and time availability), claim it by following these steps:
     * Claim the ticket by clicking the radio button next to "Accept ticket"
       near the bottom of the page, then clicking "Submit changes."
 
+If you have an account but have forgotten your password, you can reset it
+using the `password reset page`_.
+
 .. _Create an account: http://www.djangoproject.com/accounts/register/
+.. _password reset page: http://www.djangoproject.com/accounts/password/reset/
 
 Ticket claimers' responsibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
