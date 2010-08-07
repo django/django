@@ -569,7 +569,7 @@ function supports both positional and named interpolation:
       object or associative array. For example::
 
         d = {
-            count: 10
+            count: 10,
             total: 50
         };
 
