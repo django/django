@@ -31,3 +31,23 @@ class Post(models.Model):
     magic_numbers = models.ListField(
         models.IntegerField()
     )
+
+
+class Revision(models.Model):
+    number = models.IntegerField()
+    content = models.TextField()
+
+
+class AuthenticatedRevision(Revision):
+    # This is a really stupid way to add optional authentication, but it serves
+    # its purpose.
+    author = models.CharField(max_length=100)
+
+
+class WikiPage(models.Model):
+    id = models.NativeAutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    
+    revisions = models.ListField(
+        models.EmbeddedModel(Revision)
+    )

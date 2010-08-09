@@ -47,6 +47,7 @@ def is_protected_type(obj):
     return isinstance(obj, (
         types.NoneType,
         int, long,
+        list,
         datetime.datetime, datetime.date, datetime.time,
         float, Decimal)
     )

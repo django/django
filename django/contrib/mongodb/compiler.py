@@ -172,6 +172,10 @@ class SQLUpdateCompiler(SQLCompiler):
 
         vals = {}
         for field, o, value in self.query.values:
+            if hasattr(value, 'prepare_database_save'):
+                value = value.prepare_database_save(field)
+            else:
+                value = field.get_db_prep_save(value, connection=self.connection)
             if hasattr(value, "evaluate"):
                 assert value.connector in (value.ADD, value.SUB)
                 assert not value.negated

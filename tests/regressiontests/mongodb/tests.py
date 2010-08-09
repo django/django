@@ -1,8 +1,9 @@
+from django.core.exceptions import ValidationError
 from django.db import connection, UnsupportedDatabaseOperation
 from django.db.models import Count, Sum, F, Q
 from django.test import TestCase
 
-from models import Artist, Group, Post
+from models import Artist, Group, Post, WikiPage, Revision, AuthenticatedRevision
 
 
 class MongoTestCase(TestCase):
@@ -398,6 +399,9 @@ class MongoTestCase(TestCase):
         )
     
     def test_list_field(self):
+        p = Post()
+        self.assertEqual(p.tags, [])
+        
         p = Post.objects.create(
             title="Django ORM grows MongoDB support",
             tags=["python", "django", "mongodb", "web"]
@@ -428,7 +432,7 @@ class MongoTestCase(TestCase):
             lambda p: p.title
         )
         
-        self.assertRaises(ValueError,
+        self.assertRaises(ValidationError,
             lambda: Post.objects.create(magic_numbers=["a"])
         )
         
@@ -448,3 +452,52 @@ class MongoTestCase(TestCase):
             ],
             lambda p: p.title,
         )
+    
+    def test_embedded_model(self):
+        page = WikiPage(title="Django")
+        page.revisions.append(
+            Revision(number=1, content="Django is a Python")
+        )
+        page.revisions.append(
+            Revision(number=2, content="Django is a Python web framework.")
+        )
+        
+        page.save()
+        
+        page = WikiPage.objects.get(pk=page.pk)
+        self.assertEqual(len(page.revisions), 2)
+        self.assertEqual(
+            [(r.number, r.content) for r in page.revisions],
+            [(1, "Django is a Python"), (2, "Django is a Python web framework.")]
+        )
+        
+        self.assertEqual(Revision.objects.count(), 0)
+        
+        self.assertRaises(ValidationError,
+            lambda: WikiPage.objects.create(title="Python", revisions=14)
+        )
+        self.assertRaises(ValidationError,
+            lambda: WikiPage.objects.create(title="Python", revisions=[14])
+        )
+        
+        page = WikiPage.objects.create(title="Python", revisions=[
+            Revision(number=1, content="Python was created by Guido van Rossum.")
+        ])
+        page = WikiPage.objects.get(pk=page.pk)
+        self.assertEqual(len(page.revisions), 1)
+        
+        page.revisions.append(
+            AuthenticatedRevision(number=2, content="Python is a trap.", author="Rasmus Lerdorf"),
+        )
+        
+        page.save()
+        self.assertEqual(len(page.revisions), 2)
+        self.assertEqual(page.revisions[-1].author, "Rasmus Lerdorf")
+        
+        page = WikiPage.objects.get(pk=page.pk)
+        self.assertEqual(len(page.revisions), 2)
+        self.assertTrue(isinstance(page.revisions[-1], AuthenticatedRevision))
+        self.assertEqual(page.revisions[-1].author, "Rasmus Lerdorf")
+        
+        page.revisions.append(14)
+        self.assertRaises(ValidationError, page.save)
