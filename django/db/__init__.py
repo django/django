@@ -35,6 +35,8 @@ if DEFAULT_DB_ALIAS not in settings.DATABASES:
     raise ImproperlyConfigured("You must default a '%s' database" % DEFAULT_DB_ALIAS)
 
 for alias, database in settings.DATABASES.items():
+    if 'ENGINE' not in database:
+        raise ImproperlyConfigured("You must specify a 'ENGINE' for database '%s'" % alias)
     if database['ENGINE'] in ("postgresql", "postgresql_psycopg2", "sqlite3", "mysql", "oracle"):
         import warnings
         if 'django.contrib.gis' in settings.INSTALLED_APPS:

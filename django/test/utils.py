@@ -19,6 +19,12 @@ class ContextList(list):
         else:
             return super(ContextList, self).__getitem__(key)
 
+    def __contains__(self, key):
+        try:
+            value = self[key]
+        except KeyError:
+            return False
+        return True
 
 def instrumented_test_render(self, context):
     """

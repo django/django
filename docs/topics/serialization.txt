@@ -338,7 +338,7 @@ example, ``(first name, last name)``. Then, when you call
 ``serializers.serialize()``, you provide a ``use_natural_keys=True``
 argument::
 
-    >>> serializers.serialize([book1, book2], format='json', indent=2, use_natural_keys=True)
+    >>> serializers.serialize('json', [book1, book2], indent=2, use_natural_keys=True)
 
 When ``use_natural_keys=True`` is specified, Django will use the
 ``natural_key()`` method to serialize any reference to objects of the

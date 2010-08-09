@@ -62,6 +62,17 @@ u'<input type="text" class="special" name="email" />'
 u'<input type="password" name="email" />'
 >>> w.render('email', None)
 u'<input type="password" name="email" />'
+>>> w.render('email', 'secret')
+u'<input type="password" name="email" />'
+
+The render_value argument lets you specify whether the widget should render
+its value. For security reasons, this is off by default.
+
+>>> w = PasswordInput(render_value=True)
+>>> w.render('email', '')
+u'<input type="password" name="email" />'
+>>> w.render('email', None)
+u'<input type="password" name="email" />'
 >>> w.render('email', 'test@example.com')
 u'<input type="password" name="email" value="test@example.com" />'
 >>> w.render('email', 'some "quoted" & ampersanded value')
@@ -70,35 +81,19 @@ u'<input type="password" name="email" value="some &quot;quoted&quot; &amp; amper
 u'<input type="password" name="email" value="test@example.com" class="fun" />'
 
 You can also pass 'attrs' to the constructor:
->>> w = PasswordInput(attrs={'class': 'fun'})
+>>> w = PasswordInput(attrs={'class': 'fun'}, render_value=True)
 >>> w.render('email', '')
 u'<input type="password" class="fun" name="email" />'
 >>> w.render('email', 'foo@example.com')
 u'<input type="password" class="fun" value="foo@example.com" name="email" />'
 
 'attrs' passed to render() get precedence over those passed to the constructor:
->>> w = PasswordInput(attrs={'class': 'pretty'})
+>>> w = PasswordInput(attrs={'class': 'pretty'}, render_value=True)
 >>> w.render('email', '', attrs={'class': 'special'})
 u'<input type="password" class="special" name="email" />'
 
 >>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
 u'<input type="password" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
-
-The render_value argument lets you specify whether the widget should render
-its value. You may want to do this for security reasons.
->>> w = PasswordInput(render_value=True)
->>> w.render('email', 'secret')
-u'<input type="password" name="email" value="secret" />'
->>> w = PasswordInput(render_value=False)
->>> w.render('email', '')
-u'<input type="password" name="email" />'
->>> w.render('email', None)
-u'<input type="password" name="email" />'
->>> w.render('email', 'secret')
-u'<input type="password" name="email" />'
->>> w = PasswordInput(attrs={'class': 'fun'}, render_value=False)
->>> w.render('email', 'secret')
-u'<input type="password" class="fun" name="email" />'
 
 # HiddenInput Widget ############################################################
 
@@ -1286,7 +1281,7 @@ class SelectAndTextWidget(forms.MultiWidget):
             forms.TextInput
         ]
         super(SelectAndTextWidget, self).__init__(widgets)
-    
+
     def _set_choices(self, choices):
         """
         When choices are set for this widget, we want to pass those along to the Select widget

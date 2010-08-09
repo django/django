@@ -1883,6 +1883,8 @@ For example::
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is ..."``.
 
+Newlines within the string will be removed.
+
 .. templatefilter:: truncatewords_html
 
 truncatewords_html
@@ -1901,6 +1903,8 @@ For example::
 
 If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
 ``"<p>Joel is ...</p>"``.
+
+Newlines in the HTML content will be preserved.
 
 .. templatefilter:: unordered_list
 

@@ -101,7 +101,7 @@ Use ``iterator()``
 
 When you have a lot of objects, the caching behaviour of the ``QuerySet`` can
 cause a large amount of memory to be used. In this case,
-:ref:`QuerySet.iterator() <queryset-iterator>` may help.
+:meth:`~django.db.models.QuerySet.iterator()` may help.
 
 Do database work in the database rather than in Python
 ======================================================
@@ -121,9 +121,9 @@ If these aren't enough to generate the SQL you need:
 Use ``QuerySet.extra()``
 ------------------------
 
-A less portable but more powerful method is :ref:`QuerySet.extra()
-<queryset-extra>`, which allows some SQL to be explicitly added to the query.
-If that still isn't powerful enough:
+A less portable but more powerful method is
+:meth:`~django.db.models.QuerySet.extra()`, which allows some SQL to be
+explicitly added to the query. If that still isn't powerful enough:
 
 Use raw SQL
 -----------
@@ -159,7 +159,7 @@ Use ``QuerySet.values()`` and ``values_list()``
 -----------------------------------------------
 
 When you just want a dict/list of values, and don't need ORM model objects, make
-appropriate usage of :ref:`QuerySet.values() <queryset-values>`.
+appropriate usage of :meth:`~django.db.models.QuerySet.values()`.
 These can be useful for replacing model objects in template code - as long as
 the dicts you supply have the same attributes as those used in the template, you
 are fine.
@@ -167,7 +167,8 @@ are fine.
 Use ``QuerySet.defer()`` and ``only()``
 ---------------------------------------
 
-Use :ref:`defer() and only() <queryset-defer>` if there are database columns you
+Use :meth:`~django.db.models.QuerySet.defer()` and
+:meth:`~django.db.models.QuerySet.only()` if there are database columns you
 know that you won't need (or won't need in most cases) to avoid loading
 them. Note that if you *do* use them, the ORM will have to go and get them in a
 separate query, making this a pessimization if you use it inappropriately.

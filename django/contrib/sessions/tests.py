@@ -1,388 +1,273 @@
-r"""
-
->>> from django.conf import settings
->>> from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
->>> from django.contrib.sessions.backends.cache import SessionStore as CacheSession
->>> from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
->>> from django.contrib.sessions.backends.file import SessionStore as FileSession
->>> from django.contrib.sessions.backends.base import SessionBase
->>> from django.contrib.sessions.models import Session
-
->>> db_session = DatabaseSession()
->>> db_session.modified
-False
->>> db_session.get('cat')
->>> db_session['cat'] = "dog"
->>> db_session.modified
-True
->>> db_session.pop('cat')
-'dog'
->>> db_session.pop('some key', 'does not exist')
-'does not exist'
->>> db_session.save()
->>> db_session.exists(db_session.session_key)
-True
->>> db_session.delete(db_session.session_key)
->>> db_session.exists(db_session.session_key)
-False
-
->>> db_session['foo'] = 'bar'
->>> db_session.save()
->>> db_session.exists(db_session.session_key)
-True
->>> prev_key = db_session.session_key
->>> db_session.flush()
->>> db_session.exists(prev_key)
-False
->>> db_session.session_key == prev_key
-False
->>> db_session.modified, db_session.accessed
-(True, True)
->>> db_session['a'], db_session['b'] = 'c', 'd'
->>> db_session.save()
->>> prev_key = db_session.session_key
->>> prev_data = db_session.items()
->>> db_session.cycle_key()
->>> db_session.session_key == prev_key
-False
->>> db_session.items() == prev_data
-True
-
-# Submitting an invalid session key (either by guessing, or if the db has
-# removed the key) results in a new key being generated.
->>> Session.objects.filter(pk=db_session.session_key).delete()
->>> db_session = DatabaseSession(db_session.session_key)
->>> db_session.save()
->>> DatabaseSession('1').get('cat')
-
-#
-# Cached DB session tests
-#
-
->>> cdb_session = CacheDBSession()
->>> cdb_session.modified
-False
->>> cdb_session['cat'] = "dog"
->>> cdb_session.modified
-True
->>> cdb_session.pop('cat')
-'dog'
->>> cdb_session.pop('some key', 'does not exist')
-'does not exist'
->>> cdb_session.save()
->>> cdb_session.exists(cdb_session.session_key)
-True
->>> cdb_session.delete(cdb_session.session_key)
->>> cdb_session.exists(cdb_session.session_key)
-False
-
-#
-# File session tests.
-#
-
-# Do file session tests in an isolated directory, and kill it after we're done.
->>> original_session_file_path = settings.SESSION_FILE_PATH
->>> import tempfile
->>> temp_session_store = settings.SESSION_FILE_PATH = tempfile.mkdtemp()
-
->>> file_session = FileSession()
->>> file_session.modified
-False
->>> file_session['cat'] = "dog"
->>> file_session.modified
-True
->>> file_session.pop('cat')
-'dog'
->>> file_session.pop('some key', 'does not exist')
-'does not exist'
->>> file_session.save()
->>> file_session.exists(file_session.session_key)
-True
->>> file_session.delete(file_session.session_key)
->>> file_session.exists(file_session.session_key)
-False
->>> FileSession('1').get('cat')
-
->>> file_session['foo'] = 'bar'
->>> file_session.save()
->>> file_session.exists(file_session.session_key)
-True
->>> prev_key = file_session.session_key
->>> file_session.flush()
->>> file_session.exists(prev_key)
-False
->>> file_session.session_key == prev_key
-False
->>> file_session.modified, file_session.accessed
-(True, True)
->>> file_session['a'], file_session['b'] = 'c', 'd'
->>> file_session.save()
->>> prev_key = file_session.session_key
->>> prev_data = file_session.items()
->>> file_session.cycle_key()
->>> file_session.session_key == prev_key
-False
->>> file_session.items() == prev_data
-True
-
->>> Session.objects.filter(pk=file_session.session_key).delete()
->>> file_session = FileSession(file_session.session_key)
->>> file_session.save()
-
-# Make sure the file backend checks for a good storage dir
->>> settings.SESSION_FILE_PATH = "/if/this/directory/exists/you/have/a/weird/computer"
->>> FileSession()
-Traceback (innermost last):
-    ...
-ImproperlyConfigured: The session storage path '/if/this/directory/exists/you/have/a/weird/computer' doesn't exist. Please set your SESSION_FILE_PATH setting to an existing directory in which Django can store session data.
-
-# Clean up after the file tests
->>> settings.SESSION_FILE_PATH = original_session_file_path
->>> import shutil
->>> shutil.rmtree(temp_session_store)
-
-#
-# Cache-based tests
-# NB: be careful to delete any sessions created; stale sessions fill up the
-# /tmp and eventually overwhelm it after lots of runs (think buildbots)
-#
-
->>> cache_session = CacheSession()
->>> cache_session.modified
-False
->>> cache_session['cat'] = "dog"
->>> cache_session.modified
-True
->>> cache_session.pop('cat')
-'dog'
->>> cache_session.pop('some key', 'does not exist')
-'does not exist'
->>> cache_session.save()
->>> cache_session.delete(cache_session.session_key)
->>> cache_session.exists(cache_session.session_key)
-False
->>> cache_session['foo'] = 'bar'
->>> cache_session.save()
->>> cache_session.exists(cache_session.session_key)
-True
->>> prev_key = cache_session.session_key
->>> cache_session.flush()
->>> cache_session.exists(prev_key)
-False
->>> cache_session.session_key == prev_key
-False
->>> cache_session.modified, cache_session.accessed
-(True, True)
->>> cache_session['a'], cache_session['b'] = 'c', 'd'
->>> cache_session.save()
->>> prev_key = cache_session.session_key
->>> prev_data = cache_session.items()
->>> cache_session.cycle_key()
->>> cache_session.session_key == prev_key
-False
->>> cache_session.items() == prev_data
-True
->>> cache_session = CacheSession()
->>> cache_session.save()
->>> key = cache_session.session_key
->>> cache_session.exists(key)
-True
-
->>> Session.objects.filter(pk=cache_session.session_key).delete()
->>> cache_session = CacheSession(cache_session.session_key)
->>> cache_session.save()
->>> cache_session.delete(cache_session.session_key)
-
->>> s = SessionBase()
->>> s._session['some key'] = 'exists' # Pre-populate the session with some data
->>> s.accessed = False   # Reset to pretend this wasn't accessed previously
-
->>> s.accessed, s.modified
-(False, False)
-
->>> s.pop('non existant key', 'does not exist')
-'does not exist'
->>> s.accessed, s.modified
-(True, False)
-
->>> s.setdefault('foo', 'bar')
-'bar'
->>> s.setdefault('foo', 'baz')
-'bar'
-
->>> s.accessed = False  # Reset the accessed flag
-
->>> s.pop('some key')
-'exists'
->>> s.accessed, s.modified
-(True, True)
-
->>> s.pop('some key', 'does not exist')
-'does not exist'
+from datetime import datetime, timedelta
+from django.conf import settings
+from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
+from django.contrib.sessions.backends.cache import SessionStore as CacheSession
+from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
+from django.contrib.sessions.backends.file import SessionStore as FileSession
+from django.contrib.sessions.backends.base import SessionBase
+from django.contrib.sessions.models import Session
+from django.core.exceptions import ImproperlyConfigured
+from django.test import TestCase
+import shutil
+import tempfile
+import unittest
 
 
->>> s.get('update key', None)
+class SessionTestsMixin(object):
+    # This does not inherit from TestCase to avoid any tests being run with this
+    # class, which wouldn't work, and to allow different TestCase subclasses to
+    # be used.
 
-# test .update()
->>> s.modified = s.accessed = False   # Reset to pretend this wasn't accessed previously
->>> s.update({'update key':1})
->>> s.accessed, s.modified
-(True, True)
->>> s.get('update key', None)
-1
+    backend = None # subclasses must specify
 
-# test .has_key()
->>> s.modified = s.accessed = False   # Reset to pretend this wasn't accessed previously
->>> s.has_key('update key')
-True
->>> s.accessed, s.modified
-(True, False)
+    def setUp(self):
+        self.session = self.backend()
 
-# test .values()
->>> s = SessionBase()
->>> s.values()
-[]
->>> s.accessed
-True
->>> s['x'] = 1
->>> s.values()
-[1]
+    def tearDown(self):
+        # NB: be careful to delete any sessions created; stale sessions fill up
+        # the /tmp (with some backends) and eventually overwhelm it after lots
+        # of runs (think buildbots)
+        self.session.delete()
 
-# test .iterkeys()
->>> s.accessed = False
->>> i = s.iterkeys()
->>> hasattr(i,'__iter__')
-True
->>> s.accessed
-True
->>> list(i)
-['x']
+    def test_new_session(self):
+        self.assertFalse(self.session.modified)
+        self.assertFalse(self.session.accessed)
 
-# test .itervalues()
->>> s.accessed = False
->>> i = s.itervalues()
->>> hasattr(i,'__iter__')
-True
->>> s.accessed
-True
->>> list(i)
-[1]
+    def test_get_empty(self):
+        self.assertEqual(self.session.get('cat'), None)
 
-# test .iteritems()
->>> s.accessed = False
->>> i = s.iteritems()
->>> hasattr(i,'__iter__')
-True
->>> s.accessed
-True
->>> list(i)
-[('x', 1)]
+    def test_store(self):
+        self.session['cat'] = "dog"
+        self.assertTrue(self.session.modified)
+        self.assertEqual(self.session.pop('cat'), 'dog')
 
-# test .clear()
->>> s.modified = s.accessed = False
->>> s.items()
-[('x', 1)]
->>> s.clear()
->>> s.items()
-[]
->>> s.accessed, s.modified
-(True, True)
+    def test_pop(self):
+        self.session['some key'] = 'exists'
+        # Need to reset these to pretend we haven't accessed it:
+        self.accessed = False
+        self.modified = False
 
-#########################
-# Custom session expiry #
-#########################
+        self.assertEqual(self.session.pop('some key'), 'exists')
+        self.assertTrue(self.session.accessed)
+        self.assertTrue(self.session.modified)
+        self.assertEqual(self.session.get('some key'), None)
 
->>> from django.conf import settings
->>> from datetime import datetime, timedelta
+    def test_pop_default(self):
+        self.assertEqual(self.session.pop('some key', 'does not exist'),
+                         'does not exist')
+        self.assertTrue(self.session.accessed)
+        self.assertFalse(self.session.modified)
 
->>> td10 = timedelta(seconds=10)
+    def test_setdefault(self):
+        self.assertEqual(self.session.setdefault('foo', 'bar'), 'bar')
+        self.assertEqual(self.session.setdefault('foo', 'baz'), 'bar')
+        self.assertTrue(self.session.accessed)
+        self.assertTrue(self.session.modified)
 
-# A normal session has a max age equal to settings
->>> s.get_expiry_age() == settings.SESSION_COOKIE_AGE
-True
+    def test_update(self):
+        self.session.update({'update key': 1})
+        self.assertTrue(self.session.accessed)
+        self.assertTrue(self.session.modified)
+        self.assertEqual(self.session.get('update key', None), 1)
 
-# So does a custom session with an idle expiration time of 0 (but it'll expire
-# at browser close)
->>> s.set_expiry(0)
->>> s.get_expiry_age() == settings.SESSION_COOKIE_AGE
-True
+    def test_has_key(self):
+        self.session['some key'] = 1
+        self.session.modified = False
+        self.session.accessed = False
+        self.assertTrue(self.session.has_key('some key'))
+        self.assertTrue(self.session.accessed)
+        self.assertFalse(self.session.modified)
 
-# Custom session idle expiration time
->>> s.set_expiry(10)
->>> delta = s.get_expiry_date() - datetime.now()
->>> delta.seconds in (9, 10)
-True
->>> age = s.get_expiry_age()
->>> age in (9, 10)
-True
+    def test_values(self):
+        self.assertEqual(self.session.values(), [])
+        self.assertTrue(self.session.accessed)
+        self.session['some key'] = 1
+        self.assertEqual(self.session.values(), [1])
 
-# Custom session fixed expiry date (timedelta)
->>> s.set_expiry(td10)
->>> delta = s.get_expiry_date() - datetime.now()
->>> delta.seconds in (9, 10)
-True
->>> age = s.get_expiry_age()
->>> age in (9, 10)
-True
+    def test_iterkeys(self):
+        self.session['x'] = 1
+        self.session.modified = False
+        self.session.accessed = False
+        i = self.session.iterkeys()
+        self.assertTrue(hasattr(i, '__iter__'))
+        self.assertTrue(self.session.accessed)
+        self.assertFalse(self.session.modified)
+        self.assertEqual(list(i), ['x'])
 
-# Custom session fixed expiry date (fixed datetime)
->>> s.set_expiry(datetime.now() + td10)
->>> delta = s.get_expiry_date() - datetime.now()
->>> delta.seconds in (9, 10)
-True
->>> age = s.get_expiry_age()
->>> age in (9, 10)
-True
+    def test_iterkeys(self):
+        self.session['x'] = 1
+        self.session.modified = False
+        self.session.accessed = False
+        i = self.session.itervalues()
+        self.assertTrue(hasattr(i, '__iter__'))
+        self.assertTrue(self.session.accessed)
+        self.assertFalse(self.session.modified)
+        self.assertEqual(list(i), [1])
 
-# Set back to default session age
->>> s.set_expiry(None)
->>> s.get_expiry_age() == settings.SESSION_COOKIE_AGE
-True
+    def test_iteritems(self):
+        self.session['x'] = 1
+        self.session.modified = False
+        self.session.accessed = False
+        i = self.session.iteritems()
+        self.assertTrue(hasattr(i, '__iter__'))
+        self.assertTrue(self.session.accessed)
+        self.assertFalse(self.session.modified)
+        self.assertEqual(list(i), [('x',1)])
 
-# Allow to set back to default session age even if no alternate has been set
->>> s.set_expiry(None)
+    def test_clear(self):
+        self.session['x'] = 1
+        self.session.modified = False
+        self.session.accessed = False
+        self.assertEqual(self.session.items(), [('x',1)])
+        self.session.clear()
+        self.assertEqual(self.session.items(), [])
+        self.assertTrue(self.session.accessed)
+        self.assertTrue(self.session.modified)
+
+    def test_save(self):
+        self.session.save()
+        self.assertTrue(self.session.exists(self.session.session_key))
+
+    def test_delete(self):
+        self.session.delete(self.session.session_key)
+        self.assertFalse(self.session.exists(self.session.session_key))
+
+    def test_flush(self):
+        self.session['foo'] = 'bar'
+        self.session.save()
+        prev_key = self.session.session_key
+        self.session.flush()
+        self.assertFalse(self.session.exists(prev_key))
+        self.assertNotEqual(self.session.session_key, prev_key)
+        self.assertTrue(self.session.modified)
+        self.assertTrue(self.session.accessed)
+
+    def test_cycle(self):
+        self.session['a'], self.session['b'] = 'c', 'd'
+        self.session.save()
+        prev_key = self.session.session_key
+        prev_data = self.session.items()
+        self.session.cycle_key()
+        self.assertNotEqual(self.session.session_key, prev_key)
+        self.assertEqual(self.session.items(), prev_data)
+
+    def test_invalid_key(self):
+        # Submitting an invalid session key (either by guessing, or if the db has
+        # removed the key) results in a new key being generated.
+        session = self.backend('1')
+        session.save()
+        self.assertNotEqual(session.session_key, '1')
+        self.assertEqual(session.get('cat'), None)
+        session.delete()
+
+    # Custom session expiry
+    def test_default_expiry(self):
+        # A normal session has a max age equal to settings
+        self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE_AGE)
+
+        # So does a custom session with an idle expiration time of 0 (but it'll
+        # expire at browser close)
+        self.session.set_expiry(0)
+        self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE_AGE)
+
+    def test_custom_expiry_seconds(self):
+        # Using seconds
+        self.session.set_expiry(10)
+        delta = self.session.get_expiry_date() - datetime.now()
+        self.assertTrue(delta.seconds in (9, 10))
+
+        age = self.session.get_expiry_age()
+        self.assertTrue(age in (9, 10))
+
+    def test_custom_expiry_timedelta(self):
+        # Using timedelta
+        self.session.set_expiry(timedelta(seconds=10))
+        delta = self.session.get_expiry_date() - datetime.now()
+        self.assertTrue(delta.seconds in (9, 10))
+
+        age = self.session.get_expiry_age()
+        self.assertTrue(age in (9, 10))
+
+    def test_custom_expiry_timedelta(self):
+        # Using timedelta
+        self.session.set_expiry(datetime.now() + timedelta(seconds=10))
+        delta = self.session.get_expiry_date() - datetime.now()
+        self.assertTrue(delta.seconds in (9, 10))
+
+        age = self.session.get_expiry_age()
+        self.assertTrue(age in (9, 10))
+
+    def test_custom_expiry_reset(self):
+        self.session.set_expiry(None)
+        self.session.set_expiry(10)
+        self.session.set_expiry(None)
+        self.assertEqual(self.session.get_expiry_age(), settings.SESSION_COOKIE_AGE)
+
+    def test_get_expire_at_browser_close(self):
+        # Tests get_expire_at_browser_close with different settings and different
+        # set_expiry calls
+        try:
+            original_expire_at_browser_close = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
+            settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+            self.session.set_expiry(10)
+            self.assertFalse(self.session.get_expire_at_browser_close())
+
+            self.session.set_expiry(0)
+            self.assertTrue(self.session.get_expire_at_browser_close())
+
+            self.session.set_expiry(None)
+            self.assertFalse(self.session.get_expire_at_browser_close())
+
+            settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+            self.session.set_expiry(10)
+            self.assertFalse(self.session.get_expire_at_browser_close())
+
+            self.session.set_expiry(0)
+            self.assertTrue(self.session.get_expire_at_browser_close())
+
+            self.session.set_expiry(None)
+            self.assertTrue(self.session.get_expire_at_browser_close())
+
+        except:
+            raise
+
+        finally:
+            settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = original_expire_at_browser_close
 
 
-# We're changing the setting then reverting back to the original setting at the
-# end of these tests.
->>> original_expire_at_browser_close = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
->>> settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
-# Custom session age
->>> s.set_expiry(10)
->>> s.get_expire_at_browser_close()
-False
+    backend = DatabaseSession
 
-# Custom expire-at-browser-close
->>> s.set_expiry(0)
->>> s.get_expire_at_browser_close()
-True
 
-# Default session age
->>> s.set_expiry(None)
->>> s.get_expire_at_browser_close()
-False
+class CacheDBSessionTests(SessionTestsMixin, TestCase):
 
->>> settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+    backend = CacheDBSession
 
-# Custom session age
->>> s.set_expiry(10)
->>> s.get_expire_at_browser_close()
-False
+# Don't need DB flushing for these tests, so can use unittest.TestCase as base class
+class FileSessionTests(SessionTestsMixin, unittest.TestCase):
 
-# Custom expire-at-browser-close
->>> s.set_expiry(0)
->>> s.get_expire_at_browser_close()
-True
+    backend = FileSession
 
-# Default session age
->>> s.set_expiry(None)
->>> s.get_expire_at_browser_close()
-True
+    def setUp(self):
+        super(FileSessionTests, self).setUp()
+        # Do file session tests in an isolated directory, and kill it after we're done.
+        self.original_session_file_path = settings.SESSION_FILE_PATH
+        self.temp_session_store = settings.SESSION_FILE_PATH = tempfile.mkdtemp()
 
->>> settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = original_expire_at_browser_close
-"""
+    def tearDown(self):
+        settings.SESSION_FILE_PATH = self.original_session_file_path
+        shutil.rmtree(self.temp_session_store)
+        super(FileSessionTests, self).tearDown()
 
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+    def test_configuration_check(self):
+        # Make sure the file backend checks for a good storage dir
+        settings.SESSION_FILE_PATH = "/if/this/directory/exists/you/have/a/weird/computer"
+        self.assertRaises(ImproperlyConfigured, self.backend)
+
+
+class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
+
+    backend = CacheSession

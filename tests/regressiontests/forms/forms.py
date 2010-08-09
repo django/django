@@ -705,13 +705,13 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> print f.as_table()
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><input type="text" name="username" value="adrian" maxlength="10" /></td></tr>
-<tr><th>Password1:</th><td><input type="password" name="password1" value="foo" /></td></tr>
-<tr><th>Password2:</th><td><input type="password" name="password2" value="bar" /></td></tr>
+<tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
+<tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>
 >>> print f.as_ul()
 <li><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></li>
 <li>Username: <input type="text" name="username" value="adrian" maxlength="10" /></li>
-<li>Password1: <input type="password" name="password1" value="foo" /></li>
-<li>Password2: <input type="password" name="password2" value="bar" /></li>
+<li>Password1: <input type="password" name="password1" /></li>
+<li>Password2: <input type="password" name="password2" /></li>
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'}, auto_id=False)
 >>> f.errors
 {}
@@ -1258,20 +1258,20 @@ to a Field class. This help text is displayed when a Form is rendered.
 ...    password = CharField(widget=PasswordInput, help_text='Choose wisely.')
 >>> p = UserRegistration(auto_id=False)
 >>> print p.as_ul()
-<li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
-<li>Password: <input type="password" name="password" /> Choose wisely.</li>
+<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
+<li>Password: <input type="password" name="password" /> <span class="helptext">Choose wisely.</span></li>
 >>> print p.as_p()
-<p>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</p>
-<p>Password: <input type="password" name="password" /> Choose wisely.</p>
+<p>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></p>
+<p>Password: <input type="password" name="password" /> <span class="helptext">Choose wisely.</span></p>
 >>> print p.as_table()
-<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /><br />e.g., user@example.com</td></tr>
-<tr><th>Password:</th><td><input type="password" name="password" /><br />Choose wisely.</td></tr>
+<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /><br /><span class="helptext">e.g., user@example.com</span></td></tr>
+<tr><th>Password:</th><td><input type="password" name="password" /><br /><span class="helptext">Choose wisely.</span></td></tr>
 
 The help text is displayed whether or not data is provided for the form.
 >>> p = UserRegistration({'username': u'foo'}, auto_id=False)
 >>> print p.as_ul()
-<li>Username: <input type="text" name="username" value="foo" maxlength="10" /> e.g., user@example.com</li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /> Choose wisely.</li>
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /> <span class="helptext">Choose wisely.</span></li>
 
 help_text is not displayed for hidden fields. It can be used for documentation
 purposes, though.
@@ -1281,7 +1281,7 @@ purposes, though.
 ...    next = CharField(widget=HiddenInput, initial='/', help_text='Redirect destination')
 >>> p = UserRegistration(auto_id=False)
 >>> print p.as_ul()
-<li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
+<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
 <li>Password: <input type="password" name="password" /><input type="hidden" name="next" value="/" /></li>
 
 Help text can include arbitrary Unicode characters.
@@ -1289,7 +1289,7 @@ Help text can include arbitrary Unicode characters.
 ...    username = CharField(max_length=10, help_text='ŠĐĆŽćžšđ')
 >>> p = UserRegistration(auto_id=False)
 >>> p.as_ul()
-u'<li>Username: <input type="text" name="username" maxlength="10" /> \u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</li>'
+u'<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</span></li>'
 
 # Subclassing forms ###########################################################
 
@@ -1589,8 +1589,8 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters (it has 23).</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
-<tr><th>Password1:</th><td><input type="password" name="password1" value="foo" /></td></tr>
-<tr><th>Password2:</th><td><input type="password" name="password2" value="bar" /></td></tr>
+<tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
+<tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>
 </table>
 <input type="submit" />
 </form>
@@ -1719,8 +1719,8 @@ the list of errors is empty). You can also use it in {% if %} statements.
 >>> print t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)}))
 <form action="">
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
-<p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
-<p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
+<p><label>Password: <input type="password" name="password1" /></label></p>
+<p><label>Password (again): <input type="password" name="password2" /></label></p>
 <input type="submit" />
 </form>
 >>> t = Template('''<form action="">
@@ -1734,8 +1734,8 @@ the list of errors is empty). You can also use it in {% if %} statements.
 <form action="">
 <ul class="errorlist"><li>Please make sure your passwords match.</li></ul>
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
-<p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
-<p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
+<p><label>Password: <input type="password" name="password1" /></label></p>
+<p><label>Password (again): <input type="password" name="password2" /></label></p>
 <input type="submit" />
 </form>
 

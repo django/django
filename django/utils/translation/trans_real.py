@@ -496,7 +496,7 @@ def parse_accept_lang_header(lang_string):
             return []
         priority = priority and float(priority) or 1.0
         result.append((lang, priority))
-    result.sort(lambda x, y: -cmp(x[1], y[1]))
+    result.sort(key=lambda k: k[1], reverse=True)
     return result
 
 # get_date_formats and get_partial_date_formats aren't used anymore by Django

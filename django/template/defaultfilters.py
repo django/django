@@ -11,9 +11,10 @@ except ImportError:
 from django.template import Variable, Library
 from django.conf import settings
 from django.utils import formats
-from django.utils.translation import ugettext, ungettext
 from django.utils.encoding import force_unicode, iri_to_uri
+from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe, SafeData
+from django.utils.translation import ugettext, ungettext
 
 register = Library()
 
@@ -255,6 +256,8 @@ def truncatewords(value, arg):
     Truncates a string after a certain number of words.
 
     Argument: Number of words to truncate after.
+
+    Newlines within the string are removed.
     """
     from django.utils.text import truncate_words
     try:
@@ -270,6 +273,8 @@ def truncatewords_html(value, arg):
     Truncates HTML after a certain number of words.
 
     Argument: Number of words to truncate after.
+
+    Newlines in the HTML are preserved.
     """
     from django.utils.text import truncate_html_words
     try:
@@ -496,10 +501,9 @@ def join(value, arg, autoescape=None):
     """
     value = map(force_unicode, value)
     if autoescape:
-        from django.utils.html import conditional_escape
         value = [conditional_escape(v) for v in value]
     try:
-        data = arg.join(value)
+        data = conditional_escape(arg).join(value)
     except AttributeError: # fail silently but nicely
         return value
     return mark_safe(data)

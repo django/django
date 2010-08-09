@@ -469,6 +469,9 @@ class AutoField(BaseAutoField):
         'invalid': _(u'This value must be an integer.'),
     }
 
+    def get_internal_type(self):
+        return "AutoField"
+
     def to_python(self, value):
         if value is None:
             return value
@@ -801,6 +804,14 @@ class EmailField(CharField):
         kwargs['max_length'] = kwargs.get('max_length', 75)
         CharField.__init__(self, *args, **kwargs)
 
+    def formfield(self, **kwargs):
+        # As with CharField, this will cause email validation to be performed twice
+        defaults = {
+            'form_class': forms.EmailField,
+        }
+        defaults.update(kwargs)
+        return super(EmailField, self).formfield(**defaults)
+
 class FilePathField(Field):
     description = _("File path")
 
@@ -1110,6 +1121,14 @@ class URLField(CharField):
         kwargs['max_length'] = kwargs.get('max_length', 200)
         CharField.__init__(self, verbose_name, name, **kwargs)
         self.validators.append(validators.URLValidator(verify_exists=verify_exists))
+
+    def formfield(self, **kwargs):
+        # As with CharField, this will cause URL validation to be performed twice
+        defaults = {
+            'form_class': forms.URLField,
+        }
+        defaults.update(kwargs)
+        return super(URLField, self).formfield(**defaults)
 
 class XMLField(TextField):
     description = _("XML text")

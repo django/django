@@ -199,14 +199,12 @@ class BaseFormSet(StrAndUnicode):
             # A sort function to order things numerically ascending, but
             # None should be sorted below anything else. Allowing None as
             # a comparison value makes it so we can leave ordering fields
-            # blamk.
-            def compare_ordering_values(x, y):
-                if x[1] is None:
-                    return 1
-                if y[1] is None:
-                    return -1
-                return x[1] - y[1]
-            self._ordering.sort(compare_ordering_values)
+            # blank.
+            def compare_ordering_key(k):
+                if k[1] is None:
+                    return (1, 0) # +infinity, larger than any number
+                return (0, k[1])
+            self._ordering.sort(key=compare_ordering_key)
         # Return a list of form.cleaned_data dicts in the order spcified by
         # the form data.
         return [self.forms[i[0]] for i in self._ordering]

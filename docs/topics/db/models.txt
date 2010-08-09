@@ -353,7 +353,7 @@ For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
 
 As with :class:`~django.db.models.ForeignKey`, you can also create
 :ref:`recursive relationships <recursive-relationships>` (an object with a
-many-to-one relationship to itself) and :ref:`relationships to models not yet
+many-to-many relationship to itself) and :ref:`relationships to models not yet
 defined <lazy-relationships>`; see :ref:`the model field reference
 <ref-manytomany>` for details.
 

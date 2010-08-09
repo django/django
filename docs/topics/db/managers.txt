@@ -170,7 +170,8 @@ and ``Person.people.all()``, yielding predictable results.
 If you use custom ``Manager`` objects, take note that the first ``Manager``
 Django encounters (in the order in which they're defined in the model) has a
 special status. Django interprets the first ``Manager`` defined in a class as
-the "default" ``Manager``, and several parts of Django will use that ``Manager``
+the "default" ``Manager``, and several parts of Django
+(including :djadmin:`dumpdata`) will use that ``Manager``
 exclusively for that model. As a result, it's a good idea to be careful in
 your choice of default manager in order to avoid a situation where overriding
 ``get_query_set()`` results in an inability to retrieve objects you'd like to
