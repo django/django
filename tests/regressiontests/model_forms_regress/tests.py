@@ -129,7 +129,7 @@ class ManyToManyCallableInitialTests(TestCase):
 <option value="1" selected="selected">First Book</option>
 <option value="2" selected="selected">Second Book</option>
 <option value="3">Third Book</option>
-</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>""")
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>""")
 
 class CFFForm(forms.ModelForm):
     class Meta:

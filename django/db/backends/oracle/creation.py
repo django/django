@@ -61,8 +61,6 @@ class DatabaseCreation(BaseDatabaseCreation):
 
         cursor = self.connection.cursor()
         if self._test_database_create():
-            if verbosity >= 1:
-                print 'Creating test database...'
             try:
                 self._execute_test_db_creation(cursor, parameters, verbosity)
             except Exception, e:
@@ -72,10 +70,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
-                            print "Destroying old test database..."
+                            print "Destroying old test database '%s'..." % self.connection.alias
                         self._execute_test_db_destruction(cursor, parameters, verbosity)
-                        if verbosity >= 1:
-                            print "Creating test database..."
                         self._execute_test_db_creation(cursor, parameters, verbosity)
                     except Exception, e:
                         sys.stderr.write("Got an error recreating the test database: %s\n" % e)

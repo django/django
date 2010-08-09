@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-04 22:01-0300\n"
-"PO-Revision-Date: 2010-05-04 22:10-0300\n"
+"POT-Creation-Date: 2010-08-06 15:47-0300\n"
+"PO-Revision-Date: 2010-08-06 15:52-0300\n"
 "Last-Translator: Ramiro Morales <rm0@gmx.net>\n"
 "Language-Team: Django-I18N <django-i18n@googlegroups.com>\n"
 "Language: es_AR\n"
@@ -17,45 +17,17 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.1\n"
 
-#: contrib/admin/media/js/SelectFilter2.js:37
-#, perl-format
-msgid "Available %s"
-msgstr "%s disponibles"
-
-#: contrib/admin/media/js/SelectFilter2.js:45
-msgid "Choose all"
-msgstr "Seleccionar todos"
-
-#: contrib/admin/media/js/SelectFilter2.js:50
-msgid "Add"
-msgstr "Agregar"
-
-#: contrib/admin/media/js/SelectFilter2.js:52
-msgid "Remove"
-msgstr "Eliminar"
-
-#: contrib/admin/media/js/SelectFilter2.js:57
-#, perl-format
-msgid "Chosen %s"
-msgstr "%s elegidos"
-
-#: contrib/admin/media/js/SelectFilter2.js:58
-msgid "Select your choice(s) and click "
-msgstr "Seleccione los items a agregar y haga click en "
-
 #: contrib/admin/media/js/SelectFilter2.js:63
 msgid "Clear all"
 msgstr "Eliminar todos"
 
 #: contrib/admin/media/js/actions.js:18
-#: contrib/admin/media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s de %(cnt)s seleccionado/a"
 msgstr[1] "%(sel)s de %(cnt)s seleccionados/as"
 
 #: contrib/admin/media/js/actions.js:109
-#: contrib/admin/media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."

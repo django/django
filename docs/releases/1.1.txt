@@ -258,8 +258,9 @@ processing to convert them to Python objects. If you know you don't need those
 particular fields, you can now tell Django not to retrieve them from the
 database.
 
-You'll do this with the :ref:`new queryset methods <queryset-defer>`
-``defer()`` and ``only()``.
+You'll do this with the new queryset methods
+:meth:`~django.db.models.QuerySet.defer` and
+:meth:`~django.db.models.QuerySet.only`.
 
 Testing improvements
 --------------------

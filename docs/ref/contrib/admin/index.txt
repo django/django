@@ -474,17 +474,16 @@ change list page. By default, this is set to ``100``.
 
 .. attribute:: ModelAdmin.list_select_related
 
-Set ``list_select_related`` to tell Django to use ``select_related()`` in
-retrieving the list of objects on the admin change list page. This can save you
-a bunch of database queries.
+Set ``list_select_related`` to tell Django to use
+:meth:`~django.db.models.QuerySet.select_related` in retrieving the list of
+objects on the admin change list page. This can save you a bunch of database
+queries.
 
 The value should be either ``True`` or ``False``. Default is ``False``.
 
-Note that Django will use ``select_related()``, regardless of this setting,
-if one of the ``list_display`` fields is a ``ForeignKey``.
-
-For more on ``select_related()``, see
-:ref:`the select_related() docs <select-related>`.
+Note that Django will use :meth:`~django.db.models.QuerySet.select_related`,
+regardless of this setting, if one of the ``list_display`` fields is a
+``ForeignKey``.
 
 .. attribute:: ModelAdmin.inlines
 
@@ -595,10 +594,15 @@ This should be set to a list of field names that will be searched whenever
 somebody submits a search query in that text box.
 
 These fields should be some kind of text field, such as ``CharField`` or
-``TextField``. You can also perform a related lookup on a ``ForeignKey`` with
-the lookup API "follow" notation::
+``TextField``. You can also perform a related lookup on a ``ForeignKey`` or
+``ManyToManyField`` with the lookup API "follow" notation::
 
     search_fields = ['foreign_key__related_fieldname']
+
+For example, if you have a blog entry with an author, the following definition
+would enable search blog entries by the email address of the author::
+
+    search_fields = ['user__email']
 
 When somebody does a search in the admin search box, Django splits the search
 query into words and returns all objects that contain each of the words, case
@@ -865,11 +869,26 @@ return a subset of objects for this foreign key field based on the user::
         def formfield_for_foreignkey(self, db_field, request, **kwargs):
             if db_field.name == "car":
                 kwargs["queryset"] = Car.objects.filter(owner=request.user)
-                return db_field.formfield(**kwargs)
             return super(MyModelAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key field
-to only the cars owned by the ``User`` instance.
+to only display the cars owned by the ``User`` instance.
+
+.. method:: ModelAdmin.formfield_for_manytomany(self, db_field, request, **kwargs)
+
+.. versionadded:: 1.1
+
+Like the ``formfield_for_foreignkey`` method, the ``formfield_for_manytomany``
+method can be overridden to change the default formfield for a many to many
+field. For example, if an owner can own multiple cars and cars can belong
+to multiple owners -- a many to many relationship -- you could filter the
+``Car`` foreign key field to only display the cars owned by the ``User``::
+
+    class MyModelAdmin(admin.ModelAdmin):
+        def formfield_for_manytomany(self, db_field, request, **kwargs):
+            if db_field.name == "cars":
+                kwargs["queryset"] = Car.objects.filter(owner=request.user)
+            return super(MyModelAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
 .. method:: ModelAdmin.queryset(self, request)
 

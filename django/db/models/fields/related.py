@@ -566,7 +566,7 @@ def create_many_related_manager(superclass, rel=False):
                     # duplicate data row for symmetrical reverse entries.
                     signals.m2m_changed.send(sender=rel.through, action='pre_add',
                         instance=self.instance, reverse=self.reverse,
-                        model=self.model, pk_set=new_ids)
+                        model=self.model, pk_set=new_ids, using=db)
                 # Add the ones that aren't there already
                 for obj_id in new_ids:
                     self.through._default_manager.using(db).create(**{
@@ -578,7 +578,7 @@ def create_many_related_manager(superclass, rel=False):
                     # duplicate data row for symmetrical reverse entries.
                     signals.m2m_changed.send(sender=rel.through, action='post_add',
                         instance=self.instance, reverse=self.reverse,
-                        model=self.model, pk_set=new_ids)
+                        model=self.model, pk_set=new_ids, using=db)
 
         def _remove_items(self, source_field_name, target_field_name, *objs):
             # source_col_name: the PK colname in join_table for the source object
@@ -594,14 +594,16 @@ def create_many_related_manager(superclass, rel=False):
                         old_ids.add(obj.pk)
                     else:
                         old_ids.add(obj)
+                # Work out what DB we're operating on
+                db = router.db_for_write(self.through.__class__, instance=self.instance)
+                # Send a signal to the other end if need be.
                 if self.reverse or source_field_name == self.source_field_name:
                     # Don't send the signal when we are deleting the
                     # duplicate data row for symmetrical reverse entries.
                     signals.m2m_changed.send(sender=rel.through, action="pre_remove",
                         instance=self.instance, reverse=self.reverse,
-                        model=self.model, pk_set=old_ids)
+                        model=self.model, pk_set=old_ids, using=db)
                 # Remove the specified objects from the join table
-                db = router.db_for_write(self.through.__class__, instance=self.instance)
                 self.through._default_manager.using(db).filter(**{
                     source_field_name: self._pk_val,
                     '%s__in' % target_field_name: old_ids
@@ -611,17 +613,17 @@ def create_many_related_manager(superclass, rel=False):
                     # duplicate data row for symmetrical reverse entries.
                     signals.m2m_changed.send(sender=rel.through, action="post_remove",
                         instance=self.instance, reverse=self.reverse,
-                        model=self.model, pk_set=old_ids)
+                        model=self.model, pk_set=old_ids, using=db)
 
         def _clear_items(self, source_field_name):
+            db = router.db_for_write(self.through.__class__, instance=self.instance)
             # source_col_name: the PK colname in join_table for the source object
             if self.reverse or source_field_name == self.source_field_name:
                 # Don't send the signal when we are clearing the
                 # duplicate data rows for symmetrical reverse entries.
                 signals.m2m_changed.send(sender=rel.through, action="pre_clear",
                     instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=None)
-            db = router.db_for_write(self.through.__class__, instance=self.instance)
+                    model=self.model, pk_set=None, using=db)
             self.through._default_manager.using(db).filter(**{
                 source_field_name: self._pk_val
             }).delete()
@@ -630,7 +632,7 @@ def create_many_related_manager(superclass, rel=False):
                 # duplicate data rows for symmetrical reverse entries.
                 signals.m2m_changed.send(sender=rel.through, action="post_clear",
                     instance=self.instance, reverse=self.reverse,
-                    model=self.model, pk_set=None)
+                    model=self.model, pk_set=None, using=db)
 
     return ManyRelatedManager
 

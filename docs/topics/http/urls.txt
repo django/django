@@ -827,17 +827,80 @@ namespaces into URLs on specific application instances, according to the
 resolve()
 ---------
 
-The :func:`django.core.urlresolvers.resolve` function can be used for resolving
-URL paths to the corresponding view functions. It has the following signature:
+The :func:`django.core.urlresolvers.resolve` function can be used for
+resolving URL paths to the corresponding view functions. It has the
+following signature:
 
 .. function:: resolve(path, urlconf=None)
 
-``path`` is the URL path you want to resolve. As with ``reverse()`` above, you
-don't need to worry about the ``urlconf`` parameter. The function returns the
-triple (view function, arguments, keyword arguments).
+``path`` is the URL path you want to resolve. As with
+:func:`~django.core.urlresolvers.reverse`, you don't need to
+worry about the ``urlconf`` parameter. The function returns a
+:class:`django.core.urlresolvers.ResolverMatch` object that allows you
+to access various meta-data about the resolved URL.
 
-For example, it can be used for testing if a view would raise a ``Http404``
-error before redirecting to it::
+.. class:: ResolverMatch()
+
+    .. attribute:: ResolverMatch.func
+
+        The view function that would be used to serve the URL
+
+    .. attribute:: ResolverMatch.args
+
+        The arguments that would be passed to the view function, as
+        parsed from the URL.
+
+    .. attribute:: ResolverMatch.kwargs
+
+        The keyword arguments that would be passed to the view
+        function, as parsed from the URL.
+
+    .. attribute:: ResolverMatch.url_name
+
+        The name of the URL pattern that matches the URL.
+
+    .. attribute:: ResolverMatch.app_name
+
+        The application namespace for the URL pattern that matches the
+        URL.
+
+    .. attribute:: ResolverMatch.namespace
+
+        The instance namespace for the URL pattern that matches the
+        URL.
+
+    .. attribute:: ResolverMatch.namespaces
+
+        The list of individual namespace components in the full
+        instance namespace for the URL pattern that matches the URL.
+        i.e., if the namespace is ``foo:bar``, then namespaces will be
+        ``[`foo`, `bar`]``.
+
+A :class:`~django.core.urlresolvers.ResolverMatch` object can then be
+interrogated to provide information about the URL pattern that matches
+a URL::
+
+    # Resolve a URL
+    match = resolve('/some/path/')
+    # Print the URL pattern that matches the URL
+    print match.url_name
+
+A :class:`~django.core.urlresolvers.ResolverMatch` object can also be
+assigned to a triple::
+
+    func, args, kwargs = resolve('/some/path/')
+
+.. versionchanged:: 1.3
+    Triple-assignment exists for backwards-compatibility. Prior to
+    Django 1.3, :func:`~django.core.urlresolvers.resolve` returned a
+    triple containing (view function, arguments, keyword arguments);
+    the :class:`~django.core.urlresolvers.ResolverMatch` object (as
+    well as the namespace and pattern information it provides) is not
+    available in earlier Django releases.
+
+One possible use of :func:`~django.core.urlresolvers.resolve` would be
+to testing if a view would raise a ``Http404`` error before
+redirecting to it::
 
     from urlparse import urlparse
     from django.core.urlresolvers import resolve
@@ -857,6 +920,7 @@ error before redirecting to it::
         except Http404:
             return HttpResponseRedirect('/')
         return response
+
 
 permalink()
 -----------

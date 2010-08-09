@@ -116,9 +116,9 @@ Fields may also be left out::
 
     >>> people = Person.objects.raw('SELECT id, first_name FROM myapp_person')
 
-The ``Person`` objects returned by this query will be :ref:`deferred
-<queryset-defer>` model instances. This means that the fields that are omitted
-from the query will be loaded on demand. For example::
+The ``Person`` objects returned by this query will be deferred model instances
+(see :meth:`~django.db.models.QuerySet.defer()`). This means that the fields
+that are omitted from the query will be loaded on demand. For example::
 
     >>> for p in Person.objects.raw('SELECT id, first_name FROM myapp_person'):
     ...     print p.first_name, # This will be retrieved by the original query

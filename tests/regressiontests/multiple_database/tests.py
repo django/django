@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
+from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import TestCase
 
@@ -1619,3 +1620,114 @@ class PickleQuerySetTestCase(TestCase):
             Book.objects.using(db).create(title='Dive into Python', published=datetime.date(2009, 5, 4))
             qs = Book.objects.all()
             self.assertEqual(qs.db, pickle.loads(pickle.dumps(qs)).db)
+
+
+class DatabaseReceiver(object):
+    """
+    Used in the tests for the database argument in signals (#13552)
+    """
+    def __call__(self, signal, sender, **kwargs):
+        self._database = kwargs['using']
+
+class WriteToOtherRouter(object):
+    """
+    A router that sends all writes to the other database.
+    """
+    def db_for_write(self, model, **hints):
+        return "other"
+
+class SignalTests(TestCase):
+    multi_db = True
+
+    def setUp(self):
+        self.old_routers = router.routers
+
+    def tearDown(self):
+        router.routser = self.old_routers
+
+    def _write_to_other(self):
+        "Sends all writes to 'other'."
+        router.routers = [WriteToOtherRouter()]
+
+    def _write_to_default(self):
+        "Sends all writes to the default DB"
+        router.routers = self.old_routers
+
+    def test_database_arg_save_and_delete(self):
+        """
+        Tests that the pre/post_save signal contains the correct database.
+        (#13552)
+        """
+        # Make some signal receivers
+        pre_save_receiver = DatabaseReceiver()
+        post_save_receiver = DatabaseReceiver()
+        pre_delete_receiver = DatabaseReceiver()
+        post_delete_receiver = DatabaseReceiver()
+        # Make model and connect receivers
+        signals.pre_save.connect(sender=Person, receiver=pre_save_receiver)
+        signals.post_save.connect(sender=Person, receiver=post_save_receiver)
+        signals.pre_delete.connect(sender=Person, receiver=pre_delete_receiver)
+        signals.post_delete.connect(sender=Person, receiver=post_delete_receiver)
+        p = Person.objects.create(name='Darth Vader')
+        # Save and test receivers got calls
+        p.save()
+        self.assertEqual(pre_save_receiver._database, DEFAULT_DB_ALIAS)
+        self.assertEqual(post_save_receiver._database, DEFAULT_DB_ALIAS)
+        # Delete, and test
+        p.delete()
+        self.assertEqual(pre_delete_receiver._database, DEFAULT_DB_ALIAS)
+        self.assertEqual(post_delete_receiver._database, DEFAULT_DB_ALIAS)
+        # Save again to a different database
+        p.save(using="other")
+        self.assertEqual(pre_save_receiver._database, "other")
+        self.assertEqual(post_save_receiver._database, "other")
+        # Delete, and test
+        p.delete(using="other")
+        self.assertEqual(pre_delete_receiver._database, "other")
+        self.assertEqual(post_delete_receiver._database, "other")
+
+    def test_database_arg_m2m(self):
+        """
+        Test that the m2m_changed signal has a correct database arg (#13552)
+        """
+        # Make a receiver
+        receiver = DatabaseReceiver()
+        # Connect it, and make the models
+        signals.m2m_changed.connect(receiver=receiver)
+
+        b = Book.objects.create(title="Pro Django",
+                                published=datetime.date(2008, 12, 16))
+
+        p = Person.objects.create(name="Marty Alchin")
+
+        # Test addition
+        b.authors.add(p)
+        self.assertEqual(receiver._database, DEFAULT_DB_ALIAS)
+        self._write_to_other()
+        b.authors.add(p)
+        self._write_to_default()
+        self.assertEqual(receiver._database, "other")
+
+        # Test removal
+        b.authors.remove(p)
+        self.assertEqual(receiver._database, DEFAULT_DB_ALIAS)
+        self._write_to_other()
+        b.authors.remove(p)
+        self._write_to_default()
+        self.assertEqual(receiver._database, "other")
+
+        # Test addition in reverse
+        p.book_set.add(b)
+        self.assertEqual(receiver._database, DEFAULT_DB_ALIAS)
+        self._write_to_other()
+        p.book_set.add(b)
+        self._write_to_default()
+        self.assertEqual(receiver._database, "other")
+
+        # Test clearing
+        b.authors.clear()
+        self.assertEqual(receiver._database, DEFAULT_DB_ALIAS)
+        self._write_to_other()
+        b.authors.clear()
+        self._write_to_default()
+        self.assertEqual(receiver._database, "other")

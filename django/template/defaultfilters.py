@@ -256,6 +256,8 @@ def truncatewords(value, arg):
     Truncates a string after a certain number of words.
 
     Argument: Number of words to truncate after.
+
+    Newlines within the string are removed.
     """
     from django.utils.text import truncate_words
     try:
@@ -271,6 +273,8 @@ def truncatewords_html(value, arg):
     Truncates HTML after a certain number of words.
 
     Argument: Number of words to truncate after.
+
+    Newlines in the HTML are preserved.
     """
     from django.utils.text import truncate_html_words
     try:
