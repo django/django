@@ -35,20 +35,20 @@ class AssertContainsTests(TestCase):
         try:
             self.assertContains(response, 'text', status_code=999)
         except AssertionError, e:
-            self.assertTrue("Couldn't retrieve page: Response code was 200 (expected 999)" in str(e))
+            self.assertTrue("Couldn't retrieve content: Response code was 200 (expected 999)" in str(e))
         try:
             self.assertContains(response, 'text', status_code=999, msg_prefix='abc')
         except AssertionError, e:
-            self.assertTrue("abc: Couldn't retrieve page: Response code was 200 (expected 999)" in str(e))
+            self.assertTrue("abc: Couldn't retrieve content: Response code was 200 (expected 999)" in str(e))
 
         try:
             self.assertNotContains(response, 'text', status_code=999)
         except AssertionError, e:
-            self.assertTrue("Couldn't retrieve page: Response code was 200 (expected 999)" in str(e))
+            self.assertTrue("Couldn't retrieve content: Response code was 200 (expected 999)" in str(e))
         try:
             self.assertNotContains(response, 'text', status_code=999, msg_prefix='abc')
         except AssertionError, e:
-            self.assertTrue("abc: Couldn't retrieve page: Response code was 200 (expected 999)" in str(e))
+            self.assertTrue("abc: Couldn't retrieve content: Response code was 200 (expected 999)" in str(e))
 
         try:
             self.assertNotContains(response, 'once')
