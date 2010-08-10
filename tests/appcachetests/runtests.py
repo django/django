@@ -282,15 +282,6 @@ class RegisterModelsTests(AppCacheTestCase):
         self.assertEqual(app.name, 'model_app')
         self.assertEqual(app.models[0].__name__, 'Person')
 
-    def test_multiple_apps_with_same_label(self):
-        """
-        Test that an exception is raised when the function gets passed an
-        app label but there are multiple app instances with that label
-        """
-        cache.load_app('model_app')
-        self.assertRaises(MultipleInstancesReturned, cache.load_app,
-                'same_label.model_app')
-
 if __name__ == '__main__':
     unittest.main()
 

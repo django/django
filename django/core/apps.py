@@ -22,10 +22,6 @@ class App(object):
     """
     def __init__(self, name):
         self.name = name
-        try:
-            self.label = name.rsplit('.', 1)[1]
-        except IndexError:
-            self.label = name
         # errors raised when trying to import the app
         self.errors = []
         self.models = []
@@ -109,7 +105,11 @@ class AppCache(object):
         # check if an app instance with that name already exists
         app_instance = self.find_app(app_name)
         if not app_instance:
-            app_instance = app_class(app_name)
+            if '.' in app_name:
+                app_instance_name = app_name.rsplit('.', 1)[1]
+            else:
+                app_instance_name = app_name
+            app_instance = app_class(app_instance_name)
             self.app_instances.append(app_instance)
 
         try:
@@ -142,6 +142,8 @@ class AppCache(object):
 
     def find_app(self, name):
         "Returns the App instance that matches name"
+        if '.' in name:
+            name = name.rsplit('.', 1)[1]
         for app in self.app_instances:
             if app.name == name:
                 return app
@@ -259,18 +261,7 @@ class AppCache(object):
         """
         Register a set of models as belonging to an app.
         """
-        # Check if there is an existing app instance
-        # If there are more than one app instance with the
-        # app_label, an MultipleInstancesReturned is raised
-        app_instances = [app for app in self.app_instances\
-                if app.label == app_label]
-        if len(app_instances) > 1:
-            raise MultipleInstancesReturned
-        else:
-            try:
-                app_instance = app_instances[0]
-            except IndexError:
-                app_instance = None
+        app_instance = self.find_app(app_label)
 
         # Create a new App instance if the ModelBase tries to register
         # an app that isn't listed in INSTALLED_APPS
@@ -297,3 +288,5 @@ class AppCache(object):
             model_dict[model_name] = model
             app_instance.models.append(model)
         self._get_models_cache.clear()
+
+cache = AppCache()

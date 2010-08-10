@@ -1,6 +1,7 @@
 "Utilities for loading models and the modules that contain them."
 
 from django.conf import settings
+from django.core.apps import AppCache, cache
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
@@ -14,9 +15,6 @@ import threading
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
-
-from django.core.apps import AppCache
-cache = AppCache()
 
 # These methods were always module level, so are kept that way for backwards
 # compatibility.
