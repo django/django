@@ -156,7 +156,13 @@ def translation(language):
                 res = _merge(localepath)
 
         for appname in settings.INSTALLED_APPS:
-            app = import_module(appname)
+            try:
+                app = import_module(appname)
+            except ImportError:
+                if not '.' in appname:
+                    raise
+                appname, app_classname = appname.rsplit('.', 1)
+                app = import_module(appname)
             apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
 
             if os.path.isdir(apppath):
