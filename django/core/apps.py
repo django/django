@@ -25,7 +25,6 @@ class App(object):
         # errors raised when trying to import the app
         self.errors = []
         self.models = []
-        self.models_module = None
 
     def __repr__(self):
         return '<App: %s>' % self.name
@@ -112,8 +111,15 @@ class AppCache(object):
             app_instance = app_class(app_instance_name)
             self.app_instances.append(app_instance)
 
+        # check if the app instance specifies a path to models
+        # if not, we use the models.py file from the package dir
         try:
-            models = import_module('.models', app_name)
+            models_path = app_instance.models_path
+        except AttributeError:
+            models_path = '%s.models' % app_name
+
+        try:
+            models = import_module(models_path)
         except ImportError:
             self.nesting_level -= 1
             # If the app doesn't have a models module, we can just ignore the
@@ -135,9 +141,7 @@ class AppCache(object):
                     raise
 
         self.nesting_level -= 1
-        app = self.find_app(app_name.split('.')[-1])
-        if app and models is not app.models_module:
-            app.models_module = models
+        app_instance.models_module = models
         return models
 
     def find_app(self, name):

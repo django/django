@@ -221,10 +221,9 @@ class LoadAppTests(AppCacheTestCase):
         app = cache.app_instances[0]
         self.assertEqual(len(cache.app_instances), 1)
         self.assertEqual(app.name, 'nomodel_app')
-        self.assertEqual(app.models_module, None)
         self.assertEqual(rv, None)
 
-    def test_load_app_custom(self):
+    def test_custom_app(self):
         """
         Test that a custom app instance is created if the function
         gets passed a classname
@@ -235,10 +234,18 @@ class LoadAppTests(AppCacheTestCase):
         self.assertEqual(len(cache.app_instances), 1)
         self.assertEqual(app.name, 'nomodel_app')
         self.assertTrue(isinstance(app, MyApp))
-        self.assertEqual(app.models_module, None)
         self.assertEqual(rv, None)
 
-    def test_load_app_twice(self):
+    def test_custom_models_path(self):
+        """
+        Test that custom models are imported correctly 
+        """
+        rv = cache.load_app('model_app.MyApp')
+        app = cache.app_instances[0]
+        self.assertEqual(app.models_module.__name__, 'model_app.othermodels')
+        self.assertEqual(rv.__name__, 'model_app.othermodels')
+
+    def test_twice(self):
         """
         Test that loading an app twice results in only one app instance
         """
@@ -248,7 +255,7 @@ class LoadAppTests(AppCacheTestCase):
         self.assertEqual(rv.__name__, 'model_app.models')
         self.assertEqual(rv2.__name__, 'model_app.models')
 
-    def test_load_app_importerror(self):
+    def test_importerror(self):
         """
         Test that an ImportError exception is raised if a package cannot
         be imported
