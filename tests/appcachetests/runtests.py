@@ -5,12 +5,11 @@ import threading
 from django.conf import settings
 from django.utils.datastructures import SortedDict
 from django.core.exceptions import ImproperlyConfigured
-from django.core.apps import MultipleInstancesReturned
+from django.core.apps import cache, MultipleInstancesReturned
 
 # remove when tests are integrated into the django testsuite
 settings.configure()
 
-from django.db.models.loading import cache
 
 class AppCacheTestCase(unittest.TestCase):
     """
@@ -41,17 +40,15 @@ class AppCacheTestCase(unittest.TestCase):
 
         # we cannot copy() the whole cache.__dict__ in the setUp function
         # because thread.RLock is un(deep)copyable
-        cache.app_store = SortedDict()
         cache.app_models = SortedDict()
-        cache.app_errors = {}
+        cache.app_instances = []
+
         cache.loaded = False
         cache.handled = {}
         cache.postponed = []
         cache.nesting_level = 0
         cache.write_lock = threading.RLock()
         cache._get_models_cache = {}
-        
-        cache.app_instances = []
 
 class AppCacheReadyTests(AppCacheTestCase):
     """
@@ -65,9 +62,9 @@ class AppCacheReadyTests(AppCacheTestCase):
 
     def test_load_app(self):
         """Should return False after executing the load_app function"""
-        cache.load_app('django.contrib.comments')
+        cache.load_app('nomodel_app')
         self.assertFalse(cache.app_cache_ready())
-        cache.load_app('django.contrib.comments', can_postpone=True)
+        cache.load_app('nomodel_app', can_postpone=True)
         self.assertFalse(cache.app_cache_ready())
 
 class GetAppsTests(AppCacheTestCase):
@@ -75,12 +72,16 @@ class GetAppsTests(AppCacheTestCase):
 
     def test_get_apps(self):
         """Test that the correct models modules are returned"""
-        settings.INSTALLED_APPS = ('django.contrib.auth',
+        settings.INSTALLED_APPS = ('django.contrib.sites',
+                                   'django.contrib.contenttypes',
+                                   'django.contrib.auth',
                                    'django.contrib.flatpages',)
         apps = cache.get_apps()
-        self.assertEqual(len(apps), 2)
+        self.assertEqual(len(apps), 4)
         self.assertTrue(apps[0], 'django.contrib.auth.models')
         self.assertTrue(apps[1], 'django.contrib.flatpages.models')
+        self.assertTrue(apps[2], 'django.contrib.sites.models')
+        self.assertTrue(apps[3], 'django.contrib.contenttypes.models')
         self.assertTrue(cache.app_cache_ready())
 
     def test_empty_models(self):
@@ -94,7 +95,8 @@ class GetAppTests(AppCacheTestCase):
 
     def test_get_app(self):
         """Test that the correct module is returned"""
-        settings.INSTALLED_APPS = ('django.contrib.auth',)
+        settings.INSTALLED_APPS = ('django.contrib.contenttypes',
+                                   'django.contrib.auth',)
         module = cache.get_app('auth')
         self.assertTrue(module, 'django.contrib.auth.models')
         self.assertTrue(cache.app_cache_ready())
@@ -141,9 +143,10 @@ class GetModelsTests(AppCacheTestCase):
 
     def test_get_models(self):
         """Test that the correct model classes are returned"""
-        settings.INSTALLED_APPS = ('django.contrib.flatpages',) 
-        from django.contrib.flatpages.models import Site, FlatPage
+        settings.INSTALLED_APPS = ('django.contrib.sites',
+                                   'django.contrib.flatpages',) 
         models = cache.get_models()
+        from django.contrib.flatpages.models import Site, FlatPage
         self.assertEqual(len(models), 2)
         self.assertEqual(models[0], Site)
         self.assertEqual(models[1], FlatPage)
@@ -154,7 +157,11 @@ class GetModelsTests(AppCacheTestCase):
         Test that the correct model classes are returned if an
         app module is specified
         """
-        settings.INSTALLED_APPS = ('django.contrib.flatpages',)
+        settings.INSTALLED_APPS = ('django.contrib.sites',
+                                   'django.contrib.flatpages',)
+        # populate cache
+        cache.get_app_errors()
+
         from django.contrib.flatpages import models
         from django.contrib.flatpages.models import FlatPage
         rv = cache.get_models(app_mod=models)
@@ -164,9 +171,10 @@ class GetModelsTests(AppCacheTestCase):
 
     def test_include_auto_created(self):
         """Test that auto created models are included if specified"""
-        settings.INSTALLED_APPS = ('django.contrib.flatpages',)
-        from django.contrib.flatpages.models import Site, FlatPage
+        settings.INSTALLED_APPS = ('django.contrib.sites',
+                                   'django.contrib.flatpages',)
         models = cache.get_models(include_auto_created=True)
+        from django.contrib.flatpages.models import Site, FlatPage
         self.assertEqual(len(models), 3)
         self.assertEqual(models[0], Site)
         self.assertEqual(models[1].__name__, 'FlatPage_sites')
@@ -181,9 +189,11 @@ class GetModelTests(AppCacheTestCase):
 
     def test_get_model(self):
         """Test that the correct model is returned"""
-        settings.INSTALLED_APPS = ('django.contrib.flatpages',)
+        settings.INSTALLED_APPS = ('django.contrib.sites',
+                                   'django.contrib.flatpages',)
+        rv = cache.get_model('flatpages', 'FlatPage')
         from django.contrib.flatpages.models import FlatPage
-        self.assertEqual(cache.get_model('flatpages', 'FlatPage'), FlatPage)
+        self.assertEqual(rv, FlatPage)
         self.assertTrue(cache.app_cache_ready())
 
     def test_invalid(self):
@@ -278,16 +288,17 @@ class RegisterModelsTests(AppCacheTestCase):
         self.assertEqual(len(cache.app_instances), 1)
         self.assertEqual(app.models[0].__name__, 'Person')
 
-    def test_new_instance(self):
+    def test_app_not_installed(self):
         """
-        Test a new app instance is created if one doesn't exist, and the
-        models are attached to it.
+        Test that an exception is raised if models are tried to be registered
+        to an app that isn't listed in INSTALLED_APPS.
         """
-        from model_app.models import Person
-        app = cache.app_instances[0]
-        self.assertEqual(len(cache.app_instances), 1)
-        self.assertEqual(app.name, 'model_app')
-        self.assertEqual(app.models[0].__name__, 'Person')
+        try:
+            from model_app.models import Person
+        except ImproperlyConfigured:
+            pass
+        else:
+            self.fail('ImproperlyConfigured not raised')
 
 if __name__ == '__main__':
     unittest.main()

@@ -173,12 +173,8 @@ class AppCache(object):
     def get_apps(self):
         "Returns a list of all installed modules that contain models."
         self._populate()
-
-        # Ensure the returned list is always in the same order (with new apps
-        # added at the end). This avoids unstable ordering on the admin app
-        # list page, for example.
         return [app.models_module for app in self.app_instances\
-                if app.models_module]
+                if hasattr(app, 'models_module')]
 
     def get_app(self, app_label, emptyOK=False):
         """
@@ -266,13 +262,10 @@ class AppCache(object):
         Register a set of models as belonging to an app.
         """
         app_instance = self.find_app(app_label)
-
-        # Create a new App instance if the ModelBase tries to register
-        # an app that isn't listed in INSTALLED_APPS
         if not app_instance:
-            app_instance = App(app_label)
-            self.app_instances.append(app_instance)
-
+            raise ImproperlyConfigured('Could not find App instance with label "%s". '
+                                       'Please check your INSTALLED_APPS setting'
+                                       % app_label)
         for model in models:
             # Store as 'name: model' pair in a dictionary
             # in the models list of the App instance
