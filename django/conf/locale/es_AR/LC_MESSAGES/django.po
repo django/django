@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-08-06 15:38-0300\n"
-"PO-Revision-Date: 2010-08-06 16:02-0300\n"
+"PO-Revision-Date: 2010-08-11 09:00-0300\n"
 "Last-Translator: Ramiro <rm0@gmx.net>\n"
 "Language-Team: Django-I18N <django-i18n@googlegroups.com>\n"
 "Language: es_AR\n"
@@ -881,7 +881,7 @@ msgstr ""
 #: contrib/admin/templates/admin/auth/user/change_password.html:35
 #: contrib/auth/forms.py:17 contrib/auth/forms.py:61 contrib/auth/forms.py:186
 msgid "Password"
-msgstr "Contraseña:"
+msgstr "Contraseña"
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:41
 #: contrib/admin/templates/registration/password_change_form.html:37
@@ -1251,7 +1251,7 @@ msgstr "Cambiar contraseña: %s"
 
 #: contrib/auth/forms.py:14 contrib/auth/forms.py:48 contrib/auth/forms.py:60
 msgid "Username"
-msgstr "Nombre de usuario:"
+msgstr "Nombre de usuario"
 
 #: contrib/auth/forms.py:15 contrib/auth/forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
