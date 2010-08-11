@@ -40,6 +40,11 @@ class AppCache(object):
         # List of App instances
         app_instances = [],
 
+        # Normalized list of INSTALLED_APPS
+        # This stores the module name of settings.INSTALLED_APPS
+        # e.g. 'django.contrib.auth' for 'django.contrib.auth.AuthApp'
+        installed_apps = [],
+
         # Mapping of app_labels to a dictionary of model names to model code.
         app_models = SortedDict(),
 
@@ -105,11 +110,13 @@ class AppCache(object):
         app_instance = self.find_app(app_name)
         if not app_instance:
             if '.' in app_name:
+                # get the app label from the full path
                 app_instance_name = app_name.rsplit('.', 1)[1]
             else:
                 app_instance_name = app_name
             app_instance = app_class(app_instance_name)
             self.app_instances.append(app_instance)
+            self.installed_apps.append(app_name)
 
         # check if the app instance specifies a path to models
         # if not, we use the models.py file from the package dir

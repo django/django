@@ -42,6 +42,7 @@ class AppCacheTestCase(unittest.TestCase):
         # because thread.RLock is un(deep)copyable
         cache.app_models = SortedDict()
         cache.app_instances = []
+        cache.installed_apps = []
 
         cache.loaded = False
         cache.handled = {}
@@ -271,6 +272,15 @@ class LoadAppTests(AppCacheTestCase):
         be imported
         """
         self.assertRaises(ImportError, cache.load_app, 'garageland')
+
+    def test_installed_apps(self):
+        """
+        Test that the installed_apps attribute is populated correctly
+        """
+        settings.INSTALLED_APPS = ('model_app', 'nomodel_app.MyApp',)
+        # populate cache
+        cache.get_app_errors()
+        self.assertEqual(cache.installed_apps, ['model_app', 'nomodel_app',])
 
 class RegisterModelsTests(AppCacheTestCase):
     """Tests for the register_models function"""
