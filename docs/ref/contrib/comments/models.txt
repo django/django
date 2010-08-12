@@ -51,7 +51,7 @@ The built-in comment models
     
     .. attribute:: user_email
     
-        The email of the user who posteed the comment.
+        The email of the user who posted the comment.
     
     .. attribute:: user_url
     
