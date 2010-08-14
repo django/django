@@ -284,7 +284,12 @@ class RegexURLResolver(object):
     url_patterns = property(_get_url_patterns)
 
     def _resolve_special(self, view_type):
-        callback = getattr(self.urlconf_module, 'handler%s' % view_type)
+        callback = getattr(self.urlconf_module, 'handler%s' % view_type, None)
+        if not callback:
+            # No handler specified in file; use default
+            # Lazy import, since urls.defaults imports this file
+            from django.conf.urls import defaults
+            callback = getattr(defaults, 'handler%s' % view_type)
         try:
             return get_callable(callback), {}
         except (ImportError, AttributeError), e:

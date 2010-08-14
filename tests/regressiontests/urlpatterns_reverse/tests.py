@@ -356,6 +356,22 @@ class ErrorHandlerResolutionTests(TestCase):
         self.assertEqual(self.callable_resolver.resolve404(), handler)
         self.assertEqual(self.callable_resolver.resolve500(), handler)
 
+class DefaultErrorHandlerTests(TestCase):
+    urls = 'regressiontests.urlpatterns_reverse.urls_without_full_import'
+
+    def test_default_handler(self):
+        "If the urls.py doesn't specify handlers, the defaults are used"
+        try:
+            response = self.client.get('/test/')
+            self.assertEquals(response.status_code, 404)
+        except AttributeError:
+            self.fail("Shouldn't get an AttributeError due to undefined 404 handler")
+
+        try:
+            self.assertRaises(ValueError, self.client.get, '/bad_view/')
+        except AttributeError:
+            self.fail("Shouldn't get an AttributeError due to undefined 500 handler")
+
 class NoRootUrlConfTests(TestCase):
     """Tests for handler404 and handler500 if urlconf is None"""
     urls = None
