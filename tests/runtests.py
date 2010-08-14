@@ -27,6 +27,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.comments',
     'django.contrib.admin',
+    'django.contrib.admindocs',
 ]
 
 def get_test_models():

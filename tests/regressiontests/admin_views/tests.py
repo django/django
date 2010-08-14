@@ -2170,3 +2170,40 @@ class UserAdminTest(TestCase):
         self.assertRedirects(response, '/test_admin/admin/auth/user/add/')
         self.assertEquals(User.objects.count(), user_count + 1)
         self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
+
+class AdminDocsTest(TestCase):
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_tags(self):
+        response = self.client.get('/test_admin/admin/doc/tags/')
+
+        # The builtin tag group exists
+        self.assertContains(response, "<h2>Built-in tags</h2>", count=2)
+
+        # A builtin tag exists in both the index and detail
+        self.assertContains(response, '<h3 id="autoescape">autoescape</h3>')
+        self.assertContains(response, '<li><a href="#autoescape">autoescape</a></li>')
+
+        # An app tag exists in both the index and detail
+        # The builtin tag group exists
+        self.assertContains(response, "<h2>admin_list</h2>", count=2)
+
+        # A builtin tag exists in both the index and detail
+        self.assertContains(response, '<h3 id="autoescape">autoescape</h3>')
+        self.assertContains(response, '<li><a href="#admin_actions">admin_actions</a></li>')
+
+    def test_filters(self):
+        response = self.client.get('/test_admin/admin/doc/filters/')
+
+        # The builtin filter group exists
+        self.assertContains(response, "<h2>Built-in filters</h2>", count=2)
+
+        # A builtin filter exists in both the index and detail
+        self.assertContains(response, '<h3 id="add">add</h3>')
+        self.assertContains(response, '<li><a href="#add">add</a></li>')

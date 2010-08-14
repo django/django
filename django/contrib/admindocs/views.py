@@ -54,7 +54,9 @@ def template_tag_index(request):
     load_all_installed_template_libraries()
 
     tags = []
-    for module_name, library in template.libraries.items():
+    app_libs = template.libraries.items()
+    builtin_libs = [(None, lib) for lib in template.builtins]
+    for module_name, library in builtin_libs + app_libs:
         for tag_name, tag_func in library.tags.items():
             title, body, metadata = utils.parse_docstring(tag_func.__doc__)
             if title:
@@ -87,7 +89,9 @@ def template_filter_index(request):
     load_all_installed_template_libraries()
 
     filters = []
-    for module_name, library in template.libraries.items():
+    app_libs = template.libraries.items()
+    builtin_libs = [(None, lib) for lib in template.builtins]
+    for module_name, library in builtin_libs + app_libs:
         for filter_name, filter_func in library.filters.items():
             title, body, metadata = utils.parse_docstring(filter_func.__doc__)
             if title:
