@@ -476,6 +476,15 @@ u'1024.0 MB'
 >>> filesizeformat(1024*1024*1024)
 u'1.0 GB'
 
+>>> filesizeformat(1024*1024*1024*1024)
+u'1.0 TB'
+
+>>> filesizeformat(1024*1024*1024*1024*1024)
+u'1.0 PB'
+
+>>> filesizeformat(1024*1024*1024*1024*1024*2000)
+u'2000.0 PB'
+
 >>> filesizeformat(complex(1,-1))
 u'0 bytes'
 
