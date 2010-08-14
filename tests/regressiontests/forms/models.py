@@ -38,11 +38,28 @@ class ChoiceOptionModel(models.Model):
     Can't reuse ChoiceModel because error_message tests require that it have no instances."""
     name = models.CharField(max_length=10)
 
+    class Meta:
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return u'ChoiceOption %d' % self.pk
+
 class ChoiceFieldModel(models.Model):
     """Model with ForeignKey to another model, for testing ModelForm
     generation with ModelChoiceField."""
     choice = models.ForeignKey(ChoiceOptionModel, blank=False,
-                               default=lambda: ChoiceOptionModel.objects.all()[0])
+                               default=lambda: ChoiceOptionModel.objects.get(name='default'))
+    choice_int = models.ForeignKey(ChoiceOptionModel, blank=False, related_name='choice_int',
+                                   default=lambda: 1)
+
+    multi_choice = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='multi_choice',
+                                          default=lambda: ChoiceOptionModel.objects.filter(name='default'))
+    multi_choice_int = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='multi_choice_int',
+                                              default=lambda: [1])
+
+class ChoiceFieldForm(django_forms.ModelForm):
+    class Meta:
+        model = ChoiceFieldModel
 
 class FileModel(models.Model):
     file = models.FileField(storage=temp_storage, upload_to='tests')
@@ -73,6 +90,74 @@ class TestTicket12510(TestCase):
         self.assertEqual('a', field.clean(self.groups[0].pk).name)
         # only one query is required to pull the model from DB
         self.assertEqual(initial_queries+1, len(connection.queries))
+
+class ModelFormCallableModelDefault(TestCase):
+    def test_no_empty_option(self):
+        "If a model's ForeignKey has blank=False and a default, no empty option is created (Refs #10792)."
+        option = ChoiceOptionModel.objects.create(name='default')
+
+        choices = list(ChoiceFieldForm().fields['choice'].choices)
+        self.assertEquals(len(choices), 1)
+        self.assertEquals(choices[0], (option.pk, unicode(option)))
+
+    def test_callable_initial_value(self):
+        "The initial value for a callable default returning a queryset is the pk (refs #13769)"
+        obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
+        obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
+        obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
+        self.assertEquals(ChoiceFieldForm().as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
+<option value="1" selected="selected">ChoiceOption 1</option>
+<option value="2">ChoiceOption 2</option>
+<option value="3">ChoiceOption 3</option>
+</select><input type="hidden" name="initial-choice" value="1" id="initial-id_choice" /></p>
+<p><label for="id_choice_int">Choice int:</label> <select name="choice_int" id="id_choice_int">
+<option value="1" selected="selected">ChoiceOption 1</option>
+<option value="2">ChoiceOption 2</option>
+<option value="3">ChoiceOption 3</option>
+</select><input type="hidden" name="initial-choice_int" value="1" id="initial-id_choice_int" /></p>
+<p><label for="id_multi_choice">Multi choice:</label> <select multiple="multiple" name="multi_choice" id="id_multi_choice">
+<option value="1" selected="selected">ChoiceOption 1</option>
+<option value="2">ChoiceOption 2</option>
+<option value="3">ChoiceOption 3</option>
+</select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+<p><label for="id_multi_choice_int">Multi choice int:</label> <select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int">
+<option value="1" selected="selected">ChoiceOption 1</option>
+<option value="2">ChoiceOption 2</option>
+<option value="3">ChoiceOption 3</option>
+</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+
+    def test_initial_instance_value(self):
+        "Initial instances for model fields may also be instances (refs #7287)"
+        obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
+        obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
+        obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
+        self.assertEquals(ChoiceFieldForm(initial={
+                'choice': obj2,
+                'choice_int': obj2,
+                'multi_choice': [obj2,obj3],
+                'multi_choice_int': ChoiceOptionModel.objects.exclude(name="default"),
+            }).as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
+<option value="1">ChoiceOption 1</option>
+<option value="2" selected="selected">ChoiceOption 2</option>
+<option value="3">ChoiceOption 3</option>
+</select><input type="hidden" name="initial-choice" value="2" id="initial-id_choice" /></p>
+<p><label for="id_choice_int">Choice int:</label> <select name="choice_int" id="id_choice_int">
+<option value="1">ChoiceOption 1</option>
+<option value="2" selected="selected">ChoiceOption 2</option>
+<option value="3">ChoiceOption 3</option>
+</select><input type="hidden" name="initial-choice_int" value="2" id="initial-id_choice_int" /></p>
+<p><label for="id_multi_choice">Multi choice:</label> <select multiple="multiple" name="multi_choice" id="id_multi_choice">
+<option value="1">ChoiceOption 1</option>
+<option value="2" selected="selected">ChoiceOption 2</option>
+<option value="3" selected="selected">ChoiceOption 3</option>
+</select><input type="hidden" name="initial-multi_choice" value="2" id="initial-id_multi_choice_0" />
+<input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+<p><label for="id_multi_choice_int">Multi choice int:</label> <select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int">
+<option value="1">ChoiceOption 1</option>
+<option value="2" selected="selected">ChoiceOption 2</option>
+<option value="3" selected="selected">ChoiceOption 3</option>
+</select><input type="hidden" name="initial-multi_choice_int" value="2" id="initial-id_multi_choice_int_0" />
+<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
 
 
 __test__ = {'API_TESTS': """
@@ -155,18 +240,5 @@ u'class default value'
 datetime.date(1999, 3, 2)
 >>> shutil.rmtree(temp_storage_location)
 
-In a ModelForm with a ModelChoiceField, if the model's ForeignKey has blank=False and a default,
-no empty option is created (regression test for #10792).
-
-First we need at least one instance of ChoiceOptionModel:
-
->>> ChoiceOptionModel.objects.create(name='default')
-<ChoiceOptionModel: ChoiceOptionModel object>
-
->>> class ChoiceFieldForm(ModelForm):
-...     class Meta:
-...         model = ChoiceFieldModel
->>> list(ChoiceFieldForm().fields['choice'].choices)
-[(1, u'ChoiceOptionModel object')]
 
 """}

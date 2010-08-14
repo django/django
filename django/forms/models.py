@@ -906,12 +906,7 @@ class ModelChoiceIterator(object):
         return len(self.queryset)
 
     def choice(self, obj):
-        if self.field.to_field_name:
-            key = obj.serializable_value(self.field.to_field_name)
-        else:
-            key = obj.pk
-        return (key, self.field.label_from_instance(obj))
-
+        return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
 
 class ModelChoiceField(ChoiceField):
     """A ChoiceField whose choices are a model QuerySet."""
@@ -971,8 +966,8 @@ class ModelChoiceField(ChoiceField):
             return self._choices
 
         # Otherwise, execute the QuerySet in self.queryset to determine the
-        # choices dynamically. Return a fresh QuerySetIterator that has not been
-        # consumed. Note that we're instantiating a new QuerySetIterator *each*
+        # choices dynamically. Return a fresh ModelChoiceIterator that has not been
+        # consumed. Note that we're instantiating a new ModelChoiceIterator *each*
         # time _get_choices() is called (and, thus, each time self.choices is
         # accessed) so that we can ensure the QuerySet has not been consumed. This
         # construct might look complicated but it allows for lazy evaluation of
@@ -980,6 +975,14 @@ class ModelChoiceField(ChoiceField):
         return ModelChoiceIterator(self)
 
     choices = property(_get_choices, ChoiceField._set_choices)
+
+    def prepare_value(self, value):
+        if hasattr(value, '_meta'):
+            if self.to_field_name:
+                return value.serializable_value(self.to_field_name)
+            else:
+                return value.pk
+        return super(ModelChoiceField, self).prepare_value(value)
 
     def to_python(self, value):
         if value in EMPTY_VALUES:
@@ -1030,3 +1033,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
             if force_unicode(val) not in pks:
                 raise ValidationError(self.error_messages['invalid_choice'] % val)
         return qs
+
+    def prepare_value(self, value):
+        if hasattr(value, '__iter__'):
+            return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
+        return super(ModelMultipleChoiceField, self).prepare_value(value)

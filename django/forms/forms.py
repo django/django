@@ -18,10 +18,10 @@ __all__ = ('BaseForm', 'Form')
 NON_FIELD_ERRORS = '__all__'
 
 def pretty_name(name):
-    """Converts 'first_name' to 'First name'""" 
-    if not name: 
-        return u'' 
-    return name.replace('_', ' ').capitalize() 
+    """Converts 'first_name' to 'First name'"""
+    if not name:
+        return u''
+    return name.replace('_', ' ').capitalize()
 
 def get_declared_fields(bases, attrs, with_base_fields=True):
     """
@@ -423,6 +423,7 @@ class BoundField(StrAndUnicode):
         """
         if not widget:
             widget = self.field.widget
+
         attrs = attrs or {}
         auto_id = self.auto_id
         if auto_id and 'id' not in attrs and 'id' not in widget.attrs:
@@ -430,6 +431,7 @@ class BoundField(StrAndUnicode):
                 attrs['id'] = auto_id
             else:
                 attrs['id'] = self.html_initial_id
+
         if not self.form.is_bound:
             data = self.form.initial.get(self.name, self.field.initial)
             if callable(data):
@@ -439,6 +441,8 @@ class BoundField(StrAndUnicode):
                 data = self.form.initial.get(self.name, self.field.initial)
             else:
                 data = self.data
+        data = self.field.prepare_value(data)
+
         if not only_initial:
             name = self.html_name
         else:
