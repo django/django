@@ -127,6 +127,9 @@ class Field(object):
 
         self.validators = self.default_validators + validators
 
+    def prepare_value(self, value):
+        return value
+
     def to_python(self, value):
         return value
 
