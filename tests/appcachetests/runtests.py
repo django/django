@@ -32,15 +32,21 @@ class AppCacheTestCase(unittest.TestCase):
         # To detect which model modules have been imported, we go through
         # all loaded model classes and remove their respective module 
         # from sys.modules
-        for app in cache.app_models.itervalues():
+        for app in cache.unbound_models.itervalues():
             for name in app.itervalues():
                 module = name.__module__
                 if module in sys.modules:
                     del sys.modules[module]
 
+        for app in cache.app_instances:
+            for model in app.models:
+                module = model.__module__
+                if module in sys.modules:
+                    del sys.modules[module]
+
         # we cannot copy() the whole cache.__dict__ in the setUp function
         # because thread.RLock is un(deep)copyable
-        cache.app_models = SortedDict()
+        cache.unbound_models = {}
         cache.app_instances = []
         cache.installed_apps = []
 
@@ -178,34 +184,47 @@ class GetModelsTests(AppCacheTestCase):
         from django.contrib.flatpages.models import Site, FlatPage
         self.assertEqual(len(models), 3)
         self.assertEqual(models[0], Site)
-        self.assertEqual(models[1].__name__, 'FlatPage_sites')
-        self.assertEqual(models[2], FlatPage)
+        self.assertEqual(models[1], FlatPage)
+        self.assertEqual(models[2].__name__, 'FlatPage_sites')
         self.assertTrue(cache.app_cache_ready())
-
-    def test_include_deferred(self):
-        """TODO!"""
 
 class GetModelTests(AppCacheTestCase):
     """Tests for the get_model function"""
 
-    def test_get_model(self):
-        """Test that the correct model is returned"""
-        settings.INSTALLED_APPS = ('django.contrib.sites',
-                                   'django.contrib.flatpages',)
-        rv = cache.get_model('flatpages', 'FlatPage')
-        from django.contrib.flatpages.models import FlatPage
-        self.assertEqual(rv, FlatPage)
+    def test_seeded(self):
+        """
+        Test that the correct model is returned when the cache is seeded
+        """
+        settings.INSTALLED_APPS = ('model_app',)
+        rv = cache.get_model('model_app', 'Person')
+        self.assertEqual(rv.__name__, 'Person')
         self.assertTrue(cache.app_cache_ready())
 
-    def test_invalid(self):
-        """Test that None is returned if an app/model does not exist"""
-        self.assertEqual(cache.get_model('foo', 'bar'), None)
+    def test_seeded_invalid(self):
+        """
+        Test that None is returned if a model was not registered
+        with the seeded cache
+        """
+        rv = cache.get_model('model_app', 'Person')
+        self.assertEqual(rv, None)
         self.assertTrue(cache.app_cache_ready())
 
-    def test_without_seeding(self):
-        """Test that None is returned if the cache is not seeded"""
-        settings.INSTALLED_APPS = ('django.contrib.flatpages',)
-        rv = cache.get_model('flatpages', 'FlatPage', seed_cache=False)
+    def test_unseeded(self):
+        """
+        Test that the correct model is returned when the cache is
+        unseeded (but the model was registered using register_models)
+        """
+        from model_app.models import Person
+        rv = cache.get_model('model_app', 'Person', seed_cache=False)
+        self.assertEqual(rv.__name__, 'Person')
+        self.assertFalse(cache.app_cache_ready())
+
+    def test_unseeded_invalid(self):
+        """
+        Test that None is returned if a model was not registered
+        with the unseeded cache
+        """
+        rv = cache.get_model('model_app', 'Person', seed_cache=False)
         self.assertEqual(rv, None)
         self.assertFalse(cache.app_cache_ready())
 
@@ -285,30 +304,37 @@ class LoadAppTests(AppCacheTestCase):
 class RegisterModelsTests(AppCacheTestCase):
     """Tests for the register_models function"""
 
-    def test_register_models(self):
+    def test_seeded_cache(self):
         """
-        Test that register_models attaches the models to an existing
-        app instance
+        Test that the models are attached to the correct app instance
+        in a seeded cache
         """
-        # We don't need to call the register_models method. Importing the 
-        # models.py file will suffice. This is done in the load_app function
-        # The ModelBase will call the register_models method
-        cache.load_app('model_app')
-        app = cache.app_instances[0]
-        self.assertEqual(len(cache.app_instances), 1)
-        self.assertEqual(app.models[0].__name__, 'Person')
+        settings.INSTALLED_APPS = ('model_app',)
+        cache.get_app_errors()
+        self.assertTrue(cache.app_cache_ready())
+        app_models = cache.app_instances[0].models
+        self.assertEqual(len(app_models), 1)
+        self.assertEqual(app_models[0].__name__, 'Person')
 
-    def test_app_not_installed(self):
+    def test_seeded_cache_invalid_app(self):
         """
-        Test that an exception is raised if models are tried to be registered
-        to an app that isn't listed in INSTALLED_APPS.
+        Test that an exception is raised if the cache is seeded and models
+        are tried to be attached to an app instance that doesn't exist
         """
-        try:
-            from model_app.models import Person
-        except ImproperlyConfigured:
-            pass
-        else:
-            self.fail('ImproperlyConfigured not raised')
+        settings.INSTALLED_APPS = ('model_app',)
+        cache.get_app_errors()
+        self.assertTrue(cache.app_cache_ready())
+        from model_app.models import Person
+        self.assertRaises(ImproperlyConfigured, cache.register_models,
+                'model_app_NONEXISTENT', *(Person,))
+
+    def test_unseeded_cache(self):
+        """
+        Test that models can be registered with an unseeded cache
+        """
+        from model_app.models import Person
+        self.assertFalse(cache.app_cache_ready())
+        self.assertEquals(cache.unbound_models['model_app']['person'], Person)
 
 if __name__ == '__main__':
     unittest.main()

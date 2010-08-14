@@ -46,7 +46,7 @@ class AppCache(object):
         installed_apps = [],
 
         # Mapping of app_labels to a dictionary of model names to model code.
-        app_models = SortedDict(),
+        unbound_models = {},
 
         # -- Everything below here is only used when populating the cache --
         loaded = False,
@@ -79,7 +79,19 @@ class AppCache(object):
             if not self.nesting_level:
                 for app_name in self.postponed:
                     self.load_app(app_name)
+                # since the cache is still unseeded at this point
+                # all models have been stored as unbound models
+                # we need to assign the models to the app instances
+                for app_name, models in self.unbound_models.iteritems():
+                    app_instance = self.find_app(app_name)
+                    if not app_instance:
+                        raise ImproperlyConfigured(
+                                'Could not find an app instance for "%s"'
+                                % app_label)
+                    for model in models.itervalues():
+                        app_instance.models.append(model)
                 self.loaded = True
+                self.unbound_models = {}
         finally:
             self.write_lock.release()
 
@@ -158,15 +170,6 @@ class AppCache(object):
         for app in self.app_instances:
             if app.name == name:
                 return app
-
-    def create_app(self, name):
-        """create an app instance"""
-        name = name.split('.')[-1]
-        app = self.find_app(name)
-        if not app:
-            app = App(name)
-            self.app_instances.append(app)
-        return app
 
     def app_cache_ready(self):
         """
@@ -259,25 +262,34 @@ class AppCache(object):
         if seed_cache:
             self._populate()
         app = self.find_app(app_label)
-        if app:
+        if self.app_cache_ready() and not app:
+            return
+        if cache.app_cache_ready():
             for model in app.models:
                 if model_name.lower() == model._meta.object_name.lower():
                     return model
+        else:
+            return self.unbound_models.get(app_label, {}).get(
+                    model_name.lower())
 
     def register_models(self, app_label, *models):
         """
         Register a set of models as belonging to an app.
         """
         app_instance = self.find_app(app_label)
-        if not app_instance:
-            raise ImproperlyConfigured('Could not find App instance with label "%s". '
-                                       'Please check your INSTALLED_APPS setting'
-                                       % app_label)
+        if self.app_cache_ready() and not app_instance:
+            raise ImproperlyConfigured(
+                'Could not find an app instance with the label "%s". '
+                'Please check your INSTALLED_APPS setting' % app_label)
+
         for model in models:
-            # Store as 'name: model' pair in a dictionary
-            # in the models list of the App instance
             model_name = model._meta.object_name.lower()
-            model_dict = self.app_models.setdefault(app_label, SortedDict())
+            if self.app_cache_ready():
+                model_dict = dict([(model._meta.object_name.lower(), model)
+                    for model in app_instance.models])
+            else:
+                model_dict = self.unbound_models.setdefault(app_label, {})
+
             if model_name in model_dict:
                 # The same model may be imported via different paths (e.g.
                 # appname.models and project.appname.models). We use the source
@@ -289,8 +301,10 @@ class AppCache(object):
                 # comparing.
                 if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
                     continue
-            model_dict[model_name] = model
-            app_instance.models.append(model)
+            if self.app_cache_ready():
+                app_instance.models.append(model)
+            else:
+                model_dict[model_name] = model
         self._get_models_cache.clear()
 
 cache = AppCache()
