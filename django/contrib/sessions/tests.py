@@ -207,32 +207,32 @@ class SessionTestsMixin(object):
         # Tests get_expire_at_browser_close with different settings and different
         # set_expiry calls
         try:
-            original_expire_at_browser_close = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
-            settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+            try:
+                original_expire_at_browser_close = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
+                settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-            self.session.set_expiry(10)
-            self.assertFalse(self.session.get_expire_at_browser_close())
+                self.session.set_expiry(10)
+                self.assertFalse(self.session.get_expire_at_browser_close())
 
-            self.session.set_expiry(0)
-            self.assertTrue(self.session.get_expire_at_browser_close())
+                self.session.set_expiry(0)
+                self.assertTrue(self.session.get_expire_at_browser_close())
 
-            self.session.set_expiry(None)
-            self.assertFalse(self.session.get_expire_at_browser_close())
+                self.session.set_expiry(None)
+                self.assertFalse(self.session.get_expire_at_browser_close())
 
-            settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+                settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-            self.session.set_expiry(10)
-            self.assertFalse(self.session.get_expire_at_browser_close())
+                self.session.set_expiry(10)
+                self.assertFalse(self.session.get_expire_at_browser_close())
 
-            self.session.set_expiry(0)
-            self.assertTrue(self.session.get_expire_at_browser_close())
+                self.session.set_expiry(0)
+                self.assertTrue(self.session.get_expire_at_browser_close())
 
-            self.session.set_expiry(None)
-            self.assertTrue(self.session.get_expire_at_browser_close())
+                self.session.set_expiry(None)
+                self.assertTrue(self.session.get_expire_at_browser_close())
 
-        except:
-            raise
-
+            except:
+                raise
         finally:
             settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = original_expire_at_browser_close
 
