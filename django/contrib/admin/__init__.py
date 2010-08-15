@@ -2,7 +2,7 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.options import ModelAdmin, HORIZONTAL, VERTICAL
 from django.contrib.admin.options import StackedInline, TabularInline
 from django.contrib.admin.sites import AdminSite, site
-
+from django.core.apps import cache
 
 def autodiscover():
     """
@@ -16,8 +16,9 @@ def autodiscover():
     from django.utils.importlib import import_module
     from django.utils.module_loading import module_has_submodule
 
-    for app in settings.INSTALLED_APPS:
-        mod = import_module(app)
+    for app in cache.installed_apps:
+        app_instance = cache.find_app(app)
+        mod = app_instance.module
         # Attempt to import the app's admin module.
         try:
             before_import_registry = copy.copy(site._registry)

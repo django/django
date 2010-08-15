@@ -3,6 +3,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
+from django.utils.translation import ugettext as _
 
 import imp
 import sys
@@ -22,9 +23,14 @@ class App(object):
     """
     def __init__(self, name):
         self.name = name
-        # errors raised when trying to import the app
+        self.verbose_name = _(name.title())
+        self.verbose_name_plural = _(name.title())
         self.errors = []
         self.models = []
+        self.module = None
+
+    def __str__(self):
+        return self.name
 
     def __repr__(self):
         return '<App: %s>' % self.name
@@ -127,6 +133,7 @@ class AppCache(object):
             else:
                 app_instance_name = app_name
             app_instance = app_class(app_instance_name)
+            app_instance.module = app_module
             self.app_instances.append(app_instance)
             self.installed_apps.append(app_name)
 

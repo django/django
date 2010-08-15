@@ -8,6 +8,7 @@ from django.contrib.admin import helpers
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
+from django.core.apps import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -845,7 +846,7 @@ class ModelAdmin(BaseModelAdmin):
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
             'root_path': self.admin_site.root_path,
-            'app_label': opts.app_label,
+            'app_label': cache.find_app(opts.app_label).verbose_name,
         }
         context.update(extra_context or {})
         return self.render_change_form(request, context, form_url=form_url, add=True)
@@ -937,7 +938,7 @@ class ModelAdmin(BaseModelAdmin):
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
             'root_path': self.admin_site.root_path,
-            'app_label': opts.app_label,
+            'app_label': cache.find_app(opts.app_label).verbose_name,
         }
         context.update(extra_context or {})
         return self.render_change_form(request, context, change=True, obj=obj)
@@ -1076,7 +1077,7 @@ class ModelAdmin(BaseModelAdmin):
             'media': media,
             'has_add_permission': self.has_add_permission(request),
             'root_path': self.admin_site.root_path,
-            'app_label': app_label,
+            'app_label': cache.find_app(app_label).verbose_name,
             'action_form': action_form,
             'actions_on_top': self.actions_on_top,
             'actions_on_bottom': self.actions_on_bottom,
@@ -1129,7 +1130,7 @@ class ModelAdmin(BaseModelAdmin):
             "perms_lacking": perms_needed,
             "opts": opts,
             "root_path": self.admin_site.root_path,
-            "app_label": app_label,
+            "app_label": cache.find_app(app_label).verbose_name,
         }
         context.update(extra_context or {})
         context_instance = template.RequestContext(request, current_app=self.admin_site.name)
@@ -1157,7 +1158,7 @@ class ModelAdmin(BaseModelAdmin):
             'module_name': capfirst(force_unicode(opts.verbose_name_plural)),
             'object': obj,
             'root_path': self.admin_site.root_path,
-            'app_label': app_label,
+            'app_label': cache.find_app(app_label).verbose_name,
         }
         context.update(extra_context or {})
         context_instance = template.RequestContext(request, current_app=self.admin_site.name)

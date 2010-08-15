@@ -5,6 +5,7 @@ from django.contrib.admin import actions
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
+from django.core.apps import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -371,7 +372,7 @@ class AdminSite(object):
                         app_dict[app_label]['models'].append(model_dict)
                     else:
                         app_dict[app_label] = {
-                            'name': app_label.title(),
+                            'name': cache.find_app(app_label).verbose_name,
                             'app_url': app_label + '/',
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
@@ -415,6 +416,7 @@ class AdminSite(object):
         user = request.user
         has_module_perms = user.has_module_perms(app_label)
         app_dict = {}
+        app_instance = cache.find_app(app_label)
         for model, model_admin in self._registry.items():
             if app_label == model._meta.app_label:
                 if has_module_perms:
@@ -435,7 +437,7 @@ class AdminSite(object):
                             # something to display, add in the necessary meta
                             # information.
                             app_dict = {
-                                'name': app_label.title(),
+                                'name': app_instance.verbose_name,
                                 'app_url': '',
                                 'has_module_perms': has_module_perms,
                                 'models': [model_dict],
@@ -445,7 +447,7 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(lambda x, y: cmp(x['name'], y['name']))
         context = {
-            'title': _('%s administration') % capfirst(app_label),
+            'title': _('%s administration') % app_instance.verbose_name,
             'app_list': [app_dict],
             'root_path': self.root_path,
         }
