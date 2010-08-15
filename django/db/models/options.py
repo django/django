@@ -2,6 +2,7 @@ import re
 from bisect import bisect
 
 from django.conf import settings
+from django.core.apps import cache
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
@@ -95,9 +96,10 @@ class Options(object):
             self.verbose_name_plural = string_concat(self.verbose_name, 's')
         del self.meta
 
-        # If the db_table wasn't provided, use the app_label + module_name.
+        # If the db_table wasn't provided, use the db_prefix + module_name.
         if not self.db_table:
-            self.db_table = "%s_%s" % (self.app_label, self.module_name)
+            app_instance = cache.find_app(self.app_label)
+            self.db_table = "%s_%s" % (app_instance.db_prefix, self.module_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
 
     def _prepare(self, model):

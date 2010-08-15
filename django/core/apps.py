@@ -25,6 +25,7 @@ class App(object):
         self.name = name
         self.verbose_name = _(name.title())
         self.verbose_name_plural = _(name.title())
+        self.db_prefix = name
         self.errors = []
         self.models = []
         self.module = None
@@ -201,7 +202,7 @@ class AppCache(object):
         self._populate()
         self.write_lock.acquire()
         try:
-            for app_name in settings.INSTALLED_APPS:
+            for app_name in self.installed_apps:
                 if app_label == app_name.split('.')[-1]:
                     mod = self.load_app(app_name, False)
                     if mod is None:
