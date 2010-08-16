@@ -141,10 +141,6 @@ to install third-party Python modules:
     ``json``    Serializes to and from JSON_ (using a version of simplejson_
                 bundled with Django).
 
-    ``python``  Translates to and from "simple" Python objects (lists, dicts,
-                strings, etc.).  Not really all that useful on its own, but
-                used as a base for other serializers.
-
     ``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
                 serializer is only available if PyYAML_ is installed.
     ==========  ==============================================================
