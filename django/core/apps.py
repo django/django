@@ -24,7 +24,6 @@ class App(object):
     def __init__(self, name):
         self.name = name
         self.verbose_name = _(name.title())
-        self.verbose_name_plural = _(name.title())
         self.db_prefix = name
         self.errors = []
         self.models = []
@@ -97,6 +96,16 @@ class AppCache(object):
                                 % app_label)
                     for model in models.itervalues():
                         app_instance.models.append(model)
+                # check if there is more than one app with the same
+                # db_prefix attribute
+                for app in self.app_instances:
+                    for app_cmp in self.app_instances:
+                        if app != app_cmp and \
+                                app.db_prefix == app_cmp.db_prefix:
+                            raise ImproperlyConfigured(
+                                'The apps "%s" and "%s" have the same '
+                                'db_prefix "%s"'
+                                % (app, app_cmp, app.db_prefix))
                 self.loaded = True
                 self.unbound_models = {}
         finally:

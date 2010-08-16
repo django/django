@@ -97,6 +97,14 @@ class GetAppsTests(AppCacheTestCase):
         self.assertEqual(cache.get_apps(), [])
         self.assertTrue(cache.app_cache_ready())
 
+    def test_db_prefix_exception(self):
+        """
+        Test that an exception is raised if two app instances
+        have the same db_prefix attribute
+        """
+        settings.INSTALLED_APPS = ('nomodel_app.MyApp', 'model_app.MyOtherApp',)
+        self.assertRaises(ImproperlyConfigured, cache.get_apps)
+
 class GetAppTests(AppCacheTestCase):
     """Tests for the get_app function"""
 
