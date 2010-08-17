@@ -1,6 +1,5 @@
 import types
 import sys
-import os
 from itertools import izip
 import django.db.models.manager     # Imported to register signal handler.
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS
@@ -16,7 +15,7 @@ from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 import django.utils.copycompat as copy
 from django.utils.functional import curry, update_wrapper
-from django.utils.encoding import smart_str, force_unicode, smart_unicode
+from django.utils.encoding import smart_str, force_unicode
 from django.utils.text import get_text_list, capfirst
 from django.conf import settings
 
@@ -744,11 +743,11 @@ class Model(object):
                     continue
                 if f.unique:
                     unique_checks.append((model_class, (name,)))
-                if f.unique_for_date:
+                if f.unique_for_date and f.unique_for_date not in exclude:
                     date_checks.append((model_class, 'date', name, f.unique_for_date))
-                if f.unique_for_year:
+                if f.unique_for_year and f.unique_for_year not in exclude:
                     date_checks.append((model_class, 'year', name, f.unique_for_year))
-                if f.unique_for_month:
+                if f.unique_for_month and f.unique_for_month not in exclude:
                     date_checks.append((model_class, 'month', name, f.unique_for_month))
         return unique_checks, date_checks
 

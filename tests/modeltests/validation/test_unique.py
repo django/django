@@ -40,6 +40,15 @@ class GetUniqueCheckTests(unittest.TestCase):
             ), m._get_unique_checks()
         )
 
+    def test_unique_for_date_exclusion(self):
+        m = UniqueForDateModel()
+        self.assertEqual((
+            [(UniqueForDateModel, ('id',))],
+            [(UniqueForDateModel, 'year', 'count', 'end_date'),
+             (UniqueForDateModel, 'month', 'order', 'end_date')]
+            ), m._get_unique_checks(exclude='start_date')
+        )
+
 class PerformUniqueChecksTest(unittest.TestCase):
     def setUp(self):
         # Set debug to True to gain access to connection.queries.

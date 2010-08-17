@@ -156,6 +156,10 @@ class UniqueTest(TestCase):
         form = PostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
             "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
         self.assertTrue(form.is_valid())
+        form = PostForm({'title': "Django 1.0 is released"})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 1)
+        self.assertEqual(form.errors['posted'], [u'This field is required.'])
 
     def test_inherited_unique_for_date(self):
         p = Post.objects.create(title="Django 1.0 is released",
