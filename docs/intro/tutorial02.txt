@@ -426,7 +426,7 @@ Then, just edit the file and replace the generic Django text with your own
 site's name as you see fit.
 
 This template file contains lots of text like ``{% block branding %}``
-and ``{{ title }}. The ``{%`` and ``{{`` tags are part of Django's
+and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Django's
 template language. When Django renders ``admin/base_site.html``, this
 template language will be evaluated to produce the final HTML page.
 Don't worry if you can't make any sense of the template right now --
