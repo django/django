@@ -19,6 +19,7 @@ from sphinx import addnodes, roles
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.writers.html import SmartyPantsHTMLTranslator
 from sphinx.util.console import bold
+from sphinx.util.compat import Directive
 
 
 def setup(app):
@@ -55,38 +56,46 @@ def setup(app):
         parse_node    = parse_django_adminopt_node,
     )
     app.add_config_value('django_next_version', '0.0', True)
-    app.add_directive('versionadded', parse_version_directive, 1, (1, 1, 1))
-    app.add_directive('versionchanged', parse_version_directive, 1, (1, 1, 1))
+    app.add_directive('versionadded', VersionDirective)
+    app.add_directive('versionchanged', VersionDirective)
     app.add_transform(SuppressBlockquotes)
     app.add_builder(DjangoStandaloneHTMLBuilder)
 
-def parse_version_directive(name, arguments, options, content, lineno,
-                      content_offset, block_text, state, state_machine):
-    env = state.document.settings.env
-    is_nextversion = env.config.django_next_version == arguments[0]
-    ret = []
-    node = addnodes.versionmodified()
-    ret.append(node)
-    if not is_nextversion:
-        if len(arguments) == 1:
-            linktext = 'Please, see the release notes <releases-%s>' % (arguments[0])
-            try:
-                xrefs = roles.XRefRole()('ref', linktext, linktext, lineno, state) # Sphinx >= 1.0
-            except:
-                xrefs = roles.xfileref_role('ref', linktext, linktext, lineno, state) # Sphinx < 1.0
-            node.extend(xrefs[0])
-        node['version'] = arguments[0]
-    else:
-        node['version'] = "Development version"
-    node['type'] = name
-    if len(arguments) == 2:
-        inodes, messages = state.inline_text(arguments[1], lineno+1)
-        node.extend(inodes)
-        if content:
-            state.nested_parse(content, content_offset, node)
-        ret = ret + messages
-    env.note_versionchange(node['type'], node['version'], node, lineno)
-    return ret
+
+class VersionDirective(Directive):
+    has_content = True
+    required_arguments = 1
+    optional_arguments = 1
+    final_argument_whitespace = True
+    option_spec = {}
+
+    def run(self):
+        env = self.state.document.settings.env
+        arg0 = self.arguments[0]
+        is_nextversion = env.config.django_next_version == arg0
+        ret = []
+        node = addnodes.versionmodified()
+        ret.append(node)
+        if not is_nextversion:
+            if len(self.arguments) == 1:
+                linktext = 'Please, see the release notes <releases-%s>' % (arg0)
+                try:
+                    xrefs = roles.XRefRole()('std:ref', linktext, linktext, self.lineno, self.state) # Sphinx >= 1.0
+                except AttributeError:
+                    xrefs = roles.xfileref_role('ref', linktext, linktext, self.lineno, self.state) # Sphinx < 1.0
+                node.extend(xrefs[0])
+            node['version'] = arg0
+        else:
+            node['version'] = "Development version"
+        node['type'] = self.name
+        if len(self.arguments) == 2:
+            inodes, messages = self.state.inline_text(self.arguments[1], self.lineno+1)
+            node.extend(inodes)
+            if self.content:
+                self.state.nested_parse(self.content, self.content_offset, node)
+            ret = ret + messages
+        env.note_versionchange(node['type'], node['version'], node, self.lineno)
+        return ret
 
 
 class SuppressBlockquotes(transforms.Transform):
@@ -185,7 +194,7 @@ def parse_django_adminopt_node(env, sig, signode):
     """A copy of sphinx.directives.CmdoptionDesc.parse_signature()"""
     try:
         from sphinx.domains.std import option_desc_re # Sphinx >= 1.0
-    except:
+    except ImportError:
         from sphinx.directives.desc import option_desc_re # Sphinx < 1.0
     count = 0
     firstname = ''
