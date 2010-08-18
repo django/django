@@ -187,11 +187,10 @@ You can get a local copy of the HTML documentation following a few easy steps:
 
     * The HTML documentation will be placed in ``docs/_build/html``.
 
-.. warning::
+.. note::
 
-    At the time of this writing, Django's using a version of Sphinx not
-    yet released, so you'll currently need to install Sphinx from the
-    source. We'll fix this shortly.
+    Generation of the Django documentation will work with Sphinx version 0.6
+    or newer, but we recommend going straight to Sphinx 1.0.2 or newer.
 
 __ http://sphinx.pocoo.org/
 __ http://www.gnu.org/software/make/
