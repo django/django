@@ -1,5 +1,3 @@
-.. _topics-testing:
-
 ===========================
 Testing Django applications
 ===========================
@@ -342,7 +340,7 @@ For fine-grained control over the character encoding of your test
 database, use the :setting:`TEST_CHARSET` option. If you're using
 MySQL, you can also use the :setting:`TEST_COLLATION` option to
 control the particular collation used by the test database. See the
-:ref:`settings documentation <ref-settings>` for details of these
+:doc:`settings documentation </ref/settings>` for details of these
 advanced settings.
 
 .. _topics-testing-masterslave:
@@ -751,7 +749,7 @@ arguments at time of construction:
 
         .. versionadded:: 1.0
 
-        If your site uses Django's :ref:`authentication system<topics-auth>`
+        If your site uses Django's :doc:`authentication system</topics/auth>`
         and you deal with logging in users, you can use the test client's
         ``login()`` method to simulate the effect of a user logging into the
         site.
@@ -797,7 +795,7 @@ arguments at time of construction:
 
         .. versionadded:: 1.0
 
-        If your site uses Django's :ref:`authentication system<topics-auth>`,
+        If your site uses Django's :doc:`authentication system</topics/auth>`,
         the ``logout()`` method can be used to simulate the effect of a user
         logging out of your site.
 
@@ -904,7 +902,7 @@ can access these properties as part of a test condition.
 .. attribute:: Client.session
 
     A dictionary-like object containing session information. See the
-    :ref:`session documentation<topics-http-sessions>` for full details.
+    :doc:`session documentation</topics/http/sessions>` for full details.
 
 .. _Cookie module documentation: http://docs.python.org/library/cookie.html
 
@@ -1268,8 +1266,8 @@ E-mail services
 
 .. versionadded:: 1.0
 
-If any of your Django views send e-mail using :ref:`Django's e-mail
-functionality <topics-email>`, you probably don't want to send e-mail each time
+If any of your Django views send e-mail using :doc:`Django's e-mail
+functionality </topics/email>`, you probably don't want to send e-mail each time
 you run a test using that view. For this reason, Django's test runner
 automatically redirects all Django-sent e-mail to a dummy outbox. This lets you
 test every aspect of sending e-mail -- from the number of messages sent to the

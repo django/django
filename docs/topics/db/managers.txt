@@ -1,5 +1,3 @@
-.. _topics-db-managers:
-
 ========
 Managers
 ========
@@ -12,7 +10,7 @@ A ``Manager`` is the interface through which database query operations are
 provided to Django models. At least one ``Manager`` exists for every model in
 a Django application.
 
-The way ``Manager`` classes work is documented in :ref:`topics-db-queries`;
+The way ``Manager`` classes work is documented in :doc:`/topics/db/queries`;
 this document specifically touches on model options that customize ``Manager``
 behavior.
 
@@ -325,7 +323,7 @@ it will use :class:`django.db.models.Manager`.
     attribute only controlled the type of manager used for related field
     access, which is where the name came from. As it became clear the concept
     was more broadly useful, the name hasn't been changed. This is primarily
-    so that existing code will :ref:`continue to work <misc-api-stability>` in
+    so that existing code will :doc:`continue to work </misc/api-stability>` in
     future Django versions.
 
 Writing Correct Managers For Use In Automatic Manager Instances

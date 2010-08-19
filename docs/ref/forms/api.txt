@@ -1,5 +1,3 @@
-.. _ref-forms-api:
-
 =============
 The Forms API
 =============
@@ -11,7 +9,7 @@ The Forms API
 .. admonition:: About this document
 
     This document covers the gritty details of Django's forms API. You should
-    read the :ref:`introduction to working with forms <topics-forms-index>`
+    read the :doc:`introduction to working with forms </topics/forms/index>`
     first.
 
 .. _ref-forms-api-bound-unbound:
@@ -262,7 +260,7 @@ for each field in the "Built-in ``Field`` classes" section below.
 
 You can write code to perform validation for particular form fields (based on
 their name) or for the form as a whole (considering combinations of various
-fields). More information about this is in :ref:`ref-forms-validation`.
+fields). More information about this is in :doc:`/ref/forms/validation`.
 
 Outputting forms as HTML
 ------------------------

@@ -1,5 +1,3 @@
-.. _ref-contrib-csrf:
-
 =====================================
 Cross Site Request Forgery protection
 =====================================

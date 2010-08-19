@@ -1,5 +1,3 @@
-.. _ref-generic-views:
-
 =============
 Generic views
 =============
@@ -9,8 +7,8 @@ again and again. In Django, the most common of these patterns have been
 abstracted into "generic views" that let you quickly provide common views of
 an object without actually needing to write any Python code.
 
-A general introduction to generic views can be found in the :ref:`topic guide
-<topics-generic-views>`.
+A general introduction to generic views can be found in the :doc:`topic guide
+</topics/http/generic-views>`.
 
 This reference contains details of Django's built-in generic views, along with
 a list of all keyword arguments that a generic view expects. Remember that
@@ -18,7 +16,7 @@ arguments may either come from the URL pattern or from the ``extra_context``
 additional-information dictionary.
 
 Most generic views require the ``queryset`` key, which is a ``QuerySet``
-instance; see :ref:`topics-db-queries` for more information about ``QuerySet``
+instance; see :doc:`/topics/db/queries` for more information about ``QuerySet``
 objects.
 
 "Simple" generic views
@@ -766,8 +764,8 @@ specify the page number in the URL in one of two ways:
 These values and lists are 1-based, not 0-based, so the first page would be
 represented as page ``1``.
 
-For more on pagination, read the :ref:`pagination documentation
-<topics-pagination>`.
+For more on pagination, read the :doc:`pagination documentation
+</topics/pagination>`.
 
 .. versionadded:: 1.0
 
@@ -858,8 +856,8 @@ for creating, editing and deleting objects.
 .. versionchanged:: 1.0
 
 ``django.views.generic.create_update.create_object`` and
-``django.views.generic.create_update.update_object`` now use the new :ref:`forms
-library <topics-forms-index>` to build and display the form.
+``django.views.generic.create_update.update_object`` now use the new :doc:`forms
+library </topics/forms/index>` to build and display the form.
 
 ``django.views.generic.create_update.create_object``
 ----------------------------------------------------
@@ -875,7 +873,7 @@ validation errors (if there are any) and saving the object.
 
       If you provide ``form_class``, it should be a ``django.forms.ModelForm``
       subclass. Use this argument when you need to customize the model's form.
-      See the :ref:`ModelForm docs <topics-forms-modelforms>` for more
+      See the :doc:`ModelForm docs </topics/forms/modelforms>` for more
       information.
 
       Otherwise, ``model`` should be a Django model class and the form used
@@ -892,7 +890,7 @@ validation errors (if there are any) and saving the object.
 
     * ``login_required``: A boolean that designates whether a user must be
       logged in, in order to see the page and save changes. This hooks into the
-      Django :ref:`authentication system <topics-auth>`. By default, this is
+      Django :doc:`authentication system </topics/auth>`. By default, this is
       ``False``.
 
       If this is ``True``, and a non-logged-in user attempts to visit this page
@@ -932,7 +930,7 @@ In addition to ``extra_context``, the template's context will be:
           <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      See the :ref:`forms documentation <topics-forms-index>` for more
+      See the :doc:`forms documentation </topics/forms/index>` for more
       information about using ``Form`` objects in templates.
 
 ``django.views.generic.create_update.update_object``
@@ -951,7 +949,7 @@ model class.
 
       If you provide ``form_class``, it should be a ``django.forms.ModelForm``
       subclass. Use this argument when you need to customize the model's form.
-      See the :ref:`ModelForm docs <topics-forms-modelforms>` for more
+      See the :doc:`ModelForm docs </topics/forms/modelforms>` for more
       information.
 
       Otherwise, ``model`` should be a Django model class and the form used
@@ -977,7 +975,7 @@ model class.
 
     * ``login_required``: A boolean that designates whether a user must be
       logged in, in order to see the page and save changes. This hooks into the
-      Django :ref:`authentication system <topics-auth>`. By default, this is
+      Django :doc:`authentication system </topics/auth>`. By default, this is
       ``False``.
 
       If this is ``True``, and a non-logged-in user attempts to visit this page
@@ -1020,7 +1018,7 @@ In addition to ``extra_context``, the template's context will be:
           <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      See the :ref:`forms documentation <topics-forms-index>` for more
+      See the :doc:`forms documentation </topics/forms/index>` for more
       information about using ``Form`` objects in templates.
 
     * ``object``: The original object being edited. This variable's name
@@ -1059,7 +1057,7 @@ contain a form that POSTs to the same URL.
 
     * ``login_required``: A boolean that designates whether a user must be
       logged in, in order to see the page and save changes. This hooks into the
-      Django :ref:`authentication system <topics-auth>`. By default, this is
+      Django :doc:`authentication system </topics/auth>`. By default, this is
       ``False``.
 
       If this is ``True``, and a non-logged-in user attempts to visit this page

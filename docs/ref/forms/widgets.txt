@@ -1,5 +1,3 @@
-.. _ref-forms-widgets:
-
 =======
 Widgets
 =======

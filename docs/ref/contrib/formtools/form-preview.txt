@@ -1,5 +1,3 @@
-.. _ref-contrib-formtools-form-preview:
-
 ============
 Form preview
 ============

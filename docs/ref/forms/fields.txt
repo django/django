@@ -1,5 +1,3 @@
-.. _ref-forms-fields:
-
 ===========
 Form fields
 ===========
@@ -192,7 +190,7 @@ The callable will be evaluated only when the unbound form is displayed, not when
 .. attribute:: Field.widget
 
 The ``widget`` argument lets you specify a ``Widget`` class to use when
-rendering this ``Field``. See :ref:`ref-forms-widgets` for more information.
+rendering this ``Field``. See :doc:`/ref/forms/widgets` for more information.
 
 ``help_text``
 ~~~~~~~~~~~~~
@@ -267,7 +265,7 @@ error message keys it uses.
 The ``validators`` argument lets you provide a list of validation functions
 for this field.
 
-See the :ref:`validators documentation <ref-validators>` for more information.
+See the :doc:`validators documentation </ref/validators>` for more information.
 
 ``localize``
 ~~~~~~~~~~~~
@@ -516,8 +514,8 @@ given length.
     * Validates that non-empty file data has been bound to the form.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``
 
-To learn more about the ``UploadedFile`` object, see the :ref:`file uploads
-documentation <topics-http-file-uploads>`.
+To learn more about the ``UploadedFile`` object, see the :doc:`file uploads
+documentation </topics/http/file-uploads>`.
 
 When you use a ``FileField`` in a form, you must also remember to
 :ref:`bind the file data to the form <binding-uploaded-files>`.

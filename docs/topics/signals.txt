@@ -1,5 +1,3 @@
-.. _topics-signals:
-
 =======
 Signals
 =======
@@ -13,7 +11,7 @@ signals allow certain *senders* to notify a set of *receivers* that some action
 has taken place. They're especially useful when many pieces of code may be
 interested in the same events.
 
-Django provides a :ref:`set of built-in signals <ref-signals>` that let user
+Django provides a :doc:`set of built-in signals </ref/signals>` that let user
 code get notified by Django itself of certain actions. These include some useful
 notifications:
 
@@ -38,7 +36,7 @@ notifications:
 
       Sent when Django starts or finishes an HTTP request.
 
-See the :ref:`built-in signal documentation <ref-signals>` for a complete list,
+See the :doc:`built-in signal documentation </ref/signals>` for a complete list,
 and a complete explanation of each signal.
 
 You can also `define and send your own custom signals`_; see below.
@@ -128,7 +126,7 @@ The ``my_handler`` function will only be called when an instance of ``MyModel``
 is saved.
 
 Different signals use different objects as their senders; you'll need to consult
-the :ref:`built-in signal documentation <ref-signals>` for details of each
+the :doc:`built-in signal documentation </ref/signals>` for details of each
 particular signal.
 
 Defining and sending signals

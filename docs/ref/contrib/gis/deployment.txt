@@ -54,7 +54,7 @@ Example::
     number of ``processes`` instead.
 
 For more information, please consult Django's
-:ref:`mod_wsgi documentation <howto-deployment-modwsgi>`.
+:doc:`mod_wsgi documentation </howto/deployment/modwsgi>`.
 
 ``mod_python``
 --------------
@@ -84,7 +84,7 @@ Example::
    else your GeoDjango application may crash Apache.
 
 For more information, please consult Django's
-:ref:`mod_python documentation <howto-deployment-modpython>`.
+:doc:`mod_python documentation </howto/deployment/modpython>`.
 
 Lighttpd
 ========

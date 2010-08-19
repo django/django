@@ -1,5 +1,3 @@
-.. _releases-1.2-alpha-1:
-
 ================================
 Django 1.2 alpha 1 release notes
 ================================
@@ -25,7 +23,7 @@ CSRF Protection
 ---------------
 
 There have been large changes to the way that CSRF protection works, detailed in
-:ref:`the CSRF documentaton <ref-contrib-csrf>`.  The following are the major
+:doc:`the CSRF documentaton </ref/contrib/csrf>`.  The following are the major
 changes that developers must be aware of:
 
  * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
@@ -303,7 +301,7 @@ User Messages API
 
 The API for storing messages in the user ``Message`` model (via
 ``user.message_set.create``) is now deprecated and will be removed in Django
-1.4 according to the standard :ref:`release process <internals-release-process>`.
+1.4 according to the standard :doc:`release process </internals/release-process>`.
 
 To upgrade your code, you need to replace any instances of::
 
@@ -327,7 +325,7 @@ with::
         ...
 
 For more information, see the full
-:ref:`messages documentation <ref-contrib-messages>`. You should begin to
+:doc:`messages documentation </ref/contrib/messages>`. You should begin to
 update your code to use the new API immediately.
 
 Date format helper functions
@@ -378,8 +376,8 @@ release cycle. Some minor features will continue development until the
 CSRF support
 ------------
 
-Django now has much improved protection against :ref:`Cross-Site
-Request Forgery (CSRF) attacks<ref-contrib-csrf>`. This type of attack
+Django now has much improved protection against :doc:`Cross-Site
+Request Forgery (CSRF) attacks</ref/contrib/csrf>`. This type of attack
 occurs when a malicious Web site contains a link, a form button or
 some javascript that is intended to perform some action on your Web
 site, using the credentials of a logged-in user who visits the
@@ -395,7 +393,7 @@ You can now :ref:`configure the way that Django sends e-mail
 can now choose a configurable e-mail backend to send messages. If your
 hosting provider uses a sandbox or some other non-SMTP technique for
 sending mail, you can now construct an e-mail backend that will allow
-Django's standard :ref:`mail sending methods<topics-email>` to use
+Django's standard :doc:`mail sending methods</topics/email>` to use
 those facilities.
 
 This also makes it easier to debug mail sending - Django ships with
@@ -408,8 +406,8 @@ e-mail to be :ref:`thrown away<topic-email-dummy-backend>`.
 Messages Framework
 ------------------
 
-Django now includes a robust and configurable :ref:`messages framework
-<ref-contrib-messages>` with built-in support for cookie- and session-based
+Django now includes a robust and configurable :doc:`messages framework
+</ref/contrib/messages>` with built-in support for cookie- and session-based
 messaging, for both anonymous and authenticated clients. The messages framework
 replaces the deprecated user message API and allows you to temporarily store
 messages in one request and retrieve them for display in a subsequent request
@@ -418,8 +416,8 @@ messages in one request and retrieve them for display in a subsequent request
 Support for multiple databases
 ------------------------------
 
-Django 1.2 adds the ability to use :ref:`more than one database
-<topics-db-multi-db>` in your Django project. Queries can be
+Django 1.2 adds the ability to use :doc:`more than one database
+</topics/db/multi-db>` in your Django project. Queries can be
 issued at a specific database with the `using()` method on
 querysets; individual objects can be saved to a specific database
 by providing a ``using`` argument when you save the instance.
@@ -500,7 +498,7 @@ from the test run that reports details of the tests run before the interruption.
 Improved localization
 ---------------------
 
-Django's :ref:`internationalization framework <topics-i18n>` has been
+Django's :doc:`internationalization framework </topics/i18n/index>` has been
 expanded by locale aware formatting and form processing. That means, if
 enabled, dates and numbers on templates will be displayed using the format
 specified for the current locale. Django will also use localized formats
@@ -568,7 +566,7 @@ discussions there.
 Django's online documentation also includes pointers on how to contribute to
 Django:
 
-    * :ref:`How to contribute to Django <internals-contributing>`
+    * :doc:`How to contribute to Django </internals/contributing>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and

@@ -1,5 +1,3 @@
-.. _ref-contrib-admin:
-
 =====================
 The Django admin site
 =====================
@@ -678,7 +676,7 @@ do that::
 
 Note that the key in the dictionary is the actual field class, *not* a string.
 The value is another dictionary; these arguments will be passed to
-:meth:`~django.forms.Field.__init__`. See :ref:`ref-forms-api` for details.
+:meth:`~django.forms.Field.__init__`. See :doc:`/ref/forms/api` for details.
 
 .. warning::
 
@@ -696,7 +694,7 @@ The value is another dictionary; these arguments will be passed to
 .. versionadded:: 1.1
 
 A list of actions to make available on the change list page. See
-:ref:`ref-contrib-admin-actions` for details.
+:doc:`/ref/contrib/admin/actions` for details.
 
 .. attribute:: ModelAdmin.actions_on_top
 .. attribute:: ModelAdmin.actions_on_bottom
@@ -747,8 +745,8 @@ templates used by the :class:`ModelAdmin` views:
 
     Path to a custom template, used by the :meth:`delete_selected`
     action method for displaying a confirmation page when deleting one
-    or more objects. See the :ref:`actions
-    documentation<ref-contrib-admin-actions>`.
+    or more objects. See the :doc:`actions
+    documentation</ref/contrib/admin/actions>`.
 
 .. attribute:: ModelAdmin.object_history_template
 
@@ -805,7 +803,7 @@ described above in the :attr:`ModelAdmin.readonly_fields` section.
 
 The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
 that ModelAdmin in the same way as a URLconf.  Therefore you can extend them as
-documented in :ref:`topics-http-urls`::
+documented in :doc:`/topics/http/urls`::
 
     class MyModelAdmin(admin.ModelAdmin):
         def get_urls(self):
@@ -969,7 +967,7 @@ on your ``ModelAdmin``::
             js = ("my_code.js",)
 
 Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
-apply as :ref:`regular media definitions on forms <topics-forms-media>`.
+apply as :doc:`regular media definitions on forms </topics/forms/media>`.
 
 Django admin Javascript makes use of the `jQuery`_ library. To avoid
 conflict with user scripts, Django's jQuery is namespaced as
@@ -1002,8 +1000,8 @@ any field::
             return self.cleaned_data["name"]
 
 It is important you use a ``ModelForm`` here otherwise things can break. See the
-:ref:`forms <ref-forms-index>` documentation on :ref:`custom validation
-<ref-forms-validation>` and, more specifically, the
+:doc:`forms </ref/forms/index>` documentation on :doc:`custom validation
+</ref/forms/validation>` and, more specifically, the
 :ref:`model form validation notes <overriding-modelform-clean-method>` for more
 information.
 
@@ -1075,7 +1073,7 @@ all the same functionality as well as some of its own:
 
     This controls the number of extra forms the formset will display in addition
     to the initial forms. See the
-    :ref:`formsets documentation <topics-forms-formsets>` for more information.
+    :doc:`formsets documentation </topics/forms/formsets>` for more information.
 
     .. versionadded:: 1.2
 
@@ -1298,7 +1296,7 @@ example app::
 
 ``django.contrib.contenttypes.generic`` provides both a ``GenericTabularInline``
 and ``GenericStackedInline`` and behave just like any other inline. See the
-:ref:`contenttypes documentation <ref-contrib-contenttypes>` for more specific
+:doc:`contenttypes documentation </ref/contrib/contenttypes>` for more specific
 information.
 
 Overriding Admin Templates

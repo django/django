@@ -1,5 +1,3 @@
-.. _topics-i18n-localization:
-
 ============
 Localization
 ============
@@ -12,7 +10,7 @@ files`_ and `locale aware date, time and numbers input/output in forms`_
 
 .. seealso::
 
-    The :ref:`howto-i18n` document included with the Django HOW-TO documents collection.
+    The :doc:`/howto/i18n` document included with the Django HOW-TO documents collection.
 
 .. _how-to-create-language-files:
 

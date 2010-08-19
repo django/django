@@ -1,5 +1,3 @@
-.. _ref-contrib-databrowse:
-
 ==========
 Databrowse
 ==========
@@ -49,8 +47,8 @@ How to use Databrowse
        Note that you should register the model *classes*, not instances.
 
        It doesn't matter where you put this, as long as it gets executed at some
-       point. A good place for it is in your :ref:`URLconf file
-       <topics-http-urls>` (``urls.py``).
+       point. A good place for it is in your :doc:`URLconf file
+       </topics/http/urls>` (``urls.py``).
 
     3. Change your URLconf to import the :mod:`~django.contrib.databrowse` module::
 
@@ -73,20 +71,20 @@ code. Simply add the following import to your URLconf::
 
     from django.contrib.auth.decorators import login_required
 
-Then modify the :ref:`URLconf <topics-http-urls>` so that the
+Then modify the :doc:`URLconf </topics/http/urls>` so that the
 :func:`databrowse.site.root` view is decorated with
 :func:`django.contrib.auth.decorators.login_required`::
 
     (r'^databrowse/(.*)', login_required(databrowse.site.root)),
 
-If you haven't already added support for user logins to your :ref:`URLconf
-<topics-http-urls>`, as described in the :ref:`user authentication docs
-<ref-contrib-auth>`, then you will need to do so now with the following
+If you haven't already added support for user logins to your :doc:`URLconf
+</topics/http/urls>`, as described in the :doc:`user authentication docs
+</ref/contrib/auth>`, then you will need to do so now with the following
 mapping::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
 The final step is to create the login form required by
 :func:`django.contrib.auth.views.login`. The
-:ref:`user authentication docs <ref-contrib-auth>` provide full details and a
+:doc:`user authentication docs </ref/contrib/auth>` provide full details and a
 sample template that can be used for this purpose.

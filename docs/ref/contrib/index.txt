@@ -1,5 +1,3 @@
-.. _ref-contrib-index:
-
 ====================
 ``contrib`` packages
 ====================
@@ -46,8 +44,8 @@ admin
 =====
 
 The automatic Django administrative interface. For more information, see
-:ref:`Tutorial 2 <intro-tutorial02>` and the
-:ref:`admin documentation <ref-contrib-admin>`.
+:doc:`Tutorial 2 </intro/tutorial02>` and the
+:doc:`admin documentation </ref/contrib/admin/index>`.
 
 Requires the auth_ and contenttypes_ contrib packages to be installed.
 
@@ -56,16 +54,16 @@ auth
 
 Django's authentication framework.
 
-See :ref:`topics-auth`.
+See :doc:`/topics/auth`.
 
 comments
 ========
 
 .. versionchanged:: 1.0
-   The comments application has been rewriten. See :ref:`ref-contrib-comments-upgrade`
+   The comments application has been rewriten. See :doc:`/ref/contrib/comments/upgrade`
    for information on howto upgrade.
 
-A simple yet flexible comments system. See :ref:`ref-contrib-comments-index`.
+A simple yet flexible comments system. See :doc:`/ref/contrib/comments/index`.
 
 contenttypes
 ============
@@ -73,21 +71,21 @@ contenttypes
 A light framework for hooking into "types" of content, where each installed
 Django model is a separate content type.
 
-See the :ref:`contenttypes documentation <ref-contrib-contenttypes>`.
+See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
 
 csrf
 ====
 
 A middleware for preventing Cross Site Request Forgeries
 
-See the :ref:`csrf documentation <ref-contrib-csrf>`.
+See the :doc:`csrf documentation </ref/contrib/csrf>`.
 
 flatpages
 =========
 
 A framework for managing simple "flat" HTML content in a database.
 
-See the :ref:`flatpages documentation <ref-contrib-flatpages>`.
+See the :doc:`flatpages documentation </ref/contrib/flatpages>`.
 
 Requires the sites_ contrib package to be installed as well.
 
@@ -103,14 +101,14 @@ An abstraction of the following workflow:
 
 "Display an HTML form, force a preview, then do something with the submission."
 
-See the :ref:`form preview documentation <ref-contrib-formtools-form-preview>`.
+See the :doc:`form preview documentation </ref/contrib/formtools/form-preview>`.
 
 django.contrib.formtools.wizard
 --------------------------------
 
 Splits forms across multiple Web pages.
 
-See the :ref:`form wizard documentation <ref-contrib-formtools-form-wizard>`.
+See the :doc:`form wizard documentation </ref/contrib/formtools/form-wizard>`.
 
 gis
 ====
@@ -118,14 +116,14 @@ gis
 A world-class geospatial framework built on top of Django, that enables
 storage, manipulation and display of spatial data.
 
-See the :ref:`ref-contrib-gis` documentation for more.
+See the :doc:`/ref/contrib/gis/index` documentation for more.
 
 humanize
 ========
 
 A set of Django template filters useful for adding a "human touch" to data.
 
-See the :ref:`humanize documentation <ref-contrib-humanize>`.
+See the :doc:`humanize documentation </ref/contrib/humanize>`.
 
 localflavor
 ===========
@@ -134,7 +132,7 @@ A collection of various Django snippets that are useful only for a particular
 country or culture. For example, ``django.contrib.localflavor.us.forms``
 contains a ``USZipCodeField`` that you can use to validate U.S. zip codes.
 
-See the :ref:`localflavor documentation <ref-contrib-localflavor>`.
+See the :doc:`localflavor documentation </ref/contrib/localflavor>`.
 
 .. _ref-contrib-markup:
 
@@ -183,21 +181,21 @@ messages
 A framework for storing and retrieving temporary cookie- or session-based
 messages
 
-See the :ref:`messages documentation <ref-contrib-messages>`.
+See the :doc:`messages documentation </ref/contrib/messages>`.
 
 redirects
 =========
 
 A framework for managing redirects.
 
-See the :ref:`redirects documentation <ref-contrib-redirects>`.
+See the :doc:`redirects documentation </ref/contrib/redirects>`.
 
 sessions
 ========
 
 A framework for storing data in anonymous sessions.
 
-See the :ref:`sessions documentation <topics-http-sessions>`.
+See the :doc:`sessions documentation </topics/http/sessions>`.
 
 sites
 =====
@@ -206,21 +204,21 @@ A light framework that lets you operate multiple Web sites off of the same
 database and Django installation. It gives you hooks for associating objects to
 one or more sites.
 
-See the :ref:`sites documentation <ref-contrib-sites>`.
+See the :doc:`sites documentation </ref/contrib/sites>`.
 
 sitemaps
 ========
 
 A framework for generating Google sitemap XML files.
 
-See the :ref:`sitemaps documentation <ref-contrib-sitemaps>`.
+See the :doc:`sitemaps documentation </ref/contrib/sitemaps>`.
 
 syndication
 ===========
 
 A framework for generating syndication feeds, in RSS and Atom, quite easily.
 
-See the :ref:`syndication documentation <ref-contrib-syndication>`.
+See the :doc:`syndication documentation </ref/contrib/syndication>`.
 
 webdesign
 =========
@@ -228,7 +226,7 @@ webdesign
 Helpers and utilities targeted primarily at Web *designers* rather than
 Web *developers*.
 
-See the :ref:`Web design helpers documentation <ref-contrib-webdesign>`.
+See the :doc:`Web design helpers documentation </ref/contrib/webdesign>`.
 
 Other add-ons
 =============

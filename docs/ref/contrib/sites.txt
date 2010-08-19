@@ -1,5 +1,3 @@
-.. _ref-contrib-sites:
-
 =====================
 The "sites" framework
 =====================
@@ -260,7 +258,7 @@ The ``CurrentSiteManager``
 If :class:`~django.contrib.sites.models.Site` plays a key role in your
 application, consider using the helpful
 :class:`~django.contrib.sites.managers.CurrentSiteManager` in your
-model(s). It's a model :ref:`manager <topics-db-managers>` that
+model(s). It's a model :doc:`manager </topics/db/managers>` that
 automatically filters its queries to include only objects associated
 with the current :class:`~django.contrib.sites.models.Site`.
 
@@ -322,7 +320,7 @@ and pass a field name that doesn't exist, Django will raise a :exc:`ValueError`.
 Finally, note that you'll probably want to keep a normal
 (non-site-specific) ``Manager`` on your model, even if you use
 :class:`~django.contrib.sites.managers.CurrentSiteManager`. As
-explained in the :ref:`manager documentation <topics-db-managers>`, if
+explained in the :doc:`manager documentation </topics/db/managers>`, if
 you define a manager manually, then Django won't create the automatic
 ``objects = models.Manager()`` manager for you. Also note that certain
 parts of Django -- namely, the Django admin site and generic views --
@@ -387,7 +385,7 @@ Here's how Django uses the sites framework:
 
 .. versionadded:: 1.0
 
-Some :ref:`django.contrib <ref-contrib-index>` applications take advantage of
+Some :doc:`django.contrib </ref/contrib/index>` applications take advantage of
 the sites framework but are architected in a way that doesn't *require* the
 sites framework to be installed in your database. (Some people don't want to, or
 just aren't *able* to install the extra database table that the sites framework

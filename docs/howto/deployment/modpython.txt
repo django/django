@@ -1,5 +1,3 @@
-.. _howto-deployment-modpython:
-
 ============================================
 How to use Django with Apache and mod_python
 ============================================
@@ -8,7 +6,7 @@ How to use Django with Apache and mod_python
 
 The `mod_python`_ module for Apache_ can be used to deploy Django to a
 production server, although it has been mostly superseded by the simpler
-:ref:`mod_wsgi deployment option <howto-deployment-modwsgi>`.
+:doc:`mod_wsgi deployment option </howto/deployment/modwsgi>`.
 
 mod_python is similar to (and inspired by) `mod_perl`_ : It embeds Python within
 Apache and loads Python code into memory when the server starts. Code stays in
@@ -25,8 +23,8 @@ Django requires Apache 2.x and mod_python 3.x, and you should use Apache's
       Apache, there's no better source than `Apache's own official
       documentation`_
 
-    * You may also be interested in :ref:`How to use Django with FastCGI, SCGI,
-      or AJP <howto-deployment-fastcgi>`.
+    * You may also be interested in :doc:`How to use Django with FastCGI, SCGI,
+      or AJP </howto/deployment/fastcgi>`.
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
@@ -383,7 +381,7 @@ If you get a UnicodeEncodeError
 ===============================
 
 If you're taking advantage of the internationalization features of Django (see
-:ref:`topics-i18n`) and you intend to allow users to upload files, you must
+:doc:`/topics/i18n/index`) and you intend to allow users to upload files, you must
 ensure that the environment used to start Apache is configured to accept
 non-ASCII file names. If your environment is not correctly configured, you
 will trigger ``UnicodeEncodeError`` exceptions when calling functions like

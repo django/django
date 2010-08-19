@@ -1,15 +1,13 @@
-.. _topics-db-queries:
-
 ==============
 Making queries
 ==============
 
 .. currentmodule:: django.db.models
 
-Once you've created your :ref:`data models <topics-db-models>`, Django
+Once you've created your :doc:`data models </topics/db/models>`, Django
 automatically gives you a database-abstraction API that lets you create,
 retrieve, update and delete objects. This document explains how to use this
-API. Refer to the :ref:`data model reference <ref-models-index>` for full
+API. Refer to the :doc:`data model reference </ref/models/index>` for full
 details of all the various model lookup options.
 
 Throughout this guide (and in the reference), we'll refer to the following
@@ -937,7 +935,7 @@ be accessed from an instance::
 In addition to the ``QuerySet`` methods defined in "Retrieving objects" above,
 the ``ForeignKey`` ``Manager`` has additional methods used to handle the set of
 related objects. A synopsis of each is below, and complete details can be found
-in the :ref:`related objects reference <ref-models-relations>`.
+in the :doc:`related objects reference </ref/models/relations>`.
 
 ``add(obj1, obj2, ...)``
     Adds the specified model objects to the related object set.
@@ -1067,7 +1065,7 @@ Falling back to raw SQL
 If you find yourself needing to write an SQL query that is too complex for
 Django's database-mapper to handle, you can fall back on writing SQL by hand.
 Django has a couple of options for writing raw SQL queries; see
-:ref:`topics-db-sql`.
+:doc:`/topics/db/sql`.
 
 Finally, it's important to note that the Django database layer is merely an
 interface to your database. You can access your database via other tools,

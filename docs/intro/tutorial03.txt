@@ -1,10 +1,8 @@
-.. _intro-tutorial03:
-
 =====================================
 Writing your first Django app, part 3
 =====================================
 
-This tutorial begins where :ref:`Tutorial 2 <intro-tutorial02>` left off. We're
+This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off. We're
 continuing the Web-poll application and will focus on creating the public
 interface -- "views."
 
@@ -68,8 +66,8 @@ arbitrary keyword arguments from the dictionary (an optional third item in the
 tuple).
 
 For more on :class:`~django.http.HttpRequest` objects, see the
-:ref:`ref-request-response`. For more details on URLconfs, see the
-:ref:`topics-http-urls`.
+:doc:`/ref/request-response`. For more details on URLconfs, see the
+:doc:`/topics/http/urls`.
 
 When you ran ``django-admin.py startproject mysite`` at the beginning of
 Tutorial 1, it created a default URLconf in ``mysite/urls.py``. It also
@@ -205,7 +203,7 @@ you want, using whatever Python libraries you want.
 All Django wants is that :class:`~django.http.HttpResponse`. Or an exception.
 
 Because it's convenient, let's use Django's own database API, which we covered
-in :ref:`Tutorial 1 <intro-tutorial01>`. Here's one stab at the ``index()``
+in :doc:`Tutorial 1 </intro/tutorial01>`. Here's one stab at the ``index()``
 view, which displays the latest 5 poll questions in the system, separated by
 commas, according to publication date::
 
@@ -425,7 +423,7 @@ Method-calling happens in the ``{% for %}`` loop: ``poll.choice_set.all`` is
 interpreted as the Python code ``poll.choice_set.all()``, which returns an
 iterable of Choice objects and is suitable for use in the ``{% for %}`` tag.
 
-See the :ref:`template guide <topics-templates>` for more about templates.
+See the :doc:`template guide </topics/templates>` for more about templates.
 
 Simplifying the URLconfs
 ========================
@@ -514,5 +512,5 @@ under "/content/polls/", or any other URL root, and the app will still work.
 
 All the poll app cares about is its relative URLs, not its absolute URLs.
 
-When you're comfortable with writing views, read :ref:`part 4 of this tutorial
-<intro-tutorial04>` to learn about simple form processing and generic views.
+When you're comfortable with writing views, read :doc:`part 4 of this tutorial
+</intro/tutorial04>` to learn about simple form processing and generic views.

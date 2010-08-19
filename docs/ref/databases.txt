@@ -1,5 +1,3 @@
-.. _ref-databases:
-
 =========
 Databases
 =========
@@ -50,7 +48,7 @@ aggregate with a database backend that falls within the affected release range.
 Transaction handling
 ---------------------
 
-:ref:`By default <topics-db-transactions>`, Django starts a transaction when a
+:doc:`By default </topics/db/transactions>`, Django starts a transaction when a
 database connection is first used and commits the result at the end of the
 request/response handling. The PostgreSQL backends normally operate the same
 as any other Django backend in this respect.
@@ -266,7 +264,7 @@ table (usually called ``django_session``) and the
 Connecting to the database
 --------------------------
 
-Refer to the :ref:`settings documentation <ref-settings>`.
+Refer to the :doc:`settings documentation </ref/settings>`.
 
 Connection settings are used in this order:
 

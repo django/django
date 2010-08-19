@@ -1,5 +1,3 @@
-.. _topics-forms-media:
-
 Form Media
 ==========
 

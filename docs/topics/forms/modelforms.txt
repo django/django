@@ -1,5 +1,3 @@
-.. _topics-forms-modelforms:
-
 ==========================
 Creating forms from models
 ==========================
@@ -446,7 +444,7 @@ parameter when declaring the form field::
             class Meta:
                 model = Article
 
-    See the :ref:`form field documentation <ref-forms-fields>` for more information
+    See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
 
 Changing the order of fields
@@ -540,7 +538,7 @@ Interaction with model validation
 As part of its validation process, ``ModelForm`` will call the ``clean()``
 method of each field on your model that has a corresponding field on your form.
 If you have excluded any model fields, validation will not be run on those
-fields. See the :ref:`form validation <ref-forms-validation>` documentation
+fields. See the :doc:`form validation </ref/forms/validation>` documentation
 for more on how field cleaning and validation work. Also, your model's
 ``clean()`` method will be called before any uniqueness checks are made. See
 :ref:`Validating objects <validating-objects>` for more information on the
@@ -551,7 +549,7 @@ model's ``clean()`` hook.
 Model formsets
 ==============
 
-Like :ref:`regular formsets <topics-forms-formsets>`, Django provides a couple
+Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
 of enhanced formset classes that make it easy to work with Django models. Let's
 reuse the ``Author`` model from above::
 

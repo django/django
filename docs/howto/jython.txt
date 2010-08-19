@@ -1,5 +1,3 @@
-.. _howto-jython:
-
 ========================
 Running Django on Jython
 ========================

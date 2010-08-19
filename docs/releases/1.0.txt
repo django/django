@@ -1,5 +1,3 @@
-.. _releases-1.0:
-
 ========================
 Django 1.0 release notes
 ========================
@@ -24,12 +22,12 @@ contributions overtake those made privately.
 Stability and forwards-compatibility
 ====================================
 
-:ref:`The release of Django 1.0 <releases-1.0>` comes with a promise of API
+:doc:`The release of Django 1.0 </releases/1.0>` comes with a promise of API
 stability and forwards-compatibility. In a nutshell, this means that code you
 develop against Django 1.0 will continue to work against 1.1 unchanged, and you
 should need to make only minor changes for any 1.X release.
 
-See the :ref:`API stability guide <misc-api-stability>` for full details.
+See the :doc:`API stability guide </misc/api-stability>` for full details.
 
 Backwards-incompatible changes
 ==============================
@@ -42,7 +40,7 @@ detailed porting guide:
    :maxdepth: 1
 
    1.0-porting-guide
-   
+
 A complete list of backwards-incompatible changes can be found at
 http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges.
 
@@ -60,9 +58,9 @@ In fact, new documentation is one of our favorite features of Django 1.0, so we
 might as well start there. First, there's a new documentation site:
 
     http://docs.djangoproject.com/
-    
+
 The documentation has been greatly improved, cleaned up, and generally made
-awesome. There's now dedicated search, indexes, and more. 
+awesome. There's now dedicated search, indexes, and more.
 
 We can't possibly document everything that's new in 1.0, but the documentation
 will be your definitive guide. Anywhere you see something like:
@@ -85,7 +83,7 @@ Django's new form-handling library (introduced in the 0.96 release as
 redesigned with extensibility and customization in mind. Full documentation for
 the admin application is available online in the official Django documentation:
 
-See the :ref:`admin reference <ref-contrib-admin>` for details
+See the :doc:`admin reference </ref/contrib/admin/index>` for details
 
 Improved Unicode handling
 -------------------------
@@ -97,7 +95,7 @@ interoperability with third-party libraries and systems which may or may not
 handle Unicode gracefully. Details are available in Django's Unicode-handling
 documentation.
 
-See :ref:`ref-unicode`.
+See :doc:`/ref/unicode`.
 
 An improved ORM
 ---------------
@@ -142,8 +140,8 @@ Pluggable file storage
 
 Django's built-in ``FileField`` and ``ImageField`` now can take advantage of
 pluggable file-storage backends, allowing extensive customization of where and
-how uploaded files get stored by Django. For details, see :ref:`the files
-documentation <topics-files>`; big thanks go to Marty Alchin for putting in the
+how uploaded files get stored by Django. For details, see :doc:`the files
+documentation </topics/files>`; big thanks go to Marty Alchin for putting in the
 hard work to get this completed.
 
 Jython compatibility
@@ -155,7 +153,7 @@ Django's codebase has been refactored to remove incompatibilities with
 on the Java Virtual Machine. Django is now compatible with the forthcoming
 Jython 2.5 release.
 
-See :ref:`howto-jython`.
+See :doc:`/howto/jython`.
 
 .. _Jython: http://www.jython.org/
 
@@ -187,17 +185,17 @@ handle the two parts of caching (inserting into and reading from the cache)
 separately, offering additional flexibility for situations where combining these
 functions into a single middleware posed problems.
 
-Full details, including updated notes on appropriate use, are in :ref:`the
-caching documentation <topics-cache>`.
+Full details, including updated notes on appropriate use, are in :doc:`the
+caching documentation </topics/cache>`.
 
 Refactored ``django.contrib.comments``
 --------------------------------------
 
 As part of a Google Summer of Code project, Thejaswi Puthraya carried out a
 major rewrite and refactoring of Django's bundled comment system, greatly
-increasing its flexibility and customizability. :ref:`Full documentation
-<ref-contrib-comments-index>` is available, as well as :ref:`an upgrade guide
-<ref-contrib-comments-upgrade>` if you were using the previous incarnation of
+increasing its flexibility and customizability. :doc:`Full documentation
+</ref/contrib/comments/index>` is available, as well as :doc:`an upgrade guide
+</ref/contrib/comments/upgrade>` if you were using the previous incarnation of
 the comments application.
 
 Removal of deprecated features
@@ -240,7 +238,7 @@ Caveats with support of certain databases
 -----------------------------------------
 
 Django attempts to support as many features as possible on all database
-backends. However, not all database backends are alike, and in particular many of the supported database differ greatly from version to version. It's a good idea to checkout our :ref:`notes on supported database <ref-databases>`:
+backends. However, not all database backends are alike, and in particular many of the supported database differ greatly from version to version. It's a good idea to checkout our :doc:`notes on supported database </ref/databases>`:
 
     - :ref:`mysql-notes`
     - :ref:`sqlite-notes`

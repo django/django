@@ -1,5 +1,3 @@
-.. _faq-models:
-
 FAQ: Databases and models
 =========================
 
@@ -30,7 +28,7 @@ backend, and not all backends provide a way to retrieve the SQL after quoting.
 
 .. versionadded:: 1.2
 
-If you are using :ref:`multiple databases<topics-db-multi-db>`, you can use the
+If you are using :doc:`multiple databases</topics/db/multi-db>`, you can use the
 same interface on each member of the ``connections`` dictionary::
 
     >>> from django.db import connections
@@ -39,7 +37,7 @@ same interface on each member of the ``connections`` dictionary::
 Can I use Django with a pre-existing database?
 ----------------------------------------------
 
-Yes. See :ref:`Integrating with a legacy database <howto-legacy-databases>`.
+Yes. See :doc:`Integrating with a legacy database </howto/legacy-databases>`.
 
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------

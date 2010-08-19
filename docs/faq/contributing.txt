@@ -1,5 +1,3 @@
-.. _faq-contributing:
-
 FAQ: Contributing code
 ======================
 
@@ -7,7 +5,7 @@ How can I get started contributing code to Django?
 --------------------------------------------------
 
 Thanks for asking! We've written an entire document devoted to this question.
-It's titled :ref:`Contributing to Django <internals-contributing>`.
+It's titled :doc:`Contributing to Django </internals/contributing>`.
 
 I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
 --------------------------------------------------------------------------------------------

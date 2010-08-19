@@ -1,5 +1,3 @@
-.. _topics-http-views:
-
 =============
 Writing Views
 =============
@@ -59,7 +57,7 @@ Mapping URLs to Views
 
 So, to recap, this view function returns an HTML page that includes the current
 date and time. To display this view at a particular URL, you'll need to create a
-*URLconf*; see :ref:`topics-http-urls` for instructions.
+*URLconf*; see :doc:`/topics/http/urls` for instructions.
 
 Returning errors
 ================

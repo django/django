@@ -1,5 +1,3 @@
-.. _topics-http-urls:
-
 ==============
 URL dispatcher
 ==============
@@ -335,7 +333,7 @@ The view prefix
 You can specify a common prefix in your ``patterns()`` call, to cut down on
 code duplication.
 
-Here's the example URLconf from the :ref:`Django overview <intro-overview>`::
+Here's the example URLconf from the :doc:`Django overview </intro/overview>`::
 
     from django.conf.urls.defaults import *
 
@@ -537,8 +535,8 @@ In this example, for a request to ``/blog/2005/``, Django will call the
 
     year='2005', foo='bar'
 
-This technique is used in :ref:`generic views <ref-generic-views>` and in the
-:ref:`syndication framework <ref-contrib-syndication>` to pass metadata and
+This technique is used in :doc:`generic views </ref/generic-views>` and in the
+:doc:`syndication framework </ref/contrib/syndication>` to pass metadata and
 options to views.
 
 .. admonition:: Dealing with conflicts

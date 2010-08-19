@@ -1,5 +1,3 @@
-.. _howto-auth-remote-user:
-
 ====================================
 Authentication using ``REMOTE_USER``
 ====================================

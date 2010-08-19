@@ -1,5 +1,3 @@
-.. _releases-index:
-
 =============
 Release notes
 =============

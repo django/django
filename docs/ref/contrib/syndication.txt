@@ -1,5 +1,3 @@
-.. _ref-contrib-syndication:
-
 ==============================
 The syndication feed framework
 ==============================
@@ -38,8 +36,8 @@ Overview
 The high-level feed-generating framework is supplied by the
 :class:`~django.contrib.syndication.views.Feed` class. To create a
 feed, write a :class:`~django.contrib.syndication.views.Feed` class
-and point to an instance of it in your :ref:`URLconf
-<topics-http-urls>`.
+and point to an instance of it in your :doc:`URLconf
+</topics/http/urls>`.
 
 Feed classes
 ------------
@@ -54,7 +52,7 @@ Feed classes subclass :class:`django.contrib.syndication.views.Feed`.
 They can live anywhere in your codebase.
 
 Instances of :class:`~django.contrib.syndication.views.Feed` classes
-are views which can be used in your :ref:`URLconf <topics-http-urls>`.
+are views which can be used in your :doc:`URLconf </topics/http/urls>`.
 
 A simple example
 ----------------
@@ -80,7 +78,7 @@ latest five news items::
             return item.description
 
 To connect a URL to this feed, put an instance of the Feed object in
-your :ref:`URLconf <topics-http-urls>`. For example::
+your :doc:`URLconf </topics/http/urls>`. For example::
 
     from django.conf.urls.defaults import *
     from myproject.feeds import LatestEntriesFeed
@@ -102,7 +100,7 @@ Note:
 * :meth:`items()` is, simply, a method that returns a list of objects that
   should be included in the feed as ``<item>`` elements. Although this
   example returns ``NewsItem`` objects using Django's
-  :ref:`object-relational mapper <ref-models-querysets>`, :meth:`items()`
+  :doc:`object-relational mapper </ref/models/querysets>`, :meth:`items()`
   doesn't have to return model instances. Although you get a few bits of
   functionality "for free" by using Django models, :meth:`items()` can
   return any type of object you want.
@@ -123,7 +121,7 @@ into those elements.
       both.
 
       If you want to do any special formatting for either the title or
-      description, :ref:`Django templates <topics-templates>` can be used
+      description, :doc:`Django templates </topics/templates>` can be used
       instead. Their paths can be specified with the ``title_template`` and
       ``description_template`` attributes on the
       :class:`~django.contrib.syndication.views.Feed` class. The templates are
@@ -167,7 +165,7 @@ police beat in Chicago. It'd be silly to create a separate
 :class:`~django.contrib.syndication.views.Feed` class for each police beat; that
 would violate the :ref:`DRY principle <dry>` and would couple data to
 programming logic. Instead, the syndication framework lets you access the
-arguments passed from your :ref:`URLconf <topics-http-urls>` so feeds can output
+arguments passed from your :doc:`URLconf </topics/http/urls>` so feeds can output
 items based on information in the feed's URL.
 
 On chicagocrime.org, the police-beat feeds are accessible via URLs like this:
@@ -175,7 +173,7 @@ On chicagocrime.org, the police-beat feeds are accessible via URLs like this:
     * :file:`/beats/613/rss/` -- Returns recent crimes for beat 613.
     * :file:`/beats/1424/rss/` -- Returns recent crimes for beat 1424.
 
-These can be matched with a :ref:`URLconf <topics-http-urls>` line such as::
+These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
     (r'^beats/(?P<beat_id>\d+)/rss/$', BeatFeed()),
 

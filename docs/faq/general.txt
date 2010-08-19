@@ -1,5 +1,3 @@
-.. _faq-general:
-
 FAQ: General
 ============
 
@@ -63,15 +61,15 @@ at any level -- database servers, caching servers or Web/application servers.
 
 The framework cleanly separates components such as its database layer and
 application layer. And it ships with a simple-yet-powerful
-:ref:`cache framework <topics-cache>`.
+:doc:`cache framework </topics/cache>`.
 
 Who's behind this?
 ------------------
 
 Django was originally developed at World Online, the Web department of a
 newspaper in Lawrence, Kansas, USA. Django's now run by an international team of
-volunteers; you can read all about them over at the :ref:`list of committers
-<internals-committers>`
+volunteers; you can read all about them over at the :doc:`list of committers
+</internals/committers>`
 
 Which sites use Django?
 -----------------------
@@ -146,7 +144,7 @@ philosophies 100%.
 Like we said: We're picky.
 
 We've documented our philosophies on the
-:ref:`design philosophies page <misc-design-philosophies>`.
+:doc:`design philosophies page </misc/design-philosophies>`.
 
 Is Django a content-management-system (CMS)?
 --------------------------------------------

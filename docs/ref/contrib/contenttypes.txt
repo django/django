@@ -1,5 +1,3 @@
-.. _ref-contrib-contenttypes:
-
 ==========================
 The contenttypes framework
 ==========================
@@ -346,7 +344,7 @@ it would be deleted at the same time.
 Generic relations and aggregation
 ---------------------------------
 
-:ref:`Django's database aggregation API <topics-db-aggregation>`
+:doc:`Django's database aggregation API </topics/db/aggregation>`
 doesn't work with a
 :class:`~django.contrib.contenttypes.generic.GenericRelation`. For example, you
 might be tempted to try something like::
@@ -365,8 +363,8 @@ Generic relations in forms and admin
 :class:`~django.contrib.contenttypes.generic.GenericInlineFormSet`
 and :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`.
 This enables the use of generic relations in forms and the admin. See the
-:ref:`model formset <topics-forms-modelforms>` and
-:ref:`admin <ref-contrib-admin>` documentation for more information.
+:doc:`model formset </topics/forms/modelforms>` and
+:doc:`admin </ref/contrib/admin/index>` documentation for more information.
 
 .. class:: generic.GenericInlineModelAdmin
 

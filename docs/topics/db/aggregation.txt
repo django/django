@@ -1,5 +1,3 @@
-.. _topics-db-aggregation:
-
 ===========
 Aggregation
 ===========
@@ -8,7 +6,7 @@ Aggregation
 
 .. currentmodule:: django.db.models
 
-The topic guide on :ref:`Django's database-abstraction API <topics-db-queries>`
+The topic guide on :doc:`Django's database-abstraction API </topics/db/queries>`
 described the way that you can use Django queries that create,
 retrieve, update and delete individual objects. However, sometimes you will
 need to retrieve values that are derived by summarizing or *aggregating* a
@@ -363,7 +361,7 @@ you also select in a ``values()`` call.
     for you. The main reason is consistency with ``distinct()`` and other
     places: Django **never** removes ordering constraints that you have
     specified (and we can't change those other methods' behavior, as that
-    would violate our :ref:`misc-api-stability` policy).
+    would violate our :doc:`/misc/api-stability` policy).
 
 Aggregating annotations
 -----------------------

@@ -1,5 +1,3 @@
-.. _ref-signals:
-
 =======
 Signals
 =======
@@ -8,11 +6,11 @@ A list of all the signals that Django sends.
 
 .. seealso::
 
-    See the documentation on the :ref:`signal dispatcher <topics-signals>` for
+    See the documentation on the :doc:`signal dispatcher </topics/signals>` for
     information regarding how to register for and receive signals.
 
-    The :ref:`comment framework <ref-contrib-comments-index>` sends a :ref:`set
-    of comment-related signals <ref-contrib-comments-signals>`.
+    The :doc:`comment framework </ref/contrib/comments/index>` sends a :doc:`set
+    of comment-related signals </ref/contrib/comments/signals>`.
 
 Model signals
 =============
@@ -61,7 +59,7 @@ Arguments sent with this signal:
         A dictionary of keyword arguments passed to
         :meth:`~django.db.models.Model.__init__`:.
 
-For example, the :ref:`tutorial <intro-tutorial01>` has this line:
+For example, the :doc:`tutorial </intro/tutorial01>` has this line:
 
 .. code-block:: python
 
@@ -332,7 +330,7 @@ Arguments that are sent with this signal:
 Management signals
 ==================
 
-Signals sent by :ref:`django-admin <ref-django-admin>`.
+Signals sent by :doc:`django-admin </ref/django-admin>`.
 
 post_syncdb
 -----------
@@ -435,7 +433,7 @@ Test signals
 .. module:: django.test.signals
    :synopsis: Signals sent during testing.
 
-Signals only sent when :ref:`running tests <topics-testing>`.
+Signals only sent when :doc:`running tests </topics/testing>`.
 
 template_rendered
 -----------------

@@ -1,12 +1,10 @@
-.. _ref-templates-api:
-
 ====================================================
 The Django template language: For Python programmers
 ====================================================
 
 This document explains the Django template system from a technical
 perspective -- how it works and how to extend it. If you're just looking for
-reference on the language syntax, see :ref:`topics-templates`.
+reference on the language syntax, see :doc:`/topics/templates`.
 
 If you're looking to use the Django template system as part of another
 application -- i.e., without the rest of the framework -- make sure to read
@@ -323,7 +321,7 @@ and return a dictionary of items to be merged into the context. By default,
 
 .. versionadded:: 1.2
    The ``'messages'`` context processor was added.  For more information, see
-   the :ref:`messages documentation <ref-contrib-messages>`.
+   the :doc:`messages documentation </ref/contrib/messages>`.
 
 .. versionchanged:: 1.2
     The auth context processor was moved in this release from its old location
@@ -384,7 +382,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
       logged in).
 
     * ``messages`` -- A list of messages (as strings) that have been set
-      via the :ref:`messages framework <ref-contrib-messages>`.
+      via the :doc:`messages framework </ref/contrib/messages>`.
 
     * ``perms`` -- An instance of
       ``django.core.context_processors.PermWrapper``, representing the
@@ -397,7 +395,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 .. versionchanged:: 1.2
    Prior to version 1.2, the ``messages`` variable was a lazy accessor for
    ``user.get_and_delete_messages()``. It has been changed to include any
-   messages added via the :ref:`messages framework <ref-contrib-messages>`.
+   messages added via the :doc:`messages framework </ref/contrib/messages>`.
 
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -423,7 +421,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
     * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
       the value of the :setting:`LANGUAGE_CODE` setting.
 
-See :ref:`topics-i18n` for more.
+See :doc:`/topics/i18n/index` for more.
 
 django.core.context_processors.media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -440,7 +438,7 @@ django.core.context_processors.csrf
 .. versionadded:: 1.2
 
 This processor adds a token that is needed by the ``csrf_token`` template tag
-for protection against :ref:`Cross Site Request Forgeries <ref-contrib-csrf>`.
+for protection against :doc:`Cross Site Request Forgeries </ref/contrib/csrf>`.
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -458,7 +456,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 
     * ``messages`` -- A list of messages (as strings) that have been set
       via the user model (using ``user.message_set.create``) or through
-      the :ref:`messages framework <ref-contrib-messages>`.
+      the :doc:`messages framework </ref/contrib/messages>`.
 
 .. versionadded:: 1.2
    This template context variable was previously supplied by the ``'auth'``
@@ -716,7 +714,7 @@ settings you wish to specify. You might want to consider setting at least
 :setting:`TEMPLATE_DIRS` (if you're going to use template loaders),
 :setting:`DEFAULT_CHARSET` (although the default of ``utf-8`` is probably fine)
 and :setting:`TEMPLATE_DEBUG`. All available settings are described in the
-:ref:`settings documentation <ref-settings>`, and any setting starting with
+:doc:`settings documentation </ref/settings>`, and any setting starting with
 ``TEMPLATE_`` is of obvious interest.
 
 .. _topic-template-alternate-language:

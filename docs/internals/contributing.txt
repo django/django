@@ -1,5 +1,3 @@
-.. _internals-contributing:
-
 ======================
 Contributing to Django
 ======================
@@ -42,7 +40,7 @@ amount of overhead involved in working with any bug tracking system, so your
 help in keeping our ticket tracker as useful as possible is appreciated.  In
 particular:
 
-    * **Do** read the :ref:`FAQ <faq-index>` to see if your issue might be a well-known question.
+    * **Do** read the :doc:`FAQ </faq/index>` to see if your issue might be a well-known question.
 
     * **Do** `search the tracker`_ to see if your issue has already been filed.
 
@@ -398,7 +396,7 @@ Various parts of Django, such as the admin site and validation error messages,
 are internationalized. This means they display different text depending on a
 user's language setting. For this, Django uses the same internationalization
 infrastructure available to Django applications described in the
-:ref:`i18n documentation<topics-i18n>`.
+:doc:`i18n documentation</topics/i18n/index>`.
 
 These translations are contributed by Django users worldwide. If you find an
 incorrect translation, or if you'd like to add a language that isn't yet
@@ -409,7 +407,7 @@ translated, here's what to do:
     * Make sure you read the notes about :ref:`specialties-of-django-i18n`.
 
     * Create translations using the methods described in the
-      :ref:`localization documentation <topics-i18n-localization>`. For this
+      :doc:`localization documentation </topics/i18n/localization>`. For this
       you will use the ``django-admin.py makemessages`` tool. In this
       particular case it should be run from the top-level ``django`` directory
       of the Django source tree.
@@ -535,8 +533,8 @@ Please follow these coding standards when writing code for inclusion in Django:
     * Use ``InitialCaps`` for class names (or for factory functions that
       return classes).
 
-    * Mark all strings for internationalization; see the :ref:`i18n
-      documentation <topics-i18n>` for details.
+    * Mark all strings for internationalization; see the :doc:`i18n
+      documentation </topics/i18n/index>` for details.
 
     * In docstrings, use "action words" such as::
 
@@ -698,8 +696,8 @@ General improvements, or other changes to the APIs that should be emphasized
 should use the ".. versionchanged:: X.Y" directive (with the same format as the
 ``versionadded`` mentioned above.
 
-There's a full page of information about the :ref:`Django documentation
-system <internals-documentation>` that you should read prior to working on the
+There's a full page of information about the :doc:`Django documentation
+system </internals/documentation>` that you should read prior to working on the
 documentation.
 
 Guidelines for ReST files
@@ -829,7 +827,7 @@ The tests cover:
 We appreciate any and all contributions to the test suite!
 
 The Django tests all use the testing infrastructure that ships with Django for
-testing applications. See :ref:`Testing Django applications <topics-testing>`
+testing applications. See :doc:`Testing Django applications </topics/testing>`
 for an explanation of how to write new tests.
 
 Running the unit tests
@@ -1017,8 +1015,8 @@ for feature branches:
        public, please add the branch to the `Django branches`_ wiki page.
 
     2. Feature branches using SVN have a higher bar. If you want a branch in SVN
-       itself, you'll need a "mentor" among the :ref:`core committers
-       <internals-committers>`. This person is responsible for actually creating
+       itself, you'll need a "mentor" among the :doc:`core committers
+       </internals/committers>`. This person is responsible for actually creating
        the branch, monitoring your process (see below), and ultimately merging
        the branch into trunk.
 

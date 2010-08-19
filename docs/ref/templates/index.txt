@@ -1,5 +1,3 @@
-.. _ref-templates-index:
-
 =========
 Templates
 =========
@@ -18,4 +16,4 @@ an understanding of HTML; no knowledge of Python is required.
 .. seealso::
 
     For information on writing your own custom tags and filters, see
-    :ref:`howto-custom-template-tags`.
+    :doc:`/howto/custom-template-tags`.

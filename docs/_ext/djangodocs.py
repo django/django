@@ -78,11 +78,11 @@ class VersionDirective(Directive):
         ret.append(node)
         if not is_nextversion:
             if len(self.arguments) == 1:
-                linktext = 'Please, see the release notes <releases-%s>' % (arg0)
+                linktext = 'Please, see the release notes </releases/%s>' % (arg0)
                 try:
-                    xrefs = roles.XRefRole()('std:ref', linktext, linktext, self.lineno, self.state) # Sphinx >= 1.0
+                    xrefs = roles.XRefRole()('doc', linktext, linktext, self.lineno, self.state) # Sphinx >= 1.0
                 except AttributeError:
-                    xrefs = roles.xfileref_role('ref', linktext, linktext, self.lineno, self.state) # Sphinx < 1.0
+                    xrefs = roles.xfileref_role('doc', linktext, linktext, self.lineno, self.state) # Sphinx < 1.0
                 node.extend(xrefs[0])
             node['version'] = arg0
         else:

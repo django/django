@@ -13,7 +13,7 @@ Changes`_ for a list of a bunch of less-common compatibility issues.
 
 .. seealso::
 
-    The :ref:`1.0 release notes <releases-1.0>`. That document explains the new
+    The :doc:`1.0 release notes </releases/1.0>`. That document explains the new
     features in 1.0 more deeply; the porting guide is more concerned with
     helping you quickly update your code.
 
@@ -31,7 +31,7 @@ now uses Unicode strings throughout. In most places, raw strings will continue
 to work, but updating to use Unicode literals will prevent some obscure
 problems.
 
-See :ref:`ref-unicode` for full details.
+See :doc:`/ref/unicode` for full details.
 
 Models
 ------
@@ -211,7 +211,7 @@ New (1.0)::
       can be found on the `NewformsAdminBranch wiki page`__
 
     * The new admin comes with a ton of new features; you can read about them in
-      the :ref:`admin documentation <ref-contrib-admin>`.
+      the :doc:`admin documentation </ref/contrib/admin/index>`.
 
     __ http://code.djangoproject.com/wiki/NewformsAdminBranch
 
@@ -271,7 +271,7 @@ New::
 
 If you're using the old forms system (formerly known as ``django.forms`` and
 ``django.oldforms``), you'll have to rewrite your forms. A good place to start
-is the :ref:`forms documentation <topics-forms-index>`
+is the :doc:`forms documentation </topics/forms/index>`
 
 Handle uploaded files using the new API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -318,7 +318,7 @@ Old (0.96)                           New (1.0)
 
 Note that the ``width`` and ``height`` attributes only make sense for
 :class:`~django.db.models.ImageField` fields. More details can be found in the
-:ref:`model API <ref-models-fields>` documentation.
+:doc:`model API </ref/models/fields>` documentation.
 
 Use ``Paginator`` instead of ``ObjectPaginator``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -392,7 +392,7 @@ Comments
 
 If you were using Django 0.96's ``django.contrib.comments`` app, you'll need to
 upgrade to the new comments app introduced in 1.0. See
-:ref:`ref-contrib-comments-upgrade` for details.
+:doc:`/ref/contrib/comments/upgrade` for details.
 
 Template tags
 -------------

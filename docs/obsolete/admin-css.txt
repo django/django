@@ -1,5 +1,3 @@
-.. _obsolete-admin-css:
-
 ======================================
 Customizing the Django admin interface
 ======================================

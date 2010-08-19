@@ -1,5 +1,3 @@
-.. _howto-deployment-modwsgi:
-
 ==========================================
 How to use Django with Apache and mod_wsgi
 ==========================================

@@ -1,5 +1,3 @@
-.. _topics-install:
-
 =====================
 How to install Django
 =====================
@@ -13,7 +11,7 @@ Being a Python Web framework, Django requires Python.
 
 It works with any Python version from 2.4 to 2.7 (due to backwards
 incompatibilities in Python 3.0, Django does not currently work with
-Python 3.0; see :ref:`the Django FAQ <faq-install>` for more
+Python 3.0; see :doc:`the Django FAQ </faq/install>` for more
 information on supported Python versions and the 3.0 transition).
 
 Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
@@ -22,7 +20,7 @@ probably already have it installed.
 .. admonition:: Django on Jython
 
     If you use Jython_ (a Python implementation for the Java platform), you'll
-    need to follow a few additional steps. See :ref:`howto-jython` for details.
+    need to follow a few additional steps. See :doc:`/howto/jython` for details.
 
 .. _jython: http://jython.org/
 
@@ -41,12 +39,12 @@ other server arrangements. Make sure you have Apache installed, with the
 mod_wsgi module activated. Django will work with any version of Apache that
 supports mod_wsgi.
 
-See :ref:`How to use Django with mod_wsgi <howto-deployment-modwsgi>` for
+See :doc:`How to use Django with mod_wsgi </howto/deployment/modwsgi>` for
 information on how to configure mod_wsgi once you have it installed.
 
 If you can't use mod_wsgi for some reason, fear not: Django supports many other
-deployment options. A great second choice is :ref:`mod_python
-<howto-deployment-modpython>`, the predecessor to mod_wsgi. Additionally, Django
+deployment options. A great second choice is :doc:`mod_python
+</howto/deployment/modpython>`, the predecessor to mod_wsgi. Additionally, Django
 follows the WSGI_ spec, which allows it to run on a variety of server platforms.
 See the `server-arrangements wiki page`_ for specific installation instructions
 for each platform.
@@ -90,8 +88,8 @@ database bindings are installed.
   If you're on Windows, check out the unofficial `compiled Windows version`_.
 
 * If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher. You
-  will also want to read the database-specific notes for the :ref:`MySQL
-  backend <ref-databases>`.
+  will also want to read the database-specific notes for the :doc:`MySQL
+  backend </ref/databases>`.
 
 * If you're using SQLite and Python 2.4, you'll need pysqlite_. Use version
   2.0.3 or higher. Python 2.5 ships with an SQLite wrapper in the standard
@@ -115,7 +113,7 @@ can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
 ``ALTER TABLE`` privileges during ``syncdb`` but won't issue
 ``ALTER TABLE`` statements on a table once ``syncdb`` has created it.
 
-If you're using Django's :ref:`testing framework<topics-testing>` to test database queries,
+If you're using Django's :doc:`testing framework</topics/testing>` to test database queries,
 Django will need permission to create a test database.
 
 .. _PostgreSQL: http://www.postgresql.org/
@@ -177,7 +175,7 @@ It's easy, no matter which way you choose.
 Installing a distribution-specific package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Check the :ref:`distribution specific notes <misc-distributions>` to see if your
+Check the :doc:`distribution specific notes </misc/distributions>` to see if your
 platform/distribution provides official Django packages/installers.
 Distribution-provided packages will typically allow for automatic installation
 of dependencies and easy upgrade paths.
@@ -265,7 +263,7 @@ latest bug fixes and improvements, follow these instructions:
       Apache configuration file.
 
       More information about deployment is available, of course, in our
-      :ref:`How to use Django with mod_python <howto-deployment-modpython>`
+      :doc:`How to use Django with mod_python </howto/deployment/modpython>`
       documentation.
 
 4. On Unix-like systems, create a symbolic link to the file

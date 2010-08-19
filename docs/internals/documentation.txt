@@ -1,5 +1,3 @@
-.. _internals-documentation:
-
 How the Django documentation works
 ==================================
 
@@ -88,27 +86,55 @@ __ http://sphinx.pocoo.org/markup/desc.html
 An example
 ----------
 
-For a quick example of how it all fits together, check this out:
+For a quick example of how it all fits together, consider this hypothetical
+example:
 
-    * First, the ``ref/settings.txt`` document starts out like this::
+    * First, the ``ref/settings.txt`` document could have an overall layout
+      like this:
 
-        .. _ref-settings:
+      .. code-block:: rst
+
+        ========
+        Settings
+        ========
+
+        ...
+
+        .. _available-settings:
 
         Available settings
         ==================
 
         ...
 
-    * Next, if you look at the ``topics/settings.txt`` document, you can see how
-      a link to ``ref/settings`` works::
+        .. _deprecated-settings:
 
-        Available settings
-        ==================
+        Deprecated settings
+        ===================
 
-        For a full list of available settings, see the :ref:`settings reference
-        <ref-settings>`.
+        ...
 
-    * Next, notice how the settings (right now just the top few) are annotated::
+    * Next, the ``topics/settings.txt`` document could contain something like
+      this:
+
+      .. code-block:: rst
+
+        You can access a :ref:`listing of all available settings
+        <available-settings>`. For a list of deprecated settings see
+        :ref:`deprecated-settings`.
+
+        You can find both in the :doc:`settings reference document </ref/settings>`.
+
+      We use the Sphinx doc_ cross reference element when we want to link to
+      another document as a whole and the ref_ element when we want to link to
+      an arbitrary location in a document.
+
+.. _doc: http://sphinx.pocoo.org/markup/inline.html#role-doc
+.. _ref: http://sphinx.pocoo.org/markup/inline.html#role-ref
+
+    * Next, notice how the settings are annotated:
+
+      .. code-block:: rst
 
         .. setting:: ADMIN_FOR
 

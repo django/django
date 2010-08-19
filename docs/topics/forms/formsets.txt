@@ -1,4 +1,3 @@
-.. _topics-forms-formsets:
 .. _formsets:
 
 Formsets

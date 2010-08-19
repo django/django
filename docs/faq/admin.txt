@@ -1,5 +1,3 @@
-.. _faq-admin:
-
 FAQ: The admin
 ==============
 
@@ -32,7 +30,7 @@ How can I prevent the cache middleware from caching the admin site?
 -------------------------------------------------------------------
 
 Set the :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY` setting to ``True``. See the
-:ref:`cache documentation <topics-cache>` for more information.
+:doc:`cache documentation </topics/cache>` for more information.
 
 How do I automatically set a field's value to the user who last edited the object in the admin?
 -----------------------------------------------------------------------------------------------
@@ -91,5 +89,5 @@ We like it, but if you don't agree, you can modify the admin site's
 presentation by editing the CSS stylesheet and/or associated image files. The
 site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
 like to make should be possible by editing the stylesheet. We've got a
-:ref:`guide to the CSS used in the admin <obsolete-admin-css>` to get you started.
+:doc:`guide to the CSS used in the admin </obsolete/admin-css>` to get you started.
 

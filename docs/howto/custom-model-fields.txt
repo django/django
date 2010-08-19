@@ -1,5 +1,3 @@
-.. _howto-custom-model-fields:
-
 ===========================
 Writing custom model fields
 ===========================
@@ -10,7 +8,7 @@ Writing custom model fields
 Introduction
 ============
 
-The :ref:`model reference <topics-db-models>` documentation explains how to use
+The :doc:`model reference </topics/db/models>` documentation explains how to use
 Django's standard field classes -- :class:`~django.db.models.CharField`,
 :class:`~django.db.models.DateField`, etc. For many purposes, those classes are
 all you'll need. Sometimes, though, the Django version won't meet your precise
@@ -109,7 +107,7 @@ What does a field class do?
 ---------------------------
 
 All of Django's fields (and when we say *fields* in this document, we always
-mean model fields and not :ref:`form fields <ref-forms-fields>`) are subclasses
+mean model fields and not :doc:`form fields </ref/forms/fields>`) are subclasses
 of :class:`django.db.models.Field`. Most of the information that Django records
 about a field is common to all fields -- name, help text, uniqueness and so
 forth. Storing all that information is handled by ``Field``. We'll get into the
@@ -124,7 +122,7 @@ when the model class is created (the precise details of how this is done are
 unimportant here). This is because the field classes aren't necessary when
 you're just creating and modifying attributes. Instead, they provide the
 machinery for converting between the attribute value and what is stored in the
-database or sent to the :ref:`serializer <topics-serialization>`.
+database or sent to the :doc:`serializer </topics/serialization>`.
 
 Keep this in mind when creating your own custom fields. The Django ``Field``
 subclass you write provides the machinery for converting between your Python
@@ -209,8 +207,8 @@ parameters:
     * :attr:`~django.db.models.Field.default`
     * :attr:`~django.db.models.Field.editable`
     * :attr:`~django.db.models.Field.serialize`: If ``False``, the field will
-      not be serialized when the model is passed to Django's :ref:`serializers
-      <topics-serialization>`. Defaults to ``True``.
+      not be serialized when the model is passed to Django's :doc:`serializers
+      </topics/serialization>`. Defaults to ``True``.
     * :attr:`~django.db.models.Field.unique_for_date`
     * :attr:`~django.db.models.Field.unique_for_month`
     * :attr:`~django.db.models.Field.unique_for_year`
@@ -225,8 +223,8 @@ parameters:
       inheritance. For advanced use only.
 
 All of the options without an explanation in the above list have the same
-meaning they do for normal Django fields. See the :ref:`field documentation
-<ref-models-fields>` for examples and details.
+meaning they do for normal Django fields. See the :doc:`field documentation
+</ref/models/fields>` for examples and details.
 
 The ``SubfieldBase`` metaclass
 ------------------------------
@@ -270,8 +268,8 @@ value. This means that whenever a value may be assigned to the field,
 you need to ensure that it will be of the correct datatype, or that
 you handle any exceptions.
 
-This is especially important if you use :ref:`ModelForms
-<topics-forms-modelforms>`. When saving a ModelForm, Django will use
+This is especially important if you use :doc:`ModelForms
+</topics/forms/modelforms>`. When saving a ModelForm, Django will use
 form values to instantiate model instances. However, if the cleaned
 form data can't be used as valid input to the field, the normal form
 validation process will break.
@@ -611,8 +609,8 @@ All of the ``kwargs`` dictionary is passed directly to the form field's
 :meth:`~django.forms.Field__init__` method. Normally, all you need to do is
 set up a good default for the ``form_class`` argument and then delegate further
 handling to the parent class. This might require you to write a custom form
-field (and even a form widget). See the :ref:`forms documentation
-<topics-forms-index>` for information about this, and take a look at the code in
+field (and even a form widget). See the :doc:`forms documentation
+</topics/forms/index>` for information about this, and take a look at the code in
 :mod:`django.contrib.localflavor` for some examples of custom widgets.
 
 Continuing our ongoing example, we can write the :meth:`formfield` method as::
@@ -721,7 +719,7 @@ Django provides a ``File`` class, which is used as a proxy to the file's
 contents and operations. This can be subclassed to customize how the file is
 accessed, and what methods are available. It lives at
 ``django.db.models.fields.files``, and its default behavior is explained in the
-:ref:`file documentation <ref-files-file>`.
+:doc:`file documentation </ref/files/file>`.
 
 Once a subclass of ``File`` is created, the new ``FileField`` subclass must be
 told to use it. To do so, simply assign the new ``File`` subclass to the special

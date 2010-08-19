@@ -1,5 +1,3 @@
-.. _ref-contrib-comments-forms:
-
 ====================
 Comment form classes
 ====================
@@ -9,7 +7,7 @@ Comment form classes
 
 The ``django.contrib.comments.forms`` module contains a handful of forms
 you'll use when writing custom views dealing with comments, or when writing
-:ref:`custom comment apps <ref-contrib-comments-custom>`.
+:doc:`custom comment apps </ref/contrib/comments/custom>`.
 
 .. class:: CommentForm
 
@@ -23,7 +21,7 @@ you'll use when writing custom views dealing with comments, or when writing
 Abstract comment forms for custom comment apps
 ----------------------------------------------
 
-If you're building a :ref:`custom comment app <ref-contrib-comments-custom>`,
+If you're building a :doc:`custom comment app </ref/contrib/comments/custom>`,
 you might want to replace *some* of the form logic but still rely on parts of
 the existing form.
 

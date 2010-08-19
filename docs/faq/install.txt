@@ -1,5 +1,3 @@
-.. _faq-install:
-
 FAQ: Installation
 =================
 
@@ -7,9 +5,9 @@ How do I get started?
 ---------------------
 
     #. `Download the code`_.
-    #. Install Django (read the :ref:`installation guide <intro-install>`).
-    #. Walk through the :ref:`tutorial <intro-tutorial01>`.
-    #. Check out the rest of the :ref:`documentation <index>`, and `ask questions`_ if you
+    #. Install Django (read the :doc:`installation guide </intro/install>`).
+    #. Walk through the :doc:`tutorial </intro/tutorial01>`.
+    #. Check out the rest of the :doc:`documentation </index>`, and `ask questions`_ if you
        run into trouble.
 
 .. _`Download the code`: http://www.djangoproject.com/download/
@@ -26,7 +24,7 @@ For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
 own lightweight development server. For a production environment, Django
 follows the WSGI_ spec, which means it can run on a variety of server
-platforms.  See :ref:`Deploying Django <howto-deployment-index>` for some
+platforms.  See :doc:`Deploying Django </howto/deployment/index>` for some
 popular alternatives.  Also, the `server arrangements wiki page`_ contains
 details for several deployment strategies.
 

@@ -1,10 +1,8 @@
-.. _intro-install:
-
 Quick install guide
 ===================
 
 Before you can use Django, you'll need to get it installed. We have a
-:ref:`complete installation guide <topics-install>` that covers all the
+:doc:`complete installation guide </topics/install>` that covers all the
 possibilities; this guide will guide you to a simple, minimal installation
 that'll work while you walk through the introduction.
 
@@ -14,7 +12,7 @@ Install Python
 Being a Python Web framework, Django requires Python. It works with any Python
 version from 2.4 to 2.7 (due to backwards
 incompatibilities in Python 3.0, Django does not currently work with
-Python 3.0; see :ref:`the Django FAQ <faq-install>` for more
+Python 3.0; see :doc:`the Django FAQ </faq/install>` for more
 information on supported Python versions and the 3.0 transition), but we recommend installing Python 2.5 or later. If you do so, you won't need to set up a database just yet: Python 2.5 or later includes a lightweight database called SQLite_.
 
 .. _sqlite: http://sqlite.org/
@@ -25,17 +23,17 @@ probably already have it installed.
 .. admonition:: Django on Jython
 
     If you use Jython_ (a Python implementation for the Java platform), you'll
-    need to follow a few additional steps. See :ref:`howto-jython` for details.
+    need to follow a few additional steps. See :doc:`/howto/jython` for details.
 
 .. _jython: http://www.jython.org/
 
 You can verify that Python's installed by typing ``python`` from your shell; you should see something like::
 
-    Python 2.5.1 (r251:54863, Jan 17 2008, 19:35:17) 
+    Python 2.5.1 (r251:54863, Jan 17 2008, 19:35:17)
     [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
-    
+
 Set up a database
 -----------------
 
@@ -57,18 +55,18 @@ Install Django
 
 You've got three easy options to install Django:
 
-    * Install a version of Django :ref:`provided by your operating system
-      distribution <misc-distributions>`. This is the quickest option for those
+    * Install a version of Django :doc:`provided by your operating system
+      distribution </misc/distributions>`. This is the quickest option for those
       who have operating systems that distribute Django.
 
     * :ref:`Install an official release <installing-official-release>`. This
       is the best approach for users who want a stable version number and aren't
       concerned about running a slightly older version of Django.
-      
+
     * :ref:`Install the latest development version
       <installing-development-version>`. This is best for users who want the
       latest-and-greatest features and aren't afraid of running brand-new code.
-      
+
 .. warning::
 
     If you do either of the first two steps, keep an eye out for parts of the
@@ -79,7 +77,7 @@ You've got three easy options to install Django:
 That's it!
 ----------
 
-That's it -- you can now :ref:`move onto the tutorial <intro-tutorial01>`.
+That's it -- you can now :doc:`move onto the tutorial </intro/tutorial01>`.
 
 
 

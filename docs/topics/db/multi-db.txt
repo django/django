@@ -1,5 +1,3 @@
-.. _topics-db-multi-db:
-
 ==================
 Multiple databases
 ==================

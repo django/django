@@ -1,5 +1,3 @@
-.. _ref-models-querysets:
-
 ======================
 QuerySet API reference
 ======================
@@ -7,13 +5,13 @@ QuerySet API reference
 .. currentmodule:: django.db.models.QuerySet
 
 This document describes the details of the ``QuerySet`` API. It builds on the
-material presented in the :ref:`model <topics-db-models>` and :ref:`database
-query <topics-db-queries>` guides, so you'll probably want to read and
+material presented in the :doc:`model </topics/db/models>` and :doc:`database
+query </topics/db/queries>` guides, so you'll probably want to read and
 understand those documents before reading this one.
 
 Throughout this reference we'll use the :ref:`example weblog models
-<queryset-model-example>` presented in the :ref:`database query guide
-<topics-db-queries>`.
+<queryset-model-example>` presented in the :doc:`database query guide
+</topics/db/queries>`.
 
 .. _when-querysets-are-evaluated:
 
@@ -223,8 +221,8 @@ control the name of the annotation::
     >>> q[0].number_of_entries
     42
 
-For an in-depth discussion of aggregation, see :ref:`the topic guide on
-Aggregation <topics-db-aggregation>`.
+For an in-depth discussion of aggregation, see :doc:`the topic guide on
+Aggregation </topics/db/aggregation>`.
 
 ``order_by(*fields)``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1205,8 +1203,8 @@ control the name of the aggregation value that is returned::
     >>> q = Blog.objects.aggregate(number_of_entries=Count('entry'))
     {'number_of_entries': 16}
 
-For an in-depth discussion of aggregation, see :ref:`the topic guide on
-Aggregation <topics-db-aggregation>`.
+For an in-depth discussion of aggregation, see :doc:`the topic guide on
+Aggregation </topics/db/aggregation>`.
 
 ``exists()``
 ~~~~~~~~~~~~
@@ -1266,7 +1264,7 @@ SQL equivalents::
     a Django setting. It's possible to configure your MySQL tables to use
     case-sensitive comparisons, but some trade-offs are involved. For more
     information about this, see the :ref:`collation section <mysql-collation>`
-    in the :ref:`databases <ref-databases>` documentation.
+    in the :doc:`databases </ref/databases>` documentation.
 
 .. fieldlookup:: iexact
 
@@ -1725,7 +1723,7 @@ Aggregation Functions
 Django provides the following aggregation functions in the
 ``django.db.models`` module. For details on how to use these
 aggregate functions, see
-:ref:`the topic guide on aggregation <topics-db-aggregation>`.
+:doc:`the topic guide on aggregation </topics/db/aggregation>`.
 
 ``Avg``
 ~~~~~~~

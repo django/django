@@ -1,5 +1,3 @@
-.. _ref-authentication-backends:
-
 =======================
 Authentication backends
 =======================
@@ -10,8 +8,8 @@ Authentication backends
 This document details the authentication backends that come with Django. For
 information on how to use them and how to write your own authentication
 backends, see the :ref:`Other authentication sources section
-<authentication-backends>` of the :ref:`User authentication guide
-<topics-auth>`.
+<authentication-backends>` of the :doc:`User authentication guide
+</topics/auth>`.
 
 
 Available authentication backends
@@ -33,5 +31,5 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     Use this backend to take advantage of external-to-Django-handled
     authentication.  It authenticates using usernames passed in
     :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
-    the :ref:`Authenticating against REMOTE_USER <howto-auth-remote-user>`
+    the :doc:`Authenticating against REMOTE_USER </howto/auth-remote-user>`
     documentation.

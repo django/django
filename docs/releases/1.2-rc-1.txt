@@ -1,5 +1,3 @@
-.. _releases-1.2-rc-1:
-
 =============================
 Django 1.2 RC 1 release notes
 =============================
@@ -21,8 +19,8 @@ such use is discouraged.
 
 Django has been feature frozen since the 1.2 beta release, so this
 release candidate contains no new features, only bugfixes; for a
-summary of features new to Django 1.2, consult the :ref:`1.2 alpha
-<releases-1.2-alpha-1>` and :ref:`1.2 beta <releases-1.2-beta-1>`
+summary of features new to Django 1.2, consult the :doc:`1.2 alpha
+</releases/1.2-alpha-1>` and :doc:`1.2 beta </releases/1.2-beta-1>`
 release notes.
 
 
@@ -42,7 +40,7 @@ This change should affect only a small number of Django users, as most
 operating-system vendors today are shipping Python 2.4 or newer as
 their default version. If you're still using Python 2.3, however,
 you'll need to stick to Django 1.1 until you can upgrade; per
-:ref:`our support policy <internals-release-process>`, Django 1.1 will
+:doc:`our support policy </internals/release-process>`, Django 1.1 will
 continue to receive security support until the release of Django 1.3.
 
 A roadmap for Django's overall 2.x Python support, and eventual
@@ -96,7 +94,7 @@ discussions there.
 Django's online documentation also includes pointers on how to contribute to
 Django: 
 
-    * :ref:`How to contribute to Django <internals-contributing>`
+    * :doc:`How to contribute to Django </internals/contributing>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and

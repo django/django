@@ -1,5 +1,3 @@
-.. _topics-email:
-
 ==============
 Sending e-mail
 ==============

@@ -1,5 +1,3 @@
-.. _howto-legacy-databases:
-
 =========================================
 Integrating Django with a legacy database
 =========================================
@@ -9,7 +7,7 @@ possible to integrate it into legacy databases. Django includes a couple of
 utilities to automate as much of this process as possible.
 
 This document assumes you know the Django basics, as covered in the
-:ref:`tutorial <intro-tutorial01>`.
+:doc:`tutorial </intro/tutorial01>`.
 
 Once you've got Django set up, you'll follow this general process to integrate
 with an existing database.

@@ -12,10 +12,10 @@ Getting help
 
 Having trouble? We'd like to help!
 
-* Try the :ref:`FAQ <faq-index>` -- it's got answers to many common questions.
+* Try the :doc:`FAQ <faq/index>` -- it's got answers to many common questions.
 
 * Looking for specific information? Try the :ref:`genindex`, :ref:`modindex` or
-  the :ref:`detailed table of contents <contents>`.
+  the :doc:`detailed table of contents <contents>`.
 
 * Search for information in the `archives of the django-users mailing list`_, or
   `post a question`_.
@@ -35,179 +35,179 @@ First steps
 ===========
 
     * **From scratch:**
-      :ref:`Overview <intro-overview>` |
-      :ref:`Installation <intro-install>`
+      :doc:`Overview <intro/overview>` |
+      :doc:`Installation <intro/install>`
 
     * **Tutorial:**
-      :ref:`Part 1 <intro-tutorial01>` |
-      :ref:`Part 2 <intro-tutorial02>` |
-      :ref:`Part 3 <intro-tutorial03>` |
-      :ref:`Part 4 <intro-tutorial04>`
+      :doc:`Part 1 <intro/tutorial01>` |
+      :doc:`Part 2 <intro/tutorial02>` |
+      :doc:`Part 3 <intro/tutorial03>` |
+      :doc:`Part 4 <intro/tutorial04>`
 
 The model layer
 ===============
 
     * **Models:**
-      :ref:`Model syntax <topics-db-models>` |
-      :ref:`Field types <ref-models-fields>` |
-      :ref:`Meta options <ref-models-options>`
+      :doc:`Model syntax <topics/db/models>` |
+      :doc:`Field types <ref/models/fields>` |
+      :doc:`Meta options <ref/models/options>`
 
     * **QuerySets:**
-      :ref:`Executing queries <topics-db-queries>` |
-      :ref:`QuerySet method reference <ref-models-querysets>`
+      :doc:`Executing queries <topics/db/queries>` |
+      :doc:`QuerySet method reference <ref/models/querysets>`
 
     * **Model instances:**
-      :ref:`Instance methods <ref-models-instances>` |
-      :ref:`Accessing related objects <ref-models-relations>`
+      :doc:`Instance methods <ref/models/instances>` |
+      :doc:`Accessing related objects <ref/models/relations>`
 
     * **Advanced:**
-      :ref:`Managers <topics-db-managers>` |
-      :ref:`Raw SQL <topics-db-sql>` |
-      :ref:`Transactions <topics-db-transactions>` |
-      :ref:`Aggregation <topics-db-aggregation>` |
-      :ref:`Custom fields <howto-custom-model-fields>` |
-      :ref:`Multiple databases <topics-db-multi-db>`
+      :doc:`Managers <topics/db/managers>` |
+      :doc:`Raw SQL <topics/db/sql>` |
+      :doc:`Transactions <topics/db/transactions>` |
+      :doc:`Aggregation <topics/db/aggregation>` |
+      :doc:`Custom fields <howto/custom-model-fields>` |
+      :doc:`Multiple databases <topics/db/multi-db>`
 
     * **Other:**
-      :ref:`Supported databases <ref-databases>` |
-      :ref:`Legacy databases <howto-legacy-databases>` |
-      :ref:`Providing initial data <howto-initial-data>` |
-      :ref:`Optimize database access <topics-db-optimization>`
+      :doc:`Supported databases <ref/databases>` |
+      :doc:`Legacy databases <howto/legacy-databases>` |
+      :doc:`Providing initial data <howto/initial-data>` |
+      :doc:`Optimize database access <topics/db/optimization>`
 
 The template layer
 ==================
 
     * **For designers:**
-      :ref:`Syntax overview <topics-templates>` |
-      :ref:`Built-in tags and filters <ref-templates-builtins>`
+      :doc:`Syntax overview <topics/templates>` |
+      :doc:`Built-in tags and filters <ref/templates/builtins>`
 
     * **For programmers:**
-      :ref:`Template API <ref-templates-api>` |
-      :ref:`Custom tags and filters <howto-custom-template-tags>`
+      :doc:`Template API <ref/templates/api>` |
+      :doc:`Custom tags and filters <howto/custom-template-tags>`
 
 The view layer
 ==============
 
     * **The basics:**
-      :ref:`URLconfs <topics-http-urls>` |
-      :ref:`View functions <topics-http-views>` |
-      :ref:`Shortcuts <topics-http-shortcuts>`
+      :doc:`URLconfs <topics/http/urls>` |
+      :doc:`View functions <topics/http/views>` |
+      :doc:`Shortcuts <topics/http/shortcuts>`
 
-    * **Reference:**  :ref:`Request/response objects <ref-request-response>`
+    * **Reference:**  :doc:`Request/response objects <ref/request-response>`
 
     * **File uploads:**
-      :ref:`Overview <topics-http-file-uploads>` |
-      :ref:`File objects <ref-files-file>` |
-      :ref:`Storage API <ref-files-storage>` |
-      :ref:`Managing files <topics-files>` |
-      :ref:`Custom storage <howto-custom-file-storage>`
+      :doc:`Overview <topics/http/file-uploads>` |
+      :doc:`File objects <ref/files/file>` |
+      :doc:`Storage API <ref/files/storage>` |
+      :doc:`Managing files <topics/files>` |
+      :doc:`Custom storage <howto/custom-file-storage>`
 
     * **Generic views:**
-      :ref:`Overview<topics-generic-views>` |
-      :ref:`Built-in generic views<ref-generic-views>`
+      :doc:`Overview<topics/generic-views>` |
+      :doc:`Built-in generic views<ref/generic-views>`
 
     * **Advanced:**
-      :ref:`Generating CSV <howto-outputting-csv>` |
-      :ref:`Generating PDF <howto-outputting-pdf>`
+      :doc:`Generating CSV <howto/outputting-csv>` |
+      :doc:`Generating PDF <howto/outputting-pdf>`
 
     * **Middleware:**
-      :ref:`Overview <topics-http-middleware>` |
-      :ref:`Built-in middleware classes <ref-middleware>`
+      :doc:`Overview <topics/http/middleware>` |
+      :doc:`Built-in middleware classes <ref/middleware>`
 
 Forms
 =====
 
     * **The basics:**
-      :ref:`Overview <topics-forms-index>` |
-      :ref:`Form API <ref-forms-api>` |
-      :ref:`Built-in fields <ref-forms-fields>` |
-      :ref:`Built-in widgets <ref-forms-widgets>`
+      :doc:`Overview <topics/forms/index>` |
+      :doc:`Form API <ref/forms/api>` |
+      :doc:`Built-in fields <ref/forms/fields>` |
+      :doc:`Built-in widgets <ref/forms/widgets>`
 
     * **Advanced:**
-      :ref:`Forms for models <topics-forms-modelforms>` |
-      :ref:`Integrating media <topics-forms-media>` |
-      :ref:`Formsets <topics-forms-formsets>` |
-      :ref:`Customizing validation <ref-forms-validation>`
+      :doc:`Forms for models <topics/forms/modelforms>` |
+      :doc:`Integrating media <topics/forms/media>` |
+      :doc:`Formsets <topics/forms/formsets>` |
+      :doc:`Customizing validation <ref/forms/validation>`
 
     * **Extras:**
-      :ref:`Form preview <ref-contrib-formtools-form-preview>` |
-      :ref:`Form wizard <ref-contrib-formtools-form-wizard>`
+      :doc:`Form preview <ref/contrib/formtools/form-preview>` |
+      :doc:`Form wizard <ref/contrib/formtools/form-wizard>`
 
 The development process
 =======================
 
     * **Settings:**
-      :ref:`Overview <topics-settings>` |
-      :ref:`Full list of settings <ref-settings>`
+      :doc:`Overview <topics/settings>` |
+      :doc:`Full list of settings <ref/settings>`
 
     * **Exceptions:**
-      :ref:`Overview <ref-exceptions>`
+      :doc:`Overview <ref/exceptions>`
 
     * **django-admin.py and manage.py:**
-      :ref:`Overview <ref-django-admin>` |
-      :ref:`Adding custom commands <howto-custom-management-commands>`
+      :doc:`Overview <ref/django-admin>` |
+      :doc:`Adding custom commands <howto/custom-management-commands>`
 
-    * **Testing:**  :ref:`Overview <topics-testing>`
+    * **Testing:**  :doc:`Overview <topics/testing>`
 
     * **Deployment:**
-      :ref:`Overview <howto-deployment-index>` |
-      :ref:`Apache/mod_wsgi <howto-deployment-modwsgi>` |
-      :ref:`Apache/mod_python <howto-deployment-modpython>` |
-      :ref:`FastCGI/SCGI/AJP <howto-deployment-fastcgi>` |
-      :ref:`Apache authentication <howto-apache-auth>` |
-      :ref:`Serving static files <howto-static-files>` |
-      :ref:`Tracking code errors by e-mail <howto-error-reporting>`
+      :doc:`Overview <howto/deployment/index>` |
+      :doc:`Apache/mod_wsgi <howto/deployment/modwsgi>` |
+      :doc:`Apache/mod_python <howto/deployment/modpython>` |
+      :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
+      :doc:`Apache authentication <howto/apache-auth>` |
+      :doc:`Serving static files <howto/static-files>` |
+      :doc:`Tracking code errors by e-mail <howto/error-reporting>`
 
 Other batteries included
 ========================
 
-    * :ref:`Admin site <ref-contrib-admin>` | :ref:`Admin actions <ref-contrib-admin-actions>`
-    * :ref:`Authentication <topics-auth>`
-    * :ref:`Cache system <topics-cache>`
-    * :ref:`Conditional content processing <topics-conditional-processing>`
-    * :ref:`Comments <ref-contrib-comments-index>` | :ref:`Moderation <ref-contrib-comments-moderation>` | :ref:`Custom comments <ref-contrib-comments-custom>`
-    * :ref:`Content types <ref-contrib-contenttypes>`
-    * :ref:`Cross Site Request Forgery protection <ref-contrib-csrf>`
-    * :ref:`Databrowse <ref-contrib-databrowse>`
-    * :ref:`E-mail (sending) <topics-email>`
-    * :ref:`Flatpages <ref-contrib-flatpages>`
-    * :ref:`GeoDjango <ref-contrib-gis>`
-    * :ref:`Humanize <ref-contrib-humanize>`
-    * :ref:`Internationalization <topics-i18n>`
-    * :ref:`Jython support <howto-jython>`
-    * :ref:`"Local flavor" <ref-contrib-localflavor>`
-    * :ref:`Messages <ref-contrib-messages>`
-    * :ref:`Pagination <topics-pagination>`
-    * :ref:`Redirects <ref-contrib-redirects>`
-    * :ref:`Serialization <topics-serialization>`
-    * :ref:`Sessions <topics-http-sessions>`
-    * :ref:`Signals <topics-signals>`
-    * :ref:`Sitemaps <ref-contrib-sitemaps>`
-    * :ref:`Sites <ref-contrib-sites>`
-    * :ref:`Syndication feeds (RSS/Atom) <ref-contrib-syndication>`
-    * :ref:`Unicode in Django <ref-unicode>`
-    * :ref:`Web design helpers <ref-contrib-webdesign>`
-    * :ref:`Validators <ref-validators>`
+    * :doc:`Admin site <ref/contrib/admin/index>` | :doc:`Admin actions <ref/contrib/admin/actions>`
+    * :doc:`Authentication <topics/auth>`
+    * :doc:`Cache system <topics/cache>`
+    * :doc:`Conditional content processing <topics/conditional-view-processing>`
+    * :doc:`Comments <ref/contrib/comments/index>` | :doc:`Moderation <ref/contrib/comments/moderation>` | :doc:`Custom comments <ref/contrib/comments/custom>`
+    * :doc:`Content types <ref/contrib/contenttypes>`
+    * :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
+    * :doc:`Databrowse <ref/contrib/databrowse>`
+    * :doc:`E-mail (sending) <topics/email>`
+    * :doc:`Flatpages <ref/contrib/flatpages>`
+    * :doc:`GeoDjango <ref/contrib/gis/index>`
+    * :doc:`Humanize <ref/contrib/humanize>`
+    * :doc:`Internationalization <topics/i18n/index>`
+    * :doc:`Jython support <howto/jython>`
+    * :doc:`"Local flavor" <ref/contrib/localflavor>`
+    * :doc:`Messages <ref/contrib/messages>`
+    * :doc:`Pagination <topics/pagination>`
+    * :doc:`Redirects <ref/contrib/redirects>`
+    * :doc:`Serialization <topics/serialization>`
+    * :doc:`Sessions <topics/http/sessions>`
+    * :doc:`Signals <topics/signals>`
+    * :doc:`Sitemaps <ref/contrib/sitemaps>`
+    * :doc:`Sites <ref/contrib/sites>`
+    * :doc:`Syndication feeds (RSS/Atom) <ref/contrib/syndication>`
+    * :doc:`Unicode in Django <ref/unicode>`
+    * :doc:`Web design helpers <ref/contrib/webdesign>`
+    * :doc:`Validators <ref/validators>`
 
 The Django open-source project
 ==============================
 
     * **Community:**
-      :ref:`How to get involved <internals-contributing>` |
-      :ref:`The release process <internals-release-process>` |
-      :ref:`Team of committers <internals-committers>` |
-      :ref:`The Django source code repository <internals-svn>`
+      :doc:`How to get involved <internals/contributing>` |
+      :doc:`The release process <internals/release-process>` |
+      :doc:`Team of committers <internals/committers>` |
+      :doc:`The Django source code repository <internals/svn>`
 
     * **Design philosophies:**
-      :ref:`Overview <misc-design-philosophies>`
+      :doc:`Overview <misc/design-philosophies>`
 
     * **Documentation:**
-      :ref:`About this documentation <internals-documentation>`
+      :doc:`About this documentation <internals/documentation>`
 
     * **Third-party distributions:**
-      :ref:`Overview <misc-distributions>`
+      :doc:`Overview <misc/distributions>`
 
     * **Django over time:**
-      :ref:`API stability <misc-api-stability>` |
-      :ref:`Release notes and upgrading instructions <releases-index>` |
-      :ref:`Deprecation Timeline <internals-deprecation>`
+      :doc:`API stability <misc/api-stability>` |
+      :doc:`Release notes and upgrading instructions <releases/index>` |
+      :doc:`Deprecation Timeline <internals/deprecation>`

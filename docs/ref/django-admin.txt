@@ -1,5 +1,3 @@
-.. _ref-django-admin:
-
 =============================
 django-admin.py and manage.py
 =============================
@@ -104,7 +102,7 @@ compilemessages
    Before 1.0 this was the "bin/compile-messages.py" command.
 
 Compiles .po files created with ``makemessages`` to .mo files for use with
-the builtin gettext support. See :ref:`topics-i18n`.
+the builtin gettext support. See :doc:`/topics/i18n/index`.
 
 Use the :djadminopt:`--locale`` option to specify the locale to process.
 If not provided, all locales are processed.
@@ -119,7 +117,7 @@ createcachetable
 .. django-admin:: createcachetable
 
 Creates a cache table named ``tablename`` for use with the database cache
-backend. See :ref:`topics-cache` for more information.
+backend. See :doc:`/topics/cache` for more information.
 
 .. versionadded:: 1.2
 
@@ -151,8 +149,8 @@ using the ``--username`` and ``--email`` arguments on the command
 line. If either of those is not supplied, ``createsuperuser`` will prompt for
 it when running interactively.
 
-This command is only available if Django's :ref:`authentication system
-<topics-auth>` (``django.contrib.auth``) is installed.
+This command is only available if Django's :doc:`authentication system
+</topics/auth>` (``django.contrib.auth``) is installed.
 
 dbshell
 -------
@@ -529,8 +527,8 @@ runfcgi [options]
 .. django-admin:: runfcgi
 
 Starts a set of FastCGI processes suitable for use with any Web server that
-supports the FastCGI protocol. See the :ref:`FastCGI deployment documentation
-<howto-deployment-fastcgi>` for details. Requires the Python FastCGI module from
+supports the FastCGI protocol. See the :doc:`FastCGI deployment documentation
+</howto/deployment/fastcgi>` for details. Requires the Python FastCGI module from
 `flup`_.
 
 .. _flup: http://www.saddi.com/software/flup/
@@ -616,7 +614,7 @@ Serving static files with the development server
 
 By default, the development server doesn't serve any static files for your site
 (such as CSS files, images, things under ``MEDIA_URL`` and so forth). If
-you want to configure Django to serve static media, read :ref:`howto-static-files`.
+you want to configure Django to serve static media, read :doc:`/howto/static-files`.
 
 shell
 -----
@@ -822,7 +820,7 @@ test <app or test identifier>
 
 .. django-admin:: test
 
-Runs tests for all installed models. See :ref:`topics-testing` for more
+Runs tests for all installed models. See :doc:`/topics/testing` for more
 information.
 
 .. versionadded:: 1.2
@@ -847,7 +845,7 @@ For example, this command::
 
 ...would perform the following steps:
 
-    1. Create a test database, as described in :ref:`topics-testing`.
+    1. Create a test database, as described in :doc:`/topics/testing`.
     2. Populate the test database with fixture data from the given fixtures.
        (For more on fixtures, see the documentation for ``loaddata`` above.)
     3. Runs the Django development server (as in ``runserver``), pointed at
@@ -855,7 +853,7 @@ For example, this command::
 
 This is useful in a number of ways:
 
-    * When you're writing :ref:`unit tests <topics-testing>` of how your views
+    * When you're writing :doc:`unit tests </topics/testing>` of how your views
       act with certain fixture data, you can use ``testserver`` to interact with
       the views in a Web browser, manually.
 
@@ -1116,4 +1114,4 @@ distribution. It enables tab-completion of ``django-admin.py`` and
       with ``sql``.
 
 
-See :ref:`howto-custom-management-commands` for how to add customized actions.
+See :doc:`/howto/custom-management-commands` for how to add customized actions.

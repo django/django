@@ -14,7 +14,7 @@ vector spatial data files (e.g. shapefiles) intoto GeoDjango models.
 
 This utility grew out of the author's personal needs to eliminate
 the code repetition that went into pulling geometries and fields out of
-a vector layer, converting to another coordinate system (e.g. WGS84), and 
+a vector layer, converting to another coordinate system (e.g. WGS84), and
 then inserting into a GeoDjango model.
 
 .. note::
@@ -27,7 +27,7 @@ then inserting into a GeoDjango model.
     that :class:`LayerMapping` is using too much memory, set
     :setting:`DEBUG` to ``False`` in your settings.  When :setting:`DEBUG`
     is set to ``True``, Django :ref:`automatically logs <faq-see-raw-sql-queries>`
-    *every* SQL query -- thus, when SQL statements contain geometries, it is 
+    *every* SQL query -- thus, when SQL statements contain geometries, it is
     easy to consume more memory than is typical.
 
 Example
@@ -50,7 +50,7 @@ Example
         DATUM["WGS_1984",
             SPHEROID["WGS_1984",6378137,298.257223563]],
         PRIMEM["Greenwich",0],
-        UNIT["Degree",0.017453292519943295]]    
+        UNIT["Degree",0.017453292519943295]]
 
 2. Now we define our corresponding Django model (make sure to use ``syncdb``)::
 
@@ -71,16 +71,16 @@ Example
     >>> mapping = {'name' : 'str', # The 'name' model field maps to the 'str' layer field.
                    'poly' : 'POLYGON', # For geometry fields use OGC name.
                    } # The mapping is a dictionary
-    >>> lm = LayerMapping(TestGeo, 'test_poly.shp', mapping) 
-    >>> lm.save(verbose=True) # Save the layermap, imports the data. 
+    >>> lm = LayerMapping(TestGeo, 'test_poly.shp', mapping)
+    >>> lm.save(verbose=True) # Save the layermap, imports the data.
     Saved: Name: 1
     Saved: Name: 2
     Saved: Name: 3
 
 Here, :class:`LayerMapping` just transformed the three geometries from the
 shapefile in their original spatial reference system (WGS84) to the spatial
-reference system of the GeoDjango model (NAD83).  If no spatial reference 
-system is defined for the layer, use the ``source_srs`` keyword with a 
+reference system of the GeoDjango model (NAD83).  If no spatial reference
+system is defined for the layer, use the ``source_srs`` keyword with a
 :class:`~django.contrib.gis.gdal.SpatialReference` object to specify one.
 
 ``LayerMapping`` API
@@ -106,43 +106,43 @@ Argument           Description
                    model field is a geographic then it should
                    correspond to the OGR geometry type,
                    e.g., ``'POINT'``, ``'LINESTRING'``, ``'POLYGON'``.
-=================  =========================================================  
+=================  =========================================================
 
 =====================  =====================================================
 Keyword Arguments
-=====================  =====================================================  
-``layer``              The index of the layer to use from the Data Source 
+=====================  =====================================================
+``layer``              The index of the layer to use from the Data Source
                        (defaults to 0)
-    
-``source_srs``         Use this to specify the source SRS manually (for 
-                       example, some shapefiles don't come with a '.prj' 
-                       file).  An integer SRID, WKT or PROJ.4 strings, and 
-                       :class:`django.contrib.gis.gdal.SpatialReference` 
+
+``source_srs``         Use this to specify the source SRS manually (for
+                       example, some shapefiles don't come with a '.prj'
+                       file).  An integer SRID, WKT or PROJ.4 strings, and
+                       :class:`django.contrib.gis.gdal.SpatialReference`
                        objects are accepted.
-    
-``encoding``           Specifies the character set encoding of the strings 
-                       in the OGR data source.  For example, ``'latin-1'``, 
-                       ``'utf-8'``, and ``'cp437'`` are all valid encoding 
+
+``encoding``           Specifies the character set encoding of the strings
+                       in the OGR data source.  For example, ``'latin-1'``,
+                       ``'utf-8'``, and ``'cp437'`` are all valid encoding
                        parameters.
-    
-``transaction_mode``   May be ``'commit_on_success'`` (default) or 
+
+``transaction_mode``   May be ``'commit_on_success'`` (default) or
                        ``'autocommit'``.
-    
-``transform``          Setting this to False will disable coordinate 
+
+``transform``          Setting this to False will disable coordinate
                        transformations.  In other words, geometries will
                        be inserted into the database unmodified from their
                        original state in the data source.
-    
+
 ``unique``             Setting this to the name, or a tuple of names,
                        from the given  model will create models unique
-                       only to the given name(s). Geometries will from 
-                       each feature will be added into the collection 
-                       associated with the unique model.  Forces 
+                       only to the given name(s). Geometries will from
+                       each feature will be added into the collection
+                       associated with the unique model.  Forces
                        the transaction mode to be ``'autocommit'``.
 
 ``using``              New in version 1.2.  Sets the database to use when
                        importing spatial data.  Default is ``'default'``
-=====================  =====================================================  
+=====================  =====================================================
 
 ``save()`` Keyword Arguments
 ----------------------------
@@ -156,42 +156,42 @@ specific feature ranges.
 ===========================  =================================================
 Save Keyword Arguments       Description
 ===========================  =================================================
-``fid_range``                May be set with a slice or tuple of 
-                             (begin, end) feature ID's to map from 
+``fid_range``                May be set with a slice or tuple of
+                             (begin, end) feature ID's to map from
                              the data source.  In other words, this
-                             keyword enables the user to selectively 
+                             keyword enables the user to selectively
                              import a subset range of features in the
                              geographic data source.
 
 ``progress``                 When this keyword is set, status information
-                             will be printed giving the number of features 
-                             processed and successfully saved.  By default, 
+                             will be printed giving the number of features
+                             processed and successfully saved.  By default,
                              progress information will be printed every 1000
-                             features processed, however, this default may 
-                             be overridden by setting this keyword with an 
+                             features processed, however, this default may
+                             be overridden by setting this keyword with an
                              integer for the desired interval.
 
-``silent``                   By default, non-fatal error notifications are 
-                             printed to ``sys.stdout``, but this keyword may 
+``silent``                   By default, non-fatal error notifications are
+                             printed to ``sys.stdout``, but this keyword may
                              be set to disable these notifications.
 
-``step``                     If set with an integer, transactions will 
-                             occur at every step interval. For example, if 
-                             ``step=1000``, a commit would occur after the 
+``step``                     If set with an integer, transactions will
+                             occur at every step interval. For example, if
+                             ``step=1000``, a commit would occur after the
                              1,000th feature, the 2,000th feature etc.
 
 
-``stream``                   Status information will be written to this file 
-                             handle.  Defaults to using ``sys.stdout``, but 
+``stream``                   Status information will be written to this file
+                             handle.  Defaults to using ``sys.stdout``, but
                              any object with a ``write`` method is supported.
 
-``strict``                   Execution of the model mapping will cease upon 
+``strict``                   Execution of the model mapping will cease upon
                              the first error encountered.  The default value
                              (``False``)
                              behavior is to attempt to continue.
 
-``verbose``                  If set, information will be printed 
-                             subsequent to each model save 
+``verbose``                  If set, information will be printed
+                             subsequent to each model save
                              executed on the database.
 ===========================  =================================================
 
@@ -213,7 +213,7 @@ If you encounter the following error when using ``LayerMapping`` and MySQL::
     OperationalError: (1153, "Got a packet bigger than 'max_allowed_packet' bytes")
 
 Then the solution is to increase the value of the ``max_allowed_packet``
-setting in your MySQL configuration.  For example, the default value may 
+setting in your MySQL configuration.  For example, the default value may
 be something low like one megabyte -- the setting may be modified in MySQL's
 configuration file (``my.cnf``) in the ``[mysqld]`` section::
 

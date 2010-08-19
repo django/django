@@ -1,10 +1,8 @@
-.. _intro-tutorial02:
-
 =====================================
 Writing your first Django app, part 2
 =====================================
 
-This tutorial begins where :ref:`Tutorial 1 <intro-tutorial01>` left off. We're
+This tutorial begins where :doc:`Tutorial 1 </intro/tutorial01>` left off. We're
 continuing the Web-poll application and will focus on Django's
 automatically-generated admin site.
 
@@ -463,5 +461,5 @@ object-specific admin pages in whatever way you think is best. Again,
 don't worry if you can't understand the template language -- we'll cover that
 in more detail in Tutorial 3.
 
-When you're comfortable with the admin site, read :ref:`part 3 of this tutorial
-<intro-tutorial03>` to start working on public poll views.
+When you're comfortable with the admin site, read :doc:`part 3 of this tutorial
+</intro/tutorial03>` to start working on public poll views.

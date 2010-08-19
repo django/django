@@ -1,10 +1,8 @@
-.. _intro-whatsnext:
-
 =================
 What to read next
 =================
 
-So you've read all the :ref:`introductory material <intro-index>` and have
+So you've read all the :doc:`introductory material </intro/index>` and have
 decided you'd like to keep using Django. We've only just scratched the surface
 with this intro (in fact, if you've read every single word you've still read
 less than 10% of the overall documentation).
@@ -37,15 +35,15 @@ How the documentation is organized
 Django's main documentation is broken up into "chunks" designed to fill
 different needs:
 
-    * The :ref:`introductory material <intro-index>` is designed for people new
+    * The :doc:`introductory material </intro/index>` is designed for people new
       to Django -- or to web development in general. It doesn't cover anything
       in depth, but instead gives a high-level overview of how developing in
       Django "feels".
 
-    * The :ref:`topic guides <topics-index>`, on the other hand, dive deep into
+    * The :doc:`topic guides </topics/index>`, on the other hand, dive deep into
       individual parts of Django. There are complete guides to Django's
-      :ref:`model system <topics-db-index>`, :ref:`template engine
-      <topics-templates>`, :ref:`forms framework <topics-forms-index>`, and much
+      :doc:`model system </topics/db/index>`, :doc:`template engine
+      </topics/templates>`, :doc:`forms framework </topics/forms/index>`, and much
       more.
 
       This is probably where you'll want to spend most of your time; if you work
@@ -53,27 +51,27 @@ different needs:
       everything there is to know about Django.
 
     * Web development is often broad, not deep -- problems span many domains.
-      We've written a set of :ref:`how-to guides <howto-index>` that answer
+      We've written a set of :doc:`how-to guides </howto/index>` that answer
       common "How do I ...?" questions. Here you'll find information about
-      :ref:`generating PDFs with Django <howto-outputting-pdf>`, :ref:`writing
-      custom template tags <howto-custom-template-tags>`, and more.
+      :doc:`generating PDFs with Django </howto/outputting-pdf>`, :doc:`writing
+      custom template tags </howto/custom-template-tags>`, and more.
 
-      Answers to really common questions can also be found in the :ref:`FAQ
-      <faq-index>`.
+      Answers to really common questions can also be found in the :doc:`FAQ
+      </faq/index>`.
 
     * The guides and how-to's don't cover every single class, function, and
       method available in Django -- that would be overwhelming when you're
       trying to learn. Instead, details about individual classes, functions,
-      methods, and modules are kept in the :ref:`reference <ref-index>`. This is
+      methods, and modules are kept in the :doc:`reference </ref/index>`. This is
       where you'll turn to find the details of a particular function or
       whathaveyou.
 
     * Finally, there's some "specialized" documentation not usually relevant to
-      most developers. This includes the :ref:`release notes <releases-index>`,
-      :ref:`documentation of obsolete features <obsolete-index>`,
-      :ref:`internals documentation <internals-index>` for those who want to add
-      code to Django itself, and a :ref:`few other things that simply don't fit
-      elsewhere <misc-index>`.
+      most developers. This includes the :doc:`release notes </releases/index>`,
+      :doc:`documentation of obsolete features </obsolete/index>`,
+      :doc:`internals documentation </internals/index>` for those who want to add
+      code to Django itself, and a :doc:`few other things that simply don't fit
+      elsewhere </misc/index>`.
 
 
 How documentation is updated
