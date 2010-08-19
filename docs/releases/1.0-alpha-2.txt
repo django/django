@@ -1,5 +1,3 @@
-.. _releases-1.0-alpha-2:
-
 ================================
 Django 1.0 alpha 2 release notes
 ================================
@@ -21,8 +19,8 @@ What's new in Django 1.0 alpha 2
 
 Django's development trunk has been the site of nearly constant activity over
 the past year, with several major new features landing since the 0.96 release.
-For features which were new as of Django 1.0 alpha 1, see :ref:`the 1.0 alpha 1
-release notes <releases-1.0-alpha-1`. Since the 1.0 alpha 1 release several new
+For features which were new as of Django 1.0 alpha 1, see :doc:`the 1.0 alpha 1
+release notes </releases/1.0-alpha-1>`. Since the 1.0 alpha 1 release several new
 features have landed, including:
 
 ``django.contrib.gis`` (`GeoDjango`_)
@@ -37,8 +35,8 @@ features have landed, including:
 Pluggable file storage
     Django's built-in ``FileField`` and ``ImageField`` now can take advantage of
     pluggable file-storage backends, allowing extensive customization of where
-    and how uploaded files get stored by Django. For details, see :ref:`the
-    files documentation <topics-files>`; big thanks go to Marty Alchin for
+    and how uploaded files get stored by Django. For details, see :doc:`the
+    files documentation </topics/files>`; big thanks go to Marty Alchin for
     putting in the hard work to get this completed.
 
 Jython compatibility
@@ -51,11 +49,11 @@ Jython compatibility
 
 There are many other new features and improvements in this release, including
 two major performance boosts: strings marked for translation using
-:ref:`Django's internationalization system <topics-i18n>` now consume far less
+:doc:`Django's internationalization system </topics/i18n/index>` now consume far less
 memory, and Django's internal dispatcher -- which is invoked frequently during
 request/response processing and when working with Django's object-relational
 mapper -- is now significantly faster.
-    
+
 .. _GeoDjango: http://geodjango.org/
 .. _Geographic Information Systems: http://en.wikipedia.org/wiki/Geographic_information_system
 .. _Its documentation: http://geodjango.org/docs/
@@ -131,7 +129,7 @@ to join the discussions there.
 Django's online documentation also includes pointers on how to
 contribute to Django:
 
-    :ref:`contributing to Django <internals-contributing>`
+    :doc:`contributing to Django </internals/contributing>`
 
 Contributions on any level -- developing code, writing
 documentation or simply triaging tickets and helping to test proposed

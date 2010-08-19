@@ -1,5 +1,3 @@
-.. _ref-contrib-comments-signals:
-
 ================================
 Signals sent by the comments app
 ================================
@@ -7,9 +5,9 @@ Signals sent by the comments app
 .. module:: django.contrib.comments.signals
    :synopsis: Signals sent by the comment module.
 
-The comment app sends a series of :ref:`signals <topics-signals>` to allow for
-comment moderation and similar activities. See :ref:`the introduction to signals
-<topics-signals>` for information about how to register for and receive these
+The comment app sends a series of :doc:`signals </topics/signals>` to allow for
+comment moderation and similar activities. See :doc:`the introduction to signals
+</topics/signals>` for information about how to register for and receive these
 signals.
 
 comment_will_be_posted

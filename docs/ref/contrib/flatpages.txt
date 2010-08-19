@@ -1,5 +1,3 @@
-.. _ref-contrib-flatpages:
-
 =================
 The flatpages app
 =================
@@ -92,8 +90,8 @@ Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you can
 put :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at
 the end of the list, because it's a last resort.
 
-For more on middleware, read the :ref:`middleware docs
-<topics-http-middleware>`.
+For more on middleware, read the :doc:`middleware docs
+</topics/http/middleware>`.
 
 .. admonition:: Ensure that your 404 template works
     
@@ -124,9 +122,9 @@ Via the Python API
 .. class:: models.FlatPage
 
     Flatpages are represented by a standard
-    :ref:`Django model <topics-db-models>`,
+    :doc:`Django model </topics/db/models>`,
     which lives in `django/contrib/flatpages/models.py`_. You can access
-    flatpage objects via the :ref:`Django database API <topics-db-queries>`.
+    flatpage objects via the :doc:`Django database API </topics/db/queries>`.
 
 .. _django/contrib/flatpages/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models.py
 

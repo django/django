@@ -1,5 +1,3 @@
-.. _ref-contrib-formtools-form-wizard:
-
 ===========
 Form wizard
 ===========
@@ -10,7 +8,7 @@ Form wizard
 .. versionadded:: 1.0
 
 Django comes with an optional "form wizard" application that splits
-:ref:`forms <topics-forms-index>` across multiple Web pages. It maintains
+:doc:`forms </topics/forms/index>` across multiple Web pages. It maintains
 state in hashed HTML :samp:`<input type="hidden">` fields, and the data isn't
 processed server-side until the final form is submitted.
 
@@ -65,8 +63,8 @@ Defining ``Form`` classes
 
 The first step in creating a form wizard is to create the
 :class:`~django.forms.Form` classes.  These should be standard
-:class:`django.forms.Form` classes, covered in the :ref:`forms documentation
-<topics-forms-index>`.  These classes can live anywhere in your codebase, but
+:class:`django.forms.Form` classes, covered in the :doc:`forms documentation
+</topics/forms/index>`.  These classes can live anywhere in your codebase, but
 convention is to put them in a file called :file:`forms.py` in your
 application.
 

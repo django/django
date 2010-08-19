@@ -1,5 +1,3 @@
-.. _releases-1.2:
-
 ========================
 Django 1.2 release notes
 ========================
@@ -55,7 +53,7 @@ be found below`_.
 .. _django advent: http://djangoadvent.com/
 
 Wherever possible these features have been introduced in a backwards-compatible
-manner per :ref:`our API stability policy <misc-api-stability>` policy.
+manner per :doc:`our API stability policy </misc/api-stability>` policy.
 
 However, a handful of features *have* changed in ways that, for some users, will be
 backwards-incompatible. The big changes are:
@@ -110,7 +108,7 @@ This change should affect only a small number of Django users, as most
 operating-system vendors today are shipping Python 2.4 or newer as
 their default version. If you're still using Python 2.3, however,
 you'll need to stick to Django 1.1 until you can upgrade; per
-:ref:`our support policy <internals-release-process>`, Django 1.1 will
+:doc:`our support policy </internals/release-process>`, Django 1.1 will
 continue to receive security support until the release of Django 1.3.
 
 A roadmap for Django's overall 2.x Python support, and eventual
@@ -123,8 +121,8 @@ What's new in Django 1.2
 Support for multiple databases
 ------------------------------
 
-Django 1.2 adds the ability to use :ref:`more than one database
-<topics-db-multi-db>` in your Django project. Queries can be issued at a
+Django 1.2 adds the ability to use :doc:`more than one database
+</topics/db/multi-db>` in your Django project. Queries can be issued at a
 specific database with the `using()` method on ``QuerySet`` objects. Individual
 objects can be saved to a specific database by providing a ``using`` argument
 when you call ``save()``.
@@ -134,7 +132,7 @@ Model validation
 
 Model instances now have support for :ref:`validating their own data
 <validating-objects>`, and both model and form fields now accept configurable
-lists of :ref:`validators <ref-validators>` specifying reusable, encapsulated
+lists of :doc:`validators </ref/validators>` specifying reusable, encapsulated
 validation behavior. Note, however, that validation must still be performed
 explicitly. Simply invoking a model instance's ``save()`` method will not
 perform any validation of the instance's data.
@@ -142,8 +140,8 @@ perform any validation of the instance's data.
 Improved CSRF protection
 ------------------------
 
-Django now has much improved protection against :ref:`Cross-Site Request Forgery
-(CSRF) attacks<ref-contrib-csrf>`. This type of attack occurs when a malicious
+Django now has much improved protection against :doc:`Cross-Site Request Forgery
+(CSRF) attacks</ref/contrib/csrf>`. This type of attack occurs when a malicious
 Web site contains a link, a form button or some JavaScript that is intended to
 perform some action on your Web site, using the credentials of a logged-in user
 who visits the malicious site in their browser. A related type of attack, "login
@@ -153,8 +151,8 @@ with someone else's credentials, is also covered.
 Messages framework
 ------------------
 
-Django now includes a robust and configurable :ref:`messages framework
-<ref-contrib-messages>` with built-in support for cookie- and session-based
+Django now includes a robust and configurable :doc:`messages framework
+</ref/contrib/messages>` with built-in support for cookie- and session-based
 messaging, for both anonymous and authenticated clients. The messages framework
 replaces the deprecated user message API and allows you to temporarily store
 messages in one request and retrieve them for display in a subsequent request
@@ -166,8 +164,8 @@ Object-level permissions
 A foundation for specifying permissions at the per-object level has been added.
 Although there is no implementation of this in core, a custom authentication
 backend can provide this implementation and it will be used by
-:class:`django.contrib.auth.models.User`. See the :ref:`authentication docs
-<topics-auth>` for more information.
+:class:`django.contrib.auth.models.User`. See the :doc:`authentication docs
+</topics/auth>` for more information.
 
 Permissions for anonymous users
 -------------------------------
@@ -176,8 +174,8 @@ If you provide a custom auth backend with ``supports_anonymous_user`` set to
 ``True``, AnonymousUser will check the backend for permissions, just like
 User already did.  This is useful for centralizing permission handling - apps
 can always delegate the question of whether something is allowed or not to
-the authorization/authentication backend. See the :ref:`authentication
-docs <topics-auth>` for more details.
+the authorization/authentication backend. See the :doc:`authentication
+docs </topics/auth>` for more details.
 
 Relaxed requirements for usernames
 ----------------------------------
@@ -194,7 +192,7 @@ You can now :ref:`configure the way that Django sends e-mail
 can now choose a configurable e-mail backend to send messages. If your
 hosting provider uses a sandbox or some other non-SMTP technique for
 sending mail, you can now construct an e-mail backend that will allow
-Django's standard :ref:`mail sending methods<topics-email>` to use
+Django's standard :doc:`mail sending methods</topics/email>` to use
 those facilities.
 
 This also makes it easier to debug mail sending. Django ships with
@@ -286,7 +284,7 @@ Models can now use a 64-bit :class:`~django.db.models.BigIntegerField` type.
 Improved localization
 ---------------------
 
-Django's :ref:`internationalization framework <topics-i18n>` has been expanded
+Django's :doc:`internationalization framework </topics/i18n/index>` has been expanded
 with locale-aware formatting and form processing. That means, if enabled, dates
 and numbers on templates will be displayed using the format specified for the
 current locale. Django will also use localized formats when parsing data in
@@ -309,8 +307,8 @@ the colors used by ``django-admin.py`` to provide :ref:`syntax highlighting
 Syndication feeds as views
 --------------------------
 
-:ref:`Syndication feeds <ref-contrib-syndication>` can now be used directly as
-views in your :ref:`URLconf <topics-http-urls>`. This means that you can
+:doc:`Syndication feeds </ref/contrib/syndication>` can now be used directly as
+views in your :doc:`URLconf </topics/http/urls>`. This means that you can
 maintain complete control over the URL structure of your feeds. Like any other
 view, feeds views are passed a ``request`` object, so you can do anything you
 would normally do with a view, like user based access control, or making a feed
@@ -319,7 +317,7 @@ a named URL.
 GeoDjango
 ---------
 
-The most significant new feature for :ref:`GeoDjango <ref-contrib-gis>`
+The most significant new feature for :doc:`GeoDjango </ref/contrib/gis/index>`
 in 1.2 is support for multiple spatial databases.  As a result,
 the following :ref:`spatial database backends <spatial-backends>`
 are now included:
@@ -357,7 +355,7 @@ set a :attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on
 the features returned when iterating over a
 :class:`~django.contrib.gis.gdal.Layer`.
 
-Finally, :ref:`GeoDjango's documentation <ref-contrib-gis>` is now
+Finally, :doc:`GeoDjango's documentation </ref/contrib/gis/index>` is now
 included with Django's and is no longer
 hosted separately at `geodjango.org <http://geodjango.org/>`_.
 
@@ -391,8 +389,8 @@ Backwards-incompatible changes in 1.2
 =====================================
 
 Wherever possible the new features above have been introduced in a
-backwards-compatible manner per :ref:`our API stability policy
-<misc-api-stability>` policy. This means that practically all existing
+backwards-compatible manner per :doc:`our API stability policy
+</misc/api-stability>` policy. This means that practically all existing
 code which worked with Django 1.1 will continue to work with Django
 1.2; such code will, however, begin issuing warnings (see below for
 details).
@@ -405,7 +403,7 @@ CSRF Protection
 ---------------
 
 We've made large changes to the way CSRF protection works, detailed in
-:ref:`the CSRF documentaton <ref-contrib-csrf>`. Here are the major changes you
+:doc:`the CSRF documentaton </ref/contrib/csrf>`. Here are the major changes you
 should be aware of:
 
  * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated and
@@ -742,9 +740,9 @@ be removed entirely.
 
 .. seealso::
 
-    For more details, see the documentation :ref:`Django's release process
-    <internals-release-process>` and our :ref:`deprecation timeline
-    <internals-deprecation>`.`
+    For more details, see the documentation :doc:`Django's release process
+    </internals/release-process>` and our :doc:`deprecation timeline
+    </internals/deprecation>`.`
 
 .. _specifying-databases:
 
@@ -877,7 +875,7 @@ User Messages API
 
 The API for storing messages in the user ``Message`` model (via
 ``user.message_set.create``) is now deprecated and will be removed in Django
-1.4 according to the standard :ref:`release process <internals-release-process>`.
+1.4 according to the standard :doc:`release process </internals/release-process>`.
 
 To upgrade your code, you need to replace any instances of this::
 
@@ -901,7 +899,7 @@ following::
         ...
 
 For more information, see the full
-:ref:`messages documentation <ref-contrib-messages>`. You should begin to
+:doc:`messages documentation </ref/contrib/messages>`. You should begin to
 update your code to use the new API immediately.
 
 Date format helper functions
@@ -965,7 +963,7 @@ Django 1.4.
 
 The new class has an almost identical API, but allows instances to be
 used as views. For example, consider the use of the old framework in
-the following :ref:`URLconf <topics-http-urls>`::
+the following :doc:`URLconf </topics/http/urls>`::
 
     from django.conf.urls.defaults import *
     from myproject.feeds import LatestEntries, LatestEntriesByCategory
@@ -1034,8 +1032,8 @@ In accordance with `RSS best practices`_, RSS feeds will now include
 an ``atom:link`` element. You may need to update your tests to take
 this into account.
 
-For more information, see the full :ref:`syndication framework
-documentation <ref-contrib-syndication>`.
+For more information, see the full :doc:`syndication framework
+documentation </ref/contrib/syndication>`.
 
 .. _RSS best practices: http://www.rssboard.org/rss-profile
 

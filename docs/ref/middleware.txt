@@ -1,5 +1,3 @@
-.. _ref-middleware:
-
 ==========
 Middleware
 ==========
@@ -9,7 +7,7 @@ Middleware
 
 This document explains all middleware components that come with Django. For
 information on how how to use them and how to write your own middleware, see
-the :ref:`middleware usage guide <topics-http-middleware>`.
+the :doc:`middleware usage guide </topics/http/middleware>`.
 
 Available middleware
 ====================
@@ -26,7 +24,7 @@ Cache middleware
 
 Enable the site-wide cache. If these are enabled, each Django-powered page will
 be cached for as long as the :setting:`CACHE_MIDDLEWARE_SECONDS` setting
-defines. See the :ref:`cache documentation <topics-cache>`.
+defines. See the :doc:`cache documentation </topics/cache>`.
 
 "Common" middleware
 -------------------
@@ -136,8 +134,8 @@ Locale middleware
 .. class:: django.middleware.locale.LocaleMiddleware
 
 Enables language selection based on data from the request. It customizes
-content for each user. See the :ref:`internationalization documentation
-<topics-i18n>`.
+content for each user. See the :doc:`internationalization documentation
+</topics/i18n/index>`.
 
 Message middleware
 ------------------
@@ -151,7 +149,7 @@ Message middleware
    ``MessageMiddleware`` was added.
 
 Enables cookie- and session-based message support. See the
-:ref:`messages documentation <ref-contrib-messages>`.
+:doc:`messages documentation </ref/contrib/messages>`.
 
 Session middleware
 ------------------
@@ -161,8 +159,8 @@ Session middleware
 
 .. class:: django.contrib.sessions.middleware.SessionMiddleware
 
-Enables session support. See the :ref:`session documentation
-<topics-http-sessions>`.
+Enables session support. See the :doc:`session documentation
+</topics/http/sessions>`.
 
 Authentication middleware
 -------------------------
@@ -173,8 +171,8 @@ Authentication middleware
 .. class:: django.contrib.auth.middleware.AuthenticationMiddleware
 
 Adds the ``user`` attribute, representing the currently-logged-in user, to
-every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
-<topics-auth>`.
+every incoming ``HttpRequest`` object. See :doc:`Authentication in Web requests
+</topics/auth>`.
 
 CSRF protection middleware
 --------------------------
@@ -189,7 +187,7 @@ CSRF protection middleware
 
 Adds protection against Cross Site Request Forgeries by adding hidden form
 fields to POST forms and checking requests for the correct value. See the
-:ref:`Cross Site Request Forgery protection documentation <ref-contrib-csrf>`.
+:doc:`Cross Site Request Forgery protection documentation </ref/contrib/csrf>`.
 
 Transaction middleware
 ----------------------
@@ -208,4 +206,4 @@ running outside of it run with commit-on-save - the default Django behavior.
 Middleware modules running inside it (coming later in the stack) will be under
 the same transaction control as the view functions.
 
-See the :ref:`transaction management documentation <topics-db-transactions>`.
+See the :doc:`transaction management documentation </topics/db/transactions>`.

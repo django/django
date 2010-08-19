@@ -1,5 +1,3 @@
-.. _topics-http-shortcuts:
-
 =========================
 Django shortcut functions
 =========================

@@ -1,5 +1,3 @@
-.. _faq-usage:
-
 FAQ: Using Django
 =================
 

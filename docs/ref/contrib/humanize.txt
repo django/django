@@ -1,5 +1,3 @@
-.. _ref-contrib-humanize:
-
 ========================
 django.contrib.humanize
 ========================

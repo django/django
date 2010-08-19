@@ -1,5 +1,3 @@
-.. _ref-contrib-comments-settings:
-
 ================
 Comment settings
 ================
@@ -29,7 +27,7 @@ this will be rejected. Defaults to 3000.
 COMMENTS_APP
 ------------
 
-An app which provides :ref:`customization of the comments framework
-<ref-contrib-comments-custom>`.  Use the same dotted-string notation
+An app which provides :doc:`customization of the comments framework
+</ref/contrib/comments/custom>`.  Use the same dotted-string notation
 as in :setting:`INSTALLED_APPS`.  Your custom :setting:`COMMENTS_APP`
 must also be listed in :setting:`INSTALLED_APPS`.

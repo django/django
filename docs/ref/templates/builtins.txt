@@ -1,5 +1,3 @@
-.. _ref-templates-builtins:
-
 ==================================
 Built-in template tags and filters
 ==================================
@@ -60,8 +58,8 @@ csrf_token
 
 In the Django 1.1.X series, this is a no-op tag that returns an empty string for
 future compatibility purposes.  In Django 1.2 and later, it is used for CSRF
-protection, as described in the documentation for :ref:`Cross Site Request
-Forgeries <ref-contrib-csrf>`.
+protection, as described in the documentation for :doc:`Cross Site Request
+Forgeries </ref/contrib/csrf>`.
 
 .. templatetag:: cycle
 
@@ -633,7 +631,7 @@ load
 
 Load a custom template tag set.
 
-See :ref:`Custom tag and filter libraries <howto-custom-template-tags>` for more information.
+See :doc:`Custom tag and filter libraries </howto/custom-template-tags>` for more information.
 
 .. templatetag:: now
 
@@ -2062,7 +2060,7 @@ django.contrib.humanize
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 A set of Django template filters useful for adding a "human touch" to data. See
-:ref:`ref-contrib-humanize`.
+:doc:`/ref/contrib/humanize`.
 
 django.contrib.markup
 ~~~~~~~~~~~~~~~~~~~~~
@@ -2079,7 +2077,7 @@ django.contrib.webdesign
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 A collection of template tags that can be useful while designing a website,
-such as a generator of Lorem Ipsum text. See :ref:`ref-contrib-webdesign`.
+such as a generator of Lorem Ipsum text. See :doc:`/ref/contrib/webdesign`.
 
 i18n
 ~~~~

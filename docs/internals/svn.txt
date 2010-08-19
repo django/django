@@ -1,5 +1,3 @@
-.. _internals-svn:
-
 =================================
 The Django source code repository
 =================================
@@ -87,8 +85,8 @@ the ``django`` module within your checkout.
 
 If you're going to be working on Django's code (say, to fix a bug or
 develop a new feature), you can probably stop reading here and move
-over to :ref:`the documentation for contributing to Django
-<internals-contributing>`, which covers things like the preferred
+over to :doc:`the documentation for contributing to Django
+</internals/contributing>`, which covers things like the preferred
 coding style and how to generate and submit a patch.
 
 
@@ -129,20 +127,20 @@ part of Django itself, and so are no longer separately maintained:
   object-relational mapper. This has been part of Django since the 1.0
   release, as the bundled application ``django.contrib.gis``.
 
-* ``i18n``: Added :ref:`internationalization support <topics-i18n>` to
+* ``i18n``: Added :doc:`internationalization support </topics/i18n/index>` to
   Django. This has been part of Django since the 0.90 release.
 
 * ``magic-removal``: A major refactoring of both the internals and
   public APIs of Django's object-relational mapper. This has been part
   of Django since the 0.95 release.
 
-* ``multi-auth``: A refactoring of :ref:`Django's bundled
-  authentication framework <topics-auth>` which added support for
+* ``multi-auth``: A refactoring of :doc:`Django's bundled
+  authentication framework </topics/auth>` which added support for
   :ref:`authentication backends <authentication-backends>`. This has
   been part of Django since the 0.95 release.
 
-* ``new-admin``: A refactoring of :ref:`Django's bundled
-  administrative application <ref-contrib-admin>`. This became part of
+* ``new-admin``: A refactoring of :doc:`Django's bundled
+  administrative application </ref/contrib/admin/index>`. This became part of
   Django as of the 0.91 release, but was superseded by another
   refactoring (see next listing) prior to the Django 1.0 release.
 

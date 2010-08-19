@@ -1,5 +1,3 @@
-.. _topics-serialization:
-
 ==========================
 Serializing Django objects
 ==========================

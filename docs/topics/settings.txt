@@ -1,5 +1,3 @@
-.. _topics-settings:
-
 ===============
 Django settings
 ===============
@@ -46,7 +44,7 @@ Python `import search path`_.
 The django-admin.py utility
 ---------------------------
 
-When using :ref:`django-admin.py <ref-django-admin>`, you can either set the
+When using :doc:`django-admin.py </ref/django-admin>`, you can either set the
 environment variable once, or explicitly pass in the settings module each time
 you run the utility.
 
@@ -78,7 +76,7 @@ settings file to use. Do that with ``SetEnv``::
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     </Location>
 
-Read the :ref:`Django mod_python documentation <howto-deployment-modpython>` for
+Read the :doc:`Django mod_python documentation </howto/deployment/modpython>` for
 more information.
 
 Default settings
@@ -151,7 +149,7 @@ read it. This is especially important in a shared-hosting environment.
 Available settings
 ==================
 
-For a full list of available settings, see the :ref:`settings reference <ref-settings>`.
+For a full list of available settings, see the :doc:`settings reference </ref/settings>`.
 
 Creating your own settings
 ==========================

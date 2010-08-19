@@ -1,6 +1,4 @@
-.. _ref-contrib-auth:
-
 ``django.contrib.auth``
 =======================
 
-See :ref:`topics-auth`.
+See :doc:`/topics/auth`.

@@ -1,5 +1,3 @@
-.. _topics-conditional-processing:
-
 ===========================
 Conditional View Processing
 ===========================

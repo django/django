@@ -14,12 +14,12 @@ GeoQuerySet API Reference
 Spatial Lookups
 ===============
 
-Just like when using the the :ref:`queryset-api`, interaction 
+Just like when using the the :ref:`queryset-api`, interaction
 with ``GeoQuerySet`` by :ref:`chaining filters <chaining-filters>`.
 Instead of the regular Django :ref:`field-lookups`, the
 spatial lookups in this section are available for :class:`GeometryField`.
 
-For an introduction, see the :ref:`spatial lookups introduction 
+For an introduction, see the :ref:`spatial lookups introduction
 <spatial-lookups-intro>`.  For an overview of what lookups are
 compatible with a particular spatial backend, refer to the
 :ref:`spatial lookup compatibility table <spatial-lookup-compatibility>`.
@@ -31,7 +31,7 @@ bbcontains
 
 *Availability*: PostGIS, MySQL, SpatiaLite
 
-Tests if the geometry field's bounding box completely contains the lookup 
+Tests if the geometry field's bounding box completely contains the lookup
 geometry's bounding box.
 
 Example::
@@ -53,7 +53,7 @@ bboverlaps
 
 *Availability*: PostGIS, MySQL, SpatiaLite
 
-Tests if the geometry field's bounding box overlaps the lookup geometry's 
+Tests if the geometry field's bounding box overlaps the lookup geometry's
 bounding box.
 
 Example::
@@ -277,9 +277,9 @@ the values given in the given pattern.  This lookup requires a tuple parameter,
 
 PostGIS & SpatiaLite
 ~~~~~~~~~~~~~~~~~~~~
-On these spatial backends the intersection pattern is a string comprising 
-nine characters, which  define intersections between  the interior, boundary, 
-and exterior of the geometry field and the lookup geometry.  
+On these spatial backends the intersection pattern is a string comprising
+nine characters, which  define intersections between  the interior, boundary,
+and exterior of the geometry field and the lookup geometry.
 The intersection pattern matrix may only use the following characters:
 ``1``, ``2``, ``T``, ``F``, or ``*``.  This lookup type allows users to "fine tune"
 a specific geometric relationship consistent with the DE-9IM model. [#fnde9im]_
@@ -302,7 +302,7 @@ Oracle
 ~~~~~~
 
 Here the relation pattern is compreised at least one of the nine relation
-strings: ``TOUCH``, ``OVERLAPBDYDISJOINT``, ``OVERLAPBDYINTERSECT``, 
+strings: ``TOUCH``, ``OVERLAPBDYDISJOINT``, ``OVERLAPBDYINTERSECT``,
 ``EQUAL``, ``INSIDE``, ``COVEREDBY``, ``CONTAINS``, ``COVERS``, ``ON``, and
 ``ANYINTERACT``.   Multiple strings may be combined with the logical Boolean
 operator OR, for example, ``'inside+touch'``. [#fnsdorelate]_  The relation
@@ -312,7 +312,7 @@ Example::
 
     Zipcode.objects.filter(poly__relate(geom, 'anyinteract'))
 
-Oracle SQL equivalent:: 
+Oracle SQL equivalent::
 
     SELECT ... WHERE SDO_RELATE(poly, geom, 'anyinteract')
 
@@ -403,7 +403,7 @@ overlaps_left
 
 *Availability*: PostGIS
 
-Tests if the geometry field's bounding box overlaps or is to the left of the lookup 
+Tests if the geometry field's bounding box overlaps or is to the left of the lookup
 geometry's bounding box.
 
 Example::
@@ -422,7 +422,7 @@ overlaps_right
 
 *Availability*: PostGIS
 
-Tests if the geometry field's bounding box overlaps or is to the right of the lookup 
+Tests if the geometry field's bounding box overlaps or is to the right of the lookup
 geometry's bounding box.
 
 Example::
@@ -440,7 +440,7 @@ overlaps_above
 
 *Availability*: PostGIS
 
-Tests if the geometry field's bounding box overlaps or is above the lookup 
+Tests if the geometry field's bounding box overlaps or is above the lookup
 geometry's bounding box.
 
 Example::
@@ -458,7 +458,7 @@ overlaps_below
 
 *Availability*: PostGIS
 
-Tests if the geometry field's bounding box overlaps or is below the lookup 
+Tests if the geometry field's bounding box overlaps or is below the lookup
 geometry's bounding box.
 
 Example::
@@ -476,7 +476,7 @@ strictly_above
 
 *Availability*: PostGIS
 
-Tests if the geometry field's bounding box is strictly above the lookup 
+Tests if the geometry field's bounding box is strictly above the lookup
 geometry's bounding box.
 
 Example::
@@ -494,7 +494,7 @@ strictly_below
 
 *Availability*: PostGIS
 
-Tests if the geometry field's bounding box is strictly above the lookup 
+Tests if the geometry field's bounding box is strictly above the lookup
 geometry's bounding box.
 
 Example::
@@ -662,7 +662,7 @@ Keyword Argument       Description
 =====================  =====================================================
 ``field_name``         By default, ``GeoQuerySet`` methods use the first
                        geographic field encountered in the model.  This
-                       keyword should be used to specify another 
+                       keyword should be used to specify another
                        geographic field (e.g., ``field_name='point2'``)
                        when there are multiple geographic fields in a model.
 
@@ -670,7 +670,7 @@ Keyword Argument       Description
                        used on geometry fields in models that are related
                        via a ``ForeignKey`` relation (e.g.,
                        ``field_name='related__point'``).
-    
+
 ``model_att``          By default, ``GeoQuerySet`` methods typically attach
                        their output in an attribute with the same name as
                        the ``GeoQuerySet`` method.  Setting this keyword
@@ -679,12 +679,12 @@ Keyword Argument       Description
                        ``qs = Zipcode.objects.centroid(model_att='c')`` will
                        attach the centroid of the ``Zipcode`` geometry field
                        in a ``c`` attribute on every model rather than in a
-                       ``centroid`` attribute.  
+                       ``centroid`` attribute.
 
-                       This keyword is required if 
-                       a method name clashes with an existing 
-                       ``GeoQuerySet`` method -- if you wanted to use the 
-                       ``area()`` method on model with a ``PolygonField`` 
+                       This keyword is required if
+                       a method name clashes with an existing
+                       ``GeoQuerySet`` method -- if you wanted to use the
+                       ``area()`` method on model with a ``PolygonField``
 		       named ``area``, for example.
 =====================  =====================================================
 
@@ -705,12 +705,12 @@ each element of this GeoQuerySet.
 
 .. method:: GeoQuerySet.distance(geom, **kwargs)
 
-This method takes a geometry as a parameter, and attaches a ``distance`` 
-attribute to every model in the returned queryset that contains the 
+This method takes a geometry as a parameter, and attaches a ``distance``
+attribute to every model in the returned queryset that contains the
 distance (as a :class:`~django.contrib.gis.measure.Distance` object) to the given geometry.
 
-In the following example (taken from the `GeoDjango distance tests`__), 
-the distance from the `Tasmanian`__ city of Hobart to every other 
+In the following example (taken from the `GeoDjango distance tests`__),
+the distance from the `Tasmanian`__ city of Hobart to every other
 :class:`PointField` in the ``AustraliaCity`` queryset is calculated::
 
     >>> pnt = AustraliaCity.objects.get(name='Hobart').point
@@ -732,7 +732,7 @@ the distance from the `Tasmanian`__ city of Hobart to every other
     Because the ``distance`` attribute is a
     :class:`~django.contrib.gis.measure.Distance` object, you can easily express
     the value in the units of your choice.  For example, ``city.distance.mi`` is
-    the distance value in miles and ``city.distance.km`` is the distance value 
+    the distance value in miles and ``city.distance.km`` is the distance value
     in kilometers.  See the :ref:`ref-measure` for usage details and the list of
     :ref:`supported_units`.
 
@@ -867,9 +867,9 @@ then 4326 (WGS84) is used by default.
     geometry is placed on the models.
 
 .. note::
-    
-    What spatial reference system an integer SRID corresponds to may depend on 
-    the spatial database used.  In other words, the SRID numbers used for Oracle 
+
+    What spatial reference system an integer SRID corresponds to may depend on
+    the spatial database used.  In other words, the SRID numbers used for Oracle
     are not necessarily the same as those used by PostGIS.
 
 Example::
@@ -903,7 +903,7 @@ to each element of the ``GeoQuerySet`` that is the result of the operation.
 .. method:: GeoQuerySet.difference(geom)
 
 Returns the spatial difference of the geographic field with the given
-geometry in a ``difference`` attribute on each element of the 
+geometry in a ``difference`` attribute on each element of the
 ``GeoQuerySet``.
 
 
@@ -913,7 +913,7 @@ geometry in a ``difference`` attribute on each element of the
 .. method:: GeoQuerySet.intersection(geom)
 
 Returns the spatial intersection of the geographic field with the
-given geometry in an ``intersection`` attribute on each element of the 
+given geometry in an ``intersection`` attribute on each element of the
 ``GeoQuerySet``.
 
 ``sym_difference``
@@ -937,7 +937,7 @@ geometry in an ``union`` attribute on each element of the
 Geometry Output
 ---------------
 
-The following ``GeoQuerySet`` methods will return an attribute that has the value 
+The following ``GeoQuerySet`` methods will return an attribute that has the value
 of the geometry field in each model converted to the requested output format.
 
 ``geohash``
@@ -967,8 +967,8 @@ Attaches a ``geojson`` attribute to every model in the queryset that contains th
 =====================  =====================================================
 Keyword Argument       Description
 =====================  =====================================================
-``precision``          It may be used to specify the number of significant 
-                       digits for the coordinates in the GeoJSON 
+``precision``          It may be used to specify the number of significant
+                       digits for the coordinates in the GeoJSON
                        representation -- the default value is 8.
 
 ``crs``                Set this to ``True`` if you want the coordinate
@@ -988,8 +988,8 @@ __ http://geojson.org/
 
 *Availability*: PostGIS, Oracle
 
-Attaches a ``gml`` attribute to every model in the queryset that contains the 
-`Geographic Markup Language (GML)`__ representation of the geometry. 
+Attaches a ``gml`` attribute to every model in the queryset that contains the
+`Geographic Markup Language (GML)`__ representation of the geometry.
 
 Example::
 
@@ -1000,9 +1000,9 @@ Example::
 =====================  =====================================================
 Keyword Argument       Description
 =====================  =====================================================
-``precision``          This keyword is for PostGIS only.  It may be used 
-                       to specify the number of significant digits for the 
-                       coordinates in the GML representation -- the default 
+``precision``          This keyword is for PostGIS only.  It may be used
+                       to specify the number of significant digits for the
+                       coordinates in the GML representation -- the default
                        value is 8.
 
 ``version``            This keyword is for PostGIS only.  It may be used to
@@ -1019,9 +1019,9 @@ __ http://en.wikipedia.org/wiki/Geography_Markup_Language
 
 *Availability*: PostGIS
 
-Attaches a ``kml`` attribute to every model in the queryset that contains the 
-`Keyhole Markup Language (KML)`__ representation of the geometry fields. It 
-should be noted that the contents of the KML are transformed to WGS84 if 
+Attaches a ``kml`` attribute to every model in the queryset that contains the
+`Keyhole Markup Language (KML)`__ representation of the geometry fields. It
+should be noted that the contents of the KML are transformed to WGS84 if
 necessary.
 
 Example::
@@ -1033,8 +1033,8 @@ Example::
 =====================  =====================================================
 Keyword Argument       Description
 =====================  =====================================================
-``precision``          This keyword may be used to specify the number of 
-                       significant digits for the coordinates in the KML 
+``precision``          This keyword may be used to specify the number of
+                       significant digits for the coordinates in the KML
                        representation -- the default value is 8.
 =====================  =====================================================
 
@@ -1054,11 +1054,11 @@ the `Scalable Vector Graphics (SVG)`__ path data of the geometry fields.
 Keyword Argument       Description
 =====================  =====================================================
 ``relative``           If set to ``True``, the path data will be implemented
-                       in terms of relative moves.  Defaults to ``False``, 
+                       in terms of relative moves.  Defaults to ``False``,
 		       meaning that absolute moves are used instead.
 
-``precision``          This keyword may be used to specify the number of 
-                       significant digits for the coordinates in the SVG 
+``precision``          This keyword may be used to specify the number of
+                       significant digits for the coordinates in the SVG
                        representation -- the default value is 8.
 =====================  =====================================================
 
@@ -1129,7 +1129,7 @@ dissolving boundaries.
 
 *Availability*: PostGIS, Oracle
 
-Returns the extent of the ``GeoQuerySet`` as a four-tuple, comprising the 
+Returns the extent of the ``GeoQuerySet`` as a four-tuple, comprising the
 lower left coordinate and the upper right coordinate.
 
 Example::
@@ -1163,7 +1163,7 @@ Example::
 
 *Availability*: PostGIS
 
-Returns a ``LineString`` constructed from the point field geometries in the 
+Returns a ``LineString`` constructed from the point field geometries in the
 ``GeoQuerySet``.  Currently, ordering the queryset has no effect.
 
 Example::
@@ -1184,25 +1184,25 @@ use of ``unionagg`` is processor intensive and may take a significant amount
 of time on large querysets.
 
 .. note::
-  
+
     If the computation time for using this method is too expensive,
     consider using :meth:`GeoQuerySet.collect` instead.
 
 Example::
-    
+
     >>> u = Zipcode.objects.unionagg() # This may take a long time.
     >>> u = Zipcode.objects.filter(poly__within=bbox).unionagg() # A more sensible approach.
 
 =====================  =====================================================
 Keyword Argument       Description
 =====================  =====================================================
-``tolerance``          This keyword is for Oracle only.  It is for the 
+``tolerance``          This keyword is for Oracle only.  It is for the
                        tolerance value used by the ``SDOAGGRTYPE``
-                       procedure; the  `Oracle documentation`__ has more 
+                       procedure; the  `Oracle documentation`__ has more
                        details.
 =====================  =====================================================
 
-__ http://download.oracle.com/docs/html/B14255_01/sdo_intro.htm#sthref150 
+__ http://download.oracle.com/docs/html/B14255_01/sdo_intro.htm#sthref150
 
 Aggregate Functions
 -------------------

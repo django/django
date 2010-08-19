@@ -7,17 +7,17 @@ Measurement Objects
 .. module:: django.contrib.gis.measure
    :synopsis: GeoDjango's distance and area measurment objects.
 
-The :mod:`django.contrib.gis.measure` module contains objects that allow 
-for convenient representation of distance and area units of measure. [#]_ 
-Specifically, it implements two objects, :class:`Distance` and 
-:class:`Area` -- both of which may be accessed via the 
+The :mod:`django.contrib.gis.measure` module contains objects that allow
+for convenient representation of distance and area units of measure. [#]_
+Specifically, it implements two objects, :class:`Distance` and
+:class:`Area` -- both of which may be accessed via the
 :class:`D` and :class:`A` convenience aliases, respectively.
 
 Example
 =======
 
-:class:`Distance` objects may be instantiated using a keyword argument indicating the 
-context of the units.  In the example below, two different distance objects are 
+:class:`Distance` objects may be instantiated using a keyword argument indicating the
+context of the units.  In the example below, two different distance objects are
 instantiated in units of kilometers (``km``) and miles (``mi``)::
 
     >>> from django.contrib.gis.measure import Distance, D
@@ -40,7 +40,7 @@ Moreover, arithmetic operations may be performed between the distance
 objects::
 
     >>> print d1 + d2 # Adding 5 miles to 5 kilometers
-    13.04672 km    
+    13.04672 km
     >>> print d2 - d1 # Subtracting 5 kilometers from 5 miles
     1.89314403881 mi
 
@@ -67,7 +67,7 @@ Supported units
 =================================  ========================================
 Unit Attribute                     Full name or alias(es)
 =================================  ========================================
-``km``                             Kilometre, Kilometer   
+``km``                             Kilometre, Kilometer
 ``mi``                             Mile
 ``m``                              Meter, Metre
 ``yd``                             Yard
@@ -163,7 +163,7 @@ Measurement API
        12.949940551680001
 
    .. classmethod:: unit_attname(unit_name)
-   
+
    Returns the area unit attribute name for the given full unit name.
    For example::
 
@@ -175,6 +175,6 @@ Measurement API
    Alias for :class:`Area` class.
 
 .. rubric:: Footnotes
-.. [#] `Robert Coup <http://koordinates.com/>`_ is the initial author of the measure objects, 
-       and was inspired by Brian Beck's work in `geopy <http://code.google.com/p/geopy/>`_ 
+.. [#] `Robert Coup <http://koordinates.com/>`_ is the initial author of the measure objects,
+       and was inspired by Brian Beck's work in `geopy <http://code.google.com/p/geopy/>`_
        and Geoff Biggs' PhD work on dimensioned units for robotics.

@@ -1,5 +1,3 @@
-.. _topics-forms-index:
-
 ==================
 Working with forms
 ==================
@@ -7,8 +5,8 @@ Working with forms
 .. admonition:: About this document
 
     This document provides an introduction to Django's form handling features.
-    For a more detailed look at the forms API, see :ref:`ref-forms-api`. For
-    documentation of the available field types, see :ref:`ref-forms-fields`.
+    For a more detailed look at the forms API, see :doc:`/ref/forms/api`. For
+    documentation of the available field types, see :doc:`/ref/forms/fields`.
 
 .. highlightlang:: html+django
 
@@ -77,10 +75,10 @@ personal Web site:
 A form is composed of ``Field`` objects. In this case, our form has four
 fields: ``subject``, ``message``, ``sender`` and ``cc_myself``. ``CharField``,
 ``EmailField`` and ``BooleanField`` are just three of the available field types;
-a full list can be found in :ref:`ref-forms-fields`.
+a full list can be found in :doc:`/ref/forms/fields`.
 
 If your form is going to be used to directly add or edit a Django model, you can
-use a :ref:`ModelForm <topics-forms-modelforms>` to avoid duplicating your model
+use a :doc:`ModelForm </topics/forms/modelforms>` to avoid duplicating your model
 description.
 
 Using a form in a view
@@ -163,7 +161,7 @@ Extending the above example, here's how the form data could be processed:
         send_mail(subject, message, sender, recipients)
         return HttpResponseRedirect('/thanks/') # Redirect after POST
 
-For more on sending e-mail from Django, see :ref:`topics-email`.
+For more on sending e-mail from Django, see :doc:`/topics/email`.
 
 Displaying a form using a template
 ----------------------------------
@@ -397,4 +395,4 @@ This covers the basics, but forms can do a whole lot more:
 
 .. seealso::
 
-    The :ref:`form API reference <ref-forms-index>`.
+    The :doc:`form API reference </ref/forms/index>`.

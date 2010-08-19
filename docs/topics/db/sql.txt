@@ -1,12 +1,10 @@
-.. _topics-db-sql:
-
 ==========================
 Performing raw SQL queries
 ==========================
 
 .. currentmodule:: django.db.models
 
-When the :ref:`model query APIs <topics-db-queries>` don't go far enough, you
+When the :doc:`model query APIs </topics/db/queries>` don't go far enough, you
 can fall back to writing raw SQL. Django gives you two ways of performing raw
 SQL queries: you can use :meth:`Manager.raw()` to `perform raw queries and
 return model instances`__, or you can avoid the model layer entirely and
@@ -269,7 +267,7 @@ Connections and cursors
 -----------------------
 
 ``connection`` and ``cursor`` mostly implement the standard `Python DB-API`_
-(except when it comes to :ref:`transaction handling <topics-db-transactions>`).
+(except when it comes to :doc:`transaction handling </topics/db/transactions>`).
 If you're not familiar with the Python DB-API, note that the SQL statement in
 ``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
 directly within the SQL. If you use this technique, the underlying database

@@ -1,5 +1,3 @@
-.. _ref-models-instances:
-
 ========================
 Model instance reference
 ========================
@@ -7,13 +5,13 @@ Model instance reference
 .. currentmodule:: django.db.models
 
 This document describes the details of the ``Model`` API. It builds on the
-material presented in the :ref:`model <topics-db-models>` and :ref:`database
-query <topics-db-queries>` guides, so you'll probably want to read and
+material presented in the :doc:`model </topics/db/models>` and :doc:`database
+query </topics/db/queries>` guides, so you'll probably want to read and
 understand those documents before reading this one.
 
 Throughout this reference we'll use the :ref:`example weblog models
-<queryset-model-example>` presented in the :ref:`database query guide
-<topics-db-queries>`.
+<queryset-model-example>` presented in the :doc:`database query guide
+</topics/db/queries>`.
 
 Creating objects
 ================
@@ -45,8 +43,8 @@ All three steps are performed when you call by a model's
 
 When you use a ``ModelForm``, the call to ``is_valid()`` will perform
 these validation steps for all the fields that are included on the
-form. (See the :ref:`ModelForm documentation
-<topics-forms-modelforms>` for more information.) You should only need
+form. (See the :doc:`ModelForm documentation
+</topics/forms/modelforms>` for more information.) You should only need
 to call a model's ``full_clean()`` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
 ModelForm that require validation.
@@ -215,7 +213,7 @@ What happens when you save?
 
 When you save an object, Django performs the following steps:
 
-    1. **Emit a pre-save signal.** The :ref:`signal <ref-signals>`
+    1. **Emit a pre-save signal.** The :doc:`signal </ref/signals>`
        :attr:`django.db.models.signals.pre_save` is sent, allowing any
        functions listening for that signal to take some customized
        action.
@@ -426,8 +424,8 @@ Django uses this in its admin interface. If an object defines
 link that will jump you directly to the object's public view, according to
 ``get_absolute_url()``.
 
-Also, a couple of other bits of Django, such as the :ref:`syndication feed
-framework <ref-contrib-syndication>`, use ``get_absolute_url()`` as a
+Also, a couple of other bits of Django, such as the :doc:`syndication feed
+framework </ref/contrib/syndication>`, use ``get_absolute_url()`` as a
 convenience to reward people who've defined the method.
 
 It's good practice to use ``get_absolute_url()`` in templates, instead of
@@ -523,8 +521,8 @@ of the view name::
     def get_absolute_url(self):
         return ('people_view', [str(self.id)])
 
-More details on named URL patterns are in the :ref:`URL dispatch documentation
-<topics-http-urls>`.
+More details on named URL patterns are in the :doc:`URL dispatch documentation
+</topics/http/urls>`.
 
 Extra instance methods
 ======================

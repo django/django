@@ -1,5 +1,3 @@
-.. _howto-static-files:
-
 =========================
 How to serve static files
 =========================
@@ -42,7 +40,7 @@ Here's the formal definition of the :func:`~django.views.static.serve` view:
 
 .. function:: def serve(request, path, document_root, show_indexes=False)
 
-To use it, just put this in your :ref:`URLconf <topics-http-urls>`::
+To use it, just put this in your :doc:`URLconf </topics/http/urls>`::
 
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': '/path/to/media'}),
@@ -71,7 +69,7 @@ required. For example, if we have a line in ``settings.py`` that says::
 
     STATIC_DOC_ROOT = '/path/to/media'
 
-...we could write the above :ref:`URLconf <topics-http-urls>` entry as::
+...we could write the above :doc:`URLconf </topics/http/urls>` entry as::
 
     from django.conf import settings
     ...

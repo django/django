@@ -1,5 +1,3 @@
-.. _topics-index:
-
 Using Django
 ============
 

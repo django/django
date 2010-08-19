@@ -1,5 +1,3 @@
-.. _ref-settings:
-
 ========
 Settings
 ========
@@ -74,7 +72,7 @@ of (Full name, e-mail address). Example::
     (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
 
 Note that Django will e-mail *all* of these people whenever an error happens.
-See :ref:`howto-error-reporting` for more information.
+See :doc:`/howto/error-reporting` for more information.
 
 .. setting:: ALLOWED_INCLUDE_ROOTS
 
@@ -99,7 +97,7 @@ APPEND_SLASH
 Default: ``True``
 
 Whether to append trailing slashes to URLs. This is only used if
-``CommonMiddleware`` is installed (see :ref:`topics-http-middleware`). See also
+``CommonMiddleware`` is installed (see :doc:`/topics/http/middleware`). See also
 ``PREPEND_WWW``.
 
 .. setting:: AUTHENTICATION_BACKENDS
@@ -110,8 +108,8 @@ AUTHENTICATION_BACKENDS
 Default: ``('django.contrib.auth.backends.ModelBackend',)``
 
 A tuple of authentication backend classes (as strings) to use when attempting to
-authenticate a user. See the :ref:`authentication backends documentation
-<authentication-backends>` for details.
+authenticate a user. See the :doc:`authentication backends documentation
+</ref/authbackends>` for details.
 
 .. setting:: AUTH_PROFILE_MODULE
 
@@ -130,7 +128,7 @@ CACHE_BACKEND
 
 Default: ``'locmem://'``
 
-The cache backend to use. See :ref:`topics-cache`.
+The cache backend to use. See :doc:`/topics/cache`.
 
 .. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
 
@@ -140,7 +138,7 @@ CACHE_MIDDLEWARE_KEY_PREFIX
 Default: ``''`` (Empty string)
 
 The cache key prefix that the cache middleware should use. See
-:ref:`topics-cache`.
+:doc:`/topics/cache`.
 
 .. setting:: CACHE_MIDDLEWARE_SECONDS
 
@@ -177,7 +175,7 @@ CSRF_COOKIE_NAME
 Default: ``'csrftoken'``
 
 The name of the cookie to use for the CSRF authentication token. This can be whatever you
-want.  See :ref:`ref-contrib-csrf`.
+want.  See :doc:`/ref/contrib/csrf`.
 
 .. setting:: CSRF_FAILURE_VIEW
 
@@ -195,7 +193,7 @@ is rejected by the CSRF protection.  The function should have this signature::
 
 where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
-:ref:`ref-contrib-csrf`.
+:doc:`/ref/contrib/csrf`.
 
 
 .. setting:: DATABASES
@@ -385,7 +383,7 @@ If the default value (``None``) is used with the SQLite database engine, the
 tests will use a memory resident database. For all other database engines the
 test database will use the name ``'test_' + DATABASE_NAME``.
 
-See :ref:`topics-testing`.
+See :doc:`/topics/testing`.
 
 
 .. setting:: DATABASE_ROUTERS
@@ -563,7 +561,7 @@ DEFAULT_FILE_STORAGE
 Default: ``'django.core.files.storage.FileSystemStorage'``
 
 Default file storage class to be used for any file-related operations that don't
-specify a particular storage system. See :ref:`topics-files`.
+specify a particular storage system. See :doc:`/topics/files`.
 
 DEFAULT_FROM_EMAIL
 ------------------
@@ -607,7 +605,7 @@ Default: ``()`` (Empty tuple)
 List of compiled regular expression objects representing User-Agent strings that
 are not allowed to visit any page, systemwide. Use this for bad robots/crawlers.
 This is only used if ``CommonMiddleware`` is installed (see
-:ref:`topics-http-middleware`).
+:doc:`/topics/http/middleware`).
 
 .. setting:: EMAIL_BACKEND
 
@@ -619,7 +617,7 @@ EMAIL_BACKEND
 Default: ``'django.core.mail.backends.smtp.EmailBackend'``
 
 The backend to use for sending emails. For the list of available backends see
-:ref:`topics-email`.
+:doc:`/topics/email`.
 
 .. setting:: EMAIL_FILE_PATH
 
@@ -724,7 +722,7 @@ Default::
     ("django.core.files.uploadhandler.MemoryFileUploadHandler",
      "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
 
-A tuple of handlers to use for uploading. See :ref:`topics-files` for details.
+A tuple of handlers to use for uploading. See :doc:`/topics/files` for details.
 
 .. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
 
@@ -736,7 +734,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE
 Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size (in bytes) that an upload will be before it gets streamed to
-the file system. See :ref:`topics-files` for details.
+the file system. See :doc:`/topics/files` for details.
 
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
@@ -779,7 +777,7 @@ The directory to store data temporarily while uploading files. If ``None``,
 Django will use the standard temporary directory for the operating system. For
 example, this will default to '/tmp' on \*nix-style operating systems.
 
-See :ref:`topics-files` for details.
+See :doc:`/topics/files` for details.
 
 .. setting:: FIRST_DAY_OF_WEEK
 
@@ -807,7 +805,7 @@ Default: ``()`` (Empty tuple)
 
 List of locations of the fixture data files, in search order. Note that
 these paths should use Unix-style forward slashes, even on Windows. See
-:ref:`topics-testing`.
+:doc:`/topics/testing`.
 
 FORCE_SCRIPT_NAME
 ------------------
@@ -867,7 +865,7 @@ Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
 
 A tuple of strings that specify beginnings of URLs that should be ignored by
 the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` and
-the :ref:`howto-error-reporting`.
+the :doc:`/howto/error-reporting`.
 
 .. setting:: INSTALLED_APPS
 
@@ -900,7 +898,7 @@ A tuple of IP addresses, as strings, that:
 
     * See debug comments, when ``DEBUG`` is ``True``
     * Receive X headers if the ``XViewMiddleware`` is installed (see
-      :ref:`topics-http-middleware`)
+      :doc:`/topics/http/middleware`)
 
 .. setting:: LANGUAGE_CODE
 
@@ -911,7 +909,7 @@ Default: ``'en-us'``
 
 A string representing the language code for this installation. This should be in
 standard :term:`language format<language code>`. For example, U.S. English is
-``"en-us"``. See :ref:`topics-i18n`.
+``"en-us"``. See :doc:`/topics/i18n/index`.
 
 .. setting:: LANGUAGE_COOKIE_NAME
 
@@ -924,7 +922,7 @@ Default: ``'django_language'``
 
 The name of the cookie to use for the language cookie. This can be whatever you
 want (but should be different from ``SESSION_COOKIE_NAME``). See
-:ref:`topics-i18n`.
+:doc:`/topics/i18n/index`.
 
 .. setting:: LANGUAGES
 
@@ -942,7 +940,7 @@ The list is a tuple of two-tuples in the format ``(language code, language
 name)``, the ``language code`` part should be a
 :term:`language name<language code>` -- for example, ``('ja', 'Japanese')``.
 This specifies which languages are available for language selection. See
-:ref:`topics-i18n`.
+:doc:`/topics/i18n/index`.
 
 Generally, the default value should suffice. Only set this setting if you want
 to restrict language selection to a subset of the Django-provided languages.
@@ -1062,7 +1060,7 @@ MESSAGE_LEVEL
 Default: `messages.INFO`
 
 Sets the minimum message level that will be recorded by the messages
-framework. See the :ref:`messages documentation <ref-contrib-messages>` for
+framework. See the :doc:`messages documentation </ref/contrib/messages>` for
 more details.
 
 MESSAGE_STORAGE
@@ -1073,7 +1071,7 @@ MESSAGE_STORAGE
 Default: ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
 
 Controls where Django stores message data.  See the
-:ref:`messages documentation <ref-contrib-messages>` for more details.
+:doc:`messages documentation </ref/contrib/messages>` for more details.
 
 MESSAGE_TAGS
 ------------
@@ -1089,7 +1087,7 @@ Default::
         messages.ERROR: 'error',}
 
 Sets the mapping of message levels to message tags. See the
-:ref:`messages documentation <ref-contrib-messages>` for more details.
+:doc:`messages documentation </ref/contrib/messages>` for more details.
 
 MIDDLEWARE_CLASSES
 ------------------
@@ -1102,12 +1100,12 @@ Default::
      'django.contrib.auth.middleware.AuthenticationMiddleware',
      'django.contrib.messages.middleware.MessageMiddleware',)
 
-A tuple of middleware classes to use. See :ref:`topics-http-middleware`.
+A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
 
 .. versionchanged:: 1.2
    ``'django.contrib.messages.middleware.MessageMiddleware'`` was added to the
-   default.  For more information, see the :ref:`messages documentation
-   <ref-contrib-messages>`.
+   default.  For more information, see the :doc:`messages documentation
+   </ref/contrib/messages>`.
 
 .. setting:: MONTH_DAY_FORMAT
 
@@ -1153,7 +1151,7 @@ PREPEND_WWW
 Default: ``False``
 
 Whether to prepend the "www." subdomain to URLs that don't have it. This is only
-used if ``CommonMiddleware`` is installed (see :ref:`topics-http-middleware`).
+used if ``CommonMiddleware`` is installed (see :doc:`/topics/http/middleware`).
 See also ``APPEND_SLASH``.
 
 .. setting:: PROFANITIES_LIST
@@ -1201,8 +1199,8 @@ Default: ``False``
 Whether to send an e-mail to the ``MANAGERS`` each time somebody visits a
 Django-powered page that is 404ed with a non-empty referer (i.e., a broken
 link). This is only used if ``CommonMiddleware`` is installed (see
-:ref:`topics-http-middleware`. See also ``IGNORABLE_404_STARTS``,
-``IGNORABLE_404_ENDS`` and :ref:`howto-error-reporting`.
+:doc:`/topics/http/middleware`. See also ``IGNORABLE_404_STARTS``,
+``IGNORABLE_404_ENDS`` and :doc:`/howto/error-reporting`.
 
 .. setting:: SERIALIZATION_MODULES
 
@@ -1234,7 +1232,7 @@ SESSION_COOKIE_AGE
 
 Default: ``1209600`` (2 weeks, in seconds)
 
-The age of session cookies, in seconds. See :ref:`topics-http-sessions`.
+The age of session cookies, in seconds. See :doc:`/topics/http/sessions`.
 
 .. setting:: SESSION_COOKIE_DOMAIN
 
@@ -1245,7 +1243,7 @@ Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
 ``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
-domain cookie. See the :ref:`topics-http-sessions`.
+domain cookie. See the :doc:`/topics/http/sessions`.
 
 .. setting:: SESSION_COOKIE_NAME
 
@@ -1255,7 +1253,7 @@ SESSION_COOKIE_NAME
 Default: ``'sessionid'``
 
 The name of the cookie to use for sessions. This can be whatever you want (but
-should be different from ``LANGUAGE_COOKIE_NAME``). See the :ref:`topics-http-sessions`.
+should be different from ``LANGUAGE_COOKIE_NAME``). See the :doc:`/topics/http/sessions`.
 
 .. setting:: SESSION_COOKIE_PATH
 
@@ -1283,7 +1281,7 @@ Default: ``False``
 Whether to use a secure cookie for the session cookie. If this is set to
 ``True``, the cookie will be marked as "secure," which means browsers may
 ensure that the cookie is only sent under an HTTPS connection.
-See the :ref:`topics-http-sessions`.
+See the :doc:`/topics/http/sessions`.
 
 .. setting:: SESSION_ENGINE
 
@@ -1304,7 +1302,7 @@ Controls where Django stores session data. Valid values are:
     * ``'django.contrib.sessions.backends.cache'``
     * ``'django.contrib.sessions.backends.cached_db'``
 
-See :ref:`topics-http-sessions`.
+See :doc:`/topics/http/sessions`.
 
 .. setting:: SESSION_EXPIRE_AT_BROWSER_CLOSE
 
@@ -1314,7 +1312,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE
 Default: ``False``
 
 Whether to expire the session when the user closes his or her browser.
-See the :ref:`topics-http-sessions`.
+See the :doc:`/topics/http/sessions`.
 
 .. setting:: SESSION_FILE_PATH
 
@@ -1326,7 +1324,7 @@ SESSION_FILE_PATH
 Default: ``None``
 
 If you're using file-based session storage, this sets the directory in
-which Django will store session data. See :ref:`topics-http-sessions`. When
+which Django will store session data. See :doc:`/topics/http/sessions`. When
 the default value (``None``) is used, Django will use the standard temporary
 directory for the system.
 
@@ -1338,7 +1336,7 @@ SESSION_SAVE_EVERY_REQUEST
 Default: ``False``
 
 Whether to save the session data on every request. See
-:ref:`topics-http-sessions`.
+:doc:`/topics/http/sessions`.
 
 .. setting:: SHORT_DATE_FORMAT
 
@@ -1383,7 +1381,7 @@ The ID, as an integer, of the current site in the ``django_site`` database
 table. This is used so that application data can hook into specific site(s)
 and a single database can manage content for multiple sites.
 
-See :ref:`ref-contrib-sites`.
+See :doc:`/ref/contrib/sites`.
 
 .. _site framework docs: ../sites/
 
@@ -1406,8 +1404,8 @@ of items to be merged into the context.
 
 .. versionchanged:: 1.2
    ``"django.contrib.messages.context_processors.messages"`` was added to the
-   default.  For more information, see the :ref:`messages documentation
-   <ref-contrib-messages>`.
+   default.  For more information, see the :doc:`messages documentation
+   </ref/contrib/messages>`.
 
 .. versionchanged:: 1.2
     The auth context processor was moved in this release from its old location
@@ -1441,7 +1439,7 @@ Default: ``()`` (Empty tuple)
 List of locations of the template source files, in search order. Note that
 these paths should use Unix-style forward slashes, even on Windows.
 
-See :ref:`topics-templates`..
+See :doc:`/topics/templates`.
 
 .. setting:: TEMPLATE_LOADERS
 
@@ -1457,7 +1455,7 @@ A tuple of template loader classes, specified as strings. Each ``Loader`` class
 knows how to import templates from a particular source. Optionally, a tuple can be
 used instead of a string. The first item in the tuple should be the ``Loader``'s
 module, subsequent items are passed to the ``Loader`` during initialization. See
-:ref:`ref-templates-api`.
+:doc:`/ref/templates/api`.
 
 .. setting:: TEMPLATE_STRING_IF_INVALID
 
@@ -1480,7 +1478,7 @@ Default: ``'django.test.simple.DjangoTestSuiteRunner'``
    Prior to 1.2, test runners were a function, not a class.
 
 The name of the class to use for starting the test suite. See
-:ref:`topics-testing`.
+:doc:`/topics/testing`.
 
 .. _Testing Django Applications: ../testing/
 
@@ -1599,7 +1597,7 @@ Default: ``False``
 
 A boolean that specifies whether to output the "Etag" header. This saves
 bandwidth but slows down performance. This is only used if ``CommonMiddleware``
-is installed (see :ref:`topics-http-middleware`).
+is installed (see :doc:`/topics/http/middleware`).
 
 .. setting:: USE_I18N
 

@@ -1,5 +1,3 @@
-.. _misc-index:
-
 Meta-documentation and miscellany
 =================================
 

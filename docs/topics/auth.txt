@@ -1,5 +1,3 @@
-.. _topics-auth:
-
 =============================
 User authentication in Django
 =============================
@@ -138,8 +136,8 @@ Methods
     :class:`~django.contrib.auth.models.User` objects have two many-to-many
     fields: models.User. ``groups`` and ``user_permissions``.
     :class:`~django.contrib.auth.models.User` objects can access their related
-    objects in the same way as any other :ref:`Django model
-    <topics-db-models>`:
+    objects in the same way as any other :doc:`Django model
+    </topics/db/models>`:
 
     .. code-block:: python
 
@@ -537,7 +535,7 @@ First, install the
 :class:`~django.contrib.sessions.middleware.SessionMiddleware` and
 :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
 middlewares by adding them to your :setting:`MIDDLEWARE_CLASSES` setting. See
-the :ref:`session documentation <topics-http-sessions>` for more information.
+the :doc:`session documentation </topics/http/sessions>` for more information.
 
 Once you have those middlewares installed, you'll be able to access
 :attr:`request.user <django.http.HttpRequest.user>` in views.
@@ -554,7 +552,7 @@ section). You can tell them apart with
     else:
         # Do something for anonymous users.
 
-.. _howtologauserin:
+.. _how-to-log-a-user-in:
 
 How to log a user in
 --------------------
@@ -753,7 +751,7 @@ the following line to your URLconf::
     template context variables:
 
         * ``form``: A :class:`~django.forms.Form` object representing the login
-          form. See the :ref:`forms documentation <topics-forms-index>` for
+          form. See the :doc:`forms documentation </topics/forms/index>` for
           more on ``Form`` objects.
 
         * ``next``: The URL to redirect to after successful login. This may
@@ -769,7 +767,7 @@ the following line to your URLconf::
         * ``site_name``: An alias for ``site.name``. If you don't have the site
           framework installed, this will be set to the value of
           :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
-          For more on sites, see :ref:`ref-contrib-sites`.
+          For more on sites, see :doc:`/ref/contrib/sites`.
 
     If you'd prefer not to call the template :file:`registration/login.html`,
     you can pass the ``template_name`` parameter via the extra arguments to
@@ -1111,7 +1109,7 @@ The permission_required decorator
 Limiting access to generic views
 --------------------------------
 
-To limit access to a :ref:`generic view <ref-generic-views>`, write a thin
+To limit access to a :doc:`generic view </ref/generic-views>`, write a thin
 wrapper around the view, and point your URLconf to your wrapper instead of the
 generic view itself. For example::
 
@@ -1228,13 +1226,13 @@ Methods
 ~~~~~~~
 
 :class:`~django.contrib.auth.models.Permission` objects have the standard
-data-access methods like any other :ref:`Django model <ref-models-instances>`.
+data-access methods like any other :doc:`Django model </ref/models/instances>`.
 
 Authentication data in templates
 ================================
 
 The currently logged-in user and his/her permissions are made available in the
-:ref:`template context <ref-templates-api>` when you use
+:doc:`template context </ref/templates/api>` when you use
 :class:`~django.template.context.RequestContext`.
 
 .. admonition:: Technicality
@@ -1323,7 +1321,7 @@ Messages
 
 .. deprecated:: 1.2
    This functionality will be removed in Django 1.4.  You should use the
-   :ref:`messages framework <ref-contrib-messages>` for all new projects and
+   :doc:`messages framework </ref/contrib/messages>` for all new projects and
    begin to update your existing code immediately.
 
 The message system is a lightweight way to queue messages for given users.
@@ -1358,7 +1356,7 @@ a playlist::
 
 When you use :class:`~django.template.context.RequestContext`, the currently
 logged-in user and his/her messages are made available in the
-:ref:`template context <ref-templates-api>` as the template variable
+:doc:`template context </ref/templates/api>` as the template variable
 ``{{ messages }}``. Here's an example of template code that displays messages:
 
 .. code-block:: html+django
@@ -1373,14 +1371,14 @@ logged-in user and his/her messages are made available in the
 
 .. versionchanged:: 1.2
    The ``messages`` template variable uses a backwards compatible method in the
-   :ref:`messages framework <ref-contrib-messages>` to retrieve messages from
+   :doc:`messages framework </ref/contrib/messages>` to retrieve messages from
    both the user ``Message`` model and from the new framework.  Unlike in
    previous revisions, the messages will not be erased unless they are actually
    displayed.
 
 Finally, note that this messages framework only works with users in the user
 database. To send messages to anonymous users, use the
-:ref:`messages framework <ref-contrib-messages>`.
+:doc:`messages framework </ref/contrib/messages>`.
 
 .. _authentication-backends:
 
@@ -1401,7 +1399,7 @@ plug in other authentication sources. You can override Django's default
 database-based scheme, or you can use the default system in tandem with other
 systems.
 
-See the :ref:`authentication backend reference <ref-authentication-backends>`
+See the :doc:`authentication backend reference </ref/authbackends>`
 for information on the authentication backends included with Django.
 
 Specifying authentication backends
@@ -1410,9 +1408,9 @@ Specifying authentication backends
 Behind the scenes, Django maintains a list of "authentication backends" that it
 checks for authentication. When somebody calls
 :func:`django.contrib.auth.authenticate()` -- as described in :ref:`How to log
-a user in` above -- Django tries authenticating across all of its
-authentication backends. If the first authentication method fails, Django tries
-the second one, and so on, until all backends have been attempted.
+a user in <how-to-log-a-user-in>` above -- Django tries authenticating across
+all of its authentication backends. If the first authentication method fails,
+Django tries the second one, and so on, until all backends have been attempted.
 
 The list of authentication backends to use is specified in the
 :setting:`AUTHENTICATION_BACKENDS` setting. This should be a tuple of Python
@@ -1592,7 +1590,7 @@ object permissions will always return ``False`` or an empty list (depending on
 the check performed).
 
 To enable object permissions in your own
-:ref:`authentication backend <ref-authentication-backends>` you'll just have
+:doc:`authentication backend </ref/authbackends>` you'll just have
 to allow passing an ``obj`` parameter to the permission methods and set the
 ``supports_object_permissions`` class attribute to ``True``.
 

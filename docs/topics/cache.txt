@@ -1,5 +1,3 @@
-.. _topics-cache:
-
 ========================
 Django's cache framework
 ========================
@@ -344,7 +342,7 @@ Additionally, the cache middleware automatically sets a few headers in each
     * Sets the ``Cache-Control`` header to give a max age for the page --
       again, from the ``CACHE_MIDDLEWARE_SECONDS`` setting.
 
-See :ref:`topics-http-middleware` for more on middleware.
+See :doc:`/topics/http/middleware` for more on middleware.
 
 .. versionadded:: 1.0
 
@@ -365,7 +363,7 @@ include the name of the active :term:`language<language code>`.
 This allows you to easily cache multilingual sites without having to create
 the cache key yourself.
 
-See :ref:`topics-i18n-deployment` for more on how Django discovers the active
+See :doc:`/topics/i18n/deployment` for more on how Django discovers the active
 language.
 
 __ `Controlling cache: Using other headers`_

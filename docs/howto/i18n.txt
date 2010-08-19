@@ -1,5 +1,3 @@
-.. _howto-i18n:
-
 .. _using-translations-in-your-own-projects:
 
 ===============================================
@@ -46,7 +44,7 @@ To create message files, you use the :djadmin:`django-admin.py makemessages <mak
 tool. You only need to be in the same directory where the ``locale/`` directory
 is located. And you use :djadmin:`django-admin.py compilemessages <compilemessages>`
 to produce the binary ``.mo`` files that are used by ``gettext``. Read the
-:ref:`topics-i18n-localization` document for more details.
+:doc:`/topics/i18n/localization` document for more details.
 
 You can also run ``django-admin.py compilemessages --settings=path.to.settings``
 to make the compiler process all the directories in your :setting:`LOCALE_PATHS`

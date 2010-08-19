@@ -6,7 +6,7 @@ Testing GeoDjango Apps
 
 In Django 1.2, the addition of :ref:`spatial-backends`
 simplified the process of testing GeoDjango applications.  Specifically, testing
-GeoDjango applications is now the same as :ref:`topics-testing`.
+GeoDjango applications is now the same as :doc:`/topics/testing`.
 
 Included in this documentation are some additional notes and settings
 for :ref:`testing-postgis` and :ref:`testing-spatialite` users.

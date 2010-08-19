@@ -1,5 +1,3 @@
-.. _topics-http-sessions:
-
 ===================
 How to use sessions
 ===================
@@ -15,7 +13,7 @@ Cookies contain a session ID -- not the data itself.
 Enabling sessions
 =================
 
-Sessions are implemented via a piece of :ref:`middleware <ref-middleware>`.
+Sessions are implemented via a piece of :doc:`middleware </ref/middleware>`.
 
 To enable session functionality, do the following:
 
@@ -56,8 +54,8 @@ For better performance, you may want to use a cache-based session backend.
    Django 1.0 did not include the ``cached_db`` session backend.
 
 To store session data using Django's cache system, you'll first need to make
-sure you've configured your cache; see the :ref:`cache documentation
-<topics-cache>` for details.
+sure you've configured your cache; see the :doc:`cache documentation
+</topics/cache>` for details.
 
 .. warning::
 
@@ -412,7 +410,7 @@ in the past -- but your application may have different requirements.
 Settings
 ========
 
-A few :ref:`Django settings <ref-settings>` give you control over session behavior:
+A few :doc:`Django settings </ref/settings>` give you control over session behavior:
 
 SESSION_ENGINE
 --------------

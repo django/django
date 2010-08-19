@@ -1,5 +1,3 @@
-.. _ref-models-fields:
-
 =====================
 Model field reference
 =====================
@@ -14,8 +12,8 @@ This document contains all the gory details about all the `field options`_ and
 
 .. seealso::
 
-    If the built-in fields don't do the trick, you can easily :ref:`write your
-    own custom model fields <howto-custom-model-fields>`.
+    If the built-in fields don't do the trick, you can easily :doc:`write your
+    own custom model fields </howto/custom-model-fields>`.
 
 .. note::
 
@@ -302,8 +300,8 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 
 .. attribute:: Field.validators
 
-A list of validators to run for this field.See the :ref:`validators
-documentation <ref-validators>` for more information.
+A list of validators to run for this field.See the :doc:`validators
+documentation </ref/validators>` for more information.
 
 
 Field types
@@ -370,8 +368,8 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 
     If you are writing an application that must be portable to multiple
     database backends, you should be aware that there are restrictions on
-    ``max_length`` for some backends. Refer to the :ref:`database backend
-    notes <ref-databases>` for details.
+    ``max_length`` for some backends. Refer to the :doc:`database backend
+    notes </ref/databases>` for details.
 
 .. admonition:: MySQL users
 
@@ -518,7 +516,7 @@ Also has one optional argument:
     .. versionadded:: 1.0
 
     Optional. A storage object, which handles the storage and retrieval of your
-    files. See :ref:`topics-files` for details on how to provide this object.
+    files. See :doc:`/topics/files` for details on how to provide this object.
 
 The admin represents this field as an ``<input type="file">`` (a file-upload
 widget).
@@ -553,7 +551,7 @@ day. If you upload a file on Jan. 15, 2007, it will be saved in the directory
 If you want to retrieve the upload file's on-disk filename, or a URL that refers
 to that file, or the file's size, you can use the
 :attr:`~django.core.files.File.name`, :attr:`~django.core.files.File.url`
-and :attr:`~django.core.files.File.size` attributes; see :ref:`topics-files`.
+and :attr:`~django.core.files.File.size` attributes; see :doc:`/topics/files`.
 
 Note that whenever you deal with uploaded files, you should pay close attention
 to where you're uploading them and what type of files they are, to avoid
@@ -903,7 +901,7 @@ define the details of how the relation works.
 
 .. attribute:: ForeignKey.limit_choices_to
 
-    A dictionary of lookup arguments and values (see :ref:`topics-db-queries`)
+    A dictionary of lookup arguments and values (see :doc:`/topics/db/queries`)
     that limit the available admin choices for this object. Use this with
     functions from the Python ``datetime`` module to limit choices of objects by
     date. For example::

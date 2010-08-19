@@ -1,5 +1,3 @@
-.. _ref-contrib-messages:
-
 ======================
 The messages framework
 ======================
@@ -20,8 +18,8 @@ with a specific ``level`` that determines its priority (e.g., ``info``,
 Enabling messages
 =================
 
-Messages are implemented through a :ref:`middleware <ref-middleware>`
-class and corresponding :ref:`context processor <ref-templates-api>`.
+Messages are implemented through a :doc:`middleware </ref/middleware>`
+class and corresponding :doc:`context processor </ref/templates/api>`.
 
 To enable message functionality, do the following:
 
@@ -29,7 +27,7 @@ To enable message functionality, do the following:
       it contains ``'django.contrib.messages.middleware.MessageMiddleware'``.
 
       If you are using a :ref:`storage backend <message-storage-backends>` that
-      relies on :ref:`sessions <topics-http-sessions>` (the default),
+      relies on :doc:`sessions </topics/http/sessions>` (the default),
       ``'django.contrib.sessions.middleware.SessionMiddleware'`` must be
       enabled and appear before ``MessageMiddleware`` in your
       :setting:`MIDDLEWARE_CLASSES`.
@@ -106,7 +104,7 @@ LegacyFallbackStorage
 The ``LegacyFallbackStorage`` is a temporary tool to facilitate the transition
 from the deprecated ``user.message_set`` API and will be removed in Django 1.4
 according to Django's standard deprecation policy.  For more information, see
-the full :ref:`release process documentation <internals-release-process>`.
+the full :doc:`release process documentation </internals/release-process>`.
 
 In addition to the functionality in the ``FallbackStorage``, it adds a custom,
 read-only storage class that retrieves messages from the user ``Message``
@@ -300,7 +298,7 @@ example::
     messages.info(request, 'Hello world.', fail_silently=True)
 
 Internally, Django uses this functionality in the create, update, and delete
-:ref:`generic views <topics-generic-views>` so that they work even if the
+:doc:`generic views </topics/http/generic-views>` so that they work even if the
 message framework is disabled.
 
 .. note::
@@ -343,7 +341,7 @@ window/tab will have its own browsing context.
 Settings
 ========
 
-A few :ref:`Django settings <ref-settings>` give you control over message
+A few :doc:`Django settings </ref/settings>` give you control over message
 behavior:
 
 MESSAGE_LEVEL

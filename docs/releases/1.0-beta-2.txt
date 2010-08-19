@@ -1,5 +1,3 @@
-.. _releases-1.0-beta-2:
-
 ===============================
 Django 1.0 beta 2 release notes
 ===============================
@@ -21,11 +19,11 @@ What's new in Django 1.0 beta 2
 Django's development trunk has been the site of nearly constant
 activity over the past year, with several major new features landing
 since the 0.96 release.  For features which were new as of Django 1.0
-alpha 1, see :ref:`the 1.0 alpha 1 release notes
-<releases-1.0-alpha-1>`. For features which were new as of Django 1.0
-alpha 2, see :ref:`the 1.0 alpha 2 release notes
-<releases-1.0-alpha-2>`. For features which were new as of Django 1.0
-beta 1, see :ref:`the 1.0 beta 1 release notes <releases-1.0-beta>`.
+alpha 1, see :doc:`the 1.0 alpha 1 release notes
+</releases/1.0-alpha-1>`. For features which were new as of Django 1.0
+alpha 2, see :doc:`the 1.0 alpha 2 release notes
+</releases/1.0-alpha-2>`. For features which were new as of Django 1.0
+beta 1, see :doc:`the 1.0 beta 1 release notes </releases/1.0-beta>`.
 
 This beta release includes two major features:
 
@@ -33,9 +31,9 @@ Refactored ``django.contrib.comments``
     As part of a Google Summer of Code project, Thejaswi Puthraya
     carried out a major rewrite and refactoring of Django's bundled
     comment system, greatly increasing its flexibility and
-    customizability. :ref:`Full documentation
-    <ref-contrib-comments-index>` is available, as well as :ref:`an
-    upgrade guide <ref-contrib-comments-upgrade>` if you were using
+    customizability. :doc:`Full documentation
+    </ref/contrib/comments/index>` is available, as well as :doc:`an
+    upgrade guide </ref/contrib/comments/upgrade>` if you were using
     the previous incarnation of the comments application..
 
 Refactored documentation
@@ -59,8 +57,8 @@ Also, as part of its ongoing deprecation process, Django's old
 form-handling system has been removed; this means ``django.oldforms``
 no longer exists, and its various API hooks (such as automatic
 manipulators) are no longer present in Django. This system has been
-completely replaced by :ref:`the new form-handling system
-<topics-forms-index>` in ``django.forms``.
+completely replaced by :doc:`the new form-handling system
+</topics/forms/index>` in ``django.forms``.
 
 
 The Django 1.0 roadmap
@@ -114,7 +112,7 @@ to join the discussions there.
 Django's online documentation also includes pointers on how to
 contribute to Django:
 
-    :ref:`contributing to Django <internals-contributing>`
+    :doc:`contributing to Django </internals/contributing>`
 
 Contributions on any level -- developing code, writing
 documentation or simply triaging tickets and helping to test proposed

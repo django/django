@@ -1,5 +1,3 @@
-.. _topics-i18n:
-
 =====================================
 Internationalization and localization
 =====================================
@@ -23,10 +21,10 @@ associated with each of these tasks (although it's perfectly normal if you
 find yourself performing more than one of these roles):
 
     * For application authors wishing to make sure their Django apps can be
-      used in different locales: :ref:`topics-i18n-internationalization`.
-    * For translators wanting to translate Django apps: :ref:`topics-i18n-localization`.
+      used in different locales: :doc:`/topics/i18n/internationalization`.
+    * For translators wanting to translate Django apps: :doc:`/topics/i18n/localization`.
     * For system administrators/final users setting up internationalized apps or
-      developers integrating third party apps: :ref:`topics-i18n-deployment`.
+      developers integrating third party apps: :doc:`/topics/i18n/deployment`.
 
 .. toctree::
    :hidden:

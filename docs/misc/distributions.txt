@@ -1,5 +1,3 @@
-.. _misc-distributions:
-
 ===================================
 Third-party distributions of Django
 ===================================

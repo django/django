@@ -1,5 +1,3 @@
-.. _topics-templates:
-
 ============================
 The Django template language
 ============================
@@ -8,7 +6,7 @@ The Django template language
 
     This document explains the language syntax of the Django template system. If
     you're looking for a more technical perspective on how it works and how to
-    extend it, see :ref:`ref-templates-api`.
+    extend it, see :doc:`/ref/templates/api`.
 
 Django's template language is designed to strike a balance between power and
 ease. It's designed to feel comfortable to those used to working with HTML. If
@@ -28,8 +26,8 @@ or CheetahTemplate_, you should feel right at home with Django's templates.
     tag for looping, etc. -- but these are not simply executed as the
     corresponding Python code, and the template system will not execute
     arbitrary Python expressions. Only the tags, filters and syntax listed below
-    are supported by default (although you can add :ref:`your own extensions
-    <howto-custom-template-tags>` to the template language as needed).
+    are supported by default (although you can add :doc:`your own extensions
+    </howto/custom-template-tags>` to the template language as needed).
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
 .. _Smarty: http://smarty.php.net/
@@ -140,7 +138,7 @@ template filters:
 
         If ``value`` isn't provided or is empty, the above will display
         "``nothing``".
-        
+
     :tfilter:`length`
         Returns the length of the value. This works for both strings and lists;
         for example::
@@ -148,7 +146,7 @@ template filters:
             {{ value|length }}
 
         If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
-    
+
     :tfilter:`striptags`
         Strips all [X]HTML tags. For example::
 
@@ -161,7 +159,7 @@ Again, these are just a few examples; see the :ref:`built-in filter reference
 <ref-templates-builtins-filters>` for the complete list.
 
 You can also create your own custom template filters; see
-:ref:`howto-custom-template-tags`.
+:doc:`/howto/custom-template-tags`.
 
 Tags
 ====
@@ -217,7 +215,7 @@ Again, the above is only a selection of the whole list; see the :ref:`built-in
 tag reference <ref-templates-builtins-tags>` for the complete list.
 
 You can also create your own custom template tags; see
-:ref:`howto-custom-template-tags`.
+:doc:`/howto/custom-template-tags`.
 
 Comments
 ========
@@ -634,8 +632,8 @@ The ``{% load %}`` tag can take multiple library names, separated by spaces.
 Example::
 
     {% load comments i18n %}
-    
-See :ref:`howto-custom-template-tags` for information on writing your own custom
+
+See :doc:`/howto/custom-template-tags` for information on writing your own custom
 template libraries.
 
 Custom libraries and template inheritance

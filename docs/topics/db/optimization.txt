@@ -1,5 +1,3 @@
-.. _topics-db-optimization:
-
 ============================
 Database access optimization
 ============================
@@ -45,13 +43,13 @@ Use standard DB optimization techniques
 We will assume you have done the obvious things above. The rest of this document
 focuses on how to use Django in such a way that you are not doing unnecessary
 work. This document also does not address other optimization techniques that
-apply to all expensive operations, such as :ref:`general purpose caching
-<topics-cache>`.
+apply to all expensive operations, such as :doc:`general purpose caching
+</topics/cache>`.
 
 Understand QuerySets
 ====================
 
-Understanding :ref:`QuerySets <ref-models-querysets>` is vital to getting good
+Understanding :doc:`QuerySets </ref/models/querysets>` is vital to getting good
 performance with simple code. In particular:
 
 Understand QuerySet evaluation
@@ -114,7 +112,7 @@ For instance:
 * Use :ref:`F() object query expressions <query-expressions>` to do filtering
   against other fields within the same model.
 
-* Use :ref:`annotate to do aggregation in the database <topics-db-aggregation>`.
+* Use :doc:`annotate to do aggregation in the database </topics/db/aggregation>`.
 
 If these aren't enough to generate the SQL you need:
 
@@ -128,8 +126,8 @@ explicitly added to the query. If that still isn't powerful enough:
 Use raw SQL
 -----------
 
-Write your own :ref:`custom SQL to retrieve data or populate models
-<topics-db-sql>`. Use ``django.db.connection.queries`` to find out what Django
+Write your own :doc:`custom SQL to retrieve data or populate models
+</topics/db/sql>`. Use ``django.db.connection.queries`` to find out what Django
 is writing for you and start from there.
 
 Retrieve everything at once if you know you will need it
@@ -148,7 +146,7 @@ Understand :ref:`QuerySet.select_related() <select-related>` thoroughly, and use
 
 * in view code,
 
-* and in :ref:`managers and default managers <topics-db-managers>` where
+* and in :doc:`managers and default managers </topics/db/managers>` where
   appropriate. Be aware when your manager is and is not used; sometimes this is
   tricky so don't make assumptions.
 
@@ -243,7 +241,7 @@ individual, use a bulk SQL UPDATE statement, via :ref:`QuerySet.update()
 Note, however, that these bulk update methods cannot call the ``save()`` or ``delete()``
 methods of individual instances, which means that any custom behaviour you have
 added for these methods will not be executed, including anything driven from the
-normal database object :ref:`signals <ref-signals>`.
+normal database object :doc:`signals </ref/signals>`.
 
 Use foreign key values directly
 -------------------------------

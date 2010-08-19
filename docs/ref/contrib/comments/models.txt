@@ -1,82 +1,80 @@
-.. _ref-contrib-comments-models:
-
 ===========================
 The built-in comment models
 ===========================
 
 .. module:: django.contrib.comments.models
    :synopsis: The built-in comment models
-  
+
 .. class:: Comment
 
     Django's built-in comment model. Has the following fields:
-    
+
     .. attribute:: content_object
-    
+
         A :class:`~django.contrib.contettypes.generic.GenericForeignKey`
         attribute pointing to the object the comment is attached to. You can use
         this to get at the related object (i.e. ``my_comment.content_object``).
-        
+
         Since this field is a
         :class:`~django.contrib.contettypes.generic.GenericForeignKey`, it's
         actually syntactic sugar on top of two underlying attributes, described
         below.
-    
+
     .. attribute:: content_type
-   
+
         A :class:`~django.db.models.ForeignKey` to
         :class:`~django.contrib.contenttypes.models.ContentType`; this is the
         type of the object the comment is attached to.
-      
+
     .. attribute:: object_pk
-    
+
         A :class:`~django.db.models.TextField` containing the primary
         key of the object the comment is attached to.
-        
+
     .. attribute:: site
-    
+
         A :class:`~django.db.models.ForeignKey` to the
         :class:`~django.contrib.sites.models.Site` on which the comment was
         posted.
-        
+
     .. attribute:: user
-    
+
         A :class:`~django.db.models.ForeignKey` to the
         :class:`~django.contrib.auth.models.User` who posted the comment.
         May be blank if the comment was posted by an unauthenticated user.
-        
+
     .. attribute:: user_name
-    
+
         The name of the user who posted the comment.
-    
+
     .. attribute:: user_email
-    
+
         The email of the user who posted the comment.
-    
+
     .. attribute:: user_url
-    
+
         The URL entered by the person who posted the comment.
-    
+
     .. attribute:: comment
-    
+
         The actual content of the comment itself.
-    
+
     .. attribute:: submit_date
-    
+
         The date the comment was submitted.
-    
+
     .. attribute:: ip_address
-    
+
         The IP address of the user posting the comment.
-    
+
     .. attribute:: is_public
-    
+
         ``False`` if the comment is in moderation (see
-        :ref:`ref-contrib-comments-moderation`); If ``True``, the comment will
+        :doc:`/ref/contrib/comments/moderation`); If ``True``, the comment will
         be displayed on the site.
-    
+
     .. attribute:: is_removed
-    
+
         ``True`` if the comment was removed. Used to keep track of removed
         comments instead of just deleting them.
-        
+

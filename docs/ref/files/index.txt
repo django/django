@@ -1,5 +1,3 @@
-.. _ref-files-index:
-
 =============
 File handling
 =============

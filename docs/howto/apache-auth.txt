@@ -1,12 +1,10 @@
-.. _howto-apache-auth:
-
 =========================================================
 Authenticating against Django's user database from Apache
 =========================================================
 
 Since keeping multiple authentication databases in sync is a common problem when
 dealing with Apache, you can configuring Apache to authenticate against Django's
-:ref:`authentication system <topics-auth>` directly. For example, you
+:doc:`authentication system </topics/auth>` directly. For example, you
 could:
 
     * Serve static/media files directly from Apache only to authenticated users.

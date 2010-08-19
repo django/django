@@ -1,5 +1,3 @@
-.. _internals-release-process:
-
 ========================
 Django's release process
 ========================

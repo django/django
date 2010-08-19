@@ -1,5 +1,3 @@
-.. _howto-deployment-index:
-
 Deploying Django
 ================
 
@@ -10,18 +8,18 @@ ways to easily deploy Django:
 
 .. toctree::
    :maxdepth: 1
-   
+
    modwsgi
    modpython
    fastcgi
-   
+
 If you're new to deploying Django and/or Python, we'd recommend you try
-:ref:`mod_wsgi <howto-deployment-modwsgi>` first. In most cases it'll be the easiest,
+:doc:`mod_wsgi </howto/deployment/modwsgi>` first. In most cases it'll be the easiest,
 fastest, and most stable deployment choice.
 
 .. seealso::
 
     * `Chapter 12 of The Django Book`_ discusses deployment and especially
       scaling in more detail.
-      
+
 .. _chapter 12 of the django book: http://djangobook.com/en/2.0/chapter12/

@@ -1,5 +1,3 @@
-.. _howto-initial-data:
-
 =================================
 Providing initial data for models
 =================================
@@ -20,10 +18,10 @@ Providing initial data with fixtures
 
 A fixture is a collection of data that Django knows how to import into a
 database. The most straightforward way of creating a fixture if you've already
-got some data is to use the :djadmin:`manage.py dumpdata` command. Or, you can
-write fixtures by hand; fixtures can be written as XML, YAML, or JSON documents.
-The :ref:`serialization documentation <topics-serialization>` has more details
-about each of these supported :ref:`serialization formats
+got some data is to use the :djadmin:`manage.py dumpdata <dumpdata>` command.
+Or, you can write fixtures by hand; fixtures can be written as XML, YAML, or
+JSON documents. The :doc:`serialization documentation </topics/serialization>`
+has more details about each of these supported :ref:`serialization formats
 <serialization-formats>`.
 
 As an example, though, here's what a fixture for a simple ``Person`` model might
@@ -114,9 +112,9 @@ which will insert the desired data (e.g., properly-formatted
 ``INSERT`` statements separated by semicolons).
 
 The SQL files are read by the :djadmin:`sqlcustom`, :djadmin:`sqlreset`,
-:djadmin:`sqlall` and :djadmin:`reset` commands in :ref:`manage.py
-<ref-django-admin>`. Refer to the :ref:`manage.py documentation
-<ref-django-admin>` for more information.
+:djadmin:`sqlall` and :djadmin:`reset` commands in :doc:`manage.py
+</ref/django-admin>`. Refer to the :doc:`manage.py documentation
+</ref/django-admin>` for more information.
 
 Note that if you have multiple SQL data files, there's no guarantee of
 the order in which they're executed. The only thing you can assume is

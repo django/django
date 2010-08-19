@@ -1,5 +1,3 @@
-.. _topics-http-file-uploads:
-
 ============
 File Uploads
 ============
@@ -10,8 +8,8 @@ File Uploads
 
 When Django handles a file upload, the file data ends up placed in
 :attr:`request.FILES <django.http.HttpRequest.FILES>` (for more on the
-``request`` object see the documentation for :ref:`request and response objects
-<ref-request-response>`). This document explains how files are stored on disk
+``request`` object see the documentation for :doc:`request and response objects
+</ref/request-response>`). This document explains how files are stored on disk
 and in memory, and how to customize the default behavior.
 
 Basic file uploads

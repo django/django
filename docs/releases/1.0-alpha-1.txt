@@ -1,5 +1,3 @@
-.. _releases-1.0-alpha-1:
-
 ================================
 Django 1.0 alpha release notes
 ================================
@@ -34,7 +32,7 @@ Refactored admin application (newforms-admin)
     documentation for the admin application is available online in the
     official Django documentation:
 
-        :ref:`admin reference <ref-contrib-admin>`
+        :doc:`admin reference </ref/contrib/admin/index>`
 
 Improved Unicode handling
     Django's internals have been refactored to use Unicode throughout;
@@ -45,7 +43,7 @@ Improved Unicode handling
     Unicode gracefully. Details are available in Django's
     Unicode-handling documentation:
 
-         :ref:`unicode reference <ref-unicode>`
+         :doc:`unicode reference </ref/unicode>`
 
 An improved Django ORM
     Django's object-relational mapper -- the component which provides
@@ -156,7 +154,7 @@ to join the discussions there.
 Django's online documentation also includes pointers on how to
 contribute to Django:
 
-    :ref:`contributing to Django <internals-contributing>`
+    :doc:`contributing to Django </internals/contributing>`
 
 Contributions on any level -- developing code, writing
 documentation or simply triaging tickets and helping to test proposed

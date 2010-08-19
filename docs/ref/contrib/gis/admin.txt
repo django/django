@@ -54,7 +54,7 @@ GeoDjango's admin site
    existing geometry fields in the admin.
 
    .. note::
-   
+
        This is different from adding the geometry field to
        :attr:`~django.contrib.admin.ModelAdmin.readonly_fields`,
        which will only display the WKT of the geometry. Setting

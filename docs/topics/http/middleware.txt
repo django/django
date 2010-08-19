@@ -1,5 +1,3 @@
-.. _topics-http-middleware:
-
 ==========
 Middleware
 ==========
@@ -14,8 +12,8 @@ an ``"X-View"`` HTTP header to every response to a ``HEAD`` request.
 
 This document explains how middleware works, how you activate middleware, and
 how to write your own middleware. Django ships with some built-in middleware
-you can use right out of the box; they're documented in the :ref:`built-in
-middleware reference <ref-middleware>`.
+you can use right out of the box; they're documented in the :doc:`built-in
+middleware reference </ref/middleware>`.
 
 Activating middleware
 =====================
@@ -173,9 +171,9 @@ Guidelines
       cares about is that the :setting:`MIDDLEWARE_CLASSES` setting includes
       the path to it.
 
-    * Feel free to look at :ref:`Django's available middleware
-      <ref-middleware>` for examples.
+    * Feel free to look at :doc:`Django's available middleware
+      </ref/middleware>` for examples.
 
     * If you write a middleware component that you think would be useful to
-      other people, contribute to the community! :ref:`Let us know
-      <internals-contributing>`, and we'll consider adding it to Django.
+      other people, contribute to the community! :doc:`Let us know
+      </internals/contributing>`, and we'll consider adding it to Django.

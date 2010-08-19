@@ -1,5 +1,3 @@
-.. _ref-gis-feeds:
-
 ================
 Geographic Feeds
 ================
@@ -8,10 +6,10 @@ Geographic Feeds
    :synopsis: GeoDjango's framework for generating spatial feeds.
 
 GeoDjango has its own :class:`Feed` subclass that may embed location information
-in RSS/Atom feeds formatted according to either the `Simple GeoRSS`__ or 
+in RSS/Atom feeds formatted according to either the `Simple GeoRSS`__ or
 `W3C Geo`_ standards.  Because GeoDjango's syndication API is a superset of
-Django's, please consult `Django's syndication documentation <ref-contrib-syndication>`
-for details on general usage.
+Django's, please consult :doc:`Django's syndication documentation
+</ref/contrib/syndication>` for details on general usage.
 
 .. _W3C Geo: http://www.w3.org/2003/01/geo/
 
@@ -28,7 +26,7 @@ API Reference
 
 .. class:: Feed
 
-   In addition to methods provided by 
+   In addition to methods provided by
    the :class:`django.contrib.syndication.feeds.Feed`
    base class, GeoDjango's ``Feed`` class provides
    the following overrides.  Note that these overrides may be done in multiple ways::
