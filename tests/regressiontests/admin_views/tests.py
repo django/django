@@ -2171,39 +2171,46 @@ class UserAdminTest(TestCase):
         self.assertEquals(User.objects.count(), user_count + 1)
         self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
 
-class AdminDocsTest(TestCase):
-    fixtures = ['admin-views-users.xml']
+try:
+    # If docutils isn't installed, skip the AdminDocs tests.
+    import docutils
 
-    def setUp(self):
-        self.client.login(username='super', password='secret')
+    class AdminDocsTest(TestCase):
+        fixtures = ['admin-views-users.xml']
 
-    def tearDown(self):
-        self.client.logout()
+        def setUp(self):
+            self.client.login(username='super', password='secret')
 
-    def test_tags(self):
-        response = self.client.get('/test_admin/admin/doc/tags/')
+        def tearDown(self):
+            self.client.logout()
 
-        # The builtin tag group exists
-        self.assertContains(response, "<h2>Built-in tags</h2>", count=2)
+        def test_tags(self):
+            response = self.client.get('/test_admin/admin/doc/tags/')
 
-        # A builtin tag exists in both the index and detail
-        self.assertContains(response, '<h3 id="autoescape">autoescape</h3>')
-        self.assertContains(response, '<li><a href="#autoescape">autoescape</a></li>')
+            # The builtin tag group exists
+            self.assertContains(response, "<h2>Built-in tags</h2>", count=2)
 
-        # An app tag exists in both the index and detail
-        # The builtin tag group exists
-        self.assertContains(response, "<h2>admin_list</h2>", count=2)
+            # A builtin tag exists in both the index and detail
+            self.assertContains(response, '<h3 id="autoescape">autoescape</h3>')
+            self.assertContains(response, '<li><a href="#autoescape">autoescape</a></li>')
 
-        # A builtin tag exists in both the index and detail
-        self.assertContains(response, '<h3 id="autoescape">autoescape</h3>')
-        self.assertContains(response, '<li><a href="#admin_actions">admin_actions</a></li>')
+            # An app tag exists in both the index and detail
+            # The builtin tag group exists
+            self.assertContains(response, "<h2>admin_list</h2>", count=2)
 
-    def test_filters(self):
-        response = self.client.get('/test_admin/admin/doc/filters/')
+            # A builtin tag exists in both the index and detail
+            self.assertContains(response, '<h3 id="autoescape">autoescape</h3>')
+            self.assertContains(response, '<li><a href="#admin_actions">admin_actions</a></li>')
 
-        # The builtin filter group exists
-        self.assertContains(response, "<h2>Built-in filters</h2>", count=2)
+        def test_filters(self):
+            response = self.client.get('/test_admin/admin/doc/filters/')
 
-        # A builtin filter exists in both the index and detail
-        self.assertContains(response, '<h3 id="add">add</h3>')
-        self.assertContains(response, '<li><a href="#add">add</a></li>')
+            # The builtin filter group exists
+            self.assertContains(response, "<h2>Built-in filters</h2>", count=2)
+
+            # A builtin filter exists in both the index and detail
+            self.assertContains(response, '<h3 id="add">add</h3>')
+            self.assertContains(response, '<li><a href="#add">add</a></li>')
+
+except ImportError:
+    pass
