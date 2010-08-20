@@ -1,10 +1,27 @@
-import sys, time, os
+import sys
+import time
+import os
 from django.conf import settings
 from django.core import mail
 from django.core.mail.backends import locmem
 from django.test import signals
 from django.template import Template
 from django.utils.translation import deactivate
+
+
+class Approximate(object):
+    def __init__(self, val, places=7):
+        self.val = val
+        self.places = places
+
+    def __repr__(self):
+        return repr(self.val)
+
+    def __eq__(self, other):
+        if self.val == other:
+            return True
+        return round(abs(self.val-other), self.places) == 0
+
 
 class ContextList(list):
     """A wrapper that provides direct key access to context items contained
