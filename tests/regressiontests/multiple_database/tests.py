@@ -1570,10 +1570,30 @@ class UserProfileTestCase(TestCase):
         self.assertEquals(alice.get_profile().flavor, 'chocolate')
         self.assertEquals(bob.get_profile().flavor, 'crunchy frog')
 
+class AntiPetRouter(object):
+    # A router that only expresses an opinion on syncdb,
+    # passing pets to the 'other' database
+
+    def allow_syncdb(self, db, model):
+        "Make sure the auth app only appears on the 'other' db"
+        if db == 'other':
+            return model._meta.object_name == 'Pet'
+        else:
+            return model._meta.object_name != 'Pet'
+        return None
 
 class FixtureTestCase(TestCase):
     multi_db = True
     fixtures = ['multidb-common', 'multidb']
+
+    def setUp(self):
+        # Install the anti-pet router
+        self.old_routers = router.routers
+        router.routers = [AntiPetRouter()]
+
+    def tearDown(self):
+        # Restore the 'other' database as an independent database
+        router.routers = self.old_routers
 
     def test_fixture_loading(self):
         "Multi-db fixtures are loaded correctly"
@@ -1611,6 +1631,14 @@ class FixtureTestCase(TestCase):
             Book.objects.using('other').get(title="The Definitive Guide to Django")
         except Book.DoesNotExist:
             self.fail('"The Definitive Guide to Django" should exist on both databases')
+
+    def test_pseudo_empty_fixtures(self):
+        "A fixture can contain entries, but lead to nothing in the database; this shouldn't raise an error (ref #14068)"
+        new_io = StringIO()
+        management.call_command('loaddata', 'pets', stdout=new_io, stderr=new_io)
+        command_output = new_io.getvalue().strip()
+        # No objects will actually be loaded
+        self.assertEqual(command_output, "Installed 0 object(s) (of 2) from 1 fixture(s)")
 
 class PickleQuerySetTestCase(TestCase):
     multi_db = True
