@@ -122,22 +122,19 @@ def django_tests(verbosity, interactive, failfast, test_labels):
     get_apps()
 
     # Load all the test model apps.
+    test_labels_set = set([label.split('.')[0] for label in test_labels])
     for model_dir, model_name in get_test_models():
         model_label = '.'.join([model_dir, model_name])
-        try:
-            # if the model was named on the command line, or
-            # no models were named (i.e., run all), import
-            # this model and add it to the list to test.
-            if not test_labels or model_name in set([label.split('.')[0] for label in test_labels]):
-                if verbosity >= 2:
-                    print "Importing model %s" % model_name
-                mod = load_app(model_label)
-                if mod:
-                    if model_label not in settings.INSTALLED_APPS:
-                        settings.INSTALLED_APPS.append(model_label)
-        except Exception, e:
-            sys.stderr.write("Error while importing %s:" % model_name + ''.join(traceback.format_exception(*sys.exc_info())[1:]))
-            continue
+        # if the model was named on the command line, or
+        # no models were named (i.e., run all), import
+        # this model and add it to the list to test.
+        if not test_labels or model_name in test_labels_set:
+            if verbosity >= 2:
+                print "Importing model %s" % model_name
+            mod = load_app(model_label)
+            if mod:
+                if model_label not in settings.INSTALLED_APPS:
+                    settings.INSTALLED_APPS.append(model_label)
 
     # Add tests for invalid models.
     extra_tests = []
