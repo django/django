@@ -1050,23 +1050,25 @@ A fixture is a collection of data that Django knows how to import into a
 database. For example, if your site has user accounts, you might set up a
 fixture of fake user accounts in order to populate your database during tests.
 
-The most straightforward way of creating a fixture is to use the ``manage.py
-dumpdata`` command. This assumes you already have some data in your database.
-See the :djadmin:`dumpdata documentation<dumpdata>` for more details.
+The most straightforward way of creating a fixture is to use the
+:djadmin:`manage.py dumpdata <dumpdata>` command. This assumes you
+already have some data in your database. See the :djadmin:`dumpdata
+documentation<dumpdata>` for more details.
 
 .. note::
-    If you've ever run ``manage.py syncdb``, you've already used a fixture
-    without even knowing it! When you call ``syncdb`` in the database for
-    the first time, Django installs a fixture called ``initial_data``.
-    This gives you a way of populating a new database with any initial data,
-    such as a default set of categories.
+    If you've ever run :djadmin:`manage.py syncdb<syncdb>`, you've
+    already used a fixture without even knowing it! When you call
+    :djadmin:`syncdb` in the database for the first time, Django
+    installs a fixture called ``initial_data``. This gives you a way
+    of populating a new database with any initial data, such as a
+    default set of categories.
 
-    Fixtures with other names can always be installed manually using the
-    ``manage.py loaddata`` command.
+    Fixtures with other names can always be installed manually using
+    the :djadmin:`manage.py loaddata<loaddata>` command.
 
 Once you've created a fixture and placed it in a ``fixtures`` directory in one
 of your :setting:`INSTALLED_APPS`, you can use it in your unit tests by
-specifying a ``fixtures`` class attribute on your ``django.test.TestCase``
+specifying a ``fixtures`` class attribute on your :class:`django.test.TestCase`
 subclass::
 
     from django.test import TestCase
