@@ -293,7 +293,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def post(self, path, data={}, content_type=MULTIPART_CONTENT,
@@ -325,7 +325,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def head(self, path, data={}, follow=False, **extra):
@@ -344,7 +344,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def options(self, path, data={}, follow=False, **extra):
@@ -362,7 +362,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def put(self, path, data={}, content_type=MULTIPART_CONTENT,
@@ -394,7 +394,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def delete(self, path, data={}, follow=False, **extra):
@@ -412,7 +412,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def login(self, **credentials):
@@ -467,7 +467,7 @@ class Client(object):
             session.delete(session_key=session_cookie.value)
         self.cookies = SimpleCookie()
 
-    def _handle_redirects(self, response):
+    def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."
 
         response.redirect_chain = []
@@ -478,7 +478,6 @@ class Client(object):
             redirect_chain = response.redirect_chain
             redirect_chain.append((url, response.status_code))
 
-            extra = {}
             if scheme:
                 extra['wsgi.url_scheme'] = scheme
 

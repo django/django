@@ -847,3 +847,17 @@ class UploadedFileEncodingTest(TestCase):
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.zip"))[2])
         self.assertEqual('Content-Type: application/octet-stream',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.unknown"))[2])
+
+class RequestHeadersTest(TestCase):
+    def test_client_headers(self):
+        "A test client can receive custom headers"
+        response = self.client.get("/test_client_regress/check_headers/", HTTP_X_ARG_CHECK='Testing 123')
+        self.assertEquals(response.content, "HTTP_X_ARG_CHECK: Testing 123")
+        self.assertEquals(response.status_code, 200)
+
+    def test_client_headers_redirect(self):
+        "Test client headers are preserved through redirects"
+        response = self.client.get("/test_client_regress/check_headers_redirect/", follow=True, HTTP_X_ARG_CHECK='Testing 123')
+        self.assertEquals(response.content, "HTTP_X_ARG_CHECK: Testing 123")
+        self.assertRedirects(response, '/test_client_regress/check_headers/',
+            status_code=301, target_status_code=200)
