@@ -133,7 +133,7 @@ class AdminScriptTestCase(unittest.TestCase):
         return out, err
 
     def run_django_admin(self, args, settings_file=None):
-        bin_dir = os.path.dirname(bin.__file__)
+        bin_dir = os.path.abspath(os.path.dirname(bin.__file__))
         return self.run_test(os.path.join(bin_dir,'django-admin.py'), args, settings_file)
 
     def run_manage(self, args, settings_file=None):
