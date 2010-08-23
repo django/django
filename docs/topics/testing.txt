@@ -310,7 +310,7 @@ but not gracefully. No details of the tests run before the interruption will
 be reported, and any test databases created by the run will not be destroyed.
 
 Running tests outside the test runner
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 If you want to run tests outside of ``./manage.py test`` -- for example,
 from a shell prompt -- you will need to set up the test
@@ -417,7 +417,7 @@ Other test conditions
 ---------------------
 
 Regardless of the value of the :setting:`DEBUG` setting in your configuration
-file, all Django tests run with :setting:`DEBUG=False`. This is to ensure that
+file, all Django tests run with :setting:`DEBUG`\=False. This is to ensure that
 the observed output of your code matches what will be seen in a production
 setting.
 

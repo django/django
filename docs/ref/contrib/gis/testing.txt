@@ -133,7 +133,7 @@ You will need to download the `initialization SQL`__ script for SpatiaLite::
 If ``init_spatialite-2.3.sql`` is in the same path as your project's ``manage.py``,
 then all you have to do is::
 
-    $ python manage.py test 
+    $ python manage.py test
 
 Settings
 --------
@@ -166,9 +166,9 @@ must be used.  To use this runner, configure :setting:`TEST_RUNNER` as follows::
 
 .. note::
 
-    In order to create a spatial database, the :setting:`DATABASE_USER` setting
-    (or :setting:`TEST_DATABASE_USER`, if optionally defined on Oracle) requires
-    elevated privileges.  When using PostGIS or MySQL, the database user 
+    In order to create a spatial database, the :setting:`USER` setting
+    (or :setting:`TEST_USER`, if optionally defined on Oracle) requires
+    elevated privileges.  When using PostGIS or MySQL, the database user
     must have at least the ability to create databases.  When testing on Oracle,
     the user should be a superuser.
 

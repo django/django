@@ -700,7 +700,7 @@ Configuring the template system in standalone mode
 
 Normally, Django will load all the configuration information it needs from its
 own default configuration file, combined with the settings in the module given
-in the :setting:`DJANGO_SETTINGS_MODULE` environment variable. But if you're
+in the :envvar:`DJANGO_SETTINGS_MODULE` environment variable. But if you're
 using the template system independently of the rest of Django, the environment
 variable approach isn't very convenient, because you probably want to configure
 the template system in line with the rest of your application rather than

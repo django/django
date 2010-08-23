@@ -291,8 +291,6 @@ A human-readable name for the field. If the verbose name isn't given, Django
 will automatically create it using the field's attribute name, converting
 underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 
-.. _model-field-types:
-
 ``validators``
 -------------------
 
@@ -303,6 +301,7 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 A list of validators to run for this field.See the :doc:`validators
 documentation </ref/validators>` for more information.
 
+.. _model-field-types:
 
 Field types
 ===========
