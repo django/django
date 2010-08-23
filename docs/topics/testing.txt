@@ -309,6 +309,24 @@ can press ``Ctrl-C`` a second time and the test run will halt immediately,
 but not gracefully. No details of the tests run before the interruption will
 be reported, and any test databases created by the run will not be destroyed.
 
+Running tests outside the test runner
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to run tests outside of ``./manage.py test`` -- for example,
+from a shell prompt -- you will need to set up the test
+environment first. Django provides a convenience method to do this::
+
+    >>> from django.test.utils import setup_test_environment
+    >>> setup_test_environment()
+
+This convenience method sets up the test database, and puts other
+Django features into modes that allow for repeatable testing.
+
+The call to :meth:`~django.test.utils.setup_test_environment` is made
+automatically as part of the setup of `./manage.py test`. You only
+need to manually invoke this method if you're not using running your
+tests via Django's test runner.
+
 The test database
 -----------------
 
