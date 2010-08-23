@@ -222,7 +222,7 @@ DATABASES
 Default: ``{}`` (Empty dictionary)
 
 A dictionary containing the settings for all databases to be used with
-Django. It is a nested dictionary who's contents maps database aliases
+Django. It is a nested dictionary whose contents maps database aliases
 to a dictionary containing the options for an individual database.
 
 The :setting:`DATABASES` setting must configure a ``default`` database;
