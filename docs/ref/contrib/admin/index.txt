@@ -5,8 +5,6 @@ The Django admin site
 .. module:: django.contrib.admin
    :synopsis: Django's admin site.
 
-.. currentmodule:: django.contrib.admin
-
 One of the most powerful parts of Django is the automatic admin interface. It
 reads metadata in your model to provide a powerful and production-ready
 interface that content producers can immediately use to start adding content to
@@ -831,7 +829,7 @@ problems:
 
 Since this is usually not what you want, Django provides a convenience wrapper
 to check permissions and mark the view as non-cacheable. This wrapper is
-:meth:`AdminSite.admin_view` (i.e.  ``self.admin_site.admin_view`` inside a
+:meth:`AdminSite.admin_view` (i.e. ``self.admin_site.admin_view`` inside a
 ``ModelAdmin`` instance); use it like so::
 
     class MyModelAdmin(admin.ModelAdmin):
@@ -1009,6 +1007,8 @@ information.
 
 ``InlineModelAdmin`` objects
 ============================
+
+.. class:: InlineModelAdmin
 
 The admin interface has the ability to edit models on the same page as a
 parent model. These are called inlines. Suppose you have these two models::

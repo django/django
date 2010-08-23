@@ -104,7 +104,7 @@ compilemessages
 Compiles .po files created with ``makemessages`` to .mo files for use with
 the builtin gettext support. See :doc:`/topics/i18n/index`.
 
-Use the :djadminopt:`--locale`` option to specify the locale to process.
+Use the :djadminopt:`--locale` option to specify the locale to process.
 If not provided, all locales are processed.
 
 Example usage::

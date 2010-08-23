@@ -112,7 +112,7 @@ Methods on ``ContentType`` instances
 
     Takes a set of valid :ref:`lookup arguments <field-lookups-intro>` for the
     model the :class:`~django.contrib.contenttypes.models.ContentType`
-    represents, and does :ref:`a get() lookup <get-kwargs>` on that model,
+    represents, and does :lookup:`a get() lookup <get>` on that model,
     returning the corresponding object.
 
 .. method:: models.ContentType.model_class()
@@ -370,7 +370,7 @@ This enables the use of generic relations in forms and the admin. See the
 
     The :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`
     class inherits all properties from an
-    :class:`~django.contrib.admin.options.InlineModelAdmin` class. However,
+    :class:`~django.contrib.admin.InlineModelAdmin` class. However,
     it adds a couple of its own for working with the generic relation:
 
     .. attribute:: generic.GenericInlineModelAdmin.ct_field

@@ -962,8 +962,6 @@ something *other than* a ``QuerySet``.
 These methods do not use a cache (see :ref:`caching-and-querysets`). Rather,
 they query the database each time they're called.
 
-.. _get-kwargs:
-
 ``get(**kwargs)``
 ~~~~~~~~~~~~~~~~~
 

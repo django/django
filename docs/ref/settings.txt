@@ -130,6 +130,22 @@ Default: ``'locmem://'``
 
 The cache backend to use. See :doc:`/topics/cache`.
 
+.. setting:: CACHE_MIDDLEWARE_ANONYMOUS_ONLY
+
+CACHE_MIDDLEWARE_ANONYMOUS_ONLY
+-------------------------------
+
+Default: ``False``
+
+If the value of this setting is ``True``, only anonymous requests (i.e., not
+those made by a logged-in user) will be cached.  Otherwise, the middleware
+caches every page that doesn't have GET or POST parameters.
+
+If you set the value of this setting to ``True``, you should make sure you've
+activated ``AuthenticationMiddleware``.
+
+See the :doc:`cache documentation </topics/cache>` for more information.
+
 .. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
 
 CACHE_MIDDLEWARE_KEY_PREFIX
@@ -385,6 +401,17 @@ test database will use the name ``'test_' + DATABASE_NAME``.
 
 See :doc:`/topics/testing`.
 
+.. setting:: TEST_USER
+
+TEST_USER
+~~~~~~~~~
+
+Default: ``None``
+
+This is an Oracle-specific setting.
+
+The username to use when connecting to the Oracle database that will be used
+when running tests.
 
 .. setting:: DATABASE_ROUTERS
 
@@ -553,7 +580,7 @@ Default content type to use for all ``HttpResponse`` objects, if a MIME type
 isn't manually specified. Used with ``DEFAULT_CHARSET`` to construct the
 ``Content-Type`` header.
 
-.. setting:: DEFAULT_FROM_EMAIL
+.. setting:: DEFAULT_FILE_STORAGE
 
 DEFAULT_FILE_STORAGE
 --------------------
@@ -562,6 +589,8 @@ Default: ``'django.core.files.storage.FileSystemStorage'``
 
 Default file storage class to be used for any file-related operations that don't
 specify a particular storage system. See :doc:`/topics/files`.
+
+.. setting:: DEFAULT_FROM_EMAIL
 
 DEFAULT_FROM_EMAIL
 ------------------
@@ -1166,6 +1195,21 @@ We don't list the default values here, because that would be profane. To see
 the default values, see the file `django/conf/global_settings.py`_.
 
 .. _django/conf/global_settings.py: http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
+
+.. setting:: RESTRUCTUREDTEXT_FILTER_SETTINGS
+
+RESTRUCTUREDTEXT_FILTER_SETTINGS
+--------------------------------
+
+Default: ``{}``
+
+A dictionary containing settings for the ``restructuredtext`` markup filter from
+the :doc:`django.contrib.markup application </ref/contrib/markup>`. They override
+the default writer settings. See the Docutils restructuredtext `writer settings
+docs`_ for details.
+
+.. _writer settings docs: http://docutils.sourceforge.net/docs/user/config.html#html4css1-writer
+
 .. setting:: ROOT_URLCONF
 
 ROOT_URLCONF
