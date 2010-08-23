@@ -27,7 +27,7 @@ class FormWizard(object):
     def __init__(self, form_list, initial=None):
         """
         Start a new wizard with a list of forms.
-        
+
         form_list should be a list of Form classes (not instances).
         """
         self.form_list = form_list[:]
@@ -37,7 +37,7 @@ class FormWizard(object):
         self.extra_context = {}
 
         # A zero-based counter keeping track of which step we're in.
-        self.step = 0 
+        self.step = 0
 
     def __repr__(self):
         return "step: %d\nform_list: %s\ninitial_data: %s" % (self.step, self.form_list, self.initial)
@@ -48,7 +48,7 @@ class FormWizard(object):
 
     def num_steps(self):
         "Helper method that returns the number of steps."
-        # You might think we should just set "self.form_list = len(form_list)"
+        # You might think we should just set "self.num_steps = len(form_list)"
         # in __init__(), but this calculation needs to be dynamic, because some
         # hook methods might alter self.form_list.
         return len(self.form_list)
