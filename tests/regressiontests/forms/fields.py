@@ -766,13 +766,13 @@ class FieldsTests(TestCase):
     # FilePathField ###############################################################
 
     def test_filepathfield_65(self):
-        path = forms.__file__
+        path = os.path.abspath(forms.__file__)
         path = os.path.dirname(path) + '/'
-        assert fix_os_paths(path).endswith('/django/forms/')
+        self.assertTrue(fix_os_paths(path).endswith('/django/forms/'))
 
     def test_filepathfield_66(self):
         path = forms.__file__
-        path = os.path.dirname(path) + '/'
+        path = os.path.dirname(os.path.abspath(path)) + '/'
         f = FilePathField(path=path)
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
         f.choices.sort()
@@ -787,13 +787,13 @@ class FieldsTests(TestCase):
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
-            assert got[0].endswith(exp[0])
+            self.assertTrue(got[0].endswith(exp[0]))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. fields.py is not one of the available choices.']", f.clean, 'fields.py')
         assert fix_os_paths(f.clean(path + 'fields.py')).endswith('/django/forms/fields.py')
 
     def test_filepathfield_67(self):
         path = forms.__file__
-        path = os.path.dirname(path) + '/'
+        path = os.path.dirname(os.path.abspath(path)) + '/'
         f = FilePathField(path=path, match='^.*?\.py$')
         f.choices.sort()
         expected = [
@@ -807,10 +807,10 @@ class FieldsTests(TestCase):
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
-            assert got[0].endswith(exp[0])
+            self.assertTrue(got[0].endswith(exp[0]))
 
     def test_filepathfield_68(self):
-        path = forms.__file__
+        path = os.path.abspath(forms.__file__)
         path = os.path.dirname(path) + '/'
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
         f.choices.sort()
@@ -827,7 +827,7 @@ class FieldsTests(TestCase):
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
-            assert got[0].endswith(exp[0])
+            self.assertTrue(got[0].endswith(exp[0]))
 
     # SplitDateTimeField ##########################################################
 
