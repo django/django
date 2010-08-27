@@ -1,0 +1,32 @@
+[
+    {
+        "pk": 1,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "registration_required": false,
+            "title": "A Flatpage",
+            "url": "/flatpage/",
+            "template_name": "",
+            "sites": [
+                1
+            ],
+            "content": "Isn't it flat!",
+            "enable_comments": false
+        }
+    },
+    {
+        "pk": 2,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "registration_required": true,
+            "title": "Sekrit Flatpage",
+            "url": "/sekrit/",
+            "template_name": "",
+            "sites": [
+                1
+            ],
+            "content": "Isn't it sekrit!",
+            "enable_comments": false
+        }
+    }
+]
