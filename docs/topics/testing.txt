@@ -1279,7 +1279,7 @@ cause of an failure in your test suite.
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
 
-.. method:: TestCase.assertQuerysetEqual(response, qs, values, transform=repr)
+.. method:: TestCase.assertQuerysetEqual(qs, values, transform=repr)
 
     .. versionadded:: 1.3
 
