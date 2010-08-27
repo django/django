@@ -69,7 +69,7 @@ class Sitemap(object):
                 'location':   loc,
                 'lastmod':    self.__get('lastmod', item, None),
                 'changefreq': self.__get('changefreq', item, None),
-                'priority':   self.__get('priority', item, None)
+                'priority':   str(self.__get('priority', item, ''))
             }
             urls.append(url_info)
         return urls
