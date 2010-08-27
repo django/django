@@ -398,6 +398,13 @@ set a flag on requests which relaxes the middleware and the ``csrf_protect``
 decorator so that they no longer rejects requests.  In every other respect
 (e.g. sending cookies etc.), they behave the same.
 
+If, for some reason, you *want* the test client to perform CSRF
+checks, you can create an instance of the test client that enforces
+CSRF checks::
+
+    >>> from django.test import Client
+    >>> csrf_client = Client(enforce_csrf_checks=True)
+
 Limitations
 ===========
 

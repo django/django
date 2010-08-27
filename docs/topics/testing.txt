@@ -572,6 +572,19 @@ Note a few important things about how the test client works:
       This black magic (essentially a patching of Django's template system in
       memory) only happens during test running.
 
+    * By default, the test client will disable any CSRF checks
+      performed by your site.
+
+      If, for some reason, you *want* the test client to perform CSRF
+      checks, you can create an instance of the test client that
+      enforces CSRF checks. To do this, pass in the
+      ``enforce_csrf_checks`` argument when you construct your
+      client::
+
+          >>> from django.test import Client
+          >>> csrf_client = Client(enforce_csrf_checks=True)
+
+
 .. _urllib: http://docs.python.org/library/urllib.html
 .. _urllib2: http://docs.python.org/library/urllib2.html
 
