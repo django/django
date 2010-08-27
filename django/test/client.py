@@ -55,6 +55,10 @@ class ClientHandler(BaseHandler):
     Uses the WSGI interface to compose requests, but returns
     the raw HttpResponse object
     """
+    def __init__(self, enforce_csrf_checks=True, *args, **kwargs):
+        self.enforce_csrf_checks = enforce_csrf_checks
+        super(ClientHandler, self).__init__(*args, **kwargs)
+
     def __call__(self, environ):
         from django.conf import settings
         from django.core import signals
@@ -71,7 +75,7 @@ class ClientHandler(BaseHandler):
             # CsrfViewMiddleware.  This makes life easier, and is probably
             # required for backwards compatibility with external tests against
             # admin views.
-            request._dont_enforce_csrf_checks = True
+            request._dont_enforce_csrf_checks = not self.enforce_csrf_checks
             response = self.get_response(request)
 
             # Apply response middleware.
@@ -169,8 +173,8 @@ class Client(object):
     contexts and templates produced by a view, rather than the
     HTML rendered to the end-user.
     """
-    def __init__(self, **defaults):
-        self.handler = ClientHandler()
+    def __init__(self, enforce_csrf_checks=False, **defaults):
+        self.handler = ClientHandler(enforce_csrf_checks)
         self.defaults = defaults
         self.cookies = SimpleCookie()
         self.exc_info = None
