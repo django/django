@@ -33,6 +33,7 @@ those packages have.
    gis/index
    humanize
    localflavor
+   markup
    messages
    redirects
    sitemaps
@@ -134,44 +135,12 @@ contains a ``USZipCodeField`` that you can use to validate U.S. zip codes.
 
 See the :doc:`localflavor documentation </ref/contrib/localflavor>`.
 
-.. _ref-contrib-markup:
-
 markup
 ======
 
-A collection of template filters that implement common markup languages:
+A collection of template filters that implement common markup languages
 
-    * ``textile`` -- implements `Textile`_ -- requires `PyTextile`_
-    * ``markdown`` -- implements `Markdown`_ -- requires `Python-markdown`_
-    * ``restructuredtext`` -- implements `ReST (ReStructured Text)`_
-      -- requires `doc-utils`_
-
-In each case, the filter expects formatted markup as a string and returns a
-string representing the marked-up text. For example, the ``textile`` filter
-converts text that is marked-up in Textile format to HTML.
-
-To activate these filters, add ``'django.contrib.markup'`` to your
-:setting:`INSTALLED_APPS` setting. Once you've done that, use
-``{% load markup %}`` in a template, and you'll have access to these filters.
-For more documentation, read the source code in
-:file:`django/contrib/markup/templatetags/markup.py`.
-
-.. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
-.. _Markdown: http://en.wikipedia.org/wiki/Markdown
-.. _ReST (ReStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
-.. _PyTextile: http://loopcore.com/python-textile/
-.. _Python-markdown: http://www.freewisdom.org/projects/python-markdown
-.. _doc-utils: http://docutils.sf.net/
-
-ReStructured Text
------------------
-
-When using the ``restructuredtext`` markup filter you can define a
-:setting:`RESTRUCTUREDTEXT_FILTER_SETTINGS` in your django settings to override
-the default writer settings. See the `restructuredtext writer settings`_ for
-details on what these settings are.
-
-.. _restructuredtext writer settings: http://docutils.sourceforge.net/docs/user/config.html#html4css1-writer
+See the :doc:`markup documentation </ref/contrib/markup>`.
 
 messages
 ========
