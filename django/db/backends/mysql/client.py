@@ -24,7 +24,10 @@ class DatabaseClient(BaseDatabaseClient):
         if passwd:
             args += ["--password=%s" % passwd]
         if host:
-            args += ["--host=%s" % host]
+            if '/' in host:
+                args += ["--socket=%s" % host]
+            else:
+             	args += ["--host=%s" % host]
         if port:
             args += ["--port=%s" % port]
         if db:
