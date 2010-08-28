@@ -18,7 +18,7 @@ class FlatpageViewTests(TestCase):
                 'templates'
             ),
         )
-        settings.DEBUG = True
+
     def tearDown(self):
         settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
         settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
