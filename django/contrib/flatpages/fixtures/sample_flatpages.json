@@ -18,6 +18,22 @@
         "pk": 2,
         "model": "flatpages.flatpage",
         "fields": {
+            "registration_required": false,
+            "title": "A Nested Flatpage",
+            "url": "/location/flatpage/",
+            "template_name": "",
+            "sites": [
+                1
+            ],
+            "content": "Isn't it flat and deep!",
+            "enable_comments": false
+        }
+    },
+
+    {
+        "pk": 101,
+        "model": "flatpages.flatpage",
+        "fields": {
             "registration_required": true,
             "title": "Sekrit Flatpage",
             "url": "/sekrit/",
@@ -26,6 +42,21 @@
                 1
             ],
             "content": "Isn't it sekrit!",
+            "enable_comments": false
+        }
+    },
+    {
+        "pk": 102,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "registration_required": true,
+            "title": "Sekrit Nested Flatpage",
+            "url": "/location/sekrit/",
+            "template_name": "",
+            "sites": [
+                1
+            ],
+            "content": "Isn't it sekrit and deep!",
             "enable_comments": false
         }
     }

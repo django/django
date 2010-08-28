@@ -102,6 +102,8 @@ like this::
 
 This has the same benefits as described in the last section.
 
+.. _hooking-into-current-site-from-views:
+
 Hooking into the current site from views
 ----------------------------------------
 

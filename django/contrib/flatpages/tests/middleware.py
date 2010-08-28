@@ -1,5 +1,6 @@
 import os
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 
 class FlatpageMiddlewareTests(TestCase):
@@ -38,6 +39,11 @@ class FlatpageMiddlewareTests(TestCase):
         "A flatpage served through a view can require authentication"
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/flatpage_root/sekrit/')
+        User.objects.create_user('testuser', 'test@example.com', 's3krit')
+        self.client.login(username='testuser',password='s3krit')
+        response = self.client.get('/flatpage_root/sekrit/')
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, "<p>Isn't it sekrit!</p>")
 
     def test_fallback_flatpage(self):
         "A flatpage can be served by the fallback middlware"
@@ -54,3 +60,8 @@ class FlatpageMiddlewareTests(TestCase):
         "A flatpage served by the middleware can require authentication"
         response = self.client.get('/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/sekrit/')
+        User.objects.create_user('testuser', 'test@example.com', 's3krit')
+        self.client.login(username='testuser',password='s3krit')
+        response = self.client.get('/sekrit/')
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, "<p>Isn't it sekrit!</p>")
