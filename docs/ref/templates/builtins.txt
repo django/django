@@ -2071,7 +2071,7 @@ A collection of template filters that implement these common markup languages:
     * Markdown
     * ReST (ReStructured Text)
 
-See :ref:`ref-contrib-markup`.
+See the :doc:`markup documentation </ref/contrib/markup>`.
 
 django.contrib.webdesign
 ~~~~~~~~~~~~~~~~~~~~~~~~
