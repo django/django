@@ -703,9 +703,10 @@ of the arguments is required, but you should use at least one of them.
     greater than Jan. 1, 2006.
 
     Django inserts the given SQL snippet directly into the ``SELECT``
-    statement, so the resulting SQL of the above example would be::
+    statement, so the resulting SQL of the above example would be something
+    like::
 
-        SELECT blog_entry.*, (pub_date > '2006-01-01')
+        SELECT blog_entry.*, (pub_date > '2006-01-01') AS is_recent
         FROM blog_entry;
 
 
@@ -859,7 +860,7 @@ deferred field will be retrieved from the database if you access that field
 You can make multiple calls to ``defer()``. Each call adds new fields to the
 deferred set::
 
-    # Defers both the body and lede fields.
+    # Defers both the body and headline fields.
     Entry.objects.defer("body").filter(rating=5).defer("headline")
 
 The order in which fields are added to the deferred set does not matter. Calling ``defer()`` with a field name that has already been deferred is harmless (the field will still be deferred).
@@ -919,7 +920,7 @@ immediately; the remainder are deferred. Thus, successive calls to ``only()``
 result in only the final fields being considered::
 
     # This will defer all fields except the headline.
-    Entry.objects.only("body", "lede").only("headline")
+    Entry.objects.only("body", "rating").only("headline")
 
 Since ``defer()`` acts incrementally (adding fields to the deferred list), you
 can combine calls to ``only()`` and ``defer()`` and things will behave
