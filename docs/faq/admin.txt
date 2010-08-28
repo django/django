@@ -52,11 +52,11 @@ admin. Using the same trick of extracting the user from the request, the
 :meth:`~django.contrib.admin.ModelAdmin.has_change_permission` can be used to
 control the visibility and editability of objects in the admin.
 
-My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.
+My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_wsgi.
 ---------------------------------------------------------------------------------------------------------------------------
 
-See :ref:`serving the admin files <howto-deployment-modpython-serving-the-admin-files>`
-in the "How to use Django with mod_python" documentation.
+See :ref:`serving the admin files <serving-the-admin-files>`
+in the "How to use Django with mod_wsgi" documentation.
 
 My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ----------------------------------------------------------------------------

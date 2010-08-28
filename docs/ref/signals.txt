@@ -393,8 +393,7 @@ Sent when Django begins processing an HTTP request.
 Arguments sent with this signal:
 
     ``sender``
-        The handler class -- i.e.
-        :class:`django.core.handlers.modpython.ModPythonHandler` or
+        The handler class -- e.g.
         :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
         the request.
 

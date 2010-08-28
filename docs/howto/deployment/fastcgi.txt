@@ -20,14 +20,14 @@ serve pages to a Web server. The Web server delegates the incoming Web requests
 (via a socket) to FastCGI, which executes the code and passes the response back
 to the Web server, which, in turn, passes it back to the client's Web browser.
 
-Like mod_python, FastCGI allows code to stay in memory, allowing requests to be
-served with no startup time. Unlike mod_python_ (or `mod_perl`_), a FastCGI
-process doesn't run inside the Web server process, but in a separate,
+Like mod_wsgi, FastCGI allows code to stay in memory, allowing requests to be
+served with no startup time. While mod_wsgi can either be configured embedded
+in the Apache webserver process or as a separate daemon process, a FastCGI
+process never runs inside the Web server process, always in a separate,
 persistent process.
 
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
 .. _mod_perl: http://perl.apache.org/
-.. _mod_python: http://www.modpython.org/
 
 .. admonition:: Why run code in a separate process?
 
@@ -35,8 +35,7 @@ persistent process.
     languages (most notably PHP, Python and Perl) inside the process space of
     your Web server. Although this lowers startup time -- because code doesn't
     have to be read off disk for every request -- it comes at the cost of
-    memory use. For mod_python, for example, every Apache process gets its own
-    Python interpreter, which uses up a considerable amount of RAM.
+    memory use.
 
     Due to the nature of FastCGI, it's even possible to have processes that run
     under a different user account than the Web server process. That's a nice
@@ -361,7 +360,7 @@ Serving admin media files
 
 Regardless of the server and configuration you eventually decide to use, you
 will also need to give some thought to how to serve the admin media files. The
-advice given in the :ref:`modpython <serving-the-admin-files>` documentation
+advice given in the :ref:`mod_wsgi <serving-the-admin-files>` documentation
 is also applicable in the setups detailed above.
 
 Forcing the URL prefix to a particular value

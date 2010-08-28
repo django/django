@@ -31,7 +31,7 @@ Using this method is **inefficient** and **insecure**. Do not use this in a
 production setting. Use this only for development.
 
 For information on serving static files in an Apache production environment,
-see the :ref:`Django mod_python documentation <serving-media-files>`.
+see the :ref:`Django mod_wsgi documentation <serving-media-files>`.
 
 How to do it
 ============

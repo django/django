@@ -1,5 +1,6 @@
 import os
 from pprint import pformat
+from warnings import warn
 
 from django import http
 from django.core import signals
@@ -179,6 +180,9 @@ class ModPythonHandler(BaseHandler):
     request_class = ModPythonRequest
 
     def __call__(self, req):
+        warn(('The mod_python handler is deprecated; use a WSGI or FastCGI server instead.'),
+             PendingDeprecationWarning)
+
         # mod_python fakes the environ, and thus doesn't process SetEnv.  This fixes that
         os.environ.update(req.subprocess_env)
 

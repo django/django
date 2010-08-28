@@ -2,6 +2,13 @@
 How to use Django with Apache and mod_python
 ============================================
 
+.. warning::
+
+    Support for mod_python will be deprecated in a future release of Django. If
+    you are configuring a new deployment, you are strongly encouraged to
+    consider using :doc:`mod_wsgi </howto/deployment/modwsgi>` or any of the
+    other :doc:`supported backends </howto/deployment/index>`.
+
 .. highlight:: apache
 
 The `mod_python`_ module for Apache_ can be used to deploy Django to a
@@ -214,8 +221,6 @@ Or add the debugging information to the template of your page.
 
 .. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
 
-.. _serving-media-files:
-
 Serving media files
 ===================
 
@@ -266,10 +271,6 @@ the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
 .. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/
 .. _Cherokee: http://www.cherokee-project.com/
-
-.. _howto-deployment-modpython-serving-the-admin-files:
-
-.. _serving-the-admin-files:
 
 Serving the admin files
 =======================

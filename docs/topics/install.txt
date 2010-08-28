@@ -27,27 +27,38 @@ probably already have it installed.
 Install Apache and mod_wsgi
 =============================
 
-If you just want to experiment with Django, skip ahead to the next section;
-Django includes a lightweight web server you can use for testing, so you won't
-need to set up Apache until you're ready to deploy Django in production.
+If you just want to experiment with Django, skip ahead to the next
+section; Django includes a lightweight web server you can use for
+testing, so you won't need to set up Apache until you're ready to
+deploy Django in production.
 
-If you want to use Django on a production site, use Apache with `mod_wsgi`_.
-mod_wsgi is similar to mod_perl -- it embeds Python within Apache and loads
-Python code into memory when the server starts. Code stays in memory throughout
-the life of an Apache process, which leads to significant performance gains over
-other server arrangements. Make sure you have Apache installed, with the
-mod_wsgi module activated. Django will work with any version of Apache that
-supports mod_wsgi.
+If you want to use Django on a production site, use Apache with
+`mod_wsgi`_. mod_wsgi can operate in one of two modes: an embedded
+mode and a daemon mode. In embedded mode, mod_wsgi is similar to
+mod_perl -- it embeds Python within Apache and loads Python code into
+memory when the server starts. Code stays in memory throughout the
+life of an Apache process, which leads to significant performance
+gains over other server arrangements. In daemon mode, mod_wsgi spawns
+an independent daemon process that handles requests. The daemon
+process can run as a different user than the webserver, possibly
+leading to improved security, and the daemon process can be restarted
+without restarting the entire Apache webserver, possibly making
+refreshing your codebase more seamless. Consult the mod_wsgi
+documentation to determine which mode is right for your setup. Make
+sure you have Apache installed, with the mod_wsgi module activated.
+Django will work with any version of Apache that supports mod_wsgi.
 
-See :doc:`How to use Django with mod_wsgi </howto/deployment/modwsgi>` for
-information on how to configure mod_wsgi once you have it installed.
+See :doc:`How to use Django with mod_wsgi </howto/deployment/modwsgi>`
+for information on how to configure mod_wsgi once you have it
+installed.
 
-If you can't use mod_wsgi for some reason, fear not: Django supports many other
-deployment options. A great second choice is :doc:`mod_python
-</howto/deployment/modpython>`, the predecessor to mod_wsgi. Additionally, Django
-follows the WSGI_ spec, which allows it to run on a variety of server platforms.
-See the `server-arrangements wiki page`_ for specific installation instructions
-for each platform.
+If you can't use mod_wsgi for some reason, fear not: Django supports
+many other deployment options. Another option is :doc:`FastCGI
+</howto/deployment/fastcgi>`, perfect for using Django with servers
+other than Apache. Additionally, Django follows the WSGI_ spec, which
+allows it to run on a variety of server platforms. See the
+`server-arrangements wiki page`_ for specific installation
+instructions for each platform.
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
@@ -255,15 +266,15 @@ latest bug fixes and improvements, follow these instructions:
    links. (Environment variables can be defined on Windows systems `from the
    Control Panel`_.)
 
-   .. admonition:: What about Apache and mod_python?
+   .. admonition:: What about Apache and mod_wsgi?
 
-      If you take the approach of setting ``PYTHONPATH``, you'll need to
-      remember to do the same thing in your Apache configuration once you
-      deploy your production site. Do this by setting ``PythonPath`` in your
-      Apache configuration file.
+      If you take the approach of setting ``PYTHONPATH``, you'll need
+      to remember to do the same thing in your WSGI application once
+      you deploy your production site. Do this by appending to
+      ``sys.path`` in your WSGI application.
 
       More information about deployment is available, of course, in our
-      :doc:`How to use Django with mod_python </howto/deployment/modpython>`
+      :doc:`How to use Django with mod_wsgi </howto/deployment/modwsgi>`
       documentation.
 
 4. On Unix-like systems, create a symbolic link to the file

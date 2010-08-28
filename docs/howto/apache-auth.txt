@@ -2,6 +2,13 @@
 Authenticating against Django's user database from Apache
 =========================================================
 
+.. warning::
+
+    Support for mod_python has been deprecated within Django. At that
+    time, this method of authentication will no longer be provided by
+    Django. The community is welcome to offer its own alternate
+    solutions using WSGI middleware or other approaches.
+
 Since keeping multiple authentication databases in sync is a common problem when
 dealing with Apache, you can configuring Apache to authenticate against Django's
 :doc:`authentication system </topics/auth>` directly. For example, you

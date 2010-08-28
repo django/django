@@ -42,13 +42,45 @@ custom widget to your form that sets the ``render_value`` argument::
         username = forms.CharField(max_length=100)
         password = forms.PasswordField(widget=forms.PasswordInput(render_value=True))
 
+.. _deprecated-features-1.3:
 
 Features deprecated in 1.3
 ==========================
 
+Django 1.3 deprecates some features from earlier releases.
+These features are still supported, but will be gradually phased out
+over the next few release cycles.
 
+Code taking advantage of any of the features below will raise a
+``PendingDeprecationWarning`` in Django 1.3. This warning will be
+silent by default, but may be turned on using Python's `warnings
+module`_, or by running Python with a ``-Wd`` or `-Wall` flag.
+
+.. _warnings module: http://docs.python.org/library/warnings.html
+
+In Django 1.4, these warnings will become a ``DeprecationWarning``,
+which is *not* silent. In Django 1.5 support for these features will
+be removed entirely.
+
+.. seealso::
+
+    For more details, see the documentation :doc:`Django's release process
+    </internals/release-process>` and our :doc:`deprecation timeline
+    </internals/deprecation>`.`
+
+``mod_python`` support
+~~~~~~~~~~~~~~~~~~~~~~
+
+The ``mod_python`` library has not had a release since 2007 or a commit since
+2008. The Apache Foundation board voted to remove ``mod_python`` from the set
+of active projects in its version control repositories, and its lead developer
+has shifted all of his efforts toward the lighter, slimmer, more stable, and
+more flexible ``mod_wsgi`` backend.
+
+If you are currently using the ``mod_python`` request handler, it is strongly
+encouraged you redeploy your Django instances using :doc:`mod_wsgi
+</howto/deployment/modwsgi>`.
 
 What's new in Django 1.3
 ========================
-
 
