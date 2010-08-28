@@ -478,6 +478,11 @@ ul.errorlist {
     background: red url(../img/admin/icon_alert.gif) 5px .3em no-repeat;
 }
 
+.errorlist li a {
+ 	color: white;
+    text-decoration: underline;
+}
+
 td ul.errorlist {
     margin: 0 !important;
     padding: 0 !important;
