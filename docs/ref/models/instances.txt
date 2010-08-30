@@ -515,7 +515,7 @@ the ``url`` function)::
 ...and then using that name to perform the reverse URL resolution instead
 of the view name::
 
-    from django.db.models import permalink
+    from django.db import models
 
     @models.permalink
     def get_absolute_url(self):
