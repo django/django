@@ -8,6 +8,7 @@ from django.core import management
 from django.core.management.color import no_style
 from django.db import backend, connection, connections, DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
+from django.db.backends.postgresql import version as pg_version
 from django.test import TestCase
 
 from regressiontests.backends import models
@@ -154,46 +155,34 @@ class SequenceResetTest(TestCase):
         obj = models.Post.objects.create(name='New post', text='goodbye world')
         self.assertTrue(obj.pk > 10)
 
+class PostgresVersionTest(TestCase):
+    def assert_parses(self, version_string, version):
+        self.assertEqual(pg_version._parse_version(version_string), version)
 
-def connection_created_test(sender, **kwargs):
-    print 'connection_created signal'
-
-__test__ = {'API_TESTS': """
-# Check Postgres version parsing
->>> from django.db.backends.postgresql import version as pg_version
-
->>> pg_version._parse_version("PostgreSQL 8.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)")
-(8, 3, 1)
-
->>> pg_version._parse_version("PostgreSQL 8.3.6")
-(8, 3, 6)
-
->>> pg_version._parse_version("PostgreSQL 8.3")
-(8, 3, None)
-
->>> pg_version._parse_version("EnterpriseDB 8.3")
-(8, 3, None)
-
->>> pg_version._parse_version("PostgreSQL 8.3 beta4")
-(8, 3, None)
-
->>> pg_version._parse_version("PostgreSQL 8.4beta1")
-(8, 4, None)
-
-"""}
+    def test_parsing(self):
+        self.assert_parses("PostgreSQL 8.3 beta4", (8, 3, None))
+        self.assert_parses("PostgreSQL 8.3", (8, 3, None))
+        self.assert_parses("EnterpriseDB 8.3", (8, 3, None))
+        self.assert_parses("PostgreSQL 8.3.6", (8, 3, 6))
+        self.assert_parses("PostgreSQL 8.4beta1", (8, 4, None))
+        self.assert_parses("PostgreSQL 8.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", (8, 3, 1))
 
 # Unfortunately with sqlite3 the in-memory test database cannot be
 # closed, and so it cannot be re-opened during testing, and so we
 # sadly disable this test for now.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.sqlite3':
-    __test__['API_TESTS'] += """
->>> connection_created.connect(connection_created_test)
->>> connection.close() # Ensure the connection is closed
->>> cursor = connection.cursor()
-connection_created signal
->>> connection_created.disconnect(connection_created_test)
->>> cursor = connection.cursor()
-"""
+if settings.DATABASES[DEFAULT_DB_ALIAS]["ENGINE"] != "django.db.backends.sqlite3":
+    class ConnectionCreatedSignalTest(TestCase):
+        def test_signal(self):
+            data = {}
+            def receiver(sender, connection, **kwargs):
+                data["connection"] = connection
 
-if __name__ == '__main__':
-    unittest.main()
+            connection_created.connect(receiver)
+            connection.close()
+            cursor = connection.cursor()
+            self.assertTrue(data["connection"] is connection)
+
+            connection_created.disconnect(receiver)
+            data.clear()
+            cursor = connection.cursor()
+            self.assertTrue(data == {})
