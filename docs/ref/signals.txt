@@ -454,3 +454,39 @@ Arguments sent with this signal:
     context
         The :class:`~django.template.Context` with which the template was
         rendered.
+
+Database Wrappers
+=================
+
+.. module:: django.db.backends
+   :synopsis: Core signals sent by the database wrapper.
+
+Signals sent by the database wrapper when a database connection is
+initiated.
+
+connection_created
+------------------
+
+.. data:: django.db.backends.signals.connection_created
+   :module:
+
+.. versionadded:: 1.1
+
+.. versionchanged:: 1.2
+   The connection argument was added
+
+Sent when the database wrapper makes the initial connection to the
+database.  This is particularly useful if you'd like to send any post
+connection commands to the SQL backend.
+
+Arguments sent with this signal:
+
+    sender
+        The database wrapper class -- i.e.
+        :class: `django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
+        :class: `django.db.backends.mysql.DatabaseWrapper`, etc.
+
+    connection
+        The database connection that was opened. This can be used in a
+        multiple-database configuration to differentiate connection signals
+        from different databases.
