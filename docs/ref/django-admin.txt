@@ -208,6 +208,12 @@ records to dump. If you're using a :ref:`custom manager <custom-managers>` as
 the default manager and it filters some of the available records, not all of the
 objects will be dumped.
 
+.. versionadded:: 1.3
+
+The :djadminopt:`--all` option may be provided to specify that
+``dumpdata`` should use Django's base manager, dumping records which
+might otherwise be filtered or modified by a custom manager.
+
 .. django-admin-option:: --format <fmt>
 
 By default, ``dumpdata`` will format its output in JSON, but you can use the
@@ -270,7 +276,6 @@ prompts.
 
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
-
 
 inspectdb
 ---------

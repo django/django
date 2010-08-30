@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core import management
 from django.db import DEFAULT_DB_ALIAS
 
-from models import Article, Blog, Book, Category, Person, Tag, Visa
+from models import Article, Blog, Book, Category, Person, Spy, Tag, Visa
 
 class TestCaseFixtureLoadingTests(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
@@ -24,12 +24,13 @@ class TestCaseFixtureLoadingTests(TestCase):
 class FixtureLoadingTests(TestCase):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False,
-                         exclude_list=[]):
+                         use_base_manager=False, exclude_list=[]):
         new_io = StringIO.StringIO()
         management.call_command('dumpdata', *args, **{'format':format,
                                                       'stdout':new_io,
                                                       'stderr':new_io,
                                                       'use_natural_keys':natural_keys,
+                                                      'use_base_manager':use_base_manager,
                                                       'exclude': exclude_list})
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, output)
@@ -196,6 +197,17 @@ class FixtureLoadingTests(TestCase):
                           ['fixtures', 'sites'],
                           '',
                           exclude_list=['fixtures.FooModel'])
+
+    def test_dumpdata_with_filtering_manager(self):
+        Spy(name='Paul').save()
+        Spy(name='Alex', cover_blown=True).save()
+        self.assertQuerysetEqual(Spy.objects.all(),
+                                 ['<Spy: Paul>'])
+        # Use the default manager
+        self._dumpdata_assert(['fixtures.Spy'],'[{"pk": 1, "model": "fixtures.spy", "fields": {"cover_blown": false}}]')
+        # Dump using Django's base manager. Should return all objects,
+        # even those normally filtered by the manager
+        self._dumpdata_assert(['fixtures.Spy'], '[{"pk": 2, "model": "fixtures.spy", "fields": {"cover_blown": true}}, {"pk": 1, "model": "fixtures.spy", "fields": {"cover_blown": false}}]', use_base_manager=True)
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification

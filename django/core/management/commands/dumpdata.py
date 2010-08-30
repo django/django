@@ -19,9 +19,12 @@ class Command(BaseCommand):
             help='An appname or appname.ModelName to exclude (use multiple --exclude to exclude multiple apps/models).'),
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
             help='Use natural keys if they are available.'),
+        make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
+            help="Use Django's base manager to dump all models stored in the database, including those that would otherwise be filtered or modified by a custom manager."),
     )
     help = ("Output the contents of the database as a fixture of the given "
-            "format (using each model's default manager).")
+            "format (using each model's default manager unless --all is "
+            "specified).")
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
@@ -34,6 +37,7 @@ class Command(BaseCommand):
         excludes = options.get('exclude',[])
         show_traceback = options.get('traceback', False)
         use_natural_keys = options.get('use_natural_keys', False)
+        use_base_manager = options.get('use_base_manager', False)
 
         excluded_apps = set()
         excluded_models = set()
@@ -100,7 +104,10 @@ class Command(BaseCommand):
             if model in excluded_models:
                 continue
             if not model._meta.proxy and router.allow_syncdb(using, model):
-                objects.extend(model._default_manager.using(using).all())
+                if use_base_manager:
+                    objects.extend(model._base_manager.using(using).all())
+                else:
+                    objects.extend(model._default_manager.using(using).all())
 
         try:
             return serializers.serialize(format, objects, indent=indent,

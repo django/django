@@ -72,6 +72,14 @@ class Person(models.Model):
     def natural_key(self):
         return (self.name,)
 
+class SpyManager(PersonManager):
+    def get_query_set(self):
+        return super(SpyManager, self).get_query_set().filter(cover_blown=False)
+
+class Spy(Person):
+    objects = SpyManager()
+    cover_blown = models.BooleanField(default=False)
+
 class Visa(models.Model):
     person = models.ForeignKey(Person)
     permissions = models.ManyToManyField(Permission, blank=True)
