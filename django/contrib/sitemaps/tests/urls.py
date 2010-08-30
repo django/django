@@ -1,20 +1,28 @@
 from datetime import datetime
 from django.conf.urls.defaults import *
-from django.contrib.sitemaps import Sitemap
+from django.contrib.sitemaps import Sitemap, GenericSitemap
+from django.contrib.auth.models import User
 
 class SimpleSitemap(Sitemap):
     changefreq = "never"
     priority = 0.5
-    location = '/ticket14164'
+    location = '/location/'
     lastmod = datetime.now()
 
     def items(self):
         return [object()]
 
-sitemaps = {
+simple_sitemaps = {
     'simple': SimpleSitemap,
 }
 
+generic_sitemaps = {
+    'generic': GenericSitemap({
+        'queryset': User.objects.all()
+    }),
+}
+
 urlpatterns = patterns('django.contrib.sitemaps.views',
-    (r'^sitemaps/sitemap\.xml$', 'sitemap', {'sitemaps': sitemaps}),
+    (r'^simple/sitemap\.xml$', 'sitemap', {'sitemaps': simple_sitemaps}),
+    (r'^generic/sitemap\.xml$', 'sitemap', {'sitemaps': generic_sitemaps}),
 )
