@@ -238,7 +238,7 @@ master/slave relationship between the databases ``master``, ``slave1`` and
                 return False
             return None
 
-     class MasterSlaveRouter(object):
+    class MasterSlaveRouter(object):
         """A router that sets up a simple master/slave configuration"""
 
         def db_for_read(self, model, **hints):
