@@ -136,7 +136,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection = Database.connect(**conn_params)
             self.connection.set_client_encoding('UTF8')
             self.connection.set_isolation_level(self.isolation_level)
-            connection_created.send(sender=self.__class__)
+            connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = None
         if new_connection:

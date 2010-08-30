@@ -135,8 +135,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if settings_dict['PORT']:
                 conn_string += " port=%s" % settings_dict['PORT']
             self.connection = Database.connect(conn_string, **settings_dict['OPTIONS'])
-            self.connection.set_isolation_level(1) # make transactions transparent to all cursors
-            connection_created.send(sender=self.__class__)
+            # make transactions transparent to all cursors
+            self.connection.set_isolation_level(1)
+            connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         if new_connection:
             if set_tz:
