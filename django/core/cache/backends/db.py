@@ -124,6 +124,7 @@ class CacheClass(BaseCache):
         if self._cull_frequency == 0:
             self.clear()
         else:
+            table = connections[db].ops.quote_name(self._table)
             cursor.execute("DELETE FROM %s WHERE expires < %%s" % table,
                            [connections[db].ops.value_to_db_datetime(now)])
             cursor.execute("SELECT COUNT(*) FROM %s" % table)
