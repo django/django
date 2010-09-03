@@ -935,6 +935,15 @@ can access these properties as part of a test condition.
     A dictionary-like object containing session information. See the
     :doc:`session documentation</topics/http/sessions>` for full details.
 
+    To modify the session and then save it, it must be stored in a variable
+    first (because a new ``SessionStore`` is created every time this property
+    is accessed)::
+
+        def test_something(self):
+            session = self.client.session
+            session['somekey'] = 'test'
+            session.save()
+
 .. _Cookie module documentation: http://docs.python.org/library/cookie.html
 
 Example
