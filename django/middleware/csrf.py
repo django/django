@@ -27,18 +27,28 @@ else:
     randrange = random.randrange
 _MAX_CSRF_KEY = 18446744073709551616L     # 2 << 63
 
+REASON_NO_REFERER = "Referer checking failed - no Referer."
+REASON_BAD_REFERER = "Referer checking failed - %s does not match %s."
+REASON_NO_COOKIE = "No CSRF or session cookie."
+REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
+REASON_BAD_TOKEN = "CSRF token missing or incorrect."
+
+
 def _get_failure_view():
     """
     Returns the view to be used for CSRF rejections
     """
     return get_callable(settings.CSRF_FAILURE_VIEW)
 
+
 def _get_new_csrf_key():
     return md5_constructor("%s%s"
                 % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY)).hexdigest()
 
+
 def _make_legacy_session_token(session_id):
     return md5_constructor(settings.SECRET_KEY + session_id).hexdigest()
+
 
 def get_token(request):
     """
@@ -51,6 +61,7 @@ def get_token(request):
     """
     request.META["CSRF_COOKIE_USED"] = True
     return request.META.get("CSRF_COOKIE", None)
+
 
 class CsrfViewMiddleware(object):
     """
@@ -143,13 +154,13 @@ class CsrfViewMiddleware(object):
                 # we can use strict Referer checking.
                 referer = request.META.get('HTTP_REFERER')
                 if referer is None:
-                    return reject("Referer checking failed - no Referer.")
+                    return reject(REASON_NO_REFERER)
 
                 # The following check ensures that the referer is HTTPS,
                 # the domains match and the ports match - the same origin policy.
                 good_referer = 'https://%s/' % request.get_host()
                 if not referer.startswith(good_referer):
-                    return reject("Referer checking failed - %s does not match %s." %
+                    return reject(REASON_BAD_REFERER %
                                   (referer, good_referer))
 
             # If the user didn't already have a CSRF cookie, then fall back to
@@ -164,7 +175,7 @@ class CsrfViewMiddleware(object):
                     # No CSRF cookie and no session cookie. For POST requests,
                     # we insist on a CSRF cookie, and in this way we can avoid
                     # all CSRF attacks, including login CSRF.
-                    return reject("No CSRF or session cookie.")
+                    return reject(REASON_NO_COOKIE)
             else:
                 csrf_token = request.META["CSRF_COOKIE"]
 
@@ -173,9 +184,9 @@ class CsrfViewMiddleware(object):
             if request_csrf_token != csrf_token:
                 if cookie_is_new:
                     # probably a problem setting the CSRF cookie
-                    return reject("CSRF cookie not set.")
+                    return reject(REASON_NO_CSRF_COOKIE)
                 else:
-                    return reject("CSRF token missing or incorrect.")
+                    return reject(REASON_BAD_TOKEN)
 
         return accept()
 
@@ -200,6 +211,7 @@ class CsrfViewMiddleware(object):
         patch_vary_headers(response, ('Cookie',))
         response.csrf_processing_done = True
         return response
+
 
 class CsrfResponseMiddleware(object):
     """
@@ -251,6 +263,7 @@ class CsrfResponseMiddleware(object):
                 del response['ETag']
         return response
 
+
 class CsrfMiddleware(object):
     """
     Django middleware that adds protection against Cross Site
@@ -278,4 +291,3 @@ class CsrfMiddleware(object):
     def process_view(self, request, callback, callback_args, callback_kwargs):
         return self.view_middleware.process_view(request, callback, callback_args,
                                                  callback_kwargs)
-
