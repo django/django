@@ -52,6 +52,10 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
 
+    def __init__(self, *args, **kwargs):
+        super(UserChangeForm, self).__init__(*args, **kwargs)
+        self.fields['user_permissions'].queryset = self.fields['user_permissions'].queryset.select_related('content_type')
+
 class AuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts
