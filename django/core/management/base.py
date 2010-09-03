@@ -394,9 +394,9 @@ def copy_helper(style, app_or_project, name, directory, other_name=''):
         relative_dir = d[len(template_dir)+1:].replace('%s_name' % app_or_project, name)
         if relative_dir:
             os.mkdir(os.path.join(top_dir, relative_dir))
-        for i, subdir in enumerate(subdirs):
+        for subdir in subdirs[:]:
             if subdir.startswith('.'):
-                del subdirs[i]
+                subdirs.remove(subdir)
         for f in files:
             if not f.endswith('.py'):
                 # Ignore .pyc, .pyo, .py.class etc, as they cause various
