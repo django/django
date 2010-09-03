@@ -23,7 +23,7 @@ CSRF_FAILRE_TEMPLATE = """
     h1 span { font-size:60%; color:#666; font-weight:normal; }
     #info { background:#f6f6f6; }
     #info ul { margin: 0.5em 4em; }
-    #info p { padding-top:10px; }
+    #info p, #summary p { padding-top:10px; }
     #summary { background: #ffc; }
     #explanation { background:#eee; border-bottom: 0px none; }
   </style>
@@ -32,6 +32,16 @@ CSRF_FAILRE_TEMPLATE = """
 <div id="summary">
   <h1>Forbidden <span>(403)</span></h1>
   <p>CSRF verification failed. Request aborted.</p>
+{% if no_referer %}
+  <p>You are seeing this message because this HTTPS site requires a 'Referer
+   header' to be sent by your web browser, but none was sent. This header is
+   required for security reasons, to ensure that your browser is not being
+   hijacked by third parties.</p>
+
+  <p>If you have configured your browser to disable 'Referer' headers, please
+   re-enable them, at least for this site, or for HTTPS connections, or for
+   'same-origin' requests.</p>
+{% endif %}
 </div>
 {% if DEBUG %}
 <div id="info">
@@ -83,7 +93,10 @@ def csrf_failure(request, reason=""):
     """
     Default view used when request fails CSRF protection
     """
+    from django.middleware.csrf import REASON_NO_REFERER
     t = Template(CSRF_FAILRE_TEMPLATE)
     c = Context({'DEBUG': settings.DEBUG,
-                 'reason': reason})
+                 'reason': reason,
+                 'no_referer': reason == REASON_NO_REFERER
+                 })
     return HttpResponseForbidden(t.render(c), mimetype='text/html')
