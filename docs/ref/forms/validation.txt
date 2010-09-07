@@ -178,7 +178,7 @@ Using validators
 .. versionadded:: 1.2
 
 Django's form (and model) fields support use of simple utility functions and
-classes known as validators. These can passed to a field's constructor, via
+classes known as validators. These can be passed to a field's constructor, via
 the field's ``validators`` argument, or defined on the Field class itself with
 the ``default_validators`` attribute.
 
