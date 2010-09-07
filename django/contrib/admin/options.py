@@ -754,7 +754,7 @@ class ModelAdmin(BaseModelAdmin):
             if isinstance(response, HttpResponse):
                 return response
             else:
-                return HttpResponseRedirect(".")
+                return HttpResponseRedirect(request.get_full_path())
         else:
             msg = _("No action selected.")
             self.message_user(request, msg)

@@ -1477,6 +1477,21 @@ class AdminActionsTest(TestCase):
         response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
         self.failUnlessEqual(response.status_code, 302)
 
+    def test_default_redirect(self):
+        """
+        Test that actions which don't return an HttpResponse are redirected to
+        the same page, retaining the querystring (which may contain changelist
+        information).
+        """
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action' : 'external_mail',
+            'index': 0,
+        }
+        url = '/test_admin/admin/admin_views/externalsubscriber/?ot=asc&o=1'
+        response = self.client.post(url, action_data)
+        self.assertRedirects(response, url)
+
     def test_model_without_action(self):
         "Tests a ModelAdmin without any action"
         response = self.client.get('/test_admin/admin/admin_views/oldsubscriber/')
