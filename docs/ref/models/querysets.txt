@@ -1556,7 +1556,7 @@ Example::
 
 SQL equivalent::
 
-    SELECT ... WHERE EXTRACT('year' FROM pub_date) = '2005';
+    SELECT ... WHERE pub_date BETWEEN '2005-01-01' AND '2005-12-31 23:59:59.999999';
 
 (The exact SQL syntax varies for each database engine.)
 
