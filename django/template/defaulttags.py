@@ -157,15 +157,22 @@ class ForNode(Node):
             loop_dict['first'] = (i == 0)
             loop_dict['last'] = (i == len_values - 1)
 
+            pop_context = False
             if unpack:
                 # If there are multiple loop variables, unpack the item into
                 # them.
-                context.update(dict(zip(self.loopvars, item)))
+                try:
+                    unpacked_vars = dict(zip(self.loopvars, item))
+                except TypeError:
+                    pass
+                else:
+                    pop_context = True
+                    context.update(unpacked_vars)
             else:
                 context[self.loopvars[0]] = item
             for node in self.nodelist_loop:
                 nodelist.append(node.render(context))
-            if unpack:
+            if pop_context:
                 # The loop variables were pushed on to the context so pop them
                 # off again. This is necessary because the tag lets the length
                 # of loopvars differ to the length of each set of items and we
