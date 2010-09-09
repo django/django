@@ -9,6 +9,7 @@ from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.template.smartif import IfParser, Literal
 from django.conf import settings
+from django.utils.html import escape
 from django.utils.encoding import smart_str, smart_unicode
 from django.utils.safestring import mark_safe
 
@@ -42,7 +43,7 @@ class CsrfTokenNode(Node):
             if csrf_token == 'NOTPROVIDED':
                 return mark_safe(u"")
             else:
-                return mark_safe(u"<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='%s' /></div>" % (csrf_token))
+                return mark_safe(u"<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='%s' /></div>" % escape(csrf_token))
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
