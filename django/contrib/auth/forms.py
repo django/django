@@ -54,7 +54,9 @@ class UserChangeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
-        self.fields['user_permissions'].queryset = self.fields['user_permissions'].queryset.select_related('content_type')
+        f = self.fields.get('user_permissions', None)
+        if f is not None:
+            f.queryset = f.queryset.select_related('content_type')
 
 class AuthenticationForm(forms.Form):
     """
