@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.hashcompat import md5_constructor
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 _POST_FORM_RE = \
@@ -52,7 +53,8 @@ def _make_legacy_session_token(session_id):
 
 def get_token(request):
     """
-    Returns the the CSRF token required for a POST form.
+    Returns the the CSRF token required for a POST form. No assumptions should
+    be made about what characters might be in the CSRF token.
 
     A side effect of calling this function is to make the the csrf_protect
     decorator and the CsrfViewMiddleware add a CSRF cookie and a 'Vary: Cookie'
@@ -247,7 +249,7 @@ class CsrfResponseMiddleware(object):
                 """Returns the matched <form> tag plus the added <input> element"""
                 return mark_safe(match.group() + "<div style='display:none;'>" + \
                 "<input type='hidden' " + idattributes.next() + \
-                " name='csrfmiddlewaretoken' value='" + csrf_token + \
+                " name='csrfmiddlewaretoken' value='" + escape(csrf_token) + \
                 "' /></div>")
 
             # Modify any POST forms

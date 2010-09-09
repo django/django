@@ -6,6 +6,7 @@ from django.middleware.csrf import CsrfMiddleware, CsrfViewMiddleware
 from django.views.decorators.csrf import csrf_exempt, csrf_view_exempt
 from django.core.context_processors import csrf
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.utils.html import escape
 from django.utils.importlib import import_module
 from django.conf import settings
 from django.template import RequestContext, Template
@@ -56,7 +57,9 @@ class TestingHttpRequest(HttpRequest):
         return getattr(self, '_is_secure', False)
 
 class CsrfMiddlewareTest(TestCase):
-    _csrf_id = "1"
+    # The csrf token is potentially from an untrusted source, so could have
+    # characters that need escaping
+    _csrf_id = "<1>"
 
     # This is a valid session token for this ID and secret key.  This was generated using
     # the old code that we're to be backwards-compatible with.  Don't use the CSRF code
@@ -101,7 +104,7 @@ class CsrfMiddlewareTest(TestCase):
         return req
 
     def _check_token_present(self, response, csrf_id=None):
-        self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % (csrf_id or self._csrf_id))
+        self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % escape(csrf_id or self._csrf_id))
 
     # Check the post processing and outgoing cookie
     def test_process_response_no_csrf_cookie(self):
