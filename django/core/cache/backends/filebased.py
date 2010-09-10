@@ -116,7 +116,7 @@ class CacheClass(BaseCache):
             return
 
         try:
-            filelist = os.listdir(self._dir)
+            filelist = sorted(os.listdir(self._dir))
         except (IOError, OSError):
             return
 
