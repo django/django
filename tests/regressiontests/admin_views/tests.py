@@ -604,6 +604,28 @@ class AdminViewPermissionsTest(TestCase):
                         'Plural error message not found in response to post with multiple errors.')
         self.client.get('/test_admin/admin/logout/')
 
+    def testConditionallyShowAddSectionLink(self):
+        """
+        The foreign key widget should only show the "add related" button if the
+        user has permission to add that related item.
+        """
+        # Set up and log in user.
+        url = '/test_admin/admin/admin_views/article/add/'
+        add_link_text = ' class="add-another"'
+        self.client.get('/test_admin/admin/')
+        self.client.post('/test_admin/admin/', self.adduser_login)
+        # The add user can't add sections yet, so they shouldn't see the "add
+        # section" link.
+        response = self.client.get(url)
+        self.assertNotContains(response, add_link_text)
+        # Allow the add user to add sections too. Now they can see the "add
+        # section" link.
+        add_user = User.objects.get(username='adduser')
+        perm = get_perm(Section, Section._meta.get_add_permission())
+        add_user.user_permissions.add(perm)
+        response = self.client.get(url)
+        self.assertContains(response, add_link_text)
+
     def testCustomModelAdminTemplates(self):
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.super_login)
