@@ -13,7 +13,6 @@ from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.hashcompat import md5_constructor
-from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 _POST_FORM_RE = \
@@ -53,8 +52,8 @@ def _make_legacy_session_token(session_id):
 
 def get_token(request):
     """
-    Returns the the CSRF token required for a POST form. No assumptions should
-    be made about what characters might be in the CSRF token.
+    Returns the the CSRF token required for a POST form. The token is an
+    alphanumeric value.
 
     A side effect of calling this function is to make the the csrf_protect
     decorator and the CsrfViewMiddleware add a CSRF cookie and a 'Vary: Cookie'
@@ -63,6 +62,17 @@ def get_token(request):
     """
     request.META["CSRF_COOKIE_USED"] = True
     return request.META.get("CSRF_COOKIE", None)
+
+
+def _sanitize_token(token):
+    # Allow only alphanum, and ensure we return a 'str' for the sake of the post
+    # processing middleware.
+    token = re.sub('[^a-zA-Z0-9]', '', str(token.decode('ascii', 'ignore')))
+    if token == "":
+        # In case the cookie has been truncated to nothing at some point.
+        return _get_new_csrf_key()
+    else:
+        return token
 
 
 class CsrfViewMiddleware(object):
@@ -90,7 +100,10 @@ class CsrfViewMiddleware(object):
         # request, so it's available to the view.  We'll store it in a cookie when
         # we reach the response.
         try:
-            request.META["CSRF_COOKIE"] = request.COOKIES[settings.CSRF_COOKIE_NAME]
+            # In case of cookies from untrusted sources, we strip anything
+            # dangerous at this point, so that the cookie + token will have the
+            # same, sanitized value.
+            request.META["CSRF_COOKIE"] = _sanitize_token(request.COOKIES[settings.CSRF_COOKIE_NAME])
             cookie_is_new = False
         except KeyError:
             # No cookie, so create one.  This will be sent with the next
@@ -249,7 +262,7 @@ class CsrfResponseMiddleware(object):
                 """Returns the matched <form> tag plus the added <input> element"""
                 return mark_safe(match.group() + "<div style='display:none;'>" + \
                 "<input type='hidden' " + idattributes.next() + \
-                " name='csrfmiddlewaretoken' value='" + escape(csrf_token) + \
+                " name='csrfmiddlewaretoken' value='" + csrf_token + \
                 "' /></div>")
 
             # Modify any POST forms
