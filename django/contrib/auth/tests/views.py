@@ -36,6 +36,16 @@ class AuthViewsTestCase(TestCase):
         settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
         settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
 
+    def login(self, password='password'):
+        response = self.client.post('/login/', {
+            'username': 'testclient',
+            'password': password
+            }
+        )
+        self.assertEquals(response.status_code, 302)
+        self.assert_(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
+        self.assert_(SESSION_KEY in self.client.session)
+
 class PasswordResetTest(AuthViewsTestCase):
 
     def test_email_not_found(self):
@@ -117,15 +127,6 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assert_("The two password fields didn&#39;t match" in response.content)
 
 class ChangePasswordTest(AuthViewsTestCase):
-
-    def login(self, password='password'):
-        response = self.client.post('/login/', {
-            'username': 'testclient',
-            'password': password
-            }
-        )
-        self.assertEquals(response.status_code, 302)
-        self.assert_(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
 
     def fail_login(self, password='password'):
         response = self.client.post('/login/', {
@@ -227,16 +228,6 @@ class LoginTest(AuthViewsTestCase):
         
 class LogoutTest(AuthViewsTestCase):
     urls = 'django.contrib.auth.tests.urls'
-
-    def login(self, password='password'):
-        response = self.client.post('/login/', {
-            'username': 'testclient',
-            'password': password
-            }
-        )
-        self.assertEquals(response.status_code, 302)
-        self.assert_(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
-        self.assert_(SESSION_KEY in self.client.session)
 
     def confirm_logged_out(self):
         self.assert_(SESSION_KEY not in self.client.session)

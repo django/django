@@ -713,6 +713,17 @@ The login_required decorator
         def my_view(request):
             ...
 
+    .. versionadded:: 1.3
+
+    :func:`~django.contrib.auth.decorators.login_required` also takes an
+    optional ``login_url`` parameter. Example::
+
+        from django.contrib.auth.decorators import login_required
+
+        @login_required(login_url='/accounts/login/')
+        def my_view(request):
+            ...
+
     :func:`~django.contrib.auth.decorators.login_required` does the following:
 
         * If the user isn't logged in, redirect to
@@ -726,9 +737,9 @@ The login_required decorator
         * If the user is logged in, execute the view normally. The view code is
           free to assume the user is logged in.
 
-Note that you'll need to map the appropriate Django view to
-:setting:`settings.LOGIN_URL <LOGIN_URL>`. For example, using the defaults, add
-the following line to your URLconf::
+Note that if you don't specify the ``login_url`` parameter, you'll need to map
+the appropriate Django view to :setting:`settings.LOGIN_URL <LOGIN_URL>`. For
+example, using the defaults, add the following line to your URLconf::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
