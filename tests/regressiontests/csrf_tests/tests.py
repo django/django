@@ -6,15 +6,14 @@ from django.middleware.csrf import CsrfMiddleware, CsrfViewMiddleware
 from django.views.decorators.csrf import csrf_exempt, csrf_view_exempt
 from django.core.context_processors import csrf
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.utils.html import escape
 from django.utils.importlib import import_module
 from django.conf import settings
 from django.template import RequestContext, Template
 
 # Response/views used for CsrfResponseMiddleware and CsrfViewMiddleware tests
 def post_form_response():
-    resp = HttpResponse(content="""
-<html><body><form method="post"><input type="text" /></form></body></html>
+    resp = HttpResponse(content=u"""
+<html><body><h1>\u00a1Unicode!<form method="post"><input type="text" /></form></body></html>
 """, mimetype="text/html")
     return resp
 
@@ -58,8 +57,9 @@ class TestingHttpRequest(HttpRequest):
 
 class CsrfMiddlewareTest(TestCase):
     # The csrf token is potentially from an untrusted source, so could have
-    # characters that need escaping
-    _csrf_id = "<1>"
+    # characters that need dealing with.
+    _csrf_id_cookie = "<1>\xc2\xa1"
+    _csrf_id = "1"
 
     # This is a valid session token for this ID and secret key.  This was generated using
     # the old code that we're to be backwards-compatible with.  Don't use the CSRF code
@@ -74,7 +74,7 @@ class CsrfMiddlewareTest(TestCase):
 
     def _get_GET_csrf_cookie_request(self):
         req = TestingHttpRequest()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = self._csrf_id
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = self._csrf_id_cookie
         return req
 
     def _get_POST_csrf_cookie_request(self):
@@ -104,7 +104,7 @@ class CsrfMiddlewareTest(TestCase):
         return req
 
     def _check_token_present(self, response, csrf_id=None):
-        self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % escape(csrf_id or self._csrf_id))
+        self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % (csrf_id or self._csrf_id))
 
     # Check the post processing and outgoing cookie
     def test_process_response_no_csrf_cookie(self):
@@ -289,6 +289,17 @@ class CsrfMiddlewareTest(TestCase):
         req = self._get_GET_no_csrf_cookie_request()
         resp = token_view(req)
         self.assertEquals(u"", resp.content)
+
+    def test_token_node_empty_csrf_cookie(self):
+        """
+        Check that we get a new token if the csrf_cookie is the empty string
+        """
+        req = self._get_GET_no_csrf_cookie_request()
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = ""
+        CsrfViewMiddleware().process_view(req, token_view, (), {})
+        resp = token_view(req)
+
+        self.assertNotEqual(u"", resp.content)
 
     def test_token_node_with_csrf_cookie(self):
         """
