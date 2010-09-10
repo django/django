@@ -150,7 +150,7 @@ def model_to_dict(instance, fields=None, exclude=None):
             data[f.name] = f.value_from_object(instance)
     return data
 
-def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
+def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_callback=None):
     """
     Returns a ``SortedDict`` containing form fields for the given model.
 
@@ -175,7 +175,14 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
             kwargs = {'widget': widgets[f.name]}
         else:
             kwargs = {}
-        formfield = formfield_callback(f, **kwargs)
+
+        if formfield_callback is None:
+            formfield = f.formfield(**kwargs)
+        elif not callable(formfield_callback):
+            raise TypeError('formfield_callback must be a function or callable')
+        else:
+            formfield = formfield_callback(f, **kwargs)
+
         if formfield:
             field_list.append((f.name, formfield))
         else:
@@ -198,8 +205,7 @@ class ModelFormOptions(object):
 
 class ModelFormMetaclass(type):
     def __new__(cls, name, bases, attrs):
-        formfield_callback = attrs.pop('formfield_callback',
-                lambda f, **kwargs: f.formfield(**kwargs))
+        formfield_callback = attrs.pop('formfield_callback', None)
         try:
             parents = [b for b in bases if issubclass(b, ModelForm)]
         except NameError:
@@ -376,7 +382,7 @@ class ModelForm(BaseModelForm):
     __metaclass__ = ModelFormMetaclass
 
 def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
-                       formfield_callback=lambda f: f.formfield()):
+                       formfield_callback=None):
     # Create the inner Meta class. FIXME: ideally, we should be able to
     # construct a ModelForm without creating and passing in a temporary
     # inner class.
@@ -658,7 +664,7 @@ class BaseModelFormSet(BaseFormSet):
             form.fields[self._pk_field.name] = ModelChoiceField(qs, initial=pk_value, required=False, widget=HiddenInput)
         super(BaseModelFormSet, self).add_fields(form, index)
 
-def modelformset_factory(model, form=ModelForm, formfield_callback=lambda f: f.formfield(),
+def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          formset=BaseModelFormSet,
                          extra=1, can_delete=False, can_order=False,
                          max_num=None, fields=None, exclude=None):
@@ -813,7 +819,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                           formset=BaseInlineFormSet, fk_name=None,
                           fields=None, exclude=None,
                           extra=3, can_order=False, can_delete=True, max_num=None,
-                          formfield_callback=lambda f: f.formfield()):
+                          formfield_callback=None):
     """
     Returns an ``InlineFormSet`` for the given kwargs.
 
