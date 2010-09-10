@@ -207,8 +207,11 @@ class CsrfMiddlewareTest(TestCase):
         """
         Check that no post processing is done for an exempt view
         """
-        req = self._get_POST_csrf_cookie_request()
-        resp = csrf_exempt(post_form_view)(req)
+        req = self._get_GET_csrf_cookie_request()
+        view = csrf_exempt(post_form_view)
+        CsrfMiddleware().process_view(req, view, (), {})
+
+        resp = view(req)
         resp_content = resp.content
         resp2 = CsrfMiddleware().process_response(req, resp)
         self.assertEquals(resp_content, resp2.content)
