@@ -3,9 +3,10 @@ include AUTHORS
 include INSTALL
 include LICENSE
 include MANIFEST.in
-include django/utils/simplejson/LICENSE.txt
 include django/contrib/gis/gdal/LICENSE
 include django/contrib/gis/geos/LICENSE
+include django/dispatch/LICENSE.txt
+include django/utils/simplejson/LICENSE.txt
 recursive-include docs *
 recursive-include scripts *
 recursive-include examples *
@@ -20,6 +21,8 @@ recursive-include django/contrib/auth/tests/templates *
 recursive-include django/contrib/comments/templates *
 recursive-include django/contrib/databrowse/templates *
 recursive-include django/contrib/formtools/templates *
+recursive-include django/contrib/flatpages/fixtures *
+recursive-include django/contrib/flatpages/tests/templates *
 recursive-include django/contrib/gis/templates *
 recursive-include django/contrib/gis/tests/data *
 recursive-include django/contrib/gis/tests/geoapp/fixtures *
