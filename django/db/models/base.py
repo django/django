@@ -644,6 +644,8 @@ class Model(object):
         return force_unicode(dict(field.flatchoices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
+        if not self.pk:
+            raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
         op = is_next and 'gt' or 'lt'
         order = not is_next and '-' or ''
         param = smart_str(getattr(self, field.attname))

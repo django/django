@@ -568,3 +568,5 @@ described in :ref:`Field lookups <field-lookups>`.
 
 Note that in the case of identical date values, these methods will use the ID
 as a fallback check. This guarantees that no records are skipped or duplicated.
+
+That also means you cannot use those methods on unsaved objects.
