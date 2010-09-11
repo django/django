@@ -303,13 +303,16 @@ class HttpResponse(object):
 
     def __init__(self, content='', mimetype=None, status=None,
             content_type=None):
-        from django.conf import settings
+        # _headers is a mapping of the lower-case name to the original case of
+        # the header (required for working with legacy systems) and the header
+        # value.  Both the name of the header and its value are ASCII strings.
+        self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
         if mimetype:
             content_type = mimetype     # For backwards compatibility
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
-                    settings.DEFAULT_CHARSET)
+                    self._charset)
         if not isinstance(content, basestring) and hasattr(content, '__iter__'):
             self._container = content
             self._is_string = False
@@ -320,10 +323,7 @@ class HttpResponse(object):
         if status:
             self.status_code = status
 
-        # _headers is a mapping of the lower-case name to the original case of
-        # the header (required for working with legacy systems) and the header
-        # value.
-        self._headers = {'content-type': ('Content-Type', content_type)}
+        self['Content-Type'] = content_type
 
     def __str__(self):
         """Full HTTP message, including headers."""

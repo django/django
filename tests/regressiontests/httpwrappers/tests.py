@@ -204,9 +204,18 @@ class HttpResponseTests(unittest.TestCase):
         r['value'] = u'test value'
         self.failUnless(isinstance(r['value'], str))
         
-        # An error is raised When a unicode object with non-ascii is assigned.
+        # An error is raised ~hen a unicode object with non-ascii is assigned.
         self.assertRaises(UnicodeEncodeError, r.__setitem__, 'value', u't\xebst value')
         
+        # An error is raised when  a unicode object with non-ASCII format is
+        # passed as initial mimetype or content_type.
+        self.assertRaises(UnicodeEncodeError, HttpResponse,
+                mimetype=u't\xebst value')
+
+        # HttpResponse headers must be convertible to ASCII.
+        self.assertRaises(UnicodeEncodeError, HttpResponse,
+                content_type=u't\xebst value')
+
         # The response also converts unicode keys to strings.)      
         r[u'test'] = 'testing key'
         l = list(r.items())
