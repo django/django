@@ -2228,16 +2228,19 @@ try:
             self.assertContains(response, "<h2>Built-in tags</h2>", count=2)
 
             # A builtin tag exists in both the index and detail
-            self.assertContains(response, '<h3 id="autoescape">autoescape</h3>')
-            self.assertContains(response, '<li><a href="#autoescape">autoescape</a></li>')
+            self.assertContains(response, '<h3 id="built_in-autoescape">autoescape</h3>')
+            self.assertContains(response, '<li><a href="#built_in-autoescape">autoescape</a></li>')
 
             # An app tag exists in both the index and detail
-            # The builtin tag group exists
+            self.assertContains(response, '<h3 id="flatpages-get_flatpages">get_flatpages</h3>')
+            self.assertContains(response, '<li><a href="#flatpages-get_flatpages">get_flatpages</a></li>')
+
+            # The admin list tag group exists
             self.assertContains(response, "<h2>admin_list</h2>", count=2)
 
-            # A builtin tag exists in both the index and detail
-            self.assertContains(response, '<h3 id="autoescape">autoescape</h3>')
-            self.assertContains(response, '<li><a href="#admin_actions">admin_actions</a></li>')
+            # An admin list tag exists in both the index and detail
+            self.assertContains(response, '<h3 id="admin_list-admin_actions">admin_actions</h3>')
+            self.assertContains(response, '<li><a href="#admin_list-admin_actions">admin_actions</a></li>')
 
         def test_filters(self):
             response = self.client.get('/test_admin/admin/doc/filters/')
@@ -2246,8 +2249,8 @@ try:
             self.assertContains(response, "<h2>Built-in filters</h2>", count=2)
 
             # A builtin filter exists in both the index and detail
-            self.assertContains(response, '<h3 id="add">add</h3>')
-            self.assertContains(response, '<li><a href="#add">add</a></li>')
+            self.assertContains(response, '<h3 id="built_in-add">add</h3>')
+            self.assertContains(response, '<li><a href="#built_in-add">add</a></li>')
 
 except ImportError:
     pass
