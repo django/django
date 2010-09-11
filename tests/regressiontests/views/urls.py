@@ -77,7 +77,6 @@ urlpatterns += patterns('django.views.generic.date_based',
 )
 
 # crud generic views.
-
 urlpatterns += patterns('django.views.generic.create_update',
     (r'^create_update/member/create/article/$', 'create_object',
         dict(login_required=True, model=Article)),
@@ -122,4 +121,13 @@ urlpatterns += patterns('django.views.generic.simple',
 urlpatterns += patterns('regressiontests.views.views',
     url(r'view_exception/(?P<n>\d+)/$', 'view_exception', name='view_exception'),
     url(r'template_exception/(?P<n>\d+)/$', 'template_exception', name='template_exception'),
+)
+
+# simple generic views.
+urlpatterns += patterns('django.views.generic.simple',
+    (r'^simple/redirect_to/$', 'redirect_to', dict(url='/views/simple/target/')),
+    (r'^simple/redirect_to_temp/$', 'redirect_to', dict(url='/views/simple/target/', permanent=False)),
+    (r'^simple/redirect_to_none/$', 'redirect_to', dict(url=None)),
+    (r'^simple/redirect_to_arg/(?P<id>\d+)/$', 'redirect_to', dict(url='/views/simple/target_arg/%(id)s/')),
+    (r'^simple/redirect_to_query/$', 'redirect_to', dict(url='/views/simple/target/', query_string=True)),
 )
