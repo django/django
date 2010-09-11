@@ -189,7 +189,7 @@ def items_for_result(cl, result, form):
             else:
                 result_repr = conditional_escape(result_repr)
             yield mark_safe(u'<td%s>%s</td>' % (row_class, result_repr))
-    if form:
+    if form and not form[cl.model._meta.pk.name].is_hidden:
         yield mark_safe(u'<td>%s</td>' % force_unicode(form[cl.model._meta.pk.name]))
 
 def results(cl):
@@ -200,11 +200,18 @@ def results(cl):
         for res in cl.result_list:
             yield list(items_for_result(cl, res, None))
 
+def result_hidden_fields(cl):
+    if cl.formset:
+        for res, form in zip(cl.result_list, cl.formset.forms):
+            if form[cl.model._meta.pk.name].is_hidden:
+                yield mark_safe(force_unicode(form[cl.model._meta.pk.name]))
+
 def result_list(cl):
     """
     Displays the headers and data list together
     """
     return {'cl': cl,
+            'result_hidden_fields': list(result_hidden_fields(cl)),
             'result_headers': list(result_headers(cl)),
             'results': list(results(cl))}
 result_list = register.inclusion_tag("admin/change_list_results.html")(result_list)
