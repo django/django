@@ -9,7 +9,8 @@ from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, \
+                                   FieldError
 from django.core.validators import EMPTY_VALUES
 from util import ErrorList
 from forms import BaseForm, get_declared_fields
@@ -224,6 +225,15 @@ class ModelFormMetaclass(type):
             # If a model is defined, extract form fields from it.
             fields = fields_for_model(opts.model, opts.fields,
                                       opts.exclude, opts.widgets, formfield_callback)
+            # make sure opts.fields doesn't specify an invalid field
+            none_model_fields = [k for k, v in fields.iteritems() if not v]
+            missing_fields = set(none_model_fields) - \
+                             set(declared_fields.keys())
+            if missing_fields:
+                message = 'Unknown field(s) (%s) specified for %s'
+                message = message % (', '.join(missing_fields),
+                                     opts.model.__name__)
+                raise FieldError(message)
             # Override default model fields with any custom declared ones
             # (plus, include all the other declared fields).
             fields.update(declared_fields)
