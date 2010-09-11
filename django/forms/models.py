@@ -1006,7 +1006,7 @@ class ModelChoiceField(ChoiceField):
         try:
             key = self.to_field_name or 'pk'
             value = self.queryset.get(**{key: value})
-        except self.queryset.model.DoesNotExist:
+        except (ValueError, self.queryset.model.DoesNotExist):
             raise ValidationError(self.error_messages['invalid_choice'])
         return value
 

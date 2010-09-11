@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import widgets
@@ -151,3 +153,13 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
             post_data)
         self.assertContains(response,
             'Select a valid choice. That choice is not one of the available choices.')
+
+    def test_invalid_target_id(self):
+
+        for test_str in ('Iñtërnâtiônàlizætiøn', "1234'", -1234):
+            # This should result in an error message, not a server exception.
+            response = self.client.post('%s/admin_widgets/event/add/' % self.admin_root,
+                {"band": test_str})
+
+            self.assertContains(response,
+                'Select a valid choice. That choice is not one of the available choices.')

@@ -154,9 +154,9 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         key = self.rel.get_related_field().name
         try:
             obj = self.rel.to._default_manager.using(self.db).get(**{key: value})
-        except self.rel.to.DoesNotExist:
+            return '&nbsp;<strong>%s</strong>' % escape(truncate_words(obj, 14))
+        except (ValueError, self.rel.to.DoesNotExist):
             return ''
-        return '&nbsp;<strong>%s</strong>' % escape(truncate_words(obj, 14))
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
@@ -169,7 +169,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     def render(self, name, value, attrs=None):
         attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
-            value = ','.join([str(v) for v in value])
+            value = ','.join([force_unicode(v) for v in value])
         else:
             value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
