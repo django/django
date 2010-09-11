@@ -1305,3 +1305,21 @@ class WidgetTests(TestCase):
         # w2 ought to be independent of w1, since MultiWidget ought
         # to make a copy of its sub-widgets when it is copied.
         self.assertEqual(w1.choices, [1,2,3])
+
+    def test_13390(self):
+        # See ticket #13390
+        class SplitDateForm(forms.Form):
+            field = forms.DateTimeField(widget=forms.SplitDateTimeWidget, required=False)
+
+        form = SplitDateForm({'field': ''})
+        self.assertTrue(form.is_valid())
+        form = SplitDateForm({'field': ['', '']})
+        self.assertTrue(form.is_valid())
+
+        class SplitDateRequiredForm(forms.Form):
+            field = forms.DateTimeField(widget=forms.SplitDateTimeWidget, required=True)
+
+        form = SplitDateRequiredForm({'field': ''})
+        self.assertFalse(form.is_valid())
+        form = SplitDateRequiredForm({'field': ['', '']})
+        self.assertFalse(form.is_valid())
