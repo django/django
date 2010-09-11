@@ -120,9 +120,11 @@ class SortedDict(dict):
             self.keyOrder = data.keys()
         else:
             self.keyOrder = []
+            seen = set()
             for key, value in data:
-                if key not in self.keyOrder:
+                if key not in seen:
                     self.keyOrder.append(key)
+                    seen.add(key)
 
     def __deepcopy__(self, memo):
         return self.__class__([(key, deepcopy(value, memo))
