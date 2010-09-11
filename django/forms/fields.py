@@ -399,6 +399,8 @@ class DateTimeField(Field):
             # components: date and time.
             if len(value) != 2:
                 raise ValidationError(self.error_messages['invalid'])
+            if value[0] in validators.EMPTY_VALUES and value[1] in validators.EMPTY_VALUES:
+                return None
             value = '%s %s' % tuple(value)
         for format in self.input_formats or formats.get_format('DATETIME_INPUT_FORMATS'):
             try:
