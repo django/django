@@ -412,7 +412,7 @@ TECHNICAL_500_TEMPLATE = """
 <body>
 <div id="summary">
   <h1>{{ exception_type }} at {{ request.path_info|escape }}</h1>
-  <pre class="exception_value">{{ exception_value|escape }}</pre>
+  <pre class="exception_value">{{ exception_value|force_escape }}</pre>
   <table class="meta">
     <tr>
       <th>Request Method:</th>
@@ -432,7 +432,7 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
     <tr>
       <th>Exception Value:</th>
-      <td><pre>{{ exception_value|escape }}</pre></td>
+      <td><pre>{{ exception_value|force_escape }}</pre></td>
     </tr>
     <tr>
       <th>Exception Location:</th>
@@ -459,7 +459,7 @@ TECHNICAL_500_TEMPLATE = """
 {% if unicode_hint %}
 <div id="unicode-hint">
     <h2>Unicode error hint</h2>
-    <p>The string that could not be encoded/decoded was: <strong>{{ unicode_hint|escape }}</strong></p>
+    <p>The string that could not be encoded/decoded was: <strong>{{ unicode_hint|force_escape }}</strong></p>
 </div>
 {% endif %}
 {% if template_does_not_exist %}
@@ -532,8 +532,8 @@ TECHNICAL_500_TEMPLATE = """
               <tbody>
                 {% for var in frame.vars|dictsort:"0" %}
                   <tr>
-                    <td>{{ var.0|escape }}</td>
-                    <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
+                    <td>{{ var.0|force_escape }}</td>
+                    <td class="code"><div>{{ var.1|pprint|force_escape }}</div></td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -582,7 +582,7 @@ Traceback:
 {% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line|escape }}{% endif %}
 {% endfor %}
 Exception Type: {{ exception_type|escape }} at {{ request.path_info|escape }}
-Exception Value: {{ exception_value|escape }}
+Exception Value: {{ exception_value|force_escape }}
 </textarea>
   <br><br>
   <input type="submit" value="Share this traceback on a public Web site">
