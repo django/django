@@ -2210,8 +2210,8 @@ try:
             self.assertContains(response, '<li><a href="#built_in-autoescape">autoescape</a></li>')
 
             # An app tag exists in both the index and detail
-            self.assertContains(response, '<h3 id="flatpages-get_flatpages">get_flatpages</h3>')
-            self.assertContains(response, '<li><a href="#flatpages-get_flatpages">get_flatpages</a></li>')
+            self.assertContains(response, '<h3 id="comments-get_comment_count">get_comment_count</h3>')
+            self.assertContains(response, '<li><a href="#comments-get_comment_count">get_comment_count</a></li>')
 
             # The admin list tag group exists
             self.assertContains(response, "<h2>admin_list</h2>", count=2)
