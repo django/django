@@ -529,8 +529,11 @@ Methods
 
         * ``max_age`` should be a number of seconds, or ``None`` (default) if
           the cookie should last only as long as the client's browser session.
-        * ``expires`` should be a string in the format
-          ``"Wdy, DD-Mon-YY HH:MM:SS GMT"``.
+          If ``expires`` is not specified, it will be calculated.
+        * ``expires`` should either be a string in the format
+          ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
+          in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
+          will be calculated.
         * Use ``domain`` if you want to set a cross-domain cookie. For example,
           ``domain=".lawrence.com"`` will set a cookie that is readable by
           the domains www.lawrence.com, blogs.lawrence.com and

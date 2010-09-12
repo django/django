@@ -1,5 +1,5 @@
 """
->>> from django.http import HttpRequest
+>>> from django.http import HttpRequest, HttpResponse
 >>> print repr(HttpRequest())
 <HttpRequest
 GET:{},
@@ -44,4 +44,27 @@ https://www.example.com/asdf
 >>> request.path = ''
 >>> print request.build_absolute_uri(location="/path/with:colons")
 http://www.example.com/path/with:colons
+
+
+# Test cookie datetime expiration logic
+>>> from datetime import datetime, timedelta
+>>> delta = timedelta(seconds=10)
+>>> response = HttpResponse()
+>>> response.set_cookie('datetime', expires=datetime.utcnow()+delta)
+>>> datetime_cookie = response.cookies['datetime']
+>>> datetime_cookie['max-age']
+10
+>>> response.set_cookie('datetime', expires=datetime(2028, 1, 1, 4, 5, 6))
+>>> response.cookies['datetime']['expires']
+'Sat, 01-Jan-2028 04:05:06 GMT'
+
+# Test automatically setting cookie expires if only max_age is provided 
+>>> response.set_cookie('max_age', max_age=10)
+>>> max_age_cookie = response.cookies['max_age']
+>>> max_age_cookie['max-age']
+10
+>>> from django.utils.http import cookie_date
+>>> import time
+>>> max_age_cookie['expires'] == cookie_date(time.time()+10)
+True
 """

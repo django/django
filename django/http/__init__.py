@@ -1,5 +1,7 @@
+import datetime
 import os
 import re
+import time
 from Cookie import BaseCookie, SimpleCookie, CookieError
 from pprint import pformat
 from urllib import urlencode
@@ -12,6 +14,7 @@ except ImportError:
 
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
+from django.utils.http import cookie_date
 from django.http.multipartparser import MultiPartParser
 from django.conf import settings
 from django.core.files import uploadhandler
@@ -373,11 +376,32 @@ class HttpResponse(object):
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/',
                    domain=None, secure=False):
+        """
+        Sets a cookie.
+
+        ``expires`` can be a string in the correct format or a 
+        ``datetime.datetime`` object in UTC. If ``expires`` is a datetime
+        object then ``max_age`` will be calculated.
+        """
         self.cookies[key] = value
+        if expires is not None:
+            if isinstance(expires, datetime.datetime):
+                delta = expires - expires.utcnow()
+                # Add one second so the date matches exactly (a fraction of
+                # time gets lost between converting to a timedelta and
+                # then the date string).
+                delta = delta + datetime.timedelta(seconds=1)
+                # Just set max_age - the max_age logic will set expires.
+                expires = None
+                max_age = max(0, delta.days * 86400 + delta.seconds)
+            else:
+                self.cookies[key]['expires'] = expires
         if max_age is not None:
             self.cookies[key]['max-age'] = max_age
-        if expires is not None:
-            self.cookies[key]['expires'] = expires
+            # IE requires expires, so set it if hasn't been already.
+            if not expires:
+                self.cookies[key]['expires'] = cookie_date(time.time() +
+                                                           max_age) 
         if path is not None:
             self.cookies[key]['path'] = path
         if domain is not None:
