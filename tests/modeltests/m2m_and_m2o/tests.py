@@ -8,21 +8,21 @@ class RelatedObjectTests(TestCase):
     def test_m2m_and_m2o(self):
         r = User.objects.create(username="russell")
         g = User.objects.create(username="gustav")
-        
+
         i1 = Issue(num=1)
         i1.client = r
         i1.save()
-        
+
         i2 = Issue(num=2)
         i2.client = r
         i2.save()
         i2.cc.add(r)
-        
+
         i3 = Issue(num=3)
         i3.client = g
         i3.save()
         i3.cc.add(r)
-        
+
         self.assertQuerysetEqual(
             Issue.objects.filter(client=r.id), [
                 1,
@@ -46,7 +46,7 @@ class RelatedObjectTests(TestCase):
             ],
             lambda i: i.num
         )
-        
+
         # These queries combine results from the m2m and the m2o relationships.
         # They're three ways of saying the same thing.
         self.assertQuerysetEqual(
