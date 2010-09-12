@@ -62,6 +62,14 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEquals(response.status_code, 302)
         self.assertEquals(len(mail.outbox), 1)
         self.assert_("http://" in mail.outbox[0].body)
+        self.assertEquals(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
+
+    def test_email_found_custom_from(self):
+        "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."
+        response = self.client.post('/password_reset_from_email/', {'email': 'staffmember@example.com'})
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals("staffmember@example.com", mail.outbox[0].from_email)
 
     def _test_confirm_start(self):
         # Start by creating the email

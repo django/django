@@ -16,6 +16,7 @@ urlpatterns += patterns('',
     (r'^logout/custom_query/$', 'django.contrib.auth.views.logout', dict(redirect_field_name='follow')),
     (r'^logout/next_page/$', 'django.contrib.auth.views.logout', dict(next_page='/somewhere/')),
     (r'^remote_user/$', remote_user_auth_view),
+    (r'^password_reset_from_email/$', 'django.contrib.auth.views.password_reset', dict(from_email='staffmember@example.com')),
     (r'^login_required/$', login_required(password_reset)),
     (r'^login_required_login_url/$', login_required(password_reset, login_url='/somewhere/')),
 )

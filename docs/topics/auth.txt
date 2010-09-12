@@ -906,7 +906,7 @@ includes a few other useful built-in views located in
           default to :file:`registration/password_change_done.html` if not
           supplied.
 
-.. function:: views.password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect])
+.. function:: views.password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email])
 
     Allows a user to reset their password by generating a one-time use link
     that can be used to reset the password, and sending that link to the
@@ -931,6 +931,11 @@ includes a few other useful built-in views located in
 
         * ``post_reset_redirect``: The URL to redirect to after a successful
           password change.
+
+        .. versionchanged:: 1.3
+
+        * ``from_email``: A valid e-mail address. By default Django uses
+          the :setting:`DEFAULT_FROM_EMAIL`.
 
     **Template context:**
 
