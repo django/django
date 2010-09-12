@@ -370,8 +370,8 @@ DECIMAL_SEPARATOR = '.'
 # Boolean that sets whether to add thousand separator when formatting numbers
 USE_THOUSAND_SEPARATOR = False
 
-# Number of digits that will be togheter, when spliting them by THOUSAND_SEPARATOR
-# 0 means no grouping, 3 means splitting by thousands...
+# Number of digits that will be together, when spliting them by
+# THOUSAND_SEPARATOR. 0 means no grouping, 3 means splitting by thousands...
 NUMBER_GROUPING = 0
 
 # Thousand separator symbol

@@ -79,16 +79,16 @@ def localize(value):
     Checks if value is a localizable type (date, number...) and returns it
     formatted as a string using current locale format
     """
-    if settings.USE_L10N:
-        if isinstance(value, (decimal.Decimal, float, int)):
-            return number_format(value)
-        elif isinstance(value, datetime.datetime):
-            return date_format(value, 'DATETIME_FORMAT')
-        elif isinstance(value, datetime.date):
-            return date_format(value)
-        elif isinstance(value, datetime.time):
-            return time_format(value, 'TIME_FORMAT')
-    return value
+    if isinstance(value, (decimal.Decimal, float, int)):
+        return number_format(value)
+    elif isinstance(value, datetime.datetime):
+        return date_format(value, 'DATETIME_FORMAT')
+    elif isinstance(value, datetime.date):
+        return date_format(value)
+    elif isinstance(value, datetime.time):
+        return time_format(value, 'TIME_FORMAT')
+    else:
+        return value
 
 def localize_input(value, default=None):
     """
