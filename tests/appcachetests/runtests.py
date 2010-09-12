@@ -18,10 +18,13 @@ class AppCacheTestCase(unittest.TestCase):
 
     def setUp(self):
         self.old_installed_apps = settings.INSTALLED_APPS
+        self.old_app_classes = settings.APP_CLASSES
+        settings.APP_CLASSES = ()
         settings.INSTALLED_APPS = ()
 
     def tearDown(self):
         settings.INSTALLED_APPS = self.old_installed_apps
+        settings.APP_CLASSES = self.old_app_classes
 
         # The appcache imports models modules. We need to delete the
         # imported module from sys.modules after the test has run. 
@@ -102,7 +105,7 @@ class GetAppsTests(AppCacheTestCase):
         Test that an exception is raised if two app instances
         have the same db_prefix attribute
         """
-        settings.INSTALLED_APPS = ('nomodel_app.MyApp', 'model_app.MyOtherApp',)
+        settings.APP_CLASSES = ('nomodel_app.MyApp', 'model_app.MyOtherApp',)
         self.assertRaises(ImproperlyConfigured, cache.get_apps)
 
 class GetAppTests(AppCacheTestCase):
@@ -264,10 +267,10 @@ class LoadAppTests(AppCacheTestCase):
     def test_custom_app(self):
         """
         Test that a custom app instance is created if the function
-        gets passed a classname
+        gets passed a custom app class
         """
         from nomodel_app import MyApp
-        rv = cache.load_app('nomodel_app.MyApp')
+        rv = cache.load_app('nomodel_app', False, MyApp)
         app = cache.app_instances[0]
         self.assertEqual(len(cache.app_instances), 1)
         self.assertEqual(app.name, 'nomodel_app')
@@ -278,10 +281,11 @@ class LoadAppTests(AppCacheTestCase):
         """
         Test that custom models are imported correctly 
         """
-        rv = cache.load_app('model_app.MyApp')
+        from nomodel_app import MyApp
+        rv = cache.load_app('model_app', False, MyApp)
         app = cache.app_instances[0]
-        self.assertEqual(app.models_module.__name__, 'model_app.othermodels')
-        self.assertEqual(rv.__name__, 'model_app.othermodels')
+        self.assertEqual(app.models_module.__name__, 'model_app.models')
+        self.assertEqual(rv.__name__, 'model_app.models')
 
     def test_twice(self):
         """
@@ -304,10 +308,11 @@ class LoadAppTests(AppCacheTestCase):
         """
         Test that the installed_apps attribute is populated correctly
         """
-        settings.INSTALLED_APPS = ('model_app', 'nomodel_app.MyApp',)
+        settings.APP_CLASSES = ('nomodel_app.MyApp',)
+        settings.INSTALLED_APPS = ('model_app',)
         # populate cache
         cache.get_app_errors()
-        self.assertEqual(cache.installed_apps, ['model_app', 'nomodel_app',])
+        self.assertEqual(cache.installed_apps, ['nomodel_app', 'model_app',])
 
 class RegisterModelsTests(AppCacheTestCase):
     """Tests for the register_models function"""

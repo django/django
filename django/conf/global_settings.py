@@ -170,6 +170,9 @@ EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 
+# List of strings representing installed app classes.
+APP_CLASSES = ()
+
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
 

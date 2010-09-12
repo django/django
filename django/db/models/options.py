@@ -99,7 +99,13 @@ class Options(object):
         # If the db_table wasn't provided, use the db_prefix + module_name.
         if not self.db_table:
             app_instance = cache.find_app(self.app_label)
-            self.db_table = "%s_%s" % (app_instance.db_prefix, self.module_name)
+            if not app_instance:
+                # use the app label when no app instance was found, this
+                # can happen when the app cache is not initialized but the
+                # model is imported
+                self.db_table = "%s_%s" % (self.app_label, self.module_name)
+            else:
+                self.db_table = "%s_%s" % (app_instance.db_prefix, self.module_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
 
     def _prepare(self, model):

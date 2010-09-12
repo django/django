@@ -33,7 +33,7 @@ class App(object):
         return self.name
 
     def __repr__(self):
-        return '<App: %s>' % self.name
+        return '<%s: %s>' % (self.__class__.__name__, self.name)
 
 class AppCache(object):
     """
@@ -78,10 +78,19 @@ class AppCache(object):
         try:
             if self.loaded:
                 return
+            for app_name in settings.APP_CLASSES:
+                if app_name in self.handled:
+                    continue
+                app_module, app_classname = app_name.rsplit('.', 1)
+                app_module = import_module(app_module)
+                app_class = getattr(app_module, app_classname)
+                app_name = app_name.rsplit('.', 2)[0]
+                self.load_app(app_name, True, app_class)
             for app_name in settings.INSTALLED_APPS:
                 if app_name in self.handled:
                     continue
                 self.load_app(app_name, True)
+
             if not self.nesting_level:
                 for app_name in self.postponed:
                     self.load_app(app_name)
@@ -111,7 +120,7 @@ class AppCache(object):
         finally:
             self.write_lock.release()
 
-    def load_app(self, app_name, can_postpone=False):
+    def load_app(self, app_name, can_postpone=False, app_class=App):
         """
         Loads the app with the provided fully qualified name, and returns the
         model module.
@@ -119,20 +128,7 @@ class AppCache(object):
         self.handled[app_name] = None
         self.nesting_level += 1
 
-        try:
-            app_module = import_module(app_name)
-        except ImportError:
-            # If the import fails, we assume it was because an path to a
-            # class was passed (e.g. "foo.bar.MyApp")
-            # We split the app_name by the rightmost dot to get the path
-            # and classname, and then try importing it again
-            if not '.' in app_name:
-                raise
-            app_name, app_classname = app_name.rsplit('.', 1)
-            app_module = import_module(app_name)
-            app_class = getattr(app_module, app_classname)
-        else:
-            app_class = App
+        app_module = import_module(app_name)
 
         # check if an app instance with that name already exists
         app_instance = self.find_app(app_name)
@@ -144,10 +140,11 @@ class AppCache(object):
                 app_instance_name = app_name
             app_instance = app_class(app_instance_name)
             app_instance.module = app_module
+            app_instance.path = app_name
             self.app_instances.append(app_instance)
             self.installed_apps.append(app_name)
 
-        # check if the app instance specifies a path to models
+        # Check if the app instance specifies a path to models
         # if not, we use the models.py file from the package dir
         try:
             models_path = app_instance.models_path
@@ -179,7 +176,7 @@ class AppCache(object):
         self.nesting_level -= 1
         app_instance.models_module = models
         return models
-
+    
     def find_app(self, name):
         "Returns the App instance that matches name"
         if '.' in name:
@@ -211,9 +208,9 @@ class AppCache(object):
         self._populate()
         self.write_lock.acquire()
         try:
-            for app_name in self.installed_apps:
-                if app_label == app_name.split('.')[-1]:
-                    mod = self.load_app(app_name, False)
+            for app in self.app_instances:
+                if app_label == app.name:
+                    mod = self.load_app(app.path, False)
                     if mod is None:
                         if emptyOK:
                             return None
