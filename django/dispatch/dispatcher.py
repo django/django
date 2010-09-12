@@ -235,3 +235,19 @@ class Signal(object):
             for idx, (r_key, _) in enumerate(self.receivers):
                 if r_key == key:
                     del self.receivers[idx]
+
+
+def receiver(signal, **kwargs):
+    """
+    A decorator for connecting receivers to signals. Used by passing in the
+    signal and keyword arguments to connect::
+
+        @receiver(post_save, sender=MyModel)
+        def signal_receiver(sender, **kwargs):
+            ...
+
+    """
+    def _decorator(func):
+        signal.connect(func, **kwargs)
+        return func
+    return _decorator

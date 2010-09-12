@@ -80,13 +80,25 @@ must be able to handle those new arguments.
 Connecting receiver functions
 -----------------------------
 
-Next, we'll need to connect our receiver to the signal:
+There are two ways you can connect a receiever to a signal. You can take the
+manual connect route:
 
 .. code-block:: python
 
     from django.core.signals import request_finished
 
     request_finished.connect(my_callback)
+
+Alternatively, you can use a decorator used when you define your receiver:
+
+.. code-block:: python
+
+    from django.core.signals import request_finished
+    from django.dispatch import receiver
+
+    @receiver(request_finished)
+    def my_callback(sender, **kwargs):
+        print "Request finished!"
 
 Now, our ``my_callback`` function will be called each time a request finishes.
 
@@ -115,12 +127,12 @@ signals sent by some model:
 .. code-block:: python
 
     from django.db.models.signals import pre_save
+    from django.dispatch import receiver
     from myapp.models import MyModel
 
+    @receiver(pre_save, sender=MyModel)
     def my_handler(sender, **kwargs):
         ...
-
-    pre_save.connect(my_handler, sender=MyModel)
 
 The ``my_handler`` function will only be called when an instance of ``MyModel``
 is saved.
