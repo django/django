@@ -823,6 +823,8 @@ a join with an ``F()`` object, a ``FieldError`` will be raised::
     # THIS WILL RAISE A FieldError
     >>> Entry.objects.update(headline=F('blog__name'))
 
+.. _topics-db-queries-related:
+
 Related objects
 ===============
 

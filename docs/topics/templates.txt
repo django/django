@@ -569,6 +569,45 @@ This doesn't affect what happens to data coming from the variable itself.
 The variable's contents are still automatically escaped, if necessary, because
 they're beyond the control of the template author.
 
+.. _template-accessing-methods:
+
+Accessing method calls
+======================
+
+Most method calls attached to objects are also available from within templates.
+This means that templates have access to much more than just class attributes
+(like field names) and variables passed in from views. For example, the Django
+ORM provides the :ref:`"entry_set"<topics-db-queries-related>` syntax for
+finding a collection of objects related on a foreign key. Therefore, given
+a model called "comment" with a foreign key relationship to a model called
+"task" you can loop through all comments attached to a given task like this::
+
+    {% for comment in task.comment_set.all %}
+        {{ comment }}
+    {% endfor %}
+
+Similarly, :doc:`QuerySets<ref/models/querysets>` provide a ``count()`` method
+to count the number of objects they contain. Therefore, you can obtain a count
+of all comments related to the current task with::
+
+    {{ task.comment_set.all.count }}
+
+And of course you can easily access methods you've explicitly defined on your
+own models::
+
+    # In model
+    class Task(models.Model):
+        def foo(self):
+            return "bar"
+
+    # In template
+    {{ task.foo }}
+
+Because Django intentionally limits the amount of logic processing available
+in the template language, it is not possible to pass arguments to method calls
+accessed from within templates. Data should be calculated in views, then passed
+to templates for display.
+
 .. _template-built-in-reference:
 
 Using the built-in reference
