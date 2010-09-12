@@ -18,7 +18,7 @@ See docs/cache.txt for information on the public API.
 from cgi import parse_qsl
 from django.conf import settings
 from django.core import signals
-from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.base import InvalidCacheBackendError, CacheKeyWarning
 from django.utils import importlib
 
 # Name for use in settings file --> name of module in "backends" directory.

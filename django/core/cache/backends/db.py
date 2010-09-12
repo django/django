@@ -46,6 +46,7 @@ class CacheClass(BaseCache):
             self._cull_frequency = 3
 
     def get(self, key, default=None):
+        self.validate_key(key)
         db = router.db_for_read(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
         cursor = connections[db].cursor()
@@ -65,9 +66,11 @@ class CacheClass(BaseCache):
         return pickle.loads(base64.decodestring(value))
 
     def set(self, key, value, timeout=None):
+        self.validate_key(key)
         self._base_set('set', key, value, timeout)
 
     def add(self, key, value, timeout=None):
+        self.validate_key(key)
         return self._base_set('add', key, value, timeout)
 
     def _base_set(self, mode, key, value, timeout=None):
@@ -103,6 +106,7 @@ class CacheClass(BaseCache):
             return True
 
     def delete(self, key):
+        self.validate_key(key)
         db = router.db_for_write(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
         cursor = connections[db].cursor()
@@ -111,6 +115,7 @@ class CacheClass(BaseCache):
         transaction.commit_unless_managed(using=db)
 
     def has_key(self, key):
+        self.validate_key(key)
         db = router.db_for_read(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
         cursor = connections[db].cursor()
