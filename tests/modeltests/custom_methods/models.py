@@ -33,27 +33,4 @@ class Article(models.Model):
             WHERE pub_date = %s
                 AND id != %s""", [connection.ops.value_to_db_date(self.pub_date),
                                   self.id])
-        # The asterisk in "(*row)" tells Python to expand the list into
-        # positional arguments to Article().
         return [self.__class__(*row) for row in cursor.fetchall()]
-
-__test__ = {'API_TESTS':"""
-# Create a couple of Articles.
->>> from datetime import date
->>> a = Article(id=None, headline='Area man programs in Python', pub_date=date(2005, 7, 27))
->>> a.save()
->>> b = Article(id=None, headline='Beatles reunite', pub_date=date(2005, 7, 27))
->>> b.save()
-
-# Test the custom methods.
->>> a.was_published_today()
-False
->>> a.articles_from_same_day_1()
-[<Article: Beatles reunite>]
->>> a.articles_from_same_day_2()
-[<Article: Beatles reunite>]
->>> b.articles_from_same_day_1()
-[<Article: Area man programs in Python>]
->>> b.articles_from_same_day_2()
-[<Article: Area man programs in Python>]
-"""}
