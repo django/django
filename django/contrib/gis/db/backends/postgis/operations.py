@@ -233,8 +233,6 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                     })
             self.geography_operators = {
                 'bboverlaps' : PostGISOperator('&&'),
-                'exact' : PostGISOperator('~='),
-                'same_as' : PostGISOperator('~='),
                 }
 
         # Creating a dictionary lookup of all GIS terms for PostGIS.
