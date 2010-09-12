@@ -1,12 +1,12 @@
 from datetime import date
 
 from django.db import IntegrityError
-from django.test import TestCase
+from django.test import TransactionTestCase
 
 from models import Person, ManualPrimaryKeyTest
 
 
-class GetOrCreateTests(TestCase):
+class GetOrCreateTests(TransactionTestCase):
     def test_get_or_create(self):
         p = Person.objects.create(
             first_name='John', last_name='Lennon', birthday=date(1940, 10, 9)
