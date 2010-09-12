@@ -252,9 +252,9 @@ class RegexURLResolver(object):
                 except Resolver404, e:
                     sub_tried = e.args[0].get('tried')
                     if sub_tried is not None:
-                        tried.extend([(pattern.regex.pattern + '   ' + t) for t in sub_tried])
+                        tried.extend([[pattern] + t for t in sub_tried])
                     else:
-                        tried.append(pattern.regex.pattern)
+                        tried.append([pattern])
                 else:
                     if sub_match:
                         sub_match_dict = dict([(smart_str(k), v) for k, v in match.groupdict().items()])
@@ -262,7 +262,7 @@ class RegexURLResolver(object):
                         for k, v in sub_match.kwargs.iteritems():
                             sub_match_dict[smart_str(k)] = v
                         return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
-                    tried.append(pattern.regex.pattern)
+                    tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path' : path})
 

@@ -18,7 +18,9 @@ import unittest
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, resolve, NoReverseMatch, Resolver404, ResolverMatch
+from django.core.urlresolvers import reverse, resolve, NoReverseMatch,\
+                                     Resolver404, ResolverMatch,\
+                                     RegexURLResolver, RegexURLPattern
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
@@ -172,6 +174,42 @@ class ResolverTests(unittest.TestCase):
         self.assertRaises(Resolver404, resolve, 'a')
         self.assertRaises(Resolver404, resolve, '\\')
         self.assertRaises(Resolver404, resolve, '.')
+        
+    def test_404_tried_urls_have_names(self):
+        """
+        Verifies that the list of URLs that come back from a Resolver404
+        exception contains a list in the right format for printing out in
+        the DEBUG 404 page with both the patterns and URL names, if available.
+        """
+        urls = 'regressiontests.urlpatterns_reverse.named_urls'
+        # this list matches the expected URL types and names returned when
+        # you try to resolve a non-existent URL in the first level of included
+        # URLs in named_urls.py (e.g., '/included/non-existent-url')
+        url_types_names = [
+            [{'type': RegexURLPattern, 'name': 'named-url1'}],
+            [{'type': RegexURLPattern, 'name': 'named-url2'}],
+            [{'type': RegexURLPattern, 'name': None}],
+            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url3'}],
+            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url4'}],
+            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': None}],
+            [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
+        ]
+        try:
+            resolve('/included/non-existent-url', urlconf=urls)
+            self.fail('resolve did not raise a 404')
+        except Resolver404, e:
+            # make sure we at least matched the root ('/') url resolver:
+            self.assertTrue('tried' in e.args[0])
+            tried = e.args[0]['tried']
+            self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
+            for tried, expected in zip(e.args[0]['tried'], url_types_names):
+                for t, e in zip(tried, expected):
+                    self.assertTrue(isinstance(t, e['type']), '%s is not an instance of %s' % (t, e['type']))
+                    if 'name' in e:
+                        if not e['name']:
+                            self.assertTrue(t.name is None, 'Expected no URL name but found %s.' % t.name)
+                        else:
+                            self.assertEqual(t.name, e['name'], 'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name))
 
 class ReverseShortcutTests(TestCase):
     urls = 'regressiontests.urlpatterns_reverse.urls'

@@ -778,7 +778,12 @@ TECHNICAL_404_TEMPLATE = """
       </p>
       <ol>
         {% for pattern in urlpatterns %}
-          <li>{{ pattern }}</li>
+          <li>
+            {% for pat in pattern %}
+                {{ pat.regex.pattern }}
+                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+            {% endfor %}
+          </li>
         {% endfor %}
       </ol>
       <p>The current URL, <code>{{ request_path|escape }}</code>, didn't match any of these.</p>
