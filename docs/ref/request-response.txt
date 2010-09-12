@@ -30,10 +30,25 @@ All attributes except ``session`` should be considered read-only.
 
 .. attribute:: HttpRequest.path
 
-   A string representing the full path to the requested page, not including
-   the domain.
+    A string representing the full path to the requested page, not including
+    the domain.
 
-   Example: ``"/music/bands/the_beatles/"``
+    Example: ``"/music/bands/the_beatles/"``
+
+.. attribute:: HttpRequest.path_info
+
+    Under some web server configurations, the portion of the URL after the host
+    name is split up into a script prefix portion and a path info portion
+    (this happens, for example, when using the ``django.root`` option
+    with the :ref:`modpython handler from Apache <howto-deployment-modpython>`).
+    The ``path_info`` attribute always contains the path info portion of the
+    path, no matter what web server is being used. Using this instead of
+    attr:`~HttpRequest.path` can make your code much easier to move between test
+    and deployment servers.
+
+    For example, if the ``django.root`` for your application is set to 
+    ``"/minfo"``, then ``path`` might be ``"/minfo/music/bands/the_beatles/"``
+    and ``path_info`` would be ``"/music/bands/the_beatles/"``.
 
 .. attribute:: HttpRequest.method
 
