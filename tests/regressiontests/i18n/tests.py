@@ -5,14 +5,17 @@ import os
 import sys
 import pickle
 
-from django.template import Template, Context
 from django.conf import settings
+from django.template import Template, Context
+from django.test import TestCase
 from django.utils.formats import get_format, date_format, time_format, localize, localize_input
 from django.utils.numberformat import format as nformat
-from django.test import TestCase
+from django.utils.safestring import mark_safe, SafeString, SafeUnicode
 from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, to_locale
 
+
 from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
+from models import Company, TestModel
 
 
 class TranslationTests(TestCase):
@@ -59,7 +62,6 @@ class TranslationTests(TestCase):
         """
         Translating a string requiring no auto-escaping shouldn't change the "safe" status.
         """
-        from django.utils.safestring import mark_safe, SafeString, SafeUnicode
         s = mark_safe('Password')
         self.assertEqual(SafeString, type(s))
         activate('de')
@@ -620,3 +622,16 @@ class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_django_fallback(self):
         self.assertUgettext('Date/time', 'Datum/Zeit')
+
+
+class TestModels(TestCase):
+    def test_lazy(self):
+        tm = TestModel()
+        tm.save()
+
+    def test_safestr(self):
+        c = Company(cents_payed=12, products_delivered=1)
+        c.name = SafeUnicode(u'Iñtërnâtiônàlizætiøn1')
+        c.save()
+        c.name = SafeString(u'Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
+        c.save()
