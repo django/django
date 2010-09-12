@@ -84,23 +84,31 @@ class AppCacheReadyTests(AppCacheTestCase):
 class GetAppsTests(AppCacheTestCase):
     """Tests for the get_apps function"""
 
-    def test_get_apps(self):
-        """Test that the correct models modules are returned"""
-        settings.INSTALLED_APPS = ('django.contrib.sites',
-                                   'django.contrib.contenttypes',
-                                   'django.contrib.auth',
-                                   'django.contrib.flatpages',)
+    def test_app_classes(self):
+        """
+        Test that the correct models modules are returned for apps installed
+        via the APP_CLASSES setting
+        """
+        settings.APP_CLASSES = ('model_app.apps.MyApp',)
         apps = cache.get_apps()
-        self.assertEqual(len(apps), 4)
-        self.assertTrue(apps[0], 'django.contrib.auth.models')
-        self.assertTrue(apps[1], 'django.contrib.flatpages.models')
-        self.assertTrue(apps[2], 'django.contrib.sites.models')
-        self.assertTrue(apps[3], 'django.contrib.contenttypes.models')
         self.assertTrue(cache.app_cache_ready())
+        self.assertEquals(apps[0].__name__, 'model_app.othermodels')
+
+    def test_installed_apps(self):
+        """
+        Test that the correct models modules are returned for apps installed
+        via the INSTALLED_APPS setting
+        """
+        settings.INSTALLED_APPS = ('model_app',)
+        apps = cache.get_apps()
+        self.assertTrue(cache.app_cache_ready())
+        self.assertEquals(apps[0].__name__, 'model_app.models')
 
     def test_empty_models(self):
-        """Test that modules that don't contain models are not returned"""
-        settings.INSTALLED_APPS = ('django.contrib.csrf',)
+        """
+        Test that modules that don't contain models are not returned
+        """
+        settings.INSTALLED_APPS = ('nomodel_app',)
         self.assertEqual(cache.get_apps(), [])
         self.assertTrue(cache.app_cache_ready())
 
@@ -116,13 +124,23 @@ class GetAppsTests(AppCacheTestCase):
 class GetAppTests(AppCacheTestCase):
     """Tests for the get_app function"""
 
-    def test_get_app(self):
-        """Test that the correct module is returned"""
-        settings.INSTALLED_APPS = ('django.contrib.contenttypes',
-                                   'django.contrib.auth',)
-        module = cache.get_app('auth')
-        self.assertTrue(module, 'django.contrib.auth.models')
-        self.assertTrue(cache.app_cache_ready())
+    def test_app_classes(self):
+        """
+        Test that the correct module is returned when the app was installed
+        via the APP_CLASSES setting
+        """
+        settings.APP_CLASSES = ('model_app.apps.MyApp',)
+        rv = cache.get_app('model_app')
+        self.assertEquals(rv.__name__, 'model_app.othermodels')
+
+    def test_installed_apps(self):
+        """
+        Test that the correct module is returned when the app was installed
+        via the INSTALLED_APPS setting
+        """
+        settings.INSTALLED_APPS = ('model_app',)
+        rv = cache.get_app('model_app')
+        self.assertEquals(rv.__name__, 'model_app.models')
 
     def test_not_found_exception(self):
         """
@@ -130,7 +148,7 @@ class GetAppTests(AppCacheTestCase):
         could not be found
         """
         self.assertRaises(ImproperlyConfigured, cache.get_app,
-                          'django.contrib.auth')
+                          'notarealapp')
         self.assertTrue(cache.app_cache_ready())
 
     def test_emptyOK(self):
@@ -141,16 +159,6 @@ class GetAppTests(AppCacheTestCase):
         settings.INSTALLED_APPS = ('django.contrib.csrf',)
         module = cache.get_app('csrf', emptyOK=True)
         self.failUnless(module is None)
-        self.assertTrue(cache.app_cache_ready())
-
-    def test_load_app_modules(self):
-        """
-        Test that only apps that are listed in the INSTALLED_APPS setting 
-        are searched (unlike the get_apps function, which also searches
-        apps that are loaded via load_app)
-        """
-        cache.load_app('django.contrib.sites')
-        self.assertRaises(ImproperlyConfigured, cache.get_app, 'sites')
         self.assertTrue(cache.app_cache_ready())
 
 class GetAppErrorsTests(AppCacheTestCase):

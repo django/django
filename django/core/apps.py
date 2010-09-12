@@ -189,7 +189,7 @@ class AppCache(object):
         return self.loaded
 
     def get_apps(self):
-        "Returns a list of all installed modules that contain models."
+        "Returns a list of all models modules."
         self._populate()
         return [app.models_module for app in self.app_instances\
                 if hasattr(app, 'models_module')]
