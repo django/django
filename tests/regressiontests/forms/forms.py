@@ -522,6 +522,18 @@ tags.
 <input type="hidden" name="composers" value="P" />
 <input type="hidden" name="composers" value="J" />
 
+DateTimeField rendered as_hidden() is special too
+
+>>> class MessageForm(Form):
+...     when = SplitDateTimeField()
+>>> f = MessageForm({'when_0': '1992-01-01', 'when_1': '01:01'})
+>>> print f.is_valid()
+True
+>>> print f['when']
+<input type="text" name="when_0" value="1992-01-01" id="id_when_0" /><input type="text" name="when_1" value="01:01" id="id_when_1" />
+>>> print f['when'].as_hidden()
+<input type="hidden" name="when_0" value="1992-01-01" id="id_when_0" /><input type="hidden" name="when_1" value="01:01" id="id_when_1" />
+
 MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
 >>> class SongForm(Form):
 ...     name = CharField()
