@@ -67,11 +67,15 @@ class AppCacheReadyTests(AppCacheTestCase):
     """
 
     def test_not_initialized(self):
-        """Should return False if the AppCache hasn't been initialized"""
+        """
+        Should return False if the AppCache hasn't been initialized
+        """
         self.assertFalse(cache.app_cache_ready())
 
     def test_load_app(self):
-        """Should return False after executing the load_app function"""
+        """
+        Should return False after executing the load_app function
+        """
         cache.load_app('nomodel_app')
         self.assertFalse(cache.app_cache_ready())
         cache.load_app('nomodel_app', can_postpone=True)
@@ -105,7 +109,8 @@ class GetAppsTests(AppCacheTestCase):
         Test that an exception is raised if two app instances
         have the same db_prefix attribute
         """
-        settings.APP_CLASSES = ('nomodel_app.MyApp', 'model_app.MyOtherApp',)
+        settings.APP_CLASSES = ('nomodel_app.apps.MyApp',
+                                'model_app.apps.MyOtherApp',)
         self.assertRaises(ImproperlyConfigured, cache.get_apps)
 
 class GetAppTests(AppCacheTestCase):
@@ -254,9 +259,22 @@ class LoadAppTests(AppCacheTestCase):
         self.assertEqual(app.models_module.__name__, 'model_app.models')
         self.assertEqual(rv.__name__, 'model_app.models')
 
+    def test_with_custom_models(self):
+        """
+        Test that custom models are imported correctly, if the App specifies
+        an models_path attribute
+        """
+        from nomodel_app.apps import MyApp
+        rv = cache.load_app('model_app', can_postpone=False, app_class=MyApp)
+        app = cache.app_instances[0]
+        self.assertEqual(app.models_module.__name__, 'model_app.models')
+        self.assertTrue(isinstance(app, MyApp))
+        self.assertEqual(rv.__name__, 'model_app.models')
+
     def test_without_models(self):
         """
-        Test that an app instance is created when there are no models
+        Test that an app instance is created even when there are
+        no models provided
         """
         rv = cache.load_app('nomodel_app')
         app = cache.app_instances[0]
@@ -264,32 +282,10 @@ class LoadAppTests(AppCacheTestCase):
         self.assertEqual(app.name, 'nomodel_app')
         self.assertEqual(rv, None)
 
-    def test_custom_app(self):
+    def test_loading_the_same_app_twice(self):
         """
-        Test that a custom app instance is created if the function
-        gets passed a custom app class
-        """
-        from nomodel_app import MyApp
-        rv = cache.load_app('nomodel_app', False, MyApp)
-        app = cache.app_instances[0]
-        self.assertEqual(len(cache.app_instances), 1)
-        self.assertEqual(app.name, 'nomodel_app')
-        self.assertTrue(isinstance(app, MyApp))
-        self.assertEqual(rv, None)
-
-    def test_custom_models_path(self):
-        """
-        Test that custom models are imported correctly 
-        """
-        from nomodel_app import MyApp
-        rv = cache.load_app('model_app', False, MyApp)
-        app = cache.app_instances[0]
-        self.assertEqual(app.models_module.__name__, 'model_app.models')
-        self.assertEqual(rv.__name__, 'model_app.models')
-
-    def test_twice(self):
-        """
-        Test that loading an app twice results in only one app instance
+        Test that loading the same app twice results in only one app instance
+        being created
         """
         rv = cache.load_app('model_app')
         rv2 = cache.load_app('model_app')
@@ -303,16 +299,6 @@ class LoadAppTests(AppCacheTestCase):
         be imported
         """
         self.assertRaises(ImportError, cache.load_app, 'garageland')
-
-    def test_installed_apps(self):
-        """
-        Test that the installed_apps attribute is populated correctly
-        """
-        settings.APP_CLASSES = ('nomodel_app.MyApp',)
-        settings.INSTALLED_APPS = ('model_app',)
-        # populate cache
-        cache.get_app_errors()
-        self.assertEqual(cache.installed_apps, ['nomodel_app', 'model_app',])
 
 class RegisterModelsTests(AppCacheTestCase):
     """Tests for the register_models function"""
@@ -348,6 +334,32 @@ class RegisterModelsTests(AppCacheTestCase):
         from model_app.models import Person
         self.assertFalse(cache.app_cache_ready())
         self.assertEquals(cache.unbound_models['model_app']['person'], Person)
+
+class FindAppTests(AppCacheTestCase):
+    """Tests for the find_app function"""
+
+    def test_seeded(self):
+        """
+        Test that the correct app is returned when the cache is seeded
+        """
+        from django.core.apps import App
+        settings.INSTALLED_APPS = ('model_app',)
+        cache.get_app_errors()
+        self.assertTrue(cache.app_cache_ready())
+        rv = cache.find_app('model_app')
+        self.assertEquals(rv.name, 'model_app')
+        self.assertTrue(isinstance(rv, App))
+
+    def test_unseeded(self):
+        """
+        Test that the correct app is returned when the cache is unseeded
+        """
+        from django.core.apps import App
+        cache.load_app('model_app')
+        self.assertFalse(cache.app_cache_ready())
+        rv = cache.find_app('model_app')
+        self.assertEquals(rv.name, 'model_app')
+        self.assertTrue(isinstance(rv, App))
 
 if __name__ == '__main__':
     unittest.main()
