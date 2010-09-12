@@ -32,6 +32,7 @@ class CacheClass(BaseCache):
             self._createdir()
 
     def add(self, key, value, timeout=None):
+        self.validate_key(key)
         if self.has_key(key):
             return False
 
@@ -39,6 +40,7 @@ class CacheClass(BaseCache):
         return True
 
     def get(self, key, default=None):
+        self.validate_key(key)
         fname = self._key_to_file(key)
         try:
             f = open(fname, 'rb')
@@ -56,6 +58,7 @@ class CacheClass(BaseCache):
         return default
 
     def set(self, key, value, timeout=None):
+        self.validate_key(key)
         fname = self._key_to_file(key)
         dirname = os.path.dirname(fname)
 
@@ -79,6 +82,7 @@ class CacheClass(BaseCache):
             pass
 
     def delete(self, key):
+        self.validate_key(key)
         try:
             self._delete(self._key_to_file(key))
         except (IOError, OSError):
@@ -95,6 +99,7 @@ class CacheClass(BaseCache):
             pass
 
     def has_key(self, key):
+        self.validate_key(key)
         fname = self._key_to_file(key)
         try:
             f = open(fname, 'rb')

@@ -8,11 +8,12 @@ import shutil
 import tempfile
 import time
 import unittest
+import warnings
 
 from django.conf import settings
 from django.core import management
 from django.core.cache import get_cache
-from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.base import InvalidCacheBackendError, CacheKeyWarning
 from django.http import HttpResponse, HttpRequest
 from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware
 from django.utils import translation
@@ -366,6 +367,33 @@ class BaseCacheTests(object):
                 count = count + 1
         self.assertEqual(count, final_count)
 
+    def test_invalid_keys(self):
+        """
+        All the builtin backends (except memcached, see below) should warn on
+        keys that would be refused by memcached. This encourages portable
+        caching code without making it too difficult to use production backends
+        with more liberal key rules. Refs #6447.
+
+        """
+        # On Python 2.6+ we could use the catch_warnings context
+        # manager to test this warning nicely. Since we can't do that
+        # yet, the cleanest option is to temporarily ask for
+        # CacheKeyWarning to be raised as an exception.
+        warnings.simplefilter("error", CacheKeyWarning)
+
+        # memcached does not allow whitespace or control characters in keys
+        self.assertRaises(CacheKeyWarning, self.cache.set, 'key with spaces', 'value')
+        # memcached limits key length to 250
+        self.assertRaises(CacheKeyWarning, self.cache.set, 'a' * 251, 'value')
+
+        # The warnings module has no public API for getting the
+        # current list of warning filters, so we can't save that off
+        # and reset to the previous value, we have to globally reset
+        # it. The effect will be the same, as long as the Django test
+        # runner doesn't add any global warning filters (it currently
+        # does not).
+        warnings.resetwarnings()
+
 class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         # Spaces are used in the table name to ensure quoting/escaping is working
@@ -396,6 +424,22 @@ if settings.CACHE_BACKEND.startswith('memcached://'):
     class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
         def setUp(self):
             self.cache = get_cache(settings.CACHE_BACKEND)
+
+        def test_invalid_keys(self):
+            """
+            On memcached, we don't introduce a duplicate key validation
+            step (for speed reasons), we just let the memcached API
+            library raise its own exception on bad keys. Refs #6447.
+
+            In order to be memcached-API-library agnostic, we only assert
+            that a generic exception of some kind is raised.
+
+            """
+            # memcached does not allow whitespace or control characters in keys
+            self.assertRaises(Exception, self.cache.set, 'key with spaces', 'value')
+            # memcached limits key length to 250
+            self.assertRaises(Exception, self.cache.set, 'a' * 251, 'value')
+
 
 class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     """
@@ -428,6 +472,22 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
 
     def test_cull(self):
         self.perform_cull_test(50, 28)
+
+class CustomCacheKeyValidationTests(unittest.TestCase):
+    """
+    Tests for the ability to mixin a custom ``validate_key`` method to
+    a custom cache backend that otherwise inherits from a builtin
+    backend, and override the default key validation. Refs #6447.
+
+    """
+    def test_custom_key_validation(self):
+        cache = get_cache('regressiontests.cache.liberal_backend://')
+
+        # this key is both longer than 250 characters, and has spaces
+        key = 'some key with spaces' * 15
+        val = 'a value'
+        cache.set(key, val)
+        self.assertEqual(cache.get(key), val)
 
 class CacheUtils(unittest.TestCase):
     """TestCase for django.utils.cache functions."""
