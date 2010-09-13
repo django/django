@@ -33,7 +33,7 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
         self.assertEqual(None, mtv.full_clean())
 
-    def test_limitted_FK_raises_error(self):
+    def test_limited_FK_raises_error(self):
         # The limit_choices_to on the parent field says that a parent object's
         # number attribute must be 10, so this should fail validation.
         parent = ModelToValidate.objects.create(number=11, name='Other Name')
@@ -60,7 +60,7 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', url='http://www.djangoproject.com/')
         self.assertEqual(None, mtv.full_clean()) # This will fail if there's no Internet connection
 
-    def test_text_greater_that_charfields_max_length_eaises_erros(self):
+    def test_text_greater_that_charfields_max_length_raises_erros(self):
         mtv = ModelToValidate(number=10, name='Some Name'*100)
         self.assertFailsValidation(mtv.full_clean, ['name',])
 

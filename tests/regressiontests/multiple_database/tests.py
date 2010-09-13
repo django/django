@@ -24,7 +24,7 @@ class QueryTestCase(TestCase):
     multi_db = True
 
     def test_db_selection(self):
-        "Check that querysets will use the default databse by default"
+        "Check that querysets will use the default database by default"
         self.assertEquals(Book.objects.db, DEFAULT_DB_ALIAS)
         self.assertEquals(Book.objects.all().db, DEFAULT_DB_ALIAS)
 
@@ -1221,7 +1221,7 @@ class RouterTestCase(TestCase):
 
         mark = Person.objects.using('default').create(pk=2, name="Mark Pilgrim")
 
-        # Now save back onto the usual databse.
+        # Now save back onto the usual database.
         # This simulates master/slave - the objects exist on both database,
         # but the _state.db is as it is for all other tests.
         pro.save(using='default')
