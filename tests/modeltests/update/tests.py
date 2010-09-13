@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from models import A, B, D
+from models import A, B, C, D, DataPoint, RelatedPoint
 
 class SimpleTest(TestCase):
     def setUp(self):
@@ -47,3 +47,69 @@ class SimpleTest(TestCase):
         self.failUnlessEqual(num_updated, 0)
         cnt = D.objects.filter(y=100).count()
         self.failUnlessEqual(cnt, 0)
+
+class AdvancedTests(TestCase):
+
+    def setUp(self):
+        self.d0 = DataPoint.objects.create(name="d0", value="apple")
+        self.d2 = DataPoint.objects.create(name="d2", value="banana")
+        self.d3 = DataPoint.objects.create(name="d3", value="banana")
+        self.r1 = RelatedPoint.objects.create(name="r1", data=self.d3)
+
+    def test_update(self):
+        """
+        Objects are updated by first filtering the candidates into a queryset
+        and then calling the update() method. It executes immediately and
+        returns nothing.
+        """
+        resp = DataPoint.objects.filter(value="apple").update(name="d1")
+        self.assertEqual(resp, 1)
+        resp = DataPoint.objects.filter(value="apple")
+        self.assertEqual(list(resp), [self.d0])
+
+    def test_update_multiple_objects(self):
+        """
+        We can update multiple objects at once.
+        """
+        resp = DataPoint.objects.filter(value="banana").update(
+            value="pineapple")
+        self.assertEqual(resp, 2)
+        self.assertEqual(DataPoint.objects.get(name="d2").value, u'pineapple')
+
+    def test_update_fk(self):
+        """
+        Foreign key fields can also be updated, although you can only update
+        the object referred to, not anything inside the related object.
+        """
+        resp = RelatedPoint.objects.filter(name="r1").update(data=self.d0)
+        self.assertEqual(resp, 1)
+        resp = RelatedPoint.objects.filter(data__name="d0")
+        self.assertEqual(list(resp), [self.r1])
+
+    def test_update_multiple_fields(self):
+        """
+        Multiple fields can be updated at once
+        """
+        resp = DataPoint.objects.filter(value="apple").update(
+            value="fruit", another_value="peach")
+        self.assertEqual(resp, 1)
+        d = DataPoint.objects.get(name="d0")
+        self.assertEqual(d.value, u'fruit')
+        self.assertEqual(d.another_value, u'peach')
+
+    def test_update_all(self):
+        """
+        In the rare case you want to update every instance of a model, update()
+        is also a manager method.
+        """
+        self.assertEqual(DataPoint.objects.update(value='thing'), 3)
+        resp = DataPoint.objects.values('value').distinct()
+        self.assertEqual(list(resp), [{'value': u'thing'}])
+
+    def test_update_slice_fail(self):
+        """
+        We do not support update on already sliced query sets.
+        """
+        method = DataPoint.objects.all()[:2].update
+        self.assertRaises(AssertionError, method,
+            another_value='another thing')
