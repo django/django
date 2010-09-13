@@ -11,4 +11,4 @@ class Command(BaseCommand):
     ]
 
     def handle(self, *args, **options):
-        print "I don't feel like dancing %s." % options["style"]
+        self.stdout.write("I don't feel like dancing %s." % options["style"])
