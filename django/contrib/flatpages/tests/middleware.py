@@ -19,10 +19,13 @@ class FlatpageMiddlewareTests(TestCase):
                 'templates'
             ),
         )
+        self.old_LOGIN_URL = settings.LOGIN_URL
+        settings.LOGIN_URL = '/accounts/login/'
 
     def tearDown(self):
         settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
         settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+        settings.LOGIN_URL = self.old_LOGIN_URL
 
     def test_view_flatpage(self):
         "A flatpage can be served through a view, even when the middleware is in use"
