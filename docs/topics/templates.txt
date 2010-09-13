@@ -79,7 +79,11 @@ Variables
 
 Variables look like this: ``{{ variable }}``. When the template engine
 encounters a variable, it evaluates that variable and replaces it with the
-result.
+result. Variable names consist of any combination of alphanumeric characters
+and the underscore (``"_"``). The dot (``"."``) also appears in variable
+sections, although that has a special meaning, as indicated below.
+Importantly, *you cannot have spaces or punctuation characters in variable
+names.*
 
 Use a dot (``.``) to access attributes of a variable.
 
