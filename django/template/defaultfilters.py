@@ -601,6 +601,10 @@ def unordered_list(value, autoescape=None):
         first_item, second_item = list_
         if second_item == []:
             return [first_item], True
+        try:
+            it = iter(second_item)  # see if second item is iterable
+        except TypeError:
+            return list_, False
         old_style_list = True
         new_second_item = []
         for sublist in second_item:
