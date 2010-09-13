@@ -474,10 +474,14 @@ Copy the file ``mysite/urls.py`` to ``mysite/polls/urls.py``. Then, change
 ``mysite/urls.py`` to remove the poll-specific URLs and insert an
 :func:`~django.conf.urls.defaults.include`::
 
+    # This also imports the include function
+    from django.conf.urls.defaults import *
+
     # ...
     urlpatterns = patterns('',
         (r'^polls/', include('mysite.polls.urls')),
         # ...
+    )
 
 :func:`~django.conf.urls.defaults.include`, simply, references another URLconf.
 Note that the regular expression doesn't have a ``$`` (end-of-string match
