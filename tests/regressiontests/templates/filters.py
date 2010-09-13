@@ -265,6 +265,10 @@ def get_filter_tests():
         'filter-iriencode03': ('{{ url|iriencode }}', {'url': mark_safe('?test=1&me=2')}, '?test=1&me=2'),
         'filter-iriencode04': ('{% autoescape off %}{{ url|iriencode }}{% endautoescape %}', {'url': mark_safe('?test=1&me=2')}, '?test=1&me=2'),
 
+        # urlencode
+        'filter-urlencode01': ('{{ url|urlencode }}', {'url': '/test&"/me?/'}, '/test%26%22/me%3F/'),
+        'filter-urlencode02': ('/test/{{ urlbit|urlencode:"" }}/', {'urlbit': 'escape/slash'}, '/test/escape%2Fslash/'),
+
         # Chaining a bunch of safeness-preserving filters should not alter
         # the safe status either way.
         'chaining01': ('{{ a|capfirst|center:"7" }}.{{ b|capfirst|center:"7" }}', {"a": "a < b", "b": mark_safe("a < b")}, " A &lt; b . A < b "),
