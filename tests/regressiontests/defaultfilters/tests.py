@@ -347,6 +347,17 @@ u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1\n\t\t<ul>\n\t\t\t<li>item 1.1.1\n\t\t\t
 >>> unordered_list(['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']])
 u'\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>'
 
+>>> class ULItem(object):
+...     def __init__(self, title):
+...       self.title = title
+...     def __unicode__(self):
+...         return u'ulitem-%s' % str(self.title)
+
+>>> a = ULItem('a')
+>>> b = ULItem('b')
+>>> unordered_list([a,b])
+u'\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>'
+
 # Old format for unordered lists should still work
 >>> unordered_list([u'item 1', []])
 u'\t<li>item 1</li>'
