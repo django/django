@@ -171,6 +171,8 @@ know that you won't need (or won't need in most cases) to avoid loading
 them. Note that if you *do* use them, the ORM will have to go and get them in a
 separate query, making this a pessimization if you use it inappropriately.
 
+Also, be aware that there is some (small extra) overhead incurred inside Django when constructing a model with deferred fields. Don't be too aggressive in deferring fields without profiling as the database has to read most of the non-text, non-VARCHAR data from the disk for a single row in the results, even if it ends up only using a few columns. The `defer()` and `only()` methods are most useful when you can avoid loading a lot of text data or for fields that might take a lot of processing to convert back to Python. As always, profile first, then optimize.
+
 Use QuerySet.count()
 --------------------
 
