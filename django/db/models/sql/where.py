@@ -36,10 +36,10 @@ class WhereNode(tree.Node):
     def add(self, data, connector):
         """
         Add a node to the where-tree. If the data is a list or tuple, it is
-        expected to be of the form (alias, col_name, field_obj, lookup_type,
-        value), which is then slightly munged before being stored (to avoid
-        storing any reference to field objects). Otherwise, the 'data' is
-        stored unchanged and can be anything with an 'as_sql()' method.
+        expected to be of the form (obj, lookup_type, value), where obj is
+        a Constraint object, and is then slightly munged before being stored
+        (to avoid storing any reference to field objects). Otherwise, the 'data'
+        is stored unchanged and can be any class with an 'as_sql()' method.
         """
         if not isinstance(data, (list, tuple)):
             super(WhereNode, self).add(data, connector)
