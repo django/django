@@ -1,5 +1,3 @@
-.. _ref-signals:
-
 =======
 Signals
 =======
@@ -8,11 +6,11 @@ A list of all the signals that Django sends.
 
 .. seealso::
 
-    See the documentation on the :ref:`signal dispatcher <topics-signals>` for
+    See the documentation on the :doc:`signal dispatcher </topics/signals>` for
     information regarding how to register for and receive signals.
 
-    The :ref:`comment framework <ref-contrib-comments-index>` sends a :ref:`set
-    of comment-related signals <ref-contrib-comments-signals>`.
+    The :doc:`comment framework </ref/contrib/comments/index>` sends a :doc:`set
+    of comment-related signals </ref/contrib/comments/signals>`.
 
 Model signals
 =============
@@ -33,9 +31,9 @@ module system.
     If you override these methods on your model, you must call the parent class'
     methods for this signals to be sent.
 
-	Note also that Django stores signal handlers as weak references by default,
-	so if your handler is a local function, it may be garbage collected.  To
-	prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
+    Note also that Django stores signal handlers as weak references by default,
+    so if your handler is a local function, it may be garbage collected.  To
+    prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
 
 pre_init
 --------
@@ -61,7 +59,7 @@ Arguments sent with this signal:
         A dictionary of keyword arguments passed to
         :meth:`~django.db.models.Model.__init__`:.
 
-For example, the :ref:`tutorial <intro-tutorial01>` has this line:
+For example, the :doc:`tutorial </intro/tutorial01>` has this line:
 
 .. code-block:: python
 
@@ -113,6 +111,9 @@ Arguments sent with this signal:
     ``instance``
         The actual instance being saved.
 
+    ``using``
+        The database alias being used.
+
 post_save
 ---------
 
@@ -133,6 +134,9 @@ Arguments sent with this signal:
     ``created``
         A boolean; ``True`` if a new record was created.
 
+    ``using``
+        The database alias being used.
+
 pre_delete
 ----------
 
@@ -149,6 +153,9 @@ Arguments sent with this signal:
 
     ``instance``
         The actual instance being deleted.
+
+    ``using``
+        The database alias being used.
 
 post_delete
 -----------
@@ -169,6 +176,9 @@ Arguments sent with this signal:
 
         Note that the object will no longer be in the database, so be very
         careful what you do with this instance.
+
+    ``using``
+        The database alias being used.
 
 m2m_changed
 -----------
@@ -215,8 +225,8 @@ Arguments sent with this signal:
             Sent *after* the relation is cleared
 
     ``reverse``
-    	Indicates which side of the relation is updated (i.e., if it is the
-    	forward or reverse relation that is being modified).
+        Indicates which side of the relation is updated (i.e., if it is the
+        forward or reverse relation that is being modified).
 
     ``model``
         The class of the objects that are added to, removed from or cleared
@@ -227,6 +237,9 @@ Arguments sent with this signal:
         primary key values that have been added to or removed from the relation.
 
         For the ``"clear"`` action, this is ``None``.
+
+    ``using``
+        The database alias being used.
 
 For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
 like this:
@@ -266,6 +279,8 @@ the arguments sent to a :data:`m2m_changed` handler would be:
                     ``Pizza``)
 
     ``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
+
+    ``using``       ``"default"`` (since the default router sends writes here)
     ==============  ============================================================
 
 And if we would then do something like this:
@@ -293,6 +308,8 @@ the arguments sent to a :data:`m2m_changed` handler would be:
 
     ``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
                     relation)
+
+    ``using``       ``"default"`` (since the default router sends writes here)
     ==============  ============================================================
 
 class_prepared
@@ -313,7 +330,7 @@ Arguments that are sent with this signal:
 Management signals
 ==================
 
-Signals sent by :ref:`django-admin <ref-django-admin>`.
+Signals sent by :doc:`django-admin </ref/django-admin>`.
 
 post_syncdb
 -----------
@@ -376,8 +393,7 @@ Sent when Django begins processing an HTTP request.
 Arguments sent with this signal:
 
     ``sender``
-        The handler class -- i.e.
-        :class:`django.core.handlers.modpython.ModPythonHandler` or
+        The handler class -- e.g.
         :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
         the request.
 
@@ -416,7 +432,7 @@ Test signals
 .. module:: django.test.signals
    :synopsis: Signals sent during testing.
 
-Signals only sent when :ref:`running tests <topics-testing>`.
+Signals only sent when :doc:`running tests </topics/testing>`.
 
 template_rendered
 -----------------
@@ -438,3 +454,39 @@ Arguments sent with this signal:
     context
         The :class:`~django.template.Context` with which the template was
         rendered.
+
+Database Wrappers
+=================
+
+.. module:: django.db.backends
+   :synopsis: Core signals sent by the database wrapper.
+
+Signals sent by the database wrapper when a database connection is
+initiated.
+
+connection_created
+------------------
+
+.. data:: django.db.backends.signals.connection_created
+   :module:
+
+.. versionadded:: 1.1
+
+.. versionchanged:: 1.2
+   The connection argument was added
+
+Sent when the database wrapper makes the initial connection to the
+database.  This is particularly useful if you'd like to send any post
+connection commands to the SQL backend.
+
+Arguments sent with this signal:
+
+    sender
+        The database wrapper class -- i.e.
+        :class: `django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
+        :class: `django.db.backends.mysql.DatabaseWrapper`, etc.
+
+    connection
+        The database connection that was opened. This can be used in a
+        multiple-database configuration to differentiate connection signals
+        from different databases.

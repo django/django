@@ -1,4 +1,10 @@
+{% if result_hidden_fields %}
+<div class="hiddenfields"> {# DIV for HTML validation #}
+{% for item in result_hidden_fields %}{{ item }}{% endfor %}
+</div>
+{% endif %}
 {% if results %}
+<div class="results">
 <table cellspacing="0" id="result_list">
 <thead>
 <tr>
@@ -14,4 +20,5 @@
 {% endfor %}
 </tbody>
 </table>
+</div>
 {% endif %}

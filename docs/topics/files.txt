@@ -1,5 +1,3 @@
-.. _topics-files:
-
 ==============
 Managing files
 ==============
@@ -70,7 +68,7 @@ using a Python built-in ``file`` object::
     >>> myfile = File(f)
 
 Now you can use any of the ``File`` attributes and methods documented in
-:ref:`ref-files-file`.
+:doc:`/ref/files/file`.
 
 File storage
 ============
@@ -84,7 +82,7 @@ setting; if you don't explicitly provide a storage system, this is the one that
 will be used.
 
 See below for details of the built-in default file storage system, and see
-:ref:`howto-custom-file-storage` for information on writing your own file
+:doc:`/howto/custom-file-storage` for information on writing your own file
 storage system.
 
 Storage objects
@@ -111,7 +109,7 @@ useful -- you can use the global default storage system::
     >>> default_storage.exists(path)
     False
 
-See :ref:`ref-files-storage` for the file storage API.
+See :doc:`/ref/files/storage` for the file storage API.
 
 The built-in filesystem storage class
 -------------------------------------
@@ -143,5 +141,5 @@ For example, the following code will store uploaded files under
         ...
         photo = models.ImageField(storage=fs)
 
-:ref:`Custom storage systems <howto-custom-file-storage>` work the same way: you
+:doc:`Custom storage systems </howto/custom-file-storage>` work the same way: you
 can pass them in as the ``storage`` argument to a ``FileField``.

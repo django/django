@@ -229,7 +229,7 @@ class TextInput(Input):
 class PasswordInput(Input):
     input_type = 'password'
 
-    def __init__(self, attrs=None, render_value=True):
+    def __init__(self, attrs=None, render_value=False):
         super(PasswordInput, self).__init__(attrs)
         self.render_value = render_value
 
@@ -308,9 +308,13 @@ class DateInput(Input):
         super(DateInput, self).__init__(attrs)
         if format:
             self.format = format
+            self.manual_format = True
+        else:
+            self.format = formats.get_format('DATE_INPUT_FORMATS')[0]
+            self.manual_format = False
 
     def _format_value(self, value):
-        if self.is_localized:
+        if self.is_localized and not self.manual_format:
             return formats.localize_input(value)
         elif hasattr(value, 'strftime'):
             value = datetime_safe.new_date(value)
@@ -336,9 +340,13 @@ class DateTimeInput(Input):
         super(DateTimeInput, self).__init__(attrs)
         if format:
             self.format = format
+            self.manual_format = True
+        else:
+            self.format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
+            self.manual_format = False
 
     def _format_value(self, value):
-        if self.is_localized:
+        if self.is_localized and not self.manual_format:
             return formats.localize_input(value)
         elif hasattr(value, 'strftime'):
             value = datetime_safe.new_datetime(value)
@@ -364,9 +372,13 @@ class TimeInput(Input):
         super(TimeInput, self).__init__(attrs)
         if format:
             self.format = format
+            self.manual_format = True
+        else:
+            self.format = formats.get_format('TIME_INPUT_FORMATS')[0]
+            self.manual_format = False
 
     def _format_value(self, value):
-        if self.is_localized:
+        if self.is_localized and not self.manual_format:
             return formats.localize_input(value)
         elif hasattr(value, 'strftime'):
             return value.strftime(self.format)
@@ -438,13 +450,14 @@ class Select(Widget):
         output.append(u'</select>')
         return mark_safe(u'\n'.join(output))
 
+    def render_option(self, selected_choices, option_value, option_label):
+        option_value = force_unicode(option_value)
+        selected_html = (option_value in selected_choices) and u' selected="selected"' or ''
+        return u'<option value="%s"%s>%s</option>' % (
+            escape(option_value), selected_html,
+            conditional_escape(force_unicode(option_label)))
+
     def render_options(self, choices, selected_choices):
-        def render_option(option_value, option_label):
-            option_value = force_unicode(option_value)
-            selected_html = (option_value in selected_choices) and u' selected="selected"' or ''
-            return u'<option value="%s"%s>%s</option>' % (
-                escape(option_value), selected_html,
-                conditional_escape(force_unicode(option_label)))
         # Normalize to strings.
         selected_choices = set([force_unicode(v) for v in selected_choices])
         output = []
@@ -452,10 +465,10 @@ class Select(Widget):
             if isinstance(option_label, (list, tuple)):
                 output.append(u'<optgroup label="%s">' % escape(force_unicode(option_value)))
                 for option in option_label:
-                    output.append(render_option(*option))
+                    output.append(self.render_option(selected_choices, *option))
                 output.append(u'</optgroup>')
             else:
-                output.append(render_option(option_value, option_label))
+                output.append(self.render_option(selected_choices, option_value, option_label))
         return u'\n'.join(output)
 
 class NullBooleanSelect(Select):
@@ -751,12 +764,8 @@ class SplitDateTimeWidget(MultiWidget):
     time_format = TimeInput.format
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
-        if date_format:
-            self.date_format = date_format
-        if time_format:
-            self.time_format = time_format
-        widgets = (DateInput(attrs=attrs, format=self.date_format),
-                   TimeInput(attrs=attrs, format=self.time_format))
+        widgets = (DateInput(attrs=attrs, format=date_format),
+                   TimeInput(attrs=attrs, format=time_format))
         super(SplitDateTimeWidget, self).__init__(widgets, attrs)
 
     def decompress(self, value):

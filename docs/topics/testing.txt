@@ -1,5 +1,3 @@
-.. _topics-testing:
-
 ===========================
 Testing Django applications
 ===========================
@@ -311,6 +309,24 @@ can press ``Ctrl-C`` a second time and the test run will halt immediately,
 but not gracefully. No details of the tests run before the interruption will
 be reported, and any test databases created by the run will not be destroyed.
 
+Running tests outside the test runner
+-------------------------------------
+
+If you want to run tests outside of ``./manage.py test`` -- for example,
+from a shell prompt -- you will need to set up the test
+environment first. Django provides a convenience method to do this::
+
+    >>> from django.test.utils import setup_test_environment
+    >>> setup_test_environment()
+
+This convenience method sets up the test database, and puts other
+Django features into modes that allow for repeatable testing.
+
+The call to :meth:`~django.test.utils.setup_test_environment` is made
+automatically as part of the setup of `./manage.py test`. You only
+need to manually invoke this method if you're not using running your
+tests via Django's test runner.
+
 The test database
 -----------------
 
@@ -342,7 +358,7 @@ For fine-grained control over the character encoding of your test
 database, use the :setting:`TEST_CHARSET` option. If you're using
 MySQL, you can also use the :setting:`TEST_COLLATION` option to
 control the particular collation used by the test database. See the
-:ref:`settings documentation <ref-settings>` for details of these
+:doc:`settings documentation </ref/settings>` for details of these
 advanced settings.
 
 .. _topics-testing-masterslave:
@@ -401,7 +417,7 @@ Other test conditions
 ---------------------
 
 Regardless of the value of the :setting:`DEBUG` setting in your configuration
-file, all Django tests run with :setting:`DEBUG=False`. This is to ensure that
+file, all Django tests run with :setting:`DEBUG`\=False. This is to ensure that
 the observed output of your code matches what will be seen in a production
 setting.
 
@@ -555,6 +571,19 @@ Note a few important things about how the test client works:
       magic in order to determine which template was loaded by a given view.
       This black magic (essentially a patching of Django's template system in
       memory) only happens during test running.
+
+    * By default, the test client will disable any CSRF checks
+      performed by your site.
+
+      If, for some reason, you *want* the test client to perform CSRF
+      checks, you can create an instance of the test client that
+      enforces CSRF checks. To do this, pass in the
+      ``enforce_csrf_checks`` argument when you construct your
+      client::
+
+          >>> from django.test import Client
+          >>> csrf_client = Client(enforce_csrf_checks=True)
+
 
 .. _urllib: http://docs.python.org/library/urllib.html
 .. _urllib2: http://docs.python.org/library/urllib2.html
@@ -751,7 +780,7 @@ arguments at time of construction:
 
         .. versionadded:: 1.0
 
-        If your site uses Django's :ref:`authentication system<topics-auth>`
+        If your site uses Django's :doc:`authentication system</topics/auth>`
         and you deal with logging in users, you can use the test client's
         ``login()`` method to simulate the effect of a user logging into the
         site.
@@ -797,7 +826,7 @@ arguments at time of construction:
 
         .. versionadded:: 1.0
 
-        If your site uses Django's :ref:`authentication system<topics-auth>`,
+        If your site uses Django's :doc:`authentication system</topics/auth>`,
         the ``logout()`` method can be used to simulate the effect of a user
         logging out of your site.
 
@@ -904,7 +933,16 @@ can access these properties as part of a test condition.
 .. attribute:: Client.session
 
     A dictionary-like object containing session information. See the
-    :ref:`session documentation<topics-http-sessions>` for full details.
+    :doc:`session documentation</topics/http/sessions>` for full details.
+
+    To modify the session and then save it, it must be stored in a variable
+    first (because a new ``SessionStore`` is created every time this property
+    is accessed)::
+
+        def test_something(self):
+            session = self.client.session
+            session['somekey'] = 'test'
+            session.save()
 
 .. _Cookie module documentation: http://docs.python.org/library/cookie.html
 
@@ -1052,23 +1090,25 @@ A fixture is a collection of data that Django knows how to import into a
 database. For example, if your site has user accounts, you might set up a
 fixture of fake user accounts in order to populate your database during tests.
 
-The most straightforward way of creating a fixture is to use the ``manage.py
-dumpdata`` command. This assumes you already have some data in your database.
-See the :djadmin:`dumpdata documentation<dumpdata>` for more details.
+The most straightforward way of creating a fixture is to use the
+:djadmin:`manage.py dumpdata <dumpdata>` command. This assumes you
+already have some data in your database. See the :djadmin:`dumpdata
+documentation<dumpdata>` for more details.
 
 .. note::
-    If you've ever run ``manage.py syncdb``, you've already used a fixture
-    without even knowing it! When you call ``syncdb`` in the database for
-    the first time, Django installs a fixture called ``initial_data``.
-    This gives you a way of populating a new database with any initial data,
-    such as a default set of categories.
+    If you've ever run :djadmin:`manage.py syncdb<syncdb>`, you've
+    already used a fixture without even knowing it! When you call
+    :djadmin:`syncdb` in the database for the first time, Django
+    installs a fixture called ``initial_data``. This gives you a way
+    of populating a new database with any initial data, such as a
+    default set of categories.
 
-    Fixtures with other names can always be installed manually using the
-    ``manage.py loaddata`` command.
+    Fixtures with other names can always be installed manually using
+    the :djadmin:`manage.py loaddata<loaddata>` command.
 
 Once you've created a fixture and placed it in a ``fixtures`` directory in one
 of your :setting:`INSTALLED_APPS`, you can use it in your unit tests by
-specifying a ``fixtures`` class attribute on your ``django.test.TestCase``
+specifying a ``fixtures`` class attribute on your :class:`django.test.TestCase`
 subclass::
 
     from django.test import TestCase
@@ -1248,6 +1288,21 @@ cause of an failure in your test suite.
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
 
+.. method:: TestCase.assertQuerysetEqual(qs, values, transform=repr)
+
+    .. versionadded:: 1.3
+
+    Asserts that a queryset ``qs`` returns a particular list of values ``values``.
+
+    The comparison of the contents of ``qs`` and ``values`` is performed using
+    the function ``transform``; by default, this means that the ``repr()`` of
+    each value is compared. Any other callable can be used if ``repr()`` doesn't
+    provide a unique or helpful comparison.
+
+    The comparison is also ordering dependent. If ``qs`` doesn't provide an
+    implicit ordering, you will need to apply a ``order_by()`` clause to your
+    queryset to ensure that the test will pass reliably.
+
 .. _topics-testing-email:
 
 E-mail services
@@ -1255,8 +1310,8 @@ E-mail services
 
 .. versionadded:: 1.0
 
-If any of your Django views send e-mail using :ref:`Django's e-mail
-functionality <topics-email>`, you probably don't want to send e-mail each time
+If any of your Django views send e-mail using :doc:`Django's e-mail
+functionality </topics/email>`, you probably don't want to send e-mail each time
 you run a test using that view. For this reason, Django's test runner
 automatically redirects all Django-sent e-mail to a dummy outbox. This lets you
 test every aspect of sending e-mail -- from the number of messages sent to the

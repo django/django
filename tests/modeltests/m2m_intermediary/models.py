@@ -34,35 +34,3 @@ class Writer(models.Model):
     def __unicode__(self):
         return u'%s (%s)' % (self.reporter, self.position)
 
-__test__ = {'API_TESTS':"""
-# Create a few Reporters.
->>> r1 = Reporter(first_name='John', last_name='Smith')
->>> r1.save()
->>> r2 = Reporter(first_name='Jane', last_name='Doe')
->>> r2.save()
-
-# Create an Article.
->>> from datetime import datetime
->>> a = Article(headline='This is a test', pub_date=datetime(2005, 7, 27))
->>> a.save()
-
-# Create a few Writers.
->>> w1 = Writer(reporter=r1, article=a, position='Main writer')
->>> w1.save()
->>> w2 = Writer(reporter=r2, article=a, position='Contributor')
->>> w2.save()
-
-# Play around with the API.
->>> a.writer_set.select_related().order_by('-position')
-[<Writer: John Smith (Main writer)>, <Writer: Jane Doe (Contributor)>]
->>> w1.reporter
-<Reporter: John Smith>
->>> w2.reporter
-<Reporter: Jane Doe>
->>> w1.article
-<Article: This is a test>
->>> w2.article
-<Article: This is a test>
->>> r1.writer_set.all()
-[<Writer: John Smith (Main writer)>]
-"""}

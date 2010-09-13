@@ -1,10 +1,8 @@
-.. _ref-forms-index:
-
 =====
 Forms
 =====
 
-Detailed form API reference. For introductory material, see :ref:`topics-forms-index`.
+Detailed form API reference. For introductory material, see :doc:`/topics/forms/index`.
 
 .. toctree::
    :maxdepth: 1

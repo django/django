@@ -54,7 +54,7 @@ LANGUAGES = (
     ('en', gettext_noop('English')),
     ('en-gb', gettext_noop('British English')),
     ('es', gettext_noop('Spanish')),
-    ('es-ar', gettext_noop('Argentinean Spanish')),
+    ('es-ar', gettext_noop('Argentinian Spanish')),
     ('et', gettext_noop('Estonian')),
     ('eu', gettext_noop('Basque')),
     ('fa', gettext_noop('Persian')),
@@ -78,6 +78,7 @@ LANGUAGES = (
     ('lt', gettext_noop('Lithuanian')),
     ('lv', gettext_noop('Latvian')),
     ('mk', gettext_noop('Macedonian')),
+    ('ml', gettext_noop('Malayalam')),
     ('mn', gettext_noop('Mongolian')),
     ('nl', gettext_noop('Dutch')),
     ('no', gettext_noop('Norwegian')),
@@ -372,8 +373,8 @@ DECIMAL_SEPARATOR = '.'
 # Boolean that sets whether to add thousand separator when formatting numbers
 USE_THOUSAND_SEPARATOR = False
 
-# Number of digits that will be togheter, when spliting them by THOUSAND_SEPARATOR
-# 0 means no grouping, 3 means splitting by thousands...
+# Number of digits that will be together, when spliting them by
+# THOUSAND_SEPARATOR. 0 means no grouping, 3 means splitting by thousands...
 NUMBER_GROUPING = 0
 
 # Thousand separator symbol

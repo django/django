@@ -5,14 +5,17 @@ import os
 import sys
 import pickle
 
-from django.template import Template, Context
 from django.conf import settings
+from django.template import Template, Context
+from django.test import TestCase
 from django.utils.formats import get_format, date_format, time_format, localize, localize_input
 from django.utils.numberformat import format as nformat
-from django.test import TestCase
+from django.utils.safestring import mark_safe, SafeString, SafeUnicode
 from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, to_locale
 
+
 from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
+from models import Company, TestModel
 
 
 class TranslationTests(TestCase):
@@ -59,7 +62,6 @@ class TranslationTests(TestCase):
         """
         Translating a string requiring no auto-escaping shouldn't change the "safe" status.
         """
-        from django.utils.safestring import mark_safe, SafeString, SafeUnicode
         s = mark_safe('Password')
         self.assertEqual(SafeString, type(s))
         activate('de')
@@ -170,14 +172,14 @@ class FormattingTests(TestCase):
             self.assertEqual(u'desembre 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual(u'12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
             self.assertEqual('No localizable', localize('No localizable'))
-            self.assertEqual(decimal.Decimal('66666.666'), localize(self.n))
-            self.assertEqual(99999.999, localize(self.f))
-            self.assertEqual(datetime.date(2009, 12, 31), localize(self.d))
-            self.assertEqual(datetime.datetime(2009, 12, 31, 20, 50), localize(self.dt))
+            self.assertEqual('66666.666', localize(self.n))
+            self.assertEqual('99999.999', localize(self.f))
+            self.assertEqual(u'des. 31, 2009', localize(self.d))
+            self.assertEqual(u'des. 31, 2009, 8:50 p.m.', localize(self.dt))
             self.assertEqual(u'66666.666', Template('{{ n }}').render(self.ctxt))
             self.assertEqual(u'99999.999', Template('{{ f }}').render(self.ctxt))
-            self.assertEqual(u'2009-12-31', Template('{{ d }}').render(self.ctxt))
-            self.assertEqual(u'2009-12-31 20:50:00', Template('{{ dt }}').render(self.ctxt))
+            self.assertEqual(u'des. 31, 2009', Template('{{ d }}').render(self.ctxt))
+            self.assertEqual(u'des. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
             self.assertEqual(u'66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
             self.assertEqual(u'100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
             self.assertEqual(u'10:15 a.m.', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
@@ -620,3 +622,16 @@ class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_django_fallback(self):
         self.assertUgettext('Date/time', 'Datum/Zeit')
+
+
+class TestModels(TestCase):
+    def test_lazy(self):
+        tm = TestModel()
+        tm.save()
+
+    def test_safestr(self):
+        c = Company(cents_payed=12, products_delivered=1)
+        c.name = SafeUnicode(u'Iñtërnâtiônàlizætiøn1')
+        c.save()
+        c.name = SafeString(u'Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
+        c.save()

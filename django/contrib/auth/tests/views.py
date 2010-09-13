@@ -36,6 +36,16 @@ class AuthViewsTestCase(TestCase):
         settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
         settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
 
+    def login(self, password='password'):
+        response = self.client.post('/login/', {
+            'username': 'testclient',
+            'password': password
+            }
+        )
+        self.assertEquals(response.status_code, 302)
+        self.assert_(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
+        self.assert_(SESSION_KEY in self.client.session)
+
 class PasswordResetTest(AuthViewsTestCase):
 
     def test_email_not_found(self):
@@ -52,6 +62,14 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEquals(response.status_code, 302)
         self.assertEquals(len(mail.outbox), 1)
         self.assert_("http://" in mail.outbox[0].body)
+        self.assertEquals(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
+
+    def test_email_found_custom_from(self):
+        "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."
+        response = self.client.post('/password_reset_from_email/', {'email': 'staffmember@example.com'})
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals("staffmember@example.com", mail.outbox[0].from_email)
 
     def _test_confirm_start(self):
         # Start by creating the email
@@ -117,15 +135,6 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assert_("The two password fields didn&#39;t match" in response.content)
 
 class ChangePasswordTest(AuthViewsTestCase):
-
-    def login(self, password='password'):
-        response = self.client.post('/login/', {
-            'username': 'testclient',
-            'password': password
-            }
-        )
-        self.assertEquals(response.status_code, 302)
-        self.assert_(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
 
     def fail_login(self, password='password'):
         response = self.client.post('/login/', {
@@ -227,16 +236,6 @@ class LoginTest(AuthViewsTestCase):
         
 class LogoutTest(AuthViewsTestCase):
     urls = 'django.contrib.auth.tests.urls'
-
-    def login(self, password='password'):
-        response = self.client.post('/login/', {
-            'username': 'testclient',
-            'password': password
-            }
-        )
-        self.assertEquals(response.status_code, 302)
-        self.assert_(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
-        self.assert_(SESSION_KEY in self.client.session)
 
     def confirm_logged_out(self):
         self.assert_(SESSION_KEY not in self.client.session)

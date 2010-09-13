@@ -1,5 +1,3 @@
-.. _releases-1.1.2:
-
 ==========================
 Django 1.1.2 release notes
 ==========================
@@ -15,7 +13,7 @@ improvements. Django 1.1.2 is a recommended upgrade for any
 development or deployment currently using or targeting Django 1.1.
 
 For full details on the new features, backwards incompatibilities, and
-deprecated features in the 1.1 branch, see the :ref:`releases-1.1`.
+deprecated features in the 1.1 branch, see the :doc:`/releases/1.1`.
 
 Backwards-incompatible changes in 1.1.2
 =======================================

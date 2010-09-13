@@ -297,7 +297,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection = Database.connect(**kwargs)
             self.connection.encoders[SafeUnicode] = self.connection.encoders[unicode]
             self.connection.encoders[SafeString] = self.connection.encoders[str]
-            connection_created.send(sender=self.__class__)
+            connection_created.send(sender=self.__class__, connection=self)
         cursor = CursorWrapper(self.connection.cursor())
         return cursor
 

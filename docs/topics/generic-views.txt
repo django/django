@@ -1,5 +1,3 @@
-.. _topics-generic-views:
-
 =============
 Generic views
 =============
@@ -192,7 +190,7 @@ might look like the following::
 
 That's really all there is to it. All the cool features of generic views come
 from changing the "info" dictionary passed to the generic view. The
-:ref:`generic views reference<ref-generic-views>` documents all the generic
+:doc:`generic views reference</ref/generic-views>` documents all the generic
 views and all their options in detail; the rest of this document will consider
 some of the common ways you might customize and extend generic views.
 
@@ -315,9 +313,9 @@ Viewing subsets of objects
 
 Now let's take a closer look at this ``queryset`` key we've been using all
 along. Most generic views take one of these ``queryset`` arguments -- it's how
-the view knows which set of objects to display (see :ref:`topics-db-queries` for
+the view knows which set of objects to display (see :doc:`/topics/db/queries` for
 more information about ``QuerySet`` objects, and see the
-:ref:`generic views reference<ref-generic-views>` for the complete details).
+:doc:`generic views reference</ref/generic-views>` for the complete details).
 
 To pick a simple example, we might want to order a list of books by
 publication date, with the most recent first:
@@ -365,7 +363,7 @@ We'll deal with this problem in the next section.
     If you get a 404 when requesting ``/books/acme/``, check to ensure you
     actually have a Publisher with the name 'ACME Publishing'.  Generic
     views have an ``allow_empty`` parameter for this case.  See the
-    :ref:`generic views reference<ref-generic-views>` for more details.
+    :doc:`generic views reference</ref/generic-views>` for more details.
 
 Complex filtering with wrapper functions
 ----------------------------------------

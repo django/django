@@ -380,11 +380,11 @@ class AdminSite(object):
 
         # Sort the apps alphabetically.
         app_list = app_dict.values()
-        app_list.sort(lambda x, y: cmp(x['name'], y['name']))
+        app_list.sort(key=lambda x: x['name'])
 
         # Sort the models alphabetically within each app.
         for app in app_list:
-            app['models'].sort(lambda x, y: cmp(x['name'], y['name']))
+            app['models'].sort(key=lambda x: x['name'])
 
         context = {
             'title': _('Site administration'),
@@ -445,7 +445,7 @@ class AdminSite(object):
         if not app_dict:
             raise http.Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
-        app_dict['models'].sort(lambda x, y: cmp(x['name'], y['name']))
+        app_dict['models'].sort(key=lambda x: x['name'])
         context = {
             'title': _('%s administration') % app_instance.verbose_name,
             'app_list': [app_dict],

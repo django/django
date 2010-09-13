@@ -41,6 +41,8 @@ from fields import FieldsTests
 from validators import TestFieldWithValidators
 from widgets import WidgetTests
 
+from input_formats import *
+
 __test__ = {
     'extra_tests': extra_tests,
     'form_tests': form_tests,

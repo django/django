@@ -250,15 +250,15 @@ class ManagementUtility(object):
         """
         try:
             app_name = get_commands()[subcommand]
-            if isinstance(app_name, BaseCommand):
-                # If the command is already loaded, use it directly.
-                klass = app_name
-            else:
-                klass = load_command_class(app_name, subcommand)
         except KeyError:
             sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % \
                 (subcommand, self.prog_name))
             sys.exit(1)
+        if isinstance(app_name, BaseCommand):
+            # If the command is already loaded, use it directly.
+            klass = app_name
+        else:
+            klass = load_command_class(app_name, subcommand)
         return klass
 
     def autocomplete(self):

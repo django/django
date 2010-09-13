@@ -7,13 +7,13 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-02-08 19:37+0100\n"
-"PO-Revision-Date: 2008-02-14 22:12+0100\n"
-"Last-Translator: Ibon\n"
+"PO-Revision-Date: 2010-07-08 12:55+0200\n"
+"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
 "Language-Team:  <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"X-Generator: emacs\n"
 
 #: conf/global_settings.py:39
 msgid "Arabic"
@@ -53,7 +53,7 @@ msgstr "Greziera"
 
 #: conf/global_settings.py:48
 msgid "English"
-msgstr "Ingeles"
+msgstr "Ingelesa"
 
 #: conf/global_settings.py:49
 msgid "Spanish"
@@ -69,7 +69,7 @@ msgstr "Persiera"
 
 #: conf/global_settings.py:52
 msgid "Finnish"
-msgstr "Finlandesa"
+msgstr "Finlandiera"
 
 #: conf/global_settings.py:53
 msgid "French"
@@ -81,11 +81,11 @@ msgstr "Gaelikoa"
 
 #: conf/global_settings.py:55
 msgid "Galician"
-msgstr "Galiziarra"
+msgstr "Galiziera"
 
 #: conf/global_settings.py:56
 msgid "Hungarian"
-msgstr "Hungarierra"
+msgstr "Hungariera"
 
 #: conf/global_settings.py:57
 msgid "Hebrew"
@@ -129,7 +129,7 @@ msgstr "Mazedoniera"
 
 #: conf/global_settings.py:67
 msgid "Dutch"
-msgstr "Holandesa"
+msgstr "Holandera"
 
 #: conf/global_settings.py:68
 msgid "Norwegian"
@@ -246,15 +246,15 @@ msgstr "Ezezaguna"
 
 #: contrib/admin/models.py:18
 msgid "action time"
-msgstr "Ekintz hordua"
+msgstr "Ekintza hordua"
 
 #: contrib/admin/models.py:21
 msgid "object id"
-msgstr "Objetuaren id"
+msgstr "Objetuaren id-a"
 
 #: contrib/admin/models.py:22
 msgid "object repr"
-msgstr "Objeturaren repr"
+msgstr "Objeturaren aurkezpena"
 
 #: contrib/admin/models.py:23
 msgid "action flag"
@@ -275,11 +275,11 @@ msgstr "log sarrerak"
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
-msgstr "Ez da lekua aurkitu"
+msgstr "Ez da orririk aurkitu"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Barkatu, eskatutako lekua ezin daiteke aurkitu"
+msgstr "Barkatu, eskatutako orria ezin daiteke aurkitu"
 
 #: contrib/admin/templates/admin/500.html:4
 #: contrib/admin/templates/admin/base.html:37
@@ -300,21 +300,21 @@ msgstr "Hasiera"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
-msgstr "Serbidore errorea"
+msgstr "Zerbitzari errorea"
 
 #: contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
-msgstr "Serbidor errorea (500)"
+msgstr "Zerbitzari errorea (500)"
 
 #: contrib/admin/templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
-msgstr "Serbidore Errorea <em>(500)</em>"
+msgstr "Zerbitzari Errorea <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
-msgstr "Arazo bat izan da. Web guneraren administradorea e-mail bidez ohartuko da eta laister konpondua egon beharko luke. Barkatu arazoak."
+msgstr "Arazo bat izan da. Web guneraren administradoreri abisu email bat bidali zaio eta laister konpondua egon beharko luke. Barkatu eragozpenak."
 
 #: contrib/admin/templates/admin/base.html:26
 msgid "Welcome,"
@@ -329,7 +329,7 @@ msgstr "Dokumentazioa"
 #: contrib/admin/templates/admin/auth/user/change_password.html:14
 #: contrib/admin/templates/admin/auth/user/change_password.html:45
 msgid "Change password"
-msgstr "Hitz ezkutua aldatu"
+msgstr "Pasahitza aldatu"
 
 #: contrib/admin/templates/admin/base.html:30
 #: contrib/comments/templates/comments/form.html:6
@@ -338,11 +338,11 @@ msgstr "Atera"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Django admin. gunea"
+msgstr "Django kudeaketa gunea"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Django administradorea"
+msgstr "Django kudeaketa"
 
 #: contrib/admin/templates/admin/change_form.html:14
 #: contrib/admin/templates/admin/index.html:28
@@ -356,18 +356,18 @@ msgstr "Aurrekoak"
 
 #: contrib/admin/templates/admin/change_form.html:21
 msgid "View on site"
-msgstr "Lekuaren bista"
+msgstr "Webgunean ikusi"
 
 #: contrib/admin/templates/admin/change_form.html:31
 #: contrib/admin/templates/admin/auth/user/change_password.html:23
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Arren zuzendu ondoko akatsa"
-msgstr[1] "Arren zuzendu ondoko akatsak"
+msgstr[0] "Arren zuzendu akatsa"
+msgstr[1] "Arren zuzendu akatsak"
 
 #: contrib/admin/templates/admin/change_form.html:49
 msgid "Ordering"
-msgstr "Ordenaketa"
+msgstr "Ordenazioa"
 
 #: contrib/admin/templates/admin/change_form.html:52
 msgid "Order:"
@@ -389,20 +389,14 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects: "
-"%(object_name)s '%(escaped_object)s' ezabatuz, erlazionatutako objetuak ere ezabatuko ditu, baina zure kontuak ez du baimenik, hurrengo objetuak ezabatzeko:"
+msgstr "%(object_name)s ezabatzean bere '%(escaped_object)s' ere ezabatzen dira, baina zure kontuak ez dauka baimenik objetu mota hauek ezabatzeko:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:20
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr ""
-"Ziur zaude %(object_name)s \"%(escaped_object)s\" ezabatu nai duzula ? "
-"Erlazionaturik dauden hurrengo elementuak ere ezabatuko dira:"
+msgstr "Ziur zaude %(object_name)s \"%(escaped_object)s\" ezabatu nahi dituzula? Erlazionaturik dauden hurrengo elementuak ere ezabatuko dira:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:25
 msgid "Yes, I'm sure"
@@ -418,9 +412,9 @@ msgid "Filter"
 msgstr "Filtroa"
 
 #: contrib/admin/templates/admin/index.html:17
-#, python-format
+#, python-format, fuzzy
 msgid "Models available in the %(name)s application."
-msgstr "%(name)s aplikazioan Modeloak."
+msgstr "%(name)s aplikazioan eskuragarri dauden modeloak."
 
 #: contrib/admin/templates/admin/index.html:18
 #, python-format
@@ -433,7 +427,7 @@ msgstr "Aldatu"
 
 #: contrib/admin/templates/admin/index.html:44
 msgid "You don't have permission to edit anything."
-msgstr "Ezer aldatzeko baimenik ez dezu."
+msgstr "Ezer aldatzeko baimenik ez duzu."
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "Recent Actions"
@@ -452,18 +446,18 @@ msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
-msgstr "Zerbait gaizki dago zure data-basearekin. Ziurtatu ezazu data-baseko taulak sortuak izan direla eta usuario egokiarengatik irakurriak izan daitekela"
+msgstr "Zerbait gaizki dago zure data-basearekin. Ziurtatu ezazu datu-baseko taulak sortu direla eta erabiltzaile egokiak duela irakurketa baimena"
 
 #: contrib/admin/templates/admin/login.html:17
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/comments/templates/comments/form.html:8
 msgid "Username:"
-msgstr "Usuario Izena:"
+msgstr "Erabiltzaile izena:"
 
 #: contrib/admin/templates/admin/login.html:20
 #: contrib/comments/templates/comments/form.html:8
 msgid "Password:"
-msgstr "Hitz ezkutua:"
+msgstr "Pasahitza:"
 
 #: contrib/admin/templates/admin/login.html:25
 #: contrib/admin/views/decorators.py:25
@@ -476,7 +470,7 @@ msgstr "Data/ordua"
 
 #: contrib/admin/templates/admin/object_history.html:18
 msgid "User"
-msgstr "Usuarioa"
+msgstr "Erabiltzailea"
 
 #: contrib/admin/templates/admin/object_history.html:19
 msgid "Action"
@@ -490,7 +484,7 @@ msgstr ""
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
-msgstr "Objetu honek ez du alketa zerrenda bat. Ziur asko, administrazio leku hau erabili gabe gehitua izan da."
+msgstr "Objetu honek ez dauka aldaketa zerrendarik. Ziur asko, kudeaketa gunetik kanpo gehituko zen."
 
 #: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
@@ -532,31 +526,31 @@ msgstr "Gorde"
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
-msgstr "Lehenengo usuario izena eta hitz ezkutua idatzi. Gero usuarioaren aukera gehiago aldatu ditzakezu"
+msgstr "Lehenengo erabiltzaile izena eta pasahitza idatzi. Gero erabiltzaile aukera gehiago aldatzeko aukera gehiago izango duzu"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:12
 msgid "Username"
-msgstr "Usuario izena"
+msgstr "Erabiltzaile izena"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:18
 #: contrib/admin/templates/admin/auth/user/change_password.html:33
 msgid "Password"
-msgstr "Hitz ezkutua"
+msgstr "Pasahitza"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:23
 #: contrib/admin/templates/admin/auth/user/change_password.html:38
 msgid "Password (again)"
-msgstr "Hitz ezkutua (berriro)"
+msgstr "Pasahitza (berriro)"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:24
 #: contrib/admin/templates/admin/auth/user/change_password.html:39
 msgid "Enter the same password as above, for verification."
-msgstr "Idatzi berriro hitz ezkutua."
+msgstr "Idatzi berriro pasahitza."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:27
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Hitz ezkutu berria idatzi <strong>%(username)s</strong> usuarioarentzat."
+msgstr "Pasahitz berria idatzi <strong>%(username)s</strong> erabiltzailearentzat."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -577,20 +571,18 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Markadoreak instalatzeko eraman linka zure erreminta panelera (toolbar).\n"
-"Orain markadorea lekuko edozein horritik aukeratu dezakezu. Hauetako \n"
-"markadore batzu, zure ordenadorea 'barnekoa' bezala erregistratua egotea\n"
-"behar dute. Hitzegin web lekuaren administradorearekin azalpen gehiagorako.</p>\n"
+"<p class=\"help\">Markadoreak instalatzeko eraman linka zure erreminta panelera (toolbar), edo eskuineko botoiarekin klik egin eta gehitu erreminta panelera. Kontuan izan, markadore hauetako batzuk, exekutatzen ari diren ordenagailua 'barneko' gisa markatua egotea behar dutela (hitzagin zure sistema kudeatzailearekin zure ordenagailua 'barnekoa' den edo ez argitzeko)\n"
+".</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
-msgstr "Web horri honentzat dokumentazioa"
+msgstr "Web orri honen dokumentazioa"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
-msgstr "Edozein lekutik, horriaren bista sortzaileara (view) salto egiten du."
+msgstr "Edozein orritik, orria sortzen duen bistaren dokumentaziora eramango zaitu."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
@@ -600,23 +592,23 @@ msgstr "Objetuaren ID erakutsi"
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
-msgstr "Objetu bakarra erakusten duten horrietan, eduki mota (content-type) eta horriaren ID bakarra erakutsi, ."
+msgstr "Objetu bakarra erakusten duten orrietan, eduki mota (content-type) eta orriaren ID bakarra erakutsi, ."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
-msgstr "Objetu hau aldatu ( leiho hau)"
+msgstr "Objetu hau aldatu ( leiho honetan)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Objetu bakarra erakusten horrietan, adminiztrazio gunera joan."
+msgstr "Objetu bakarra erakusten orrietan, adminiztrazio gunera joan."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
-msgstr "Objetu hay aldatu (leiho berria)"
+msgstr "Objetu hau aldatu (leiho berrian)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
-msgstr "Goian bezala baina administrzazio gune leio berrian irekitzen."
+msgstr "Goian bezala, baina kudeaketa guena leiho berri batean irekiko da."
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -624,85 +616,85 @@ msgstr "Mila esker gaur zure denbora web gunean erabiltzegatik."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr "Berrio sartu (log in)"
+msgstr "Sartu berriro"
 
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/registration/password_change_form.html:5
 #: contrib/admin/templates/registration/password_change_form.html:9
 msgid "Password change"
-msgstr "Hitz ezkutua aldatu"
+msgstr "Pasahitza aldatu"
 
 #: contrib/admin/templates/registration/password_change_done.html:5
 #: contrib/admin/templates/registration/password_change_done.html:9
 msgid "Password change successful"
-msgstr "Hitz ezkutuaren aldaketa arrakastatsua"
+msgstr "Pasahitza ondo aldatu da"
 
 #: contrib/admin/templates/registration/password_change_done.html:11
 msgid "Your password was changed."
-msgstr "Hitz ezkutua aldatua izan da"
+msgstr "Pasahitza aldatu da"
 
 #: contrib/admin/templates/registration/password_change_form.html:11
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
-msgstr "Idatzi hitz ezkutu zaharra segurtasun arrazoiengatik eta gero hitz ezkutu berria bi aldiz, akatsik egiten ez duzula ziurtatu dezagun."
+msgstr "Idatzi pasahitz zaharra segurtasun arrazoiengatik eta gero pasahitz berria bi aldiz, akatsik egiten ez duzula ziurtatu dezagun."
 
 #: contrib/admin/templates/registration/password_change_form.html:16
 msgid "Old password:"
-msgstr "Hitz ezkutu zaharra"
+msgstr "Pasahitz zaharra"
 
 #: contrib/admin/templates/registration/password_change_form.html:18
 msgid "New password:"
-msgstr "Hitz ezkutu berria:"
+msgstr "Pasahitz berria:"
 
 #: contrib/admin/templates/registration/password_change_form.html:20
 msgid "Confirm password:"
-msgstr "Hitz ezkutua baieztatu:"
+msgstr "Pasahitza baieztatu:"
 
 #: contrib/admin/templates/registration/password_change_form.html:22
 msgid "Change my password"
-msgstr "Nire hitz ezkutua aldatu"
+msgstr "Nire pasahitza aldatu"
 
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
 #: contrib/admin/templates/registration/password_reset_form.html:10
 msgid "Password reset"
-msgstr "Hitz ezkutua ezabatu"
+msgstr "Pasahitza berrezarri"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Hitz ezkutuaren ezabaketa zuzena"
+msgstr "Pasahitza ondo berrezarri da"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed a new password to the e-mail address you submitted. You "
 "should be receiving it shortly."
-msgstr "Hitz ezkutu berria e-mail bidez bidali dizugu. Epe laburrean jasokor duzu."
+msgstr "Pasahitz berria e-mail bidez bidali dizugu. Epe laburrean jasoko duzu."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Mezu elektroniko hau jaso dezu, hitz ezkutuaren ezabaketa eskatu duzulako"
+msgstr "Mezu elektroniko hau jaso duzu pasahitzaren berrezarketa eskatu duzulako"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr "%(site_name)s usuario kontuarentzat"
+msgstr "%(site_name)s erabiltzaile kontuarentzat"
 
 #: contrib/admin/templates/registration/password_reset_email.html:5
 #, python-format
 msgid "Your new password is: %(new_password)s"
-msgstr "Zure hitz ezkutu berria %(new_password)s da"
+msgstr "Zure pasahitz berria %(new_password)s da"
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
-msgstr "Hitz ezkutua aldatu nai baduzu, zoaz web horri honetara joan:"
+msgstr "Pasahitza aldatu dezakezu orri honetan:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
-msgstr "Zure usuario izena (ahaztu badezu):"
+msgstr "Zure erabiltzaile izena (ahaztu badezu):"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
@@ -711,13 +703,13 @@ msgstr "Mila esker gure web gunea erabiltzeagatik!"
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "%(site_name)s web gunearen taldea"
+msgstr "%(site_name)s web guneko taldea"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
-msgstr "Hitz ezkutua ahaztu dezu ? Hidatzi zure e-mail helbidea, eta hitz ezkutu berri bat bidaliko dizugu."
+msgstr "Pasahitza ahaztu duzu? Idatzi zure e-mail helbidea, eta pasahitz berri bat bidaliko dizugu."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -725,7 +717,7 @@ msgstr "E-mail helbidea:"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
-msgstr "Hitz ezkutua ezabatu"
+msgstr "Pasahitza berrezarri"
 
 #: contrib/admin/templates/widget/date_time.html:3
 msgid "Date:"
@@ -750,7 +742,7 @@ msgstr "Data guztiak"
 #: contrib/admin/views/auth.py:20 contrib/admin/views/main.py:267
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s arrakastaz gehitua izan da."
+msgstr "%(name)s \"%(obj)s\" ondo gehitu da."
 
 #: contrib/admin/views/auth.py:25 contrib/admin/views/main.py:271
 #: contrib/admin/views/main.py:356
@@ -759,48 +751,48 @@ msgstr "Berriro alkatu zenezake beherago."
 
 #: contrib/admin/views/auth.py:31
 msgid "Add user"
-msgstr "Usuario gehitu"
+msgstr "Erabiltzailea gehitu"
 
 #: contrib/admin/views/auth.py:58
 msgid "Password changed successfully."
-msgstr "Hitz ezkutua aldaketa zuzena."
+msgstr "Ondo aldatu da pasahitza."
 
 #: contrib/admin/views/auth.py:65
 #, python-format
 msgid "Change password: %s"
-msgstr "Hitz ezkutua aldatu: %s"
+msgstr "Pasahitza aldatu: %s"
 
 #: contrib/admin/views/decorators.py:11 contrib/auth/forms.py:60
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
-msgstr "Mesedez idatzi usuario izena eta hitz ezkutu egokiak. Maiskula eta minuskula ondo bereiztu."
+msgstr "Mesedez idatzi erabiltzaile izen eta pasahitz egokiak. Maiskula eta minuskulak ondo bereiztu."
 
 #: contrib/admin/views/decorators.py:63
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
-msgstr "Mesedez berriro sar saitez, sesioa zahartu bai da. Bidalitakoa gorde egin da."
+msgstr "Sesioa iraungitu da. Mesedez sar zaitez berriro. Ez arduratu, bidalitakoa gorde da."
 
 #: contrib/admin/views/decorators.py:70
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
-msgstr "Zure nabegatzaileak ez ditu cookie-ak onartzen. Aktiba ezazu hauen erabilera eta ekarri ezazu horria hau berriro."
+msgstr "Zure nabigatzaileak ez ditu cookie-ak onartzen. Aktiba ezazu hauen erabilera eta eskatu ezazu orri hau berriro."
 
 #: contrib/admin/views/decorators.py:84
 msgid "Usernames cannot contain the '@' character."
-msgstr "Usuario izenek ezin dezkete @ karakterea eduki."
+msgstr "Erabiltzaile izenek ezin dezkete '@' karakterea eduki."
 
 #: contrib/admin/views/decorators.py:86
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Zure e-mail helbidea ez da zure usuario izena. Ahalegindo '%s' rekin."
+msgstr "Zure e-mail helbidea ez da zure erabiltzaile izena. Saiatu '%s' rekin."
 
 #: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
 #: contrib/admin/views/doc.py:52
 msgid "tag:"
-msgstr "tag:"
+msgstr "etiketa:"
 
 #: contrib/admin/views/doc.py:79 contrib/admin/views/doc.py:81
 #: contrib/admin/views/doc.py:83
@@ -825,7 +817,7 @@ msgstr "%(name)r modeloa ez da %(label)r aplikazioan aurkitu"
 #: contrib/admin/views/doc.py:185
 #, python-format
 msgid "the related `%(label)s.%(type)s` object"
-msgstr "erlazionaturik `%(label)s.%(type)s` objetua"
+msgstr "erlazionatutako `%(label)s.%(type)s` objetua"
 
 #: contrib/admin/views/doc.py:185 contrib/admin/views/doc.py:207
 #: contrib/admin/views/doc.py:221 contrib/admin/views/doc.py:226
@@ -835,7 +827,7 @@ msgstr "modeloa:"
 #: contrib/admin/views/doc.py:216
 #, python-format
 msgid "related `%(label)s.%(name)s` objects"
-msgstr "erlazionaturik `%(label)s.%(name)s` objetua"
+msgstr "erlazionatutako `%(label)s.%(name)s` objetua"
 
 #: contrib/admin/views/doc.py:221
 #, python-format
@@ -850,7 +842,7 @@ msgstr "%s zenbakia"
 #: contrib/admin/views/doc.py:231
 #, python-format
 msgid "Fields on %s objects"
-msgstr "%s objetuan zutabeak"
+msgstr "%s objetuaren eremuak"
 
 #: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:304
 #: contrib/admin/views/doc.py:306 contrib/admin/views/doc.py:312
@@ -869,7 +861,7 @@ msgstr "Katea (%(max_length)s gehienez)"
 
 #: contrib/admin/views/doc.py:296
 msgid "Comma-separated integers"
-msgstr "Komaz bereiztutako zenbako osoak"
+msgstr "Komaz bereiztutako zenbaki osoak"
 
 #: contrib/admin/views/doc.py:297
 msgid "Date (without time)"
@@ -881,7 +873,7 @@ msgstr "Data (orduarekin)"
 
 #: contrib/admin/views/doc.py:299
 msgid "Decimal number"
-msgstr "Zenbaki dezimala"
+msgstr "Zenbaki hamartarra"
 
 #: contrib/admin/views/doc.py:300
 msgid "E-mail address"
@@ -890,7 +882,7 @@ msgstr "E-mail helbidea"
 #: contrib/admin/views/doc.py:301 contrib/admin/views/doc.py:302
 #: contrib/admin/views/doc.py:305
 msgid "File path"
-msgstr "Fitxegi bidea (path)"
+msgstr "Fitxegi bidea"
 
 #: contrib/admin/views/doc.py:303
 msgid "Floating point number"
@@ -906,7 +898,7 @@ msgstr "Boolearra (egia, gezurra edo hutsa[None])"
 
 #: contrib/admin/views/doc.py:310
 msgid "Relation to parent model"
-msgstr "Gurazo modeloarekin erlazioa"
+msgstr "Guraso modeloarekin erlazioa"
 
 #: contrib/admin/views/doc.py:311
 msgid "Phone number"
@@ -926,11 +918,11 @@ msgstr "URL"
 
 #: contrib/admin/views/doc.py:319
 msgid "U.S. state (two uppercase letters)"
-msgstr "U.S statua (bi letra maiuskula)"
+msgstr "AEB estatua (bi letra maiuskula)"
 
 #: contrib/admin/views/doc.py:320
 msgid "XML text"
-msgstr "XML textua"
+msgstr "XML testua"
 
 #: contrib/admin/views/doc.py:346
 #, python-format
@@ -939,7 +931,7 @@ msgstr "%s ez dirudi  url heredu objetua"
 
 #: contrib/admin/views/main.py:233
 msgid "Site administration"
-msgstr "Web gunearen administrazioa"
+msgstr "Web gunearen kudeaketa"
 
 #: contrib/admin/views/main.py:280 contrib/admin/views/main.py:365
 #, python-format
@@ -974,17 +966,17 @@ msgstr "%s ezabatuta."
 
 #: contrib/admin/views/main.py:351
 msgid "No fields changed."
-msgstr "Ez da zutaberik aldatu."
+msgstr "Ez da eremurik aldatu."
 
 #: contrib/admin/views/main.py:354
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" aldatuta izan da."
+msgstr "%(name)s \"%(obj)s\" ondo aldatu da."
 
 #: contrib/admin/views/main.py:362
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" arrakastarekin gehituta izan da. Jarraian aldatu dezakezu berriro."
+msgstr "%(name)s \"%(obj)s\" ondo gehitu da. Jarraian aldatu dezakezu berriro."
 
 #: contrib/admin/views/main.py:400
 #, python-format
@@ -1004,7 +996,7 @@ msgstr "%(fieldname)s bat edo gehiago %(name)s n"
 #: contrib/admin/views/main.py:524
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\"  arrakastaz ezabatua izan da."
+msgstr "%(name)s \"%(obj)s\" ondo ezabatu da."
 
 #: contrib/admin/views/main.py:527
 msgid "Are you sure?"
@@ -1023,7 +1015,7 @@ msgstr "%s aukeratu"
 #: contrib/admin/views/main.py:583
 #, python-format
 msgid "Select %s to change"
-msgstr "aldaketarako %s aukeratu"
+msgstr "Aldaketarako %s aukeratu"
 
 #: contrib/admin/views/main.py:784
 msgid "Database error"
@@ -1031,40 +1023,41 @@ msgstr "Data base errorea"
 
 #: contrib/auth/forms.py:17 contrib/auth/forms.py:138
 msgid "The two password fields didn't match."
-msgstr "Hitz ezkutuak ez dira berdinak."
+msgstr "Pasahitzak ez datoz bat."
 
 #: contrib/auth/forms.py:25
 msgid "A user with that username already exists."
-msgstr "Usuario izen hori erabiltzen ari da."
+msgstr "Erabiltzaile izen hori ez dago eskuragarri."
 
 #: contrib/auth/forms.py:53
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
-msgstr "Zure nabegatzaileak ez ditu cookiak onartzen. Cookia-k beharrezkoak dira sistemn sartzeko."
+msgstr "Zure nabigatzaileak ez ditu cookiak onartzen. Cookia-k beharrezkoak dira sisteman sartzeko."
 
 #: contrib/auth/forms.py:62
 msgid "This account is inactive."
-msgstr "Kontu hau az dago aktibatuta."
+msgstr "Kontu hau az dago aktibo."
 
 #: contrib/auth/forms.py:84
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
-msgstr "E-mail helbide horrek ez du usariorik. Ziur al zaude erregistraturik zaudela?"
+msgstr "E-mail helbide horrek ez du lotutako erabiltzailerik. Ziur al zaude erregistratu duzula?"
 
 #: contrib/auth/forms.py:107
 #, python-format
 msgid "Password reset on %s"
-msgstr "Hitz ezkutu ezabatua %s n"
+msgstr "Pasahitza berrezarri %s n"
 
 #: contrib/auth/forms.py:117
 msgid "The two 'new password' fields didn't match."
-msgstr "Bi hitz ezkutu berriak ez dira berdinak."
+msgstr "Bi pasahitz berriak ez datoz bat."
 
+# c
 #: contrib/auth/forms.py:124
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Zure hitz ezkutu zaharra ez zuzena. Idatzi ezazu berriro."
+msgstr "Zure pasahitz zaharra ez da zuzena. Idatzi ezazu berriro."
 
 #: contrib/auth/models.py:73 contrib/auth/models.py:93
 msgid "name"
@@ -1072,7 +1065,7 @@ msgstr "izena"
 
 #: contrib/auth/models.py:75
 msgid "codename"
-msgstr "code izena (codename)"
+msgstr "kode izena"
 
 #: contrib/auth/models.py:78
 msgid "permission"
@@ -1092,7 +1085,7 @@ msgstr "taldeak"
 
 #: contrib/auth/models.py:131
 msgid "username"
-msgstr "usuario izena"
+msgstr "erabiltzaile izena"
 
 #: contrib/auth/models.py:131
 msgid ""
@@ -1116,21 +1109,21 @@ msgstr "e-mail helbidea"
 
 #: contrib/auth/models.py:135
 msgid "password"
-msgstr "hitz ezkutua"
+msgstr "pasahitza"
 
 #: contrib/auth/models.py:135
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
-msgstr "Erabili '[algo]$[salt]$[hexdigest]' edo erabili <a href=\"password/\">hitz ezkuta aldatu </a>."
+msgstr "Erabili '[algo]$[salt]$[hexdigest]' edo erabili <a href=\"password/\">pasahitza aldatzeko formularioa </a>."
 
 #: contrib/auth/models.py:136
 msgid "staff status"
-msgstr "Arduraduen egoera"
+msgstr "Arduradun egoera"
 
 #: contrib/auth/models.py:136
 msgid "Designates whether the user can log into this admin site."
-msgstr "Usuarioak administrazio gune honetan sartu dezkeen ala ez izendatzen du."
+msgstr "Erabiltzaileak kudeaketa gune honetan sartzeko baimena duen edo ez adierazten du."
 
 #: contrib/auth/models.py:137
 msgid "active"
@@ -1140,17 +1133,17 @@ msgstr "Aktiboa"
 msgid ""
 "Designates whether this user can log into the Django admin. Unselect this "
 "instead of deleting accounts."
-msgstr "Usuarioak Django adminiztrazio gunean sartu daitekeen ala ez. Desaktiba ezazu aukera hau,kontua ezabatu ordez."
+msgstr "Erabiltzailea Django adminiztrazio gunean sartu daitekeen edo ez adierazten du. Desaktiba ezazu aukera hau kontua ezabatu ordez."
 
 #: contrib/auth/models.py:138
 msgid "superuser status"
-msgstr "Usuario nagusia (superuser)"
+msgstr "Erabiltzaile nagusia"
 
 #: contrib/auth/models.py:138
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
-msgstr "Usuario honek baimen guztiak ditu, banan banan denak zehaztu gabe."
+msgstr "Erabiltzaileari baimen guztiak esleitzeko banan-banan aukeratu behar izan gabe."
 
 #: contrib/auth/models.py:139
 msgid "last login"
@@ -1164,19 +1157,19 @@ msgstr "erregistro eguna"
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
-msgstr "Usuario honek, eskuz emandako baimen guztietaz aparte, berari egokitutako talde bakoitzari emandako baimenak ere izango ditu."
+msgstr "Erabiltzaile honek, eskuz emandako baimen guztiez gain, berari egokitutako talde bakoitzari emandako baimenak ere izango ditu."
 
 #: contrib/auth/models.py:143
 msgid "user permissions"
-msgstr "Usuarioaren baimenak"
+msgstr "Erabiltzailearen baimenak"
 
 #: contrib/auth/models.py:147
 msgid "user"
-msgstr "Usuarioa"
+msgstr "Erabiltzailea"
 
 #: contrib/auth/models.py:148
 msgid "users"
-msgstr "Usuarioak"
+msgstr "Erabiltzaileak"
 
 #: contrib/auth/models.py:154
 msgid "Personal info"
@@ -1267,7 +1260,7 @@ msgstr "ezabatua"
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
-msgstr "Markatu kutxa hau komentario ezegokia bada. A \"Komentario hau ezabatua izan da\" mezua erakutsiko da bere ordez."
+msgstr "Markatu kutxa hau komentario ezegokia bada. \"Komentario hau ezabatua izan da\" mezua erakutsiko da bere ordez."
 
 #: contrib/comments/models.py:96
 msgid "comments"
@@ -1298,7 +1291,7 @@ msgstr "pertsonaren izena"
 
 #: contrib/comments/models.py:181
 msgid "ip address"
-msgstr "ip zenbakia"
+msgstr "ip helbidea"
 
 #: contrib/comments/models.py:183
 msgid "approved by staff"
@@ -1340,7 +1333,7 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"%(user)s -k komentario hay markatu du:\n"
+"%(user)s -k komentario hau markatu du:\n"
 "\n"
 "%(text)s"
 
@@ -1350,11 +1343,11 @@ msgstr "markatutako eguna"
 
 #: contrib/comments/models.py:289
 msgid "user flag"
-msgstr "usuarioaren markaketa"
+msgstr "erabiltzailearen markaketa"
 
 #: contrib/comments/models.py:290
 msgid "user flags"
-msgstr "usuariaren markaketak"
+msgstr "erabiltzailearen markaketak"
 
 #: contrib/comments/models.py:294
 #, python-format
@@ -1380,7 +1373,7 @@ msgstr "%r moderatzaileak ezabatua"
 
 #: contrib/comments/templates/comments/form.html:8
 msgid "Forgotten your password?"
-msgstr "Hitz ezkutua ahaztu duzu?"
+msgstr "Pasahitza ahaztu duzu?"
 
 #: contrib/comments/templates/comments/form.html:12
 msgid "Ratings"
@@ -1430,7 +1423,7 @@ msgid_plural ""
 "comments:\n"
 "\n"
 "%(text)s"
-msgstr[0] "Komentario hau, %(count)s komentario baino gutxiago egindako usuario batek bidalia da:<br><br>%(text)s"
+msgstr[0] "Komentario hau, %(count)s komentario baino gutxiago egindako erabiltzaile batek bidali du:<br><br>%(text)s"
 msgstr[1] ""
 
 #: contrib/comments/views/comments.py:117
@@ -1440,19 +1433,19 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"Komentario hau usuario 'arin' batek bidalia da:\n"
+"Komentario hau behin-behineko erabiltzaile batek bidali du:\n"
 "\n"
 "%(text)s"
 
 #: contrib/comments/views/comments.py:190
 #: contrib/comments/views/comments.py:283
 msgid "Only POSTs are allowed"
-msgstr "POST bakarrik onartzen dira"
+msgstr "POSTak bakarrik onartzen dira"
 
 #: contrib/comments/views/comments.py:194
 #: contrib/comments/views/comments.py:287
 msgid "One or more of the required fields wasn't submitted"
-msgstr "Beharrezko fitxategi bat edo gehiago ez dira bidali"
+msgstr "Beharrezko eremu bat edo gehiago ez dira bidali"
 
 #: contrib/comments/views/comments.py:198
 #: contrib/comments/views/comments.py:289
@@ -1473,7 +1466,7 @@ msgstr "Komentario formularioa ez zuen ez 'berikusi'  edo 'bidali'"
 
 #: contrib/comments/views/karma.py:21
 msgid "Anonymous users cannot vote"
-msgstr "Usuario ezezagunak ezin dezakete botoa eman"
+msgstr "Erabiltzaile anonimoek ezin dezakete botorik eman"
 
 #: contrib/comments/views/karma.py:25
 msgid "Invalid comment ID"
@@ -1489,11 +1482,11 @@ msgstr "python model class izena"
 
 #: contrib/contenttypes/models.py:40
 msgid "content type"
-msgstr "edukiera moeta"
+msgstr "eduki mota"
 
 #: contrib/contenttypes/models.py:41
 msgid "content types"
-msgstr "edukiera moetak"
+msgstr "eduki motak"
 
 #: contrib/flatpages/models.py:8
 msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
@@ -1505,7 +1498,7 @@ msgstr "izenburua"
 
 #: contrib/flatpages/models.py:10
 msgid "content"
-msgstr "edukiera"
+msgstr "edukia"
 
 #: contrib/flatpages/models.py:11
 msgid "enable comments"
@@ -1519,7 +1512,7 @@ msgstr "plantila izena"
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
-msgstr "Adibidez: 'flatpages/contact_page.html'. Hau ematen ez bada, sistema 'flatpages/default.html' erabiliko du."
+msgstr "Adibidez: 'flatpages/contact_page.html'. Hau ematen ez bada, sistemak 'flatpages/default.html' erabiliko du."
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
@@ -1527,7 +1520,7 @@ msgstr "erregistratzea beharrezkoa da"
 
 #: contrib/flatpages/models.py:14
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Hau markatuta badago, erregistratutako usuarioak bakarrik ikusiko dute horria."
+msgstr "Hau markatuta badago, erregistratutako erabiltzaileek bakarrik ikusiko dute orria."
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
@@ -1630,11 +1623,11 @@ msgstr "NNNN edo ANNNNAAA formatoan idatzi posta kode bat."
 #: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
 #: contrib/localflavor/pe/forms.py:51
 msgid "This field requires only numbers."
-msgstr "Data honek zenbakiak bakarrik behar ditu."
+msgstr "Eremu honek zenbakiak bakarrik behar ditu."
 
 #: contrib/localflavor/ar/forms.py:51
 msgid "This field requires 7 or 8 digits."
-msgstr "Data honek 7 edo 8 digito behar ditu."
+msgstr "Eremu honek 7 edo 8 digito behar ditu."
 
 #: contrib/localflavor/ar/forms.py:80
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
@@ -1646,7 +1639,7 @@ msgstr "CUIT okerra."
 
 #: contrib/localflavor/au/forms.py:16
 msgid "Enter a 4 digit post code."
-msgstr "4 zenbaki posta kodean idatzi."
+msgstr "4 zenbakiko posta kodea idatzi."
 
 #: contrib/localflavor/br/forms.py:21
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -1668,7 +1661,7 @@ msgstr "CPF zenbaki okerra."
 
 #: contrib/localflavor/br/forms.py:95
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Data honek gehienez 11 digito edo 14 karaktere behar ditu."
+msgstr "Eremu honek gehienez 11 digito edo 14 karaktere behar ditu."
 
 #: contrib/localflavor/br/forms.py:134
 msgid "Invalid CNPJ number."
@@ -1676,7 +1669,7 @@ msgstr "CNPJ zenbaki okerra."
 
 #: contrib/localflavor/br/forms.py:136
 msgid "This field requires at least 14 digits"
-msgstr "Data honek 14 digito behar ditu gutxienez"
+msgstr "Eremu honek 14 digito behar ditu gutxienez"
 
 #: contrib/localflavor/ca/forms.py:17
 msgid "Enter a postal code in the format XXX XXX."
@@ -1684,7 +1677,7 @@ msgstr "Posta kodea idatzi XXX XXX formatoan."
 
 #: contrib/localflavor/ca/forms.py:88
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr ""
+msgstr "Sartu Kanadako segurtasun sozialeko zenbaki zuzen bat XXX-XXX-XXX formatoan."
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
@@ -1802,15 +1795,15 @@ msgstr ""
 
 #: contrib/localflavor/cl/forms.py:29
 msgid "Enter a valid Chilean RUT."
-msgstr ""
+msgstr "Txileko RUT zuzen bat sartu"
 
 #: contrib/localflavor/cl/forms.py:30
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr ""
+msgstr "Txileko RUT zuzen bat sartu. Formatoa: XX.XXX.XXX.X."
 
 #: contrib/localflavor/cl/forms.py:31
 msgid "The Chilean RUT is not valid."
-msgstr ""
+msgstr "Txileko RUTa ez da baliozkoa"
 
 #: contrib/localflavor/de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -1879,7 +1872,7 @@ msgstr ""
 #: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
 #: contrib/localflavor/fr/forms.py:15
 msgid "Enter a zip code in the format XXXXX."
-msgstr ""
+msgstr "Sartu zip kodea XXXXX formatoan"
 
 #: contrib/localflavor/de/forms.py:41
 msgid ""
@@ -2152,7 +2145,7 @@ msgstr "Nafarroako komunitate forala"
 
 #: contrib/localflavor/es/es_regions.py:21
 msgid "Valencian Community"
-msgstr "Valeciako komunitatea"
+msgstr "Valenciako komunitatea"
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
@@ -2182,7 +2175,7 @@ msgstr "NIE kontrol kode okerra."
 
 #: contrib/localflavor/es/forms.py:70
 msgid "Invalid checksum for CIF."
-msgstr "CIF kontrl kode okerra."
+msgstr "CIF kontrol kode okerra."
 
 #: contrib/localflavor/es/forms.py:142
 msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
@@ -3400,7 +3393,7 @@ msgstr "nondik berbidalia"
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
-msgstr "Hau 'bide' absolutua izan beharko luke, dominio izena kenduta. 'Adibidez: events/search/'."
+msgstr "Honek 'bide' absolutua izan beharko luke, dominio izena kenduta. 'Adibidez: events/search/'."
 
 #: contrib/redirects/models.py:9
 msgid "redirect to"
@@ -3484,7 +3477,7 @@ msgstr "Komaz bereiztutako digitoak bakarrik idatzi."
 
 #: core/validators.py:107
 msgid "Enter valid e-mail addresses separated by commas."
-msgstr "E-mail norabide zuzenak idatzi, komaz bereizturik."
+msgstr "E-mail helbide zuzenak idatzi, komaz bereizturik."
 
 #: core/validators.py:111
 msgid "Please enter a valid IP address."
@@ -3500,7 +3493,7 @@ msgstr "Zenbaki karaktereak bakarrik onartzen dira hemen."
 
 #: core/validators.py:123
 msgid "This value can't be comprised solely of digits."
-msgstr "Balore honek ezin daiteke digitoz bakarrik osatua egon."
+msgstr "Balore hau ezin daiteke digitoz bakarrik osatua egon."
 
 #: core/validators.py:128 newforms/fields.py:151
 msgid "Enter a whole number."
@@ -3512,7 +3505,7 @@ msgstr "Karaktere alfabetikoak bakarrik onartzen dira hemen."
 
 #: core/validators.py:147
 msgid "Year must be 1900 or later."
-msgstr "Urtea 1900 edo haundiagoa izan behar du."
+msgstr "Urtea 1900 edo handiagoa izan behar du."
 
 #: core/validators.py:151
 #, python-format
@@ -3525,11 +3518,11 @@ msgstr "Data zuzena idatzi, YYY-MM-DD formatoan."
 
 #: core/validators.py:161
 msgid "Enter a valid time in HH:MM format."
-msgstr "Hordu zuzena idatzi HH:MM formatoan."
+msgstr "Ordu zuzena idatzi HH:MM formatoan."
 
 #: core/validators.py:165 db/models/fields/__init__.py:583
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Idatzi data/hordua zuzena YYYY-MM-DD HH:MM formatoan."
+msgstr "Idatzi data/ordua zuzena YYYY-MM-DD HH:MM formatoan."
 
 #: core/validators.py:170 newforms/fields.py:402
 msgid "Enter a valid e-mail address."
@@ -3538,13 +3531,13 @@ msgstr "e-mail helbide zuzena idatzi."
 #: core/validators.py:182 core/validators.py:474 newforms/fields.py:432
 #: oldforms/__init__.py:687
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Ez da fitxategirik bidali. Baiztatu ezazu formularioren kode formatoa."
+msgstr "Ez da fitxategirik bidali. Baiztatu ezazu formularioren kodeketa."
 
 #: core/validators.py:193 newforms/fields.py:458
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
-msgstr "Bidali irudi zuzena. Zuk bidalitako fitxategia ez da irudi motako edo akatsa du."
+msgstr "Bidali irudi zuzena. Zuk bidalitako fitxategia ez da irudi motako edo akatsa dauka."
 
 #: core/validators.py:200
 #, python-format
@@ -3554,7 +3547,7 @@ msgstr "%s URLa ez da irudi zuzena."
 #: core/validators.py:204
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "Telefono zenbakiak XXX-XXX-XXXX formatoa eduki behar dute. \"%s\" okerra."
+msgstr "Telefono zenbakiek XXX-XXX-XXXX formatoa eduki behar dute. \"%s\" okerra."
 
 #: core/validators.py:212
 #, python-format
@@ -3587,11 +3580,11 @@ msgstr "URL okerra: %s"
 #: core/validators.py:259 core/validators.py:261
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr "%s URLa ez dabil ondo."
+msgstr "%s URLa ez dago ondo."
 
 #: core/validators.py:267
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "U.S estatu laburpen zuzen idatzi."
+msgstr "AEB estatu laburpen zuzen bat idatzi."
 
 #: core/validators.py:281
 #, python-format
@@ -3603,73 +3596,73 @@ msgstr[1] ""
 #: core/validators.py:288
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr "Data hau '%s' data berdindu behar du."
+msgstr "Eremu hau eta '%s' eremua berdinak izan behar dira."
 
 #: core/validators.py:307
 msgid "Please enter something for at least one field."
-msgstr "Idatzi gutxienez data bat."
+msgstr "Bete eremuren bat."
 
 #: core/validators.py:316 core/validators.py:327
 msgid "Please enter both fields or leave them both empty."
-msgstr "Hidatzi bi datuak edo utzi biak hutsik."
+msgstr "Bete bi eremuak edo ez bete bat bera ere."
 
 #: core/validators.py:335
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Data hau idatzi behar da, %(field)s %(value)s balorea badu."
+msgstr "%(field)s eremuak %(value)s balioa baldin badauka, eremu hau bete behar da."
 
 #: core/validators.py:348
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Data hau idatzi behar da %(field)s %(value)s balorea ez bada."
+msgstr "%(field)s eremuak %(value)s balioa ez baldin badauka, eremu hau bete behar da."
 
 #: core/validators.py:367
 msgid "Duplicate values are not allowed."
-msgstr "Errepikatutako datak ez dira onartzen."
+msgstr "Errepikatutako balioak ez dira onartzen."
 
 #: core/validators.py:382
 #, python-format
 msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Balore hau %(lower)s eta %(upper)s artean egon behar du."
+msgstr "Balio hau %(lower)s eta %(upper)s artean egon behar da."
 
 #: core/validators.py:384
 #, python-format
 msgid "This value must be at least %s."
-msgstr "Gutxienez  %s izan behar du."
+msgstr "Gutxienez  %s izan behar da."
 
 #: core/validators.py:386
 #, python-format
 msgid "This value must be no more than %s."
-msgstr "Balore hau %s baino txikiagoa izan behar du."
+msgstr "Balio hau %s baino txikiagoa izan behar da."
 
 #: core/validators.py:427
 #, python-format
 msgid "This value must be a power of %s."
-msgstr "Balore hau %s-ren multiploa izan behar du."
+msgstr "Balio hau %s-ren multiploa izan behar da."
 
 #: core/validators.py:437
 msgid "Please enter a valid decimal number."
-msgstr "Idatzi zenbaki dezimal zuzena mesedez."
+msgstr "Idatzi zenbaki hamartar zuzena mesedez."
 
 #: core/validators.py:444
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Idatzi zenbaki dezimal zuzena gehienez %s digitorekin."
+msgstr[0] "Idatzi zenbaki hamartar zuzena gehienez %s digitorekin."
 msgstr[1] ""
 
 #: core/validators.py:447
 #, python-format
 msgid "Please enter a valid decimal number with a whole part of at most %s digit."
 msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "Idatzi zenbaki digital zuzena, %s digitorekin gutxienez alde osoan."
+msgstr[0] "Idatzi zenbaki hamartar zuzena, %s digitorekin gutxienez alde osoan."
 msgstr[1] ""
 
 #: core/validators.py:450
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Idatzi zenbaki dezimal zuzena, %s digitorekin dezimalean."
+msgstr[0] "Idatzi zenbaki hamartar zuzena, %s digitorekin dezimalean."
 msgstr[1] ""
 
 #: core/validators.py:458
@@ -3679,20 +3672,20 @@ msgstr "Idatzi zenbaki erreal zuzena."
 #: core/validators.py:467
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Ziurta zaitez bidalitako fitxategia gutxienex %s byte tamaina duela."
+msgstr "Ziurta zaitez bidalitako fitxategia gutxienez %s byte tamaina duela."
 
 #: core/validators.py:468
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Ziurta zaitez bidalitako fitxategia gehienez %s byte dituela."
+msgstr "Ziurta zaitez bidalitako fitxategiak gehienez %s byte dituela."
 
 #: core/validators.py:485
 msgid "The format for this field is wrong."
-msgstr "Data honen formatoa okerra da."
+msgstr "Eremu honen formatoa okerra da."
 
 #: core/validators.py:500
 msgid "This field is invalid."
-msgstr "Data okerra."
+msgstr "Eremu okerra."
 
 #: core/validators.py:536
 #, python-format
@@ -3709,47 +3702,47 @@ msgstr "%(url)s URLak content-type okerra itzuli du: '%(contenttype)s'."
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
-msgstr "Mesedez itxi itxigabeko %(tag)s elementoa %(line)s lerroan. Lerroa hasiera: \"%(start)s\"."
+msgstr "Mesedez itxi itxigabeko %(tag)s elementoa %(line)s lerroan. Lerro hasiera: \"%(start)s\"."
 
 #: core/validators.py:576
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
 "starts with \"%(start)s\".)"
-msgstr "Texturen bat  %(line)s lerroan ez da onartzen contextu horretan. Lerro hasiera: \"%(start)s\"."
+msgstr "%(line)s lerroan hasitako testuren bat  ez da onartzen testuinguru horretan. Lerro hasiera: \"%(start)s\"."
 
 #: core/validators.py:581
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
 "(start)s\".)"
-msgstr "\"%(attr)s\" %(line)s lerroan atribitu okerra da. Lerro hasiera: \"%(start)s\"."
+msgstr "%(line)s lerroko \"%(attr)s\" atributua okerra da. Lerro hasiera: \"%(start)s\"."
 
 #: core/validators.py:586
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
 "(start)s\".)"
-msgstr "\"%(tag)s\" %(line)s lerroan elementu okerra da. Lerro hasiera: \"%(start)s\"."
+msgstr "%(line)s lerroko \"<%(tag)s>\"  atributua okerra da. Lerro hasiera: \"%(start)s\"."
 
 #: core/validators.py:590
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
-msgstr "%(line)s lerroan elementu atributu bat edo gehiago faltan ditu. Lerro hasiera:\"%(start)s\"."
+msgstr "%(line)s lerroan elementuren bat falta de edo atributuren bat falta du. Lerro hasiera:\"%(start)s\"."
 
 #: core/validators.py:595
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
 "starts with \"%(start)s\".)"
-msgstr "\"%(attr)s\" atributoa %(line)s lerroan balore okerra du. (Lerro hasiera: \"%(start)s\".)"
+msgstr " %(line)s lerroko \"%(attr)s\" atributoak balio okerra du. (Lerro hasiera: \"%(start)s\".)"
 
 #: db/models/manipulators.py:308
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr "%(type)s motako %(object)s objetua existitzen da %(field)s eremurako."
 
 #: db/models/fields/__init__.py:52
 #, python-format
@@ -3760,40 +3753,40 @@ msgstr "Badago %(optname)s izenarekin %(fieldname)s-n."
 #: db/models/fields/__init__.py:735 db/models/fields/__init__.py:746
 #: newforms/fields.py:45 oldforms/__init__.py:374
 msgid "This field is required."
-msgstr "Kanpo hau beharrezkoa da."
+msgstr "Eremu hau beharrezkoa da."
 
 #: db/models/fields/__init__.py:418
 msgid "This value must be an integer."
-msgstr "Balore hau zenbaki osoa izan behar du."
+msgstr "Balio honek zenbaki osoa izan behar du."
 
 #: db/models/fields/__init__.py:454
 msgid "This value must be either True or False."
-msgstr "Balore hau egia ala gezurra izan behar du (True/False)."
+msgstr "Balio honek True edo False izan behar du."
 
 #: db/models/fields/__init__.py:475
 msgid "This field cannot be null."
-msgstr "Datu hau ezin daiteke hutsa izan (null)."
+msgstr "Eremu hau ezin daiteke hutsa izan (null)."
 
 #: db/models/fields/__init__.py:644
 msgid "This value must be a decimal number."
-msgstr "Balore hau zenbaki dezimala izan begar du."
+msgstr "Balio honek zenbaki hamartarra izan behar du."
 
 #: db/models/fields/__init__.py:755
 msgid "Enter a valid filename."
-msgstr "Idatzi fitxategi izen zuzena"
+msgstr "Idatzi fitxategi izen zuzen bat."
 
 #: db/models/fields/__init__.py:908
 msgid "This value must be either None, True or False."
-msgstr "Balore hau hutsa, egia edo gezurra izan behar du (None, True,False)"
+msgstr "Balio honek hutsa, egia edo gezurra izan behar du (None, True,False)"
 
 #: db/models/fields/related.py:55
 #, python-format
 msgid "Please enter a valid %s."
-msgstr "Mesades idatzi %s zuzena."
+msgstr "Mesedez idatzi %s zuzena."
 
 #: db/models/fields/related.py:658
 msgid "Separate multiple IDs with commas."
-msgstr "Bereiztu ID zerrenda koma bidez."
+msgstr "Bereiztu ID anitzak komaz."
 
 #: db/models/fields/related.py:660
 msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
@@ -3813,22 +3806,22 @@ msgstr "Idatzi balio zuzena."
 #: newforms/fields.py:123
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr "Ziurta zaitez balore honek gehienez %(max)d karactere dituela, %(length)d ditu orain."
+msgstr "Ziurta zaitez balio honek gehienez %(max)d karaktere dituela, %(length)d ditu orain."
 
 #: newforms/fields.py:124
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr "Ziurta zaitez balore honek gutxienez %(min)d karaktere dituela ,%(length)d ditu orain."
+msgstr "Ziurta zaitez balio honek gutxienez %(min)d karaktere dituela ,%(length)d ditu orain."
 
 #: newforms/fields.py:152 newforms/fields.py:181 newforms/fields.py:210
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
-msgstr "Ziurta zaitez balore hau %s baino txikiagoa edo berdina dela."
+msgstr "Ziurta zaitez balio hau %s baino txikiagoa edo berdina dela."
 
 #: newforms/fields.py:153 newforms/fields.py:182 newforms/fields.py:211
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
-msgstr "Ziurta zaitez balore hau %s baino haundiagoa edo berdina dela."
+msgstr "Ziurta zaitez balio hau %s baino handiagoa edo berdina dela."
 
 #: newforms/fields.py:180 newforms/fields.py:209
 msgid "Enter a number."
@@ -3842,12 +3835,12 @@ msgstr "Ziurta zaitez %s baino digito gehiago ez dagoela."
 #: newforms/fields.py:213
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
-msgstr "Ziurta zaitez %s baino dezimale gehiago ez dagoela."
+msgstr "Ziurta zaitez %s baino hamartar gehiago ez dagoela."
 
 #: newforms/fields.py:214
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr "Ziurta zaitez %s digitu baino gehiago ez dagoela puntu dezimalaren aurretik."
+msgstr "Ziurta zaitez %s digitu baino gehiago ez dagoela puntu hamartarraren aurretik."
 
 #: newforms/fields.py:262 newforms/fields.py:723
 msgid "Enter a valid date."
@@ -3859,7 +3852,7 @@ msgstr "Ordu zuzen bat idatzi."
 
 #: newforms/fields.py:334
 msgid "Enter a valid date/time."
-msgstr "Data/Ordua zuzen bat idatzi."
+msgstr "Data/Ordu zuzen bat idatzi."
 
 #: newforms/fields.py:433
 msgid "No file was submitted."
@@ -3875,7 +3868,7 @@ msgstr "URL zuzen bat idatzi."
 
 #: newforms/fields.py:497
 msgid "This URL appears to be a broken link."
-msgstr "URL hau ez dabil ondo."
+msgstr "URL hau ez dago ondo."
 
 #: newforms/fields.py:559 newforms/models.py:317
 msgid "Select a valid choice. That choice is not one of the available choices."
@@ -3897,7 +3890,7 @@ msgstr "IPv4 zuzen bat idatzi."
 #: newforms/models.py:378
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Aukera zuzena aukeratu. %s ez da zuzena."
+msgstr "Aukera zuzena aukeratu. %s ez da aukeretako bat."
 
 #: oldforms/__init__.py:409
 #, python-format
@@ -3908,7 +3901,7 @@ msgstr[1] ""
 
 #: oldforms/__init__.py:414
 msgid "Line breaks are not allowed here."
-msgstr "Lerro berriak (line breaks) ez dire onartzen hemen."
+msgstr "Lerro jauziak ez dira onartzen hemen."
 
 #: oldforms/__init__.py:512 oldforms/__init__.py:586 oldforms/__init__.py:625
 #, python-format
@@ -4007,31 +4000,31 @@ msgstr "Igandea"
 
 #: utils/dates.py:10
 msgid "Mon"
-msgstr "Astelehe"
+msgstr "Al"
 
 #: utils/dates.py:10
 msgid "Tue"
-msgstr "Astear"
+msgstr "Ar"
 
 #: utils/dates.py:10
 msgid "Wed"
-msgstr "Asteaz"
+msgstr "Az"
 
 #: utils/dates.py:10
 msgid "Thu"
-msgstr "Oste"
+msgstr "Og"
 
 #: utils/dates.py:10
 msgid "Fri"
-msgstr "Osti"
+msgstr "Ol"
 
 #: utils/dates.py:11
 msgid "Sat"
-msgstr "Lar"
+msgstr "Lr"
 
 #: utils/dates.py:11
 msgid "Sun"
-msgstr "Iga"
+msgstr "Ig"
 
 #: utils/dates.py:18
 msgid "January"
@@ -4165,37 +4158,37 @@ msgstr "edo"
 msgid "year"
 msgid_plural "years"
 msgstr[0] "urtea"
-msgstr[1] ""
+msgstr[1] "urteak"
 
 #: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "hilabetea"
-msgstr[1] ""
+msgstr[1] "hilabeteak"
 
 #: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "astea"
-msgstr[1] ""
+msgstr[1] "asteak"
 
 #: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "eguna"
-msgstr[1] ""
+msgstr[1] "egunak"
 
 #: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] "hordua"
-msgstr[1] ""
+msgstr[0] "ordua"
+msgstr[1] "orduak"
 
 #: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minutu"
-msgstr[1] ""
+msgstr[1] "minutuak"
 
 #: utils/timesince.py:46
 msgid "minutes"
@@ -4239,10 +4232,10 @@ msgstr "%(verbose_name)s arazorik gabe sortu da"
 #: views/generic/create_update.py:117
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
-msgstr "%(verbose_name)s arazorik gabe aldatua izan da."
+msgstr "%(verbose_name)s arazorik gabe eguneratu da."
 
 #: views/generic/create_update.py:184
 #, python-format
 msgid "The %(verbose_name)s was deleted."
-msgstr "%(verbose_name)s ezabatua izan da."
+msgstr "%(verbose_name)s ezabatu da."
 

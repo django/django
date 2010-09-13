@@ -1,5 +1,3 @@
-.. _howto-outputting-csv:
-
 ==========================
 Outputting CSV with Django
 ==========================
@@ -61,7 +59,7 @@ mention:
 Using the template system
 =========================
 
-Alternatively, you can use the :ref:`Django template system <topics-templates>`
+Alternatively, you can use the :doc:`Django template system </topics/templates>`
 to generate CSV. This is lower-level than using the convenient CSV, but the
 solution is presented here for completeness.
 
@@ -113,4 +111,4 @@ Other text-based formats
 Notice that there isn't very much specific to CSV here -- just the specific
 output format. You can use either of these techniques to output any text-based
 format you can dream of. You can also use a similar technique to generate
-arbitrary binary data; see :ref:`howto-outputting-pdf` for an example.
+arbitrary binary data; see :doc:`/howto/outputting-pdf` for an example.

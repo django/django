@@ -9,6 +9,8 @@
     width: 100%;
 }
 
+.change-list .hiddenfields { display:none; }
+
 .change-list .filtered table {
     border-right: 1px solid #ddd;
 }
@@ -21,7 +23,7 @@
     background: white url(../img/admin/changelist-bg.gif) top right repeat-y !important;
 }
 
-.change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
+.change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
     margin-right: 160px !important;
     width: auto !important;
 }

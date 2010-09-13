@@ -554,7 +554,7 @@ fields with the 'choices' attribute are represented by a ChoiceField.
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
-</select><br /> Hold down "Control", or "Command" on a Mac, to select more than one.</td></tr>
+</select><br /><span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></td></tr>
 
 You can restrict a form to a subset of the complete list of fields
 by providing a 'fields' argument. If you try to save a
@@ -579,7 +579,7 @@ inserted as 'initial' data in each Field.
 ...         model = Writer
 >>> f = RoykoForm(auto_id=False, instance=w)
 >>> print f
-<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br />Use both first and last names.</td></tr>
+<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br /><span class="helptext">Use both first and last names.</span></td></tr>
 
 >>> art = Article(headline='Test article', slug='test-article', pub_date=datetime.date(1988, 1, 4), writer=w, article='Hello.')
 >>> art.save()
@@ -609,7 +609,7 @@ inserted as 'initial' data in each Field.
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
-</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 >>> f = TestArticleForm({'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': unicode(w_royko.pk), 'article': 'Hello.'}, instance=art)
 >>> f.errors
 {}
@@ -672,7 +672,7 @@ Add some categories and test the many-to-many form output.
 <option value="1" selected="selected">Entertainment</option>
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
-</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 
 Initial values can be provided for model forms
 >>> f = TestArticleForm(auto_id=False, initial={'headline': 'Your headline here', 'categories': ['1','2']})
@@ -696,7 +696,7 @@ Initial values can be provided for model forms
 <option value="1" selected="selected">Entertainment</option>
 <option value="2" selected="selected">It&#39;s a test</option>
 <option value="3">Third test</option>
-</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 
 >>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
 ...     'writer': unicode(w_royko.pk), 'article': u'Hello.', 'categories': [u'1', u'2']}, instance=new_art)
@@ -812,7 +812,7 @@ the data in the database when the form is instantiated.
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
 <option value="3">Third</option>
-</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 >>> Category.objects.create(name='Fourth', url='4th')
 <Category: Fourth>
 >>> Writer.objects.create(name='Carl Bernstein')
@@ -839,7 +839,7 @@ the data in the database when the form is instantiated.
 <option value="2">It&#39;s a test</option>
 <option value="3">Third</option>
 <option value="4">Fourth</option>
-</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 
 # ModelChoiceField ############################################################
 

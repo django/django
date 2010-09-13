@@ -17,7 +17,7 @@ def direct_to_template(request, template, extra_context=None, mimetype=None, **k
     t = loader.get_template(template)
     return HttpResponse(t.render(c), mimetype=mimetype)
 
-def redirect_to(request, url, permanent=True, **kwargs):
+def redirect_to(request, url, permanent=True, query_string=False, **kwargs):
     """
     Redirect to a given URL.
 
@@ -33,7 +33,15 @@ def redirect_to(request, url, permanent=True, **kwargs):
 
     If the ``permanent`` argument is False, then the response will have a 302
     HTTP status code. Otherwise, the status code will be 301.
+
+    If the ``query_string`` argument is True, then the GET query string
+    from the request is appended to the URL.
+
     """
+    args = request.META["QUERY_STRING"]
+    if args and query_string and url is not None:
+        url = "%s?%s" % (url, args)
+
     if url is not None:
         klass = permanent and HttpResponsePermanentRedirect or HttpResponseRedirect
         return klass(url % kwargs)

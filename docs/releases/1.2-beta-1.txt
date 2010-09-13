@@ -1,5 +1,3 @@
-.. _releases-1.2-beta-1:
-
 ===============================
 Django 1.2 beta 1 release notes
 ===============================
@@ -19,7 +17,7 @@ As such, this release is *not* intended for production use, and any
 such use is discouraged.
 
 This document covers changes since the Django 1.2 alpha release; the
-:ref:`1.2 alpha release notes <releases-1.2-alpha-1>` cover new and
+:doc:`1.2 alpha release notes </releases/1.2-alpha-1>` cover new and
 updated features in Django between 1.1 and 1.2 alpha.
 
 
@@ -28,7 +26,7 @@ Deprecations and other changes in 1.2 beta
 
 This beta release deprecates two portions of public API, and
 introduces a potentially backwards-incompatible change to
-another. Under :ref:`our API stability policy <misc-api-stability>`,
+another. Under :doc:`our API stability policy </misc/api-stability>`,
 deprecation proceeds over multiple release cycles: initially, the
 deprecated API will raise ``PendingDeprecationWarning``, followed by
 raising ``DeprecationWarning`` in the next release, and finally
@@ -58,8 +56,8 @@ Also, in accordance with `RSS best practices`_, RSS feeds will now
 include an ``atom:link`` element. You may need to update your tests to
 take this into account.
 
-For more information, see the full :ref:`syndication framework
-documentation <ref-contrib-syndication>`.
+For more information, see the full :doc:`syndication framework
+documentation </ref/contrib/syndication>`.
 
 .. _RSS best practices: http://www.rssboard.org/rss-profile
 
@@ -93,7 +91,7 @@ added in Django 1.2 alpha but not documented with the alpha release.
 
 The default authentication backends shipped with Django do not
 currently make use of this, but third-party authentication backends
-are free to do so. See the :ref:`authentication docs <topics-auth>`
+are free to do so. See the :doc:`authentication docs </topics/auth>`
 for more information.
 
 
@@ -106,7 +104,7 @@ class will check the backend for permissions, just as the normal
 ``User`` does. This is intended to help centralize permission
 handling; apps can always delegate the question of whether something
 is allowed or not to the authorization/authentication system. See the
-:ref:`authentication docs <topics-auth>` for more details.
+:doc:`authentication docs </topics/auth>` for more details.
 
 
 ``select_related()`` improvements
@@ -163,7 +161,7 @@ discussions there.
 Django's online documentation also includes pointers on how to
 contribute to Django:
 
-    * :ref:`How to contribute to Django <internals-contributing>`
+    * :doc:`How to contribute to Django </internals/contributing>`
 
 Contributions on any level -- developing code, writing documentation
 or simply triaging tickets and helping to test proposed bugfixes --

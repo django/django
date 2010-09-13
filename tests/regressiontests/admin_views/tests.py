@@ -604,6 +604,28 @@ class AdminViewPermissionsTest(TestCase):
                         'Plural error message not found in response to post with multiple errors.')
         self.client.get('/test_admin/admin/logout/')
 
+    def testConditionallyShowAddSectionLink(self):
+        """
+        The foreign key widget should only show the "add related" button if the
+        user has permission to add that related item.
+        """
+        # Set up and log in user.
+        url = '/test_admin/admin/admin_views/article/add/'
+        add_link_text = ' class="add-another"'
+        self.client.get('/test_admin/admin/')
+        self.client.post('/test_admin/admin/', self.adduser_login)
+        # The add user can't add sections yet, so they shouldn't see the "add
+        # section" link.
+        response = self.client.get(url)
+        self.assertNotContains(response, add_link_text)
+        # Allow the add user to add sections too. Now they can see the "add
+        # section" link.
+        add_user = User.objects.get(username='adduser')
+        perm = get_perm(Section, Section._meta.get_add_permission())
+        add_user.user_permissions.add(perm)
+        response = self.client.get(url)
+        self.assertContains(response, add_link_text)
+
     def testCustomModelAdminTemplates(self):
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.super_login)
@@ -1477,6 +1499,21 @@ class AdminActionsTest(TestCase):
         response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
         self.failUnlessEqual(response.status_code, 302)
 
+    def test_default_redirect(self):
+        """
+        Test that actions which don't return an HttpResponse are redirected to
+        the same page, retaining the querystring (which may contain changelist
+        information).
+        """
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action' : 'external_mail',
+            'index': 0,
+        }
+        url = '/test_admin/admin/admin_views/externalsubscriber/?ot=asc&o=1'
+        response = self.client.post(url, action_data)
+        self.assertRedirects(response, url)
+
     def test_model_without_action(self):
         "Tests a ModelAdmin without any action"
         response = self.client.get('/test_admin/admin/admin_views/oldsubscriber/')
@@ -2113,11 +2150,9 @@ class ReadonlyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/pizza/add/')
         self.assertEqual(response.status_code, 200)
 
-class IncompleteFormTest(TestCase):
+class UserAdminTest(TestCase):
     """
-    Tests validation of a ModelForm that doesn't explicitly have all data
-    corresponding to model fields. Model validation shouldn't fail
-    such a forms.
+    Tests user CRUD functionality.
     """
     fixtures = ['admin-views-users.xml']
 
@@ -2128,6 +2163,7 @@ class IncompleteFormTest(TestCase):
         self.client.logout()
 
     def test_user_creation(self):
+        user_count = User.objects.count()
         response = self.client.post('/test_admin/admin/auth/user/add/', {
             'username': 'newuser',
             'password1': 'newpassword',
@@ -2136,6 +2172,7 @@ class IncompleteFormTest(TestCase):
         })
         new_user = User.objects.order_by('-id')[0]
         self.assertRedirects(response, '/test_admin/admin/auth/user/%s/' % new_user.pk)
+        self.assertEquals(User.objects.count(), user_count + 1)
         self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
 
     def test_password_mismatch(self):
@@ -2149,3 +2186,71 @@ class IncompleteFormTest(TestCase):
         self.assert_('password' not in adminform.form.errors)
         self.assertEquals(adminform.form.errors['password2'],
                           [u"The two password fields didn't match."])
+
+    def test_user_fk_popup(self):
+        response = self.client.get('/test_admin/admin/admin_views/album/add/')
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertContains(response, '/test_admin/admin/auth/user/add')
+        self.assertContains(response, 'class="add-another" id="add_id_owner" onclick="return showAddAnotherPopup(this);"')
+        response = self.client.get('/test_admin/admin/auth/user/add/?_popup=1')
+        self.assertNotContains(response, 'name="_continue"')
+
+    def test_user_add_another(self):
+        user_count = User.objects.count()
+        response = self.client.post('/test_admin/admin/auth/user/add/', {
+            'username': 'newuser',
+            'password1': 'newpassword',
+            'password2': 'newpassword',
+            '_addanother': '1',
+        })
+        new_user = User.objects.order_by('-id')[0]
+        self.assertRedirects(response, '/test_admin/admin/auth/user/add/')
+        self.assertEquals(User.objects.count(), user_count + 1)
+        self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
+
+try:
+    # If docutils isn't installed, skip the AdminDocs tests.
+    import docutils
+
+    class AdminDocsTest(TestCase):
+        fixtures = ['admin-views-users.xml']
+
+        def setUp(self):
+            self.client.login(username='super', password='secret')
+
+        def tearDown(self):
+            self.client.logout()
+
+        def test_tags(self):
+            response = self.client.get('/test_admin/admin/doc/tags/')
+
+            # The builtin tag group exists
+            self.assertContains(response, "<h2>Built-in tags</h2>", count=2)
+
+            # A builtin tag exists in both the index and detail
+            self.assertContains(response, '<h3 id="built_in-autoescape">autoescape</h3>')
+            self.assertContains(response, '<li><a href="#built_in-autoescape">autoescape</a></li>')
+
+            # An app tag exists in both the index and detail
+            self.assertContains(response, '<h3 id="flatpages-get_flatpages">get_flatpages</h3>')
+            self.assertContains(response, '<li><a href="#flatpages-get_flatpages">get_flatpages</a></li>')
+
+            # The admin list tag group exists
+            self.assertContains(response, "<h2>admin_list</h2>", count=2)
+
+            # An admin list tag exists in both the index and detail
+            self.assertContains(response, '<h3 id="admin_list-admin_actions">admin_actions</h3>')
+            self.assertContains(response, '<li><a href="#admin_list-admin_actions">admin_actions</a></li>')
+
+        def test_filters(self):
+            response = self.client.get('/test_admin/admin/doc/filters/')
+
+            # The builtin filter group exists
+            self.assertContains(response, "<h2>Built-in filters</h2>", count=2)
+
+            # A builtin filter exists in both the index and detail
+            self.assertContains(response, '<h3 id="built_in-add">add</h3>')
+            self.assertContains(response, '<li><a href="#built_in-add">add</a></li>')
+
+except ImportError:
+    pass

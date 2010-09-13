@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-09 14:26+0200\n"
-"PO-Revision-Date: 2010-05-09 14:09+0100\n"
+"POT-Creation-Date: 2010-08-06 18:35+0200\n"
+"PO-Revision-Date: 2010-08-06 18:33+0100\n"
 "Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech\n"
 "MIME-Version: 1.0\n"
@@ -70,7 +70,7 @@ msgid "Spanish"
 msgstr "španělsky"
 
 #: conf/global_settings.py:57
-msgid "Argentinean Spanish"
+msgid "Argentinian Spanish"
 msgstr "španělsky (Argentina)"
 
 #: conf/global_settings.py:58
@@ -122,138 +122,146 @@ msgid "Hungarian"
 msgstr "maďarsky"
 
 #: conf/global_settings.py:70
+msgid "Indonesian"
+msgstr "indonésky"
+
+#: conf/global_settings.py:71
 msgid "Icelandic"
 msgstr "islandsky"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Italian"
 msgstr "italsky"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Japanese"
 msgstr "japonsky"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Georgian"
 msgstr "gruzínsky"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Khmer"
 msgstr "khmersky"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Kannada"
 msgstr "kannadsky"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Korean"
 msgstr "korejsky"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Lithuanian"
 msgstr "litevsky"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Latvian"
 msgstr "lotyšsky"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Macedonian"
 msgstr "makedonsky"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
+msgid "Malayalam"
+msgstr "malajálamsky"
+
+#: conf/global_settings.py:82
 msgid "Mongolian"
 msgstr "mongolsky"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:83
 msgid "Dutch"
 msgstr "holandsky"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:84
 msgid "Norwegian"
 msgstr "norsky"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:85
 msgid "Norwegian Bokmal"
 msgstr "norsky (Bokmål)"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:86
 msgid "Norwegian Nynorsk"
 msgstr "norsky (Nynorsk)"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:87
 msgid "Polish"
 msgstr "polsky"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:88
 msgid "Portuguese"
 msgstr "portugalsky"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:89
 msgid "Brazilian Portuguese"
 msgstr "portugalsky (Brazílie)"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:90
 msgid "Romanian"
 msgstr "rumunsky"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:91
 msgid "Russian"
 msgstr "rusky"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:92
 msgid "Slovak"
 msgstr "slovensky"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:93
 msgid "Slovenian"
 msgstr "slovinsky"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:94
 msgid "Albanian"
 msgstr "albánsky"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:95
 msgid "Serbian"
 msgstr "srbsky"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:96
 msgid "Serbian Latin"
 msgstr "srbsky (latinkou)"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:97
 msgid "Swedish"
 msgstr "švédsky"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:98
 msgid "Tamil"
 msgstr "tamilsky"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:99
 msgid "Telugu"
 msgstr "telužsky"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:100
 msgid "Thai"
 msgstr "thajsky"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:101
 msgid "Turkish"
 msgstr "turecky"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:102
 msgid "Ukrainian"
 msgstr "ukrajinsky"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:103
 msgid "Vietnamese"
 msgstr "vietnamsky"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:104
 msgid "Simplified Chinese"
 msgstr "čínsky (zjednodušeně)"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:105
 msgid "Traditional Chinese"
 msgstr "čínsky (tradičně)"
 
@@ -305,15 +313,15 @@ msgstr "Tento měsíc"
 msgid "This year"
 msgstr "Tento rok"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:478
 msgid "Yes"
 msgstr "Ano"
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
+#: contrib/admin/filterspecs.py:147 forms/widgets.py:478
 msgid "No"
 msgstr "Ne"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:469
+#: contrib/admin/filterspecs.py:154 forms/widgets.py:478
 msgid "Unknown"
 msgstr "Neznámé"
 
@@ -359,7 +367,7 @@ msgid "Changed %s."
 msgstr "Změněno: %s"
 
 #: contrib/admin/options.py:559 contrib/admin/options.py:569
-#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:844
+#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:845
 #: forms/models.py:568
 msgid "and"
 msgstr "a"
@@ -853,13 +861,17 @@ msgstr "Uložit a přidat další položku"
 msgid "Save and continue editing"
 msgstr "Uložit a pokračovat v úpravách"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:5
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
 "Nejdříve vložte uživatelské jméno a heslo. Poté budete moci upravovat více "
 "uživatelských nastavení."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Vložte uživatelské jméno a heslo."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:28
 #, python-format
@@ -1418,8 +1430,8 @@ msgstr "zpráva"
 msgid "Logged out"
 msgstr "Odhlášeno"
 
-#: contrib/auth/management/commands/createsuperuser.py:23
-#: core/validators.py:120 forms/fields.py:428
+#: contrib/auth/management/commands/createsuperuser.py:24
+#: core/validators.py:120 forms/fields.py:427
 msgid "Enter a valid e-mail address."
 msgstr "Vložte platnou e-mailovou adresu."
 
@@ -1491,7 +1503,7 @@ msgid "Email address"
 msgstr "E-mailová adresa"
 
 #: contrib/comments/forms.py:95 contrib/flatpages/admin.py:8
-#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1101
+#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1109
 msgid "URL"
 msgstr "URL"
 
@@ -1541,7 +1553,7 @@ msgstr "komentář"
 msgid "date/time submitted"
 msgstr "datum a čas byly zaslané"
 
-#: contrib/comments/models.py:60 db/models/fields/__init__.py:896
+#: contrib/comments/models.py:60 db/models/fields/__init__.py:904
 msgid "IP address"
 msgstr "Adresa IP"
 
@@ -4473,22 +4485,22 @@ msgstr "weby"
 msgid "Enter a valid value."
 msgstr "Vložte platnou hodnotu."
 
-#: core/validators.py:87 forms/fields.py:529
+#: core/validators.py:87 forms/fields.py:528
 msgid "Enter a valid URL."
 msgstr "Vložte platnou adresu URL."
 
-#: core/validators.py:89 forms/fields.py:530
+#: core/validators.py:89 forms/fields.py:529
 msgid "This URL appears to be a broken link."
 msgstr "Tato adresa URL je zřejmě neplatný odkaz."
 
-#: core/validators.py:123 forms/fields.py:873
+#: core/validators.py:123 forms/fields.py:877
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Vložte platný identifikátor složený pouze z písmen, čísel, podtržítek a "
 "pomlček."
 
-#: core/validators.py:126 forms/fields.py:866
+#: core/validators.py:126 forms/fields.py:870
 msgid "Enter a valid IPv4 address."
 msgstr "Vložte platnou adresu typu IPv4."
 
@@ -4501,12 +4513,12 @@ msgstr "Vložte pouze číslice oddělené čárkami."
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "Hodnota musí být %(limit_value)s (nyní je %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:205 forms/fields.py:257
+#: core/validators.py:153 forms/fields.py:204 forms/fields.py:256
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Hodnota musí být menší nebo rovna %(limit_value)s."
 
-#: core/validators.py:158 forms/fields.py:206 forms/fields.py:258
+#: core/validators.py:158 forms/fields.py:205 forms/fields.py:257
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Hodnota musí být větší nebo rovna %(limit_value)s."
@@ -4529,13 +4541,13 @@ msgstr ""
 "Hodnota smí mít nejvýše %(limit_value)d znaků, ale nyní jich má %(show_value)"
 "d."
 
-#: db/models/base.py:822
+#: db/models/base.py:823
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 "Pole %(field_name)s musí být unikátní testem %(lookup)s pole %(date_field)s."
 
-#: db/models/base.py:837 db/models/base.py:845
+#: db/models/base.py:838 db/models/base.py:846
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
@@ -4559,13 +4571,13 @@ msgstr "Pole nemůže být prázdné."
 msgid "Field of type: %(field_type)s"
 msgstr "Pole typu: %(field_type)s"
 
-#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:852
-#: db/models/fields/__init__.py:961 db/models/fields/__init__.py:972
-#: db/models/fields/__init__.py:999
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:860
+#: db/models/fields/__init__.py:969 db/models/fields/__init__.py:980
+#: db/models/fields/__init__.py:1007
 msgid "Integer"
 msgstr "Celé číslo"
 
-#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:850
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:858
 msgid "This value must be an integer."
 msgstr "Hodnota musí být celé číslo."
 
@@ -4577,7 +4589,7 @@ msgstr "Hodnota musí být buď Ano (True) nebo Ne (False)."
 msgid "Boolean (Either True or False)"
 msgstr "Pravdivost (buď Ano (True), nebo Ne (False))"
 
-#: db/models/fields/__init__.py:539 db/models/fields/__init__.py:982
+#: db/models/fields/__init__.py:539 db/models/fields/__init__.py:990
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Řetězec (max. %(max_length)s znaků)"
@@ -4619,44 +4631,44 @@ msgstr "Desetinné číslo"
 msgid "E-mail address"
 msgstr "E-mailová adresa"
 
-#: db/models/fields/__init__.py:799 db/models/fields/files.py:220
+#: db/models/fields/__init__.py:807 db/models/fields/files.py:220
 #: db/models/fields/files.py:331
 msgid "File path"
 msgstr "Cesta k souboru"
 
-#: db/models/fields/__init__.py:822
+#: db/models/fields/__init__.py:830
 msgid "This value must be a float."
 msgstr "Hodnota musí být desetinné číslo."
 
-#: db/models/fields/__init__.py:824
+#: db/models/fields/__init__.py:832
 msgid "Floating point number"
 msgstr "Číslo s pohyblivou řádovou čárkou"
 
-#: db/models/fields/__init__.py:883
+#: db/models/fields/__init__.py:891
 msgid "Big (8 byte) integer"
 msgstr "Velké číslo (8 bajtů)"
 
-#: db/models/fields/__init__.py:912
+#: db/models/fields/__init__.py:920
 msgid "This value must be either None, True or False."
 msgstr "Hodnota musí být buď Nic (None), Ano (True) nebo Ne (False)."
 
-#: db/models/fields/__init__.py:914
+#: db/models/fields/__init__.py:922
 msgid "Boolean (Either True, False or None)"
 msgstr "Pravdivost (buď Ano (True), Ne (False) nebo Nic (None))"
 
-#: db/models/fields/__init__.py:1005
+#: db/models/fields/__init__.py:1013
 msgid "Text"
 msgstr "Text"
 
-#: db/models/fields/__init__.py:1021
+#: db/models/fields/__init__.py:1029
 msgid "Time"
 msgstr "Čas"
 
-#: db/models/fields/__init__.py:1025
+#: db/models/fields/__init__.py:1033
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Vložte platný čas ve tvaru HH:MM[:ss[.uuuuuu]]"
 
-#: db/models/fields/__init__.py:1109
+#: db/models/fields/__init__.py:1125
 msgid "XML text"
 msgstr "XML text"
 
@@ -4669,22 +4681,22 @@ msgstr "Položka typu %(model)s s primárním klíčem %(pk)r neexistuje."
 msgid "Foreign Key (type determined by related field)"
 msgstr "Cizí klíč (typ určen pomocí souvisejícího pole)"
 
-#: db/models/fields/related.py:918
+#: db/models/fields/related.py:919
 msgid "One-to-one relationship"
 msgstr "Vazba jedna-jedna"
 
-#: db/models/fields/related.py:980
+#: db/models/fields/related.py:981
 msgid "Many-to-many relationship"
 msgstr "Vazba mnoho-mnoho"
 
-#: db/models/fields/related.py:1000
+#: db/models/fields/related.py:1001
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Výběr více než jedné položky je možný přidržením klávesy \"Control\" (nebo "
 "\"Command\" na Macu)."
 
-#: db/models/fields/related.py:1061
+#: db/models/fields/related.py:1062
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -4697,74 +4709,74 @@ msgstr[2] "Vložte platné ID položky %(self)s. Hodnoty %(value)r jsou neplatn�
 msgid "This field is required."
 msgstr "Pole je povinné."
 
-#: forms/fields.py:204
+#: forms/fields.py:203
 msgid "Enter a whole number."
 msgstr "Vložte celé číslo."
 
-#: forms/fields.py:235 forms/fields.py:256
+#: forms/fields.py:234 forms/fields.py:255
 msgid "Enter a number."
 msgstr "Vložte číslo."
 
-#: forms/fields.py:259
+#: forms/fields.py:258
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Hodnota nesmí celkem mít více než %s cifer."
 
-#: forms/fields.py:260
+#: forms/fields.py:259
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Hodnota nesmí mít za desetinnou čárkou více než %s cifer."
 
-#: forms/fields.py:261
+#: forms/fields.py:260
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Hodnota nesmí mít před desetinnou čárkou více než %s cifer."
 
-#: forms/fields.py:323 forms/fields.py:838
+#: forms/fields.py:322 forms/fields.py:837
 msgid "Enter a valid date."
 msgstr "Vložte platné datum."
 
-#: forms/fields.py:351 forms/fields.py:839
+#: forms/fields.py:350 forms/fields.py:838
 msgid "Enter a valid time."
 msgstr "Vložte platný čas."
 
-#: forms/fields.py:377
+#: forms/fields.py:376
 msgid "Enter a valid date/time."
 msgstr "Vložte platné datum a čas."
 
-#: forms/fields.py:435
+#: forms/fields.py:434
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "Soubor nebyl odeslán. Zkontrolujte parametr \"encoding type\" formuláře."
 
-#: forms/fields.py:436
+#: forms/fields.py:435
 msgid "No file was submitted."
 msgstr "Žádný soubor nebyl odeslán."
 
-#: forms/fields.py:437
+#: forms/fields.py:436
 msgid "The submitted file is empty."
 msgstr "Odeslaný soubor je prázdný."
 
-#: forms/fields.py:438
+#: forms/fields.py:437
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Délka názvu souboru má být nejvýše %(max)d znaků, ale nyní je %(length)d."
 
-#: forms/fields.py:473
+#: forms/fields.py:472
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
 "Nahrajte platný obrázek. Odeslaný soubor buď nebyl obrázek nebo byl poškozen."
 
-#: forms/fields.py:596 forms/fields.py:671
+#: forms/fields.py:595 forms/fields.py:670
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Vyberte platnou možnost, \"%(value)s\" není k dispozici."
 
-#: forms/fields.py:672 forms/fields.py:734 forms/models.py:1002
+#: forms/fields.py:671 forms/fields.py:733 forms/models.py:1002
 msgid "Enter a list of values."
 msgstr "Vložte seznam hodnot."
 

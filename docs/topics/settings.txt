@@ -1,5 +1,3 @@
-.. _topics-settings:
-
 ===============
 Django settings
 ===============
@@ -46,7 +44,7 @@ Python `import search path`_.
 The django-admin.py utility
 ---------------------------
 
-When using :ref:`django-admin.py <ref-django-admin>`, you can either set the
+When using :doc:`django-admin.py </ref/django-admin>`, you can either set the
 environment variable once, or explicitly pass in the settings module each time
 you run the utility.
 
@@ -66,20 +64,19 @@ Use the ``--settings`` command-line argument to specify the settings manually::
 
 .. _django-admin.py: ../django-admin/
 
-On the server (mod_python)
+On the server (mod_wsgi)
 --------------------------
 
-In your live server environment, you'll need to tell Apache/mod_python which
-settings file to use. Do that with ``SetEnv``::
+In your live server environment, you'll need to tell your WSGI
+application what settings file to use. Do that with ``os.environ``::
 
-    <Location "/mysite/">
-        SetHandler python-program
-        PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
-    </Location>
+    import os
 
-Read the :ref:`Django mod_python documentation <howto-deployment-modpython>` for
-more information.
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+
+Read the :doc:`Django mod_wsgi documentation
+</howto/deployment/modwsgi>` for more information and other common
+elements to a Django WSGI application.
 
 Default settings
 ================
@@ -151,7 +148,7 @@ read it. This is especially important in a shared-hosting environment.
 Available settings
 ==================
 
-For a full list of available settings, see the :ref:`settings reference <ref-settings>`.
+For a full list of available settings, see the :doc:`settings reference </ref/settings>`.
 
 Creating your own settings
 ==========================

@@ -1,12 +1,12 @@
-from unittest import TestCase
-
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.tests.views import AuthViewsTestCase
 
-
-class LoginRequiredTestCase(TestCase):
+class LoginRequiredTestCase(AuthViewsTestCase):
     """
     Tests the login_required decorators
     """
+    urls = 'django.contrib.auth.tests.urls'
+
     def testCallable(self):
         """
         Check that login_required is assignable to callable objects.
@@ -23,3 +23,23 @@ class LoginRequiredTestCase(TestCase):
         def normal_view(request):
             pass
         login_required(normal_view)
+
+    def testLoginRequired(self, view_url='/login_required/', login_url='/login/'):
+        """
+        Check that login_required works on a simple view wrapped in a
+        login_required decorator.
+        """
+        response = self.client.get(view_url)
+        self.assertEqual(response.status_code, 302)
+        self.assert_(login_url in response['Location'])
+        self.login()
+        response = self.client.get(view_url)
+        self.assertEqual(response.status_code, 200)
+
+    def testLoginRequiredNextUrl(self):
+        """
+        Check that login_required works on a simple view wrapped in a
+        login_required decorator with a login_url set.
+        """
+        self.testLoginRequired(view_url='/login_required_login_url/',
+            login_url='/somewhere/')

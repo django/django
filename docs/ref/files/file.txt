@@ -1,5 +1,3 @@
-.. _ref-files-file:
-
 The ``File`` object
 ===================
 
@@ -20,14 +18,14 @@ Django's ``File`` has the following attributes and methods:
 
     The absolute path to the file's location on a local filesystem.
 
-    :ref:`Custom file storage systems <howto-custom-file-storage>` may not store
+    :doc:`Custom file storage systems </howto/custom-file-storage>` may not store
     files locally; files stored on these systems will have a ``path`` of
     ``None``.
 
 .. attribute:: File.url
 
     The URL where the file can be retrieved. This is often useful in
-    :ref:`templates <topics-templates>`; for example, a bit of a template for
+    :doc:`templates </topics/templates>`; for example, a bit of a template for
     displaying a ``Car`` (see above) might look like:
     
     .. code-block:: html+django

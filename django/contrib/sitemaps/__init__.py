@@ -65,11 +65,12 @@ class Sitemap(object):
         urls = []
         for item in self.paginator.page(page).object_list:
             loc = "http://%s%s" % (current_site.domain, self.__get('location', item))
+            priority = self.__get('priority', item, None)
             url_info = {
                 'location':   loc,
                 'lastmod':    self.__get('lastmod', item, None),
                 'changefreq': self.__get('changefreq', item, None),
-                'priority':   self.__get('priority', item, None)
+                'priority':   str(priority is not None and priority or '')
             }
             urls.append(url_info)
         return urls
@@ -78,7 +79,7 @@ class FlatPageSitemap(Sitemap):
     def items(self):
         from django.contrib.sites.models import Site
         current_site = Site.objects.get_current()
-        return current_site.flatpage_set.all()
+        return current_site.flatpage_set.filter(registration_required=False)
 
 class GenericSitemap(Sitemap):
     priority = None

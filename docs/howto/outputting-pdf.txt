@@ -1,5 +1,3 @@
-.. _howto-outputting-pdf:
-
 ===========================
 Outputting PDFs with Django
 ===========================
@@ -154,5 +152,5 @@ Other formats
 Notice that there isn't a lot in these examples that's PDF-specific -- just the
 bits using ``reportlab``. You can use a similar technique to generate any
 arbitrary format that you can find a Python library for. Also see
-:ref:`howto-outputting-csv` for another example and some techniques you can use
+:doc:`/howto/outputting-csv` for another example and some techniques you can use
 when generated text-based formats.

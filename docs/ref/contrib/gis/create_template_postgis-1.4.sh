@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-POSTGIS_SQL_PATH=`pg_config --sharedir`/contrib/postgis-1.4
+POSTGIS_SQL_PATH=`pg_config --sharedir`/contrib
 createdb -E UTF8 template_postgis # Create the template spatial database.
 createlang -d template_postgis plpgsql # Adding PLPGSQL language support.
 psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis';"

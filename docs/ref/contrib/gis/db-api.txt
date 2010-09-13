@@ -14,7 +14,7 @@ Spatial Backends
 
 .. versionadded:: 1.2
 
-In Django 1.2, support for :ref:`multiple databases <topics-db-multi-db>` was
+In Django 1.2, support for :doc:`multiple databases </topics/db/multi-db>` was
 introduced.  In order to support multiple databases, GeoDjango has segregated
 its functionality into full-fledged spatial database backends:
 
@@ -26,7 +26,7 @@ its functionality into full-fledged spatial database backends:
 Database Settings Backwards-Compatibility
 -----------------------------------------
 
-In :ref:`Django 1.2 <releases-1.2>`, the way 
+In :doc:`Django 1.2 </releases/1.2>`, the way
 to :ref:`specify databases <specifying-databases>` in your settings was changed.
 The old database settings format (e.g., the ``DATABASE_*`` settings)
 is backwards compatible with GeoDjango, and  will automatically use the
@@ -60,7 +60,7 @@ MySQL's spatial extensions only support bounding box operations
     [``Contains``, ``Crosses``, ``Disjoint``, ``Intersects``, ``Overlaps``,
     ``Touches``, ``Within``]
     according to the specification.  Those that are implemented return
-    the same result as the corresponding MBR-based functions. 
+    the same result as the corresponding MBR-based functions.
 
 In other words, while spatial lookups such as :lookup:`contains <gis-contains>`
 are available in GeoDjango when using MySQL, the results returned are really
@@ -92,8 +92,8 @@ model)::
     >>> z.save()
 
 Moreover, if the ``GEOSGeometry`` is in a different coordinate system (has a
-different SRID value) than that of the field, then it will be implicitly 
-transformed into the SRID of the model's field, using the spatial database's 
+different SRID value) than that of the field, then it will be implicitly
+transformed into the SRID of the model's field, using the spatial database's
 transform procedure::
 
     >>> poly_3084 = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))', srid=3084)  # SRID 3084 is 'NAD83(HARN) / Texas Centric Lambert Conformal'
@@ -133,17 +133,17 @@ For example::
     >>> qs = Zipcode.objects.filter(poly__contains=pnt)
 
 In this case, ``poly`` is the geographic field, :lookup:`contains <gis-contains>`
-is the spatial lookup type, and ``pnt`` is the parameter (which may be a 
+is the spatial lookup type, and ``pnt`` is the parameter (which may be a
 :class:`~django.contrib.gis.geos.GEOSGeometry` object or a string of
 GeoJSON , WKT, or HEXEWKB).
 
-A complete reference can be found in the :ref:`spatial lookup reference 
+A complete reference can be found in the :ref:`spatial lookup reference
 <spatial-lookups>`.
 
 .. note::
 
-    GeoDjango constructs spatial SQL with the :class:`GeoQuerySet`, a 
-    subclass of :class:`~django.db.models.QuerySet`.  The 
+    GeoDjango constructs spatial SQL with the :class:`GeoQuerySet`, a
+    subclass of :class:`~django.db.models.QuerySet`.  The
     :class:`GeoManager` instance attached to your model is what
     enables use of :class:`GeoQuerySet`.
 
@@ -156,8 +156,8 @@ Introduction
 ------------
 Distance calculations with spatial data is tricky because, unfortunately,
 the Earth is not flat.  Some distance queries with fields in a geographic
-coordinate system may have to be expressed differently because of 
-limitations in PostGIS.  Please see the :ref:`selecting-an-srid` section 
+coordinate system may have to be expressed differently because of
+limitations in PostGIS.  Please see the :ref:`selecting-an-srid` section
 in the :ref:`ref-gis-model-api` documentation for more details.
 
 .. _distance-lookups-intro:
@@ -181,7 +181,7 @@ The following distance lookups are available:
 
 Distance lookups take a tuple parameter comprising:
 
-#. A geometry to base calculations from; and 
+#. A geometry to base calculations from; and
 #. A number or :class:`~django.contrib.gis.measure.Distance` object containing the distance.
 
 If a :class:`~django.contrib.gis.measure.Distance` object is used,
@@ -191,8 +191,8 @@ to be in the units of the field.
 
 .. note::
 
-    For users of PostGIS 1.4 and below, the routine ``ST_Distance_Sphere`` 
-    is used by default for calculating distances on geographic coordinate systems 
+    For users of PostGIS 1.4 and below, the routine ``ST_Distance_Sphere``
+    is used by default for calculating distances on geographic coordinate systems
     (e.g., WGS84) -- which may only be called with point geometries [#fndistsphere14]_.
     Thus, geographic distance lookups on traditional PostGIS geometry columns are
     only allowed on :class:`PointField` model fields using a point for the
@@ -212,24 +212,24 @@ to be in the units of the field.
     You can tell GeoDjango to use a geography column by setting ``geography=True``
     in your field definition.
 
-For example, let's say we have a ``SouthTexasCity`` model (from the 
-`GeoDjango distance tests`__ ) on a *projected* coordinate system valid for cities 
+For example, let's say we have a ``SouthTexasCity`` model (from the
+`GeoDjango distance tests`__ ) on a *projected* coordinate system valid for cities
 in southern Texas::
 
     from django.contrib.gis.db import models
-    
+
     class SouthTexasCity(models.Model):
         name = models.CharField(max_length=30)
-        # A projected coordinate system (only valid for South Texas!) 
+        # A projected coordinate system (only valid for South Texas!)
         # is used, units are in meters.
-        point = models.PointField(srid=32140) 
+        point = models.PointField(srid=32140)
         objects = models.GeoManager()
 
 Then distance queries may be performed as follows::
 
     >>> from django.contrib.gis.geos import *
     >>> from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
-    >>> from geoapp import SouthTexasCity 
+    >>> from geoapp import SouthTexasCity
     # Distances will be calculated from this point, which does not have to be projected.
     >>> pnt = fromstr('POINT(-96.876369 29.905320)', srid=4326)
     # If numeric parameter, units of field (meters in this case) are assumed.
@@ -294,7 +294,7 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite
 ``GeoQuerySet`` Methods
 -----------------------
 The following table provides a summary of what :class:`GeoQuerySet` methods
-are available on each spatial backend.  Please note that MySQL does not 
+are available on each spatial backend.  Please note that MySQL does not
 support any of these methods, and is thus excluded from the table.
 
 ====================================  =======  ======  ==========
@@ -330,7 +330,7 @@ Method                                PostGIS  Oracle  SpatiaLite
 :meth:`GeoQuerySet.translate`         X                X
 :meth:`GeoQuerySet.union`             X        X       X
 :meth:`GeoQuerySet.unionagg`          X        X       X
-====================================  =======  ======  ==========    
+====================================  =======  ======  ==========
 
 .. rubric:: Footnotes
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).

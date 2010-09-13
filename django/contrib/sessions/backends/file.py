@@ -58,7 +58,7 @@ class SessionStore(SessionBase):
             finally:
                 session_file.close()
         except IOError:
-            pass
+            self.create()
         return session_data
 
     def create(self):

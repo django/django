@@ -1,5 +1,3 @@
-.. _intro-tutorial01:
-
 =====================================
 Writing your first Django app, part 1
 =====================================
@@ -14,7 +12,7 @@ It'll consist of two parts:
     * A public site that lets people view polls and vote in them.
     * An admin site that lets you add, change and delete polls.
 
-We'll assume you have :ref:`Django installed <intro-install>` already. You can
+We'll assume you have :doc:`Django installed </intro/install>` already. You can
 tell Django is installed by running the Python interactive interpreter and
 typing ``import django``. If that command runs successfully, with no errors,
 Django is installed.
@@ -47,8 +45,8 @@ create a ``mysite`` directory in your current directory.
    you try to run ``django-admin.py startproject``. This is because, on
    Unix-based systems like OS X, a file must be marked as "executable" before it
    can be run as a program. To do this, open Terminal.app and navigate (using
-   the ``cd`` command) to the directory where :ref:`django-admin.py
-   <ref-django-admin>` is installed, then run the command
+   the ``cd`` command) to the directory where :doc:`django-admin.py
+   </ref/django-admin>` is installed, then run the command
    ``chmod +x django-admin.py``.
 
 .. note::
@@ -58,11 +56,11 @@ create a ``mysite`` directory in your current directory.
     ``django`` (which will conflict with Django itself) or ``test`` (which
     conflicts with a built-in Python package).
 
-:ref:`django-admin.py <ref-django-admin>` should be on your system path if you
+:doc:`django-admin.py </ref/django-admin>` should be on your system path if you
 installed Django via ``python setup.py``. If it's not on your path, you can find
 it in ``site-packages/django/bin``, where ```site-packages``` is a directory
-within your Python installation. Consider symlinking to :ref:`django-admin.py
-<ref-django-admin>` from some place on your path, such as
+within your Python installation. Consider symlinking to :doc:`django-admin.py
+</ref/django-admin>` from some place on your path, such as
 :file:`/usr/local/bin`.
 
 .. admonition:: Where should this code live?
@@ -93,14 +91,14 @@ These files are:
 
     * :file:`manage.py`: A command-line utility that lets you interact with this
       Django project in various ways. You can read all the details about
-      :file:`manage.py` in :ref:`ref-django-admin`.
+      :file:`manage.py` in :doc:`/ref/django-admin`.
 
     * :file:`settings.py`: Settings/configuration for this Django project.
-      :ref:`topics-settings` will tell you all about how settings work.
+      :doc:`/topics/settings` will tell you all about how settings work.
 
     * :file:`urls.py`: The URL declarations for this Django project; a "table of
       contents" of your Django-powered site. You can read more about URLs in
-      :ref:`topics-http-urls`.
+      :doc:`/topics/http/urls`.
 
 .. _more about packages: http://docs.python.org/tutorial/modules.html#packages
 
@@ -473,7 +471,7 @@ added to your project since the last time you ran syncdb. :djadmin:`syncdb` can
 be called as often as you like, and it will only ever create the tables that
 don't exist.
 
-Read the :ref:`django-admin.py documentation <ref-django-admin>` for full
+Read the :doc:`django-admin.py documentation </ref/django-admin>` for full
 information on what the ``manage.py`` utility can do.
 
 Playing with the API
@@ -508,10 +506,10 @@ things:
     set the ``DJANGO_SETTINGS_MODULE`` environment variable to
     ``mysite.settings``.
 
-    For more information on all of this, see the :ref:`django-admin.py
-    documentation <ref-django-admin>`.
+    For more information on all of this, see the :doc:`django-admin.py
+    documentation </ref/django-admin>`.
 
-Once you're in the shell, explore the :ref:`database API <topics-db-queries>`::
+Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
     >>> from mysite.polls.models import Poll, Choice # Import the model classes we just wrote.
 
@@ -570,8 +568,8 @@ of this object. Let's fix that by editing the polls model (in the
    models and don't see any change in how they're represented, you're most
    likely using an old version of Django. (This version of the tutorial is
    written for the latest development version of Django.) If you're using a
-   Subversion checkout of Django's development version (see :ref:`the
-   installation docs <topics-install>` for more information), you shouldn't have
+   Subversion checkout of Django's development version (see :doc:`the
+   installation docs </topics/install>` for more information), you shouldn't have
    any problems.
 
    If you want to stick with an older version of Django, you'll want to switch
@@ -693,9 +691,9 @@ Save these changes and start a new Python interactive shell by running
     >>> c = p.choice_set.filter(choice__startswith='Just hacking')
     >>> c.delete()
 
-For more information on model relations, see :ref:`Accessing related objects
-<ref-models-relations>`. For full details on the database API, see our
-:ref:`Database API reference <topics-db-queries>`.
+For more information on model relations, see :doc:`Accessing related objects
+</ref/models/relations>`. For full details on the database API, see our
+:doc:`Database API reference </topics/db/queries>`.
 
-When you're comfortable with the API, read :ref:`part 2 of this tutorial
-<intro-tutorial02>` to get Django's automatic admin working.
+When you're comfortable with the API, read :doc:`part 2 of this tutorial
+</intro/tutorial02>` to get Django's automatic admin working.

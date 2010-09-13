@@ -30,6 +30,40 @@ _prefixes = {}
 # Overridden URLconfs for each thread are stored here.
 _urlconfs = {}
 
+class ResolverMatch(object):
+    def __init__(self, func, args, kwargs, url_name=None, app_name=None, namespaces=None):
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+        self.app_name = app_name
+        if namespaces:
+            self.namespaces = [x for x in namespaces if x]
+        else:
+            self.namespaces = []
+        if not url_name:
+            if not hasattr(func, '__name__'):
+                # An instance of a callable class
+                url_name = '.'.join([func.__class__.__module__, func.__class__.__name__])
+            else:
+                # A function
+                url_name = '.'.join([func.__module__, func.__name__])
+        self.url_name = url_name
+
+    def namespace(self):
+        return ':'.join(self.namespaces)
+    namespace = property(namespace)
+
+    def view_name(self):
+        return ':'.join([ x for x in [ self.namespace, self.url_name ]  if x ])
+    view_name = property(view_name)
+
+    def __getitem__(self, index):
+        return (self.func, self.args, self.kwargs)[index]
+
+    def __repr__(self):
+        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name='%s', app_name='%s', namespace='%s')" % (
+            self.func, self.args, self.kwargs, self.url_name, self.app_name, self.namespace)
+
 class Resolver404(Http404):
     pass
 
@@ -120,7 +154,7 @@ class RegexURLPattern(object):
             # In both cases, pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
 
-            return self.callback, args, kwargs
+            return ResolverMatch(self.callback, args, kwargs, self.name)
 
     def _get_callback(self):
         if self._callback is not None:
@@ -183,7 +217,8 @@ class RegexURLResolver(object):
             else:
                 bits = normalize(p_pattern)
                 lookups.appendlist(pattern.callback, (bits, p_pattern))
-                lookups.appendlist(pattern.name, (bits, p_pattern))
+                if pattern.name is not None:
+                    lookups.appendlist(pattern.name, (bits, p_pattern))
         self._reverse_dict = lookups
         self._namespace_dict = namespaces
         self._app_dict = apps
@@ -217,17 +252,17 @@ class RegexURLResolver(object):
                 except Resolver404, e:
                     sub_tried = e.args[0].get('tried')
                     if sub_tried is not None:
-                        tried.extend([(pattern.regex.pattern + '   ' + t) for t in sub_tried])
+                        tried.extend([[pattern] + t for t in sub_tried])
                     else:
-                        tried.append(pattern.regex.pattern)
+                        tried.append([pattern])
                 else:
                     if sub_match:
                         sub_match_dict = dict([(smart_str(k), v) for k, v in match.groupdict().items()])
                         sub_match_dict.update(self.default_kwargs)
-                        for k, v in sub_match[2].iteritems():
+                        for k, v in sub_match.kwargs.iteritems():
                             sub_match_dict[smart_str(k)] = v
-                        return sub_match[0], sub_match[1], sub_match_dict
-                    tried.append(pattern.regex.pattern)
+                        return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
+                    tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path' : path})
 
@@ -249,7 +284,12 @@ class RegexURLResolver(object):
     url_patterns = property(_get_url_patterns)
 
     def _resolve_special(self, view_type):
-        callback = getattr(self.urlconf_module, 'handler%s' % view_type)
+        callback = getattr(self.urlconf_module, 'handler%s' % view_type, None)
+        if not callback:
+            # No handler specified in file; use default
+            # Lazy import, since urls.defaults imports this file
+            from django.conf.urls import defaults
+            callback = getattr(defaults, 'handler%s' % view_type)
         try:
             return get_callable(callback), {}
         except (ImportError, AttributeError), e:

@@ -52,6 +52,12 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
 
+    def __init__(self, *args, **kwargs):
+        super(UserChangeForm, self).__init__(*args, **kwargs)
+        f = self.fields.get('user_permissions', None)
+        if f is not None:
+            f.queryset = f.queryset.select_related('content_type')
+
 class AuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts
@@ -111,7 +117,7 @@ class PasswordResetForm(forms.Form):
         return email
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html',
-             use_https=False, token_generator=default_token_generator):
+             use_https=False, token_generator=default_token_generator, from_email=None):
         """
         Generates a one-use only link for resetting password and sends to the user
         """
@@ -134,7 +140,7 @@ class PasswordResetForm(forms.Form):
                 'protocol': use_https and 'https' or 'http',
             }
             send_mail(_("Password reset on %s") % site_name,
-                t.render(Context(c)), None, [user.email])
+                t.render(Context(c)), from_email, [user.email])
 
 class SetPasswordForm(forms.Form):
     """

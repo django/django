@@ -1,5 +1,3 @@
-.. _ref-contrib-localflavor:
-
 ==========================
 The "local flavor" add-ons
 ==========================
@@ -17,7 +15,7 @@ Inside that package, country- or culture-specific code is organized into
 subpackages, named using `ISO 3166 country codes`_.
 
 Most of the ``localflavor`` add-ons are localized form components deriving
-from the :ref:`forms <topics-forms-index>` framework -- for example, a
+from the :doc:`forms </topics/forms/index>` framework -- for example, a
 :class:`~django.contrib.localflavor.us.forms.USStateField` that knows how to
 validate U.S. state abbreviations, and a
 :class:`~django.contrib.localflavor.fi.forms.FISocialSecurityNumber` that
@@ -74,7 +72,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
 The ``django.contrib.localflavor`` package also includes a ``generic`` subpackage,
 containing useful code that is not specific to one particular country or culture.
 Currently, it defines date, datetime and split datetime input fields based on
-those from :ref:`forms <topics-forms-index>`, but with non-US default formats.
+those from :doc:`forms </topics/forms/index>`, but with non-US default formats.
 Here's an example of how to use them::
 
     from django import forms

@@ -8,11 +8,12 @@ import shutil
 import tempfile
 import time
 import unittest
+import warnings
 
 from django.conf import settings
 from django.core import management
 from django.core.cache import get_cache
-from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.base import InvalidCacheBackendError, CacheKeyWarning
 from django.http import HttpResponse, HttpRequest
 from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware
 from django.utils import translation
@@ -352,21 +353,68 @@ class BaseCacheTests(object):
         self.assertEqual(self.cache.get('key3'), 'sausage')
         self.assertEqual(self.cache.get('key4'), 'lobster bisque')
 
+    def perform_cull_test(self, initial_count, final_count):
+        """This is implemented as a utility method, because only some of the backends
+        implement culling. The culling algorithm also varies slightly, so the final
+        number of entries will vary between backends"""
+        # Create initial cache key entries. This will overflow the cache, causing a cull
+        for i in range(1, initial_count):
+            self.cache.set('cull%d' % i, 'value', 1000)
+        count = 0
+        # Count how many keys are left in the cache.
+        for i in range(1, initial_count):
+            if self.cache.has_key('cull%d' % i):
+                count = count + 1
+        self.assertEqual(count, final_count)
+
+    def test_invalid_keys(self):
+        """
+        All the builtin backends (except memcached, see below) should warn on
+        keys that would be refused by memcached. This encourages portable
+        caching code without making it too difficult to use production backends
+        with more liberal key rules. Refs #6447.
+
+        """
+        # On Python 2.6+ we could use the catch_warnings context
+        # manager to test this warning nicely. Since we can't do that
+        # yet, the cleanest option is to temporarily ask for
+        # CacheKeyWarning to be raised as an exception.
+        warnings.simplefilter("error", CacheKeyWarning)
+
+        # memcached does not allow whitespace or control characters in keys
+        self.assertRaises(CacheKeyWarning, self.cache.set, 'key with spaces', 'value')
+        # memcached limits key length to 250
+        self.assertRaises(CacheKeyWarning, self.cache.set, 'a' * 251, 'value')
+
+        # The warnings module has no public API for getting the
+        # current list of warning filters, so we can't save that off
+        # and reset to the previous value, we have to globally reset
+        # it. The effect will be the same, as long as the Django test
+        # runner doesn't add any global warning filters (it currently
+        # does not).
+        warnings.resetwarnings()
+
 class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         # Spaces are used in the table name to ensure quoting/escaping is working
         self._table_name = 'test cache table'
         management.call_command('createcachetable', self._table_name, verbosity=0, interactive=False)
-        self.cache = get_cache('db://%s' % self._table_name)
+        self.cache = get_cache('db://%s?max_entries=30' % self._table_name)
 
     def tearDown(self):
         from django.db import connection
         cursor = connection.cursor()
         cursor.execute('DROP TABLE %s' % connection.ops.quote_name(self._table_name))
 
+    def test_cull(self):
+        self.perform_cull_test(50, 29)
+
 class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
-        self.cache = get_cache('locmem://')
+        self.cache = get_cache('locmem://?max_entries=30')
+
+    def test_cull(self):
+        self.perform_cull_test(50, 29)
 
 # memcached backend isn't guaranteed to be available.
 # To check the memcached backend, the test settings file will
@@ -377,13 +425,29 @@ if settings.CACHE_BACKEND.startswith('memcached://'):
         def setUp(self):
             self.cache = get_cache(settings.CACHE_BACKEND)
 
+        def test_invalid_keys(self):
+            """
+            On memcached, we don't introduce a duplicate key validation
+            step (for speed reasons), we just let the memcached API
+            library raise its own exception on bad keys. Refs #6447.
+
+            In order to be memcached-API-library agnostic, we only assert
+            that a generic exception of some kind is raised.
+
+            """
+            # memcached does not allow whitespace or control characters in keys
+            self.assertRaises(Exception, self.cache.set, 'key with spaces', 'value')
+            # memcached limits key length to 250
+            self.assertRaises(Exception, self.cache.set, 'a' * 251, 'value')
+
+
 class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     """
     Specific test cases for the file-based cache.
     """
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
-        self.cache = get_cache('file://%s' % self.dirname)
+        self.cache = get_cache('file://%s?max_entries=30' % self.dirname)
 
     def test_hashing(self):
         """Test that keys are hashed into subdirectories correctly"""
@@ -405,6 +469,25 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         self.assert_(not os.path.exists(keypath))
         self.assert_(not os.path.exists(os.path.dirname(keypath)))
         self.assert_(not os.path.exists(os.path.dirname(os.path.dirname(keypath))))
+
+    def test_cull(self):
+        self.perform_cull_test(50, 28)
+
+class CustomCacheKeyValidationTests(unittest.TestCase):
+    """
+    Tests for the ability to mixin a custom ``validate_key`` method to
+    a custom cache backend that otherwise inherits from a builtin
+    backend, and override the default key validation. Refs #6447.
+
+    """
+    def test_custom_key_validation(self):
+        cache = get_cache('regressiontests.cache.liberal_backend://')
+
+        # this key is both longer than 250 characters, and has spaces
+        key = 'some key with spaces' * 15
+        val = 'a value'
+        cache.set(key, val)
+        self.assertEqual(cache.get(key), val)
 
 class CacheUtils(unittest.TestCase):
     """TestCase for django.utils.cache functions."""

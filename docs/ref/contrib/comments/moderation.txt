@@ -1,5 +1,3 @@
-.. _ref-contrib-comments-moderation:
-
 ==========================
 Generic comment moderation
 ==========================

@@ -1,5 +1,3 @@
-.. _topics-db-index:
-
 Models and databases
 ====================
 

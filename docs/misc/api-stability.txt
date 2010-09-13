@@ -1,10 +1,8 @@
-.. _misc-api-stability:
-
 =============
 API stability
 =============
 
-:ref:`The release of Django 1.0 <releases-1.0>` comes with a promise of API
+:doc:`The release of Django 1.0 </releases/1.0>` comes with a promise of API
 stability and forwards-compatibility. In a nutshell, this means that code you
 develop against Django 1.0 will continue to work against 1.1 unchanged, and you
 should need to make only minor changes for any 1.X release.
@@ -37,67 +35,67 @@ Stable APIs
 ===========
 
 In general, everything covered in the documentation -- with the exception of
-anything in the :ref:`internals area <internals-index>` is considered stable as
+anything in the :doc:`internals area </internals/index>` is considered stable as
 of 1.0. This includes these APIs:
 
-    - :ref:`Authorization <topics-auth>`
+    - :doc:`Authorization </topics/auth>`
 
-    - :ref:`Caching <topics-cache>`.
+    - :doc:`Caching </topics/cache>`.
     
-    - :ref:`Model definition, managers, querying and transactions
-      <topics-db-index>`
+    - :doc:`Model definition, managers, querying and transactions
+      </topics/db/index>`
     
-    - :ref:`Sending e-mail <topics-email>`.
+    - :doc:`Sending e-mail </topics/email>`.
     
-    - :ref:`File handling and storage <topics-files>`
+    - :doc:`File handling and storage </topics/files>`
     
-    - :ref:`Forms <topics-forms-index>`
+    - :doc:`Forms </topics/forms/index>`
     
-    - :ref:`HTTP request/response handling <topics-http-index>`, including file
+    - :doc:`HTTP request/response handling </topics/http/index>`, including file
       uploads, middleware, sessions, URL resolution, view, and shortcut APIs.
     
-    - :ref:`Generic views <topics-http-generic-views>`.
+    - :doc:`Generic views </topics/http/generic-views>`.
 
-    - :ref:`Internationalization <topics-i18n>`.
+    - :doc:`Internationalization </topics/i18n/index>`.
     
-    - :ref:`Pagination <topics-pagination>`
+    - :doc:`Pagination </topics/pagination>`
     
-    - :ref:`Serialization <topics-serialization>`
+    - :doc:`Serialization </topics/serialization>`
     
-    - :ref:`Signals <topics-signals>`
+    - :doc:`Signals </topics/signals>`
     
-    - :ref:`Templates <topics-templates>`, including the language, Python-level
-      :ref:`template APIs <ref-templates-index>`, and :ref:`custom template tags
-      and libraries <howto-custom-template-tags>`. We may add new template
+    - :doc:`Templates </topics/templates>`, including the language, Python-level
+      :doc:`template APIs </ref/templates/index>`, and :doc:`custom template tags
+      and libraries </howto/custom-template-tags>`. We may add new template
       tags in the future and the names may inadvertently clash with
       external template tags. Before adding any such tags, we'll ensure that
       Django raises an error if it tries to load tags with duplicate names.
       
-    - :ref:`Testing <topics-testing>`
+    - :doc:`Testing </topics/testing>`
 
-    - :ref:`django-admin utility <ref-django-admin>`.
+    - :doc:`django-admin utility </ref/django-admin>`.
     
-    - :ref:`Built-in middleware <ref-middleware>`
+    - :doc:`Built-in middleware </ref/middleware>`
     
-    - :ref:`Request/response objects <ref-request-response>`.
+    - :doc:`Request/response objects </ref/request-response>`.
     
-    - :ref:`Settings <ref-settings>`. Note, though that while the :ref:`list of
-      built-in settings <ref-settings>` can be considered complete we may -- and
+    - :doc:`Settings </ref/settings>`. Note, though that while the :doc:`list of
+      built-in settings </ref/settings>` can be considered complete we may -- and
       probably will -- add new settings in future versions. This is one of those
       places where "'stable' does not mean 'complete.'"
       
-    - :ref:`Built-in signals <ref-signals>`. Like settings, we'll probably add
+    - :doc:`Built-in signals </ref/signals>`. Like settings, we'll probably add
       new signals in the future, but the existing ones won't break.
       
-    - :ref:`Unicode handling <ref-unicode>`.
+    - :doc:`Unicode handling </ref/unicode>`.
         
-    - Everything covered by the :ref:`HOWTO guides <howto-index>`.
+    - Everything covered by the :doc:`HOWTO guides </howto/index>`.
     
 ``django.utils``
 ----------------
 
 Most of the modules in ``django.utils`` are designed for internal use. Only
-the following parts of :ref:`django.utils <ref-utils>` can be considered stable:
+the following parts of :doc:`django.utils </ref/utils>` can be considered stable:
 
     - ``django.utils.cache``
     - ``django.utils.datastructures.SortedDict`` -- only this single class; the

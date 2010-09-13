@@ -1,5 +1,3 @@
-.. _ref-contrib-comments-example:
-
 .. highlightlang:: html+django
 
 ===========================================
@@ -7,7 +5,7 @@ Example of using the in-built comments app
 ===========================================
 
 Follow the first three steps of the quick start guide in the
-:ref:`documentation <ref-contrib-comments-index>`.
+:doc:`documentation </ref/contrib/comments/index>`.
 
 Now suppose, you have an app (``blog``) with a model (``Post``)
 to which you want to attach comments. Let us also suppose that
@@ -85,8 +83,8 @@ It looks for the ``form.html`` under the following directories
 
 Since we customize the form in the second method, we make use of another
 tag called :ttag:`comment_form_target`. This tag on rendering gives the URL
-where the comment form is posted. Without any :ref:`customization
-<ref-contrib-comments-custom>`, :ttag:`comment_form_target` evaluates to
+where the comment form is posted. Without any :doc:`customization
+</ref/contrib/comments/custom>`, :ttag:`comment_form_target` evaluates to
 ``/comments/post/``. We use this tag in the form's ``action`` attribute.
 
 The :ttag:`get_comment_form` tag renders a ``form`` for a model instance by
@@ -136,7 +134,7 @@ found under the directory structure we saw for ``form.html``.
 Feeds
 =====
 
-Suppose you want to export a :ref:`feed <ref-contrib-syndication>` of the
+Suppose you want to export a :doc:`feed </ref/contrib/syndication>` of the
 latest comments, you can use the in-built :class:`LatestCommentFeed`. Just
 enable it in your project's ``urls.py``:
 
@@ -163,8 +161,8 @@ Moderation
 
 Now that we have the comments framework working, we might want to have some
 moderation setup to administer the comments. The comments framework comes
-in-built with :ref:`generic comment moderation
-<ref-contrib-comments-moderation>`. The comment moderation has the following
+in-built with :doc:`generic comment moderation
+</ref/contrib/comments/moderation>`. The comment moderation has the following
 features (all of which or only certain can be enabled):
 
   * Enable comments for a particular model instance.
@@ -181,18 +179,18 @@ following way:
 
    from django.contrib.comments.moderation import CommentModerator, moderator
    from django.db import models
-   
+
    class Post(models.Model):
        title   = models.CharField(max_length = 255)
        content = models.TextField()
        posted_date = models.DateTimeField()
-   
+
    class PostModerator(CommentModerator):
        email_notification = True
        auto_close_field   = 'posted_date'
        # Close the comments after 7 days.
        close_after        = 7
-   
+
    moderator.register(Post, PostModerator)
 
 The generic comment moderation also has the facility to remove comments.

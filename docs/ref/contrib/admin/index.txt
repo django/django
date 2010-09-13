@@ -1,13 +1,9 @@
-.. _ref-contrib-admin:
-
 =====================
 The Django admin site
 =====================
 
 .. module:: django.contrib.admin
    :synopsis: Django's admin site.
-
-.. currentmodule:: django.contrib.admin
 
 One of the most powerful parts of Django is the automatic admin interface. It
 reads metadata in your model to provide a powerful and production-ready
@@ -474,17 +470,16 @@ change list page. By default, this is set to ``100``.
 
 .. attribute:: ModelAdmin.list_select_related
 
-Set ``list_select_related`` to tell Django to use ``select_related()`` in
-retrieving the list of objects on the admin change list page. This can save you
-a bunch of database queries.
+Set ``list_select_related`` to tell Django to use
+:meth:`~django.db.models.QuerySet.select_related` in retrieving the list of
+objects on the admin change list page. This can save you a bunch of database
+queries.
 
 The value should be either ``True`` or ``False``. Default is ``False``.
 
-Note that Django will use ``select_related()``, regardless of this setting,
-if one of the ``list_display`` fields is a ``ForeignKey``.
-
-For more on ``select_related()``, see
-:ref:`the select_related() docs <select-related>`.
+Note that Django will use :meth:`~django.db.models.QuerySet.select_related`,
+regardless of this setting, if one of the ``list_display`` fields is a
+``ForeignKey``.
 
 .. attribute:: ModelAdmin.inlines
 
@@ -595,10 +590,15 @@ This should be set to a list of field names that will be searched whenever
 somebody submits a search query in that text box.
 
 These fields should be some kind of text field, such as ``CharField`` or
-``TextField``. You can also perform a related lookup on a ``ForeignKey`` with
-the lookup API "follow" notation::
+``TextField``. You can also perform a related lookup on a ``ForeignKey`` or
+``ManyToManyField`` with the lookup API "follow" notation::
 
     search_fields = ['foreign_key__related_fieldname']
+
+For example, if you have a blog entry with an author, the following definition
+would enable search blog entries by the email address of the author::
+
+    search_fields = ['user__email']
 
 When somebody does a search in the admin search box, Django splits the search
 query into words and returns all objects that contain each of the words, case
@@ -674,7 +674,7 @@ do that::
 
 Note that the key in the dictionary is the actual field class, *not* a string.
 The value is another dictionary; these arguments will be passed to
-:meth:`~django.forms.Field.__init__`. See :ref:`ref-forms-api` for details.
+:meth:`~django.forms.Field.__init__`. See :doc:`/ref/forms/api` for details.
 
 .. warning::
 
@@ -692,7 +692,7 @@ The value is another dictionary; these arguments will be passed to
 .. versionadded:: 1.1
 
 A list of actions to make available on the change list page. See
-:ref:`ref-contrib-admin-actions` for details.
+:doc:`/ref/contrib/admin/actions` for details.
 
 .. attribute:: ModelAdmin.actions_on_top
 .. attribute:: ModelAdmin.actions_on_bottom
@@ -743,8 +743,8 @@ templates used by the :class:`ModelAdmin` views:
 
     Path to a custom template, used by the :meth:`delete_selected`
     action method for displaying a confirmation page when deleting one
-    or more objects. See the :ref:`actions
-    documentation<ref-contrib-admin-actions>`.
+    or more objects. See the :doc:`actions
+    documentation</ref/contrib/admin/actions>`.
 
 .. attribute:: ModelAdmin.object_history_template
 
@@ -801,7 +801,7 @@ described above in the :attr:`ModelAdmin.readonly_fields` section.
 
 The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
 that ModelAdmin in the same way as a URLconf.  Therefore you can extend them as
-documented in :ref:`topics-http-urls`::
+documented in :doc:`/topics/http/urls`::
 
     class MyModelAdmin(admin.ModelAdmin):
         def get_urls(self):
@@ -829,7 +829,7 @@ problems:
 
 Since this is usually not what you want, Django provides a convenience wrapper
 to check permissions and mark the view as non-cacheable. This wrapper is
-:meth:`AdminSite.admin_view` (i.e.  ``self.admin_site.admin_view`` inside a
+:meth:`AdminSite.admin_view` (i.e. ``self.admin_site.admin_view`` inside a
 ``ModelAdmin`` instance); use it like so::
 
     class MyModelAdmin(admin.ModelAdmin):
@@ -865,11 +865,26 @@ return a subset of objects for this foreign key field based on the user::
         def formfield_for_foreignkey(self, db_field, request, **kwargs):
             if db_field.name == "car":
                 kwargs["queryset"] = Car.objects.filter(owner=request.user)
-                return db_field.formfield(**kwargs)
             return super(MyModelAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key field
-to only the cars owned by the ``User`` instance.
+to only display the cars owned by the ``User`` instance.
+
+.. method:: ModelAdmin.formfield_for_manytomany(self, db_field, request, **kwargs)
+
+.. versionadded:: 1.1
+
+Like the ``formfield_for_foreignkey`` method, the ``formfield_for_manytomany``
+method can be overridden to change the default formfield for a many to many
+field. For example, if an owner can own multiple cars and cars can belong
+to multiple owners -- a many to many relationship -- you could filter the
+``Car`` foreign key field to only display the cars owned by the ``User``::
+
+    class MyModelAdmin(admin.ModelAdmin):
+        def formfield_for_manytomany(self, db_field, request, **kwargs):
+            if db_field.name == "cars":
+                kwargs["queryset"] = Car.objects.filter(owner=request.user)
+            return super(MyModelAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
 .. method:: ModelAdmin.queryset(self, request)
 
@@ -950,7 +965,7 @@ on your ``ModelAdmin``::
             js = ("my_code.js",)
 
 Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
-apply as :ref:`regular media definitions on forms <topics-forms-media>`.
+apply as :doc:`regular media definitions on forms </topics/forms/media>`.
 
 Django admin Javascript makes use of the `jQuery`_ library. To avoid
 conflict with user scripts, Django's jQuery is namespaced as
@@ -983,8 +998,8 @@ any field::
             return self.cleaned_data["name"]
 
 It is important you use a ``ModelForm`` here otherwise things can break. See the
-:ref:`forms <ref-forms-index>` documentation on :ref:`custom validation
-<ref-forms-validation>` and, more specifically, the
+:doc:`forms </ref/forms/index>` documentation on :doc:`custom validation
+</ref/forms/validation>` and, more specifically, the
 :ref:`model form validation notes <overriding-modelform-clean-method>` for more
 information.
 
@@ -992,6 +1007,8 @@ information.
 
 ``InlineModelAdmin`` objects
 ============================
+
+.. class:: InlineModelAdmin
 
 The admin interface has the ability to edit models on the same page as a
 parent model. These are called inlines. Suppose you have these two models::
@@ -1027,90 +1044,88 @@ The difference between these two is merely the template used to render them.
 The ``InlineModelAdmin`` class is a subclass of ``ModelAdmin`` so it inherits
 all the same functionality as well as some of its own:
 
-``model``
-~~~~~~~~~
+.. attribute:: InlineModelAdmin.model
 
-The model in which the inline is using. This is required.
+    The model in which the inline is using. This is required.
 
-``fk_name``
-~~~~~~~~~~~
+.. attribute:: InlineModelAdmin.fk_name
 
-The name of the foreign key on the model. In most cases this will be dealt
-with automatically, but ``fk_name`` must be specified explicitly if there are
-more than one foreign key to the same parent model.
+    The name of the foreign key on the model. In most cases this will be dealt
+    with automatically, but ``fk_name`` must be specified explicitly if there
+    are more than one foreign key to the same parent model.
 
-``formset``
-~~~~~~~~~~~
+.. attribute:: InlineModelAdmin.formset
 
-This defaults to ``BaseInlineFormSet``. Using your own formset can give you
-many possibilities of customization. Inlines are built around
-:ref:`model formsets <model-formsets>`.
+    This defaults to ``BaseInlineFormSet``. Using your own formset can give you
+    many possibilities of customization. Inlines are built around
+    :ref:`model formsets <model-formsets>`.
 
-``form``
-~~~~~~~~
+.. attribute:: InlineModelAdmin.form
 
-The value for ``form`` defaults to ``ModelForm``. This is what is
-passed through to ``inlineformset_factory`` when creating the formset for this
-inline.
+    The value for ``form`` defaults to ``ModelForm``. This is what is passed
+    through to ``inlineformset_factory`` when creating the formset for this
+    inline.
 
 .. _ref-contrib-admin-inline-extra:
 
-``extra``
-~~~~~~~~~
+.. attribute:: InlineModelAdmin.extra
 
-This controls the number of extra forms the formset will display in addition
-to the initial forms. See the
-:ref:`formsets documentation <topics-forms-formsets>` for more information.
 
-.. versionadded:: 1.2
+    This controls the number of extra forms the formset will display in addition
+    to the initial forms. See the
+    :doc:`formsets documentation </topics/forms/formsets>` for more information.
 
-For users with JavaScript-enabled browsers, an "Add another" link is
-provided to enable any number of additional inlines to be added in
-addition to those provided as a result of the ``extra`` argument.
+    .. versionadded:: 1.2
 
-The dynamic link will not appear if the number of currently displayed
-forms exceeds ``max_num``, or if the user does not have JavaScript
-enabled.
+    For users with JavaScript-enabled browsers, an "Add another" link is
+    provided to enable any number of additional inlines to be added in addition
+    to those provided as a result of the ``extra`` argument.
+
+    The dynamic link will not appear if the number of currently displayed forms
+    exceeds ``max_num``, or if the user does not have JavaScript enabled.
 
 .. _ref-contrib-admin-inline-max-num:
 
-``max_num``
-~~~~~~~~~~~
+.. attribute:: InlineModelAdmin.max_num
 
-This controls the maximum number of forms to show in the inline. This doesn't
-directly correlate to the number of objects, but can if the value is small
-enough. See :ref:`model-formsets-max-num` for more information.
+    This controls the maximum number of forms to show in the inline. This
+    doesn't directly correlate to the number of objects, but can if the value
+    is small enough. See :ref:`model-formsets-max-num` for more information.
 
-``raw_id_fields``
-~~~~~~~~~~~~~~~~~
+.. attribute:: InlineModelAdmin.raw_id_fields
 
-By default, Django's admin uses a select-box interface (<select>) for
-fields that are ``ForeignKey``. Sometimes you don't want to incur the
-overhead of having to select all the related instances to display in the
-drop-down.
+    By default, Django's admin uses a select-box interface (<select>) for
+    fields that are ``ForeignKey``. Sometimes you don't want to incur the
+    overhead of having to select all the related instances to display in the
+    drop-down.
 
-``raw_id_fields`` is a list of fields you would like to change
-into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
+    ``raw_id_fields`` is a list of fields you would like to change into a
+    ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
 
-    class BookInline(admin.TabularInline):
-        model = Book
-        raw_id_fields = ("pages",)
+        class BookInline(admin.TabularInline):
+            model = Book
+            raw_id_fields = ("pages",)
 
-``template``
-~~~~~~~~~~~~
 
-The template used to render the inline on the page.
+.. attribute:: InlineModelAdmin.template
 
-``verbose_name``
-~~~~~~~~~~~~~~~~
+    The template used to render the inline on the page.
 
-An override to the ``verbose_name`` found in the model's inner ``Meta`` class.
+.. attribute:: InlineModelAdmin.verbose_name
 
-``verbose_name_plural``
-~~~~~~~~~~~~~~~~~~~~~~~
+    An override to the ``verbose_name`` found in the model's inner ``Meta``
+    class.
 
-An override to the ``verbose_name_plural`` found in the model's inner ``Meta``
-class.
+.. attribute:: InlineModelAdmin.verbose_name_plural
+
+    An override to the ``verbose_name_plural`` found in the model's inner
+    ``Meta`` class.
+
+.. attribute:: InlineModelAdmin.can_delete
+
+    Specifies whether or not inline objects can be deleted in the inline.
+    Defaults to ``True``.
+
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
@@ -1189,7 +1204,7 @@ your admin page for managing the relation.
 
 In all other respects, the ``InlineModelAdmin`` is exactly the same as any
 other. You can customize the appearance using any of the normal
-``InlineModelAdmin`` properties.
+``ModelAdmin`` properties.
 
 Working with Many-to-Many Intermediary Models
 ----------------------------------------------
@@ -1281,7 +1296,7 @@ example app::
 
 ``django.contrib.contenttypes.generic`` provides both a ``GenericTabularInline``
 and ``GenericStackedInline`` and behave just like any other inline. See the
-:ref:`contenttypes documentation <ref-contrib-contenttypes>` for more specific
+:doc:`contenttypes documentation </ref/contrib/contenttypes>` for more specific
 information.
 
 Overriding Admin Templates

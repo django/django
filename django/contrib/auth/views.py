@@ -105,7 +105,7 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
 def password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html',
         email_template_name='registration/password_reset_email.html',
         password_reset_form=PasswordResetForm, token_generator=default_token_generator,
-        post_reset_redirect=None):
+        post_reset_redirect=None, from_email=None):
     if post_reset_redirect is None:
         post_reset_redirect = reverse('django.contrib.auth.views.password_reset_done')
     if request.method == "POST":
@@ -114,6 +114,7 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
             opts = {}
             opts['use_https'] = request.is_secure()
             opts['token_generator'] = token_generator
+            opts['from_email'] = from_email
             if is_admin_site:
                 opts['domain_override'] = request.META['HTTP_HOST']
             else:

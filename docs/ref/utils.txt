@@ -1,5 +1,3 @@
-.. _ref-utils:
-
 ============
 Django Utils
 ============
@@ -32,7 +30,7 @@ into account when building its cache key. Requests with the same path but
 different header content for headers named in ``Vary`` need to get different
 cache keys to prevent delivery of wrong content.
 
-For example, :ref:`internationalization <topics-i18n>` middleware would need
+For example, :doc:`internationalization </topics/i18n/index>` middleware would need
 to distinguish caches by the ``Accept-language`` header.
 
 .. function:: patch_cache_control(response, **kwargs)
@@ -395,7 +393,7 @@ applied once).
    :synopsis: Internationalization support.
 
 For a complete discussion on the usage of the following see the
-:ref:`Internationalization documentation <topics-i18n-internationalization>`.
+:doc:`Internationalization documentation </topics/i18n/internationalization>`.
 
 .. function:: gettext(message)
 

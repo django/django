@@ -108,7 +108,13 @@ class BaseModelAdmin(object):
             # rendered output. formfield can be None if it came from a
             # OneToOneField with parent_link=True or a M2M intermediary.
             if formfield and db_field.name not in self.raw_id_fields:
-                formfield.widget = widgets.RelatedFieldWidgetWrapper(formfield.widget, db_field.rel, self.admin_site)
+                related_modeladmin = self.admin_site._registry.get(
+                                                            db_field.rel.to)
+                can_add_related = bool(related_modeladmin and
+                            related_modeladmin.has_add_permission(request))
+                formfield.widget = widgets.RelatedFieldWidgetWrapper(
+                            formfield.widget, db_field.rel, self.admin_site,
+                            can_add_related=can_add_related)
 
             return formfield
 
@@ -502,7 +508,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Convert the actions into a SortedDict keyed by name
         # and sorted by description.
-        actions.sort(lambda a,b: cmp(a[2].lower(), b[2].lower()))
+        actions.sort(key=lambda k: k[2].lower())
         actions = SortedDict([
             (name, (func, name, desc))
             for func, name, desc in actions
@@ -755,7 +761,7 @@ class ModelAdmin(BaseModelAdmin):
             if isinstance(response, HttpResponse):
                 return response
             else:
-                return HttpResponseRedirect(".")
+                return HttpResponseRedirect(request.get_full_path())
         else:
             msg = _("No action selected.")
             self.message_user(request, msg)

@@ -1,5 +1,3 @@
-.. _ref-contrib-redirects:
-
 =================
 The redirects app
 =================
@@ -47,8 +45,8 @@ Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you
 can put ``RedirectFallbackMiddleware`` at the end of the list, because it's a
 last resort.
 
-For more on middleware, read the :ref:`middleware docs
-<topics-http-middleware>`.
+For more on middleware, read the :doc:`middleware docs
+</topics/http/middleware>`.
 
 How to add, change and delete redirects
 =======================================
@@ -65,8 +63,8 @@ Via the Python API
 
 .. class:: models.Redirect
 
-    Redirects are represented by a standard :ref:`Django model <topics-db-models>`,
+    Redirects are represented by a standard :doc:`Django model </topics/db/models>`,
     which lives in `django/contrib/redirects/models.py`_. You can access redirect
-    objects via the :ref:`Django database API <topics-db-queries>`.
+    objects via the :doc:`Django database API </topics/db/queries>`.
 
 .. _django/contrib/redirects/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/redirects/models.py

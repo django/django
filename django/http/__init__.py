@@ -1,5 +1,7 @@
+import datetime
 import os
 import re
+import time
 from Cookie import BaseCookie, SimpleCookie, CookieError
 from pprint import pformat
 from urllib import urlencode
@@ -12,6 +14,7 @@ except ImportError:
 
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
+from django.utils.http import cookie_date
 from django.http.multipartparser import MultiPartParser
 from django.conf import settings
 from django.core.files import uploadhandler
@@ -177,14 +180,14 @@ class QueryDict(MultiValueDict):
         super(QueryDict, self).__delitem__(key)
 
     def __copy__(self):
-        result = self.__class__('', mutable=True)
+        result = self.__class__('', mutable=True, encoding=self.encoding)
         for key, value in dict.items(self):
             dict.__setitem__(result, key, value)
         return result
 
     def __deepcopy__(self, memo):
         import django.utils.copycompat as copy
-        result = self.__class__('', mutable=True)
+        result = self.__class__('', mutable=True, encoding=self.encoding)
         memo[id(self)] = result
         for key, value in dict.items(self):
             dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
@@ -303,13 +306,16 @@ class HttpResponse(object):
 
     def __init__(self, content='', mimetype=None, status=None,
             content_type=None):
-        from django.conf import settings
+        # _headers is a mapping of the lower-case name to the original case of
+        # the header (required for working with legacy systems) and the header
+        # value.  Both the name of the header and its value are ASCII strings.
+        self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
         if mimetype:
             content_type = mimetype     # For backwards compatibility
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
-                    settings.DEFAULT_CHARSET)
+                    self._charset)
         if not isinstance(content, basestring) and hasattr(content, '__iter__'):
             self._container = content
             self._is_string = False
@@ -320,10 +326,7 @@ class HttpResponse(object):
         if status:
             self.status_code = status
 
-        # _headers is a mapping of the lower-case name to the original case of
-        # the header (required for working with legacy systems) and the header
-        # value.
-        self._headers = {'content-type': ('Content-Type', content_type)}
+        self['Content-Type'] = content_type
 
     def __str__(self):
         """Full HTTP message, including headers."""
@@ -373,11 +376,32 @@ class HttpResponse(object):
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/',
                    domain=None, secure=False):
+        """
+        Sets a cookie.
+
+        ``expires`` can be a string in the correct format or a 
+        ``datetime.datetime`` object in UTC. If ``expires`` is a datetime
+        object then ``max_age`` will be calculated.
+        """
         self.cookies[key] = value
+        if expires is not None:
+            if isinstance(expires, datetime.datetime):
+                delta = expires - expires.utcnow()
+                # Add one second so the date matches exactly (a fraction of
+                # time gets lost between converting to a timedelta and
+                # then the date string).
+                delta = delta + datetime.timedelta(seconds=1)
+                # Just set max_age - the max_age logic will set expires.
+                expires = None
+                max_age = max(0, delta.days * 86400 + delta.seconds)
+            else:
+                self.cookies[key]['expires'] = expires
         if max_age is not None:
             self.cookies[key]['max-age'] = max_age
-        if expires is not None:
-            self.cookies[key]['expires'] = expires
+            # IE requires expires, so set it if hasn't been already.
+            if not expires:
+                self.cookies[key]['expires'] = cookie_date(time.time() +
+                                                           max_age) 
         if path is not None:
             self.cookies[key]['path'] = path
         if domain is not None:

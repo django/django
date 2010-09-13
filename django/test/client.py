@@ -3,6 +3,7 @@ from urlparse import urlparse, urlunparse, urlsplit
 import sys
 import os
 import re
+import mimetypes
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -54,6 +55,10 @@ class ClientHandler(BaseHandler):
     Uses the WSGI interface to compose requests, but returns
     the raw HttpResponse object
     """
+    def __init__(self, enforce_csrf_checks=True, *args, **kwargs):
+        self.enforce_csrf_checks = enforce_csrf_checks
+        super(ClientHandler, self).__init__(*args, **kwargs)
+
     def __call__(self, environ):
         from django.conf import settings
         from django.core import signals
@@ -70,7 +75,7 @@ class ClientHandler(BaseHandler):
             # CsrfViewMiddleware.  This makes life easier, and is probably
             # required for backwards compatibility with external tests against
             # admin views.
-            request._dont_enforce_csrf_checks = True
+            request._dont_enforce_csrf_checks = not self.enforce_csrf_checks
             response = self.get_response(request)
 
             # Apply response middleware.
@@ -138,11 +143,14 @@ def encode_multipart(boundary, data):
 
 def encode_file(boundary, key, file):
     to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
+    content_type = mimetypes.guess_type(file.name)[0]
+    if content_type is None:
+        content_type = 'application/octet-stream'
     return [
         '--' + boundary,
         'Content-Disposition: form-data; name="%s"; filename="%s"' \
             % (to_str(key), to_str(os.path.basename(file.name))),
-        'Content-Type: application/octet-stream',
+        'Content-Type: %s' % content_type,
         '',
         file.read()
     ]
@@ -165,8 +173,8 @@ class Client(object):
     contexts and templates produced by a view, rather than the
     HTML rendered to the end-user.
     """
-    def __init__(self, **defaults):
-        self.handler = ClientHandler()
+    def __init__(self, enforce_csrf_checks=False, **defaults):
+        self.handler = ClientHandler(enforce_csrf_checks)
         self.defaults = defaults
         self.cookies = SimpleCookie()
         self.exc_info = None
@@ -289,7 +297,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def post(self, path, data={}, content_type=MULTIPART_CONTENT,
@@ -321,7 +329,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def head(self, path, data={}, follow=False, **extra):
@@ -340,7 +348,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def options(self, path, data={}, follow=False, **extra):
@@ -358,7 +366,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def put(self, path, data={}, content_type=MULTIPART_CONTENT,
@@ -390,7 +398,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def delete(self, path, data={}, follow=False, **extra):
@@ -408,7 +416,7 @@ class Client(object):
 
         response = self.request(**r)
         if follow:
-            response = self._handle_redirects(response)
+            response = self._handle_redirects(response, **extra)
         return response
 
     def login(self, **credentials):
@@ -463,7 +471,7 @@ class Client(object):
             session.delete(session_key=session_cookie.value)
         self.cookies = SimpleCookie()
 
-    def _handle_redirects(self, response):
+    def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."
 
         response.redirect_chain = []
@@ -474,7 +482,6 @@ class Client(object):
             redirect_chain = response.redirect_chain
             redirect_chain.append((url, response.status_code))
 
-            extra = {}
             if scheme:
                 extra['wsgi.url_scheme'] = scheme
 

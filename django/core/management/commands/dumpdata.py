@@ -16,11 +16,15 @@ class Command(BaseCommand):
             default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
                 'fixtures into. Defaults to the "default" database.'),
         make_option('-e', '--exclude', dest='exclude',action='append', default=[],
-            help='App to exclude (use multiple --exclude to exclude multiple apps).'),
+            help='An appname or appname.ModelName to exclude (use multiple --exclude to exclude multiple apps/models).'),
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
             help='Use natural keys if they are available.'),
+        make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
+            help="Use Django's base manager to dump all models stored in the database, including those that would otherwise be filtered or modified by a custom manager."),
     )
-    help = 'Output the contents of the database as a fixture of the given format.'
+    help = ("Output the contents of the database as a fixture of the given "
+            "format (using each model's default manager unless --all is "
+            "specified).")
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
@@ -30,11 +34,26 @@ class Command(BaseCommand):
         indent = options.get('indent',None)
         using = options.get('database', DEFAULT_DB_ALIAS)
         connection = connections[using]
-        exclude = options.get('exclude',[])
+        excludes = options.get('exclude',[])
         show_traceback = options.get('traceback', False)
         use_natural_keys = options.get('use_natural_keys', False)
+        use_base_manager = options.get('use_base_manager', False)
 
-        excluded_apps = set(get_app(app_label) for app_label in exclude)
+        excluded_apps = set()
+        excluded_models = set()
+        for exclude in excludes:
+            if '.' in exclude:
+                app_label, model_name = exclude.split('.', 1)
+                model_obj = get_model(app_label, model_name)
+                if not model_obj:
+                    raise CommandError('Unknown model in excludes: %s' % exclude)
+                excluded_models.add(model_obj)
+            else:
+                try:
+                    app_obj = get_app(exclude)
+                    excluded_apps.add(app_obj)
+                except ImproperlyConfigured:
+                    raise CommandError('Unknown app in excludes: %s' % exclude)
 
         if len(app_labels) == 0:
             app_list = SortedDict((app, None) for app in get_apps() if app not in excluded_apps)
@@ -47,7 +66,8 @@ class Command(BaseCommand):
                         app = get_app(app_label)
                     except ImproperlyConfigured:
                         raise CommandError("Unknown application: %s" % app_label)
-
+                    if app in excluded_apps:
+                        continue
                     model = get_model(app_label, model_label)
                     if model is None:
                         raise CommandError("Unknown model: %s.%s" % (app_label, model_label))
@@ -64,6 +84,8 @@ class Command(BaseCommand):
                         app = get_app(app_label)
                     except ImproperlyConfigured:
                         raise CommandError("Unknown application: %s" % app_label)
+                    if app in excluded_apps:
+                        continue
                     app_list[app] = None
 
         # Check that the serialization format exists; this is a shortcut to
@@ -79,8 +101,13 @@ class Command(BaseCommand):
         # Now collate the objects to be serialized.
         objects = []
         for model in sort_dependencies(app_list.items()):
+            if model in excluded_models:
+                continue
             if not model._meta.proxy and router.allow_syncdb(using, model):
-                objects.extend(model._default_manager.using(using).all())
+                if use_base_manager:
+                    objects.extend(model._base_manager.using(using).all())
+                else:
+                    objects.extend(model._default_manager.using(using).all())
 
         try:
             return serializers.serialize(format, objects, indent=indent,

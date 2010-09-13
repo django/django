@@ -1,5 +1,3 @@
-.. _ref-contrib-webdesign:
-
 ========================
 django.contrib.webdesign
 ========================
@@ -9,13 +7,13 @@ django.contrib.webdesign
               rather than Web *developers*.
 
 The ``django.contrib.webdesign`` package, part of the
-:ref:`"django.contrib" add-ons <ref-contrib-index>`, provides various Django
+:doc:`"django.contrib" add-ons </ref/contrib/index>`, provides various Django
 helpers that are particularly useful to Web *designers* (as opposed to
 developers).
 
 At present, the package contains only a single template tag. If you have ideas
 for Web-designer-friendly functionality in Django, please
-:ref:`suggest them <internals-contributing>`.
+:doc:`suggest them </internals/contributing>`.
 
 Template tags
 =============

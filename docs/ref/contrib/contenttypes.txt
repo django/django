@@ -1,5 +1,3 @@
-.. _ref-contrib-contenttypes:
-
 ==========================
 The contenttypes framework
 ==========================
@@ -114,7 +112,7 @@ Methods on ``ContentType`` instances
 
     Takes a set of valid :ref:`lookup arguments <field-lookups-intro>` for the
     model the :class:`~django.contrib.contenttypes.models.ContentType`
-    represents, and does :ref:`a get() lookup <get-kwargs>` on that model,
+    represents, and does :lookup:`a get() lookup <get>` on that model,
     returning the corresponding object.
 
 .. method:: models.ContentType.model_class()
@@ -324,15 +322,19 @@ same types of lookups manually::
     ...                           object_id=b.id)
     [<TaggedItem: django>, <TaggedItem: python>]
 
-Note that if the model with a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
-that you're referring to uses a non-default value for ``ct_field`` or ``fk_field``
-(e.g. the :mod:`django.contrib.comments` app uses ``ct_field="object_pk"``),
-you'll need to pass ``content_type_field`` and ``object_id_field`` to
-:class:`~django.contrib.contenttypes.generic.GenericRelation`.::
+Note that if the model in a
+:class:`~django.contrib.contenttypes.generic.GenericRelation` uses a
+non-default value for ``ct_field`` or ``fk_field`` in its
+:class:`~django.contrib.contenttypes.generic.GenericForeignKey` (e.g. the
+:mod:`django.contrib.comments` app uses ``ct_field="object_pk"``),
+you'll need to set ``content_type_field`` and/or ``object_id_field`` in
+the :class:`~django.contrib.contenttypes.generic.GenericRelation` to
+match the ``ct_field`` and ``fk_field``, respectively, in the
+:class:`~django.contrib.contenttypes.generic.GenericForeignKey`::
 
-	comments = generic.GenericRelation(Comment, content_type_field="content_type", object_id_field="object_pk")
+	comments = generic.GenericRelation(Comment, object_id_field="object_pk")
 
-Note that if you delete an object that has a
+Note also, that if you delete an object that has a
 :class:`~django.contrib.contenttypes.generic.GenericRelation`, any objects
 which have a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
 pointing at it will be deleted as well. In the example above, this means that
@@ -342,7 +344,7 @@ it would be deleted at the same time.
 Generic relations and aggregation
 ---------------------------------
 
-:ref:`Django's database aggregation API <topics-db-aggregation>`
+:doc:`Django's database aggregation API </topics/db/aggregation>`
 doesn't work with a
 :class:`~django.contrib.contenttypes.generic.GenericRelation`. For example, you
 might be tempted to try something like::
@@ -361,14 +363,14 @@ Generic relations in forms and admin
 :class:`~django.contrib.contenttypes.generic.GenericInlineFormSet`
 and :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`.
 This enables the use of generic relations in forms and the admin. See the
-:ref:`model formset <topics-forms-modelforms>` and
-:ref:`admin <ref-contrib-admin>` documentation for more information.
+:doc:`model formset </topics/forms/modelforms>` and
+:doc:`admin </ref/contrib/admin/index>` documentation for more information.
 
 .. class:: generic.GenericInlineModelAdmin
 
     The :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`
     class inherits all properties from an
-    :class:`~django.contrib.admin.options.InlineModelAdmin` class. However,
+    :class:`~django.contrib.admin.InlineModelAdmin` class. However,
     it adds a couple of its own for working with the generic relation:
 
     .. attribute:: generic.GenericInlineModelAdmin.ct_field

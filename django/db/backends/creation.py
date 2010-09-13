@@ -350,12 +350,17 @@ class BaseDatabaseCreation(object):
         can_rollback = self._rollback_works()
         self.connection.settings_dict["SUPPORTS_TRANSACTIONS"] = can_rollback
 
-        call_command('syncdb', verbosity=verbosity, interactive=False, database=self.connection.alias)
+        # Report syncdb messages at one level lower than that requested.
+        # This ensures we don't get flooded with messages during testing
+        # (unless you really ask to be flooded)
+        call_command('syncdb', verbosity=max(verbosity - 1, 0), interactive=False, database=self.connection.alias)
 
         if settings.CACHE_BACKEND.startswith('db://'):
-            from django.core.cache import parse_backend_uri
-            _, cache_name, _ = parse_backend_uri(settings.CACHE_BACKEND)
-            call_command('createcachetable', cache_name)
+            from django.core.cache import parse_backend_uri, cache
+            from django.db import router
+            if router.allow_syncdb(self.connection.alias, cache.cache_model_class):
+                _, cache_name, _ = parse_backend_uri(settings.CACHE_BACKEND)
+                call_command('createcachetable', cache_name, database=self.connection.alias)
 
         # Get a cursor (even though we don't need one yet). This has
         # the side effect of initializing the test database.
@@ -388,10 +393,8 @@ class BaseDatabaseCreation(object):
             if autoclobber or confirm == 'yes':
                 try:
                     if verbosity >= 1:
-                        print "Destroying old test database..."
+                        print "Destroying old test database '%s'..." % self.connection.alias
                     cursor.execute("DROP DATABASE %s" % qn(test_database_name))
-                    if verbosity >= 1:
-                        print "Creating test database..."
                     cursor.execute("CREATE DATABASE %s %s" % (qn(test_database_name), suffix))
                 except Exception, e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)

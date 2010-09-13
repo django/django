@@ -118,7 +118,7 @@ class BaseCommand(object):
     # Metadata about this command.
     option_list = (
         make_option('-v', '--verbosity', action='store', dest='verbosity', default='1',
-            type='choice', choices=['0', '1', '2'],
+            type='choice', choices=['0', '1', '2', '3'],
             help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
         make_option('--settings',
             help='The Python path to a settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.'),
@@ -213,20 +213,24 @@ class BaseCommand(object):
                 sys.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
                 sys.exit(1)
         try:
+            self.stdout = options.get('stdout', sys.stdout)
+            self.stderr = options.get('stderr', sys.stderr)
             if self.requires_model_validation:
                 self.validate()
             output = self.handle(*args, **options)
             if output:
                 if self.output_transaction:
-                    # This needs to be imported here, because it relies on settings.
-                    from django.db import connection
+                    # This needs to be imported here, because it relies on
+                    # settings.
+                    from django.db import connections, DEFAULT_DB_ALIAS
+                    connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
                     if connection.ops.start_transaction_sql():
-                        print self.style.SQL_KEYWORD(connection.ops.start_transaction_sql())
-                print output
+                        self.stdout.write(self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()))
+                self.stdout.write(output)
                 if self.output_transaction:
-                    print self.style.SQL_KEYWORD("COMMIT;")
+                    self.stdout.write(self.style.SQL_KEYWORD("COMMIT;") + '\n')
         except CommandError, e:
-            sys.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
+            self.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
             sys.exit(1)
 
     def validate(self, app=None, display_num_errors=False):
@@ -248,7 +252,7 @@ class BaseCommand(object):
             error_text = s.read()
             raise CommandError("One or more models did not validate:\n%s" % error_text)
         if display_num_errors:
-            print "%s error%s found" % (num_errors, num_errors != 1 and 's' or '')
+            self.stdout.write("%s error%s found\n" % (num_errors, num_errors != 1 and 's' or ''))
 
     def handle(self, *args, **options):
         """
@@ -390,9 +394,9 @@ def copy_helper(style, app_or_project, name, directory, other_name=''):
         relative_dir = d[len(template_dir)+1:].replace('%s_name' % app_or_project, name)
         if relative_dir:
             os.mkdir(os.path.join(top_dir, relative_dir))
-        for i, subdir in enumerate(subdirs):
+        for subdir in subdirs[:]:
             if subdir.startswith('.'):
-                del subdirs[i]
+                subdirs.remove(subdir)
         for f in files:
             if not f.endswith('.py'):
                 # Ignore .pyc, .pyo, .py.class etc, as they cause various

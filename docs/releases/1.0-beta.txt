@@ -1,5 +1,3 @@
-.. _releases-1.0-beta:
-
 ===============================
 Django 1.0 beta 1 release notes
 ===============================
@@ -20,9 +18,9 @@ What's new in Django 1.0 beta 1
 
 Django's development trunk has been the site of nearly constant activity over
 the past year, with several major new features landing since the 0.96 release.
-For features which were new as of Django 1.0 alpha 1, see :ref:`the 1.0 alpha 1
-release notes <releases-1.0-alpha-1>`. For features which were new as of Django
-1.0 alpha 2, see :ref:`the 1.0 alpha 2 release notes <releases-1.0-alpha-2>`.
+For features which were new as of Django 1.0 alpha 1, see :doc:`the 1.0 alpha 1
+release notes </releases/1.0-alpha-1>`. For features which were new as of Django
+1.0 alpha 2, see :doc:`the 1.0 alpha 2 release notes </releases/1.0-alpha-2>`.
 
 This beta release does not contain any major new features, but does
 include several smaller updates and improvements to Django:
@@ -38,7 +36,7 @@ Improved flexibility in the admin
     interface (``django.contrib.admin``), introduced in Django 1.0
     alpha 1, two new hooks have been added to allow customized pre-
     and post-save handling of model instances in the admin. Full
-    details are in :ref:`the admin documentation <ref-contrib-admin>`.
+    details are in :doc:`the admin documentation </ref/contrib/admin/index>`.
 
 ``INSERT``/``UPDATE`` distinction
     Although Django's default behavior of having a model's ``save()``
@@ -59,7 +57,7 @@ Split ``CacheMiddleware``
    flexibility for situations where combining these functions into a
    single middleware posed problems. Full details, including updated
    notes on appropriate use, are in 
-   :ref:`the caching documentation <topics-cache>`.
+   :doc:`the caching documentation </topics/cache>`.
 
 Removal of deprecated features
     A number of features and methods which had previously been marked
@@ -148,7 +146,7 @@ to join the discussions there.
 Django's online documentation also includes pointers on how to
 contribute to Django:
 
-    :ref:`contributing to Django <internals-contributing>`
+    :doc:`contributing to Django </internals/contributing>`
 
 Contributions on any level -- developing code, writing
 documentation or simply triaging tickets and helping to test proposed

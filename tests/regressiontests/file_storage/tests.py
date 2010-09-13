@@ -230,3 +230,19 @@ if Image is not None:
             finally:
                 del images.open
             self.assert_(FileWrapper._closed)
+
+    class InconsistentGetImageDimensionsBug(TestCase):
+        """
+        Test that get_image_dimensions() works properly after various calls using a file handler (#11158)
+        """
+        def test_multiple_calls(self):
+            """
+            Multiple calls of get_image_dimensions() should return the same size.
+            """
+            from django.core.files.images import ImageFile
+            img_path = os.path.join(os.path.dirname(__file__), "test.png")
+            image = ImageFile(open(img_path))
+            image_pil = Image.open(img_path)
+            size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
+            self.assertEqual(image_pil.size, size_1)
+            self.assertEqual(size_1, size_2)

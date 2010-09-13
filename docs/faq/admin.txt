@@ -1,5 +1,3 @@
-.. _faq-admin:
-
 FAQ: The admin
 ==============
 
@@ -32,30 +30,33 @@ How can I prevent the cache middleware from caching the admin site?
 -------------------------------------------------------------------
 
 Set the :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY` setting to ``True``. See the
-:ref:`cache documentation <topics-cache>` for more information.
+:doc:`cache documentation </topics/cache>` for more information.
 
 How do I automatically set a field's value to the user who last edited the object in the admin?
 -----------------------------------------------------------------------------------------------
 
-The :class:`ModelAdmin` class provides customization hooks that allow you to transform
-an object as it saved, using details from the request. By extracting the current user
-from the request, and customizing the :meth:`ModelAdmin.save_model` hook, you can update
-an object to reflect the user that edited it. See :ref:`the documentation on ModelAdmin
-methods <model-admin-methods>` for an example.
+The :class:`~django.contrib.admin.ModelAdmin` class provides customization hooks
+that allow you to transform an object as it saved, using details from the
+request. By extracting the current user from the request, and customizing the
+:meth:`~django.contrib.admin.ModelAdmin.save_model` hook, you can update an
+object to reflect the user that edited it. See :ref:`the documentation on
+ModelAdmin methods <model-admin-methods>` for an example.
 
 How do I limit admin access so that objects can only be edited by the users who created them?
 ---------------------------------------------------------------------------------------------
 
-The :class:`ModelAdmin` class also provides customization hooks that allow you to control the
-visibility and editability of objects in the admin. Using the same trick of extracting the
-user from the request, the :meth:`ModelAdmin.queryset` and :meth:`ModelAdmin.has_change_permission`
-can be used to control the visibility and editability of objects in the admin.
+The :class:`~django.contrib.admin.ModelAdmin` class also provides customization
+hooks that allow you to control the visibility and editability of objects in the
+admin. Using the same trick of extracting the user from the request, the
+:meth:`~django.contrib.admin.ModelAdmin.queryset` and
+:meth:`~django.contrib.admin.ModelAdmin.has_change_permission` can be used to
+control the visibility and editability of objects in the admin.
 
-My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.
+My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_wsgi.
 ---------------------------------------------------------------------------------------------------------------------------
 
-See :ref:`serving the admin files <howto-deployment-modpython-serving-the-admin-files>`
-in the "How to use Django with mod_python" documentation.
+See :ref:`serving the admin files <serving-the-admin-files>`
+in the "How to use Django with mod_wsgi" documentation.
 
 My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ----------------------------------------------------------------------------
@@ -91,5 +92,5 @@ We like it, but if you don't agree, you can modify the admin site's
 presentation by editing the CSS stylesheet and/or associated image files. The
 site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
 like to make should be possible by editing the stylesheet. We've got a
-:ref:`guide to the CSS used in the admin <obsolete-admin-css>` to get you started.
+:doc:`guide to the CSS used in the admin </obsolete/admin-css>` to get you started.
 

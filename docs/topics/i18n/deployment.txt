@@ -1,5 +1,3 @@
-.. _topics-i18n-deployment:
-
 ==========================
 Deployment of translations
 ==========================
@@ -72,8 +70,8 @@ For example, your ``MIDDLEWARE_CLASSES`` might look like this::
        'django.middleware.common.CommonMiddleware',
     )
 
-(For more on middleware, see the :ref:`middleware documentation
-<topics-http-middleware>`.)
+(For more on middleware, see the :doc:`middleware documentation
+</topics/http/middleware>`.)
 
 ``LocaleMiddleware`` tries to determine the user's language preference by
 following this algorithm:

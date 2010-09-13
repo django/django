@@ -6,7 +6,7 @@ class MySQLCreation(DatabaseCreation):
         from django.contrib.gis.db.models.fields import GeometryField
         output = super(MySQLCreation, self).sql_indexes_for_field(model, f, style)
 
-        if isinstance(f, GeometryField):
+        if isinstance(f, GeometryField) and f.spatial_index:
             qn = self.connection.ops.quote_name
             db_table = model._meta.db_table
             idx_name = '%s_%s_id' % (db_table, f.column)

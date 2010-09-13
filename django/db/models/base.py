@@ -1,6 +1,5 @@
 import types
 import sys
-import os
 from itertools import izip
 import django.db.models.manager     # Imported to register signal handler.
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS
@@ -16,7 +15,7 @@ from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 import django.utils.copycompat as copy
 from django.utils.functional import curry, update_wrapper
-from django.utils.encoding import smart_str, force_unicode, smart_unicode
+from django.utils.encoding import smart_str, force_unicode
 from django.utils.text import get_text_list, capfirst
 from django.conf import settings
 
@@ -456,7 +455,7 @@ class Model(object):
             meta = cls._meta
 
         if origin and not meta.auto_created:
-            signals.pre_save.send(sender=origin, instance=self, raw=raw)
+            signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using)
 
         # If we are in a raw save, save the object exactly as presented.
         # That means that we don't try to be smart about saving attributes
@@ -540,7 +539,7 @@ class Model(object):
         # Signal that the save is complete
         if origin and not meta.auto_created:
             signals.post_save.send(sender=origin, instance=self,
-                created=(not record_exists), raw=raw)
+                created=(not record_exists), raw=raw, using=using)
 
     save_base.alters_data = True
 
@@ -645,6 +644,8 @@ class Model(object):
         return force_unicode(dict(field.flatchoices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
+        if not self.pk:
+            raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
         op = is_next and 'gt' or 'lt'
         order = not is_next and '-' or ''
         param = smart_str(getattr(self, field.attname))
@@ -744,11 +745,11 @@ class Model(object):
                     continue
                 if f.unique:
                     unique_checks.append((model_class, (name,)))
-                if f.unique_for_date:
+                if f.unique_for_date and f.unique_for_date not in exclude:
                     date_checks.append((model_class, 'date', name, f.unique_for_date))
-                if f.unique_for_year:
+                if f.unique_for_year and f.unique_for_year not in exclude:
                     date_checks.append((model_class, 'year', name, f.unique_for_year))
-                if f.unique_for_month:
+                if f.unique_for_month and f.unique_for_month not in exclude:
                     date_checks.append((model_class, 'month', name, f.unique_for_month))
         return unique_checks, date_checks
 

@@ -1,5 +1,3 @@
-.. _topics-serialization:
-
 ==========================
 Serializing Django objects
 ==========================
@@ -141,10 +139,6 @@ to install third-party Python modules:
     ``json``    Serializes to and from JSON_ (using a version of simplejson_
                 bundled with Django).
 
-    ``python``  Translates to and from "simple" Python objects (lists, dicts,
-                strings, etc.).  Not really all that useful on its own, but
-                used as a base for other serializers.
-
     ``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
                 serializer is only available if PyYAML_ is installed.
     ==========  ==============================================================
@@ -169,7 +163,7 @@ For example::
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 The Django source code includes the simplejson_ module. However, if you're
-using Python 2.6 (which includes a builtin version of the module), Django will
+using Python 2.6 or later (which includes a builtin version of the module), Django will
 use the builtin ``json`` module automatically. If you have a system installed
 version that includes the C-based speedup extension, or your system version is
 more recent than the version shipped with Django (currently, 2.0.7), the
@@ -338,7 +332,7 @@ example, ``(first name, last name)``. Then, when you call
 ``serializers.serialize()``, you provide a ``use_natural_keys=True``
 argument::
 
-    >>> serializers.serialize([book1, book2], format='json', indent=2, use_natural_keys=True)
+    >>> serializers.serialize('json', [book1, book2], indent=2, use_natural_keys=True)
 
 When ``use_natural_keys=True`` is specified, Django will use the
 ``natural_key()`` method to serialize any reference to objects of the

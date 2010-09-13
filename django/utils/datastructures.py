@@ -77,6 +77,27 @@ class MergeDict(object):
         """Returns a copy of this object."""
         return self.__copy__()
 
+    def __str__(self):
+        '''
+        Returns something like
+
+            "{'key1': 'val1', 'key2': 'val2', 'key3': 'val3'}"
+
+        instead of the generic "<object meta-data>" inherited from object.
+        '''
+        return str(dict(self.items()))
+
+    def __repr__(self):
+        '''
+        Returns something like
+
+            MergeDict({'key1': 'val1', 'key2': 'val2'}, {'key3': 'val3'})
+
+        instead of generic "<object meta-data>" inherited from object.
+        '''
+        dictreprs = ', '.join(repr(d) for d in self.dicts)
+        return '%s(%s)' % (self.__class__.__name__, dictreprs)
+
 class SortedDict(dict):
     """
     A dictionary that keeps its keys in the order in which they're inserted.
@@ -99,9 +120,11 @@ class SortedDict(dict):
             self.keyOrder = data.keys()
         else:
             self.keyOrder = []
+            seen = set()
             for key, value in data:
-                if key not in self.keyOrder:
+                if key not in seen:
                     self.keyOrder.append(key)
+                    seen.add(key)
 
     def __deepcopy__(self, memo):
         return self.__class__([(key, deepcopy(value, memo))

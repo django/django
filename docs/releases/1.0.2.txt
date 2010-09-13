@@ -1,5 +1,3 @@
-.. _releases-1.0.2:
-
 ==========================
 Django 1.0.2 release notes
 ==========================
@@ -9,7 +7,7 @@ Welcome to Django 1.0.2!
 This is the second "bugfix" release in the Django 1.0 series,
 improving the stability and performance of the Django 1.0 codebase. As
 such, Django 1.0.2 contains no new features (and, pursuant to
-:ref:`our compatibility policy <misc-api-stability>`, maintains backwards compatibility with Django
+:doc:`our compatibility policy </misc/api-stability>`, maintains backwards compatibility with Django
 1.0.0), but does contain a number of fixes and other
 improvements. Django 1.0.2 is a recommended upgrade for any
 development or deployment currently using or targeting Django 1.0.
@@ -27,7 +25,7 @@ Django's unit-test suite.
 Django 1.0.2 contains updated packaging scripts, and the release
 package contains the directories omitted from Django 1.0.1. As such,
 this release contains all of the fixes and improvements from Django
-1.0.1; see :ref:`the Django 1.0.1 release notes <releases-1.0.1>` for
+1.0.1; see :doc:`the Django 1.0.1 release notes </releases/1.0.1>` for
 details.
 
 Additionally, in the period since Django 1.0.1 was released:
