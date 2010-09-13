@@ -291,10 +291,20 @@ def upper(value):
 upper.is_safe = False
 upper = stringfilter(upper)
 
-def urlencode(value):
-    """Escapes a value for use in a URL."""
+def urlencode(value, safe=None):
+    """
+    Escapes a value for use in a URL.
+
+    Takes an optional ``safe`` parameter used to determine the characters which
+    should not be escaped by Django's ``urlquote`` method. If not provided, the
+    default safe characters will be used (but an empty string can be provided
+    when *all* characters should be escaped).
+    """
     from django.utils.http import urlquote
-    return urlquote(value)
+    kwargs = {}
+    if safe is not None:
+        kwargs['safe'] = safe
+    return urlquote(value, **kwargs)
 urlencode.is_safe = False
 urlencode = stringfilter(urlencode)
 

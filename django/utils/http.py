@@ -14,7 +14,7 @@ def urlquote(url, safe='/'):
     can safely be used as part of an argument to a subsequent iri_to_uri() call
     without double-quoting occurring.
     """
-    return force_unicode(urllib.quote(smart_str(url), safe))
+    return force_unicode(urllib.quote(smart_str(url), smart_str(safe)))
 
 urlquote = allow_lazy(urlquote, unicode)
 
@@ -25,7 +25,7 @@ def urlquote_plus(url, safe=''):
     returned string can safely be used as part of an argument to a subsequent
     iri_to_uri() call without double-quoting occurring.
     """
-    return force_unicode(urllib.quote_plus(smart_str(url), safe))
+    return force_unicode(urllib.quote_plus(smart_str(url), smart_str(safe)))
 urlquote_plus = allow_lazy(urlquote_plus, unicode)
 
 def urlencode(query, doseq=0):
