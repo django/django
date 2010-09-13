@@ -8,10 +8,11 @@ import unittest
 from cStringIO import StringIO
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
-from django.core.files.base import ContentFile
+from django.core.files.base import ContentFile, File
 from django.core.files.images import get_image_dimensions
-from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
+from django.core.exceptions import ImproperlyConfigured
 from unittest import TestCase
 try:
     import threading
@@ -29,16 +30,66 @@ except ImportError:
     except ImportError:
         Image = None
 
+class GetStorageClassTests(unittest.TestCase):
+    def assertRaisesErrorWithMessage(self, error, message, callable,
+        *args, **kwargs):
+        self.assertRaises(error, callable, *args, **kwargs)
+        try:
+            callable(*args, **kwargs)
+        except error, e:
+            self.assertEqual(message, str(e))
+
+    def test_get_filesystem_storage(self):
+        """
+        get_storage_class returns the class for a storage backend name/path.
+        """
+        self.assertEqual(
+            get_storage_class('django.core.files.storage.FileSystemStorage'),
+            FileSystemStorage)
+
+    def test_get_invalid_storage_module(self):
+        """
+        get_storage_class raises an error if the requested import don't exist.
+        """
+        self.assertRaisesErrorWithMessage(
+            ImproperlyConfigured,
+            "NonExistingStorage isn't a storage module.",
+            get_storage_class,
+            'NonExistingStorage')
+
+    def test_get_nonexisting_storage_class(self):
+        """
+        get_storage_class raises an error if the requested class don't exist.
+        """
+        self.assertRaisesErrorWithMessage(
+            ImproperlyConfigured,
+            'Storage module "django.core.files.storage" does not define a '\
+                '"NonExistingStorage" class.',
+            get_storage_class,
+            'django.core.files.storage.NonExistingStorage')
+
+    def test_get_nonexisting_storage_module(self):
+        """
+        get_storage_class raises an error if the requested module don't exist.
+        """
+        self.assertRaisesErrorWithMessage(
+            ImproperlyConfigured,
+            'Error importing storage module django.core.files.non_existing_'\
+                'storage: "No module named non_existing_storage"',
+            get_storage_class,
+            'django.core.files.non_existing_storage.NonExistingStorage')
+
 class FileStorageTests(unittest.TestCase):
     storage_class = FileSystemStorage
     
     def setUp(self):
         self.temp_dir = tempfile.mktemp()
         os.makedirs(self.temp_dir)
-        self.storage = self.storage_class(location=self.temp_dir)
+        self.storage = self.storage_class(location=self.temp_dir,
+            base_url='/test_media_url/')
     
     def tearDown(self):
-        os.rmdir(self.temp_dir)
+        shutil.rmtree(self.temp_dir)
         
     def test_file_access_options(self):
         """
@@ -56,6 +107,89 @@ class FileStorageTests(unittest.TestCase):
         
         self.storage.delete('storage_test')
         self.failIf(self.storage.exists('storage_test'))
+
+    def test_file_save_without_name(self):
+        """
+        File storage extracts the filename from the content object if no
+        name is given explicitly.
+        """
+        self.failIf(self.storage.exists('test.file'))
+
+        f = ContentFile('custom contents')
+        f.name = 'test.file'
+
+        storage_f_name = self.storage.save(None, f)
+
+        self.assertEqual(storage_f_name, f.name)
+
+        self.assert_(os.path.exists(os.path.join(self.temp_dir, f.name)))
+
+        self.storage.delete(storage_f_name)
+
+    def test_file_path(self):
+        """
+        File storage returns the full path of a file
+        """
+        self.failIf(self.storage.exists('test.file'))
+
+        f = ContentFile('custom contents')
+        f_name = self.storage.save('test.file', f)
+
+        self.assertEqual(self.storage.path(f_name),
+            os.path.join(self.temp_dir, f_name))
+
+        self.storage.delete(f_name)
+
+    def test_file_url(self):
+        """
+        File storage returns a url to access a given file from the web.
+        """
+        self.assertEqual(self.storage.url('test.file'),
+            '%s%s' % (self.storage.base_url, 'test.file'))
+
+        self.storage.base_url = None
+        self.assertRaises(ValueError, self.storage.url, 'test.file')
+
+    def test_file_with_mixin(self):
+        """
+        File storage can get a mixin to extend the functionality of the
+        returned file.
+        """
+        self.failIf(self.storage.exists('test.file'))
+
+        class TestFileMixin(object):
+            mixed_in = True
+
+        f = ContentFile('custom contents')
+        f_name = self.storage.save('test.file', f)
+
+        self.assert_(isinstance(
+            self.storage.open('test.file', mixin=TestFileMixin),
+            TestFileMixin
+        ))
+
+        self.storage.delete('test.file')
+
+    def test_listdir(self):
+        """
+        File storage returns a tuple containing directories and files.
+        """
+        self.failIf(self.storage.exists('storage_test_1'))
+        self.failIf(self.storage.exists('storage_test_2'))
+        self.failIf(self.storage.exists('storage_dir_1'))
+
+        f = self.storage.save('storage_test_1', ContentFile('custom content'))
+        f = self.storage.save('storage_test_2', ContentFile('custom content'))
+        os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
+
+        dirs, files = self.storage.listdir('')
+        self.assertEqual(set(dirs), set([u'storage_dir_1']))
+        self.assertEqual(set(files),
+                         set([u'storage_test_1', u'storage_test_2']))
+
+        self.storage.delete('storage_test_1')
+        self.storage.delete('storage_test_2')
+        os.rmdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
     def test_file_storage_prevents_directory_traversal(self):
         """
