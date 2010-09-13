@@ -9,6 +9,7 @@ circular import difficulties.
 import weakref
 from django.utils.copycompat import deepcopy
 
+from django.db.backends import util
 from django.utils import tree
 from django.utils.datastructures import SortedDict
 
@@ -262,9 +263,10 @@ def deferred_class_factory(model, attrs):
 
     # The app_cache wants a unique name for each model, otherwise the new class
     # won't be created (we get an old one back). Therefore, we generate the
-    # name using the passed in attrs. It's OK to reuse an old case if the attrs
-    # are identical.
+    # name using the passed in attrs. It's OK to reuse an existing class
+    # object if the attrs are identical.
     name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
+    name = util.truncate_name(name, 80, 32)
 
     overrides = dict([(attr, DeferredAttribute(attr, model))
             for attr in attrs])

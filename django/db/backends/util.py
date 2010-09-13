@@ -105,15 +105,15 @@ def rev_typecast_decimal(d):
         return None
     return str(d)
 
-def truncate_name(name, length=None):
+def truncate_name(name, length=None, hash_len=4):
     """Shortens a string to a repeatable mangled version with the given length.
     """
     if length is None or len(name) <= length:
         return name
 
-    hash = md5_constructor(name).hexdigest()[:4]
+    hash = md5_constructor(name).hexdigest()[:hash_len]
 
-    return '%s%s' % (name[:length-4], hash)
+    return '%s%s' % (name[:length-hash_len], hash)
 
 def format_number(value, max_digits, decimal_places):
     """
