@@ -123,30 +123,3 @@ class Unmanaged2(models.Model):
 # table *will* be created (unless given a custom `through` as for C02 above).
 class Managed1(models.Model):
     mm = models.ManyToManyField(Unmanaged1)
-
-__test__ = {'API_TESTS':"""
-The main test here is that the all the models can be created without any
-database errors. We can also do some more simple insertion and lookup tests
-whilst we're here to show that the second of models do refer to the tables from
-the first set.
-
-# Insert some data into one set of models.
->>> a = A01.objects.create(f_a="foo", f_b=42)
->>> _ = B01.objects.create(fk_a=a, f_a="fred", f_b=1729)
->>> c = C01.objects.create(f_a="barney", f_b=1)
->>> c.mm_a = [a]
-
-# ... and pull it out via the other set.
->>> A02.objects.all()
-[<A02: foo>]
->>> b = B02.objects.all()[0]
->>> b
-<B02: fred>
->>> b.fk_a
-<A02: foo>
->>> C02.objects.filter(f_a=None)
-[]
->>> C02.objects.filter(mm_a=a.id)
-[<C02: barney>]
-
-"""}
