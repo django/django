@@ -6,7 +6,7 @@
 {% block content %}
   {% load comments %}
   <form action="{% comment_form_target %}" method="post">{% csrf_token %}
-    {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+    {% if next %}<div><input type="hidden" name="next" value="{{ next }}" /></div>{% endif %}
     {% if form.errors %}
     <h1>{% blocktrans count form.errors|length as counter %}Please correct the error below{% plural %}Please correct the errors below{% endblocktrans %}</h1>
     {% else %}
@@ -18,7 +18,7 @@
     {% endif %}
     {% for field in form %}
       {% if field.is_hidden %}
-        {{ field }}
+        <div>{{ field }}</div>
       {% else %}
         {% if field.errors %}{{ field.errors }}{% endif %}
         <p
