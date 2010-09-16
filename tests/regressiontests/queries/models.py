@@ -1339,3 +1339,23 @@ Using an empty generator expression as the rvalue for an "__in" lookup is legal
 []
 
 """
+
+# Sqlite 3 does not support passing in more than 1000 parameters except by
+# changing a parameter at compilation time.
+if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != "django.db.backends.sqlite3":
+    __test__["API_TESTS"] += """
+Bug #14244: Test that the "in" lookup works with lists of 1000 items or more.
+>>> Number.objects.all().delete()
+>>> numbers = range(2500)
+>>> for num in numbers:
+...     _ = Number.objects.create(num=num)
+>>> Number.objects.filter(num__in=numbers[:1000]).count()
+1000
+>>> Number.objects.filter(num__in=numbers[:1001]).count()
+1001
+>>> Number.objects.filter(num__in=numbers[:2000]).count()
+2000
+>>> Number.objects.filter(num__in=numbers).count()
+2500
+
+"""
