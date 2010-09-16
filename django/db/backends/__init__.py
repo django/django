@@ -233,6 +233,13 @@ class BaseDatabaseOperations(object):
         """
         return "%s"
 
+    def max_in_list_size(self):
+        """
+        Returns the maximum number of items that can be passed in a single 'IN'
+        list condition, or None if the backend does not impose a limit.
+        """
+        return None
+
     def max_name_length(self):
         """
         Returns the maximum length of table and column names, or None if there

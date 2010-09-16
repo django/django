@@ -178,6 +178,9 @@ WHEN (new.%(col_name)s IS NULL)
             return "UPPER(%s)"
         return "%s"
 
+    def max_in_list_size(self):
+        return 1000
+
     def max_name_length(self):
         return 30
 
