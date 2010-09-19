@@ -42,10 +42,16 @@ class Serializer(base.Serializer):
             raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
 
         self.indent(1)
-        self.xml.startElement("object", {
-            "pk"    : smart_unicode(obj._get_pk_val()),
-            "model" : smart_unicode(obj._meta),
-        })
+        obj_pk = obj._get_pk_val()
+        if obj_pk is None:
+            attrs = {"model": smart_unicode(obj._meta),}
+        else:
+            attrs = {
+                "pk": smart_unicode(obj._get_pk_val()),
+                "model": smart_unicode(obj._meta),
+            }
+
+        self.xml.startElement("object", attrs)
 
     def end_object(self, obj):
         """
@@ -166,11 +172,12 @@ class Deserializer(base.Deserializer):
         # bail.
         Model = self._get_model_from_node(node, "model")
 
-        # Start building a data dictionary from the object.  If the node is
-        # missing the pk attribute, bail.
-        pk = node.getAttribute("pk")
-        if not pk:
-            raise base.DeserializationError("<object> node is missing the 'pk' attribute")
+        # Start building a data dictionary from the object.
+        # If the node is missing the pk set it to None
+        if node.hasAttribute("pk"):
+            pk = node.getAttribute("pk")
+        else:
+            pk = None
 
         data = {Model._meta.pk.attname : Model._meta.pk.to_python(pk)}
 
