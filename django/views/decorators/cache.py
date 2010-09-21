@@ -33,6 +33,10 @@ def cache_page(*args, **kwargs):
     #   my_view = cache_page(123, key_prefix="foo")(my_view)
     # and possibly this way (?):
     #   my_view = cache_page(123, my_view)
+    # and also this way:
+    #   my_view = cache_page(my_view)
+    # and also this way:
+    #   my_view = cache_page()(my_view)
 
     # We also add some asserts to give better error messages in case people are
     # using other ways to call cache_page that no longer work.
@@ -45,9 +49,14 @@ def cache_page(*args, **kwargs):
         elif callable(args[1]):
             return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], key_prefix=key_prefix)(args[1])
         else:
-            assert False, "cache_page must be passed either a single argument (timeout) or a view function and a timeout"
+            assert False, "cache_page must be passed a view function if called with two arguments"
+    elif len(args) == 1:
+        if callable(args[0]):
+            return decorator_from_middleware_with_args(CacheMiddleware)(key_prefix=key_prefix)(args[0])
+        else:
+            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], key_prefix=key_prefix)
     else:
-        return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], key_prefix=key_prefix)
+        return decorator_from_middleware_with_args(CacheMiddleware)(key_prefix=key_prefix)
 
 
 def cache_control(**kwargs):

@@ -112,6 +112,10 @@ class DecoratorsTest(TestCase):
         self.assertEqual(my_view_cached(HttpRequest()), "response")
         my_view_cached2 = cache_page(my_view, 123, key_prefix="test")
         self.assertEqual(my_view_cached2(HttpRequest()), "response")
+        my_view_cached3 = cache_page(my_view)
+        self.assertEqual(my_view_cached3(HttpRequest()), "response")
+        my_view_cached4 = cache_page()(my_view)
+        self.assertEqual(my_view_cached4(HttpRequest()), "response")
 
 
 # For testing method_decorator, a decorator that assumes a single argument.
