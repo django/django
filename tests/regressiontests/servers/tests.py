@@ -13,8 +13,9 @@ from django.core.servers.basehttp import AdminMediaHandler
 class AdminMediaHandlerTests(TestCase):
 
     def setUp(self):
-        self.admin_media_file_path = \
+        self.admin_media_file_path = os.path.abspath(
             os.path.join(django.__path__[0], 'contrib', 'admin', 'media')
+        )
         self.handler = AdminMediaHandler(WSGIHandler())
 
     def test_media_urls(self):
