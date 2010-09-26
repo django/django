@@ -1,3 +1,4 @@
+import mimetypes
 from os import path
 
 from django.test import TestCase
@@ -8,12 +9,13 @@ class StaticTests(TestCase):
 
     def test_serve(self):
         "The static view can serve static media"
-        media_files = ['file.txt',]
+        media_files = ['file.txt', 'file.txt.gz']
         for filename in media_files:
             response = self.client.get('/views/site_media/%s' % filename)
-            file = open(path.join(media_dir, filename))
-            self.assertEquals(file.read(), response.content)
+            file_path = path.join(media_dir, filename)
+            self.assertEquals(open(file_path).read(), response.content)
             self.assertEquals(len(response.content), int(response['Content-Length']))
+            self.assertEquals(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
 
     def test_unknown_mime_type(self):
         response = self.client.get('/views/site_media/file.unknown')
