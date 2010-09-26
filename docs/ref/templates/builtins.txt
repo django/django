@@ -2058,6 +2058,10 @@ yesno
 Given a string mapping values for true, false and (optionally) None,
 returns one of those strings according to the value:
 
+For example::
+
+    {{ value|yesno:"yeah,no,maybe" }}
+
 ==========  ======================  ==================================
 Value       Argument                Outputs
 ==========  ======================  ==================================
