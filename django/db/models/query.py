@@ -2,7 +2,6 @@
 The main QuerySet implementation. This provides the public API for the ORM.
 """
 
-from copy import deepcopy
 from itertools import izip
 
 from django.db import connections, router, transaction, IntegrityError
