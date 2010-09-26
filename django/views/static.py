@@ -56,7 +56,8 @@ def serve(request, path, document_root=None, show_indexes=False):
         raise Http404('"%s" does not exist' % fullpath)
     # Respect the If-Modified-Since header.
     statobj = os.stat(fullpath)
-    mimetype = mimetypes.guess_type(fullpath)[0] or 'application/octet-stream'
+    mimetype, encoding = mimetypes.guess_type(fullpath)
+    mimetype = mimetype or 'application/octet-stream'
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
         return HttpResponseNotModified(mimetype=mimetype)
@@ -64,6 +65,8 @@ def serve(request, path, document_root=None, show_indexes=False):
     response = HttpResponse(contents, mimetype=mimetype)
     response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
     response["Content-Length"] = len(contents)
+    if encoding:
+        response["Content-Encoding"] = encoding
     return response
 
 DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
