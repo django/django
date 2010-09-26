@@ -170,7 +170,7 @@ def validate_inline(cls, parent, parent_model):
     fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
 
     # extra = 3
-    if not isinstance(getattr(cls, 'extra'), int):
+    if not isinstance(cls.extra, int):
         raise ImproperlyConfigured("'%s.extra' should be a integer."
                 % cls.__name__)
 

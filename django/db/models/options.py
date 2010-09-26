@@ -79,14 +79,14 @@ class Options(object):
             # unique_together can be either a tuple of tuples, or a single
             # tuple of two strings. Normalize it to a tuple of tuples, so that
             # calling code can uniformly expect that.
-            ut = meta_attrs.pop('unique_together', getattr(self, 'unique_together'))
+            ut = meta_attrs.pop('unique_together', self.unique_together)
             if ut and not isinstance(ut[0], (tuple, list)):
                 ut = (ut,)
-            setattr(self, 'unique_together', ut)
+            self.unique_together = ut
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
-            setattr(self, 'verbose_name_plural', meta_attrs.pop('verbose_name_plural', string_concat(self.verbose_name, 's')))
+            self.verbose_name_plural = meta_attrs.pop('verbose_name_plural', string_concat(self.verbose_name, 's'))
 
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:

@@ -58,7 +58,7 @@ class DjangoTestRunner(unittest.TextTestRunner):
                 func(test)
             return stoptest
 
-        setattr(result, 'stopTest', stoptest_override(result.stopTest))
+        result.stopTest = stoptest_override(result.stopTest)
         return result
 
 def get_tests(app_module):

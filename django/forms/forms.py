@@ -268,7 +268,7 @@ class BaseForm(StrAndUnicode):
         self._clean_form()
         self._post_clean()
         if self._errors:
-            delattr(self, 'cleaned_data')
+            del self.cleaned_data
 
     def _clean_fields(self):
         for name, field in self.fields.items():

@@ -508,7 +508,7 @@ class Model(object):
                     # autopopulate the _order field
                     field = meta.order_with_respect_to
                     order_value = manager.using(using).filter(**{field.name: getattr(self, field.attname)}).count()
-                    setattr(self, '_order', order_value)
+                    self._order = order_value
 
                 if not pk_set:
                     if force_update:

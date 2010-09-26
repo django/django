@@ -257,9 +257,8 @@ def deferred_class_factory(model, attrs):
     deferred attributes to a particular instance of the model.
     """
     class Meta:
-        pass
-    setattr(Meta, "proxy", True)
-    setattr(Meta, "app_label", model._meta.app_label)
+        proxy = True
+        app_label = model._meta.app_label
 
     # The app_cache wants a unique name for each model, otherwise the new class
     # won't be created (we get an old one back). Therefore, we generate the

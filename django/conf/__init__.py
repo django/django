@@ -102,7 +102,7 @@ class Settings(object):
                 new_installed_apps.append(app)
         self.INSTALLED_APPS = new_installed_apps
 
-        if hasattr(time, 'tzset') and getattr(self, 'TIME_ZONE'):
+        if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
             zoneinfo_root = '/usr/share/zoneinfo'

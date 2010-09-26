@@ -63,7 +63,7 @@ def get_cache(backend_uri):
     else:
         name = scheme
     module = importlib.import_module(name)
-    return getattr(module, 'CacheClass')(host, params)
+    return module.CacheClass(host, params)
 
 cache = get_cache(settings.CACHE_BACKEND)
 

@@ -20,15 +20,12 @@ def load_backend(path):
         cls = getattr(mod, attr)
     except AttributeError:
         raise ImproperlyConfigured('Module "%s" does not define a "%s" authentication backend' % (module, attr))
-    try:
-        getattr(cls, 'supports_object_permissions')
-    except AttributeError:
+    if not hasattr(cls, "supports_object_permissions"):
         warn("Authentication backends without a `supports_object_permissions` attribute are deprecated. Please define it in %s." % cls,
              PendingDeprecationWarning)
         cls.supports_object_permissions = False
-    try:
-        getattr(cls, 'supports_anonymous_user')
-    except AttributeError:
+
+    if not hasattr(cls, 'supports_anonymous_user'):
         warn("Authentication backends without a `supports_anonymous_user` attribute are deprecated. Please define it in %s." % cls,
              PendingDeprecationWarning)
         cls.supports_anonymous_user = False
