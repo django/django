@@ -135,6 +135,6 @@ def was_modified_since(header=None, mtime=0, size=0):
             raise ValueError
         if mtime > header_mtime:
             raise ValueError
-    except (AttributeError, ValueError):
+    except (AttributeError, ValueError, OverflowError):
         return True
     return False
