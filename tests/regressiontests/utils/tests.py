@@ -12,4 +12,7 @@ from text import *
 from simplelazyobject import *
 from decorators import *
 from functional import *
-
+from timesince import *
+from datastructures import *
+from tzinfo import *
+from datetime_safe import *
