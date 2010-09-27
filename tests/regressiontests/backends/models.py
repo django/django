@@ -20,5 +20,4 @@ class SchoolClass(models.Model):
     day = models.CharField(max_length=9, blank=True)
     last_updated = models.DateTimeField()
 
-qn = connection.ops.quote_name
 
