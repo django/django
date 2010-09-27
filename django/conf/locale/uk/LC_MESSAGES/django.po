@@ -1,5 +1,5 @@
 # Django, ukrainian translation.
-# Copyright (C) 2008
+# Copyright (C) 2008-2010
 # This file is distributed under the same license as the PACKAGE package.
 #
 msgid ""
@@ -7,12 +7,13 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-19 19:42+0200\n"
-"PO-Revision-Date: 2008-11-23 00:02+0300\n"
+"PO-Revision-Date: 2010-04-06 00:02+0300\n"
 "Last-Translator: Mykola Zamkovoy <nickzam@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #: .\conf\global_settings.py:44
 msgid "Arabic"
@@ -604,6 +605,7 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Будь ласка, виправте помилку, що зазначена нижче"
 msgstr[1] "Будь ласка, виправте помилки, що зазначені нижче"
+msgstr[2] "Будь ласка, виправте помилки, що зазначені нижче"
 
 #: .\contrib\admin\templates\admin\change_list.html.py:16
 #, python-format
@@ -731,7 +733,8 @@ msgstr "Уперед"
 msgid "1 result"
 msgid_plural "%(counter)s results"
 msgstr[0] "1 результат"
-msgstr[1] "Результатів: %(counter)s"
+msgstr[1] "%(counter)s результати"
+msgstr[2] "%(counter)s результатів"
 
 #: .\contrib\admin\templates\admin\search_form.html.py:10
 #, python-format
@@ -1486,6 +1489,7 @@ msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Слідкуйте за виразами! Слово %s тут заборонено."
 msgstr[1] "Слідкуйте за виразами! Слова %s тут заборонені."
+msgstr[2] "Слідкуйте за виразами! Слова %s тут заборонені."
 
 #: .\contrib\comments\models.py:23
 msgid "object ID"
@@ -1699,6 +1703,7 @@ msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
 msgstr[0] "Будь ласка, виправте помилку, що зазначена нижче"
 msgstr[1] "Будь ласка, виправте помилки, що зазначені нижче"
+msgstr[2] "Будь ласка, виправте помилки, що зазначені нижче"
 
 #: .\contrib\comments\templates\comments\preview.html.py:15
 msgid "Post your comment"
@@ -1835,21 +1840,24 @@ msgstr ""
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f мільйон"
-msgstr[1] "%(value).1f мільйона(ів)"
+msgstr[1] "%(value).1f мільйони"
+msgstr[2] "%(value).1f мільйонів"
 
 #: .\contrib\humanize\templatetags\humanize.py:54
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f більйон"
-msgstr[1] "%(value).1f більйона(ів)"
+msgstr[0] "%(value).1f мільярд"
+msgstr[1] "%(value).1f мільярди"
+msgstr[2] "%(value).1f мільярдів"
 
 #: .\contrib\humanize\templatetags\humanize.py:57
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f трильйон"
-msgstr[1] "%(value).1f трильйона(ів)"
+msgstr[1] "%(value).1f трильйони"
+msgstr[2] "%(value).1f трильйонів"
 
 #: .\contrib\humanize\templatetags\humanize.py:73
 msgid "one"
@@ -4004,11 +4012,14 @@ msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] ""
-"Будь ласка, введіть правильне десяткове число з загальною  кількістю цифр не "
-"більше ніж %s."
+"Будь ласка, введіть правильне десяткове число з загальною кількістю цифр не "
+"більшою ніж %s."
 msgstr[1] ""
-"Будь ласка, введіть правильне десяткове число з загальною  кількістю цифр не "
-"більше ніж %s."
+"Будь ласка, введіть правильне десяткове число з загальною кількістю цифр не "
+"більшою ніж %s."
+msgstr[2] ""
+"Будь ласка, введіть правильне десяткове число з загальною кількістю цифр не "
+"більшою ніж %s."
 
 #: .\core\validators.py:443
 #, python-format
@@ -4018,10 +4029,13 @@ msgid_plural ""
 "Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr[0] ""
 "Будь ласка, введіть правильне десяткове число з цілою частиною, що налічує  "
-"максимум %s цифр"
+"максимум %s цифру."
 msgstr[1] ""
 "Будь ласка, введіть правильне десяткове число з цілою частиною, що налічує  "
-"максимум %s цифр"
+"максимум %s цифри."
+msgstr[2] ""
+"Будь ласка, введіть правильне десяткове число з цілою частиною, що налічує  "
+"максимум %s цифр."
 
 #: .\core\validators.py:446
 #, python-format
@@ -4030,6 +4044,7 @@ msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] "Будь ласка, введіть правильне десяткове число з %s цифр після коми."
 msgstr[1] "Будь ласка, введіть правильне десяткове число з %s цифр після коми."
+msgstr[2] "Будь ласка, введіть правильне десяткове число з %s цифр після коми."
 
 #: .\core\validators.py:454
 msgid "Please enter a valid floating point number."
@@ -4166,7 +4181,8 @@ msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
 "Будь ласка, введіть правильні %(self)s ID. Значення %(value)r помилкове."
-msgstr[1] ""
+msgstr[1] "Будь ласка, введіть правильні %(self)s ID. Значення %(value)r помилкові."
+msgstr[2] "Будь ласка, введіть правильні %(self)s ID. Значення %(value)r помилкові."
 
 #: .\forms\fields.py:54 .\newforms\fields.py:46 .\oldforms\__init__.py:370
 msgid "This field is required."
@@ -4293,7 +4309,8 @@ msgstr "Зробить коректний вибір. Такого варіан�
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] "Переконайтеся, що ваш текст менше, ніж %s символ."
-msgstr[1] "Переконайтеся, що ваш текст менше, ніж %s символів."
+msgstr[1] "Переконайтеся, що ваш текст менше, ніж %s символи."
+msgstr[2] "Переконайтеся, що ваш текст менше, ніж %s символів."
 
 #: .\oldforms\__init__.py:410
 msgid "Line breaks are not allowed here."
@@ -4326,7 +4343,8 @@ msgstr "так,ні,можливо"
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d байт"
-msgstr[1] "%(size)d байтів"
+msgstr[1] "%(size)d байти"
+msgstr[2] "%(size)d байтів"
 
 #: .\template\defaultfilters.py:776
 #, python-format
@@ -4555,37 +4573,43 @@ msgstr "або"
 msgid "year"
 msgid_plural "years"
 msgstr[0] "рік"
-msgstr[1] "рокі(в)"
+msgstr[1] "роки"
+msgstr[2] "років"
 
 #: .\utils\timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "місяць"
-msgstr[1] "місяці(в)"
+msgstr[1] "місяці"
+msgstr[2] "місяців"
 
 #: .\utils\timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "тиждень"
-msgstr[1] "тижні(в)"
+msgstr[1] "тижні"
+msgstr[2] "тижнів"
 
 #: .\utils\timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "день"
-msgstr[1] "дні(в)"
+msgstr[1] "дні"
+msgstr[2] "днів"
 
 #: .\utils\timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "година"
-msgstr[1] "годин(и)"
+msgstr[1] "години"
+msgstr[2] "годин"
 
 #: .\utils\timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "хвилина"
-msgstr[1] "хвилин(и)"
+msgstr[1] "хвилини"
+msgstr[2] "хвилин"
 
 #: .\utils\timesince.py:43
 msgid "minutes"
