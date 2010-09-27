@@ -186,3 +186,42 @@ if settings.DATABASES[DEFAULT_DB_ALIAS]["ENGINE"] != "django.db.backends.sqlite3
             data.clear()
             cursor = connection.cursor()
             self.assertTrue(data == {})
+
+
+class BackendTestCase(TestCase):
+    def test_cursor_executemany(self):
+        #4896: Test cursor.executemany
+        cursor = connection.cursor()
+        qn = connection.ops.quote_name
+        opts = models.Square._meta
+        f1, f2 = opts.get_field('root'), opts.get_field('square')
+        query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)'
+                 % (connection.introspection.table_name_converter(opts.db_table), qn(f1.column), qn(f2.column)))
+        cursor.executemany(query, [(i, i**2) for i in range(-5, 6)])
+        self.assertEqual(models.Square.objects.count(), 11)
+        for i in range(-5, 6):
+            square = models.Square.objects.get(root=i)
+            self.assertEqual(square.square, i**2)
+
+        #4765: executemany with params=[] does nothing
+        cursor.executemany(query, [])
+        self.assertEqual(models.Square.objects.count(), 11)
+
+    def test_unicode_fetches(self):
+        #6254: fetchone, fetchmany, fetchall return strings as unicode objects
+        qn = connection.ops.quote_name
+        models.Person(first_name="John", last_name="Doe").save()
+        models.Person(first_name="Jane", last_name="Doe").save()
+        models.Person(first_name="Mary", last_name="Agnelline").save()
+        models.Person(first_name="Peter", last_name="Parker").save()
+        models.Person(first_name="Clark", last_name="Kent").save()
+        opts2 = models.Person._meta
+        f3, f4 = opts2.get_field('first_name'), opts2.get_field('last_name')
+        query2 = ('SELECT %s, %s FROM %s ORDER BY %s'
+          % (qn(f3.column), qn(f4.column), connection.introspection.table_name_converter(opts2.db_table),
+             qn(f3.column)))
+        cursor = connection.cursor()
+        cursor.execute(query2)
+        self.assertEqual(cursor.fetchone(), (u'Clark', u'Kent'))
+        self.assertEqual(list(cursor.fetchmany(2)), [(u'Jane', u'Doe'), (u'John', u'Doe')])
+        self.assertEqual(list(cursor.fetchall()), [(u'Mary', u'Agnelline'), (u'Peter', u'Parker')])
