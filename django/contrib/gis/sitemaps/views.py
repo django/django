@@ -93,7 +93,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         else:
             qs = klass._default_manager.using(using).all()
         for mod in qs:
-            mod.kml = getattr(mod, field_name).kml)
+            mod.kml = getattr(mod, field_name).kml
             placemarks.append(mod)
 
     # Getting the render function and rendering to the correct.
