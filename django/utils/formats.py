@@ -7,29 +7,36 @@ from django.utils.importlib import import_module
 from django.utils.encoding import smart_str
 from django.utils import dateformat, numberformat, datetime_safe
 
+# format_cache is a mapping from (format_type, lang) to the format string.
+# By using the cache, it is possible to avoid running get_format_modules
+# repeatedly.
+_format_cache = {}
+_format_modules_cache = {}
+
+def iter_format_modules(lang):
+    """
+    Does the heavy lifting of finding format modules.
+    """
+    if check_for_language(lang) or settings.USE_L10N:
+        format_locations = ['django.conf.locale.%s']
+        if settings.FORMAT_MODULE_PATH:
+            format_locations.append(settings.FORMAT_MODULE_PATH + '.%s')
+            format_locations.reverse()
+        locale = to_locale(lang)
+        locales = set((locale, locale.split('_')[0]))
+        for location in format_locations:
+            for loc in locales:
+                try:
+                    yield import_module('.formats', location % loc)
+                except ImportError:
+                    pass
+
 def get_format_modules(reverse=False):
     """
-    Returns an iterator over the format modules found in the project and Django
+    Returns an iterator over the format modules found
     """
-    modules = []
-    if not check_for_language(get_language()) or not settings.USE_L10N:
-        return modules
-    locale = to_locale(get_language())
-    if settings.FORMAT_MODULE_PATH:
-        format_locations = [settings.FORMAT_MODULE_PATH + '.%s']
-    else:
-        format_locations = []
-    format_locations.append('django.conf.locale.%s')
-    for location in format_locations:
-        for l in (locale, locale.split('_')[0]):
-            try:
-                mod = import_module('.formats', location % l)
-            except ImportError:
-                pass
-            else:
-                # Don't return duplicates
-                if mod not in modules:
-                    modules.append(mod)
+    lang = get_language()
+    modules = _format_modules_cache.setdefault(lang, list(iter_format_modules(lang)))
     if reverse:
         modules.reverse()
     return modules
@@ -42,11 +49,18 @@ def get_format(format_type):
     """
     format_type = smart_str(format_type)
     if settings.USE_L10N:
-        for module in get_format_modules():
-            try:
-                return getattr(module, format_type)
-            except AttributeError:
-                pass
+        cache_key = (format_type, get_language())
+        try:
+            return _format_cache[cache_key] or getattr(settings, format_type)
+        except KeyError:
+            for module in get_format_modules():
+                try:
+                    val = getattr(module, format_type)
+                    _format_cache[cache_key] = val
+                    return val
+                except AttributeError:
+                    pass
+            _format_cache[cache_key] = None
     return getattr(settings, format_type)
 
 def date_format(value, format=None):
