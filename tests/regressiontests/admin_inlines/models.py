@@ -123,25 +123,3 @@ class InlineWeakness(admin.TabularInline):
     extra = 1
 
 admin.site.register(Fashionista, inlines=[InlineWeakness])
-
-
-__test__ = {'API_TESTS': """
-
-# Regression test for #9362
-
->>> sally = Teacher.objects.create(name='Sally')
->>> john = Parent.objects.create(name='John')
->>> joe = Child.objects.create(name='Joe', teacher=sally, parent=john)
-
-The problem depends only on InlineAdminForm and its "original" argument, so
-we can safely set the other arguments to None/{}. We just need to check that
-the content_type argument of Child isn't altered by the internals of the
-inline form.
-
->>> from django.contrib.admin.helpers import InlineAdminForm
->>> iaf = InlineAdminForm(None, None, {}, {}, joe)
->>> iaf.original
-<Child: I am Joe, a child of John>
-
-"""
-}
