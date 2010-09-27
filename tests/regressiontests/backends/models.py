@@ -54,5 +54,4 @@ class Post(models.Model):
     class Meta:
         db_table = 'CaseSensitive_Post'
 
-qn = connection.ops.quote_name
 
