@@ -8,10 +8,11 @@ import pickle
 from django.conf import settings
 from django.template import Template, Context
 from django.test import TestCase
-from django.utils.formats import get_format, date_format, time_format, localize, localize_input
+from django.utils.formats import get_format, date_format, time_format, localize, localize_input, iter_format_modules
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import mark_safe, SafeString, SafeUnicode
 from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, to_locale
+from django.utils.importlib import import_module
 
 
 from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
@@ -421,6 +422,23 @@ class FormattingTests(TestCase):
             # Checking for the localized "products_delivered" field
             self.assert_(u'<input type="text" name="products_delivered" value="12.000" id="id_products_delivered" />' in form6.as_ul())
         finally:
+            deactivate()
+
+    def test_iter_format_modules(self):
+        """
+        Tests the iter_format_modules function.
+        """
+        activate('de-at')
+        old_format_module_path = settings.FORMAT_MODULE_PATH
+        try:
+            settings.USE_L10N = True
+            de_format_mod = import_module('django.conf.locale.de.formats')
+            self.assertEqual(list(iter_format_modules('de')), [de_format_mod])
+            settings.FORMAT_MODULE_PATH = 'regressiontests.i18n.other.locale'
+            test_de_format_mod = import_module('regressiontests.i18n.other.locale.de.formats')
+            self.assertEqual(list(iter_format_modules('de')), [test_de_format_mod, de_format_mod])
+        finally:
+            settings.FORMAT_MODULE_PATH = old_format_module_path
             deactivate()
 
 class MiscTests(TestCase):

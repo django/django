@@ -58,6 +58,11 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
+    # Handle the common case first, saves 30-40% in performance when s
+    # is an instance of unicode. This function gets called often in that
+    # setting.
+    if isinstance(s, unicode):
+        return s
     if strings_only and is_protected_type(s):
         return s
     try:
