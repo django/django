@@ -20,42 +20,48 @@ __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
 # replace the functions with their real counterparts (once we do access the
 # settings).
 
-def delayed_loader(real_name, *args, **kwargs):
+class Trans(object):
     """
-    Call the real, underlying function.  We have a level of indirection here so
-    that modules can use the translation bits without actually requiring
-    Django's settings bits to be configured before import.
+    The purpose of this class is to store the actual translation function upon
+    receiving the first call to that function. After this is done, changes to
+    USE_I18N will have no effect to which function is served upon request. If
+    your tests rely on changing USE_I18N, you can delete all the functions
+    from _trans.__dict__.
+
+    Note that storing the function with setattr will have a noticeable
+    performance effect, as access to the function goes the normal path,
+    instead of using __getattr__.
     """
-    from django.conf import settings
-    if settings.USE_I18N:
-        from django.utils.translation import trans_real as trans
-    else:
-        from django.utils.translation import trans_null as trans
+    def __getattr__(self, real_name):
+        from django.conf import settings
+        if settings.USE_I18N:
+            from django.utils.translation import trans_real as trans
+        else:
+            from django.utils.translation import trans_null as trans
+        setattr(self, real_name, getattr(trans, real_name))
+        return getattr(trans, real_name)
 
-    # Make the originally requested function call on the way out the door.
-    return getattr(trans, real_name)(*args, **kwargs)
+_trans = Trans()
 
-g = globals()
-for name in __all__:
-    g['real_%s' % name] = curry(delayed_loader, name)
-del g, delayed_loader
+# The Trans class is no more needed, so remove it from the namespace.
+del Trans
 
 def gettext_noop(message):
-    return real_gettext_noop(message)
+    return _trans.gettext_noop(message)
 
 ugettext_noop = gettext_noop
 
 def gettext(message):
-    return real_gettext(message)
+    return _trans.gettext(message)
 
 def ngettext(singular, plural, number):
-    return real_ngettext(singular, plural, number)
+    return _trans.ngettext(singular, plural, number)
 
 def ugettext(message):
-    return real_ugettext(message)
+    return _trans.ugettext(message)
 
 def ungettext(singular, plural, number):
-    return real_ungettext(singular, plural, number)
+    return _trans.ungettext(singular, plural, number)
 
 ngettext_lazy = lazy(ngettext, str)
 gettext_lazy = lazy(gettext, str)
@@ -63,37 +69,37 @@ ungettext_lazy = lazy(ungettext, unicode)
 ugettext_lazy = lazy(ugettext, unicode)
 
 def activate(language):
-    return real_activate(language)
+    return _trans.activate(language)
 
 def deactivate():
-    return real_deactivate()
+    return _trans.deactivate()
 
 def get_language():
-    return real_get_language()
+    return _trans.get_language()
 
 def get_language_bidi():
-    return real_get_language_bidi()
+    return _trans.get_language_bidi()
 
 def get_date_formats():
-    return real_get_date_formats()
+    return _trans.get_date_formats()
 
 def get_partial_date_formats():
-    return real_get_partial_date_formats()
+    return _trans.get_partial_date_formats()
 
 def check_for_language(lang_code):
-    return real_check_for_language(lang_code)
+    return _trans.check_for_language(lang_code)
 
 def to_locale(language):
-    return real_to_locale(language)
+    return _trans.to_locale(language)
 
 def get_language_from_request(request):
-    return real_get_language_from_request(request)
+    return _trans.get_language_from_request(request)
 
 def templatize(src):
-    return real_templatize(src)
+    return _trans.templatize(src)
 
 def deactivate_all():
-    return real_deactivate_all()
+    return _trans.deactivate_all()
 
 def _string_concat(*strings):
     """
