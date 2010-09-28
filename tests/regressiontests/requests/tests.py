@@ -10,22 +10,21 @@ from django.utils.http import cookie_date
 class RequestsTests(unittest.TestCase):
 
     def test_httprequest(self):
-        self.assertEquals(repr(HttpRequest()),
-            "<HttpRequest\n"\
-            "GET:{},\n"\
-            "POST:{},\n"\
-            "COOKIES:{},\n"\
-            "META:{}>"
-        )
+        request = HttpRequest()
+        self.assertEqual(request.GET.keys(), [])
+        self.assertEqual(request.POST.keys(), [])
+        self.assertEqual(request.COOKIES.keys(), [])
+        self.assertEqual(request.META.keys(), [])
 
     def test_wsgirequest(self):
-        self.assertEquals(repr(WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus'})),
-            "<WSGIRequest\n"\
-            "GET:<QueryDict: {}>,\n"\
-            "POST:<QueryDict: {}>,\n"\
-            "COOKIES:{},\n"\
-            "META:{'PATH_INFO': u'bogus', 'REQUEST_METHOD': 'bogus', 'SCRIPT_NAME': u''}>"
-        )
+        request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus'})
+        self.assertEqual(request.GET.keys(), [])
+        self.assertEqual(request.POST.keys(), [])
+        self.assertEqual(request.COOKIES.keys(), [])
+        self.assertEqual(set(request.META.keys()), set(['PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME']))
+        self.assertEqual(request.META['PATH_INFO'], 'bogus')
+        self.assertEqual(request.META['REQUEST_METHOD'], 'bogus')
+        self.assertEqual(request.META['SCRIPT_NAME'], '')
 
     def test_modpythonrequest(self):
         class FakeModPythonRequest(ModPythonRequest):
@@ -39,23 +38,22 @@ class RequestsTests(unittest.TestCase):
 
         req = Dummy()
         req.uri = 'bogus'
-        self.assertEquals(repr(FakeModPythonRequest(req)),
-            "<ModPythonRequest\n"\
-            "path:bogus,\n"\
-            "GET:{},\n"\
-            "POST:{},\n"\
-            "COOKIES:{},\n"\
-            "META:{}>")
+        request = FakeModPythonRequest(req)
+        self.assertEqual(request.path, 'bogus')
+        self.assertEqual(request.GET.keys(), [])
+        self.assertEqual(request.POST.keys(), [])
+        self.assertEqual(request.COOKIES.keys(), [])
+        self.assertEqual(request.META.keys(), [])
 
     def test_parse_cookie(self):
-        self.assertEquals(parse_cookie('invalid:key=true'), {})
+        self.assertEqual(parse_cookie('invalid:key=true'), {})
 
     def test_httprequest_location(self):
         request = HttpRequest()
-        self.assertEquals(request.build_absolute_uri(location="https://www.example.com/asdf"),
+        self.assertEqual(request.build_absolute_uri(location="https://www.example.com/asdf"),
             'https://www.example.com/asdf')
 
         request.get_host = lambda: 'www.example.com'
         request.path = ''
-        self.assertEquals(request.build_absolute_uri(location="/path/with:colons"),
+        self.assertEqual(request.build_absolute_uri(location="/path/with:colons"),
             'http://www.example.com/path/with:colons')
