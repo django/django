@@ -1,5 +1,6 @@
-from django.test import TestCase
+import unittest
 
+import django.utils.copycompat as copy
 from django.utils.functional import SimpleLazyObject
 
 class _ComplexObject(object):
@@ -23,7 +24,7 @@ class _ComplexObject(object):
 
 complex_object = lambda: _ComplexObject("joe")
 
-class TestUtilsSimpleLazyObject(TestCase):
+class TestUtilsSimpleLazyObject(unittest.TestCase):
     """
     Tests for SimpleLazyObject
     """
@@ -59,7 +60,6 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertEqual(_ComplexObject, SimpleLazyObject(complex_object).__class__)
 
     def test_deepcopy(self):
-        import django.utils.copycompat as copy
         # Check that we *can* do deep copy, and that it returns the right
         # objects.
 

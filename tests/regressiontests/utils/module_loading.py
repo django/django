@@ -1,12 +1,12 @@
 import os
 import sys
-from unittest import TestCase
+import unittest
 from zipimport import zipimporter
 
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
-class DefaultLoader(TestCase):
+class DefaultLoader(unittest.TestCase):
     def test_loader(self):
         "Normal module existence can be tested"
         test_module = import_module('regressiontests.utils.test_module')
@@ -24,7 +24,7 @@ class DefaultLoader(TestCase):
         self.assertFalse(module_has_submodule(test_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'regressiontests.utils.test_module.no_such_module')
 
-class EggLoader(TestCase):
+class EggLoader(unittest.TestCase):
     def setUp(self):
         self.old_path = sys.path
         self.egg_dir = '%s/eggs' % os.path.dirname(__file__)

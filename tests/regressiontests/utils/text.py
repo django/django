@@ -1,8 +1,8 @@
-from django.test import TestCase
+import unittest
 
 from django.utils import text
 
-class TestUtilsText(TestCase):
+class TestUtilsText(unittest.TestCase):
     def test_truncate_words(self):
         self.assertEqual(u'The quick brown fox jumped over the lazy dog.',
             text.truncate_words(u'The quick brown fox jumped over the lazy dog.', 10))
