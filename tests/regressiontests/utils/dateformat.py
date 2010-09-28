@@ -1,10 +1,11 @@
-import os
-from unittest import TestCase
 from datetime import datetime, date
+import os
+import unittest
+
 from django.utils.dateformat import format
 from django.utils.tzinfo import FixedOffset, LocalTimezone
 
-class DateFormatTests(TestCase):
+class DateFormatTests(unittest.TestCase):
     def test_date(self):
         d = date(2009, 5, 16)
         self.assertEquals(date.fromtimestamp(int(format(d, 'U'))), d)

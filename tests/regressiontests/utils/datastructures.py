@@ -1,7 +1,8 @@
-from django.test import TestCase
+import unittest
+
 from django.utils.datastructures import SortedDict
 
-class DatastructuresTests(TestCase):
+class DatastructuresTests(unittest.TestCase):
     def setUp(self):
         self.d1 = SortedDict()
         self.d1[7] = 'seven'

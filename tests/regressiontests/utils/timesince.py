@@ -1,11 +1,10 @@
-from django.test import TestCase
-
 import datetime
+import unittest
 
 from django.utils.timesince import timesince, timeuntil
 from django.utils.tzinfo import LocalTimezone, FixedOffset
 
-class TimesinceTests(TestCase):
+class TimesinceTests(unittest.TestCase):
 
     def setUp(self):
         self.t = datetime.datetime(2007, 8, 14, 13, 46, 0)

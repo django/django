@@ -1,8 +1,8 @@
-from django.test import TestCase
+import unittest
 
 from django.utils import html
 
-class TestUtilsHtml(TestCase):
+class TestUtilsHtml(unittest.TestCase):
 
     def check_output(self, function, value, output=None):
         """

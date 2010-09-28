@@ -1,9 +1,9 @@
-from django.test import TestCase
+import unittest
 
 from datetime import date as original_date, datetime as original_datetime
 from django.utils.datetime_safe import date, datetime
 
-class DatetimeTests(TestCase):
+class DatetimeTests(unittest.TestCase):
 
     def setUp(self):
         self.just_safe = (1900, 1, 1)

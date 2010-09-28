@@ -1,8 +1,8 @@
-from django.test import TestCase
+import unittest
 
 from django.utils.tzinfo import FixedOffset
 
-class TzinfoTests(TestCase):
+class TzinfoTests(unittest.TestCase):
 
     def test_fixedoffset(self):
         self.assertEquals(repr(FixedOffset(0)), '+0000')

@@ -1,8 +1,8 @@
-from django.test import TestCase
+import unittest
 
 from django.utils import checksums
 
-class TestUtilsChecksums(TestCase):
+class TestUtilsChecksums(unittest.TestCase):
 
     def check_output(self, function, value, output=None):
         """
