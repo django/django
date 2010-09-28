@@ -22,8 +22,6 @@ class CustomColumnRegression(TestCase):
         self.authors = [self.a1, self.a2]
 
     def test_basic_creation(self):
-        self.assertEqual(self.a1.Author_ID, 1)
-
         art = Article(headline='Django lets you build web apps easily', primary_author=self.a1)
         art.save()
         art.authors = [self.a1, self.a2]
