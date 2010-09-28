@@ -48,9 +48,20 @@ http://www.example.com/path/with:colons
 
 # Test cookie datetime expiration logic
 >>> from datetime import datetime, timedelta
+>>> import time
 >>> delta = timedelta(seconds=10)
 >>> response = HttpResponse()
->>> response.set_cookie('datetime', expires=datetime.utcnow()+delta)
+>>> expires = datetime.utcnow() + delta
+
+# There is a timing weakness in this test; The
+# expected result for max-age requires that there be
+# a very slight difference between the evaluated expiration
+# time, and the time evaluated in set_cookie(). If this
+# difference doesn't exist, the cookie time will be
+# 1 second larger. To avoid the problem, put in a quick sleep,
+# which guarantees that there will be a time difference.
+>>> time.sleep(0.001)
+>>> response.set_cookie('datetime', expires=expires)
 >>> datetime_cookie = response.cookies['datetime']
 >>> datetime_cookie['max-age']
 10
@@ -58,7 +69,7 @@ http://www.example.com/path/with:colons
 >>> response.cookies['datetime']['expires']
 'Sat, 01-Jan-2028 04:05:06 GMT'
 
-# Test automatically setting cookie expires if only max_age is provided 
+# Test automatically setting cookie expires if only max_age is provided
 >>> response.set_cookie('max_age', max_age=10)
 >>> max_age_cookie = response.cookies['max_age']
 >>> max_age_cookie['max-age']
