@@ -270,6 +270,30 @@ list::
     Thus, you should always modify uploading handlers as early in your view as
     possible.
 
+    Also, ``request.POST`` is accessed by
+    :class:`~django.middleware.csrf.CsrfViewMiddleware` which is enabled by
+    default. This means you will probably need to use
+    :func:`~django.views.decorators.csrf.csrf_exempt` on your view to allow you
+    to change the upload handlers. Assuming you do need CSRF protection, you
+    will then need to use :func:`~django.views.decorators.csrf.csrf_protect` on
+    the function that actually processes the request.  Note that this means that
+    the handlers may start receiving the file upload before the CSRF checks have
+    been done. Example code:
+
+    .. code-block:: python
+
+        from django.views.decorators.csrf import csrf_exempt, csrf_protect
+
+        @csrf_exempt
+        def upload_file_view(request):
+            request.upload_handlers.insert(0, ProgressBarUploadHandler())
+            return _upload_file_view(request)
+
+        @csrf_protect
+        def _upload_file_view(request):
+            ... # Process request
+
+
 Writing custom upload handlers
 ------------------------------
 
