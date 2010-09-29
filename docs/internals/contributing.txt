@@ -812,6 +812,42 @@ repository:
       Subversion and Trac so that any commit message in that format will
       automatically post a comment to the appropriate ticket.
 
+Reverting commits
+-----------------
+
+Nobody's perfect; mistakes will be committed. When a mistaken commit is
+discovered, please follow these guidelines:
+
+    * Try very hard to ensure that mistakes don't happen. Just because we
+      have a reversion policy doesn't relax your responsibility to aim for
+      the highest quality possible. Really: double-check your work before
+      you commit it in the first place!
+      
+    * If possible, have the original author revert his/her own commit.
+      
+    * Don't revert another author's changes without permission from the
+      original author.
+      
+    * If the original author can't be reached (within a reasonable amount
+      of time -- a day or so) and the problem is severe -- crashing bug,
+      major test failures, etc -- then ask for objections on django-dev
+      then revert if there are none.
+      
+    * If the problem is small (a feature commit after feature freeze,
+      say), wait it out.
+      
+    * If there's a disagreement between the committer and the
+      reverter-to-be then try to work it out on the `django-developers`_
+      mailing list. If an agreement can't be reached then it should
+      be put to a vote.
+      
+    * If the commit introduced a confirmed, disclosed security
+      vulnerability then the commit may be reverted immediately without
+      permission from anyone.
+    
+    * The release branch maintainer may back out commits to the release
+      branch without permission if the commit breaks the release branch.
+
 Unit tests
 ==========
 
@@ -1159,11 +1195,8 @@ file. Then copy the branch's version of the ``django`` directory into
 
 .. _path file: http://docs.python.org/library/site.html
 
-Deciding on features
-====================
-
-Once a feature's been requested and discussed, eventually we'll have a decision
-about whether to include the feature or drop it.
+How we make decisions
+=====================
 
 Whenever possible, we strive for a rough consensus. To that end, we'll often
 have informal votes on `django-developers`_ about a feature. In these votes we
@@ -1183,24 +1216,45 @@ Although these votes on django-developers are informal, they'll be taken very
 seriously. After a suitable voting period, if an obvious consensus arises
 we'll follow the votes.
 
-However, consensus is not always possible.  Tough decisions will be discussed by
-all full committers and finally decided by the Benevolent Dictators for Life,
-Adrian and Jacob.
+However, consensus is not always possible. If consensus cannot be reached, or
+if the discussion towards a consensus fizzles out without a concrete decision,
+we use a more formal process.
+
+Any core committer (see below) may call for a formal vote using the same
+voting mechanism above. A proposition will be considered carried by the core team
+if:
+
+    * There are three "+1" votes from members of the core team.
+    
+    * There is no "-1" vote from any member of the core team.
+    
+    * The BDFLs haven't stepped in and executed their positive or negative
+      veto.
+
+When calling for a vote, the caller should specify a deadline by which
+votes must be received. One week is generally suggested as the minimum
+amount of time.
+
+Since this process allows any core committer to veto a proposal, any "-1"
+votes (or BDFL vetos) should be accompanied by an explanation that explains
+what it would take to convert that "-1" into at least a "+0".
+
+Whenever possible, these formal votes should be announced and held in
+public on the `django-developers`_ mailing list. However, overly sensitive
+or contentious issues -- including, most notably, votes on new core
+committers -- may be held in private.
 
 Commit access
 =============
 
 Django has two types of committers:
 
-Full committers
+Core committers
     These are people who have a long history of contributions to Django's
-    codebase, a solid track record of being polite and helpful on the mailing
-    lists, and a proven desire to dedicate serious time to Django's development.
-
-    The bar is very high for full commit access. It will only be granted by
-    unanimous approval of all existing full committers, and the decision will err
-    on the side of rejection.
-
+    codebase, a solid track record of being polite and helpful on the
+    mailing lists, and a proven desire to dedicate serious time to Django's
+    development. The bar is high for full commit access.
+    
 Partial committers
     These are people who are "domain experts." They have direct check-in access
     to the subsystems that fall under their jurisdiction, and they're given a
@@ -1208,10 +1262,12 @@ Partial committers
     is likely to be given to someone who contributes a large subframework to
     Django and wants to continue to maintain it.
 
-    Like full committers, partial commit access is by unanimous approval of all
-    full committers (and any other partial committers in the same area).
-    However, the bar is set lower; proven expertise in the area in question is
-    likely to be sufficient.
+    Partial commit access is granted by the same process as full
+    committers. However, the bar is set lower; proven expertise in the area
+    in question is likely to be sufficient.
+
+Decisions on new committers will follow the process explained above in `how
+we make decisions`_.
 
 To request commit access, please contact an existing committer privately. Public
 requests for commit access are potential flame-war starters, and will be ignored.
