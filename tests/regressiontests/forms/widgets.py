@@ -1269,6 +1269,7 @@ u'<input type="hidden" name="date_0" value="17.09.2007" /><input type="hidden" n
 from django.utils import copycompat as copy
 from unittest import TestCase
 from django import forms
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class SelectAndTextWidget(forms.MultiWidget):
@@ -1323,3 +1324,76 @@ class WidgetTests(TestCase):
         self.assertFalse(form.is_valid())
         form = SplitDateRequiredForm({'field': ['', '']})
         self.assertFalse(form.is_valid())
+
+
+class FakeFieldFile(object):
+    """
+    Quacks like a FieldFile (has a .url and unicode representation), but
+    doesn't require us to care about storages etc.
+
+    """
+    url = 'something'
+
+    def __unicode__(self):
+        return self.url
+
+class ClearableFileInputTests(TestCase):
+    def test_clear_input_renders(self):
+        """
+        A ClearableFileInput with is_required False and rendered with
+        an initial value that is a file renders a clear checkbox.
+
+        """
+        widget = forms.ClearableFileInput()
+        widget.is_required = False
+        self.assertEqual(widget.render('myfile', FakeFieldFile()),
+                         u'Currently: <a target="_blank" href="something">something</a> <input type="checkbox" name="myfile-clear" id="myfile-clear_id" /> <label for="myfile-clear_id">Clear</label><br />Change: <input type="file" name="myfile" />')
+
+    def test_clear_input_renders_only_if_not_required(self):
+        """
+        A ClearableFileInput with is_required=False does not render a clear
+        checkbox.
+
+        """
+        widget = forms.ClearableFileInput()
+        widget.is_required = True
+        self.assertEqual(widget.render('myfile', FakeFieldFile()),
+                         u'Currently: <a target="_blank" href="something">something</a> <br />Change: <input type="file" name="myfile" />')
+
+    def test_clear_input_renders_only_if_initial(self):
+        """
+        A ClearableFileInput instantiated with no initial value does not render
+        a clear checkbox.
+
+        """
+        widget = forms.ClearableFileInput()
+        widget.is_required = False
+        self.assertEqual(widget.render('myfile', None),
+                         u'<input type="file" name="myfile" />')
+
+    def test_clear_input_checked_returns_false(self):
+        """
+        ClearableFileInput.value_from_datadict returns False if the clear
+        checkbox is checked, if not required.
+
+        """
+        widget = forms.ClearableFileInput()
+        widget.is_required = False
+        self.assertEqual(widget.value_from_datadict(
+                data={'myfile-clear': True},
+                files={},
+                name='myfile'), False)
+
+    def test_clear_input_checked_returns_false_only_if_not_required(self):
+        """
+        ClearableFileInput.value_from_datadict never returns False if the field
+        is required.
+
+        """
+        widget = forms.ClearableFileInput()
+        widget.is_required = True
+        f = SimpleUploadedFile('something.txt', 'content')
+        self.assertEqual(widget.value_from_datadict(
+                data={'myfile-clear': True},
+                files={'myfile': f},
+                name='myfile'), f)

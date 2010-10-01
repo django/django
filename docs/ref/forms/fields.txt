@@ -507,7 +507,7 @@ given length.
 
 .. class:: FileField(**kwargs)
 
-    * Default widget: ``FileInput``
+    * Default widget: ``ClearableFileInput``
     * Empty value: ``None``
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
@@ -573,7 +573,7 @@ These control the range of values permitted in the field.
 
 .. class:: ImageField(**kwargs)
 
-    * Default widget: ``FileInput``
+    * Default widget: ``ClearableFileInput``
     * Empty value: ``None``
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.

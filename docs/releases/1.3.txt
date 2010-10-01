@@ -42,6 +42,31 @@ custom widget to your form that sets the ``render_value`` argument::
         username = forms.CharField(max_length=100)
         password = forms.PasswordField(widget=forms.PasswordInput(render_value=True))
 
+Clearable default widget for FileField
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.3 now includes a ``ClearableFileInput`` form widget in addition to
+``FileInput``. ``ClearableFileInput`` renders with a checkbox to clear the
+field's value (if the field has a value and is not required); ``FileInput``
+provided no means for clearing an existing file from a ``FileField``.
+
+``ClearableFileInput`` is now the default widget for a ``FileField``, so
+existing forms including ``FileField`` without assigning a custom widget will
+need to account for the possible extra checkbox in the rendered form output.
+
+To return to the previous rendering (without the ability to clear the
+``FileField``), use the ``FileInput`` widget in place of
+``ClearableFileInput``. For instance, in a ``ModelForm`` for a hypothetical
+``Document`` model with a ``FileField`` named ``document``::
+
+    from django import forms
+    from myapp.models import Document
+
+    class DocumentForm(forms.ModelForm):
+        class Meta:
+            model = Document
+            widgets = {'document': forms.FileInput}
+
 .. _deprecated-features-1.3:
 
 Features deprecated in 1.3

@@ -57,3 +57,6 @@ class Author1(models.Model):
 
 class Homepage(models.Model):
     url = models.URLField(verify_exists=False)
+
+class Document(models.Model):
+    myfile = models.FileField(upload_to='unused', blank=True)

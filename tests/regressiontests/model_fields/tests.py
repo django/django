@@ -6,8 +6,9 @@ import django.test
 from django import forms
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.db.models.fields.files import FieldFile
 
-from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel, BooleanModel
+from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel, BooleanModel, Document
 
 # If PIL available, do these tests.
 if Image:
@@ -311,3 +312,39 @@ class TypeCoercionTests(django.test.TestCase):
     def test_lookup_integer_in_textfield(self):
         self.assertEquals(Post.objects.filter(body=24).count(), 0)
 
+class FileFieldTests(unittest.TestCase):
+    def test_clearable(self):
+        """
+        Test that FileField.save_form_data will clear its instance attribute
+        value if passed False.
+
+        """
+        d = Document(myfile='something.txt')
+        self.assertEqual(d.myfile, 'something.txt')
+        field = d._meta.get_field('myfile')
+        field.save_form_data(d, False)
+        self.assertEqual(d.myfile, '')
+
+    def test_unchanged(self):
+        """
+        Test that FileField.save_form_data considers None to mean "no change"
+        rather than "clear".
+
+        """
+        d = Document(myfile='something.txt')
+        self.assertEqual(d.myfile, 'something.txt')
+        field = d._meta.get_field('myfile')
+        field.save_form_data(d, None)
+        self.assertEqual(d.myfile, 'something.txt')
+
+    def test_changed(self):
+        """
+        Test that FileField.save_form_data, if passed a truthy value, updates
+        its instance attribute.
+
+        """
+        d = Document(myfile='something.txt')
+        self.assertEqual(d.myfile, 'something.txt')
+        field = d._meta.get_field('myfile')
+        field.save_form_data(d, 'else.txt')
+        self.assertEqual(d.myfile, 'else.txt')

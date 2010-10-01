@@ -46,6 +46,14 @@ commonly used groups of widgets:
 
     File upload input: ``<input type='file' ...>``
 
+.. class:: ClearableFileInput
+
+    .. versionadded:: 1.3
+
+    File upload input: ``<input type='file' ...>``, with an additional checkbox
+    input to clear the field's value, if the field is not required and has
+    initial data.
+
 .. class:: DateInput
 
     .. versionadded:: 1.1

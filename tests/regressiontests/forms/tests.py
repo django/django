@@ -39,7 +39,7 @@ from media import media_tests
 
 from fields import FieldsTests
 from validators import TestFieldWithValidators
-from widgets import WidgetTests
+from widgets import WidgetTests, ClearableFileInputTests
 
 from input_formats import *
 

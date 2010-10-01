@@ -198,6 +198,13 @@ p.file-upload {
     margin-left: 5px;
 }
 
+span.clearable-file-input label {
+	color: #333;
+    font-size: 11px;
+	display: inline;
+    float: none;
+}
+
 /* CALENDARS & CLOCKS */
 
 .calendarbox, .clockbox {

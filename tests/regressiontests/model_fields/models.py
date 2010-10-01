@@ -67,6 +67,12 @@ class BooleanModel(models.Model):
     string = models.CharField(max_length=10, default='abc')
 
 ###############################################################################
+# FileField
+
+class Document(models.Model):
+    myfile = models.FileField(upload_to='unused')
+
+###############################################################################
 # ImageField
 
 # If PIL available, do these tests.

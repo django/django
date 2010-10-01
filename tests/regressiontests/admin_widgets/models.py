@@ -116,7 +116,7 @@ HTML escaped.
 
 >>> w = AdminFileWidget()
 >>> print conditional_escape(w.render('test', album.cover_art))
-Currently: <a target="_blank" href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <br />Change: <input type="file" name="test" />
+<p class="file-upload">Currently: <a target="_blank" href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>
 >>> print conditional_escape(w.render('test', SimpleUploadedFile('test', 'content')))
 <input type="file" name="test" />
 

@@ -57,6 +57,10 @@ class FieldsTests(TestCase):
         except error, e:
             self.assertEqual(message, str(e))
 
+    def test_field_sets_widget_is_required(self):
+        self.assertEqual(Field(required=True).widget.is_required, True)
+        self.assertEqual(Field(required=False).widget.is_required, False)
+
     # CharField ###################################################################
 
     def test_charfield_0(self):

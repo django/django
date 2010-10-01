@@ -85,20 +85,12 @@ class AdminRadioFieldRenderer(RadioFieldRenderer):
 class AdminRadioSelect(forms.RadioSelect):
     renderer = AdminRadioFieldRenderer
 
-class AdminFileWidget(forms.FileInput):
-    """
-    A FileField Widget that shows its current value if it has one.
-    """
-    def __init__(self, attrs={}):
-        super(AdminFileWidget, self).__init__(attrs)
+class AdminFileWidget(forms.ClearableFileInput):
+    template_with_initial = (u'<p class="file-upload">%s</p>'
+                            % forms.ClearableFileInput.template_with_initial)
+    template_with_clear = (u'<span class="clearable-file-input">%s</span>'
+                           % forms.ClearableFileInput.template_with_clear)
 
-    def render(self, name, value, attrs=None):
-        output = []
-        if value and hasattr(value, "url"):
-            output.append('%s <a target="_blank" href="%s">%s</a> <br />%s ' % \
-                (_('Currently:'), value.url, value, _('Change:')))
-        output.append(super(AdminFileWidget, self).render(name, value, attrs))
-        return mark_safe(u''.join(output))
 
 class ForeignKeyRawIdWidget(forms.TextInput):
     """

@@ -1,3 +1,4 @@
+import unittest
 from datetime import date
 
 from django import db
@@ -5,10 +6,11 @@ from django import forms
 from django.forms.models import modelform_factory, ModelChoiceField
 from django.conf import settings
 from django.test import TestCase
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from models import Person, RealPerson, Triple, FilePathModel, Article, \
-    Publication, CustomFF, Author, Author1, Homepage
+    Publication, CustomFF, Author, Author1, Homepage, Document
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
@@ -333,3 +335,69 @@ class InvalidFieldAndFactory(TestCase):
         self.assertRaises(FieldError, modelform_factory,
                           Person, fields=['no-field', 'name'])
 
+
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+
+class FileFieldTests(unittest.TestCase):
+    def test_clean_false(self):
+        """
+        If the ``clean`` method on a non-required FileField receives False as
+        the data (meaning clear the field value), it returns False, regardless
+        of the value of ``initial``.
+
+        """
+        f = forms.FileField(required=False)
+        self.assertEqual(f.clean(False), False)
+        self.assertEqual(f.clean(False, 'initial'), False)
+
+    def test_clean_false_required(self):
+        """
+        If the ``clean`` method on a required FileField receives False as the
+        data, it has the same effect as None: initial is returned if non-empty,
+        otherwise the validation catches the lack of a required value.
+
+        """
+        f = forms.FileField(required=True)
+        self.assertEqual(f.clean(False, 'initial'), 'initial')
+        self.assertRaises(ValidationError, f.clean, False)
+
+    def test_full_clear(self):
+        """
+        Integration happy-path test that a model FileField can actually be set
+        and cleared via a ModelForm.
+
+        """
+        form = DocumentForm()
+        self.assert_('name="myfile"' in unicode(form))
+        self.assert_('myfile-clear' not in unicode(form))
+        form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', 'content')})
+        self.assert_(form.is_valid())
+        doc = form.save(commit=False)
+        self.assertEqual(doc.myfile.name, 'something.txt')
+        form = DocumentForm(instance=doc)
+        self.assert_('myfile-clear' in unicode(form))
+        form = DocumentForm(instance=doc, data={'myfile-clear': 'true'})
+        doc = form.save(commit=False)
+        self.assertEqual(bool(doc.myfile), False)
+
+    def test_clear_and_file_contradiction(self):
+        """
+        If the user submits a new file upload AND checks the clear checkbox,
+        they get a validation error, and the bound redisplay of the form still
+        includes the current file and the clear checkbox.
+
+        """
+        form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', 'content')})
+        self.assert_(form.is_valid())
+        doc = form.save(commit=False)
+        form = DocumentForm(instance=doc,
+                            files={'myfile': SimpleUploadedFile('something.txt', 'content')},
+                            data={'myfile-clear': 'true'})
+        self.assert_(not form.is_valid())
+        self.assertEqual(form.errors['myfile'],
+                         [u'Please either submit a file or check the clear checkbox, not both.'])
+        rendered = unicode(form)
+        self.assert_('something.txt' in rendered)
+        self.assert_('myfile-clear' in rendered)

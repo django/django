@@ -437,10 +437,8 @@ class BoundField(StrAndUnicode):
             if callable(data):
                 data = data()
         else:
-            if isinstance(self.field, FileField) and self.data is None:
-                data = self.form.initial.get(self.name, self.field.initial)
-            else:
-                data = self.data
+            data = self.field.bound_data(
+                self.data, self.form.initial.get(self.name, self.field.initial))
         data = self.field.prepare_value(data)
 
         if not only_initial:
