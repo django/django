@@ -155,9 +155,6 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     A Widget for displaying ManyToMany ids in the "raw_id" interface rather than
     in a <select multiple> box.
     """
-    def __init__(self, rel, attrs=None, using=None):
-        super(ManyToManyRawIdWidget, self).__init__(rel, attrs, using=None)
-
     def render(self, name, value, attrs=None):
         attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
