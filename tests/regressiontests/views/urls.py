@@ -31,6 +31,16 @@ date_based_info_dict = {
     'date_field': 'date_created',
     'month_format': '%m',
 }
+
+object_list_dict = {
+    'queryset': Article.objects.all(),
+    'paginate_by': 2,
+}
+
+object_list_no_paginate_by = {
+    'queryset': Article.objects.all(),
+}
+
 numeric_days_info_dict = dict(date_based_info_dict, day_format='%d')
 
 date_based_datefield_info_dict = dict(date_based_info_dict, queryset=DateArticle.objects.all())
@@ -102,6 +112,12 @@ urlpatterns += patterns('django.views.generic.create_update',
         dict(model=UrlArticle)),
     (r'^create_update/no_url/update/article/(?P<slug>[-\w]+)/$',
         'update_object', dict(slug_field='slug', model=UrlArticle)),
+)
+
+urlpatterns += patterns('django.views.generic.list_detail',
+    (r'^object_list/page(?P<page>[\w]*)/$', 'object_list', object_list_dict),
+    (r'^object_list_no_paginate_by/page(?P<page>[0-9]+)/$', 'object_list',
+     object_list_no_paginate_by),
 )
 
 # a view that raises an exception for the debug view
