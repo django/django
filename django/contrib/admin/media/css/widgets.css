@@ -199,9 +199,9 @@ p.file-upload {
 }
 
 span.clearable-file-input label {
-	color: #333;
+    color: #333;
     font-size: 11px;
-	display: inline;
+    display: inline;
     float: none;
 }
 
