@@ -156,6 +156,8 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     in a <select multiple> box.
     """
     def render(self, name, value, attrs=None):
+        if attrs is None:
+            attrs = {}
         attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
             value = ','.join([force_unicode(v) for v in value])

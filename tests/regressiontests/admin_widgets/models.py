@@ -133,6 +133,8 @@ HTML escaped.
 >>> w = ManyToManyRawIdWidget(rel)
 >>> print conditional_escape(w.render('test', [m1.pk, m2.pk], attrs={}))
 <input type="text" name="test" value="1,2" class="vManyToManyRawIdAdminField" /><a href="../../../admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
+>>> print conditional_escape(w.render('test', [m1.pk]))
+<input type="text" name="test" value="1" class="vManyToManyRawIdAdminField" /><a href="../../../admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
 >>> w._has_changed(None, None)
 False
 >>> w._has_changed([], None)
