@@ -420,16 +420,6 @@ file-like object::
     >>> response.write("<p>Here's the text of the Web page.</p>")
     >>> response.write("<p>Here's another paragraph.</p>")
 
-You can add and delete headers using dictionary syntax::
-
-    >>> response = HttpResponse()
-    >>> response['X-DJANGO'] = "It's the best."
-    >>> del response['X-PHP']
-    >>> response['X-DJANGO']
-    "It's the best."
-
-Note that ``del`` doesn't raise ``KeyError`` if the header doesn't exist.
-
 Passing iterators
 ~~~~~~~~~~~~~~~~~
 
@@ -444,10 +434,14 @@ hard-coded strings. If you use this technique, follow these guidelines:
 Setting headers
 ~~~~~~~~~~~~~~~
 
-To set a header in your response, just treat it like a dictionary::
+To set or remove a header in your response, treat it like a dictionary::
 
     >>> response = HttpResponse()
     >>> response['Cache-Control'] = 'no-cache'
+    >>> del response['Cache-Control']
+
+Note that unlike a dictionary, ``del`` doesn't raise ``KeyError`` if the header
+doesn't exist.
 
 .. versionadded:: 1.1
 
