@@ -89,7 +89,8 @@ manual connect route:
 
     request_finished.connect(my_callback)
 
-Alternatively, you can use a decorator used when you define your receiver:
+Alternatively, you can use a ``receiver`` decorator when you define your
+receiver:
 
 .. code-block:: python
 
@@ -101,6 +102,10 @@ Alternatively, you can use a decorator used when you define your receiver:
         print "Request finished!"
 
 Now, our ``my_callback`` function will be called each time a request finishes.
+
+.. versionadded:: 1.3
+
+The ``receiver`` decorator was added in Django 1.3.
 
 .. admonition:: Where should this code live?
 

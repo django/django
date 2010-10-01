@@ -590,7 +590,7 @@ a model called "comment" with a foreign key relationship to a model called
         {{ comment }}
     {% endfor %}
 
-Similarly, :doc:`QuerySets<ref/models/querysets>` provide a ``count()`` method
+Similarly, :doc:`QuerySets</ref/models/querysets>` provide a ``count()`` method
 to count the number of objects they contain. Therefore, you can obtain a count
 of all comments related to the current task with::
 
