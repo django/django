@@ -238,15 +238,15 @@ class TestFixtures(TestCase):
         )
         articles = Article.objects.exclude(id=9)
         self.assertEqual(
-            articles.values_list('id', flat=True).__repr__(),
-            "[1, 2, 3, 4, 5, 6, 7, 8]"
+            list(articles.values_list('id', flat=True)),
+            [1, 2, 3, 4, 5, 6, 7, 8]
         )
         # Just for good measure, run the same query again.
         # Under the influence of ticket #7572, this will
         # give a different result to the previous call.
         self.assertEqual(
-            articles.values_list('id', flat=True).__repr__(),
-            "[1, 2, 3, 4, 5, 6, 7, 8]"
+            list(articles.values_list('id', flat=True)),
+            [1, 2, 3, 4, 5, 6, 7, 8]
         )
 
     def test_field_value_coerce(self):
