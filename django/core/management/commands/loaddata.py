@@ -118,8 +118,9 @@ class Command(BaseCommand):
                 self.stderr.write(
                     self.style.ERROR("Problem installing fixture '%s': %s is not a known serialization format.\n" %
                         (fixture_name, format)))
-                transaction.rollback(using=using)
-                transaction.leave_transaction_management(using=using)
+                if commit:
+                    transaction.rollback(using=using)
+                    transaction.leave_transaction_management(using=using)
                 return
 
             if os.path.isabs(fixture_name):
@@ -152,8 +153,9 @@ class Command(BaseCommand):
                             fixture.close()
                             self.stderr.write(self.style.ERROR("Multiple fixtures named '%s' in %s. Aborting.\n" %
                                 (fixture_name, humanize(fixture_dir))))
-                            transaction.rollback(using=using)
-                            transaction.leave_transaction_management(using=using)
+                            if commit:
+                                transaction.rollback(using=using)
+                                transaction.leave_transaction_management(using=using)
                             return
                         else:
                             fixture_count += 1
@@ -178,8 +180,9 @@ class Command(BaseCommand):
                             except Exception:
                                 import traceback
                                 fixture.close()
-                                transaction.rollback(using=using)
-                                transaction.leave_transaction_management(using=using)
+                                if commit:
+                                    transaction.rollback(using=using)
+                                    transaction.leave_transaction_management(using=using)
                                 if show_traceback:
                                     traceback.print_exc()
                                 else:
@@ -196,8 +199,9 @@ class Command(BaseCommand):
                                 self.stderr.write(
                                     self.style.ERROR("No fixture data found for '%s'. (File format may be invalid.)\n" %
                                         (fixture_name)))
-                                transaction.rollback(using=using)
-                                transaction.leave_transaction_management(using=using)
+                                if commit:
+                                    transaction.rollback(using=using)
+                                    transaction.leave_transaction_management(using=using)
                                 return
 
                     except Exception, e:
