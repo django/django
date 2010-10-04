@@ -10,7 +10,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.views.decorators.csrf import csrf_protect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
-from django.contrib.sites.models import Site, RequestSite
+from django.contrib.sites.models import get_current_site
 from django.http import HttpResponseRedirect, Http404
 from django.template import RequestContext
 from django.utils.http import urlquote, base36_to_int
@@ -26,21 +26,21 @@ def login(request, template_name='registration/login.html',
     """Displays the login form and handles the login action."""
 
     redirect_to = request.REQUEST.get(redirect_field_name, '')
-    
+
     if request.method == "POST":
         form = authentication_form(data=request.POST)
         if form.is_valid():
             # Light security check -- make sure redirect_to isn't garbage.
             if not redirect_to or ' ' in redirect_to:
                 redirect_to = settings.LOGIN_REDIRECT_URL
-            
-            # Heavier security check -- redirects to http://example.com should 
-            # not be allowed, but things like /view/?param=http://example.com 
+
+            # Heavier security check -- redirects to http://example.com should
+            # not be allowed, but things like /view/?param=http://example.com
             # should be allowed. This regex checks if there is a '//' *before* a
             # question mark.
             elif '//' in redirect_to and re.match(r'[^\?]*//', redirect_to):
                     redirect_to = settings.LOGIN_REDIRECT_URL
-            
+
             # Okay, security checks complete. Log the user in.
             auth_login(request, form.get_user())
 
@@ -51,14 +51,11 @@ def login(request, template_name='registration/login.html',
 
     else:
         form = authentication_form(request)
-    
+
     request.session.set_test_cookie()
-    
-    if Site._meta.installed:
-        current_site = Site.objects.get_current()
-    else:
-        current_site = RequestSite(request)
-    
+
+    current_site = get_current_site(request)
+
     return render_to_response(template_name, {
         'form': form,
         redirect_field_name: redirect_to,
@@ -75,7 +72,10 @@ def logout(request, next_page=None, template_name='registration/logged_out.html'
         if redirect_to:
             return HttpResponseRedirect(redirect_to)
         else:
+            current_site = get_current_site(request)
             return render_to_response(template_name, {
+                'site': current_site,
+                'site_name': current_site.name,
                 'title': _('Logged out')
             }, context_instance=RequestContext(request))
     else:
@@ -97,7 +97,7 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
 # 4 views for password reset:
 # - password_reset sends the mail
 # - password_reset_done shows a success message for the above
-# - password_reset_confirm checks the link the user clicked and 
+# - password_reset_confirm checks the link the user clicked and
 #   prompts for a new password
 # - password_reset_complete shows a success message for the above
 
@@ -115,12 +115,10 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
             opts['use_https'] = request.is_secure()
             opts['token_generator'] = token_generator
             opts['from_email'] = from_email
+            opts['email_template_name'] = email_template_name
+            opts['request'] = request
             if is_admin_site:
                 opts['domain_override'] = request.META['HTTP_HOST']
-            else:
-                opts['email_template_name'] = email_template_name
-                if not Site._meta.installed:
-                    opts['domain_override'] = RequestSite(request).domain
             form.save(**opts)
             return HttpResponseRedirect(post_reset_redirect)
     else:

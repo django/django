@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import get_current_site
 from django.template import Context, loader
 from django import forms
 from django.utils.translation import ugettext_lazy as _
@@ -117,14 +117,14 @@ class PasswordResetForm(forms.Form):
         return email
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html',
-             use_https=False, token_generator=default_token_generator, from_email=None):
+             use_https=False, token_generator=default_token_generator, from_email=None, request=None):
         """
         Generates a one-use only link for resetting password and sends to the user
         """
         from django.core.mail import send_mail
         for user in self.users_cache:
             if not domain_override:
-                current_site = Site.objects.get_current()
+                current_site = get_current_site(request)
                 site_name = current_site.name
                 domain = current_site.domain
             else:

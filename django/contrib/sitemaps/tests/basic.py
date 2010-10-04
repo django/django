@@ -2,6 +2,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
+from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.utils.formats import localize
 from django.utils.translation import activate
@@ -12,11 +13,13 @@ class SitemapTests(TestCase):
 
     def setUp(self):
         self.old_USE_L10N = settings.USE_L10N
+        self.old_Site_meta_installed = Site._meta.installed
         # Create a user that will double as sitemap content
         User.objects.create_user('testuser', 'test@example.com', 's3krit')
 
     def tearDown(self):
         settings.USE_L10N = self.old_USE_L10N
+        Site._meta.installed = self.old_Site_meta_installed
 
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
@@ -66,7 +69,7 @@ class SitemapTests(TestCase):
             url=u'/private/',
             title=u'Public Page',
             enable_comments=True,
-            registration_required=True    
+            registration_required=True
         )
         private.sites.add(settings.SITE_ID)
         response = self.client.get('/flatpages/sitemap.xml')
@@ -75,3 +78,16 @@ class SitemapTests(TestCase):
         # Private flatpage should not be in the sitemap
         self.assertNotContains(response, '<loc>http://example.com%s</loc>' % private.url)
 
+    def test_requestsite_sitemap(self):
+        # Make sure hitting the flatpages sitemap without the sites framework
+        # installed doesn't raise an exception
+        Site._meta.installed = False
+        response = self.client.get('/flatpages/sitemap.xml')
+        # Retrieve the sitemap.
+        response = self.client.get('/simple/sitemap.xml')
+        # Check for all the important bits:
+        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
+</urlset>
+""" % date.today().strftime('%Y-%m-%d'))

@@ -107,7 +107,7 @@ This has the same benefits as described in the last section.
 Hooking into the current site from views
 ----------------------------------------
 
-On a lower level, you can use the sites framework in your Django views to do
+You can use the sites framework in your Django views to do
 particular things based on the site in which the view is being called.
 For example::
 
@@ -147,6 +147,16 @@ the :class:`~django.contrib.sites.models.Site` model's manager has a
             # Do something
         else:
             # Do something else.
+
+.. versionchanged:: 1.3
+
+For code which relies on getting the current domain but cannot be certain
+that the sites framework will be installed for any given project, there is a
+utility function :func:`~django.contrib.sites.models.get_current_site` that
+takes a request object as an argument and returns either a Site instance (if
+the sites framework is installed) or a RequestSite instance (if it is not).
+This allows loose coupling with the sites framework and provides a usable
+fallback for cases where it is not installed.
 
 Getting the current domain for display
 --------------------------------------

@@ -1,6 +1,6 @@
 from django.http import HttpResponse, Http404
 from django.template import loader
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import get_current_site
 from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.contrib.gis.db.models.fields import GeometryField
@@ -15,7 +15,7 @@ def index(request, sitemaps):
     This view generates a sitemap index that uses the proper view
     for resolving geographic section sitemap URLs.
     """
-    current_site = Site.objects.get_current()
+    current_site = get_current_site(request)
     sites = []
     protocol = request.is_secure() and 'https' or 'http'
     for section, site in sitemaps.items():

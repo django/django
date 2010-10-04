@@ -248,6 +248,12 @@ class LogoutTest(AuthViewsTestCase):
         self.assert_('Logged out' in response.content)
         self.confirm_logged_out()
 
+    def test_14377(self):
+        # Bug 14377
+        self.login()
+        response = self.client.get('/logout/')
+        self.assertTrue('site' in response.context)
+
     def test_logout_with_next_page_specified(self): 
         "Logout with next_page option given redirects to specified resource"
         self.login()

@@ -1,6 +1,6 @@
 import datetime
 from django.conf import settings
-from django.contrib.sites.models import Site, RequestSite
+from django.contrib.sites.models import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 from django.template import loader, Template, TemplateDoesNotExist, RequestContext
@@ -91,10 +91,7 @@ class Feed(object):
         Returns a feedgenerator.DefaultFeed object, fully populated, for
         this feed. Raises FeedDoesNotExist for invalid parameters.
         """
-        if Site._meta.installed:
-            current_site = Site.objects.get_current()
-        else:
-            current_site = RequestSite(request)
+        current_site = get_current_site(request)
 
         link = self.__get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link)
