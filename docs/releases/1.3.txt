@@ -109,3 +109,13 @@ encouraged you redeploy your Django instances using :doc:`mod_wsgi
 What's new in Django 1.3
 ========================
 
+Logging
+~~~~~~~
+
+Django 1.3 adds framework-level support for Python's logging module.
+This means you can now esaily configure and control logging as part of
+your Django project. A number of logging handlers and logging calls
+have been added to Django's own code as well -- most notably, the
+error emails sent on a HTTP 500 server error are now handled as a
+logging activity. See :doc:`the documentation on Django's logging
+interface </topics/logging>` for more details.

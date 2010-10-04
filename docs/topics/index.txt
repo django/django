@@ -20,6 +20,7 @@ Introductions to all the key parts of Django you'll need to know:
    conditional-view-processing
    email
    i18n/index
+   logging
    pagination
    serialization
    settings

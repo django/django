@@ -1008,6 +1008,36 @@ See :ref:`using-translations-in-your-own-projects`.
 
 .. setting:: LOGIN_REDIRECT_URL
 
+LOGGING
+-------
+
+Default: A logging configuration dictionary.
+
+A data structure containing configuration information. The contents of
+this data structure will be passed as the argument to the
+configuration method described in :setting:`LOGGING_CONFIG`.
+
+The default logging configuration passes HTTP 500 server errors to an
+email log handler; all other log messages are given to a NullHandler.
+
+.. versionadded:: 1.3
+
+LOGGING_CONFIG
+--------------
+
+Default: ``'django.utils.log.dictConfig'``
+
+A path to a callable that will be used to configure logging in the
+Django project. Points at a instance of Python's `dictConfig`_
+configuration method by default.
+
+If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
+configuration process will be skipped.
+
+.. _dictConfig: http://docs.python.org/library/logging.html#logging.dictConfig
+
+.. versionadded:: 1.3
+
 LOGIN_REDIRECT_URL
 ------------------
 

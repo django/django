@@ -10,7 +10,6 @@ class Advertisment(models.Model):
 __test__ = {'API_TESTS': """
 >>> from models.publication import Publication
 >>> from models.article import Article
->>> from django.contrib.auth.views import Site
 
 >>> p = Publication(title="FooBar")
 >>> p.save()

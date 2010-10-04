@@ -1,9 +1,13 @@
+import logging
 import sys
 
 from django import http
 from django.core import signals
 from django.utils.encoding import force_unicode
 from django.utils.importlib import import_module
+
+logger = logging.getLogger('django.request')
+
 
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).
@@ -118,6 +122,11 @@ class BaseHandler(object):
 
                 return response
             except http.Http404, e:
+                logger.warning('Not Found: %s' % request.path,
+                            extra={
+                                'status_code': 404,
+                                'request': request
+                            })
                 if settings.DEBUG:
                     from django.views import debug
                     return debug.technical_404_response(request, e)
@@ -131,6 +140,11 @@ class BaseHandler(object):
                         finally:
                             receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
             except exceptions.PermissionDenied:
+                logger.warning('Forbidden (Permission denied): %s' % request.path,
+                            extra={
+                                'status_code': 403,
+                                'request': request
+                            })
                 return http.HttpResponseForbidden('<h1>Permission denied</h1>')
             except SystemExit:
                 # Allow sys.exit() to actually exit. See tickets #1023 and #4701
@@ -155,7 +169,6 @@ class BaseHandler(object):
         available would be an error.
         """
         from django.conf import settings
-        from django.core.mail import mail_admins
 
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
@@ -164,25 +177,20 @@ class BaseHandler(object):
             from django.views import debug
             return debug.technical_500_response(request, *exc_info)
 
-        # When DEBUG is False, send an error message to the admins.
-        subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), request.path)
-        try:
-            request_repr = repr(request)
-        except:
-            request_repr = "Request repr() unavailable"
-        message = "%s\n\n%s" % (self._get_traceback(exc_info), request_repr)
-        mail_admins(subject, message, fail_silently=True)
+        logger.error('Internal Server Error: %s' % request.path,
+            exc_info=exc_info,
+            extra={
+                'status_code': 500,
+                'request':request
+            }
+        )
+
         # If Http500 handler is not installed, re-raise last exception
         if resolver.urlconf_module is None:
             raise exc_info[1], None, exc_info[2]
         # Return an HttpResponse that displays a friendly error message.
         callback, param_dict = resolver.resolve500()
         return callback(request, **param_dict)
-
-    def _get_traceback(self, exc_info=None):
-        "Helper function to return the traceback as a string"
-        import traceback
-        return '\n'.join(traceback.format_exception(*(exc_info or sys.exc_info())))
 
     def apply_response_fixes(self, request, response):
         """

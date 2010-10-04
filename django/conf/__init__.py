@@ -16,6 +16,7 @@ from django.utils import importlib
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
+
 class LazySettings(LazyObject):
     """
     A lazy proxy for either global Django settings or a custom settings object.
@@ -113,6 +114,16 @@ class Settings(object):
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
+
+        # Settings are configured, so we can set up the logger if required
+        if self.LOGGING_CONFIG:
+            # First find the logging configuration function ...
+            logging_config_path, logging_config_func_name = self.LOGGING_CONFIG.rsplit('.', 1)
+            logging_config_module = importlib.import_module(logging_config_path)
+            logging_config_func = getattr(logging_config_module, logging_config_func_name)
+
+            # ... then invoke it with the logging settings
+            logging_config_func(self.LOGGING)
 
 class UserSettingsHolder(object):
     """

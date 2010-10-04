@@ -176,6 +176,7 @@ Other batteries included
     * :doc:`Internationalization <topics/i18n/index>`
     * :doc:`Jython support <howto/jython>`
     * :doc:`"Local flavor" <ref/contrib/localflavor>`
+    * :doc:`Logging <topics/logging>`
     * :doc:`Messages <ref/contrib/messages>`
     * :doc:`Pagination <topics/pagination>`
     * :doc:`Redirects <ref/contrib/redirects>`

@@ -1,3 +1,4 @@
+import logging
 import re
 
 from django.conf import settings
@@ -6,6 +7,9 @@ from django.core.mail import mail_managers
 from django.utils.http import urlquote
 from django.core import urlresolvers
 from django.utils.hashcompat import md5_constructor
+
+logger = logging.getLogger('django.request')
+
 
 class CommonMiddleware(object):
     """
@@ -38,6 +42,12 @@ class CommonMiddleware(object):
         if 'HTTP_USER_AGENT' in request.META:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
+                    logger.warning('Forbidden (User agent): %s' % request.path,
+                        extra={
+                            'status_code': 403,
+                            'request': request
+                        }
+                    )
                     return http.HttpResponseForbidden('<h1>Forbidden</h1>')
 
         # Check for a redirect based on settings.APPEND_SLASH

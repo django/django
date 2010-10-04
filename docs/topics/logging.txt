@@ -1,0 +1,442 @@
+=======
+Logging
+=======
+
+.. versionadded:: 1.3
+
+.. module:: django.utils.log
+   :synopsis: Logging tools for Django applications
+
+A quick logging primer
+======================
+
+Django uses Python's builtin logging module to perform system logging.
+The usage of the logging module is discussed in detail in `Python's
+own documentation`_. However, if you've never used Python's logging
+framework (or even if you have), here's a quick primer.
+
+.. _Python's own documentation: http://docs.python.org/library/logging.html
+
+The cast of players
+-------------------
+
+A Python logging configuration consists of four parts:
+
+    * :ref:`topic-logging-parts-loggers`
+    * :ref:`topic-logging-parts-handlers`
+    * :ref:`topic-logging-parts-filters`
+    * :ref:`topic-logging-parts-formatters`
+
+.. _topic-logging-parts-loggers:
+
+Loggers
+~~~~~~~
+
+A logger is the entry point into the logging system. Each logger is
+a named bucket to which messages can be written for processing.
+
+A logger is configured to have *log level*. This log level describes
+the severity of the messages that the logger will handle. Python
+defines the following log levels:
+
+    * ``DEBUG``: Low level system information for debugging purposes
+
+    * ``INFO``: General system information
+
+    * ``WARNING``: Information describing a minor problem that has
+      occurred.
+
+    * ``ERROR``: Information describing a major problem that has
+      occurred.
+
+    * ``CRITICAL``: Information describing a critical problem that has
+      occurred.
+
+Each message that is written to the logger is a *Log Record*. Each log
+record also has a *log level* indicating the severity of that specific
+message. A log record can also contain useful metadata that describes
+the event that is being logged. This can include details such as a
+stack trace or an error code.
+
+When a message is given to the logger, the log level of the message is
+compare to the log level of the logger. If the log level of the
+message meets or exceeds the log level of the logger itself, the
+message will undergo further processing. If it doesn't, the message
+will be ignored.
+
+Once a logger has determined that a message needs to be processed,
+it is passed to a *Handler*.
+
+.. _topic-logging-parts-handlers:
+
+Handlers
+~~~~~~~~
+
+The handler is the engine that determines what happens to each message
+in a logger. It describes a particular logging behavior, such as
+writing a message to the screen, to a file, or to a network socket.
+
+Like loggers, handlers also have a log level. If the log level of a
+log record doesn't meet or exceed the level of the handler, the
+handler will ignore the message.
+
+A logger can have multiple handlers, and each handler can have a
+different log level. In this way, it is possible to provide different
+forms of notification depending on the importance of a message. For
+example, you could install one handler that forwards ``ERROR`` and
+``CRITICIAL`` messages to a paging service, while a second handler
+logs all messages (including ``ERROR`` and ``CRITICAL`` messages) to a
+file for later analysis.
+
+.. _topic-logging-parts-filters:
+
+Filters
+~~~~~~~
+
+A filter is used to provide additional control over which log records
+are passed from logger to handler.
+
+By default, any log message that meets log level requirements will be
+handled. However, by installing a filter, you can place additional
+criteria on the logging process. For example, you could install a
+filter that only allows ``ERROR`` messages from a particular source to
+be emitted.
+
+Filters can also be used to modify the logging record prior to being
+emitted. For example, you could write a filter that downgrades
+``ERROR`` log records to ``WARNING`` records if a particular set of
+criteria are met.
+
+Filters can be installed on loggers or on handlers; multiple filters
+can be used in a chain to perform multiple filtering actions.
+
+.. _topic-logging-parts-formatters:
+
+Formatters
+~~~~~~~~~~
+
+Ultimately, a log record needs to be rendered as text. Formatters
+describe the exact format of that text. A formatter usually consists
+of a Python formatting string; however, you can also write custom
+formatters to implement specific formatting behavior.
+
+Using logging
+=============
+
+Once you have configured your loggers, handlers, filters and
+formatters, you need to place logging calls into your code. Using the
+logging framework is very simple. Here's an example::
+
+    # import the logging library
+    import logging
+
+    # Get an instance of a logger
+    logger = logging.getLogger(__name__)
+
+    def my_view(request, arg1, arg):
+        ...
+        if bad_mojo:
+            # Log an error message
+            logger.error('Something went wrong!')
+
+And that's it! Every time the ``bad_mojo`` condition is activated, an
+error log record will be written.
+
+Naming loggers
+~~~~~~~~~~~~~~
+
+The call to :meth:`logging.getLogger()` obtains (creating, if
+necessary) an instance of a logger. The logger instance is identified
+by a name. This name is used to identify the logger for configuration
+purposes.
+
+By convention, the logger name is usually ``__name__``, the name of
+the python module that contains the logger. This allows you to filter
+and handle logging calls on a per-module basis. However, if you have
+some other way of organizing your logging messages, you can provide
+any dot-separated name to identify your logger::
+
+    # Get an instance of a specfic named logger
+    logger = logging.getLogger('project.interesting.stuff')
+
+The dotted paths of logger names define a hierarchy. The
+``project.interesting`` logger is considered to be a parent of the
+``project.interesting.stuff`` logger; the ``project`` logger
+is a parent of the ``project.interesting`` logger.
+
+Why is the hierarchy important? Well, because loggers can be set to
+*propagate* their logging calls to their parents. In this way, you can
+define a single set of handlers at the root of a logger tree, and
+capture all logging calls in the subtree of loggers. A logging handler
+defined in the ``project`` namespace will catch all logging messages
+issued on the ``project.interesting`` and
+``project.interesting.stuff`` loggers.
+
+This propagation can be controlled on a per-logger basis. If
+you don't want a particular logger to propagate to it's parents, you
+can turn off this behavior.
+
+Making logging calls
+~~~~~~~~~~~~~~~~~~~~
+
+The logger instance contains an entry method for each of the default
+log levels:
+
+    * ``logger.critical()``
+    * ``logger.error()``
+    * ``logger.warning()``
+    * ``logger.info()``
+    * ``logger.debug()``
+
+There are two other logging calls available:
+
+    * ``logger.log()``: manually a logging message with a specific
+      log level.
+
+    * ``logger.exception()``: create a ``ERRORR`` level logging
+      message wrapping the current exception stack frame.
+
+Configuring logging
+===================
+
+Of course, it isn't enough to just put logging calls into your code.
+You also need to configure the loggers, handlers, filters and
+formatters to ensure that logging output is output in a useful way.
+
+Python's logging library provides several techniques to configure
+logging, ranging from a programatic interface to configuration files.
+By default, Django uses the `dictConfig format`_.
+
+.. note::
+    ``logging.dictConfig`` is a builtin library in Python 2.7. In
+    order to make this library available for users of earlier Python
+    versions, Django includes a copy as part of ``django.utils.log``.
+    If you have Python 2.7, the system native library will be used; if
+    you have Python 2.6 or earlier, Django's copy will be used.
+
+In order to configure logging, you use :setting:`LOGGING` to define a
+dictionary of logging settings. These settings describes the loggers,
+handlers, filters and formatters that you want in your logging setup,
+and the log levels and other properties that you want those components
+to have.
+
+Logging is configured immediately after settings have been loaded.
+Since the loading of settings is one of the first things that Django
+does, you can be certain that loggers are always ready for use in your
+project code.
+
+.. _dictConfig format: http://docs.python.org/library/logging.html#configuration-dictionary-schema
+
+.. _a third-party library: http://bitbucket.org/vinay.sajip/dictconfig
+
+An example
+----------
+
+The full documentation for `dictConfig format`_ is the best source of
+information about logging configuration dictionaries. However, to give
+you a taste of what is possible, here is an example of a fairly
+complex logging setup, configured using :meth:`logging.dictConfig`::
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'formatters': {
+            'explicit': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            },
+        },
+        'filters': {
+            'special': {
+                '()': 'project.logging.SpecialFilter',
+                'foo': 'bar',
+            }
+        },
+        'handlers': {
+            'null': {
+                'level':'DEBUG',
+                'class':'django.utils.log.NullHandler',
+            },
+            'console':{
+                'level':'DEBUG',
+                'class':'logging.StreamHandler',
+                'formatter': 'simple'
+            },
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler'
+                'filters': ['special']
+            }
+        },
+        'loggers': {
+            'django': {
+                'handlers':['null'],
+                'propagate': True,
+                'level':'INFO',
+            },
+            'django.request': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
+            'myproject.custom': {
+                'handlers: ['console', 'mail_admins'],
+                'level': 'INFO',
+                'filters': ['special']
+            }
+        }
+    }
+
+This logging configuration does the following things:
+
+    * Identifies the configuration as being in 'dictConfig version 1'
+      format. At present, this is the only dictConfig format version.
+
+    * Disables all existing logging configurations.
+
+    * Defines two formatters:
+
+        * ``simple``, that just outputs the log level name (e.g.,
+          ``DEBUG``) and the log message.
+
+          The `format` string is a normal Python formatting string
+          describing the details that are to be output on each logging
+          line. The full list of detail that can be output can be
+          found in the `formatter documentation`_.
+
+        * ``verbose``, that outputs the log level name, the log
+          message, plus the time, process, thread and module that
+          generate the log message.
+
+
+    * Defines one filter -- :class:`project.logging.SpecialFilter`,
+      using the alias ``special``. If this filter required additional
+      arguments at time of construction, they can be provided as
+      additional keys in the filter configuration dictionary. In this
+      case, the argument ``foo`` will be given a value of ``bar`` when
+      instantiating the :class:`SpecialFilter`.
+
+    * Defines three handlers:
+
+        * ``null``, a NullHandler, which will pass any `DEBUG` or
+          higher message to ``/dev/null``.
+
+        * ``console``, a StreamHandler, which will print any `DEBUG`
+          message to stdout. This handler uses the `simple` output
+          format.
+
+        * ``mail_admins``, an AdminEmailHandler, which will email any
+          `ERROR` level message to the site admins. This handler uses
+          the ``special`` filter.
+
+    * Configures three loggers:
+
+        * ``django``, which passes all messages at ``INFO`` or higher
+          to the ``null`` handler.
+
+        * ``django.request``, which passes all ``ERROR`` messages to
+          the ``mail_admins`` handler. In addition, this logger is
+          marked to *not* propagate messages. This means that log
+          messages written to ``django.request`` will not be handled
+          by the ``django`` logger.
+
+        * ``myproject.custom``, which passes all messages at ``INFO``
+          or higher that also pass the ``special`` filter to two
+          handlers -- the ``console``, and ``mail_admins``. This
+          means that all ``INFO`` level messages (or higher) will be
+          printed to the console; ``ERROR`` and ``CRITICIAL``
+          messages will also be output via e-mail.
+
+.. _formatter documentation: http://docs.python.org/library/logging.html#formatter-objects
+
+Custom logging configuration
+----------------------------
+
+If you don't want to use Python's dictConfig format to configure your
+logger, you can specify your own configuration scheme.
+
+The :setting:`LOGGING_CONFIG` setting defines the callable that will
+be used to configure Django's loggers. By default, it points at
+Python's :meth:`logging.dictConfig()` method. However, if you want to
+use a different configuration process, you can use any other callable
+that takes a single argument. The contents of :setting:`LOGGING` will
+be provided as the value of that argument when logging is configured.
+
+Disabling logging configuration
+-------------------------------
+
+If you don't want to configure logging at all (or you want to manually
+configure logging using your own approach), you can set
+:setting:`LOGGING_CONFIG` to ``None``. This will disable the
+configuration process.
+
+.. note::
+    Setting :setting:`LOGGING_CONFIG` to ``None`` only means that the
+    configuration process is disabled, not logging itself. If you
+    disable the configuration process, Django will still make logging
+    calls, falling back to whatever default logging behavior is
+    defined.
+
+Django's logging extensions
+===========================
+
+Django provides a number of utilities to handle the unique
+requirements of logging in webserver environment.
+
+Loggers
+-------
+
+Django provides three built-in loggers.
+
+``django``
+~~~~~~~~~~
+
+``django`` is the catch-all logger. No messages are posted directly to
+this logger.
+
+``django.requests``
+~~~~~~~~~~~~~~~~~~~
+
+Log messages related to the handling of requests. 5XX responses are
+raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
+messages.
+
+Messages to this logger have the following extra context:
+
+    * ``status_code``: The HTTP response code associated with the
+      request.
+
+    * ``request``: The request object that generated the logging
+      message.
+
+``django.db.backends``
+~~~~~~~~~~~~~~~~~~~~~~
+
+Messages relating to the interaction of code with the database.
+For example, every SQL statement executed by a request is logged
+at the ``DEBUG`` level to this logger.
+
+Messages to this logger have the following extra context:
+
+    * ``duration``: The time taken to execute the SQL statement.
+    * ``sql``: The SQL statement that was executed.
+    * ``params``: The parameters that were used in the SQL call.
+
+Handlers
+--------
+
+Django provides one log handler in addition to those provided by the
+Python logging module.
+
+.. class:: AdminEmailHandler()
+
+    This handler sends an email to the site admins for each log
+    message it receives.
+
+    If the log record contains a 'request' attribute, the full details
+    of the request will be included in the email.
+
+    If the log record contains stack trace information, that stack
+    trace will be included in the email.

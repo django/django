@@ -1,5 +1,7 @@
-from threading import Lock
+import logging
 from pprint import pformat
+import sys
+from threading import Lock
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -11,6 +13,9 @@ from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
 from django.utils.encoding import force_unicode, iri_to_uri
+
+logger = logging.getLogger('django.request')
+
 
 # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 STATUS_CODE_TEXT = {
@@ -236,6 +241,13 @@ class WSGIHandler(base.BaseHandler):
             try:
                 request = self.request_class(environ)
             except UnicodeDecodeError:
+                logger.warning('Bad Request (UnicodeDecodeError): %s' % request.path,
+                    exc_info=sys.exc_info(),
+                    extra={
+                        'status_code': 400,
+                        'request': request
+                    }
+                )
                 response = http.HttpResponseBadRequest()
             else:
                 response = self.get_response(request)

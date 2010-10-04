@@ -1,5 +1,10 @@
+import logging
+
 from django.template import loader, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponseGone
+
+logger = logging.getLogger('django.request')
+
 
 def direct_to_template(request, template, extra_context=None, mimetype=None, **kwargs):
     """
@@ -46,4 +51,9 @@ def redirect_to(request, url, permanent=True, query_string=False, **kwargs):
         klass = permanent and HttpResponsePermanentRedirect or HttpResponseRedirect
         return klass(url % kwargs)
     else:
+        logger.warning('Gone: %s' % request.path,
+                    extra={
+                        'status_code': 410,
+                        'request': request
+                    })
         return HttpResponseGone()

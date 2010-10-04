@@ -499,6 +499,34 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.user_messages.LegacyFallbackS
 # django.contrib.messages to avoid imports in this settings file.
 
 ###########
+# LOGGING #
+###########
+
+# The callable to use to configure logging
+LOGGING_CONFIG = 'django.utils.log.dictConfig'
+
+# The default logging configuration. This sends an email to
+# the site admins on every HTTP 500 error. All other log
+# records are sent to the bit bucket.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django.request':{
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}
+
+###########
 # TESTING #
 ###########
 

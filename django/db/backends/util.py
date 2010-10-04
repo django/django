@@ -1,8 +1,11 @@
 import datetime
 import decimal
+import logging
 from time import time
 
 from django.utils.hashcompat import md5_constructor
+
+logger = logging.getLogger('django.db.backends')
 
 class CursorDebugWrapper(object):
     def __init__(self, cursor, db):
@@ -15,11 +18,15 @@ class CursorDebugWrapper(object):
             return self.cursor.execute(sql, params)
         finally:
             stop = time()
+            duration = stop - start
             sql = self.db.ops.last_executed_query(self.cursor, sql, params)
             self.db.queries.append({
                 'sql': sql,
-                'time': "%.3f" % (stop - start),
+                'time': "%.3f" % duration,
             })
+            logger.debug('(%.3f) %s; args=%s' % (duration, sql, params),
+                extra={'duration':duration, 'sql':sql, 'params':params}
+            )
 
     def executemany(self, sql, param_list):
         start = time()
@@ -27,10 +34,14 @@ class CursorDebugWrapper(object):
             return self.cursor.executemany(sql, param_list)
         finally:
             stop = time()
+            duration = stop - start
             self.db.queries.append({
                 'sql': '%s times: %s' % (len(param_list), sql),
-                'time': "%.3f" % (stop - start),
+                'time': "%.3f" % duration,
             })
+            logger.debug('(%.3f) %s; args=%s' % (duration, sql, param_list),
+                extra={'duration':duration, 'sql':sql, 'params':param_list}
+            )
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
