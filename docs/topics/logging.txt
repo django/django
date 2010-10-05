@@ -241,7 +241,7 @@ complex logging setup, configured using :meth:`logging.dictConfig`::
         'version': 1,
         'disable_existing_loggers': True,
         'formatters': {
-            'explicit': {
+            'verbose': {
                 'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
             },
             'simple': {
