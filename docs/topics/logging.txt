@@ -193,7 +193,7 @@ There are two other logging calls available:
     * ``logger.log()``: Manually emits a logging message with a
       specific log level.
 
-    * ``logger.exception()``: Creates an ``ERORR`` level logging
+    * ``logger.exception()``: Creates an ``ERROR`` level logging
       message wrapping the current exception stack frame.
 
 Configuring logging
