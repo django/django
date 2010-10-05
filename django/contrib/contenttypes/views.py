@@ -1,6 +1,6 @@
 from django import http
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 
 def shortcut(request, content_type_id, object_id):
@@ -26,35 +26,37 @@ def shortcut(request, content_type_id, object_id):
     # Otherwise, we need to introspect the object's relationships for a
     # relation to the Site object
     object_domain = None
-    opts = obj._meta
 
-    # First, look for an many-to-many relationship to Site.
-    for field in opts.many_to_many:
-        if field.rel.to is Site:
-            try:
-                # Caveat: In the case of multiple related Sites, this just
-                # selects the *first* one, which is arbitrary.
-                object_domain = getattr(obj, field.name).all()[0].domain
-            except IndexError:
-                pass
-            if object_domain is not None:
-                break
+    if Site._meta.installed:
+        opts = obj._meta
 
-    # Next, look for a many-to-one relationship to Site.
-    if object_domain is None:
-        for field in obj._meta.fields:
-            if field.rel and field.rel.to is Site:
+        # First, look for an many-to-many relationship to Site.
+        for field in opts.many_to_many:
+            if field.rel.to is Site:
                 try:
-                    object_domain = getattr(obj, field.name).domain
-                except Site.DoesNotExist:
+                    # Caveat: In the case of multiple related Sites, this just
+                    # selects the *first* one, which is arbitrary.
+                    object_domain = getattr(obj, field.name).all()[0].domain
+                except IndexError:
                     pass
                 if object_domain is not None:
                     break
 
+        # Next, look for a many-to-one relationship to Site.
+        if object_domain is None:
+            for field in obj._meta.fields:
+                if field.rel and field.rel.to is Site:
+                    try:
+                        object_domain = getattr(obj, field.name).domain
+                    except Site.DoesNotExist:
+                        pass
+                    if object_domain is not None:
+                        break
+
     # Fall back to the current site (if possible).
     if object_domain is None:
         try:
-            object_domain = Site.objects.get_current().domain
+            object_domain = get_current_site(request).domain
         except Site.DoesNotExist:
             pass
 
