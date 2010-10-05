@@ -1,6 +1,7 @@
 from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.flatpages.models import FlatPage
 from django.test import TestCase
 from django.utils.formats import localize
 from django.utils.translation import activate
@@ -51,3 +52,26 @@ class SitemapTests(TestCase):
 <url><loc>http://example.com/users/testuser/</loc></url>
 </urlset>
 """)
+
+    def test_flatpage_sitemap(self):
+        "Basic FlatPage sitemap test"
+        public = FlatPage.objects.create(
+            url=u'/public/',
+            title=u'Public Page',
+            enable_comments=True,
+            registration_required=False,
+        )
+        public.sites.add(settings.SITE_ID)
+        private = FlatPage.objects.create(
+            url=u'/private/',
+            title=u'Public Page',
+            enable_comments=True,
+            registration_required=True    
+        )
+        private.sites.add(settings.SITE_ID)
+        response = self.client.get('/flatpages/sitemap.xml')
+        # Public flatpage should be in the sitemap
+        self.assertContains(response, '<loc>http://example.com%s</loc>' % public.url)
+        # Private flatpage should not be in the sitemap
+        self.assertNotContains(response, '<loc>http://example.com%s</loc>' % private.url)
+

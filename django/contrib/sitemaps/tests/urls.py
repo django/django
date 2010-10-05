@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.conf.urls.defaults import *
-from django.contrib.sitemaps import Sitemap, GenericSitemap
+from django.contrib.sitemaps import Sitemap, GenericSitemap, FlatPageSitemap
 from django.contrib.auth.models import User
 
 class SimpleSitemap(Sitemap):
@@ -22,7 +22,12 @@ generic_sitemaps = {
     }),
 }
 
+flatpage_sitemaps = {
+    'flatpages': FlatPageSitemap,
+}
+
 urlpatterns = patterns('django.contrib.sitemaps.views',
     (r'^simple/sitemap\.xml$', 'sitemap', {'sitemaps': simple_sitemaps}),
     (r'^generic/sitemap\.xml$', 'sitemap', {'sitemaps': generic_sitemaps}),
+    (r'^flatpages/sitemap\.xml$', 'sitemap', {'sitemaps': flatpage_sitemaps}),
 )
