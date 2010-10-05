@@ -35,7 +35,7 @@ Loggers
 A logger is the entry point into the logging system. Each logger is
 a named bucket to which messages can be written for processing.
 
-A logger is configured to have *log level*. This log level describes
+A logger is configured to have a *log level*. This log level describes
 the severity of the messages that the logger will handle. Python
 defines the following log levels:
 
@@ -59,7 +59,7 @@ the event that is being logged. This can include details such as a
 stack trace or an error code.
 
 When a message is given to the logger, the log level of the message is
-compare to the log level of the logger. If the log level of the
+compared to the log level of the logger. If the log level of the
 message meets or exceeds the log level of the logger itself, the
 message will undergo further processing. If it doesn't, the message
 will be ignored.
@@ -84,7 +84,7 @@ A logger can have multiple handlers, and each handler can have a
 different log level. In this way, it is possible to provide different
 forms of notification depending on the importance of a message. For
 example, you could install one handler that forwards ``ERROR`` and
-``CRITICIAL`` messages to a paging service, while a second handler
+``CRITICAL`` messages to a paging service, while a second handler
 logs all messages (including ``ERROR`` and ``CRITICAL`` messages) to a
 file for later analysis.
 
@@ -143,7 +143,7 @@ And that's it! Every time the ``bad_mojo`` condition is activated, an
 error log record will be written.
 
 Naming loggers
-~~~~~~~~~~~~~~
+--------------
 
 The call to :meth:`logging.getLogger()` obtains (creating, if
 necessary) an instance of a logger. The logger instance is identified
@@ -177,7 +177,7 @@ you don't want a particular logger to propagate to it's parents, you
 can turn off this behavior.
 
 Making logging calls
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 The logger instance contains an entry method for each of the default
 log levels:
@@ -190,10 +190,10 @@ log levels:
 
 There are two other logging calls available:
 
-    * ``logger.log()``: manually a logging message with a specific
-      log level.
+    * ``logger.log()``: Manually emits a logging message with a
+      specific log level.
 
-    * ``logger.exception()``: create a ``ERRORR`` level logging
+    * ``logger.exception()``: Creates an ``ERORR`` level logging
       message wrapping the current exception stack frame.
 
 Configuring logging
@@ -204,7 +204,7 @@ You also need to configure the loggers, handlers, filters and
 formatters to ensure that logging output is output in a useful way.
 
 Python's logging library provides several techniques to configure
-logging, ranging from a programatic interface to configuration files.
+logging, ranging from a programmatic interface to configuration files.
 By default, Django uses the `dictConfig format`_.
 
 .. note::
@@ -320,15 +320,15 @@ This logging configuration does the following things:
 
     * Defines three handlers:
 
-        * ``null``, a NullHandler, which will pass any `DEBUG` or
+        * ``null``, a NullHandler, which will pass any ``DEBUG`` or
           higher message to ``/dev/null``.
 
-        * ``console``, a StreamHandler, which will print any `DEBUG`
+        * ``console``, a StreamHandler, which will print any ``DEBUG``
           message to stdout. This handler uses the `simple` output
           format.
 
         * ``mail_admins``, an AdminEmailHandler, which will email any
-          `ERROR` level message to the site admins. This handler uses
+          ``ERROR`` level message to the site admins. This handler uses
           the ``special`` filter.
 
     * Configures three loggers:
@@ -346,7 +346,7 @@ This logging configuration does the following things:
           or higher that also pass the ``special`` filter to two
           handlers -- the ``console``, and ``mail_admins``. This
           means that all ``INFO`` level messages (or higher) will be
-          printed to the console; ``ERROR`` and ``CRITICIAL``
+          printed to the console; ``ERROR`` and ``CRITICAL``
           messages will also be output via e-mail.
 
 .. _formatter documentation: http://docs.python.org/library/logging.html#formatter-objects

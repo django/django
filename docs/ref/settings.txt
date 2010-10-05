@@ -1006,10 +1006,12 @@ Default: ``()`` (Empty tuple)
 A tuple of directories where Django looks for translation files.
 See :ref:`using-translations-in-your-own-projects`.
 
-.. setting:: LOGIN_REDIRECT_URL
+.. setting:: LOGGING
 
 LOGGING
 -------
+
+.. versionadded:: 1.3
 
 Default: A logging configuration dictionary.
 
@@ -1020,10 +1022,12 @@ configuration method described in :setting:`LOGGING_CONFIG`.
 The default logging configuration passes HTTP 500 server errors to an
 email log handler; all other log messages are given to a NullHandler.
 
-.. versionadded:: 1.3
+.. setting:: LOGGING_CONFIG
 
 LOGGING_CONFIG
 --------------
+
+.. versionadded:: 1.3
 
 Default: ``'django.utils.log.dictConfig'``
 
@@ -1036,7 +1040,7 @@ configuration process will be skipped.
 
 .. _dictConfig: http://docs.python.org/library/logging.html#logging.dictConfig
 
-.. versionadded:: 1.3
+.. setting:: LOGIN_REDIRECT_URL
 
 LOGIN_REDIRECT_URL
 ------------------
