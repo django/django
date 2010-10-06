@@ -266,7 +266,7 @@ complex logging setup, configured using :meth:`logging.dictConfig`::
             },
             'mail_admins': {
                 'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler'
+                'class': 'django.utils.log.AdminEmailHandler',
                 'filters': ['special']
             }
         },
@@ -282,7 +282,7 @@ complex logging setup, configured using :meth:`logging.dictConfig`::
                 'propagate': False,
             },
             'myproject.custom': {
-                'handlers: ['console', 'mail_admins'],
+                'handlers': ['console', 'mail_admins'],
                 'level': 'INFO',
                 'filters': ['special']
             }
