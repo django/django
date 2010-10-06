@@ -1,4 +1,3 @@
-import logging
 import os
 from pprint import pformat
 import sys
@@ -10,8 +9,9 @@ from django.core.handlers.base import BaseHandler
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
 from django.utils.encoding import force_unicode, smart_str, iri_to_uri
+from django.utils.log import getLogger
 
-logger = logging.getLogger('django.request')
+logger = getLogger('django.request')
 
 
 # NOTE: do *not* import settings (or any module which eventually imports

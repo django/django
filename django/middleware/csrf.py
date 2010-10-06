@@ -6,7 +6,6 @@ against request forgeries from other sites.
 """
 
 import itertools
-import logging
 import re
 import random
 
@@ -14,6 +13,7 @@ from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.hashcompat import md5_constructor
+from django.utils.log import getLogger
 from django.utils.safestring import mark_safe
 
 _POST_FORM_RE = \
@@ -21,7 +21,7 @@ _POST_FORM_RE = \
 
 _HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
-logger = logging.getLogger('django.request')
+logger = getLogger('django.request')
 
 # Use the system (hardware-based) random number generator if it exists.
 if hasattr(random, 'SystemRandom'):

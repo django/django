@@ -1,4 +1,5 @@
 import logging
+import sys
 from django.core import mail
 
 # Make sure a NullHandler is available
@@ -17,10 +18,32 @@ try:
 except ImportError:
     from django.utils.dictconfig import dictConfig
 
+if sys.version_info < (2, 5):
+    class LoggerCompat(object):
+        def __init__(self, logger):
+            self._logger = logger
+
+        def __getattr__(self, name):
+            val = getattr(self._logger, name)
+            if callable(val):
+                def _wrapper(*args, **kwargs):
+                    # Python 2.4 logging module doesn't support 'extra' parameter to
+                    # methods of Logger
+                    kwargs.pop('extra', None)
+                    return val(*args, **kwargs)
+                return _wrapper
+            else:
+                return val
+
+    def getLogger(name=None):
+        return LoggerCompat(logging.getLogger(name=name))
+else:
+    getLogger = logging.getLogger
+
 # Ensure the creation of the Django logger
 # with a null handler. This ensures we don't get any
 # 'No handlers could be found for logger "django"' messages
-logger = logging.getLogger('django')
+logger = getLogger('django')
 if not logger.handlers:
     logger.addHandler(NullHandler())
 
@@ -35,7 +58,14 @@ class AdminEmailHandler(logging.Handler):
         from django.conf import settings
 
         try:
-            request = record.request
+            if sys.version_info < (2,5):
+                # A nasty workaround required because Python 2.4's logging
+                # module doesn't support passing in extra context.
+                # For this handler, the only extra data we need is the
+                # request, and that's in the top stack frame.
+                request = record.exc_info[2].tb_frame.f_locals['request']
+            else:
+                request = record.request
 
             subject = '%s (%s IP): %s' % (
                 record.levelname,

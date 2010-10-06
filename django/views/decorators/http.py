@@ -10,16 +10,16 @@ except ImportError:
 from calendar import timegm
 from datetime import timedelta
 from email.Utils import formatdate
-import logging
 
 from django.utils.decorators import decorator_from_middleware, available_attrs
 from django.utils.http import parse_etags, quote_etag
+from django.utils.log import getLogger
 from django.middleware.http import ConditionalGetMiddleware
 from django.http import HttpResponseNotAllowed, HttpResponseNotModified, HttpResponse
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
 
-logger = logging.getLogger('django.request')
+logger = getLogger('django.request')
 
 
 def require_http_methods(request_method_list):

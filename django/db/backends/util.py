@@ -1,11 +1,11 @@
 import datetime
 import decimal
-import logging
 from time import time
 
 from django.utils.hashcompat import md5_constructor
+from django.utils.log import getLogger
 
-logger = logging.getLogger('django.db.backends')
+logger = getLogger('django.db.backends')
 
 class CursorDebugWrapper(object):
     def __init__(self, cursor, db):

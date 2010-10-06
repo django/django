@@ -1,4 +1,3 @@
-import logging
 import re
 
 from django.conf import settings
@@ -7,8 +6,9 @@ from django.core.mail import mail_managers
 from django.utils.http import urlquote
 from django.core import urlresolvers
 from django.utils.hashcompat import md5_constructor
+from django.utils.log import getLogger
 
-logger = logging.getLogger('django.request')
+logger = getLogger('django.request')
 
 
 class CommonMiddleware(object):

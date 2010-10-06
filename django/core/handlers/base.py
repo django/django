@@ -1,12 +1,12 @@
-import logging
 import sys
 
 from django import http
 from django.core import signals
 from django.utils.encoding import force_unicode
 from django.utils.importlib import import_module
+from django.utils.log import getLogger
 
-logger = logging.getLogger('django.request')
+logger = getLogger('django.request')
 
 
 class BaseHandler(object):

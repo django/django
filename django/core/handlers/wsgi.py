@@ -1,4 +1,3 @@
-import logging
 from pprint import pformat
 import sys
 from threading import Lock
@@ -13,8 +12,9 @@ from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
 from django.utils.encoding import force_unicode, iri_to_uri
+from django.utils.log import getLogger
 
-logger = logging.getLogger('django.request')
+logger = getLogger('django.request')
 
 
 # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html

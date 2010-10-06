@@ -411,6 +411,10 @@ Messages to this logger have the following extra context:
     * ``request``: The request object that generated the logging
       message.
 
+.. note::
+    Due to a limitation in the logging library, this extra
+    context is not available if you are using Python 2.4.
+
 ``django.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -423,6 +427,10 @@ Messages to this logger have the following extra context:
     * ``duration``: The time taken to execute the SQL statement.
     * ``sql``: The SQL statement that was executed.
     * ``params``: The parameters that were used in the SQL call.
+
+.. note::
+    Due to a limitation in the logging library, this extra
+    context is not available if you are using Python 2.4.
 
 Handlers
 --------
