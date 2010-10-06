@@ -32,7 +32,7 @@ if not settings.DATABASES:
     }
 
 if DEFAULT_DB_ALIAS not in settings.DATABASES:
-    raise ImproperlyConfigured("You must default a '%s' database" % DEFAULT_DB_ALIAS)
+    raise ImproperlyConfigured("You must define a '%s' database" % DEFAULT_DB_ALIAS)
 
 for alias, database in settings.DATABASES.items():
     if 'ENGINE' not in database:
