@@ -375,7 +375,7 @@ if Image is not None:
             """
             from django.core.files.images import ImageFile
             img_path = os.path.join(os.path.dirname(__file__), "test.png")
-            image = ImageFile(open(img_path))
+            image = ImageFile(open(img_path, 'rb'))
             image_pil = Image.open(img_path)
             size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
             self.assertEqual(image_pil.size, size_1)
