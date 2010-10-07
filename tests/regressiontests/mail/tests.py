@@ -417,4 +417,30 @@ Content
 >>> settings.ADMINS = old_admins
 >>> settings.MANAGERS = old_managers
 
+# Add Cc to the email argument list (#7722)
+
+>>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], cc=['cc@example.com'])
+>>> message = email.message()
+>>> message['Cc']
+'cc@example.com'
+>>> email.recipients()
+['to@example.com', 'cc@example.com']
+
+>>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com','other@example.com'], cc=['cc@example.com', 'cc.other@example.com'])
+>>> message = email.message()
+>>> message['Cc']
+'cc@example.com, cc.other@example.com'
+>>> email.recipients()
+['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com']
+
+>>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com','other@example.com'], cc=['cc@example.com', 'cc.other@example.com'], bcc=['bcc@example.com'])
+>>> message = email.message()
+>>> email.recipients()
+['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com']
+
+>>> email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], cc=['cc@example.com'])
+>>> message = email.message()
+>>> message.as_string()
+'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nCc: cc@example.com\nDate: ...\nMessage-ID: <...>\n\nContent'
+
 """

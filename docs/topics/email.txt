@@ -235,6 +235,9 @@ following parameters (in the given order, if positional arguments are used).
 All parameters are optional and can be set at any time prior to calling the
 ``send()`` method.
 
+.. versionchanged:: 1.3
+   The ``cc`` argument was added.
+
     * ``subject``: The subject line of the e-mail.
 
     * ``body``: The body text. This should be a plain text message.
@@ -260,6 +263,9 @@ All parameters are optional and can be set at any time prior to calling the
       keys are the header name, values are the header values. It's up to the
       caller to ensure header names and values are in the correct format for
       an e-mail message.
+
+    * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
+      when sending the e-mail.
 
 For example::
 

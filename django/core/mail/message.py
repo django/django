@@ -105,7 +105,7 @@ class EmailMessage(object):
     encoding = None     # None => use settings default
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
-                 connection=None, attachments=None, headers=None):
+                 connection=None, attachments=None, headers=None, cc=None):
         """
         Initialize a single email message (which can be sent to multiple
         recipients).
@@ -119,6 +119,11 @@ class EmailMessage(object):
             self.to = list(to)
         else:
             self.to = []
+        if cc:
+            assert not isinstance(cc, basestring), '"cc" argument must be a list or tuple'
+            self.cc = list(cc)
+        else:
+            self.cc = []
         if bcc:
             assert not isinstance(bcc, basestring), '"bcc" argument must be a list or tuple'
             self.bcc = list(bcc)
@@ -145,6 +150,8 @@ class EmailMessage(object):
         msg['Subject'] = self.subject
         msg['From'] = self.extra_headers.get('From', self.from_email)
         msg['To'] = ', '.join(self.to)
+        if self.cc:
+            msg['Cc'] = ', '.join(self.cc)
 
         # Email header names are case-insensitive (RFC 2045), so we have to
         # accommodate that when doing comparisons.
@@ -162,9 +169,9 @@ class EmailMessage(object):
     def recipients(self):
         """
         Returns a list of all recipients of the email (includes direct
-        addressees as well as Bcc entries).
+        addressees as well as Cc and Bcc entries).
         """
-        return self.to + self.bcc
+        return self.to + self.cc + self.bcc
 
     def send(self, fail_silently=False):
         """Sends the email message."""
@@ -252,7 +259,8 @@ class EmailMultiAlternatives(EmailMessage):
     alternative_subtype = 'alternative'
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
-            connection=None, attachments=None, headers=None, alternatives=None):
+            connection=None, attachments=None, headers=None, alternatives=None,
+            cc=None):
         """
         Initialize a single email message (which can be sent to multiple
         recipients).
@@ -261,7 +269,7 @@ class EmailMultiAlternatives(EmailMessage):
         bytestrings). The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
-        super(EmailMultiAlternatives, self).__init__(subject, body, from_email, to, bcc, connection, attachments, headers)
+        super(EmailMultiAlternatives, self).__init__(subject, body, from_email, to, bcc, connection, attachments, headers, cc)
         self.alternatives=alternatives or []
 
     def attach_alternative(self, content, mimetype):
