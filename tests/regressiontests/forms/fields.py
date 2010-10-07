@@ -430,6 +430,7 @@ class FieldsTests(TestCase):
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'', f.clean(None))
         self.assertEqual(u'person@example.com', f.clean('person@example.com'))
+        self.assertEqual(u'example@example.com', f.clean('      example@example.com  \t   \t '))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo@')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo@bar')
