@@ -311,11 +311,11 @@ be reported, and any test databases created by the run will not be destroyed.
 
 .. admonition:: Test with warnings enabled
 
-    It is a good idea to run your tests with ``python -Wall manage.py
-    test``. This will allow you to catch any deprecation warnings that
-    might be in your code. Django (as well as many other libraries) use
-    warnings to flag when features are deprecated. It can also flag
-    areas in your code that are not strictly wrong, but may benefit
+    It's a good idea to run your tests with Python warnings enabled:
+    ``python -Wall manage.py test``. The ``-Wall`` flag tells Python to
+    display deprecation warnings. Django, like many other Python libraries,
+    uses these warnings to flag when features are going away. It also might
+    flag areas in your code that aren't strictly wrong but could benefit
     from a better implementation.
 
 Running tests outside the test runner
