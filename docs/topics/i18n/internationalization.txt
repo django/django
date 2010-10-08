@@ -387,15 +387,14 @@ separate the pieces with ``and``::
     This is {{ book_t }} by {{ author_t }}
     {% endblocktrans %}
 
-This tag is also in charge of handling another functionality: Pluralization.
-To make use of it you should:
+This tag also provides for pluralization. To use it:
 
-    * Designate and bind a counter value by using ``count``, such value will
+    * Designate and bind a counter value with the name ``count``. This value will
       be the one used to select the right plural form.
 
     * Specify both the singular and plural forms separating them with the
-      ``{% plural %}`` tag, which appears within ``{% blocktrans %}`` and
-      ``{% endblocktrans %}``.
+      ``{% plural %}`` tag within the ``{% blocktrans %}`` and
+      ``{% endblocktrans %}`` tags.
 
 An example::
 
@@ -414,7 +413,7 @@ A more complex example::
     {% endblocktrans %}
 
 When you both use the pluralization feature and bind values to local variables
-in addition to the counter value, have in mind that the ``blocktrans``
+in addition to the counter value, keep in mind that the ``blocktrans``
 construct is internally converted to an ``ungettext`` call. This means the
 same :ref:`notes regarding ungettext variables <pluralization-var-notes>`
 apply.
