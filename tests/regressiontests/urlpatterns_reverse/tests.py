@@ -5,7 +5,7 @@ import unittest
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, resolve, NoReverseMatch, Resolver404
+from django.core.urlresolvers import reverse, resolve, NoReverseMatch, Resolver404, RegexURLResolver
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
@@ -305,7 +305,6 @@ class ErrorHandlerResolutionTests(TestCase):
     """Tests for handler404 and handler500"""
 
     def setUp(self):
-        from django.core.urlresolvers import RegexURLResolver
         urlconf = 'regressiontests.urlpatterns_reverse.urls_error_handlers'
         urlconf_callables = 'regressiontests.urlpatterns_reverse.urls_error_handlers_callables'
         self.resolver = RegexURLResolver(r'^$', urlconf)
