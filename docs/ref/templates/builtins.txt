@@ -2095,7 +2095,7 @@ A collection of template filters that implement these common markup languages:
 
     * Textile
     * Markdown
-    * ReST (ReStructured Text)
+    * reST (reStructuredText)
 
 See the :doc:`markup documentation </ref/contrib/markup>`.
 

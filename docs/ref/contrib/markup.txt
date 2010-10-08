@@ -10,7 +10,7 @@ languages:
 
     * ``textile`` -- implements `Textile`_ -- requires `PyTextile`_
     * ``markdown`` -- implements `Markdown`_ -- requires `Python-markdown`_
-    * ``restructuredtext`` -- implements `ReST (ReStructured Text)`_
+    * ``restructuredtext`` -- implements `reST (reStructured Text)`_
       -- requires `doc-utils`_
 
 In each case, the filter expects formatted markup as a string and
@@ -26,12 +26,12 @@ For more documentation, read the source code in
 
 .. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
 .. _Markdown: http://en.wikipedia.org/wiki/Markdown
-.. _ReST (ReStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
+.. _reST (reStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
 .. _PyTextile: http://loopcore.com/python-textile/
 .. _Python-markdown: http://www.freewisdom.org/projects/python-markdown
 .. _doc-utils: http://docutils.sf.net/
 
-ReStructured Text
+reStructured Text
 -----------------
 
 When using the ``restructuredtext`` markup filter you can define a
