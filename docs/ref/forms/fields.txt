@@ -775,7 +775,7 @@ Takes one extra required argument:
         ...
         ValidationError: [u'Ensure this value has at most 20 characters (it has 28).']
 
-``MultiValuefield``
+``MultiValueField``
 ~~~~~~~~~~~~~~~~~~~
 
 .. class:: MultiValueField(**kwargs)
