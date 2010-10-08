@@ -210,6 +210,7 @@ the way a form is presented using the Django template language. Extending the
 above example::
 
     <form action="/contact/" method="post">
+        {{ form.non_field_errors }}
         <div class="fieldWrapper">
             {{ form.subject.errors }}
             <label for="id_subject">E-mail subject:</label>
