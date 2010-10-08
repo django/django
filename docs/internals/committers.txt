@@ -255,6 +255,16 @@ Jeremy Dunck
 
     Jeremy lives in Dallas, Texas, USA.
 
+`Simon Meers`_
+    Simon discovered Django 0.96 during his Computer Science PhD research and 
+    has been developing with it full-time ever since. His core code 
+    contributions are mostly in Django's admin application. He is also helping 
+    to improve Django's documentation.
+
+    Simon works as a freelance developer based in Wollongong, Australia.
+
+.. _simon meers: http://simonmeers.com/
+
 Developers Emeritus
 ===================
 
