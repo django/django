@@ -19,6 +19,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Jannis Leidel
     * James Tauber
     * Alex Gaynor
+    * Andrew Godwin
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -191,7 +192,6 @@ answer newbie questions, and generally made Django that much better:
     martin.glueck@gmail.com
     Artyom Gnilov <boobsd@gmail.com>
     Ben Godfrey <http://aftnn.org>
-    Andrew Godwin <andrew@aeracode.org>
     GomoX <gomo@datafull.com>
     Guilherme Mesquita Gondim <semente@taurinus.org>
     Mario Gonzalez <gonzalemario@gmail.com>

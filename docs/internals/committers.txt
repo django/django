@@ -222,6 +222,17 @@ Karen Tracey
 
 .. _Alex Gaynor: http://alexgaynor.net
 
+`Andrew Godwin`_
+    Andrew is a freelance Python developer and tinkerer, and has been
+    developing against Django since 2007. He graduated from Oxford University
+    with a degree in Computer Science, and has become most well known
+    in the Django community for his work on South, the schema migrations
+    library.
+
+    Andrew lives in London, UK.
+
+.. _Andrew Godwin: http://www.aeracode.org/
+
 Specialists
 -----------
 
