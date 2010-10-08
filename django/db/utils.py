@@ -111,9 +111,11 @@ class ConnectionRouter(object):
                 except ImportError, e:
                     raise ImproperlyConfigured('Error importing database router %s: "%s"' % (klass_name, e))
                 try:
-                    router = getattr(module, klass_name)()
+                    router_class = getattr(module, klass_name)
                 except AttributeError:
                     raise ImproperlyConfigured('Module "%s" does not define a database router name "%s"' % (module, klass_name))
+                else:
+                    router = router_class()
             else:
                 router = r
             self.routers.append(router)
