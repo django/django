@@ -205,10 +205,10 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``date_list``: A list of ``datetime.date`` objects representing all
-      years that have objects available according to ``queryset``. These are
-      ordered in reverse. This is equivalent to
-      ``queryset.dates(date_field, 'year')[::-1]``.
+    * ``date_list``: A ``DateQuerySet`` object containing all years that have
+      have objects available according to ``queryset``, represented as
+      ``datetime.datetime`` objects. These are ordered in reverse. This is
+      equivalent to ``queryset.dates(date_field, 'year')[::-1]``.
 
     .. versionchanged:: 1.0
        The behaviour depending on ``template_object_name`` is new in this version.
@@ -290,9 +290,9 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``date_list``: A list of ``datetime.date`` objects representing all
-      months that have objects available in the given year, according to
-      ``queryset``, in ascending order.
+    * ``date_list``: A ``DateQuerySet`` object containing all months that have
+      have objects available according to ``queryset``, represented as
+      ``datetime.datetime`` objects, in ascending order.
 
     * ``year``: The given year, as a four-character string.
 
@@ -380,9 +380,9 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``date_list``: A list of ``datetime.date`` objects representing all
-      days that have objects available in the given month, according to
-      ``queryset``, in ascending order.
+    * ``date_list``: A ``DateQuerySet`` object containing all days that have
+      have objects available in the given month, according to ``queryset``,
+      represented as ``datetime.datetime`` objects, in ascending order.
 
     * ``month``: A ``datetime.date`` object representing the given month.
 
