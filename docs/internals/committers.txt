@@ -213,10 +213,10 @@ Karen Tracey
 
 `Alex Gaynor`_
     Alex is a student at Rensselaer Polytechnic Institute, and is also an
-    independent contractor.  He found Django in 2007 and has been ever since he
-    found out you don't need to write out your forms by hand.  He has a small
-    obsession with compilers.  He's contributed to the ORM, forms, admin, and
-    other components of Django.
+    independent contractor.  He found Django in 2007 and has been addicted ever
+    since he found out you don't need to write out your forms by hand.  He has
+    a small obsession with compilers.  He's contributed to the ORM, forms,
+    admin, and other components of Django.
     
     Alex lives in Chicago, IL, but spends most of his time in Troy, NY.
 
