@@ -1,0 +1,29 @@
+==========================
+Django 1.2.2 release notes
+==========================
+
+Welcome to Django 1.2.2!
+
+This is the second "bugfix" release in the Django 1.2 series,
+improving the stability and performance of the Django 1.2 codebase.
+
+Django 1.2.2 maintains backwards compatibility with Django
+1.2.1, but contain a number of fixes and other
+improvements. Django 1.2.2 is a recommended upgrade for any
+development or deployment currently using or targeting Django 1.2.
+
+For full details on the new features, backwards incompatibilities, and
+deprecated features in the 1.2 branch, see the :doc:`/releases/1.2`.
+
+One new feature
+===============
+
+Ordinarily, a point release would not include new features, but in the
+case of Django 1.2.2, we have made an exception to this rule.
+
+In order to test a bug fix that forms part of the 1.2.2 release, it
+was necessary to add a feature -- the ``enforce_csrf_checks`` flag --
+to the :mod:`test client <django.test.client>`. This flag forces
+the test client to perform full CSRF checks on forms. The default
+behavior of the test client hasn't changed, but if you want to do
+CSRF checks with the test client, it is now possible to do so.

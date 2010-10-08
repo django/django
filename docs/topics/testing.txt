@@ -575,6 +575,8 @@ Note a few important things about how the test client works:
     * By default, the test client will disable any CSRF checks
       performed by your site.
 
+      .. versionadded:: 1.2.2
+
       If, for some reason, you *want* the test client to perform CSRF
       checks, you can create an instance of the test client that
       enforces CSRF checks. To do this, pass in the
