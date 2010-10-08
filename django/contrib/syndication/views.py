@@ -8,13 +8,17 @@ from django.utils import feedgenerator, tzinfo
 from django.utils.encoding import force_unicode, iri_to_uri, smart_unicode
 from django.utils.html import escape
 
-def add_domain(domain, url):
+def add_domain(domain, url, secure=False):
     if not (url.startswith('http://')
             or url.startswith('https://')
             or url.startswith('mailto:')):
         # 'url' must already be ASCII and URL-quoted, so no need for encoding
         # conversions here.
-        url = iri_to_uri(u'http://%s%s' % (domain, url))
+        if secure:
+            protocol = 'https'
+        else:
+            protocol = 'http'
+        url = iri_to_uri(u'%s://%s%s' % (protocol, domain, url))
     return url
 
 class FeedDoesNotExist(ObjectDoesNotExist):
@@ -94,7 +98,7 @@ class Feed(object):
         current_site = get_current_site(request)
 
         link = self.__get_dynamic_attr('link', obj)
-        link = add_domain(current_site.domain, link)
+        link = add_domain(current_site.domain, link, request.is_secure())
 
         feed = self.feed_type(
             title = self.__get_dynamic_attr('title', obj),
@@ -102,8 +106,11 @@ class Feed(object):
             link = link,
             description = self.__get_dynamic_attr('description', obj),
             language = settings.LANGUAGE_CODE.decode(),
-            feed_url = add_domain(current_site.domain,
-                    self.__get_dynamic_attr('feed_url', obj) or request.path),
+            feed_url = add_domain(
+                current_site.domain,
+                self.__get_dynamic_attr('feed_url', obj) or request.path,
+                request.is_secure(),
+            ),
             author_name = self.__get_dynamic_attr('author_name', obj),
             author_link = self.__get_dynamic_attr('author_link', obj),
             author_email = self.__get_dynamic_attr('author_email', obj),
@@ -137,7 +144,11 @@ class Feed(object):
                 description = description_tmp.render(RequestContext(request, {'obj': item, 'site': current_site}))
             else:
                 description = self.__get_dynamic_attr('item_description', item)
-            link = add_domain(current_site.domain, self.__get_dynamic_attr('item_link', item))
+            link = add_domain(
+                current_site.domain,
+                self.__get_dynamic_attr('item_link', item),
+                request.is_secure(),
+            )
             enc = None
             enc_url = self.__get_dynamic_attr('item_enclosure_url', item)
             if enc_url:
