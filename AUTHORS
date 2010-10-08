@@ -19,6 +19,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Jannis Leidel
     * James Tauber
     * Alex Gaynor
+    * Andrew Godwin
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
