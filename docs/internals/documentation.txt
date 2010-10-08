@@ -20,7 +20,7 @@ Sphinx -- ``easy_install Sphinx`` should do the trick.
 
 Then, building the HTML is easy; just ``make html`` from the ``docs`` directory.
 
-To get started contributing, you'll want to read the `ReStructuredText
+To get started contributing, you'll want to read the `reStructuredText
 Primer`__. After that, you'll want to read about the `Sphinx-specific markup`__
 that's used to manage metadata, indexing, and cross-references.
 

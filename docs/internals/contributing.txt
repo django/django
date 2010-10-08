@@ -700,10 +700,10 @@ There's a full page of information about the :doc:`Django documentation
 system </internals/documentation>` that you should read prior to working on the
 documentation.
 
-Guidelines for ReST files
+Guidelines for reST files
 -------------------------
 
-These guidelines regulate the format of our ReST documentation:
+These guidelines regulate the format of our reST documentation:
 
     * In section titles, capitalize only initial words and proper nouns.
 

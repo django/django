@@ -8,7 +8,7 @@ markup syntaxes to HTML; currently there is support for:
     * Markdown, which requires the Python-markdown library from
       http://www.freewisdom.org/projects/python-markdown
 
-    * ReStructuredText, which requires docutils from http://docutils.sf.net/
+    * reStructuredText, which requires docutils from http://docutils.sf.net/
 """
 
 from django import template
