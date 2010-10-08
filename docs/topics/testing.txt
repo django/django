@@ -309,6 +309,15 @@ can press ``Ctrl-C`` a second time and the test run will halt immediately,
 but not gracefully. No details of the tests run before the interruption will
 be reported, and any test databases created by the run will not be destroyed.
 
+.. admonition:: Test with warnings enabled
+
+    It is a good idea to run your tests with ``python -Wall manage.py
+    test``. This will allow you to catch any deprecation warnings that
+    might be in your code. Django (as well as many other libraries) use
+    warnings to flag when features are deprecated. It can also flag
+    areas in your code that are not strictly wrong, but may benefit
+    from a better implementation.
+
 Running tests outside the test runner
 -------------------------------------
 
