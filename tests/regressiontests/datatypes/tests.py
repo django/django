@@ -3,7 +3,7 @@ from django.db import DEFAULT_DB_ALIAS
 from django.test import TestCase
 from django.utils import tzinfo
 
-from models import Donut
+from models import Donut, RumBaba
 from django.conf import settings
 
 class DataTypesTestCase(TestCase):
@@ -43,7 +43,7 @@ class DataTypesTestCase(TestCase):
         self.assertEqual(d2.baked_time, datetime.time(16, 19, 59))
 
     def test_year_boundaries(self):
-        # Year boundary tests (ticket #3689)
+        """Year boundary tests (ticket #3689)"""
         d = Donut.objects.create(name='Date Test 2007',
              baked_date=datetime.datetime(year=2007, month=12, day=31),
              consumed_at=datetime.datetime(year=2007, month=12, day=31, hour=23, minute=59, second=59))
@@ -67,17 +67,27 @@ class DataTypesTestCase(TestCase):
         self.assertEqual(0, Donut.objects.filter(consumed_at__year=2008).count())
 
     def test_textfields_unicode(self):
-        # Regression test for #10238: TextField values returned from the database
-        # should be unicode.
+        """Regression test for #10238: TextField values returned from the
+        database should be unicode."""
         d = Donut.objects.create(name=u'Jelly Donut', review=u'Outstanding')
         newd = Donut.objects.get(id=d.id)
         self.assert_(isinstance(newd.review, unicode))
 
     def test_tz_awareness_mysql(self):
-        # Regression test for #8354: the MySQL backend should raise an error if given
-        # a timezone-aware datetime object.
+        """Regression test for #8354: the MySQL backend should raise an error
+        if given a timezone-aware datetime object."""
         if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.mysql':
             dt = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=tzinfo.FixedOffset(0))
             d = Donut(name='Bear claw', consumed_at=dt)
             self.assertRaises(ValueError, d.save)
             # ValueError: MySQL backend does not support timezone-aware datetimes.
+
+    def test_datefield_auto_now_add(self):
+        """Regression test for #10970, auto_now_add for DateField should store
+        a Python datetime.date, not a datetime.datetime"""
+        b = RumBaba.objects.create()
+        # Verify we didn't break DateTimeField behavior
+        self.assert_(isinstance(b.baked_timestamp, datetime.datetime))
+        # We need to test this this way because datetime.datetime inherits
+        # from datetime.date:
+        self.assert_(isinstance(b.baked_date, datetime.date) and not isinstance(b.baked_date, datetime.datetime))
