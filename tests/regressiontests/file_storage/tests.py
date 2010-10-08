@@ -6,6 +6,7 @@ import tempfile
 import time
 import unittest
 from cStringIO import StringIO
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import ContentFile, File
@@ -81,16 +82,16 @@ class GetStorageClassTests(unittest.TestCase):
 
 class FileStorageTests(unittest.TestCase):
     storage_class = FileSystemStorage
-    
+
     def setUp(self):
         self.temp_dir = tempfile.mktemp()
         os.makedirs(self.temp_dir)
         self.storage = self.storage_class(location=self.temp_dir,
             base_url='/test_media_url/')
-    
+
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
-        
+
     def test_file_access_options(self):
         """
         Standard file access options are available, and work as expected.
@@ -104,9 +105,59 @@ class FileStorageTests(unittest.TestCase):
         f = self.storage.open('storage_test', 'r')
         self.assertEqual(f.read(), 'storage contents')
         f.close()
-        
+
         self.storage.delete('storage_test')
         self.failIf(self.storage.exists('storage_test'))
+
+    def test_file_accessed_time(self):
+        """
+        File storage returns a Datetime object for the last accessed time of
+        a file.
+        """
+        self.failIf(self.storage.exists('test.file'))
+
+        f = ContentFile('custom contents')
+        f_name = self.storage.save('test.file', f)
+        atime = self.storage.accessed_time(f_name)
+
+        self.assertEqual(atime, datetime.fromtimestamp(
+            os.path.getatime(self.storage.path(f_name))))
+        self.assertTrue(datetime.now() - self.storage.accessed_time(f_name) < timedelta(seconds=2))
+        self.storage.delete(f_name)
+
+    def test_file_created_time(self):
+        """
+        File storage returns a Datetime object for the creation time of
+        a file.
+        """
+        self.failIf(self.storage.exists('test.file'))
+
+        f = ContentFile('custom contents')
+        f_name = self.storage.save('test.file', f)
+        ctime = self.storage.created_time(f_name)
+
+        self.assertEqual(ctime, datetime.fromtimestamp(
+            os.path.getctime(self.storage.path(f_name))))
+        self.assertTrue(datetime.now() - self.storage.created_time(f_name) < timedelta(seconds=2))
+
+        self.storage.delete(f_name)
+
+    def test_file_modified_time(self):
+        """
+        File storage returns a Datetime object for the last modified time of
+        a file.
+        """
+        self.failIf(self.storage.exists('test.file'))
+
+        f = ContentFile('custom contents')
+        f_name = self.storage.save('test.file', f)
+        mtime = self.storage.modified_time(f_name)
+
+        self.assertEqual(mtime, datetime.fromtimestamp(
+            os.path.getmtime(self.storage.path(f_name))))
+        self.assertTrue(datetime.now() - self.storage.modified_time(f_name) < timedelta(seconds=2))
+
+        self.storage.delete(f_name)
 
     def test_file_save_without_name(self):
         """
@@ -215,7 +266,7 @@ class CustomStorage(FileSystemStorage):
 
 class CustomStorageTests(FileStorageTests):
     storage_class = CustomStorage
-    
+
     def test_custom_get_available_name(self):
         first = self.storage.save('custom_storage', ContentFile('custom contents'))
         self.assertEqual(first, 'custom_storage')

@@ -13,6 +13,33 @@ The local filesystem path where the file can be opened using Python's standard
 ``open()``. For storage systems that aren't accessible from the local
 filesystem, this will raise ``NotImplementedError`` instead.
 
+``Storage.accessed_time(name)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.3
+
+Returns a ``datetime`` object containing the last accessed time of the file.
+For storage systems that aren't able to return the last accessed time, this
+will raise ``NotImplementedError`` instead.
+
+``Storage.created_time(name)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.3
+
+Returns a ``datetime`` object containing the creation time of the file.
+For storage systems that aren't able to return the creation time, this
+will raise ``NotImplementedError`` instead.
+
+``Storage.modified_time(name)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.3
+
+Returns a ``datetime`` object containing the last modified time. For storage
+systems that aren't able to return the last modified time, this will raise
+``NotImplementedError`` instead.
+
 ``Storage.size(name)``
 ~~~~~~~~~~~~~~~~~~~~~~
 
