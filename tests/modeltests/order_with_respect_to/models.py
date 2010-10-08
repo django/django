@@ -17,3 +17,13 @@ class Answer(models.Model):
 
     def __unicode__(self):
         return unicode(self.text)
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    parent = models.ForeignKey("self", related_name="children", null=True)
+
+    class Meta:
+        order_with_respect_to = "parent"
+
+    def __unicode__(self):
+        return self.title

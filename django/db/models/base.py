@@ -5,7 +5,8 @@ import django.db.models.manager     # Imported to register signal handler.
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS
 from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
-from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
+from django.db.models.fields.related import (OneToOneRel, ManyToOneRel,
+    OneToOneField, add_lazy_relation)
 from django.db.models.query import delete_objects, Q
 from django.db.models.query_utils import CollectedObjects, DeferredAttribute
 from django.db.models.options import Options
@@ -223,8 +224,25 @@ class ModelBase(type):
         if opts.order_with_respect_to:
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
-            setattr(opts.order_with_respect_to.rel.to, 'get_%s_order' % cls.__name__.lower(), curry(method_get_order, cls))
-            setattr(opts.order_with_respect_to.rel.to, 'set_%s_order' % cls.__name__.lower(), curry(method_set_order, cls))
+            # defer creating accessors on the foreign class until we are
+            # certain it has been created
+            def make_foreign_order_accessors(field, model, cls):
+                setattr(
+                    field.rel.to,
+                    'get_%s_order' % cls.__name__.lower(),
+                    curry(method_get_order, cls)
+                )
+                setattr(
+                    field.rel.to,
+                    'set_%s_order' % cls.__name__.lower(),
+                    curry(method_set_order, cls)
+                )
+            add_lazy_relation(
+                cls,
+                opts.order_with_respect_to,
+                opts.order_with_respect_to.rel.to,
+                make_foreign_order_accessors
+            )
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
