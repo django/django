@@ -18,6 +18,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Karen Tracey
     * Jannis Leidel
     * James Tauber
+    * Alex Gaynor
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -180,7 +181,6 @@ answer newbie questions, and generally made Django that much better:
     Jorge Gajon <gajon@gajon.org>
     gandalf@owca.info
     Marc Garcia <marc.garcia@accopensys.com>
-    Alex Gaynor <alex.gaynor@gmail.com>
     Andy Gayton <andy-django@thecablelounge.com>
     Idan Gazit
     geber@datacollect.com
