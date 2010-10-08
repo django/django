@@ -25,10 +25,10 @@ yourself with basic Django concepts.
     please consult the :ref:`installation documentation <ref-gis-install>`
     for more details.
 
-This tutorial is going to guide you through guide the user through the creation
-of a geographic web application for viewing the `world borders`_. [#]_  Some of
-the code used in this tutorial is taken from and/or inspired by the
-`GeoDjango basic apps`_ project. [#]_
+This tutorial will guide you through the creation of a geographic web
+application for viewing the `world borders`_. [#]_ Some of the code
+used in this tutorial is taken from and/or inspired by the `GeoDjango
+basic apps`_ project. [#]_
 
 .. note::
 
