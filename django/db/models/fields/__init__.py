@@ -622,7 +622,7 @@ class DateField(Field):
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
-            value = datetime.datetime.now()
+            value = datetime.date.today()
             setattr(model_instance, self.attname, value)
             return value
         else:
@@ -708,6 +708,14 @@ class DateTimeField(DateField):
                                              **kwargs)
                 except ValueError:
                     raise exceptions.ValidationError(self.error_messages['invalid'])
+
+    def pre_save(self, model_instance, add):
+        if self.auto_now or (self.auto_now_add and add):
+            value = datetime.datetime.now()
+            setattr(model_instance, self.attname, value)
+            return value
+        else:
+            return super(DateTimeField, self).pre_save(model_instance, add)
 
     def get_prep_value(self, value):
         return self.to_python(value)

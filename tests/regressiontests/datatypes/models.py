@@ -19,3 +19,7 @@ class Donut(models.Model):
 
     def __str__(self):
         return self.name
+
+class RumBaba(models.Model):
+    baked_date = models.DateField(auto_now_add=True)
+    baked_timestamp = models.DateTimeField(auto_now_add=True)
