@@ -106,7 +106,6 @@ class UserManager(models.Manager):
         """
         Creates and saves a User with the given username, e-mail and password.
         """
-
         now = datetime.datetime.now()
         
         # Normalize the address by lowercasing the domain part of the email
@@ -122,10 +121,7 @@ class UserManager(models.Manager):
                          is_active=True, is_superuser=False, last_login=now,
                          date_joined=now)
 
-        if password:
-            user.set_password(password)
-        else:
-            user.set_unusable_password()
+        user.set_password(password)
         user.save(using=self._db)
         return user
 
@@ -238,11 +234,14 @@ class User(models.Model):
         return full_name.strip()
 
     def set_password(self, raw_password):
-        import random
-        algo = 'sha1'
-        salt = get_hexdigest(algo, str(random.random()), str(random.random()))[:5]
-        hsh = get_hexdigest(algo, salt, raw_password)
-        self.password = '%s$%s$%s' % (algo, salt, hsh)
+        if raw_password is None:
+            self.set_unusable_password()
+        else:
+            import random
+            algo = 'sha1'
+            salt = get_hexdigest(algo, str(random.random()), str(random.random()))[:5]
+            hsh = get_hexdigest(algo, salt, raw_password)
+            self.password = '%s$%s$%s' % (algo, salt, hsh)
 
     def check_password(self, raw_password):
         """
@@ -265,7 +264,11 @@ class User(models.Model):
         self.password = UNUSABLE_PASSWORD
 
     def has_usable_password(self):
-        return self.password != UNUSABLE_PASSWORD
+        if self.password is None \
+            or self.password == UNUSABLE_PASSWORD:
+            return False
+        else:
+            return True
 
     def get_group_permissions(self, obj=None):
         """
