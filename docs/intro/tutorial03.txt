@@ -10,7 +10,7 @@ Philosophy
 ==========
 
 A view is a "type" of Web page in your Django application that generally serves
-a specific function and has a specific template. For example, in a weblog
+a specific function and has a specific template. For example, in a Weblog
 application, you might have the following views:
 
     * Blog homepage -- displays the latest few entries.

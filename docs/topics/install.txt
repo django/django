@@ -28,7 +28,7 @@ Install Apache and mod_wsgi
 =============================
 
 If you just want to experiment with Django, skip ahead to the next
-section; Django includes a lightweight web server you can use for
+section; Django includes a lightweight Web server you can use for
 testing, so you won't need to set up Apache until you're ready to
 deploy Django in production.
 
@@ -40,9 +40,9 @@ memory when the server starts. Code stays in memory throughout the
 life of an Apache process, which leads to significant performance
 gains over other server arrangements. In daemon mode, mod_wsgi spawns
 an independent daemon process that handles requests. The daemon
-process can run as a different user than the webserver, possibly
+process can run as a different user than the Web server, possibly
 leading to improved security, and the daemon process can be restarted
-without restarting the entire Apache webserver, possibly making
+without restarting the entire Apache Web server, possibly making
 refreshing your codebase more seamless. Consult the mod_wsgi
 documentation to determine which mode is right for your setup. Make
 sure you have Apache installed, with the mod_wsgi module activated.

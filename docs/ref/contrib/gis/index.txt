@@ -9,8 +9,8 @@ GeoDjango
 .. module:: django.contrib.gis
    :synopsis: Geographic Information System (GIS) extensions for Django
 
-GeoDjango intends to be a world-class geographic web framework. Its goal is to
-make it as easy as possible to build GIS web applications and harness the power
+GeoDjango intends to be a world-class geographic Web framework. Its goal is to
+make it as easy as possible to build GIS Web applications and harness the power
 of spatially enabled data.
 
 .. toctree::

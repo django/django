@@ -46,7 +46,7 @@ Optional Fcgi settings: (setting=value)
 
 Examples:
   Run a "standard" fastcgi process on a file-descriptor
-  (for webservers which spawn your processes for you)
+  (for Web servers which spawn your processes for you)
     $ manage.py runfcgi method=threaded
 
   Run a scgi server on a TCP host/port

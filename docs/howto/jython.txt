@@ -51,7 +51,7 @@ on top of Jython.
 .. _`django-jython`: http://code.google.com/p/django-jython/
 
 To install it, follow the `installation instructions`_ detailed on the project
-website. Also, read the `database backends`_ documentation there.
+Web site. Also, read the `database backends`_ documentation there.
 
 .. _`installation instructions`: http://code.google.com/p/django-jython/wiki/Install
 .. _`database backends`: http://code.google.com/p/django-jython/wiki/DatabaseBackends

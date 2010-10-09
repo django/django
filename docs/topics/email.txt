@@ -580,7 +580,7 @@ Testing e-mail sending
 ======================
 
 There are times when you do not want Django to send e-mails at
-all. For example, while developing a website, you probably don't want
+all. For example, while developing a Web site, you probably don't want
 to send out thousands of e-mails -- but you may want to validate that
 e-mails will be sent to the right people under the right conditions,
 and that those e-mails will contain the correct content.

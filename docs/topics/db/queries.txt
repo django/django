@@ -11,7 +11,7 @@ API. Refer to the :doc:`data model reference </ref/models/index>` for full
 details of all the various model lookup options.
 
 Throughout this guide (and in the reference), we'll refer to the following
-models, which comprise a weblog application:
+models, which comprise a Weblog application:
 
 .. _queryset-model-example:
 

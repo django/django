@@ -383,7 +383,7 @@ Django's logging extensions
 ===========================
 
 Django provides a number of utilities to handle the unique
-requirements of logging in webserver environment.
+requirements of logging in Web server environment.
 
 Loggers
 -------

@@ -8,7 +8,7 @@ Deploying GeoDjango
     not thread safe at this time.  Thus, it is *highly* recommended
     to not use threading when deploying -- in other words, use a
     an appropriate configuration of Apache or the prefork method
-    when using FastCGI through another web server.
+    when using FastCGI through another Web server.
 
 Apache
 ======

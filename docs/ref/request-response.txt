@@ -37,12 +37,12 @@ All attributes except ``session`` should be considered read-only.
 
 .. attribute:: HttpRequest.path_info
 
-    Under some web server configurations, the portion of the URL after the host
+    Under some Web server configurations, the portion of the URL after the host
     name is split up into a script prefix portion and a path info portion
     (this happens, for example, when using the ``django.root`` option
     with the :doc:`modpython handler from Apache </howto/deployment/modpython>`).
     The ``path_info`` attribute always contains the path info portion of the
-    path, no matter what web server is being used. Using this instead of
+    path, no matter what Web server is being used. Using this instead of
     attr:`~HttpRequest.path` can make your code much easier to move between test
     and deployment servers.
 
@@ -152,7 +152,7 @@ All attributes except ``session`` should be considered read-only.
         * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
         * ``REMOTE_ADDR`` -- The IP address of the client.
         * ``REMOTE_HOST`` -- The hostname of the client.
-        * ``REMOTE_USER`` -- The user authenticated by the web server, if any.
+        * ``REMOTE_USER`` -- The user authenticated by the Web server, if any.
         * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
         * ``SERVER_NAME`` -- The hostname of the server.
         * ``SERVER_PORT`` -- The port of the server.

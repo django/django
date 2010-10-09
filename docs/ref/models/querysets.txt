@@ -9,7 +9,7 @@ material presented in the :doc:`model </topics/db/models>` and :doc:`database
 query </topics/db/queries>` guides, so you'll probably want to read and
 understand those documents before reading this one.
 
-Throughout this reference we'll use the :ref:`example weblog models
+Throughout this reference we'll use the :ref:`example Weblog models
 <queryset-model-example>` presented in the :doc:`database query guide
 </topics/db/queries>`.
 

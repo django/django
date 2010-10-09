@@ -3,7 +3,7 @@ The "sites" framework
 =====================
 
 .. module:: django.contrib.sites
-   :synopsis: Lets you operate multiple web sites from the same database and
+   :synopsis: Lets you operate multiple Web sites from the same database and
               Django project
 
 Django comes with an optional "sites" framework. It's a hook for associating

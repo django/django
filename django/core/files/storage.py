@@ -117,7 +117,7 @@ class Storage(object):
     def url(self, name):
         """
         Returns an absolute URL where the file's contents can be accessed
-        directly by a web browser.
+        directly by a Web browser.
         """
         raise NotImplementedError()
 

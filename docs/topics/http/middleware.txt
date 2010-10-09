@@ -152,7 +152,7 @@ of caveats:
       define ``__init__`` as requiring any arguments.
 
     * Unlike the ``process_*`` methods which get called once per request,
-      ``__init__`` gets called only *once*, when the web server starts up.
+      ``__init__`` gets called only *once*, when the Web server starts up.
 
 Marking middleware as unused
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

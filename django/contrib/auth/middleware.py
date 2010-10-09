@@ -19,7 +19,7 @@ class AuthenticationMiddleware(object):
 
 class RemoteUserMiddleware(object):
     """
-    Middleware for utilizing web-server-provided authentication.
+    Middleware for utilizing Web-server-provided authentication.
 
     If request.user is not authenticated, then this middleware attempts to
     authenticate the username passed in the ``REMOTE_USER`` request header.

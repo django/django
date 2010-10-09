@@ -29,7 +29,7 @@ and uses a two-step process to enable moderation for any given model:
    model class and the class which specifies its moderation options.
 
 A simple example is the best illustration of this. Suppose we have the
-following model, which would represent entries in a weblog::
+following model, which would represent entries in a Weblog::
 
     from django.db import models
     

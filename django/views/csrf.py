@@ -34,7 +34,7 @@ CSRF_FAILRE_TEMPLATE = """
   <p>CSRF verification failed. Request aborted.</p>
 {% if no_referer %}
   <p>You are seeing this message because this HTTPS site requires a 'Referer
-   header' to be sent by your web browser, but none was sent. This header is
+   header' to be sent by your Web browser, but none was sent. This header is
    required for security reasons, to ensure that your browser is not being
    hijacked by third parties.</p>
 

@@ -210,7 +210,7 @@ Customizing widget instances
 When Django renders a widget as HTML, it only renders the bare minimum
 HTML - Django doesn't add a class definition, or any other widget-specific
 attributes. This means that all 'TextInput' widgets will appear the same
-on your web page.
+on your Web page.
 
 If you want to make one widget look different to another, you need to
 specify additional attributes for each widget. When you specify a
@@ -235,7 +235,7 @@ each widget will be rendered exactly the same::
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 
-On a real web page, you probably don't want every widget to look the same. You
+On a real Web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the 'name'
 widget to have some special CSS class. To do this, you use the ``attrs``
 argument when creating the widget:

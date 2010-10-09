@@ -193,7 +193,7 @@ Transaction middleware
 ----------------------
 
 .. module:: django.middleware.transaction
-   :synopsis: Middleware binding a database transaction to each web request.
+   :synopsis: Middleware binding a database transaction to each Web request.
 
 .. class:: django.middleware.transaction.TransactionMiddleware
 

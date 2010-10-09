@@ -22,7 +22,7 @@ to the Web server, which, in turn, passes it back to the client's Web browser.
 
 Like mod_wsgi, FastCGI allows code to stay in memory, allowing requests to be
 served with no startup time. While mod_wsgi can either be configured embedded
-in the Apache webserver process or as a separate daemon process, a FastCGI
+in the Apache Web server process or as a separate daemon process, a FastCGI
 process never runs inside the Web server process, always in a separate,
 persistent process.
 
@@ -367,14 +367,14 @@ Forcing the URL prefix to a particular value
 ============================================
 
 Because many of these fastcgi-based solutions require rewriting the URL at
-some point inside the webserver, the path information that Django sees may not
+some point inside the Web server, the path information that Django sees may not
 resemble the original URL that was passed in. This is a problem if the Django
 application is being served from under a particular prefix and you want your
 URLs from the ``{% url %}`` tag to look like the prefix, rather than the
 rewritten version, which might contain, for example, ``mysite.fcgi``.
 
 Django makes a good attempt to work out what the real script name prefix
-should be. In particular, if the webserver sets the ``SCRIPT_URL`` (specific
+should be. In particular, if the Web server sets the ``SCRIPT_URL`` (specific
 to Apache's mod_rewrite), or ``REDIRECT_URL`` (set by a few servers, including
 Apache + mod_rewrite in some situations), Django will work out the original
 prefix automatically.

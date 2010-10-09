@@ -288,7 +288,7 @@ def commit_on_success(using=None):
     This decorator activates commit on response. This way, if the view function
     runs successfully, a commit is made; if the viewfunc produces an exception,
     a rollback is made. This is one of the most common ways to do transaction
-    control in web apps.
+    control in Web apps.
     """
     def inner_commit_on_success(func, db=None):
         def _commit_on_success(*args, **kw):

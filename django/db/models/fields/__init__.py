@@ -514,7 +514,7 @@ class BooleanField(Field):
         raise exceptions.ValidationError(self.error_messages['invalid'])
 
     def get_prep_lookup(self, lookup_type, value):
-        # Special-case handling for filters coming from a web request (e.g. the
+        # Special-case handling for filters coming from a Web request (e.g. the
         # admin interface). Only works for scalar values (not lists). If you're
         # passing in a list, you might as well make things the right type when
         # constructing the list.
@@ -954,7 +954,7 @@ class NullBooleanField(Field):
         raise exceptions.ValidationError(self.error_messages['invalid'])
 
     def get_prep_lookup(self, lookup_type, value):
-        # Special-case handling for filters coming from a web request (e.g. the
+        # Special-case handling for filters coming from a Web request (e.g. the
         # admin interface). Only works for scalar values (not lists). If you're
         # passing in a list, you might as well make things the right type when
         # constructing the list.
