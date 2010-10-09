@@ -925,6 +925,15 @@ define the details of how the relation works.
     <abstract-base-classes>`; and when you do so
     :ref:`some special syntax <abstract-related-name>` is available.
 
+    If you wish to supress the provision of a backwards relation, you may
+    simply provide a ``related_name`` which ends with a '+' character.
+    For example::
+   
+        user = models.ForeignKey(User, related_name='+')
+
+    will ensure that no backwards relation to this model is provided on the 
+    ``User`` model.
+
 .. attribute:: ForeignKey.to_field
 
     The field on the related object that the relation is to. By default, Django
