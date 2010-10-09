@@ -926,7 +926,7 @@ define the details of how the relation works.
     :ref:`some special syntax <abstract-related-name>` is available.
 
     If you wish to supress the provision of a backwards relation, you may
-    simply provide a ``related_name`` which ends with a '+' character.
+    simply provide a ``related_name`` which ends with a ``'+'`` character.
     For example::
    
         user = models.ForeignKey(User, related_name='+')
