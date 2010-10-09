@@ -4,7 +4,7 @@ from django.db import DatabaseError, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count
 from django.test import TestCase
 
-from models import Tag, Annotation, DumbCategory, Note, ExtraInfo
+from models import Tag, Annotation, DumbCategory, Note, ExtraInfo, Number
 
 class QuerysetOrderedTests(unittest.TestCase):
     """
@@ -81,3 +81,9 @@ class CloneTests(TestCase):
             self.assertEquals(ExtraInfo.objects.filter(note__in=n_list)[0].info, 'good')
         except:
             self.fail('Query should be clonable')
+
+
+class EmptyQuerySetTests(TestCase):
+    def test_emptyqueryset_values(self):
+        "#14366 -- calling .values() on an EmptyQuerySet and then cloning that should not cause an error"
+        self.assertEqual(list(Number.objects.none().values('num').order_by('num')), [])
