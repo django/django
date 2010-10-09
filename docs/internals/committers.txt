@@ -137,7 +137,7 @@ Joseph Kocherhans
     Django / Pinax_ based websites. He enjoys learning more about programming
     languages and system architectures and contributing to open source
     projects. Brian is the host of the `Django Dose`_ podcasts.
-    
+
     Brian helped immensely in getting Django's "newforms-admin" branch finished
     in time for Django 1.0; he's now a full committer, continuing to improve on
     the admin and forms system.
@@ -204,9 +204,9 @@ Karen Tracey
     since 1998 and Django since 2006. He serves on the board of the Python
     Software Foundation and is currently on a leave of absence from a PhD in
     linguistics.
-    
-    James currently lives in Boston, MA, USA but originally hails from 
-    Perth, Western Australia where he attended the same high school as 
+
+    James currently lives in Boston, MA, USA but originally hails from
+    Perth, Western Australia where he attended the same high school as
     Russell Keith-Magee.
 
 .. _James Tauber: http://jtauber.com/
@@ -217,7 +217,7 @@ Karen Tracey
     since he found out you don't need to write out your forms by hand.  He has
     a small obsession with compilers.  He's contributed to the ORM, forms,
     admin, and other components of Django.
-    
+
     Alex lives in Chicago, IL, but spends most of his time in Troy, NY.
 
 .. _Alex Gaynor: http://alexgaynor.net
@@ -244,6 +244,17 @@ Karen Tracey
 
 .. _Carl Meyer: http://www.oddbird.net/about/#hcard-carl
 .. _OddBird: http://www.oddbird.net/
+
+Ramiro Morales
+    Ramiro has been reading Django source code and submitting patches since
+    mid-2006 after researching for a Python Web tool with matching awesomeness
+    and being pointed to it by an old ninja.
+
+    A software developer in the electronic transactions industry, he is a
+    living proof of the fact that anyone with enough enthusiasm can contribute
+    to Django, learning a lot and having fun in the process.
+
+    Ramiro lives in Córdoba, Argentina.
 
 Specialists
 -----------
@@ -279,9 +290,9 @@ Jeremy Dunck
     Jeremy lives in Dallas, Texas, USA.
 
 `Simon Meers`_
-    Simon discovered Django 0.96 during his Computer Science PhD research and 
-    has been developing with it full-time ever since. His core code 
-    contributions are mostly in Django's admin application. He is also helping 
+    Simon discovered Django 0.96 during his Computer Science PhD research and
+    has been developing with it full-time ever since. His core code
+    contributions are mostly in Django's admin application. He is also helping
     to improve Django's documentation.
 
     Simon works as a freelance developer based in Wollongong, Australia.
