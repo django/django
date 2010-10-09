@@ -268,10 +268,8 @@ so you can focus on writing code rather than creating directories.
     configuration and apps for a particular Web site. A project can contain
     multiple apps. An app can be in multiple projects.
 
-In this tutorial, we'll create our poll app in the :file:`mysite` directory,
-for simplicity. As a consequence, the app will be coupled to the project --
-that is, Python code within the poll app will refer to ``mysite.polls``.
-Later in this tutorial, we'll discuss decoupling your apps for distribution.
+Your apps can live anywhere on your `Python path`_. In this tutorial we will
+create our poll app in the :file:`mysite` directory for simplicity.
 
 To create your app, make sure you're in the :file:`mysite` directory and type
 this command:
@@ -369,7 +367,7 @@ But first we need to tell our project that the ``polls`` app is installed.
     Django installation.
 
 Edit the :file:`settings.py` file again, and change the
-:setting:`INSTALLED_APPS` setting to include the string ``'mysite.polls'``. So
+:setting:`INSTALLED_APPS` setting to include the string ``'polls'``. So
 it'll look like this::
 
     INSTALLED_APPS = (
@@ -377,10 +375,10 @@ it'll look like this::
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.sites',
-        'mysite.polls'
+        'polls'
     )
 
-Now Django knows ``mysite`` includes the ``polls`` app. Let's run another
+Now Django knows to include the ``polls`` app. Let's run another
 command:
 
 .. code-block:: bash
@@ -488,9 +486,9 @@ We're using this instead of simply typing "python", because ``manage.py`` sets
 up the project's environment for you. "Setting up the environment" involves two
 things:
 
-    * Putting ``mysite`` on ``sys.path``. For flexibility, several pieces of
+    * Putting ``polls`` on ``sys.path``. For flexibility, several pieces of
       Django refer to projects in Python dotted-path notation (e.g.
-      ``'mysite.polls.models'``). In order for this to work, the ``mysite``
+      ``'polls.models'``). In order for this to work, the ``polls``
       package has to be on ``sys.path``.
 
       We've already seen one example of this: the :setting:`INSTALLED_APPS`
@@ -502,16 +500,16 @@ things:
 .. admonition:: Bypassing manage.py
 
     If you'd rather not use ``manage.py``, no problem. Just make sure ``mysite``
-    is at the root level on the Python path (i.e., ``import mysite`` works) and
-    set the ``DJANGO_SETTINGS_MODULE`` environment variable to
-    ``mysite.settings``.
+    and ``polls`` are at the root level on the Python path (i.e., ``import mysite``
+    and ``import polls`` work) and set the ``DJANGO_SETTINGS_MODULE`` environment
+    variable to ``mysite.settings``.
 
     For more information on all of this, see the :doc:`django-admin.py
     documentation </ref/django-admin>`.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
-    >>> from mysite.polls.models import Poll, Choice # Import the model classes we just wrote.
+    >>> from polls.models import Poll, Choice # Import the model classes we just wrote.
 
     # No polls are in the system yet.
     >>> Poll.objects.all()
@@ -619,7 +617,7 @@ Note the addition of ``import datetime`` to reference Python's standard
 Save these changes and start a new Python interactive shell by running
 ``python manage.py shell`` again::
 
-    >>> from mysite.polls.models import Poll, Choice
+    >>> from polls.models import Poll, Choice
 
     # Make sure our __unicode__() addition worked.
     >>> Poll.objects.all()

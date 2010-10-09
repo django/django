@@ -84,10 +84,10 @@ Time for an example. Edit ``mysite/urls.py`` so it looks like this::
     admin.autodiscover()
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'mysite.polls.views.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'mysite.polls.views.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'mysite.polls.views.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
+        (r'^polls/$', 'polls.views.index'),
+        (r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
+        (r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
+        (r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
         (r'^admin/', include(admin.site.urls)),
     )
 
@@ -96,8 +96,8 @@ This is worth a review. When somebody requests a page from your Web site -- say,
 the :setting:`ROOT_URLCONF` setting. It finds the variable named ``urlpatterns``
 and traverses the regular expressions in order. When it finds a regular
 expression that matches -- ``r'^polls/(?P<poll_id>\d+)/$'`` -- it loads the
-function ``detail()`` from ``mysite/polls/views.py``. Finally,
-it calls that ``detail()`` function like so::
+function ``detail()`` from ``polls/views.py``. Finally, it calls that
+``detail()`` function like so::
 
     detail(request=<HttpRequest object>, poll_id='23')
 
@@ -112,7 +112,7 @@ what you can do with them. And there's no need to add URL cruft such as ``.php``
 -- unless you have a sick sense of humor, in which case you can do something
 like this::
 
-    (r'^polls/latest\.php$', 'mysite.polls.views.index'),
+    (r'^polls/latest\.php$', 'polls.views.index'),
 
 But, don't do that. It's silly.
 
@@ -148,17 +148,17 @@ You should get a pleasantly-colored error page with the following message::
 
     ViewDoesNotExist at /polls/
 
-    Tried index in module mysite.polls.views. Error was: 'module'
+    Tried index in module polls.views. Error was: 'module'
     object has no attribute 'index'
 
 This error happened because you haven't written a function ``index()`` in the
-module ``mysite/polls/views.py``.
+module ``polls/views.py``.
 
 Try "/polls/23/", "/polls/23/results/" and "/polls/23/vote/". The error
 messages tell you which view Django tried (and failed to find, because you
 haven't written any views yet).
 
-Time to write the first view. Open the file ``mysite/polls/views.py``
+Time to write the first view. Open the file ``polls/views.py``
 and put the following Python code in it::
 
     from django.http import HttpResponse
@@ -207,7 +207,7 @@ in :doc:`Tutorial 1 </intro/tutorial01>`. Here's one stab at the ``index()``
 view, which displays the latest 5 poll questions in the system, separated by
 commas, according to publication date::
 
-    from mysite.polls.models import Poll
+    from polls.models import Poll
     from django.http import HttpResponse
 
     def index(request):
@@ -220,7 +220,7 @@ you want to change the way the page looks, you'll have to edit this Python code.
 So let's use Django's template system to separate the design from Python::
 
     from django.template import Context, loader
-    from mysite.polls.models import Poll
+    from polls.models import Poll
     from django.http import HttpResponse
 
     def index(request):
@@ -279,7 +279,7 @@ template. Django provides a shortcut. Here's the full ``index()`` view,
 rewritten::
 
     from django.shortcuts import render_to_response
-    from mysite.polls.models import Poll
+    from polls.models import Poll
 
     def index(request):
         latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
@@ -432,19 +432,19 @@ Take some time to play around with the views and template system. As you edit
 the URLconf, you may notice there's a fair bit of redundancy in it::
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'mysite.polls.views.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'mysite.polls.views.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'mysite.polls.views.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
+        (r'^polls/$', 'polls.views.index'),
+        (r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
+        (r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
+        (r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
     )
 
-Namely, ``mysite.polls.views`` is in every callback.
+Namely, ``polls.views`` is in every callback.
 
 Because this is a common case, the URLconf framework provides a shortcut for
 common prefixes. You can factor out the common prefixes and add them as the
 first argument to :func:`~django.conf.urls.defaults.patterns`, like so::
 
-    urlpatterns = patterns('mysite.polls.views',
+    urlpatterns = patterns('polls.views',
         (r'^polls/$', 'index'),
         (r'^polls/(?P<poll_id>\d+)/$', 'detail'),
         (r'^polls/(?P<poll_id>\d+)/results/$', 'results'),
@@ -470,7 +470,7 @@ We've been editing the URLs in ``mysite/urls.py``, but the URL design of an
 app is specific to the app, not to the Django installation -- so let's move the
 URLs within the app directory.
 
-Copy the file ``mysite/urls.py`` to ``mysite/polls/urls.py``. Then, change
+Copy the file ``mysite/urls.py`` to ``polls/urls.py``. Then, change
 ``mysite/urls.py`` to remove the poll-specific URLs and insert an
 :func:`~django.conf.urls.defaults.include`::
 
@@ -479,7 +479,7 @@ Copy the file ``mysite/urls.py`` to ``mysite/polls/urls.py``. Then, change
 
     # ...
     urlpatterns = patterns('',
-        (r'^polls/', include('mysite.polls.urls')),
+        (r'^polls/', include('polls.urls')),
         # ...
     )
 
@@ -495,14 +495,14 @@ Here's what happens if a user goes to "/polls/34/" in this system:
     * Django will find the match at ``'^polls/'``
 
     * Then, Django will strip off the matching text (``"polls/"``) and send the
-      remaining text -- ``"34/"`` -- to the 'mysite.polls.urls' URLconf for
+      remaining text -- ``"34/"`` -- to the 'polls.urls' URLconf for
       further processing.
 
-Now that we've decoupled that, we need to decouple the 'mysite.polls.urls'
+Now that we've decoupled that, we need to decouple the 'polls.urls'
 URLconf by removing the leading "polls/" from each line, and removing the
 lines registering the admin site::
 
-    urlpatterns = patterns('mysite.polls.views',
+    urlpatterns = patterns('polls.views',
         (r'^$', 'index'),
         (r'^(?P<poll_id>\d+)/$', 'detail'),
         (r'^(?P<poll_id>\d+)/results/$', 'results'),
