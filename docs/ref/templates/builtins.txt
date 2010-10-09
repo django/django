@@ -2102,7 +2102,7 @@ See the :doc:`markup documentation </ref/contrib/markup>`.
 django.contrib.webdesign
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-A collection of template tags that can be useful while designing a website,
+A collection of template tags that can be useful while designing a Web site,
 such as a generator of Lorem Ipsum text. See :doc:`/ref/contrib/webdesign`.
 
 i18n

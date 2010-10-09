@@ -137,7 +137,7 @@ All attributes except ``session`` should be considered read-only.
         * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
         * ``REMOTE_ADDR`` -- The IP address of the client.
         * ``REMOTE_HOST`` -- The hostname of the client.
-        * ``REMOTE_USER`` -- The user authenticated by the web server, if any.
+        * ``REMOTE_USER`` -- The user authenticated by the Web server, if any.
         * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
         * ``SERVER_NAME`` -- The hostname of the server.
         * ``SERVER_PORT`` -- The port of the server.

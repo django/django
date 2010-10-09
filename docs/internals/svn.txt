@@ -22,7 +22,7 @@ The Django source code repository uses `Subversion`_ to track changes
 to the code over time, so you'll need a copy of the Subversion client
 (a program called ``svn``) on your computer, and you'll want to
 familiarize yourself with the basics of how Subversion
-works. Subversion's web site offers downloads for various operating
+works. Subversion's Web site offers downloads for various operating
 systems, and `a free online book`_ is available to help you get up to
 speed with using Subversion.
 
@@ -34,7 +34,7 @@ repository address instead. At the top level of the repository are two
 directories: ``django`` contains the full source code for all Django
 releases, while ``djangoproject.com`` contains the source code and
 templates for the `djangoproject.com <http://www.djangoproject.com/>`_
-web site. For trying out in-development Django code, or contributing
+Web site. For trying out in-development Django code, or contributing
 to Django, you'll always want to check out code from some location in
 the ``django`` directory.
 
@@ -58,7 +58,7 @@ into three areas:
 
 .. _Subversion: http://subversion.tigris.org/
 .. _a free online book: http://svnbook.red-bean.com/
-.. _A friendly web-based interface for browsing the code: http://code.djangoproject.com/browser/
+.. _A friendly Web-based interface for browsing the code: http://code.djangoproject.com/browser/
 
 
 Working with Django's trunk

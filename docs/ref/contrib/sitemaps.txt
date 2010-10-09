@@ -76,7 +76,7 @@ Sitemap classes
 A :class:`~django.contrib.sitemaps.Sitemap` class is a simple Python
 class that represents a "section" of entries in your sitemap. For example,
 one :class:`~django.contrib.sitemaps.Sitemap` class could represent
-all the entries of your weblog, while another could represent all of the
+all the entries of your Weblog, while another could represent all of the
 events in your events calendar.
 
 In the simplest case, all these sections get lumped together into one

@@ -1,6 +1,6 @@
 """
   This module houses the GoogleMap object, used for generating
-   the needed javascript to embed Google Maps in a webpage.
+   the needed javascript to embed Google Maps in a Web page.
 
   Google(R) is a registered trademark of Google, Inc. of Mountain View, California.
 

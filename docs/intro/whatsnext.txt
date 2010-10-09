@@ -36,7 +36,7 @@ Django's main documentation is broken up into "chunks" designed to fill
 different needs:
 
     * The :doc:`introductory material </intro/index>` is designed for people new
-      to Django -- or to web development in general. It doesn't cover anything
+      to Django -- or to Web development in general. It doesn't cover anything
       in depth, but instead gives a high-level overview of how developing in
       Django "feels".
 
@@ -166,7 +166,7 @@ You can get a local copy of the HTML documentation following a few easy steps:
 
     * Django's documentation uses a system called Sphinx__ to convert from
       plain text to HTML. You'll need to install Sphinx by either downloading
-      and installing the package from the Sphinx website, or by Python's
+      and installing the package from the Sphinx Web site, or by Python's
       ``easy_install``:
 
       .. code-block:: bash

@@ -658,7 +658,7 @@ How to log a user out
 
     When you call :func:`~django.contrib.auth.logout()`, the session data for
     the current request is completely cleaned out. All existing data is
-    removed. This is to prevent another person from using the same web browser
+    removed. This is to prevent another person from using the same Web browser
     to log in and have access to the previous user's session data. If you want
     to put anything into the session that will be available to the user
     immediately after logging out, do that *after* calling

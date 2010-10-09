@@ -1,7 +1,7 @@
 Deploying Django
 ================
 
-Django's chock-full of shortcuts to make web developer's lives easier, but all
+Django's chock-full of shortcuts to make Web developer's lives easier, but all
 those tools are of no use if you can't easily deploy your sites. Since Django's
 inception, ease of deployment has been a major goal. There's a number of good
 ways to easily deploy Django:

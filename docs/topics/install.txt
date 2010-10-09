@@ -28,7 +28,7 @@ Install Apache and mod_wsgi
 =============================
 
 If you just want to experiment with Django, skip ahead to the next section;
-Django includes a lightweight web server you can use for testing, so you won't
+Django includes a lightweight Web server you can use for testing, so you won't
 need to set up Apache until you're ready to deploy Django in production.
 
 If you want to use Django on a production site, use Apache with `mod_wsgi`_.
@@ -274,7 +274,7 @@ latest bug fixes and improvements, follow these instructions:
    .. code-block:: bash
 
        ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin
-       
+
    (In the above line, change WORKING-DIR to match the full path to your new
    ``django-trunk`` directory.)
 

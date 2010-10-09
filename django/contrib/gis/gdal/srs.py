@@ -37,7 +37,7 @@ from django.contrib.gis.gdal.prototypes import srs as capi
 #### Spatial Reference class. ####
 class SpatialReference(GDALBase):
     """
-    A wrapper for the OGRSpatialReference object.  According to the GDAL website,
+    A wrapper for the OGRSpatialReference object.  According to the GDAL Web site,
     the SpatialReference object "provide[s] services to represent coordinate 
     systems (projections and datums) and to transform between them."
     """

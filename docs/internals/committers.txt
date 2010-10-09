@@ -20,10 +20,10 @@ Journal-World`_ of Lawrence, Kansas, USA.
     Adrian lives in Chicago, USA.
 
 `Simon Willison`_
-    Simon is a well-respected web developer from England. He had a one-year
+    Simon is a well-respected Web developer from England. He had a one-year
     internship at World Online, during which time he and Adrian developed Django
     from scratch. The most enthusiastic Brit you'll ever meet, he's passionate
-    about best practices in web development and maintains a well-read
+    about best practices in Web development and maintains a well-read
     `web-development blog`_.
 
     Simon lives in Brighton, England.
@@ -33,13 +33,13 @@ Journal-World`_ of Lawrence, Kansas, USA.
     around Django and related open source technologies. A good deal of Jacob's
     work time is devoted to working on Django. Jacob previously worked at World
     Online, where Django was invented, where he was the lead developer of
-    Ellington, a commercial web publishing platform for media companies.
+    Ellington, a commercial Web publishing platform for media companies.
 
     Jacob lives in Lawrence, Kansas, USA.
 
 `Wilson Miner`_
     Wilson's design-fu is what makes Django look so nice. He designed the
-    website you're looking at right now, as well as Django's acclaimed admin
+    Web site you're looking at right now, as well as Django's acclaimed admin
     interface. Wilson is the designer for EveryBlock_.
 
     Wilson lives in San Francisco, USA.
@@ -89,7 +89,7 @@ and have free rein to hack on all parts of Django.
     Russell studied physics as an undergraduate, and studied neural networks for
     his PhD. His first job was with a startup in the defense industry developing
     simulation frameworks. Over time, mostly through work with Django, he's
-    become more involved in web development.
+    become more involved in Web development.
 
     Russell has helped with several major aspects of Django, including a
     couple major internal refactorings, creation of the test system, and more.
@@ -134,7 +134,7 @@ Joseph Kocherhans
 
 `Brian Rosner`_
     Brian is currently the tech lead at Eldarion_ managing and developing
-    Django / Pinax_ based websites. He enjoys learning more about programming
+    Django / Pinax_ based Web sites. He enjoys learning more about programming
     languages and system architectures and contributing to open source
     projects. Brian is the host of the `Django Dose`_ podcasts.
 
@@ -180,7 +180,7 @@ Karen Tracey
     Karen has a background in distributed operating systems (graduate school),
     communications software (industry) and crossword puzzle construction
     (freelance).  The last of these brought her to Django, in late 2006, when
-    she set out to put a web front-end on her crossword puzzle database.
+    she set out to put a Web front-end on her crossword puzzle database.
     That done, she stuck around in the community answering questions, debugging
     problems, etc. -- because coding puzzles are as much fun as word puzzles.
 
@@ -190,7 +190,7 @@ Karen Tracey
     Jannis graduated in media design from `Bauhaus-University Weimar`_,
     is the author of a number of pluggable Django apps and likes to
     contribute to Open Source projects like Pinax_. He currently works as
-    a freelance web developer and designer.
+    a freelance Web developer and designer.
 
     Jannis lives in Berlin, Germany.
 
@@ -262,7 +262,7 @@ Specialists
 `James Bennett`_
     James is Django's release manager; he also contributes to the documentation.
 
-    James came to web development from philosophy when he discovered
+    James came to Web development from philosophy when he discovered
     that programmers get to argue just as much while collecting much
     better pay. He lives in Lawrence, Kansas, where he works for the
     Journal-World developing Ellington. He `keeps a blog`_, has

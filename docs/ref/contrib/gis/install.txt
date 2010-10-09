@@ -147,7 +147,7 @@ internal geometry representation used by GeoDjango (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS 3.2 from the refractions website and untar the source
+First, download GEOS 3.2 from the refractions Web site and untar the source
 archive::
 
     $ wget http://download.osgeo.org/geos/geos-3.2.2.tar.bz2
@@ -640,7 +640,7 @@ If you can't find the solution to your problem here then participate in the
 community!  You can:
 
 * Join the ``#geodjango`` IRC channel on FreeNode (may be accessed on the
-  web via `Mibbit`__).  Please be patient and polite -- while you may not
+  Web via `Mibbit`__).  Please be patient and polite -- while you may not
   get an immediate response, someone will attempt to answer your question
   as soon as they see it.
 * Ask your question on the `GeoDjango`__ mailing list.
@@ -1085,7 +1085,7 @@ Windows XP
 Python
 ^^^^^^
 
-First, download the `Python 2.6 installer`__ from the Python website.  Next,
+First, download the `Python 2.6 installer`__ from the Python Web site.  Next,
 execute the installer and use defaults, e.g., keep 'Install for all users'
 checked and the installation path set as ``C:\Python26``.
 
@@ -1101,7 +1101,7 @@ PostgreSQL
 ^^^^^^^^^^
 
 First, select a mirror and download the latest `PostgreSQL 8.3 installer`__ from
-the EnterpriseDB website.
+the EnterpriseDB Web site.
 
 .. note::
 

@@ -16,7 +16,7 @@ Example
 -------
 
 First, we define a simple model class which might represent entries in
-a weblog::
+a Weblog::
 
     from django.db import models
 

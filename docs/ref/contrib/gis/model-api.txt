@@ -97,7 +97,7 @@ corresponds to the projection system that will be used to interpret the data
 in the spatial database. [#fnsrid]_  Projection systems give the context to the
 coordinates that specify a location.  Although the details of `geodesy`__ are
 beyond the scope of this documentation, the general problem is that the earth
-is spherical and representations of the earth (e.g., paper maps, web maps)
+is spherical and representations of the earth (e.g., paper maps, Web maps)
 are not.
 
 Most people are familiar with using latitude and longitude to reference a
@@ -133,7 +133,7 @@ Additional Resources:
 
 * `spatialreference.org`__: A Django-powered database of spatial reference
   systems.
-* `The State Plane Coordinate System`__: A website covering the various
+* `The State Plane Coordinate System`__: A Web site covering the various
   projection systems used in the United States.  Much of the U.S. spatial
   data encountered will be in one of these coordinate systems rather than
   in a geographic coordinate system such as WGS84.

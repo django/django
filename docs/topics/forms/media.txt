@@ -1,7 +1,7 @@
 Form Media
 ==========
 
-Rendering an attractive and easy-to-use web form requires more than just
+Rendering an attractive and easy-to-use Web form requires more than just
 HTML - it also requires CSS stylesheets, and if you want to use fancy
 "Web2.0" widgets, you may also need to include some JavaScript on each
 page. The exact combination of CSS and JavaScript that is required for
@@ -14,7 +14,7 @@ you can define a custom Calendar widget. This widget can then be associated
 with the CSS and JavaScript that is required to render the calendar. When
 the Calendar widget is used on a form, Django is able to identify the CSS and
 JavaScript files that are required, and provide the list of file names
-in a form suitable for easy inclusion on your web page.
+in a form suitable for easy inclusion on your Web page.
 
 .. admonition:: Media and Django Admin
 

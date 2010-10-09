@@ -6,8 +6,8 @@ Introduction
 ============
 
 GeoDjango is an add-on for Django that turns it into a world-class geographic
-web framework.  GeoDjango strives to make at as simple as possible to create
-geographic web applications, like location-based services.  Some features include:
+Web framework.  GeoDjango strives to make at as simple as possible to create
+geographic Web applications, like location-based services.  Some features include:
 
 * Django model fields for `OGC`_ geometries.
 * Extensions to Django's ORM for the querying and manipulation of spatial data.
@@ -25,7 +25,7 @@ yourself with basic Django concepts.
     please consult the :ref:`installation documentation <ref-gis-install>`
     for more details.
 
-This tutorial will guide you through the creation of a geographic web
+This tutorial will guide you through the creation of a geographic Web
 application for viewing the `world borders`_. [#]_ Some of the code
 used in this tutorial is taken from and/or inspired by the `GeoDjango
 basic apps`_ project. [#]_
@@ -197,7 +197,7 @@ as well as detailed information for each attribute field.  For example,
 ``FIPS: String (2.0)`` indicates that there's a ``FIPS`` character field
 with a maximum length of 2; similarly, ``LON: Real (8.3)`` is a floating-point
 field that holds a maximum of 8 digits up to three decimal places.  Although
-this information may be found right on the `world borders`_ website, this shows
+this information may be found right on the `world borders`_ Web site, this shows
 you how to determine this information yourself when such metadata is not
 provided.
 

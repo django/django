@@ -68,7 +68,7 @@ Understand cached attributes
 
 As well as caching of the whole ``QuerySet``, there is caching of the result of
 attributes on ORM objects. In general, attributes that are not callable will be
-cached. For example, assuming the :ref:`example weblog models
+cached. For example, assuming the :ref:`example Weblog models
 <queryset-model-example>`:
 
   >>> entry = Entry.objects.get(id=1)

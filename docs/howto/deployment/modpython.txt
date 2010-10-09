@@ -317,7 +317,7 @@ project (or somewhere else) that contains something like the following:
     import os
     os.environ['PYTHON_EGG_CACHE'] = '/some/directory'
 
-Here, ``/some/directory`` is a directory that the Apache webserver process can
+Here, ``/some/directory`` is a directory that the Apache Web server process can
 write to. It will be used as the location for any unpacking of code the eggs
 need to do.
 

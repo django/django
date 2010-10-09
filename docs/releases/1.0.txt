@@ -6,7 +6,7 @@ Welcome to Django 1.0!
 
 We've been looking forward to this moment for over three years, and it's finally
 here. Django 1.0 represents a the largest milestone in Django's development to
-date: a web framework that a group of perfectionists can truly be proud of.
+date: a Web framework that a group of perfectionists can truly be proud of.
 
 Django 1.0 represents over three years of community development as an Open
 Source project. Django's received contributions from hundreds of developers,

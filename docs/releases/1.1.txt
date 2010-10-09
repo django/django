@@ -426,7 +426,7 @@ Other new features and changes introduced since Django 1.0 include:
   notably, the memcached backend -- these operations will be atomic, and
   quite fast.
 
-* Django now can :doc:`easily delegate authentication to the web server
+* Django now can :doc:`easily delegate authentication to the Web server
   </howto/auth-remote-user>` via a new authentication backend that supports
   the standard ``REMOTE_USER`` environment variable used for this purpose.
 

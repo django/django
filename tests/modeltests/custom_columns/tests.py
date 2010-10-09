@@ -9,7 +9,7 @@ class CustomColumnsTests(TestCase):
         a1 = Author.objects.create(first_name="John", last_name="Smith")
         a2 = Author.objects.create(first_name="Peter", last_name="Jones")
 
-        art = Article.objects.create(headline="Django lets you build web apps easily")
+        art = Article.objects.create(headline="Django lets you build Web apps easily")
         art.authors = [a1, a2]
 
         # Although the table and column names on Author have been set to custom
@@ -58,7 +58,7 @@ class CustomColumnsTests(TestCase):
         # Get the articles for an author
         self.assertQuerysetEqual(
             a.article_set.all(), [
-                "Django lets you build web apps easily",
+                "Django lets you build Web apps easily",
             ],
             lambda a: a.headline
         )

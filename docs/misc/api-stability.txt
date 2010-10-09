@@ -125,7 +125,7 @@ Contributed applications (``django.contrib``)
 
 While we'll make every effort to keep these APIs stable -- and have no plans to
 break any contrib apps -- this is an area that will have more flux between
-releases. As the web evolves, Django must evolve with it.
+releases. As the Web evolves, Django must evolve with it.
 
 However, any changes to contrib apps will come with an important guarantee:
 we'll make sure it's always possible to use an older version of a contrib app if
