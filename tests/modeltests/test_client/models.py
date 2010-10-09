@@ -457,3 +457,15 @@ class CSRFEnabledClientTests(TestCase):
         # The CSRF-enabled client rejects it
         response = csrf_client.post('/test_client/post_view/', {})
         self.assertEqual(response.status_code, 403)
+
+
+class CustomTestClient(Client):
+    i_am_customized = "Yes"
+
+class CustomTestClientTest(TestCase):
+    client_class = CustomTestClient
+
+    def test_custom_test_client(self):
+        """A test case can specify a custom class for self.client."""
+        self.assertEqual(hasattr(self.client, "i_am_customized"), True)
+

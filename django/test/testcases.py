@@ -210,6 +210,10 @@ class DocTestRunner(doctest.DocTestRunner):
             transaction.rollback_unless_managed(using=conn)
 
 class TransactionTestCase(unittest.TestCase):
+    # The class we'll use for the test client self.client.
+    # Can be overridden in derived classes.
+    client_class = Client
+
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
@@ -251,7 +255,7 @@ class TransactionTestCase(unittest.TestCase):
         set up. This means that user-defined Test Cases aren't required to
         include a call to super().setUp().
         """
-        self.client = Client()
+        self.client = self.client_class()
         try:
             self._pre_setup()
         except (KeyboardInterrupt, SystemExit):
