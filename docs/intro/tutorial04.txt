@@ -74,13 +74,13 @@ created a URLconf for the polls application that includes this line::
     (r'^(?P<poll_id>\d+)/vote/$', 'vote'),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
-create a real version. Add the following to ``mysite/polls/views.py``::
+create a real version. Add the following to ``polls/views.py``::
 
     from django.shortcuts import get_object_or_404, render_to_response
     from django.http import HttpResponseRedirect, HttpResponse
     from django.core.urlresolvers import reverse
     from django.template import RequestContext
-    from mysite.polls.models import Choice, Poll
+    from polls.models import Choice, Poll
     # ...
     def vote(request, poll_id):
         p = get_object_or_404(Poll, pk=poll_id)
@@ -98,7 +98,7 @@ create a real version. Add the following to ``mysite/polls/views.py``::
             # Always return an HttpResponseRedirect after successfully dealing
             # with POST data. This prevents data from being posted twice if a
             # user hits the Back button.
-            return HttpResponseRedirect(reverse('mysite.polls.views.results', args=(p.id,)))
+            return HttpResponseRedirect(reverse('polls.views.results', args=(p.id,)))
 
 This code includes a few things we haven't covered yet in this tutorial:
 
@@ -222,7 +222,7 @@ tutorial so far::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('mysite.polls.views',
+    urlpatterns = patterns('polls.views',
         (r'^$', 'index'),
         (r'^(?P<poll_id>\d+)/$', 'detail'),
         (r'^(?P<poll_id>\d+)/results/$', 'results'),
@@ -232,7 +232,7 @@ tutorial so far::
 Change it like so::
 
     from django.conf.urls.defaults import *
-    from mysite.polls.models import Poll
+    from polls.models import Poll
 
     info_dict = {
         'queryset': Poll.objects.all(),
@@ -242,7 +242,7 @@ Change it like so::
         (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
         (r'^(?P<object_id>\d+)/$', 'django.views.generic.list_detail.object_detail', info_dict),
         url(r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results.html'), 'poll_results'),
-        (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
+        (r'^(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
     )
 
 We're using two generic views here:
