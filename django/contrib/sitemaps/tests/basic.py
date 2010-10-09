@@ -5,7 +5,7 @@ from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.utils.formats import localize
-from django.utils.translation import activate
+from django.utils.translation import activate, deactivate
 
 
 class SitemapTests(TestCase):
@@ -44,6 +44,7 @@ class SitemapTests(TestCase):
         response = self.client.get('/simple/sitemap.xml')
         self.assertContains(response, '<priority>0.5</priority>')
         self.assertContains(response, '<lastmod>%s</lastmod>' % date.today().strftime('%Y-%m-%d'))
+        deactivate()
 
     def test_generic_sitemap(self):
         "A minimal generic sitemap can be rendered"
