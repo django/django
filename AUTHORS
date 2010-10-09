@@ -20,6 +20,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * James Tauber
     * Alex Gaynor
     * Andrew Godwin
+    * Carl Meyer
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -334,7 +335,6 @@ answer newbie questions, and generally made Django that much better:
     Tobias McNulty <http://www.caktusgroup.com/blog>
     Zain Memon
     Christian Metts
-    Carl Meyer <carl@dirtcircle.com>
     michal@plovarna.cz
     Slawek Mikula <slawek dot mikula at gmail dot com>
     mitakummaa@gmail.com
