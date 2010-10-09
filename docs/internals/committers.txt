@@ -233,6 +233,18 @@ Karen Tracey
 
 .. _Andrew Godwin: http://www.aeracode.org/
 
+`Carl Meyer`_
+    Carl has been working with Django since 2007 (long enough to remember
+    queryset-refactor, but not magic-removal), and works as a freelance
+    developer with OddBird_ and Eldarion_. He became a Django contributor by
+    accident, because fixing bugs is more interesting than working around
+    them.
+
+    Carl lives in Elkhart, IN, USA.
+
+.. _Carl Meyer: http://www.oddbird.net/about/#hcard-carl
+.. _OddBird: http://www.oddbird.net/
+
 Specialists
 -----------
 
