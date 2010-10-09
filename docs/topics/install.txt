@@ -254,11 +254,12 @@ latest bug fixes and improvements, follow these instructions:
 
    .. code-block:: bash
 
-       ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
+       ln -s WORKING-DIR/django-trunk/django SITE-PACKAGES-DIR/django
 
    (In the above line, change ``SITE-PACKAGES-DIR`` to match the location of
    your system's ``site-packages`` directory, as explained in the
-   "Where are my ``site-packages`` stored?" section above.)
+   "Where are my ``site-packages`` stored?" section above. Change WORKING-DIR
+   to match the full path to your new ``djanjo-trunk`` directory.)
 
    Alternatively, you can define your ``PYTHONPATH`` environment variable
    so that it includes the ``django-trunk`` directory. This is perhaps the
@@ -283,7 +284,10 @@ latest bug fixes and improvements, follow these instructions:
 
    .. code-block:: bash
 
-       ln -s `pwd`/django-trunk/django/bin/django-admin.py /usr/local/bin
+       ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin
+       
+   (In the above line, change WORKING-DIR to match the full path to your new
+   ``djanjo-trunk`` directory.)
 
    This simply lets you type ``django-admin.py`` from within any directory,
    rather than having to qualify the command with the full path to the file.
