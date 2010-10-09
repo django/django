@@ -280,7 +280,7 @@ Matt Boersma
     Matt is also responsible for Django's Oracle support.
 
 Jeremy Dunck
-    Jeremy the lead developer of Pegasus News, a personalized local site based
+    Jeremy is the lead developer of Pegasus News, a personalized local site based
     in Dallas, Texas. An early contributor to Greasemonkey and Django, he sees
     technology as a tool for communication and access to knowledge.
 
@@ -298,6 +298,18 @@ Jeremy Dunck
     Simon works as a freelance developer based in Wollongong, Australia.
 
 .. _simon meers: http://simonmeers.com/
+
+`Gabriel Hurley`_
+    Gabriel has been working with Django since 2008, shortly after the 1.0
+    release. Convinced by his business partner that Python and Django were the
+    right direction for the company, he couldn't have been more happy with the
+    decision. His contributions range across many areas in Django, but years of
+    copy-editing and an eye for detail lead him to be particularly at home
+    while working on Django's documentation.
+    
+    Gabriel works as a web developer in Berkeley, CA, USA.
+
+.. _gabriel hurley: http://strikeawe.com/
 
 Developers Emeritus
 ===================
