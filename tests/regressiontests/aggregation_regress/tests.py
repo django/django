@@ -481,6 +481,14 @@ class AggregationTests(TestCase):
             lambda b: b.name
         )
 
+    def test_duplicate_alias(self):
+        # Regression for #11256 - duplicating a default alias raises ValueError.
+        self.assertRaises(ValueError, Book.objects.all().annotate, Avg('authors__age'), authors__age__avg=Avg('authors__age'))
+
+    def test_field_name_conflict(self):
+        # Regression for #11256 - providing an aggregate name that conflicts with a field name on the model raises ValueError
+        self.assertRaises(ValueError, Author.objects.annotate, age=Avg('friends__age'))
+
     def test_pickle(self):
         # Regression for #10197 -- Queries with aggregates can be pickled.
         # First check that pickling is possible at all. No crash = success
