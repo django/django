@@ -160,13 +160,18 @@ class CommentViewTests(CommentTestCase):
 
         # Connect signals and keep track of handled ones
         received_signals = []
-        excepted_signals = [signals.comment_will_be_posted, signals.comment_was_posted]
-        for signal in excepted_signals:
+        expected_signals = [
+            signals.comment_will_be_posted, signals.comment_was_posted
+        ]
+        for signal in expected_signals:
             signal.connect(receive)
 
         # Post a comment and check the signals
         self.testCreateValidComment()
-        self.assertEqual(received_signals, excepted_signals)
+        self.assertEqual(received_signals, expected_signals)
+
+        for signal in expected_signals:
+            signal.disconnect(receive)
 
     def testWillBePostedSignal(self):
         """
@@ -251,4 +256,3 @@ class CommentViewTests(CommentTestCase):
         broken_location = location + u"\ufffd"
         response = self.client.get(broken_location)
         self.assertEqual(response.status_code, 200)
-
