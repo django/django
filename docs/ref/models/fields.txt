@@ -925,7 +925,7 @@ define the details of how the relation works.
     <abstract-base-classes>`; and when you do so
     :ref:`some special syntax <abstract-related-name>` is available.
 
-    If you wish to supress the provision of a backwards relation, you may
+    If you wish to suppress the provision of a backwards relation, you may
     simply provide a ``related_name`` which ends with a ``'+'`` character.
     For example::
    
