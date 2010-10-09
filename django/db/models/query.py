@@ -1021,7 +1021,7 @@ class EmptyQuerySet(QuerySet):
         pass
 
     def _clone(self, klass=None, setup=False, **kwargs):
-        c = super(EmptyQuerySet, self)._clone(klass, **kwargs)
+        c = super(EmptyQuerySet, self)._clone(klass, setup=setup, **kwargs)
         c._result_cache = []
         return c
 
