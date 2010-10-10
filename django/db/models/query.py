@@ -625,7 +625,7 @@ class QuerySet(object):
                                  % arg.default_alias)
             kwargs[arg.default_alias] = arg
 
-        names = set([f.name for f in self.model._meta.fields])
+        names = set(self.model._meta.get_all_field_names())
         for aggregate in kwargs:
             if aggregate in names:
                 raise ValueError("The %s annotation conflicts with a field on "
