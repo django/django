@@ -494,6 +494,8 @@ Testing tools
 
 Django provides a small set of tools that come in handy when writing tests.
 
+.. _test-client:
+
 The test client
 ---------------
 
@@ -894,15 +896,15 @@ Specifically, a ``Response`` object has the following attributes:
         The HTTP status of the response, as an integer. See RFC2616_ for a full
         list of HTTP status codes.
 
-    .. attribute:: template
+    .. versionadded:: 1.3
 
-        The ``Template`` instance that was used to render the final content. Use
+    .. attribute:: templates
+
+        A list of ``Template`` instances used to render the final content, in
+        the order they were rendered. For each template in the list, use
         ``template.name`` to get the template's file name, if the template was
-        loaded from a file. (The name is a string such as ``'admin/index.html'``.)
-
-        If the rendered page used multiple templates -- e.g., using :ref:`template
-        inheritance<template-inheritance>` -- then ``template`` will be a list of
-        ``Template`` instances, in the order in which they were rendered.
+        loaded from a file. (The name is a string such as
+        ``'admin/index.html'``.)
 
 You can also use dictionary syntax on the response object to query the value
 of any settings in the HTTP headers. For example, you could determine the

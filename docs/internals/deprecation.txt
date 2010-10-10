@@ -102,6 +102,12 @@ their deprecation, as per the :ref:`Django deprecation policy
         * The ``mod_python`` request handler has been deprecated since the 1.3
           release. The ``mod_wsgi`` handler should be used instead.
 
+        * The ``template`` attribute on :class:`~django.test.client.Response`
+          objects returned by the :ref:`test client <test-client>` has been
+          deprecated since the 1.3 release. The
+          :attr:`~django.test.client.Response.templates` attribute should be
+          used instead.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the

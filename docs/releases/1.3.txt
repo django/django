@@ -106,6 +106,23 @@ If you are currently using the ``mod_python`` request handler, it is strongly
 encouraged you redeploy your Django instances using :doc:`mod_wsgi
 </howto/deployment/modwsgi>`.
 
+Test client response ``template`` attribute
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's :ref:`test client <test-client>` returns
+:class:`~django.test.client.Response` objects annotated with extra testing
+information. In Django versions prior to 1.3, this included a
+:attr:`~django.test.client.Response.template` attribute containing information
+about templates rendered in generating the response: either None, a single
+:class:`~django.template.Template` object, or a list of
+:class:`~django.template.Template` objects. This inconsistency in return values
+(sometimes a list, sometimes not) made the attribute difficult to work with.
+
+In Django 1.3 the :attr:`~django.test.client.Response.template` attribute is
+deprecated in favor of a new :attr:`~django.test.client.Response.templates`
+attribute, which is always a list, even if it has only a single element or no
+elements.
+
 What's new in Django 1.3
 ========================
 

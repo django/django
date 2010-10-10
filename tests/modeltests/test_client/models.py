@@ -37,7 +37,7 @@ class ClientTest(TestCase):
         # Check some response details
         self.assertContains(response, 'This is a test')
         self.assertEqual(response.context['var'], u'\xf2')
-        self.assertEqual(response.template.name, 'GET Template')
+        self.assertEqual(response.templates[0].name, 'GET Template')
 
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
@@ -45,7 +45,7 @@ class ClientTest(TestCase):
 
         # Check some response details
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, 'Empty GET Template')
+        self.assertEqual(response.templates[0].name, 'Empty GET Template')
         self.assertTemplateUsed(response, 'Empty GET Template')
         self.assertTemplateNotUsed(response, 'Empty POST Template')
 
@@ -55,7 +55,7 @@ class ClientTest(TestCase):
 
         # Check some response details
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, 'Empty POST Template')
+        self.assertEqual(response.templates[0].name, 'Empty POST Template')
         self.assertTemplateNotUsed(response, 'Empty GET Template')
         self.assertTemplateUsed(response, 'Empty POST Template')
 
@@ -69,7 +69,7 @@ class ClientTest(TestCase):
         # Check some response details
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['data'], '37')
-        self.assertEqual(response.template.name, 'POST Template')
+        self.assertEqual(response.templates[0].name, 'POST Template')
         self.failUnless('Data received' in response.content)
 
     def test_response_headers(self):
@@ -84,7 +84,7 @@ class ClientTest(TestCase):
         response = self.client.post("/test_client/raw_post_view/", test_doc,
                                     content_type="text/xml")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, "Book template")
+        self.assertEqual(response.templates[0].name, "Book template")
         self.assertEqual(response.content, "Blink - Malcolm Gladwell")
 
     def test_redirect(self):

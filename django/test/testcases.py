@@ -443,7 +443,7 @@ class TransactionTestCase(unittest.TestCase):
         if msg_prefix:
             msg_prefix += ": "
 
-        template_names = [t.name for t in to_list(response.template)]
+        template_names = [t.name for t in response.templates]
         if not template_names:
             self.fail(msg_prefix + "No templates used to render the response")
         self.failUnless(template_name in template_names,
@@ -459,7 +459,7 @@ class TransactionTestCase(unittest.TestCase):
         if msg_prefix:
             msg_prefix += ": "
 
-        template_names = [t.name for t in to_list(response.template)]
+        template_names = [t.name for t in response.templates]
         self.failIf(template_name in template_names,
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)

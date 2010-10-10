@@ -4,6 +4,7 @@ import sys
 import os
 import re
 import mimetypes
+import warnings
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -93,7 +94,7 @@ def store_rendered_templates(store, signal, sender, template, context, **kwargs)
     """
     Stores templates and contexts that are rendered.
     """
-    store.setdefault('template', []).append(template)
+    store.setdefault('templates', []).append(template)
     store.setdefault('context', ContextList()).append(context)
 
 def encode_multipart(boundary, data):
@@ -260,16 +261,25 @@ class Client(object):
             response.request = request
 
             # Add any rendered template detail to the response.
-            # If there was only one template rendered (the most likely case),
-            # flatten the list to a single element.
-            for detail in ('template', 'context'):
-                if data.get(detail):
-                    if len(data[detail]) == 1:
-                        setattr(response, detail, data[detail][0]);
-                    else:
-                        setattr(response, detail, data[detail])
-                else:
-                    setattr(response, detail, None)
+            response.templates = data.get("templates", [])
+            response.context = data.get("context")
+
+            # Flatten a single context. Not really necessary anymore thanks to
+            # the __getattr__ flattening in ContextList, but has some edge-case
+            # backwards-compatibility implications.
+            if response.context and len(response.context) == 1:
+                response.context = response.context[0]
+
+            # Provide a backwards-compatible (but pending deprecation) response.template
+            def _get_template(self):
+                warnings.warn("response.template is deprecated; use response.templates instead (which is always a list)",
+                              PendingDeprecationWarning)
+                if not self.templates:
+                    return None
+                elif len(self.templates) == 1:
+                    return self.templates[0]
+                return self.templates
+            response.__class__.template = property(_get_template)
 
             # Update persistent cookie data.
             if response.cookies:

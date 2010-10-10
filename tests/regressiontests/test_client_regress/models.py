@@ -9,7 +9,7 @@ from django.test import Client, TestCase
 from django.test.utils import ContextList
 from django.core.urlresolvers import reverse
 from django.core.exceptions import SuspiciousOperation
-from django.template import TemplateDoesNotExist, TemplateSyntaxError, Context
+from django.template import TemplateDoesNotExist, TemplateSyntaxError, Context, Template
 from django.template import loader
 from django.test.client import encode_file
 
@@ -861,3 +861,18 @@ class RequestHeadersTest(TestCase):
         self.assertEquals(response.content, "HTTP_X_ARG_CHECK: Testing 123")
         self.assertRedirects(response, '/test_client_regress/check_headers/',
             status_code=301, target_status_code=200)
+
+class ResponseTemplateDeprecationTests(TestCase):
+    """
+    Response.template still works backwards-compatibly, but with pending deprecation warning. Refs #12226.
+
+    """
+    def test_response_template_data(self):
+        response = self.client.get("/test_client_regress/request_data/", data={'foo':'whiz'})
+        self.assertEqual(response.template.__class__, Template)
+        self.assertEqual(response.template.name, 'base.html')
+
+    def test_response_no_template(self):
+        response = self.client.get("/test_client_regress/request_methods/")
+        self.assertEqual(response.template, None)
+
