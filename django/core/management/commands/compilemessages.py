@@ -1,9 +1,17 @@
+import codecs
 import os
 import sys
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 
-def compile_messages(locale=None):
+def has_bom(fn):
+    f = open(fn, 'r')
+    sample = f.read(4)
+    return sample[:3] == '\xef\xbb\xbf' or \
+            sample.startswith(codecs.BOM_UTF16_LE) or \
+            sample.startswith(codecs.BOM_UTF16_BE)
+
+def compile_messages(stderr, locale=None):
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):
         from django.conf import settings
@@ -21,8 +29,11 @@ def compile_messages(locale=None):
         for dirpath, dirnames, filenames in os.walk(basedir):
             for f in filenames:
                 if f.endswith('.po'):
-                    sys.stderr.write('processing file %s in %s\n' % (f, dirpath))
-                    pf = os.path.splitext(os.path.join(dirpath, f))[0]
+                    stderr.write('processing file %s in %s\n' % (f, dirpath))
+                    fn = os.path.join(dirpath, f)
+                    if has_bom(fn):
+                        raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
+                    pf = os.path.splitext(fn)[0]
                     # Store the names of the .mo and .po files in an environment
                     # variable, rather than doing a string replacement into the
                     # command, so that we can take advantage of shell quoting, to
@@ -49,4 +60,4 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         locale = options.get('locale')
-        compile_messages(locale)
+        compile_messages(self.stderr, locale=locale)

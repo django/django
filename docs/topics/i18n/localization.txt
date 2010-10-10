@@ -188,6 +188,12 @@ That's it. Your translations are ready for use.
    ``django-admin compilemessages`` works see :ref:`gettext_on_windows` for more
    information.
 
+.. admonition:: .po files: Encoding and BOM usage.
+
+   Django only supports ``.po`` files encoded in UTF-8 and without any BOM
+   (Byte Order Mark) so if your text editor adds such marks to the beginning of
+   files by default then you will need to reconfigure it.
+
 .. _creating-message-files-from-js-code:
 
 Creating message files from JavaScript source code
