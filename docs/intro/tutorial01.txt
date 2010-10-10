@@ -43,7 +43,7 @@ create a ``mysite`` directory in your current directory.
 
    If you installed Django using the Ubuntu package manager (e.g. apt-get)
    ``django-admin.py`` has been renamed to ``django-admin``. You may continue
-   through through this documentation by omitting ``.py`` from each command.
+   through this documentation by omitting ``.py`` from each command.
 
 .. admonition:: Mac OS X permissions
 
