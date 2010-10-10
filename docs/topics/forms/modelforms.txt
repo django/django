@@ -387,7 +387,7 @@ widget::
     class AuthorForm(ModelForm):
         class Meta:
             model = Author
-            fields = ['name', 'title', 'birth_date']
+            fields = ('name', 'title', 'birth_date')
             widgets = {
                 'name': Textarea(attrs={'cols': 80, 'rows': 20}),
             }
@@ -471,7 +471,7 @@ to be rendered first, we could specify the following ``ModelForm``::
     >>> class BookForm(ModelForm):
     ...     class Meta:
     ...         model = Book
-    ...         fields = ['title', 'author']
+    ...         fields = ('title', 'author')
 
 .. _overriding-modelform-clean-method:
 
@@ -514,7 +514,7 @@ the ``Meta.fields`` or ``Meta.excludes`` lists::
 
     >>> class RestrictedArticleForm(EnhancedArticleForm):
     ...     class Meta(ArticleForm.Meta):
-    ...         exclude = ['body']
+    ...         exclude = ('body',)
 
 This adds the extra method from the ``EnhancedArticleForm`` and modifies
 the original ``ArticleForm.Meta`` to remove one field.
