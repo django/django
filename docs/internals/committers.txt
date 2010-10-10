@@ -256,6 +256,18 @@ Ramiro Morales
 
     Ramiro lives in Córdoba, Argentina.
 
+`Chris Beaven`_
+    Chris has been submitting patches and suggesting crazy ideas for Django
+    since early 2006. An advocate for community involement and a long-term
+    triager, he is still often found answering questions in the #django IRC
+    channel.
+
+    Chris lives in Napier, New Zealand (adding to the pool of Oceanic core
+    developers). He works remotely as a developer for `Lincoln Loop`_.
+
+.. _Chris Beaven: http://smileychris.com/
+.. _Lincoln Loop: http://lincolnloop.com/
+
 Specialists
 -----------
 

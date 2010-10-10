@@ -22,6 +22,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Andrew Godwin
     * Carl Meyer
     * Ramiro Morales
+    * Chris Beaven
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -69,7 +70,6 @@ answer newbie questions, and generally made Django that much better:
     Ned Batchelder <http://www.nedbatchelder.com/>
     batiste@dosimple.ch
     Batman
-    Chris Beaven <http://smileychris.tactful.co.nz/>
     Brian Beck <http://blog.brianbeck.com/>
     Shannon -jj Behrens <http://jjinux.blogspot.com/>
     Esdras Beleza <linux@esdrasbeleza.com>
