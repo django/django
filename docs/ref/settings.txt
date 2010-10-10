@@ -314,8 +314,12 @@ OPTIONS
 
 Default: ``{}`` (Empty dictionary)
 
-Extra parameters to use when connecting to the database. Consult backend
-module's document for available keywords.
+Extra parameters to use when connecting to the database. Available parameters
+vary depending on your database backend.
+
+Some information on available parameters can be found in the
+:doc:`Database Backends </ref/databases>` documentation. For more information,
+consult your backend module's own documentation.
 
 .. setting:: PASSWORD
 
