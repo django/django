@@ -96,9 +96,14 @@ APPEND_SLASH
 
 Default: ``True``
 
-Whether to append trailing slashes to URLs. This is only used if
-``CommonMiddleware`` is installed (see :doc:`/topics/http/middleware`). See also
-``PREPEND_WWW``.
+When set to ``True``, if the request URL does not match any of the patterns 
+in the URLconf and it doesn't end in a slash, an HTTP redirect is issued to the
+same URL with a slash appended. Note that the redirect may cause any data 
+submitted in a POST request to be lost.
+
+The ``APPEND_SLASH`` setting is only used if
+:class:`~django.middleware.common.CommonMiddleware` is installed
+(see :doc:`/topics/http/middleware`). See also :setting:`PREPEND_WWW`.
 
 .. setting:: AUTHENTICATION_BACKENDS
 
@@ -1214,8 +1219,8 @@ PREPEND_WWW
 Default: ``False``
 
 Whether to prepend the "www." subdomain to URLs that don't have it. This is only
-used if ``CommonMiddleware`` is installed (see :doc:`/topics/http/middleware`).
-See also ``APPEND_SLASH``.
+used if :class:`~django.middleware.common.CommonMiddleware` is installed
+(see :doc:`/topics/http/middleware`). See also :setting:`APPEND_SLASH`.
 
 .. setting:: PROFANITIES_LIST
 
