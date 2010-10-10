@@ -433,6 +433,10 @@ class EmailField(CharField):
     }
     default_validators = [validators.validate_email]
 
+    def clean(self, value):
+        value = self.to_python(value).strip()
+        return super(EmailField, self).clean(value)
+
 class FileField(Field):
     widget = FileInput
     default_error_messages = {
