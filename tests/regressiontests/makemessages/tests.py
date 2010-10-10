@@ -38,3 +38,6 @@ if xgettext_cmd:
         if xversion >= (0, 15):
             from extraction import *
     del p
+
+if find_command('msgfmt'):
+    from compilation import *
