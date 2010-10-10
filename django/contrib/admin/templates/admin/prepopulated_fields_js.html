@@ -17,7 +17,7 @@
 
     $('.empty-form .{{ field.field.name }}').addClass('prepopulated_field');
     $(field.id).data('dependency_list', field['dependency_list'])
-               .prepopulate($(field['dependency_ids'].join(',')), field.maxLength);
+               .prepopulate(field['dependency_ids'], field.maxLength);
 {% endfor %}
 })(django.jQuery);
 </script>

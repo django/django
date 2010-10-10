@@ -4,7 +4,7 @@
             Depends on urlify.js
             Populates a selected field with the values of the dependent fields,
             URLifies and shortens the string. 
-            dependencies - selected jQuery object of dependent fields
+            dependencies - array of dependent fields id's 
             maxLength - maximum length of the URLify'd string 
         */
         return this.each(function() {
@@ -20,15 +20,15 @@
                 if (field.data('_changed') == true) return;
  
                 var values = [];
-                dependencies.each(function() {
-                    if ($(this).val().length > 0) {
-                        values.push($(this).val());
-                    }
-                });
+                $.each(dependencies, function(i, field) {
+                  if ($(field).val().length > 0) {
+                      values.push($(field).val());
+                  }
+                })
                 field.val(URLify(values.join(' '), maxLength));
             };
 
-            dependencies.keyup(populate).change(populate).focus(populate);
+            $(dependencies.join(',')).keyup(populate).change(populate).focus(populate);
         });
     };
 })(django.jQuery);
