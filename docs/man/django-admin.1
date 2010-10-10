@@ -27,6 +27,9 @@ Compiles .po files to .mo files for use with builtin gettext support.
 .BI "createcachetable [" "tablename" "]"
 Creates the table needed to use the SQL cache backend
 .TP
+.BI "createsuperuser [" "\-\-username=USERNAME" "] [" "\-\-email=EMAIL" "]"
+Creates a superuser account (a user who has all permissions).
+.TP
 .B dbshell
 Runs the command\-line client for the specified
 .BI database ENGINE.
@@ -37,9 +40,20 @@ Displays differences between the current
 and Django's default settings. Settings that don't appear in the defaults are
 followed by "###".
 .TP
+.BI "dumpdata [" "\-\-all" "] [" "\-\-format=FMT" "] [" "\-\-indent=NUM" "] [" "\-\-natural=NATURAL" "] [" "appname appname appname.Model ..." "]"
+Outputs to standard output all data in the database associated with the named
+application(s).
+.TP
+.BI flush
+Returns the database to the state it was in immediately after syncdb was
+executed.
+.TP
 .B inspectdb
 Introspects the database tables in the database specified in settings.py and outputs a Django
 model module.
+.TP
+.BI "loaddata [" "fixture fixture ..." "]"
+Searches for and loads the contents of the named fixture into the database.
 .TP
 .BI "install [" "appname ..." "]"
 Executes
@@ -81,6 +95,13 @@ given model module name(s).
 .BI "sqlclear [" "appname ..." "]"
 Prints the DROP TABLE SQL statements for the given app name(s).
 .TP
+.BI "sqlcustom [" "appname ..." "]"
+Prints the custom SQL statements for the given app name(s).
+.TP
+.BI "sqlflush [" "appname ..." "]"
+Prints the SQL statements that would be executed for the "flush" 
+command.
+.TP
 .BI "sqlindexes [" "appname ..." "]"
 Prints the CREATE INDEX SQL statements for the given model module name(s).
 .TP
@@ -107,7 +128,11 @@ in the current directory.
 Creates the database tables for all apps in INSTALLED_APPS whose tables
 haven't already been created.
 .TP
-.BI "test [" "\-\-verbosity" "] [" "appname ..." "]"
+.BI "test [" "\-\-verbosity" "] [" "\-\-failfast" "] [" "appname ..." "]"
+Runs the test suite for the specified applications, or the entire project if
+no apps are specified
+.TP
+.BI "testserver [" "\-\-addrport=ipaddr|port" "] [" "fixture fixture ..." "]"
 Runs the test suite for the specified applications, or the entire project if
 no apps are specified
 .TP
@@ -145,6 +170,11 @@ Verbosity level: 0=minimal output, 1=normal output, 2=all output.
 .I \-\-adminmedia=ADMIN_MEDIA_PATH
 Specifies the directory from which to serve admin media when using the development server.
 .TP
+.I \-\-traceback
+By default, django-admin.py will show a simple error message whenever an
+error occurs. If you specify this option, django-admin.py  will
+output a full stack trace whenever an exception is raised.
+.TP
 .I \-l, \-\-locale=LOCALE
 The locale to process when using makemessages or compilemessages.
 .TP
@@ -155,15 +185,15 @@ The domain of the message files (default: "django") when using makemessages.
 The file extension(s) to examine (default: ".html", separate multiple
 extensions with commas, or use -e multiple times).
 .TP
-.I \-e, \-\-symlinks
+.I \-s, \-\-symlinks
 Follows symlinks to directories when examining source code and templates for
 translation strings.
 .TP
-.I \-e, \-\-ignore=PATTERN
+.I \-i, \-\-ignore=PATTERN
 Ignore files or directories matching this glob-style pattern. Use multiple
 times to ignore more.
 .TP
-.I \-e, \-\-no\-default\-ignore
+.I \-\-no\-default\-ignore
 Don't ignore the common private glob-style patterns 'CVS', '.*' and '*~'.
 .TP
 .I \-a, \-\-all
@@ -174,6 +204,10 @@ In the absence of the
 .BI \-\-settings
 option, this environment variable defines the settings module to be read.
 It should be in Python-import form, e.g. "myproject.settings".
+.I \-\-database=DB
+Used to specify the database on which a command will operate. If not
+specified, this option will default to an alias of "default".
+.TP
 
 .SH "SEE ALSO"
 Full descriptions of all these options, with examples, as well as documentation
