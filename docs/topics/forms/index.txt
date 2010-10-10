@@ -5,8 +5,9 @@ Working with forms
 .. admonition:: About this document
 
     This document provides an introduction to Django's form handling features.
-    For a more detailed look at the forms API, see :doc:`/ref/forms/api`. For
-    documentation of the available field types, see :doc:`/ref/forms/fields`.
+    For a more detailed look at specific areas of the forms API, see
+    :doc:`/ref/forms/api`, :doc:`/ref/forms/fields`, and
+    :doc:`/ref/forms/validation`.
 
 .. highlightlang:: html+django
 
@@ -388,7 +389,7 @@ Further topics
 This covers the basics, but forms can do a whole lot more:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    modelforms
    formsets
@@ -396,4 +397,6 @@ This covers the basics, but forms can do a whole lot more:
 
 .. seealso::
 
-    The :doc:`form API reference </ref/forms/index>`.
+    :doc:`The Forms Reference </ref/forms/index>`
+        Covers the full API reference, including form fields, form widgets, 
+        and form and field validation.
