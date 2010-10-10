@@ -18,6 +18,8 @@ from django.utils.importlib import import_module
 from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from models import Company, TestModel
 
+from commands.tests import *
+
 
 class TranslationTests(TestCase):
 
