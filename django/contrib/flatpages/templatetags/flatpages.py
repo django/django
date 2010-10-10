@@ -1,7 +1,6 @@
 from django import template
-from django.contrib.flatpages.models import FlatPage
-from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.contrib.flatpages.models import FlatPage
 
 
 register = template.Library()
@@ -67,7 +66,7 @@ def get_flatpages(parser, token):
         {% get_flatpages '/about/' for someuser as about_pages %}
     """
     bits = token.split_contents()
-    syntax_message = _("%(tag_name)s expects a syntax of %(tag_name)s "
+    syntax_message = ("%(tag_name)s expects a syntax of %(tag_name)s "
                        "['url_starts_with'] [for user] as context_name" %
                        dict(tag_name=bits[0]))
    # Must have at 3-6 bits in the tag
