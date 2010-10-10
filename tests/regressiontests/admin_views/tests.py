@@ -18,6 +18,7 @@ from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.translation import get_date_formats, activate, deactivate
+import django.template.context
 
 # local test models
 from models import Article, BarAccount, CustomArticle, EmptyModel, \
@@ -2254,3 +2255,32 @@ try:
 
 except ImportError:
     pass
+
+class ValidXHTMLTests(TestCase):
+    fixtures = ['admin-views-users.xml']
+    urlbit = 'admin'
+
+    def setUp(self):
+        self._context_processors = None
+        self._use_i18n, settings.USE_I18N = settings.USE_I18N, False
+        if 'django.core.context_processors.i18n' in settings.TEMPLATE_CONTEXT_PROCESSORS:
+            self._context_processors = settings.TEMPLATE_CONTEXT_PROCESSORS
+            cp = list(settings.TEMPLATE_CONTEXT_PROCESSORS)
+            cp.remove('django.core.context_processors.i18n')
+            settings.TEMPLATE_CONTEXT_PROCESSORS = tuple(cp)
+            # Force re-evaluation of the contex processor list
+            django.template.context._standard_context_processors = None
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+        if self._context_processors is not None:
+            settings.TEMPLATE_CONTEXT_PROCESSORS = self._context_processors
+            # Force re-evaluation of the contex processor list
+            django.template.context._standard_context_processors = None
+        settings.USE_I18N = self._use_i18n
+
+    def testLangNamePresent(self):
+        response = self.client.get('/test_admin/%s/admin_views/' % self.urlbit)
+        self.failIf(' lang=""' in response.content)
+        self.failIf(' xml:lang=""' in response.content)
