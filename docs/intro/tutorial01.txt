@@ -39,6 +39,12 @@ From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the command ``django-admin.py startproject mysite``. This will
 create a ``mysite`` directory in your current directory.
 
+.. admonition:: Script name differs on Ubuntu
+
+   If you installed Django using the Ubuntu package manager (e.g. apt-get)
+   ``django-admin.py`` has been renamed to ``django-admin``. You may continue
+   through through this documentation by omitting ``.py`` from each command.
+
 .. admonition:: Mac OS X permissions
 
    If you're using Mac OS X, you may see the message "permission denied" when
