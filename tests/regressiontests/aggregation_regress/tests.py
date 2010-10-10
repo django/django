@@ -489,6 +489,14 @@ class AggregationTests(TestCase):
         # Regression for #11256 - providing an aggregate name that conflicts with a field name on the model raises ValueError
         self.assertRaises(ValueError, Author.objects.annotate, age=Avg('friends__age'))
 
+    def test_m2m_name_conflict(self):
+        # Regression for #11256 - providing an aggregate name that conflicts with an m2m name on the model raises ValueError
+        self.assertRaises(ValueError, Author.objects.annotate, friends=Count('friends'))
+
+    def test_reverse_relation_name_conflict(self):
+        # Regression for #11256 - providing an aggregate name that conflicts with a reverse-related name on the model raises ValueError
+        self.assertRaises(ValueError, Author.objects.annotate, book_contact_set=Avg('friends__age'))
+
     def test_pickle(self):
         # Regression for #10197 -- Queries with aggregates can be pickled.
         # First check that pickling is possible at all. No crash = success
