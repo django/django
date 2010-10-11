@@ -106,6 +106,6 @@ class SMTPConnection(_SMTPConnection):
         import warnings
         warnings.warn(
             'mail.SMTPConnection is deprecated; use mail.get_connection() instead.',
-            PendingDeprecationWarning
+            DeprecationWarning
         )
         super(SMTPConnection, self).__init__(*args, **kwds)

@@ -1,3 +1,5 @@
+import warnings
+
 from django import http
 from django.test import TestCase
 from django.conf import settings
@@ -49,6 +51,8 @@ class BaseTest(TestCase):
         self._message_storage = settings.MESSAGE_STORAGE
         settings.MESSAGE_STORAGE = '%s.%s' % (self.storage_class.__module__,
                                               self.storage_class.__name__)
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.contrib.auth.models')
 
     def tearDown(self):
         for setting in self.restore_settings:
@@ -59,6 +63,8 @@ class BaseTest(TestCase):
            self._template_context_processors
         settings.INSTALLED_APPS = self._installed_apps
         settings.MESSAGE_STORAGE = self._message_storage
+        warnings.resetwarnings()
+        warnings.simplefilter('ignore', PendingDeprecationWarning)
 
     def restore_setting(self, setting):
         if setting in self._remembered_settings:

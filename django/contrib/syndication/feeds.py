@@ -10,7 +10,7 @@ class Feed(views.Feed):
     def __init__(self, slug, request):
         warnings.warn('The syndication feeds.Feed class is deprecated. Please '
                       'use the new class based view API.',
-                      category=PendingDeprecationWarning)
+                      category=DeprecationWarning)
 
         self.slug = slug
         self.request = request

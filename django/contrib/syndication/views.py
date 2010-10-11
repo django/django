@@ -191,7 +191,7 @@ def feed(request, url, feed_dict=None):
     import warnings
     warnings.warn('The syndication feed() view is deprecated. Please use the '
                   'new class based view API.',
-                  category=PendingDeprecationWarning)
+                  category=DeprecationWarning)
 
     if not feed_dict:
         raise Http404("No feeds are registered.")

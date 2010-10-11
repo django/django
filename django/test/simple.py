@@ -320,7 +320,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, failfast=False, extra_
     import warnings
     warnings.warn(
         'The run_tests() test runner has been deprecated in favor of DjangoTestSuiteRunner.',
-        PendingDeprecationWarning
+        DeprecationWarning
     )
     test_runner = DjangoTestSuiteRunner(verbosity=verbosity, interactive=interactive, failfast=failfast)
     return test_runner.run_tests(test_labels, extra_tests=extra_tests)

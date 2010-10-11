@@ -107,7 +107,7 @@ class UserManager(models.Manager):
         Creates and saves a User with the given username, e-mail and password.
         """
         now = datetime.datetime.now()
-        
+
         # Normalize the address by lowercasing the domain part of the email
         # address.
         try:
@@ -380,7 +380,7 @@ class User(models.Model):
         import warnings
         warnings.warn('The user messaging API is deprecated. Please update'
                       ' your code to use the new messages framework.',
-                      category=PendingDeprecationWarning)
+                      category=DeprecationWarning)
         return self._message_set
     message_set = property(_get_message_set)
 

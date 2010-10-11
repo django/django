@@ -10,7 +10,7 @@ try:
     import warnings
     warnings.warn(
         "Support for the 'cmemcache' library has been deprecated. Please use python-memcached instead.",
-        PendingDeprecationWarning
+        DeprecationWarning
     )
 except ImportError:
     try:

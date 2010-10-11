@@ -50,7 +50,7 @@ def en_format(name):
     from django.conf.locale.en import formats
     warnings.warn(
         "`django.forms.fields.DEFAULT_%s` is deprecated; use `django.utils.formats.get_format('%s')` instead." % (name, name),
-        PendingDeprecationWarning
+        DeprecationWarning
     )
     return getattr(formats, name)
 

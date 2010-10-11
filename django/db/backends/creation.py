@@ -140,7 +140,7 @@ class BaseDatabaseCreation(object):
         import warnings
         warnings.warn(
             'Database creation API for m2m tables has been deprecated. M2M models are now automatically generated',
-            PendingDeprecationWarning
+            DeprecationWarning
         )
 
         output = []
@@ -154,7 +154,7 @@ class BaseDatabaseCreation(object):
         import warnings
         warnings.warn(
             'Database creation API for m2m tables has been deprecated. M2M models are now automatically generated',
-            PendingDeprecationWarning
+            DeprecationWarning
         )
 
         from django.db import models
@@ -217,7 +217,7 @@ class BaseDatabaseCreation(object):
         import warnings
         warnings.warn(
             'Database creation API for m2m tables has been deprecated. M2M models are now automatically generated',
-            PendingDeprecationWarning
+            DeprecationWarning
         )
 
         from django.db import models
@@ -322,7 +322,7 @@ class BaseDatabaseCreation(object):
         import warnings
         warnings.warn(
             'Database creation API for m2m tables has been deprecated. M2M models are now automatically generated',
-            PendingDeprecationWarning
+            DeprecationWarning
         )
 
         qn = self.connection.ops.quote_name

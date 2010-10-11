@@ -24,7 +24,7 @@ def auth(request):
         "The context processor at `django.core.context_processors.auth` is " \
         "deprecated; use the path `django.contrib.auth.context_processors.auth` " \
         "instead.",
-        PendingDeprecationWarning
+        DeprecationWarning
     )
     from django.contrib.auth.context_processors import auth as auth_context_processor
     return auth_context_processor(request)

@@ -142,7 +142,7 @@ def find_template_source(name, dirs=None):
     import warnings
     warnings.warn(
         "`django.template.loaders.find_template_source` is deprecated; use `django.template.loaders.find_template` instead.",
-        PendingDeprecationWarning
+        DeprecationWarning
     )
     template, origin = find_template(name, dirs)
     if hasattr(template, 'render'):

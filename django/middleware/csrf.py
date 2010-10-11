@@ -274,7 +274,7 @@ class CsrfResponseMiddleware(object):
         import warnings
         warnings.warn(
             "CsrfResponseMiddleware and CsrfMiddleware are deprecated; use CsrfViewMiddleware and the template tag instead (see CSRF documentation).",
-            PendingDeprecationWarning
+            DeprecationWarning
         )
 
     def process_response(self, request, response):

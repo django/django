@@ -1,16 +1,15 @@
 import datetime
+import warnings
+from xml.dom import minidom
+
 from django.contrib.syndication import feeds, views
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.utils import tzinfo
 from django.utils.feedgenerator import rfc2822_date, rfc3339_date
-from models import Entry
-from xml.dom import minidom
 
-try:
-    set
-except NameError:
-    from sets import Set as set
+from models import Entry
+
 
 class FeedTestCase(TestCase):
     fixtures = ['feeddata.json']
@@ -315,6 +314,15 @@ class DeprecatedSyndicationFeedTest(FeedTestCase):
     """
     Tests for the deprecated API (feed() view and the feed_dict etc).
     """
+    def setUp(self):
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.contrib.syndication.feeds')
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.contrib.syndication.views')
+
+    def tearDown(self):
+        warnings.resetwarnings()
+        warnings.simplefilter('ignore', PendingDeprecationWarning)
 
     def test_empty_feed_dict(self):
         """

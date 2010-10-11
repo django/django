@@ -40,14 +40,14 @@ class MyAutoField(models.CharField):
             value = MyWrapper(value)
         return value
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, connection):
         if not value:
             return
         if isinstance(value, MyWrapper):
             return unicode(value)
         return value
 
-    def get_db_prep_value(self, value):
+    def get_db_prep_value(self, value, connection, prepared=False):
         if not value:
             return
         if isinstance(value, MyWrapper):

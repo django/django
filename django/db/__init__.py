@@ -15,7 +15,7 @@ if not settings.DATABASES:
     import warnings
     warnings.warn(
         "settings.DATABASE_* is deprecated; use settings.DATABASES instead.",
-        PendingDeprecationWarning
+        DeprecationWarning
     )
 
     settings.DATABASES[DEFAULT_DB_ALIAS] = {
@@ -44,7 +44,7 @@ for alias, database in settings.DATABASES.items():
                 "django.contrib.gis is now implemented as a full database backend. "
                 "Modify ENGINE in the %s database configuration to select "
                 "a backend from 'django.contrib.gis.db.backends'" % alias,
-                PendingDeprecationWarning
+                DeprecationWarning
             )
             if database['ENGINE'] == 'postgresql_psycopg2':
                 full_engine = 'django.contrib.gis.db.backends.postgis'
@@ -56,7 +56,7 @@ for alias, database in settings.DATABASES.items():
             warnings.warn(
                 "Short names for ENGINE in database configurations are deprecated. "
                 "Prepend %s.ENGINE with 'django.db.backends.'" % alias,
-                PendingDeprecationWarning
+                DeprecationWarning
             )
             full_engine = "django.db.backends.%s" % database['ENGINE']
         database['ENGINE'] = full_engine

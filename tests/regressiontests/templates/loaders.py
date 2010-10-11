@@ -67,7 +67,8 @@ class DeprecatedEggLoaderTest(unittest.TestCase):
         })
         self._old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = []
-        warnings.simplefilter("ignore", PendingDeprecationWarning)
+        warnings.filterwarnings("ignore", category=DeprecationWarning,
+                                module='django.template.loaders.eggs')
 
     def tearDown(self):
         settings.INSTALLED_APPS = self._old_installed_apps
@@ -79,6 +80,8 @@ class DeprecatedEggLoaderTest(unittest.TestCase):
         contents, template_name = lts_egg("y.html")
         self.assertEqual(contents, "y")
         self.assertEqual(template_name, "egg:egg_1:templates/y.html")
+        warnings.resetwarnings()
+        warnings.simplefilter("ignore", PendingDeprecationWarning)
 
 
 class EggLoaderTest(unittest.TestCase):

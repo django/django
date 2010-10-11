@@ -9,6 +9,7 @@
 from decimal import Decimal
 from django.db import models
 
+
 class Category(models.Model):
     name = models.CharField(max_length=20)
 
@@ -96,7 +97,7 @@ class TeamField(models.CharField):
     def __init__(self):
         super(TeamField, self).__init__(max_length=100)
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, connection):
         return unicode(value.title)
 
     def to_python(self, value):

@@ -29,7 +29,7 @@ class Command(BaseCommand):
             import warnings
             warnings.warn(
                 'Function-based test runners are deprecated. Test runners should be classes with a run_tests() method.',
-                PendingDeprecationWarning
+                DeprecationWarning
             )
             failures = TestRunner(test_labels, verbosity=verbosity, interactive=interactive)
         else:

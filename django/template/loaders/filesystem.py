@@ -55,7 +55,7 @@ def load_template_source(template_name, template_dirs=None):
     import warnings
     warnings.warn(
         "'django.template.loaders.filesystem.load_template_source' is deprecated; use 'django.template.loaders.filesystem.Loader' instead.",
-        PendingDeprecationWarning
+        DeprecationWarning
     )
     return _loader.load_template_source(template_name, template_dirs)
 load_template_source.is_usable = True

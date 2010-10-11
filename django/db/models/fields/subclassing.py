@@ -15,14 +15,14 @@ def call_with_connection(func):
     if not updated:
         warn("A Field class whose %s method hasn't been updated to take a "
             "`connection` argument." % func.__name__,
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
 
     def inner(*args, **kwargs):
         if 'connection' not in kwargs:
             from django.db import connection
             kwargs['connection'] = connection
             warn("%s has been called without providing a connection argument. " %
-                func.__name__, PendingDeprecationWarning,
+                func.__name__, DeprecationWarning,
                 stacklevel=1)
         if updated:
             return func(*args, **kwargs)
@@ -40,14 +40,14 @@ def call_with_connection_and_prepared(func):
     if not updated:
         warn("A Field class whose %s method hasn't been updated to take "
             "`connection` and `prepared` arguments." % func.__name__,
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
 
     def inner(*args, **kwargs):
         if 'connection' not in kwargs:
             from django.db import connection
             kwargs['connection'] = connection
             warn("%s has been called without providing a connection argument. " %
-                func.__name__, PendingDeprecationWarning,
+                func.__name__, DeprecationWarning,
                 stacklevel=1)
         if updated:
             return func(*args, **kwargs)

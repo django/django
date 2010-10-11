@@ -22,12 +22,12 @@ def load_backend(path):
         raise ImproperlyConfigured('Module "%s" does not define a "%s" authentication backend' % (module, attr))
     if not hasattr(cls, "supports_object_permissions"):
         warn("Authentication backends without a `supports_object_permissions` attribute are deprecated. Please define it in %s." % cls,
-             PendingDeprecationWarning)
+             DeprecationWarning)
         cls.supports_object_permissions = False
 
     if not hasattr(cls, 'supports_anonymous_user'):
         warn("Authentication backends without a `supports_anonymous_user` attribute are deprecated. Please define it in %s." % cls,
-             PendingDeprecationWarning)
+             DeprecationWarning)
         cls.supports_anonymous_user = False
     return cls()
 

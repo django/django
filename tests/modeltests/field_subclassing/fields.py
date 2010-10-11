@@ -3,6 +3,8 @@ from django.db import models
 from django.utils import simplejson as json
 from django.utils.encoding import force_unicode
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.db.models.fields.subclassing')
 
 class Small(object):
     """

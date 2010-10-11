@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import warnings
 
 from django.test import TestCase
 from django.http import HttpRequest, HttpResponse
@@ -68,6 +69,14 @@ class CsrfMiddlewareTest(TestCase):
     _session_token = "5a105e8b9d40e1329780d62ea2265d8a"
     _session_id = "1"
     _secret_key_for_session_test= "test"
+
+    def setUp(self):
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.middleware.csrf')
+
+    def tearDown(self):
+        warnings.resetwarnings()
+        warnings.simplefilter('ignore', PendingDeprecationWarning)
 
     def _get_GET_no_csrf_cookie_request(self):
         return TestingHttpRequest()

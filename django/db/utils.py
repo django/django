@@ -23,7 +23,7 @@ def load_backend(backend_name):
         import warnings
         warnings.warn(
             "Short names for DATABASE_ENGINE are deprecated; prepend with 'django.db.backends.'",
-            PendingDeprecationWarning
+            DeprecationWarning
         )
         return module
     except ImportError, e:

@@ -13,7 +13,7 @@ def run_gis_tests(test_labels, verbosity=1, interactive=True, failfast=False, ex
     import warnings
     warnings.warn(
         'The run_gis_tests() test runner has been deprecated in favor of GeoDjangoTestSuiteRunner.',
-        PendingDeprecationWarning
+        DeprecationWarning
     )
     test_runner = GeoDjangoTestSuiteRunner(verbosity=verbosity, interactive=interactive, failfast=failfast)
     return test_runner.run_tests(test_labels, extra_tests=extra_tests)
@@ -22,7 +22,7 @@ class GeoDjangoTestSuiteRunner(DjangoTestSuiteRunner):
 
     def setup_test_environment(self, **kwargs):
         super(GeoDjangoTestSuiteRunner, self).setup_test_environment(**kwargs)
-        
+
         from django.db import connection
         from django.contrib.gis.geos import GEOS_PREPARE
         from django.contrib.gis.gdal import HAS_GDAL
@@ -49,7 +49,7 @@ class GeoDjangoTestSuiteRunner(DjangoTestSuiteRunner):
 
             self.geo_apps.append('layermap')
 
-        # Constructing the new INSTALLED_APPS, and including applications 
+        # Constructing the new INSTALLED_APPS, and including applications
         # within the GeoDjango test namespace (`self.geo_apps`).
         new_installed =  ['django.contrib.sites',
                           'django.contrib.sitemaps',

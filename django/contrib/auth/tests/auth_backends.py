@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.contenttypes.models import ContentType
@@ -152,9 +154,13 @@ class RowlevelBackendTest(TestCase):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.user2 = User.objects.create_user('test2', 'test2@example.com', 'test')
         self.user3 = User.objects.create_user('test3', 'test3@example.com', 'test')
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.contrib.auth')
 
     def tearDown(self):
         settings.AUTHENTICATION_BACKENDS = self.curr_auth
+        warnings.resetwarnings()
+        warnings.simplefilter('ignore', PendingDeprecationWarning)
 
     def test_has_perm(self):
         self.assertEqual(self.user1.has_perm('perm', TestObj()), False)
