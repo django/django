@@ -292,34 +292,34 @@ FILE_UPLOAD_PERMISSIONS = None
 FORMAT_MODULE_PATH = None
 
 # Default formatting for date objects. See all available format strings here:
-# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = 'N j, Y'
 
 # Default formatting for datetime objects. See all available format strings here:
-# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATETIME_FORMAT = 'N j, Y, P'
 
 # Default formatting for time objects. See all available format strings here:
-# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 TIME_FORMAT = 'P'
 
 # Default formatting for date objects when only the year and month are relevant.
 # See all available format strings here:
-# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 YEAR_MONTH_FORMAT = 'F Y'
 
 # Default formatting for date objects when only the month and day are relevant.
 # See all available format strings here:
-# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 MONTH_DAY_FORMAT = 'F j'
 
 # Default short formatting for date objects. See all available format strings here:
-# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 SHORT_DATE_FORMAT = 'm/d/Y'
 
 # Default short formatting for datetime objects.
 # See all available format strings here:
-# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 SHORT_DATETIME_FORMAT = 'm/d/Y P'
 
 # Default formats to be used when parsing dates from input boxes, in order
