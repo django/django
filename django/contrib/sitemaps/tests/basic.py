@@ -68,7 +68,7 @@ class SitemapTests(TestCase):
         public.sites.add(settings.SITE_ID)
         private = FlatPage.objects.create(
             url=u'/private/',
-            title=u'Public Page',
+            title=u'Private Page',
             enable_comments=True,
             registration_required=True
         )
