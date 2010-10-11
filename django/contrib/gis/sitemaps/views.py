@@ -46,12 +46,13 @@ def sitemap(request, sitemaps, section=None):
         maps = sitemaps.values()
 
     page = request.GET.get("p", 1)
+    current_site = get_current_site(request)
     for site in maps:
         try:
             if callable(site):
-                urls.extend(site().get_urls(page))
+                urls.extend(site().get_urls(page=page, site=current_site))
             else:
-                urls.extend(site.get_urls(page))
+                urls.extend(site.get_urls(page=page, site=current_site))
         except EmptyPage:
             raise Http404("Page %s empty" % page)
         except PageNotAnInteger:

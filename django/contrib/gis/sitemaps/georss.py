@@ -36,12 +36,12 @@ class GeoRSSSitemap(Sitemap):
             else:
                 self.locations.append(section)
  
-    def get_urls(self, page=1):
+    def get_urls(self, page=1, site=None):
         """
         This method is overrridden so the appropriate `geo_format` attribute
         is placed on each URL element.
         """
-        urls = Sitemap.get_urls(self, page=page)
+        urls = Sitemap.get_urls(self, page=page, site=site)
         for url in urls: url['geo_format'] = 'georss'
         return urls
 
