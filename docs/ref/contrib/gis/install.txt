@@ -240,9 +240,9 @@ installed prior to building PostGIS.
 
 First download the source archive, and extract::
 
-    $ wget http://postgis.refractions.net/download/postgis-1.5.1.tar.gz
-    $ tar xzf postgis-1.5.1.tar.gz
-    $ cd postgis-1.5.1
+    $ wget http://postgis.refractions.net/download/postgis-1.5.2.tar.gz
+    $ tar xzf postgis-1.5.2.tar.gz
+    $ cd postgis-1.5.2
 
 Next, configure, make and install PostGIS::
 
