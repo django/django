@@ -2,7 +2,7 @@
 Module for executing all of the GDAL tests.  None
 of these tests require the use of the database.
 """
-from unittest import TestSuite, TextTestRunner
+from django.utils.unittest import TestSuite, TextTestRunner
 
 # Importing the GDAL test modules.
 import test_driver, test_ds, test_envelope, test_geom, test_srs

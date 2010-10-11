@@ -1,8 +1,7 @@
-import unittest
-
 from django.db import DatabaseError, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count
 from django.test import TestCase
+from django.utils import unittest
 
 from models import Tag, Annotation, DumbCategory, Note, ExtraInfo, Number
 

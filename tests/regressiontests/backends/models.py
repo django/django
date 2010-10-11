@@ -28,7 +28,7 @@ class SchoolClass(models.Model):
 
 # Unfortunately, the following model breaks MySQL hard.
 # Until #13711 is fixed, this test can't be run under MySQL.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
+if connection.features.supports_long_model_names:
     class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
         class Meta:
             # We need to use a short actual table name or

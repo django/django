@@ -2,7 +2,7 @@
 import datetime
 
 from django.conf import settings
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import models, DEFAULT_DB_ALIAS, connection
 from django.utils import tzinfo
 
 CHOICES = (
@@ -149,9 +149,7 @@ datetime.datetime(2000, 1, 1, 6, 1, 1)
 
 """}
 
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] not in (
-        "django.db.backends.mysql",
-        "django.db.backends.oracle"):
+if connection.features.supports_timezones:
     __test__["timezone-tests"] = """
 # Saving an updating with timezone-aware datetime Python objects. Regression
 # test for #10443.

@@ -60,6 +60,27 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # setting ensures we always read result sets fully into memory all in one
     # go.
     can_use_chunked_reads = False
+    test_db_allows_multiple_connections = False
+    supports_unspecified_pk = True
+    supports_1000_query_paramters = False
+
+    def _supports_stddev(self):
+        """Confirm support for STDDEV and related stats functions
+
+        SQLite supports STDDEV as an extension package; so
+        connection.ops.check_aggregate_support() can't unilaterally
+        rule out support for STDDEV. We need to manually check
+        whether the call works.
+        """
+        cursor = self.connection.cursor()
+        cursor.execute('CREATE TABLE STDDEV_TEST (X INT)')
+        try:
+            cursor.execute('SELECT STDDEV(*) FROM STDDEV_TEST')
+            has_support = True
+        except utils.DatabaseError:
+            has_support = False
+        cursor.execute('DROP TABLE STDDEV_TEST')
+        return has_support
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
@@ -129,7 +150,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return value
 
 class DatabaseWrapper(BaseDatabaseWrapper):
-
+    vendor = 'sqlite'
     # SQLite requires LIKE statements to include an ESCAPE clause if the value
     # being escaped has a percent or underscore in it.
     # See http://www.sqlite.org/lang_expr.html for an explanation.
@@ -153,7 +174,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
-        self.features = DatabaseFeatures()
+        self.features = DatabaseFeatures(self)
         self.ops = DatabaseOperations()
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)

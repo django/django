@@ -1,18 +1,19 @@
-from unittest import TestCase
 from sys import version_info
 try:
     from functools import wraps
 except ImportError:
     from django.utils.functional import wraps  # Python 2.4 fallback.
 
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, HttpRequest
+from django.utils.decorators import method_decorator
 from django.utils.functional import allow_lazy, lazy, memoize
+from django.utils.unittest import TestCase
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.views.decorators.vary import vary_on_headers, vary_on_cookie
 from django.views.decorators.cache import cache_page, never_cache, cache_control
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.contrib.admin.views.decorators import staff_member_required
+
 
 def fully_decorated(request):
     """Expected __doc__"""
@@ -70,25 +71,25 @@ class DecoratorsTest(TestCase):
         def test1(user):
             user.decorators_applied.append('test1')
             return True
-            
+
         def test2(user):
             user.decorators_applied.append('test2')
             return True
-            
+
         def callback(request):
             return request.user.decorators_applied
 
         callback = user_passes_test(test1)(callback)
         callback = user_passes_test(test2)(callback)
-        
+
         class DummyUser(object): pass
         class DummyRequest(object): pass
-        
+
         request = DummyRequest()
         request.user = DummyUser()
         request.user.decorators_applied = []
         response = callback(request)
-        
+
         self.assertEqual(response, ['test2', 'test1'])
 
     def test_cache_page_new_style(self):

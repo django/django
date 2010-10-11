@@ -1,5 +1,4 @@
-import unittest
-
+from django.utils import unittest
 from django.utils.functional import lazy
 
 

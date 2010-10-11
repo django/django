@@ -1,6 +1,7 @@
-import unittest
 from datetime import timedelta, date
+
 from django.template import Template, Context, add_to_builtins
+from django.utils import unittest
 from django.utils.dateformat import DateFormat
 from django.utils.translation import ugettext as _
 from django.utils.html import escape

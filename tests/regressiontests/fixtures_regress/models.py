@@ -1,4 +1,4 @@
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import models, DEFAULT_DB_ALIAS, connection
 from django.contrib.auth.models import User
 from django.conf import settings
 
@@ -31,7 +31,7 @@ class Stuff(models.Model):
         # Oracle doesn't distinguish between None and the empty string.
         # This hack makes the test case pass using Oracle.
         name = self.name
-        if (settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle'
+        if (connection.features.interprets_empty_strings_as_nulls
             and name == u''):
             name = None
         return unicode(name) + u' is owned by ' + unicode(self.owner)

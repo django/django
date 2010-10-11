@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta
+import shutil
+import tempfile
+
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
@@ -8,9 +11,7 @@ from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
-import shutil
-import tempfile
-import unittest
+from django.utils import unittest
 
 
 class SessionTestsMixin(object):

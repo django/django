@@ -1,12 +1,12 @@
 import datetime
-import unittest
 from decimal import Decimal
 
-import django.test
+from django import test
 from django import forms
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models.fields.files import FieldFile
+from django.utils import unittest
 
 from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel, BooleanModel, Document
 
@@ -22,7 +22,7 @@ if Image:
             TwoImageFieldTests
 
 
-class BasicFieldTests(django.test.TestCase):
+class BasicFieldTests(test.TestCase):
     def test_show_hidden_initial(self):
         """
         Regression test for #12913. Make sure fields with choices respect
@@ -48,7 +48,7 @@ class BasicFieldTests(django.test.TestCase):
         except ValidationError, e:
             self.fail("NullBooleanField failed validation with value of None: %s" % e.messages)
 
-class DecimalFieldTests(django.test.TestCase):
+class DecimalFieldTests(test.TestCase):
     def test_to_python(self):
         f = models.DecimalField(max_digits=4, decimal_places=2)
         self.assertEqual(f.to_python(3), Decimal("3"))
@@ -95,7 +95,7 @@ class DecimalFieldTests(django.test.TestCase):
         # This should not crash. That counts as a win for our purposes.
         Foo.objects.filter(d__gte=100000000000)
 
-class ForeignKeyTests(django.test.TestCase):
+class ForeignKeyTests(test.TestCase):
     def test_callable_default(self):
         """Test the use of a lazy callable for ForeignKey.default"""
         a = Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
@@ -194,7 +194,7 @@ class BooleanFieldTests(unittest.TestCase):
             select={'string_length': 'LENGTH(string)'})[0]
         self.assertFalse(isinstance(b5.pk, bool))
 
-class ChoicesTests(django.test.TestCase):
+class ChoicesTests(test.TestCase):
     def test_choices_and_field_display(self):
         """
         Check that get_choices and get_flatchoices interact with
@@ -206,7 +206,7 @@ class ChoicesTests(django.test.TestCase):
         self.assertEqual(Whiz(c=None).get_c_display(), None)    # Blank value
         self.assertEqual(Whiz(c='').get_c_display(), '')        # Empty value
 
-class SlugFieldTests(django.test.TestCase):
+class SlugFieldTests(test.TestCase):
     def test_slugfield_max_length(self):
         """
         Make sure SlugField honors max_length (#9706)
@@ -216,7 +216,7 @@ class SlugFieldTests(django.test.TestCase):
         self.assertEqual(bs.s, 'slug'*50)
 
 
-class ValidationTest(django.test.TestCase):
+class ValidationTest(test.TestCase):
     def test_charfield_raises_error_on_empty_string(self):
         f = models.CharField()
         self.assertRaises(ValidationError, f.clean, "", None)
@@ -271,7 +271,7 @@ class ValidationTest(django.test.TestCase):
         self.assertRaises(ValidationError, f.clean, None, None)
 
 
-class BigIntegerFieldTests(django.test.TestCase):
+class BigIntegerFieldTests(test.TestCase):
     def test_limits(self):
         # Ensure that values that are right at the limits can be saved
         # and then retrieved without corruption.
@@ -299,7 +299,7 @@ class BigIntegerFieldTests(django.test.TestCase):
         b = BigInt.objects.get(value = '10')
         self.assertEqual(b.value, 10)
 
-class TypeCoercionTests(django.test.TestCase):
+class TypeCoercionTests(test.TestCase):
     """
     Test that database lookups can accept the wrong types and convert
     them with no error: especially on Postgres 8.3+ which does not do

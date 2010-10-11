@@ -1,9 +1,9 @@
 from datetime import time, date, datetime
-from unittest import TestCase
 
 from django import forms
 from django.conf import settings
 from django.utils.translation import activate, deactivate
+from django.utils.unittest import TestCase
 
 
 class LocalizedTimeTests(TestCase):

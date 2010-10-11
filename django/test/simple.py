@@ -1,12 +1,12 @@
 import sys
 import signal
-import unittest
 
 from django.conf import settings
 from django.db.models import get_app, get_apps
 from django.test import _doctest as doctest
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.testcases import OutputChecker, DocTestRunner, TestCase
+from django.utils import unittest
 
 # The module name for tests outside models.py
 TEST_MODULE = 'tests'
@@ -14,52 +14,13 @@ TEST_MODULE = 'tests'
 doctestOutputChecker = OutputChecker()
 
 class DjangoTestRunner(unittest.TextTestRunner):
-
-    def __init__(self, verbosity=0, failfast=False, **kwargs):
-        super(DjangoTestRunner, self).__init__(verbosity=verbosity, **kwargs)
-        self.failfast = failfast
-        self._keyboard_interrupt_intercepted = False
-
-    def run(self, *args, **kwargs):
-        """
-        Runs the test suite after registering a custom signal handler
-        that triggers a graceful exit when Ctrl-C is pressed.
-        """
-        self._default_keyboard_interrupt_handler = signal.signal(signal.SIGINT,
-            self._keyboard_interrupt_handler)
-        try:
-            result = super(DjangoTestRunner, self).run(*args, **kwargs)
-        finally:
-            signal.signal(signal.SIGINT, self._default_keyboard_interrupt_handler)
-        return result
-
-    def _keyboard_interrupt_handler(self, signal_number, stack_frame):
-        """
-        Handles Ctrl-C by setting a flag that will stop the test run when
-        the currently running test completes.
-        """
-        self._keyboard_interrupt_intercepted = True
-        sys.stderr.write(" <Test run halted by Ctrl-C> ")
-        # Set the interrupt handler back to the default handler, so that
-        # another Ctrl-C press will trigger immediate exit.
-        signal.signal(signal.SIGINT, self._default_keyboard_interrupt_handler)
-
-    def _makeResult(self):
-        result = super(DjangoTestRunner, self)._makeResult()
-        failfast = self.failfast
-
-        def stoptest_override(func):
-            def stoptest(test):
-                # If we were set to failfast and the unit test failed,
-                # or if the user has typed Ctrl-C, report and quit
-                if (failfast and not result.wasSuccessful()) or \
-                    self._keyboard_interrupt_intercepted:
-                    result.stop()
-                func(test)
-            return stoptest
-
-        result.stopTest = stoptest_override(result.stopTest)
-        return result
+    def __init__(self, *args, **kwargs):
+        import warnings
+        warnings.warn(
+            "DjangoTestRunner is deprecated; it's functionality is indistinguishable from TextTestRunner",
+            PendingDeprecationWarning
+        )
+        super(DjangoTestRunner, self).__init__(*args, **kwargs)
 
 def get_tests(app_module):
     try:
@@ -232,6 +193,7 @@ class DjangoTestSuiteRunner(object):
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
         settings.DEBUG = False
+        unittest.installHandler()
 
     def build_suite(self, test_labels, extra_tests=None, **kwargs):
         suite = unittest.TestSuite()
@@ -271,7 +233,7 @@ class DjangoTestSuiteRunner(object):
         return old_names, mirrors
 
     def run_suite(self, suite, **kwargs):
-        return DjangoTestRunner(verbosity=self.verbosity, failfast=self.failfast).run(suite)
+        return unittest.TextTestRunner(verbosity=self.verbosity, failfast=self.failfast).run(suite)
 
     def teardown_databases(self, old_config, **kwargs):
         from django.db import connections
@@ -284,6 +246,7 @@ class DjangoTestSuiteRunner(object):
             connection.creation.destroy_test_db(old_name, self.verbosity)
 
     def teardown_test_environment(self, **kwargs):
+        unittest.removeHandler()
         teardown_test_environment()
 
     def suite_result(self, suite, result, **kwargs):

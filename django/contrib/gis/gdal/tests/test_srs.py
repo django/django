@@ -1,5 +1,6 @@
-import unittest
 from django.contrib.gis.gdal import SpatialReference, CoordTransform, OGRException, SRSException
+from django.utils import unittest
+
 
 class TestSRS:
     def __init__(self, wkt, **kwargs):
@@ -79,7 +80,7 @@ class SpatialRefTest(unittest.TestCase):
                 srs1 = SpatialReference(s.wkt)
                 srs2 = SpatialReference(s.proj)
                 self.assertEqual(srs1.proj, srs2.proj)
-        
+
     def test05_epsg(self):
         "Test EPSG import."
         for s in srlist:
@@ -159,7 +160,7 @@ class SpatialRefTest(unittest.TestCase):
         self.assertEqual(4326, int(s1['AUTHORITY', 1]))
         #for i in range(7): self.assertEqual(0, int(s1['TOWGS84', i]))
         self.assertEqual(None, s1['FOOBAR'])
-    
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(SpatialRefTest))

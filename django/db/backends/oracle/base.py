@@ -50,7 +50,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     uses_savepoints = True
     can_return_id_from_insert = True
     allow_sliced_subqueries = False
-
+    supports_subqueries_in_group_by = True
+    supports_timezones = False
+    supports_bitwise_or = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"
@@ -314,7 +316,7 @@ WHEN (new.%(col_name)s IS NULL)
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
-
+    vendor = 'oracle'
     operators = {
         'exact': '= %s',
         'iexact': '= UPPER(%s)',
@@ -334,7 +336,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
-        self.features = DatabaseFeatures()
+        self.features = DatabaseFeatures(self)
         self.ops = DatabaseOperations()
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)

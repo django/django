@@ -1,6 +1,5 @@
-from unittest import TestCase
-
 from django.core.paginator import Paginator, EmptyPage
+from django.utils.unittest import TestCase
 
 class PaginatorTests(TestCase):
     """

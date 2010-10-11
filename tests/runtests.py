@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-
 import os, subprocess, sys, traceback
-import unittest
 
 import django.contrib as contrib
+from django.utils import unittest
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
@@ -256,7 +255,7 @@ def paired_tests(paired_test, options, test_labels):
 
     print '***** Trying paired execution'
 
-    # Make sure the bisection point isn't in the test list
+    # Make sure the constant member of the pair isn't in the test list
     # Also remove tests that need to be run in specific combinations
     for label in [paired_test, 'model_inheritance_same_model_name']:
         try:

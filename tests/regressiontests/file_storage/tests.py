@@ -4,7 +4,6 @@ import shutil
 import sys
 import tempfile
 import time
-import unittest
 from cStringIO import StringIO
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -14,7 +13,8 @@ from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.core.exceptions import ImproperlyConfigured
-from unittest import TestCase
+from django.utils import unittest
+
 try:
     import threading
 except ImportError:
@@ -294,7 +294,7 @@ class SlowFile(ContentFile):
         time.sleep(1)
         return super(ContentFile, self).chunks()
 
-class FileSaveRaceConditionTest(TestCase):
+class FileSaveRaceConditionTest(unittest.TestCase):
     def setUp(self):
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
@@ -315,7 +315,7 @@ class FileSaveRaceConditionTest(TestCase):
         self.storage.delete('conflict')
         self.storage.delete('conflict_1')
 
-class FileStoragePermissions(TestCase):
+class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
         self.old_perms = settings.FILE_UPLOAD_PERMISSIONS
         settings.FILE_UPLOAD_PERMISSIONS = 0666
@@ -332,7 +332,7 @@ class FileStoragePermissions(TestCase):
         self.assertEqual(actual_mode, 0666)
 
 
-class FileStoragePathParsing(TestCase):
+class FileStoragePathParsing(unittest.TestCase):
     def setUp(self):
         self.storage_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(self.storage_dir)
@@ -370,64 +370,67 @@ class FileStoragePathParsing(TestCase):
         else:
             self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
 
-if Image is not None:
-    class DimensionClosingBug(TestCase):
+class DimensionClosingBug(unittest.TestCase):
+    """
+    Test that get_image_dimensions() properly closes files (#8817)
+    """
+    @unittest.skipUnless(Image, "PIL not installed")
+    def test_not_closing_of_files(self):
         """
-        Test that get_image_dimensions() properly closes files (#8817)
+        Open files passed into get_image_dimensions() should stay opened.
         """
-        def test_not_closing_of_files(self):
-            """
-            Open files passed into get_image_dimensions() should stay opened.
-            """
-            empty_io = StringIO()
-            try:
-                get_image_dimensions(empty_io)
-            finally:
-                self.assert_(not empty_io.closed)
+        empty_io = StringIO()
+        try:
+            get_image_dimensions(empty_io)
+        finally:
+            self.assert_(not empty_io.closed)
 
-        def test_closing_of_filenames(self):
-            """
-            get_image_dimensions() called with a filename should closed the file.
-            """
-            # We need to inject a modified open() builtin into the images module
-            # that checks if the file was closed properly if the function is
-            # called with a filename instead of an file object.
-            # get_image_dimensions will call our catching_open instead of the
-            # regular builtin one.
-
-            class FileWrapper(object):
-                _closed = []
-                def __init__(self, f):
-                    self.f = f
-                def __getattr__(self, name):
-                    return getattr(self.f, name)
-                def close(self):
-                    self._closed.append(True)
-                    self.f.close()
-
-            def catching_open(*args):
-                return FileWrapper(open(*args))
-
-            from django.core.files import images
-            images.open = catching_open
-            try:
-                get_image_dimensions(os.path.join(os.path.dirname(__file__), "test1.png"))
-            finally:
-                del images.open
-            self.assert_(FileWrapper._closed)
-
-    class InconsistentGetImageDimensionsBug(TestCase):
+    @unittest.skipUnless(Image, "PIL not installed")
+    def test_closing_of_filenames(self):
         """
-        Test that get_image_dimensions() works properly after various calls using a file handler (#11158)
+        get_image_dimensions() called with a filename should closed the file.
         """
-        def test_multiple_calls(self):
-            """
-            Multiple calls of get_image_dimensions() should return the same size.
-            """
-            from django.core.files.images import ImageFile
-            img_path = os.path.join(os.path.dirname(__file__), "test.png")
-            image = ImageFile(open(img_path, 'rb'))
-            image_pil = Image.open(img_path)
-            size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
-            self.assertEqual(image_pil.size, size_1)
-            self.assertEqual(size_1, size_2)
+        # We need to inject a modified open() builtin into the images module
+        # that checks if the file was closed properly if the function is
+        # called with a filename instead of an file object.
+        # get_image_dimensions will call our catching_open instead of the
+        # regular builtin one.
+
+        class FileWrapper(object):
+            _closed = []
+            def __init__(self, f):
+                self.f = f
+            def __getattr__(self, name):
+                return getattr(self.f, name)
+            def close(self):
+                self._closed.append(True)
+                self.f.close()
+
+        def catching_open(*args):
+            return FileWrapper(open(*args))
+
+        from django.core.files import images
+        images.open = catching_open
+        try:
+            get_image_dimensions(os.path.join(os.path.dirname(__file__), "test1.png"))
+        finally:
+            del images.open
+        self.assert_(FileWrapper._closed)
+
+class InconsistentGetImageDimensionsBug(unittest.TestCase):
+    """
+    Test that get_image_dimensions() works properly after various calls
+    using a file handler (#11158)
+    """
+    @unittest.skipUnless(Image, "PIL not installed")
+    def test_multiple_calls(self):
+        """
+        Multiple calls of get_image_dimensions() should return the same size.
+        """
+        from django.core.files.images import ImageFile
+        img_path = os.path.join(os.path.dirname(__file__), "test.png")
+        image = ImageFile(open(img_path, 'rb'))
+        image_pil = Image.open(img_path)
+        size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
+        self.assertEqual(image_pil.size, size_1)
+        self.assertEqual(size_1, size_2)

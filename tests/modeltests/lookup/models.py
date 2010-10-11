@@ -4,7 +4,7 @@
 This demonstrates features of the database API.
 """
 
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import models, DEFAULT_DB_ALIAS, connection
 from django.conf import settings
 
 class Article(models.Model):
@@ -41,15 +41,16 @@ False
 # There should be some now!
 >>> Article.objects.exists()
 True
-"""}
 
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] in (
-        'django.db.backends.postgresql',
-        'django.db.backends.postgresql_pysycopg2'):
-    __test__['API_TESTS'] += r"""
-# text matching tests for PostgreSQL 8.3
+# Integer value can be queried using string
 >>> Article.objects.filter(id__iexact='1')
 [<Article: Article 1>]
+
+"""}
+
+if connection.features.supports_date_lookup_using_string:
+    __test__['API_TESTS'] += r"""
+# A date lookup can be performed using a string search
 >>> Article.objects.filter(pub_date__startswith='2005')
 [<Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
 """
@@ -409,7 +410,7 @@ FieldError: Join on field 'headline' not permitted. Did you misspell 'starts' fo
 """
 
 
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
+if connection.features.supports_regex_backreferencing:
     __test__['API_TESTS'] += r"""
 # grouping and backreferences
 >>> Article.objects.filter(headline__regex=r'b(.).*b\1')

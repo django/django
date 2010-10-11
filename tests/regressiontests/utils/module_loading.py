@@ -1,10 +1,11 @@
 import os
 import sys
-import unittest
 from zipimport import zipimporter
 
+from django.utils import unittest
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
+
 
 class DefaultLoader(unittest.TestCase):
     def test_loader(self):

@@ -57,8 +57,8 @@ frameworks are:
           class MyFuncTestCase(unittest.TestCase):
               def testBasic(self):
                   a = ['larry', 'curly', 'moe']
-                  self.assertEquals(my_func(a, 0), 'larry')
-                  self.assertEquals(my_func(a, 1), 'curly')
+                  self.assertEqual(my_func(a, 0), 'larry')
+                  self.assertEqual(my_func(a, 1), 'curly')
 
 You can choose the test framework you like, depending on which syntax you
 prefer, or you can mix and match, using one framework for some of your code and
@@ -151,9 +151,38 @@ documentation for doctest`_.
 Writing unit tests
 ------------------
 
-Like doctests, Django's unit tests use a standard library module: unittest_.
-This module uses a different way of defining tests, taking a class-based
-approach.
+Like doctests, Django's unit tests use a Python standard library
+module: unittest_. This module uses a different way of defining tests,
+taking a class-based approach.
+
+.. admonition:: unittest2
+
+    .. versionchanged:: 1.3
+
+    Python 2.7 introduced some major changes to the unittest library,
+    adding some extremely useful features. To ensure that every Django
+    project can benefit from these new features, Django ships with a
+    copy of unittest2_, a copy of the Python 2.7 unittest library,
+    backported for Python 2.4 compatibility.
+
+    To access this library, Django provides the
+    ``django.utils.unittest`` module alias. If you are using Python
+    2.7, or you have installed unittest2 locally, Django will mapt the
+    alias to the installed version of the unittest library Otherwise,
+    Django will use it's own bundled version of unittest2.
+
+    To use this alias, simply use::
+
+        from django.utils import unittest
+
+    wherever you would historically used::
+
+        import unittest
+
+    If you want to continue to use the base unittest libary, you can --
+    you just won't get any of the nice new unittest2 features.
+
+.. _unittest2: http://pypi.python.org/pypi/unittest2
 
 As with doctests, for a given Django application, the test runner looks for
 unit tests in two places:
@@ -168,7 +197,7 @@ unit tests in two places:
 This example ``unittest.TestCase`` subclass is equivalent to the example given
 in the doctest section above::
 
-    import unittest
+    from django.utils import unittest
     from myapp.models import Animal
 
     class AnimalTestCase(unittest.TestCase):
@@ -177,8 +206,8 @@ in the doctest section above::
             self.cat = Animal.objects.create(name="cat", sound="meow")
 
         def testSpeaking(self):
-            self.assertEquals(self.lion.speak(), 'The lion says "roar"')
-            self.assertEquals(self.cat.speak(), 'The cat says "meow"')
+            self.assertEqual(self.lion.speak(), 'The lion says "roar"')
+            self.assertEqual(self.cat.speak(), 'The cat says "meow"')
 
 When you :ref:`run your tests <running-tests>`, the default behavior of the
 test utility is to find all the test cases (that is, subclasses of
@@ -198,6 +227,7 @@ documentation`_.
 .. _unittest: http://docs.python.org/library/unittest.html
 .. _standard library unittest documentation: unittest_
 .. _suggested organization: http://docs.python.org/library/unittest.html#organizing-tests
+
 
 Which should I use?
 -------------------
@@ -230,6 +260,8 @@ you:
       common methods. The framework also supports explicit setup and/or cleanup
       routines, which give you a high level of control over the environment
       in which your test cases are run.
+
+    * If you're writing tests for Django itself, you should use ``unittest``.
 
 Again, remember that you can use both systems side-by-side (even in the same
 app). In the end, most projects will eventually end up using both. Each shines
@@ -964,7 +996,7 @@ Example
 
 The following is a simple unit test using the test client::
 
-    import unittest
+    from django.utils import unittest
     from django.test.client import Client
 
     class SimpleTest(unittest.TestCase):
@@ -977,10 +1009,10 @@ The following is a simple unit test using the test client::
             response = self.client.get('/customer/details/')
 
             # Check that the response is 200 OK.
-            self.failUnlessEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
             # Check that the rendered context contains 5 customers.
-            self.failUnlessEqual(len(response.context['customers']), 5)
+            self.assertEqual(len(response.context['customers']), 5)
 
 TestCase
 --------
@@ -1061,19 +1093,19 @@ worry about state (such as cookies) carrying over from one test to another.
 
 This means, instead of instantiating a ``Client`` in each test::
 
-    import unittest
+    from django.utils import unittest
     from django.test.client import Client
 
     class SimpleTest(unittest.TestCase):
         def test_details(self):
             client = Client()
             response = client.get('/customer/details/')
-            self.failUnlessEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
         def test_index(self):
             client = Client()
             response = client.get('/customer/index/')
-            self.failUnlessEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
 ...you can just refer to ``self.client``, like so::
 
@@ -1082,11 +1114,11 @@ This means, instead of instantiating a ``Client`` in each test::
     class SimpleTest(TestCase):
         def test_details(self):
             response = self.client.get('/customer/details/')
-            self.failUnlessEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
         def test_index(self):
             response = self.client.get('/customer/index/')
-            self.failUnlessEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
 Customizing the test client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1265,7 +1297,7 @@ Assertions
     Addded ``msg_prefix`` argument.
 
 As Python's normal ``unittest.TestCase`` class implements assertion methods
-such as ``assertTrue`` and ``assertEquals``, Django's custom ``TestCase`` class
+such as ``assertTrue`` and ``assertEqual``, Django's custom ``TestCase`` class
 provides a number of custom assertion methods that are useful for testing Web
 applications:
 
@@ -1385,10 +1417,10 @@ and contents::
                 fail_silently=False)
 
             # Test that one message has been sent.
-            self.assertEquals(len(mail.outbox), 1)
+            self.assertEqual(len(mail.outbox), 1)
 
             # Verify that the subject of the first message is correct.
-            self.assertEquals(mail.outbox[0].subject, 'Subject here')
+            self.assertEqual(mail.outbox[0].subject, 'Subject here')
 
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
 at the start of every test in a Django ``TestCase``. To empty the outbox

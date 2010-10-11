@@ -1,6 +1,5 @@
-from unittest import TestCase
-
 from django.contrib import admin
+from django.utils.unittest import TestCase
 
 
 class Bug8245Test(TestCase):

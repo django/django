@@ -1,4 +1,4 @@
-import unittest
+from django.utils import unittest
 
 from django.core.exceptions import ValidationError
 

@@ -1,6 +1,6 @@
 # Validate that you can override the default test suite
 
-import unittest
+from django.utils import unittest
 
 def suite():
     """

@@ -1,8 +1,9 @@
-import unittest
 from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, \
     OGRException, OGRIndexError, SpatialReference, CoordTransform, \
     gdal_version
 from django.contrib.gis.tests.geometries import *
+from django.utils import unittest
+
 
 class OGRGeomTest(unittest.TestCase):
     "This tests the OGR Geometry."

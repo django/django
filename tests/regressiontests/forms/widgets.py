@@ -1265,10 +1265,9 @@ u'<input type="hidden" name="date_0" value="17.09.2007" /><input type="hidden" n
 
 """
 
-
-from django.utils import copycompat as copy
-from unittest import TestCase
 from django import forms
+from django.utils import copycompat as copy
+from django.utils.unittest import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 

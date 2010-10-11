@@ -1,12 +1,13 @@
 import StringIO
 import sys
 
-from django.test import TestCase, TransactionTestCase
 from django.conf import settings
 from django.core import management
 from django.db import DEFAULT_DB_ALIAS
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from models import Article, Blog, Book, Category, Person, Spy, Tag, Visa
+
 
 class TestCaseFixtureLoadingTests(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
@@ -291,46 +292,46 @@ class FixtureLoadingTests(TestCase):
         self._dumpdata_assert(['fixtures'], """<?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0"><object pk="1" model="fixtures.category"><field type="CharField" name="title">News Stories</field><field type="TextField" name="description">Latest news stories</field></object><object pk="3" model="fixtures.article"><field type="CharField" name="headline">Time to reform copyright</field><field type="DateTimeField" name="pub_date">2006-06-16 13:00:00</field></object><object pk="2" model="fixtures.article"><field type="CharField" name="headline">Poker has no place on ESPN</field><field type="DateTimeField" name="pub_date">2006-06-16 12:00:00</field></object><object pk="1" model="fixtures.article"><field type="CharField" name="headline">Python program becomes self aware</field><field type="DateTimeField" name="pub_date">2006-06-16 11:00:00</field></object><object pk="1" model="fixtures.tag"><field type="CharField" name="name">copyright</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="2" model="fixtures.tag"><field type="CharField" name="name">law</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="1" model="fixtures.person"><field type="CharField" name="name">Django Reinhardt</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">Prince</field></object><object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane Grappelli</field></object></django-objects>""", format='xml', natural_keys=True)
 
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
-    class FixtureTransactionTests(TransactionTestCase):
-        def _dumpdata_assert(self, args, output, format='json'):
-            new_io = StringIO.StringIO()
-            management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io})
-            command_output = new_io.getvalue().strip()
-            self.assertEqual(command_output, output)
+class FixtureTransactionTests(TransactionTestCase):
+    def _dumpdata_assert(self, args, output, format='json'):
+        new_io = StringIO.StringIO()
+        management.call_command('dumpdata', *args, **{'format':format, 'stdout':new_io})
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, output)
 
-        def test_format_discovery(self):
-            # Load fixture 1 again, using format discovery
-            management.call_command('loaddata', 'fixture1', verbosity=0, commit=False)
-            self.assertQuerysetEqual(Article.objects.all(), [
-                '<Article: Time to reform copyright>',
-                '<Article: Poker has no place on ESPN>',
-                '<Article: Python program becomes self aware>'
-            ])
+    @skipUnlessDBFeature('supports_forward_references')
+    def test_format_discovery(self):
+        # Load fixture 1 again, using format discovery
+        management.call_command('loaddata', 'fixture1', verbosity=0, commit=False)
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: Time to reform copyright>',
+            '<Article: Poker has no place on ESPN>',
+            '<Article: Python program becomes self aware>'
+        ])
 
-            # Try to load fixture 2 using format discovery; this will fail
-            # because there are two fixture2's in the fixtures directory
-            new_io = StringIO.StringIO()
-            management.call_command('loaddata', 'fixture2', verbosity=0, stderr=new_io)
-            output = new_io.getvalue().strip().split('\n')
-            self.assertEqual(len(output), 1)
-            self.assertTrue(output[0].startswith("Multiple fixtures named 'fixture2'"))
+        # Try to load fixture 2 using format discovery; this will fail
+        # because there are two fixture2's in the fixtures directory
+        new_io = StringIO.StringIO()
+        management.call_command('loaddata', 'fixture2', verbosity=0, stderr=new_io)
+        output = new_io.getvalue().strip().split('\n')
+        self.assertEqual(len(output), 1)
+        self.assertTrue(output[0].startswith("Multiple fixtures named 'fixture2'"))
 
-            # object list is unaffected
-            self.assertQuerysetEqual(Article.objects.all(), [
-                '<Article: Time to reform copyright>',
-                '<Article: Poker has no place on ESPN>',
-                '<Article: Python program becomes self aware>'
-            ])
+        # object list is unaffected
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: Time to reform copyright>',
+            '<Article: Poker has no place on ESPN>',
+            '<Article: Python program becomes self aware>'
+        ])
 
-            # Dump the current contents of the database as a JSON fixture
-            self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16 12:00:00"}}, {"pk": 1, "model": "fixtures.article", "fields": {"headline": "Python program becomes self aware", "pub_date": "2006-06-16 11:00:00"}}]')
+        # Dump the current contents of the database as a JSON fixture
+        self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16 12:00:00"}}, {"pk": 1, "model": "fixtures.article", "fields": {"headline": "Python program becomes self aware", "pub_date": "2006-06-16 11:00:00"}}]')
 
-            # Load fixture 4 (compressed), using format discovery
-            management.call_command('loaddata', 'fixture4', verbosity=0, commit=False)
-            self.assertQuerysetEqual(Article.objects.all(), [
-                '<Article: Django pets kitten>',
-                '<Article: Time to reform copyright>',
-                '<Article: Poker has no place on ESPN>',
-                '<Article: Python program becomes self aware>'
-            ])
+        # Load fixture 4 (compressed), using format discovery
+        management.call_command('loaddata', 'fixture4', verbosity=0, commit=False)
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: Django pets kitten>',
+            '<Article: Time to reform copyright>',
+            '<Article: Poker has no place on ESPN>',
+            '<Article: Python program becomes self aware>'
+        ])

@@ -136,3 +136,31 @@ have been added to Django's own code as well -- most notably, the
 error emails sent on a HTTP 500 server error are now handled as a
 logging activity. See :doc:`the documentation on Django's logging
 interface </topics/logging>` for more details.
+
+``unittest2`` support
+~~~~~~~~~~~~~~~~~~~~~
+
+Python 2.7 introduced some major changes to the unittest library,
+adding some extremely useful features. To ensure that every Django
+project can benefit from these new features, Django ships with a
+copy of unittest2_, a copy of the Python 2.7 unittest library,
+backported for Python 2.4 compatibility.
+
+To access this library, Django provides the
+``django.utils.unittest`` module alias. If you are using Python
+2.7, or you have installed unittest2 locally, Django will mapt the
+alias to the installed version of the unittest library Otherwise,
+Django will use it's own bundled version of unittest2.
+
+To use this alias, simply use::
+
+    from django.utils import unittest
+
+wherever you would historically used::
+
+    import unittest
+
+If you want to continue to use the base unittest libary, you can --
+you just won't get any of the nice new unittest2 features.
+
+.. _unittest2: http://pypi.python.org/pypi/unittest2

@@ -4,13 +4,13 @@ advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODU
 and default settings.py files.
 """
 import os
-import unittest
 import shutil
 import sys
 import re
 
 from django import conf, bin, get_version
 from django.conf import settings
+from django.utils import unittest
 
 class AdminScriptTestCase(unittest.TestCase):
     def write_settings(self, filename, apps=None, is_dir=False, sdict=None):

@@ -1,8 +1,10 @@
-import unittest
 from xml.dom import minidom
 
 from django.test import Client
+from django.utils import unittest
+
 from models import City
+
 
 class GeoFeedTest(unittest.TestCase):
     client = Client()

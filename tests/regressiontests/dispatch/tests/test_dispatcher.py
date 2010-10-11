@@ -1,7 +1,8 @@
-from django.dispatch import Signal
-import unittest
-import sys
 import gc
+import sys
+
+from django.dispatch import Signal
+from django.utils import unittest
 import django.utils.copycompat as copy
 
 if sys.platform.startswith('java'):
@@ -20,7 +21,7 @@ def receiver_1_arg(val, **kwargs):
 class Callable(object):
     def __call__(self, val, **kwargs):
         return val
-    
+
     def a(self, val, **kwargs):
         return val
 
@@ -35,7 +36,7 @@ class DispatcherTests(unittest.TestCase):
 
         # force cleanup just in case
         signal.receivers = []
-    
+
     def testExact(self):
         a_signal.connect(receiver_1_arg, sender=self)
         expected = [(receiver_1_arg,"test")]
@@ -51,7 +52,7 @@ class DispatcherTests(unittest.TestCase):
         self.assertEqual(result, expected)
         a_signal.disconnect(receiver_1_arg)
         self._testIsClean(a_signal)
-    
+
     def testGarbageCollected(self):
         a = Callable()
         a_signal.connect(a.a, sender=self)
@@ -61,7 +62,7 @@ class DispatcherTests(unittest.TestCase):
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
         self._testIsClean(a_signal)
-    
+
     def testMultipleRegistration(self):
         a = Callable()
         a_signal.connect(a)
@@ -90,7 +91,7 @@ class DispatcherTests(unittest.TestCase):
         self.assertEqual(len(a_signal.receivers), 1)
         a_signal.disconnect(dispatch_uid = "uid")
         self._testIsClean(a_signal)
-    
+
     def testRobust(self):
         """Test the sendRobust function"""
         def fails(val, **kwargs):

@@ -7,7 +7,6 @@ import os
 import shutil
 import tempfile
 import time
-import unittest
 import warnings
 
 from django.conf import settings
@@ -17,6 +16,7 @@ from django.core.cache.backends.base import InvalidCacheBackendError, CacheKeyWa
 from django.http import HttpResponse, HttpRequest
 from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware
 from django.utils import translation
+from django.utils import unittest
 from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
 from django.utils.hashcompat import md5_constructor
 from regressiontests.cache.models import Poll, expensive_calculation
@@ -393,6 +393,7 @@ class BaseCacheTests(object):
         # runner doesn't add any global warning filters (it currently
         # does not).
         warnings.resetwarnings()
+        warnings.simplefilter("ignore", PendingDeprecationWarning)
 
 class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):

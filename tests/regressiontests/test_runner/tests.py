@@ -2,9 +2,9 @@
 Tests for django test runner
 """
 import StringIO
-import unittest
-import django
+
 from django.test import simple
+from django.utils import unittest
 
 class DjangoTestRunnerTests(unittest.TestCase):
 

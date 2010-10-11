@@ -20,6 +20,7 @@ class BaseDatabaseWrapper(local):
         self.queries = []
         self.settings_dict = settings_dict
         self.alias = alias
+        self.vendor = 'unknown'
 
     def __eq__(self, other):
         return self.settings_dict == other.settings_dict
@@ -87,15 +88,104 @@ class BaseDatabaseFeatures(object):
     needs_datetime_string_cast = True
     empty_fetchmany_value = []
     update_can_self_select = True
+
+    # Does the backend distinguish between '' and None?
     interprets_empty_strings_as_nulls = False
+
     can_use_chunked_reads = True
     can_return_id_from_insert = False
     uses_autocommit = False
     uses_savepoints = False
+
     # If True, don't use integer foreign keys referring to, e.g., positive
     # integer primary keys.
     related_fields_match_type = False
     allow_sliced_subqueries = True
+
+    # Does the default test database allow multiple connections?
+    # Usually an indication that the test database is in-memory
+    test_db_allows_multiple_connections = True
+
+    # Can an object be saved without an explicit primary key?
+    supports_unspecified_pk = False
+
+    # Can a fixture contain forward references? i.e., are
+    # FK constraints checked at the end of transaction, or
+    # at the end of each save operation?
+    supports_forward_references = True
+
+    # Does a dirty transaction need to be rolled back
+    # before the cursor can be used again?
+    requires_rollback_on_dirty_transaction = False
+
+    # Does the backend allow very long model names without error?
+    supports_long_model_names = True
+
+    # Is there a REAL datatype in addition to floats/doubles?
+    has_real_datatype = False
+    supports_subqueries_in_group_by = True
+    supports_bitwise_or = True
+
+    # Do time/datetime fields have microsecond precision?
+    supports_microsecond_precision = True
+
+    # Does the __regex lookup support backreferencing and grouping?
+    supports_regex_backreferencing = True
+
+    # Can date/datetime lookups be performed using a string?
+    supports_date_lookup_using_string = True
+
+    # Can datetimes with timezones be used?
+    supports_timezones = True
+
+    # When performing a GROUP BY, is an ORDER BY NULL required
+    # to remove any ordering?
+    requires_explicit_null_ordering_when_grouping = False
+
+    # Is there a 1000 item limit on query parameters?
+    supports_1000_query_paramters = True
+
+    # Can an object have a primary key of 0? MySQL says No.
+    allows_primary_key_0 = True
+
+    # Features that need to be confirmed at runtime
+    # Cache whether the confirmation has been performed.
+    _confirmed = False
+    supports_transactions = None
+    supports_stddev = None
+
+    def __init__(self, connection):
+        self.connection = connection
+
+    def confirm(self):
+        "Perform manual checks of any database features that might vary between installs"
+        self._confirmed = True
+        self.supports_transactions = self._supports_transactions()
+        self.supports_stddev = self._supports_stddev()
+
+    def _supports_transactions(self):
+        "Confirm support for transactions"
+        cursor = self.connection.cursor()
+        cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+        self.connection._commit()
+        cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+        self.connection._rollback()
+        cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+        count, = cursor.fetchone()
+        cursor.execute('DROP TABLE ROLLBACK_TEST')
+        self.connection._commit()
+        return count == 0
+
+    def _supports_stddev(self):
+        "Confirm support for STDDEV and related stats functions"
+        class StdDevPop(object):
+            sql_function = 'STDDEV_POP'
+
+        try:
+            self.connection.ops.check_aggregate_support(StdDevPop())
+        except DatabaseError:
+            self.supports_stddev = False
+
 
 class BaseDatabaseOperations(object):
     """

@@ -4,7 +4,7 @@
 
 This is a basic model with only two non-primary-key fields.
 """
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import models, DEFAULT_DB_ALIAS, connection
 
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
@@ -359,9 +359,7 @@ AttributeError: Manager isn't accessible via Article instances
 
 from django.conf import settings
 
-building_docs = getattr(settings, 'BUILDING_DOCS', False)
-
-if building_docs or settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.postgresql':
+if connection.features.supports_microsecond_precision:
     __test__['API_TESTS'] += """
 # In PostgreSQL, microsecond-level precision is available.
 >>> a9 = Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
@@ -369,8 +367,7 @@ if building_docs or settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db
 >>> Article.objects.get(id__exact=9).pub_date
 datetime.datetime(2005, 7, 31, 12, 30, 45, 180)
 """
-
-if building_docs or settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.mysql':
+else:
     __test__['API_TESTS'] += """
 # In MySQL, microsecond-level precision isn't available. You'll lose
 # microsecond-level precision once the data is saved.

@@ -3,30 +3,11 @@ from decimal import Decimal
 
 from django.core.exceptions import FieldError
 from django.conf import settings
-from django.test import TestCase, Approximate
+from django.test import TestCase, Approximate, skipUnlessDBFeature
 from django.db import DEFAULT_DB_ALIAS
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F
 
 from regressiontests.aggregation_regress.models import *
-
-
-def run_stddev_tests():
-    """Check to see if StdDev/Variance tests should be run.
-
-    Stddev and Variance are not guaranteed to be available for SQLite, and
-    are not available for PostgreSQL before 8.2.
-    """
-    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.sqlite3':
-        return False
-
-    class StdDevPop(object):
-        sql_function = 'STDDEV_POP'
-
-    try:
-        connection.ops.check_aggregate_support(StdDevPop())
-    except:
-        return False
-    return True
 
 
 class AggregationTests(TestCase):
@@ -75,27 +56,27 @@ class AggregationTests(TestCase):
         qs2 = books.filter(id__in=list(qs))
         self.assertEqual(list(qs1), list(qs2))
 
-    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.oracle':
-        def test_annotate_with_extra(self):
-            """
-            Regression test for #11916: Extra params + aggregation creates
-            incorrect SQL.
-            """
-            #oracle doesn't support subqueries in group by clause
-            shortest_book_sql = """
-            SELECT name
-            FROM aggregation_regress_book b
-            WHERE b.publisher_id = aggregation_regress_publisher.id
-            ORDER BY b.pages
-            LIMIT 1
-            """
-            # tests that this query does not raise a DatabaseError due to the full
-            # subselect being (erroneously) added to the GROUP BY parameters
-            qs = Publisher.objects.extra(select={
-                'name_of_shortest_book': shortest_book_sql,
-            }).annotate(total_books=Count('book'))
-            # force execution of the query
-            list(qs)
+    @skipUnlessDBFeature('supports_subqueries_in_group_by')
+    def test_annotate_with_extra(self):
+        """
+        Regression test for #11916: Extra params + aggregation creates
+        incorrect SQL.
+        """
+        #oracle doesn't support subqueries in group by clause
+        shortest_book_sql = """
+        SELECT name
+        FROM aggregation_regress_book b
+        WHERE b.publisher_id = aggregation_regress_publisher.id
+        ORDER BY b.pages
+        LIMIT 1
+        """
+        # tests that this query does not raise a DatabaseError due to the full
+        # subselect being (erroneously) added to the GROUP BY parameters
+        qs = Publisher.objects.extra(select={
+            'name_of_shortest_book': shortest_book_sql,
+        }).annotate(total_books=Count('book'))
+        # force execution of the query
+        list(qs)
 
     def test_aggregate(self):
         # Ordering requests are ignored
@@ -641,64 +622,64 @@ class AggregationTests(TestCase):
             lambda: Book.objects.annotate(mean_age=Avg('authors__age')).annotate(Avg('mean_age'))
         )
 
-    if run_stddev_tests():
-        def test_stddev(self):
-            self.assertEqual(
-                Book.objects.aggregate(StdDev('pages')),
-                {'pages__stddev': Approximate(311.46, 1)}
-            )
+    @skipUnlessDBFeature('supports_stddev')
+    def test_stddev(self):
+        self.assertEqual(
+            Book.objects.aggregate(StdDev('pages')),
+            {'pages__stddev': Approximate(311.46, 1)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(StdDev('rating')),
-                {'rating__stddev': Approximate(0.60, 1)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(StdDev('rating')),
+            {'rating__stddev': Approximate(0.60, 1)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(StdDev('price')),
-                {'price__stddev': Approximate(24.16, 2)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(StdDev('price')),
+            {'price__stddev': Approximate(24.16, 2)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(StdDev('pages', sample=True)),
-                {'pages__stddev': Approximate(341.19, 2)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(StdDev('pages', sample=True)),
+            {'pages__stddev': Approximate(341.19, 2)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(StdDev('rating', sample=True)),
-                {'rating__stddev': Approximate(0.66, 2)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(StdDev('rating', sample=True)),
+            {'rating__stddev': Approximate(0.66, 2)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(StdDev('price', sample=True)),
-                {'price__stddev': Approximate(26.46, 1)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(StdDev('price', sample=True)),
+            {'price__stddev': Approximate(26.46, 1)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(Variance('pages')),
-                {'pages__variance': Approximate(97010.80, 1)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(Variance('pages')),
+            {'pages__variance': Approximate(97010.80, 1)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(Variance('rating')),
-                {'rating__variance': Approximate(0.36, 1)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(Variance('rating')),
+            {'rating__variance': Approximate(0.36, 1)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(Variance('price')),
-                {'price__variance': Approximate(583.77, 1)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(Variance('price')),
+            {'price__variance': Approximate(583.77, 1)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(Variance('pages', sample=True)),
-                {'pages__variance': Approximate(116412.96, 1)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(Variance('pages', sample=True)),
+            {'pages__variance': Approximate(116412.96, 1)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(Variance('rating', sample=True)),
-                {'rating__variance': Approximate(0.44, 2)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(Variance('rating', sample=True)),
+            {'rating__variance': Approximate(0.44, 2)}
+        )
 
-            self.assertEqual(
-                Book.objects.aggregate(Variance('price', sample=True)),
-                {'price__variance': Approximate(700.53, 2)}
-            )
+        self.assertEqual(
+            Book.objects.aggregate(Variance('price', sample=True)),
+            {'price__variance': Approximate(700.53, 2)}
+        )

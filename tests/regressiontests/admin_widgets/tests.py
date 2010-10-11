@@ -3,9 +3,10 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import widgets
-from unittest import TestCase
-from django.test import TestCase as DjangoTestCase
 from django.db.models import DateField
+from django.test import TestCase as DjangoTestCase
+from django.utils.unittest import TestCase
+
 import models
 
 class AdminFormfieldForDBFieldTests(TestCase):

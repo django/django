@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
 import datetime
-import unittest
 
 from django.conf import settings
 from django.core import management
@@ -9,48 +8,46 @@ from django.core.management.color import no_style
 from django.db import backend, connection, connections, DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql import version as pg_version
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
+from django.utils import unittest
 
 from regressiontests.backends import models
 
-class Callproc(unittest.TestCase):
+class OracleChecks(unittest.TestCase):
 
+    @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle cursor semantics")
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
-        if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
-            convert_unicode = backend.convert_unicode
-            cursor = connection.cursor()
-            cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
-                            [convert_unicode('_django_testing!'),])
-            return True
-        else:
-            return True
+        convert_unicode = backend.convert_unicode
+        cursor = connection.cursor()
+        cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
+                        [convert_unicode('_django_testing!'),])
 
+    @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle cursor semantics")
     def test_cursor_var(self):
         # If the backend is Oracle, test that we can pass cursor variables
         # as query parameters.
-        if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
-            cursor = connection.cursor()
-            var = cursor.var(backend.Database.STRING)
-            cursor.execute("BEGIN %s := 'X'; END; ", [var])
-            self.assertEqual(var.getvalue(), 'X')
+        cursor = connection.cursor()
+        var = cursor.var(backend.Database.STRING)
+        cursor.execute("BEGIN %s := 'X'; END; ", [var])
+        self.assertEqual(var.getvalue(), 'X')
 
-
-class LongString(unittest.TestCase):
-
+    @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle cursor semantics")
     def test_long_string(self):
         # If the backend is Oracle, test that we can save a text longer
         # than 4000 chars and read it properly
-        if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
-            c = connection.cursor()
-            c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-            long_str = ''.join([unicode(x) for x in xrange(4000)])
-            c.execute('INSERT INTO ltext VALUES (%s)',[long_str])
-            c.execute('SELECT text FROM ltext')
-            row = c.fetchone()
-            self.assertEquals(long_str, row[0].read())
-            c.execute('DROP TABLE ltext')
+        c = connection.cursor()
+        c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
+        long_str = ''.join([unicode(x) for x in xrange(4000)])
+        c.execute('INSERT INTO ltext VALUES (%s)',[long_str])
+        c.execute('SELECT text FROM ltext')
+        row = c.fetchone()
+        self.assertEqual(long_str, row[0].read())
+        c.execute('DROP TABLE ltext')
 
 class DateQuotingTest(TestCase):
 
@@ -97,46 +94,48 @@ class ParameterHandlingTest(TestCase):
 # Unfortunately, the following tests would be a good test to run on all
 # backends, but it breaks MySQL hard. Until #13711 is fixed, it can't be run
 # everywhere (although it would be an effective test of #13711).
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
-    class LongNameTest(TestCase):
-        """Long primary keys and model names can result in a sequence name
-        that exceeds the database limits, which will result in truncation
-        on certain databases (e.g., Postgres). The backend needs to use
-        the correct sequence name in last_insert_id and other places, so
-        check it is. Refs #8901.
-        """
+class LongNameTest(TestCase):
+    """Long primary keys and model names can result in a sequence name
+    that exceeds the database limits, which will result in truncation
+    on certain databases (e.g., Postgres). The backend needs to use
+    the correct sequence name in last_insert_id and other places, so
+    check it is. Refs #8901.
+    """
 
-        def test_sequence_name_length_limits_create(self):
-            """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
-            models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+    @skipUnlessDBFeature('supports_long_model_names')
+    def test_sequence_name_length_limits_create(self):
+        """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
+        models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
 
-        def test_sequence_name_length_limits_m2m(self):
-            """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Django >=1.2 this now uses object saves. Ref #8901"""
-            obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
-            rel_obj = models.Person.objects.create(first_name='Django', last_name='Reinhardt')
-            obj.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.add(rel_obj)
+    @skipUnlessDBFeature('supports_long_model_names')
+    def test_sequence_name_length_limits_m2m(self):
+        """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Django >=1.2 this now uses object saves. Ref #8901"""
+        obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+        rel_obj = models.Person.objects.create(first_name='Django', last_name='Reinhardt')
+        obj.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.add(rel_obj)
 
-        def test_sequence_name_length_limits_flush(self):
-            """Test that sequence resetting as part of a flush with model with long name and long pk name doesn't error. Ref #8901"""
-            # A full flush is expensive to the full test, so we dig into the
-            # internals to generate the likely offending SQL and run it manually
+    @skipUnlessDBFeature('supports_long_model_names')
+    def test_sequence_name_length_limits_flush(self):
+        """Test that sequence resetting as part of a flush with model with long name and long pk name doesn't error. Ref #8901"""
+        # A full flush is expensive to the full test, so we dig into the
+        # internals to generate the likely offending SQL and run it manually
 
-            # Some convenience aliases
-            VLM = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
-            VLM_m2m = VLM.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.through
-            tables = [
-                VLM._meta.db_table,
-                VLM_m2m._meta.db_table,
-            ]
-            sequences = [
-                {
-                    'column': VLM._meta.pk.column,
-                    'table': VLM._meta.db_table
-                },
-            ]
-            cursor = connection.cursor()
-            for statement in connection.ops.sql_flush(no_style(), tables, sequences):
-                cursor.execute(statement)
+        # Some convenience aliases
+        VLM = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+        VLM_m2m = VLM.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.through
+        tables = [
+            VLM._meta.db_table,
+            VLM_m2m._meta.db_table,
+        ]
+        sequences = [
+            {
+                'column': VLM._meta.pk.column,
+                'table': VLM._meta.db_table
+            },
+        ]
+        cursor = connection.cursor()
+        for statement in connection.ops.sql_flush(no_style(), tables, sequences):
+            cursor.execute(statement)
 
 class SequenceResetTest(TestCase):
     def test_generic_relation(self):
@@ -170,22 +169,22 @@ class PostgresVersionTest(TestCase):
 # Unfortunately with sqlite3 the in-memory test database cannot be
 # closed, and so it cannot be re-opened during testing, and so we
 # sadly disable this test for now.
-if settings.DATABASES[DEFAULT_DB_ALIAS]["ENGINE"] != "django.db.backends.sqlite3":
-    class ConnectionCreatedSignalTest(TestCase):
-        def test_signal(self):
-            data = {}
-            def receiver(sender, connection, **kwargs):
-                data["connection"] = connection
+class ConnectionCreatedSignalTest(TestCase):
+    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    def test_signal(self):
+        data = {}
+        def receiver(sender, connection, **kwargs):
+            data["connection"] = connection
 
-            connection_created.connect(receiver)
-            connection.close()
-            cursor = connection.cursor()
-            self.assertTrue(data["connection"] is connection)
+        connection_created.connect(receiver)
+        connection.close()
+        cursor = connection.cursor()
+        self.assertTrue(data["connection"] is connection)
 
-            connection_created.disconnect(receiver)
-            data.clear()
-            cursor = connection.cursor()
-            self.assertTrue(data == {})
+        connection_created.disconnect(receiver)
+        data.clear()
+        cursor = connection.cursor()
+        self.assertTrue(data == {})
 
 
 class BackendTestCase(TestCase):
@@ -225,3 +224,4 @@ class BackendTestCase(TestCase):
         self.assertEqual(cursor.fetchone(), (u'Clark', u'Kent'))
         self.assertEqual(list(cursor.fetchmany(2)), [(u'Jane', u'Doe'), (u'John', u'Doe')])
         self.assertEqual(list(cursor.fetchall()), [(u'Mary', u'Agnelline'), (u'Peter', u'Parker')])
+

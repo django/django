@@ -1,5 +1,5 @@
-import unittest
 from django.template.smartif import IfParser, Literal
+from django.utils import unittest
 
 class SmartIfTests(unittest.TestCase):
 

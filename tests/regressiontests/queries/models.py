@@ -8,7 +8,7 @@ import sys
 import threading
 
 from django.conf import settings
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import models, DEFAULT_DB_ALIAS, connection
 from django.db.models import Count
 from django.db.models.query import Q, ITER_CHUNK_SIZE, EmptyQuerySet
 
@@ -1307,13 +1307,13 @@ FieldError: Infinite loop caused by ordering.
 
 
 # In Oracle, we expect a null CharField to return u'' instead of None.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == "django.db.backends.oracle":
+if connection.features.interprets_empty_strings_as_nulls:
     __test__["API_TESTS"] = __test__["API_TESTS"].replace("<NONE_OR_EMPTY_UNICODE>", "u''")
 else:
     __test__["API_TESTS"] = __test__["API_TESTS"].replace("<NONE_OR_EMPTY_UNICODE>", "None")
 
 
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == "django.db.backends.mysql":
+if connection.features.requires_explicit_null_ordering_when_grouping:
     __test__["API_TESTS"] += """
 When grouping without specifying ordering, we add an explicit "ORDER BY NULL"
 portion in MySQL to prevent unnecessary sorting.
@@ -1342,7 +1342,7 @@ Using an empty generator expression as the rvalue for an "__in" lookup is legal
 
 # Sqlite 3 does not support passing in more than 1000 parameters except by
 # changing a parameter at compilation time.
-if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != "django.db.backends.sqlite3":
+if connection.features.supports_1000_query_paramters:
     __test__["API_TESTS"] += """
 Bug #14244: Test that the "in" lookup works with lists of 1000 items or more.
 >>> Number.objects.all().delete()

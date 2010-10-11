@@ -1,6 +1,6 @@
-from unittest import TestCase
 from django.template.loader import get_template_from_string
 from django.template import VariableNode
+from django.utils.unittest import TestCase
 
 
 class NodelistTest(TestCase):

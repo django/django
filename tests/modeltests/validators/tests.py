@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
 import types
-from unittest import TestCase
 from datetime import datetime, timedelta
+
 from django.core.exceptions import ValidationError
 from django.core.validators import *
+from django.utils.unittest import TestCase
+
 
 NOW = datetime.now()
 

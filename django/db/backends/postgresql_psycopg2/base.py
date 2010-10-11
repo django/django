@@ -67,6 +67,8 @@ class CursorWrapper(object):
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     can_return_id_from_insert = False
+    requires_rollback_on_dirty_transaction = True
+    has_real_datatype = True
 
 class DatabaseOperations(PostgresqlDatabaseOperations):
     def last_executed_query(self, cursor, sql, params):
@@ -79,6 +81,7 @@ class DatabaseOperations(PostgresqlDatabaseOperations):
         return "RETURNING %s", ()
 
 class DatabaseWrapper(BaseDatabaseWrapper):
+    vendor = 'postgresql'
     operators = {
         'exact': '= %s',
         'iexact': '= UPPER(%s)',
@@ -99,7 +102,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
-        self.features = DatabaseFeatures()
+        self.features = DatabaseFeatures(self)
         autocommit = self.settings_dict["OPTIONS"].get('autocommit', False)
         self.features.uses_autocommit = autocommit
         self._set_isolation_level(int(not autocommit))

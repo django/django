@@ -1,11 +1,11 @@
 from datetime import datetime, date
 import os
 import time
-import unittest
 
 from django.utils.dateformat import format
-from django.utils import dateformat, translation
+from django.utils import dateformat, translation, unittest
 from django.utils.tzinfo import FixedOffset, LocalTimezone
+
 
 class DateFormatTests(unittest.TestCase):
     def setUp(self):

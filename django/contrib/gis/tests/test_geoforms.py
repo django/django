@@ -1,8 +1,8 @@
-import unittest
-
 from django.forms import ValidationError
 from django.contrib.gis import forms
 from django.contrib.gis.geos import GEOSGeometry
+from django.utils import unittest
+
 
 class GeometryFieldTest(unittest.TestCase):
 

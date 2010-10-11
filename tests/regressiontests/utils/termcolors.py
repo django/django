@@ -1,5 +1,4 @@
-import unittest
-
+from django.utils import unittest
 from django.utils.termcolors import parse_color_setting, PALETTES, DEFAULT_PALETTE, LIGHT_PALETTE, DARK_PALETTE, NOCOLOR_PALETTE
 
 class TermColorTests(unittest.TestCase):

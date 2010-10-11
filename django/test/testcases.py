@@ -1,5 +1,4 @@
 import re
-import unittest
 from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
 
@@ -7,12 +6,14 @@ from django.conf import settings
 from django.core import mail
 from django.core.management import call_command
 from django.core.urlresolvers import clear_url_caches
-from django.db import transaction, connections, DEFAULT_DB_ALIAS
+from django.db import transaction, connection, connections, DEFAULT_DB_ALIAS
 from django.http import QueryDict
 from django.test import _doctest as doctest
 from django.test.client import Client
-from django.utils import simplejson
+from django.utils import simplejson, unittest
 from django.utils.encoding import smart_str
+from django.utils.functional import wraps
+
 
 try:
     all
@@ -21,6 +22,7 @@ except NameError:
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 normalize_decimals = lambda s: re.sub(r"Decimal\('(\d+(\.\d*)?)'\)", lambda m: "Decimal(\"%s\")" % m.groups()[0], s)
+
 
 def to_list(value):
     """
@@ -472,7 +474,7 @@ def connections_support_transactions():
     Returns True if all connections support transactions.  This is messy
     because 2.4 doesn't support any or all.
     """
-    return all(conn.settings_dict['SUPPORTS_TRANSACTIONS']
+    return all(conn.features.supports_transactions
         for conn in connections.all())
 
 class TestCase(TransactionTestCase):
@@ -528,3 +530,25 @@ class TestCase(TransactionTestCase):
 
         for connection in connections.all():
             connection.close()
+
+def _deferredSkip(condition, reason):
+    def decorator(test_item):
+        if not (isinstance(test_item, type) and issubclass(test_item, TestCase)):
+            @wraps(test_item)
+            def skip_wrapper(*args, **kwargs):
+                if condition():
+                    raise unittest.SkipTest(reason)
+            test_item = skip_wrapper
+        test_item.__unittest_skip_why__ = reason
+        return test_item
+    return decorator
+
+def skipIfDBFeature(feature):
+    "Skip a test if a database has the named feature"
+    return _deferredSkip(lambda: getattr(connection.features, feature),
+                         "Database has feature %s" % feature)
+
+def skipUnlessDBFeature(feature):
+    "Skip a test unless a database has the named feature"
+    return _deferredSkip(lambda: not getattr(connection.features, feature),
+                         "Database doesn't support feature %s" % feature)

@@ -1,7 +1,9 @@
-import unittest
 import datetime
+
 from django.conf import settings
 from django.db import connection
+from django.utils import unittest
+
 from models import CustomPKModel, UniqueTogetherModel, UniqueFieldsModel, UniqueForDateModel, ModelToValidate
 
 

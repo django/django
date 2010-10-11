@@ -30,11 +30,10 @@ import re
 import os
 from decimal import Decimal
 
-from unittest import TestCase
-
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.forms.widgets import RadioFieldRenderer
+from django.utils.unittest import TestCase
 
 
 def fix_os_paths(x):

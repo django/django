@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS, transaction, IntegrityError
-from django.test import TestCase
+from django.test import TestCase, skipIfDBFeature
 
 from models import Employee, Business, Bar, Foo
 
@@ -168,16 +168,15 @@ class CustomPKTests(TestCase):
         self.assertEqual(f, new_foo),
         self.assertEqual(f.bar, new_bar)
 
-
     # SQLite lets objects be saved with an empty primary key, even though an
     # integer is expected. So we can't check for an error being raised in that
     # case for SQLite. Remove it from the suite for this next bit.
-    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.sqlite3':
-        def test_required_pk(self):
-            # The primary key must be specified, so an error is raised if you
-            # try to create an object without it.
-            sid = transaction.savepoint()
-            self.assertRaises(IntegrityError,
-                Employee.objects.create, first_name="Tom", last_name="Smith"
-            )
-            transaction.savepoint_rollback(sid)
+    @skipIfDBFeature('supports_unspecified_pk')
+    def test_required_pk(self):
+        # The primary key must be specified, so an error is raised if you
+        # try to create an object without it.
+        sid = transaction.savepoint()
+        self.assertRaises(IntegrityError,
+            Employee.objects.create, first_name="Tom", last_name="Smith"
+        )
+        transaction.savepoint_rollback(sid)

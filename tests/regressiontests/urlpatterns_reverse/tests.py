@@ -1,8 +1,6 @@
 """
 Unit tests for reverse URL lookups.
 """
-import unittest
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, resolve, NoReverseMatch,\
@@ -11,6 +9,7 @@ from django.core.urlresolvers import reverse, resolve, NoReverseMatch,\
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
+from django.utils import unittest
 
 import urlconf_outer
 import urlconf_inner

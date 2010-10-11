@@ -1,6 +1,6 @@
 from django.dispatch.saferef import *
 
-import unittest
+from django.utils import unittest
 
 class Test1(object):
     def x(self):

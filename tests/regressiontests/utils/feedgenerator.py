@@ -1,7 +1,6 @@
 import datetime
-import unittest
 
-from django.utils import feedgenerator, tzinfo
+from django.utils import feedgenerator, tzinfo, unittest
 
 class FeedgeneratorTest(unittest.TestCase):
     """

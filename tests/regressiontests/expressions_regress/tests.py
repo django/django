@@ -1,13 +1,13 @@
 """
 Spanning tests for all the operations that F() expressions can perform.
 """
-from django.test import TestCase, Approximate
-
 from django.conf import settings
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import F
+from django.test import TestCase, Approximate, skipUnlessDBFeature
 
 from regressiontests.expressions_regress.models import Number
+
 
 class ExpressionsRegressTests(TestCase):
 
@@ -130,13 +130,13 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 40)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
-    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.oracle':
-        def test_lefthand_bitwise_or(self):
-            # LH Bitwise or on integers
-            Number.objects.filter(pk=self.n.pk).update(integer=F('integer') | 48)
+    @skipUnlessDBFeature('supports_bitwise_or')
+    def test_lefthand_bitwise_or(self):
+        # LH Bitwise or on integers
+        Number.objects.filter(pk=self.n.pk).update(integer=F('integer') | 48)
 
-            self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
-            self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_right_hand_addition(self):
         # Right hand operators
@@ -185,11 +185,11 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 10)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
-    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.oracle':
-        def test_right_hand_bitwise_or(self):
-            # RH Bitwise or on integers
-            Number.objects.filter(pk=self.n.pk).update(integer=15 | F('integer'))
+    @skipUnlessDBFeature('supports_bitwise_or')
+    def test_right_hand_bitwise_or(self):
+        # RH Bitwise or on integers
+        Number.objects.filter(pk=self.n.pk).update(integer=15 | F('integer'))
 
-            self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 47)
-            self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 47)
+        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 

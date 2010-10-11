@@ -2,12 +2,12 @@
 A series of tests to establish that the command-line bash completion works.
 """
 import os
-import unittest
 import sys
 import StringIO
 
 from django.conf import settings
 from django.core.management import ManagementUtility
+from django.utils import unittest
 
 class BashCompletionTests(unittest.TestCase):
     """

@@ -1,8 +1,8 @@
-import unittest
 from django import forms
-from django.contrib.formtools import preview, wizard, utils
 from django import http
+from django.contrib.formtools import preview, wizard, utils
 from django.test import TestCase
+from django.utils import unittest
 
 success_string = "Done was called!"
 
@@ -115,7 +115,7 @@ class SecurityHashTests(unittest.TestCase):
         hash1 = utils.security_hash(None, f1)
         hash2 = utils.security_hash(None, f2)
         self.assertEqual(hash1, hash2)
-        
+
     def test_empty_permitted(self):
         """
         Regression test for #10643: the security hash should allow forms with

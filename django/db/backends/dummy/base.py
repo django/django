@@ -42,7 +42,7 @@ class DatabaseWrapper(object):
     _rollback = ignore
 
     def __init__(self, settings_dict, alias, *args, **kwargs):
-        self.features = BaseDatabaseFeatures()
+        self.features = BaseDatabaseFeatures(self)
         self.ops = DatabaseOperations()
         self.client = DatabaseClient(self)
         self.creation = BaseDatabaseCreation(self)

@@ -6,9 +6,10 @@ ModelForm's save() method causes Model.save() to be called more than once.
 
 import os
 import shutil
-import unittest
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import unittest
+
 from regressiontests.bug639.models import Photo, PhotoForm, temp_storage_dir
 
 class Bug639Test(unittest.TestCase):
