@@ -1431,6 +1431,61 @@ manually, assign the empty list to ``mail.outbox``::
     # Empty the test outbox
     mail.outbox = []
 
+Skipping tests
+--------------
+
+.. versionadded:: 1.3
+
+The unittest library provides the ``@skipIf`` and ``@skipUnless``
+decorators to allow you to skip tests if you know ahead of time that
+those tests are going to fail under certain conditions.
+
+For example, if your test requires a particular optional library in
+order to succeed, you could decorate the test case with ``@skipIf``.
+Then, the test runner will report that the test wasn't executed and
+why, instead of failing the test or omitting the test altogether.
+
+To supplement these test skipping behaviors, Django provides two
+additional skip decorators. Instead of testing a generic boolean,
+these decorators check the capabilities of the database, and skip the
+test if the database doesn't support a specific named feature.
+
+The decorators use a string identifier to describe database features.
+This string corresponds to attributes of the database connection
+features class. See :class:`~django.db.backends.BaseDatabaseFeatures`
+class for a full list of database features that can be used as a basis
+for skipping tests.
+
+skipIfDBFeature
+~~~~~~~~~~~~~~~
+
+Skip the decorated test if the named database feature is supported.
+
+For example, the following test will not be executed if the database
+supports transactions (e.g., it would *not* run under PostgreSQL, but
+it would under MySQL with MyISAM tables)::
+
+    class MyTests(TestCase):
+        @skipIfDBFeature('supports_transactions')
+        def test_transaction_behavior(self):
+            # ... conditional test code
+
+skipUnlessDBFeature
+~~~~~~~~~~~~~~~~~~~
+
+Skip the decorated test if the named database feature is *not*
+supported.
+
+For example, the following test will not be executed if the database
+supports transactions (e.g., it would run under PostgreSQL, but *not*
+under MySQL with MyISAM tables)::
+
+    class MyTests(TestCase):
+        @skipUnlessDBFeature('supports_transactions')
+        def test_transaction_behavior(self):
+            # ... conditional test code
+
+
 Using different testing frameworks
 ==================================
 

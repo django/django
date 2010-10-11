@@ -108,6 +108,12 @@ their deprecation, as per the :ref:`Django deprecation policy
           :attr:`~django.test.client.Response.templates` attribute should be
           used instead.
 
+        * The features of the :class:`django.test.simple.DjangoTestRunner`
+          (including fail-fast and Ctrl-C test termination) can now be provided
+          by the unittest-native :class:`TextTestRunner`. The
+          :class:`~django.test.simple.DjangoTestRunner` will be removed in
+          favor of using the unittest-native class.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the
