@@ -40,6 +40,7 @@ from media import media_tests
 from fields import FieldsTests
 from validators import TestFieldWithValidators
 from widgets import WidgetTests, ClearableFileInputTests
+from localflavor.be import BETests
 
 from input_formats import *
 
