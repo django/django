@@ -7,9 +7,54 @@ This page documents release notes for the as-yet-unreleased Django
 up-to-date information for those who are following trunk.
 
 Django 1.3 includes a number of nifty `new features`_, lots of bug
-fixes and an easy upgrade path from Django 1.2.
+fixes, some minor `backwards incompatible changes`_ and an easy
+upgrade path from Django 1.2.
 
 .. _new features: `What's new in Django 1.3`_
+
+.. _backwards incompatible changes: backwards-incompatible-changes-1.3_
+
+What's new in Django 1.3
+========================
+
+Logging
+~~~~~~~
+
+Django 1.3 adds framework-level support for Python's logging module.
+This means you can now easily configure and control logging as part of
+your Django project. A number of logging handlers and logging calls
+have been added to Django's own code as well -- most notably, the
+error emails sent on a HTTP 500 server error are now handled as a
+logging activity. See :doc:`the documentation on Django's logging
+interface </topics/logging>` for more details.
+
+``unittest2`` support
+~~~~~~~~~~~~~~~~~~~~~
+
+Python 2.7 introduced some major changes to the unittest library,
+adding some extremely useful features. To ensure that every Django
+project can benefit from these new features, Django ships with a
+copy of unittest2_, a copy of the Python 2.7 unittest library,
+backported for Python 2.4 compatibility.
+
+To access this library, Django provides the
+``django.utils.unittest`` module alias. If you are using Python
+2.7, or you have installed unittest2 locally, Django will map the
+alias to the installed version of the unittest library. Otherwise,
+Django will use it's own bundled version of unittest2.
+
+To use this alias, simply use::
+
+    from django.utils import unittest
+
+wherever you would have historically used::
+
+    import unittest
+
+If you want to continue to use the base unittest libary, you can --
+you just won't get any of the nice new unittest2 features.
+
+.. _unittest2: http://pypi.python.org/pypi/unittest2
 
 .. _backwards-incompatible-changes-1.3:
 
@@ -122,45 +167,3 @@ In Django 1.3 the :attr:`~django.test.client.Response.template` attribute is
 deprecated in favor of a new :attr:`~django.test.client.Response.templates`
 attribute, which is always a list, even if it has only a single element or no
 elements.
-
-What's new in Django 1.3
-========================
-
-Logging
-~~~~~~~
-
-Django 1.3 adds framework-level support for Python's logging module.
-This means you can now easily configure and control logging as part of
-your Django project. A number of logging handlers and logging calls
-have been added to Django's own code as well -- most notably, the
-error emails sent on a HTTP 500 server error are now handled as a
-logging activity. See :doc:`the documentation on Django's logging
-interface </topics/logging>` for more details.
-
-``unittest2`` support
-~~~~~~~~~~~~~~~~~~~~~
-
-Python 2.7 introduced some major changes to the unittest library,
-adding some extremely useful features. To ensure that every Django
-project can benefit from these new features, Django ships with a
-copy of unittest2_, a copy of the Python 2.7 unittest library,
-backported for Python 2.4 compatibility.
-
-To access this library, Django provides the
-``django.utils.unittest`` module alias. If you are using Python
-2.7, or you have installed unittest2 locally, Django will map the
-alias to the installed version of the unittest library. Otherwise,
-Django will use it's own bundled version of unittest2.
-
-To use this alias, simply use::
-
-    from django.utils import unittest
-
-wherever you would have historically used::
-
-    import unittest
-
-If you want to continue to use the base unittest libary, you can --
-you just won't get any of the nice new unittest2 features.
-
-.. _unittest2: http://pypi.python.org/pypi/unittest2
