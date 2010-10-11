@@ -343,3 +343,23 @@ class MailTests(TestCase):
         settings.ADMINS = old_admins
         settings.MANAGERS = old_managers
 
+    def test_mail_prefix(self):
+        """Test prefix argument in manager/admin mail."""
+        # Regression for #13494.
+        old_admins = settings.ADMINS
+        old_managers = settings.MANAGERS
+        settings.ADMINS = settings.MANAGERS = [('nobody','nobody@example.com')]
+
+        mail_managers(ugettext_lazy('Subject'), 'Content')
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(message.subject, '[Django] Subject')
+
+        mail.outbox = []
+        mail_admins(ugettext_lazy('Subject'), 'Content')
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(message.subject, '[Django] Subject')
+
+        settings.ADMINS = old_admins
+        settings.MANAGERS = old_managers
