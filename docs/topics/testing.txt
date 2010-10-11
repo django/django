@@ -167,15 +167,15 @@ taking a class-based approach.
 
     To access this library, Django provides the
     ``django.utils.unittest`` module alias. If you are using Python
-    2.7, or you have installed unittest2 locally, Django will mapt the
-    alias to the installed version of the unittest library Otherwise,
+    2.7, or you have installed unittest2 locally, Django will map the
+    alias to the installed version of the unittest library. Otherwise,
     Django will use it's own bundled version of unittest2.
 
     To use this alias, simply use::
 
         from django.utils import unittest
 
-    wherever you would historically used::
+    wherever you would have historically used::
 
         import unittest
 
