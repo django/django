@@ -85,7 +85,7 @@ custom widget to your form that sets the ``render_value`` argument::
 
     class LoginForm(forms.Form):
         username = forms.CharField(max_length=100)
-        password = forms.PasswordField(widget=forms.PasswordInput(render_value=True))
+        password = forms.CharField(widget=forms.PasswordInput(render_value=True))
 
 Clearable default widget for FileField
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
