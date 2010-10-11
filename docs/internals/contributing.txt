@@ -15,7 +15,9 @@ of the community, so there are many ways you can help Django's development:
       served up.
 
     * Submit patches for new and/or fixed behavior.  Please read `Submitting
-      patches`_, below, for details on how to submit a patch.
+      patches`_, below, for details on how to submit a patch. If you're looking
+      for an easy way to start contributing to Django have a look at the
+      `easy-pickings`_ tickets.
 
     * Join the `django-developers`_ mailing list and share your ideas for how
       to improve Django.  We're always open to suggestions, although we're
@@ -353,6 +355,9 @@ members can do to help the triage process. In particular, you can help out by:
 
     * Correcting the "Needs tests", "Needs documentation", or "Has patch" flags
       for tickets where they are incorrectly set.
+
+    * Adding the `easy-pickings`_ keyword to tickets that are small and
+      relatively straightforward.
 
     * Checking that old tickets are still valid. If a ticket hasn't seen
       any activity in a long time, it's possible that the problem has been
@@ -1282,3 +1287,4 @@ requests for commit access are potential flame-war starters, and will be ignored
 .. _pep8.py: http://pypi.python.org/pypi/pep8/
 .. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
 .. _`tags/releases`: http://code.djangoproject.com/browser/django/tags/releases
+.. _`easy-pickings`: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&keywords=~easy-pickings&order=priority
