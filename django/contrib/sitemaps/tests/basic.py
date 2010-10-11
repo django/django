@@ -2,7 +2,9 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
+from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
@@ -92,3 +94,22 @@ class SitemapTests(TestCase):
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % date.today().strftime('%Y-%m-%d'))
+
+    def test_sitemap_get_urls_no_site_1(self):
+        """
+        Check we get ImproperlyConfigured if we don't pass a site object to
+        Sitemap.get_urls and no Site objects exist
+        """
+        Site._meta.installed = True
+        Site.objects.all().delete()
+        self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
+
+    def test_sitemap_get_urls_no_site_2(self):
+        """
+        Check we get ImproperlyConfigured when we don't pass a site object to
+        Sitemap.get_urls if Site objects exists, but the sites framework is not
+        actually installed.
+        """
+        Site.objects.get_current()
+        Site._meta.installed = False
+        self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
