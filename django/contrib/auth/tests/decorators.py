@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tests.views import AuthViewsTestCase
 
@@ -15,7 +16,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
             def __call__(self, *args, **kwargs):
                 pass
         login_required(CallableView())
-        
+
     def testView(self):
         """
         Check that login_required is assignable to normal views.
@@ -24,7 +25,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
             pass
         login_required(normal_view)
 
-    def testLoginRequired(self, view_url='/login_required/', login_url='/login/'):
+    def testLoginRequired(self, view_url='/login_required/', login_url=settings.LOGIN_URL):
         """
         Check that login_required works on a simple view wrapped in a
         login_required decorator.
