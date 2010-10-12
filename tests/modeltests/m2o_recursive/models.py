@@ -19,22 +19,10 @@ class Category(models.Model):
     def __unicode__(self):
         return self.name
 
-__test__ = {'API_TESTS':"""
-# Create a few Category objects.
->>> r = Category(id=None, name='Root category', parent=None)
->>> r.save()
->>> c = Category(id=None, name='Child category', parent=r)
->>> c.save()
+class Person(models.Model):
+    full_name = models.CharField(max_length=20)
+    mother = models.ForeignKey('self', null=True, related_name='mothers_child_set')
+    father = models.ForeignKey('self', null=True, related_name='fathers_child_set')
 
->>> r.child_set.all()
-[<Category: Child category>]
->>> r.child_set.get(name__startswith='Child')
-<Category: Child category>
->>> print r.parent
-None
-
->>> c.child_set.all()
-[]
->>> c.parent
-<Category: Root category>
-"""}
+    def __unicode__(self):
+        return self.full_name
