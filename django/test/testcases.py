@@ -1,4 +1,5 @@
 import re
+import sys
 from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
 
@@ -204,6 +205,33 @@ class DocTestRunner(doctest.DocTestRunner):
         # side effects on other tests.
         for conn in connections:
             transaction.rollback_unless_managed(using=conn)
+
+class _AssertNumQueriesContext(object):
+    def __init__(self, test_case, num, connection):
+        self.test_case = test_case
+        self.num = num
+        self.connection = connection
+
+    def __enter__(self):
+        self.old_debug_cursor = self.connection.use_debug_cursor
+        self.connection.use_debug_cursor = True
+        self.starting_queries = len(self.connection.queries)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is not None:
+            return
+
+        self.connection.use_debug_cursor = self.old_debug_cursor
+        final_queries = len(self.connection.queries)
+        executed = final_queries - self.starting_queries
+
+        self.test_case.assertEqual(
+            executed, self.num, "%d queries executed, %d expected" % (
+                executed, self.num
+            )
+        )
+
 
 class TransactionTestCase(unittest.TestCase):
     # The class we'll use for the test client self.client.
@@ -468,6 +496,22 @@ class TransactionTestCase(unittest.TestCase):
 
     def assertQuerysetEqual(self, qs, values, transform=repr):
         return self.assertEqual(map(transform, qs), values)
+
+    def assertNumQueries(self, num, func=None, *args, **kwargs):
+        using = kwargs.pop("using", DEFAULT_DB_ALIAS)
+        connection = connections[using]
+
+        context = _AssertNumQueriesContext(self, num, connection)
+        if func is None:
+            return context
+
+        # Basically emulate the `with` statement here.
+
+        context.__enter__()
+        try:
+            func(*args, **kwargs)
+        finally:
+            context.__exit__(*sys.exc_info())
 
 def connections_support_transactions():
     """

@@ -6,7 +6,8 @@ from modeltests.validation.models import Author, Article, ModelToValidate
 
 # Import other tests for this package.
 from modeltests.validation.validators import TestModelsWithValidators
-from modeltests.validation.test_unique import GetUniqueCheckTests, PerformUniqueChecksTest
+from modeltests.validation.test_unique import (GetUniqueCheckTests,
+    PerformUniqueChecksTest)
 from modeltests.validation.test_custom_messages import CustomMessagesTest
 
 
@@ -111,4 +112,3 @@ class ModelFormsTests(TestCase):
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
         self.assertEqual(form.errors.keys(), ['pub_date'])
-

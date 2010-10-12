@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import datetime
-import tempfile
 import shutil
+import tempfile
 
-from django.db import models, connection
-from django.conf import settings
+from django.db import models
 # Can't import as "forms" due to implementation details in the test suite (the
 # current file is called "forms" and is already imported).
 from django import forms as django_forms
@@ -77,19 +76,13 @@ class TestTicket12510(TestCase):
     ''' It is not necessary to generate choices for ModelChoiceField (regression test for #12510). '''
     def setUp(self):
         self.groups = [Group.objects.create(name=name) for name in 'abc']
-        self.old_debug = settings.DEBUG
-        # turn debug on to get access to connection.queries
-        settings.DEBUG = True
-
-    def tearDown(self):
-        settings.DEBUG = self.old_debug
 
     def test_choices_not_fetched_when_not_rendering(self):
-        initial_queries = len(connection.queries)
-        field = django_forms.ModelChoiceField(Group.objects.order_by('-name'))
-        self.assertEqual('a', field.clean(self.groups[0].pk).name)
+        def test():
+            field = django_forms.ModelChoiceField(Group.objects.order_by('-name'))
+            self.assertEqual('a', field.clean(self.groups[0].pk).name)
         # only one query is required to pull the model from DB
-        self.assertEqual(initial_queries+1, len(connection.queries))
+        self.assertNumQueries(1, test)
 
 class ModelFormCallableModelDefault(TestCase):
     def test_no_empty_option(self):

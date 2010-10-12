@@ -11,17 +11,6 @@ from models import ResolveThis, Item, RelatedItem, Child, Leaf
 
 
 class DeferRegressionTest(TestCase):
-    def assert_num_queries(self, n, func, *args, **kwargs):
-        old_DEBUG = settings.DEBUG
-        settings.DEBUG = True
-        starting_queries = len(connection.queries)
-        try:
-            func(*args, **kwargs)
-        finally:
-            settings.DEBUG = old_DEBUG
-        self.assertEqual(starting_queries + n, len(connection.queries))
-
-
     def test_basic(self):
         # Deferred fields should really be deferred and not accidentally use
         # the field's default value just because they aren't passed to __init__
@@ -33,19 +22,19 @@ class DeferRegressionTest(TestCase):
         def test():
             self.assertEqual(obj.name, "first")
             self.assertEqual(obj.other_value, 0)
-        self.assert_num_queries(0, test)
+        self.assertNumQueries(0, test)
 
         def test():
             self.assertEqual(obj.value, 42)
-        self.assert_num_queries(1, test)
+        self.assertNumQueries(1, test)
 
         def test():
             self.assertEqual(obj.text, "xyzzy")
-        self.assert_num_queries(1, test)
+        self.assertNumQueries(1, test)
 
         def test():
             self.assertEqual(obj.text, "xyzzy")
-        self.assert_num_queries(0, test)
+        self.assertNumQueries(0, test)
 
         # Regression test for #10695. Make sure different instances don't
         # inadvertently share data in the deferred descriptor objects.

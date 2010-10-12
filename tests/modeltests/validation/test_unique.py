@@ -2,9 +2,11 @@ import datetime
 
 from django.conf import settings
 from django.db import connection
+from django.test import TestCase
 from django.utils import unittest
 
-from models import CustomPKModel, UniqueTogetherModel, UniqueFieldsModel, UniqueForDateModel, ModelToValidate
+from models import (CustomPKModel, UniqueTogetherModel, UniqueFieldsModel,
+    UniqueForDateModel, ModelToValidate)
 
 
 class GetUniqueCheckTests(unittest.TestCase):
@@ -51,37 +53,26 @@ class GetUniqueCheckTests(unittest.TestCase):
             ), m._get_unique_checks(exclude='start_date')
         )
 
-class PerformUniqueChecksTest(unittest.TestCase):
-    def setUp(self):
-        # Set debug to True to gain access to connection.queries.
-        self._old_debug, settings.DEBUG = settings.DEBUG, True
-        super(PerformUniqueChecksTest, self).setUp()
-
-    def tearDown(self):
-        # Restore old debug value.
-        settings.DEBUG = self._old_debug
-        super(PerformUniqueChecksTest, self).tearDown()
-
+class PerformUniqueChecksTest(TestCase):
     def test_primary_key_unique_check_not_performed_when_adding_and_pk_not_specified(self):
         # Regression test for #12560
-        query_count = len(connection.queries)
-        mtv = ModelToValidate(number=10, name='Some Name')
-        setattr(mtv, '_adding', True)
-        mtv.full_clean()
-        self.assertEqual(query_count, len(connection.queries))
+        def test():
+            mtv = ModelToValidate(number=10, name='Some Name')
+            setattr(mtv, '_adding', True)
+            mtv.full_clean()
+        self.assertNumQueries(0, test)
 
     def test_primary_key_unique_check_performed_when_adding_and_pk_specified(self):
         # Regression test for #12560
-        query_count = len(connection.queries)
-        mtv = ModelToValidate(number=10, name='Some Name', id=123)
-        setattr(mtv, '_adding', True)
-        mtv.full_clean()
-        self.assertEqual(query_count + 1, len(connection.queries))
+        def test():
+            mtv = ModelToValidate(number=10, name='Some Name', id=123)
+            setattr(mtv, '_adding', True)
+            mtv.full_clean()
+        self.assertNumQueries(1, test)
 
     def test_primary_key_unique_check_not_performed_when_not_adding(self):
         # Regression test for #12132
-        query_count= len(connection.queries)
-        mtv = ModelToValidate(number=10, name='Some Name')
-        mtv.full_clean()
-        self.assertEqual(query_count, len(connection.queries))
-
+        def test():
+            mtv = ModelToValidate(number=10, name='Some Name')
+            mtv.full_clean()
+        self.assertNumQueries(0, test)

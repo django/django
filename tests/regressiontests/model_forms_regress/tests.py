@@ -1,10 +1,8 @@
 import unittest
 from datetime import date
 
-from django import db
 from django import forms
 from django.forms.models import modelform_factory, ModelChoiceField
-from django.conf import settings
 from django.test import TestCase
 from django.core.exceptions import FieldError, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -14,14 +12,6 @@ from models import Person, RealPerson, Triple, FilePathModel, Article, \
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
-
-    def setUp(self):
-        self.old_debug = settings.DEBUG
-        settings.DEBUG = True
-
-    def tearDown(self):
-        settings.DEBUG = self.old_debug
-
     def test_model_multiple_choice_number_of_queries(self):
         """
         Test that ModelMultipleChoiceField does O(1) queries instead of
@@ -30,10 +20,8 @@ class ModelMultipleChoiceFieldTests(TestCase):
         for i in range(30):
             Person.objects.create(name="Person %s" % i)
 
-        db.reset_queries()
         f = forms.ModelMultipleChoiceField(queryset=Person.objects.all())
-        selected = f.clean([1, 3, 5, 7, 9])
-        self.assertEquals(len(db.connection.queries), 1)
+        self.assertNumQueries(1, f.clean, [1, 3, 5, 7, 9])
 
 class TripleForm(forms.ModelForm):
     class Meta:
@@ -312,7 +300,7 @@ class InvalidFieldAndFactory(TestCase):
                     model = Person
                     fields = ('name', 'no-field')
         except FieldError, e:
-            # Make sure the exception contains some reference to the 
+            # Make sure the exception contains some reference to the
             # field responsible for the problem.
             self.assertTrue('no-field' in e.args[0])
         else:

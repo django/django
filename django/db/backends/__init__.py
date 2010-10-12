@@ -21,6 +21,7 @@ class BaseDatabaseWrapper(local):
         self.settings_dict = settings_dict
         self.alias = alias
         self.vendor = 'unknown'
+        self.use_debug_cursor = None
 
     def __eq__(self, other):
         return self.settings_dict == other.settings_dict
@@ -74,7 +75,8 @@ class BaseDatabaseWrapper(local):
     def cursor(self):
         from django.conf import settings
         cursor = self._cursor()
-        if settings.DEBUG:
+        if (self.use_debug_cursor or
+            (self.use_debug_cursor is None and settings.DEBUG)):
             return self.make_debug_cursor(cursor)
         return cursor
 

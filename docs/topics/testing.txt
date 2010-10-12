@@ -1372,6 +1372,32 @@ cause of an failure in your test suite.
     implicit ordering, you will need to apply a ``order_by()`` clause to your
     queryset to ensure that the test will pass reliably.
 
+.. method:: TestCase.assertNumQueries(num, func, *args, **kwargs):
+
+    .. versionadded:: 1.3
+
+    Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
+    ``num`` database queries are executed.
+
+    If a ``"using"`` key is present in ``kwargs`` it is used as the database
+    alias for which to check the number of queries.  If you wish to call a
+    function with a ``using`` parameter you can do it by wrapping the call with
+    a ``lambda`` to add an extra parameter::
+
+        self.assertNumQueries(7, lambda: my_function(using=7))
+
+    If you're using Python 2.5 or greater you can also use this as a context
+    manager::
+
+        # This is necessary in Python 2.5 to enable the with statement, in 2.6
+        # and up it is no longer necessary.
+        from __future__ import with_statement
+
+        with self.assertNumQueries(2):
+            Person.objects.create(name="Aaron")
+            Person.objects.create(name="Daniel")
+
+
 .. _topics-testing-email:
 
 E-mail services
