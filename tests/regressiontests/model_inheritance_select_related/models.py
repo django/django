@@ -27,21 +27,3 @@ class Person(models.Model):
 
     def __unicode__(self):
         return self.name
-
-__test__ = {'API_TESTS':"""
-Regression test for #7246
-
->>> r1 = Restaurant.objects.create(name="Nobu", serves_sushi=True, serves_steak=False)
->>> r2 = Restaurant.objects.create(name="Craft", serves_sushi=False, serves_steak=True)
->>> p1 = Person.objects.create(name="John", favorite_restaurant=r1)
->>> p2 = Person.objects.create(name="Jane", favorite_restaurant=r2)
-
->>> Person.objects.order_by('name').select_related()
-[<Person: Jane>, <Person: John>]
-
->>> jane = Person.objects.order_by('name').select_related('favorite_restaurant')[0]
->>> jane.favorite_restaurant.name
-u'Craft'
-
-"""}
-
