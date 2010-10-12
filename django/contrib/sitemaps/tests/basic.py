@@ -1,7 +1,6 @@
 from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.flatpages.models import FlatPage
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
@@ -52,40 +51,51 @@ class SitemapTests(TestCase):
         "A minimal generic sitemap can be rendered"
         # Retrieve the sitemap.
         response = self.client.get('/generic/sitemap.xml')
+
+        expected = ''
+        for username in User.objects.values_list("username", flat=True):
+            expected += "<url><loc>http://example.com/users/%s/</loc></url>" %username
         # Check for all the important bits:
         self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>http://example.com/users/testuser/</loc></url>
+%s
 </urlset>
-""")
+""" %expected)
 
-    def test_flatpage_sitemap(self):
-        "Basic FlatPage sitemap test"
-        public = FlatPage.objects.create(
-            url=u'/public/',
-            title=u'Public Page',
-            enable_comments=True,
-            registration_required=False,
-        )
-        public.sites.add(settings.SITE_ID)
-        private = FlatPage.objects.create(
-            url=u'/private/',
-            title=u'Private Page',
-            enable_comments=True,
-            registration_required=True
-        )
-        private.sites.add(settings.SITE_ID)
-        response = self.client.get('/flatpages/sitemap.xml')
-        # Public flatpage should be in the sitemap
-        self.assertContains(response, '<loc>http://example.com%s</loc>' % public.url)
-        # Private flatpage should not be in the sitemap
-        self.assertNotContains(response, '<loc>http://example.com%s</loc>' % private.url)
+    if "django.contrib.flatpages" in settings.INSTALLED_APPS:
+        def test_flatpage_sitemap(self):
+            "Basic FlatPage sitemap test"
+
+            # Import FlatPage inside the test so that when django.contrib.flatpages
+            # is not installed we don't get problems trying to delete Site
+            # objects (FlatPage has an M2M to Site, Site.delete() tries to
+            # delete related objects, but the M2M table doesn't exist.
+            from django.contrib.flatpages.models import FlatPage
+
+            public = FlatPage.objects.create(
+                url=u'/public/',
+                title=u'Public Page',
+                enable_comments=True,
+                registration_required=False,
+            )
+            public.sites.add(settings.SITE_ID)
+            private = FlatPage.objects.create(
+                url=u'/private/',
+                title=u'Private Page',
+                enable_comments=True,
+                registration_required=True
+            )
+            private.sites.add(settings.SITE_ID)
+            response = self.client.get('/flatpages/sitemap.xml')
+            # Public flatpage should be in the sitemap
+            self.assertContains(response, '<loc>http://example.com%s</loc>' % public.url)
+            # Private flatpage should not be in the sitemap
+            self.assertNotContains(response, '<loc>http://example.com%s</loc>' % private.url)
 
     def test_requestsite_sitemap(self):
         # Make sure hitting the flatpages sitemap without the sites framework
         # installed doesn't raise an exception
         Site._meta.installed = False
-        response = self.client.get('/flatpages/sitemap.xml')
         # Retrieve the sitemap.
         response = self.client.get('/simple/sitemap.xml')
         # Check for all the important bits:
