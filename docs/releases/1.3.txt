@@ -167,3 +167,13 @@ In Django 1.3 the :attr:`~django.test.client.Response.template` attribute is
 deprecated in favor of a new :attr:`~django.test.client.Response.templates`
 attribute, which is always a list, even if it has only a single element or no
 elements.
+
+``DjangoTestRunner``
+~~~~~~~~~~~~~~~~~~~~
+
+As a result of the introduction of support for unittest2, the features
+of :class:`django.test.simple.DjangoTestRunner` (including fail-fast
+and Ctrl-C test termination) have been made redundant. In view of this
+redundancy, :class:`~django.test.simple.DjangoTestRunner` has been
+turned into an empty placeholder class, and will be removed entirely
+in Django 1.5.
