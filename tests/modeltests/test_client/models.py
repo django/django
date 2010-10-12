@@ -20,9 +20,12 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
-from django.test import Client, TestCase
 from django.conf import settings
 from django.core import mail
+from django.test import Client, TestCase, RequestFactory
+
+from views import get_view
+
 
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
@@ -469,3 +472,12 @@ class CustomTestClientTest(TestCase):
         """A test case can specify a custom class for self.client."""
         self.assertEqual(hasattr(self.client, "i_am_customized"), True)
 
+
+class RequestFactoryTest(TestCase):
+    def test_request_factory(self):
+        factory = RequestFactory()
+        request = factory.get('/somewhere/')
+        response = get_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This is a test')

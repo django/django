@@ -1014,6 +1014,51 @@ The following is a simple unit test using the test client::
             # Check that the rendered context contains 5 customers.
             self.assertEqual(len(response.context['customers']), 5)
 
+The request factory
+-------------------
+
+.. Class:: RequestFactory
+
+The :class:`~django.test.client.RequestFactory` is a simplified
+version of the test client that provides a way to generate a request
+instance that can be used as the first argument to any view. This
+means you can test a view function the same way as you would test any
+other function -- as a black box, with exactly known inputs, testing
+for specific outputs.
+
+The API for the :class:`~django.test.client.RequestFactory` is a slightly
+restricted subset of the test client API:
+
+    * It only has access to the HTTP methods :meth:`~Client.get()`,
+      :meth:`~Client.post()`, :meth:`~Client.put()`,
+      :meth:`~Client.delete()`, :meth:`~Client.head()` and
+      :meth:`~Client.options()`.
+
+    * These methods accept all the same arguments *except* for
+      ``follows``. Since this is just a factory for producing
+      requests, it's up to you to handle the response.
+
+Example
+~~~~~~~
+
+The following is a simple unit test using the request factory::
+
+    from django.utils import unittest
+    from django.test.client import RequestFactory
+
+    class SimpleTest(unittest.TestCase):
+        def setUp(self):
+            # Every test needs a client.
+            self.factory = RequestFactory()
+
+        def test_details(self):
+            # Issue a GET request.
+            request = self.factory.get('/customer/details')
+
+            # Test my_view() as if it were deployed at /customer/details
+            response = my_view(request)
+            self.assertEquals(response.status_code, 200)
+
 TestCase
 --------
 
