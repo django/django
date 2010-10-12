@@ -23,6 +23,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Carl Meyer
     * Ramiro Morales
     * Chris Beaven
+    * Honza Král
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -273,7 +274,6 @@ answer newbie questions, and generally made Django that much better:
     Gasper Koren
     Martin Kosír <martin@martinkosir.net>
     Arthur Koziel <http://arthurkoziel.com>
-    Honza Král <honza.kral@gmail.com>
     Meir Kriheli <http://mksoft.co.il/>
     Bruce Kroeze <http://coderseye.com/>
     krzysiek.pawlik@silvermedia.pl

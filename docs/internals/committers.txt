@@ -268,6 +268,19 @@ Ramiro Morales
 .. _Chris Beaven: http://smileychris.com/
 .. _Lincoln Loop: http://lincolnloop.com/
 
+Honza Král
+    Honza first discovered Django in 2006 and started using it right away,
+    first for school and personal projects and later in his full time job. He
+    contributed various patches and fixes mostly to the newforms library,
+    newforms admin and, through participation in the Google Summer of Code
+    project, assisted in creating the :ref:`model validation
+    <validating-objects>` functionality.
+
+    He is currently working for `Whiskey Media`_ in San Francisco developing
+    awesome sites running on pure Django.
+
+.. _Whiskey Media: http://www.whiskeymedia.com/
+
 Specialists
 -----------
 
