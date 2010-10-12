@@ -10,7 +10,7 @@ class Zipcode(models.Model):
     code = models.CharField(max_length=10)
     poly = models.PolygonField(geography=True)
     objects = models.GeoManager()
-    def __unicode__(self): return self.name
+    def __unicode__(self): return self.code
 
 class County(models.Model):
     name = models.CharField(max_length=25)

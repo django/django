@@ -216,7 +216,6 @@ only the following additional :ref:`spatial lookups <spatial-lookups>` are
 available for geography columns:
 
 * :lookup:`bboverlaps`
-* :lookup:`exact`, and :lookup:`same_as`
 * :lookup:`coveredby`
 * :lookup:`covers`
 * :lookup:`intersects`
