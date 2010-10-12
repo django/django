@@ -40,7 +40,7 @@ class ManyToOneNullTests(TestCase):
     def test_created_without_related(self):
         self.assertEqual(self.a3.reporter, None)
         # Need to reget a3 to refresh the cache
-        a3 = Article.objects.get(pk=3)
+        a3 = Article.objects.get(pk=self.a3.pk)
         self.assertRaises(AttributeError, getattr, a3.reporter, 'id')
         # Accessing an article's 'reporter' attribute returns None
         # if the reporter is set to None.
