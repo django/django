@@ -19,22 +19,3 @@ class Person(models.Model):
     full_name = property(_get_full_name)
 
     full_name_2 = property(_get_full_name, _set_full_name)
-
-__test__ = {'API_TESTS':"""
->>> a = Person(first_name='John', last_name='Lennon')
->>> a.save()
->>> a.full_name
-'John Lennon'
-
-# The "full_name" property hasn't provided a "set" method.
->>> a.full_name = 'Paul McCartney'
-Traceback (most recent call last):
-    ...
-AttributeError: can't set attribute
-
-# But "full_name_2" has, and it can be used to initialise the class.
->>> a2 = Person(full_name_2 = 'Paul McCartney')
->>> a2.save()
->>> a2.first_name
-'Paul'
-"""}
