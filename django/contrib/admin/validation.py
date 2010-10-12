@@ -4,7 +4,6 @@ from django.forms.models import (BaseModelForm, BaseModelFormSet, fields_for_mod
     _get_foreign_key)
 from django.contrib.admin.options import flatten_fieldsets, BaseModelAdmin
 from django.contrib.admin.options import HORIZONTAL, VERTICAL
-from django.contrib.admin.util import lookup_field
 
 
 __all__ = ['validate']

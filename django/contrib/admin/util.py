@@ -1,4 +1,3 @@
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.forms.forms import pretty_name
 from django.utils import formats
@@ -6,7 +5,7 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.encoding import force_unicode, smart_unicode, smart_str
-from django.utils.translation import ungettext, ugettext as _
+from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.datastructures import SortedDict
 

@@ -1,11 +1,9 @@
-import base64
 try:
     from functools import wraps
 except ImportError:
     from django.utils.functional import wraps  # Python 2.4 fallback.
 
 from django import http, template
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render_to_response

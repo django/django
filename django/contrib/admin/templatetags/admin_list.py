@@ -6,7 +6,6 @@ from django.contrib.admin.views.main import ALL_VAR, EMPTY_CHANGELIST_VALUE
 from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.forms.forms import pretty_name
 from django.utils import formats
 from django.utils.html import escape, conditional_escape
 from django.utils.safestring import mark_safe

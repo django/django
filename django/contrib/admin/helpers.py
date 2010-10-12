@@ -4,7 +4,6 @@ from django.contrib.admin.util import flatten_fieldsets, lookup_field
 from django.contrib.admin.util import display_for_field, label_for_field
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.fields import FieldDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
 from django.forms.util import flatatt
 from django.template.defaultfilters import capfirst
