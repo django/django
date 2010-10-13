@@ -1050,11 +1050,11 @@ The following is a simple unit test using the request factory::
 
     class SimpleTest(unittest.TestCase):
         def setUp(self):
-            # Every test needs a client.
+            # Every test needs access to the request factory.
             self.factory = RequestFactory()
 
         def test_details(self):
-            # Create a in instance of a GET request.
+            # Create an instance of a GET request.
             request = self.factory.get('/customer/details')
 
             # Test my_view() as if it were deployed at /customer/details
