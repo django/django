@@ -40,7 +40,7 @@ def construct_instance(form, instance, fields=None, exclude=None):
         if not f.editable or isinstance(f, models.AutoField) \
                 or not f.name in cleaned_data:
             continue
-        if fields and f.name not in fields:
+        if fields is not None and f.name not in fields:
             continue
         if exclude and f.name in exclude:
             continue
@@ -168,7 +168,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
     for f in opts.fields + opts.many_to_many:
         if not f.editable:
             continue
-        if fields and not f.name in fields:
+        if fields is not None and not f.name in fields:
             continue
         if exclude and f.name in exclude:
             continue

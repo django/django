@@ -159,6 +159,14 @@ class InlineFormsetTests(TestCase):
         form = Form(instance=None)
         formset = FormSet(instance=None)
 
+    def test_empty_fields_on_modelformset(self):
+        "No fields passed to modelformset_factory should result in no fields on returned forms except for the id. See #14119."
+        UserFormSet = modelformset_factory(User, fields=())
+        formset = UserFormSet()
+        for form in formset.forms:
+            self.assertTrue('id' in form.fields)
+            self.assertEqual(len(form.fields), 1)
+
 
 class CustomWidget(forms.CharField):
     pass

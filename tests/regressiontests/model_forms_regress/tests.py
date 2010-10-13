@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 
 from django import forms
-from django.forms.models import modelform_factory, ModelChoiceField
+from django.forms.models import modelform_factory, ModelChoiceField, fields_for_model, construct_instance
 from django.test import TestCase
 from django.core.exceptions import FieldError, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -417,3 +417,28 @@ class UniqueErrorsTests(TestCase):
         self.assertEquals(form.errors, {'__all__': [u'Edition with this Author and Publication already exists.']})
         form = EditionForm(data={'author': self.author2.pk, 'publication': self.pub1.pk, 'edition': 1, 'isbn': '9783161487777'})
         self.assertEquals(form.errors, {'__all__': [u'Edition with this Publication and Edition already exists.']})
+
+
+class EmptyFieldsTestCase(TestCase):
+    "Tests for fields=() cases as reported in #14119"
+    class EmptyPersonForm(forms.ModelForm):
+        class Meta:
+            model = Person
+            fields = ()
+
+    def test_empty_fields_to_fields_for_model(self):
+        "An argument of fields=() to fields_for_model should return an empty dictionary"
+        field_dict = fields_for_model(Person, fields=())
+        self.assertEqual(len(field_dict), 0)
+
+    def test_empty_fields_on_modelform(self):
+        "No fields on a ModelForm should actually result in no fields"
+        form = self.EmptyPersonForm()
+        self.assertEqual(len(form.fields), 0)
+
+    def test_empty_fields_to_construct_instance(self):
+        "No fields should be set on a model instance if construct_instance receives fields=()"
+        form = modelform_factory(Person)({'name': 'John Doe'})
+        self.assertTrue(form.is_valid())
+        instance = construct_instance(form, Person(), fields=())
+        self.assertEqual(instance.name, '')
