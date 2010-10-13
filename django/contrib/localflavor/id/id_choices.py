@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 # I decided to use unambiguous and consistent (some are common) 3-letter codes.
 
 PROVINCE_CHOICES = (
+    ('ACE', _('Aceh')),
     ('BLI', _('Bali')),
     ('BTN', _('Banten')),
     ('BKL', _('Bengkulu')),
@@ -25,7 +26,6 @@ PROVINCE_CHOICES = (
     ('LPG', _('Lampung')),
     ('MLK', _('Maluku')),
     ('MUT', _('Maluku Utara')),
-    ('NAD', _('Nanggroe Aceh Darussalam')),
     ('NTB', _('Nusa Tenggara Barat')),
     ('NTT', _('Nusa Tenggara Timur')),
     ('PPA', _('Papua')),
