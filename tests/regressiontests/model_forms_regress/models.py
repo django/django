@@ -60,3 +60,12 @@ class Homepage(models.Model):
 
 class Document(models.Model):
     myfile = models.FileField(upload_to='unused', blank=True)
+
+class Edition(models.Model):
+    author = models.ForeignKey(Person)
+    publication = models.ForeignKey(Publication)
+    edition = models.IntegerField()
+    isbn = models.CharField(max_length=13, unique=True)
+
+    class Meta:
+        unique_together = (('author', 'publication'), ('publication', 'edition'),)

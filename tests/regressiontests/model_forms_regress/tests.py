@@ -8,7 +8,7 @@ from django.core.exceptions import FieldError, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from models import Person, RealPerson, Triple, FilePathModel, Article, \
-    Publication, CustomFF, Author, Author1, Homepage, Document
+    Publication, CustomFF, Author, Author1, Homepage, Document, Edition
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
@@ -389,3 +389,31 @@ class FileFieldTests(unittest.TestCase):
         rendered = unicode(form)
         self.assert_('something.txt' in rendered)
         self.assert_('myfile-clear' in rendered)
+
+class EditionForm(forms.ModelForm):
+    author = forms.ModelChoiceField(queryset=Person.objects.all())
+    publication = forms.ModelChoiceField(queryset=Publication.objects.all())
+    edition = forms.IntegerField()
+    isbn = forms.CharField(max_length=13)
+
+    class Meta:
+        model = Edition
+
+class UniqueErrorsTests(TestCase):
+    def setUp(self):
+        self.author1 = Person.objects.create(name=u'Author #1')
+        self.author2 = Person.objects.create(name=u'Author #2')
+        self.pub1 = Publication.objects.create(title='Pub #1', date_published=date(2000, 10, 31))
+        self.pub2 = Publication.objects.create(title='Pub #2', date_published=date(2004, 1, 5))
+        form = EditionForm(data={'author': self.author1.pk, 'publication': self.pub1.pk, 'edition': 1, 'isbn': '9783161484100'})
+        form.save()
+
+    def test_unique_error_message(self):
+        form = EditionForm(data={'author': self.author1.pk, 'publication': self.pub2.pk, 'edition': 1, 'isbn': '9783161484100'})
+        self.assertEquals(form.errors, {'isbn': [u'Edition with this Isbn already exists.']})
+
+    def test_unique_together_error_message(self):
+        form = EditionForm(data={'author': self.author1.pk, 'publication': self.pub1.pk, 'edition': 2, 'isbn': '9783161489999'})
+        self.assertEquals(form.errors, {'__all__': [u'Edition with this Author and Publication already exists.']})
+        form = EditionForm(data={'author': self.author2.pk, 'publication': self.pub1.pk, 'edition': 1, 'isbn': '9783161487777'})
+        self.assertEquals(form.errors, {'__all__': [u'Edition with this Publication and Edition already exists.']})
