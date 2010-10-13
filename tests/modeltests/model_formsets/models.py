@@ -35,6 +35,23 @@ class BookWithCustomPK(models.Model):
     def __unicode__(self):
         return u'%s: %s' % (self.my_pk, self.title)
 
+class Editor(models.Model):
+    name = models.CharField(max_length=100)
+
+class BookWithOptionalAltEditor(models.Model):
+    author = models.ForeignKey(Author)
+    # Optional secondary author
+    alt_editor = models.ForeignKey(Editor, blank=True, null=True)
+    title = models.CharField(max_length=100)
+
+    class Meta:
+        unique_together = (
+            ('author', 'title', 'alt_editor'),
+        )
+
+    def __unicode__(self):
+        return self.title
+
 class AlternateBook(Book):
     notes = models.CharField(max_length=100)
 
@@ -647,6 +664,26 @@ True
 
 >>> formset.save()
 [<AlternateBook: Flowers of Evil - English translation of Les Fleurs du Mal>]
+
+Test inline formsets where the inline-edited object has a unique_together constraint with a nullable member
+
+>>> AuthorBooksFormSet4 = inlineformset_factory(Author, BookWithOptionalAltEditor, can_delete=False, extra=2)
+
+>>> data = {
+...     'bookwithoptionalalteditor_set-TOTAL_FORMS': '2', # the number of forms rendered
+...     'bookwithoptionalalteditor_set-INITIAL_FORMS': '0', # the number of forms with initial data
+...     'bookwithoptionalalteditor_set-MAX_NUM_FORMS': '', # the max number of forms
+...     'bookwithoptionalalteditor_set-0-author': '1',
+...     'bookwithoptionalalteditor_set-0-title': 'Les Fleurs du Mal',
+...     'bookwithoptionalalteditor_set-1-author': '1',
+...     'bookwithoptionalalteditor_set-1-title': 'Les Fleurs du Mal',
+... }
+>>> formset = AuthorBooksFormSet4(data, instance=author)
+>>> formset.is_valid()
+True
+
+>>> formset.save()
+[<BookWithOptionalAltEditor: Les Fleurs du Mal>, <BookWithOptionalAltEditor: Les Fleurs du Mal>]
 
 
 # ModelForm with a custom save method in an inline formset ###################

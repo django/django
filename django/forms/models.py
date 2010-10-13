@@ -526,10 +526,9 @@ class BaseModelFormSet(BaseFormSet):
                 # it's already invalid
                 if not hasattr(form, "cleaned_data"):
                     continue
-                # get each of the fields for which we have data on this form
-                if [f for f in unique_check if f in form.cleaned_data and form.cleaned_data[f] is not None]:
-                    # get the data itself
-                    row_data = tuple([form.cleaned_data[field] for field in unique_check])
+                # get data for each field of each of unique_check
+                row_data = tuple([form.cleaned_data[field] for field in unique_check if field in form.cleaned_data])
+                if row_data and not None in row_data:
                     # if we've aready seen it then we have a uniqueness failure
                     if row_data in seen_data:
                         # poke error messages into the right places and mark
