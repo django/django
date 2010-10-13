@@ -453,9 +453,8 @@ class ModelAdmin(BaseModelAdmin):
 
     def log_deletion(self, request, object, object_repr):
         """
-        Log that an object has been successfully deleted. Note that since the
-        object is deleted, it might no longer be safe to call *any* methods
-        on the object, hence this method getting object_repr.
+        Log that an object will be deleted. Note that this method is called
+        before the deletion.
 
         The default implementation creates an admin LogEntry object.
         """
@@ -1097,6 +1096,7 @@ class ModelAdmin(BaseModelAdmin):
         ], context, context_instance=context_instance)
 
     @csrf_protect_m
+    @transaction.commit_on_success
     def delete_view(self, request, object_id, extra_context=None):
         "The 'delete' admin view for this model."
         opts = self.model._meta
