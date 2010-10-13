@@ -86,8 +86,18 @@ class EmptyQuerySetTests(TestCase):
     def test_emptyqueryset_values(self):
         "#14366 -- calling .values() on an EmptyQuerySet and then cloning that should not cause an error"
         self.assertEqual(list(Number.objects.none().values('num').order_by('num')), [])
-    
+
     def test_values_subquery(self):
         self.assertQuerysetEqual(
             Number.objects.filter(pk__in=Number.objects.none().values("pk")), []
         )
+
+
+class WeirdQuerySetSlicing(TestCase):
+    def setUp(self):
+        Number.objects.create(num=1)
+        Number.objects.create(num=2)
+
+    def test_empty_resultset_sql(self):
+        # ticket #12192
+        self.assertNumQueries(0, lambda: list(Number.objects.all()[1:1]))

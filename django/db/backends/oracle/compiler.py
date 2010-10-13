@@ -27,6 +27,8 @@ class SQLCompiler(compiler.SQLCompiler):
         If 'with_limits' is False, any limit/offset information is not
         included in the query.
         """
+        if with_limits and self.query.low_mark == self.query.high_mark:
+            return '', ()
 
         # The `do_offset` flag indicates whether we need to construct
         # the SQL needed to use limit/offset with Oracle.

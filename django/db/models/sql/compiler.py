@@ -52,6 +52,9 @@ class SQLCompiler(object):
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
+        if with_limits and self.query.low_mark == self.query.high_mark:
+            return '', ()
+
         self.pre_sql_setup()
         out_cols = self.get_columns(with_col_aliases)
         ordering, ordering_group_by = self.get_ordering()
