@@ -258,7 +258,7 @@ Ramiro Morales
 
 `Chris Beaven`_
     Chris has been submitting patches and suggesting crazy ideas for Django
-    since early 2006. An advocate for community involement and a long-term
+    since early 2006. An advocate for community involvement and a long-term
     triager, he is still often found answering questions in the #django IRC
     channel.
 
