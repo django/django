@@ -56,6 +56,29 @@ you just won't get any of the nice new unittest2 features.
 
 .. _unittest2: http://pypi.python.org/pypi/unittest2
 
+Everything else
+~~~~~~~~~~~~~~~
+
+Django :doc:`1.1 <1.1>` and :doc:`1.2 <1.2>` added
+lots of big ticket items to Django, like multiple-database support,
+model validation, and a session-based messages framework. However,
+this focus on big features came at the cost of lots of smaller
+features.
+
+To compensate for this, the focus of the Django 1.3 development
+process has been on adding lots of smaller, long standing feature
+requests. These include:
+
+    * Improved tools for accessing and manipulating the current Site.
+
+    * A :class:`~django.test.client.RequestFactory` for mocking
+      requests in tests.
+
+    * A new test assertion --
+      :meth:`~django.test.client.Client.assertNumQueries` -- making it
+      easier to test the database activity associated with a view.
+
+
 .. _backwards-incompatible-changes-1.3:
 
 Backwards-incompatible changes in 1.3
