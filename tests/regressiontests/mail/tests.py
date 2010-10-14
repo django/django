@@ -363,3 +363,18 @@ class MailTests(TestCase):
 
         settings.ADMINS = old_admins
         settings.MANAGERS = old_managers
+
+    def test_idn_validation(self):
+        """Test internationalized email adresses"""
+        # Regression for #14301.
+        mail.outbox = []
+        from_email = u'fröm@öäü.com'
+        to_email = u'tö@öäü.com'
+        connection = mail.get_connection('django.core.mail.backends.locmem.EmailBackend')
+        send_mail('Subject', 'Content', from_email, [to_email], connection=connection)
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(message.subject, 'Subject')
+        self.assertEqual(message.from_email, from_email)
+        self.assertEqual(message.to, [to_email])
+        self.assertTrue(message.message().as_string().startswith('Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: =?utf-8?b?ZnLDtm1Aw7bDpMO8LmNvbQ==?=\nTo: =?utf-8?b?dMO2QMO2w6TDvC5jb20=?='))
