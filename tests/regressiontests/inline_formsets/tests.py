@@ -2,7 +2,9 @@ from django.test import TestCase
 from django.forms.models import inlineformset_factory
 from regressiontests.inline_formsets.models import Poet, Poem, School, Parent, Child
 
+
 class DeletionTests(TestCase):
+
     def test_deletion(self):
         PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True)
         poet = Poet.objects.create(name='test')
@@ -103,3 +105,51 @@ class DeletionTests(TestCase):
             obj.save()
         self.assertEqual(school.child_set.count(), 1)
 
+
+class InlineFormsetFactoryTest(TestCase):
+    def test_inline_formset_factory(self):
+        """
+        These should both work without a problem.
+        """
+        inlineformset_factory(Parent, Child, fk_name='mother')
+        inlineformset_factory(Parent, Child, fk_name='father')
+
+    def test_exception_on_unspecified_foreign_key(self):
+        """
+        Child has two ForeignKeys to Parent, so if we don't specify which one
+        to use for the inline formset, we should get an exception.
+        """
+        self.assertRaisesRegexp(Exception,
+            "<class 'regressiontests.inline_formsets.models.Child'> has more than 1 ForeignKey to <class 'regressiontests.inline_formsets.models.Parent'>",
+            inlineformset_factory, Parent, Child
+        )
+
+    def test_fk_name_not_foreign_key_field_from_child(self):
+        """
+        If we specify fk_name, but it isn't a ForeignKey from the child model
+        to the parent model, we should get an exception.
+        """
+        self.assertRaises(Exception,
+            "fk_name 'school' is not a ForeignKey to <class 'regressiontests.inline_formsets.models.Parent'>",
+            inlineformset_factory, Parent, Child, fk_name='school'
+        )
+
+    def test_non_foreign_key_field(self):
+        """
+        If the field specified in fk_name is not a ForeignKey, we should get an
+        exception.
+        """
+        self.assertRaisesRegexp(Exception,
+            "<class 'regressiontests.inline_formsets.models.Child'> has no field named 'test'",
+            inlineformset_factory, Parent, Child, fk_name='test'
+        )
+
+    def test_any_iterable_allowed_as_argument_to_exclude(self):
+        # Regression test for #9171.
+        inlineformset_factory(
+            Parent, Child, exclude=['school'], fk_name='mother'
+        )
+
+        inlineformset_factory(
+            Parent, Child, exclude=('school',), fk_name='mother'
+        )
