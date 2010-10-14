@@ -856,6 +856,12 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
 
 .. class:: ModelChoiceField(**kwargs)
 
+    * Default widget: ``Select``
+    * Empty value: ``None``
+    * Normalizes to: A model instance.
+    * Validates that the given id exists in the queryset.
+    * Error message keys: ``required``, ``invalid_choice``
+
 Allows the selection of a single model object, suitable for
 representing a foreign key.  A single argument is required:
 
@@ -900,6 +906,14 @@ example::
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: ModelMultipleChoiceField(**kwargs)
+
+    * Default widget: ``SelectMultiple``
+    * Empty value: ``[]`` (an empty list) 
+    * Normalizes to: A list of model instances.
+    * Validates that every id in the given list of values exists in the
+      queryset.
+    * Error message keys: ``required``, ``list``, ``invalid_choice``, 
+      ``invalid_pk_value``
 
 Allows the selection of one or more model objects, suitable for
 representing a many-to-many relation. As with :class:`ModelChoiceField`,
