@@ -15,6 +15,7 @@ from django.utils.cache import patch_vary_headers
 from django.utils.hashcompat import md5_constructor
 from django.utils.log import getLogger
 from django.utils.safestring import mark_safe
+from django.utils.crypto import constant_time_compare
 
 _POST_FORM_RE = \
     re.compile(r'(<form\W[^>]*\bmethod\s*=\s*(\'|"|)POST(\'|"|)\b[^>]*>)', re.IGNORECASE)
@@ -216,8 +217,8 @@ class CsrfViewMiddleware(object):
                 csrf_token = request.META["CSRF_COOKIE"]
 
             # check incoming token
-            request_csrf_token = request.POST.get('csrfmiddlewaretoken', None)
-            if request_csrf_token != csrf_token:
+            request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+            if not constant_time_compare(request_csrf_token, csrf_token):
                 if cookie_is_new:
                     # probably a problem setting the CSRF cookie
                     logger.warning('Forbidden (%s): %s' % (REASON_NO_CSRF_COOKIE, request.path),

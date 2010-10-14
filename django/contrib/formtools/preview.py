@@ -9,6 +9,7 @@ from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.hashcompat import md5_constructor
+from django.utils.crypto import constant_time_compare
 from django.contrib.formtools.utils import security_hash
 
 AUTO_ID = 'formtools_%s' # Each form here uses this as its auto_id parameter.
@@ -67,11 +68,33 @@ class FormPreview(object):
         else:
             return render_to_response(self.form_template, context, context_instance=RequestContext(request))
 
+    def _check_security_hash(self, token, request, form):
+        expected = self.security_hash(request, form)
+        if constant_time_compare(token, expected):
+            return True
+        else:
+            # Fall back to Django 1.2 method, for compatibility with forms that
+            # are in the middle of being used when the upgrade occurs. However,
+            # we don't want to do this fallback if a subclass has provided their
+            # own security_hash method - because they might have implemented a
+            # more secure method, and this would punch a hole in that.
+
+            # PendingDeprecationWarning <- left here to remind us that this
+            # compatibility fallback should be removed in Django 1.5
+            FormPreview_expected = FormPreview.security_hash(self, request, form)
+            if expected == FormPreview_expected:
+                # They didn't override security_hash, do the fallback:
+                old_expected = security_hash(request, form)
+                return constant_time_compare(token, old_expected)
+            else:
+                return False
+
     def post_post(self, request):
         "Validates the POST data. If valid, calls done(). Else, redisplays form."
         f = self.form(request.POST, auto_id=AUTO_ID)
         if f.is_valid():
-            if self.security_hash(request, f) != request.POST.get(self.unused_name('hash')):
+            if not self._check_security_hash(request.POST.get(self.unused_name('hash'), ''),
+                                             request, f):
                 return self.failed_hash(request) # Security hash failed.
             return self.done(request, f.cleaned_data)
         else:

@@ -8,12 +8,13 @@ import cPickle as pickle
 
 from django import forms
 from django.conf import settings
+from django.contrib.formtools.utils import security_hash, form_hmac
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
+from django.utils.crypto import constant_time_compare
 from django.utils.hashcompat import md5_constructor
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.formtools.utils import security_hash
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 
@@ -53,6 +54,27 @@ class FormWizard(object):
         # hook methods might alter self.form_list.
         return len(self.form_list)
 
+    def _check_security_hash(self, token, request, form):
+        expected = self.security_hash(request, form)
+        if constant_time_compare(token, expected):
+            return True
+        else:
+            # Fall back to Django 1.2 method, for compatibility with forms that
+            # are in the middle of being used when the upgrade occurs. However,
+            # we don't want to do this fallback if a subclass has provided their
+            # own security_hash method - because they might have implemented a
+            # more secure method, and this would punch a hole in that.
+
+            # PendingDeprecationWarning <- left here to remind us that this
+            # compatibility fallback should be removed in Django 1.5
+            FormWizard_expected = FormWizard.security_hash(self, request, form)
+            if expected == FormWizard_expected:
+                # They didn't override security_hash, do the fallback:
+                old_expected = security_hash(request, form)
+                return constant_time_compare(token, old_expected)
+            else:
+                return False
+
     @method_decorator(csrf_protect)
     def __call__(self, request, *args, **kwargs):
         """
@@ -72,7 +94,7 @@ class FormWizard(object):
         # TODO: Move "hash_%d" to a method to make it configurable.
         for i in range(current_step):
             form = self.get_form(i, request.POST)
-            if request.POST.get("hash_%d" % i, '') != self.security_hash(request, form):
+            if not self._check_security_hash(request.POST.get("hash_%d" % i, ''), request, form):
                 return self.render_hash_failure(request, i)
             self.process_step(request, form, i)
 
@@ -95,6 +117,21 @@ class FormWizard(object):
                 # Validate all the forms. If any of them fail validation, that
                 # must mean the validator relied on some other input, such as
                 # an external Web site.
+
+                # It is also possible that validation might fail under certain
+                # attack situations: an attacker might be able to bypass previous
+                # stages, and generate correct security hashes for all the
+                # skipped stages by virtue of:
+                #  1) having filled out an identical form which doesn't have the
+                #     validation (and does something different at the end),
+                #  2) or having filled out a previous version of the same form
+                #     which had some validation missing,
+                #  3) or previously having filled out the form when they had
+                #     more privileges than they do now.
+                #
+                # Since the hashes only take into account values, and not other
+                # other validation the form might do, we must re-do validation
+                # now for security reasons.
                 for i, f in enumerate(final_form_list):
                     if not f.is_valid():
                         return self.render_revalidation_failure(request, i, f)
@@ -155,7 +192,7 @@ class FormWizard(object):
         Subclasses may want to take into account request-specific information,
         such as the IP address.
         """
-        return security_hash(request, form)
+        return form_hmac(form)
 
     def determine_step(self, request, *args, **kwargs):
         """

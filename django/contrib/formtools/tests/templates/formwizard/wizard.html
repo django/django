@@ -1,0 +1,9 @@
+<p>Step {{ step }} of {{ step_count }}</p>
+<form action="." method="post">{% csrf_token %}
+<table>
+{{ form }}
+</table>
+<input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+{{ previous_fields|safe }}
+<input type="submit">
+</form>

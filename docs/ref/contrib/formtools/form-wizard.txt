@@ -240,7 +240,7 @@ Advanced ``FormWizard`` methods
     Calculates the security hash for the given request object and
     :class:`~django.forms.Form` instance.
 
-    By default, this uses an MD5 hash of the form data and your
+    By default, this generates a SHA1 HMAC using your form data and your
     :setting:`SECRET_KEY` setting. It's rare that somebody would need to
     override this.
 
