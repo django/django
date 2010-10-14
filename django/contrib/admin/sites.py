@@ -28,8 +28,9 @@ class AdminSite(object):
     """
     An AdminSite object encapsulates an instance of the Django admin application, ready
     to be hooked in to your URLconf. Models are registered with the AdminSite using the
-    register() method, and the root() method can then be used as a Django view function
-    that presents a full admin interface for the collection of registered models.
+    register() method, and the get_urls() method can then be used to access Django view
+    functions that present a full admin interface for the collection of registered
+    models.
     """
 
     index_template = None
