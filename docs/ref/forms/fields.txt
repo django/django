@@ -352,7 +352,11 @@ Takes one extra required argument:
 .. attribute:: ChoiceField.choices
 
     An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
-    field.
+    field. This argument accepts the same formats as the ``choices`` argument
+    to a model field. See the `model field reference documentation on choices`_
+    for more details.
+    
+    .. _model field reference documentation on choices: ../models/fields#choices
 
 ``TypedChoiceField``
 ~~~~~~~~~~~~~~~~~~~~
