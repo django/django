@@ -4,7 +4,7 @@ Django's standard crypto functions and utilities.
 import hmac
 
 from django.conf import settings
-from django.utils.hashcompat import sha_constructor
+from django.utils.hashcompat import sha_constructor, sha_hmac
 
 
 def salted_hmac(key_salt, value, secret=None):
@@ -28,7 +28,7 @@ def salted_hmac(key_salt, value, secret=None):
     # the hmac module does the same thing for keys longer than the block size.
     # However, we need to ensure that we *always* do this.
 
-    return hmac.new(key, msg=value, digestmod=sha_constructor)
+    return hmac.new(key, msg=value, digestmod=sha_hmac)
 
 
 def constant_time_compare(val1, val2):
