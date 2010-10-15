@@ -231,6 +231,23 @@ Brazil (``br``)
     A ``Select`` widget that uses a list of Brazilian states/territories as its
     choices.
 
+.. class:: br.forms.BRCPFField
+
+    A form field that validates input as `Brazilian CPF`_.
+    
+    Input can either be of the format XXX.XXX.XXX-VD or be a group of 11 digits.
+
+.. _Brazilian CPF: http://en.wikipedia.org/wiki/Cadastro_de_Pessoas_F%C3%ADsicas
+
+.. class:: br.forms.BRCNPJField
+
+    A form field that validates input as `Brazilian CNPJ`_.
+    
+    Input can either be of the format XX.XXX.XXX/XXXX-XX or be a group of 14
+    digits.
+
+.. _Brazilian CNPJ: http://en.wikipedia.org/wiki/National_identification_number#Brazil
+
 Canada (``ca``)
 ===============
 
