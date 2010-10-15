@@ -69,6 +69,8 @@ purely database-related, whereas :attr:`~Field.blank` is validation-related. If
 a field has ``blank=True``, validation on Django's admin site will allow entry
 of an empty value. If a field has ``blank=False``, the field will be required.
 
+.. _field-choices:
+
 ``choices``
 -----------
 
