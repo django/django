@@ -451,7 +451,7 @@ Indonesia (``id``)
 Israel (``il``)
 ===============
 
-.. class: il.forms.ILPostalCodeField
+.. class:: il.forms.ILPostalCodeField
 
     A form field that validates its input as an Israeli five-digit postal code.
 
@@ -459,8 +459,8 @@ Israel (``il``)
 
     A form field that validates its input as an `Israeli identification number`_.
     The output will be in the format of a 2-9 digit number, consisting of a
-    1-8 digit ID number followed by a single checksum digit, calculated using the `Luhn
-    algorithm.`_.
+    1-8 digit ID number followed by a single checksum digit, calculated using
+    the `Luhn algorithm`_.
 
     Input may contain an optional hyphen separating the ID number from the checksum
     digit.
