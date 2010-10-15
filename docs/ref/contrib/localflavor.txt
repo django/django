@@ -51,6 +51,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * India_
     * Indonesia_
     * Ireland_
+    * Israel_
     * Italy_
     * Japan_
     * Kuwait_
@@ -99,6 +100,7 @@ Here's an example of how to use them::
 .. _India: `India (in\_)`_
 .. _Indonesia: `Indonesia (id)`_
 .. _Ireland: `Ireland (ie)`_
+.. _Israel: `Israel (il)`_
 .. _Italy: `Italy (it)`_
 .. _Japan: `Japan (jp)`_
 .. _Kuwait: `Kuwait (kw)`_
@@ -445,6 +447,28 @@ Indonesia (``id``)
     down the numbers.
 
 .. _NIK: http://en.wikipedia.org/wiki/Indonesian_identity_card
+
+Israel (``il``)
+===============
+
+.. class: il.forms.ILPostalCodeField
+
+    A form field that validates its input as an Israeli five-digit postal code.
+
+.. class:: il.forms.ILIDNumberField
+
+    A form field that validates its input as an `Israeli identification number`_.
+    The output will be in the format of a 2-9 digit number, consisting of a
+    1-8 digit ID number followed by a single checksum digit, calculated using the `Luhn
+    algorithm.`_.
+
+    Input may contain an optional hyphen separating the ID number from the checksum
+    digit.
+
+.. _Israeli identification number: http://he.wikipedia.org/wiki/%D7%9E%D7%A1%D7%A4%D7%A8_%D7%96%D7%94%D7%95%D7%AA_(%D7%99%D7%A9%D7%A8%D7%90%D7%9C)
+.. _Luhn algorithm: http://en.wikipedia.org/wiki/Luhn_algorithm
+
+
 
 Italy (``it``)
 ==============
