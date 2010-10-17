@@ -107,6 +107,13 @@ class DeletionTests(TestCase):
 
 
 class InlineFormsetFactoryTest(TestCase):
+    def assertRaisesErrorWithMessage(self, error, message, callable, *args, **kwargs):
+        self.assertRaises(error, callable, *args, **kwargs)
+        try:
+            callable(*args, **kwargs)
+        except error, e:
+            self.assertEqual(message, str(e))
+
     def test_inline_formset_factory(self):
         """
         These should both work without a problem.
@@ -119,7 +126,7 @@ class InlineFormsetFactoryTest(TestCase):
         Child has two ForeignKeys to Parent, so if we don't specify which one
         to use for the inline formset, we should get an exception.
         """
-        self.assertRaisesRegexp(Exception,
+        self.assertRaisesErrorWithMessage(Exception,
             "<class 'regressiontests.inline_formsets.models.Child'> has more than 1 ForeignKey to <class 'regressiontests.inline_formsets.models.Parent'>",
             inlineformset_factory, Parent, Child
         )
@@ -129,7 +136,7 @@ class InlineFormsetFactoryTest(TestCase):
         If we specify fk_name, but it isn't a ForeignKey from the child model
         to the parent model, we should get an exception.
         """
-        self.assertRaises(Exception,
+        self.assertRaisesErrorWithMessage(Exception,
             "fk_name 'school' is not a ForeignKey to <class 'regressiontests.inline_formsets.models.Parent'>",
             inlineformset_factory, Parent, Child, fk_name='school'
         )
@@ -139,7 +146,7 @@ class InlineFormsetFactoryTest(TestCase):
         If the field specified in fk_name is not a ForeignKey, we should get an
         exception.
         """
-        self.assertRaisesRegexp(Exception,
+        self.assertRaisesErrorWithMessage(Exception,
             "<class 'regressiontests.inline_formsets.models.Child'> has no field named 'test'",
             inlineformset_factory, Parent, Child, fk_name='test'
         )

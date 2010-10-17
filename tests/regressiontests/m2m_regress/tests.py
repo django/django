@@ -6,6 +6,13 @@ from models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
 
 
 class M2MRegressionTests(TestCase):
+    def assertRaisesErrorWithMessage(self, error, message, callable, *args, **kwargs):
+        self.assertRaises(error, callable, *args, **kwargs)
+        try:
+            callable(*args, **kwargs)
+        except error, e:
+            self.assertEqual(message, str(e))
+
     def test_multiple_m2m(self):
         # Multiple m2m references to model must be distinguished when
         # accessing the relations through an instance attribute.
@@ -33,8 +40,8 @@ class M2MRegressionTests(TestCase):
         # The secret internal related names for self-referential many-to-many
         # fields shouldn't appear in the list when an error is made.
 
-        self.assertRaisesRegexp(FieldError,
-            "Choices are: id, name, references, related, selfreferchild, selfreferchildsibling$",
+        self.assertRaisesErrorWithMessage(FieldError,
+            "Cannot resolve keyword 'porcupine' into field. Choices are: id, name, references, related, selfreferchild, selfreferchildsibling",
             lambda: SelfRefer.objects.filter(porcupine='fred')
         )
 
