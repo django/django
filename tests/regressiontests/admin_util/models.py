@@ -1,7 +1,5 @@
 from django.db import models
 
-
-
 class Article(models.Model):
     """
     A simple Article model for testing
@@ -20,3 +18,16 @@ class Article(models.Model):
 
 class Count(models.Model):
     num = models.PositiveSmallIntegerField()
+
+class Event(models.Model):
+    date = models.DateTimeField(auto_now_add=True)
+
+class Location(models.Model):
+    event = models.OneToOneField(Event, verbose_name='awesome event')
+
+class Guest(models.Model):
+    event = models.OneToOneField(Event)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = "awesome guest"
