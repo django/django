@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.related import RelatedObject
 from django.forms.forms import pretty_name
 from django.utils import formats
 from django.utils.html import escape
@@ -278,7 +279,11 @@ def lookup_field(name, obj, model_admin=None):
 def label_for_field(name, model, model_admin=None, return_attr=False):
     attr = None
     try:
-        label = model._meta.get_field_by_name(name)[0].verbose_name
+        field = model._meta.get_field_by_name(name)[0]
+        if isinstance(field, RelatedObject):
+            label = field.opts.verbose_name
+        else:
+            label = field.verbose_name
     except models.FieldDoesNotExist:
         if name == "__unicode__":
             label = force_unicode(model._meta.verbose_name)
