@@ -11,13 +11,11 @@ class AssertNumQueriesTests(TestCase):
             pass
 
         with self.assertNumQueries(1):
-            # Guy who wrote Linux
-            Person.objects.create(name="Linus Torvalds")
+            Person.objects.count()
 
         with self.assertNumQueries(2):
-            # Guy who owns the bagel place I like
-            Person.objects.create(name="Uncle Ricky")
-            self.assertEqual(Person.objects.count(), 2)
+            Person.objects.count()
+            Person.objects.count()
 
     def test_failure(self):
         with self.assertRaises(AssertionError) as exc_info:

@@ -88,8 +88,8 @@ class GenericRelationsTests(TestCase):
 
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
                 (u'clearish', Mineral, quartz.pk),
-                (u'fatty', Vegetable, bacon.pk),
                 (u'fatty', Animal, platypus.pk),
+                (u'fatty', Vegetable, bacon.pk),
                 (u'hairy', Animal, lion.pk),
                 (u'salty', Vegetable, bacon.pk),
                 (u'shiny', Animal, platypus.pk),
@@ -100,8 +100,8 @@ class GenericRelationsTests(TestCase):
         lion.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
                 (u'clearish', Mineral, quartz.pk),
-                (u'fatty', Vegetable, bacon.pk),
                 (u'fatty', Animal, platypus.pk),
+                (u'fatty', Vegetable, bacon.pk),
                 (u'salty', Vegetable, bacon.pk),
                 (u'shiny', Animal, platypus.pk)
             ],
@@ -114,8 +114,8 @@ class GenericRelationsTests(TestCase):
         quartz.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
                 (u'clearish', Mineral, quartz_pk),
-                (u'fatty', Vegetable, bacon.pk),
                 (u'fatty', Animal, platypus.pk),
+                (u'fatty', Vegetable, bacon.pk),
                 (u'salty', Vegetable, bacon.pk),
                 (u'shiny', Animal, platypus.pk)
             ],
@@ -123,7 +123,7 @@ class GenericRelationsTests(TestCase):
         )
         # If you delete a tag, the objects using the tag are unaffected
         # (other than losing a tag)
-        tag = TaggedItem.objects.get(id=1)
+        tag = TaggedItem.objects.order_by("id")[0]
         tag.delete()
         self.assertQuerysetEqual(bacon.tags.all(), ["<TaggedItem: salty>"])
         self.assertQuerysetEqual(TaggedItem.objects.all(), [

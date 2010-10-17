@@ -23,7 +23,7 @@ class TaggedItem(models.Model):
     content_object = generic.GenericForeignKey()
 
     class Meta:
-        ordering = ["tag", "-object_id"]
+        ordering = ["tag", "content_type__name"]
 
     def __unicode__(self):
         return self.tag
