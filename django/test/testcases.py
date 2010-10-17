@@ -576,13 +576,16 @@ class TestCase(TransactionTestCase):
             connection.close()
 
 def _deferredSkip(condition, reason):
-    def decorator(test_item):
-        if not (isinstance(test_item, type) and issubclass(test_item, TestCase)):
-            @wraps(test_item)
+    def decorator(test_func):
+        if not (isinstance(test_func, type) and issubclass(test_func, TestCase)):
+            @wraps(test_func)
             def skip_wrapper(*args, **kwargs):
                 if condition():
                     raise unittest.SkipTest(reason)
+                return test_func(*args, **kwargs)
             test_item = skip_wrapper
+        else:
+            test_item = test_func
         test_item.__unittest_skip_why__ = reason
         return test_item
     return decorator

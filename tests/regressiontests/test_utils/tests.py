@@ -1,7 +1,21 @@
 import sys
 
+from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+
+
 if sys.version_info >= (2, 5):
     from python_25 import AssertNumQueriesTests
+
+
+class SkippingTestCase(TestCase):
+    def test_skip_unless_db_feature(self):
+        "A test that might be skipped is actually called."
+        # Total hack, but it works, just want an attribute that's always true.
+        @skipUnlessDBFeature("__class__")
+        def test_func():
+            raise ValueError
+
+        self.assertRaises(ValueError, test_func)
 
 
 __test__ = {"API_TEST": r"""
