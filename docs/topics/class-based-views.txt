@@ -213,7 +213,7 @@ attribute - here, we'll override it in the URLconf, since it's a simple change:
     urlpatterns = patterns('',
         (r'^publishers/$', ListView.as_view(
             model=Publisher,
-            **context_object_name = "publisher_list",**
+            **context_object_name="publisher_list",**
         )),
     )
 
@@ -287,12 +287,12 @@ publication date, with the most recent first::
 
     urlpatterns = patterns('',
         (r'^publishers/$', ListView.as_view(
-            queryset = Publisher.objects.all(),
-            context_object_name = "publisher_list",
+            queryset=Publisher.objects.all(),
+            context_object_name="publisher_list",
         )),
         (r'^books/$', ListView.as_view(
-            queryset = Book.objects.order_by("-publication_date"),
-            context_object_name = "book_list",
+            queryset=Book.objects.order_by("-publication_date"),
+            context_object_name="book_list",
         )),
     )
 
