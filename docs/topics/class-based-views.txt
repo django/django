@@ -273,7 +273,7 @@ specify the list of objects using the ``queryset`` argument::
     class PublisherDetailView(DetailView):
 
         context_object_name = "publisher"
-        queryset = Publisher.object.all()
+        queryset = Publisher.objects.all()
 
 Specifying ``model = Publisher`` is really just shorthand for saying
 ``queryset = Publisher.objects.all()``. However, by using ``queryset``

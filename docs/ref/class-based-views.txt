@@ -1,5 +1,5 @@
 =========================
-Class-Based Generic views
+Class-based generic views
 =========================
 
 .. versionadded:: 1.3
