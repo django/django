@@ -11,7 +11,7 @@ Class-based generic views
 
     For details on the previous generic views implementation,
     see the :doc:`topic guide </topics/generic-views>` and
-    :doc:`detailed reference </topics/generic-views>`.
+    :doc:`detailed reference </ref/generic-views>`.
 
 Writing Web applications can be monotonous, because we repeat certain patterns
 again and again. Django tries to take away some of that monotony at the model
@@ -499,7 +499,7 @@ For example, a simple JSON mixin might look something like this::
             # to do much more complex handling to ensure that arbitrary
             # objects -- such as Django model instances or querysets
             # -- can be serialized as JSON.
-            return json.dumps(content)
+            return json.dumps(context)
 
 Then, you could build a JSON-returning
 :class:`~django.views.generic.detail.DetailView` by mixing your
