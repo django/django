@@ -66,780 +66,675 @@ Simple mixins
 
 .. currentmodule:: django.views.generic.base
 
-TemplateResponseMixin
-~~~~~~~~~~~~~~~~~~~~~
 .. class:: TemplateResponseMixin()
 
-**Attributes**
+    .. attribute:: template_name
 
-.. attribute:: TemplateResponseMixin.template_name
+        The path to the template to use when rendering the view.
 
-    The path to the template to use when rendering the view.
+    .. method:: render_to_response(context)
 
-**Methods**
+        Returns a full composed HttpResponse instance, ready to be returned to
+        the user.
 
-.. method:: TemplateResponseMixin.render_to_response(context)
+        Calls, :meth:`~TemplateResponseMixin.render_template()` to build the
+        content of the response, and
+        :meth:`~TemplateResponseMixin.get_response()` to construct the
+        :class:`~django.http.HttpResponse` object.
 
-    Returns a full composed HttpResponse instance, ready to be
-    returned to the user.
+    .. method:: get_response(content, **httpresponse_kwargs)
 
-    Calls, :meth:`~TemplateResponseMixin.render_template()` to build
-    the content of the response, and
-    :meth:`~TemplateResponseMixin.get_response()` to construct the
-    :class:`~django.http.HttpResponse` object.
+        Constructs the :class:`~django.http.HttpResponse` object around the
+        given content. If any keyword arguments are provided, they will be
+        passed to the constructor of the :class:`~django.http.HttpResponse`
+        instance.
 
-.. method:: TemplateResponseMixin.get_response(content, **httpresponse_kwargs)
+    .. method:: render_template(context)
 
-    Constructs the :class:`~django.http.HttpResponse` object around
-    the given content. If any keyword arguments are provided, they
-    will be passed to the constructor of the
-    :class:`~django.http.HttpResponse` instance.
+        Calls :meth:`~TemplateResponseMixin.get_context_instance()` to obtain
+        the :class:`Context` instance to use for rendering, and calls
+        :meth:`TemplateReponseMixin.get_template()` to load the template that
+        will be used to render the final content.
 
-.. method:: TemplateResponseMixin.render_template(context)
+    .. method:: get_context_instance(context)
 
-    Calls :meth:`~TemplateResponseMixin.get_context_instance()` to
-    obtain the :class:`Context` instance to use for rendering, and
-    calls :meth:`TemplateReponseMixin.get_template()` to load the
-    template that will be used to render the final content.
+        Turns the data dictionary ``context`` into an actual context instance
+        that can be used for rendering.
 
-.. method:: TemplateResponseMixin.get_context_instance(context)
+        By default, constructs a :class:`~django.template.RequestContext`
+        instance.
 
-    Turns the data dictionary ``context`` into an actual context
-    instance that can be used for rendering.
+    .. method:: get_template()
 
-    By default, constructs a :class:`~django.template.RequestContext`
-    instance.
+        Calls :meth:`~TemplateResponseMixin.get_template_names()` to obtain the
+        list of template names that will be searched looking for an existent
+        template.
 
-.. method:: TemplateResponseMixin.get_template()
+    .. method:: get_template_names()
 
-    Calls :meth:`~TemplateResponseMixin.get_template_names()` to
-    obtain the list of template names that will be searched looking
-    for an existent template.
+        The list of template names to search for when rendering the template.
 
-.. method:: TemplateResponseMixin.get_template_names()
+        If :attr:`TemplateResponseMixin.template_name` is specified, the
+        default implementation will return a list containing
+        :attr:`TemplateResponseMixin.template_name` (if it is specified).
 
-    The list of template names to search for when rendering the
-    template.
+    .. method:: load_template(names)
 
-    If :attr:`TemplateResponseMixin.template_name` is specified, the
-    default implementation will return a list containing
-    :attr:`TemplateResponseMixin.template_name` (if it is specified).
-
-.. method:: TemplateResponseMixin.load_template(names)
-
-    Loads and returns a template found by searching the list of
-    ``names`` for a match. Uses Django's default template loader.
+        Loads and returns a template found by searching the list of ``names``
+        for a match. Uses Django's default template loader.
 
 Single object mixins
 --------------------
 
 .. currentmodule:: django.views.generic.detail
 
-SingleObjectMixin
-~~~~~~~~~~~~~~~~~
 .. class:: SingleObjectMixin()
 
-**Attributes**
+    .. attribute:: model
 
-.. attribute:: SingleObjectMixin.model
+        The model that this view will display data for. Specifying ``model
+        = Foo`` is effectively the same as specifying ``queryset =
+        Foo.objects.all()``.
 
-    The model that this view will display data for. Specifying ``model
-    = Foo`` is effectively the same as specifying ``queryset =
-    Foo.objects.all()``.
+    .. attribute:: queryset
 
-.. attribute:: SingleObjectMixin.queryset
+        A ``QuerySet`` that represents the objects. If provided, the value of
+        :attr:`SingleObjectMixin.queryset` supersedes the value provided for
+        :attr:`SingleObjectMixin.model`.
 
-    A ``QuerySet`` that represents the objects. If provided, the
-    value of :attr:`SingleObjectMixin.queryset` supersedes the
-    value provided for :attr:`SingleObjectMixin.model`.
+    .. attribute:: slug_field
 
-.. attribute:: SingleObjectMixin.slug_field
+        The name of the field on the model that contains the slug. By default,
+        ``slug_field`` is ``'slug'``.
 
-    The name of the field on the model that contains the slug. By
-    default, ``slug_field`` is ``'slug'``.
+    .. attribute:: context_object_name
 
-.. attribute:: SingleObjectMixin.context_object_name
+        Designates the name of the variable to use in the context.
 
-    Designates the name of the variable to use in the context.
+    .. method:: get_queryset()
 
-**Methods**
+        Returns the queryset that will be used to retrieve the object that this
+        view will display.
 
-.. method:: SingleObjectMixin.get_queryset()
+    .. method:: get_context_object_name(object_list)
 
-    Returns the queryset that will be used to retrieve the object that
-    this view will display.
+        Return the context variable name that will be used to contain the list
+        of data that this view is manipulating. If object_list is a queryset of
+        Django objects, the context name will be verbose plural name of the
+        model that the queryset is composed from.
 
-.. method:: SingleObjectMixin.get_context_object_name(object_list)
+    .. method:: get_context_data(**kwargs)
 
-    Return the context variable name that will be used to contain the
-    list of data that this view is manipulating. If object_list is a
-    queryset of Django objects, the context name will be verbose
-    plural name of the model that the queryset is composed from.
+        Returns context data for displaying the list of objects.
 
-.. method:: SingleObjectMixin.get_context_data(**kwargs)
+    **Context**
 
-    Returns context data for displaying the list of objects.
-
-**Context**
-
-    * ``object``: The object that this view is displaying. If
-      ``context_object_name`` is specified, that variable will also be
-      set in the context, with the same value as ``object``.
-
-SingleObjectTemplateResponseMixin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        * ``object``: The object that this view is displaying. If
+          ``context_object_name`` is specified, that variable will also be
+          set in the context, with the same value as ``object``.
 
 .. class:: SingleObjectTemplateResponseMixin()
 
-A mixin class that performs template-based response rendering for
-views that operate upon a single object instance. Requires that the
-view it is mixed with provides ``self.object``, the object instance
-that the view is operating on. ``self.object`` will usually be, but is
-not required to be, an instance of a Django model. It may be ``None``
-if the view is in the process of constructing a new instance.
+    A mixin class that performs template-based response rendering for views
+    that operate upon a single object instance. Requires that the view it is
+    mixed with provides ``self.object``, the object instance that the view is
+    operating on. ``self.object`` will usually be, but is not required to be,
+    an instance of a Django model. It may be ``None`` if the view is in the
+    process of constructing a new instance.
 
-**Extends**
+    **Extends**
 
-    * :class:`~django.views.generic.base.TemplateResponseMixin`
+        * :class:`~django.views.generic.base.TemplateResponseMixin`
 
-**Attributes**
+    .. attribute:: template_name_field
 
-.. attribute:: SingleObjectTemplateResponseMixin.template_name_field
+        The field on the current object instance that can be used to determine
+        the name of a candidate template. If either ``template_name_field`` or
+        the value of the ``template_name_field`` on the current object instance
+        is ``None``, the object will not be interrogated for a candidate
+        template name.
 
-    The field on the current object instance that can be used to
-    determine the name of a candidate template. If either
-    ``template_name_field`` or the value of the
-    ``template_name_field`` on the current object instance is
-    ``None``, the object will not be interrogated for a candidate
-    template name.
+    .. attribute:: template_name_suffix
 
-.. attribute:: SingleObjectTemplateResponseMixin.template_name_suffix
+        The suffix to append to the auto-generated candidate template name.
+        Default suffix is ``_detail``.
 
-    The suffix to append to the auto-generated candidate template name.
-    Default suffix is ``_detail``.
+    .. method:: get_template_names()
 
-**Methods**
+        Returns a list of candidate template names. Returns the following list:
 
-.. method:: SingleObjectTemplateResponseMixin.get_template_names()
-
-    Returns a list of candidate template names. Returns the following
-    list:
-
-      * the value of ``template_name`` on the view (if provided)
-      * the contents of the ``template_name_field`` field on the
-        object instance that the view is operating upon (if available)
-      * ``<app_label>/<object_name><template_name_suffix>.html``
+          * the value of ``template_name`` on the view (if provided)
+          * the contents of the ``template_name_field`` field on the
+            object instance that the view is operating upon (if available)
+          * ``<app_label>/<object_name><template_name_suffix>.html``
 
 Multiple object mixins
 ----------------------
 
 .. currentmodule:: django.views.generic.list
 
-MultipleObjectMixin
-~~~~~~~~~~~~~~~~~~~
 .. class:: MultipleObjectMixin()
 
-A mixin that can be used to display a list of objects.
+    A mixin that can be used to display a list of objects.
 
-If ``paginate_by`` is specified, Django will paginate the results
-returned by this. You can specify the page number in the URL in one of
-two ways:
+    If ``paginate_by`` is specified, Django will paginate the results returned
+    by this. You can specify the page number in the URL in one of two ways:
 
-    * Use the ``page`` parameter in the URLconf. For example, this is
-      what your URLconf might look like::
+        * Use the ``page`` parameter in the URLconf. For example, this is what
+          your URLconf might look like::
 
-        (r'^objects/page(?P<page>[0-9]+)/$', PaginatedView.as_view())
+            (r'^objects/page(?P<page>[0-9]+)/$', PaginatedView.as_view())
 
-    * Pass the page number via the ``page`` query-string parameter. For
-      example, a URL would look like this::
+        * Pass the page number via the ``page`` query-string parameter. For
+          example, a URL would look like this::
 
-        /objects/?page=3
+            /objects/?page=3
 
-These values and lists are 1-based, not 0-based, so the first page
-would be represented as page ``1``.
+    These values and lists are 1-based, not 0-based, so the first page would be
+    represented as page ``1``.
 
-For more on pagination, read the :doc:`pagination documentation
-</topics/pagination>`.
+    For more on pagination, read the :doc:`pagination documentation
+    </topics/pagination>`.
 
-As a special case, you are also permitted to use ``last`` as a value
-for ``page``::
+    As a special case, you are also permitted to use ``last`` as a value for
+    ``page``::
 
-    /objects/?page=last
+        /objects/?page=last
 
-This allows you to access the final page of results without first
-having to determine how many pages there are.
+    This allows you to access the final page of results without first having to
+    determine how many pages there are.
 
-Note that ``page`` *must* be either a valid page number or the value
-``last``; any other value for ``page`` will result in a 404 error.
+    Note that ``page`` *must* be either a valid page number or the value
+    ``last``; any other value for ``page`` will result in a 404 error.
 
-**Attributes**
+    .. attribute:: allow_empty
 
-.. attribute:: MultipleObjectMixin.allow_empty
+        A boolean specifying whether to display the page if no objects are
+        available. If this is ``False`` and no objects are available, the view
+        will raise a 404 instead of displaying an empty page. By default, this
+        is ``True``.
 
-    A boolean specifying whether to display the page if no objects are
-    available. If this is ``False`` and no objects are available, the
-    view will raise a 404 instead of displaying an empty page. By
-    default, this is ``True``.
+    .. attribute:: model
 
-.. attribute:: MultipleObjectMixin.model
+        The model that this view will display data for. Specifying ``model
+        = Foo`` is effectively the same as specifying ``queryset =
+        Foo.objects.all()``.
 
-    The model that this view will display data for. Specifying ``model
-    = Foo`` is effectively the same as specifying ``queryset =
-    Foo.objects.all()``.
+    .. attribute:: queryset
 
-.. attribute:: MultipleObjectMixin.queryset
+        A ``QuerySet`` that represents the objects. If provided, the value of
+        :attr:`MultipleObjectMixin.queryset` supersedes the value provided for
+        :attr:`MultipleObjectMixin.model`.
 
-    A ``QuerySet`` that represents the objects. If provided, the
-    value of :attr:`MultipleObjectMixin.queryset` supersedes the
-    value provided for :attr:`MultipleObjectMixin.model`.
+    .. attribute:: paginate_by
 
-.. attribute:: MultipleObjectMixin.paginate_by
+        An integer specifying how many objects should be displayed per page. If
+        this is given, the view will paginate objects with
+        :attr:`MultipleObjectMixin.paginate_by` objects per page. The view will
+        expect either a ``page`` query string parameter (via ``GET``) or a
+        ``page`` variable specified in the URLconf.
 
-    An integer specifying how many objects should be displayed per
-    page. If this is given, the view will paginate objects with
-    :attr:`MultipleObjectMixin.paginate_by` objects per page. The view
-    will expect either a ``page`` query string parameter (via ``GET``)
-    or a ``page`` variable specified in the URLconf.
+    .. attribute:: context_object_name
 
-.. attribute:: MultipleObjectMixin.context_object_name
+        Designates the name of the variable to use in the context.
 
-    Designates the name of the variable to use in the context.
+    .. method:: get_queryset()
 
-**Methods**
+        Returns the queryset that represents the data this view will display.
 
-.. method:: MultipleObjectMixin.get_queryset()
+    .. method:: paginate_queryset(queryset, page_size)
 
-    Returns the queryset that represents the data this view will display.
+        Returns a 4-tuple containing (``paginator``, ``page``, ``object_list``,
+        ``is_paginated``).
 
-.. method:: MultipleObjectMixin.paginate_queryset(queryset, page_size)
+        Constructed by paginating ``queryset`` into pages of size ``page_size``.
+        If the request contains a ``page`` argument, either as a captured URL
+        argument or as a GET argument, ``object_list`` will correspond to the
+        objects from that page.
 
-    Returns a 4-tuple containing (``paginator``, ``page``,
-    ``object_list``, ``is_paginated``).
+    .. method:: get_paginate_by(queryset)
 
-    constructed by paginating ``queryset`` into pages of size ``page_size``.
-    If the request contains a ``page`` argument, either as a captured
-    URL argument or as a GET argument, ``object_list`` will correspond
-    to the objects from that page.
+    .. method:: get_allow_empty()
 
-.. method:: MultipleObjectMixin.get_paginate_by(queryset)
+        Return a boolean specifying whether to display the page if no objects
+        are available. If this method returns ``False`` and no objects are
+        available, the view will raise a 404 instead of displaying an empty
+        page. By default, this is ``True``.
 
-.. method:: MultipleObjectMixin.get_allow_empty()
+    .. method:: get_context_object_name(object_list)
 
-    Return a boolean specifying whether to display the page if no objects are
-    available. If this method returns ``False`` and no objects are available, the
-    view will raise a 404 instead of displaying an empty page. By
-    default, this is ``True``.
+        Return the context variable name that will be used to contain the list
+        of data that this view is manipulating. If object_list is a queryset of
+        Django objects, the context name will be verbose plural name of the
+        model that the queryset is composed from.
 
-.. method:: MultipleObjectMixin.get_context_object_name(object_list)
+    .. method:: get_context_data(**kwargs)
 
-    Return the context variable name that will be used to contain the
-    list of data that this view is manipulating. If object_list is a
-    queryset of Django objects, the context name will be verbose
-    plural name of the model that the queryset is composed from.
+        Returns context data for displaying the list of objects.
 
-.. method:: MultipleObjectMixin.get_context_data(**kwargs)
+    **Context**
 
-    Returns context data for displaying the list of objects.
+        * ``object_list``: The list of object that this view is displaying. If
+          ``context_object_name`` is specified, that variable will also be set
+          in the context, with the same value as ``object_list``.
 
-**Context**
+        * ``is_paginated``: A boolean representing whether the results are
+          paginated. Specifically, this is set to ``False`` if no page size has
+          been specified, or if the number of available objects is less than or
+          equal to ``paginate_by``.
 
-    * ``object_list``: The list of object that this view is
-      displaying. If ``context_object_name`` is specified, that
-      variable will also be set in the context, with the same value as
-      ``object_list``.
+        * ``paginator``: An instance of
+          :class:`django.core.paginator.Paginator`. If the page is not
+          paginated, this context variable will be ``None``
 
-    * ``is_paginated``: A boolean representing whether the results are
-      paginated. Specifically, this is set to ``False`` if no page
-      size has been specified, or if the number of available objects
-      is less than or equal to ``paginate_by``.
+        * ``page_obj``: An instance of
+          :class:`django.core.paginator.Page`. If the page is not paginated,
+          this context variable will be ``None``
 
-    * ``paginator``: An instance of
-      :class:`django.core.paginator.Paginator`. If the page is not
-      paginated, this context variable will be ``None``
-
-    * ``page_obj``: An instance of
-      :class:`django.core.paginator.Page`. If the page is not
-      paginated, this context variable will be ``None``
-
-MultipleObjectTemplateResponseMixin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. class:: MultipleObjectTemplateResponseMixin()
 
-A mixin class that performs template-based response rendering for
-views that operate upon a list of object instances. Requires that the
-view it is mixed with provides ``self.object_list``, the list of
-object instances that the view is operating on. ``self.object_list``
-may be, but is not required to be, a
-:class:`~django.db.models.Queryset`.
+    A mixin class that performs template-based response rendering for views
+    that operate upon a list of object instances. Requires that the view it is
+    mixed with provides ``self.object_list``, the list of object instances that
+    the view is operating on. ``self.object_list`` may be, but is not required
+    to be, a :class:`~django.db.models.Queryset`.
 
-**Extends**
+    **Extends**
 
-    * :class:`~django.views.generic.base.TemplateResponseMixin`
+        * :class:`~django.views.generic.base.TemplateResponseMixin`
 
-**Attributes**
+    .. attribute:: template_name_suffix
 
-.. attribute:: MultipleObjectTemplateResponseMixin.template_name_suffix
+        The suffix to append to the auto-generated candidate template name.
+        Default suffix is ``_list``.
 
-    The suffix to append to the auto-generated candidate template name.
-    Default suffix is ``_list``.
+    .. method:: get_template_names()
 
-**Methods**
+        Returns a list of candidate template names. Returns the following list:
 
-.. method:: MultipleObjectTemplateResponseMixin.get_template_names()
-
-    Returns a list of candidate template names. Returns the following
-    list:
-
-      * the value of ``template_name`` on the view (if provided)
-      * ``<app_label>/<object_name><template_name_suffix>.html``
+          * the value of ``template_name`` on the view (if provided)
+          * ``<app_label>/<object_name><template_name_suffix>.html``
 
 Editing mixins
 --------------
 
 .. currentmodule:: django.views.generic.edit
 
-FormMixin
-~~~~~~~~~
 .. class:: FormMixin()
 
-A mixin class that provides facilities for creating and displaying forms.
+    A mixin class that provides facilities for creating and displaying forms.
 
-**Attributes**
+    .. attribute:: initial
 
-.. attribute:: FormMixin.initial
+        A dictionary containing initial data for the form.
 
-    A dictionary containing initial data for the form.
+    .. attribute:: form_class
 
-.. attribute:: FormMixin.form_class
+        The form class to instantiate.
 
-    The form class to instantiate.
+    .. attribute:: success_url
 
-.. attribute:: FormMixin.success_url
+        The URL to redirect to when the form is successfully processed.
 
-    The URL to redirect to when the form is successfully processed.
+    .. method:: get_initial()
 
-**Methods**
+        Retrieve initial data for the form. By default, returns
+        :attr:`FormMixin.initial`.
 
-.. method:: FormMixin.get_initial()
+    .. method:: get_form_class()
 
-    Retrieve initial data for the form. By default, returns
-    :attr:`FormMixin.initial`.
+        Retrieve the form class to instantiate. By default,
+        :attr:`FormMixin.form_class`.
 
-.. method:: FormMixin.get_form_class()
+    .. method:: get_form(form_class)
 
-    Retrieve the form class to instantiate. By default,
-    :attr:`FormMixin.form_class`.
+        Instantiate an instance of ``form_class``. If the request is a ``POST``
+        or ``PUT``, the request data (``request.POST`` and ``request.FILES``)
+        will be provided to the form at time of construction.
 
-.. method:: FormMixin.get_form(form_class)
+    .. method:: get_success_url()
 
-    Instantiate an instance of ``form_class``. If the request is a
-    ``POST`` or ``PUT``, the request data (``request.POST`` and
-    ``request.FILES``) will be provided to the form at time of
-    construction
+        Determine the URL to redirect to when the form is successfully
+        validated. Returns :attr:`FormMixin.success_url` by default.
 
-.. method:: FormMixin.get_success_url()
+    .. method:: form_valid()
 
-    Determine the URL to redirect to when the form is successfully
-    validated. Returns :attr:`FormMixin.success_url` by default.
+        Redirects to :attr:`ModelFormMixin.success_url`.
 
-.. method:: FormMixin.form_valid()
+    .. method:: form_invalid()
 
-    Redirects to :attr:`ModelFormMixin.success_url`.
+        Renders a response, providing the invalid form as context.
 
-.. method:: FormMixin.form_invalid()
+    .. method:: get_context_data(**kwargs)
 
-    Renders a response, providing the invalid form as context.
+        Populates a context containing the contents of ``kwargs``.
 
-.. method:: FormMixin.get_context_data(**kwargs)
+    **Context**
 
-    Populates a context containing the contents of ``kwargs``.
+        * ``form``: The form instance that was generated for the view.
 
-**Context**
+    **Notes**
 
-    * ``form``: The form instance that was generated for the view.
+        * Views mixing :class:`~django.views.generic.edit.FormMixin` must
+          provide an implementation of :meth:`~FormMixin.form_valid()` and
+          :meth:`~FormMixin.form_invalid()`.
 
-**Notes**
-
-    * Views mixing :class:`~django.views.generic.edit.FormMixin` must
-      provide an implementation of :meth:`~FormMixin.form_valid()` and
-      :meth:`~FormMixin.form_invalid()`.
-
-ModelFormMixin
-~~~~~~~~~~~~~~
 .. class:: ModelFormMixin()
 
-A form mixin that works on ModelForms, rather than a standalone form.
+    A form mixin that works on ModelForms, rather than a standalone form.
 
-Since this is a subclass of
-:class:`~django.views.generic.detail.SingleObjectMixin`, instances of
-this mixin have access to the :attr:`~SingleObjectMixin.model`` and
-:attr:`~SingleObjectMixin.queryset`` attributes, describing the type of
-object that the ModelForm is manipulating. The view also provides
-``self.object``, the instance being manipulated. If the instance is
-being created, ``self.object`` will be ``None``
+    Since this is a subclass of
+    :class:`~django.views.generic.detail.SingleObjectMixin`, instances of this
+    mixin have access to the :attr:`~SingleObjectMixin.model`` and
+    :attr:`~SingleObjectMixin.queryset`` attributes, describing the type of
+    object that the ModelForm is manipulating. The view also provides
+    ``self.object``, the instance being manipulated. If the instance is being
+    created, ``self.object`` will be ``None``
 
-**Mixins**
+    **Mixins**
 
-    * :class:`django.views.generic.forms.FormMixin`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
+        * :class:`django.views.generic.forms.FormMixin`
+        * :class:`django.views.generic.detail.SingleObjectMixin`
 
-**Attributes**
+    .. attribute:: success_url
 
-.. attribute:: ModelFormMixin.success_url
+        The URL to redirect to when the form is successfully processed.
 
-    The URL to redirect to when the form is successfully processed.
+    .. method:: get_form_class()
 
-**Methods**
+        Retrieve the form class to instantiate. If
+        :attr:`FormMixin.form_class` is provided, that class will be used.
+        Otherwise, a ModelForm will be instantiated using the model associated
+        with the :attr:`~SingleObjectMixin.queryset``, or with the
+        :attr:`~SingleObjectMixin.model``, depending on which attribute is
+        provided.
 
-.. method:: ModelFormMixin.get_form_class()
+    .. method:: get_form(form_class)
 
-    Retrieve the form class to instantiate. If
-    :attr:`FormMixin.form_class` is provided, that class will be used.
-    Otherwise, a ModelForm will be instantiated using the model
-    associated with the :attr:`~SingleObjectMixin.queryset``, or with
-    the :attr:`~SingleObjectMixin.model``, depending on which
-    attribute is provided.
+        Instantiate an instance of ``form_class``. If the request is a ``POST``
+        or ``PUT``, the request data (``request.POST`` and ``request.FILES``)
+        will be provided to the form at time of construction. The current
+        instance (``self.object``) will also be provided.
 
-.. method:: FormMixin.get_form(form_class)
+    .. method:: get_success_url()
 
-    Instantiate an instance of ``form_class``. If the request is a
-    ``POST`` or ``PUT``, the request data (``request.POST`` and
-    ``request.FILES``) will be provided to the form at time of
-    construction. The current instance (``self.object``) will also
-    be provided.
+        Determine the URL to redirect to when the form is successfully
+        validated. Returns :attr:`FormMixin.success_url` if it is provided;
+        otherwise, attempts to use the ``get_absolute_url()`` of the object.
 
-.. method:: ModelFormMixin.get_success_url()
+    .. method:: form_valid()
 
-    Determine the URL to redirect to when the form is successfully
-    validated. Returns :attr:`FormMixin.success_url` if it is
-    provided; otherwise, attempts to use the ``get_absolute_url()``
-    of the object.
+        Saves the form instance, sets the current object for the view, and
+        redirects to :attr:`ModelFormMixin.success_url`.
 
-.. method:: ModelFormMixin.form_valid()
+    .. method:: form_invalid()
 
-    Saves the form instance, sets the current object for the view,
-    and redirects to :attr:`ModelFormMixin.success_url`.
+        Renders a response, providing the invalid form as context.
 
-.. method:: ModelFormMixin.form_invalid()
-
-    Renders a response, providing the invalid form as context.
-
-ProcessFormView
-~~~~~~~~~~~~~~~
 .. class:: ProcessFormView()
 
-A mixin that provides basic HTTP GET and POST workflow.
+    A mixin that provides basic HTTP GET and POST workflow.
 
-On GET:
-    * Construct a form
-    * Render a response using a context that contains that form
+    On GET:
+        * Construct a form
+        * Render a response using a context that contains that form
 
-On POST:
-    * Construct a form
-    * Check the form for validity, and handle accordingly.
+    On POST:
+        * Construct a form
+        * Check the form for validity, and handle accordingly.
 
-The PUT action is also handled, as an analog of POST.
+    The PUT action is also handled, as an analog of POST.
 
-DeletionMixin
-~~~~~~~~~~~~~
 .. class:: DeletionMixin()
 
-Enables handling of the ``DELETE`` http action.
+    Enables handling of the ``DELETE`` http action.
 
-**Attributes**
+    .. attribute:: success_url
 
-.. attribute:: DeletionMixin.success_url
+        The url to redirect to when the nominated object has been
+        successfully deleted.
 
-    The url to redirect to when the nominated object has been
-    successfully deleted.
+    .. attribute:: get_success_url(obj)
 
-**Methods**
-
-.. attribute:: DeletionMixin.get_success_url(obj)
-
-    Returns the url to redirect to when the nominated object has been
-    successfully deleted. Returns
-    :attr:`~django.views.generic.edit.DeletionMixin.success_url` by
-    default.
+        Returns the url to redirect to when the nominated object has been
+        successfully deleted. Returns
+        :attr:`~django.views.generic.edit.DeletionMixin.success_url` by
+        default.
 
 Date-based mixins
 -----------------
 
 .. currentmodule:: django.views.generic.dates
 
-YearMixin
-~~~~~~~~~
 .. class:: YearMixin()
 
-A mixin that can be used to retrieve and provide parsing information
-for a year component of a date.
+    A mixin that can be used to retrieve and provide parsing information for a
+    year component of a date.
 
-**Attributes**
+    .. attribute:: year_format
 
-.. attribute:: YearMixin.year_format
+        The strftime_ format to use when parsing the year. By default, this is
+        ``'%Y'``.
 
-    The strftime_ format to use when parsing the year. By default,
-    this is ``'%Y'``.
+    .. _strftime: http://docs.python.org/library/time.html#time.strftime
 
-.. _strftime: http://docs.python.org/library/time.html#time.strftime
+    .. attribute:: year
 
-.. attribute:: YearMixin.year
+        **Optional** The value for the year (as a string). By default, set to
+        ``None``, which means the year will be determined using other means.
 
-    **Optional** The value for the year (as a string). By default,
-    set to ``None``, which means the year will be determined using
-    other means.
+    .. method:: get_year_format()
 
-**Methods**
+        Returns the strftime_ format to use when parsing the year. Returns
+        :attr:`YearMixin.year_format` by default.
 
-.. method:: YearMixin.get_year_format()
+    .. method:: get_year()
 
-    Returns the strftime_ format to use when parsing the year. Returns
-    :attr:`YearMixin.year_format` by default.
+        Returns the year for which this view will display data. Tries the
+        following sources, in order:
 
-.. method:: YearMixin.get_year()
+            * The value of the :attr:`YearMixin.year` attribute.
+            * The value of the `year` argument captured in the URL pattern
+            * The value of the `year` GET query argument.
 
-    Returns the year for which this view will display data. Tries the
-    following sources, in order:
+        Raises a 404 if no valid year specification can be found.
 
-        * The value of the :attr:`YearMixin.year` attribute.
-        * The value of the `year` argument captured in the URL pattern
-        * The value of the `year` GET query argument.
-
-    Raises a 404 if no valid year specification can be found.
-
-MonthMixin
-~~~~~~~~~~
 .. class:: MonthMixin()
 
-A mixin that can be used to retrieve and provide parsing information
-for a month component of a date.
+    A mixin that can be used to retrieve and provide parsing information for a
+    month component of a date.
 
-**Attributes**
+    .. attribute:: month_format
 
-.. attribute:: MonthMixin.month_format
+        The strftime_ format to use when parsing the month. By default, this is
+        ``'%b'``.
 
-    The strftime_ format to use when parsing the month. By default,
-    this is ``'%b'``.
+    .. attribute:: month
 
-.. attribute:: MonthMixin.month
+        **Optional** The value for the month (as a string). By default, set to
+        ``None``, which means the month will be determined using other means.
 
-    **Optional** The value for the month (as a string). By default,
-    set to ``None``, which means the month will be determined using
-    other means.
+    .. method:: get_month_format()
 
-**Methods**
+        Returns the strftime_ format to use when parsing the month. Returns
+        :attr:`MonthMixin.month_format` by default.
 
-.. method:: MonthMixin.get_month_format()
+    .. method:: get_month()
 
-    Returns the strftime_ format to use when parsing the month. Returns
-    :attr:`MonthMixin.month_format` by default.
+        Returns the month for which this view will display data. Tries the
+        following sources, in order:
 
-.. method:: MonthMixin.get_month()
+            * The value of the :attr:`MonthMixin.month` attribute.
+            * The value of the `month` argument captured in the URL pattern
+            * The value of the `month` GET query argument.
 
-    Returns the month for which this view will display data. Tries the
-    following sources, in order:
+        Raises a 404 if no valid month specification can be found.
 
-        * The value of the :attr:`MonthMixin.month` attribute.
-        * The value of the `month` argument captured in the URL pattern
-        * The value of the `month` GET query argument.
+    .. method:: get_next_month(date)
 
-    Raises a 404 if no valid month specification can be found.
+        Returns a date object containing the first day of the month after the
+        date provided. Returns `None`` if mixed with a view that sets
+        ``allow_future = False``, and the next month is in the future. If
+        ``allow_empty = False``, returns the next month that contains data.
 
-.. method:: MonthMixin.get_next_month(date)
+    .. method:: get_prev_month(date)
 
-    Returns a date object containing the first day of the month after
-    the date provided. Returns `None`` if mixed with a view that sets
-    ``allow_future = False``, and the next month is in the future.
-    If ``allow_empty = False``, returns the next month that contains
-    data.
+        Returns a date object containing the first day of the month before the
+        date provided. If ``allow_empty = False``, returns the previous month
+        that contained data.
 
-.. method:: MonthMixin.get_prev_month(date)
-
-    Returns a date object containing the first day of the month before
-    the date provided. If ``allow_empty = False``, returns the previous
-    month that contained data.
-
-DayMixin
-~~~~~~~~~
 .. class:: DayMixin()
 
-A mixin that can be used to retrieve and provide parsing information
-for a day component of a date.
+    A mixin that can be used to retrieve and provide parsing information for a
+    day component of a date.
 
-**Attributes**
+    .. attribute:: day_format
 
-.. attribute:: DayMixin.day_format
+        The strftime_ format to use when parsing the day. By default, this is
+        ``'%d'``.
 
-    The strftime_ format to use when parsing the day. By default,
-    this is ``'%d'``.
+    .. attribute:: day
 
-.. attribute:: DayMixin.day
+        **Optional** The value for the day (as a string). By default, set to
+        ``None``, which means the day will be determined using other means.
 
-    **Optional** The value for the day (as a string). By default,
-    set to ``None``, which means the day will be determined using
-    other means.
+    .. method:: get_day_format()
 
-**Methods**
+        Returns the strftime_ format to use when parsing the day. Returns
+        :attr:`DayMixin.day_format` by default.
 
-.. method:: DayMixin.get_day_format()
+    .. method:: get_day()
 
-    Returns the strftime_ format to use when parsing the day. Returns
-    :attr:`DayMixin.day_format` by default.
+        Returns the day for which this view will display data. Tries the
+        following sources, in order:
 
-.. method:: DayMixin.get_day()
+            * The value of the :attr:`DayMixin.day` attribute.
+            * The value of the `day` argument captured in the URL pattern
+            * The value of the `day` GET query argument.
 
-    Returns the day for which this view will display data. Tries the
-    following sources, in order:
+        Raises a 404 if no valid day specification can be found.
 
-        * The value of the :attr:`DayMixin.day` attribute.
-        * The value of the `day` argument captured in the URL pattern
-        * The value of the `day` GET query argument.
+    .. method:: get_next_day(date)
 
-    Raises a 404 if no valid day specification can be found.
+        Returns a date object containing the next day after the date provided.
+        Returns `None`` if mixed with a view that sets ``allow_future = False``,
+        and the next day is in the future. If ``allow_empty = False``, returns
+        the next day that contains data.
 
-.. method:: MonthMixin.get_next_day(date)
+    .. method:: get_prev_day(date)
 
-    Returns a date object containing the next day after the date
-    provided. Returns `None`` if mixed with a view that sets
-    ``allow_future = False``, and the next day is in the future. If
-    ``allow_empty = False``, returns the next day that contains
-    data.
+        Returns a date object containing the previous day. If
+        ``allow_empty = False``, returns the previous day that contained data.
 
-.. method:: MonthMixin.get_prev_day(date)
-
-    Returns a date object containing the previous day. If
-    ``allow_empty = False``, returns the previous day that contained
-    data.
-
-WeekMixin
-~~~~~~~~~
 .. class:: WeekMixin()
 
-A mixin that can be used to retrieve and provide parsing information
-for a week component of a date.
+    A mixin that can be used to retrieve and provide parsing information for a
+    week component of a date.
 
-**Attributes**
+    .. attribute:: week_format
 
-.. attribute:: WeekMixin.week_format
+        The strftime_ format to use when parsing the week. By default, this is
+        ``'%U'``.
 
-    The strftime_ format to use when parsing the week. By default,
-    this is ``'%U'``.
+    .. attribute:: week
 
-.. attribute:: WeekMixin.week
+        **Optional** The value for the week (as a string). By default, set to
+        ``None``, which means the week will be determined using other means.
 
-    **Optional** The value for the week (as a string). By default,
-    set to ``None``, which means the week will be determined using
-    other means.
+    .. method:: get_week_format()
 
-**Methods**
+        Returns the strftime_ format to use when parsing the week. Returns
+        :attr:`WeekMixin.week_format` by default.
 
-.. method:: WeekMixin.get_week_format()
+    .. method:: get_week()
 
-    Returns the strftime_ format to use when parsing the week. Returns
-    :attr:`WeekMixin.week_format` by default.
+        Returns the week for which this view will display data. Tries the
+        following sources, in order:
 
-.. method:: WeekMixin.get_week()
+            * The value of the :attr:`WeekMixin.week` attribute.
+            * The value of the `week` argument captured in the URL pattern
+            * The value of the `week` GET query argument.
 
-    Returns the week for which this view will display data. Tries the
-    following sources, in order:
-
-        * The value of the :attr:`WeekMixin.week` attribute.
-        * The value of the `week` argument captured in the URL pattern
-        * The value of the `week` GET query argument.
-
-    Raises a 404 if no valid week specification can be found.
+        Raises a 404 if no valid week specification can be found.
 
 
-DateMixin
-~~~~~~~~~
 .. class:: DateMixin()
 
-A mixin class providing common behavior for all date-based views.
+    A mixin class providing common behavior for all date-based views.
 
-**Attributes**
+    .. attribute:: date_field
 
-.. attribute:: BaseDateListView.date_field
+        The name of the ``DateField`` or ``DateTimeField`` in the
+        ``QuerySet``'s model that the date-based archive should use to
+        determine the objects on the page.
 
-    The name of the ``DateField`` or ``DateTimeField`` in the
-    ``QuerySet``'s model that the date-based archive should use to
-    determine the objects on the page.
+    .. attribute:: allow_future
 
-.. attribute:: BaseDateListView.allow_future
+        A boolean specifying whether to include "future" objects on this page,
+        where "future" means objects in which the field specified in
+        ``date_field`` is greater than the current date/time. By default, this
+        is ``False``.
 
-    A boolean specifying whether to include "future" objects on this
-    page, where "future" means objects in which the field specified in
-    ``date_field`` is greater than the current date/time. By default,
-    this is ``False``.
+    .. method:: get_date_field()
 
-**Methods**
+        Returns the name of the field that contains the date data that this
+        view will operate on. Returns :attr:`DateMixin.date_field` by default.
 
-.. method:: BaseDateListView.get_date_field()
+    .. method:: get_allow_future()
 
-    Returns the name of the field that contains the date data that
-    this view will operate on. Returns :attr:`DateMixin.date_field` by
-    default.
+        Determine whether to include "future" objects on this page, where
+        "future" means objects in which the field specified in ``date_field``
+        is greater than the current date/time. Returns
+        :attr:`DateMixin.date_field` by default.
 
-.. method:: BaseDateListView.get_allow_future()
-
-    Determine whether to include "future" objects on this page, where
-    "future" means objects in which the field specified in
-    ``date_field`` is greater than the current date/time. Returns
-    :attr:`DateMixin.date_field` by default.
-
-BaseDateListView
-~~~~~~~~~~~~~~~~
 .. class:: BaseDateListView()
 
-A base class that provides common behavior for all date-based views.
-There won't normally be a reason to instantiate
-:class:`~django.views.generic.dates.BaseDateListView`; instantiate one of
-the subclasses instead.
+    A base class that provides common behavior for all date-based views. There
+    won't normally be a reason to instantiate
+    :class:`~django.views.generic.dates.BaseDateListView`; instantiate one of
+    the subclasses instead.
 
-While this view (and it's subclasses) are executing,
-``self.object_list`` will contain the list of objects that the view is
-operating upon, and ``self.date_list`` will contain the list of dates
-for which data is available.
+    While this view (and it's subclasses) are executing, ``self.object_list``
+    will contain the list of objects that the view is operating upon, and
+    ``self.date_list`` will contain the list of dates for which data is
+    available.
 
-**Mixins**
+    **Mixins**
 
-    * :class:`~django.views.generic.dates.DateMixin`
-    * :class:`~django.views.generic.list.MultipleObjectMixin`
+        * :class:`~django.views.generic.dates.DateMixin`
+        * :class:`~django.views.generic.list.MultipleObjectMixin`
 
-**Attributes**
+    .. attribute:: allow_empty
 
-.. attribute:: BaseDateListView.allow_empty
+        A boolean specifying whether to display the page if no objects are
+        available. If this is ``False`` and no objects are available, the view
+        will raise a 404 instead of displaying an empty page. By default, this
+        is ``True``.
 
-    A boolean specifying whether to display the page if no objects are
-    available. If this is ``False`` and no objects are available, the
-    view will raise a 404 instead of displaying an empty page. By
-    default, this is ``True``.
+    .. method:: get_dated_items():
 
-**Methods**
+        Returns a 3-tuple containing (``date_list``, ``latest``,
+        ``extra_context``).
 
-.. method:: ArchiveView.get_dated_items():
+        ``date_list`` is the list of dates for which data is available.
+        ``object_list`` is the list of objects ``extra_context`` is a
+        dictionary of context data that will be added to any context data
+        provided by the
+        :class:`~django.db.views.generic.list.MultiplObjectMixin`.
 
-    Returns a 3-tuple containing (``date_list``, ``latest``,
-    ``extra_context``).
+    .. method:: get_dated_queryset(**lookup)
 
-    ``date_list`` is the list of dates for which data is available.
-    ``object_list`` is the list of objects ``extra_context`` is a
-    dictionary of context data that will be added to any context data
-    provided by the
-    :class:`~django.db.views.generic.list.MultiplObjectMixin`.
+        Returns a queryset, filtered using the query arguments defined by
+        ``lookup``. Enforces any restrictions on the queryset, such as
+        ``allow_empty`` and ``allow_future``.
 
-.. method:: BaseDateListView.get_dated_queryset(**lookup)
+    .. method:: get_date_list(queryset, date_type)
 
-    Returns a queryset, filtered using the query arguments defined by
-    ``lookup``. Enforces any restrictions on the queryset, such as
-    ``allow_empty`` and ``allow_future``.
-
-.. method:: BaseDateListView.get_date_list(queryset, date_type)
-
-    Returns the list of dates of type ``date_type`` for which
-    ``queryset`` contains entries. For example, ``get_date_list(qs,
-    'year')`` will return the list of years for which ``qs`` has
-    entries. See :meth:``~django.db.models.QuerySet.dates()` for the
-    ways that the ``date_type`` argument can be used.
+        Returns the list of dates of type ``date_type`` for which
+        ``queryset`` contains entries. For example, ``get_date_list(qs,
+        'year')`` will return the list of years for which ``qs`` has entries.
+        See :meth:``~django.db.models.QuerySet.dates()` for the
+        ways that the ``date_type`` argument can be used.
 
 
 Generic views
@@ -850,195 +745,169 @@ Simple generic views
 
 .. currentmodule:: django.views.generic.base
 
-View
-~~~~
 .. class:: View()
 
-The master class-based base view. All other generic class-based views
-inherit from this base class.
+    The master class-based base view. All other generic class-based views
+    inherit from this base class.
 
-Each request served by a :class:`~django.views.generic.base.View` has
-an independent state; therefore, it is safe to store state variables
-on the instance (i.e., ``self.foo = 3`` is a thread-safe operation).
+    Each request served by a :class:`~django.views.generic.base.View` has an
+    independent state; therefore, it is safe to store state variables on the
+    instance (i.e., ``self.foo = 3`` is a thread-safe operation).
 
-A class-based view is deployed into a URL pattern using the
-:meth:`~View.as_view()` classmethod::
+    A class-based view is deployed into a URL pattern using the
+    :meth:`~View.as_view()` classmethod::
 
-    urlpatterns = patterns('',
-            (r'^view/$', MyView.as_view(size=42)),
-        )
+        urlpatterns = patterns('',
+                (r'^view/$', MyView.as_view(size=42)),
+            )
 
-Any argument passed into :meth:`~View.as_view()` will be assigned onto
-the instance that is used to service a request. Using the previous
-example, this means that every request on ``MyView`` is able to
-interrogate ``self.size``.
+    Any argument passed into :meth:`~View.as_view()` will be assigned onto the
+    instance that is used to service a request. Using the previous example,
+    this means that every request on ``MyView`` is able to interrogate
+    ``self.size``.
 
-.. admonition:: Thread safety with view arguments
+    .. admonition:: Thread safety with view arguments
 
-    Arguments passed to a view are shared between every instance of a
-    view. This means that you shoudn't use a list, dictionary, or any
-    other variable object as an argument to a view. If you did, the
-    actions of one user visiting your view could have an effect on
-    subsequent users visiting the same view.
+        Arguments passed to a view are shared between every instance of a view.
+        This means that you shoudn't use a list, dictionary, or any other
+        variable object as an argument to a view. If you did, the actions of
+        one user visiting your view could have an effect on subsequent users
+        visiting the same view.
 
-**Methods**
+    .. method:: dispatch(request, *args, **kwargs)
 
-.. method:: View.dispatch(request, *args, **kwargs)
+        The ``view`` part of the view -- the method that accepts a ``request``
+        argument plus arguments, and returns a HTTP response.
 
-    The ``view`` part of the view -- the method that accepts a
-    ``request`` argument plus arguments, and returns a HTTP response.
+        The default implementation will inspect the HTTP method and attempt to
+        delegate to a method that matches the HTTP method; a ``GET`` will be
+        delegated to :meth:`~View.get()`, a ``POST`` to :meth:`~View.post()`,
+        and so on.
 
-    The default implementation will inspect the HTTP method and
-    attempt to delegate to a method that matches the HTTP method; a
-    ``GET`` will be delegated to :meth:`~View.get()`, a ``POST`` to
-    :meth:`~View.post()`, and so on.
+        The default implementation also sets ``request``, ``args`` and
+        ``kwargs`` as instance variables, so any method on the view can know
+        the full details of the request that was made to invoke the view.
 
-    The default implementation also sets ``request``, ``args`` and
-    ``kwargs`` as instance variables, so any method on the view can
-    know the full details of the request that was made to invoke the
-    view.
+    .. method:: http_method_not_allowed(request, *args, **kwargs)
 
-.. method:: View.http_method_not_allowed(request, *args, **kwargs)
+        If the view was called with HTTP method it doesn't support, this method
+        is called instead.
 
-    If the view was called with HTTP method it doesn't support, this
-    method is called instead.
+        The default implementation returns ``HttpResponseNotAllowed`` with list
+        of allowed methods in plain text.
 
-    The default implementation returns ``HttpResponseNotAllowed``
-    with list of allowed methods in plain text.
-
-TemplateView
-~~~~~~~~~~~~
 .. class:: TemplateView()
 
-Renders a given template, passing it a ``{{ params }}`` template
-variable, which is a dictionary of the parameters captured in the URL.
+    Renders a given template, passing it a ``{{ params }}`` template variable,
+    which is a dictionary of the parameters captured in the URL.
 
-**Mixins**
+    **Mixins**
 
-    * :class:`django.views.generic.base.TemplateResponseMixin`
+        * :class:`django.views.generic.base.TemplateResponseMixin`
 
-**Attributes**
+    .. attribute:: template_name
 
-.. attribute:: TemplateView.template_name
+        The full name of a template to use.
 
-    The full name of a template to use.
+    .. method:: get_context_data(**kwargs)
 
-**Methods**
+        Return a context data dictionary consisting of the contents of
+        ``kwargs`` stored in the context variable ``params``.
 
-.. method:: TemplateView.get_context_data(**kwargs)
+    **Context**
 
-    Return a context data dictionary consisting of the contents of
-    ``kwargs`` stored in the context variable ``params``.
+        * ``params``: The dictionary of keyword arguments captured from the URL
+          pattern that served the view.
 
-**Context**
-
-    * ``params``: The dictionary of keyword arguments captured from
-      the URL pattern that served the view.
-
-RedirectView
-~~~~~~~~~~~~
 .. class:: RedirectView()
 
-Redirects to a given URL.
+    Redirects to a given URL.
 
-The given URL may contain dictionary-style string formatting, which
-will be interpolated against the parameters captured in the URL.
-Because keyword interpolation is *always* done (even if no arguments
-are passed in), any ``"%"`` characters in the URL must be written as
-``"%%"`` so that Python will convert them to a single percent sign on
-output.
+    The given URL may contain dictionary-style string formatting, which will be
+    interpolated against the parameters captured in the URL. Because keyword
+    interpolation is *always* done (even if no arguments are passed in), any
+    ``"%"`` characters in the URL must be written as ``"%%"`` so that Python
+    will convert them to a single percent sign on output.
 
-If the given URL is ``None``, Django will return an
-``HttpResponseGone`` (410).
+    If the given URL is ``None``, Django will return an ``HttpResponseGone``
+    (410).
 
-**Mixins**
+    .. attribute:: url
 
-None.
+        The URL to redirect to, as a string. Or ``None`` to raise a 410 (Gone)
+        HTTP error.
 
-**Attributes**
+    .. attribute:: permanent
 
-.. attribute:: RedirectView.url
+        Whether the redirect should be permanent. The only difference here is
+        the HTTP status code returned. If ``True``, then the redirect will use
+        status code 301. If ``False``, then the redirect will use status code
+        302. By default, ``permanent`` is ``True``.
 
-    The URL to redirect to, as a string. Or ``None`` to raise a 410
-    (Gone) HTTP error.
+    .. attribute:: query_string
 
-.. attribute:: RedirectView.permanent
+        Whether to pass along the GET query string to the new location. If
+        ``True``, then the query string is appended to the URL. If ``False``,
+        then the query string is discarded. By default, ``query_string`` is
+        ``False``.
 
-    Whether the redirect should be permanent. The only difference here
-    is the HTTP status code returned. If ``True``, then the redirect
-    will use status code 301. If ``False``, then the redirect will use
-    status code 302. By default, ``permanent`` is ``True``.
+    .. method:: get_redirect_url(**kwargs)
 
-.. attribute:: RedirectView.query_string
+        Constructs the target URL for redirection.
 
-    Whether to pass along the GET query string to the new location. If
-    ``True``, then the query string is appended to the URL. If
-    ``False``, then the query string is discarded. By default,
-    ``query_string`` is ``False``.
-
-**Methods**
-
-.. method:: RedirectView.get_redirect_url(**kwargs)
-
-    Constructs the target URL for redirection.
-
-    The default implementation uses :attr:`~RedirectView.url` as a
-    starting string, performs expansion of ``%`` parameters in that
-    string, as well as the appending of query string if requested by
-    :attr:`~RedirectView.query_string`. Subclasses may implement any
-    behavior they wish, as long as the method returns a redirect-ready
-    URL string.
+        The default implementation uses :attr:`~RedirectView.url` as a starting
+        string, performs expansion of ``%`` parameters in that string, as well
+        as the appending of query string if requested by
+        :attr:`~RedirectView.query_string`. Subclasses may implement any
+        behavior they wish, as long as the method returns a redirect-ready URL
+        string.
 
 Detail views
 ------------
 
 .. currentmodule:: django.views.generic.detail
 
-DetailView
-~~~~~~~~~~
 .. class:: BaseDetailView()
 .. class:: DetailView()
 
-A page representing an individual object.
+    A page representing an individual object.
 
-While this view is executing, ``self.object`` will contain the object that
-the view is operating upon.
+    While this view is executing, ``self.object`` will contain the object that
+    the view is operating upon.
 
-:class:`~django.views.generic.base.BaseDetailView` implements the same
-behavior as :class:`~django.views.generic.base.DetailView`, but doesn't
-include the
-:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
+    :class:`~django.views.generic.base.BaseDetailView` implements the same
+    behavior as :class:`~django.views.generic.base.DetailView`, but doesn't
+    include the
+    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-  * :class:`django.views.generic.detail.SingleObjectMixin`
-  * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+      * :class:`django.views.generic.detail.SingleObjectMixin`
+      * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
 
 List views
 ----------
 
 .. currentmodule:: django.views.generic.list
 
-ListView
-~~~~~~~~
 .. class:: BaseListView()
 .. class:: ListView()
 
-A page representing a list of objects.
+    A page representing a list of objects.
 
-While this view is executing, ``self.object_list`` will contain the
-list of objects (usually, but not necessarily a queryset) that the
-view is operating upon.
+    While this view is executing, ``self.object_list`` will contain the list of
+    objects (usually, but not necessarily a queryset) that the view is
+    operating upon.
 
-:class:`~django.views.generic.list.BaseListView` implements the same
-behavior as :class:`~django.views.generic.list.ListView`, but doesn't
-include the
-:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
+    :class:`~django.views.generic.list.BaseListView` implements the same
+    behavior as :class:`~django.views.generic.list.ListView`, but doesn't
+    include the
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-  * :class:`django.views.generic.base.MultipleObjectMixin`
-  * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+      * :class:`django.views.generic.base.MultipleObjectMixin`
+      * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
 
 
 Editing views
@@ -1046,86 +915,74 @@ Editing views
 
 .. currentmodule:: django.views.generic.edit
 
-FormView
-~~~~~~~~
 .. class:: BaseFormView()
 .. class:: FormView()
 
-A view that displays a form. On error, redisplays the form with
-validation errors; on success, redirects to a new URL.
+    A view that displays a form. On error, redisplays the form with validation
+    errors; on success, redirects to a new URL.
 
-:class:`~django.views.generic.edit.BaseFormView` implements the same
-behavior as :class:`~django.views.generic.edit.FormView`, but doesn't
-include the :class:`~django.views.generic.base.TemplateResponseMixin`.
+    :class:`~django.views.generic.edit.BaseFormView` implements the same
+    behavior as :class:`~django.views.generic.edit.FormView`, but doesn't
+    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-  * :class:`django.views.generic.edit.FormMixin`
-  * :class:`django.views.generic.edit.ProcessFormView`
+      * :class:`django.views.generic.edit.FormMixin`
+      * :class:`django.views.generic.edit.ProcessFormView`
 
-CreateView
-~~~~~~~~~~
 .. class:: BaseCreateView()
 .. class:: CreateView()
 
-A view that displays a form for creating an object, redisplaying the
-form with validation errors (if there are any) and saving the object.
+    A view that displays a form for creating an object, redisplaying the form
+    with validation errors (if there are any) and saving the object.
 
-:class:`~django.views.generic.edit.BaseCreateView` implements the same
-behavior as :class:`~django.views.generic.edit.CreateView`, but
-doesn't include the
-:class:`~django.views.generic.base.TemplateResponseMixin`.
+    :class:`~django.views.generic.edit.BaseCreateView` implements the same
+    behavior as :class:`~django.views.generic.edit.CreateView`, but doesn't
+    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-  * :class:`django.views.generic.edit.ModelFormMixin`
-  * :class:`django.views.generic.edit.ProcessFormView`
+      * :class:`django.views.generic.edit.ModelFormMixin`
+      * :class:`django.views.generic.edit.ProcessFormView`
 
-UpdateView
-~~~~~~~~~~
 .. class:: BaseUpdateView()
 .. class:: UpdateView()
 
-A view that displays a form for editing an existing object,
-redisplaying the form with validation errors (if there are any) and
-saving changes to the object. This uses a form automatically generated
-from the object's model class (unless a form class is manually
-specified).
+    A view that displays a form for editing an existing object, redisplaying
+    the form with validation errors (if there are any) and saving changes to
+    the object. This uses a form automatically generated from the object's
+    model class (unless a form class is manually specified).
 
-:class:`~django.views.generic.edit.BaseUpdateView` implements the same
-behavior as :class:`~django.views.generic.edit.UpdateView`, but
-doesn't include the
-:class:`~django.views.generic.base.TemplateResponseMixin`.
+    :class:`~django.views.generic.edit.BaseUpdateView` implements the same
+    behavior as :class:`~django.views.generic.edit.UpdateView`, but doesn't
+    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-  * :class:`django.views.generic.edit.ModelFormMixin`
-  * :class:`django.views.generic.edit.ProcessFormView`
+      * :class:`django.views.generic.edit.ModelFormMixin`
+      * :class:`django.views.generic.edit.ProcessFormView`
 
-DeleteView
-~~~~~~~~~~
 .. class:: BaseDeleteView()
 .. class:: DeleteView()
 
-A view that displays a confirmation page and deletes an existing object. The
-given object will only be deleted if the request method is ``POST``. If this
-view is fetched via ``GET``, it will display a confirmation page that should
-contain a form that POSTs to the same URL.
+    A view that displays a confirmation page and deletes an existing object.
+    The given object will only be deleted if the request method is ``POST``. If
+    this view is fetched via ``GET``, it will display a confirmation page that
+    should contain a form that POSTs to the same URL.
 
-:class:`~django.views.generic.edit.BaseDeleteView` implements the same
-behavior as :class:`~django.views.generic.edit.DeleteView`, but
-doesn't include the
-:class:`~django.views.generic.base.TemplateResponseMixin`.
+    :class:`~django.views.generic.edit.BaseDeleteView` implements the same
+    behavior as :class:`~django.views.generic.edit.DeleteView`, but doesn't
+    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-  * :class:`django.views.generic.edit.ModelFormMixin`
-  * :class:`django.views.generic.edit.ProcessFormView`
+      * :class:`django.views.generic.edit.ModelFormMixin`
+      * :class:`django.views.generic.edit.ProcessFormView`
 
-**Notes**
+    **Notes**
 
-   * The delete confirmation page displayed to a GET request uses a
-     ``template_name_suffix`` of ``'_confirm_delete'``.
+       * The delete confirmation page displayed to a GET request uses a
+         ``template_name_suffix`` of ``'_confirm_delete'``.
 
 Date-based views
 ----------------
@@ -1135,255 +992,233 @@ are views for displaying drilldown pages for date-based data.
 
 .. currentmodule:: django.views.generic.dates
 
-ArchiveIndexView
-~~~~~~~~~~~~~~~~
 .. class:: BaseArchiveIndexView()
 .. class:: ArchiveIndexView()
 
-A top-level index page showing the "latest" objects, by date. Objects
-with a date in the *future* are not included unless you set
-``allow_future`` to ``True``.
+    A top-level index page showing the "latest" objects, by date. Objects with
+    a date in the *future* are not included unless you set ``allow_future`` to
+    ``True``.
 
-:class:`~django.views.generic.dates.BaseArchiveIndexView` implements
-the same behavior as
-:class:`~django.views.generic.dates.ArchiveIndexView`, but doesn't
-include the
-:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
+    :class:`~django.views.generic.dates.BaseArchiveIndexView` implements the
+    same behavior as :class:`~django.views.generic.dates.ArchiveIndexView`, but
+    doesn't include the
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+        * :class:`django.views.generic.dates.BaseDateListView`
+        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
 
-**Notes**
+    **Notes**
 
-    * Uses a default ``context_object_name`` of ``latest``.
+        * Uses a default ``context_object_name`` of ``latest``.
 
-    * Uses a default ``template_name_suffix`` of ``_archive``.
+        * Uses a default ``template_name_suffix`` of ``_archive``.
 
-YearArchiveView
-~~~~~~~~~~~~~~~
 .. class:: BaseYearArchiveView()
 .. class:: YearArchiveView()
 
-A yearly archive page showing all available months in a given year.
-Objects with a date in the *future* are not displayed unless you set
-``allow_future`` to ``True``.
+    A yearly archive page showing all available months in a given year. Objects
+    with a date in the *future* are not displayed unless you set
+    ``allow_future`` to ``True``.
 
-:class:`~django.views.generic.dates.BaseYearArchiveView` implements the
-same behavior as :class:`~django.views.generic.dates.YearArchiveView`,
-but doesn't include the
-:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
+    :class:`~django.views.generic.dates.BaseYearArchiveView` implements the
+    same behavior as :class:`~django.views.generic.dates.YearArchiveView`, but
+    doesn't include the
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
+        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+        * :class:`django.views.generic.dates.YearMixin`
+        * :class:`django.views.generic.dates.BaseDateListView`
 
-**Attributes**
+    .. attribute:: make_object_list
 
-.. attribute:: YearArchiveView.make_object_list
+        A boolean specifying whether to retrieve the full list of objects for
+        this year and pass those to the template. If ``True``, the list of
+        objects will be made available to the context. By default, this is
+        ``False``.
 
-    A boolean specifying whether to retrieve the full list of objects
-    for this year and pass those to the template. If ``True``, the
-    list of objects will be made available to the context. By default,
-    this is ``False``.
+    .. method:: get_make_object_list()
 
-**Methods**
+        Determine if an object list will be returned as part of the context. If
+        ``False``, the ``None`` queryset will be used as the object list.
 
-.. method:: YearArchiveView.get_make_object_list()
+    **Context**
 
-    Determine if an object list will be returned as part of the context.
-    If ``False``, the ``None`` queryset will be used as the object list.
+    In addition to the context provided by
+    :class:`django.views.generic.list.MultipleObjectMixin` (via
+    :class:`django.views.generic.dates.BaseDateListView`), the template's
+    context will be:
 
-**Context**
+        * ``date_list``: A ``DateQuerySet`` object containing all months that
+          have objects available according to ``queryset``, represented as
+          ``datetime.datetime`` objects, in ascending order.
 
-In addition to the context provided by
-:class:`django.views.generic.list.MultipleObjectMixin` (via
-:class:`django.views.generic.dates.BaseDateListView`), the template's
-context will be:
+        * ``year``: The given year, as a four-character string.
 
-    * ``date_list``: A ``DateQuerySet`` object containing all months that have
-      have objects available according to ``queryset``, represented as
-      ``datetime.datetime`` objects, in ascending order.
+    **Notes**
 
-    * ``year``: The given year, as a four-character string.
+        * Uses a default ``template_name_suffix`` of ``_archive_year``.
 
-**Notes**
-
-    * Uses a default ``template_name_suffix`` of ``_archive_year``.
-
-MonthArchiveView
-~~~~~~~~~~~~~~~~
 .. class:: BaseMonthArchiveView()
 .. class:: MonthArchiveView()
 
-A monthly archive page showing all objects in a given month. Objects with a
-date in the *future* are not displayed unless you set ``allow_future`` to
-``True``.
+    A monthly archive page showing all objects in a given month. Objects with a
+    date in the *future* are not displayed unless you set ``allow_future`` to
+    ``True``.
 
-:class:`~django.views.generic.dates.BaseMonthArchiveView` implements
-the same behavior as
-:class:`~django.views.generic.dates.MonthArchiveView`, but doesn't
-include the
-:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
+    :class:`~django.views.generic.dates.BaseMonthArchiveView` implements
+    the same behavior as
+    :class:`~django.views.generic.dates.MonthArchiveView`, but doesn't
+    include the
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
+        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+        * :class:`django.views.generic.dates.YearMixin`
+        * :class:`django.views.generic.dates.MonthMixin`
+        * :class:`django.views.generic.dates.BaseDateListView`
 
-**Attributes**
+    **Context**
 
-**Methods**
+    In addition to the context provided by
+    :class:`~django.views.generic.list.MultipleObjectMixin` (via
+    :class:`~django.views.generic.dates.BaseDateListView`), the template's
+    context will be:
 
-**Context**
+        * ``date_list``: A ``DateQuerySet`` object containing all days that
+          have objects available in the given month, according to ``queryset``,
+          represented as ``datetime.datetime`` objects, in ascending order.
 
-In addition to the context provided by
-:class:`~django.views.generic.list.MultipleObjectMixin` (via
-:class:`~django.views.generic.dates.BaseDateListView`), the template's
-context will be:
+        * ``month``: A ``datetime.date`` object representing the given month.
 
-    * ``date_list``: A ``DateQuerySet`` object containing all days that have
-      have objects available in the given month, according to ``queryset``,
-      represented as ``datetime.datetime`` objects, in ascending order.
+        * ``next_month``: A ``datetime.date`` object representing the first day
+          of the next month. If the next month is in the future, this will be
+          ``None``.
 
-    * ``month``: A ``datetime.date`` object representing the given month.
+        * ``previous_month``: A ``datetime.date`` object representing the first
+          day of the previous month. Unlike ``next_month``, this will never be
+          ``None``.
 
-    * ``next_month``: A ``datetime.date`` object representing the first day of
-      the next month. If the next month is in the future, this will be
-      ``None``.
+    **Notes**
 
-    * ``previous_month``: A ``datetime.date`` object representing the first day
-      of the previous month. Unlike ``next_month``, this will never be
-      ``None``.
+        * Uses a default ``template_name_suffix`` of ``_archive_month``.
 
-**Notes**
-
-    * Uses a default ``template_name_suffix`` of ``_archive_month``.
-
-WeekArchiveView
-~~~~~~~~~~~~~~~
 .. class:: BaseWeekArchiveView()
 .. class:: WeekArchiveView()
 
-A weekly archive page showing all objects in a given week. Objects with a date
-in the *future* are not displayed unless you set ``allow_future`` to ``True``.
+    A weekly archive page showing all objects in a given week. Objects with a
+    date in the *future* are not displayed unless you set ``allow_future`` to
+    ``True``.
 
-:class:`~django.views.generic.dates.BaseWeekArchiveView` implements the
-same behavior as :class:`~django.views.generic.dates.WeekArchiveView`,
-but doesn't include the
-:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
+    :class:`~django.views.generic.dates.BaseWeekArchiveView` implements the
+    same behavior as :class:`~django.views.generic.dates.WeekArchiveView`, but
+    doesn't include the
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
+        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+        * :class:`django.views.generic.dates.YearMixin`
+        * :class:`django.views.generic.dates.MonthMixin`
+        * :class:`django.views.generic.dates.BaseDateListView`
 
-**Context**
+    **Context**
 
-In addition to the context provided by
-:class:`~django.views.generic.list.MultipleObjectMixin` (via
-:class:`~django.views.generic.dates.BaseDateListView`), the template's
-context will be:
+    In addition to the context provided by
+    :class:`~django.views.generic.list.MultipleObjectMixin` (via
+    :class:`~django.views.generic.dates.BaseDateListView`), the template's
+    context will be:
 
-    * ``week``: A ``datetime.date`` object representing the first day of the
-      given week.
+        * ``week``: A ``datetime.date`` object representing the first day of
+          the given week.
 
-**Notes**
+    **Notes**
 
-    * Uses a default ``template_name_suffix`` of ``_archive_week``.
+        * Uses a default ``template_name_suffix`` of ``_archive_week``.
 
-DayArchiveView
-~~~~~~~~~~~~~~
 .. class:: BaseDayArchiveView()
 .. class:: DayArchiveView()
 
-A day archive page showing all objects in a given day. Days in the future throw
-a 404 error, regardless of whether any objects exist for future days, unless
-you set ``allow_future`` to ``True``.
+    A day archive page showing all objects in a given day. Days in the future
+    throw a 404 error, regardless of whether any objects exist for future days,
+    unless you set ``allow_future`` to ``True``.
 
-:class:`~django.views.generic.dates.BaseDayArchiveView` implements the
-same behavior as :class:`~django.views.generic.dates.DayArchiveView`,
-but doesn't include the
-:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
+    :class:`~django.views.generic.dates.BaseDayArchiveView` implements the same
+    behavior as :class:`~django.views.generic.dates.DayArchiveView`, but
+    doesn't include the
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.DayMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
+        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+        * :class:`django.views.generic.dates.YearMixin`
+        * :class:`django.views.generic.dates.MonthMixin`
+        * :class:`django.views.generic.dates.DayMixin`
+        * :class:`django.views.generic.dates.BaseDateListView`
 
-**Context**
+    **Context**
 
-In addition to the context provided by
-:class:`~django.views.generic.list.MultipleObjectMixin` (via
-:class:`~django.views.generic.dates.BaseDateListView`), the template's
-context will be:
+    In addition to the context provided by
+    :class:`~django.views.generic.list.MultipleObjectMixin` (via
+    :class:`~django.views.generic.dates.BaseDateListView`), the template's
+    context will be:
 
-    * ``day``: A ``datetime.date`` object representing the given day.
+        * ``day``: A ``datetime.date`` object representing the given day.
 
-    * ``next_day``: A ``datetime.date`` object representing the next day. If
-      the next day is in the future, this will be ``None``.
+        * ``next_day``: A ``datetime.date`` object representing the next day.
+          If the next day is in the future, this will be ``None``.
 
-    * ``previous_day``: A ``datetime.date`` object representing the previous day.
-      Unlike ``next_day``, this will never be ``None``.
+        * ``previous_day``: A ``datetime.date`` object representing the
+          previous day. Unlike ``next_day``, this will never be ``None``.
 
-    * ``next_month``: A ``datetime.date`` object representing the first day of
-      the next month. If the next month is in the future, this will be
-      ``None``.
+        * ``next_month``: A ``datetime.date`` object representing the first day
+          of the next month. If the next month is in the future, this will be
+          ``None``.
 
-    * ``previous_month``: A ``datetime.date`` object representing the first day
-      of the previous month. Unlike ``next_month``, this will never be
-      ``None``.
+        * ``previous_month``: A ``datetime.date`` object representing the first
+          day of the previous month. Unlike ``next_month``, this will never be
+          ``None``.
 
-**Notes**
+    **Notes**
 
-    * Uses a default ``template_name_suffix`` of ``_archive_day``.
+        * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
-TodayArchiveView
-~~~~~~~~~~~~~~~~
 .. class:: BaseTodayArchiveView()
 .. class:: TodayArchiveView()
 
-A day archive page showing all objects for *today*. This is exactly the same as
-``archive_day``, except the ``year``/``month``/``day`` arguments are not used,
+    A day archive page showing all objects for *today*. This is exactly the
+    same as ``archive_day``, except the ``year``/``month``/``day`` arguments
+    are not used,
 
-:class:`~django.views.generic.dates.BaseTodayArchiveView` implements
-the same behavior as
-:class:`~django.views.generic.dates.TodayArchiveView`, but doesn't
-include the
-:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
+    :class:`~django.views.generic.dates.BaseTodayArchiveView` implements the
+    same behavior as :class:`~django.views.generic.dates.TodayArchiveView`, but
+    doesn't include the
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-    * :class:`django.views.generic.dates.DayArchiveView`
+        * :class:`django.views.generic.dates.DayArchiveView`
 
-DateDetailView
-~~~~~~~~~~~~~~
 .. class:: BaseDateDetailView()
 .. class:: DateDetailView()
 
-A page representing an individual object. If the object has a date value in the
-future, the view will throw a 404 error by default, unless you set
-``allow_future`` to ``True``.
+    A page representing an individual object. If the object has a date value in
+    the future, the view will throw a 404 error by default, unless you set
+    ``allow_future`` to ``True``.
 
-:class:`~django.views.generic.dates.BaseDateDetailView` implements the
-same behavior as :class:`~django.views.generic.dates.DateDetailView`,
-but doesn't include the
-:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
+    :class:`~django.views.generic.dates.BaseDateDetailView` implements the same
+    behavior as :class:`~django.views.generic.dates.DateDetailView`, but
+    doesn't include the
+    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
 
-**Mixins**
+    **Mixins**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.DayMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
+        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+        * :class:`django.views.generic.dates.YearMixin`
+        * :class:`django.views.generic.dates.MonthMixin`
+        * :class:`django.views.generic.dates.DayMixin`
+        * :class:`django.views.generic.dates.BaseDateListView`
