@@ -26,6 +26,8 @@ from django.utils.itercompat import is_iterable
 from django.db import transaction, close_connection
 from django.test.utils import ContextList
 
+all = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
+
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
 CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')

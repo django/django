@@ -11,10 +11,12 @@ from django.db import transaction, connection, connections, DEFAULT_DB_ALIAS
 from django.http import QueryDict
 from django.test import _doctest as doctest
 from django.test.client import Client
-from django.utils import simplejson, unittest
+from django.utils import simplejson, unittest as ut2
 from django.utils.encoding import smart_str
 from django.utils.functional import wraps
 
+__all__ = ('DocTestRunner', 'OutputChecker', 'TestCase', 'TransactionTestCase',
+           'skipIfDBFeature', 'skipUnlessDBFeature')
 
 try:
     all
@@ -233,7 +235,7 @@ class _AssertNumQueriesContext(object):
         )
 
 
-class TransactionTestCase(unittest.TestCase):
+class TransactionTestCase(ut2.TestCase):
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
@@ -581,7 +583,7 @@ def _deferredSkip(condition, reason):
             @wraps(test_func)
             def skip_wrapper(*args, **kwargs):
                 if condition():
-                    raise unittest.SkipTest(reason)
+                    raise ut2.SkipTest(reason)
                 return test_func(*args, **kwargs)
             test_item = skip_wrapper
         else:
