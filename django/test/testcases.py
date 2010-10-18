@@ -18,6 +18,7 @@ from django.utils.functional import wraps
 __all__ = ('DocTestRunner', 'OutputChecker', 'TestCase', 'TransactionTestCase',
            'skipIfDBFeature', 'skipUnlessDBFeature')
 
+
 try:
     all
 except NameError:

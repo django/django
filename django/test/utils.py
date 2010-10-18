@@ -8,8 +8,9 @@ from django.test import signals
 from django.template import Template
 from django.utils.translation import deactivate
 
-all = ('Approximate', 'ContextList', 'setup_test_environment',
+__all__ = ('Approximate', 'ContextList', 'setup_test_environment',
        'teardown_test_environment', 'get_runner')
+
 
 class Approximate(object):
     def __init__(self, val, places=7):
