@@ -290,7 +290,7 @@ publication date, with the most recent first::
             queryset = Publisher.objects.all(),
             context_object_name = "publisher_list",
         )),
-        (r'^publishers/$', ListView.as_view(
+        (r'^books/$', ListView.as_view(
             queryset = Book.objects.order_by("-publication_date"),
             context_object_name = "book_list",
         )),
