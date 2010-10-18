@@ -6,5 +6,6 @@ import views
 
 urlpatterns = patterns('',
     (r'^article/(?P<object_id>\d+)/$', object_detail, {'queryset': Article.objects.all()}),
-    (r'^xview/$', views.xview),
+    (r'^xview/func/$', views.xview_dec(views.xview)),
+    (r'^xview/class/$', views.xview_dec(views.XViewClass.as_view())),
 )
