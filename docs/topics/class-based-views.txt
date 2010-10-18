@@ -9,7 +9,7 @@ Class-based generic views
     function-based implementation has been deprecated in favor of the
     class-based approach described here.
 
-    For the reference to the old on details on the old implementation,
+    For details on the previous generic views implementation,
     see the :doc:`topic guide </topics/generic-views>` and
     :doc:`detailed reference </topics/generic-views>`.
 
@@ -38,9 +38,9 @@ Django ships with generic views to do the following:
       talk page is an example of what we call a "detail" view.
 
     * Present date-based objects in year/month/day archive pages,
-      associated detail, and "latest" pages. The Django Weblog's
-      (http://www.djangoproject.com/weblog/) year, month, and
-      day archives are built with these, as would be a typical
+      associated detail, and "latest" pages.
+      `The Django Weblog <http://www.djangoproject.com/weblog/>`_'s
+      year, month, and day archives are built with these, as would be a typical
       newspaper's archives.
 
     * Allow users to create, update, and delete objects -- with or
@@ -53,17 +53,16 @@ tasks developers encounter.
 Simple usage
 ============
 
-Class-based generic views (and indeed any class-based views that are
-based on the base classes Django provides) can be configured in two
+Class-based generic views (and any class-based views that inherit from
+the base classes Django provides) can be configured in two
 ways: subclassing, or passing in arguments directly in the URLconf.
 
 When you subclass a class-based view, you can override attributes
-(such as the template name, ``template_name``) or methods (such as
-``get_context_data``) in your subclass to provide new values or
-methods. Consider, for example, a view that just displays one
-template, ``about.html``. Django has a generic view to do this -
-:class:`~django.views.generic.base.TemplateView` - so we can just
-subclass it, and override the template name::
+(such as the ``template_name``) or methods (such as ``get_context_data``)
+in your subclass to provide new values or methods. Consider, for example,
+a view that just displays one template, ``about.html``. Django has a
+generic view to do this - :class:`~django.views.generic.base.TemplateView` -
+so we can just subclass it, and override the template name::
 
     # some_app/views.py
     from django.views.generic import TemplateView
@@ -104,7 +103,7 @@ Generic views of objects
 
 :class:`~django.views.generic.base.TemplateView` certainly is useful,
 but Django's generic views really shine when it comes to presenting
-views on your database content. Because it's such a common task,
+views of your database content. Because it's such a common task,
 Django comes with a handful of built-in generic views that make
 generating list and detail views of objects incredibly easy.
 
@@ -175,7 +174,7 @@ might look like the following::
 That's really all there is to it. All the cool features of generic views come
 from changing the "info" dictionary passed to the generic view. The
 :doc:`generic views reference</ref/class-based-views>` documents all the generic
-views and all their options in detail; the rest of this document will consider
+views and their options in detail; the rest of this document will consider
 some of the common ways you might customize and extend generic views.
 
 
@@ -201,10 +200,10 @@ Making "friendly" template contexts
 -----------------------------------
 
 You might have noticed that our sample publisher list template stores all the
-books in a variable named ``object_list``. While this works just fine, it isn't
-all that "friendly" to template authors: they have to "just know" that they're
-dealing with publishers here. A better name for that variable would be
-``publisher_list``; that variable's content is pretty obvious.
+publishers in a variable named ``object_list``. While this works just fine, it
+isn't all that "friendly" to template authors: they have to "just know" that
+they're dealing with publishers here. A more obvious name for that variable
+would be ``publisher_list``.
 
 We can change the name of that variable easily with the ``context_object_name``
 attribute - here, we'll override it in the URLconf, since it's a simple change:
@@ -237,11 +236,11 @@ However, there is; you can subclass
 implementation of the ``get_context_data`` method. The default
 implementation of this that comes with
 :class:`~django.views.generic.detail.DetailView` simply adds in the
-object being displayed to the template, but we can override it to show
+object being displayed to the template, but you can override it to show
 more::
 
     from django.views.generic import DetailView
-    from some_app.models import Publisher, Book
+    from books.models import Publisher, Book
 
     class PublisherDetailView(DetailView):
 
@@ -268,7 +267,7 @@ specify the objects that the view will operate upon -- you can also
 specify the list of objects using the ``queryset`` argument::
 
     from django.views.generic import DetailView
-    from some_app.models import Publisher, Book
+    from books.models import Publisher, Book
 
     class PublisherDetailView(DetailView):
 
@@ -279,8 +278,9 @@ Specifying ``model = Publisher`` is really just shorthand for saying
 ``queryset = Publisher.objects.all()``. However, by using ``queryset``
 to define a filtered list of objects you can be more specific about the
 objects that will be visible in the view (see :doc:`/topics/db/queries`
-for more information about ``QuerySet`` objects, and see the
-:doc:`generic views reference</ref/generic-views>` for the complete details).
+for more information about :class:`QuerySet` objects, and see the
+:doc:`class-based views reference </ref/class-based-views>` for the complete
+details).
 
 To pick a simple example, we might want to order a list of books by
 publication date, with the most recent first::
@@ -304,7 +304,7 @@ technique (here, illustrated using subclassing rather than by passing arguments
 in the URLconf)::
 
     from django.views.generic import ListView
-    from some_app.models import Book
+    from books.models import Book
 
     class AcmeBookListView(ListView):
 
@@ -326,7 +326,7 @@ We'll deal with this problem in the next section.
     If you get a 404 when requesting ``/books/acme/``, check to ensure you
     actually have a Publisher with the name 'ACME Publishing'.  Generic
     views have an ``allow_empty`` parameter for this case.  See the
-    :doc:`generic views reference</ref/class-based-views>` for more details.
+    :doc:`class-based-views reference</ref/class-based-views>` for more details.
 
 
 Dynamic filtering
@@ -337,9 +337,10 @@ key in the URL. Earlier we hard-coded the publisher's name in the URLconf, but
 what if we wanted to write a view that displayed all the books by some arbitrary
 publisher?
 
-Handily, the ListView has a ``get_queryset`` method we can override. Previously,
-it has just been returning the value of the ``queryset`` attribute, but now we
-can add more logic.
+Handily, the ListView has a
+:meth:`~django.views.generic.detail.ListView.get_queryset` method we can
+override. Previously, it has just been returning the value of the ``queryset``
+attribute, but now we can add more logic.
 
 The key part to making this work is that when class-based views are called,
 various useful things are stored on ``self``; as well as the request
@@ -348,7 +349,7 @@ various useful things are stored on ``self``; as well as the request
 
 Here, we have a URLconf with a single captured group::
 
-    from some_app.views import PublisherBookListView
+    from books.views import PublisherBookListView
 
     urlpatterns = patterns('',
         (r'^books/(\w+)/$', PublisherBookListView.as_view()),
@@ -358,7 +359,7 @@ Next, we'll write the ``PublisherBookListView`` view itself::
 
     from django.shortcuts import get_object_or_404
     from django.views.generic import ListView
-    from some_app.models import Book, Publisher
+    from books.models import Book, Publisher
 
     class PublisherBookListView(ListView):
 
@@ -420,7 +421,7 @@ custom view:
 
 .. parsed-literal::
 
-    from some_app.views import AuthorDetailView
+    from books.views import AuthorDetailView
 
     urlpatterns = patterns('',
         #...
@@ -431,7 +432,7 @@ Then we'd write our new view - ``get_object`` is the method that retrieves the
 object, so we simply override it and wrap the call::
 
     import datetime
-    from some_app.models import Author
+    from books.models import Author
     from django.views.generic import DetailView
     from django.shortcuts import get_object_or_404
 
@@ -472,11 +473,14 @@ Each generic view is composed out of a series of mixins, and each
 mixin contributes a little piece of the entire view. Some of these
 mixins -- such as
 :class:`~django.views.generic.base.TemplateResponseMixin` -- are
-specifically designed for rendering content to a HTML response using a
+specifically designed for rendering content to an HTML response using a
 template. However, you can write your own mixins that perform
 different rendering behavior.
 
 For example, a simple JSON mixin might look something like this::
+
+    from django import http
+    from django.utils import simplejson as json
 
     class JSONResponseMixin(object):
         def render_to_response(self, context):
