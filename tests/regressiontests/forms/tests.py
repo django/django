@@ -38,6 +38,8 @@ from widgets import tests as widgets_tests
 from formsets import tests as formset_tests
 from media import media_tests
 
+
+from formsets import FormsetAsFooTests
 from fields import FieldsTests
 from validators import TestFieldWithValidators
 from widgets import WidgetTests, ClearableFileInputTests

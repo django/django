@@ -326,6 +326,16 @@ class BaseFormSet(StrAndUnicode):
         forms = u' '.join([form.as_table() for form in self.forms])
         return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
 
+    def as_p(self):
+        "Returns this formset rendered as HTML <p>s."
+        forms = u' '.join([form.as_p() for form in self.forms])
+        return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
+
+    def as_ul(self):
+        "Returns this formset rendered as HTML <li>s."
+        forms = u' '.join([form.as_ul() for form in self.forms])
+        return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
+
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None):
     """Return a FormSet for the given form class."""

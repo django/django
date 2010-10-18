@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from django.test.testcases import TestCase
+from django.forms.forms import Form
+from django.forms.fields import CharField, IntegerField
+from django.forms.formsets import formset_factory
 tests = """
 # Basic FormSet creation and usage ############################################
 
@@ -722,3 +726,37 @@ False
 <ul class="errorlist"><li>You may only specify a drink once.</li></ul>
 
 """
+
+data = {
+    'choices-TOTAL_FORMS': '1', # the number of forms rendered
+    'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+    'choices-MAX_NUM_FORMS': '0', # max number of forms
+    'choices-0-choice': 'Calexico',
+    'choices-0-votes': '100',
+}
+
+class Choice(Form):
+    choice = CharField()
+    votes = IntegerField()
+
+ChoiceFormSet = formset_factory(Choice)
+
+class FormsetAsFooTests(TestCase):
+    def test_as_table(self):
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertEqual(formset.as_table(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+<tr><th>Choice:</th><td><input type="text" name="choices-0-choice" value="Calexico" /></td></tr>
+<tr><th>Votes:</th><td><input type="text" name="choices-0-votes" value="100" /></td></tr>""")
+
+    def test_as_p(self):
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertEqual(formset.as_p(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+<p>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></p>
+<p>Votes: <input type="text" name="choices-0-votes" value="100" /></p>""")
+
+    def test_as_ul(self):
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertEqual(formset.as_ul(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
+<li>Votes: <input type="text" name="choices-0-votes" value="100" /></li>""")
+
