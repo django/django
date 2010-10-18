@@ -476,7 +476,7 @@ specifically designed for rendering content to a HTML response using a
 template. However, you can write your own mixins that perform
 different rendering behavior.
 
-For example, you a simple JSON mixin might look something like this::
+For example, a simple JSON mixin might look something like this::
 
     class JSONResponseMixin(object):
         def render_to_response(self, context):
