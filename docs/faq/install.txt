@@ -45,7 +45,13 @@ Do I lose anything by using Python 2.4 versus newer Python versions, such as Pyt
 
 Not in the core framework. Currently, Django itself officially supports any
 version of Python from 2.4 through 2.7, inclusive. However, newer versions of
-Python are often faster, have more features, and are better supported.
+Python are often faster, have more features, and are better supported. If you
+use a newer version of Python you will also have access to some APIs that
+aren't available under older versions of Python. For example Django provides
+some `context managers`_ for various operations. If you use Python 2.4 you
+won't be able to use them, however other APIs which provide the same
+functionality are always made available.
+
 Third-party applications for use with Django are, of course, free to set their
 own version requirements.
 
@@ -58,6 +64,8 @@ All else being equal, we recommend that you use the latest 2.x release
 improvements and optimizations to the Python language since version 2.4, and
 will help ease the process of dropping support for older Python versions on
 the road to Python 3.
+
+.. _context managers: http://docs.python.org/reference/datamodel.html#context-managers
 
 Can I use Django with Python 2.3?
 ---------------------------------
