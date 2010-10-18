@@ -250,7 +250,7 @@ more::
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
-            context = DetailView.get_context_data(self, **kwargs)
+            context = super(DetailView, self).get_context_data(**kwargs)
             # Add in a QuerySet of all the books
             context['book_list'] = Book.objects.all()
             return context
@@ -275,7 +275,7 @@ specify the list of objects using the ``queryset`` argument::
         context_object_name = "publisher"
         queryset = Publisher.object.all()
 
-Specifying ``mode = Publisher`` is really just shorthand for saying
+Specifying ``model = Publisher`` is really just shorthand for saying
 ``queryset = Publisher.objects.all()``. However, by using ``queryset``
 to define a filtered list of objects you can be more specific about the
 objects that will be visible in the view (see :doc:`/topics/db/queries`
@@ -387,7 +387,7 @@ use it in the template::
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
-            context = ListView.get_context_data(self, **kwargs)
+            context = super(ListView, self).get_context_data(**kwargs)
             # Add in the publisher
             context['publisher'] = self.publisher
             return context
@@ -441,7 +441,7 @@ object, so we simply override it and wrap the call::
 
         def get_object(self, **kwargs):
             # Call the superclass
-            object = DetailView.get_object(self, **kwargs)
+            object = super(DetailView, self).get_object(**kwargs)
             # Record the lass accessed date
             object.last_accessed = datetime.datetime.now()
             object.save()
@@ -530,6 +530,6 @@ requested::
                 return SingleObjectTemplateResponseMixin.render_to_response(self, context)
 
 Because of the way that Python resolves method overloading, the local
-:func:``render_to_response()`` implementation will override the
+:func:`render_to_response()` implementation will override the
 versions provided by :class:`JSONResponseMixin` and
 :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.

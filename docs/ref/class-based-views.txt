@@ -313,9 +313,8 @@ Note that ``page`` *must* be either a valid page number or the value
 
 .. method:: MultipleObjectMixin.paginate_queryset(queryset, page_size)
 
-    Returns a 4-tuple containing::
-
-        (``paginator``, ``page``, ``object_list``, ``is_paginated``)
+    Returns a 4-tuple containing (``paginator``, ``page``,
+    ``object_list``, ``is_paginated``).
 
     constructed by paginating ``queryset`` into pages of size ``page_size``.
     If the request contains a ``page`` argument, either as a captured
@@ -819,9 +818,8 @@ for which data is available.
 
 .. method:: ArchiveView.get_dated_items():
 
-    Returns a 3-tuple containing::
-
-        (date_list, latest, extra_context)
+    Returns a 3-tuple containing (``date_list``, ``latest``,
+    ``extra_context``).
 
     ``date_list`` is the list of dates for which data is available.
     ``object_list`` is the list of objects ``extra_context`` is a
