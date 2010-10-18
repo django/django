@@ -1,0 +1,146 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-18 13:15+0200\n"
+"PO-Revision-Date: 2010-10-15 08:31+0530\n"
+"Last-Translator: A S Alam <aalam@users.sf.net>\n"
+"Language-Team: Punjabi/Panjabi <punjabi-users@lists.sf.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:37
+#, perl-format
+msgid "Available %s"
+msgstr "ਉਪਲੱਬਧ %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:45
+msgid "Choose all"
+msgstr "ਸਭ ਚੁਣੋ"
+
+#: contrib/admin/media/js/SelectFilter2.js:50
+msgid "Add"
+msgstr "ਸ਼ਾਮਲ"
+
+#: contrib/admin/media/js/SelectFilter2.js:52
+msgid "Remove"
+msgstr "ਹਟਾਓ"
+
+#: contrib/admin/media/js/SelectFilter2.js:57
+#, perl-format
+msgid "Chosen %s"
+msgstr "%s ਚੁਣੋ"
+
+#: contrib/admin/media/js/SelectFilter2.js:58
+msgid "Select your choice(s) and click "
+msgstr "ਆਪਣੀ ਚੋਣ ਕਰੋ ਤੇ ਕਲਿੱਕ ਕਰੋ "
+
+#: contrib/admin/media/js/SelectFilter2.js:63
+msgid "Clear all"
+msgstr "ਸਭ ਸਾਫ਼ ਕਰੋ"
+
+#: contrib/admin/media/js/actions.js:18
+#: contrib/admin/media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/media/js/actions.js:109
+#: contrib/admin/media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+
+#: contrib/admin/media/js/actions.js:121
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+
+#: contrib/admin/media/js/actions.js:123
+#: contrib/admin/media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "ਜਨਵਰੀ ਫਰਵਰੀ ਮਾਰਚ ਅਪਰੈਲ ਮਈ ਜੂਨ ਜੁਲਾਈ ਅਗਸਤ ਸਤੰਬਰ ਅਕਤੂਬਰ ਨਵੰਬਰ ਦਸੰਬਰ"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "S M T W T F S"
+
+#: contrib/admin/media/js/collapse.js:9 contrib/admin/media/js/collapse.js:21
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Show"
+msgstr "ਵੇਖੋ"
+
+#: contrib/admin/media/js/collapse.js:16
+#: contrib/admin/media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "ਓਹਲੇ"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "ਐਤਵਾਰ ਸੋਮਵਾਰ ਮੰਗਲਵਾਰ ਬੁੱਧਵਾਰ ਵੀਰਵਾਰ ਸ਼ੁੱਕਰਵਾਰ ਸ਼ਨਿੱਚਰਵਾਰ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:49
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+msgid "Now"
+msgstr "ਹੁਣੇ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "ਘੜੀ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+msgid "Choose a time"
+msgstr "ਸਮਾਂ ਚੁਣੋ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:85
+msgid "Midnight"
+msgstr "ਅੱਧੀ-ਰਾਤ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:86
+msgid "6 a.m."
+msgstr "6 ਸਵੇਰ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
+msgid "Noon"
+msgstr "ਦੁਪਹਿਰ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:91
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:188
+msgid "Cancel"
+msgstr "ਰੱਦ ਕਰੋ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:133
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:182
+msgid "Today"
+msgstr "ਅੱਜ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:137
+msgid "Calendar"
+msgstr "ਕੈਲੰਡਰ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:180
+msgid "Yesterday"
+msgstr "ਕੱਲ੍ਹ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:184
+msgid "Tomorrow"
+msgstr "ਭਲਕੇ"
