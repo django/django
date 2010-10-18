@@ -2,6 +2,12 @@ from django.template import loader, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponseGone
 from django.utils.log import getLogger
 
+import warnings
+warnings.warn(
+    'Function-based generic views have been deprecated; use class-based views instead.',
+    PendingDeprecationWarning
+)
+
 logger = getLogger('django.request')
 
 

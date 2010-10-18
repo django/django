@@ -12,7 +12,7 @@ API Reference
    exceptions
    files/index
    forms/index
-   generic-views
+   class-based-views
    middleware
    models/index
    request-response
@@ -22,3 +22,11 @@ API Reference
    unicode
    utils
    validators
+
+Deprecated features
+-------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   generic-views

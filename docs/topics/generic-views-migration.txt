@@ -1,0 +1,127 @@
+======================================
+Migrating function-based generic views
+======================================
+
+All the :doc:`function-based generic views</ref/generic-views>`
+that existed in Django 1.2 have analogs as :doc:`class-based generic
+views</ref/class-based-views>` in Django 1.3. The feature set
+exposed in those function-based views can be replicated in a
+class-based way.
+
+How to migrate
+==============
+
+Replace generic views with generic classes
+------------------------------------------
+
+Existing usage of function-based generic views should be replaced with
+their class-based analogs:
+
+    ====================================================  ====================================================
+    Old function-based generic view                       New class-based generic view
+    ====================================================  ====================================================
+    ``django.views.generic.simple.direct_to_template``    :class:`django.views.generic.base.TemplateView`
+    ``django.views.generic.simple.redirect_to``           :class:`django.views.generic.base.RedirectView`
+    ``django.views.generic.list_detail.object_list``      :class:`django.views.generic.list.ListView`
+    ``django.views.generic.list_detail.object_detail``    :class:`django.views.generic.detail.DetailView`
+    ``django.views.generic.create_update.create_object``  :class:`django.views.generic.edit.CreateView`
+    ``django.views.generic.create_update.update_object``  :class:`django.views.generic.edit.UpdateView`
+    ``django.views.generic.create_update.delete_object``  :class:`django.views.generic.edit.DeleteView`
+    ``django.views.generic.date_based.archive_index``     :class:`django.views.generic.dates.ArchiveIndexView`
+    ``django.views.generic.date_based.archive_year``      :class:`django.views.generic.dates.YearArchiveView`
+    ``django.views.generic.date_based.archive_month``     :class:`django.views.generic.dates.MonthArchiveView`
+    ``django.views.generic.date_based.archive_week``      :class:`django.views.generic.dates.WeekArchiveView`
+    ``django.views.generic.date_based.archive_day``       :class:`django.views.generic.dates.DayArchiveView`
+    ``django.views.generic.date_based.archive_today``     :class:`django.views.generic.dates.TodayArchiveView`
+    ``django.views.generic.date_based.object_detail``     :class:`django.views.generic.dates.DateDetailView`
+    ====================================================  ====================================================
+
+To do this, replace the reference to the generic view function with
+a ``as_view()`` instantiation of the class-based view. For example,
+the old-style ``direct_to_template`` pattern::
+
+    ('^about/$', direct_to_template, {'template': 'about.html'})
+
+can be replaced with an instance of
+:class:`~django.views.generic.base.TemplateView`::
+
+    ('^about/$', TemplateView.as_view(template_name='about.html'))
+
+``template`` argument to ``direct_to_template`` views
+-----------------------------------------------------
+
+The ``template`` argument to the ``direct_to_template`` view has been renamed
+``template_name``. This has ben done to maintain consistency with other views.
+
+``object_id`` argument to detail views
+--------------------------------------
+
+The object_id argument to the ``object_detail`` view has been renamed
+``pk`` on the :class:`~django.views.generic.detail.DetailView`.
+
+``template_object_name``
+------------------------
+
+``template_object_name`` has been renamed ``context_object_name``,
+reflecting the fact that the context data can be used for purposes
+other than template rendering (e.g., to populate JSON output).
+
+The ``_list`` suffix on list views
+----------------------------------
+
+In a function-based :class:`ListView`, the ``template_object_name``
+was appended with the suffix ``'_list'`` to yield the final context
+variable name. In a class-based ``ListView``, the
+``context_object_name`` is used verbatim.
+
+``extra_context``
+-----------------
+
+Function-based generic views provided an ``extra_context`` argument
+as way to insert extra items into the context at time of rendering.
+
+Class-based views don't provide an ``extra_context`` argument.
+Instead, you subclass the view, overriding :meth:`get_context_data()`.
+For example::
+
+    class MyListView(ListView):
+        def get_context_data(self, **kwargs):
+            context = super(MyListView, self).get_context_data(**kwargs)
+            context.update({
+                'foo': 42,
+                'bar': 37
+            })
+            return context
+
+``mimetype``
+------------
+
+Some function-based generic views provided a ``mimetype`` argument
+as way to control the mimetype of the response.
+
+Class-based views don't provide a ``mimetype`` argument. Instead, you
+subclass the view, overriding
+:meth:`TemplateResponseMixin.get_response()` and pass in arguments for
+the HttpResponse constructor. For example::
+
+    class MyListView(ListView):
+        def get_response(self, content, **kwargs):
+            return super(MyListView, self).get_response(content,
+                            content_type='application/json', **kwargs)
+
+``context_processors``
+----------------------
+
+Some function-based generic views provided a ``context_processors``
+argument that could be used to force the use of specialized context
+processors when rendering template content.
+
+Class-based views don't provide a ``context_processors`` argument.
+Instead, you subclass the view, overriding
+:meth:`TemplateResponseMixin.get_context_instance()`. For example::
+
+    class MyListView(ListView):
+        def get_context_instance(self, context):
+            return RequestContext(self.request,
+                                  context,
+                                  processors=[custom_processor])

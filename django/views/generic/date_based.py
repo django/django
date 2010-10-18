@@ -7,6 +7,13 @@ from django.core.xheaders import populate_xheaders
 from django.db.models.fields import DateTimeField
 from django.http import Http404, HttpResponse
 
+import warnings
+warnings.warn(
+    'Function-based generic views have been deprecated; use class-based views instead.',
+    PendingDeprecationWarning
+)
+
+
 def archive_index(request, queryset, date_field, num_latest=15,
         template_name=None, template_loader=loader,
         extra_context=None, allow_empty=True, context_processors=None,

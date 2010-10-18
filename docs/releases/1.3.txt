@@ -17,6 +17,23 @@ upgrade path from Django 1.2.
 What's new in Django 1.3
 ========================
 
+Class-based views
+~~~~~~~~~~~~~~~~~
+
+Django 1.3 adds a framework that allows you to use a class as a view.
+This means you can compose a view out of a collection of methods that
+can be subclassed and overridden to provide
+
+Analogs of all the old function-based generic views have been
+provided, along with a completely generic view base class that can be
+used as the basis for reusable applications that can be easily
+extended.
+
+See :doc:`the documentation on Generic Views</topics/generic-views>`
+for more details. There is also a document to help you :doc:`convert
+your function-based generic views to class-based
+views</topics/generic-views-migration>`.
+
 Logging
 ~~~~~~~
 
@@ -173,6 +190,18 @@ more flexible ``mod_wsgi`` backend.
 If you are currently using the ``mod_python`` request handler, it is strongly
 encouraged you redeploy your Django instances using :doc:`mod_wsgi
 </howto/deployment/modwsgi>`.
+
+Function-based generic views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As a result of the introduction of class-based generic views, the
+function-based generic views provided by Django have been deprecated.
+The following modules and the views they contain have been deprecated:
+
+      * :mod:`django.views.generic.create_update`
+      * :mod:`django.views.generic.date_based`
+      * :mod:`django.views.generic.list_detail`
+      * :mod:`django.views.generic.simple`
 
 Test client response ``template`` attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

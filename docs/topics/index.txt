@@ -12,7 +12,8 @@ Introductions to all the key parts of Django you'll need to know:
    forms/index
    forms/modelforms
    templates
-   generic-views
+   class-based-views
+   generic-views-migration
    files
    testing
    auth
@@ -26,3 +27,10 @@ Introductions to all the key parts of Django you'll need to know:
    settings
    signals
 
+Deprecated features
+-------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   generic-views
