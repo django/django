@@ -9,20 +9,20 @@ Class-based generic views
     function-based implementation has been deprecated in favor of the
     class-based approach described here.
 
-    For the reference to the old on details on the old implementation,
+    For details on the previous generic views implementation,
     see the :doc:`topic guide </topics/generic-views>` and
     :doc:`detailed reference </topics/generic-views>`.
 
 Writing Web applications can be monotonous, because we repeat certain patterns
-again and again. In Django, the most common of these patterns have been
-abstracted into "generic views" that let you quickly provide common views of
-an object without actually needing to write any Python code.
+again and again. Django tries to take away some of that monotony at the model
+and template layers, but Web developers also experience this boredom at the view
+level.
 
-A general introduction to generic views can be found in the :doc:`topic guide
-</topics/class-based-views>`.
+A general introduction to class-based generic views can be found in the
+:doc:`topic guide </topics/class-based-views>`.
 
 This reference contains details of Django's built-in generic views, along with
-a list of all keyword arguments that a generic view expects. Remember that
+a list of the keyword arguments that each generic view expects. Remember that
 arguments may either come from the URL pattern or from the ``extra_context``
 additional-information dictionary.
 
@@ -35,7 +35,7 @@ Mixins
 
 A mixin class is a way of using the inheritance capabilities of
 classes to compose a class out of smaller pieces of behavior. Django's
-class-based generic views are constructed by composing a mixins into
+class-based generic views are constructed by composing mixins into
 usable generic views.
 
 For example, the :class:`~django.views.generic.base.detail.DetailView`
@@ -53,19 +53,23 @@ When combined, these mixins provide all the pieces necessary to
 provide a view over a single object that renders a template to produce
 a response.
 
-When the documentation for a view gives the list of mixins, that view
-inherits all the properties and methods of that mixin.
-
 Django provides a range of mixins. If you want to write your own
 generic views, you can build classes that compose these mixins in
 interesting ways. Alternatively, you can just use the pre-mixed
 `Generic views`_ that Django provides.
+
+.. note::
+
+    When the documentation for a view gives the list of mixins, that view
+    inherits all the properties and methods of that mixin.
 
 Simple mixins
 -------------
 
 .. currentmodule:: django.views.generic.base
 
+TemplateResponseMixin
+~~~~~~~~~~~~~~~~~~~~~
 .. class:: TemplateResponseMixin()
 
     .. attribute:: template_name
@@ -77,7 +81,7 @@ Simple mixins
         Returns a full composed HttpResponse instance, ready to be returned to
         the user.
 
-        Calls, :meth:`~TemplateResponseMixin.render_template()` to build the
+        Calls :meth:`~TemplateResponseMixin.render_template()` to build the
         content of the response, and
         :meth:`~TemplateResponseMixin.get_response()` to construct the
         :class:`~django.http.HttpResponse` object.
@@ -112,7 +116,8 @@ Simple mixins
 
     .. method:: get_template_names()
 
-        The list of template names to search for when rendering the template.
+        Returns a list of template names to search for when rendering the
+        template.
 
         If :attr:`TemplateResponseMixin.template_name` is specified, the
         default implementation will return a list containing
@@ -128,6 +133,8 @@ Single object mixins
 
 .. currentmodule:: django.views.generic.detail
 
+SingleObjectMixin
+~~~~~~~~~~~~~~~~~
 .. class:: SingleObjectMixin()
 
     .. attribute:: model
@@ -153,15 +160,21 @@ Single object mixins
 
     .. method:: get_queryset()
 
-        Returns the queryset that will be used to retrieve the object that this
-        view will display.
+        Returns the queryset that will be used to retrieve the object that
+        this view will display. By default,
+        :meth:`~SingleObjectMixin.get_queryset` returns the value of the
+        :attr:`~SingleObjectMixin.queryset` attribute if it is set, otherwise
+        it constructs a :class:`QuerySet` by calling the `all()` method on the
+        :attr:`~SingleObjectMixin.model` attribute's default manager.
 
     .. method:: get_context_object_name(object_list)
 
-        Return the context variable name that will be used to contain the list
-        of data that this view is manipulating. If object_list is a queryset of
-        Django objects, the context name will be verbose plural name of the
-        model that the queryset is composed from.
+        Return the context variable name that will be used to contain the
+        list of data that this view is manipulating. If ``object_list`` is a
+        :class:`QuerySet` of Django objects and
+        :attr:`~SingleObjectMixin.context_object_name` is not set, the context
+        name will be constructed from the verbose plural name of the model that
+        the queryset is composed from.
 
     .. method:: get_context_data(**kwargs)
 
@@ -172,6 +185,9 @@ Single object mixins
         * ``object``: The object that this view is displaying. If
           ``context_object_name`` is specified, that variable will also be
           set in the context, with the same value as ``object``.
+
+SingleObjectTemplateResponseMixin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: SingleObjectTemplateResponseMixin()
 
@@ -213,6 +229,8 @@ Multiple object mixins
 
 .. currentmodule:: django.views.generic.list
 
+MultipleObjectMixin
+~~~~~~~~~~~~~~~~~~~
 .. class:: MultipleObjectMixin()
 
     A mixin that can be used to display a list of objects.
@@ -293,6 +311,10 @@ Multiple object mixins
         objects from that page.
 
     .. method:: get_paginate_by(queryset)
+    
+        Returns the number of items to paginate by, or ``None`` for no
+        pagination. By default this simply returns the value of
+        :attr:`MultipleObjectMixin.paginate_by`.
 
     .. method:: get_allow_empty()
 
@@ -331,6 +353,8 @@ Multiple object mixins
           :class:`django.core.paginator.Page`. If the page is not paginated,
           this context variable will be ``None``
 
+MultipleObjectTemplateResponseMixin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. class:: MultipleObjectTemplateResponseMixin()
 
     A mixin class that performs template-based response rendering for views
@@ -360,6 +384,8 @@ Editing mixins
 
 .. currentmodule:: django.views.generic.edit
 
+FormMixin
+~~~~~~~~~
 .. class:: FormMixin()
 
     A mixin class that provides facilities for creating and displaying forms.
@@ -413,12 +439,14 @@ Editing mixins
 
         * ``form``: The form instance that was generated for the view.
 
-    **Notes**
+    .. note::
 
-        * Views mixing :class:`~django.views.generic.edit.FormMixin` must
-          provide an implementation of :meth:`~FormMixin.form_valid()` and
-          :meth:`~FormMixin.form_invalid()`.
+        Views mixing :class:`~django.views.generic.edit.FormMixin` must
+        provide an implementation of :meth:`~FormMixin.form_valid` and
+        :meth:`~FormMixin.form_invalid`.
 
+ModelFormMixin
+~~~~~~~~~~~~~~
 .. class:: ModelFormMixin()
 
     A form mixin that works on ModelForms, rather than a standalone form.
@@ -471,20 +499,26 @@ Editing mixins
 
         Renders a response, providing the invalid form as context.
 
+ProcessFormView
+~~~~~~~~~~~~~~~
 .. class:: ProcessFormView()
 
     A mixin that provides basic HTTP GET and POST workflow.
 
-    On GET:
-        * Construct a form
-        * Render a response using a context that contains that form
+    .. method:: get(request, *args, **kwargs)
+    
+        Constructs a form, then renders a response using a context that
+        contains that form.
 
-    On POST:
-        * Construct a form
-        * Check the form for validity, and handle accordingly.
+    .. method:: post(request, *args, **kwargs)
+
+        Constructs a form, checks the form for validity, and handles it
+        accordingly.
 
     The PUT action is also handled, as an analog of POST.
 
+DeletionMixin
+~~~~~~~~~~~~~
 .. class:: DeletionMixin()
 
     Enables handling of the ``DELETE`` http action.
@@ -494,7 +528,7 @@ Editing mixins
         The url to redirect to when the nominated object has been
         successfully deleted.
 
-    .. attribute:: get_success_url(obj)
+    .. method:: get_success_url(obj)
 
         Returns the url to redirect to when the nominated object has been
         successfully deleted. Returns
@@ -506,6 +540,8 @@ Date-based mixins
 
 .. currentmodule:: django.views.generic.dates
 
+YearMixin
+~~~~~~~~~
 .. class:: YearMixin()
 
     A mixin that can be used to retrieve and provide parsing information for a
@@ -539,6 +575,8 @@ Date-based mixins
 
         Raises a 404 if no valid year specification can be found.
 
+MonthMixin
+~~~~~~~~~~
 .. class:: MonthMixin()
 
     A mixin that can be used to retrieve and provide parsing information for a
@@ -583,6 +621,8 @@ Date-based mixins
         date provided. If ``allow_empty = False``, returns the previous month
         that contained data.
 
+DayMixin
+~~~~~~~~~
 .. class:: DayMixin()
 
     A mixin that can be used to retrieve and provide parsing information for a
@@ -626,6 +666,8 @@ Date-based mixins
         Returns a date object containing the previous day. If
         ``allow_empty = False``, returns the previous day that contained data.
 
+WeekMixin
+~~~~~~~~~
 .. class:: WeekMixin()
 
     A mixin that can be used to retrieve and provide parsing information for a
@@ -658,6 +700,8 @@ Date-based mixins
         Raises a 404 if no valid week specification can be found.
 
 
+DateMixin
+~~~~~~~~~
 .. class:: DateMixin()
 
     A mixin class providing common behavior for all date-based views.
@@ -687,6 +731,8 @@ Date-based mixins
         is greater than the current date/time. Returns
         :attr:`DateMixin.date_field` by default.
 
+BaseDateListView
+~~~~~~~~~~~~~~~~
 .. class:: BaseDateListView()
 
     A base class that provides common behavior for all date-based views. There
@@ -745,6 +791,8 @@ Simple generic views
 
 .. currentmodule:: django.views.generic.base
 
+View
+~~~~
 .. class:: View()
 
     The master class-based base view. All other generic class-based views
@@ -796,6 +844,8 @@ Simple generic views
         The default implementation returns ``HttpResponseNotAllowed`` with list
         of allowed methods in plain text.
 
+TemplateView
+~~~~~~~~~~~~
 .. class:: TemplateView()
 
     Renders a given template, passing it a ``{{ params }}`` template variable,
@@ -819,6 +869,8 @@ Simple generic views
         * ``params``: The dictionary of keyword arguments captured from the URL
           pattern that served the view.
 
+RedirectView
+~~~~~~~~~~~~
 .. class:: RedirectView()
 
     Redirects to a given URL.
@@ -867,6 +919,8 @@ Detail views
 
 .. currentmodule:: django.views.generic.detail
 
+DetailView
+~~~~~~~~~~
 .. class:: BaseDetailView()
 .. class:: DetailView()
 
@@ -890,6 +944,8 @@ List views
 
 .. currentmodule:: django.views.generic.list
 
+ListView
+~~~~~~~~
 .. class:: BaseListView()
 .. class:: ListView()
 
@@ -915,6 +971,8 @@ Editing views
 
 .. currentmodule:: django.views.generic.edit
 
+FormView
+~~~~~~~~
 .. class:: BaseFormView()
 .. class:: FormView()
 
@@ -930,6 +988,8 @@ Editing views
       * :class:`django.views.generic.edit.FormMixin`
       * :class:`django.views.generic.edit.ProcessFormView`
 
+CreateView
+~~~~~~~~~~
 .. class:: BaseCreateView()
 .. class:: CreateView()
 
@@ -945,6 +1005,8 @@ Editing views
       * :class:`django.views.generic.edit.ModelFormMixin`
       * :class:`django.views.generic.edit.ProcessFormView`
 
+UpdateView
+~~~~~~~~~~
 .. class:: BaseUpdateView()
 .. class:: UpdateView()
 
@@ -962,6 +1024,8 @@ Editing views
       * :class:`django.views.generic.edit.ModelFormMixin`
       * :class:`django.views.generic.edit.ProcessFormView`
 
+DeleteView
+~~~~~~~~~~
 .. class:: BaseDeleteView()
 .. class:: DeleteView()
 
@@ -992,6 +1056,8 @@ are views for displaying drilldown pages for date-based data.
 
 .. currentmodule:: django.views.generic.dates
 
+ArchiveIndexView
+~~~~~~~~~~~~~~~~
 .. class:: BaseArchiveIndexView()
 .. class:: ArchiveIndexView()
 
@@ -1012,9 +1078,10 @@ are views for displaying drilldown pages for date-based data.
     **Notes**
 
         * Uses a default ``context_object_name`` of ``latest``.
-
         * Uses a default ``template_name_suffix`` of ``_archive``.
 
+YearArchiveView
+~~~~~~~~~~~~~~~
 .. class:: BaseYearArchiveView()
 .. class:: YearArchiveView()
 
@@ -1062,6 +1129,8 @@ are views for displaying drilldown pages for date-based data.
 
         * Uses a default ``template_name_suffix`` of ``_archive_year``.
 
+MonthArchiveView
+~~~~~~~~~~~~~~~~
 .. class:: BaseMonthArchiveView()
 .. class:: MonthArchiveView()
 
@@ -1107,6 +1176,8 @@ are views for displaying drilldown pages for date-based data.
 
         * Uses a default ``template_name_suffix`` of ``_archive_month``.
 
+WeekArchiveView
+~~~~~~~~~~~~~~~
 .. class:: BaseWeekArchiveView()
 .. class:: WeekArchiveView()
 
@@ -1140,6 +1211,8 @@ are views for displaying drilldown pages for date-based data.
 
         * Uses a default ``template_name_suffix`` of ``_archive_week``.
 
+DayArchiveView
+~~~~~~~~~~~~~~
 .. class:: BaseDayArchiveView()
 .. class:: DayArchiveView()
 
@@ -1187,6 +1260,8 @@ are views for displaying drilldown pages for date-based data.
 
         * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
+TodayArchiveView
+~~~~~~~~~~~~~~~~
 .. class:: BaseTodayArchiveView()
 .. class:: TodayArchiveView()
 
@@ -1203,6 +1278,8 @@ are views for displaying drilldown pages for date-based data.
 
         * :class:`django.views.generic.dates.DayArchiveView`
 
+DateDetailView
+~~~~~~~~~~~~~~
 .. class:: BaseDateDetailView()
 .. class:: DateDetailView()
 
