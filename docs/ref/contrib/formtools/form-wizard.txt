@@ -193,7 +193,7 @@ wizard takes a list of your :class:`~django.forms.Form` objects as
 arguments when you instantiate the Wizard::
 
     from django.conf.urls.defaults import *
-    from mysite.testapp.forms import ContactForm1, ContactForm2, ContactWizard
+    from testapp.forms import ContactForm1, ContactForm2, ContactWizard
 
     urlpatterns = patterns('',
         (r'^contact/$', ContactWizard([ContactForm1, ContactForm2])),

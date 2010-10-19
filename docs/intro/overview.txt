@@ -21,7 +21,8 @@ code.
 
 The :doc:`data-model syntax </topics/db/models>` offers many rich ways of
 representing your models -- so far, it's been solving two years' worth of
-database-schema problems. Here's a quick example::
+database-schema problems. Here's a quick example, which might be saved in
+the file ``mysite/news/models.py``::
 
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
@@ -57,7 +58,8 @@ Enjoy the free API
 With that, you've got a free, and rich, :doc:`Python API </topics/db/queries>` to
 access your data. The API is created on the fly, no code generation necessary::
 
-    >>> from mysite.models import Reporter, Article
+    # Import the models we created from our "news" app
+    >>> from news.models import Reporter, Article
 
     # No reporters are in the system yet.
     >>> Reporter.objects.all()
@@ -177,9 +179,9 @@ example above::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^articles/(\d{4})/$', 'mysite.views.year_archive'),
-        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.views.month_archive'),
-        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
     )
 
 The code above maps URLs, as simple regular expressions, to the location of
@@ -195,7 +197,7 @@ is a simple Python function. Each view gets passed a request object --
 which contains request metadata -- and the values captured in the regex.
 
 For example, if a user requested the URL "/articles/2005/05/39323/", Django
-would call the function ``mysite.views.article_detail(request,
+would call the function ``news.views.article_detail(request,
 '2005', '05', '39323')``.
 
 Write your views

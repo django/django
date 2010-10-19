@@ -570,7 +570,7 @@ It's perfectly OK to relate a model to one from another app. To do this,
 import the related model at the top of the model that holds your model. Then,
 just refer to the other model class wherever needed. For example::
 
-    from mysite.geography.models import ZipCode
+    from geography.models import ZipCode
 
     class Restaurant(models.Model):
         # ...

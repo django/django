@@ -72,7 +72,7 @@ the URLconf to point to a view function:
 
     from django.conf.urls.defaults import *
     from django.views.generic.simple import direct_to_template
-    **from mysite.books.views import about_pages**
+    **from books.views import about_pages**
 
     urlpatterns = patterns('',
         ('^about/$', direct_to_template, {
@@ -152,7 +152,7 @@ To build a list page of all publishers, we'd use a URLconf along these lines::
 
     from django.conf.urls.defaults import *
     from django.views.generic import list_detail
-    from mysite.books.models import Publisher
+    from books.models import Publisher
 
     publisher_info = {
         "queryset" : Publisher.objects.all(),
@@ -251,7 +251,7 @@ detail view, we'd use an info dict like this:
 
 .. parsed-literal::
 
-    from mysite.books.models import Publisher, **Book**
+    from books.models import Publisher, **Book**
 
     publisher_info = {
         "queryset" : Publisher.objects.all(),
@@ -376,7 +376,7 @@ of code by hand. As usual, we'll start by writing a URLconf:
 
 .. parsed-literal::
 
-    from mysite.books.views import books_by_publisher
+    from books.views import books_by_publisher
 
     urlpatterns = patterns('',
         (r'^publishers/$', list_detail.object_list, publisher_info),
@@ -387,7 +387,7 @@ Next, we'll write the ``books_by_publisher`` view itself::
 
     from django.http import Http404
     from django.views.generic import list_detail
-    from mysite.books.models import Book, Publisher
+    from books.models import Book, Publisher
 
     def books_by_publisher(request, name):
 
@@ -447,7 +447,7 @@ custom view:
 
 .. parsed-literal::
 
-    from mysite.books.views import author_detail
+    from books.views import author_detail
 
     urlpatterns = patterns('',
         #...
@@ -457,7 +457,7 @@ custom view:
 Then we'd write our wrapper function::
 
     import datetime
-    from mysite.books.models import Author
+    from books.models import Author
     from django.views.generic import list_detail
     from django.shortcuts import get_object_or_404
 

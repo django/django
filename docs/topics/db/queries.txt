@@ -60,7 +60,7 @@ funky model importing.)
 
 Assuming models live in a file ``mysite/blog/models.py``, here's an example::
 
-    >>> from mysite.blog.models import Blog
+    >>> from blog.models import Blog
     >>> b = Blog(name='Beatles Blog', tagline='All the latest Beatles news.')
     >>> b.save()
 
@@ -98,7 +98,7 @@ Updating a ``ForeignKey`` field works exactly the same way as saving a normal
 field; simply assign an object of the right type to the field in question.
 This example updates the ``blog`` attribute of an ``Entry`` instance ``entry``::
 
-    >>> from mysite.blog.models import Entry
+    >>> from blog.models import Entry
     >>> entry = Entry.objects.get(pk=1)
     >>> cheese_blog = Blog.objects.get(name="Cheddar Talk")
     >>> entry.blog = cheese_blog
@@ -108,7 +108,7 @@ Updating a ``ManyToManyField`` works a little differently; use the ``add()``
 method on the field to add a record to the relation. This example adds the
 ``Author`` instance ``joe`` to the ``entry`` object::
 
-    >>> from mysite.blog.models import Author
+    >>> from blog.models import Author
     >>> joe = Author.objects.create(name="Joe")
     >>> entry.authors.add(joe)
 
