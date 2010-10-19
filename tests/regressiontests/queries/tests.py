@@ -1435,7 +1435,8 @@ class CloneTests(TestCase):
 
 class EmptyQuerySetTests(TestCase):
     def test_emptyqueryset_values(self):
-        "#14366 -- calling .values() on an EmptyQuerySet and then cloning that should not cause an error"
+        # #14366 -- Calling .values() on an EmptyQuerySet and then cloning that
+        # should not cause an error"
         self.assertEqual(list(Number.objects.none().values('num').order_by('num')), [])
 
     def test_values_subquery(self):
@@ -1486,9 +1487,17 @@ class EscapingTests(TestCase):
         )
 
 
-class ConditionalTests(TestCase):
+class ConditionalTests(BaseQuerysetTest):
     """Tests whose execution depend on dfferent environment conditions like
     Python version or DB backend features"""
+
+    def setUp(self):
+        generic = NamedCategory.objects.create(name="Generic")
+        t1 = Tag.objects.create(name='t1', category=generic)
+        t2 = Tag.objects.create(name='t2', parent=t1, category=generic)
+        t3 = Tag.objects.create(name='t3', parent=t1)
+        t4 = Tag.objects.create(name='t4', parent=t3)
+        t5 = Tag.objects.create(name='t5', parent=t3)
 
     # In Python 2.6 beta releases, exceptions raised in __len__ are swallowed
     # (Python issue 1242657), so these cases return an empty list, rather than
@@ -1499,7 +1508,7 @@ class ConditionalTests(TestCase):
     def test_infinite_loop(self):
         # If you're not careful, it's possible to introduce infinite loops via
         # default ordering on foreign keys in a cycle. We detect that.
-        self.assertRaises(
+        self.assertRaisesMessage(
             FieldError,
             'Infinite loop caused by ordering.',
             LoopX.objects.all
