@@ -172,12 +172,9 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         return ''
 
     def value_from_datadict(self, data, files, name):
-        value = data.get(name, None)
-        if value and ',' in value:
-            return data[name].split(',')
+        value = data.get(name)
         if value:
-            return [value]
-        return None
+            return value.split(',')
 
     def _has_changed(self, initial, data):
         if initial is None:
