@@ -1,5 +1,6 @@
 import unittest
 from django import forms
+from django.conf import settings
 from django.contrib.formtools import preview, wizard, utils
 from django import http
 from django.test import TestCase
@@ -145,6 +146,9 @@ class WizardPageOneForm(forms.Form):
 class WizardPageTwoForm(forms.Form):
     field = forms.CharField()
 
+class WizardPageThreeForm(forms.Form):
+    field = forms.CharField()
+
 class WizardClass(wizard.FormWizard):
     def render_template(self, *args, **kw):
         return http.HttpResponse("")
@@ -161,6 +165,15 @@ class DummyRequest(http.HttpRequest):
         self._dont_enforce_csrf_checks = True
 
 class WizardTests(TestCase):
+
+    def setUp(self):
+        # Use a known SECRET_KEY to make security_hash tests deterministic
+        self.old_SECRET_KEY = settings.SECRET_KEY
+        settings.SECRET_KEY = "123"
+
+    def tearDown(self):
+        settings.SECRET_KEY = self.old_SECRET_KEY
+
     def test_step_starts_at_zero(self):
         """
         step should be zero for the first form
@@ -178,4 +191,26 @@ class WizardTests(TestCase):
         request = DummyRequest(POST={"0-field":"test", "wizard_step":"0"})
         response = wizard(request)
         self.assertEquals(1, wizard.step)
+
+    def test_14498(self):
+        """
+        Regression test for ticket #14498.
+        """
+        that = self
+        reached = [False]
+
+        class WizardWithProcessStep(WizardClass):
+            def process_step(self, request, form, step):
+                reached[0] = True
+                that.assertTrue(hasattr(form, 'cleaned_data'))
+
+        wizard = WizardWithProcessStep([WizardPageOneForm,
+                                        WizardPageTwoForm,
+                                        WizardPageThreeForm])
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": "2fdbefd4c0cad51509478fbacddf8b13",
+                "wizard_step": "1"}
+        wizard(DummyRequest(POST=data))
+        self.assertTrue(reached[0])
 
