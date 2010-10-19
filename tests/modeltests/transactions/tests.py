@@ -1,8 +1,14 @@
+import sys
+
 from django.db import connection, transaction, IntegrityError, DEFAULT_DB_ALIAS
 from django.conf import settings
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from models import Reporter
+
+
+if sys.version_info >= (2, 5):
+    from tests_25 import TransactionContextManagerTests
 
 
 class TransactionTests(TransactionTestCase):

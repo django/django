@@ -73,6 +73,19 @@ you just won't get any of the nice new unittest2 features.
 
 .. _unittest2: http://pypi.python.org/pypi/unittest2
 
+Transaction context managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Users of Python 2.5 and above may now use :ref:`transaction management functions
+<transaction-management-functions>` as `context managers`_. For example::
+
+    with transaction.autocommit():
+        # ...
+
+.. _context managers: http://docs.python.org/glossary.html#term-context-manager
+
+For more information, see :ref:`transaction-management-functions`.
+
 Everything else
 ~~~~~~~~~~~~~~~
 
