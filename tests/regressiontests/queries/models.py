@@ -1342,7 +1342,7 @@ Using an empty generator expression as the rvalue for an "__in" lookup is legal
 
 # Sqlite 3 does not support passing in more than 1000 parameters except by
 # changing a parameter at compilation time.
-if connection.features.supports_1000_query_paramters:
+if connection.features.supports_1000_query_parameters:
     __test__["API_TESTS"] += """
 Bug #14244: Test that the "in" lookup works with lists of 1000 items or more.
 >>> Number.objects.all().delete()

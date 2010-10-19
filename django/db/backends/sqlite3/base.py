@@ -62,7 +62,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_use_chunked_reads = False
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
-    supports_1000_query_paramters = False
+    supports_1000_query_parameters = False
 
     def _supports_stddev(self):
         """Confirm support for STDDEV and related stats functions

@@ -145,7 +145,7 @@ class BaseDatabaseFeatures(object):
     requires_explicit_null_ordering_when_grouping = False
 
     # Is there a 1000 item limit on query parameters?
-    supports_1000_query_paramters = True
+    supports_1000_query_parameters = True
 
     # Can an object have a primary key of 0? MySQL says No.
     allows_primary_key_0 = True
