@@ -95,7 +95,7 @@ sitemap to include all the links to your individual blog entries. Here's how
 your sitemap class might look::
 
     from django.contrib.sitemaps import Sitemap
-    from mysite.blog.models import Entry
+    from blog.models import Entry
 
     class BlogSitemap(Sitemap):
         changefreq = "never"
@@ -242,7 +242,7 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
 
     from django.conf.urls.defaults import *
     from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
-    from mysite.blog.models import Entry
+    from blog.models import Entry
 
     info_dict = {
         'queryset': Entry.objects.all(),
