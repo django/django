@@ -60,7 +60,7 @@ class View(object):
         return view
 
     def dispatch(self, request, *args, **kwargs):
-        # Try to dispatch to the right method for that; if it doesn't exist,
+        # Try to dispatch to the right method; if a method doesn't exist,
         # defer to the error handler. Also defer to the error handler if the
         # request method isn't on the approved list.
         if request.method.lower() in self.http_method_names:
@@ -74,6 +74,12 @@ class View(object):
 
     def http_method_not_allowed(self, request, *args, **kwargs):
         allowed_methods = [m for m in self.http_method_names if hasattr(self, m)]
+        logger.warning('Method Not Allowed (%s): %s' % (request.method, request.path),
+            extra={
+                'status_code': 405,
+                'request': self.request
+            }
+        )
         return http.HttpResponseNotAllowed(allowed_methods)
 
 
