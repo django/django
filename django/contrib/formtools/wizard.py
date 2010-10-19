@@ -90,54 +90,49 @@ class FormWizard(object):
         if current_step >= self.num_steps():
             raise Http404('Step %s does not exist' % current_step)
 
-        # For each previous step, verify the hash and process.
-        # TODO: Move "hash_%d" to a method to make it configurable.
-        for i in range(current_step):
-            form = self.get_form(i, request.POST)
-            if not self._check_security_hash(request.POST.get("hash_%d" % i, ''), request, form):
-                return self.render_hash_failure(request, i)
-            self.process_step(request, form, i)
-
         # Process the current step. If it's valid, go to the next step or call
         # done(), depending on whether any steps remain.
         if request.method == 'POST':
             form = self.get_form(current_step, request.POST)
         else:
             form = self.get_form(current_step)
+
         if form.is_valid():
+            # Validate all the forms. If any of them fail validation, that
+            # must mean the validator relied on some other input, such as
+            # an external Web site.
+
+            # It is also possible that validation might fail under certain
+            # attack situations: an attacker might be able to bypass previous
+            # stages, and generate correct security hashes for all the
+            # skipped stages by virtue of:
+            #  1) having filled out an identical form which doesn't have the
+            #     validation (and does something different at the end),
+            #  2) or having filled out a previous version of the same form
+            #     which had some validation missing,
+            #  3) or previously having filled out the form when they had
+            #     more privileges than they do now.
+            #
+            # Since the hashes only take into account values, and not other
+            # other validation the form might do, we must re-do validation
+            # now for security reasons.
+            current_form_list = [self.get_form(i, request.POST) for i in range(current_step)]
+
+            for i, f in enumerate(current_form_list):
+                if not self._check_security_hash(request.POST.get("hash_%d" % i, ''), request, f):
+                    return self.render_hash_failure(request, i)
+
+                if not f.is_valid():
+                    return self.render_revalidation_failure(request, i, f)
+                else:
+                    self.process_step(request, f, i)
+
+            # Now progress to processing this step:
             self.process_step(request, form, current_step)
             next_step = current_step + 1
 
-            # If this was the last step, validate all of the forms one more
-            # time, as a sanity check, and call done().
-            num = self.num_steps()
-            if next_step == num:
-                final_form_list = [self.get_form(i, request.POST) for i in range(num)]
-
-                # Validate all the forms. If any of them fail validation, that
-                # must mean the validator relied on some other input, such as
-                # an external Web site.
-
-                # It is also possible that validation might fail under certain
-                # attack situations: an attacker might be able to bypass previous
-                # stages, and generate correct security hashes for all the
-                # skipped stages by virtue of:
-                #  1) having filled out an identical form which doesn't have the
-                #     validation (and does something different at the end),
-                #  2) or having filled out a previous version of the same form
-                #     which had some validation missing,
-                #  3) or previously having filled out the form when they had
-                #     more privileges than they do now.
-                #
-                # Since the hashes only take into account values, and not other
-                # other validation the form might do, we must re-do validation
-                # now for security reasons.
-                for i, f in enumerate(final_form_list):
-                    if not f.is_valid():
-                        return self.render_revalidation_failure(request, i, f)
+            if current_step == self.num_steps():
                 return self.done(request, final_form_list)
-
-            # Otherwise, move along to the next step.
             else:
                 form = self.get_form(next_step)
                 self.step = current_step = next_step

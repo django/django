@@ -340,3 +340,23 @@ class WizardTests(TestCase):
                 "wizard_step": "1"}
         response = self.client.post('/wizard/', data)
         self.assertEquals(2, response.context['step0'])
+
+    def test_14498(self):
+        """
+        Regression test for ticket #14498.
+        """
+        that = self
+
+        class WizardWithProcessStep(WizardClass):
+            def process_step(self, request, form, step):
+                that.assertTrue(hasattr(form, 'cleaned_data'))
+
+        wizard = WizardWithProcessStep([WizardPageOneForm,
+                                        WizardPageTwoForm,
+                                        WizardPageThreeForm])
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
+                "wizard_step": "1"}
+        wizard(DummyRequest(POST=data))
+
