@@ -50,8 +50,7 @@ class FormMixin(object):
             url = self.success_url
         else:
             raise ImproperlyConfigured(
-                "No URL to redirect to.  Either provide a url or define"
-                " a get_absolute_url method on the Model.")
+                "No URL to redirect to. Provide a success_url.")
         return url
 
     def form_valid(self, form):
@@ -231,8 +230,7 @@ class DeletionMixin(object):
             return self.success_url
         else:
             raise ImproperlyConfigured(
-                "No URL to redirect to.  Either provide a url or define"
-                " a get_absolute_url method on the Model.")
+                "No URL to redirect to. Provide a success_url.")
 
 class BaseDeleteView(DeletionMixin, BaseDetailView):
     """
