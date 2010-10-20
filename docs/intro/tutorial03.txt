@@ -498,9 +498,12 @@ Here's what happens if a user goes to "/polls/34/" in this system:
       remaining text -- ``"34/"`` -- to the 'polls.urls' URLconf for
       further processing.
 
-Now that we've decoupled that, we need to decouple the 'polls.urls'
+Now that we've decoupled that, we need to decouple the ``polls.urls``
 URLconf by removing the leading "polls/" from each line, and removing the
-lines registering the admin site::
+lines registering the admin site. Your ``polls.urls`` file should now look like
+this::
+
+    from django.conf.urls.defaults import *
 
     urlpatterns = patterns('polls.views',
         (r'^$', 'index'),
