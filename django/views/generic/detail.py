@@ -14,7 +14,7 @@ class SingleObjectMixin(object):
     slug_field = 'slug'
     context_object_name = None
 
-    def get_object(self, pk=None, slug=None, queryset=None, **kwargs):
+    def get_object(self, queryset=None):
         """
         Returns the object the view is displaying.
 
@@ -27,6 +27,8 @@ class SingleObjectMixin(object):
             queryset = self.get_queryset()
 
         # Next, try looking up by primary key.
+        pk = self.kwargs.get('pk', None)
+        slug = self.kwargs.get('slug', None)
         if pk is not None:
             queryset = queryset.filter(pk=pk)
 
@@ -92,7 +94,7 @@ class SingleObjectMixin(object):
 
 class BaseDetailView(SingleObjectMixin, View):
     def get(self, request, **kwargs):
-        self.object = self.get_object(**kwargs)
+        self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 

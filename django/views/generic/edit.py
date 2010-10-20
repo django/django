@@ -2,8 +2,8 @@ from django.forms import models as model_forms
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
 from django.views.generic.base import TemplateResponseMixin, View
-from django.views.generic.detail import (SingleObjectMixin, 
-                        SingleObjectTemplateResponseMixin, BaseDetailView) 
+from django.views.generic.detail import (SingleObjectMixin,
+                        SingleObjectTemplateResponseMixin, BaseDetailView)
 
 
 class FormMixin(object):
@@ -191,11 +191,11 @@ class BaseUpdateView(ModelFormMixin, ProcessFormView):
     Using this base class requires subclassing to provide a response mixin.
     """
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(**kwargs)
+        self.object = self.get_object()
         return super(BaseUpdateView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object(**kwargs)
+        self.object = self.get_object()
         return super(BaseUpdateView, self).post(request, *args, **kwargs)
 
     # PUT is a valid HTTP verb for creating (with a known URL) or editing an
@@ -218,7 +218,7 @@ class DeletionMixin(object):
     success_url = None
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object(**kwargs)
+        self.object = self.get_object()
         self.object.delete()
         return HttpResponseRedirect(self.get_success_url())
 

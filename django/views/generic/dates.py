@@ -443,7 +443,7 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
     Detail view of a single object on a single date; this differs from the
     standard DetailView by accepting a year/month/day in the URL.
     """
-    def get_object(self, queryset=None, **kwargs):
+    def get_object(self, queryset=None):
         """
         Get the object this request displays.
         """
@@ -469,7 +469,7 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         lookup = _date_lookup_for_field(field, date)
         qs = qs.filter(**lookup)
 
-        return super(BaseDetailView, self).get_object(queryset=qs, **kwargs)
+        return super(BaseDetailView, self).get_object(queryset=qs)
 
 
 

@@ -158,6 +158,19 @@ SingleObjectMixin
 
         Designates the name of the variable to use in the context.
 
+    .. method:: get_object(queryset=None)
+
+        Returns the single object that this view will display. If
+        ``queryset`` is provided, that queryset will be used as the
+        source of objects; otherwise,
+        :meth:`~SingleObjectMixin.get_queryset` will be used.
+        :meth:`~SingleObjectMixin.get_object` looks for a ``pk``
+        argument in the arguments to the view; if ``pk`` is found,
+        this method performs a primary-key based lookup using that
+        value. If no ``pk`` argument is found, it looks for a ``slug``
+        argument, and performs a slug lookup using the
+        :attr:`SingleObjectMixin.slug_field`.
+
     .. method:: get_queryset()
 
         Returns the queryset that will be used to retrieve the object that
@@ -311,7 +324,7 @@ MultipleObjectMixin
         objects from that page.
 
     .. method:: get_paginate_by(queryset)
-    
+
         Returns the number of items to paginate by, or ``None`` for no
         pagination. By default this simply returns the value of
         :attr:`MultipleObjectMixin.paginate_by`.
@@ -506,7 +519,7 @@ ProcessFormView
     A mixin that provides basic HTTP GET and POST workflow.
 
     .. method:: get(request, *args, **kwargs)
-    
+
         Constructs a form, then renders a response using a context that
         contains that form.
 

@@ -440,9 +440,9 @@ object, so we simply override it and wrap the call::
 
         queryset = Author.objects.all()
 
-        def get_object(self, **kwargs):
+        def get_object(self):
             # Call the superclass
-            object = super(AuthorDetailView, self).get_object(**kwargs)
+            object = super(AuthorDetailView, self).get_object()
             # Record the lass accessed date
             object.last_accessed = datetime.datetime.now()
             object.save()
