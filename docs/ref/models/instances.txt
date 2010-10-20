@@ -70,7 +70,7 @@ Example::
     try:
         article.full_clean()
     except ValidationError, e:
-        # Do something based on the errors contained in e.error_dict.
+        # Do something based on the errors contained in e.message_dict.
         # Display them to a user, or handle them programatically.
 
 The first step ``full_clean()`` performs is to clean each individual field.
