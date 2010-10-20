@@ -131,8 +131,8 @@ class FormWizard(object):
             self.process_step(request, form, current_step)
             next_step = current_step + 1
 
-            if current_step == self.num_steps():
-                return self.done(request, final_form_list)
+            if next_step == self.num_steps():
+                return self.done(request, current_form_list)
             else:
                 form = self.get_form(next_step)
                 self.step = current_step = next_step
