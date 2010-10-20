@@ -233,10 +233,11 @@ Arguments sent with this signal:
         from the relation.
 
     ``pk_set``
-        With the ``"add"`` and ``"remove"`` action, this is a list of
-        primary key values that have been added to or removed from the relation.
+        For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
+        actions, this is a list of primary key values that have been added to
+        or removed from the relation.
 
-        For the ``"clear"`` action, this is ``None``.
+        For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
 
     ``using``
         The database alias being used.
@@ -270,7 +271,7 @@ the arguments sent to a :data:`m2m_changed` handler would be:
 
     ``instance``    ``p`` (the ``Pizza`` instance being modified)
 
-    ``action``      ``"add"``
+    ``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
 
     ``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
                     so this call modifies the forward relation)
@@ -298,7 +299,7 @@ the arguments sent to a :data:`m2m_changed` handler would be:
 
     ``instance``    ``t`` (the ``Topping`` instance being modified)
 
-    ``action``      ``"remove"``
+    ``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
 
     ``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
                     so this call modifies the reverse relation)
