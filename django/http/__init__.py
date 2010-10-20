@@ -10,7 +10,13 @@ try:
     # The mod_python version is more efficient, so try importing it first.
     from mod_python.util import parse_qsl
 except ImportError:
-    from cgi import parse_qsl
+    try:
+        # Python 2.6 and greater
+        from urlparse import parse_qsl
+    except ImportError:
+        # Python 2.5, 2.4.  Works on Python 2.6 but raises
+        # PendingDeprecationWarning
+        from cgi import parse_qsl
 
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
