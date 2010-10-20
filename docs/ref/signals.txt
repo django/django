@@ -213,18 +213,19 @@ Arguments sent with this signal:
             Sent *after* the relation is cleared
 
     ``reverse``
-    	Indicates which side of the relation is updated (i.e., if it is the
-    	forward or reverse relation that is being modified).
+        Indicates which side of the relation is updated (i.e., if it is the
+        forward or reverse relation that is being modified).
 
     ``model``
         The class of the objects that are added to, removed from or cleared
         from the relation.
 
     ``pk_set``
-        With the ``"add"`` and ``"remove"`` action, this is a list of
-        primary key values that have been added to or removed from the relation.
+        For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
+        actions, this is a list of primary key values that have been added to
+        or removed from the relation.
 
-        For the ``"clear"`` action, this is ``None``.
+        For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
 
 For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
 like this:
@@ -255,7 +256,7 @@ the arguments sent to a :data:`m2m_changed` handler would be:
 
     ``instance``    ``p`` (the ``Pizza`` instance being modified)
 
-    ``action``      ``"add"``
+    ``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
 
     ``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
                     so this call modifies the forward relation)
@@ -281,7 +282,7 @@ the arguments sent to a :data:`m2m_changed` handler would be:
 
     ``instance``    ``t`` (the ``Topping`` instance being modified)
 
-    ``action``      ``"remove"``
+    ``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
 
     ``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
                     so this call modifies the reverse relation)
