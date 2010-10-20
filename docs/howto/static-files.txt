@@ -222,7 +222,7 @@ see :ref:`staticfiles-development-view`.
 Serving static files in production
 ==================================
 
-The basic outline of putting static files into production a simple: un the
+The basic outline of putting static files into production is simple: run the
 :djadmin:`collectstatic` command when static media changes, then arrange for the
 collected media directory (:setting:`STATICFILES_ROOT`) to be moved to the media
 server and served.
