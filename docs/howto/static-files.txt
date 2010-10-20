@@ -203,8 +203,7 @@ line goes at the top of the file, and the last line at the bottom::
 
 This will inspect your :setting:`STATICFILES_URL` and
 :setting:`STATICFILES_ROOT` settings and wire up the view to serve static media
-accordingly. Remember to run :djadmin:`collectstatic` when your media changes;
-the view only serves static files that have been collected.
+accordingly.
 
 .. warning::
 
