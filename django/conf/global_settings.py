@@ -194,18 +194,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
+    'django.contrib.staticfiles.context_processors.staticfiles',
 #    'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
 )
 
 # Output to use in template system for invalid (e.g. misspelled) variables.
 TEMPLATE_STRING_IF_INVALID = ''
-
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
 
 # Default e-mail address to use for various automated correspondence from
 # the site managers.
@@ -551,3 +546,34 @@ TEST_DATABASE_COLLATION = None
 
 # The list of directories to search for fixtures
 FIXTURE_DIRS = ()
+
+###############
+# STATICFILES #
+###############
+
+# Absolute path to the directory that holds media.
+# Example: "/home/media/media.lawrence.com/static/"
+STATICFILES_ROOT = ''
+
+# URL that handles the static files served from STATICFILES_ROOT.
+# Example: "http://media.lawrence.com/static/"
+STATICFILES_URL = '/static/'
+
+# A list of locations of additional static files
+STATICFILES_DIRS = ()
+
+# The default file storage backend used during the build process
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
+
+# URL prefix for admin media -- CSS, JavaScript and images.
+# Make sure to use a trailing slash.
+# Examples: "http://foo.com/static/admin/", "/static/admin/".
+ADMIN_MEDIA_PREFIX = '/static/admin/'

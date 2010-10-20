@@ -155,7 +155,7 @@ The development process
       :doc:`Apache/mod_python <howto/deployment/modpython>` |
       :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
       :doc:`Apache authentication <howto/apache-auth>` |
-      :doc:`Serving static files <howto/static-files>` |
+      :doc:`Handling static files <howto/static-files>` |
       :doc:`Tracking code errors by e-mail <howto/error-reporting>`
 
 Other batteries included
@@ -185,6 +185,7 @@ Other batteries included
     * :doc:`Signals <topics/signals>`
     * :doc:`Sitemaps <ref/contrib/sitemaps>`
     * :doc:`Sites <ref/contrib/sites>`
+    * :doc:`Static Files <ref/contrib/staticfiles>`
     * :doc:`Syndication feeds (RSS/Atom) <ref/contrib/syndication>`
     * :doc:`Unicode in Django <ref/unicode>`
     * :doc:`Web design helpers <ref/contrib/webdesign>`

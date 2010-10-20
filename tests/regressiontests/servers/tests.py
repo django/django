@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import AdminMediaHandler
 
+from django.conf import settings
 
 class AdminMediaHandlerTests(TestCase):
 
@@ -25,7 +26,7 @@ class AdminMediaHandlerTests(TestCase):
         """
         # Cases that should work on all platforms.
         data = (
-            ('/media/css/base.css', ('css', 'base.css')),
+            ('%scss/base.css' % settings.ADMIN_MEDIA_PREFIX, ('css', 'base.css')),
         )
         # Cases that should raise an exception.
         bad_data = ()
@@ -34,19 +35,19 @@ class AdminMediaHandlerTests(TestCase):
         if os.sep == '/':
             data += (
                 # URL, tuple of relative path parts.
-                ('/media/\\css/base.css', ('\\css', 'base.css')),
+                ('%s\\css/base.css' % settings.ADMIN_MEDIA_PREFIX, ('\\css', 'base.css')),
             )
             bad_data += (
-                '/media//css/base.css',
-                '/media////css/base.css',
-                '/media/../css/base.css',
+                '%s/css/base.css' % settings.ADMIN_MEDIA_PREFIX,
+                '%s///css/base.css' % settings.ADMIN_MEDIA_PREFIX,
+                '%s../css/base.css' % settings.ADMIN_MEDIA_PREFIX,
             )
         elif os.sep == '\\':
             bad_data += (
-                '/media/C:\css/base.css',
-                '/media//\\css/base.css',
-                '/media/\\css/base.css',
-                '/media/\\\\css/base.css'
+                '%sC:\css/base.css' % settings.ADMIN_MEDIA_PREFIX,
+                '%s/\\css/base.css' % settings.ADMIN_MEDIA_PREFIX,
+                '%s\\css/base.css' % settings.ADMIN_MEDIA_PREFIX,
+                '%s\\\\css/base.css' % settings.ADMIN_MEDIA_PREFIX
             )
         for url, path_tuple in data:
             try:

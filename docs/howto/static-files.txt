@@ -1,162 +1,399 @@
-=========================
-How to serve static files
-=========================
+=====================
+Managing static files
+=====================
 
-.. module:: django.views.static
-   :synopsis: Serving of static files during development.
+.. currentmodule:: django.contrib.staticfiles
 
-Django itself doesn't serve static (media) files, such as images, style sheets,
-or video. It leaves that job to whichever Web server you choose.
+.. versionadded:: 1.3
 
-The reasoning here is that standard Web servers, such as Apache_, lighttpd_ and
-Cherokee_, are much more fine-tuned at serving static files than a Web
-application framework.
+Django developers mostly concern themselves with the dynamic parts of web
+applications -- the views and templates that render anew for each request. But
+web applications have other parts: the static media files (images, CSS,
+Javascript, etc.) that are needed to render a complete web page.
 
-With that said, Django does support static files **during development**. You can
-use the :func:`django.views.static.serve` view to serve media files.
+For small projects, this isn't a big deal, because you can just keep the media
+somewhere your web server can find it. However, in bigger projects -- especially
+those comprised of multiple apps -- dealing with the multiple sets of static
+files provided by each application starts to get tricky.
 
-.. _Apache: http://httpd.apache.org/
-.. _lighttpd: http://www.lighttpd.net/
-.. _Cherokee: http://www.cherokee-project.com/
+That's what ``django.contrib.staticfiles`` is for: it collects media from each
+of your applications (and any other places you specify) into a single location
+that can easily be served in production.
 
-.. seealso::
+.. note::
 
-    If you just need to serve the admin media from a nonstandard location, see
-    the :djadminopt:`--adminmedia` parameter to :djadmin:`runserver`.
+    If you've used the `django-staticfiles`_ third-party app before, then
+    ``django.contrib.staticfiles`` will look very familiar. That's because
+    they're essentially the same code: ``django.contrib.staticfiles`` started
+    its life as `django-staticfiles`_ and was merged into Django 1.3.
+    
+    If you're upgrading from ``django-staticfiles``, please see `Upgrading from
+    django-staticfiles`_, below, for a few minor changes you'll need to make.
 
-The big, fat disclaimer
-=======================
+.. _django-staticfiles: http://pypi.python.org/pypi/django-staticfiles/
 
-Using this method is **inefficient** and **insecure**. Do not use this in a
-production setting. Use this only for development.
+Using ``django.contrib.staticfiles``
+====================================
 
-For information on serving static files in an Apache production environment,
-see the :ref:`Django mod_wsgi documentation <serving-media-files>`.
+Here's the basic usage in a nutshell:
 
-How to do it
-============
+    1. Put your media somewhere that staticfiles will find it..
 
-Here's the formal definition of the :func:`~django.views.static.serve` view:
+       Most of the time this place will be in a ``static`` directory within your
+       application, but it could also be a specific directory you've put into
+       your settings file. See the the documentation for the
+       :setting:`STATICFILES_DIRS` and :setting:`STATICFILES_FINDERS` settings
+       for details on where you can put media.
 
-.. function:: def serve(request, path, document_root, show_indexes=False)
+    2. Add some ``staticfiles``-related settings to your settings file.
 
-To use it, just put this in your :doc:`URLconf </topics/http/urls>`::
+       First, you'll need to make sure that ``django.contrib.staticfiles`` is in
+       your :setting:`INSTALLED_APPS`.
 
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': '/path/to/media'}),
+       Next, you'll need to edit :setting:`STATICFILES_ROOT` to point to where
+       you'd like your static media stored. For example::
 
-...where ``site_media`` is the URL where your media will be rooted, and
-``/path/to/media`` is the filesystem root for your media. This will call the
-:func:`~django.views.static.serve` view, passing in the path from the URLconf
-and the (required) ``document_root`` parameter.
+            STATICFILES_ROOT = "/home/jacob/projects/mysite.com/static_media"
 
-Given the above URLconf:
+       You may also want to set the :setting:`STATICFILES_URL` setting at this
+       time, though the default value (of ``/static/``) is perfect for local
+       development.
 
-    * The file ``/path/to/media/foo.jpg`` will be made available at the URL
-      ``/site_media/foo.jpg``.
+       There are a number of other options available that let you control *how*
+       media is stored, where ``staticfiles`` searches for files, and how files
+       will be served; see :ref:`the staticfiles settings reference
+       <staticfiles-settings>` for details.
 
-    * The file ``/path/to/media/css/mystyles.css`` will be made available
-      at the URL ``/site_media/css/mystyles.css``.
+    3. Run the :djadmin:`collectstatic` management command::
 
-    * The file ``/path/bar.jpg`` will not be accessible, because it doesn't
-      fall under the document root.
+            ./manage.py collectstatic
 
-Of course, it's not compulsory to use a fixed string for the
-``'document_root'`` value. You might wish to make that an entry in your
-settings file and use the setting value there. That will allow you and
-other developers working on the code to easily change the value as
-required. For example, if we have a line in ``settings.py`` that says::
+       This'll churn through your static file storage and move them into the
+       directory given by :setting:`STATICFILES_ROOT`.
 
-    STATIC_DOC_ROOT = '/path/to/media'
+    4. Deploy that media.
 
-...we could write the above :doc:`URLconf </topics/http/urls>` entry as::
+       If you're using the built-in development server, you can quickly
+       serve static media locally by adding::
 
-    from django.conf import settings
-    ...
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.STATIC_DOC_ROOT}),
+            from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+            urlpatterns += staticfiles_urlpatterns()
 
-Be careful not to use the same path as your :setting:`ADMIN_MEDIA_PREFIX` (which defaults
-to ``/media/``) as this will overwrite your URLconf entry.
+       to the bottom of your URLconf. See :ref:`staticfiles-development` for
+       details.
 
-Directory listings
-==================
+       When it comes time to deploy to production, :ref:`staticfiles-production`
+       covers some common deployment strategies for static files.
 
-Optionally, you can pass the ``show_indexes`` parameter to the
-:func:`~django.views.static.serve` view. This is ``False`` by default. If it's
-``True``, Django will display file listings for directories.
+       However you choose to deploy those files, you'll probably need to refer
+       to them in your templates. The easiest method is to use the included
+       context processor which will allow template code like:
 
-For example::
+          .. code-block:: html+django
 
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': '/path/to/media', 'show_indexes': True}),
+               <img src="{{ STATICFILES_URL }}images/hi.jpg />
 
-You can customize the index view by creating a template called
-``static/directory_index.html``. That template gets two objects in its context:
+       See :ref:`staticfiles-in-templates` for more details, including an
+       alternate method (using a template tag).
 
-    * ``directory`` -- the directory name (a string)
-    * ``file_list`` -- a list of file names (as strings) in the directory
+Those are the basics. For more details on common configuration options, read on;
+for a detailed reference of the settings, commands, and other bits included with
+the framework see :doc:`the staticfiles reference </ref/contrib/staticfiles>`.
 
-Here's the default ``static/directory_index.html`` template:
+.. _staticfiles-in-templates:
+
+Referring to static files in templates
+======================================
+
+At some point, you'll probably need to link to static files in your templates.
+You could, of course, simply hardcode the path to you assets in the templates:
+
+.. code-block:: html
+
+    <img src="http://media.example.com/static/myimage.jpg" />
+
+Of course, there are some serious problems with this: it doesn't work well in
+development, and it makes it *very* hard to change where you've deployed your
+media. If, for example, you wanted to switch to using a content delivery network
+(CDN), then you'd need to change more or less every single template.
+
+A far better way is to use the value of the :setting:`STATICFILES_URL` setting
+directly in your templates. This means that a switch of media servers only
+requires changing that single value. Much better!
+
+``staticfiles`` inludes two built-in ways of getting at this setting in your
+templates: a context processor and a template tag.
+
+With a context processor
+------------------------
+
+The included context processor is the easy way. Simply make sure
+``'django.contrib.staticfiles.context_processors.staticfiles'`` is in your
+:setting:`TEMPLATE_CONTEXT_PROCESSORS`. It's there by default, and if you're
+editing that setting by hand it should look something like::
+
+    TEMPLATE_CONTEXT_PROCESSORS = (
+        'django.core.context_processors.debug',
+        'django.core.context_processors.i18n',
+        'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages',
+        'django.contrib.staticfiles.context_processors.staticfiles',
+    )
+
+Once that's done, you can refer to :setting:`STATICFILES_URL` in your templates:
 
 .. code-block:: html+django
 
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-    <head>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-        <meta http-equiv="Content-Language" content="en-us" />
-        <meta name="robots" content="NONE,NOARCHIVE" />
-        <title>Index of {{ directory }}</title>
-    </head>
-    <body>
-        <h1>Index of {{ directory }}</h1>
-        <ul>
-        {% for f in file_list %}
-        <li><a href="{{ f }}">{{ f }}</a></li>
-        {% endfor %}
-        </ul>
-    </body>
-    </html>
+     <img src="{{ STATICFILES_URL }}images/hi.jpg />
 
-.. versionchanged:: 1.0.3
-    Prior to Django 1.0.3, there was a bug in the view that provided directory
-    listings. The template that was loaded had to be called
-    ``static/directory_listing`` (with no ``.html`` extension). For backwards
-    compatibility with earlier versions, Django will still load templates with
-    the older (no extension) name, but it will prefer the
-    ``directory_index.html`` version.
+If ``{{ STATICFILES_URL }}`` isn't working in your template, you're probably not
+using :class:`~django.template.RequestContext` when rendering the template.
 
-Limiting use to DEBUG=True
-==========================
+As a brief refresher, context processors add variables into the contexts of
+every template. However, context processors require that you use
+:class:`~django.template.RequestContext` when rendering templates. This happens
+automatically if you're using a :doc:`generic view </ref/class-based-views>`,
+but in views written by hand you'll need to explicitally use ``RequestContext``
+To see how that works, and to read more details, check out
+:ref:`subclassing-context-requestcontext`.
 
-Because URLconfs are just plain Python modules, you can use Python logic to
-make the static-media view available only in development mode. This is a handy
-trick to make sure the static-serving view doesn't slip into a production
-setting by mistake.
+With a template tag
+-------------------
 
-Do this by wrapping an ``if DEBUG`` statement around the
-:func:`django.views.static.serve` inclusion. Here's a full example URLconf::
+The second option is the :ttag:`get_staticfiles_prefix` template tag. You can
+use this if you're not using :class:`~django.template.RequestContext`, or if you
+need more control over exactly where and how :setting:`STATICFILES_URL` is
+injected into the template. Here's an example:
 
-    from django.conf.urls.defaults import *
-    from django.conf import settings
+.. code-block:: html+django
 
-    urlpatterns = patterns('',
-        (r'^articles/2003/$', 'news.views.special_case_2003'),
-        (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
-    )
+    {% load staticfiles %}
+    <img src="{% get_staticfiles_prefix %}images/hi.jpg" />
 
-    if settings.DEBUG:
-        urlpatterns += patterns('',
-            (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
+There's also a second form you can use to avoid extra processing if you need the
+value multiple times:
+
+.. code-block:: html+django
+
+    {% load staticfiles %}
+    {% get_staticfiles_prefix as STATIC_PREFIX %}
+
+    <img src="{{ STATIC_PREFIX }}images/hi.jpg" />
+    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" />
+
+.. _staticfiles-development:
+
+Serving static files in development
+===================================
+
+The static files tools are mostly designed to help with getting static media
+successfully deployed into production. This usually means a separate, dedicated
+media server, which is a lot of overhead to mess with when developing locally.
+Thus, the ``staticfiles`` app ships with a quick and dirty helper view that you
+can use to serve media locally in development.
+
+To enable this view, you'll add a couple of lines to your URLconf. The first
+line goes at the top of the file, and the last line at the bottom::
+
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+    # ... the rest of your URLconf goes here ...
+
+    urlpatterns += staticfiles_urlpatterns()
+
+This will inspect your :setting:`STATICFILES_URL` and
+:setting:`STATICFILES_ROOT` settings and wire up the view to serve static media
+accordingly. Remember to run :djadmin:`collectstatic` when your media changes;
+the view only serves static files that have been collected.
+
+.. warning::
+
+    This will only work if :setting:`DEBUG` is ``True``.
+
+    That's because this view is **grossly inefficient** and probably
+    **insecure**. This is only intended for local development, and should
+    **never be used in production**.
+
+For a few more details, including an alternate method of enabling this view,
+see :ref:`staticfiles-development-view`.
+
+.. _staticfiles-production:
+
+Serving static files in production
+==================================
+
+The basic outline of putting static files into production a simple: un the
+:djadmin:`collectstatic` command when static media changes, then arrange for the
+collected media directory (:setting:`STATICFILES_ROOT`) to be moved to the media
+server and served.
+
+Of course, as with all deployment tasks, the devil's in the details. Every
+production setup will be a bit different, so you'll need to adapt the basic
+outline to fit your needs. Below are a few common patterns that might help.
+
+Serving the app and your static files from the same server
+----------------------------------------------------------
+
+If you want to serve your media from the same server that's already serving your
+app, the basic outline gets modified to look something like:
+
+    * Push your code up to the deployment server.
+    * On the server, run :djadmin:`collectmedia` to move all the media into
+      :setting:`STATICFILES_ROOT`.
+    * Point your web server at :setting:`STATICFILES_ROOT`. For example, here's
+      of :ref:`how to do this under Apache and mod_wsgi <serving-media-files>`.
+
+You'll probably want to automate this process, especially if you've got multiple
+web servers. There's any number of ways to do this automation, but one option
+that many Django developers enjoy is `Fabric`__.
+
+__ http://fabfile.org/
+
+Below, and in the following sections, we'll show off a few example fabfiles
+(i.e. Fabric scripts) that automate these media deployment options. The syntax
+of a fabfile is fairly streightforward but won't be covered here; consult `Fabric's documentation`__, for a complete explanation of the syntax..
+
+__ http://docs.fabfile.org/
+
+So, a fabfile to deploy media to a couple of web servers might look something
+like::
+
+    from fabric.api import *
+
+    # Hosts to deploy onto
+    env.hosts = ['www1.example.com', 'www2.example.com']
+
+    # Where your project code lives on the server
+    env.project_root = '/home/www/myproject'
+
+    def deploy_static():
+        with cd(env.project_root):
+            run('./manage.py collectstatic')
+
+Serving static files from a dedicated media server
+--------------------------------------------------
+
+Most larger Django apps use a separate Web server -- i.e., one that's not also
+running Django -- for serving media. This server often runs a different type of
+web server -- faster but less full-featured. Some good choices are:
+
+    * lighttpd_
+    * Nginx_
+    * TUX_
+    * Cherokee_
+    * A stripped-down version of Apache_
+
+.. _lighttpd: http://www.lighttpd.net/
+.. _Nginx: http://wiki.nginx.org/Main
+.. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
+.. _Apache: http://httpd.apache.org/
+.. _Cherokee: http://www.cherokee-project.com/
+
+Configuring these servers is out of scope of this document; check each server's
+respective documentation for instructions.
+
+Since your media server won't be running Django, you'll need to modify the
+deployment strategy to look something like:
+
+    * When your media changes, run :djadmin:`collectstatic` locally.
+    * Push your local :setting:`STATICFILES_ROOT` up to the media server
+      into the directory that's being served. ``rsync`` is a good
+      choice for this step since it only needs to transfer the
+      bits of static media that have changed.
+
+Here's how this might look in a fabfile::
+
+    from fabric.api import *
+    from fabric.contrib import project
+
+    # Where the static files get collected locally
+    env.local_static_root = '/tmp/static'
+
+    # Where the static files should go remotely
+    env.remote_static_root = '/home/www/media.example.com'
+
+    @roles('media')
+    def deploy_static():
+        local('./manage.py collectstatic')
+        project.rysnc_project(
+            remote_dir = env.remote_static_root,
+            local_dir = env.local_static_root,
+            delete = True
         )
 
-This code is straightforward. It imports the settings and checks the value of
-the :setting:`DEBUG` setting. If it evaluates to ``True``, then ``site_media``
-will be associated with the ``django.views.static.serve`` view. If not, then the
-view won't be made available.
+.. _staticfiles-from-cdn:
 
-Of course, the catch here is that you'll have to remember to set ``DEBUG=False``
-in your production settings file. But you should be doing that anyway.
+Serving static media from a cloud service or CDN
+------------------------------------------------
+
+Another common tactic is to serve media from a cloud storage provider like
+Amazon's S3__ and/or a CDN (content delivery network). This lets you ignore the
+problems of serving media, and can often make for faster-loading webpages
+(especially when using a CDN).
+
+When using these services, the basic workflow would look a bit like the above,
+except that instead of using ``rsync`` to transfer your media to the server
+you'd need to transfer the media to the storage provider or CDN.
+
+There's any number of ways you might do this, but if the provider has an API a
+:doc:`custom file storage backend </howto/custom-file-storage>` will make the
+process incredibly simple. If you've written or are using a 3rd party custom
+storage backend, you can tell :djadmin:`collectstatic` to use it by setting
+:setting:`STATICFILES_STORAGE` to the storage engine.
+
+For example, if you've written an S3 storage backend in
+``myproject.storage.S3Storage`` you could use it with::
+
+    STATICFILES_STORAGE = 'storages.backends.s3.S3Storage'
+
+Once that's done, all you have to do is run :djadmin:`collectstatic` and your
+media would be pushed through your storage package up to S3. If you later needed
+to swich to a different storage provider, it could be as simple as changing your
+:setting:`STATICFILES_STORAGE` setting.
+
+For details on how you'd write one of these backends,
+:doc:`/howto/custom-file-storage`.
+
+.. seealso::
+
+    The `django-storages`__ project is a 3rd party app that provides many
+    storage backends for many common file storage APIs (including S3).
+
+__ http://s3.amazonaws.com/
+__ http://code.welldev.org/django-storages/wiki/S3Storage
+
+Upgrading from ``django-staticfiles``
+=====================================
+
+``django.contrib.staticfiles`` began its life as `django-staticfiles`_. If
+you're upgrading from `django-staticfiles`_ to ``django.contrib.staticfiles``,
+you'll need to make a few changes:
+
+    * Application files should now live in a ``static`` directory in each app
+      (`django-staticfiles`_ used the name ``media``, which was slightly
+      confusing).
+
+    * The management commands ``build_static`` and ``resolve_static`` are now
+      called :djadmin:`collectstatic` and :djadmin:`findstatic`.
+
+    * The settings ``STATIC_URL`` and ``STATIC_ROOT`` were renamed to
+      :setting:`STATICFILES_URL` and :setting:`STATICFILES_ROOT`.
+
+    * The settings ``STATICFILES_PREPEND_LABEL_APPS``,
+      ``STATICFILES_MEDIA_DIRNAMES`` and ``STATICFILES_EXCLUDED_APPS`` were
+      removed.
+      
+    * The setting ``STATICFILES_RESOLVERS`` was removed, and replaced by the new
+      :setting:`STATICFILES_FINDERS`.
+      
+    * The default for :setting:`STATICFILES_STORAGE` was renamed from
+      ``staticfiles.storage.StaticFileStorage`` to
+      ``staticfiles.storage.StaticFilesStorage``
+      
+Learn more
+==========
+
+This document has covered the basics and some common usage patterns. For
+complete details on all the settings, commands, template tags, and other pieces
+include in ``django.contrib.staticfiles``, see :doc:`the statcfiles reference
+</ref/contrib/staticfiles>`.

@@ -1,7 +1,9 @@
-from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 import os
 import sys
+import warnings
+
+from django.core.management.base import BaseCommand, CommandError
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -20,6 +22,7 @@ class Command(BaseCommand):
         import django
         from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
         from django.core.handlers.wsgi import WSGIHandler
+        from django.contrib.staticfiles.handlers import StaticFilesHandler
         if args:
             raise CommandError('Usage is runserver %s' % self.args)
         if not addrport:
@@ -56,7 +59,10 @@ class Command(BaseCommand):
             translation.activate(settings.LANGUAGE_CODE)
 
             try:
-                handler = AdminMediaHandler(WSGIHandler(), admin_media_path)
+                handler = WSGIHandler()
+                handler = StaticFilesHandler(handler)
+                # serve admin media like old-school (deprecation pending)
+                handler = AdminMediaHandler(handler, admin_media_path)
                 run(addr, int(port), handler)
             except WSGIServerException, e:
                 # Use helpful error messages instead of ugly tracebacks.

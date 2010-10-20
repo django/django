@@ -41,4 +41,7 @@ urlpatterns = patterns('',
 
     # special headers views
     (r'special_headers/', include('regressiontests.special_headers.urls')),
+
+    # static files handling
+    (r'^', include('regressiontests.staticfiles_tests.urls.default')),
 )

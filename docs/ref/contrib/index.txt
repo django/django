@@ -38,6 +38,7 @@ those packages have.
    redirects
    sitemaps
    sites
+   staticfiles
    syndication
    webdesign
 

@@ -1,0 +1,283 @@
+===================
+The staticfiles app
+===================
+
+.. module:: django.contrib.staticfiles
+   :synopsis: An app for handling static files.
+
+.. versionadded:: 1.3
+
+``django.contrib.staticfiles`` collects media from each of your applications
+(and any other places you specify) into a single location that can easily be
+served in production.
+
+.. seealso::
+
+    For an introduction to the static files app and some usage examples, see
+    :doc:`/howto/static-files`.
+
+.. _staticfiles-settings:
+
+Settings
+========
+
+.. highlight:: python
+
+The following settings control the behavior of the static files app. Only
+:setting:`STATICFILES_ROOT` is required, but you'll probably also need to
+configure :setting:`STATICFILES_URL` as well.
+
+.. setting:: STATICFILES_ROOT
+
+STATICFILES_ROOT
+----------------
+
+Default: ``''`` (Empty string)
+
+The absolute path to the directory that holds static files::
+
+   STATICFILES_ROOT = "/home/example.com/static/"
+
+This is a **required setting** unless you've overridden
+:setting:`STATICFILES_STORAGE` and are using a custom storage backend.
+
+.. setting:: STATICFILES_URL
+
+STATICFILES_URL
+---------------
+
+Default: ``'/static/'``
+
+The URL that handles the files served from :setting:`STATICFILES_ROOT`, e.g.::
+
+    STATICFILES_URL = '/site_media/static/'
+   
+... or perhaps::
+
+    STATICFILES_URL = 'http://media.exmaple.com/'
+
+This should **always** have a trailing slash.
+
+.. setting:: STATICFILES_DIRS
+
+STATICFILES_DIRS
+----------------
+
+Default: ``[]``
+
+This setting defines the additional locations the staticfiles app will traverse
+if the :class:`FileSystemFinder` finder is enabled, e.g. if you use the
+:djadmin:`collectstatic` or :djadmin:`findstatic` management command or use the
+static file serving view.
+
+It should be defined as a sequence of ``(prefix, path)`` tuples, e.g.::
+
+   STATICFILES_DIRS = (
+       ('', '/home/special.polls.com/polls/media'),
+       ('', '/home/polls.com/polls/media'),
+       ('common', '/opt/webfiles/common'),
+   )
+
+.. setting:: STATICFILES_STORAGE
+
+STATICFILES_STORAGE
+-------------------
+
+Default: ``'django.contrib.staticfiles.storage.StaticFilesStorage'``
+
+The file storage engine to use when collecting static files with the
+:djadmin:`collectstatic` management command.
+
+For an example, see :ref:`staticfiles-from-cdn`.
+
+.. setting:: STATICFILES_FINDERS
+
+STATICFILES_FINDERS
+-------------------
+
+Default::
+
+    ("django.contrib.staticfiles.finders.FileSystemFinder",
+     "django.contrib.staticfiles.finders.AppDirectoriesFinder")
+
+The list of finder backends that know how to find static files in
+various locations.
+
+The default will find files stored in the :setting:`STATICFILES_DIRS` setting
+(using :class:`django.contrib.staticfiles.finders.FileSystemFinder`) and in a
+``static`` subdirectory of each app (using
+:class:`django.contrib.staticfiles.finders.AppDirectoriesFinder`)
+
+One finder is disabled by default:
+:class:`django.contrib.staticfiles.finders.DefaultStorageFinder`. If added to
+your :setting:`STATICFILES_FINDERS` setting, it will look for static files in
+the default file storage as defined by the :setting:`DEFAULT_FILE_STORAGE`
+setting.
+
+.. note:: 
+
+    When using the :class:AppDirectoriesFinder` finder, make sure your apps can
+    be found by Django's app loading mechanism. Simply include a ``models``
+    module (an empty ``models.py`` file suffices) and add the app to the
+    :setting:`INSTALLED_APPS` setting of your site.
+
+Static file finders are currently considered a private interface, and this
+interface is thus undocumented.
+
+Management Commands
+===================
+
+.. highlight:: console
+
+``django.contrib.staticfiles`` exposes two management commands.
+
+collectstatic
+-------------
+
+.. django-admin:: collectstatic
+
+Collects the static files into :setting:`STATICFILES_ROOT`.
+
+Duplicate file names are resolved in a similar way to how template resolution
+works: files from apps later in :setting:`INSTALLED_APPS` overwrite those from
+earlier apps, and files from storage directories later in
+:setting:`STATICFILES_DIRS` overwrite those from earlier. If you're confused,
+the :djadmin:`findstatic` command can help show you where 
+
+Files are searched by using the :ref:`enabled finders
+<staticfiles-finders>`. The default is to look in all locations defined in
+:ref:`staticfiles-dirs` and in the ``media`` directory of apps specified by the
+:setting:`INSTALLED_APPS` setting.
+
+Some commonly used options are:
+
+``--noinput``
+    Do NOT prompt the user for input of any kind.
+
+``-i PATTERN`` or ``--ignore=PATTERN``
+    Ignore files or directories matching this glob-style pattern. Use multiple
+    times to ignore more.
+
+``-n`` or ``--dry-run``
+    Do everything except modify the filesystem.
+
+``-l`` or ``--link``
+    Create a symbolic link to each file instead of copying.
+
+``--no-default-ignore``
+    Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
+    and ``'*~'``.
+
+For a full list of options, refer to the commands own help by running::
+
+   $ python manage.py collectstatic --help
+
+findstatic
+----------
+
+.. django-admin:: findstatic
+
+Searches for one or more relative paths with the enabled finders.
+
+For example::
+
+   $ python manage.py findstatic css/base.css admin/js/core.js
+   /home/special.polls.com/core/media/css/base.css
+   /home/polls.com/core/media/css/base.css
+   /home/polls.com/src/django/contrib/admin/media/js/core.js
+
+By default, all matching locations are found. To only return the first match
+for each relative path, use the ``--first`` option::
+
+   $ python manage.py findstatic css/base.css --first
+   /home/special.polls.com/core/media/css/base.css
+   
+This is a debugging aid; it'll show you exactly which static file will be
+collected for a given path.
+
+Other Helpers
+=============
+
+The ``media`` context processor
+-------------------------------
+
+.. function:: django.contrib.staticfiles.context_processors.staticfiles
+
+This context processor adds the :setting:`STATICFILES_URL` into each template
+context as the variable ``{{ STATICFILES_URL }}``. To use it, make sure that
+``'django.contrib.staticfiles.context_processors.staticfiles'`` appears
+somewhere in your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+
+Remember, only templates rendered with :class:`~django.template.RequestContext`
+will have acces to the data provided by this (and any) context processor.
+
+.. templatetag:: get_staticfiles_prefix
+
+The ``get_staticfiles_prefix`` templatetag
+==========================================
+
+.. highlight:: html+django
+
+If you're not using :class:`~django.template.RequestContext`, or if you need
+more control over exactly where and how :setting:`STATICFILES_URL` is injected
+into the template, you can use the :ttag:`get_staticfiles_prefix` template tag
+instead::
+
+    {% load staticfiles %}
+    <img src="{% get_staticfiles_prefix %}images/hi.jpg" />
+
+There's also a second form you can use to avoid extra processing if you need the
+value multiple times::
+
+    {% load staticfiles %}
+    {% get_staticfiles_prefix as STATIC_PREFIX %}
+
+    <img src="{{ STATIC_PREFIX }}images/hi.jpg" />
+    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" />
+
+.. _staticfiles-development-view:
+
+Static file development view
+----------------------------
+
+.. highlight:: python
+
+.. function:: django.contrib.staticfiles.views.serve(request, path)
+
+This view function serves static media in in development.
+
+.. warning::
+
+    This view will only work if :setting:`DEBUG` is ``True``.
+
+    That's because this view is **grossly inefficient** and probably
+    **insecure**. This is only intended for local development, and should
+    **never be used in production**.
+
+To use the view, add the following snippet to the end of your primary URL
+configuration::
+
+   from django.conf import settings
+   
+   if settings.DEBUG:
+       urlpatterns = patterns('django.contrib.staticfiles.views',
+           url(r'^static/(?P<path>.*)$', 'serve'),
+       )
+
+Note, the begin of the pattern (``r'^static/'``) should be your
+:setting:`STATICFILES_URL` setting.
+
+Since this is a bit finicky, there's also a helper function that'll do this for you:
+
+.. function:: django.contrib.staticfiles.urls.staticfiles_urlpatterns()
+
+This will return the proper URL pattern for serving static files to your
+already defined pattern list. Use it like this::
+
+   from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+   
+   # ... the rest of your URLconf here ...
+   
+   urlpatterns += staticfiles_urlpatterns()
+
+

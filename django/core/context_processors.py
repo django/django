@@ -71,7 +71,15 @@ def media(request):
     Adds media-related context variables to the context.
 
     """
-    return {'MEDIA_URL': settings.MEDIA_URL}
+    import warnings
+    warnings.warn(
+        "The context processor at `django.core.context_processors.media` is " \
+        "deprecated; use the path `django.contrib.staticfiles.context_processors.staticfiles` " \
+        "instead.",
+        PendingDeprecationWarning
+    )
+    from django.contrib.staticfiles.context_processors import staticfiles as staticfiles_context_processor
+    return staticfiles_context_processor(request)
 
 def request(request):
     return {'request': request}
