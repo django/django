@@ -42,10 +42,11 @@ class FileSystemFinder(BaseFinder):
     A static files finder that uses the ``STATICFILES_DIRS`` setting
     to locate files.
     """
-    storages = SortedDict()
-    locations = set()
-
     def __init__(self, apps=None, *args, **kwargs):
+        # Maps dir paths to an appropriate storage instance
+        self.storages = SortedDict()
+        # Set of locations with static files
+        self.locations = set()
         for root in settings.STATICFILES_DIRS:
             if isinstance(root, (list, tuple)):
                 prefix, root = root
@@ -55,6 +56,7 @@ class FileSystemFinder(BaseFinder):
         # Don't initialize multiple storages for the same location
         for prefix, root in self.locations:
             self.storages[root] = FileSystemStorage(location=root)
+
         super(FileSystemFinder, self).__init__(*args, **kwargs)
 
     def find(self, path, all=False):
@@ -99,10 +101,11 @@ class AppDirectoriesFinder(BaseFinder):
     """
     A static files finder that looks in the ``media`` directory of each app.
     """
-    storages = {}
     storage_class = AppStaticStorage
 
     def __init__(self, apps=None, *args, **kwargs):
+        # Maps app modules to appropriate storage instances
+        self.storages = SortedDict()
         if apps is not None:
             self.apps = apps
         else:
