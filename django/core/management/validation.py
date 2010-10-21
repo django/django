@@ -257,7 +257,7 @@ def get_validation_errors(outfile, app=None):
                     continue
                 # Skip ordering in the format field1__field2 (FIXME: checking
                 # this format would be nice, but it's a little fiddly).
-                if '_' in field_name:
+                if '__' in field_name:
                     continue
                 try:
                     opts.get_field(field_name, many_to_many=False)

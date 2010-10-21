@@ -206,6 +206,9 @@ class UniqueFKTarget2(models.Model):
     """ Model to test for unique FK target in previously seen model: expect no error """
     tgt = models.ForeignKey(FKTarget, to_field='good')
 
+class NonExistingOrderingWithSingleUnderscore(models.Model):
+    class Meta:
+        ordering = ("does_not_exist",)
 
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
@@ -311,4 +314,5 @@ invalid_models.abstractrelationmodel: 'fk2' has an m2m relation with model Abstr
 invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the unique argument on 'unique_people'.
 invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
+invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 """
