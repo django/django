@@ -222,10 +222,10 @@ class _AssertNumQueriesContext(object):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.connection.use_debug_cursor = self.old_debug_cursor
         if exc_type is not None:
             return
 
-        self.connection.use_debug_cursor = self.old_debug_cursor
         final_queries = len(self.connection.queries)
         executed = final_queries - self.starting_queries
 
