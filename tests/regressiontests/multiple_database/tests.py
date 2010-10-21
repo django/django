@@ -1548,13 +1548,17 @@ class AuthTestCase(TestCase):
         command_output = new_io.getvalue().strip()
         self.assertTrue('"email": "alice@example.com",' in command_output)
 
+_missing = object()
 class UserProfileTestCase(TestCase):
     def setUp(self):
-        self.old_auth_profile_module = getattr(settings, 'AUTH_PROFILE_MODULE', None)
+        self.old_auth_profile_module = getattr(settings, 'AUTH_PROFILE_MODULE', _missing)
         settings.AUTH_PROFILE_MODULE = 'multiple_database.UserProfile'
 
     def tearDown(self):
-        settings.AUTH_PROFILE_MODULE = self.old_auth_profile_module
+        if self.old_auth_profile_module is _missing:
+            del settings.AUTH_PROFILE_MODULE
+        else:
+            settings.AUTH_PROFILE_MODULE = self.old_auth_profile_module
 
     def test_user_profiles(self):
 
