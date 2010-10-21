@@ -126,14 +126,60 @@ def simple_dec(func):
 simple_dec_m = method_decorator(simple_dec)
 
 
+# For testing method_decorator, two decorators that add an attribute to the function
+def myattr_dec(func):
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    wrapper.myattr = True
+    return wraps(func)(wrapper)
+
+myattr_dec_m = method_decorator(myattr_dec)
+
+
+def myattr2_dec(func):
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    wrapper.myattr2 = True
+    return wraps(func)(wrapper)
+
+myattr2_dec_m = method_decorator(myattr2_dec)
+
+
 class MethodDecoratorTests(TestCase):
     """
     Tests for method_decorator
     """
-    def test_method_decorator(self):
+    def test_preserve_signature(self):
         class Test(object):
             @simple_dec_m
             def say(self, arg):
                 return arg
 
         self.assertEqual("test:hello", Test().say("hello"))
+
+    def test_preserve_attributes(self):
+        # Sanity check myattr_dec and myattr2_dec
+        @myattr_dec
+        @myattr2_dec
+        def func():
+            pass
+
+        self.assertEqual(getattr(func, 'myattr', False), True)
+        self.assertEqual(getattr(func, 'myattr2', False), True)
+
+        # Now check method_decorator
+        class Test(object):
+            @myattr_dec_m
+            @myattr2_dec_m
+            def method(self):
+                "A method"
+                pass
+
+        self.assertEqual(getattr(Test().method, 'myattr', False), True)
+        self.assertEqual(getattr(Test().method, 'myattr2', False), True)
+
+        self.assertEqual(getattr(Test.method, 'myattr', False), True)
+        self.assertEqual(getattr(Test.method, 'myattr2', False), True)
+
+        self.assertEqual(Test.method.__doc__, 'A method')
+        self.assertEqual(Test.method.im_func.__name__, 'method')
