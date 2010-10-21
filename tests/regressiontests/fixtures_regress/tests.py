@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Unittests for fixtures.
 import os
+import re
 import sys
 try:
     from cStringIO import StringIO
@@ -307,9 +308,14 @@ class TestFixtures(TestCase):
 
         # Output order isn't guaranteed, so check for parts
         data = stdout.getvalue()
+
+        # Get rid of artifacts like '000000002' to eliminate the differences
+        # between different Python versions.
+        data = re.sub('0{6,}\d', '', data)
+
         lion_json = '{"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}}'
         emu_json = '{"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}}'
-        platypus_json = '{"pk": 11, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.2000000000000002, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}'
+        platypus_json = '{"pk": 11, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.2, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}'
 
         self.assertEqual(len(data), len('[%s]' % ', '.join([lion_json, emu_json, platypus_json])))
         self.assertTrue(lion_json in data)
