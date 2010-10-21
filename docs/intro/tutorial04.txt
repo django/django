@@ -249,7 +249,7 @@ Change it like so::
             DetailView.as_view(
                 models=Poll,
                 template_name='polls/results.html'),
-            'poll_results'),
+            name='poll_results'),
         (r'^(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
     )
 
