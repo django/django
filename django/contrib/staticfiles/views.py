@@ -41,7 +41,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     template hardcoded below, but if you'd like to override it, you can create
     a template called ``static/directory_index.html``.
     """
-    if settings.DEBUG:
+    if not settings.DEBUG:
         raise ImproperlyConfigured("The view to serve static files can only "
                                    "be used if the DEBUG setting is True")
     if not document_root:

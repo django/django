@@ -29,11 +29,13 @@ class StaticFilesTestCase(TestCase):
         self.old_media_root = settings.MEDIA_ROOT
         self.old_media_url = settings.MEDIA_URL
         self.old_admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
+        self.old_debug = settings.DEBUG
 
         # We have to load these apps to test staticfiles.
         load_app('regressiontests.staticfiles_tests.apps.test')
         load_app('regressiontests.staticfiles_tests.apps.no_label')
         site_media = os.path.join(TEST_ROOT, 'project', 'site_media')
+        settings.DEBUG = True
         settings.MEDIA_ROOT =  os.path.join(site_media, 'media')
         settings.MEDIA_URL = '/media/'
         settings.STATICFILES_ROOT = os.path.join(site_media, 'static')
@@ -49,6 +51,7 @@ class StaticFilesTestCase(TestCase):
         )
 
     def tearDown(self):
+        settings.DEBUG = self.old_debug
         settings.MEDIA_ROOT = self.old_media_root
         settings.MEDIA_URL = self.old_media_url
         settings.ADMIN_MEDIA_PREFIX = self.old_admin_media_prefix
@@ -208,6 +211,8 @@ class TestServeStatic(StaticFilesTestCase):
     """
     Test static asset serving view.
     """
+    urls = "regressiontests.staticfiles_tests.urls.default"
+
     def _response(self, filepath):
         return self.client.get(
             posixpath.join(settings.STATICFILES_URL, filepath))
@@ -219,12 +224,25 @@ class TestServeStatic(StaticFilesTestCase):
         self.assertEquals(self._response(filepath).status_code, 404)
 
 
+class TestServeDisabled(TestServeStatic):
+    """
+    Test serving media from django.contrib.admin.
+    """
+    def setUp(self):
+        super(TestServeDisabled, self).setUp()
+        settings.DEBUG = False
+
+    def test_disabled_serving(self):
+        self.assertRaisesRegexp(ImproperlyConfigured, "The view to serve "
+            "static files can only be used if the DEBUG setting is True",
+            self._response, 'test.txt')
+
+
 class TestServeStaticWithDefaultURL(TestServeStatic, TestDefaults):
     """
     Test static asset serving view with staticfiles_urlpatterns helper.
     """
-    urls = "regressiontests.staticfiles_tests.urls.default"
-
+    pass
 
 class TestServeStaticWithURLHelper(TestServeStatic, TestDefaults):
     """

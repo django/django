@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 urlpatterns = []
 
 # only serve non-fqdn URLs
-if not settings.DEBUG:
+if settings.DEBUG:
     urlpatterns += patterns('',
         url(r'^(?P<path>.*)$', 'django.contrib.staticfiles.views.serve'),
     )
@@ -15,7 +15,7 @@ def staticfiles_urlpatterns(prefix=None):
     """
     Helper function to return a URL pattern for serving static files.
     """
-    if settings.DEBUG:
+    if not settings.DEBUG:
         return []
     if prefix is None:
         prefix = settings.STATICFILES_URL

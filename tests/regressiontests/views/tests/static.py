@@ -1,12 +1,20 @@
 import mimetypes
 from os import path
 
+from django.conf import settings
 from django.test import TestCase
 from django.http import HttpResponseNotModified
 from regressiontests.views.urls import media_dir
 
 class StaticTests(TestCase):
     """Tests django views in django/views/static.py"""
+
+    def setUp(self):
+        self.old_debug = settings.DEBUG
+        settings.DEBUG = True
+
+    def tearDown(self):
+        settings.DEBUG = self.old_debug
 
     def test_serve(self):
         "The static view can serve static media"
