@@ -2,8 +2,14 @@
 Creating forms from models
 ==========================
 
+.. module:: django.forms.models
+   :synopsis: ModelForm and ModelFormset.
+
+.. currentmodule:: django.forms
+
 ``ModelForm``
 =============
+.. class:: ModelForm
 
 If you're building a database-driven app, chances are you'll have forms that
 map closely to Django models. For instance, you might have a ``BlogComment``

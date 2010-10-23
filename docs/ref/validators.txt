@@ -10,8 +10,9 @@ Writing validators
 ==================
 
 A validator is a callable that takes a value and raises a
-``ValidationError`` if it doesn't meet some criteria. Validators can be useful
-for re-using validation logic between different types of fields.
+:exc:`~django.core.exceptions.ValidationError` if it doesn't meet some
+criteria. Validators can be useful for re-using validation logic between
+different types of fields.
 
 For example, here's a validator that only allows even numbers::
 
@@ -21,7 +22,7 @@ For example, here's a validator that only allows even numbers::
         if value % 2 != 0:
             raise ValidationError(u'%s is not an even number' % value)
 
-You can add this to a model field via the field's ``validators``
+You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
 argument::
 
     from django.db import models
@@ -44,109 +45,114 @@ See the :doc:`form validation </ref/forms/validation>` for more information on
 how validators are run in forms, and :ref:`Validating objects
 <validating-objects>` for how they're run in models. Note that validators will
 not be run automatically when you save a model, but if you are using a
-``ModelForm``, it will run your validators on any fields that are included in
-your form. See the :doc:`ModelForm documentation </topics/forms/modelforms>`
-for information on how model validation interacts with forms.
+:class:`~django.forms.ModelForm`, it will run your validators on any fields
+that are included in your form. See the
+:doc:`ModelForm documentation </topics/forms/modelforms>` for information on
+how model validation interacts with forms.
 
 Built-in validators
 ===================
 
-Django has a collection of callable validators for use with model and form
-fields. They're used internally but are available for use with your own fields,
-too. They can be used in addition to, or in lieu of custom ``field.clean()``
-methods.
+The :mod:`django.core.validators` module contains a collection of callable
+validators for use with model and form fields. They're used internally but
+are available for use with your own fields, too. They can be used in addition
+to, or in lieu of custom ``field.clean()`` methods.
 
 ``RegexValidator``
 ------------------
+.. class:: RegexValidator(regex, [message=None, code=None])
 
-.. class:: RegexValidator(regex, message=None, code=None)
+    .. attribute:: regex
 
-.. attribute:: regex
+        The regular expression pattern to search for the provided ``value``,
+        or a pre-compiled regular expression. Raises a
+        :exc:`~django.core.exceptions.ValidationError` with :attr:`.message`
+        and :attr:`.code` if no match is found.
 
-The regular expression pattern to search for the provided ``value``,
-or a pre-compiled regular expression. Raises a ``ValidationError``
-with ``message`` and ``code`` if no match is found.
+    .. attribute:: message
 
-.. attribute:: message=None
+        The error message used by :exc:`~django.core.exceptions.ValidationError`
+        if validation fails. If no :attr:`.message` is specified, a generic
+        ``"Enter a valid value"`` message is used. Default value: ``None``.
 
-The error message used by ``ValidationError`` if validation fails. If no
-``message`` is specified, a generic ``"Enter a valid value"`` message is used.
+    .. attribute:: code
 
-.. attribute:: code=None
-
-The error code used by ``ValidationError`` if validation fails. If ``code``
-is not specified, ``"invalid"`` is used.
+        The error code used by :exc:`~django.core.exceptions.ValidationError`
+        if validation fails. If :attr:`.code` is not specified, ``"invalid"``
+        is used. Default value: ``None``.
 
 ``URLValidator``
 ----------------
+.. class:: URLValidator([verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT])
 
-.. class:: URLValidator(verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT)
+    A :class:`RegexValidator` that ensures a value looks like a URL and
+    optionally verifies that the URL actually exists (i.e., doesn't return a
+    404 status code). Raises an error code of ``'invalid'`` if it doesn't look
+    like a URL, and a code of ``'invalid_link'`` if it doesn't exist.
 
-A ``RegexValidator`` that ensures a value looks like a URL and optionally
-verifies that the URL actually exists (i.e., doesn't return a 404 status code).
-Raises an error code of ``'invalid'`` if it doesn't look like a URL, and a code
-of ``'invalid_link'`` if it doesn't exist.
+    .. attribute:: verify_exists
 
-.. attribute:: verify_exists=False
+        Default value: ``False``. If set to ``True``, this validator checks
+        that the URL actually exists.
 
-If ``verify_exists`` is ``True``, this validator checks that the URL actually
-exists.
+    .. attribute:: validator_user_agent
 
-.. attribute:: validator_user_agent=URL_VALIDATOR_USER_AGENT
-
-If ``verify_exists`` is ``True``, it uses ``validator_user_agent`` as the "User-agent"
-for the request. This defaults to ``settings.URL_VALIDATOR_USER_AGENT``.
+        If :attr:`.verify_exists` is ``True``, Django uses the value of
+        :attr:`.validator_user_agent` as the "User-agent" for the request. This
+        defaults to :setting:`settings.URL_VALIDATOR_USER_AGENT <URL_VALIDATOR_USER_AGENT>`.
 
 ``validate_email``
 ------------------
+.. data:: validate_email
 
-A ``RegexValidator`` instance that ensures a value looks like an e-mail address.
+    A :class:`RegexValidator` instance that ensures a value looks like an
+    e-mail address.
 
 ``validate_slug``
 -----------------
+.. data:: validate_slug
 
-A ``RegexValidator`` instance that ensures a value consists of only letters,
-numbers, underscores or hyphens.
+    A :class:`RegexValidator` instance that ensures a value consists of only
+    letters, numbers, underscores or hyphens.
 
 ``validate_ipv4_address``
 -------------------------
+.. data:: validate_ipv4_address
 
-A ``RegexValidator`` instance that ensures a value looks like an IPv4 address.
+    A :class:`RegexValidator` instance that ensures a value looks like an IPv4
+    address.
 
 ``validate_comma_separated_integer_list``
 -----------------------------------------
+.. data:: validate_comma_separated_integer_list
 
-A ``RegexValidator`` instance that ensures a value is a comma-separated list
-of integers.
+    A :class:`RegexValidator` instance that ensures a value is a
+    comma-separated list of integers.
 
 ``MaxValueValidator``
 ---------------------
-
 .. class:: MaxValueValidator(max_value)
 
-Raises a ``ValidationError`` with a code of ``'max_value'`` if ``value`` is
-greater than ``max_value``.
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'max_value'`` if ``value`` is greater than ``max_value``.
 
 ``MinValueValidator``
 ---------------------
-
 .. class:: MinValueValidator(min_value)
 
-Raises a ``ValidationError`` with a code of ``'min_value'`` if ``value`` is
-less than ``min_value``.
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'min_value'`` if ``value`` is less than ``min_value``.
 
 ``MaxLengthValidator``
 ----------------------
-
 .. class:: MaxLengthValidator(max_length)
 
-Raises a ``ValidationError`` with a code of ``'max_length'`` if the length of
-``value`` is greater than ``max_length``.
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'max_length'`` if the length of ``value`` is greater than ``max_length``.
 
 ``MinLengthValidator``
 ----------------------
-
 .. class:: MinLengthValidator(min_length)
 
-Raises a ``ValidationError`` with a code of ``'min_length'`` if the length of
-``value`` is less than ``min_length``.
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'min_length'`` if the length of ``value`` is less than ``min_length``.
