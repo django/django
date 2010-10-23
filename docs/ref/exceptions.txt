@@ -14,84 +14,103 @@ Django-specific Exceptions
 
 ObjectDoesNotExist and DoesNotExist
 -----------------------------------
+.. exception:: DoesNotExist
+.. exception:: ObjectDoesNotExist
 
-The ``DoesNotExist`` exception is raised when an object is not found
-for the given parameters of a query.
+    The :exc:`DoesNotExist` exception is raised when an object is not found
+    for the given parameters of a query.
 
-``ObjectDoesNotExist`` is defined in ``django.core.exceptions``.
-``DoesNotExist`` is a subclass of the base ``ObjectDoesNotExist``
-exception that is provided on every model class as a way of
-identifying the specific type of object that could not be found.
+    :exc:`ObjectDoesNotExist` is defined in :mod:`django.core.exceptions`.
+    :exc:`DoesNotExist` is a subclass of the base :exc:`ObjectDoesNotExist`
+    exception that is provided on every model class as a way of
+    identifying the specific type of object that could not be found.
 
-See :meth:`~django.db.models.QuerySet.get()` for further information
-on ``ObjectDoesNotExist`` and ``DoesNotExist``.
+    See :meth:`~django.db.models.QuerySet.get()` for further information
+    on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
 
 MultipleObjectsReturned
 -----------------------
+.. exception:: MultipleObjectsReturned
 
-The ``MultipleObjectsReturned`` exception is raised by a query if only
-one object is expected, but multiple objects are returned. A base version
-of this exception is provided in ``django.core.exceptions``; each model
-class contains a subclassed version that can be used to identify the
-specific object type that has returned multiple objects.
+    The :exc:`MultipleObjectsReturned` exception is raised by a query if only
+    one object is expected, but multiple objects are returned. A base version
+    of this exception is provided in :mod:`django.core.exceptions`; each model
+    class contains a subclassed version that can be used to identify the
+    specific object type that has returned multiple objects.
 
-See :meth:`~django.db.models.QuerySet.get()` for further information.
+    See :meth:`~django.db.models.QuerySet.get()` for further information.
 
 SuspiciousOperation
 -------------------
+.. exception:: SuspiciousOperation
 
-The ``SuspiciousOperation`` exception is raised when a user has performed
-an operation that should be considered suspicious from a security perspective,
-such as tampering with a session cookie.
+    The :exc:`SuspiciousOperation` exception is raised when a user has performed
+    an operation that should be considered suspicious from a security perspective,
+    such as tampering with a session cookie.
 
 PermissionDenied
 ----------------
+.. exception:: PermissionDenied
 
-The ``PermissionDenied`` exception is raised when a user does not have
-permission to perform the action requested.
+    The :exc:`PermissionDenied` exception is raised when a user does not have
+    permission to perform the action requested.
 
 ViewDoesNotExist
 ----------------
+.. exception:: ViewDoesNotExist
 
-The ``ViewDoesNotExist`` exception is raised by
-``django.core.urlresolvers`` when a requested view does not exist.
+    The :exc:`ViewDoesNotExist` exception is raised by
+    :mod:`django.core.urlresolvers` when a requested view does not exist.
 
 MiddlewareNotUsed
 -----------------
+.. exception:: MiddlewareNotUsed
 
-The ``MiddlewareNotUsed`` exception is raised when a middleware is not
-used in the server configuration.
+    The :exc:`MiddlewareNotUsed` exception is raised when a middleware is not
+    used in the server configuration.
 
 ImproperlyConfigured
 --------------------
+.. exception:: ImproperlyConfigured
 
-The ``ImproperlyConfigured`` exception is raised when Django is
-somehow improperly configured -- for example, if a value in ``settings.py``
-is incorrect or unparseable.
+    The :exc:`ImproperlyConfigured` exception is raised when Django is
+    somehow improperly configured -- for example, if a value in ``settings.py``
+    is incorrect or unparseable.
 
 FieldError
 ----------
+.. exception:: FieldError
 
-The ``FieldError`` exception is raised when there is a problem with a
-model field. This can happen for several reasons:
+    The :exc:`FieldError` exception is raised when there is a problem with a
+    model field. This can happen for several reasons:
 
-    - A field in a model clashes with a field of the same name from an
-      abstract base class
-    - An infinite loop is caused by ordering
-    - A keyword cannot be parsed from the filter parameters
-    - If a field cannot be determined from a keyword in the query
-      parameters
-    - If a join is not permitted on the specified field
-    - If a field name is invalid
-    - If a query contains invalid order_by arguments
+        - A field in a model clashes with a field of the same name from an
+          abstract base class
+        - An infinite loop is caused by ordering
+        - A keyword cannot be parsed from the filter parameters
+        - A field cannot be determined from a keyword in the query
+          parameters
+        - A join is not permitted on the specified field
+        - A field name is invalid
+        - A query contains invalid order_by arguments
+
+ValidationError
+---------------
+.. exception:: ValidationError
+
+    The :exc:`ValidationError` exception is raised when data fails form or
+    model field validation. For more information about validation, see
+    :doc:`Form and Field Validation </ref/forms/validation>`,
+    :ref:`Model Field Validation <validating-objects>` and the
+    :doc:`Validator Reference </ref/validators>`.
 
 Database Exceptions
 ===================
 
-Django wraps the standard database exceptions ``DatabaseError`` and
-``IntegrityError`` so that your Django code has a guaranteed common
+Django wraps the standard database exceptions :exc:`DatabaseError` and
+:exc:`IntegrityError` so that your Django code has a guaranteed common
 implementation of these classes. These database exceptions are
-provided in ``django.db``.
+provided in :mod:`django.db`.
 
 The Django wrappers for database exceptions behave exactly the same as
 the underlying database exceptions. See `PEP 249 - Python Database API
