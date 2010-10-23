@@ -96,9 +96,9 @@ APPEND_SLASH
 
 Default: ``True``
 
-When set to ``True``, if the request URL does not match any of the patterns 
+When set to ``True``, if the request URL does not match any of the patterns
 in the URLconf and it doesn't end in a slash, an HTTP redirect is issued to the
-same URL with a slash appended. Note that the redirect may cause any data 
+same URL with a slash appended. Note that the redirect may cause any data
 submitted in a POST request to be lost.
 
 The ``APPEND_SLASH`` setting is only used if
@@ -447,7 +447,7 @@ Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 The default formatting to use for displaying date fields in any part of the
 system. Note that if :setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
-:ttag:`allowed date format strings <now>`.
+:tfilter:`allowed date format strings <date>`.
 
 .. versionchanged:: 1.2
     This setting can now be overriden by setting ``USE_L10N`` to ``True``.
@@ -487,7 +487,7 @@ Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 The default formatting to use for displaying datetime fields in any part of the
 system. Note that if :setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
-:ttag:`allowed date format strings <now>`.
+:tfilter:`allowed date format strings <date>`.
 
 .. versionchanged:: 1.2
     This setting can now be overriden by setting ``USE_L10N`` to ``True``.
@@ -1195,7 +1195,7 @@ drilldown, the header for a given day displays the day and month. Different
 locales have different formats. For example, U.S. English would say
 "January 1," whereas Spanish might say "1 Enero."
 
-See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
+See :tfilter:`allowed date format strings <date>`. See also ``DATE_FORMAT``,
 ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``YEAR_MONTH_FORMAT``.
 
 .. setting:: NUMBER_GROUPING
@@ -1437,7 +1437,7 @@ Default: ``m/d/Y`` (e.g. ``12/31/2003``)
 An available formatting that can be used for displaying date fields on
 templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
 corresponding locale-dictated format has higher precedence and will be applied.
-See :ttag:`allowed date format strings <now>`.
+See :tfilter:`allowed date format strings <date>`.
 
 See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
 
@@ -1453,7 +1453,7 @@ Default: ``m/d/Y P`` (e.g. ``12/31/2003 4 p.m.``)
 An available formatting that can be used for displaying datetime fields on
 templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
 corresponding locale-dictated format has higher precedence and will be applied.
-See :ttag:`allowed date format strings <now>`.
+See :tfilter:`allowed date format strings <date>`.
 
 See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
 
@@ -1593,7 +1593,7 @@ Default: ``'P'`` (e.g. ``4 p.m.``)
 The default formatting to use for displaying time fields in any part of the
 system. Note that if :setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
-:ttag:`allowed date format strings <now>`.
+:tfilter:`allowed date format strings <date>`.
 
 .. versionchanged:: 1.2
     This setting can now be overriden by setting ``USE_L10N`` to ``True``.
@@ -1747,7 +1747,7 @@ drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
 "January 2006," whereas another locale might say "2006/January."
 
-See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
+See :tfilter:`allowed date format strings <date>`. See also ``DATE_FORMAT``,
 ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``MONTH_DAY_FORMAT``.
 
 Deprecated settings
