@@ -272,7 +272,7 @@ in different circumstances.
 Running tests
 =============
 
-Once you've written tests, run them using the :djadmin:`test` subcommand of
+Once you've written tests, run them using the :djadmin:`test` command of
 your project's ``manage.py`` utility::
 
     $ ./manage.py test

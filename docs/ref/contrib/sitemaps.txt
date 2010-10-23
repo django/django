@@ -33,12 +33,12 @@ To install the sitemap app, follow these steps:
 
     1. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS`
        setting.
-       
+
     2. Make sure ``'django.template.loaders.app_directories.Loader'``
        is in your :setting:`TEMPLATE_LOADERS` setting. It's in there by default,
        so you'll only need to change this if you've changed that setting.
 
-    3. Make sure you've installed the 
+    3. Make sure you've installed the
        :mod:`sites framework <django.contrib.sites>`.
 
 (Note: The sitemap application doesn't install any database tables. The only
@@ -294,7 +294,7 @@ Pinging Google
 ==============
 
 You may want to "ping" Google when your sitemap changes, to let it know to
-reindex your site. The sitemaps framework provides a function to do just 
+reindex your site. The sitemaps framework provides a function to do just
 that: :func:`django.contrib.sitemaps.ping_google()`.
 
 .. function:: ping_google
@@ -313,14 +313,14 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
 
     The :func:`ping_google` command only works if you have registered your
     site with `Google Webmaster Tools`_.
-        
+
 .. _`Google Webmaster Tools`: http://www.google.com/webmasters/tools/
-        
+
 One useful way to call :func:`ping_google` is from a model's ``save()``
 method::
 
    from django.contrib.sitemaps import ping_google
-  
+
     class Entry(models.Model):
         # ...
         def save(self, force_insert=False, force_update=False):
@@ -339,6 +339,8 @@ each time you call ``save()``.
 
 Pinging Google via `manage.py`
 ------------------------------
+
+.. django-admin:: ping_google
 
 .. versionadded:: 1.0
 

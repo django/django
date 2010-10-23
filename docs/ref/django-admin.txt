@@ -37,26 +37,26 @@ Usage
 
 .. code-block:: bash
 
-    django-admin.py <subcommand> [options]
-    manage.py <subcommand> [options]
+    django-admin.py <command> [options]
+    manage.py <command> [options]
 
-``subcommand`` should be one of the subcommands listed in this document.
+``command`` should be one of the commands listed in this document.
 ``options``, which is optional, should be zero or more of the options available
-for the given subcommand.
+for the given command.
 
 Getting runtime help
 --------------------
 
 .. django-admin-option:: --help
 
-Run ``django-admin.py help`` to display a list of all available subcommands.
-Run ``django-admin.py help <subcommand>`` to display a description of the
-given subcommand and a list of its available options.
+Run ``django-admin.py help`` to display a list of all available commands.
+Run ``django-admin.py help <command>`` to display a description of the
+given command and a list of its available options.
 
 App names
 ---------
 
-Many subcommands take a list of "app names." An "app name" is the basename of
+Many commands take a list of "app names." An "app name" is the basename of
 the package containing your models. For example, if your ``INSTALLED_APPS``
 contains the string ``'mysite.blog'``, the app name is ``blog``.
 
@@ -80,8 +80,8 @@ Use :djadminopt:`--verbosity` to specify the amount of notification and debug in
 that ``django-admin.py`` should print to the console. For more details, see the
 documentation for the :djadminopt:`--verbosity` option.
 
-Available subcommands
-=====================
+Available commands
+==================
 
 cleanup
 -------
@@ -124,34 +124,6 @@ backend. See :doc:`/topics/cache` for more information.
 The :djadminopt:`--database` option can be used to specify the database
 onto which the cachetable will be installed.
 
-createsuperuser
----------------
-
-.. django-admin:: createsuperuser
-
-.. versionadded:: 1.0
-
-Creates a superuser account (a user who has all permissions). This is
-useful if you need to create an initial superuser account but did not
-do so during ``syncdb``, or if you need to programmatically generate
-superuser accounts for your site(s).
-
-When run interactively, this command will prompt for a password for
-the new superuser account. When run non-interactively, no password
-will be set, and the superuser account will not be able to log in until
-a password has been manually set for it.
-
-.. django-admin-option:: --username
-.. django-admin-option:: --email
-
-The username and e-mail address for the new account can be supplied by
-using the ``--username`` and ``--email`` arguments on the command
-line. If either of those is not supplied, ``createsuperuser`` will prompt for
-it when running interactively.
-
-This command is only available if Django's :doc:`authentication system
-</topics/auth>` (``django.contrib.auth``) is installed.
-
 dbshell
 -------
 
@@ -174,7 +146,6 @@ manually.
 
 The :djadminopt:`--database` option can be used to specify the database
 onto which to open a shell.
-
 
 diffsettings
 ------------
@@ -324,7 +295,6 @@ only works in PostgreSQL and with certain types of MySQL tables.
 
 The :djadminopt:`--database` option may be used to specify the
 database to introspect.
-
 
 loaddata <fixture fixture ...>
 ------------------------------
@@ -878,7 +848,7 @@ templates.
 
 Use ``--addrport`` to specify a different port, or IP address and port, from
 the default of 127.0.0.1:8000. This value follows exactly the same format and
-serves exactly the same function as the argument to the ``runserver`` subcommand.
+serves exactly the same function as the argument to the ``runserver`` command.
 
 Examples:
 
@@ -908,10 +878,113 @@ validate
 Validates all installed models (according to the ``INSTALLED_APPS`` setting)
 and prints validation errors to standard output.
 
+Commands provided by applications
+=================================
+
+Some commands are only available when the ``django.contrib`` application that
+:doc:`implements </howto/custom-management-commands>` them has been
+:setting:`enabled <INSTALLED_APPS>`. This section describes them grouped by
+their application.
+
+``django.contrib.auth``
+-----------------------
+
+changepassword
+~~~~~~~~~~~~~~
+
+.. django-admin:: changepassword
+
+.. versionadded:: 1.2
+
+This command is only available if Django's :doc:`authentication system
+</topics/auth>` (``django.contrib.auth``) is installed.
+
+Allows changing a user's password. It prompts you to enter twice the password of
+the user given as parameter. If they both match, the new password will be
+changed immediately. If you do not supply a user, the command will attempt to
+change the password whose username matches the current user.
+
+Example usage::
+
+    django-admin.py changepassword ringo
+
+createsuperuser
+~~~~~~~~~~~~~~~
+
+.. django-admin:: createsuperuser
+
+.. versionadded:: 1.0
+
+This command is only available if Django's :doc:`authentication system
+</topics/auth>` (``django.contrib.auth``) is installed.
+
+Creates a superuser account (a user who has all permissions). This is
+useful if you need to create an initial superuser account but did not
+do so during ``syncdb``, or if you need to programmatically generate
+superuser accounts for your site(s).
+
+When run interactively, this command will prompt for a password for
+the new superuser account. When run non-interactively, no password
+will be set, and the superuser account will not be able to log in until
+a password has been manually set for it.
+
+.. django-admin-option:: --username
+.. django-admin-option:: --email
+
+The username and e-mail address for the new account can be supplied by
+using the ``--username`` and ``--email`` arguments on the command
+line. If either of those is not supplied, ``createsuperuser`` will prompt for
+it when running interactively.
+
+``django.contrib.gis``
+----------------------
+
+ogrinspect
+~~~~~~~~~~
+
+This command is only available if :doc:`GeoDjango </ref/contrib/gis/index>`
+(``django.contrib.gis``) is installed.
+
+Please refer to its :djadmin:`description <ogrinspect>` in the GeoDjango
+documentation.
+
+``django.contrib.sitemaps``
+---------------------------
+
+ping_google
+~~~~~~~~~~~
+
+This command is only available if the :doc:`Sitemaps framework
+</ref/contrib/sitemaps>` (``django.contrib.sitemaps``) is installed.
+
+Please refer to its :djadmin:`description <ping_google>` in the Sitemaps
+documentation.
+
+``django.contrib.staticfiles``
+------------------------------
+
+collectstatic
+~~~~~~~~~~~~~
+
+This command is only available if the :doc:`static files application
+</howto/static-files>` (``django.contrib.staticfiles``) is installed.
+
+Please refer to its :djadmin:`description <collectstatic>` in the
+:doc:`staticfiles </ref/contrib/staticfiles>` documentation.
+
+findstatic
+~~~~~~~~~~
+
+This command is only available if the :doc:`static files application
+</howto/static-files>` (``django.contrib.staticfiles``) is installed.
+
+Please refer to its :djadmin:`description <findstatic>` in the :doc:`staticfiles
+</ref/contrib/staticfiles>` documentation.
+
 Default options
 ===============
 
-Although some subcommands may allow their own custom options, every subcommand
+Although some commands may allow their own custom options, every command
 allows for the following options:
 
 .. django-admin-option:: --pythonpath
