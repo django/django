@@ -3,6 +3,7 @@ import shutil
 import os
 import sys
 import posixpath
+from StringIO import StringIO
 
 from django.test import TestCase
 from django.conf import settings
@@ -132,6 +133,39 @@ class TestDefaults(object):
 
         """
         self.assertFileContains('test/file1.txt', 'file1 in the app dir')
+
+
+class TestFindStatic(BuildStaticTestCase, TestDefaults):
+    """
+    Test ``findstatic`` management command.
+    """
+    def _get_file(self, filepath):
+        _stdout = sys.stdout
+        sys.stdout = StringIO()
+        try:
+            call_command('findstatic', filepath, all=False, verbosity='0')
+            sys.stdout.seek(0)
+            lines = [l.strip() for l in sys.stdout.readlines()]
+            contents = open(lines[1].strip()).read()
+        finally:
+            sys.stdout = _stdout
+        return contents
+
+    def test_all_files(self):
+        """
+        Test that findstatic returns all candidate files if run without --first.
+        """
+        _stdout = sys.stdout
+        sys.stdout = StringIO()
+        try:
+            call_command('findstatic', 'test/file.txt', verbosity='0')
+            sys.stdout.seek(0)
+            lines = [l.strip() for l in sys.stdout.readlines()]
+        finally:
+            sys.stdout = _stdout
+        self.assertEquals(len(lines), 3) # three because there is also the "Found <file> here" line
+        self.failUnless('project' in lines[1])
+        self.failUnless('apps' in lines[2])
 
 
 class TestBuildStatic(BuildStaticTestCase, TestDefaults):

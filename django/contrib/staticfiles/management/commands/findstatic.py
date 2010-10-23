@@ -17,6 +17,8 @@ class Command(LabelCommand):
         verbosity = int(options.get('verbosity', 1))
         result = finders.find(path, all=options['all'])
         if result:
+            if not isinstance(result, (list, tuple)):
+                result = [result]
             output = '\n  '.join((os.path.realpath(path) for path in result))
             self.stdout.write("Found %r here:\n  %s\n" % (path, output))
         else:
