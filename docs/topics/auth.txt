@@ -37,11 +37,12 @@ Authentication support is bundled as a Django application in
     2. Run the command ``manage.py syncdb``.
 
 Note that the default :file:`settings.py` file created by
-:djadmin:`django-admin.py startproject` includes ``'django.contrib.auth'`` and
-``'django.contrib.contenttypes'`` in :setting:`INSTALLED_APPS` for convenience.
-If your :setting:`INSTALLED_APPS` already contains these apps, feel free to run
-:djadmin:`manage.py syncdb` again; you can run that command as many times as
-you'd like, and each time it'll only install what's needed.
+:djadmin:`django-admin.py startproject <startproject>` includes
+``'django.contrib.auth'`` and ``'django.contrib.contenttypes'`` in
+:setting:`INSTALLED_APPS` for convenience.  If your :setting:`INSTALLED_APPS`
+already contains these apps, feel free to run :djadmin:`manage.py syncdb
+<syncdb>` again; you can run that command as many times as you'd like, and each
+time it'll only install what's needed.
 
 The :djadmin:`syncdb` command creates the necessary database tables, creates
 permission objects for all installed apps that need 'em, and prompts you to
@@ -358,8 +359,8 @@ Changing passwords
 .. versionadded:: 1.2
    The ``manage.py changepassword`` command was added.
 
-:djadmin:`manage.py changepassword <username>` offers a method of
-changing a User's password from the command line. It prompts you to
+:djadmin:`manage.py changepassword *username* <changepassword>` offers a method
+of changing a User's password from the command line. It prompts you to
 change the password of a given user which you must enter twice. If
 they both match, the new password will be changed immediately. If you
 do not supply a user, the command will attempt to change the password
