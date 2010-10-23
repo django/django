@@ -190,7 +190,7 @@ The static files tools are mostly designed to help with getting static media
 successfully deployed into production. This usually means a separate, dedicated
 media server, which is a lot of overhead to mess with when developing locally.
 Thus, the ``staticfiles`` app ships with a quick and dirty helper view that you
-can use to serve media locally in development.
+can use to serve files locally in development.
 
 To enable this view, you'll add a couple of lines to your URLconf. The first
 line goes at the top of the file, and the last line at the bottom::
@@ -203,7 +203,9 @@ line goes at the top of the file, and the last line at the bottom::
 
 This will inspect your :setting:`STATICFILES_URL` and
 :setting:`STATICFILES_ROOT` settings and wire up the view to serve static media
-accordingly.
+accordingly. Don't forget to set the :setting:`STATICFILES_DIRS` setting
+appropriately to let ``django.contrib.staticfiles`` know where to look for
+files.
 
 .. warning::
 
@@ -250,7 +252,8 @@ __ http://fabfile.org/
 
 Below, and in the following sections, we'll show off a few example fabfiles
 (i.e. Fabric scripts) that automate these media deployment options. The syntax
-of a fabfile is fairly streightforward but won't be covered here; consult `Fabric's documentation`__, for a complete explanation of the syntax..
+of a fabfile is fairly streightforward but won't be covered here; consult
+`Fabric's documentation`__, for a complete explanation of the syntax..
 
 __ http://docs.fabfile.org/
 
@@ -343,7 +346,7 @@ storage backend, you can tell :djadmin:`collectstatic` to use it by setting
 For example, if you've written an S3 storage backend in
 ``myproject.storage.S3Storage`` you could use it with::
 
-    STATICFILES_STORAGE = 'storages.backends.s3.S3Storage'
+    STATICFILES_STORAGE = 'myproject.storage.S3Storage'
 
 Once that's done, all you have to do is run :djadmin:`collectstatic` and your
 media would be pushed through your storage package up to S3. If you later needed
@@ -356,9 +359,10 @@ For details on how you'd write one of these backends,
 .. seealso::
 
     The `django-storages`__ project is a 3rd party app that provides many
-    storage backends for many common file storage APIs (including S3).
+    storage backends for many common file storage APIs (including `S3`__).
 
 __ http://s3.amazonaws.com/
+__ http://code.welldev.org/django-storages/
 __ http://code.welldev.org/django-storages/wiki/S3Storage
 
 Upgrading from ``django-staticfiles``

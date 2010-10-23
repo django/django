@@ -7,9 +7,9 @@ The staticfiles app
 
 .. versionadded:: 1.3
 
-``django.contrib.staticfiles`` collects media from each of your applications
-(and any other places you specify) into a single location that can easily be
-served in production.
+``django.contrib.staticfiles`` collects static files from each of your
+applications (and any other places you specify) into a single location that
+can easily be served in production.
 
 .. seealso::
 
@@ -23,7 +23,7 @@ Settings
 
 .. highlight:: python
 
-The following settings control the behavior of the static files app. Only
+The following settings control the behavior of the staticfiles app. Only
 :setting:`STATICFILES_ROOT` is required, but you'll probably also need to
 configure :setting:`STATICFILES_URL` as well.
 
@@ -54,7 +54,7 @@ The URL that handles the files served from :setting:`STATICFILES_ROOT`, e.g.::
    
 ... or perhaps::
 
-    STATICFILES_URL = 'http://media.exmaple.com/'
+    STATICFILES_URL = 'http://static.example.com/'
 
 This should **always** have a trailing slash.
 
@@ -70,13 +70,29 @@ if the :class:`FileSystemFinder` finder is enabled, e.g. if you use the
 :djadmin:`collectstatic` or :djadmin:`findstatic` management command or use the
 static file serving view.
 
-It should be defined as a sequence of ``(prefix, path)`` tuples, e.g.::
+This should be set to a list or tuple of strings that contain full paths to
+your additional files directory(ies) e.g.::
 
-   STATICFILES_DIRS = (
-       ('', '/home/special.polls.com/polls/media'),
-       ('', '/home/polls.com/polls/media'),
-       ('common', '/opt/webfiles/common'),
-   )
+    STATICFILES_DIRS = (
+        "/home/special.polls.com/polls/static",
+        "/home/polls.com/polls/static",
+        "/opt/webfiles/common",
+    )
+
+In case you want to refer to files in one of the locations with a additional
+namespace, you can **optionally** provide a prefix as ``(prefix, path)``
+tuples, e.g.::
+
+    STATICFILES_DIRS = (
+        "/home/polls.com/polls/static",
+        ("downloads", "/opt/webfiles/stats"),
+    )
+
+With this configuration, the :djadmin:`collectstatic` management command would
+for example collect the stats files in a ``'downloads'`` directory. So
+assuming you have :setting:`STATICFILES_URL` set ``'/static/'``, this would
+allow you to refer to the file ``'/opt/webfiles/stats/polls_20101022.tar.gz'``
+with ``'/static/downloads/polls_20101022.tar.gz'`` in your templates.
 
 .. setting:: STATICFILES_STORAGE
 
@@ -138,16 +154,15 @@ collectstatic
 
 Collects the static files into :setting:`STATICFILES_ROOT`.
 
-Duplicate file names are resolved in a similar way to how template resolution
-works: files from apps later in :setting:`INSTALLED_APPS` overwrite those from
-earlier apps, and files from storage directories later in
-:setting:`STATICFILES_DIRS` overwrite those from earlier. If you're confused,
-the :djadmin:`findstatic` command can help show you where 
+Duplicate file names are by default resolved in a similar way to how template
+resolution works: the file that is first found in one of the specified
+locations will be used. If you're confused, the :djadmin:`findstatic` command
+can help show you which files are found.
 
-Files are searched by using the :ref:`enabled finders
-<staticfiles-finders>`. The default is to look in all locations defined in
-:ref:`staticfiles-dirs` and in the ``media`` directory of apps specified by the
-:setting:`INSTALLED_APPS` setting.
+Files are searched by using the :setting:`enabled finders
+<STATICFILES_FINDERS>`. The default is to look in all locations defined in
+:setting:`STATICFILES_DIRS` and in the ``'static'`` directory of apps
+specified by the :setting:`INSTALLED_APPS` setting.
 
 Some commonly used options are:
 
@@ -182,24 +197,24 @@ Searches for one or more relative paths with the enabled finders.
 For example::
 
    $ python manage.py findstatic css/base.css admin/js/core.js
-   /home/special.polls.com/core/media/css/base.css
-   /home/polls.com/core/media/css/base.css
+   /home/special.polls.com/core/static/css/base.css
+   /home/polls.com/core/static/css/base.css
    /home/polls.com/src/django/contrib/admin/media/js/core.js
 
 By default, all matching locations are found. To only return the first match
 for each relative path, use the ``--first`` option::
 
    $ python manage.py findstatic css/base.css --first
-   /home/special.polls.com/core/media/css/base.css
-   
+   /home/special.polls.com/core/static/css/base.css
+
 This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
 
 Other Helpers
 =============
 
-The ``media`` context processor
--------------------------------
+The ``staticfiles`` context processor
+-------------------------------------
 
 .. function:: django.contrib.staticfiles.context_processors.staticfiles
 
@@ -226,8 +241,8 @@ instead::
     {% load staticfiles %}
     <img src="{% get_staticfiles_prefix %}images/hi.jpg" />
 
-There's also a second form you can use to avoid extra processing if you need the
-value multiple times::
+There's also a second form you can use to avoid extra processing if you need
+the value multiple times::
 
     {% load staticfiles %}
     {% get_staticfiles_prefix as STATIC_PREFIX %}
@@ -244,7 +259,7 @@ Static file development view
 
 .. function:: django.contrib.staticfiles.views.serve(request, path)
 
-This view function serves static media in in development.
+This view function serves static files in development.
 
 .. warning::
 
@@ -279,5 +294,4 @@ already defined pattern list. Use it like this::
    # ... the rest of your URLconf here ...
    
    urlpatterns += staticfiles_urlpatterns()
-
 
