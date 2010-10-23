@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
 import datetime
-import models
 import unittest
-from django.db import backend, connection, DEFAULT_DB_ALIAS
+
+from django.conf import settings
+from django.db import backend, connection, DEFAULT_DB_ALIAS, IntegrityError
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql import version as pg_version
-from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
+
+import models
 
 class Callproc(unittest.TestCase):
 
@@ -141,6 +143,46 @@ class BackendTestCase(TestCase):
         cursor.executemany(query, [])
         self.assertEqual(models.Square.objects.count(), 11)
 
+
+# We don't make these tests conditional because that means we would need to
+# check and differentiate between:
+# * MySQL+InnoDB, MySQL+MYISAM (something we currently can't do).
+# * if sqlite3 (if/once we get #14204 fixed) has referential integrity turned
+#   on or not, something that would be controlled by runtime support and user
+#   preference.
+# verify if its type is django.database.db.IntegrityError.
+
+class FkConstraintsTests(TransactionTestCase):
+
+    def setUp(self):
+        # Create a Reporter.
+        self.r = models.Reporter.objects.create(first_name='John', last_name='Smith')
+
+    def test_integrity_checks_on_creation(self):
+        """
+        Try to create a model instance that violates a FK constraint. If it
+        fails it should fail with IntegrityError.
+        """
+        a = models.Article(headline="This is a test", pub_date=datetime.datetime(2005, 7, 27), reporter_id=30)
+        try:
+            a.save()
+        except IntegrityError:
+            pass
+
+    def test_integrity_checks_on_update(self):
+        """
+        Try to update a model instance introducing a FK constraint violation.
+        If it fails it should fail with IntegrityError.
+        """
+        # Create an Article.
+        models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+        # Retrive it from the DB
+        a = models.Article.objects.get(headline="Test article")
+        a.reporter_id = 30
+        try:
+            a.save()
+        except IntegrityError:
+            pass
     def test_unicode_fetches(self):
         #6254: fetchone, fetchmany, fetchall return strings as unicode objects
         qn = connection.ops.quote_name
