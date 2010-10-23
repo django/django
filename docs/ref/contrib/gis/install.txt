@@ -36,10 +36,10 @@ Requirements
 
 Python 2.4+
 -----------
-Because of heavy use of the decorator syntax, Python 2.4 is minimum
-version supported by GeoDjango. Python 2.5+ is recommended because the
-`ctypes`__ module comes included; otherwise, 2.4 users will need to
-`download and install ctypes`__.
+
+Python 2.4 is the minimum version supported by Django, however Python 2.5+ is
+recommended because the `ctypes`__ module comes included; otherwise, 2.4 users
+will need to `download and install ctypes`__.
 
 __ http://docs.python.org/lib/module-ctypes.html
 __ http://sourceforge.net/projects/ctypes/files/
