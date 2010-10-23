@@ -984,7 +984,7 @@ Generally, the default value should suffice. Only set this setting if you want
 to restrict language selection to a subset of the Django-provided languages.
 
 If you define a custom ``LANGUAGES`` setting, it's OK to mark the languages as
-translation strings (as in the default value displayed above) -- but use a
+translation strings (as in the default value referred to above) -- but use a
 "dummy" ``gettext()`` function, not the one in ``django.utils.translation``.
 You should *never* import ``django.utils.translation`` from within your
 settings file, because that module in itself depends on the settings, and that
