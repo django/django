@@ -192,3 +192,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         finally:
             self.isolation_level = level
             self.features.uses_savepoints = bool(level)
+
+    def _commit(self):
+        if self.connection is not None:
+            try:
+                return self.connection.commit()
+            except Database.IntegrityError, e:
+                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]

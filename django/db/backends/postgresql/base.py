@@ -153,6 +153,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("SET client_encoding to 'UNICODE'")
         return UnicodeCursorWrapper(cursor, 'utf-8')
 
+    def _commit(self):
+        if self.connection is not None:
+            try:
+                return self.connection.commit()
+            except Database.IntegrityError, e:
+                raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+
 def typecast_string(s):
     """
     Cast all returned strings to unicode strings.
