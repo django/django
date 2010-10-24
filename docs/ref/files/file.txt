@@ -3,100 +3,106 @@ The ``File`` object
 
 .. currentmodule:: django.core.files
 
-.. class:: File(file_object)
-
 ``File`` attributes and methods
 -------------------------------
 
-Django's ``File`` has the following attributes and methods:
+The :mod:`django.core.files` module contains a built-in class for basic file
+handling in Django. The :class:`File` class has the following attributes and
+methods:
 
-.. attribute:: File.name
+.. class:: File(file_object)
 
-    The name of file including the relative path from :setting:`MEDIA_ROOT`.
+    .. attribute:: name
 
-.. attribute:: File.path
+        The name of file including the relative path from :setting:`MEDIA_ROOT`.
 
-    The absolute path to the file's location on a local filesystem.
+    .. attribute:: path
 
-    :doc:`Custom file storage systems </howto/custom-file-storage>` may not store
-    files locally; files stored on these systems will have a ``path`` of
-    ``None``.
+        The absolute path to the file's location on a local filesystem.
 
-.. attribute:: File.url
+        :doc:`Custom file storage systems </howto/custom-file-storage>` may not store
+        files locally; files stored on these systems will have a ``path`` of
+        ``None``.
 
-    The URL where the file can be retrieved. This is often useful in
-    :doc:`templates </topics/templates>`; for example, a bit of a template for
-    displaying a ``Car`` (see above) might look like:
-    
-    .. code-block:: html+django
+    .. attribute:: url
 
-        <img src='{{ car.photo.url }}' alt='{{ car.name }}' />
+        The URL where the file can be retrieved. This is often useful in
+        :doc:`templates </topics/templates>`; for example, a bit of a template for
+        displaying a ``Car`` (see above) might look like:
+        
+        .. code-block:: html+django
 
-.. attribute:: File.size
+            <img src='{{ car.photo.url }}' alt='{{ car.name }}' />
 
-    The size of the file in bytes.
+    .. attribute:: size
 
-.. method:: File.open(mode=None)
+        The size of the file in bytes.
 
-    Open or reopen the file (which by definition also does ``File.seek(0)``).
-    The ``mode`` argument allows the same values as Python's standard
-    ``open()``.
+    .. method:: open([mode=None])
 
-    When reopening a file, ``mode`` will override whatever mode the file was
-    originally opened with; ``None`` means to reopen with the original mode.
+        Open or reopen the file (which by definition also does ``File.seek(0)``).
+        The ``mode`` argument allows the same values as Python's standard
+        ``open()``.
 
-.. method:: File.read(num_bytes=None)
+        When reopening a file, ``mode`` will override whatever mode the file was
+        originally opened with; ``None`` means to reopen with the original mode.
 
-    Read content from the file. The optional ``size`` is the number of bytes to
-    read; if not specified, the file will be read to the end.
+    .. method:: read([num_bytes=None])
 
-.. method:: File.__iter__()
+        Read content from the file. The optional ``size`` is the number of bytes to
+        read; if not specified, the file will be read to the end.
 
-    Iterate over the file yielding one line at a time.
+    .. method:: __iter__()
 
-.. method:: File.chunks(chunk_size=None)
+        Iterate over the file yielding one line at a time.
 
-    Iterate over the file yielding "chunks" of a given size. ``chunk_size``
-    defaults to 64 KB.
+    .. method:: chunks([chunk_size=None])
 
-    This is especially useful with very large files since it allows them to be
-    streamed off disk and avoids storing the whole file in memory.
+        Iterate over the file yielding "chunks" of a given size. ``chunk_size``
+        defaults to 64 KB.
 
-.. method:: File.multiple_chunks(chunk_size=None)
+        This is especially useful with very large files since it allows them to be
+        streamed off disk and avoids storing the whole file in memory.
 
-    Returns ``True`` if the file is large enough to require multiple chunks to
-    access all of its content give some ``chunk_size``.
+    .. method:: multiple_chunks([chunk_size=None])
 
-.. method:: File.write(content)
+        Returns ``True`` if the file is large enough to require multiple chunks to
+        access all of its content give some ``chunk_size``.
 
-    Writes the specified content string to the file. Depending on the storage
-    system behind the scenes, this content might not be fully committed until
-    ``close()`` is called on the file.
+    .. method:: write([content])
 
-.. method:: File.close()
+        Writes the specified content string to the file. Depending on the storage
+        system behind the scenes, this content might not be fully committed until
+        ``close()`` is called on the file.
 
-    Close the file.
+    .. method:: close()
+
+        Close the file.
+
+.. currentmodule:: django.core.files.images
 
 Additional ``ImageField`` attributes
 ------------------------------------
 
-.. attribute:: File.width
-    
-    Width of the image.
+.. class:: ImageFile(file_object)
 
-.. attribute:: File.height
+    .. attribute:: width
+        
+        Width of the image.
 
-    Height of the image.
+    .. attribute:: height
+
+        Height of the image.
+
+.. currentmodule:: django.core.files
 
 Additional methods on files attached to objects
 -----------------------------------------------
 
-.. highlight:: pycon
-
 Any :class:`File` that's associated with an object (as with ``Car.photo``,
 above) will also have a couple of extra methods:
 
-.. method:: File.save(name, content, save=True)
+.. method:: File.save(name, content, [save=True])
 
     Saves a new file with the file name and contents provided. This will not
     replace the existing file, but will create a new file and update the object
@@ -113,7 +119,7 @@ above) will also have a couple of extra methods:
     Note that the ``content`` argument must be an instance of
     :class:`File` or of a subclass of :class:`File`.
 
-.. method:: File.delete(save=True)
+.. method:: File.delete([save=True])
 
     Remove the file from the model instance and delete the underlying file. The
     ``save`` argument works as above.
