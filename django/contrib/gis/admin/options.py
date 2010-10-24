@@ -119,6 +119,6 @@ if gdal.HAS_GDAL:
         num_zoom = 20
         map_srid = 900913
         max_extent = '-20037508,-20037508,20037508,20037508'
-        max_resolution = 156543.0339
+        max_resolution = '156543.0339'
         point_zoom = num_zoom - 6
         units = 'm'
