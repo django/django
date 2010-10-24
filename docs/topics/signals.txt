@@ -46,15 +46,38 @@ You can also `define and send your own custom signals`_; see below.
 Listening to signals
 ====================
 
-To receive a signal, you need to register a *receiver* function that gets called
-when the signal is sent. Let's see how this works by registering a signal that
+To receive a signal, you need to register a *receiver* function that gets
+called when the signal is sent by using the
+:meth:`.Signal.connect` method:
+
+.. method:: Signal.connect(receiver, [sender=None, weak=True, dispatch_uid=None])
+    
+    :param receiver: The callback function which will be connected to this
+        signal. See :ref:`receiver-functions` for more information.
+    
+    :param sender: Specifies a particular sender to receive signals from. See
+        :ref:`connecting-to-specific-signals` for more information.
+
+    :param weak: Django stores signal handlers as weak references by
+        default. Thus, if your receiver is a local function, it may be
+        garbage collected. To prevent this, pass ``weak=False`` when you call
+        the signal's ``connect()`` method.
+
+    :param dispatch_uid: A unique identifier for a signal receiver in cases
+        where duplicate signals may be sent. See
+        :ref:`preventing-duplicate-signals` for more information.
+
+Let's see how this works by registering a signal that
 gets called after each HTTP request is finished. We'll be connecting to the
 :data:`~django.core.signals.request_finished` signal.
+
+.. _receiver-functions:
 
 Receiver functions
 ------------------
 
-First, we need to define a receiver function. A receiver can be any Python function or method:
+First, we need to define a receiver function. A receiver can be any Python
+function or method:
 
 .. code-block:: python
 
@@ -76,6 +99,8 @@ arguments, which means we might be tempted to write our signal handling as
 This would be wrong -- in fact, Django will throw an error if you do so. That's
 because at any point arguments could get added to the signal and your receiver
 must be able to handle those new arguments.
+
+.. _connecting-receiver-functions:
 
 Connecting receiver functions
 -----------------------------
@@ -115,6 +140,8 @@ The ``receiver`` decorator was added in Django 1.3.
     to be sent. This makes your app's ``models.py`` a good place to put
     registration of signal handlers.
 
+.. _connecting-to-specific-signals:
+
 Connecting to signals sent by specific senders
 ----------------------------------------------
 
@@ -146,10 +173,34 @@ Different signals use different objects as their senders; you'll need to consult
 the :doc:`built-in signal documentation </ref/signals>` for details of each
 particular signal.
 
+.. _preventing-duplicate-signals:
+
+Preventing duplicate signals
+----------------------------
+
+In some circumstances, the module in which you are connecting signals may be
+imported multiple times. This can cause your receiver function to be
+registered more than once, and thus called multiples times for a single signal
+event. 
+
+If this behavior is problematic (such as when using signals to
+send an e-mail whenever a model is saved), pass a unique identifier as
+the ``dispatch_uid`` argument to identify your receiver function. This
+identifier will usually be a string, although any hashable object will
+suffice. The end result is that your receiver function will only be
+bound to the signal once for each unique ``dispatch_uid`` value.
+
+.. code-block:: python
+
+    from django.core.signals import request_finished
+
+    request_finished.connect(my_callback, dispatch_uid="my_unique_identifier")
+
 Defining and sending signals
 ============================
 
-Your applications can take advantage of the signal infrastructure and provide its own signals.
+Your applications can take advantage of the signal infrastructure and provide
+its own signals.
 
 Defining signals
 ----------------
@@ -176,9 +227,14 @@ Remember that you're allowed to change this list of arguments at any time, so ge
 Sending signals
 ---------------
 
-.. method:: Signal.send(sender, **kwargs)
+There are two ways to send send signals in Django.
 
-To send a signal, call :meth:`Signal.send`. You must provide the ``sender`` argument, and may provide as many other keyword arguments as you like.
+.. method:: Signal.send(sender, **kwargs)
+.. method:: Signal.send_robust(sender, **kwargs)
+
+To send a signal, call either :meth:`Signal.send` or :meth:`Signal.send_robust`.
+You must provide the ``sender`` argument, and may provide as many other keyword
+arguments as you like.
 
 For example, here's how sending our ``pizza_done`` signal might look:
 
@@ -191,4 +247,26 @@ For example, here's how sending our ``pizza_done`` signal might look:
             pizza_done.send(sender=self, toppings=toppings, size=size)
             ...
 
+Both ``send()`` and ``send_robust()`` return a list of tuple pairs
+``[(receiver, response), ... ]``, representing the list of called receiver
+functions and their response values.
 
+``send()`` differs from ``send_robust()`` in how exceptions raised by receiver
+functions are handled. ``send()`` does *not* catch any exceptions raised by
+receivers; it simply allows errors to propagate. Thus not all receivers may
+be notified of a signal in the face of an error.
+
+``send_robust()`` catches all errors derived from Python's ``Exception`` class,
+and ensures all receivers are notified of the signal. If an error occurs, the
+error instance is returned in the tuple pair for the receiver that raised the error.
+
+Disconnecting signals
+=====================
+
+.. method:: Signal.disconnect([receiver=None, sender=None, weak=True, dispatch_uid=None])
+
+To disconnect a receiver from a signal, call :meth:`Signal.disconnect`. The
+arguments are as described in :meth:`.Signal.connect`.
+
+The *receiver* argument indicates the registered receiver to disconnect. It may
+be ``None`` if ``dispatch_uid`` is used to identify the receiver.
