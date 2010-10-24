@@ -2,7 +2,7 @@
 Authentication using ``REMOTE_USER``
 ====================================
 
-.. currentmodule:: django.contrib.backends
+.. currentmodule:: django.contrib.auth.backends
 
 This document describes how to make use of external authentication sources
 (where the Web server sets the ``REMOTE_USER`` environment variable) in your
@@ -68,7 +68,7 @@ If your authentication mechanism uses a custom HTTP header and not
 ``RemoteUserBackend``
 =====================
 
-.. class:: django.contrib.backends.RemoteUserBackend
+.. class:: django.contrib.auth.backends.RemoteUserBackend
 
 If you need more control, you can create your own authentication backend
 that inherits from ``RemoteUserBackend`` and overrides certain parts:
