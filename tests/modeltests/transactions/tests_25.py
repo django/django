@@ -79,6 +79,20 @@ class TransactionContextManagerTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     @skipUnlessDBFeature('supports_transactions')
+    def test_commit_on_success_exit(self):
+        with transaction.autocommit():
+            with transaction.commit_on_success():
+                Reporter.objects.create(first_name="Bobby", last_name="Tables")
+
+            # Much more formal
+            r = Reporter.objects.get()
+            r.first_name = "Robert"
+            r.save()
+
+        r = Reporter.objects.get()
+        self.assertEqual(r.first_name, "Robert")
+
+    @skipUnlessDBFeature('supports_transactions')
     def test_manually_managed(self):
         """
         You can manually manage transactions if you really want to, but you

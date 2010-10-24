@@ -114,6 +114,25 @@ class TransactionTests(TransactionTestCase):
         self.assertEqual(list(Reporter.objects.all()), [])
 
     @skipUnlessDBFeature('supports_transactions')
+    def test_commit_on_success_exit(self):
+        @transaction.autocommit()
+        def gen_reporter():
+            @transaction.commit_on_success
+            def create_reporter():
+                Reporter.objects.create(first_name="Bobby", last_name="Tables")
+
+            create_reporter()
+            # Much more formal
+            r = Reporter.objects.get()
+            r.first_name = "Robert"
+            r.save()
+
+        gen_reporter()
+        r = Reporter.objects.get()
+        self.assertEqual(r.first_name, "Robert")
+
+
+    @skipUnlessDBFeature('supports_transactions')
     def test_manually_managed(self):
         """
         You can manually manage transactions if you really want to, but you
@@ -145,6 +164,7 @@ class TransactionTests(TransactionTestCase):
         self.assertRaises(transaction.TransactionManagementError,
             using_manually_managed_mistake
         )
+
 
 class TransactionRollbackTests(TransactionTestCase):
     def execute_bad_sql(self):

@@ -345,16 +345,19 @@ def commit_on_success(using=None):
         managed(True, using=using)
 
     def exiting(exc_value, using):
-        if exc_value is not None:
-            if is_dirty(using=using):
-                rollback(using=using)
-        else:
-            if is_dirty(using=using):
-                try:
-                    commit(using=using)
-                except:
+        try:
+            if exc_value is not None:
+                if is_dirty(using=using):
                     rollback(using=using)
-                    raise
+            else:
+                if is_dirty(using=using):
+                    try:
+                        commit(using=using)
+                    except:
+                        rollback(using=using)
+                        raise
+        finally:
+            leave_transaction_management(using=using)
 
     return _transaction_func(entering, exiting, using)
 
