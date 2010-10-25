@@ -66,6 +66,9 @@ Adds a few conveniences for perfectionists:
       indexer would treat them as separate URLs -- so it's best practice to
       normalize URLs.
 
+    * Sends broken link notification emails to :setting:`MANAGERS` if
+      :setting:`SEND_BROKEN_LINK_EMAILS` is set to ``True``.
+
     * Handles ETags based on the :setting:`USE_ETAGS` setting. If
       :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
       for each request by MD5-hashing the page content, and it'll take care of
