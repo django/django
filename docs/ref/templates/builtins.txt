@@ -1151,17 +1151,17 @@ If ``value`` is a ``datetime`` object (e.g., the result of
 ``datetime.datetime.now()``), the output will be the string
 ``'Wed 09 Jan 2008'``.
 
-Given format can be one of the predefined ones ``DATE_FORMAT``,
-``DATETIME_FORMAT``, ``SHORT_DATE_FORMAT`` or ``SHORT_DATETIME_FORMAT``,
-or a custom format, same as the :ttag:`now` tag. Note that predefined formats
-may vary depending on the current locale.
+The format passed can be one of the predefined ones ``DATE_FORMAT``,
+``DATETIME_FORMAT``, ``SHORT_DATE_FORMAT`` or ``SHORT_DATETIME_FORMAT``, or a
+custom format that uses the format specifiers shown in the table above. Note
+that predefined formats may vary depending on the current locale.
 
 Assuming that :setting:`USE_L10N` is ``True`` and :setting:`LANGUAGE_CODE` is,
 for example, ``"es"``, then for::
 
     {{ value|date:"SHORT_DATE_FORMAT" }}
 
-the output will be the string ``"09/01/2008"`` (The ``"SHORT_DATE_FORMAT"``
+the output would be the string ``"09/01/2008"`` (the ``"SHORT_DATE_FORMAT"``
 format specifier for the ``es`` locale as shipped with Django is ``"d/m/Y"``).
 
 When used without a format string::
