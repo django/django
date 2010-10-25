@@ -790,7 +790,7 @@ difference between this case and the previous ``inclusion_tag`` example.
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The above example simply output a value. Generally, it's more flexible if your
+The above examples simply output a value. Generally, it's more flexible if your
 template tags set template variables instead of outputting values. That way,
 template authors can reuse the values that your template tags create.
 
@@ -815,6 +815,13 @@ Here's how you'd use this new version of the tag:
 .. code-block:: html+django
 
     {% current_time "%Y-%M-%d %I:%M %p" %}<p>The time is {{ current_time }}.</p>
+
+.. admonition:: Variable scope in context
+
+    Any variable set in the context will only be available in the same ``block``
+    of the template in which it was assigned. This behaviour is intentional;
+    it provides a scope for variables so that they don't conflict with
+    context in other blocks.
 
 But, there's a problem with ``CurrentTimeNode2``: The variable name
 ``current_time`` is hard-coded. This means you'll need to make sure your
