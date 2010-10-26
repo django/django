@@ -26,7 +26,7 @@ that can easily be served in production.
     ``django.contrib.staticfiles`` will look very familiar. That's because
     they're essentially the same code: ``django.contrib.staticfiles`` started
     its life as `django-staticfiles`_ and was merged into Django 1.3.
-    
+
     If you're upgrading from ``django-staticfiles``, please see `Upgrading from
     django-staticfiles`_, below, for a few minor changes you'll need to make.
 
@@ -252,7 +252,7 @@ __ http://fabfile.org/
 
 Below, and in the following sections, we'll show off a few example fabfiles
 (i.e. Fabric scripts) that automate these media deployment options. The syntax
-of a fabfile is fairly streightforward but won't be covered here; consult
+of a fabfile is fairly straightforward but won't be covered here; consult
 `Fabric's documentation`__, for a complete explanation of the syntax..
 
 __ http://docs.fabfile.org/
@@ -385,14 +385,14 @@ you'll need to make a few changes:
     * The settings ``STATICFILES_PREPEND_LABEL_APPS``,
       ``STATICFILES_MEDIA_DIRNAMES`` and ``STATICFILES_EXCLUDED_APPS`` were
       removed.
-      
+
     * The setting ``STATICFILES_RESOLVERS`` was removed, and replaced by the new
       :setting:`STATICFILES_FINDERS`.
-      
+
     * The default for :setting:`STATICFILES_STORAGE` was renamed from
       ``staticfiles.storage.StaticFileStorage`` to
       ``staticfiles.storage.StaticFilesStorage``
-      
+
 Learn more
 ==========
 
