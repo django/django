@@ -239,7 +239,7 @@ If you want to serve your media from the same server that's already serving your
 app, the basic outline gets modified to look something like:
 
     * Push your code up to the deployment server.
-    * On the server, run :djadmin:`collectmedia` to move all the media into
+    * On the server, run :djadmin:`collectstatic` to move all the media into
       :setting:`STATICFILES_ROOT`.
     * Point your web server at :setting:`STATICFILES_ROOT`. For example, here's
       of :ref:`how to do this under Apache and mod_wsgi <serving-media-files>`.
