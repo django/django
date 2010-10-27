@@ -1174,22 +1174,21 @@ Customizing the test client
 
 .. attribute:: TestCase.client_class
 
-If you want to use a different Client class (for example, a subclass
-with customized behavior), you can use the
-:attr:`~TestCase.client_class` class attribute to specify a custom
-``Client`` class in your test case::
+If you want to use a different ``Client`` class (for example, a subclass
+with customized behavior), use the :attr:`~TestCase.client_class` class
+attribute::
 
     from django.test import TestCase
     from django.test.client import Client
 
     class MyTestClient(Client):
-        # .. specialized methods for your environment ..
+        # Specialized methods for your environment...
 
     class MyTest(TestCase):
         client_class = MyTestClient
 
         def test_my_stuff(self):
-            # .. Here self.client is an instance of MyTestClient ..
+            # Here self.client is an instance of MyTestClient...
 
 .. _topics-testing-fixtures:
 
