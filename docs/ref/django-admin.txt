@@ -508,6 +508,115 @@ supports the FastCGI protocol. See the :doc:`FastCGI deployment documentation
 
 .. _flup: http://www.saddi.com/software/flup/
 
+The options accepted by this command are passed to the FastCGI library and
+don't use the ``'--'`` prefix as is usual for other Django management commands.
+
+.. django-admin-option:: protocol
+
+``protocol=PROTOCOL``
+
+Protocol to use. *PROTOCOL* can be ``fcgi``, ``scgi``, ``ajp``, etc.
+(default is ``fcgi``)
+
+.. django-admin-option:: host
+
+``host=HOSTNAME``
+
+Hostname to listen on.
+
+.. django-admin-option:: port
+
+``port=PORTNUM``
+
+Port to listen on.
+
+.. django-admin-option:: socket
+
+``socket=FILE``
+
+UNIX socket to listen on.
+
+.. django-admin-option:: method
+
+``method=IMPL``
+
+Possible values: ``prefork`` or ``threaded`` (default ``prefork``)
+
+.. django-admin-option:: maxrequests
+
+``maxrequests=NUMBER``
+
+Number of requests a child handles before it is killed and a new child is
+forked (0 means no limit).
+
+.. django-admin-option:: maxspare
+
+``maxspare=NUMBER``
+
+Max number of spare processes / threads.
+
+.. django-admin-option:: minspare
+
+``minspare=NUMBER``
+
+Min number of spare processes / threads.
+
+.. django-admin-option:: maxchildren
+
+``maxchildren=NUMBER``
+
+Hard limit number of processes / threads.
+
+.. django-admin-option:: daemonize
+
+``daemonize=BOOL``
+
+Whether to detach from terminal.
+
+.. django-admin-option:: pidfile
+
+``pidfile=FILE``
+
+Write the spawned process-id to file *FILE*.
+
+.. django-admin-option:: workdir
+
+``workdir=DIRECTORY``
+
+Change to directory *DIRECTORY* when daemonizing.
+
+.. django-admin-option:: debug
+
+``debug=BOOL``
+
+Set to true to enable flup tracebacks.
+
+.. django-admin-option:: outlog
+
+``outlog=FILE``
+
+Write stdout to the *FILE* file.
+
+.. django-admin-option:: errlog
+
+``errlog=FILE``
+
+Write stderr to the *FILE* file.
+
+.. django-admin-option:: umask
+
+``umask=UMASK``
+
+Umask to use when daemonizing. The value is interpeted as an octal number
+(default value is ``022``).
+
+Example usage::
+
+    django-admin.py runfcgi socket=/tmp/fcgi.sock method=prefork daemonize=true \
+        pidfile=/var/run/django-fcgi.pid
+
+Run a FastCGI server as a daemon and write the spawned PID in a file.
+
 runserver [port or ipaddr:port]
 -------------------------------
 

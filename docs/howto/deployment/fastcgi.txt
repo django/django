@@ -79,19 +79,19 @@ your :doc:`manage.py </ref/django-admin>` is), and then run the
 If you specify ``help`` as the only option after :djadmin:`runfcgi`, it'll
 display a list of all the available options.
 
-You'll need to specify either a ``socket``, a ``protocol`` or both ``host`` and
-``port``. Then, when you set up your Web server, you'll just need to point it at
-the host/port or socket you specified when starting the FastCGI server. See the
-examples_, below.
+You'll need to specify either a :djadminopt:`socket`, a :djadminopt:`protocol`
+or both :djadminopt:`host` and :djadminopt:`port`. Then, when you set up your
+Web server, you'll just need to point it at the host/port or socket you
+specified when starting the FastCGI server. See the examples_, below.
 
 Protocols
 ---------
 
 Django supports all the protocols that flup_ does, namely fastcgi_, `SCGI`_ and
 `AJP1.3`_ (the Apache JServ Protocol, version 1.3). Select your preferred
-protocol by using the ``protocol=<protocol_name>`` option with ``./manage.py
-runfcgi`` -- where ``<protocol_name>`` may be one of: ``fcgi`` (the default),
-``scgi`` or ``ajp``. For example::
+protocol by using the :djadminopt:`protocol=\<protocol_name\> <protocol>` option
+with ``./manage.py runfcgi`` -- where ``<protocol_name>`` may be one of:
+``fcgi`` (the default), ``scgi`` or ``ajp``. For example::
 
     ./manage.py runfcgi protocol=scgi
 
@@ -131,8 +131,8 @@ Simply hitting ``Ctrl-C`` will stop and quit the FastCGI server. However, when
 you're dealing with background processes, you'll need to resort to the Unix
 ``kill`` command.
 
-If you specify the ``pidfile`` option to :djadmin:`runfcgi`, you can kill the
-running FastCGI daemon like this::
+If you specify the :djadminopt:`pidfile` option to :djadmin:`runfcgi`, you can
+kill the running FastCGI daemon like this::
 
     kill `cat $PIDFILE`
 
@@ -389,7 +389,7 @@ prefix automatically.
 
 In the cases where Django cannot work out the prefix correctly and where you
 want the original value to be used in URLs, you can set the
-``FORCE_SCRIPT_NAME`` setting in your main ``settings`` file. This sets the
+:setting:`FORCE_SCRIPT_NAME` setting in your main ``settings`` file. This sets the
 script name uniformly for every URL served via that settings file. Thus you'll
 need to use different settings files if you want different sets of URLs to
 have different script names in this case, but that is a rare situation.

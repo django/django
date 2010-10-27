@@ -2,6 +2,7 @@
 Sphinx plugins for Django documentation.
 """
 import os
+import re
 
 from docutils import nodes, transforms
 try:
@@ -21,6 +22,9 @@ from sphinx.writers.html import SmartyPantsHTMLTranslator
 from sphinx.util.console import bold
 from sphinx.util.compat import Directive
 
+# RE for option descriptions without a '--' prefix
+simple_option_desc_re = re.compile(
+    r'([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)')
 
 def setup(app):
     app.add_crossref_type(
@@ -207,6 +211,16 @@ def parse_django_adminopt_node(env, sig, signode):
         if not count:
             firstname = optname
         count += 1
+    if not count:
+        for m in simple_option_desc_re.finditer(sig):
+            optname, args = m.groups()
+            if count:
+                signode += addnodes.desc_addname(', ', ', ')
+            signode += addnodes.desc_name(optname, optname)
+            signode += addnodes.desc_addname(args, args)
+            if not count:
+                firstname = optname
+            count += 1
     if not firstname:
         raise ValueError
     return firstname
