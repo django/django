@@ -27,22 +27,22 @@ FASTCGI_HELP = r"""
 
 Optional Fcgi settings: (setting=value)
   protocol=PROTOCOL    fcgi, scgi, ajp, ... (default fcgi)
-  host=HOSTNAME        hostname to listen on..
+  host=HOSTNAME        hostname to listen on.
   port=PORTNUM         port to listen on.
   socket=FILE          UNIX socket to listen on.
-  method=IMPL          prefork or threaded (default prefork)
-  maxrequests=NUMBER   number of requests a child handles before it is 
+  method=IMPL          prefork or threaded (default prefork).
+  maxrequests=NUMBER   number of requests a child handles before it is
                        killed and a new child is forked (0 = no limit).
-  maxspare=NUMBER      max number of spare processes / threads
+  maxspare=NUMBER      max number of spare processes / threads.
   minspare=NUMBER      min number of spare processes / threads.
-  maxchildren=NUMBER   hard limit number of processes / threads
+  maxchildren=NUMBER   hard limit number of processes / threads.
   daemonize=BOOL       whether to detach from terminal.
   pidfile=FILE         write the spawned process-id to this file.
   workdir=DIRECTORY    change to this directory when daemonizing.
-  debug=BOOL           set to true to enable flup tracebacks
+  debug=BOOL           set to true to enable flup tracebacks.
   outlog=FILE          write stdout to this file.
   errlog=FILE          write stderr to this file.
-  umask=UMASK          umask to use when daemonizing (default 022).
+  umask=UMASK          umask to use when daemonizing, in octal notation (default 022).
 
 Examples:
   Run a "standard" fastcgi process on a file-descriptor
@@ -166,7 +166,7 @@ def runfastcgi(argset=[], **kwargs):
     if options['errlog']:
         daemon_kwargs['err_log'] = options['errlog']
     if options['umask']:
-        daemon_kwargs['umask'] = int(options['umask'])
+        daemon_kwargs['umask'] = int(options['umask'], 8)
 
     if daemonize:
         from django.utils.daemonize import become_daemon
