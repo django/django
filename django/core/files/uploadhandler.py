@@ -109,7 +109,7 @@ class FileUploadHandler(object):
         Signal that a file has completed. File size corresponds to the actual
         size accumulated by all the chunks.
 
-        Subclasses must should return a valid ``UploadedFile`` object.
+        Subclasses should return a valid ``UploadedFile`` object.
         """
         raise NotImplementedError()
 
