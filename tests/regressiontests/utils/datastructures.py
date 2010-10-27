@@ -4,6 +4,7 @@ Tests for stuff in django.utils.datastructures.
 import pickle
 import unittest
 
+from django.utils.copycompat import copy
 from django.utils.datastructures import *
 
 
@@ -210,6 +211,26 @@ class MultiValueDictTests(DatastructuresTestCase):
         self.assertEquals(d.values(), ['Developer', 'Simon', 'Willison'])
         self.assertEquals(list(d.itervalues()),
                           ['Developer', 'Simon', 'Willison'])
+
+    def test_copy(self):
+        for copy_func in [copy, lambda d: d.copy()]:
+            d1 = MultiValueDict({
+                "developers": ["Carl", "Fred"]
+            })
+            self.assertEqual(d1["developers"], "Fred")
+            d2 = copy_func(d1)
+            d2.update({"developers": "Groucho"})
+            self.assertEqual(d2["developers"], "Groucho")
+            self.assertEqual(d1["developers"], "Fred")
+
+            d1 = MultiValueDict({
+                "key": [[]]
+            })
+            self.assertEqual(d1["key"], [])
+            d2 = copy_func(d1)
+            d2["key"].append("Penguin")
+            self.assertEqual(d1["key"], ["Penguin"])
+            self.assertEqual(d2["key"], ["Penguin"])
 
 
 class DotExpandedDictTests(DatastructuresTestCase):
