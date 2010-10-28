@@ -178,7 +178,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         """
         Obtain the list of dates and itesm
         """
-        raise NotImplemented('A DateView must provide an implementaiton of get_dated_items()')
+        raise NotImplementedError('A DateView must provide an implementation of get_dated_items()')
 
     def get_dated_queryset(self, **lookup):
         """
