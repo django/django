@@ -14,6 +14,22 @@ CsrfViewMiddleware, but it can be used on a per view basis.  Using both, or
 using the decorator multiple times, is harmless and efficient.
 """
 
+
+class _EnsureCsrfToken(CsrfViewMiddleware):
+    # We need this to behave just like the CsrfViewMiddleware, but not reject
+    # requests.
+    def _reject(self, request, reason):
+        return None
+
+
+requires_csrf_token = decorator_from_middleware(_EnsureCsrfToken)
+requires_csrf_token.__name__ = 'requires_csrf_token'
+csrf_protect.__doc__ = """
+Use this decorator on views that need a correct csrf_token available to
+RequestContext, but without the CSRF protection that csrf_protect
+enforces.
+"""
+
 def csrf_response_exempt(view_func):
     """
     Modifies a view function so that its response is exempt

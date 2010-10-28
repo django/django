@@ -84,16 +84,20 @@ class CsrfViewMiddleware(object):
     This middleware should be used in conjunction with the csrf_token template
     tag.
     """
+    # The _accept and _reject methods currently only exist for the sake of the
+    # requires_csrf_token decorator.
+    def _accept(self, request):
+        # Avoid checking the request twice by adding a custom attribute to
+        # request.  This will be relevant when both decorator and middleware
+        # are used.
+        request.csrf_processing_done = True
+        return None
+
+    def _reject(self, request, reason):
+        return _get_failure_view()(request, reason=reason)
+
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if getattr(request, 'csrf_processing_done', False):
-            return None
-
-        reject = lambda s: _get_failure_view()(request, reason=s)
-        def accept():
-            # Avoid checking the request twice by adding a custom attribute to
-            # request.  This will be relevant when both decorator and middleware
-            # are used.
-            request.csrf_processing_done = True
             return None
 
         # If the user doesn't have a CSRF cookie, generate one and store it in the
@@ -124,7 +128,7 @@ class CsrfViewMiddleware(object):
                 # the creation of CSRF cookies, so that everything else continues to
                 # work exactly the same (e.g. cookies are sent etc), but before the
                 # any branches that call reject()
-                return accept()
+                return self._accept(request)
 
             if request.is_ajax():
                 # .is_ajax() is based on the presence of X-Requested-With.  In
@@ -149,20 +153,20 @@ class CsrfViewMiddleware(object):
                 #      allowing the cross-domain POST request.
                 #
                 # So in all cases, it is safe to allow these requests through.
-                return accept()
+                return self._accept(request)
 
             if request.is_secure():
                 # Strict referer checking for HTTPS
                 referer = request.META.get('HTTP_REFERER')
                 if referer is None:
-                    return reject(REASON_NO_REFERER)
+                    return self._reject(request, REASON_NO_REFERER)
 
                 # The following check ensures that the referer is HTTPS,
                 # the domains match and the ports match.  This might be too strict.
                 good_referer = 'https://%s/' % request.get_host()
                 if not referer.startswith(good_referer):
-                    return reject(REASON_BAD_REFERER %
-                                  (referer, good_referer))
+                    return self._reject(request, REASON_BAD_REFERER %
+                                        (referer, good_referer))
 
             # If the user didn't already have a CSRF cookie, then fall back to
             # the Django 1.1 method (hash of session ID), so a request is not
@@ -176,7 +180,7 @@ class CsrfViewMiddleware(object):
                     # No CSRF cookie and no session cookie. For POST requests,
                     # we insist on a CSRF cookie, and in this way we can avoid
                     # all CSRF attacks, including login CSRF.
-                    return reject(REASON_NO_COOKIE)
+                    return self._reject(request, REASON_NO_COOKIE)
             else:
                 csrf_token = request.META["CSRF_COOKIE"]
 
@@ -185,11 +189,11 @@ class CsrfViewMiddleware(object):
             if request_csrf_token != csrf_token:
                 if cookie_is_new:
                     # probably a problem setting the CSRF cookie
-                    return reject(REASON_NO_CSRF_COOKIE)
+                    return self._reject(request, REASON_NO_CSRF_COOKIE)
                 else:
-                    return reject(REASON_BAD_TOKEN)
+                    return self._reject(request, REASON_BAD_TOKEN)
 
-        return accept()
+        return self._accept(request)
 
     def process_response(self, request, response):
         if getattr(response, 'csrf_processing_done', False):
