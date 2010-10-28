@@ -435,8 +435,9 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 value of the :setting:`MEDIA_URL` setting.
 
 .. versionchanged:: 1.3
-    This context processor has been moved to the new :ref:`staticfiles` app.
-    Please use the new ``django.contrib.staticfiles.context_processors.staticfiles``
+    This context processor has been moved to the new
+    :doc:`/ref/contrib/staticfiles` app. Please use the new
+    ``django.contrib.staticfiles.context_processors.staticfiles``
     context processor.
 
 django.core.context_processors.csrf

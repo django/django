@@ -84,9 +84,9 @@ objects are changed or none of them are.
 
 .. admonition:: This is database-level autocommit
 
-    This functionality is not the same as the
-    :ref:`topics-db-transactions-autocommit` decorator. That decorator
-    is a Django-level implementation that commits automatically after
+    This functionality is not the same as the :ref:`autocommit
+    <topics-db-transactions-autocommit>` decorator. That decorator is
+    a Django-level implementation that commits automatically after
     data changing operations. The feature enabled using the
     :setting:`OPTIONS` option provides autocommit behavior at the
     database adapter level. It commits after *every* operation.
