@@ -33,8 +33,8 @@ class FormMixin(object):
         """
         if self.request.method in ('POST', 'PUT'):
             return form_class(
-                self.request.POST,
-                self.request.FILES,
+                data=self.request.POST,
+                files=self.request.FILES,
                 initial=self.get_initial()
             )
         else:
@@ -84,8 +84,8 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         """
         if self.request.method in ('POST', 'PUT'):
             return form_class(
-                self.request.POST,
-                self.request.FILES,
+                data=self.request.POST,
+                files=self.request.FILES,
                 initial=self.get_initial(),
                 instance=self.object,
             )
