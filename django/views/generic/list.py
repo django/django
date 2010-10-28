@@ -77,7 +77,7 @@ class MultipleObjectMixin(object):
         """
         Get the context for this view.
         """
-        queryset = kwargs.get('object_list')
+        queryset = kwargs.pop('object_list')
         page_size = self.get_paginate_by(queryset)
         if page_size:
             paginator, page, queryset, is_paginated = self.paginate_queryset(queryset, page_size)
