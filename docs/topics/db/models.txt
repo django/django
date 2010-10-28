@@ -1076,7 +1076,7 @@ attribute when you use the proxy. This is easy::
             ordering = ["username"]
             proxy = True
 
-Now normal ``User`` queries will be unorderd and ``OrderedUser`` queries will
+Now normal ``User`` queries will be unordered and ``OrderedUser`` queries will
 be ordered by ``username``.
 
 QuerySets still return the model that was requested
