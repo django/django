@@ -9,6 +9,8 @@ from regressiontests.views.models import Author, Article, UrlArticle
 class DefaultsTests(TestCase):
     """Test django views in django/views/defaults.py"""
     fixtures = ['testdata.json']
+    non_existing_urls = ['/views/non_existing_url/', # this is in urls.py
+                         '/views/other_non_existing_url/'] # this NOT in urls.py
 
     def test_shortcut_with_absolute_url(self):
         "Can view a shortcut for an Author object that has a get_absolute_url method"
@@ -49,11 +51,20 @@ class DefaultsTests(TestCase):
 
     def test_page_not_found(self):
         "A 404 status is returned by the page_not_found view"
-        non_existing_urls = ['/views/non_existing_url/', # this is in urls.py
-                             '/views/other_non_existing_url/'] # this NOT in urls.py
-        for url in non_existing_urls:
+        for url in self.non_existing_urls:
             response = self.client.get(url)
             self.assertEquals(response.status_code, 404)
+
+    def test_csrf_token_in_404(self):
+        """
+        The 404 page should have the csrf_token available in the context
+        """
+        # See ticket #14565
+        for url in self.non_existing_urls:
+            response = self.client.get(url)
+            csrf_token = response.context['csrf_token']
+            self.assertNotEqual(str(csrf_token), 'NOTPROVIDED')
+            self.assertNotEqual(str(csrf_token), '')
 
     def test_server_error(self):
         "The server_error view raises a 500 status"
