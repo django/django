@@ -185,7 +185,7 @@ class BaseDatabaseFeatures(object):
 
         try:
             self.connection.ops.check_aggregate_support(StdDevPop())
-        except DatabaseError:
+        except NotImplementedError:
             self.supports_stddev = False
 
 
