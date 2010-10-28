@@ -183,6 +183,32 @@ command::
 
     python manage.py sqlindexes sessions
 
+No more naughty words
+~~~~~~~~~~~~~~~~~~~~~
+
+Django has historically provided (and enforced) a list of profanities.
+The :doc:`comments app </ref/contrib/comments/index>` has enforced this
+list of profanities, preventing people from submitting comments that
+contained one of those profanities.
+
+Unfortunately, the technique used to implement this profanities list
+was woefully naive, and prone to the `Scunthorpe problem`_. Fixing the
+built in filter to fix this problem would require significant effort,
+and since natural language processing isn't the normal domain of a web
+framework, we have "fixed" the problem by making the list of
+prohibited words an empty list.
+
+If you want to restore the old behavior, simply put a
+``PROFANITIES_LIST`` setting in your settings file that includes the
+words that you want to prohibit (see the `commit that implemented this
+change`_ if you want to see the list of words that was historically
+prohibited). However, if avoiding profanities is important to you, you
+would be well advised to seek out a better, less naive approach to the
+problem.
+
+.. _Scunthorpe problem: http://en.wikipedia.org/wiki/Scunthorpe_problem
+.. _commit that implemented this change: http://code.djangoproject.com/changeset/13996
+
 .. _deprecated-features-1.3:
 
 Features deprecated in 1.3
