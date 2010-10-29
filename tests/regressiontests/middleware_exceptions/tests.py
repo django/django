@@ -6,8 +6,12 @@ from django.core.signals import got_request_exception
 class TestException(Exception):
     pass
 
-class TestMiddleware(object):
+class TestRequestMiddleware(object):
     def process_request(self, request):
+        raise TestException('Test Exception')
+
+class TestResponseMiddleware(object):
+    def process_response(self, request, response):
         raise TestException('Test Exception')
 
 class MiddlewareExceptionTest(TestCase):
@@ -23,12 +27,11 @@ class MiddlewareExceptionTest(TestCase):
     def _on_request_exception(self, sender, request, **kwargs):
         self.exceptions.append(sys.exc_info())
 
-    def test_process_request(self):
-        self.client.handler._request_middleware.insert(0, TestMiddleware().process_request)
+    def _assert_exception_handled(self):
         try:
-            response = self.client.get('/')
+            response = self.client.get('/middleware_exceptions/')
         except TestException, e:
-            # Test client indefinitely re-raises any exceptions being raised
+            # Test client intentionally re-raises any exceptions being raised
             # during request handling. Hence actual testing that exception was
             # properly handled is done by relying on got_request_exception
             # signal being sent.
@@ -38,3 +41,11 @@ class MiddlewareExceptionTest(TestCase):
         self.assertEquals(len(self.exceptions), 1)
         exception, value, tb = self.exceptions[0]
         self.assertEquals(value.args, ('Test Exception', ))
+
+    def test_process_request(self):
+        self.client.handler._request_middleware.insert(0, TestRequestMiddleware().process_request)
+        self._assert_exception_handled()
+
+    def test_process_response(self):
+        self.client.handler._response_middleware.insert(0, TestResponseMiddleware().process_response)
+        self._assert_exception_handled()

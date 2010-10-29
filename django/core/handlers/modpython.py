@@ -215,11 +215,6 @@ class ModPythonHandler(BaseHandler):
                 response = http.HttpResponseBadRequest()
             else:
                 response = self.get_response(request)
-
-                # Apply response middleware
-                for middleware_method in self._response_middleware:
-                    response = middleware_method(request, response)
-                response = self.apply_response_fixes(request, response)
         finally:
             signals.request_finished.send(sender=self.__class__)
 

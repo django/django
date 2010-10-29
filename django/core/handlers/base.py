@@ -120,6 +120,11 @@ class BaseHandler(object):
                         view_name = callback.__class__.__name__ + '.__call__' # If it's a class
                     raise ValueError("The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name))
 
+                # Apply response middleware
+                for middleware_method in self._response_middleware:
+                    response = middleware_method(request, response)
+                response = self.apply_response_fixes(request, response)
+
                 return response
             except http.Http404, e:
                 logger.warning('Not Found: %s' % request.path,
