@@ -453,6 +453,33 @@ class FormattingTests(TestCase):
             settings.FORMAT_MODULE_PATH = old_format_module_path
             deactivate()
 
+    def test_localize_templatetag_and_filter(self):
+        """
+        Tests the {% localize %} templatetag
+        """
+        context = Context({'value': 3.14 })
+        template1 = Template("{% load l10n %}{% localize %}{{ value }}{% endlocalize %};{% localize on %}{{ value }}{% endlocalize %}")
+        template2 = Template("{% load l10n %}{{ value }};{% localize off %}{{ value }};{% endlocalize %}{{ value }}")
+        template3 = Template('{% load l10n %}{{ value }};{{ value|unlocalize }}')
+        template4 = Template('{% load l10n %}{{ value }};{{ value|localize }}')
+        output1 = '3,14;3,14'
+        output2 = '3,14;3.14;3,14'
+        output3 = '3,14;3.14'
+        output4 = '3.14;3,14'
+        old_localize = settings.USE_L10N
+        try:
+            activate('de')
+            settings.USE_L10N = False
+            self.assertEqual(template1.render(context), output1)
+            self.assertEqual(template4.render(context), output4)
+            settings.USE_L10N = True
+            self.assertEqual(template1.render(context), output1)
+            self.assertEqual(template2.render(context), output2)
+            self.assertEqual(template3.render(context), output3)
+        finally:
+            deactivate()
+            settings.USE_L10N = old_localize
+
 class MiscTests(TestCase):
 
     def test_parse_spec_http_header(self):

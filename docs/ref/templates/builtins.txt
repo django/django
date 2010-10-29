@@ -2113,3 +2113,12 @@ Django templates. It is slightly different from the libraries described
 above because you don't need to add any application to the ``INSTALLED_APPS``
 setting but rather set :setting:`USE_I18N` to True, then loading it with
 ``{% load i18n %}``. See :ref:`specifying-translation-strings-in-template-code`.
+
+l10n
+~~~~
+
+Provides a couple of templatetags that allow control over the localization of
+values in Django templates. It is slightly different from the libraries described
+above because you don't need to add any application to the ``INSTALLED_APPS``;
+you only need to load the library using ``{% load l10n %}``. See
+:ref:`topic-l10n-templates`.

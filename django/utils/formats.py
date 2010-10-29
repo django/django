@@ -41,14 +41,17 @@ def get_format_modules(reverse=False):
         modules.reverse()
     return modules
 
-def get_format(format_type, lang=None):
+def get_format(format_type, lang=None, use_l10n=None):
     """
     For a specific format type, returns the format for the current
     language (locale), defaults to the format in the settings.
     format_type is the name of the format, e.g. 'DATE_FORMAT'
+
+    If use_l10n is provided and is not None, that will force the value to
+    be localized (or not), overriding the value of settings.USE_L10N.
     """
     format_type = smart_str(format_type)
-    if settings.USE_L10N:
+    if use_l10n or (use_l10n is None and settings.USE_L10N):
         if lang is None:
             lang = get_language()
         cache_key = (format_type, lang)
@@ -65,48 +68,60 @@ def get_format(format_type, lang=None):
             _format_cache[cache_key] = None
     return getattr(settings, format_type)
 
-def date_format(value, format=None):
+def date_format(value, format=None, use_l10n=None):
     """
     Formats a datetime.date or datetime.datetime object using a
     localizable format
-    """
-    return dateformat.format(value, get_format(format or 'DATE_FORMAT'))
 
-def time_format(value, format=None):
+    If use_l10n is provided and is not None, that will force the value to
+    be localized (or not), overriding the value of settings.USE_L10N.
+    """
+    return dateformat.format(value, get_format(format or 'DATE_FORMAT', use_l10n=use_l10n))
+
+def time_format(value, format=None, use_l10n=None):
     """
     Formats a datetime.time object using a localizable format
-    """
-    return dateformat.time_format(value, get_format(format or 'TIME_FORMAT'))
 
-def number_format(value, decimal_pos=None):
+    If use_l10n is provided and is not None, that will force the value to
+    be localized (or not), overriding the value of settings.USE_L10N.
+    """
+    return dateformat.time_format(value, get_format(format or 'TIME_FORMAT', use_l10n=use_l10n))
+
+def number_format(value, decimal_pos=None, use_l10n=None):
     """
     Formats a numeric value using localization settings
+
+    If use_l10n is provided and is not None, that will force the value to
+    be localized (or not), overriding the value of settings.USE_L10N.
     """
-    if settings.USE_L10N:
+    if use_l10n or (use_l10n is None and settings.USE_L10N):
         lang = get_language()
     else:
         lang = None
     return numberformat.format(
         value,
-        get_format('DECIMAL_SEPARATOR', lang),
+        get_format('DECIMAL_SEPARATOR', lang, use_l10n=use_l10n),
         decimal_pos,
-        get_format('NUMBER_GROUPING', lang),
-        get_format('THOUSAND_SEPARATOR', lang),
+        get_format('NUMBER_GROUPING', lang, use_l10n=use_l10n),
+        get_format('THOUSAND_SEPARATOR', lang, use_l10n=use_l10n),
     )
 
-def localize(value):
+def localize(value, use_l10n=None):
     """
     Checks if value is a localizable type (date, number...) and returns it
-    formatted as a string using current locale format
+    formatted as a string using current locale format.
+
+    If use_l10n is provided and is not None, that will force the value to
+    be localized (or not), overriding the value of settings.USE_L10N.
     """
     if isinstance(value, (decimal.Decimal, float, int, long)):
-        return number_format(value)
+        return number_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.datetime):
-        return date_format(value, 'DATETIME_FORMAT')
+        return date_format(value, 'DATETIME_FORMAT', use_l10n=use_l10n)
     elif isinstance(value, datetime.date):
-        return date_format(value)
+        return date_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.time):
-        return time_format(value, 'TIME_FORMAT')
+        return time_format(value, 'TIME_FORMAT', use_l10n=use_l10n)
     else:
         return value
 
