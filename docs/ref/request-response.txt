@@ -189,8 +189,14 @@ All attributes except ``session`` should be considered read-only.
 
 .. attribute:: HttpRequest.raw_post_data
 
-    The raw HTTP POST data. This is only useful for advanced processing. Use
-    ``POST`` instead.
+    The raw HTTP POST data as a byte string. This is useful for processing
+    data in different formats than of conventional HTML forms: binary images,
+    XML payload etc. For processing form data use ``HttpRequest.POST``.
+
+    .. versionadded:: 1.3
+
+    You can also read from an HttpRequest using file-like interface. See
+    :meth:`HttpRequest.read()`.
 
 .. attribute:: HttpRequest.urlconf
 
@@ -248,6 +254,27 @@ Methods
    ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
    If you write your own XMLHttpRequest call (on the browser side), you'll
    have to set this header manually if you want ``is_ajax()`` to work.
+
+.. method:: HttpRequest.read(size=None)
+.. method:: HttpRequest.readline()
+.. method:: HttpRequest.readlines()
+.. method:: HttpRequest.xreadlines()
+.. method:: HttpRequest.__iter__()
+
+    .. versionadded:: 1.3
+
+    Methods implementing a file-like interface for reading from an
+    HttpRequest instance. This makes it possible to consume an incoming
+    request in a streaming fashion. A common use-case would be to process a
+    big XML payload with iterative parser without constructing a whole
+    XML tree in memory.
+
+    Given this standard interface, an HttpRequest instance can be
+    passed directly to an XML parser such as ElementTree::
+
+        import xml.etree.ElementTree as ET
+        for element in ET.iterparse(request):
+            process(element)
 
 
 QueryDict objects

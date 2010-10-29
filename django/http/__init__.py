@@ -7,6 +7,10 @@ from pprint import pformat
 from urllib import urlencode
 from urlparse import urljoin
 try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+try:
     # The mod_python version is more efficient, so try importing it first.
     from mod_python.util import parse_qsl
 except ImportError:
@@ -132,6 +136,73 @@ class HttpRequest(object):
         parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
         return parser.parse()
 
+    def _get_raw_post_data(self):
+        if not hasattr(self, '_raw_post_data'):
+            if self._read_started:
+                raise Exception("You cannot access raw_post_data after reading from request's data stream")
+            self._raw_post_data = self.read()
+            self._stream = StringIO(self._raw_post_data)
+        return self._raw_post_data
+    raw_post_data = property(_get_raw_post_data)
+
+    def _mark_post_parse_error(self):
+        self._post = QueryDict('')
+        self._files = MultiValueDict()
+        self._post_parse_error = True
+
+    def _load_post_and_files(self):
+        # Populates self._post and self._files
+        if self.method != 'POST':
+            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+            return
+        if self._read_started:
+            self._mark_post_parse_error()
+            return
+
+        if self.META.get('CONTENT_TYPE', '').startswith('multipart'):
+            self._raw_post_data = ''
+            try:
+                self._post, self._files = self.parse_file_upload(self.META, self)
+            except:
+                # An error occured while parsing POST data.  Since when
+                # formatting the error the request handler might access
+                # self.POST, set self._post and self._file to prevent
+                # attempts to parse POST data again.
+                # Mark that an error occured.  This allows self.__repr__ to
+                # be explicit about it instead of simply representing an
+                # empty POST
+                self._mark_post_parse_error()
+                raise
+        else:
+            self._post, self._files = QueryDict(self.raw_post_data, encoding=self._encoding), MultiValueDict()
+
+    ## File-like and iterator interface.
+    ##
+    ## Expects self._stream to be set to an appropriate source of bytes by
+    ## a corresponding request subclass (WSGIRequest or ModPythonRequest).
+    ## Also when request data has already been read by request.POST or
+    ## request.raw_post_data, self._stream points to a StringIO instance
+    ## containing that data.
+
+    def read(self, *args, **kwargs):
+        self._read_started = True
+        return self._stream.read(*args, **kwargs)
+
+    def readline(self, *args, **kwargs):
+        self._read_started = True
+        return self._stream.readline(*args, **kwargs)
+
+    def xreadlines(self):
+        while True:
+            buf = self.readline()
+            if not buf:
+                break
+            yield buf
+    __iter__ = xreadlines
+
+    def readlines(self):
+        return list(iter(self))
+
 class QueryDict(MultiValueDict):
     """
     A specialized MultiValueDict that takes a query string when initialized.
@@ -198,7 +269,7 @@ class QueryDict(MultiValueDict):
         for key, value in dict.items(self):
             dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
-    
+
     def setlist(self, key, list_):
         self._assert_mutable()
         key = str_to_unicode(key, self.encoding)
@@ -385,7 +456,7 @@ class HttpResponse(object):
         """
         Sets a cookie.
 
-        ``expires`` can be a string in the correct format or a 
+        ``expires`` can be a string in the correct format or a
         ``datetime.datetime`` object in UTC. If ``expires`` is a datetime
         object then ``max_age`` will be calculated.
         """
@@ -407,7 +478,7 @@ class HttpResponse(object):
             # IE requires expires, so set it if hasn't been already.
             if not expires:
                 self.cookies[key]['expires'] = cookie_date(time.time() +
-                                                           max_age) 
+                                                           max_age)
         if path is not None:
             self.cookies[key]['path'] = path
         if domain is not None:

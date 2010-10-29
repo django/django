@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 import time
+from StringIO import StringIO
 import unittest
 
 from django.http import HttpRequest, HttpResponse, parse_cookie
-from django.core.handlers.wsgi import WSGIRequest
+from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.core.handlers.modpython import ModPythonRequest
 from django.utils.http import cookie_date
 
@@ -17,11 +18,11 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(request.META.keys(), [])
 
     def test_wsgirequest(self):
-        request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus'})
+        request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus', 'wsgi.input': StringIO('')})
         self.assertEqual(request.GET.keys(), [])
         self.assertEqual(request.POST.keys(), [])
         self.assertEqual(request.COOKIES.keys(), [])
-        self.assertEqual(set(request.META.keys()), set(['PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME']))
+        self.assertEqual(set(request.META.keys()), set(['PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'wsgi.input']))
         self.assertEqual(request.META['PATH_INFO'], 'bogus')
         self.assertEqual(request.META['REQUEST_METHOD'], 'bogus')
         self.assertEqual(request.META['SCRIPT_NAME'], '')
@@ -88,3 +89,62 @@ class RequestsTests(unittest.TestCase):
         max_age_cookie = response.cookies['max_age']
         self.assertEqual(max_age_cookie['max-age'], 10)
         self.assertEqual(max_age_cookie['expires'], cookie_date(time.time()+10))
+
+    def test_limited_stream(self):
+        # Read all of a limited stream
+        stream = LimitedStream(StringIO('test'), 2)
+        self.assertEqual(stream.read(), 'te')
+
+        # Read a number of characters greater than the stream has to offer
+        stream = LimitedStream(StringIO('test'), 2)
+        self.assertEqual(stream.read(5), 'te')
+
+        # Read sequentially from a stream
+        stream = LimitedStream(StringIO('12345678'), 8)
+        self.assertEqual(stream.read(5), '12345')
+        self.assertEqual(stream.read(5), '678')
+
+        # Read lines from a stream
+        stream = LimitedStream(StringIO('1234\n5678\nabcd\nefgh\nijkl'), 24)
+        # Read a full line, unconditionally
+        self.assertEqual(stream.readline(), '1234\n')
+        # Read a number of characters less than a line
+        self.assertEqual(stream.readline(2), '56')
+        # Read the rest of the partial line
+        self.assertEqual(stream.readline(), '78\n')
+        # Read a full line, with a character limit greater than the line length
+        self.assertEqual(stream.readline(6), 'abcd\n')
+        # Read the next line, deliberately terminated at the line end
+        self.assertEqual(stream.readline(4), 'efgh')
+        # Read the next line... just the line end
+        self.assertEqual(stream.readline(), '\n')
+        # Read everything else.
+        self.assertEqual(stream.readline(), 'ijkl')
+
+    def test_stream(self):
+        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        self.assertEqual(request.read(), 'name=value')
+
+    def test_read_after_value(self):
+        """
+        Reading from request is allowed after accessing request contents as
+        POST or raw_post_data.
+        """
+        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        self.assertEqual(request.POST, {u'name': [u'value']})
+        self.assertEqual(request.raw_post_data, 'name=value')
+        self.assertEqual(request.read(), 'name=value')
+
+    def test_value_after_read(self):
+        """
+        Construction of POST or raw_post_data is not allowed after reading
+        from request.
+        """
+        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        self.assertEqual(request.read(2), 'na')
+        self.assertRaises(Exception, lambda: request.raw_post_data)
+        self.assertEqual(request.POST, {})
+
+    def test_read_by_lines(self):
+        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        self.assertEqual(list(request), ['name=value'])
