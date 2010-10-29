@@ -328,7 +328,9 @@ parameters. Optionally, if the ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is
 will be cached. This is a simple and effective way of disabling caching for any
 user-specific pages (include Django's admin interface). Note that if you use
 ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY``, you should make sure you've activated
-``AuthenticationMiddleware``.
+``AuthenticationMiddleware``. The cache middleware expects that a HEAD request
+is answered with the same response headers exactly like the corresponding GET
+request, in that case it could return cached GET response for HEAD request.
 
 Additionally, the cache middleware automatically sets a few headers in each
 ``HttpResponse``:

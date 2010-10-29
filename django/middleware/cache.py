@@ -34,8 +34,8 @@ More details about how the caching works:
   and effective way of avoiding the caching of the Django admin (and any other
   user-specific content).
 
-* This middleware expects that a HEAD request is answered with a response
-  exactly like the corresponding GET request.
+* This middleware expects that a HEAD request is answered with the same response
+  headers exactly like the corresponding GET request.
 
 * When a hit occurs, a shallow copy of the original response object is returned
   from process_request.
@@ -70,12 +70,6 @@ class UpdateCacheMiddleware(object):
         """Sets the cache, if needed."""
         if not hasattr(request, '_cache_update_cache') or not request._cache_update_cache:
             # We don't need to update the cache, just return.
-            return response
-        if request.method != 'GET':
-            # This is a stronger requirement than above. It is needed
-            # because of interactions between this middleware and the
-            # HTTPMiddleware, which throws the body of a HEAD-request
-            # away before this middleware gets a chance to cache it.
             return response
         if not response.status_code == 200:
             return response
@@ -123,16 +117,25 @@ class FetchFromCacheMiddleware(object):
             request._cache_update_cache = False
             return None # Don't cache requests from authenticated users.
 
-        cache_key = get_cache_key(request, self.key_prefix)
+        # try and get the cached GET response
+        cache_key = get_cache_key(request, self.key_prefix, 'GET')
+
         if cache_key is None:
             request._cache_update_cache = True
             return None # No cache information available, need to rebuild.
 
         response = cache.get(cache_key, None)
+
+        # if it wasn't found and we are looking for a HEAD, try looking just for that
+        if response is None and request.method == 'HEAD':
+            cache_key = get_cache_key(request, self.key_prefix, 'HEAD')
+            response = cache.get(cache_key, None)
+
         if response is None:
             request._cache_update_cache = True
             return None # No cache information available, need to rebuild.
 
+        # hit, return cached response
         request._cache_update_cache = False
         return response
 

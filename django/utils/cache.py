@@ -143,7 +143,7 @@ def _i18n_cache_key_suffix(request, cache_key):
         cache_key += '.%s' % getattr(request, 'LANGUAGE_CODE', get_language())
     return cache_key
 
-def _generate_cache_key(request, headerlist, key_prefix):
+def _generate_cache_key(request, method, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
     ctx = md5_constructor()
     for header in headerlist:
@@ -151,8 +151,8 @@ def _generate_cache_key(request, headerlist, key_prefix):
         if value is not None:
             ctx.update(value)
     path = md5_constructor(iri_to_uri(request.path))
-    cache_key = 'views.decorators.cache.cache_page.%s.%s.%s' % (
-        key_prefix, path.hexdigest(), ctx.hexdigest())
+    cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
+        key_prefix, request.method, path.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 def _generate_cache_header_key(key_prefix, request):
@@ -162,7 +162,7 @@ def _generate_cache_header_key(key_prefix, request):
         key_prefix, path.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
-def get_cache_key(request, key_prefix=None):
+def get_cache_key(request, key_prefix=None, method='GET'):
     """
     Returns a cache key based on the request path. It can be used in the
     request phase because it pulls the list of headers to take into account
@@ -177,7 +177,7 @@ def get_cache_key(request, key_prefix=None):
     cache_key = _generate_cache_header_key(key_prefix, request)
     headerlist = cache.get(cache_key, None)
     if headerlist is not None:
-        return _generate_cache_key(request, headerlist, key_prefix)
+        return _generate_cache_key(request, method, headerlist, key_prefix)
     else:
         return None
 
@@ -203,12 +203,12 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None):
         headerlist = ['HTTP_'+header.upper().replace('-', '_')
                       for header in cc_delim_re.split(response['Vary'])]
         cache.set(cache_key, headerlist, cache_timeout)
-        return _generate_cache_key(request, headerlist, key_prefix)
+        return _generate_cache_key(request, request.method, headerlist, key_prefix)
     else:
         # if there is no Vary header, we still need a cache key
         # for the request.path
         cache.set(cache_key, [], cache_timeout)
-        return _generate_cache_key(request, [], key_prefix)
+        return _generate_cache_key(request, request.method, [], key_prefix)
 
 
 def _to_tuple(s):

@@ -507,12 +507,13 @@ class CacheUtils(unittest.TestCase):
         settings.CACHE_MIDDLEWARE_SECONDS = self.old_middleware_seconds
         settings.USE_I18N = self.orig_use_i18n
 
-    def _get_request(self, path):
+    def _get_request(self, path, method='GET'):
         request = HttpRequest()
         request.META = {
             'SERVER_NAME': 'testserver',
             'SERVER_PORT': 80,
         }
+        request.method = method
         request.path = request.path_info = "/cache/%s" % path
         return request
 
@@ -544,18 +545,76 @@ class CacheUtils(unittest.TestCase):
         self.assertEqual(get_cache_key(request), None)
         # Set headers to an empty list.
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
         # Verify that a specified key_prefix is taken in to account.
         learn_cache_key(request, response, key_prefix=key_prefix)
-        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
 
     def test_learn_cache_key(self):
-        request = self._get_request(self.path)
+        request = self._get_request(self.path, 'HEAD')
         response = HttpResponse()
         response['Vary'] = 'Pony'
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.HEAD.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+
+class CacheHEADTest(unittest.TestCase):
+
+    def setUp(self):
+        self.orig_cache_middleware_seconds = settings.CACHE_MIDDLEWARE_SECONDS
+        self.orig_cache_middleware_key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.orig_cache_backend = settings.CACHE_BACKEND
+        settings.CACHE_MIDDLEWARE_SECONDS = 60
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX = 'test'
+        settings.CACHE_BACKEND = 'locmem:///'
+        self.path = '/cache/test/'
+
+    def tearDown(self):
+        settings.CACHE_MIDDLEWARE_SECONDS = self.orig_cache_middleware_seconds
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX = self.orig_cache_middleware_key_prefix
+        settings.CACHE_BACKEND = self.orig_cache_backend
+
+    def _get_request(self, method):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        request.method = method
+        request.path = request.path_info = self.path
+        return request
+
+    def _get_request_cache(self, method):
+        request = self._get_request(method)
+        request._cache_update_cache = True
+        return request
+
+    def _set_cache(self, request, msg):
+        response = HttpResponse()
+        response.content = msg
+        return UpdateCacheMiddleware().process_response(request, response)
+
+    def test_head_caches_correctly(self):
+        test_content = 'test content'
+
+        request = self._get_request_cache('HEAD')
+        self._set_cache(request, test_content)
+
+        request = self._get_request('HEAD')
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertNotEqual(get_cache_data, None)
+        self.assertEqual(test_content, get_cache_data.content)
+
+    def test_head_with_cached_get(self):
+        test_content = 'test content'
+
+        request = self._get_request_cache('GET')
+        self._set_cache(request, test_content)
+
+        request = self._get_request('HEAD')
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertNotEqual(get_cache_data, None)
+        self.assertEqual(test_content, get_cache_data.content)
 
 class CacheI18nTest(unittest.TestCase):
 
