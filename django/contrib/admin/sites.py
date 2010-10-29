@@ -303,7 +303,7 @@ class AdminSite(object):
         from django.contrib.auth.models import User
 
         # If this isn't already the login page, display it.
-        if not request.POST.has_key(LOGIN_FORM_KEY):
+        if LOGIN_FORM_KEY not in request.POST:
             if request.POST:
                 message = _("Please log in again, because your session has expired.")
             else:

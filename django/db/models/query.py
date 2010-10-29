@@ -864,9 +864,9 @@ class ValuesQuerySet(QuerySet):
                     # we inspect the full extra_select list since we might
                     # be adding back an extra select item that we hadn't
                     # had selected previously.
-                    if self.query.extra.has_key(f):
+                    if f in self.query.extra:
                         self.extra_names.append(f)
-                    elif self.query.aggregate_select.has_key(f):
+                    elif f in self.query.aggregate_select:
                         self.aggregate_names.append(f)
                     else:
                         self.field_names.append(f)

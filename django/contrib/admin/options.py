@@ -648,17 +648,17 @@ class ModelAdmin(BaseModelAdmin):
         msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj)}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
-        if request.POST.has_key("_continue"):
+        if "_continue" in request.POST:
             self.message_user(request, msg + ' ' + _("You may edit it again below."))
-            if request.POST.has_key("_popup"):
+            if "_popup" in request.POST:
                 post_url_continue += "?_popup=1"
             return HttpResponseRedirect(post_url_continue % pk_value)
 
-        if request.POST.has_key("_popup"):
+        if "_popup" in request.POST:
             return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % \
                 # escape() calls force_unicode.
                 (escape(pk_value), escape(obj)))
-        elif request.POST.has_key("_addanother"):
+        elif "_addanother" in request.POST:
             self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
             return HttpResponseRedirect(request.path)
         else:
@@ -681,17 +681,17 @@ class ModelAdmin(BaseModelAdmin):
         pk_value = obj._get_pk_val()
 
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj)}
-        if request.POST.has_key("_continue"):
+        if "_continue" in request.POST:
             self.message_user(request, msg + ' ' + _("You may edit it again below."))
-            if request.REQUEST.has_key('_popup'):
+            if "_popup" in request.REQUEST:
                 return HttpResponseRedirect(request.path + "?_popup=1")
             else:
                 return HttpResponseRedirect(request.path)
-        elif request.POST.has_key("_saveasnew"):
+        elif "_saveasnew" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': obj}
             self.message_user(request, msg)
             return HttpResponseRedirect("../%s/" % pk_value)
-        elif request.POST.has_key("_addanother"):
+        elif "_addanother" in request.POST:
             self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
             return HttpResponseRedirect("../add/")
         else:
@@ -793,7 +793,7 @@ class ModelAdmin(BaseModelAdmin):
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
                 formset = FormSet(data=request.POST, files=request.FILES,
                                   instance=new_object,
-                                  save_as_new=request.POST.has_key("_saveasnew"),
+                                  save_as_new="_saveasnew" in request.POST,
                                   prefix=prefix, queryset=inline.queryset(request))
                 formsets.append(formset)
             if all_valid(formsets) and form_validated:
@@ -844,7 +844,7 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             'title': _('Add %s') % force_unicode(opts.verbose_name),
             'adminform': adminForm,
-            'is_popup': request.REQUEST.has_key('_popup'),
+            'is_popup': "_popup" in request.REQUEST,
             'show_delete': False,
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
@@ -870,7 +870,7 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_unicode(opts.verbose_name), 'key': escape(object_id)})
 
-        if request.method == 'POST' and request.POST.has_key("_saveasnew"):
+        if request.method == 'POST' and "_saveasnew" in request.POST:
             return self.add_view(request, form_url='../add/')
 
         ModelForm = self.get_form(request, obj)
@@ -937,7 +937,7 @@ class ModelAdmin(BaseModelAdmin):
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
-            'is_popup': request.REQUEST.has_key('_popup'),
+            'is_popup': "_popup" in request.REQUEST,
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),

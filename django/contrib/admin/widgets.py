@@ -111,7 +111,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
         else:
             url = ''
-        if not attrs.has_key('class'):
+        if "class" not in attrs:
             attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)]
         # TODO: "id_" is hard-coded here. This should instead use the correct
