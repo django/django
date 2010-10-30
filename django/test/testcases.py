@@ -305,9 +305,20 @@ class TransactionTestCase(ut2.TestCase):
         """ Performs any post-test things. This includes:
 
             * Putting back the original ROOT_URLCONF if it was changed.
+            * Force closing the connection, so that the next test gets
+              a clean cursor.
         """
         self._fixture_teardown()
         self._urlconf_teardown()
+        # Some DB cursors include SQL statements as part of cursor
+        # creation. If you have a test that does rollback, the effect
+        # of these statements is lost, which can effect the operation
+        # of tests (e.g., losing a timezone setting causing objects to
+        # be created with the wrong time).
+        # To make sure this doesn't happen, get a clean connection at the
+        # start of every test.
+        for connection in connections.all():
+            connection.close()
 
     def _fixture_teardown(self):
         pass
@@ -574,9 +585,6 @@ class TestCase(TransactionTestCase):
         for db in databases:
             transaction.rollback(using=db)
             transaction.leave_transaction_management(using=db)
-
-        for connection in connections.all():
-            connection.close()
 
 def _deferredSkip(condition, reason):
     def decorator(test_func):
