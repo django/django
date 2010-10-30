@@ -88,7 +88,7 @@ class DebugVariableNode(VariableNode):
     def render(self, context):
         try:
             output = self.filter_expression.resolve(context)
-            output = localize(value, use_l10n=use_l10n)
+            output = localize(output, use_l10n=context.use_l10n)
             output = force_unicode(output)
         except TemplateSyntaxError, e:
             if not hasattr(e, 'source'):
