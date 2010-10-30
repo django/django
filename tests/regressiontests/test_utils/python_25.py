@@ -21,7 +21,7 @@ class AssertNumQueriesTests(TestCase):
         with self.assertRaises(AssertionError) as exc_info:
             with self.assertNumQueries(2):
                 Person.objects.count()
-        self.assertEqual(str(exc_info.exception), "1 != 2 : 1 queries executed, 2 expected")
+        self.assertIn("1 queries executed, 2 expected", str(exc_info.exception))
 
         with self.assertRaises(TypeError):
             with self.assertNumQueries(4000):
