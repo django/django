@@ -7,12 +7,13 @@ from StringIO import StringIO
 
 from django.test import TestCase
 from django.conf import settings
+from django.contrib.staticfiles import finders, storage
+from django.core.files.storage import default_storage
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.db.models.loading import load_app
 from django.template import Template, Context
 
-from django.contrib.staticfiles import finders, storage
 
 TEST_ROOT = os.path.dirname(__file__)
 
@@ -53,6 +54,11 @@ class StaticFilesTestCase(TestCase):
         settings.INSTALLED_APPS = [
             "regressiontests.staticfiles_tests",
         ]
+
+        # Clear the cached default_storage out, this is because when it first
+        # gets accessed (by some other test), it evaluates settings.MEDIA_ROOT,
+        # since we're planning on changing that we need to clear out the cache.
+        default_storage._wrapped = None
 
     def tearDown(self):
         settings.DEBUG = self.old_debug
