@@ -78,39 +78,43 @@ class BaseHandler(object):
                 urlconf = settings.ROOT_URLCONF
                 urlresolvers.set_urlconf(urlconf)
                 resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+                response = None
 
                 # Apply request middleware
                 for middleware_method in self._request_middleware:
                     response = middleware_method(request)
                     if response:
-                        return response
+                        break
 
-                if hasattr(request, "urlconf"):
-                    # Reset url resolver with a custom urlconf.
-                    urlconf = request.urlconf
-                    urlresolvers.set_urlconf(urlconf)
-                    resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+                if response is None:
+                    if hasattr(request, "urlconf"):
+                        # Reset url resolver with a custom urlconf.
+                        urlconf = request.urlconf
+                        urlresolvers.set_urlconf(urlconf)
+                        resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
 
-                callback, callback_args, callback_kwargs = resolver.resolve(
-                        request.path_info)
+                    callback, callback_args, callback_kwargs = resolver.resolve(
+                            request.path_info)
 
-                # Apply view middleware
-                for middleware_method in self._view_middleware:
-                    response = middleware_method(request, callback, callback_args, callback_kwargs)
-                    if response:
-                        return response
-
-                try:
-                    response = callback(request, *callback_args, **callback_kwargs)
-                except Exception, e:
-                    # If the view raised an exception, run it through exception
-                    # middleware, and if the exception middleware returns a
-                    # response, use that. Otherwise, reraise the exception.
-                    for middleware_method in self._exception_middleware:
-                        response = middleware_method(request, e)
+                    # Apply view middleware
+                    for middleware_method in self._view_middleware:
+                        response = middleware_method(request, callback, callback_args, callback_kwargs)
                         if response:
-                            return response
-                    raise
+                            break
+
+                if response is None:
+                    try:
+                        response = callback(request, *callback_args, **callback_kwargs)
+                    except Exception, e:
+                        # If the view raised an exception, run it through exception
+                        # middleware, and if the exception middleware returns a
+                        # response, use that. Otherwise, reraise the exception.
+                        for middleware_method in self._exception_middleware:
+                            response = middleware_method(request, e)
+                            if response:
+                                break
+                        if response is None:
+                            raise
 
                 # Complain if the view returned None (a common error).
                 if response is None:
@@ -120,12 +124,6 @@ class BaseHandler(object):
                         view_name = callback.__class__.__name__ + '.__call__' # If it's a class
                     raise ValueError("The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name))
 
-                # Apply response middleware
-                for middleware_method in self._response_middleware:
-                    response = middleware_method(request, response)
-                response = self.apply_response_fixes(request, response)
-
-                return response
             except http.Http404, e:
                 logger.warning('Not Found: %s' % request.path,
                             extra={
@@ -134,14 +132,14 @@ class BaseHandler(object):
                             })
                 if settings.DEBUG:
                     from django.views import debug
-                    return debug.technical_404_response(request, e)
+                    response = debug.technical_404_response(request, e)
                 else:
                     try:
                         callback, param_dict = resolver.resolve404()
-                        return callback(request, **param_dict)
+                        response = callback(request, **param_dict)
                     except:
                         try:
-                            return self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
                         finally:
                             receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
             except exceptions.PermissionDenied:
@@ -150,18 +148,29 @@ class BaseHandler(object):
                                 'status_code': 403,
                                 'request': request
                             })
-                return http.HttpResponseForbidden('<h1>Permission denied</h1>')
+                response = http.HttpResponseForbidden('<h1>Permission denied</h1>')
             except SystemExit:
                 # Allow sys.exit() to actually exit. See tickets #1023 and #4701
                 raise
             except: # Handle everything else, including SuspiciousOperation, etc.
                 # Get the exception info now, in case another exception is thrown later.
                 receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
-                return self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
         finally:
             # Reset URLconf for this thread on the way out for complete
             # isolation of request.urlconf
             urlresolvers.set_urlconf(None)
+
+        try:
+            # Apply response middleware, regardless of the response
+            for middleware_method in self._response_middleware:
+                response = middleware_method(request, response)
+            response = self.apply_response_fixes(request, response)
+        except: # Any exception should be gathered and handled
+            receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
+            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+
+        return response
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
         """
