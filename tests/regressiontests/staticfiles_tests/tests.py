@@ -26,11 +26,11 @@ class StaticFilesTestCase(TestCase):
         self.old_staticfiles_root = settings.STATICFILES_ROOT
         self.old_staticfiles_dirs = settings.STATICFILES_DIRS
         self.old_staticfiles_finders = settings.STATICFILES_FINDERS
-        self.old_installed_apps = settings.INSTALLED_APPS
         self.old_media_root = settings.MEDIA_ROOT
         self.old_media_url = settings.MEDIA_URL
         self.old_admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
         self.old_debug = settings.DEBUG
+        self.old_installed_apps = settings.INSTALLED_APPS
 
         # We have to load these apps to test staticfiles.
         load_app('regressiontests.staticfiles_tests.apps.test')
@@ -50,6 +50,9 @@ class StaticFilesTestCase(TestCase):
             'django.contrib.staticfiles.finders.AppDirectoriesFinder',
             'django.contrib.staticfiles.finders.DefaultStorageFinder',
         )
+        settings.INSTALLED_APPS = [
+            "regressiontests.staticfiles_tests",
+        ]
 
     def tearDown(self):
         settings.DEBUG = self.old_debug
@@ -98,7 +101,11 @@ class BuildStaticTestCase(StaticFilesTestCase):
     def _get_file(self, filepath):
         assert filepath, 'filepath is empty.'
         filepath = os.path.join(settings.STATICFILES_ROOT, filepath)
-        return open(filepath).read()
+        f = open(filepath)
+        try:
+            return f.read()
+        finally:
+            f.close()
 
 
 class TestDefaults(object):
