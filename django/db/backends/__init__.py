@@ -615,7 +615,12 @@ class BaseDatabaseIntrospection(object):
                 tables.add(model._meta.db_table)
                 tables.update([f.m2m_db_table() for f in model._meta.local_many_to_many])
         if only_existing:
-            tables = [t for t in tables if self.table_name_converter(t) in self.table_names()]
+            existing_tables = self.table_names()
+            tables = [
+                t
+                for t in tables
+                if self.table_name_converter(t) in existing_tables
+            ]
         return tables
 
     def installed_models(self, tables):

@@ -111,7 +111,9 @@ def sql_flush(style, connection, only_django=False):
         tables = connection.introspection.django_table_names(only_existing=True)
     else:
         tables = connection.introspection.table_names()
-    statements = connection.ops.sql_flush(style, tables, connection.introspection.sequence_list())
+    statements = connection.ops.sql_flush(
+        style, tables, connection.introspection.sequence_list()
+    )
     return statements
 
 def sql_custom(app, style, connection):

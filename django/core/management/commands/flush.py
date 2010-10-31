@@ -9,7 +9,6 @@ from django.core.management.sql import sql_flush, emit_post_sync_signal
 from django.utils.importlib import import_module
 
 
-
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive', default=True,
