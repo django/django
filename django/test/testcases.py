@@ -524,7 +524,10 @@ class TransactionTestCase(ut2.TestCase):
         context.__enter__()
         try:
             func(*args, **kwargs)
-        finally:
+        except:
+            context.__exit__(*sys.exc_info())
+            raise
+        else:
             context.__exit__(*sys.exc_info())
 
 def connections_support_transactions():

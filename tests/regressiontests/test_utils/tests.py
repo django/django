@@ -8,6 +8,14 @@ if sys.version_info >= (2, 5):
 
 
 class SkippingTestCase(TestCase):
+    def test_assert_num_queries(self):
+        def test_func():
+            raise ValueError
+
+        self.assertRaises(ValueError,
+            self.assertNumQueries, 2, test_func
+        )
+
     def test_skip_unless_db_feature(self):
         "A test that might be skipped is actually called."
         # Total hack, but it works, just want an attribute that's always true.
