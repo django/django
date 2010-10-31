@@ -17,24 +17,29 @@ def _get_all_permissions(opts):
 
 def create_permissions(app, created_models, verbosity, **kwargs):
     from django.contrib.contenttypes.models import ContentType
-    from django.contrib.auth.models import Permission
+
     app_models = get_models(app)
-    if not app_models:
-        return
     for klass in app_models:
         ctype = ContentType.objects.get_for_model(klass)
         for codename, name in _get_all_permissions(klass._meta):
-            p, created = Permission.objects.get_or_create(codename=codename, content_type__pk=ctype.id,
-                defaults={'name': name, 'content_type': ctype})
+            p, created = auth_app.Permission.objects.get_or_create(
+                codename=codename,
+                content_type__pk=ctype.id,
+                defaults={
+                    'name': name,
+                    'content_type': ctype
+                }
+            )
             if created and verbosity >= 2:
                 print "Adding permission '%s'" % p
 
 def create_superuser(app, created_models, verbosity, **kwargs):
-    from django.contrib.auth.models import User
     from django.core.management import call_command
-    if User in created_models and kwargs.get('interactive', True):
-        msg = "\nYou just installed Django's auth system, which means you don't have " \
-                "any superusers defined.\nWould you like to create one now? (yes/no): "
+
+    if auth_app.User in created_models and kwargs.get('interactive', True):
+        msg = ("\nYou just installed Django's auth system, which means you "
+            "don't have any superusers defined.\nWould you like to create one "
+            "now? (yes/no): ")
         confirm = raw_input(msg)
         while 1:
             if confirm not in ('yes', 'no'):
