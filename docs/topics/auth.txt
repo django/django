@@ -1197,19 +1197,23 @@ Custom permissions
 To create custom permissions for a given model object, use the ``permissions``
 :ref:`model Meta attribute <meta-options>`.
 
-This example model creates three custom permissions::
+This example Task model creates three custom permissions, i.e., actions users
+can or cannot do with Task instances, specific to your appication::
 
-    class USCitizen(models.Model):
-        # ...
+    class Task(models.Model):
+        ...
         class Meta:
             permissions = (
-                ("can_drive", "Can drive"),
-                ("can_vote", "Can vote in elections"),
-                ("can_drink", "Can drink alcohol"),
+                ("can_view", "Can see available tasks"),
+                ("can_change_status", "Can change the status of tasks"),
+                ("can_close", "Can remove a task by setting its status as closed"),
             )
 
 The only thing this does is create those extra permissions when you run
-:djadmin:`manage.py syncdb <syncdb>`.
+:djadmin:`manage.py syncdb <syncdb>`. Your code is in charge of checking the
+value of these permissions when an user is trying to access the functionality
+provided by the application (viewing tasks, changing the status of tasks,
+closing tasks.)
 
 API reference
 -------------
