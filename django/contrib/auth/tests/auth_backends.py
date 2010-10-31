@@ -150,7 +150,7 @@ class RowlevelBackendTest(TestCase):
 
     def setUp(self):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.AUTHENTICATION_BACKENDS = self.curr_auth + (self.backend,)
+        settings.AUTHENTICATION_BACKENDS = tuple(self.curr_auth) + (self.backend,)
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.user2 = User.objects.create_user('test2', 'test2@example.com', 'test')
         self.user3 = User.objects.create_user('test3', 'test3@example.com', 'test')
@@ -232,7 +232,7 @@ class NoAnonymousUserBackendTest(TestCase):
 
     def setUp(self):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.AUTHENTICATION_BACKENDS = self.curr_auth + (self.backend,)
+        settings.AUTHENTICATION_BACKENDS = tuple(self.curr_auth) + (self.backend,)
         self.user1 = AnonymousUser()
 
     def tearDown(self):
