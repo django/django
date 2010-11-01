@@ -5,10 +5,10 @@ from django.contrib.gis.utils import GeoIP, GeoIPException
 
 # Note: Requires use of both the GeoIP country and city datasets.
 # The GEOIP_DATA path should be the only setting set (the directory
-# should contain links or the actual database files 'GeoIP.dat' and 
+# should contain links or the actual database files 'GeoIP.dat' and
 # 'GeoLiteCity.dat'.
 class GeoIPTest(unittest.TestCase):
-    
+
     def test01_init(self):
         "Testing GeoIP initialization."
         g1 = GeoIP() # Everything inferred from GeoIP path
@@ -19,7 +19,7 @@ class GeoIPTest(unittest.TestCase):
         for g in (g1, g2, g3):
             self.assertEqual(True, bool(g._country))
             self.assertEqual(True, bool(g._city))
-        
+
         # Only passing in the location of one database.
         city = os.path.join(path, 'GeoLiteCity.dat')
         cntry = os.path.join(path, 'GeoIP.dat')
@@ -52,10 +52,10 @@ class GeoIPTest(unittest.TestCase):
     def test03_country(self):
         "Testing GeoIP country querying methods."
         g = GeoIP(city='<foo>')
-        
+
         fqdn = 'www.google.com'
         addr = '12.215.42.19'
-        
+
         for query in (fqdn, addr):
             for func in (g.country_code, g.country_code_by_addr, g.country_code_by_name):
                 self.assertEqual('US', func(query))
@@ -67,7 +67,7 @@ class GeoIPTest(unittest.TestCase):
     def test04_city(self):
         "Testing GeoIP city querying methods."
         g = GeoIP(country='<foo>')
-        
+
         addr = '130.80.29.3'
         fqdn = 'chron.com'
         for query in (fqdn, addr):
@@ -78,7 +78,7 @@ class GeoIPTest(unittest.TestCase):
                 self.assertEqual('United States', func(query))
             self.assertEqual({'country_code' : 'US', 'country_name' : 'United States'},
                              g.country(query))
-            
+
             # City information dictionary.
             d = g.city(query)
             self.assertEqual('USA', d['country_code3'])
@@ -87,7 +87,7 @@ class GeoIPTest(unittest.TestCase):
             self.assertEqual(713, d['area_code'])
             geom = g.geos(query)
             self.failIf(not isinstance(geom, GEOSGeometry))
-            lon, lat = (-95.4152, 29.7755)
+            lon, lat = (-95.3670, 29.7523)
             lat_lon = g.lat_lon(query)
             lat_lon = (lat_lon[1], lat_lon[0])
             for tup in (geom.tuple, g.coords(query), g.lon_lat(query), lat_lon):
