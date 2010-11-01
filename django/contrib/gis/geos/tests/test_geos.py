@@ -1,9 +1,9 @@
 import ctypes, random, unittest, sys
 from django.contrib.gis.geos import *
 from django.contrib.gis.geos.base import gdal, numpy, GEOSBase
-from django.contrib.gis.tests.geometries import *
+from django.contrib.gis.geometry.test_data import TestDataMixin
 
-class GEOSTest(unittest.TestCase):
+class GEOSTest(unittest.TestCase, TestDataMixin):
 
     @property
     def null_srid(self):
@@ -61,13 +61,13 @@ class GEOSTest(unittest.TestCase):
 
     def test01a_wkt(self):
         "Testing WKT output."
-        for g in wkt_out:
+        for g in self.geometries.wkt_out:
             geom = fromstr(g.wkt)
             self.assertEqual(g.ewkt, geom.wkt)
 
     def test01b_hex(self):
         "Testing HEX output."
-        for g in hex_wkt:
+        for g in self.geometries.hex_wkt:
             geom = fromstr(g.wkt)
             self.assertEqual(g.hex, geom.hex)
 
@@ -75,9 +75,16 @@ class GEOSTest(unittest.TestCase):
         "Testing (HEX)EWKB output."
         from binascii import a2b_hex
 
+        # For testing HEX(EWKB).
+        ogc_hex = '01010000000000000000000000000000000000F03F'
+        # `SELECT ST_AsHEXEWKB(ST_GeomFromText('POINT(0 1)', 4326));`
+        hexewkb_2d = '0101000020E61000000000000000000000000000000000F03F'
+        # `SELECT ST_AsHEXEWKB(ST_GeomFromEWKT('SRID=4326;POINT(0 1 2)'));`
+        hexewkb_3d = '01010000A0E61000000000000000000000000000000000F03F0000000000000040'
+
         pnt_2d = Point(0, 1, srid=4326)
         pnt_3d = Point(0, 1, 2, srid=4326)
-        
+
         # OGC-compliant HEX will not have SRID nor Z value.
         self.assertEqual(ogc_hex, pnt_2d.hex)
         self.assertEqual(ogc_hex, pnt_3d.hex)
@@ -110,13 +117,13 @@ class GEOSTest(unittest.TestCase):
                 pass
             else:
                 self.fail('Should have raised GEOSException')
-        
+
         # Redundant sanity check.
         self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
 
     def test01c_kml(self):
         "Testing KML output."
-        for tg in wkt_out:
+        for tg in self.geometries.wkt_out:
             geom = fromstr(tg.wkt)
             kml = getattr(tg, 'kml', False)
             if kml: self.assertEqual(kml, geom.kml)
@@ -125,7 +132,7 @@ class GEOSTest(unittest.TestCase):
         "Testing the Error handlers."
         # string-based
         print "\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n"
-        for err in errors:
+        for err in self.geometries.errors:
             try:
                 g = fromstr(err.wkt)
             except (GEOSException, ValueError):
@@ -147,14 +154,14 @@ class GEOSTest(unittest.TestCase):
     def test01e_wkb(self):
         "Testing WKB output."
         from binascii import b2a_hex
-        for g in hex_wkt:
+        for g in self.geometries.hex_wkt:
             geom = fromstr(g.wkt)
             wkb = geom.wkb
             self.assertEqual(b2a_hex(wkb).upper(), g.hex)
 
     def test01f_create_hex(self):
         "Testing creation from HEX."
-        for g in hex_wkt:
+        for g in self.geometries.hex_wkt:
             geom_h = GEOSGeometry(g.hex)
             # we need to do this so decimal places get normalised
             geom_t = fromstr(g.wkt)
@@ -163,7 +170,7 @@ class GEOSTest(unittest.TestCase):
     def test01g_create_wkb(self):
         "Testing creation from WKB."
         from binascii import a2b_hex
-        for g in hex_wkt:
+        for g in self.geometries.hex_wkt:
             wkb = buffer(a2b_hex(g.hex))
             geom_h = GEOSGeometry(wkb)
             # we need to do this so decimal places get normalised
@@ -173,7 +180,7 @@ class GEOSTest(unittest.TestCase):
     def test01h_ewkt(self):
         "Testing EWKT."
         srid = 32140
-        for p in polygons:
+        for p in self.geometries.polygons:
             ewkt = 'SRID=%d;%s' % (srid, p.wkt)
             poly = fromstr(ewkt)
             self.assertEqual(srid, poly.srid)
@@ -183,7 +190,7 @@ class GEOSTest(unittest.TestCase):
     def test01i_json(self):
         "Testing GeoJSON input/output (via GDAL)."
         if not gdal or not gdal.GEOJSON: return
-        for g in json_geoms:
+        for g in self.geometries.json_geoms:
             geom = GEOSGeometry(g.wkt)
             if not hasattr(g, 'not_equal'):
                 self.assertEqual(g.json, geom.json)
@@ -225,7 +232,7 @@ class GEOSTest(unittest.TestCase):
     def test02a_points(self):
         "Testing Point objects."
         prev = fromstr('POINT(0 0)')
-        for p in points:
+        for p in self.geometries.points:
             # Creating the point from the WKT
             pnt = fromstr(p.wkt)
             self.assertEqual(pnt.geom_type, 'Point')
@@ -279,7 +286,7 @@ class GEOSTest(unittest.TestCase):
 
     def test02b_multipoints(self):
         "Testing MultiPoint objects."
-        for mp in multipoints:
+        for mp in self.geometries.multipoints:
             mpnt = fromstr(mp.wkt)
             self.assertEqual(mpnt.geom_type, 'MultiPoint')
             self.assertEqual(mpnt.geom_typeid, 4)
@@ -289,7 +296,7 @@ class GEOSTest(unittest.TestCase):
 
             self.assertRaises(GEOSIndexError, mpnt.__getitem__, len(mpnt))
             self.assertEqual(mp.centroid, mpnt.centroid.tuple)
-            self.assertEqual(mp.points, tuple(m.tuple for m in mpnt))
+            self.assertEqual(mp.coords, tuple(m.tuple for m in mpnt))
             for p in mpnt:
                 self.assertEqual(p.geom_type, 'Point')
                 self.assertEqual(p.geom_typeid, 0)
@@ -299,7 +306,7 @@ class GEOSTest(unittest.TestCase):
     def test03a_linestring(self):
         "Testing LineString objects."
         prev = fromstr('POINT(0 0)')
-        for l in linestrings:
+        for l in self.geometries.linestrings:
             ls = fromstr(l.wkt)
             self.assertEqual(ls.geom_type, 'LineString')
             self.assertEqual(ls.geom_typeid, 1)
@@ -325,7 +332,7 @@ class GEOSTest(unittest.TestCase):
     def test03b_multilinestring(self):
         "Testing MultiLineString objects."
         prev = fromstr('POINT(0 0)')
-        for l in multilinestrings:
+        for l in self.geometries.multilinestrings:
             ml = fromstr(l.wkt)
             self.assertEqual(ml.geom_type, 'MultiLineString')
             self.assertEqual(ml.geom_typeid, 5)
@@ -348,7 +355,7 @@ class GEOSTest(unittest.TestCase):
 
     def test04_linearring(self):
         "Testing LinearRing objects."
-        for rr in linearrings:
+        for rr in self.geometries.linearrings:
             lr = fromstr(rr.wkt)
             self.assertEqual(lr.geom_type, 'LinearRing')
             self.assertEqual(lr.geom_typeid, 2)
@@ -371,7 +378,7 @@ class GEOSTest(unittest.TestCase):
         self.assertEqual(bbox, p.extent)
 
         prev = fromstr('POINT(0 0)')
-        for p in polygons:
+        for p in self.geometries.polygons:
             # Creating the Polygon, testing its properties.
             poly = fromstr(p.wkt)
             self.assertEqual(poly.geom_type, 'Polygon')
@@ -430,7 +437,7 @@ class GEOSTest(unittest.TestCase):
         "Testing MultiPolygon objects."
         print "\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n"
         prev = fromstr('POINT (0 0)')
-        for mp in multipolygons:
+        for mp in self.geometries.multipolygons:
             mpoly = fromstr(mp.wkt)
             self.assertEqual(mpoly.geom_type, 'MultiPolygon')
             self.assertEqual(mpoly.geom_typeid, 6)
@@ -456,7 +463,7 @@ class GEOSTest(unittest.TestCase):
         # These tests are needed to ensure sanity with writable geometries.
 
         # Getting a polygon with interior rings, and pulling out the interior rings
-        poly = fromstr(polygons[1].wkt)
+        poly = fromstr(self.geometries.polygons[1].wkt)
         ring1 = poly[0]
         ring2 = poly[1]
 
@@ -472,12 +479,9 @@ class GEOSTest(unittest.TestCase):
         # Access to these rings is OK since they are clones.
         s1, s2 = str(ring1), str(ring2)
 
-        # The previous hijinks tests are now moot because only clones are
-        # now used =)
-
     def test08_coord_seq(self):
         "Testing Coordinate Sequence objects."
-        for p in polygons:
+        for p in self.geometries.polygons:
             if p.ext_ring_cs:
                 # Constructing the polygon and getting the coordinate sequence
                 poly = fromstr(p.wkt)
@@ -506,22 +510,18 @@ class GEOSTest(unittest.TestCase):
         "Testing relate() and relate_pattern()."
         g = fromstr('POINT (0 0)')
         self.assertRaises(GEOSException, g.relate_pattern, 0, 'invalid pattern, yo')
-        for i in xrange(len(relate_geoms)):
-            g_tup = relate_geoms[i]
-            a = fromstr(g_tup[0].wkt)
-            b = fromstr(g_tup[1].wkt)
-            pat = g_tup[2]
-            result = g_tup[3]
-            self.assertEqual(result, a.relate_pattern(b, pat))
-            self.assertEqual(pat, a.relate(b))
+        for rg in self.geometries.relate_geoms:
+            a = fromstr(rg.wkt_a)
+            b = fromstr(rg.wkt_b)
+            self.assertEqual(rg.result, a.relate_pattern(b, rg.pattern))
+            self.assertEqual(rg.pattern, a.relate(b))
 
     def test10_intersection(self):
         "Testing intersects() and intersection()."
-        for i in xrange(len(topology_geoms)):
-            g_tup = topology_geoms[i]
-            a = fromstr(g_tup[0].wkt)
-            b = fromstr(g_tup[1].wkt)
-            i1 = fromstr(intersect_geoms[i].wkt)
+        for i in xrange(len(self.geometries.topology_geoms)):
+            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
+            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
+            i1 = fromstr(self.geometries.intersect_geoms[i].wkt)
             self.assertEqual(True, a.intersects(b))
             i2 = a.intersection(b)
             self.assertEqual(i1, i2)
@@ -531,11 +531,10 @@ class GEOSTest(unittest.TestCase):
 
     def test11_union(self):
         "Testing union()."
-        for i in xrange(len(topology_geoms)):
-            g_tup = topology_geoms[i]
-            a = fromstr(g_tup[0].wkt)
-            b = fromstr(g_tup[1].wkt)
-            u1 = fromstr(union_geoms[i].wkt)
+        for i in xrange(len(self.geometries.topology_geoms)):
+            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
+            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
+            u1 = fromstr(self.geometries.union_geoms[i].wkt)
             u2 = a.union(b)
             self.assertEqual(u1, u2)
             self.assertEqual(u1, a | b) # __or__ is union operator
@@ -544,11 +543,10 @@ class GEOSTest(unittest.TestCase):
 
     def test12_difference(self):
         "Testing difference()."
-        for i in xrange(len(topology_geoms)):
-            g_tup = topology_geoms[i]
-            a = fromstr(g_tup[0].wkt)
-            b = fromstr(g_tup[1].wkt)
-            d1 = fromstr(diff_geoms[i].wkt)
+        for i in xrange(len(self.geometries.topology_geoms)):
+            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
+            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
+            d1 = fromstr(self.geometries.diff_geoms[i].wkt)
             d2 = a.difference(b)
             self.assertEqual(d1, d2)
             self.assertEqual(d1, a - b) # __sub__ is difference operator
@@ -557,11 +555,10 @@ class GEOSTest(unittest.TestCase):
 
     def test13_symdifference(self):
         "Testing sym_difference()."
-        for i in xrange(len(topology_geoms)):
-            g_tup = topology_geoms[i]
-            a = fromstr(g_tup[0].wkt)
-            b = fromstr(g_tup[1].wkt)
-            d1 = fromstr(sdiff_geoms[i].wkt)
+        for i in xrange(len(self.geometries.topology_geoms)):
+            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
+            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
+            d1 = fromstr(self.geometries.sdiff_geoms[i].wkt)
             d2 = a.sym_difference(b)
             self.assertEqual(d1, d2)
             self.assertEqual(d1, a ^ b) # __xor__ is symmetric difference operator
@@ -570,18 +567,19 @@ class GEOSTest(unittest.TestCase):
 
     def test14_buffer(self):
         "Testing buffer()."
-        for i in xrange(len(buffer_geoms)):
-            g_tup = buffer_geoms[i]
-            g = fromstr(g_tup[0].wkt)
+        for bg in self.geometries.buffer_geoms:
+            g = fromstr(bg.wkt)
 
             # The buffer we expect
-            exp_buf = fromstr(g_tup[1].wkt)
+            exp_buf = fromstr(bg.buffer_wkt)
+            quadsegs = bg.quadsegs
+            width = bg.width
 
             # Can't use a floating-point for the number of quadsegs.
-            self.assertRaises(ctypes.ArgumentError, g.buffer, g_tup[2], float(g_tup[3]))
+            self.assertRaises(ctypes.ArgumentError, g.buffer, width, float(quadsegs))
 
             # Constructing our buffer
-            buf = g.buffer(g_tup[2], g_tup[3])
+            buf = g.buffer(width, quadsegs)
             self.assertEqual(exp_buf.num_coords, buf.num_coords)
             self.assertEqual(len(exp_buf), len(buf))
 
@@ -605,7 +603,7 @@ class GEOSTest(unittest.TestCase):
         self.assertRaises(ctypes.ArgumentError, pnt.set_srid, '4326')
 
         # Testing SRID keyword on fromstr(), and on Polygon rings.
-        poly = fromstr(polygons[1].wkt, srid=4269)
+        poly = fromstr(self.geometries.polygons[1].wkt, srid=4269)
         self.assertEqual(4269, poly.srid)
         for ring in poly: self.assertEqual(4269, ring.srid)
         poly.srid = 4326
@@ -636,7 +634,7 @@ class GEOSTest(unittest.TestCase):
     def test16_mutable_geometries(self):
         "Testing the mutability of Polygons and Geometry Collections."
         ### Testing the mutability of Polygons ###
-        for p in polygons:
+        for p in self.geometries.polygons:
             poly = fromstr(p.wkt)
 
             # Should only be able to use __setitem__ with LinearRing geometries.
@@ -655,7 +653,7 @@ class GEOSTest(unittest.TestCase):
             self.assertEqual(poly[0], new_shell)
 
         ### Testing the mutability of Geometry Collections
-        for tg in multipoints:
+        for tg in self.geometries.multipoints:
             mp = fromstr(tg.wkt)
             for i in range(len(mp)):
                 # Creating a random point.
@@ -670,7 +668,7 @@ class GEOSTest(unittest.TestCase):
 
         # MultiPolygons involve much more memory management because each
         # Polygon w/in the collection has its own rings.
-        for tg in multipolygons:
+        for tg in self.geometries.multipolygons:
             mpoly = fromstr(tg.wkt)
             for i in xrange(len(mpoly)):
                 poly = mpoly[i]
@@ -791,10 +789,10 @@ class GEOSTest(unittest.TestCase):
         "Testing GeometryCollection handling of other collections."
         # Creating a GeometryCollection WKT string composed of other
         # collections and polygons.
-        coll = [mp.wkt for mp in multipolygons if mp.valid]
-        coll.extend([mls.wkt for mls in multilinestrings])
-        coll.extend([p.wkt for p in polygons])
-        coll.extend([mp.wkt for mp in multipoints])
+        coll = [mp.wkt for mp in self.geometries.multipolygons if mp.valid]
+        coll.extend([mls.wkt for mls in self.geometries.multilinestrings])
+        coll.extend([p.wkt for p in self.geometries.polygons])
+        coll.extend([mp.wkt for mp in self.geometries.multipoints])
         gc_wkt = 'GEOMETRYCOLLECTION(%s)' % ','.join(coll)
 
         # Should construct ok from WKT
@@ -862,7 +860,7 @@ class GEOSTest(unittest.TestCase):
         # Extent of points is just the point itself repeated.
         self.assertEqual((5.23, 17.8, 5.23, 17.8), pnt.extent)
         # Testing on the 'real world' Polygon.
-        poly = fromstr(polygons[3].wkt)
+        poly = fromstr(self.geometries.polygons[3].wkt)
         ring = poly.shell
         x, y = ring.x, ring.y
         xmin, ymin = min(x), min(y)
@@ -878,10 +876,10 @@ class GEOSTest(unittest.TestCase):
         # and setting the SRID on some of them.
         def get_geoms(lst, srid=None):
             return [GEOSGeometry(tg.wkt, srid) for tg in lst]
-        tgeoms = get_geoms(points)
-        tgeoms.extend(get_geoms(multilinestrings, 4326))
-        tgeoms.extend(get_geoms(polygons, 3084))
-        tgeoms.extend(get_geoms(multipolygons, 900913))
+        tgeoms = get_geoms(self.geometries.points)
+        tgeoms.extend(get_geoms(self.geometries.multilinestrings, 4326))
+        tgeoms.extend(get_geoms(self.geometries.polygons, 3084))
+        tgeoms.extend(get_geoms(self.geometries.multipolygons, 900913))
 
         # The SRID won't be exported in GEOS 3.0 release candidates.
         no_srid = self.null_srid == -1
