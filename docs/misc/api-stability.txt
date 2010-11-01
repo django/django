@@ -15,19 +15,19 @@ In this context, stable means:
    - All the public APIs -- everything documented in the linked documents below,
      and all methods that don't begin with an underscore -- will not be moved or
      renamed without providing backwards-compatible aliases.
-     
+
    - If new features are added to these APIs -- which is quite possible --
      they will not break or change the meaning of existing methods. In other
      words, "stable" does not (necessarily) mean "complete."
-          
+
    - If, for some reason, an API declared stable must be removed or replaced, it
      will be declared deprecated but will remain in the API for at least two
      minor version releases. Warnings will be issued when the deprecated method
      is called.
-     
+
      See :ref:`official-releases` for more details on how Django's version
      numbering scheme works, and how features will be deprecated.
-     
+
    - We'll only break backwards compatibility of these APIs if a bug or
      security hole makes it completely unavoidable.
 
@@ -41,56 +41,56 @@ of 1.0. This includes these APIs:
     - :doc:`Authorization </topics/auth>`
 
     - :doc:`Caching </topics/cache>`.
-    
+
     - :doc:`Model definition, managers, querying and transactions
       </topics/db/index>`
-    
+
     - :doc:`Sending e-mail </topics/email>`.
-    
+
     - :doc:`File handling and storage </topics/files>`
-    
+
     - :doc:`Forms </topics/forms/index>`
-    
+
     - :doc:`HTTP request/response handling </topics/http/index>`, including file
       uploads, middleware, sessions, URL resolution, view, and shortcut APIs.
-    
+
     - :doc:`Generic views </topics/http/generic-views>`.
 
     - :doc:`Internationalization </topics/i18n/index>`.
-    
+
     - :doc:`Pagination </topics/pagination>`
-    
+
     - :doc:`Serialization </topics/serialization>`
-    
+
     - :doc:`Signals </topics/signals>`
-    
+
     - :doc:`Templates </topics/templates>`, including the language, Python-level
       :doc:`template APIs </ref/templates/index>`, and :doc:`custom template tags
       and libraries </howto/custom-template-tags>`. We may add new template
       tags in the future and the names may inadvertently clash with
       external template tags. Before adding any such tags, we'll ensure that
       Django raises an error if it tries to load tags with duplicate names.
-      
+
     - :doc:`Testing </topics/testing>`
 
     - :doc:`django-admin utility </ref/django-admin>`.
-    
+
     - :doc:`Built-in middleware </ref/middleware>`
-    
+
     - :doc:`Request/response objects </ref/request-response>`.
-    
+
     - :doc:`Settings </ref/settings>`. Note, though that while the :doc:`list of
       built-in settings </ref/settings>` can be considered complete we may -- and
       probably will -- add new settings in future versions. This is one of those
       places where "'stable' does not mean 'complete.'"
-      
+
     - :doc:`Built-in signals </ref/signals>`. Like settings, we'll probably add
       new signals in the future, but the existing ones won't break.
-      
+
     - :doc:`Unicode handling </ref/unicode>`.
-        
+
     - Everything covered by the :doc:`HOWTO guides </howto/index>`.
-    
+
 ``django.utils``
 ----------------
 
@@ -106,7 +106,7 @@ the following parts of :doc:`django.utils </ref/utils>` can be considered stable
     - ``django.utils.safestring``
     - ``django.utils.translation``
     - ``django.utils.tzinfo``
-    
+
 Exceptions
 ==========
 
@@ -145,8 +145,62 @@ Certain APIs are explicitly marked as "internal" in a couple of ways:
     - Some documentation refers to internals and mentions them as such. If the
       documentation says that something is internal, we reserve the right to
       change it.
-      
+
     - Functions, methods, and other objects prefixed by a leading underscore
       (``_``). This is the standard Python way of indicating that something is
       private; if any method starts with a single ``_``, it's an internal API.
 
+.. _misc-api-stability-localflavor:
+
+Local flavors
+-------------
+
+.. versionchanged:: 1.3
+
+:mod:`django.contrib.localflavor` contains assorted pieces of code
+that are useful for particular countries or cultures. This data is
+local in nature, and is subject to change on timelines that will
+almost never correlate with Django's own release schedules. For
+example, a common change is to split a province into two new
+provinces, or to rename an existing province.
+
+These changes present two competing compatibility issues. Moving
+forward, displaying the names of deprecated, renamed and dissolved
+provinces in a selection widget is bad from a user interface
+perspective. However, maintaining full backwards compatibility
+requires that we support historical values that may be stored in a
+database -- including values that may no longer be valid.
+
+Therefore, Django has the following policy with respect to changes in
+local flavor:
+
+    * At the time of a Django release, the data and algorithms
+      contained in :mod:`django.contrib.localflavor` will, to the best
+      of our ability, reflect the officially gazetted policies of the
+      appropriate local government authority. If a province has been
+      added, altered, or removed, that change will be reflected in
+      Django's localflavor.
+
+    * These changes will *not* be backported to the previous stable
+      release. Upgrading a minor version of Django should not require
+      any data migration or audits for UI changes; therefore, if you
+      want to get the latest province list, you will either need to
+      upgrade your Django install, or backport the province list you
+      need.
+
+    * For one release, the affected localflavor module will raise a
+      ``RuntimeWarning`` when it is imported.
+
+    * The change will be announced in the release notes as a backwards
+      incompatible change requiring attention. The change will also be
+      annotated in the documentation for the localflavor module.
+
+    * Where necessary and feasible, a migration script will be provided
+      to aid the migration process.
+
+For example, Django 1.2 contains an Indonesian localflavor. It has a
+province list that includes "Nanggroe Aceh Darussalam (NAD)" as a
+province. The Indonesian government has changed the official name of
+the province to "Aceh (ACE)". As a result, Django 1.3 does *not*
+contain "Nanggroe Aceh Darussalam (NAD)" in the province list, but
+*does* contain "Aceh (ACE)".

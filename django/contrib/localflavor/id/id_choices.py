@@ -1,9 +1,15 @@
+import warnings
 from django.utils.translation import ugettext_lazy as _
 
 # Reference: http://id.wikipedia.org/wiki/Daftar_provinsi_Indonesia
 
 # Indonesia does not have an official Province code standard.
 # I decided to use unambiguous and consistent (some are common) 3-letter codes.
+
+warnings.warn(
+    'There have been recent changes to the ID localflavor. See the release notes for details',
+    RuntimeWarning
+)
 
 PROVINCE_CHOICES = (
     ('ACE', _('Aceh')),

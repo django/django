@@ -209,6 +209,17 @@ problem.
 .. _Scunthorpe problem: http://en.wikipedia.org/wiki/Scunthorpe_problem
 .. _commit that implemented this change: http://code.djangoproject.com/changeset/13996
 
+Localflavor changes
+~~~~~~~~~~~~~~~~~~~
+
+Django 1.3 introduces the following backwards-incompatible changes to
+local flavors:
+
+    * Indonesia (id) -- The province "Nanggroe Aceh Darussalam (NAD)"
+      has been removed from the province list in favor of the new
+      official designation "Aceh (ACE)".
+
+
 .. _deprecated-features-1.3:
 
 Features deprecated in 1.3

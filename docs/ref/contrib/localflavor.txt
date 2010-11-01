@@ -129,6 +129,35 @@ in the file. See any of the existing flavors for examples.
 
 .. _create a ticket: http://code.djangoproject.com/simpleticket
 
+Localflavor and backwards compatibility
+=======================================
+
+As documented in our :ref:`API stability
+<misc-api-stability-localflavor>` policy, Django will always attempt
+to make :mod:`django.contrib.localflavor` reflect the officially
+gazetted policies of the appropriate local government authority. For
+example, if a government body makes a change to add, alter, or remove
+a province (or state, or county), that change will be reflected in
+Django's localflavor in the next stable Django release.
+
+When a backwards-incompatible change is made (for example, the removal
+or renaming of a province) the localflavor in question will raise a
+warning when that localflavor is imported. This provides a runtime
+indication that something may require attention.
+
+However, once you have addressed the backwards compatibility (for
+example, auditing your code to see if any data migration is required),
+the warning serves no purpose. The warning can then be supressed.
+For example, to suppress the warnings raised by the Indonesian
+localflavor you would use the following code::
+
+    import warnings
+    warnings.filterwarnings('ignore',
+                            category=RuntimeWarning,
+                            module='django.contrib.localflavor.id')
+    from django.contrib.localflavor.id import forms as id_forms
+
+
 Argentina (``ar``)
 =============================================
 
@@ -234,7 +263,7 @@ Brazil (``br``)
 .. class:: br.forms.BRCPFField
 
     A form field that validates input as `Brazilian CPF`_.
-    
+
     Input can either be of the format XXX.XXX.XXX-VD or be a group of 11 digits.
 
 .. _Brazilian CPF: http://en.wikipedia.org/wiki/Cadastro_de_Pessoas_F%C3%ADsicas
@@ -242,7 +271,7 @@ Brazil (``br``)
 .. class:: br.forms.BRCNPJField
 
     A form field that validates input as `Brazilian CNPJ`_.
-    
+
     Input can either be of the format XX.XXX.XXX/XXXX-XX or be a group of 14
     digits.
 
@@ -442,6 +471,11 @@ Indonesia (``id``)
 .. class:: id.forms.IDProvinceSelect
 
     A ``Select`` widget that uses a list of Indonesian provinces as its choices.
+
+.. versionchanged:: 1.3
+    The province "Nanggroe Aceh Darussalam (NAD)" has been removed
+    from the province list in favor of the new official designation
+    "Aceh (ACE)".
 
 .. class:: id.forms.IDPhoneNumberField
 
