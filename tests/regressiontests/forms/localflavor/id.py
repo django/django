@@ -4,6 +4,8 @@
 tests = r"""
 
 # IDPhoneNumberField ########################################################
+>>> import warnings
+>>> warnings.filterwarnings("ignore", category=RuntimeWarning, module='django.contrib.localflavor.id.id_choices')
 
 >>> from django.contrib.localflavor.id.forms import IDPhoneNumberField
 >>> f = IDPhoneNumberField(required=False)
