@@ -1210,10 +1210,20 @@ Default: ``0``
 Number of digits grouped together on the integer part of a number. Common use
 is to display a thousand separator. If this setting is ``0``, then, no grouping
 will be applied to the number. If this setting is greater than ``0`` then the
-setting ``THOUSAND_SEPARATOR`` will be used as the separator between those
+setting :setting:`THOUSAND_SEPARATOR` will be used as the separator between those
 groups.
 
-See also ``THOUSAND_SEPARATOR``
+See also :setting:`THOUSAND_SEPARATOR`.
+
+.. setting:: PASSWORD_RESET_TIMEOUT_DAYS
+
+PASSWORD_RESET_TIMEOUT_DAYS
+---------------------------
+
+Default: ``3``
+
+The number of days a password reset link is valid for. Used by the
+:mod:`django.contrib.auth` password reset mechanism.
 
 .. setting:: PREPEND_WWW
 
