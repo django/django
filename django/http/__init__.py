@@ -148,9 +148,9 @@ class HttpRequest(object):
                 # specs, but see ticket #8259), so we handle TypeError as well.
                 content_length = 0
             if content_length:
-                self._raw_post_data = self.read()
+                self._raw_post_data = self.read(content_length)
             else:
-                self._raw_post_data = self.read(int(content_length))
+                self._raw_post_data = self.read()
             self._stream = StringIO(self._raw_post_data)
         return self._raw_post_data
     raw_post_data = property(_get_raw_post_data)
