@@ -140,7 +140,17 @@ class HttpRequest(object):
         if not hasattr(self, '_raw_post_data'):
             if self._read_started:
                 raise Exception("You cannot access raw_post_data after reading from request's data stream")
-            self._raw_post_data = self.read()
+            try:
+                content_length = int(self.META.get('CONTENT_LENGTH', 0))
+            except (ValueError, TypeError):
+                # If CONTENT_LENGTH was empty string or not an integer, don't
+                # error out. We've also seen None passed in here (against all
+                # specs, but see ticket #8259), so we handle TypeError as well.
+                content_length = 0
+            if content_length:
+                self._raw_post_data = self.read()
+            else:
+                self._raw_post_data = self.read(int(content_length))
             self._stream = StringIO(self._raw_post_data)
         return self._raw_post_data
     raw_post_data = property(_get_raw_post_data)
