@@ -1356,7 +1356,7 @@ class Templates(unittest.TestCase):
 class TemplateTagLoading(unittest.TestCase):
 
     def setUp(self):
-        self.old_path = sys.path
+        self.old_path = sys.path[:]
         self.old_apps = settings.INSTALLED_APPS
         self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
         self.old_tag_modules = template.templatetags_modules

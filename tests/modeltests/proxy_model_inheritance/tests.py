@@ -17,7 +17,7 @@ from django.test import TransactionTestCase
 class ProxyModelInheritanceTests(TransactionTestCase):
 
     def setUp(self):
-        self.old_sys_path = sys.path
+        self.old_sys_path = sys.path[:]
         sys.path.append(os.path.dirname(os.path.abspath(__file__)))
         self.old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = ('app1', 'app2')

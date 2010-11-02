@@ -27,7 +27,7 @@ class DefaultLoader(unittest.TestCase):
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
-        self.old_path = sys.path
+        self.old_path = sys.path[:]
         self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
 
     def tearDown(self):
