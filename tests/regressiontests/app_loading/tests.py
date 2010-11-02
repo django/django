@@ -7,26 +7,23 @@ from django.conf import Settings
 from django.db.models.loading import cache, load_app
 from django.utils.unittest import TestCase
 
-__test__ = {"API_TESTS": """
-Test the globbing of INSTALLED_APPS.
 
->>> old_sys_path = sys.path
->>> sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+class InstalledAppsGlobbingTest(TestCase):
+    def setUp(self):
+        self.OLD_SYS_PATH = sys.path
+        sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+        self.OLD_TZ = os.environ.get("TZ")
 
->>> old_tz = os.environ.get("TZ")
->>> settings = Settings('test_settings')
+    def test_globbing(self):
+        settings = Settings('test_settings')
+        self.assertEquals(settings.INSTALLED_APPS, ['parent.app', 'parent.app1', 'parent.app_2'])
 
->>> settings.INSTALLED_APPS
-['parent.app', 'parent.app1', 'parent.app_2']
+    def tearDown(self):
+        sys.path = self.OLD_SYS_PATH
+        if hasattr(time, "tzset") and self.OLD_TZ:
+            os.environ["TZ"] = self.OLD_TZ
+            time.tzset()
 
->>> sys.path = old_sys_path
-
-# Undo a side-effect of installing a new settings object.
->>> if hasattr(time, "tzset") and old_tz:
-...     os.environ["TZ"] = old_tz
-...     time.tzset()
-
-"""}
 
 class EggLoadingTest(TestCase):
 
