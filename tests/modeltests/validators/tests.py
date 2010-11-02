@@ -92,7 +92,7 @@ TEST_DATA = (
     (URLValidator(), 'http://www.example.com/', None),
     (URLValidator(), 'http://www.example.com:8000/test', None),
     (URLValidator(), 'http://valid-with-hyphens.com/', None),
-    (URLValidator(), 'http://subdomain.domain.com/', None),
+    (URLValidator(), 'http://subdomain.example.com/', None),
     (URLValidator(), 'http://200.8.9.10/', None),
     (URLValidator(), 'http://200.8.9.10:8000/test', None),
     (URLValidator(), 'http://valid-----hyphens.com/', None),
