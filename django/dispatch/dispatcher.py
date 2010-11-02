@@ -41,7 +41,7 @@ class Signal(object):
                 A function or an instance method which is to receive signals.
                 Receivers must be hashable objects.
 
-                if weak is True, then receiver must be weak-referencable (more
+                If weak is True, then receiver must be weak-referencable (more
                 precisely saferef.safeRef() must be able to create a reference
                 to the receiver).
         
@@ -52,11 +52,11 @@ class Signal(object):
                 dispatch_uid.
 
             sender
-                The sender to which the receiver should respond Must either be
+                The sender to which the receiver should respond. Must either be
                 of type Signal, or None to receive events from any sender.
 
             weak
-                Whether to use weak references to the receiver By default, the
+                Whether to use weak references to the receiver. By default, the
                 module will attempt to use weak references to the receiver
                 objects. If this parameter is false, then strong references will
                 be used.
@@ -170,7 +170,7 @@ class Signal(object):
         Arguments:
         
             sender
-                The sender of the signal Can be any python object (normally one
+                The sender of the signal. Can be any python object (normally one
                 registered with a connect if you actually want something to
                 occur).
 
@@ -182,7 +182,7 @@ class Signal(object):
         Return a list of tuple pairs [(receiver, response), ... ]. May raise
         DispatcherKeyError.
 
-        if any receiver raises an error (specifically any subclass of
+        If any receiver raises an error (specifically any subclass of
         Exception), the error instance is returned as the result for that
         receiver.
         """
