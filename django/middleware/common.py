@@ -90,7 +90,7 @@ class CommonMiddleware(object):
         return http.HttpResponsePermanentRedirect(newurl)
 
     def process_response(self, request, response):
-        "Check for a flat page (for 404s) and calculate the Etag, if needed."
+        "Send broken link emails and calculate the Etag, if needed."
         if response.status_code == 404:
             if settings.SEND_BROKEN_LINK_EMAILS:
                 # If the referrer was from an internal link or a non-search-engine site,
