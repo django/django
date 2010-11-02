@@ -10,7 +10,7 @@ from django.utils.unittest import TestCase
 
 class InstalledAppsGlobbingTest(TestCase):
     def setUp(self):
-        self.OLD_SYS_PATH = sys.path
+        self.OLD_SYS_PATH = sys.path[:]
         sys.path.append(os.path.dirname(os.path.abspath(__file__)))
         self.OLD_TZ = os.environ.get("TZ")
 
@@ -28,7 +28,7 @@ class InstalledAppsGlobbingTest(TestCase):
 class EggLoadingTest(TestCase):
 
     def setUp(self):
-        self.old_path = sys.path
+        self.old_path = sys.path[:]
         self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
 
         # This test adds dummy applications to the app cache. These
