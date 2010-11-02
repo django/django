@@ -140,6 +140,26 @@ In this syntax, each value gets interpreted as a literal string, and there's no
 way to specify variable values. Or literal commas. Or spaces. Did we mention
 you shouldn't use this syntax in any new projects?
 
+.. versionadded:: 1.3
+
+By default, when you use the ``as`` keyword with the cycle tag, the
+usage of ``{% cycle %}`` that declares the cycle will itself output
+the first value in the cycle. This could be a problem if you want to
+use the value in a nested loop or an included template. If you want to
+just declare the cycle, but not output the first value, you can add a
+``silent`` keyword as the last keyword in the tag. For example::
+
+    {% cycle 'row1' 'row2' as rowcolors silent %}
+    {% for obj in some_list %}
+        <tr class="{% cycle rowcolors %}">{{ obj }}</tr>
+    {% endfor %}
+
+This will output a list of ``<tr>`` elements with ``class``
+alternating between ``row1`` and ``row2``. If the ``silent`` keyword
+were to be omitted, ``row1`` would be emitted as normal text, outside
+the list of ``<tr>`` elements, and the first ``<tr>`` would have a
+class of ``row2``.
+
 .. templatetag:: debug
 
 debug

@@ -646,6 +646,9 @@ class Templates(unittest.TestCase):
             'cycle14': ("{% cycle one two as foo %}{% cycle foo %}", {'one': '1','two': '2'}, '12'),
             'cycle15': ("{% for i in test %}{% cycle aye bee %}{{ i }},{% endfor %}", {'test': range(5), 'aye': 'a', 'bee': 'b'}, 'a0,b1,a2,b3,a4,'),
             'cycle16': ("{% cycle one|lower two as foo %}{% cycle foo %}", {'one': 'A','two': '2'}, 'a2'),
+            'cycle17': ("{% cycle 'a' 'b' 'c' as abc silent %}{% cycle abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, "abca"),
+            'cycle18': ("{% cycle 'a' 'b' 'c' as foo invalid_flag %}", {}, template.TemplateSyntaxError),
+            'cycle19': ("{% cycle 'a' 'b' as silent %}{% cycle silent %}", {}, "ab"),
 
             ### EXCEPTIONS ############################################################
 

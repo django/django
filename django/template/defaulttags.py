@@ -53,13 +53,17 @@ class CsrfTokenNode(Node):
             return u''
 
 class CycleNode(Node):
-    def __init__(self, cyclevars, variable_name=None):
+    def __init__(self, cyclevars, variable_name=None, silent=False):
         self.cyclevars = cyclevars
         self.variable_name = variable_name
+        self.silent = silent
 
     def render(self, context):
         if self not in context.render_context:
+            # First time the node is rendered in template
             context.render_context[self] = itertools_cycle(self.cyclevars)
+            if self.silent:
+                return ''
         cycle_iter = context.render_context[self]
         value = cycle_iter.next().resolve(context)
         if self.variable_name:
@@ -482,6 +486,17 @@ def cycle(parser, token):
     You can use any number of values, separated by spaces. Commas can also
     be used to separate values; if a comma is used, the cycle values are
     interpreted as literal strings.
+
+    The optional flag "silent" can be used to prevent the cycle declaration
+    from returning any value::
+
+        {% cycle 'row1' 'row2' as rowcolors silent %}{# no value here #}
+        {% for o in some_list %}
+            <tr class="{% cycle rowcolors %}">{# first value will be "row1" #}
+                ...
+            </tr>
+        {% endfor %}
+
     """
 
     # Note: This returns the exact same node on each {% cycle name %} call;
@@ -513,10 +528,24 @@ def cycle(parser, token):
             raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
         return parser._namedCycleNodes[name]
 
-    if len(args) > 4 and args[-2] == 'as':
+    as_form = False
+
+    if len(args) > 4:
+        # {% cycle ... as foo [silent] %} case.
+        if args[-3] == "as":
+            if args[-1] != "silent":
+                raise TemplateSyntaxError("Only 'silent' flag is allowed after cycle's name, not '%s'." % args[-1])
+            as_form = True
+            silent = True
+            args = args[:-1]
+        elif args[-2] == "as":
+            as_form = True
+            silent = False
+
+    if as_form:
         name = args[-1]
         values = [parser.compile_filter(arg) for arg in args[1:-2]]
-        node = CycleNode(values, name)
+        node = CycleNode(values, name, silent=silent)
         if not hasattr(parser, '_namedCycleNodes'):
             parser._namedCycleNodes = {}
         parser._namedCycleNodes[name] = node
