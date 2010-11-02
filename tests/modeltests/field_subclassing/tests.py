@@ -2,7 +2,7 @@ from django.core import serializers
 from django.test import TestCase
 
 from fields import Small
-from models import DataModel, MyModel
+from models import DataModel, MyModel, OtherModel
 
 
 class CustomField(TestCase):
@@ -73,3 +73,9 @@ class CustomField(TestCase):
             ],
             lambda m: str(m.data)
         )
+
+    def test_field_subclassing(self):
+        o = OtherModel.objects.create(data=Small("a", "b"))
+        o = OtherModel.objects.get()
+        self.assertEqual(o.data.first, "a")
+        self.assertEqual(o.data.second, "b")

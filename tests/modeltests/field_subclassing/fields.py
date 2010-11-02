@@ -52,6 +52,9 @@ class SmallField(models.Field):
             return []
         raise TypeError('Invalid lookup type: %r' % lookup_type)
 
+class SmallerField(SmallField):
+    pass
+
 
 class JSONField(models.TextField):
     __metaclass__ = models.SubfieldBase
