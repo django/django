@@ -22,6 +22,18 @@ class BaseCache(object):
             timeout = 300
         self.default_timeout = timeout
 
+        max_entries = params.get('max_entries', 300)
+        try:
+            self._max_entries = int(max_entries)
+        except (ValueError, TypeError):
+            self._max_entries = 300
+
+        cull_frequency = params.get('cull_frequency', 3)
+        try:
+            self._cull_frequency = int(cull_frequency)
+        except (ValueError, TypeError):
+            self._cull_frequency = 3
+
     def add(self, key, value, timeout=None):
         """
         Set a value in the cache if the key does not already exist. If

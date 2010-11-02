@@ -14,19 +14,6 @@ from django.utils.hashcompat import md5_constructor
 class CacheClass(BaseCache):
     def __init__(self, dir, params):
         BaseCache.__init__(self, params)
-
-        max_entries = params.get('max_entries', 300)
-        try:
-            self._max_entries = int(max_entries)
-        except (ValueError, TypeError):
-            self._max_entries = 300
-
-        cull_frequency = params.get('cull_frequency', 3)
-        try:
-            self._cull_frequency = int(cull_frequency)
-        except (ValueError, TypeError):
-            self._cull_frequency = 3
-
         self._dir = dir
         if not os.path.exists(self._dir):
             self._createdir()

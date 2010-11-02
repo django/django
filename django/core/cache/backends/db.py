@@ -25,7 +25,7 @@ class Options(object):
         self.managed = True
         self.proxy = False
 
-class CacheClass(BaseCache):
+class BaseDatabaseCacheClass(BaseCache):
     def __init__(self, table, params):
         BaseCache.__init__(self, params)
         self._table = table
@@ -34,17 +34,7 @@ class CacheClass(BaseCache):
             _meta = Options(table)
         self.cache_model_class = CacheEntry
 
-        max_entries = params.get('max_entries', 300)
-        try:
-            self._max_entries = int(max_entries)
-        except (ValueError, TypeError):
-            self._max_entries = 300
-        cull_frequency = params.get('cull_frequency', 3)
-        try:
-            self._cull_frequency = int(cull_frequency)
-        except (ValueError, TypeError):
-            self._cull_frequency = 3
-
+class CacheClass(BaseDatabaseCacheClass):
     def get(self, key, default=None):
         self.validate_key(key)
         db = router.db_for_read(self.cache_model_class)

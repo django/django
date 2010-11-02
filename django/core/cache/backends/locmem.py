@@ -14,19 +14,6 @@ class CacheClass(BaseCache):
         BaseCache.__init__(self, params)
         self._cache = {}
         self._expire_info = {}
-
-        max_entries = params.get('max_entries', 300)
-        try:
-            self._max_entries = int(max_entries)
-        except (ValueError, TypeError):
-            self._max_entries = 300
-
-        cull_frequency = params.get('cull_frequency', 3)
-        try:
-            self._cull_frequency = int(cull_frequency)
-        except (ValueError, TypeError):
-            self._cull_frequency = 3
-
         self._lock = RWLock()
 
     def add(self, key, value, timeout=None):

@@ -410,6 +410,10 @@ class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def test_cull(self):
         self.perform_cull_test(50, 29)
 
+    def test_zero_cull(self):
+        self.cache = get_cache('db://%s?max_entries=30&cull_frequency=0' % self._table_name)
+        self.perform_cull_test(50, 18)
+
 class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         self.cache = get_cache('locmem://?max_entries=30')
@@ -417,30 +421,33 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
     def test_cull(self):
         self.perform_cull_test(50, 29)
 
+    def test_zero_cull(self):
+        self.cache = get_cache('locmem://?max_entries=30&cull_frequency=0')
+        self.perform_cull_test(50, 19)
+
 # memcached backend isn't guaranteed to be available.
 # To check the memcached backend, the test settings file will
 # need to contain a CACHE_BACKEND setting that points at
 # your memcache server.
-if settings.CACHE_BACKEND.startswith('memcached://'):
-    class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
-        def setUp(self):
-            self.cache = get_cache(settings.CACHE_BACKEND)
+class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
+    def setUp(self):
+        self.cache = get_cache(settings.CACHE_BACKEND)
 
-        def test_invalid_keys(self):
-            """
-            On memcached, we don't introduce a duplicate key validation
-            step (for speed reasons), we just let the memcached API
-            library raise its own exception on bad keys. Refs #6447.
+    def test_invalid_keys(self):
+        """
+        On memcached, we don't introduce a duplicate key validation
+        step (for speed reasons), we just let the memcached API
+        library raise its own exception on bad keys. Refs #6447.
 
-            In order to be memcached-API-library agnostic, we only assert
-            that a generic exception of some kind is raised.
+        In order to be memcached-API-library agnostic, we only assert
+        that a generic exception of some kind is raised.
 
-            """
-            # memcached does not allow whitespace or control characters in keys
-            self.assertRaises(Exception, self.cache.set, 'key with spaces', 'value')
-            # memcached limits key length to 250
-            self.assertRaises(Exception, self.cache.set, 'a' * 251, 'value')
-
+        """
+        # memcached does not allow whitespace or control characters in keys
+        self.assertRaises(Exception, self.cache.set, 'key with spaces', 'value')
+        # memcached limits key length to 250
+        self.assertRaises(Exception, self.cache.set, 'a' * 251, 'value')
+MemcachedCacheTests = unittest.skipUnless(settings.CACHE_BACKEND.startswith('memcached://'), "memcached not available")(MemcachedCacheTests)
 
 class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     """
