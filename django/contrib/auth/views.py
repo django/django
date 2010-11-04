@@ -143,13 +143,13 @@ def password_reset_confirm(request, uidb36=None, token=None, template_name='regi
         post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
     try:
         uid_int = base36_to_int(uidb36)
-    except ValueError:
-        raise Http404
+        user = User.objects.get(id=uid_int)
+    except (ValueError, User.DoesNotExist):
+        user = None
 
-    user = get_object_or_404(User, id=uid_int)
     context_instance = RequestContext(request)
 
-    if token_generator.check_token(user, token):
+    if user is not None and token_generator.check_token(user, token):
         context_instance['validlink'] = True
         if request.method == 'POST':
             form = set_password_form(user, request.POST)

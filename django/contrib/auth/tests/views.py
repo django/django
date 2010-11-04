@@ -100,6 +100,12 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEquals(response.status_code, 200)
         self.assert_("The password reset link was invalid" in response.content)
 
+    def test_confirm_invalid_user(self):
+        # Ensure that we get a 200 response for a non-existant user, not a 404
+        response = self.client.get('/reset/123456-1-1/')
+        self.assertEquals(response.status_code, 200)
+        self.assert_("The password reset link was invalid" in response.content)
+
     def test_confirm_invalid_post(self):
         # Same as test_confirm_invalid, but trying
         # to do a POST instead.
