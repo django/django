@@ -134,7 +134,7 @@ class WSGIRequest(http.HttpRequest):
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
         self._post_parse_error = False
-        if isinstance(self.environ['wsgi.input'], socket._fileobject):
+        if type(socket._fileobject) is type and isinstance(self.environ['wsgi.input'], socket._fileobject):
             # Under development server 'wsgi.input' is an instance of
             # socket._fileobject which hangs indefinitely on reading bytes past
             # available count. To prevent this it's wrapped in LimitedStream
@@ -144,6 +144,9 @@ class WSGIRequest(http.HttpRequest):
             # streams) beacuse they don't suffer from this problem and we can
             # avoid using another wrapper with its own .read and .readline
             # implementation.
+            #
+            # The type check is done because for some reason, AppEngine
+            # implements _fileobject as a function, not a class.
             try:
                 content_length = int(self.environ.get('CONTENT_LENGTH', 0))
             except (ValueError, TypeError):
