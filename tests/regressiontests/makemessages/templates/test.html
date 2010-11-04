@@ -1,2 +1,4 @@
 {% load i18n %}
 {% trans "This literal should be included." %}
+{% blocktrans %}I think that 100% is more that 50% of anything.{% endblocktrans %}
+{% blocktrans with 'txt' as obj %}I think that 100% is more that 50% of {{ obj }}.{% endblocktrans %}
