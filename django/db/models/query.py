@@ -7,7 +7,8 @@ from itertools import izip
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import DateField
-from django.db.models.query_utils import Q, select_related_descend, CollectedObjects, CyclicDependency, deferred_class_factory, InvalidQuery
+from django.db.models.query_utils import (Q, select_related_descend,
+    CollectedObjects, CyclicDependency, deferred_class_factory, InvalidQuery)
 from django.db.models import signals, sql
 from django.utils.copycompat import deepcopy
 
@@ -998,12 +999,7 @@ class DateQuerySet(QuerySet):
         self.query.clear_deferred_loading()
         self.query = self.query.clone(klass=sql.DateQuery, setup=True)
         self.query.select = []
-        field = self.model._meta.get_field(self._field_name, many_to_many=False)
-        assert isinstance(field, DateField), "%r isn't a DateField." \
-                % field.name
-        self.query.add_date_select(field, self._kind, self._order)
-        if field.null:
-            self.query.add_filter(('%s__isnull' % field.name, False))
+        self.query.add_date_select(self._field_name, self._kind, self._order)
 
     def _clone(self, klass=None, setup=False, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, False, **kwargs)

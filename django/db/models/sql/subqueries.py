@@ -4,6 +4,7 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 
 from django.core.exceptions import FieldError
 from django.db import connections
+from django.db.models.fields import DateField
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import Date
 from django.db.models.sql.expressions import SQLEvaluator
@@ -184,12 +185,19 @@ class DateQuery(Query):
 
     compiler = 'SQLDateCompiler'
 
-    def add_date_select(self, field, lookup_type, order='ASC'):
+    def add_date_select(self, field_name, lookup_type, order='ASC'):
         """
         Converts the query into a date extraction query.
         """
-        result = self.setup_joins([field.name], self.get_meta(),
-                self.get_initial_alias(), False)
+        result = self.setup_joins(
+            field_name.split(LOOKUP_SEP),
+            self.get_meta(),
+            self.get_initial_alias(),
+            False
+        )
+        field = result[0]
+        assert isinstance(field, DateField), "%r isn't a DateField." \
+                % field.name
         alias = result[3][-1]
         select = Date((alias, field.column), lookup_type)
         self.select = [select]
@@ -198,6 +206,9 @@ class DateQuery(Query):
         self.set_extra_mask([])
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
+
+        if field.null:
+            self.add_filter(("%s__isnull" % field_name, False))
 
 class AggregateQuery(Query):
     """
