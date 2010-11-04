@@ -4,7 +4,7 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 
 from django.core.exceptions import FieldError
 from django.db import connections
-from django.db.models.fields import DateField
+from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import Date
 from django.db.models.sql.expressions import SQLEvaluator
@@ -189,12 +189,17 @@ class DateQuery(Query):
         """
         Converts the query into a date extraction query.
         """
-        result = self.setup_joins(
-            field_name.split(LOOKUP_SEP),
-            self.get_meta(),
-            self.get_initial_alias(),
-            False
-        )
+        try:
+            result = self.setup_joins(
+                field_name.split(LOOKUP_SEP),
+                self.get_meta(),
+                self.get_initial_alias(),
+                False
+            )
+        except FieldError:
+            raise FieldDoesNotExist("%s has no field named '%s'" % (
+                self.model._meta.object_name, field_name
+            ))
         field = result[0]
         assert isinstance(field, DateField), "%r isn't a DateField." \
                 % field.name
