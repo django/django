@@ -219,6 +219,12 @@ definition.
 
 Returns a boolean indicating whether the geometry is valid.
 
+.. attribute:: GEOSGeometry.valid_reason 
+
+.. versionadded:: 1.3 
+
+Returns a string describing the reason why a geometry is invalid. 
+
 .. attribute:: GEOSGeometry.srid
 
 Property that may be used to retrieve or set the SRID associated with the

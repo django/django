@@ -1,6 +1,7 @@
 import ctypes, random, unittest, sys
 from django.contrib.gis.geos import *
 from django.contrib.gis.geos.base import gdal, numpy, GEOSBase
+from django.contrib.gis.geos.libgeos import GEOS_PREPARE
 from django.contrib.gis.geometry.test_data import TestDataMixin
 
 class GEOSTest(unittest.TestCase, TestDataMixin):
@@ -916,6 +917,26 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                       )
         for geom, merged in zip(ref_geoms, ref_merged):
             self.assertEqual(merged, geom.merged)
+
+    def test27_valid_reason(self):
+        "Testing IsValidReason support"
+        # Skipping tests if GEOS < v3.1.
+        if not GEOS_PREPARE: return
+
+        g = GEOSGeometry("POINT(0 0)")
+        self.assert_(g.valid)
+        self.assert_(isinstance(g.valid_reason, basestring))
+        self.assertEqual(g.valid_reason, "Valid Geometry")
+
+        print "\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n"
+
+        g = GEOSGeometry("LINESTRING(0 0, 0 0)")
+
+        self.assert_(not g.valid)
+        self.assert_(isinstance(g.valid_reason, basestring))
+        self.assertEqual(g.valid_reason, "Too few points in geometry component[0 0]")
+
+        print "\nEND - expecting GEOS_NOTICE; safe to ignore.\n"
 
 def suite():
     s = unittest.TestSuite()

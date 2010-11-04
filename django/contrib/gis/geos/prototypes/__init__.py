@@ -18,7 +18,7 @@ from django.contrib.gis.geos.prototypes.geom import from_hex, from_wkb, from_wkt
     to_hex, to_wkb, to_wkt
 
 # Miscellaneous routines.
-from django.contrib.gis.geos.prototypes.misc import geos_area, geos_distance, geos_length
+from django.contrib.gis.geos.prototypes.misc import *
 
 # Predicates
 from django.contrib.gis.geos.prototypes.predicates import geos_hasz, geos_isempty, \

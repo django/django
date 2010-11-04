@@ -275,6 +275,15 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "This property tests the validity of this Geometry."
         return capi.geos_isvalid(self.ptr)
 
+    @property
+    def valid_reason(self):
+        """
+        Returns a string containing the reason for any invalidity.
+        """
+        if not GEOS_PREPARE:
+            raise GEOSException('Upgrade GEOS to 3.1 to get validity reason.')
+        return capi.geos_isvalidreason(self.ptr)
+
     #### Binary predicates. ####
     def contains(self, other):
         "Returns true if other.within(this) returns true."
@@ -376,7 +385,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         Returns the WKB of this Geometry in hexadecimal form.  Please note
         that the SRID and Z values are not included in this representation
-        because it is not a part of the OGC specification (use the `hexewkb` 
+        because it is not a part of the OGC specification (use the `hexewkb`
         property instead).
         """
         # A possible faster, all-python, implementation:
@@ -386,14 +395,14 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def hexewkb(self):
         """
-        Returns the EWKB of this Geometry in hexadecimal form.  This is an 
-        extension of the WKB specification that includes SRID and Z values 
+        Returns the EWKB of this Geometry in hexadecimal form.  This is an
+        extension of the WKB specification that includes SRID and Z values
         that are a part of this geometry.
         """
         if self.hasz:
             if not GEOS_PREPARE:
                 # See: http://trac.osgeo.org/geos/ticket/216
-                raise GEOSException('Upgrade GEOS to 3.1 to get valid 3D HEXEWKB.')               
+                raise GEOSException('Upgrade GEOS to 3.1 to get valid 3D HEXEWKB.')
             return ewkb_w3d().write_hex(self)
         else:
             return ewkb_w().write_hex(self)
