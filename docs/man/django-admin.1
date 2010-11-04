@@ -60,7 +60,7 @@ Executes
 .B sqlall
 for the given app(s) in the current database.
 .TP
-.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "]"
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "] [" "\-\-no\-wrap" "]"
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the django tree) or locale (for project and application) directory.
@@ -195,6 +195,9 @@ times to ignore more.
 .TP
 .I \-\-no\-default\-ignore
 Don't ignore the common private glob-style patterns 'CVS', '.*' and '*~'.
+.TP
+.I \-\-no\-wrap
+Don't break long message lines into several lines.
 .TP
 .I \-a, \-\-all
 Process all available locales when using makemessages..SH "ENVIRONMENT"

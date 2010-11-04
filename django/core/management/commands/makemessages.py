@@ -115,7 +115,7 @@ def copy_plural_forms(msgs, locale, domain, verbosity):
 
 
 def make_messages(locale=None, domain='django', verbosity='1', all=False,
-        extensions=None, symlinks=False, ignore_patterns=[]):
+        extensions=None, symlinks=False, ignore_patterns=[], no_wrap=False):
     """
     Uses the locale directory from the Django SVN tree or an application/
     project to process all
@@ -164,6 +164,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
         locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % localedir))
         languages = [os.path.basename(l) for l in locale_dirs]
 
+    wrap = no_wrap and '--no-wrap' or ''
+
     for locale in languages:
         if verbosity > 0:
             print "processing language", locale
@@ -190,7 +192,14 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                     f.write(src)
                 finally:
                     f.close()
-                cmd = 'xgettext -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 --from-code UTF-8 -o - "%s"' % (domain, os.path.join(dirpath, thefile))
+                cmd = (
+                    'xgettext -d %s -L Perl %s --keyword=gettext_noop '
+                    '--keyword=gettext_lazy --keyword=ngettext_lazy:1,2 '
+                    '--keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 '
+                    '--from-code UTF-8 -o - "%s"' % (
+                        domain, wrap, os.path.join(dirpath, thefile)
+                    )
+                )
                 msgs, errors = _popen(cmd)
                 if errors:
                     raise CommandError("errors happened while running xgettext on %s\n%s" % (file, errors))
@@ -225,8 +234,15 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                         raise SyntaxError(msg)
                 if verbosity > 1:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
-                cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=ugettext_noop --keyword=ugettext_lazy --keyword=ungettext_lazy:1,2 --keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 --keyword=pgettext_lazy:1c,2 --keyword=npgettext_lazy:1c,2,3 --from-code UTF-8 -o - "%s"' % (
-                    domain, os.path.join(dirpath, thefile))
+                cmd = (
+                    'xgettext -d %s -L Python %s --keyword=gettext_noop '
+                    '--keyword=gettext_lazy --keyword=ngettext_lazy:1,2 '
+                    '--keyword=ugettext_noop --keyword=ugettext_lazy '
+                    '--keyword=ungettext_lazy:1,2 --keyword=pgettext:1c,2 '
+                    '--keyword=npgettext:1c,2,3 --keyword=pgettext_lazy:1c,2 '
+                    '--keyword=npgettext_lazy:1c,2,3 --from-code UTF-8 -o - '
+                    '"%s"' % (domain, wrap, os.path.join(dirpath, thefile))
+                )
                 msgs, errors = _popen(cmd)
                 if errors:
                     raise CommandError("errors happened while running xgettext on %s\n%s" % (file, errors))
@@ -250,7 +266,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                     os.unlink(os.path.join(dirpath, thefile))
 
         if os.path.exists(potfile):
-            msgs, errors = _popen('msguniq --to-code=utf-8 "%s"' % potfile)
+            msgs, errors = _popen('msguniq %s --to-code=utf-8 "%s"' %
+                                  (wrap, potfile))
             if errors:
                 raise CommandError("errors happened while running msguniq\n%s" % errors)
             f = open(potfile, 'w')
@@ -259,7 +276,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
             finally:
                 f.close()
             if os.path.exists(pofile):
-                msgs, errors = _popen('msgmerge -q "%s" "%s"' % (pofile, potfile))
+                msgs, errors = _popen('msgmerge %s -q "%s" "%s"' %
+                                      (wrap, pofile, potfile))
                 if errors:
                     raise CommandError("errors happened while running msgmerge\n%s" % errors)
             elif not invoked_for_django:
@@ -289,6 +307,8 @@ class Command(BaseCommand):
             default=[], metavar='PATTERN', help='Ignore files or directories matching this glob-style pattern. Use multiple times to ignore more.'),
         make_option('--no-default-ignore', action='store_false', dest='use_default_ignore_patterns',
             default=True, help="Don't ignore the common glob-style patterns 'CVS', '.*' and '*~'."),
+        make_option('--no-wrap', action='store_true', dest='no_wrap',
+            default=False, help="Don't break long message lines into several lines"),
     )
     help = "Runs over the entire source tree of the current directory and pulls out all strings marked for translation. It creates (or updates) a message file in the conf/locale (in the django tree) or locale (for project and application) directory."
 
@@ -309,6 +329,7 @@ class Command(BaseCommand):
         if options.get('use_default_ignore_patterns'):
             ignore_patterns += ['CVS', '.*', '*~']
         ignore_patterns = list(set(ignore_patterns))
+        no_wrap = options.get('no_wrap')
 
         if domain == 'djangojs':
             extensions = handle_extensions(extensions or ['js'])
@@ -316,6 +337,7 @@ class Command(BaseCommand):
             extensions = handle_extensions(extensions or ['html'])
 
         if verbosity > 1:
-            sys.stdout.write('examining files with the extensions: %s\n' % get_text_list(list(extensions), 'and'))
+            sys.stdout.write('examining files with the extensions: %s\n'
+                             % get_text_list(list(extensions), 'and'))
 
-        make_messages(locale, domain, verbosity, process_all, extensions, symlinks, ignore_patterns)
+        make_messages(locale, domain, verbosity, process_all, extensions, symlinks, ignore_patterns, no_wrap)

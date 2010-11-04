@@ -27,11 +27,15 @@ class ExtractorTests(TestCase):
             pass
         os.chdir(self._cwd)
 
-    def assertMsgId(self, msgid, s):
-        return self.assert_(re.search('^msgid "%s"' % msgid, s, re.MULTILINE))
+    def assertMsgId(self, msgid, s, use_quotes=True):
+        if use_quotes:
+            msgid = '"%s"' % msgid
+        return self.assert_(re.search('^msgid %s' % msgid, s, re.MULTILINE))
 
-    def assertNotMsgId(self, msgid, s):
-        return self.assert_(not re.search('^msgid "%s"' % msgid, s, re.MULTILINE))
+    def assertNotMsgId(self, msgid, s, use_quotes=True):
+        if use_quotes:
+            msgid = '"%s"' % msgid
+        return self.assert_(not re.search('^msgid %s' % msgid, s, re.MULTILINE))
 
 
 class JavascriptExtractorTests(ExtractorTests):
@@ -96,3 +100,20 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         self.assert_(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
         self.assert_('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
+
+
+class NoWrapExtractorTests(ExtractorTests):
+
+    def test_no_wrap_enabled(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=True)
+        self.assert_(os.path.exists(self.PO_FILE))
+        po_contents = open(self.PO_FILE, 'r').read()
+        self.assertMsgId('This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap option.', po_contents)
+
+    def test_no_wrap_disabled(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=False)
+        self.assert_(os.path.exists(self.PO_FILE))
+        po_contents = open(self.PO_FILE, 'r').read()
+        self.assertMsgId('""\n"This literal should also be included wrapped or not wrapped depending on the "\n"use of the --no-wrap option."', po_contents, use_quotes=False)
