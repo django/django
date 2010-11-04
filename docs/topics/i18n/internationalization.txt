@@ -179,7 +179,7 @@ cardinality of the elements at play.
         count = Report.objects.count()
         d = {
             'count': count,
-            'name': Report._meta.verbose_name
+            'name': Report._meta.verbose_name,
             'plural_name': Report._meta.verbose_name_plural
         }
         text = ungettext(
