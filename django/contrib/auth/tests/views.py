@@ -16,7 +16,7 @@ class AuthViewsTestCase(TestCase):
     Helper base class for all the follow test cases.
     """
     fixtures = ['authtestdata.json']
-    urls = 'django.contrib.auth.urls'
+    urls = 'django.contrib.auth.tests.urls'
 
     def setUp(self):
         self.old_LANGUAGES = settings.LANGUAGES

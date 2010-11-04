@@ -12,7 +12,7 @@ def remote_user_auth_view(request):
     return HttpResponse(t.render(c))
 
 # special urls for auth test cases
-urlpatterns += patterns('',
+urlpatterns = urlpatterns + patterns('',
     (r'^logout/custom_query/$', 'django.contrib.auth.views.logout', dict(redirect_field_name='follow')),
     (r'^logout/next_page/$', 'django.contrib.auth.views.logout', dict(next_page='/somewhere/')),
     (r'^remote_user/$', remote_user_auth_view),
