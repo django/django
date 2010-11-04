@@ -1,11 +1,11 @@
-from django import test
 from django import template
+from django.utils.unittest import TestCase
 
 
-custom_filters = """
->>> t = template.Template("{% load custom %}{{ string|trim:5 }}")
->>> ctxt = template.Context({"string": "abcdefghijklmnopqrstuvwxyz"})
->>> t.render(ctxt)
-u"abcde"
-"""
-
+class CustomTests(TestCase):
+    def test_filter(self):
+        t = template.Template("{% load custom %}{{ string|trim:5 }}")
+        self.assertEqual(
+            t.render(template.Context({"string": "abcdefghijklmnopqrstuvwxyz"})),
+            u"abcde"
+        )

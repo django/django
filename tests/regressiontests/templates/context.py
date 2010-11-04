@@ -1,22 +1,16 @@
 # coding: utf-8
+from django.template import Context
+from django.utils.unittest import TestCase
 
-context_tests = r"""
->>> from django.template import Context
->>> c = Context({'a': 1, 'b': 'xyzzy'})
->>> c['a']
-1
->>> c.push()
-{}
->>> c['a'] = 2
->>> c['a']
-2
->>> c.get('a')
-2
->>> c.pop()
-{'a': 2}
->>> c['a']
-1
->>> c.get('foo', 42)
-42
-"""
 
+class ContextTests(TestCase):
+    def test_context(self):
+        c = Context({"a": 1, "b": "xyzzy"})
+        self.assertEqual(c["a"], 1)
+        self.assertEqual(c.push(), {})
+        c["a"] = 2
+        self.assertEqual(c["a"], 2)
+        self.assertEqual(c.get("a"), 2)
+        self.assertEqual(c.pop(), {"a": 2})
+        self.assertEqual(c["a"], 1)
+        self.assertEqual(c.get("foo", 42), 42)
