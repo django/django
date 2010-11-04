@@ -476,7 +476,7 @@ In-memory backend
 
 The ``'locmem'`` backend stores messages in a special attribute of the
 ``django.core.mail`` module. The ``outbox`` attribute is created when the
-first message is send. It's a list with an
+first message is sent. It's a list with an
 :class:`~django.core.mail.EmailMessage` instance for each message that would
 be send.
 
