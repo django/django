@@ -24,6 +24,9 @@ _default = None
 # file lookups when checking the same locale on repeated requests.
 _accepted = {}
 
+# magic gettext number to separate context from message
+CONTEXT_SEPARATOR = u"\x04"
+
 # Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9.
 accept_language_re = re.compile(r'''
         ([A-Za-z]{1,8}(?:-[A-Za-z]{1,8})*|\*)   # "en", "en-au", "x-y-z", "*"
@@ -279,6 +282,14 @@ def gettext(message):
 def ugettext(message):
     return do_translate(message, 'ugettext')
 
+def pgettext(context, message):
+    result = do_translate(
+        u"%s%s%s" % (context, CONTEXT_SEPARATOR, message), 'ugettext')
+    if CONTEXT_SEPARATOR in result:
+        # Translation not found
+        result = message
+    return result
+
 def gettext_noop(message):
     """
     Marks strings for translation but doesn't translate them now. This can be
@@ -312,6 +323,15 @@ def ungettext(singular, plural, number):
     plural, based on the number.
     """
     return do_ntranslate(singular, plural, number, 'ungettext')
+
+def npgettext(context, singular, plural, number):
+    result = do_ntranslate(u"%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
+                           u"%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
+                           number, 'ungettext')
+    if CONTEXT_SEPARATOR in result:
+        # Translation not found
+        result = do_ntranslate(singular, plural, number, 'ungettext')
+    return result
 
 def check_for_language(lang_code):
     """

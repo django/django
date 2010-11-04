@@ -86,6 +86,14 @@ Users of Python 2.5 and above may now use :ref:`transaction management functions
 
 For more information, see :ref:`transaction-management-functions`.
 
+Contextual markers in translatable strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For translation strings with ambiguous meaning, you can now
+use the ``pgettext`` function to specify the context of the string.
+
+For more information, see :ref:`contextual-markers`
+
 Everything else
 ~~~~~~~~~~~~~~~
 

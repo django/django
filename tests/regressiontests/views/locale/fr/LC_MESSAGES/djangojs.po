@@ -22,3 +22,7 @@ msgstr "il faut le traduire"
 
 msgid "Choose a time"
 msgstr "Choisir une heure"
+
+msgctxt "month name"
+msgid "May"
+msgstr "mai"

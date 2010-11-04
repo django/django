@@ -68,6 +68,8 @@ NullSource = """
 function gettext(msgid) { return msgid; }
 function ngettext(singular, plural, count) { return (count == 1) ? singular : plural; }
 function gettext_noop(msgid) { return msgid; }
+function pgettext(context, msgid) { return msgid; }
+function npgettext(context, singular, plural, count) { return (count == 1) ? singular : plural; }
 """
 
 LibHead = """
@@ -98,6 +100,21 @@ function ngettext(singular, plural, count) {
 
 function gettext_noop(msgid) { return msgid; }
 
+function pgettext(context, msgid) {
+  var value = gettext(context + '\x04' + msgid);
+  if (value.indexOf('\x04') != -1) {
+    value = msgid;
+  }
+  return value;
+}
+
+function npgettext(context, singular, plural, count) {
+  var value = ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+  if (value.indexOf('\x04') != -1) {
+    value = ngettext(singular, plural, count);
+  }
+  return value;
+}
 """
 
 LibFormatHead = """

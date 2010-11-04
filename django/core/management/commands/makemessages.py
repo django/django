@@ -190,7 +190,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                     f.write(src)
                 finally:
                     f.close()
-                cmd = 'xgettext -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (domain, os.path.join(dirpath, thefile))
+                cmd = 'xgettext -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 --from-code UTF-8 -o - "%s"' % (domain, os.path.join(dirpath, thefile))
                 msgs, errors = _popen(cmd)
                 if errors:
                     raise CommandError("errors happened while running xgettext on %s\n%s" % (file, errors))
@@ -225,7 +225,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                         raise SyntaxError(msg)
                 if verbosity > 1:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
-                cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=ugettext_noop --keyword=ugettext_lazy --keyword=ungettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
+                cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=ugettext_noop --keyword=ugettext_lazy --keyword=ungettext_lazy:1,2 --keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 --keyword=pgettext_lazy:1c,2 --keyword=npgettext_lazy:1c,2,3 --from-code UTF-8 -o - "%s"' % (
                     domain, os.path.join(dirpath, thefile))
                 msgs, errors = _popen(cmd)
                 if errors:

@@ -30,6 +30,9 @@ class I18NTests(TestCase):
             # catalog['this is to be translated'] = 'same_that_trans_txt'
             # javascript_quote is used to be able to check unicode strings
             self.assertContains(response, javascript_quote(trans_txt), 1)
+            if lang_code == 'fr':
+                # Message with context (msgctxt)
+                self.assertContains(response, "['month name\x04May'] = 'mai';", 1)
 
 
 class JsI18NTests(TestCase):

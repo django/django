@@ -20,3 +20,20 @@ msgstr ""
 #: models.py:3
 msgid "Date/time"
 msgstr "Datum/Zeit (LOCALE_PATHS)"
+
+#: models.py:5
+msgctxt "month name"
+msgid "May"
+msgstr "Mai"
+
+#: models.py:7
+msgctxt "verb"
+msgid "May"
+msgstr "Kann"
+
+#: models.py:9
+msgctxt "search"
+msgid "%d result"
+msgid_plural "%d results"
+msgstr[0] "%d Resultat"
+msgstr[1] "%d Resultate"

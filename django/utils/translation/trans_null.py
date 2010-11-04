@@ -15,6 +15,12 @@ ngettext_lazy = ngettext
 def ungettext(singular, plural, number):
     return force_unicode(ngettext(singular, plural, number))
 
+def pgettext(context, message):
+    return ugettext(message)
+
+def npgettext(context, singular, plural, number):
+    return ungettext(singular, plural, number)
+
 activate = lambda x: None
 deactivate = deactivate_all = lambda: None
 get_language = lambda: settings.LANGUAGE_CODE

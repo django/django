@@ -10,7 +10,8 @@ __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
         'get_language', 'get_language_bidi', 'get_date_formats',
         'get_partial_date_formats', 'check_for_language', 'to_locale',
         'get_language_from_request', 'templatize', 'ugettext', 'ugettext_lazy',
-        'ungettext', 'deactivate_all']
+        'ungettext', 'ungettext_lazy', 'pgettext', 'pgettext_lazy',
+        'npgettext', 'npgettext_lazy', 'deactivate_all']
 
 # Here be dragons, so a short explanation of the logic won't hurt:
 # We are trying to solve two problems: (1) access settings, in particular
@@ -63,10 +64,18 @@ def ugettext(message):
 def ungettext(singular, plural, number):
     return _trans.ungettext(singular, plural, number)
 
+def pgettext(context, message):
+    return _trans.pgettext(context, message)
+
+def npgettext(context, singular, plural, number):
+    return _trans.npgettext(context, singular, plural, number)
+
 ngettext_lazy = lazy(ngettext, str)
 gettext_lazy = lazy(gettext, str)
 ungettext_lazy = lazy(ungettext, unicode)
 ugettext_lazy = lazy(ugettext, unicode)
+pgettext_lazy = lazy(pgettext, unicode)
+npgettext_lazy = lazy(npgettext, unicode)
 
 def activate(language):
     return _trans.activate(language)

@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.utils.formats import get_format, date_format, time_format, localize, localize_input, iter_format_modules
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import mark_safe, SafeString, SafeUnicode
-from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, to_locale
+from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, pgettext, npgettext, to_locale
 from django.utils.importlib import import_module
 
 
@@ -53,6 +53,22 @@ class TranslationTests(TestCase):
         self.assertEqual(unicode(s1), "test")
         s2 = pickle.loads(pickle.dumps(s1))
         self.assertEqual(unicode(s2), "test")
+
+    def test_pgettext(self):
+        # Reset translation catalog to include other/locale/de
+        self.old_locale_paths = settings.LOCALE_PATHS
+        settings.LOCALE_PATHS += (os.path.join(os.path.dirname(os.path.abspath(__file__)), 'other', 'locale'),)
+        from django.utils.translation import trans_real
+        trans_real._active = {}
+        trans_real._translations = {}
+        activate('de')
+
+        self.assertEqual(pgettext("unexisting", "May"), u"May")
+        self.assertEqual(pgettext("month name", "May"), u"Mai")
+        self.assertEqual(pgettext("verb", "May"), u"Kann")
+        self.assertEqual(npgettext("search", "%d result", "%d results", 4) % 4, u"4 Resultate")
+
+        settings.LOCALE_PATHS = self.old_locale_paths
 
     def test_string_concat(self):
         """

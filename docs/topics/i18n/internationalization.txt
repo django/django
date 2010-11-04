@@ -193,6 +193,39 @@ cardinality of the elements at play.
     ``django-admin.py compilemessages`` or a ``KeyError`` Python exception at
     runtime.
 
+.. _contextual-markers:
+
+Contextual markers
+------------------
+
+.. versionadded:: 1.3
+
+Sometimes words have several meanings, such as ``"May"`` in English, which
+refers to a month name and to a verb. To enable translators to translate
+these words correctly in different contexts, you can use the
+``django.utils.translation.pgettext()`` function, or the
+``django.utils.translation.npgettext()`` function if the string needs
+pluralization. Both take a context string as the first variable.
+
+In the resulting .po file, the string will then appear as often as there are
+different contextual markers for the same string (the context will appear on
+the ``msgctxt`` line), allowing the translator to give a different translation
+for each of them.
+
+For example::
+
+    from django.utils.translation import pgettext
+
+    month = pgettext("month name", "May")
+
+will appear in the .po file as:
+
+.. code-block:: po
+
+    msgctxt "month name"
+    msgid "May"
+    msgstr ""
+
 .. _lazy-translations:
 
 Lazy translation
