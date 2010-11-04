@@ -21,10 +21,10 @@ from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
 
-from context import context_tests
-from custom import custom_filters
-from parser import token_parsing, filter_parsing, variable_parsing
-from unicode import unicode_tests
+from context import ContextTests
+from custom import CustomTests
+from parser import ParserTests
+from unicode import UnicodeTests
 from nodelist import NodelistTest
 from smartif import *
 
@@ -34,16 +34,6 @@ except ImportError:
     pass # If setuptools isn't installed, that's fine. Just move on.
 
 import filters
-
-# Some other tests we would like to run
-__test__ = {
-    'unicode': unicode_tests,
-    'context': context_tests,
-    'token_parsing': token_parsing,
-    'filter_parsing': filter_parsing,
-    'variable_parsing': variable_parsing,
-    'custom_filters': custom_filters,
-}
 
 #################################
 # Custom template tag for tests #
