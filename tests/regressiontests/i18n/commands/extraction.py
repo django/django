@@ -38,6 +38,17 @@ class ExtractorTests(TestCase):
         return self.assert_(not re.search('^msgid %s' % msgid, s, re.MULTILINE))
 
 
+class TemplateExtractorTests(ExtractorTests):
+
+    def test_templatize(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        self.assert_(os.path.exists(self.PO_FILE))
+        po_contents = open(self.PO_FILE, 'r').read()
+        self.assertMsgId('I think that 100%% is more that 50%% of anything.', po_contents)
+        self.assertMsgId('I think that 100%% is more that 50%% of %\(obj\)s.', po_contents)
+
+
 class JavascriptExtractorTests(ExtractorTests):
 
     PO_FILE='locale/%s/LC_MESSAGES/djangojs.po' % LOCALE

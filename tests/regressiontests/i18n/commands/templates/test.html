@@ -1,3 +1,5 @@
 {% load i18n %}
 {% trans "This literal should be included." %}
 {% trans "This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap option." %}
+{% blocktrans %}I think that 100% is more that 50% of anything.{% endblocktrans %}
+{% blocktrans with 'txt' as obj %}I think that 100% is more that 50% of {{ obj }}.{% endblocktrans %}
