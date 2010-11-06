@@ -240,9 +240,13 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
             return
         self.info(bold("writing templatebuiltins.js..."))
         try:
-            xrefs = self.env.reftargets.keys()
-            templatebuiltins = dict([('ttags', [n for (t,n) in xrefs if t == 'ttag']),
-                                     ('tfilters', [n for (t,n) in xrefs if t == 'tfilter'])])
+            xrefs = self.env.reftargets.items()
+            templatebuiltins = dict([('ttags', [n for ((t,n),(l,a)) in xrefs
+                                                if t == 'ttag' and
+                                                l == 'ref/templates/builtins']),
+                                     ('tfilters', [n for ((t,n),(l,a)) in xrefs
+                                                   if t == 'tfilter' and
+                                                   l == 'ref/templates/builtins'])])
         except AttributeError:
             xrefs = self.env.domaindata["std"]["objects"]
             templatebuiltins = dict([('ttags', [n for (t,n) in xrefs if t == 'templatetag']),
