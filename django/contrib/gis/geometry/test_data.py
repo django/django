@@ -23,6 +23,11 @@ def tuplize(seq):
     return seq
 
 
+def strconvert(d):
+    "Converts all keys in dictionary to str type."
+    return dict([(str(k), v) for k, v in d.iteritems()])
+
+
 def get_ds_file(name, ext):
     return os.path.join(TEST_DATA,
                         name,
@@ -81,7 +86,7 @@ class TestGeomSet(object):
     """
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
-            setattr(self, key, [TestGeom(**kwargs) for kwargs in value])
+            setattr(self, key, [TestGeom(**strconvert(kw)) for kw in value])
 
 
 class TestDataMixin(object):
@@ -96,5 +101,5 @@ class TestDataMixin(object):
             # Load up the test geometry data from fixture into global.
             gzf = gzip.GzipFile(os.path.join(TEST_DATA, 'geometries.json.gz'))
             geometries = simplejson.loads(gzf.read())
-            GEOMETRIES = TestGeomSet(**geometries)
+            GEOMETRIES = TestGeomSet(**strconvert(geometries))
         return GEOMETRIES
