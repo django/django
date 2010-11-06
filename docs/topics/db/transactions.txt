@@ -32,13 +32,14 @@ If the view function produces an exception, Django rolls back any pending
 transactions.
 
 To activate this feature, just add the ``TransactionMiddleware`` middleware to
-your ``MIDDLEWARE_CLASSES`` setting::
+your :setting:`MIDDLEWARE_CLASSES` setting::
 
     MIDDLEWARE_CLASSES = (
+        'django.middleware.cache.UpdateCacheMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
-        'django.middleware.cache.CacheMiddleware',
         'django.middleware.transaction.TransactionMiddleware',
+        'django.middleware.cache.FetchFromCacheMiddleware',
     )
 
 The order is quite important. The transaction middleware applies not only to
@@ -46,9 +47,12 @@ view functions, but also for all middleware modules that come after it. So if
 you use the session middleware after the transaction middleware, session
 creation will be part of the transaction.
 
-An exception is ``CacheMiddleware``, which is never affected. The cache
-middleware uses its own database cursor (which is mapped to its own database
-connection internally).
+The various cache middlewares are an exception:
+:class:`~django.middleware.cache.CacheMiddleware`,
+:class:`~django.middleware.cache.UpdateCacheMiddleware`, and
+:class:`~django.middleware.cache.FetchFromCacheMiddleware` are never affected.
+Even when using database caching, Django's cache backend uses its own
+database cursor (which is mapped to its own database connection internally).
 
 .. _transaction-management-functions:
 
