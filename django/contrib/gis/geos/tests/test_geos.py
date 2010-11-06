@@ -934,7 +934,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         self.assert_(not g.valid)
         self.assert_(isinstance(g.valid_reason, basestring))
-        self.assertEqual(g.valid_reason, "Too few points in geometry component[0 0]")
+        self.assert_(g.valid_reason.startswith("Too few points in geometry component"))
 
         print "\nEND - expecting GEOS_NOTICE; safe to ignore.\n"
 
