@@ -454,6 +454,27 @@ first argument to :func:`~django.conf.urls.defaults.patterns`, like so::
 This is functionally identical to the previous formatting. It's just a bit
 tidier.
 
+Since you generally don't want the prefix for one app to be applied to every
+callback in your URLconf, you can concatenate multiple
+:func:`~django.conf.urls.defaults.patterns`. Your full ``mysite/urls.py`` might
+now look like this::
+
+    from django.conf.urls.defaults import *
+
+    from django.contrib import admin
+    admin.autodiscover()
+    
+    urlpatterns = patterns('polls.views',
+        (r'^polls/$', 'index'),
+        (r'^polls/(?P<poll_id>\d+)/$', 'detail'),
+        (r'^polls/(?P<poll_id>\d+)/results/$', 'results'),
+        (r'^polls/(?P<poll_id>\d+)/vote/$', 'vote'),
+    )
+    
+    urlpatterns += patterns('',
+        (r'^admin/', include(admin.site.urls)),
+    )
+
 Decoupling the URLconfs
 =======================
 
@@ -472,18 +493,20 @@ URLs within the app directory.
 
 Copy the file ``mysite/urls.py`` to ``polls/urls.py``. Then, change
 ``mysite/urls.py`` to remove the poll-specific URLs and insert an
-:func:`~django.conf.urls.defaults.include`::
+:func:`~django.conf.urls.defaults.include`, leaving you with::
 
     # This also imports the include function
     from django.conf.urls.defaults import *
-
-    # ...
+    
+    from django.contrib import admin
+    admin.autodiscover()
+    
     urlpatterns = patterns('',
         (r'^polls/', include('polls.urls')),
-        # ...
+        (r'^admin/', include(admin.site.urls)),
     )
 
-:func:`~django.conf.urls.defaults.include`, simply, references another URLconf.
+:func:`~django.conf.urls.defaults.include` simply references another URLconf.
 Note that the regular expression doesn't have a ``$`` (end-of-string match
 character) but has the trailing slash. Whenever Django encounters
 :func:`~django.conf.urls.defaults.include`, it chops off whatever part of the
