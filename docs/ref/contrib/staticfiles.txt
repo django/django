@@ -210,6 +210,8 @@ for each relative path, use the ``--first`` option::
 This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
 
+.. currentmodule:: None
+
 Other Helpers
 =============
 
