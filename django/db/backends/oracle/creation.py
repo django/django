@@ -152,7 +152,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         statements = [
             """CREATE TABLESPACE %(tblspace)s
                DATAFILE '%(tblspace)s.dbf' SIZE 20M
-               REUSE AUTOEXTEND ON NEXT 10M MAXSIZE 100M
+               REUSE AUTOEXTEND ON NEXT 10M MAXSIZE 200M
             """,
             """CREATE TEMPORARY TABLESPACE %(tblspace_temp)s
                TEMPFILE '%(tblspace_temp)s.dbf' SIZE 20M
