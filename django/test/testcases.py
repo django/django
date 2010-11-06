@@ -408,7 +408,7 @@ class TransactionTestCase(ut2.TestCase):
                 msg_prefix + "Found %d instances of '%s' in response"
                 " (expected %d)" % (real_count, text, count))
         else:
-            self.failUnless(real_count != 0,
+            self.assertTrue(real_count != 0,
                 msg_prefix + "Couldn't find '%s' in response" % text)
 
     def assertNotContains(self, response, text, status_code=200,
