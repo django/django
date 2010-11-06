@@ -1213,11 +1213,11 @@ cannot create another model field called ``author`` in any class that inherits
 from that base class.
 
 Overriding fields in a parent model leads to difficulties in areas such as
-initialising new instances (specifying which field is being intialised in
+initialising new instances (specifying which field is being initialized in
 ``Model.__init__``) and serialization. These are features which normal Python
 class inheritance doesn't have to deal with in quite the same way, so the
 difference between Django model inheritance and Python class inheritance isn't
-merely arbitrary.
+arbitrary.
 
 This restriction only applies to attributes which are
 :class:`~django.db.models.fields.Field` instances. Normal Python attributes
@@ -1229,4 +1229,3 @@ different database tables).
 
 Django will raise a ``FieldError`` exception if you override any model field
 in any ancestor model.
-
