@@ -1,15 +1,14 @@
-from datetime import datetime, timedelta
 import time
+from datetime import datetime, timedelta
 from StringIO import StringIO
-import unittest
 
-from django.http import HttpRequest, HttpResponse, parse_cookie
-from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.core.handlers.modpython import ModPythonRequest
+from django.core.handlers.wsgi import WSGIRequest, LimitedStream
+from django.http import HttpRequest, HttpResponse, parse_cookie
+from django.utils import unittest
 from django.utils.http import cookie_date
 
 class RequestsTests(unittest.TestCase):
-
     def test_httprequest(self):
         request = HttpRequest()
         self.assertEqual(request.GET.keys(), [])
