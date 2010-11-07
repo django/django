@@ -1,5 +1,4 @@
 import sys, time
-from django.core import management
 from django.db.backends.creation import BaseDatabaseCreation
 
 TEST_DATABASE_PREFIX = 'test_'
@@ -39,7 +38,9 @@ class DatabaseCreation(BaseDatabaseCreation):
         'URLField':                     'VARCHAR2(%(max_length)s)',
     }
 
-    remember = {}
+    def __init__(self, connection):
+        self.remember = {}
+        super(DatabaseCreation, self).__init__(connection)
 
     def _create_test_db(self, verbosity=1, autoclobber=False):
         TEST_NAME = self._test_database_name()
@@ -131,9 +132,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             'tblspace_temp': TEST_TBLSPACE_TMP,
         }
 
-        self.remember['user'] = self.connection.settings_dict['USER']
-        self.remember['passwd'] = self.connection.settings_dict['PASSWORD']
-
         cursor = self.connection.cursor()
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
         if self._test_user_create():
@@ -210,35 +208,13 @@ class DatabaseCreation(BaseDatabaseCreation):
                 name = self.connection.settings_dict['TEST_NAME']
         except AttributeError:
             pass
-        except:
-            raise
         return name
 
     def _test_database_create(self):
-        name = True
-        try:
-            if self.connection.settings_dict['TEST_CREATE']:
-                name = True
-            else:
-                name = False
-        except KeyError:
-            pass
-        except:
-            raise
-        return name
+        return self.connection.settings_dict.get('TEST_CREATE', True)
 
     def _test_user_create(self):
-        name = True
-        try:
-            if self.connection.settings_dict['TEST_USER_CREATE']:
-                name = True
-            else:
-                name = False
-        except KeyError:
-            pass
-        except:
-            raise
-        return name
+        return self.connection.settings_dict.get('TEST_USER_CREATE', True)
 
     def _test_database_user(self):
         name = TEST_DATABASE_PREFIX + self.connection.settings_dict['USER']
@@ -247,8 +223,6 @@ class DatabaseCreation(BaseDatabaseCreation):
                 name = self.connection.settings_dict['TEST_USER']
         except KeyError:
             pass
-        except:
-            raise
         return name
 
     def _test_database_passwd(self):
@@ -258,8 +232,6 @@ class DatabaseCreation(BaseDatabaseCreation):
                 name = self.connection.settings_dict['TEST_PASSWD']
         except KeyError:
             pass
-        except:
-            raise
         return name
 
     def _test_database_tblspace(self):
@@ -269,8 +241,6 @@ class DatabaseCreation(BaseDatabaseCreation):
                 name = self.connection.settings_dict['TEST_TBLSPACE']
         except KeyError:
             pass
-        except:
-            raise
         return name
 
     def _test_database_tblspace_tmp(self):
@@ -280,6 +250,4 @@ class DatabaseCreation(BaseDatabaseCreation):
                 name = self.connection.settings_dict['TEST_TBLSPACE_TMP']
         except KeyError:
             pass
-        except:
-            raise
         return name
