@@ -605,9 +605,9 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 .. class:: HttpResponseRedirect
 
     The constructor takes a single argument -- the path to redirect to. This
-    can be a fully qualified URL (e.g. ``'http://www.yahoo.com/search/'``) or an
-    absolute URL with no domain (e.g. ``'/search/'``). Note that this returns
-    an HTTP status code 302.
+    can be a fully qualified URL (e.g. ``'http://www.yahoo.com/search/'``) or
+    an absolute path with no domain (e.g. ``'/search/'``). Note that this
+    returns an HTTP status code 302.
 
 .. class:: HttpResponsePermanentRedirect
 

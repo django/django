@@ -491,7 +491,7 @@ Similarly, if you had a URLconf entry that looked like::
 Notice that we specify an empty sequence for the second parameter in this case,
 because we only want to pass keyword parameters, not positional ones.
 
-In this way, you're tying the model's absolute URL to the view that is used
+In this way, you're tying the model's absolute path to the view that is used
 to display it, without repeating the URL information anywhere. You can still
 use the ``get_absolute_url`` method in templates, as before.
 

@@ -539,7 +539,7 @@ takes a few steps:
        (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
        convenience :attr:`~django.core.files.File.url` function provided by
        Django. For example, if your :class:`ImageField` is called ``mug_shot``,
-       you can get the absolute URL to your image in a template with
+       you can get the absolute path to your image in a template with
        ``{{ object.mug_shot.url }}``.
 
 For example, say your :setting:`MEDIA_ROOT` is set to ``'/home/media'``, and
