@@ -8,7 +8,7 @@ and `controlling localization in templates`_.
 
 .. _`Creating language files`: how-to-create-language-files_
 .. _`locale aware date, time and numbers input/output in forms`: format-localization_
-.. _`controlling localization in templates`: topic-l10n-templates
+.. _`controlling localization in templates`: topic-l10n-templates_
 
 .. seealso::
 
@@ -318,7 +318,7 @@ where :file:`formats.py` contains custom format definitions. For example::
 to use a space as a thousand separator, instead of the default for English,
 a comma.
 
-.. topic-l10n-templates:
+.. _topic-l10n-templates:
 
 Controlling localization in templates
 =====================================
