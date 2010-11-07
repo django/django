@@ -95,22 +95,24 @@ database bindings are installed.
 * If you're using PostgreSQL, you'll need the psycopg_ package. Django supports
   both version 1 and 2. (When you configure Django's database layer, specify
   either ``postgresql`` [for version 1] or ``postgresql_psycopg2`` [for version 2].)
+  You might want to refer to our :ref:`PostgreSQL notes <postgresql-notes>` for
+  further technical details specific to this database.
 
   If you're on Windows, check out the unofficial `compiled Windows version`_.
 
 * If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher. You
-  will also want to read the database-specific notes for the :doc:`MySQL
-  backend </ref/databases>`.
+  will also want to read the database-specific :ref:`notes for the MySQL
+  backend <mysql-notes>`.
 
 * If you're using SQLite and Python 2.4, you'll need pysqlite_. Use version
   2.0.3 or higher. Python 2.5 ships with an SQLite wrapper in the standard
   library, so you don't need to install anything extra in that case. Please
-  read the SQLite backend :ref:`notes<sqlite-notes>`.
+  read the :ref:`SQLite backend notes <sqlite-notes>`.
 
 * If you're using Oracle, you'll need a copy of cx_Oracle_, but please
-  read the database-specific notes for the
-  :ref:`Oracle backend <oracle-notes>` for important information
-  regarding supported versions of both Oracle and ``cx_Oracle``.
+  read the database-specific :ref:`notes for the Oracle backend <oracle-notes>`
+  for important information regarding supported versions of both Oracle and
+  ``cx_Oracle``.
 
 * If you're using an unofficial 3rd party backend, please consult the
   documentation provided for any additional requirements.
@@ -285,7 +287,7 @@ latest bug fixes and improvements, follow these instructions:
    .. code-block:: bash
 
        ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin
-       
+
    (In the above line, change WORKING-DIR to match the full path to your new
    ``django-trunk`` directory.)
 
