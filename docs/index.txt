@@ -161,7 +161,7 @@ The development process
 Other batteries included
 ========================
 
-    * :doc:`Admin site <ref/contrib/admin/index>` | :doc:`Admin actions <ref/contrib/admin/actions>`
+    * :doc:`Admin site <ref/contrib/admin/index>` | :doc:`Admin actions <ref/contrib/admin/actions>` | :doc:`Admin documentation generator<ref/contrib/admin/admindocs>`
     * :doc:`Authentication <topics/auth>`
     * :doc:`Cache system <topics/cache>`
     * :doc:`Conditional content processing <topics/conditional-view-processing>`

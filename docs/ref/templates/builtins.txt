@@ -3,8 +3,8 @@ Built-in template tags and filters
 ==================================
 
 This document describes Django's built-in template tags and filters. It is
-recommended that you use the :ref:`automatic documentation
-<template-built-in-reference>`, if available, as this will also include
+recommended that you use the :doc:`automatic documentation
+</ref/contrib/admin/admindocs>`, if available, as this will also include
 documentation for any custom tags or filters installed.
 
 .. _ref-templates-builtins-tags:
