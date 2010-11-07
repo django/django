@@ -210,16 +210,39 @@ Methods
 
 .. method:: HttpRequest.get_host()
 
-   .. versionadded:: 1.0
+    .. versionadded:: 1.0
 
-   Returns the originating host of the request using information from the
-   ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
-   they don't provide a value, the method uses a combination of
-   ``SERVER_NAME`` and ``SERVER_PORT`` as detailed in `PEP 333`_.
+    Returns the originating host of the request using information from the
+    ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
+    they don't provide a value, the method uses a combination of
+    ``SERVER_NAME`` and ``SERVER_PORT`` as detailed in `PEP 333`_.
 
-   .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
+    .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
 
-   Example: ``"127.0.0.1:8000"``
+    Example: ``"127.0.0.1:8000"``
+
+    .. note:: The :meth:`~HttpRequest.get_host()` method fails when the host is
+        behind multiple proxies. One solution is to use middleware to rewrite
+        the proxy headers, as in the following example::
+
+            class MultipleProxyMiddleware(object):
+                FORWARDED_FOR_FIELDS = [
+                    'HTTP_X_FORWARDED_FOR',
+                    'HTTP_X_FORWARDED_HOST',
+                    'HTTP_X_FORWARDED_SERVER',
+                ]
+
+                def process_request(self, request):
+                    """
+                    Rewrites the proxy headers so that only the most
+                    recent proxy is used.
+                    """
+                    for field in self.FORWARDED_FOR_FIELDS:
+                        if field in request.META:
+                            if ',' in request.META[field]:
+                                parts = request.META[field].split(',')
+                                request.META[field] = parts[-1].strip()
+
 
 .. method:: HttpRequest.get_full_path()
 
