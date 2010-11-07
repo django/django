@@ -1,0 +1,161 @@
+========================================
+The Django admin documentation generator
+========================================
+
+.. module:: django.contrib.admindocs
+    :synopsis: Django's admin documentation generator.
+
+.. currentmodule:: django.contrib.admindocs
+
+Django's :mod:`~django.contrib.admindocs` app pulls documentation from the
+docstrings of models, views, template tags, and template filters for any app in
+:setting:`INSTALLED_APPS` and makes that documentation available from the
+:mod:`Django admin <django.contrib.admin>`.
+
+In addition to providing offline documentation for all template tags and
+template filters that ship with Django, you may utilize admindocs to quickly
+document your own code.
+
+Overview
+========
+
+To activate the :mod:`~django.contrib.admindocs`, you will need to do
+the following:
+
+    * Add :mod:`django.contrib.admindocs` to your :setting:`INSTALLED_APPS`.
+    * Add ``(r'^admin/doc/', include('django.contrib.admindocs.urls'))`` to
+      your :data:`urlpatterns`. Make sure it's included *before* the
+      ``r'^admin/'`` entry, so that requests to ``/admin/doc/`` don't get
+      handled by the latter entry.
+    * Install the docutils Python module (http://docutils.sf.net/).
+    * **Optional:** Linking to templates requires the :setting:`ADMIN_FOR`
+      setting to be configured.
+    * **Optional:** Using the admindocs bookmarklets requires the
+      :mod:`XViewMiddleware<django.middleware.doc>` to be installed.
+
+Once those steps are complete, you can start browsing the documentation by
+going to your admin interface and clicking the "Documentation" link in the
+upper right of the page.
+
+Documentation helpers
+=====================
+
+The following special markup can be used in your docstrings to easily create
+hyperlinks to other components:
+
+=================   =======================
+Django Component    reStructuredText roles
+=================   =======================
+Models              ``:model:`appname.ModelName```
+Views               ``:view:`appname.view_name```
+Template tags       ``:tag:`tagname```
+Template filters    ``:filter:`filtername```
+Templates           ``:template:`path/to/template.html```
+=================   =======================
+
+Model reference
+===============
+
+The **models** section of the ``admindocs`` page describes each model in the
+system along with all the fields and methods available on it. Relationships to
+other models appear as hyperlinks. Descriptions are pulled from ``help_text``
+attributes on fields or from docstrings on model methods.
+
+A model with useful documentation might look like this::
+
+    class BlogEntry(models.Model):
+        """
+        Stores a single blog entry, related to :model:`blog.Blog` and
+        :model:`auth.User`.
+
+        """
+        slug = models.SlugField(help_text="A short label, generally used in URLs.")
+        author = models.ForeignKey(User)
+        blog = models.ForeignKey(Blog)
+        ...
+
+        def publish(self):
+            """Makes the blog entry live on the site."""
+            ...
+
+View reference
+==============
+
+Each URL in your site has a separate entry in the ``admindocs`` page, and
+clicking on a given URL will show you the corresponding view. Helpful things
+you can document in your view function docstrings include:
+
+    * A short description of what the view does.
+    * The **context**, or a list of variables available in the view's template.
+    * The name of the template or templates that are used for that view.
+
+For example::
+
+    from myapp.models import MyModel
+
+    def my_view(request, slug):
+        """
+        Display an individual :model:`myapp.MyModel`.
+
+        **Context**
+
+        ``RequestContext``
+
+        ``mymodel``
+            An instance of :model:`myapp.MyModel`.
+
+        **Template:**
+
+        :template:`myapp/my_template.html`
+
+        """
+        return render_to_response('myapp/my_template.html', {
+            'mymodel': MyModel.objects.get(slug=slug)
+        }, context_instance=RequestContext(request))
+
+
+Template tags and filters reference
+===================================
+
+The **tags** and **filters** ``admindocs`` sections describe all the tags and
+filters that come with Django (in fact, the :ref:`built-in tag reference
+<ref-templates-builtins-tags>` and :ref:`built-in filter reference
+<ref-templates-builtins-filters>` documentation come directly from those
+pages). Any tags or filters that you create or are added by a third-party app
+will show up in these sections as well.
+
+
+Template reference
+==================
+
+While ``admindocs`` does not include a place to document templates by
+themselves, if you use the ``:template:`path/to/template.html``` syntax in a
+docstring the resulting page will verify the path of that template with
+Django’s :ref:`template loaders <template-loaders>`. This can be a handy way to
+check if the specified template exists and to show where on the filesystem that
+template is stored.
+
+
+Included Bookmarklets
+=====================
+
+Several useful bookmarklets are available from the ``admindocs`` page:
+
+    Documentation for this page
+        Jumps you from any page to the documentation for the view that generates
+        that page.
+
+    Show object ID
+        Shows the content-type and unique ID for pages that represent a single
+        object.
+
+    Edit this object
+        Jumps to the admin page for pages that represent a single object.
+
+Using these bookmarklets requires that you are either logged into the
+:mod:`Django admin <django.contrib.admin>` as a
+:class:`~django.contrib.auth.models.User` with
+:attr:`~django.contrib.auth.models.User.is_staff` set to `True`, or
+that the :mod:`django.middleware.doc` middleware and
+:mod:`XViewMiddleware <django.middleware.doc>` are installed and you
+are accessing the site from an IP address listed in :setting:`INTERNAL_IPS`.

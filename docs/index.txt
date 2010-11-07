@@ -161,7 +161,7 @@ The development process
 Other batteries included
 ========================
 
-    * :doc:`Admin site <ref/contrib/admin/index>` | :doc:`Admin actions <ref/contrib/admin/actions>`
+    * :doc:`Admin site <ref/contrib/admin/index>` | :doc:`Admin actions <ref/contrib/admin/actions>` | :doc:`Admin documentation generator<ref/contrib/admin/admindocs>`
     * :doc:`Authentication <topics/auth>`
     * :doc:`Cache system <topics/cache>`
     * :doc:`Conditional content processing <topics/conditional-view-processing>`
@@ -191,7 +191,6 @@ Other batteries included
     * :doc:`Web design helpers <ref/contrib/webdesign>`
     * :doc:`Validators <ref/validators>`
     * Function-based generic views (Deprecated) :doc:`Overview<topics/generic-views>` | :doc:`Built-in generic views<ref/generic-views>` | :doc:`Migration guide<topics/generic-views-migration>`
-
 
 The Django open-source project
 ==============================

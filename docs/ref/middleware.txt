@@ -84,7 +84,7 @@ View metadata middleware
 
 Sends custom ``X-View`` HTTP headers to HEAD requests that come from IP
 addresses defined in the :setting:`INTERNAL_IPS` setting. This is used by
-Django's automatic documentation system.
+Django's :doc:`automatic documentation system </ref/contrib/admin/admindocs>`.
 
 GZIP middleware
 ---------------

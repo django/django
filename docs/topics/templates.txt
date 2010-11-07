@@ -104,9 +104,6 @@ If you use a variable that doesn't exist, the template system will insert
 the value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
 (the empty string) by default.
 
-See `Using the built-in reference`_, below, for help on finding what variables
-are available in a given template.
-
 Filters
 =======
 
@@ -165,6 +162,12 @@ Again, these are just a few examples; see the :ref:`built-in filter reference
 You can also create your own custom template filters; see
 :doc:`/howto/custom-template-tags`.
 
+.. seealso::
+
+    Django's admin interface can include a complete reference of all template
+    tags and filters available for a given site. See
+    :doc:`/ref/contrib/admin/admindocs`.
+
 Tags
 ====
 
@@ -220,6 +223,12 @@ tag reference <ref-templates-builtins-tags>` for the complete list.
 
 You can also create your own custom template tags; see
 :doc:`/howto/custom-template-tags`.
+
+.. seealso::
+
+    Django's admin interface can include a complete reference of all template
+    tags and filters available for a given site. See
+    :doc:`/ref/contrib/admin/admindocs`.
 
 Comments
 ========
@@ -611,49 +620,6 @@ Because Django intentionally limits the amount of logic processing available
 in the template language, it is not possible to pass arguments to method calls
 accessed from within templates. Data should be calculated in views, then passed
 to templates for display.
-
-.. _template-built-in-reference:
-
-Using the built-in reference
-============================
-
-Django's admin interface includes a complete reference of all template tags and
-filters available for a given site. To activate it, follow these steps:
-
-    * Add :mod:`django.contrib.admindocs` to your :setting:`INSTALLED_APPS`.
-    * Add ``(r'^admin/doc/', include('django.contrib.admindocs.urls'))`` to your
-      :data:`urlpatterns`. Make sure it's included *before* the ``r'^admin/'``
-      entry, so that requests to ``/admin/doc/`` don't get handled by the
-      latter entry.
-    * Install the docutils module (http://docutils.sf.net/).
-
-After you've followed those steps, you can start browsing the documentation by
-going to your admin interface and clicking the "Documentation" link in the
-upper right of the page.
-
-The reference is divided into 4 sections: tags, filters, models, and views.
-
-The **tags** and **filters** sections describe all the built-in tags (in fact,
-the tag and filter references below come directly from those pages) as well as
-any custom tag or filter libraries available.
-
-The **views** page is the most valuable. Each URL in your site has a separate
-entry here, and clicking on a URL will show you:
-
-    * The name of the view function that generates that view.
-    * A short description of what the view does.
-    * The **context**, or a list of variables available in the view's template.
-    * The name of the template or templates that are used for that view.
-
-Each view documentation page also has a bookmarklet that you can use to jump
-from any page to the documentation page for that view.
-
-Because Django-powered sites usually use database objects, the **models**
-section of the documentation page describes each type of object in the system
-along with all the fields available on that object.
-
-Taken together, the documentation pages should tell you every tag, filter,
-variable and object available to you in a given template.
 
 .. _loading-custom-template-libraries:
 
