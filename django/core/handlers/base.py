@@ -73,13 +73,15 @@ class BaseHandler(object):
         from django.conf import settings
 
         try:
+            # Setup default url resolver for this thread, this code is outside
+            # the try/except so we don't get a spurious "unbound local
+            # variable" exception in the event an exception is raised before
+            # resolver is set
+            urlconf = settings.ROOT_URLCONF
+            urlresolvers.set_urlconf(urlconf)
+            resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
             try:
-                # Setup default url resolver for this thread.
-                urlconf = settings.ROOT_URLCONF
-                urlresolvers.set_urlconf(urlconf)
-                resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
                 response = None
-
                 # Apply request middleware
                 for middleware_method in self._request_middleware:
                     response = middleware_method(request)
@@ -239,4 +241,3 @@ def get_script_name(environ):
     if script_url:
         return force_unicode(script_url[:-len(environ.get('PATH_INFO', ''))])
     return force_unicode(environ.get('SCRIPT_NAME', u''))
-

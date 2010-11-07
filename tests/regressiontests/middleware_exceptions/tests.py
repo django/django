@@ -1,8 +1,9 @@
 import sys
 
-from django.test import TestCase
+from django.conf import settings
 from django.core.signals import got_request_exception
 from django.http import HttpResponse
+from django.test import TestCase
 
 
 class TestException(Exception):
@@ -694,3 +695,19 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_middleware_usage(pre_middleware,  True,  True,  True, False)
         self.assert_middleware_usage(bad_middleware,  True,  True,  True,  True)
         self.assert_middleware_usage(post_middleware, True,  True,  True,  True)
+
+
+_missing = object()
+class RootUrlconfTests(TestCase):
+    def test_missing_root_urlconf(self):
+        try:
+            original_ROOT_URLCONF = settings.ROOT_URLCONF
+            del settings.ROOT_URLCONF
+        except AttributeError:
+            original_ROOT_URLCONF = _missing
+        self.assertRaises(AttributeError,
+            self.client.get, "/middleware_exceptions/view/"
+        )
+
+        if original_ROOT_URLCONF is not _missing:
+            settings.ROOT_URLCONF = original_ROOT_URLCONF
