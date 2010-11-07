@@ -538,9 +538,9 @@ this::
 The idea behind :func:`~django.conf.urls.defaults.include` and URLconf
 decoupling is to make it easy to plug-and-play URLs. Now that polls are in their
 own URLconf, they can be placed under "/polls/", or under "/fun_polls/", or
-under "/content/polls/", or any other URL root, and the app will still work.
+under "/content/polls/", or any other path root, and the app will still work.
 
-All the poll app cares about is its relative URLs, not its absolute URLs.
+All the poll app cares about is its relative path, not its absolute path.
 
 When you're comfortable with writing views, read :doc:`part 4 of this tutorial
 </intro/tutorial04>` to learn about simple form processing and generic views.

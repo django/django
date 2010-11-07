@@ -274,7 +274,7 @@ comes directly from your :setting:`LANGUAGE_CODE` setting.
 URLs
 ----
 
-The :attr:`link` method/attribute can return either an absolute URL (e.g.
+The :attr:`link` method/attribute can return either an absolute path (e.g.
 :file:`"/blog/"`) or a URL with the fully-qualified domain and protocol (e.g.
 ``"http://www.example.com/blog/"``). If :attr:`link` doesn't return the domain,
 the syndication framework will insert the domain of the current site, according

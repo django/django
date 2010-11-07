@@ -143,21 +143,22 @@ Sitemap class reference
 
         **Optional.** Either a method or attribute.
 
-        If it's a method, it should return the absolute URL for a given object as
-        returned by :attr:`~Sitemap.items()`.
+        If it's a method, it should return the absolute path for a given object
+        as returned by :attr:`~Sitemap.items()`.
 
-        If it's an attribute, its value should be a string representing an absolute URL
-        to use for *every* object returned by :attr:`~Sitemap.items()`.
+        If it's an attribute, its value should be a string representing an
+        absolute path to use for *every* object returned by
+        :attr:`~Sitemap.items()`.
 
-        In both cases, "absolute URL" means a URL that doesn't include the protocol or
-        domain. Examples:
+        In both cases, "absolute path" means a URL that doesn't include the
+        protocol or domain. Examples:
 
             * Good: :file:`'/foo/bar/'`
             * Bad: :file:`'example.com/foo/bar/'`
             * Bad: :file:`'http://example.com/foo/bar/'`
 
-        If :attr:`~Sitemap.location` isn't provided, the framework will call the
-        ``get_absolute_url()`` method on each object as returned by
+        If :attr:`~Sitemap.location` isn't provided, the framework will call
+        the ``get_absolute_url()`` method on each object as returned by
         :attr:`~Sitemap.items()`.
 
     .. attribute:: Sitemap.lastmod
@@ -300,7 +301,7 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
 .. function:: ping_google
 
     :func:`ping_google` takes an optional argument, :data:`sitemap_url`,
-    which should be the absolute URL of your site's sitemap (e.g.,
+    which should be the absolute path to your site's sitemap (e.g.,
     :file:`'/sitemap.xml'`). If this argument isn't provided,
     :func:`ping_google` will attempt to figure out your
     sitemap by performing a reverse looking in your URLconf.

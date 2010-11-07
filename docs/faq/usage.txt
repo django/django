@@ -63,7 +63,7 @@ Using a :class:`~django.db.models.FileField` or an
        (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
        convenience :attr:`~django.core.files.File.url` attribute provided by
        Django. For example, if your :class:`~django.db.models.ImageField` is
-       called ``mug_shot``, you can get the absolute URL to your image in a
+       called ``mug_shot``, you can get the absolute path to your image in a
        template with ``{{ object.mug_shot.url }}``.
 
 How do I make a variable available to all my templates?
