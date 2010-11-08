@@ -21,7 +21,7 @@ Having trouble? We'd like to help!
   `post a question`_.
 
 * Ask a question in the `#django IRC channel`_, or search the `IRC logs`_ to see
-  if its been asked before.
+  if it's been asked before.
 
 * Report bugs with Django in our `ticket tracker`_.
 

@@ -101,7 +101,7 @@ and have free rein to hack on all parts of Django.
 
 Joseph Kocherhans
     Joseph is currently a developer at EveryBlock_, and previously worked for
-    the Lawrence Journal-World where he built most of the backend for the their
+    the Lawrence Journal-World where he built most of the backend for their
     Marketplace site. He often disappears for several days into the woods,
     attempts to teach himself computational linguistics, and annoys his
     neighbors with his Charango_ playing.
