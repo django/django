@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from unittest import TestCase
+
 from django.template import Template, TemplateEncodingError, Context
 from django.utils.safestring import SafeData
-from django.utils.unittest import TestCase
 
 
 class UnicodeTests(TestCase):
@@ -25,5 +26,5 @@ class UnicodeTests(TestCase):
         # they all render the same (and are returned as unicode objects and
         # "safe" objects as well, for auto-escaping purposes).
         self.assertEqual(t1.render(c3), t2.render(c3))
-        self.assertIsInstance(t1.render(c3), unicode)
-        self.assertIsInstance(t1.render(c3), SafeData)
+        self.assertTrue(isinstance(t1.render(c3), unicode))
+        self.assertTrue(isinstance(t1.render(c3), SafeData))
