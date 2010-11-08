@@ -274,7 +274,7 @@ so you can focus on writing code rather than creating directories.
     configuration and apps for a particular Web site. A project can contain
     multiple apps. An app can be in multiple projects.
 
-Your apps can live anywhere on your `Python path`_. In this tutorial we will
+Your apps can live anywhere on your `Python path`_. In this tutorial, we'll
 create our poll app in the :file:`mysite` directory for simplicity.
 
 To create your app, make sure you're in the :file:`mysite` directory and type
