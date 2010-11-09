@@ -682,8 +682,8 @@ and the error message as the value.
    * Default widget: ``TextInput``
    * Empty value: ``''`` (an empty string)
    * Normalizes to: A Unicode object.
-   * Validates that the given value contains only letters, numbers and
-     hyphens.
+   * Validates that the given value contains only letters, numbers,
+     underscores, and hyphens.
    * Error messages: ``required``, ``invalid``
 
 This field is intended for use in representing a model
@@ -910,11 +910,11 @@ example::
 .. class:: ModelMultipleChoiceField(**kwargs)
 
     * Default widget: ``SelectMultiple``
-    * Empty value: ``[]`` (an empty list) 
+    * Empty value: ``[]`` (an empty list)
     * Normalizes to: A list of model instances.
     * Validates that every id in the given list of values exists in the
       queryset.
-    * Error message keys: ``required``, ``list``, ``invalid_choice``, 
+    * Error message keys: ``required``, ``list``, ``invalid_choice``,
       ``invalid_pk_value``
 
 Allows the selection of one or more model objects, suitable for
