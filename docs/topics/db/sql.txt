@@ -81,7 +81,7 @@ had ``Person`` data in it, you could easily map it into ``Person`` instances::
     ...                              last AS last_name,
     ...                              bd AS birth_date,
     ...                              pk as id,
-    ...                       FROM some_other_table)
+    ...                       FROM some_other_table''')
 
 As long as the names match, the model instances will be created correctly.
 
