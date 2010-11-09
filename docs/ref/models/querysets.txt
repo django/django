@@ -1246,6 +1246,37 @@ The ``update()`` method does a bulk update and does not call any ``save()``
 methods on your models, nor does it emit the ``pre_save`` or ``post_save``
 signals (which are a consequence of calling ``save()``).
 
+``delete()``
+~~~~~~~~~~~~~~~~~~~~
+
+.. method:: delete()
+
+Performs an SQL delete query on all rows in the :class:`QuerySet`. The
+``delete()`` is applied instantly. You cannot call ``delete()`` on a
+:class:`QuerySet` that has had a slice taken or can otherwise no longer be
+filtered.
+
+For example, to delete all the entries in a particular blog::
+
+    >>> b = Blog.objects.get(pk=1)
+
+    # Delete all the entries belonging to this Blog.
+    >>> Entry.objects.filter(blog=b).delete()
+
+Django emulates the SQL constraint ``ON DELETE CASCADE`` -- in other words, any
+objects with foreign keys pointing at the objects to be deleted will be deleted
+along with them.  For example::
+
+    blogs = Blog.objects.all()
+    # This will delete all Blogs and all of their Entry objects.
+    blogs.delete()
+
+The ``delete()`` method does a bulk delete and does not call any ``delete()``
+methods on your models. It does, however, emit the
+:data:`~django.db.models.signals.pre_delete` and
+:data:`~django.db.models.signals.post_delete` signals for all deleted objects
+(including cascaded deletions).
+
 .. _field-lookups:
 
 Field lookups
