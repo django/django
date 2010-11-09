@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.deletion import Collector
 from django.db.models.related import RelatedObject
 from django.forms.forms import pretty_name
 from django.utils import formats
@@ -9,6 +10,7 @@ from django.utils.encoding import force_unicode, smart_unicode, smart_str
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.datastructures import SortedDict
+
 
 def quote(s):
     """
@@ -25,6 +27,7 @@ def quote(s):
         if c in """:/_#?;@&=+$,"<>%\\""":
             res[i] = '_%02X' % ord(c)
     return ''.join(res)
+
 
 def unquote(s):
     """
@@ -46,6 +49,7 @@ def unquote(s):
             myappend('_' + item)
     return "".join(res)
 
+
 def flatten_fieldsets(fieldsets):
     """Returns a list of field names from an admin fieldsets structure."""
     field_names = []
@@ -58,144 +62,94 @@ def flatten_fieldsets(fieldsets):
                 field_names.append(field)
     return field_names
 
-def _format_callback(obj, user, admin_site, perms_needed):
-    has_admin = obj.__class__ in admin_site._registry
-    opts = obj._meta
-    if has_admin:
-        admin_url = reverse('%s:%s_%s_change'
-                            % (admin_site.name,
-                               opts.app_label,
-                               opts.object_name.lower()),
-                            None, (quote(obj._get_pk_val()),))
-        p = '%s.%s' % (opts.app_label,
-                       opts.get_delete_permission())
-        if not user.has_perm(p):
-            perms_needed.add(opts.verbose_name)
-        # Display a link to the admin page.
-        return mark_safe(u'%s: <a href="%s">%s</a>' %
-                         (escape(capfirst(opts.verbose_name)),
-                          admin_url,
-                          escape(obj)))
-    else:
-        # Don't display link to edit, because it either has no
-        # admin or is edited inline.
-        return u'%s: %s' % (capfirst(opts.verbose_name),
-                            force_unicode(obj))
 
-def get_deleted_objects(objs, opts, user, admin_site):
+def get_deleted_objects(objs, opts, user, admin_site, using):
     """
-    Find all objects related to ``objs`` that should also be
-    deleted. ``objs`` should be an iterable of objects.
+    Find all objects related to ``objs`` that should also be deleted. ``objs``
+    must be a homogenous iterable of objects (e.g. a QuerySet).
 
     Returns a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
 
     """
-    collector = NestedObjects()
-    for obj in objs:
-        # TODO using a private model API!
-        obj._collect_sub_objects(collector)
-
+    collector = NestedObjects(using=using)
+    collector.collect(objs)
     perms_needed = set()
 
-    to_delete = collector.nested(_format_callback,
-                                 user=user,
-                                 admin_site=admin_site,
-                                 perms_needed=perms_needed)
+    def format_callback(obj):
+        has_admin = obj.__class__ in admin_site._registry
+        opts = obj._meta
+
+        if has_admin:
+            admin_url = reverse('%s:%s_%s_change'
+                                % (admin_site.name,
+                                   opts.app_label,
+                                   opts.object_name.lower()),
+                                None, (quote(obj._get_pk_val()),))
+            p = '%s.%s' % (opts.app_label,
+                           opts.get_delete_permission())
+            if not user.has_perm(p):
+                perms_needed.add(opts.verbose_name)
+            # Display a link to the admin page.
+            return mark_safe(u'%s: <a href="%s">%s</a>' %
+                             (escape(capfirst(opts.verbose_name)),
+                              admin_url,
+                              escape(obj)))
+        else:
+            # Don't display link to edit, because it either has no
+            # admin or is edited inline.
+            return u'%s: %s' % (capfirst(opts.verbose_name),
+                                force_unicode(obj))
+
+    to_delete = collector.nested(format_callback)
 
     return to_delete, perms_needed
 
 
-class NestedObjects(object):
-    """
-    A directed acyclic graph collection that exposes the add() API
-    expected by Model._collect_sub_objects and can present its data as
-    a nested list of objects.
+class NestedObjects(Collector):
+    def __init__(self, *args, **kwargs):
+        super(NestedObjects, self).__init__(*args, **kwargs)
+        self.edges = {} # {from_instance: [to_instances]}
 
-    """
-    def __init__(self):
-        # Use object keys of the form (model, pk) because actual model
-        # objects may not be unique
+    def add_edge(self, source, target):
+        self.edges.setdefault(source, []).append(target)
 
-        # maps object key to list of child keys
-        self.children = SortedDict()
+    def collect(self, objs, source_attr=None, **kwargs):
+        for obj in objs:
+            if source_attr:
+                self.add_edge(getattr(obj, source_attr), obj)
+            else:
+                self.add_edge(None, obj)
+        return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
 
-        # maps object key to parent key
-        self.parents = SortedDict()
+    def related_objects(self, related, objs):
+        qs = super(NestedObjects, self).related_objects(related, objs)
+        return qs.select_related(related.field.name)
 
-        # maps object key to actual object
-        self.seen = SortedDict()
-
-    def add(self, model, pk, obj,
-            parent_model=None, parent_obj=None, nullable=False):
-        """
-        Add item ``obj`` to the graph. Returns True (and does nothing)
-        if the item has been seen already.
-
-        The ``parent_obj`` argument must already exist in the graph; if
-        not, it's ignored (but ``obj`` is still added with no
-        parent). In any case, Model._collect_sub_objects (for whom
-        this API exists) will never pass a parent that hasn't already
-        been added itself.
-
-        These restrictions in combination ensure the graph will remain
-        acyclic (but can have multiple roots).
-
-        ``model``, ``pk``, and ``parent_model`` arguments are ignored
-        in favor of the appropriate lookups on ``obj`` and
-        ``parent_obj``; unlike CollectedObjects, we can't maintain
-        independence from the knowledge that we're operating on model
-        instances, and we don't want to allow for inconsistency.
-
-        ``nullable`` arg is ignored: it doesn't affect how the tree of
-        collected objects should be nested for display.
-        """
-        model, pk = type(obj), obj._get_pk_val()
-
-        # auto-created M2M models don't interest us
-        if model._meta.auto_created:
-            return True
-
-        key = model, pk
-
-        if key in self.seen:
-            return True
-        self.seen.setdefault(key, obj)
-
-        if parent_obj is not None:
-            parent_model, parent_pk = (type(parent_obj),
-                                       parent_obj._get_pk_val())
-            parent_key = (parent_model, parent_pk)
-            if parent_key in self.seen:
-                self.children.setdefault(parent_key, list()).append(key)
-                self.parents.setdefault(key, parent_key)
-
-    def _nested(self, key, format_callback=None, **kwargs):
-        obj = self.seen[key]
+    def _nested(self, obj, seen, format_callback):
+        if obj in seen:
+            return []
+        seen.add(obj)
+        children = []
+        for child in self.edges.get(obj, ()):
+            children.extend(self._nested(child, seen, format_callback))
         if format_callback:
-            ret = [format_callback(obj, **kwargs)]
+            ret = [format_callback(obj)]
         else:
             ret = [obj]
-
-        children = []
-        for child in self.children.get(key, ()):
-            children.extend(self._nested(child, format_callback, **kwargs))
         if children:
             ret.append(children)
-
         return ret
 
-    def nested(self, format_callback=None, **kwargs):
+    def nested(self, format_callback=None):
         """
         Return the graph as a nested list.
 
-        Passes **kwargs back to the format_callback as kwargs.
-
         """
+        seen = set()
         roots = []
-        for key in self.seen.keys():
-            if key not in self.parents:
-                roots.extend(self._nested(key, format_callback, **kwargs))
+        for root in self.edges.get(None, ()):
+            roots.extend(self._nested(root, seen, format_callback))
         return roots
 
 
@@ -218,6 +172,7 @@ def model_format_dict(obj):
         'verbose_name_plural': force_unicode(opts.verbose_name_plural)
     }
 
+
 def model_ngettext(obj, n=None):
     """
     Return the appropriate `verbose_name` or `verbose_name_plural` value for
@@ -235,6 +190,7 @@ def model_ngettext(obj, n=None):
     d = model_format_dict(obj)
     singular, plural = d["verbose_name"], d["verbose_name_plural"]
     return ungettext(singular, plural, n or 0)
+
 
 def lookup_field(name, obj, model_admin=None):
     opts = obj._meta
@@ -261,6 +217,7 @@ def lookup_field(name, obj, model_admin=None):
         attr = None
         value = getattr(obj, name)
     return f, attr, value
+
 
 def label_for_field(name, model, model_admin=None, return_attr=False):
     attr = None

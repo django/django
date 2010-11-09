@@ -150,6 +150,10 @@ class BaseDatabaseFeatures(object):
     # Can an object have a primary key of 0? MySQL says No.
     allows_primary_key_0 = True
 
+    # Do we need to NULL a ForeignKey out, or can the constraint check be
+    # deferred
+    can_defer_constraint_checks = False
+
     # Features that need to be confirmed at runtime
     # Cache whether the confirmation has been performed.
     _confirmed = False

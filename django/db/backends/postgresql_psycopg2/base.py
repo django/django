@@ -69,6 +69,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_return_id_from_insert = False
     requires_rollback_on_dirty_transaction = True
     has_real_datatype = True
+    can_defer_constraint_checks = True
 
 class DatabaseOperations(PostgresqlDatabaseOperations):
     def last_executed_query(self, cursor, sql, params):

@@ -7,10 +7,12 @@ from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (OneToOneRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
-from django.db.models.query import delete_objects, Q
-from django.db.models.query_utils import CollectedObjects, DeferredAttribute
+from django.db.models.query import Q
+from django.db.models.query_utils import DeferredAttribute
+from django.db.models.deletion import Collector
 from django.db.models.options import Options
-from django.db import connections, router, transaction, DatabaseError, DEFAULT_DB_ALIAS
+from django.db import (connections, router, transaction, DatabaseError,
+    DEFAULT_DB_ALIAS)
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
@@ -561,99 +563,13 @@ class Model(object):
 
     save_base.alters_data = True
 
-    def _collect_sub_objects(self, seen_objs, parent=None, nullable=False):
-        """
-        Recursively populates seen_objs with all objects related to this
-        object.
-
-        When done, seen_objs.items() will be in the format:
-            [(model_class, {pk_val: obj, pk_val: obj, ...}),
-             (model_class, {pk_val: obj, pk_val: obj, ...}), ...]
-        """
-        pk_val = self._get_pk_val()
-        if seen_objs.add(self.__class__, pk_val, self,
-                         type(parent), parent, nullable):
-            return
-
-        for related in self._meta.get_all_related_objects():
-            rel_opts_name = related.get_accessor_name()
-            if not related.field.rel.multiple:
-                try:
-                    sub_obj = getattr(self, rel_opts_name)
-                except ObjectDoesNotExist:
-                    pass
-                else:
-                    sub_obj._collect_sub_objects(seen_objs, self, related.field.null)
-            else:
-                # To make sure we can access all elements, we can't use the
-                # normal manager on the related object. So we work directly
-                # with the descriptor object.
-                for cls in self.__class__.mro():
-                    if rel_opts_name in cls.__dict__:
-                        rel_descriptor = cls.__dict__[rel_opts_name]
-                        break
-                else:
-                    # in the case of a hidden fkey just skip it, it'll get
-                    # processed as an m2m
-                    if not related.field.rel.is_hidden():
-                        raise AssertionError("Should never get here.")
-                    else:
-                        continue
-                delete_qs = rel_descriptor.delete_manager(self).all()
-                for sub_obj in delete_qs:
-                    sub_obj._collect_sub_objects(seen_objs, self, related.field.null)
-
-        for related in self._meta.get_all_related_many_to_many_objects():
-            if related.field.rel.through:
-                db = router.db_for_write(related.field.rel.through.__class__, instance=self)
-                opts = related.field.rel.through._meta
-                reverse_field_name = related.field.m2m_reverse_field_name()
-                nullable = opts.get_field(reverse_field_name).null
-                filters = {reverse_field_name: self}
-                for sub_obj in related.field.rel.through._base_manager.using(db).filter(**filters):
-                    sub_obj._collect_sub_objects(seen_objs, self, nullable)
-
-        for f in self._meta.many_to_many:
-            if f.rel.through:
-                db = router.db_for_write(f.rel.through.__class__, instance=self)
-                opts = f.rel.through._meta
-                field_name = f.m2m_field_name()
-                nullable = opts.get_field(field_name).null
-                filters = {field_name: self}
-                for sub_obj in f.rel.through._base_manager.using(db).filter(**filters):
-                    sub_obj._collect_sub_objects(seen_objs, self, nullable)
-            else:
-                # m2m-ish but with no through table? GenericRelation: cascade delete
-                for sub_obj in f.value_from_object(self).all():
-                    # Generic relations not enforced by db constraints, thus we can set
-                    # nullable=True, order does not matter
-                    sub_obj._collect_sub_objects(seen_objs, self, True)
-
-        # Handle any ancestors (for the model-inheritance case). We do this by
-        # traversing to the most remote parent classes -- those with no parents
-        # themselves -- and then adding those instances to the collection. That
-        # will include all the child instances down to "self".
-        parent_stack = [p for p in self._meta.parents.values() if p is not None]
-        while parent_stack:
-            link = parent_stack.pop()
-            parent_obj = getattr(self, link.name)
-            if parent_obj._meta.parents:
-                parent_stack.extend(parent_obj._meta.parents.values())
-                continue
-            # At this point, parent_obj is base class (no ancestor models). So
-            # delete it and all its descendents.
-            parent_obj._collect_sub_objects(seen_objs)
-
     def delete(self, using=None):
         using = using or router.db_for_write(self.__class__, instance=self)
         assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
 
-        # Find all the objects than need to be deleted.
-        seen_objs = CollectedObjects()
-        self._collect_sub_objects(seen_objs)
-
-        # Actually delete the objects.
-        delete_objects(seen_objs, using)
+        collector = Collector(using=using)
+        collector.collect([self])
+        collector.delete()
 
     delete.alters_data = True
 

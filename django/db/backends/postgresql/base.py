@@ -82,6 +82,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     uses_savepoints = True
     requires_rollback_on_dirty_transaction = True
     has_real_datatype = True
+    can_defer_constraint_checks = True
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'

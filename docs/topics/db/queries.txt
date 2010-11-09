@@ -749,14 +749,19 @@ model (e.g., by iterating over a ``QuerySet`` and calling ``delete()``
 on each object individually) rather than using the bulk ``delete()``
 method of a ``QuerySet``.
 
-When Django deletes an object, it emulates the behavior of the SQL
-constraint ``ON DELETE CASCADE`` -- in other words, any objects which
-had foreign keys pointing at the object to be deleted will be deleted
-along with it. For example::
+When Django deletes an object, by default it emulates the behavior of the SQL
+constraint ``ON DELETE CASCADE`` -- in other words, any objects which had
+foreign keys pointing at the object to be deleted will be deleted along with
+it. For example::
 
     b = Blog.objects.get(pk=1)
     # This will delete the Blog and all of its Entry objects.
     b.delete()
+
+.. versionadded:: 1.3
+    This cascade behavior is customizable via the
+    :attr:`~django.db.models.ForeignKey.on_delete` argument to the
+    :class:`~django.db.models.ForeignKey`.
 
 Note that ``delete()`` is the only ``QuerySet`` method that is not exposed on a
 ``Manager`` itself. This is a safety mechanism to prevent you from accidentally

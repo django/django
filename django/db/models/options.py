@@ -11,6 +11,11 @@ from django.utils.translation import activate, deactivate_all, get_language, str
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.datastructures import SortedDict
 
+try:
+    all
+except NameError:
+    from django.utils.itercompat import all
+
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
 
@@ -339,16 +344,12 @@ class Options(object):
     def get_delete_permission(self):
         return 'delete_%s' % self.object_name.lower()
 
-    def get_all_related_objects(self, local_only=False):
-        try:
-            self._related_objects_cache
-        except AttributeError:
-            self._fill_related_objects_cache()
-        if local_only:
-            return [k for k, v in self._related_objects_cache.items() if not v]
-        return self._related_objects_cache.keys()
+    def get_all_related_objects(self, local_only=False, include_hidden=False):
+        return [k for k, v in self.get_all_related_objects_with_model(
+                local_only=local_only, include_hidden=include_hidden)]
 
-    def get_all_related_objects_with_model(self):
+    def get_all_related_objects_with_model(self, local_only=False,
+                                           include_hidden=False):
         """
         Returns a list of (related-object, model) pairs. Similar to
         get_fields_with_model().
@@ -357,7 +358,13 @@ class Options(object):
             self._related_objects_cache
         except AttributeError:
             self._fill_related_objects_cache()
-        return self._related_objects_cache.items()
+        predicates = []
+        if local_only:
+            predicates.append(lambda k, v: not v)
+        if not include_hidden:
+            predicates.append(lambda k, v: not k.field.rel.is_hidden())
+        return filter(lambda t: all([p(*t) for p in predicates]),
+                      self._related_objects_cache.items())
 
     def _fill_related_objects_cache(self):
         cache = SortedDict()
@@ -370,7 +377,7 @@ class Options(object):
                     cache[obj] = parent
                 else:
                     cache[obj] = model
-        for klass in get_models():
+        for klass in get_models(include_auto_created=True):
             for f in klass._meta.local_fields:
                 if f.rel and not isinstance(f.rel.to, str) and self == f.rel.to._meta:
                     cache[RelatedObject(f.rel.to, klass, f)] = None

@@ -9,7 +9,7 @@ from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_ob
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import models, transaction
+from django.db import models, transaction, router
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
@@ -1110,9 +1110,12 @@ class ModelAdmin(BaseModelAdmin):
         if obj is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_unicode(opts.verbose_name), 'key': escape(object_id)})
 
+        using = router.db_for_write(self.model)
+
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        (deleted_objects, perms_needed) = get_deleted_objects((obj,), opts, request.user, self.admin_site)
+        (deleted_objects, perms_needed) = get_deleted_objects(
+            [obj], opts, request.user, self.admin_site, using)
 
         if request.POST: # The user has already confirmed the deletion.
             if perms_needed:

@@ -53,6 +53,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_subqueries_in_group_by = True
     supports_timezones = False
     supports_bitwise_or = False
+    can_defer_constraint_checks = True
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"

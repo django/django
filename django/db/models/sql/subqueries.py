@@ -27,16 +27,17 @@ class DeleteQuery(Query):
         self.where = where
         self.get_compiler(using).execute_sql(None)
 
-    def delete_batch(self, pk_list, using):
+    def delete_batch(self, pk_list, using, field=None):
         """
         Set up and execute delete queries for all the objects in pk_list.
 
         More than one physical query may be executed if there are a
         lot of values in pk_list.
         """
+        if not field:
+            field = self.model._meta.pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
-            field = self.model._meta.pk
             where.add((Constraint(None, field.column, field), 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
@@ -68,20 +69,14 @@ class UpdateQuery(Query):
                 related_updates=self.related_updates.copy(), **kwargs)
 
 
-    def clear_related(self, related_field, pk_list, using):
-        """
-        Set up and execute an update query that clears related entries for the
-        keys in pk_list.
-
-        This is used by the QuerySet.delete_objects() method.
-        """
+    def update_batch(self, pk_list, values, using):
+        pk_field = self.model._meta.pk
+        self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
-            f = self.model._meta.pk
-            self.where.add((Constraint(None, f.column, f), 'in',
+            self.where.add((Constraint(None, pk_field.column, pk_field), 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                     AND)
-            self.values = [(related_field, None, None)]
             self.get_compiler(using).execute_sql(None)
 
     def add_update_values(self, values):

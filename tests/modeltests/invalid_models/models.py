@@ -210,6 +210,13 @@ class NonExistingOrderingWithSingleUnderscore(models.Model):
     class Meta:
         ordering = ("does_not_exist",)
 
+class InvalidSetNull(models.Model):
+    fk = models.ForeignKey('self', on_delete=models.SET_NULL)
+
+class InvalidSetDefault(models.Model):
+    fk = models.ForeignKey('self', on_delete=models.SET_DEFAULT)
+
+
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
@@ -315,4 +322,6 @@ invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the unique 
 invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
+invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
+invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
 """

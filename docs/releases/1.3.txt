@@ -86,6 +86,19 @@ Users of Python 2.5 and above may now use :ref:`transaction management functions
 
 For more information, see :ref:`transaction-management-functions`.
 
+Configurable delete-cascade
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django.db.models.ForeignKey` and
+:class:`~django.db.models.OneToOneField` now accept an
+:attr:`~django.db.models.ForeignKey.on_delete` argument to customize behavior
+when the referenced object is deleted. Previously, deletes were always
+cascaded; available alternatives now include set null, set default, set to any
+value, protect, or do nothing.
+
+For more information, see the :attr:`~django.db.models.ForeignKey.on_delete`
+documentation.
+
 Contextual markers in translatable strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

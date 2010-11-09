@@ -18,6 +18,10 @@ class Article(models.Model):
 
 class Count(models.Model):
     num = models.PositiveSmallIntegerField()
+    parent = models.ForeignKey('self', null=True)
+
+    def __unicode__(self):
+        return unicode(self.num)
 
 class Event(models.Model):
     date = models.DateTimeField(auto_now_add=True)

@@ -7,8 +7,10 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
 from django.db.models.related import RelatedObject
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import QueryWrapper
+from django.db.models.deletion import CASCADE
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext_lazy as _, string_concat, ungettext, ugettext
+from django.utils.translation import (ugettext_lazy as _, string_concat,
+    ungettext, ugettext)
 from django.utils.functional import curry
 from django.core import exceptions
 from django import forms
@@ -733,8 +735,8 @@ class ReverseManyRelatedObjectsDescriptor(object):
         manager.add(*value)
 
 class ManyToOneRel(object):
-    def __init__(self, to, field_name, related_name=None,
-            limit_choices_to=None, lookup_overrides=None, parent_link=False):
+    def __init__(self, to, field_name, related_name=None, limit_choices_to=None,
+        parent_link=False, on_delete=None):
         try:
             to._meta
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
@@ -744,9 +746,9 @@ class ManyToOneRel(object):
         if limit_choices_to is None:
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
-        self.lookup_overrides = lookup_overrides or {}
         self.multiple = True
         self.parent_link = parent_link
+        self.on_delete = on_delete
 
     def is_hidden(self):
         "Should the related object be hidden?"
@@ -764,11 +766,12 @@ class ManyToOneRel(object):
         return data[0]
 
 class OneToOneRel(ManyToOneRel):
-    def __init__(self, to, field_name, related_name=None,
-            limit_choices_to=None, lookup_overrides=None, parent_link=False):
+    def __init__(self, to, field_name, related_name=None, limit_choices_to=None,
+        parent_link=False, on_delete=None):
         super(OneToOneRel, self).__init__(to, field_name,
                 related_name=related_name, limit_choices_to=limit_choices_to,
-                lookup_overrides=lookup_overrides, parent_link=parent_link)
+                parent_link=parent_link, on_delete=on_delete
+        )
         self.multiple = False
 
 class ManyToManyRel(object):
@@ -820,8 +823,9 @@ class ForeignKey(RelatedField, Field):
         kwargs['rel'] = rel_class(to, to_field,
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
-            lookup_overrides=kwargs.pop('lookup_overrides', None),
-            parent_link=kwargs.pop('parent_link', False))
+            parent_link=kwargs.pop('parent_link', False),
+            on_delete=kwargs.pop('on_delete', CASCADE),
+        )
         Field.__init__(self, **kwargs)
 
     def validate(self, value, model_instance):

@@ -5,13 +5,16 @@ Classes allowing "generic" relations through ContentType and object-id fields.
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import signals
-from django.db import models, router
+from django.db import models, router, DEFAULT_DB_ALIAS
 from django.db.models.fields.related import RelatedField, Field, ManyToManyRel
 from django.db.models.loading import get_model
 from django.forms import ModelForm
 from django.forms.models import BaseModelFormSet, modelformset_factory, save_instance
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.utils.encoding import smart_unicode
+
+from django.contrib.contenttypes.models import ContentType
+
 
 class GenericForeignKey(object):
     """
@@ -166,6 +169,19 @@ class GenericRelation(RelatedField, Field):
         prefix = "__".join(pieces[:pos + 1])
         return [("%s__%s" % (prefix, self.content_type_field_name),
             content_type)]
+
+    def bulk_related_objects(self, objs, using=DEFAULT_DB_ALIAS):
+        """
+        Return all objects related to ``objs`` via this ``GenericRelation``.
+
+        """
+        return self.rel.to._base_manager.db_manager(using).filter(**{
+                "%s__pk" % self.content_type_field_name:
+                    ContentType.objects.db_manager(using).get_for_model(self.model).pk,
+                "%s__in" % self.object_id_field_name:
+                    [obj.pk for obj in objs]
+                })
+
 
 class ReverseGenericRelatedObjectsDescriptor(object):
     """

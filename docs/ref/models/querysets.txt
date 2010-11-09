@@ -1263,13 +1263,19 @@ For example, to delete all the entries in a particular blog::
     # Delete all the entries belonging to this Blog.
     >>> Entry.objects.filter(blog=b).delete()
 
-Django emulates the SQL constraint ``ON DELETE CASCADE`` -- in other words, any
-objects with foreign keys pointing at the objects to be deleted will be deleted
-along with them.  For example::
+By default, Django's :class:`~django.db.models.ForeignKey` emulates the SQL
+constraint ``ON DELETE CASCADE`` -- in other words, any objects with foreign
+keys pointing at the objects to be deleted will be deleted along with them.
+For example::
 
     blogs = Blog.objects.all()
     # This will delete all Blogs and all of their Entry objects.
     blogs.delete()
+
+.. versionadded:: 1.3
+    This cascade behavior is customizable via the
+    :attr:`~django.db.models.ForeignKey.on_delete` argument to the
+    :class:`~django.db.models.ForeignKey`.
 
 The ``delete()`` method does a bulk delete and does not call any ``delete()``
 methods on your models. It does, however, emit the
