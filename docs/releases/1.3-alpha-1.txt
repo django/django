@@ -2,10 +2,6 @@
 Django 1.3 alpha 1 release notes
 ================================
 
-This page documents release notes for the as-yet-unreleased Django
-1.3. As such, it's tentative and subject to change. It provides
-up-to-date information for those who are following trunk.
-
 November 11, 2010
 
 Welcome to Django 1.3 alpha 1!
