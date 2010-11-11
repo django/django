@@ -11,6 +11,7 @@ from django.db import transaction, connection, connections, DEFAULT_DB_ALIAS
 from django.http import QueryDict
 from django.test import _doctest as doctest
 from django.test.client import Client
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import simplejson, unittest as ut2
 from django.utils.encoding import smart_str
 from django.utils.functional import wraps
@@ -327,6 +328,19 @@ class TransactionTestCase(ut2.TestCase):
         if hasattr(self, '_old_root_urlconf'):
             settings.ROOT_URLCONF = self._old_root_urlconf
             clear_url_caches()
+
+    def save_warnings_state(self):
+        """
+        Saves the state of the warnings module
+        """
+        self._warnings_state = get_warnings_state()
+
+    def restore_warnings_state(self):
+        """
+        Restores the sate of the warnings module to the state
+        saved by save_warnings_state()
+        """
+        restore_warnings_state(self._warnings_state)
 
     def assertRedirects(self, response, expected_url, status_code=302,
                         target_status_code=200, host=None, msg_prefix=''):

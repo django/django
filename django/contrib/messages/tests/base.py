@@ -51,6 +51,7 @@ class BaseTest(TestCase):
         self._message_storage = settings.MESSAGE_STORAGE
         settings.MESSAGE_STORAGE = '%s.%s' % (self.storage_class.__module__,
                                               self.storage_class.__name__)
+        self.save_warnings_state()
         warnings.filterwarnings('ignore', category=DeprecationWarning,
                                 module='django.contrib.auth.models')
 
@@ -63,8 +64,7 @@ class BaseTest(TestCase):
            self._template_context_processors
         settings.INSTALLED_APPS = self._installed_apps
         settings.MESSAGE_STORAGE = self._message_storage
-        warnings.resetwarnings()
-        warnings.simplefilter('ignore', PendingDeprecationWarning)
+        self.restore_warnings_state()
 
     def restore_setting(self, setting):
         if setting in self._remembered_settings:

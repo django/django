@@ -315,14 +315,14 @@ class DeprecatedSyndicationFeedTest(FeedTestCase):
     Tests for the deprecated API (feed() view and the feed_dict etc).
     """
     def setUp(self):
+        self.save_warnings_state()
         warnings.filterwarnings('ignore', category=DeprecationWarning,
                                 module='django.contrib.syndication.feeds')
         warnings.filterwarnings('ignore', category=DeprecationWarning,
                                 module='django.contrib.syndication.views')
 
     def tearDown(self):
-        warnings.resetwarnings()
-        warnings.simplefilter('ignore', PendingDeprecationWarning)
+        self.restore_warnings_state()
 
     def test_empty_feed_dict(self):
         """

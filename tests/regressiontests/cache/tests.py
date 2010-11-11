@@ -15,6 +15,7 @@ from django.core.cache import get_cache
 from django.core.cache.backends.base import InvalidCacheBackendError, CacheKeyWarning
 from django.http import HttpResponse, HttpRequest
 from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import translation
 from django.utils import unittest
 from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
@@ -379,21 +380,16 @@ class BaseCacheTests(object):
         # manager to test this warning nicely. Since we can't do that
         # yet, the cleanest option is to temporarily ask for
         # CacheKeyWarning to be raised as an exception.
+        _warnings_state = get_warnings_state()
         warnings.simplefilter("error", CacheKeyWarning)
 
-        # memcached does not allow whitespace or control characters in keys
-        self.assertRaises(CacheKeyWarning, self.cache.set, 'key with spaces', 'value')
-        # memcached limits key length to 250
-        self.assertRaises(CacheKeyWarning, self.cache.set, 'a' * 251, 'value')
-
-        # The warnings module has no public API for getting the
-        # current list of warning filters, so we can't save that off
-        # and reset to the previous value, we have to globally reset
-        # it. The effect will be the same, as long as the Django test
-        # runner doesn't add any global warning filters (it currently
-        # does not).
-        warnings.resetwarnings()
-        warnings.simplefilter("ignore", PendingDeprecationWarning)
+        try:
+            # memcached does not allow whitespace or control characters in keys
+            self.assertRaises(CacheKeyWarning, self.cache.set, 'key with spaces', 'value')
+            # memcached limits key length to 250
+            self.assertRaises(CacheKeyWarning, self.cache.set, 'a' * 251, 'value')
+        finally:
+            restore_warnings_state(_warnings_state)
 
 class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):

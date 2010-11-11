@@ -26,6 +26,35 @@ class SkippingTestCase(TestCase):
         self.assertRaises(ValueError, test_func)
 
 
+class SaveRestoreWarningState(TestCase):
+
+    def test_save_restore_warnings_state(self):
+        """
+        Ensure save_warnings_state/restore_warnings_state work correctly.
+        """
+        # In reality this test could be satisfied by many broken implementations
+        # of save_warnings_state/restore_warnings_state (e.g. just
+        # warnings.resetwarnings()) , but it is difficult to test more.
+        import warnings
+        self.save_warnings_state()
+
+        class MyWarning(Warning):
+            pass
+
+        # Add a filter that causes an exception to be thrown, so we can catch it
+        warnings.simplefilter("error", MyWarning)
+        self.assertRaises(Warning, lambda: warnings.warn("warn", MyWarning))
+
+        # Now restore.
+        self.restore_warnings_state()
+        # After restoring, we shouldn't get an exception. But we don't want a
+        # warning printed either, so we have to silence the warning.
+        warnings.simplefilter("ignore", MyWarning)
+        warnings.warn("warn", MyWarning)
+
+        # Remove the filter we just added.
+        self.restore_warnings_state()
+
 __test__ = {"API_TEST": r"""
 # Some checks of the doctest output normalizer.
 # Standard doctests do fairly

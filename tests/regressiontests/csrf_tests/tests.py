@@ -71,12 +71,12 @@ class CsrfMiddlewareTest(TestCase):
     _secret_key_for_session_test= "test"
 
     def setUp(self):
+        self.save_warnings_state()
         warnings.filterwarnings('ignore', category=DeprecationWarning,
                                 module='django.middleware.csrf')
 
     def tearDown(self):
-        warnings.resetwarnings()
-        warnings.simplefilter('ignore', PendingDeprecationWarning)
+        self.restore_warnings_state()
 
     def _get_GET_no_csrf_cookie_request(self):
         return TestingHttpRequest()
