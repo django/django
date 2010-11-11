@@ -31,16 +31,14 @@ Class-based views
 
 Django 1.3 adds a framework that allows you to use a class as a view.
 This means you can compose a view out of a collection of methods that
-can be subclassed and overridden to provide
+can be subclassed and overridden to provide analogs of all the old
+function-based generic views have been provided, along with a completely
+generic view base class that can be used as the basis for reusable
+applications that can be easily extended.
 
-Analogs of all the old function-based generic views have been
-provided, along with a completely generic view base class that can be
-used as the basis for reusable applications that can be easily
-extended.
-
-See :doc:`the documentation on Generic Views</topics/generic-views>`
-for more details. There is also a document to help you :doc:`convert
-your function-based generic views to class-based
+See :doc:`the documentation on Class-based Generic Views
+</topics/class-based-views>` for more details. There is also a document to
+help you :doc:`convert your function-based generic views to class-based
 views</topics/generic-views-migration>`.
 
 Logging
@@ -129,7 +127,8 @@ To compensate for this, the focus of the Django 1.3 development
 process has been on adding lots of smaller, long standing feature
 requests. These include:
 
-    * Improved tools for accessing and manipulating the current Site.
+    * Improved tools for accessing and manipulating the current Site via
+      :func:`django.contrib.sites.models.get_current_site`.
 
     * A :class:`~django.test.client.RequestFactory` for mocking
       requests in tests.
@@ -274,7 +273,7 @@ be removed entirely.
 
     For more details, see the documentation :doc:`Django's release process
     </internals/release-process>` and our :doc:`deprecation timeline
-    </internals/deprecation>`.`
+    </internals/deprecation>`.
 
 ``mod_python`` support
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -285,8 +284,8 @@ of active projects in its version control repositories, and its lead developer
 has shifted all of his efforts toward the lighter, slimmer, more stable, and
 more flexible ``mod_wsgi`` backend.
 
-If you are currently using the ``mod_python`` request handler, it is strongly
-encouraged you redeploy your Django instances using :doc:`mod_wsgi
+If you are currently using the ``mod_python`` request handler, you are strongly
+encouraged to redeploy your Django instances using :doc:`mod_wsgi
 </howto/deployment/modwsgi>`.
 
 Function-based generic views
