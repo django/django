@@ -34,12 +34,20 @@ STATICFILES_ROOT
 
 Default: ``''`` (Empty string)
 
-The absolute path to the directory that holds static files::
+The absolute path to the directory that the :djadmin:`collectstatic` management
+command will collect static files into, for serving from
+:setting:`STATICFILES_URL`::
 
    STATICFILES_ROOT = "/home/example.com/static/"
 
 This is a **required setting** unless you've overridden
 :setting:`STATICFILES_STORAGE` and are using a custom storage backend.
+
+This is not a place to store your static files permanently under version
+control; you should do that in directories that will be found by your
+:setting:`STATICFILES_FINDERS` (by default, per-app ``static/`` subdirectories,
+and any directories you include in :setting:`STATICFILES_DIRS`). Files from
+those locations will be collected into :setting:`STATICFILES_ROOT`.
 
 .. setting:: STATICFILES_URL
 
@@ -51,7 +59,7 @@ Default: ``'/static/'``
 The URL that handles the files served from :setting:`STATICFILES_ROOT`, e.g.::
 
     STATICFILES_URL = '/site_media/static/'
-   
+
 ... or perhaps::
 
     STATICFILES_URL = 'http://static.example.com/'
@@ -130,7 +138,7 @@ your :setting:`STATICFILES_FINDERS` setting, it will look for static files in
 the default file storage as defined by the :setting:`DEFAULT_FILE_STORAGE`
 setting.
 
-.. note:: 
+.. note::
 
     When using the :class:`AppDirectoriesFinder` finder, make sure your apps can
     be found by Django's app loading mechanism. Simply include a ``models``
@@ -271,11 +279,13 @@ This view function serves static files in development.
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
 
-To use the view, add the following snippet to the end of your primary URL
-configuration::
+This view is automatically enabled by :djadmin:`runserver` (with a
+:setting:`DEBUG` setting set to ``True``). To use the view with a different
+local development server, add the following snippet to the end of your
+primary URL configuration::
 
    from django.conf import settings
-   
+
    if settings.DEBUG:
        urlpatterns = patterns('django.contrib.staticfiles.views',
            url(r'^static/(?P<path>.*)$', 'serve'),
@@ -292,8 +302,8 @@ This will return the proper URL pattern for serving static files to your
 already defined pattern list. Use it like this::
 
    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-   
+
    # ... the rest of your URLconf here ...
-   
+
    urlpatterns += staticfiles_urlpatterns()
 

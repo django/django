@@ -21,7 +21,7 @@ from django.contrib.staticfiles.views import \
     directory_index, was_modified_since, serve as staticfiles_serve
 
 
-def serve(request, path, document_root=None, show_indexes=False):
+def serve(request, path, document_root=None, show_indexes=False, insecure=False):
     """
     Serve static files below a given point in the directory structure.
 
@@ -38,4 +38,4 @@ def serve(request, path, document_root=None, show_indexes=False):
     warnings.warn("The view at `django.views.static.serve` is deprecated; "
                   "use the path `django.contrib.staticfiles.views.serve` "
                   "instead.", PendingDeprecationWarning)
-    return staticfiles_serve(request, path, document_root, show_indexes)
+    return staticfiles_serve(request, path, document_root, show_indexes, insecure)

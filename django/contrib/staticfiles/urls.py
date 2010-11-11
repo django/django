@@ -19,10 +19,14 @@ def staticfiles_urlpatterns(prefix=None):
         return []
     if prefix is None:
         prefix = settings.STATICFILES_URL
+    if not prefix:
+        raise ImproperlyConfigured(
+            "The prefix for the 'staticfiles_urlpatterns' helper is empty. "
+            "Make sure the STATICFILES_URL setting is set correctly.")
     if '://' in prefix:
         raise ImproperlyConfigured(
             "The STATICFILES_URL setting is a full URL, not a path and "
-            "can't be used with the urls.staticfiles_urlpatterns() helper.")
+            "can't be used with the 'staticfiles_urlpatterns' helper.")
     if prefix.startswith("/"):
         prefix = prefix[1:]
     return patterns('',

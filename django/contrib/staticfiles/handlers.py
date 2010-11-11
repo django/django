@@ -1,10 +1,10 @@
-import os
 import urllib
 from urlparse import urlparse
 
-from django.core.handlers.wsgi import WSGIHandler, STATUS_CODE_TEXT
-from django.http import Http404
+from django.conf import settings
+from django.core.handlers.wsgi import WSGIHandler
 
+from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
 
 class StaticFilesHandler(WSGIHandler):
@@ -18,15 +18,27 @@ class StaticFilesHandler(WSGIHandler):
             self.media_dir = media_dir
         else:
             self.media_dir = self.get_media_dir()
-        self.media_url = self.get_media_url()
+        self.media_url = urlparse(self.get_media_url())
+        if settings.DEBUG:
+            utils.check_settings()
+        super(StaticFilesHandler, self).__init__()
 
     def get_media_dir(self):
-        from django.conf import settings
         return settings.STATICFILES_ROOT
 
     def get_media_url(self):
-        from django.conf import settings
         return settings.STATICFILES_URL
+
+    def _should_handle(self, path):
+        """
+        Checks if the path should be handled. Ignores the path if:
+
+        * the host is provided as part of the media_url
+        * the request's path isn't under the media path (or equal)
+        * settings.DEBUG isn't True
+        """
+        return (self.media_url[2] != path and
+            path.startswith(self.media_url[2]) and not self.media_url[1])
 
     def file_path(self, url):
         """
@@ -37,36 +49,28 @@ class StaticFilesHandler(WSGIHandler):
         is raised.
         """
         # Remove ``media_url``.
-        relative_url = url[len(self.media_url):]
+        relative_url = url[len(self.media_url[2]):]
         return urllib.url2pathname(relative_url)
 
-    def serve(self, request, path):
-        from django.contrib.staticfiles import finders
-        absolute_path = finders.find(path)
-        if not absolute_path:
-            raise Http404('%r could not be matched to a static file.' % path)
-        absolute_path, filename = os.path.split(absolute_path)
-        return serve(request, path=filename, document_root=absolute_path)
+    def serve(self, request):
+        """
+        Actually serves the request path.
+        """
+        return serve(request, self.file_path(request.path), insecure=True)
+
+    def get_response(self, request):
+        from django.http import Http404
+
+        if self._should_handle(request.path):
+            try:
+                return self.serve(request)
+            except Http404, e:
+                if settings.DEBUG:
+                    from django.views import debug
+                    return debug.technical_404_response(request, e)
+        return super(StaticFilesHandler, self).get_response(request)
 
     def __call__(self, environ, start_response):
-        media_url_bits = urlparse(self.media_url)
-        # Ignore all requests if the host is provided as part of the media_url.
-        # Also ignore requests that aren't under the media path.
-        if (media_url_bits[1] or
-                not environ['PATH_INFO'].startswith(media_url_bits[2])):
+        if not self._should_handle(environ['PATH_INFO']):
             return self.application(environ, start_response)
-        request = self.application.request_class(environ)
-        try:
-            response = self.serve(request, self.file_path(environ['PATH_INFO']))
-        except Http404:
-            status = '404 NOT FOUND'
-            start_response(status, {'Content-type': 'text/plain'}.items())
-            return [str('Page not found: %s' % environ['PATH_INFO'])]
-        status_text = STATUS_CODE_TEXT[response.status_code]
-        status = '%s %s' % (response.status_code, status_text)
-        response_headers = [(str(k), str(v)) for k, v in response.items()]
-        for c in response.cookies.values():
-            response_headers.append(('Set-Cookie', str(c.output(header=''))))
-        start_response(status, response_headers)
-        return response
-
+        return super(StaticFilesHandler, self).__call__(environ, start_response)

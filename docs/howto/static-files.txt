@@ -37,7 +37,7 @@ Using ``django.contrib.staticfiles``
 
 Here's the basic usage in a nutshell:
 
-    1. Put your media somewhere that staticfiles will find it..
+    1. Put your media somewhere that staticfiles will find it.
 
        Most of the time this place will be in a ``static`` directory within your
        application, but it could also be a specific directory you've put into
@@ -69,12 +69,19 @@ Here's the basic usage in a nutshell:
             ./manage.py collectstatic
 
        This'll churn through your static file storage and move them into the
-       directory given by :setting:`STATICFILES_ROOT`.
+       directory given by :setting:`STATICFILES_ROOT`. (This is not necessary
+       in local development if you are using :djadmin:`runserver` or adding
+       ``staticfiles_urlpatterns`` to your URLconf; see below).
 
     4. Deploy that media.
 
-       If you're using the built-in development server, you can quickly
-       serve static media locally by adding::
+       If you're using the built-in development server (the
+       :djadmin:`runserver` management command) and have the :setting:`DEBUG`
+       setting set to ``True``, your staticfiles will automatically be served
+       from :setting:`STATICFILES_URL` in development.
+
+       If you are using some other server for local development, you can
+       quickly serve static media locally by adding::
 
             from django.contrib.staticfiles.urls import staticfiles_urlpatterns
             urlpatterns += staticfiles_urlpatterns()
@@ -99,6 +106,18 @@ Here's the basic usage in a nutshell:
 Those are the basics. For more details on common configuration options, read on;
 for a detailed reference of the settings, commands, and other bits included with
 the framework see :doc:`the staticfiles reference </ref/contrib/staticfiles>`.
+
+.. note::
+
+   In previous versions of Django, it was common to place static assets in
+   :setting:`MEDIA_ROOT` along with user-uploaded files, and serve them both at
+   :setting:`MEDIA_URL`. Part of the purpose of introducing the ``staticfiles``
+   app is to make it easier to keep static files separate from user-uploaded
+   files. For this reason, you will probably want to make your
+   :setting:`MEDIA_ROOT` and :setting:`MEDIA_URL` different from your
+   :setting:`STATICFILES_ROOT` and :setting:`STATICFILES_URL`. You will need to
+   arrange for serving of files in :setting:`MEDIA_ROOT` yourself;
+   ``staticfiles`` does not deal with user-uploaded media at all.
 
 .. _staticfiles-in-templates:
 
@@ -192,8 +211,12 @@ media server, which is a lot of overhead to mess with when developing locally.
 Thus, the ``staticfiles`` app ships with a quick and dirty helper view that you
 can use to serve files locally in development.
 
-To enable this view, you'll add a couple of lines to your URLconf. The first
-line goes at the top of the file, and the last line at the bottom::
+This view is automatically enabled and will serve your static files at
+:setting:`STATICFILES_URL` when you use the built-in :djadmin:`runserver`.
+
+To enable this view if you are using some other server for local development,
+you'll add a couple of lines to your URLconf. The first line goes at the top of
+the file, and the last line at the bottom::
 
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
@@ -242,7 +265,7 @@ app, the basic outline gets modified to look something like:
     * On the server, run :djadmin:`collectstatic` to move all the media into
       :setting:`STATICFILES_ROOT`.
     * Point your web server at :setting:`STATICFILES_ROOT`. For example, here's
-      of :ref:`how to do this under Apache and mod_wsgi <serving-media-files>`.
+      :ref:`how to do this under Apache and mod_wsgi <serving-media-files>`.
 
 You'll probably want to automate this process, especially if you've got multiple
 web servers. There's any number of ways to do this automation, but one option
@@ -392,6 +415,10 @@ you'll need to make a few changes:
     * The default for :setting:`STATICFILES_STORAGE` was renamed from
       ``staticfiles.storage.StaticFileStorage`` to
       ``staticfiles.storage.StaticFilesStorage``
+
+    * If using :djadmin:`runserver` for local development (and the
+      :setting:`DEBUG` setting is ``True``), you no longer need to add
+      anything to your URLconf for serving static files in development.
 
 Learn more
 ==========

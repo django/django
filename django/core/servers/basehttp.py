@@ -651,12 +651,6 @@ class AdminMediaHandler(StaticFilesHandler):
         from django.conf import settings
         return settings.ADMIN_MEDIA_PREFIX
 
-    def __init__(self, application, media_dir=None):
-        warnings.warn('The AdminMediaHandler handler is deprecated; use the '
-            '`django.contrib.staticfiles.handlers.StaticFilesHandler` instead.',
-            PendingDeprecationWarning)
-        super(AdminMediaHandler, self).__init__(application, media_dir)
-
     def file_path(self, url):
         """
         Returns the path to the media file on disk for the given URL.
@@ -666,13 +660,23 @@ class AdminMediaHandler(StaticFilesHandler):
         is raised.
         """
         # Remove ``media_url``.
-        relative_url = url[len(self.media_url):]
+        relative_url = url[len(self.media_url[2]):]
         relative_path = urllib.url2pathname(relative_url)
         return safe_join(self.media_dir, relative_path)
 
-    def serve(self, request, path):
-        document_root, path = os.path.split(path)
-        return static.serve(request, path, document_root=document_root)
+    def serve(self, request):
+        document_root, path = os.path.split(self.file_path(request.path))
+        return static.serve(request, path,
+            document_root=document_root, insecure=True)
+
+    def _should_handle(self, path):
+        """
+        Checks if the path should be handled. Ignores the path if:
+
+        * the host is provided as part of the media_url
+        * the request's path isn't under the media path
+        """
+        return path.startswith(self.media_url[2]) and not self.media_url[1]
 
 
 def run(addr, port, wsgi_handler):

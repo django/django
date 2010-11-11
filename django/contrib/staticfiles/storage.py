@@ -27,6 +27,8 @@ class StaticFilesStorage(FileSystemStorage):
             raise ImproperlyConfigured("You're using the staticfiles app "
                 "without having set the STATICFILES_URL setting. Set it to "
                 "URL that handles the files served from STATICFILES_ROOT.")
+        if settings.DEBUG:
+            utils.check_settings()
         super(StaticFilesStorage, self).__init__(location, base_url, *args, **kwargs)
 
 

@@ -9,6 +9,10 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.'),
+        make_option('--nostatic', action="store_false", dest='use_static_handler', default=True,
+            help='Tells Django to NOT automatically serve static files at STATICFILES_URL.'),
+        make_option('--insecure', action="store_true", dest='insecure_serving', default=False,
+            help='Allows serving static files even if DEBUG is True.'),
         make_option('--adminmedia', dest='admin_media_path', default='',
             help='Specifies the directory from which to serve admin media.'),
     )
@@ -42,6 +46,8 @@ class Command(BaseCommand):
         use_reloader = options.get('use_reloader', True)
         admin_media_path = options.get('admin_media_path', '')
         shutdown_message = options.get('shutdown_message', '')
+        use_static_handler = options.get('use_static_handler', True)
+        insecure_serving = options.get('insecure_serving', False)
         quit_command = (sys.platform == 'win32') and 'CTRL-BREAK' or 'CONTROL-C'
 
         def inner_run():
@@ -60,7 +66,11 @@ class Command(BaseCommand):
 
             try:
                 handler = WSGIHandler()
-                handler = StaticFilesHandler(handler)
+                allow_serving = (settings.DEBUG and use_static_handler or
+                    (use_static_handler and insecure_serving))
+                if (allow_serving and
+                        "django.contrib.staticfiles" in settings.INSTALLED_APPS):
+                    handler = StaticFilesHandler(handler)
                 # serve admin media like old-school (deprecation pending)
                 handler = AdminMediaHandler(handler, admin_media_path)
                 run(addr, int(port), handler)

@@ -53,7 +53,7 @@ Default: ``'/media/'``
 
 The URL prefix for admin media -- CSS, JavaScript and images used by
 the Django administrative interface. Make sure to use a trailing
-slash, and to have this be different from the ``MEDIA_URL`` setting
+slash, and to have this be different from the :setting:`MEDIA_URL` setting
 (since the same URL cannot be mapped onto two different sets of
 files).
 
@@ -1104,8 +1104,12 @@ MEDIA_ROOT
 
 Default: ``''`` (Empty string)
 
-Absolute path to the directory that holds media for this installation.
-Example: ``"/home/media/media.lawrence.com/"`` See also ``MEDIA_URL``.
+Absolute path to the directory that holds media for this installation, used
+for :doc:`managing stored files </topics/files>`.
+
+Example: ``"/home/media/media.lawrence.com/"``
+
+See also :setting:`MEDIA_URL`.
 
 .. setting:: MEDIA_URL
 
@@ -1114,15 +1118,15 @@ MEDIA_URL
 
 Default: ``''`` (Empty string)
 
-URL that handles the media served from ``MEDIA_ROOT``.
+URL that handles the media served from :setting:`MEDIA_ROOT`, used
+for :doc:`managing stored files </topics/files>`.
+
 Example: ``"http://media.lawrence.com"``
 
 Note that this should have a trailing slash if it has a path component.
 
-Good: ``"http://www.example.com/static/"``
-Bad: ``"http://www.example.com/static"``
-
-.. setting:: MIDDLEWARE_CLASSES
+ * Good: ``"http://www.example.com/static/"``
+ * Bad: ``"http://www.example.com/static"``
 
 MESSAGE_LEVEL
 -------------
@@ -1160,6 +1164,8 @@ Default::
 
 Sets the mapping of message levels to message tags. See the
 :doc:`messages documentation </ref/contrib/messages>` for more details.
+
+.. setting:: MIDDLEWARE_CLASSES
 
 MIDDLEWARE_CLASSES
 ------------------
