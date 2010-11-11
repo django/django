@@ -82,7 +82,7 @@ setup(
     cmdclass = cmdclasses,
     data_files = data_files,
     scripts = ['django/bin/django-admin.py'],
-    classifiers = ['Development Status :: 5 - Production/Stable',
+    classifiers = ['Development Status :: 3 - Alpha',
                    'Environment :: Web Environment',
                    'Framework :: Django',
                    'Intended Audience :: Developers',
