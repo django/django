@@ -21,6 +21,7 @@ from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import load_template_source as lts_egg
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
+from django.test.utils import get_warnings_state, restore_warnings_state
 
 # Mock classes and objects for pkg_resources functions.
 class MockProvider(pkg_resources.NullProvider):
@@ -67,11 +68,12 @@ class DeprecatedEggLoaderTest(unittest.TestCase):
         })
         self._old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = []
+        self._warnings_state = get_warnings_state()
         warnings.simplefilter("ignore", PendingDeprecationWarning)
 
     def tearDown(self):
         settings.INSTALLED_APPS = self._old_installed_apps
-        warnings.resetwarnings()
+        restore_warnings_state(self._warnings_state)
 
     def test_existing(self):
         "A template can be loaded from an egg"
