@@ -22,7 +22,8 @@ Class-based views
 
 Django 1.3 adds a framework that allows you to use a class as a view.
 This means you can compose a view out of a collection of methods that
-can be subclassed and overridden to provide
+can be subclassed and overridden to provide common views of data without
+having to write too much code.
 
 Analogs of all the old function-based generic views have been
 provided, along with a completely generic view base class that can be
