@@ -19,7 +19,7 @@ prior to the final 1.3 release.
 As such, this release is *not* intended for production use, and any such use is
 discouraged.
 
-As of this alpha release, Django 1.3 containsa number of nifty `new
+As of this alpha release, Django 1.3 contains a number of nifty `new
 features`_, lots of bug fixes, some minor `backwards incompatible
 changes`_ and an easy upgrade path from Django 1.2.
 
