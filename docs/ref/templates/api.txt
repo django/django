@@ -311,8 +311,9 @@ and return a dictionary of items to be merged into the context. By default,
     ("django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
-    "django.contrib.staticfiles.context_processors.staticfiles",
-    "django.contrib.messages.context_processors.messages")
+    "django.core.context_processors.media",
+    "django.contrib.messages.context_processors.messages",
+    "django.contrib.staticfiles.context_processors.staticfiles")
 
 .. versionadded:: 1.2
    In addition to these, ``RequestContext`` always uses
@@ -433,12 +434,6 @@ django.core.context_processors.media
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
 value of the :setting:`MEDIA_URL` setting.
-
-.. versionchanged:: 1.3
-    This context processor has been moved to the new
-    :doc:`/ref/contrib/staticfiles` app. Please use the new
-    ``django.contrib.staticfiles.context_processors.staticfiles``
-    context processor.
 
 django.core.context_processors.csrf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

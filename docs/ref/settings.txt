@@ -1512,12 +1512,6 @@ of items to be merged into the context.
     ``django.core.context_processors.auth`` to
     ``django.contrib.auth.context_processors.auth``.
 
-.. versionchanged:: 1.3
-    ``django.core.context_processors.media`` was replaced by 
-    :func:`django.contrib.staticfiles.context_processors.staticfiles` in the
-    default. For more information, see the :doc:`staticfiles documentation 
-    </ref/contrib/staticfiles>`.
-
 .. setting:: TEMPLATE_DEBUG
 
 TEMPLATE_DEBUG
