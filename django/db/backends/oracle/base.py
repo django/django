@@ -349,7 +349,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _connect_string(self):
         settings_dict = self.settings_dict
-        if settings_dict['HOST'].strip():
+        if not settings_dict['HOST'].strip():
             settings_dict['HOST'] = 'localhost'
         if settings_dict['PORT'].strip():
             dsn = Database.makedsn(settings_dict['HOST'],
