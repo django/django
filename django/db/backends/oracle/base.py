@@ -292,11 +292,24 @@ WHEN (new.%(col_name)s IS NULL)
         return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""),
             self.quote_name(tablespace))
 
+    def value_to_db_datetime(self, value):
+        # Oracle doesn't support tz-aware datetimes
+        if getattr(value, 'tzinfo', None) is not None:
+            raise ValueError("Oracle backend does not support timezone-aware datetimes.")
+
+        return super(DatabaseOperations, self).value_to_db_datetime(value)
+
     def value_to_db_time(self, value):
         if value is None:
             return None
+
         if isinstance(value, basestring):
             return datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
+
+        # Oracle doesn't support tz-aware datetimes
+        if value.tzinfo is not None:
+            raise ValueError("Oracle backend does not support timezone-aware datetimes.")
+
         return datetime.datetime(1900, 1, 1, value.hour, value.minute,
                                  value.second, value.microsecond)
 
