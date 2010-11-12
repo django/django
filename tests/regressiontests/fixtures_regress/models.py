@@ -225,3 +225,7 @@ class ExternalDependency(models.Model):
         return self.name
     natural_key.dependencies = ['fixtures_regress.book']
 
+
+# Model for regression test of #11101
+class Thingy(models.Model):
+    name = models.CharField(max_length=255)
