@@ -87,13 +87,13 @@ The strings you pass to ``_()`` or ``ugettext()`` can take placeholders,
 specified with Python's standard named-string interpolation syntax. Example::
 
     def my_view(request, m, d):
-        output = _('Today is %(month)s, %(day)s.') % {'month': m, 'day': d}
+        output = _('Today is %(month)s %(day)s.') % {'month': m, 'day': d}
         return HttpResponse(output)
 
 This technique lets language-specific translations reorder the placeholder
-text. For example, an English translation may be ``"Today is November, 26."``,
+text. For example, an English translation may be ``"Today is November 26."``,
 while a Spanish translation may be ``"Hoy es 26 de Noviembre."`` -- with the
-placeholders (the month and the day) with their positions swapped.
+the month and the day placeholders swapped.
 
 For this reason, you should use named-string interpolation (e.g., ``%(day)s``)
 instead of positional interpolation (e.g., ``%s`` or ``%d``) whenever you
