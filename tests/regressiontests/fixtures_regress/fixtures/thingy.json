@@ -1,0 +1,9 @@
+[
+    {
+        "pk": "1",
+        "model": "fixtures_regress.thingy",
+        "fields": {
+            "name": "Whatchamacallit"
+        }
+    }
+]

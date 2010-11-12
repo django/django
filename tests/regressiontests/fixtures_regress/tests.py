@@ -12,7 +12,8 @@ from django.core import management
 from django.core.management.commands.dumpdata import sort_dependencies
 from django.core.management.base import CommandError
 from django.db.models import signals
-from django.test import TestCase
+from django.db import transaction
+from django.test import TestCase, TransactionTestCase
 
 from models import Animal, Stuff
 from models import Absolute, Parent, Child
@@ -21,6 +22,7 @@ from models import Store, Person, Book
 from models import NKChild, RefToNKChild
 from models import Circle1, Circle2, Circle3
 from models import ExternalDependency
+from models import Thingy
 
 
 pre_save_checks = []
@@ -57,7 +59,7 @@ class TestFixtures(TestCase):
             weight=2.2
         )
         animal.save()
-        self.assertEqual(animal.id, 2)
+        self.assertGreater(animal.id, 1)
 
     def test_pretty_print_xml(self):
         """
@@ -315,7 +317,8 @@ class TestFixtures(TestCase):
 
         lion_json = '{"pk": 1, "model": "fixtures_regress.animal", "fields": {"count": 3, "weight": 1.2, "name": "Lion", "latin_name": "Panthera leo"}}'
         emu_json = '{"pk": 10, "model": "fixtures_regress.animal", "fields": {"count": 42, "weight": 1.2, "name": "Emu", "latin_name": "Dromaius novaehollandiae"}}'
-        platypus_json = '{"pk": 11, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.2, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}'
+        platypus_json = '{"pk": %d, "model": "fixtures_regress.animal", "fields": {"count": 2, "weight": 2.2, "name": "Platypus", "latin_name": "Ornithorhynchus anatinus"}}'
+        platypus_json = platypus_json % animal.pk
 
         self.assertEqual(len(data), len('[%s]' % ', '.join([lion_json, emu_json, platypus_json])))
         self.assertTrue(lion_json in data)
@@ -575,3 +578,22 @@ class NaturalKeyFixtureTests(TestCase):
             books.__repr__(),
             """[<Book: Cryptonomicon by Neal Stephenson (available at Amazon, Borders)>, <Book: Ender's Game by Orson Scott Card (available at Collins Bookstore)>, <Book: Permutation City by Greg Egan (available at Angus and Robertson)>]"""
         )
+
+
+class TestTicket11101(TransactionTestCase):
+
+    def ticket_11101(self):
+        management.call_command(
+            'loaddata',
+            'thingy.json',
+            verbosity=0,
+            commit=False
+        )
+        self.assertEqual(Thingy.objects.count(), 1)
+        transaction.rollback()
+        self.assertEqual(Thingy.objects.count(), 0)
+
+    def test_ticket_11101(self):
+        """Test that fixtures can be rolled back (ticket #11101)."""
+        ticket_11101 = transaction.commit_manually(self.ticket_11101)
+        ticket_11101()
