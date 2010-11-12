@@ -28,13 +28,7 @@ class Stuff(models.Model):
     owner = models.ForeignKey(User, null=True)
 
     def __unicode__(self):
-        # Oracle doesn't distinguish between None and the empty string.
-        # This hack makes the test case pass using Oracle.
-        name = self.name
-        if (connection.features.interprets_empty_strings_as_nulls
-            and name == u''):
-            name = None
-        return unicode(name) + u' is owned by ' + unicode(self.owner)
+        return unicode(self.name) + u' is owned by ' + unicode(self.owner)
 
 
 class Absolute(models.Model):

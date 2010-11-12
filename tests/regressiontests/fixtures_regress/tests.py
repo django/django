@@ -13,7 +13,8 @@ from django.core.management.commands.dumpdata import sort_dependencies
 from django.core.management.base import CommandError
 from django.db.models import signals
 from django.db import transaction
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, skipIfDBFeature, \
+    skipUnlessDBFeature
 
 from models import Animal, Stuff
 from models import Absolute, Parent, Child
@@ -61,6 +62,7 @@ class TestFixtures(TestCase):
         animal.save()
         self.assertGreater(animal.id, 1)
 
+    @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_pretty_print_xml(self):
         """
         Regression test for ticket #4558 -- pretty printing of XML fixtures
@@ -74,6 +76,22 @@ class TestFixtures(TestCase):
             commit=False
         )
         self.assertEqual(Stuff.objects.all()[0].name, None)
+        self.assertEqual(Stuff.objects.all()[0].owner, None)
+
+    @skipUnlessDBFeature('interprets_empty_strings_as_nulls')
+    def test_pretty_print_xml_empty_strings(self):
+        """
+        Regression test for ticket #4558 -- pretty printing of XML fixtures
+        doesn't affect parsing of None values.
+        """
+        # Load a pretty-printed XML fixture with Nulls.
+        management.call_command(
+            'loaddata',
+            'pretty.xml',
+            verbosity=0,
+            commit=False
+        )
+        self.assertEqual(Stuff.objects.all()[0].name, u'')
         self.assertEqual(Stuff.objects.all()[0].owner, None)
 
     def test_absolute_path(self):
