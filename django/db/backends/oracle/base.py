@@ -50,7 +50,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     uses_savepoints = True
     can_return_id_from_insert = True
     allow_sliced_subqueries = False
-    supports_subqueries_in_group_by = True
+    supports_subqueries_in_group_by = False
     supports_timezones = False
     supports_bitwise_or = False
     can_defer_constraint_checks = True
