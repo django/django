@@ -183,7 +183,7 @@ Due to the sensitive nature of passwords, however, Django 1.3 takes
 this step automatically; the default value of ``render_value`` is now
 ``False``, and developers who want the password value returned to the
 browser on a submission with errors (the previous behavior) must now
-explicitly indicate this. For ezmple::
+explicitly indicate this. For example::
 
     class LoginForm(forms.Form):
         username = forms.CharField(max_length=100)
