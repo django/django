@@ -76,11 +76,15 @@ admin.site.register(EpisodeExclude, inlines=[MediaExcludeInline])
 # Generic inline with unique_together
 #
 
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+
 class PhoneNumber(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     phone_number = models.CharField(max_length=30)
+    category = models.ForeignKey(Category, null=True, blank=True)
 
     class Meta:
         unique_together = (('content_type', 'object_id', 'phone_number',),)
@@ -93,6 +97,7 @@ class PhoneNumberInline(generic.GenericTabularInline):
     model = PhoneNumber
 
 admin.site.register(Contact, inlines=[PhoneNumberInline])
+admin.site.register(Category)
 
 #
 # Generic inline with can_delete=False

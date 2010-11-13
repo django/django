@@ -12,6 +12,7 @@ from django.forms import ModelForm
 from django.forms.models import BaseModelFormSet, modelformset_factory, save_instance
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.utils.encoding import smart_unicode
+from django.utils.functional import curry
 
 from django.contrib.contenttypes.models import ContentType
 
@@ -407,7 +408,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "ct_field": self.ct_field,
             "fk_field": self.ct_fk_field,
             "form": self.form,
-            "formfield_callback": self.formfield_for_dbfield,
+            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
             "formset": self.formset,
             "extra": self.extra,
             "can_delete": self.can_delete,

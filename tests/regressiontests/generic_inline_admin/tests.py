@@ -6,7 +6,7 @@ from django.contrib.contenttypes.generic import generic_inlineformset_factory
 
 # local test models
 from models import Episode, EpisodeExtra, EpisodeMaxNum, EpisodeExclude, \
-                   Media, EpisodePermanent, MediaPermanentInline
+                   Media, EpisodePermanent, MediaPermanentInline, Category
 
 class GenericAdminViewTest(TestCase):
     fixtures = ['users.xml']
@@ -190,6 +190,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
         self.client.logout()
 
     def testAdd(self):
+        category_id = Category.objects.create(name='male').pk
         post_data = {
             "name": u"John Doe",
             # inline data
@@ -198,8 +199,10 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
             "generic_inline_admin-phonenumber-content_type-object_id-MAX_NUM_FORMS": u"0",
             "generic_inline_admin-phonenumber-content_type-object_id-0-id": "",
             "generic_inline_admin-phonenumber-content_type-object_id-0-phone_number": "555-555-5555",
+            "generic_inline_admin-phonenumber-content_type-object_id-0-category": "%s" % category_id,
         }
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/contact/add/')
+        self.failUnlessEqual(response.status_code, 200)
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/contact/add/', post_data)
         self.failUnlessEqual(response.status_code, 302) # redirect somewhere
 
