@@ -1,0 +1,101 @@
+================================
+Django 1.3 alpha 2 release notes
+================================
+
+Welcome to Django 1.3 alpha 2!
+
+This is the second in a series of preview/development releases leading
+up to the eventual release of Django 1.3. This release is primarily
+targeted at developers who are interested in trying out new features
+and testing the Django codebase to help identify and resolve bugs
+prior to the final 1.3 release.
+
+As such, this release is *not* intended for production use, and any such use
+is discouraged.
+
+.. _new features: `What's new in Django 1.3 alpha 2`_
+
+.. _backwards incompatible changes: backwards-incompatible-changes-1.3-alpha-2_
+
+What's new in Django 1.3 alpha 2
+================================
+
+Further tweaks to the staticfiles app
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.3 ships with a new contrib app ``'django.contrib.staticfiles'``
+to help developers handle the static media files (images, CSS, Javascript,
+etc.) that are needed to render a complete web page.
+
+``staticfiles`` ships with the ability to automatically serve static files
+during development (if the :setting:`DEBUG` is ``True``) when using the
+:djadmin:`runserver` management command. Based on feedback from the
+community this release adds two new options to the ``runserver`` command
+to modify this behaviour:
+
+    * ``--nostatic``: prevents the ``runserver`` command from serving files
+      completely
+
+    * ``--insecure``: enables serving of static files even if stupidly
+      running in with :setting:`DEBUG` set to False
+
+See the :doc:`reference documentation of the app </ref/contrib/staticfiles>`
+for more details or learn how to :doc:`manage static files
+</howto/static-files>`.
+
+The Django 1.3 roadmap
+======================
+
+Before the final Django 1.3 release, several other preview/development
+releases will be made available. The current schedule consists of at
+least the following:
+
+* Week of **November 29, 2010**: First Django 1.3 beta release. Final
+  feature freeze for Django 1.3.
+
+* Week of **January 10, 2011**: First Django 1.3 release
+  candidate. String freeze for translations.
+
+* Week of **January 17, 2011**: Django 1.3 final release.
+
+If necessary, additional alpha, beta or release-candidate packages
+will be issued prior to the final 1.3 release. Django 1.3 will be
+released approximately one week after the final release candidate.
+
+
+What you can do to help
+=======================
+
+In order to provide a high-quality 1.3 release, we need your help. Although this
+alpha release is, again, *not* intended for production use, you can help the
+Django team by trying out the alpha codebase in a safe test environment and
+reporting any bugs or issues you encounter. The Django ticket tracker is the
+central place to search for open issues:
+
+    * http://code.djangoproject.com/timeline
+
+Please open new tickets if no existing ticket corresponds to a problem you're
+running into.
+
+Additionally, discussion of Django development, including progress toward the
+1.3 release, takes place daily on the django-developers mailing list:
+
+    * http://groups.google.com/group/django-developers
+
+... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Django's development, feel free to join the
+discussions there.
+
+Django's online documentation also includes pointers on how to contribute to
+Django:
+
+    * :doc:`How to contribute to Django </internals/contributing>`
+
+Contributions on any level -- developing code, writing documentation or simply
+triaging tickets and helping to test proposed bugfixes -- are always welcome and
+appreciated.
+
+Several development sprints will also be taking place before the 1.3
+release; these will typically be announced in advance on the
+django-developers mailing list, and anyone who wants to help is
+welcome to join in.
