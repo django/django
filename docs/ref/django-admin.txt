@@ -694,7 +694,7 @@ Example usage::
 
 Use the ``--insecure`` option to force serving of static files with the
 :doc:`staticfiles </ref/contrib/staticfiles>` app even if the :setting:`DEBUG`
-setting is ``False``. By using this you acknoledge the fact that it's
+setting is ``False``. By using this you acknowledge the fact that it's
 **grossly inefficient** and probably **insecure**. This is only intended for
 local development, and should **never be used in production**.
 

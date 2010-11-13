@@ -12,7 +12,7 @@ class Command(BaseCommand):
         make_option('--nostatic', action="store_false", dest='use_static_handler', default=True,
             help='Tells Django to NOT automatically serve static files at STATICFILES_URL.'),
         make_option('--insecure', action="store_true", dest='insecure_serving', default=False,
-            help='Allows serving static files even if DEBUG is True.'),
+            help='Allows serving static files even if DEBUG is False.'),
         make_option('--adminmedia', dest='admin_media_path', default='',
             help='Specifies the directory from which to serve admin media.'),
     )
