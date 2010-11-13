@@ -4,12 +4,19 @@ from django import http
 from django.test import TestCase
 from django.conf import settings
 from django.utils.translation import ugettext_lazy
+from django.utils.unittest import skipIf
 from django.contrib.messages import constants, utils, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+
+
+def skipUnlessAuthIsInstalled(func):
+    return skipIf(
+        'django.contrib.auth' not in settings.INSTALLED_APPS,
+        "django.contrib.auth isn't installed")(func)
 
 
 def add_level_messages(storage):
@@ -196,6 +203,7 @@ class BaseTest(TestCase):
         for msg in data['messages']:
             self.assertContains(response, msg)
 
+    @skipUnlessAuthIsInstalled
     def test_middleware_disabled_auth_user(self):
         """
         Tests that the messages API successfully falls back to using

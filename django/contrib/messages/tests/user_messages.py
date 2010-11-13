@@ -2,6 +2,7 @@ from django import http
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.user_messages import UserMessagesStorage,\
     LegacyFallbackStorage
+from django.contrib.messages.tests.base import skipUnlessAuthIsInstalled
 from django.contrib.messages.tests.cookie import set_cookie_data
 from django.contrib.messages.tests.fallback import FallbackTest
 from django.test import TestCase
@@ -29,6 +30,8 @@ class UserMessagesTest(TestCase):
 
         self.assertEqual(len(storage), 1)
         self.assertEqual(list(storage)[0].message, 'test message')
+
+UserMessagesTest = skipUnlessAuthIsInstalled(UserMessagesTest)
 
 
 class LegacyFallbackTest(FallbackTest, TestCase):
@@ -63,3 +66,5 @@ class LegacyFallbackTest(FallbackTest, TestCase):
         self.assertEqual(len(storage), 2)
         self.assertEqual(list(storage)[0].message, 'user message')
         self.assertEqual(list(storage)[1], 'cookie')
+
+LegacyFallbackTest = skipUnlessAuthIsInstalled(LegacyFallbackTest)
