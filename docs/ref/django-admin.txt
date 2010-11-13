@@ -684,7 +684,9 @@ Example usage::
 .. django-admin-option:: --nostatic
 
 Use the ``--nostatic`` option to disable serving of static files with the
-:doc:`staticfiles </ref/contrib/staticfiles>` app entirely.
+:doc:`staticfiles </ref/contrib/staticfiles>` app entirely. This option is
+only available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
+in your project's :setting:`INSTALLED_APPS` setting.
 
 Example usage::
 
@@ -696,7 +698,9 @@ Use the ``--insecure`` option to force serving of static files with the
 :doc:`staticfiles </ref/contrib/staticfiles>` app even if the :setting:`DEBUG`
 setting is ``False``. By using this you acknowledge the fact that it's
 **grossly inefficient** and probably **insecure**. This is only intended for
-local development, and should **never be used in production**.
+local development, should **never be used in production** and is only
+available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
+in your project's :setting:`INSTALLED_APPS` setting.
 
 See the :doc:`reference documentation of the app </ref/contrib/staticfiles>`
 for more details and learn how to :doc:`manage and deploy static files
