@@ -49,13 +49,14 @@ models, views and template tags.
 ADMIN_MEDIA_PREFIX
 ------------------
 
-Default: ``'/media/'``
+Default: ``'/static/admin/'``
 
-The URL prefix for admin media -- CSS, JavaScript and images used by
-the Django administrative interface. Make sure to use a trailing
-slash, and to have this be different from the :setting:`MEDIA_URL` setting
-(since the same URL cannot be mapped onto two different sets of
-files).
+The URL prefix for admin media -- CSS, JavaScript and images used by the Django
+administrative interface. Make sure to use a trailing slash, and to have this be
+different from the :setting:``MEDIA_URL`` setting (since the same URL cannot be
+mapped onto two different sets of files). For integration with :doc:`staticfiles
+</ref/contrib/staticfiles>`, this should be the same as
+:setting:`STATICFILES_URL` followed by ``'admin/'``.
 
 .. setting:: ADMINS
 
