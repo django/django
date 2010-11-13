@@ -19,6 +19,14 @@ class EntryModerator4(CommentModerator):
     auto_moderate_field = 'pub_date'
     moderate_after = 7
 
+class EntryModerator5(CommentModerator):
+    auto_moderate_field = 'pub_date'
+    moderate_after = 0
+
+class EntryModerator6(CommentModerator):
+    auto_close_field = 'pub_date'
+    close_after = 0
+
 class CommentUtilsModeratorTests(CommentTestCase):
     fixtures = ["comment_utils.xml"]
 
@@ -73,3 +81,13 @@ class CommentUtilsModeratorTests(CommentTestCase):
         moderator.register(Entry, EntryModerator4)
         c1, c2 = self.createSomeComments()
         self.assertEquals(c2.is_public, False)
+
+    def testAutoModerateFieldImmediate(self):
+        moderator.register(Entry, EntryModerator5)
+        c1, c2 = self.createSomeComments()
+        self.assertEquals(c2.is_public, False)
+
+    def testAutoCloseFieldImmediate(self):
+        moderator.register(Entry, EntryModerator6)
+        c1, c2 = self.createSomeComments()
+        self.assertEquals(Comment.objects.all().count(), 0)

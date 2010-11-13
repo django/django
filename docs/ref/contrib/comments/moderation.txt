@@ -104,7 +104,9 @@ Built-in moderation options
         If :attr:`auto_close_field` is used, this must specify the number
         of days past the value of the field specified by
         :attr:`auto_close_field` after which new comments for an object
-        should be disallowed. Default value is ``None``.
+        should be disallowed. Allowed values are ``None``, 0 (which disallows
+        comments immediately), or any positive integer. Default value is
+        ``None``.
 
     .. attribute:: email_notification
 
@@ -126,11 +128,17 @@ Built-in moderation options
         If :attr:`auto_moderate_field` is used, this must specify the number
         of days past the value of the field specified by
         :attr:`auto_moderate_field` after which new comments for an object
-        should be marked non-public. Default value is ``None``.
+        should be marked non-public. Allowed values are ``None``, 0 (which
+        moderates comments immediately), or any positive integer. Default
+        value is ``None``.
 
 Simply subclassing :class:`CommentModerator` and changing the values of these
 options will automatically enable the various moderation methods for any
 models registered using the subclass.
+
+.. versionchanged:: 1.3
+
+``moderate_after`` and ``close_after`` now accept 0 as a valid value.
 
 Adding custom moderation methods
 --------------------------------
