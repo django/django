@@ -4,6 +4,7 @@ import cPickle as pickle
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+
 class SessionManager(models.Manager):
     def encode(self, session_dict):
         """
@@ -51,4 +52,6 @@ class Session(models.Model):
     def get_decoded(self):
         return SessionStore().decode(self.session_data)
 
+
+# At bottom to avoid circular import
 from django.contrib.sessions.backends.db import SessionStore
