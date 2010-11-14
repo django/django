@@ -255,7 +255,7 @@ SECRET_KEY = ''
 # Default file storage mechanism that holds media.
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-# Absolute path to the directory that holds media.
+# Absolute filesystem path to the directory that will hold user uploaded files.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = ''
 
