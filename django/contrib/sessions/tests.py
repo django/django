@@ -263,6 +263,33 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
     backend = DatabaseSession
 
+    def test_session_get_decoded(self):
+        """
+        Test we can use Session.get_decoded to retrieve data stored
+        in normal way
+        """
+        self.session['x'] = 1
+        self.session.save()
+
+        s = Session.objects.get(session_key=self.session.session_key)
+
+        self.assertEqual(s.get_decoded(), {'x': 1})
+
+    def test_sessionmanager_save(self):
+        """
+        Test SessionManager.save method
+        """
+        # Create a session
+        self.session['y'] = 1
+        self.session.save()
+
+        s = Session.objects.get(session_key=self.session.session_key)
+        # Change it
+        Session.objects.save(s.session_key, {'y':2}, s.expire_date)
+        # Clear cache, so that it will be retrieved from DB
+        del self.session._session_cache
+        self.assertEqual(self.session['y'], 2)
+
 
 class CacheDBSessionTests(SessionTestsMixin, TestCase):
 
