@@ -73,8 +73,8 @@ autocommit behavior is enabled by setting the ``autocommit`` key in
 the :setting:`OPTIONS` part of your database configuration in
 :setting:`DATABASES`::
 
-    OPTIONS = {
-        "autocommit": True,
+    'OPTIONS': {
+        'autocommit': True,
     }
 
 In this configuration, Django still ensures that :ref:`delete()
@@ -325,8 +325,8 @@ storage engine, you have a couple of options.
     * Another option is to use the ``init_command`` option for MySQLdb prior to
       creating your tables::
 
-          OPTIONS = {
-             "init_command": "SET storage_engine=INNODB",
+          'OPTIONS': {
+             'init_command': 'SET storage_engine=INNODB',
           }
 
       This sets the default storage engine upon connecting to the database.
@@ -489,9 +489,9 @@ If you're getting this error, you can solve it by:
     * Increase the default timeout value by setting the ``timeout`` database
       option option::
 
-          OPTIONS = {
+          'OPTIONS': {
               # ...
-             "timeout": 20,
+              'timeout': 20,
               # ...
           }
 
