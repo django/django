@@ -116,9 +116,9 @@ class FormWizard(object):
             # Since the hashes only take into account values, and not other
             # other validation the form might do, we must re-do validation
             # now for security reasons.
-            current_form_list = [self.get_form(i, request.POST) for i in range(current_step)]
+            previous_form_list = [self.get_form(i, request.POST) for i in range(current_step)]
 
-            for i, f in enumerate(current_form_list):
+            for i, f in enumerate(previous_form_list):
                 if not self._check_security_hash(request.POST.get("hash_%d" % i, ''), request, f):
                     return self.render_hash_failure(request, i)
 
@@ -132,7 +132,7 @@ class FormWizard(object):
             next_step = current_step + 1
 
             if next_step == self.num_steps():
-                return self.done(request, current_form_list)
+                return self.done(request, previous_form_list + [form])
             else:
                 form = self.get_form(next_step)
                 self.step = current_step = next_step
