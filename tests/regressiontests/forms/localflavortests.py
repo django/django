@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from extra import tests as extra_tests
-from forms import tests as form_tests
-from error_messages import tests as custom_error_message_tests
 from localflavor.ar import tests as localflavor_ar_tests
 from localflavor.at import tests as localflavor_at_tests
 from localflavor.au import tests as localflavor_au_tests
@@ -32,25 +29,10 @@ from localflavor.uk import tests as localflavor_uk_tests
 from localflavor.us import tests as localflavor_us_tests
 from localflavor.uy import tests as localflavor_uy_tests
 from localflavor.za import tests as localflavor_za_tests
-from regressions import tests as regression_tests
-from util import tests as util_tests
-from widgets import tests as widgets_tests
-from formsets import tests as formset_tests
-from media import media_tests
 
-
-from formsets import FormsetAsFooTests
-from fields import FieldsTests
-from validators import TestFieldWithValidators
-from widgets import WidgetTests, ClearableFileInputTests
 from localflavor.be import BETests
 
-from input_formats import *
-
 __test__ = {
-    'extra_tests': extra_tests,
-    'form_tests': form_tests,
-    'custom_error_message_tests': custom_error_message_tests,
     'localflavor_ar_tests': localflavor_ar_tests,
     'localflavor_at_tests': localflavor_at_tests,
     'localflavor_au_tests': localflavor_au_tests,
@@ -80,11 +62,6 @@ __test__ = {
     'localflavor_us_tests': localflavor_us_tests,
     'localflavor_uy_tests': localflavor_uy_tests,
     'localflavor_za_tests': localflavor_za_tests,
-    'regression_tests': regression_tests,
-    'formset_tests': formset_tests,
-    'media_tests': media_tests,
-    'util_tests': util_tests,
-    'widgets_tests': widgets_tests,
 }
 
 if __name__ == "__main__":

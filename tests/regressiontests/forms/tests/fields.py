@@ -57,12 +57,12 @@ class FieldsTests(TestCase):
             self.assertEqual(message, str(e))
 
     def test_field_sets_widget_is_required(self):
-        self.assertEqual(Field(required=True).widget.is_required, True)
-        self.assertEqual(Field(required=False).widget.is_required, False)
+        self.assertTrue(Field(required=True).widget.is_required)
+        self.assertFalse(Field(required=False).widget.is_required)
 
     # CharField ###################################################################
 
-    def test_charfield_0(self):
+    def test_charfield_1(self):
         f = CharField()
         self.assertEqual(u'1', f.clean(1))
         self.assertEqual(u'hello', f.clean('hello'))
@@ -70,7 +70,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertEqual(u'[1, 2, 3]', f.clean([1, 2, 3]))
 
-    def test_charfield_1(self):
+    def test_charfield_2(self):
         f = CharField(required=False)
         self.assertEqual(u'1', f.clean(1))
         self.assertEqual(u'hello', f.clean('hello'))
@@ -78,20 +78,20 @@ class FieldsTests(TestCase):
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'[1, 2, 3]', f.clean([1, 2, 3]))
 
-    def test_charfield_2(self):
+    def test_charfield_3(self):
         f = CharField(max_length=10, required=False)
         self.assertEqual(u'12345', f.clean('12345'))
         self.assertEqual(u'1234567890', f.clean('1234567890'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 10 characters (it has 11).']", f.clean, '1234567890a')
 
-    def test_charfield_3(self):
+    def test_charfield_4(self):
         f = CharField(min_length=10, required=False)
         self.assertEqual(u'', f.clean(''))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 10 characters (it has 5).']", f.clean, '12345')
         self.assertEqual(u'1234567890', f.clean('1234567890'))
         self.assertEqual(u'1234567890a', f.clean('1234567890a'))
 
-    def test_charfield_4(self):
+    def test_charfield_5(self):
         f = CharField(min_length=10, required=True)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 10 characters (it has 5).']", f.clean, '12345')
@@ -100,7 +100,7 @@ class FieldsTests(TestCase):
 
     # IntegerField ################################################################
 
-    def test_integerfield_5(self):
+    def test_integerfield_1(self):
         f = IntegerField()
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
@@ -115,7 +115,7 @@ class FieldsTests(TestCase):
         self.assertEqual(1, f.clean(' 1 '))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a whole number.']", f.clean, '1a')
 
-    def test_integerfield_6(self):
+    def test_integerfield_2(self):
         f = IntegerField(required=False)
         self.assertEqual(None, f.clean(''))
         self.assertEqual('None', repr(f.clean('')))
@@ -130,7 +130,7 @@ class FieldsTests(TestCase):
         self.assertEqual(1, f.clean(' 1 '))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a whole number.']", f.clean, '1a')
 
-    def test_integerfield_7(self):
+    def test_integerfield_3(self):
         f = IntegerField(max_value=10)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
         self.assertEqual(1, f.clean(1))
@@ -139,7 +139,7 @@ class FieldsTests(TestCase):
         self.assertEqual(10, f.clean('10'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is less than or equal to 10.']", f.clean, '11')
 
-    def test_integerfield_8(self):
+    def test_integerfield_4(self):
         f = IntegerField(min_value=10)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is greater than or equal to 10.']", f.clean, 1)
@@ -148,7 +148,7 @@ class FieldsTests(TestCase):
         self.assertEqual(10, f.clean('10'))
         self.assertEqual(11, f.clean('11'))
 
-    def test_integerfield_9(self):
+    def test_integerfield_5(self):
         f = IntegerField(min_value=10, max_value=20)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is greater than or equal to 10.']", f.clean, 1)
@@ -161,7 +161,7 @@ class FieldsTests(TestCase):
 
     # FloatField ##################################################################
 
-    def test_floatfield_10(self):
+    def test_floatfield_1(self):
         f = FloatField()
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
@@ -177,13 +177,13 @@ class FieldsTests(TestCase):
         self.assertEqual(1.0, f.clean(' 1.0 '))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, '1.0a')
 
-    def test_floatfield_11(self):
+    def test_floatfield_2(self):
         f = FloatField(required=False)
         self.assertEqual(None, f.clean(''))
         self.assertEqual(None, f.clean(None))
         self.assertEqual(1.0, f.clean('1'))
 
-    def test_floatfield_12(self):
+    def test_floatfield_3(self):
         f = FloatField(max_value=1.5, min_value=0.5)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is less than or equal to 1.5.']", f.clean, '1.6')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is greater than or equal to 0.5.']", f.clean, '0.4')
@@ -192,7 +192,7 @@ class FieldsTests(TestCase):
 
     # DecimalField ################################################################
 
-    def test_decimalfield_13(self):
+    def test_decimalfield_1(self):
         f = DecimalField(max_digits=4, decimal_places=2)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
@@ -223,13 +223,13 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure that there are no more than 4 digits in total.']", f.clean, '-000.12345')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, '--0.12')
 
-    def test_decimalfield_14(self):
+    def test_decimalfield_2(self):
         f = DecimalField(max_digits=4, decimal_places=2, required=False)
         self.assertEqual(None, f.clean(''))
         self.assertEqual(None, f.clean(None))
         self.assertEqual(f.clean('1'), Decimal("1"))
 
-    def test_decimalfield_15(self):
+    def test_decimalfield_3(self):
         f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is less than or equal to 1.5.']", f.clean, '1.6')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is greater than or equal to 0.5.']", f.clean, '0.4')
@@ -238,11 +238,11 @@ class FieldsTests(TestCase):
         self.assertEqual(f.clean('.5'), Decimal("0.5"))
         self.assertEqual(f.clean('00.50'), Decimal("0.50"))
 
-    def test_decimalfield_16(self):
+    def test_decimalfield_4(self):
         f = DecimalField(decimal_places=2)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure that there are no more than 2 decimal places.']", f.clean, '0.00000001')
 
-    def test_decimalfield_17(self):
+    def test_decimalfield_5(self):
         f = DecimalField(max_digits=3)
         # Leading whole zeros "collapse" to one digit.
         self.assertEqual(f.clean('0000000.10'), Decimal("0.1"))
@@ -253,14 +253,14 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure that there are no more than 3 digits in total.']", f.clean, '000000.0002')
         self.assertEqual(f.clean('.002'), Decimal("0.002"))
 
-    def test_decimalfield_18(self):
+    def test_decimalfield_6(self):
         f = DecimalField(max_digits=2, decimal_places=2)
         self.assertEqual(f.clean('.01'), Decimal(".01"))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure that there are no more than 0 digits before the decimal point.']", f.clean, '1.1')
 
     # DateField ###################################################################
 
-    def test_datefield_19(self):
+    def test_datefield_1(self):
         f = DateField()
         self.assertEqual(datetime.date(2006, 10, 25), f.clean(datetime.date(2006, 10, 25)))
         self.assertEqual(datetime.date(2006, 10, 25), f.clean(datetime.datetime(2006, 10, 25, 14, 30)))
@@ -279,14 +279,14 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid date.']", f.clean, '25/10/06')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
 
-    def test_datefield_20(self):
+    def test_datefield_2(self):
         f = DateField(required=False)
         self.assertEqual(None, f.clean(None))
         self.assertEqual('None', repr(f.clean(None)))
         self.assertEqual(None, f.clean(''))
         self.assertEqual('None', repr(f.clean('')))
 
-    def test_datefield_21(self):
+    def test_datefield_3(self):
         f = DateField(input_formats=['%Y %m %d'])
         self.assertEqual(datetime.date(2006, 10, 25), f.clean(datetime.date(2006, 10, 25)))
         self.assertEqual(datetime.date(2006, 10, 25), f.clean(datetime.datetime(2006, 10, 25, 14, 30)))
@@ -297,7 +297,7 @@ class FieldsTests(TestCase):
 
     # TimeField ###################################################################
 
-    def test_timefield_22(self):
+    def test_timefield_1(self):
         f = TimeField()
         self.assertEqual(datetime.time(14, 25), f.clean(datetime.time(14, 25)))
         self.assertEqual(datetime.time(14, 25, 59), f.clean(datetime.time(14, 25, 59)))
@@ -306,7 +306,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid time.']", f.clean, 'hello')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid time.']", f.clean, '1:24 p.m.')
 
-    def test_timefield_23(self):
+    def test_timefield_2(self):
         f = TimeField(input_formats=['%I:%M %p'])
         self.assertEqual(datetime.time(14, 25), f.clean(datetime.time(14, 25)))
         self.assertEqual(datetime.time(14, 25, 59), f.clean(datetime.time(14, 25, 59)))
@@ -316,7 +316,7 @@ class FieldsTests(TestCase):
 
     # DateTimeField ###############################################################
 
-    def test_datetimefield_24(self):
+    def test_datetimefield_1(self):
         f = DateTimeField()
         self.assertEqual(datetime.datetime(2006, 10, 25, 0, 0), f.clean(datetime.date(2006, 10, 25)))
         self.assertEqual(datetime.datetime(2006, 10, 25, 14, 30), f.clean(datetime.datetime(2006, 10, 25, 14, 30)))
@@ -337,7 +337,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid date/time.']", f.clean, 'hello')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid date/time.']", f.clean, '2006-10-25 4:30 p.m.')
 
-    def test_datetimefield_25(self):
+    def test_datetimefield_2(self):
         f = DateTimeField(input_formats=['%Y %m %d %I:%M %p'])
         self.assertEqual(datetime.datetime(2006, 10, 25, 0, 0), f.clean(datetime.date(2006, 10, 25)))
         self.assertEqual(datetime.datetime(2006, 10, 25, 14, 30), f.clean(datetime.datetime(2006, 10, 25, 14, 30)))
@@ -346,7 +346,7 @@ class FieldsTests(TestCase):
         self.assertEqual(datetime.datetime(2006, 10, 25, 14, 30), f.clean('2006 10 25 2:30 PM'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid date/time.']", f.clean, '2006-10-25 14:30:45')
 
-    def test_datetimefield_26(self):
+    def test_datetimefield_3(self):
         f = DateTimeField(required=False)
         self.assertEqual(None, f.clean(None))
         self.assertEqual('None', repr(f.clean(None)))
@@ -355,7 +355,7 @@ class FieldsTests(TestCase):
 
     # RegexField ##################################################################
 
-    def test_regexfield_27(self):
+    def test_regexfield_1(self):
         f = RegexField('^\d[A-F]\d$')
         self.assertEqual(u'2A2', f.clean('2A2'))
         self.assertEqual(u'3F3', f.clean('3F3'))
@@ -364,14 +364,14 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '2A2 ')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
 
-    def test_regexfield_28(self):
+    def test_regexfield_2(self):
         f = RegexField('^\d[A-F]\d$', required=False)
         self.assertEqual(u'2A2', f.clean('2A2'))
         self.assertEqual(u'3F3', f.clean('3F3'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '3G3')
         self.assertEqual(u'', f.clean(''))
 
-    def test_regexfield_29(self):
+    def test_regexfield_3(self):
         f = RegexField(re.compile('^\d[A-F]\d$'))
         self.assertEqual(u'2A2', f.clean('2A2'))
         self.assertEqual(u'3F3', f.clean('3F3'))
@@ -379,13 +379,13 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, ' 2A2')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '2A2 ')
 
-    def test_regexfield_30(self):
+    def test_regexfield_4(self):
         f = RegexField('^\d\d\d\d$', error_message='Enter a four-digit number.')
         self.assertEqual(u'1234', f.clean('1234'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a four-digit number.']", f.clean, '123')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a four-digit number.']", f.clean, 'abcd')
 
-    def test_regexfield_31(self):
+    def test_regexfield_5(self):
         f = RegexField('^\d+$', min_length=5, max_length=10)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 5 characters (it has 3).']", f.clean, '123')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 5 characters (it has 3).', u'Enter a valid value.']", f.clean, 'abc')
@@ -396,7 +396,7 @@ class FieldsTests(TestCase):
 
     # EmailField ##################################################################
 
-    def test_emailfield_32(self):
+    def test_emailfield_1(self):
         f = EmailField()
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
@@ -424,7 +424,7 @@ class FieldsTests(TestCase):
                 'viewx3dtextx26qx3d@yahoo.comx26latlngx3d15854521645943074058'
             )
 
-    def test_emailfield_33(self):
+    def test_emailfield_2(self):
         f = EmailField(required=False)
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'', f.clean(None))
@@ -434,7 +434,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo@')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid e-mail address.']", f.clean, 'foo@bar')
 
-    def test_emailfield_34(self):
+    def test_emailfield_3(self):
         f = EmailField(min_length=10, max_length=15)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 10 characters (it has 9).']", f.clean, 'a@foo.com')
         self.assertEqual(u'alf@foo.com', f.clean('alf@foo.com'))
@@ -442,7 +442,7 @@ class FieldsTests(TestCase):
 
     # FileField ##################################################################
 
-    def test_filefield_35(self):
+    def test_filefield_1(self):
         f = FileField()
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '', '')
@@ -460,7 +460,7 @@ class FieldsTests(TestCase):
         self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'))))
         self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', 'Some File Content'), 'files/test4.pdf')))
 
-    def test_filefield_36(self):
+    def test_filefield_2(self):
         f = FileField(max_length = 5)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this filename has at most 5 characters (it has 18).']", f.clean, SimpleUploadedFile('test_maxlength.txt', 'hello world'))
         self.assertEqual('files/test1.pdf', f.clean('', 'files/test1.pdf'))
@@ -469,7 +469,7 @@ class FieldsTests(TestCase):
 
     # URLField ##################################################################
 
-    def test_urlfield_37(self):
+    def test_urlfield_1(self):
         f = URLField()
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
@@ -505,7 +505,7 @@ class FieldsTests(TestCase):
         # domains that don't fail the domain label length check in the regex
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://%s' % ("X"*60,))
 
-    def test_urlfield_38(self):
+    def test_urlfield_2(self):
         f = URLField(required=False)
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'', f.clean(None))
@@ -517,7 +517,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example.')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://.com')
 
-    def test_urlfield_39(self):
+    def test_urlfield_3(self):
         f = URLField(verify_exists=True)
         self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com')) # This will fail if there's no Internet connection
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example')
@@ -539,24 +539,24 @@ class FieldsTests(TestCase):
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
 
-    def test_urlfield_40(self):
+    def test_urlfield_4(self):
         f = URLField(verify_exists=True, required=False)
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com')) # This will fail if there's no Internet connection
 
-    def test_urlfield_41(self):
+    def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 15 characters (it has 13).']", f.clean, 'http://f.com')
         self.assertEqual(u'http://example.com/', f.clean('http://example.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 20 characters (it has 38).']", f.clean, 'http://abcdefghijklmnopqrstuvwxyz.com')
 
-    def test_urlfield_42(self):
+    def test_urlfield_6(self):
         f = URLField(required=False)
         self.assertEqual(u'http://example.com/', f.clean('example.com'))
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'https://example.com/', f.clean('https://example.com'))
 
-    def test_urlfield_43(self):
+    def test_urlfield_7(self):
         f = URLField()
         self.assertEqual(u'http://example.com/', f.clean('http://example.com'))
         self.assertEqual(u'http://example.com/test', f.clean('http://example.com/test'))
@@ -567,7 +567,7 @@ class FieldsTests(TestCase):
 
     # BooleanField ################################################################
 
-    def test_booleanfield_44(self):
+    def test_booleanfield_1(self):
         f = BooleanField()
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
@@ -579,7 +579,7 @@ class FieldsTests(TestCase):
         self.assertEqual(True, f.clean('True'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, 'False')
 
-    def test_booleanfield_45(self):
+    def test_booleanfield_2(self):
         f = BooleanField(required=False)
         self.assertEqual(False, f.clean(''))
         self.assertEqual(False, f.clean(None))
@@ -594,7 +594,7 @@ class FieldsTests(TestCase):
 
     # ChoiceField #################################################################
 
-    def test_choicefield_46(self):
+    def test_choicefield_1(self):
         f = ChoiceField(choices=[('1', 'One'), ('2', 'Two')])
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
@@ -602,7 +602,7 @@ class FieldsTests(TestCase):
         self.assertEqual(u'1', f.clean('1'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 3 is not one of the available choices.']", f.clean, '3')
 
-    def test_choicefield_47(self):
+    def test_choicefield_2(self):
         f = ChoiceField(choices=[('1', 'One'), ('2', 'Two')], required=False)
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'', f.clean(None))
@@ -610,12 +610,12 @@ class FieldsTests(TestCase):
         self.assertEqual(u'1', f.clean('1'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 3 is not one of the available choices.']", f.clean, '3')
 
-    def test_choicefield_48(self):
+    def test_choicefield_3(self):
         f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')])
         self.assertEqual(u'J', f.clean('J'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. John is not one of the available choices.']", f.clean, 'John')
 
-    def test_choicefield_49(self):
+    def test_choicefield_4(self):
         f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
         self.assertEqual(u'1', f.clean(1))
         self.assertEqual(u'1', f.clean('1'))
@@ -629,22 +629,22 @@ class FieldsTests(TestCase):
     # TypedChoiceField is just like ChoiceField, except that coerced types will
     # be returned:
 
-    def test_typedchoicefield_50(self):
+    def test_typedchoicefield_1(self):
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int)
         self.assertEqual(1, f.clean('1'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 2 is not one of the available choices.']", f.clean, '2')
 
-    def test_typedchoicefield_51(self):
+    def test_typedchoicefield_2(self):
         # Different coercion, same validation.
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=float)
         self.assertEqual(1.0, f.clean('1'))
 
-    def test_typedchoicefield_52(self):
+    def test_typedchoicefield_3(self):
         # This can also cause weirdness: be careful (bool(-1) == True, remember)
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=bool)
         self.assertEqual(True, f.clean('-1'))
 
-    def test_typedchoicefield_53(self):
+    def test_typedchoicefield_4(self):
         # Even more weirdness: if you have a valid choice but your coercion function
         # can't coerce, you'll still get a validation error. Don't do this!
         f = TypedChoiceField(choices=[('A', 'A'), ('B', 'B')], coerce=int)
@@ -652,19 +652,19 @@ class FieldsTests(TestCase):
         # Required fields require values
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
 
-    def test_typedchoicefield_54(self):
+    def test_typedchoicefield_5(self):
         # Non-required fields aren't required
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False)
         self.assertEqual('', f.clean(''))
         # If you want cleaning an empty value to return a different type, tell the field
 
-    def test_typedchoicefield_55(self):
+    def test_typedchoicefield_6(self):
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False, empty_value=None)
         self.assertEqual(None, f.clean(''))
 
     # NullBooleanField ############################################################
 
-    def test_nullbooleanfield_56(self):
+    def test_nullbooleanfield_1(self):
         f = NullBooleanField()
         self.assertEqual(None, f.clean(''))
         self.assertEqual(True, f.clean(True))
@@ -677,7 +677,7 @@ class FieldsTests(TestCase):
         self.assertEqual(None, f.clean('hello'))
 
 
-    def test_nullbooleanfield_57(self):
+    def test_nullbooleanfield_2(self):
         # Make sure that the internal value is preserved if using HiddenInput (#7753)
         class HiddenNullBooleanForm(Form):
             hidden_nullbool1 = NullBooleanField(widget=HiddenInput, initial=True)
@@ -685,7 +685,7 @@ class FieldsTests(TestCase):
         f = HiddenNullBooleanForm()
         self.assertEqual('<input type="hidden" name="hidden_nullbool1" value="True" id="id_hidden_nullbool1" /><input type="hidden" name="hidden_nullbool2" value="False" id="id_hidden_nullbool2" />', str(f))
 
-    def test_nullbooleanfield_58(self):
+    def test_nullbooleanfield_3(self):
         class HiddenNullBooleanForm(Form):
             hidden_nullbool1 = NullBooleanField(widget=HiddenInput, initial=True)
             hidden_nullbool2 = NullBooleanField(widget=HiddenInput, initial=False)
@@ -694,7 +694,7 @@ class FieldsTests(TestCase):
         self.assertEqual(True, f.cleaned_data['hidden_nullbool1'])
         self.assertEqual(False, f.cleaned_data['hidden_nullbool2'])
 
-    def test_nullbooleanfield_59(self):
+    def test_nullbooleanfield_4(self):
         # Make sure we're compatible with MySQL, which uses 0 and 1 for its boolean
         # values. (#9609)
         NULLBOOL_CHOICES = (('1', 'Yes'), ('0', 'No'), ('', 'Unknown'))
@@ -710,7 +710,7 @@ class FieldsTests(TestCase):
 
     # MultipleChoiceField #########################################################
 
-    def test_multiplechoicefield_60(self):
+    def test_multiplechoicefield_1(self):
         f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two')])
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
@@ -724,7 +724,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, ())
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 3 is not one of the available choices.']", f.clean, ['3'])
 
-    def test_multiplechoicefield_61(self):
+    def test_multiplechoicefield_2(self):
         f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two')], required=False)
         self.assertEqual([], f.clean(''))
         self.assertEqual([], f.clean(None))
@@ -738,7 +738,7 @@ class FieldsTests(TestCase):
         self.assertEqual([], f.clean(()))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 3 is not one of the available choices.']", f.clean, ['3'])
 
-    def test_multiplechoicefield_62(self):
+    def test_multiplechoicefield_3(self):
         f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
         self.assertEqual([u'1'], f.clean([1]))
         self.assertEqual([u'1'], f.clean(['1']))
@@ -751,7 +751,7 @@ class FieldsTests(TestCase):
 
     # ComboField ##################################################################
 
-    def test_combofield_63(self):
+    def test_combofield_1(self):
         f = ComboField(fields=[CharField(max_length=20), EmailField()])
         self.assertEqual(u'test@example.com', f.clean('test@example.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 20 characters (it has 28).']", f.clean, 'longemailaddress@example.com')
@@ -759,7 +759,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
 
-    def test_combofield_64(self):
+    def test_combofield_2(self):
         f = ComboField(fields=[CharField(max_length=20), EmailField()], required=False)
         self.assertEqual(u'test@example.com', f.clean('test@example.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 20 characters (it has 28).']", f.clean, 'longemailaddress@example.com')
@@ -769,12 +769,12 @@ class FieldsTests(TestCase):
 
     # FilePathField ###############################################################
 
-    def test_filepathfield_65(self):
+    def test_filepathfield_1(self):
         path = os.path.abspath(forms.__file__)
         path = os.path.dirname(path) + '/'
         self.assertTrue(fix_os_paths(path).endswith('/django/forms/'))
 
-    def test_filepathfield_66(self):
+    def test_filepathfield_2(self):
         path = forms.__file__
         path = os.path.dirname(os.path.abspath(path)) + '/'
         f = FilePathField(path=path)
@@ -795,7 +795,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. fields.py is not one of the available choices.']", f.clean, 'fields.py')
         assert fix_os_paths(f.clean(path + 'fields.py')).endswith('/django/forms/fields.py')
 
-    def test_filepathfield_67(self):
+    def test_filepathfield_3(self):
         path = forms.__file__
         path = os.path.dirname(os.path.abspath(path)) + '/'
         f = FilePathField(path=path, match='^.*?\.py$')
@@ -813,7 +813,7 @@ class FieldsTests(TestCase):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
 
-    def test_filepathfield_68(self):
+    def test_filepathfield_4(self):
         path = os.path.abspath(forms.__file__)
         path = os.path.dirname(path) + '/'
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
@@ -835,7 +835,7 @@ class FieldsTests(TestCase):
 
     # SplitDateTimeField ##########################################################
 
-    def test_splitdatetimefield_69(self):
+    def test_splitdatetimefield_1(self):
         from django.forms.widgets import SplitDateTimeWidget
         f = SplitDateTimeField()
         assert isinstance(f.widget, SplitDateTimeWidget)
@@ -847,7 +847,7 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid time.']", f.clean, ['2006-01-10', 'there'])
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid date.']", f.clean, ['hello', '07:30'])
 
-    def test_splitdatetimefield_70(self):
+    def test_splitdatetimefield_2(self):
         f = SplitDateTimeField(required=False)
         self.assertEqual(datetime.datetime(2006, 1, 10, 7, 30), f.clean([datetime.date(2006, 1, 10), datetime.time(7, 30)]))
         self.assertEqual(datetime.datetime(2006, 1, 10, 7, 30), f.clean(['2006-01-10', '07:30']))
