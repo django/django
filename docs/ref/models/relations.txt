@@ -61,11 +61,11 @@ Related objects reference
 
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry(
-            ....     blog=b,
-            ....     headline='Hello',
-            ....     body_text='Hi',
-            ....     pub_date=datetime.date(2005, 1, 1)
-            .... )
+            ...     blog=b,
+            ...     headline='Hello',
+            ...     body_text='Hi',
+            ...     pub_date=datetime.date(2005, 1, 1)
+            ... )
             >>> e.save(force_insert=True)
 
         Note that there's no need to specify the keyword argument of the model
