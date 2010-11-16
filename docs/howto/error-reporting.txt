@@ -39,6 +39,14 @@ address, modify the :setting:`SERVER_EMAIL` setting.
 To disable this behavior, just remove all entries from the :setting:`ADMINS`
 setting.
 
+.. seealso::
+
+   .. versionadded:: 1.3
+
+   Server error e-mails are sent using the logging framework, so you can
+   customize this behaviour by :doc:`customizing your logging configuration
+   </topics/logging>`.
+
 404 errors
 ----------
 
@@ -76,3 +84,12 @@ The best way to disable this behavior is to set
     :ref:`exception middleware <exception-middleware>`. If you do write custom
     error handling, it's a good idea to emulate Django's built-in error handling
     and only report/log errors if :setting:`DEBUG` is ``False``.
+
+.. seealso::
+
+   .. versionadded:: 1.3
+
+   404 errors are logged using the logging framework. By default, these log
+   records are ignored, but you can use them for error reporting by writing a
+   handler and :doc:`configuring logging </topics/logging>` appropriately.
+
