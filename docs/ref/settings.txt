@@ -1220,7 +1220,7 @@ will be applied to the number. If this setting is greater than ``0`` then the
 setting :setting:`THOUSAND_SEPARATOR` will be used as the separator between those
 groups.
 
-See also :setting:`THOUSAND_SEPARATOR`.
+See also :setting:`THOUSAND_SEPARATOR` and :setting:`USE_THOUSAND_SEPARATOR`.
 
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
@@ -1593,9 +1593,10 @@ THOUSAND_SEPARATOR
 Default ``,`` (Comma)
 
 Default thousand separator used when formatting numbers. This setting is
-used only when ``NUMBER_GROUPING`` is set.
+used only when ``NUMBER_GROUPING`` and ``USE_THOUSAND_SEPARATOR`` are set.
 
-See also ``NUMBER_GROUPING``, ``DECIMAL_SEPARATOR``
+See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
+:setting:`USE_THOUSAND_SEPARATOR`.
 
 .. setting:: TIME_FORMAT
 
