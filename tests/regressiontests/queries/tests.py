@@ -1430,13 +1430,19 @@ class CloneTests(TestCase):
 
 class EmptyQuerySetTests(TestCase):
     def test_emptyqueryset_values(self):
-        # #14366 -- calling .values() on an EmptyQuerySet and then cloning that
-        # should not cause an error
-        self.assertEqual(list(Number.objects.none().values('num').order_by('num')), [])
+        # #14366 -- Calling .values() on an EmptyQuerySet and then cloning that
+        # should not cause an error"
+        self.assertQuerysetEqual(
+            Number.objects.none().values('num').order_by('num'), []
+        )
 
     def test_values_subquery(self):
         self.assertQuerysetEqual(
             Number.objects.filter(pk__in=Number.objects.none().values("pk")),
+            []
+        )
+        self.assertQuerysetEqual(
+            Number.objects.filter(pk__in=Number.objects.none().values_list("pk")),
             []
         )
 
