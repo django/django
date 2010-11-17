@@ -837,6 +837,9 @@ worry about the ``urlconf`` parameter. The function returns a
 :class:`django.core.urlresolvers.ResolverMatch` object that allows you
 to access various meta-data about the resolved URL.
 
+If the URL does not resolve, the function raises an
+:class:`~django.http.Http404` exception.
+
 .. class:: ResolverMatch()
 
     .. attribute:: ResolverMatch.func
