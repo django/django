@@ -19,7 +19,7 @@ except NameError:
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
 
-DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
+DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'auto_created')
@@ -91,7 +91,8 @@ class Options(object):
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
-            self.verbose_name_plural = meta_attrs.pop('verbose_name_plural', string_concat(self.verbose_name, 's'))
+            if self.verbose_name_plural is None:
+                self.verbose_name_plural = string_concat(self.verbose_name, 's')
 
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:
