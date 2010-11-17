@@ -8,6 +8,7 @@ class AggregateField(object):
     """
     def __init__(self, internal_type):
         self.internal_type = internal_type
+
     def get_internal_type(self):
         return self.internal_type
 

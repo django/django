@@ -622,6 +622,24 @@ class AggregationTests(TestCase):
             lambda: Book.objects.annotate(mean_age=Avg('authors__age')).annotate(Avg('mean_age'))
         )
 
+    def test_empty_filter_count(self):
+        self.assertEqual(
+            Author.objects.filter(id__in=[]).annotate(Count("friends")).count(),
+            0
+        )
+
+    def test_empty_filter_aggregate(self):
+        self.assertEqual(
+            Author.objects.filter(id__in=[]).annotate(Count("friends")).aggregate(Count("pk")),
+            {"pk__count": None}
+        )
+
+    def test_annotate_and_join(self):
+        self.assertEqual(
+            Author.objects.annotate(c=Count("friends__name")).exclude(friends__name="Joe").count(),
+            Author.objects.count()
+        )
+
     @skipUnlessDBFeature('supports_stddev')
     def test_stddev(self):
         self.assertEqual(
