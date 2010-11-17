@@ -650,6 +650,11 @@ class AdminMediaHandler(handlers.StaticFilesHandler):
 
     def get_base_url(self):
         from django.conf import settings
+        from django.core.exceptions import ImproperlyConfigured
+        if not settings.ADMIN_MEDIA_PREFIX:
+            raise ImproperlyConfigured(
+                "The ADMIN_MEDIA_PREFIX setting can't be empty "
+                "when using the AdminMediaHandler, e.g. with runserver.")
         return settings.ADMIN_MEDIA_PREFIX
 
     def file_path(self, url):
