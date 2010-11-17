@@ -5,17 +5,22 @@ Django documentation contents
 =============================
 
 .. toctree::
-   :maxdepth: 2
-   
-   intro/index
-   topics/index
-   howto/index
-   faq/index
-   ref/index
-   misc/index
-   glossary
-   releases/index
-   internals/index
+    :hidden:
+
+    index
+
+.. toctree::
+    :maxdepth: 2
+
+    intro/index
+    topics/index
+    howto/index
+    faq/index
+    ref/index
+    misc/index
+    glossary
+    releases/index
+    internals/index
 
 Indices, glossary and tables
 ============================
@@ -32,5 +37,5 @@ have been replaced in newer versions of Django.
 
 .. toctree::
    :maxdepth: 2
-   
+
    obsolete/index
