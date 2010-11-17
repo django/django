@@ -132,11 +132,11 @@ parent defines its media requirements. For example, if we were to extend our
 basic Calendar widget from the example above::
 
     >>> class FancyCalendarWidget(CalendarWidget):
-            class Media:
-                css = {
-                    'all': ('fancy.css',)
-                }
-                js = ('whizbang.js',)
+    ...     class Media:
+    ...         css = {
+    ...             'all': ('fancy.css',)
+    ...         }
+    ...         js = ('whizbang.js',)
 
     >>> w = FancyCalendarWidget()
     >>> print w.media
@@ -151,12 +151,12 @@ you don't want media to be inherited in this way, add an ``extend=False``
 declaration to the media declaration::
 
     >>> class FancyCalendarWidget(CalendarWidget):
-            class Media:
-                extend = False
-                css = {
-                    'all': ('fancy.css',)
-                }
-                js = ('whizbang.js',)
+    ...     class Media:
+    ...         extend = False
+    ...         css = {
+    ...             'all': ('fancy.css',)
+    ...         }
+    ...         js = ('whizbang.js',)
 
     >>> w = FancyCalendarWidget()
     >>> print w.media
@@ -214,11 +214,11 @@ your site was ``'http://uploads.example.com/'`` and :setting:`STATIC_URL`
 was ``None``::
 
     >>> class CalendarWidget(forms.TextInput):
-            class Media:
-                css = {
-                    'all': ('/css/pretty.css',),
-                }
-                js = ('animations.js', 'http://othersite.com/actions.js')
+    ...     class Media:
+    ...         css = {
+    ...             'all': ('/css/pretty.css',),
+    ...         }
+    ...         js = ('animations.js', 'http://othersite.com/actions.js')
 
     >>> w = CalendarWidget()
     >>> print w.media
@@ -270,15 +270,15 @@ Media objects can also be added together. When two media objects are added,
 the resulting Media object contains the union of the media from both files::
 
     >>> class CalendarWidget(forms.TextInput):
-            class Media:
-                css = {
-                    'all': ('pretty.css',)
-                }
-                js = ('animations.js', 'actions.js')
+    ...     class Media:
+    ...         css = {
+    ...             'all': ('pretty.css',)
+    ...         }
+    ...         js = ('animations.js', 'actions.js')
 
     >>> class OtherWidget(forms.TextInput):
-            class Media:
-                js = ('whizbang.js',)
+    ...     class Media:
+    ...         js = ('whizbang.js',)
 
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
@@ -301,8 +301,8 @@ have a media property. The default value for this property is the result
 of adding the media definitions for all widgets that are part of the form::
 
     >>> class ContactForm(forms.Form):
-            date = DateField(widget=CalendarWidget)
-            name = CharField(max_length=40, widget=OtherWidget)
+    ...     date = DateField(widget=CalendarWidget)
+    ...     name = CharField(max_length=40, widget=OtherWidget)
 
     >>> f = ContactForm()
     >>> f.media
@@ -315,13 +315,13 @@ If you want to associate additional media with a form -- for example, CSS for fo
 layout -- simply add a media declaration to the form::
 
     >>> class ContactForm(forms.Form):
-            date = DateField(widget=CalendarWidget)
-            name = CharField(max_length=40, widget=OtherWidget)
-
-            class Media:
-                css = {
-                    'all': ('layout.css',)
-                }
+    ...     date = DateField(widget=CalendarWidget)
+    ...     name = CharField(max_length=40, widget=OtherWidget)
+    ...
+    ...     class Media:
+    ...         css = {
+    ...             'all': ('layout.css',)
+    ...         }
 
     >>> f = ContactForm()
     >>> f.media

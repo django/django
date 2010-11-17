@@ -117,7 +117,7 @@ preceding the string, e.g.::
 
 This also works in templates with the :ttag:`comment` tag:
 
-.. code-block:: django+html
+.. code-block:: html+django
 
     {% comment %}Translators: This is a text of the base template {% endcomment %}
 
