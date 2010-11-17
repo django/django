@@ -284,7 +284,7 @@ be removed entirely.
 
     For more details, see the documentation :doc:`Django's release process
     </internals/release-process>` and our :doc:`deprecation timeline
-    </internals/deprecation>`.`
+    </internals/deprecation>`.
 
 ``mod_python`` support
 ~~~~~~~~~~~~~~~~~~~~~~
