@@ -8,7 +8,7 @@ from regressiontests.model_inheritance_regress.models import (
     Place, Restaurant, ItalianRestaurant, ParkingLot, ParkingLot2,
     ParkingLot3, Supplier, Wholesaler, Child, SelfRefChild, ArticleWithAuthor,
     M2MChild, QualityControl, DerivedM, Person, BirthdayParty, BachelorParty,
-    MessyBachelorParty)
+    MessyBachelorParty, InternalCertificationAudit)
 
 class ModelInheritanceTest(TestCase):
     def test_model_inheritance(self):
@@ -353,3 +353,14 @@ class ModelInheritanceTest(TestCase):
 
         parties = list(p4.bachelorparty_set.all())
         self.assertEqual(parties, [bachelor, messy_parent])
+
+    def test_11369(self):
+        """verbose_name_plural correctly inherited from ABC if inheritance chain includes an abstract model."""
+        # Regression test for #11369: verbose_name_plural should be inherited
+        # from an ABC even when there are one or more intermediate
+        # abstract models in the inheritance chain, for consistency with
+        # verbose_name.
+        self.assertEquals(
+                InternalCertificationAudit._meta.verbose_name_plural,
+                u'Audits'
+        )

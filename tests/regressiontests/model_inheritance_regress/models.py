@@ -103,6 +103,20 @@ class DerivedM(BaseM):
         return "PK = %d, base_name = %s, derived_name = %s" \
                 % (self.customPK, self.base_name, self.derived_name)
 
+class AuditBase(models.Model):
+    planned_date = models.DateField()
+
+    class Meta:
+        abstract = True
+        verbose_name_plural = u'Audits'
+
+class CertificationAudit(AuditBase):
+    class Meta(AuditBase.Meta):
+        abstract = True
+
+class InternalCertificationAudit(CertificationAudit):
+    auditing_dept = models.CharField(max_length=20)
+
 # Check that abstract classes don't get m2m tables autocreated.
 class Person(models.Model):
     name = models.CharField(max_length=100)
