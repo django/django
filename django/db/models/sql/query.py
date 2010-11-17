@@ -921,8 +921,7 @@ class Query(object):
         """
         opts = model._meta
         field_list = aggregate.lookup.split(LOOKUP_SEP)
-        if (len(field_list) == 1 and
-            aggregate.lookup in self.aggregates.keys()):
+        if len(field_list) == 1 and aggregate.lookup in self.aggregates:
             # Aggregate is over an annotation
             field_name = field_list[0]
             col = field_name
@@ -1090,11 +1089,14 @@ class Query(object):
                         if self.alias_map[alias][JOIN_TYPE] == self.LOUTER:
                             j_col = self.alias_map[alias][RHS_JOIN_COL]
                             entry = self.where_class()
-                            entry.add((Constraint(alias, j_col, None), 'isnull', True), AND)
+                            entry.add(
+                                (Constraint(alias, j_col, None), 'isnull', True),
+                                AND
+                            )
                             entry.negate()
                             self.where.add(entry, AND)
                             break
-                elif not (lookup_type == 'in'
+                if not (lookup_type == 'in'
                             and not hasattr(value, 'as_sql')
                             and not hasattr(value, '_as_sql')
                             and not value) and field.null:
