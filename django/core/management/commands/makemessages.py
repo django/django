@@ -196,7 +196,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                     'xgettext -d %s -L Perl %s --keyword=gettext_noop '
                     '--keyword=gettext_lazy --keyword=ngettext_lazy:1,2 '
                     '--keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 '
-                    '--from-code UTF-8 -o - "%s"' % (
+                    '--from-code UTF-8 --add-comments=Translators -o - "%s"' % (
                         domain, wrap, os.path.join(dirpath, thefile)
                     )
                 )
@@ -240,8 +240,9 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                     '--keyword=ugettext_noop --keyword=ugettext_lazy '
                     '--keyword=ungettext_lazy:1,2 --keyword=pgettext:1c,2 '
                     '--keyword=npgettext:1c,2,3 --keyword=pgettext_lazy:1c,2 '
-                    '--keyword=npgettext_lazy:1c,2,3 --from-code UTF-8 -o - '
-                    '"%s"' % (domain, wrap, os.path.join(dirpath, thefile))
+                    '--keyword=npgettext_lazy:1c,2,3 --from-code UTF-8 '
+                    '--add-comments=Translators -o - "%s"' % (
+                        domain, wrap, os.path.join(dirpath, thefile))
                 )
                 msgs, errors = _popen(cmd)
                 if errors:
@@ -282,6 +283,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                     raise CommandError("errors happened while running msgmerge\n%s" % errors)
             elif not invoked_for_django:
                 msgs = copy_plural_forms(msgs, locale, domain, verbosity)
+            msgs = msgs.replace(
+                "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % domain, "")
             f = open(pofile, 'wb')
             try:
                 f.write(msgs)

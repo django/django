@@ -121,13 +121,17 @@ value, protect, or do nothing.
 For more information, see the :attr:`~django.db.models.ForeignKey.on_delete`
 documentation.
 
-Contextual markers in translatable strings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Contextual markers and comments for translatable strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For translation strings with ambiguous meaning, you can now
 use the ``pgettext`` function to specify the context of the string.
 
-For more information, see :ref:`contextual-markers`
+And if you just want to add some information for translators, you
+can also add special translator comments in the source.
+
+For more information, see :ref:`contextual-markers` and
+:ref:`translator-comments`.
 
 Everything else
 ~~~~~~~~~~~~~~~

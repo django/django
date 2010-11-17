@@ -39,6 +39,22 @@ See the :doc:`reference documentation of the app </ref/contrib/staticfiles>`
 for more details or learn how to :doc:`manage static files
 </howto/static-files>`.
 
+Translation comments
+~~~~~~~~~~~~~~~~~~~~
+
+If you would like to give translators hints about a translatable string, you
+can add a comment prefixed with the ``Translators`` keyword on the line
+preceding the string, e.g.::
+
+    def my_view(request):
+        # Translators: This message appears on the home page only
+        output = ugettext("Welcome to my site.")
+
+The comment will appear in the resulting .po file and should also be
+displayed by most translation tools.
+
+For more information, see :ref:`translator-comments`.
+
 Backwards-incompatible changes in 1.3 alpha 2
 =============================================
 

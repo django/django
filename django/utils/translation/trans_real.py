@@ -427,14 +427,23 @@ def templatize(src):
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    from django.template import Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
+    from django.template import Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK, TOKEN_COMMENT
     out = StringIO()
     intrans = False
     inplural = False
     singular = []
     plural = []
+    incomment = False
+    comment = []
     for t in Lexer(src, None).tokenize():
-        if intrans:
+        if incomment:
+            if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
+                out.write(' # %s' % ''.join(comment))
+                incomment = False
+                comment = []
+            else:
+                comment.append(t.contents)
+        elif intrans:
             if t.token_type == TOKEN_BLOCK:
                 endbmatch = endblock_re.match(t.contents)
                 pluralmatch = plural_re.match(t.contents)
@@ -488,6 +497,8 @@ def templatize(src):
                 elif cmatches:
                     for cmatch in cmatches:
                         out.write(' _(%s) ' % cmatch)
+                elif t.contents == 'comment':
+                    incomment = True
                 else:
                     out.write(blankout(t.contents, 'B'))
             elif t.token_type == TOKEN_VAR:
@@ -500,6 +511,8 @@ def templatize(src):
                         out.write(' %s ' % p.split(':',1)[1])
                     else:
                         out.write(blankout(p, 'F'))
+            elif t.token_type == TOKEN_COMMENT:
+                out.write(' # %s' % t.contents)
             else:
                 out.write(blankout(t.contents, 'X'))
     return out.getvalue()
