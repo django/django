@@ -95,6 +95,8 @@ to handle those errors.
 The Http404 exception
 ---------------------
 
+.. class:: django.http.Http404()
+
 When you return an error such as ``HttpResponseNotFound``, you're responsible
 for defining the HTML of the resulting error page::
 

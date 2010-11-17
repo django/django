@@ -834,6 +834,9 @@ URL paths to the corresponding view functions. It has the following signature:
 don't need to worry about the ``urlconf`` parameter. The function returns the
 triple (view function, arguments, keyword arguments).
 
+If the URL does not resolve, the function raises an
+:class:`~django.http.Http404` exception.
+
 For example, it can be used for testing if a view would raise a ``Http404``
 error before redirecting to it::
 
