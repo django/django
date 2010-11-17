@@ -66,6 +66,13 @@ def i18n(request):
 
     return context_extras
 
+def static(request):
+    """
+    Adds static-related context variables to the context.
+
+    """
+    return {'STATIC_URL': settings.STATIC_URL}
+
 def media(request):
     """
     Adds media-related context variables to the context.

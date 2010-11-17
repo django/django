@@ -23,48 +23,11 @@ Settings
 
 .. highlight:: python
 
-The following settings control the behavior of the staticfiles app. Only
-:setting:`STATICFILES_ROOT` is required, but you'll probably also need to
-configure :setting:`STATICFILES_URL` as well.
+.. note::
 
-.. setting:: STATICFILES_ROOT
-
-STATICFILES_ROOT
-----------------
-
-Default: ``''`` (Empty string)
-
-The absolute path to the directory that the :djadmin:`collectstatic` management
-command will collect static files into, for serving from
-:setting:`STATICFILES_URL`::
-
-   STATICFILES_ROOT = "/home/example.com/static/"
-
-This is a **required setting** unless you've overridden
-:setting:`STATICFILES_STORAGE` and are using a custom storage backend.
-
-This is not a place to store your static files permanently under version
-control; you should do that in directories that will be found by your
-:setting:`STATICFILES_FINDERS` (by default, per-app ``static/`` subdirectories,
-and any directories you include in :setting:`STATICFILES_DIRS`). Files from
-those locations will be collected into :setting:`STATICFILES_ROOT`.
-
-.. setting:: STATICFILES_URL
-
-STATICFILES_URL
----------------
-
-Default: ``'/static/'``
-
-The URL that handles the files served from :setting:`STATICFILES_ROOT`, e.g.::
-
-    STATICFILES_URL = '/site_media/static/'
-
-... or perhaps::
-
-    STATICFILES_URL = 'http://static.example.com/'
-
-This should **always** have a trailing slash.
+    The following settings control the behavior of the staticfiles app.
+    Configuring the global settings :setting:`STATIC_ROOT` and
+    :setting:`STATIC_URL` is **required**.
 
 .. setting:: STATICFILES_DIRS
 
@@ -98,7 +61,7 @@ tuples, e.g.::
 
 With this configuration, the :djadmin:`collectstatic` management command would
 for example collect the stats files in a ``'downloads'`` directory. So
-assuming you have :setting:`STATICFILES_URL` set ``'/static/'``, this would
+assuming you have :setting:`STATIC_URL` set ``'/static/'``, this would
 allow you to refer to the file ``'/opt/webfiles/stats/polls_20101022.tar.gz'``
 with ``'/static/downloads/polls_20101022.tar.gz'`` in your templates.
 
@@ -153,14 +116,14 @@ Management Commands
 
 .. highlight:: console
 
-``django.contrib.staticfiles`` exposes two management commands.
+``django.contrib.staticfiles`` exposes three management commands.
 
 collectstatic
 -------------
 
 .. django-admin:: collectstatic
 
-Collects the static files into :setting:`STATICFILES_ROOT`.
+Collects the static files into :setting:`STATIC_ROOT`.
 
 Duplicate file names are by default resolved in a similar way to how template
 resolution works: the file that is first found in one of the specified
@@ -218,44 +181,76 @@ for each relative path, use the ``--first`` option::
 This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
 
+runserver
+---------
+
+Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
+is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
+files and the following new options.
+
+.. django-admin-option:: --nostatic
+
+Use the ``--nostatic`` option to disable serving of static files with the
+:doc:`staticfiles </ref/contrib/staticfiles>` app entirely. This option is
+only available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
+in your project's :setting:`INSTALLED_APPS` setting.
+
+Example usage::
+
+    django-admin.py runserver --nostatic
+
+.. django-admin-option:: --insecure
+
+Use the ``--insecure`` option to force serving of static files with the
+:doc:`staticfiles </ref/contrib/staticfiles>` app even if the :setting:`DEBUG`
+setting is ``False``. By using this you acknowledge the fact that it's
+**grossly inefficient** and probably **insecure**. This is only intended for
+local development, should **never be used in production** and is only
+available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
+in your project's :setting:`INSTALLED_APPS` setting.
+
+Example usage::
+
+    django-admin.py runserver --insecure
+
 .. currentmodule:: None
 
 Other Helpers
 =============
 
-The ``staticfiles`` context processor
--------------------------------------
+The ``static`` context processor
+--------------------------------
 
-.. function:: django.contrib.staticfiles.context_processors.staticfiles
+.. function:: django.core.context_processors.static
 
-This context processor adds the :setting:`STATICFILES_URL` into each template
-context as the variable ``{{ STATICFILES_URL }}``. To use it, make sure that
-``'django.contrib.staticfiles.context_processors.staticfiles'`` appears
-somewhere in your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+This context processor adds the :setting:`STATIC_URL` into each template
+context as the variable ``{{ STATIC_URL }}``. To use it, make sure that
+``'django.core.context_processors.static'`` appears somewhere in your
+:setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
 Remember, only templates rendered with :class:`~django.template.RequestContext`
 will have acces to the data provided by this (and any) context processor.
 
-.. templatetag:: get_staticfiles_prefix
+.. templatetag:: get_static_prefix
 
-The ``get_staticfiles_prefix`` templatetag
-==========================================
+The ``get_static_prefix`` templatetag
+=====================================
 
 .. highlight:: html+django
 
 If you're not using :class:`~django.template.RequestContext`, or if you need
-more control over exactly where and how :setting:`STATICFILES_URL` is injected
-into the template, you can use the :ttag:`get_staticfiles_prefix` template tag
+more control over exactly where and how :setting:`STATIC_URL` is injected
+into the template, you can use the :ttag:`get_static_prefix` template tag
 instead::
 
-    {% load staticfiles %}
-    <img src="{% get_staticfiles_prefix %}images/hi.jpg" />
+    {% load static %}
+    <img src="{% get_static_prefix %}images/hi.jpg" />
 
 There's also a second form you can use to avoid extra processing if you need
 the value multiple times::
 
-    {% load staticfiles %}
-    {% get_staticfiles_prefix as STATIC_PREFIX %}
+    {% load static %}
+    {% get_static_prefix as STATIC_PREFIX %}
 
     <img src="{{ STATIC_PREFIX }}images/hi.jpg" />
     <img src="{{ STATIC_PREFIX }}images/hi2.jpg" />
@@ -292,7 +287,7 @@ primary URL configuration::
        )
 
 Note, the begin of the pattern (``r'^static/'``) should be your
-:setting:`STATICFILES_URL` setting.
+:setting:`STATIC_URL` setting.
 
 Since this is a bit finicky, there's also a helper function that'll do this for you:
 
@@ -307,3 +302,8 @@ already defined pattern list. Use it like this::
 
    urlpatterns += staticfiles_urlpatterns()
 
+.. warning::
+
+    This helper function will only work if :setting:`DEBUG` is ``True``
+    and your :setting:`STATIC_URL` setting is neither empty nor a full
+    URL such as ``http://static.example.com/``.

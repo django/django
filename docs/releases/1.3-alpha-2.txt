@@ -13,10 +13,6 @@ prior to the final 1.3 release.
 As such, this release is *not* intended for production use, and any such use
 is discouraged.
 
-.. _new features: `What's new in Django 1.3 alpha 2`_
-
-.. _backwards incompatible changes: backwards-incompatible-changes-1.3-alpha-2_
-
 What's new in Django 1.3 alpha 2
 ================================
 
@@ -42,6 +38,47 @@ to modify this behaviour:
 See the :doc:`reference documentation of the app </ref/contrib/staticfiles>`
 for more details or learn how to :doc:`manage static files
 </howto/static-files>`.
+
+Backwards-incompatible changes in 1.3 alpha 2
+=============================================
+
+Introduction of STATIC_URL and STATIC_ROOT settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The newly introduced :doc:`/ref/contrib/staticfiles` app extends Django's
+abilities to handle static app and project files, required the additon of
+settings to refer to those files in templates and code, especially in
+contrast to the :setting:`MEDIA_URL` and :setting:`MEDIA_ROOT` settings that
+refer to user-uploaded files.
+
+Prior to 1.3 alpha 2 these settings were called ``STATICFILES_URL`` and
+``STATICFILES_ROOT`` to follow the naming scheme for app centric settings.
+Based on feedback from the community it became apparent that those settings
+created confusion, especially given the fact handling static files is also
+desired outside the use of the optional ``staticfiles`` app.
+
+As a result, we take the followig steps to rectify the issue:
+
+  * Two new global settings that will be used by -- **but are not limited
+    to** -- the :doc:`staticfiles</ref/contrib/staticfiles>` app:
+
+    * :setting:`STATIC_ROOT` (formally ``STATICFILES_ROOT``)
+
+    * :setting:`STATIC_URL` (formally ``STATICFILES_URL``)
+
+  * Moving the
+    ``django.contrib.staticfiles.templatetags.staticfiles.get_staticfiles_prefix``
+    template tag to the core (``django.templatetags.static``) and renaming
+    it to :ttag:`get_static_prefix`.
+
+  * Moving the context processor
+    ``django.contrib.staticfiles.context_processors.staticfiles`` to the
+    core (``django.core.context_processors.static``) and renaming it to
+    :func:`~django.core.context_processors.static`.
+
+  * :ref:`form-media-paths` will use :setting:`STATIC_URL` as the prefix
+    **if the value is not None**, and falls back to the previously used
+    :setting:`MEDIA_URL`.
 
 The Django 1.3 roadmap
 ======================

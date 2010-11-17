@@ -195,9 +195,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
+    'django.core.context_processors.static',
 #    'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
-    'django.contrib.staticfiles.context_processors.staticfiles',
 )
 
 # Output to use in template system for invalid (e.g. misspelled) variables.
@@ -256,12 +256,20 @@ SECRET_KEY = ''
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-# Example: "/home/media/media.lawrence.com/"
+# Example: "/home/media/media.lawrence.com/media/"
 MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT.
-# Example: "http://media.lawrence.com"
+# Example: "http://media.lawrence.com/media/"
 MEDIA_URL = ''
+
+# Absolute path to the directory that holds static files.
+# Example: "/home/media/media.lawrence.com/static/"
+STATIC_ROOT = ''
+
+# URL that handles the static files served from STATIC_ROOT.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = None
 
 # List of upload handler classes to be applied in order.
 FILE_UPLOAD_HANDLERS = (
@@ -551,14 +559,6 @@ FIXTURE_DIRS = ()
 ###############
 # STATICFILES #
 ###############
-
-# Absolute path to the directory that holds media.
-# Example: "/home/media/media.lawrence.com/static/"
-STATICFILES_ROOT = ''
-
-# URL that handles the static files served from STATICFILES_ROOT.
-# Example: "http://media.lawrence.com/static/"
-STATICFILES_URL = '/static/'
 
 # A list of locations of additional static files
 STATICFILES_DIRS = ()

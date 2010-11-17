@@ -1,9 +1,13 @@
 """
 HTML Widget classes
 """
+import datetime
+from itertools import chain
+import time
+from urlparse import urljoin
+from util import flatatt
 
 import django.utils.copycompat as copy
-from itertools import chain
 from django.conf import settings
 from django.utils.datastructures import MultiValueDict, MergeDict
 from django.utils.html import escape, conditional_escape
@@ -11,10 +15,6 @@ from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats
-import time
-import datetime
-from util import flatatt
-from urlparse import urljoin
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
@@ -63,10 +63,16 @@ class Media(StrAndUnicode):
                     for path in self._css[medium]]
                 for medium in media])
 
-    def absolute_path(self, path):
+    def absolute_path(self, path, prefix=None):
         if path.startswith(u'http://') or path.startswith(u'https://') or path.startswith(u'/'):
             return path
-        return urljoin(settings.MEDIA_URL,path)
+        if prefix is None:
+            if settings.STATIC_URL is None:
+                 # backwards compatibility
+                prefix = settings.MEDIA_URL
+            else:
+                prefix = settings.STATIC_URL
+        return urljoin(prefix, path)
 
     def __getitem__(self, name):
         "Returns a Media object that only contains media of the given type"

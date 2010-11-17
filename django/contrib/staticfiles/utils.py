@@ -33,13 +33,13 @@ def get_files(storage, ignore_patterns=[], location=''):
 
 def check_settings():
     """
-    Checks if the MEDIA_(ROOT|URL) and STATICFILES_(ROOT|URL)
+    Checks if the MEDIA_(ROOT|URL) and STATIC_(ROOT|URL)
     settings have the same value.
     """
-    if settings.MEDIA_URL == settings.STATICFILES_URL:
-        raise ImproperlyConfigured("The MEDIA_URL and STATICFILES_URL "
-                                   "settings must have individual values")
-    if ((settings.MEDIA_ROOT and settings.STATICFILES_ROOT) and
-            (settings.MEDIA_ROOT == settings.STATICFILES_ROOT)):
-        raise ImproperlyConfigured("The MEDIA_ROOT and STATICFILES_ROOT "
-                                   "settings must have individual values")
+    if settings.MEDIA_URL == settings.STATIC_URL:
+        raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
+                                   "settings must have different values")
+    if ((settings.MEDIA_ROOT and settings.STATIC_ROOT) and
+            (settings.MEDIA_ROOT == settings.STATIC_ROOT)):
+        raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
+                                   "settings must have different values")

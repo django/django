@@ -12,7 +12,7 @@ from django.contrib.staticfiles import finders
 class Command(NoArgsCommand):
     """
     Command that allows to copy or symlink media files from different
-    locations to the settings.STATICFILES_ROOT.
+    locations to the settings.STATIC_ROOT.
     """
     option_list = NoArgsCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive',
@@ -85,7 +85,7 @@ Type 'yes' to continue, or 'no' to cancel: """)
             self.stdout.write("\n%s static file%s %s to '%s'%s.\n"
                               % (actual_count, actual_count != 1 and 's' or '',
                                  symlink and 'symlinked' or 'copied',
-                                 settings.STATICFILES_ROOT,
+                                 settings.STATIC_ROOT,
                                  unmodified_count and ' (%s unmodified)'
                                  % unmodified_count or ''))
 

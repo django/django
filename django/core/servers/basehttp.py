@@ -17,8 +17,8 @@ import warnings
 from django.core.management.color import color_style
 from django.utils.http import http_date
 from django.utils._os import safe_join
-from django.contrib.staticfiles.handlers import StaticFilesHandler
-from django.views import static
+
+from django.contrib.staticfiles import handlers, views as static
 
 __version__ = "0.1"
 __all__ = ['WSGIServer','WSGIRequestHandler']
@@ -635,19 +635,20 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
         sys.stderr.write(msg)
 
 
-class AdminMediaHandler(StaticFilesHandler):
+class AdminMediaHandler(handlers.StaticFilesHandler):
     """
     WSGI middleware that intercepts calls to the admin media directory, as
     defined by the ADMIN_MEDIA_PREFIX setting, and serves those images.
     Use this ONLY LOCALLY, for development! This hasn't been tested for
     security and is not super efficient.
-    """
 
-    def get_media_dir(self):
+    This is pending for deprecation since 1.3.
+    """
+    def get_base_dir(self):
         import django
         return os.path.join(django.__path__[0], 'contrib', 'admin', 'media')
 
-    def get_media_url(self):
+    def get_base_url(self):
         from django.conf import settings
         return settings.ADMIN_MEDIA_PREFIX
 
@@ -655,14 +656,13 @@ class AdminMediaHandler(StaticFilesHandler):
         """
         Returns the path to the media file on disk for the given URL.
 
-        The passed URL is assumed to begin with ``media_url``.  If the
-        resultant file path is outside the media directory, then a ValueError
+        The passed URL is assumed to begin with ``self.base_url``.  If the
+        resulting file path is outside the media directory, then a ValueError
         is raised.
         """
-        # Remove ``media_url``.
-        relative_url = url[len(self.media_url[2]):]
+        relative_url = url[len(self.base_url[2]):]
         relative_path = urllib.url2pathname(relative_url)
-        return safe_join(self.media_dir, relative_path)
+        return safe_join(self.base_dir, relative_path)
 
     def serve(self, request):
         document_root, path = os.path.split(self.file_path(request.path))
@@ -673,10 +673,10 @@ class AdminMediaHandler(StaticFilesHandler):
         """
         Checks if the path should be handled. Ignores the path if:
 
-        * the host is provided as part of the media_url
-        * the request's path isn't under the media path
+        * the host is provided as part of the base_url
+        * the request's path isn't under the base path
         """
-        return path.startswith(self.media_url[2]) and not self.media_url[1]
+        return path.startswith(self.base_url[2]) and not self.base_url[1]
 
 
 def run(addr, port, wsgi_handler):

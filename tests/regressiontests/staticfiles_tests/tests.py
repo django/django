@@ -23,8 +23,8 @@ class StaticFilesTestCase(TestCase):
     Test case with a couple utility assertions.
     """
     def setUp(self):
-        self.old_staticfiles_url = settings.STATICFILES_URL
-        self.old_staticfiles_root = settings.STATICFILES_ROOT
+        self.old_static_url = settings.STATIC_URL
+        self.old_static_root = settings.STATIC_ROOT
         self.old_staticfiles_dirs = settings.STATICFILES_DIRS
         self.old_staticfiles_finders = settings.STATICFILES_FINDERS
         self.old_media_root = settings.MEDIA_ROOT
@@ -40,8 +40,8 @@ class StaticFilesTestCase(TestCase):
         settings.DEBUG = True
         settings.MEDIA_ROOT =  os.path.join(site_media, 'media')
         settings.MEDIA_URL = '/media/'
-        settings.STATICFILES_ROOT = os.path.join(site_media, 'static')
-        settings.STATICFILES_URL = '/static/'
+        settings.STATIC_ROOT = os.path.join(site_media, 'static')
+        settings.STATIC_URL = '/static/'
         settings.ADMIN_MEDIA_PREFIX = '/static/admin/'
         settings.STATICFILES_DIRS = (
             os.path.join(TEST_ROOT, 'project', 'documents'),
@@ -52,6 +52,7 @@ class StaticFilesTestCase(TestCase):
             'django.contrib.staticfiles.finders.DefaultStorageFinder',
         )
         settings.INSTALLED_APPS = [
+            "django.contrib.staticfiles",
             "regressiontests.staticfiles_tests",
         ]
 
@@ -65,8 +66,8 @@ class StaticFilesTestCase(TestCase):
         settings.MEDIA_ROOT = self.old_media_root
         settings.MEDIA_URL = self.old_media_url
         settings.ADMIN_MEDIA_PREFIX = self.old_admin_media_prefix
-        settings.STATICFILES_ROOT = self.old_staticfiles_root
-        settings.STATICFILES_URL = self.old_staticfiles_url
+        settings.STATIC_ROOT = self.old_static_root
+        settings.STATIC_URL = self.old_static_url
         settings.STATICFILES_DIRS = self.old_staticfiles_dirs
         settings.STATICFILES_FINDERS = self.old_staticfiles_finders
         settings.INSTALLED_APPS = self.old_installed_apps
@@ -91,13 +92,13 @@ class BuildStaticTestCase(StaticFilesTestCase):
     def setUp(self):
         super(BuildStaticTestCase, self).setUp()
         self.old_staticfiles_storage = settings.STATICFILES_STORAGE
-        self.old_root = settings.STATICFILES_ROOT
-        settings.STATICFILES_ROOT = tempfile.mkdtemp()
+        self.old_root = settings.STATIC_ROOT
+        settings.STATIC_ROOT = tempfile.mkdtemp()
         self.run_collectstatic()
 
     def tearDown(self):
-        shutil.rmtree(settings.STATICFILES_ROOT)
-        settings.STATICFILES_ROOT = self.old_root
+        shutil.rmtree(settings.STATIC_ROOT)
+        settings.STATIC_ROOT = self.old_root
         super(BuildStaticTestCase, self).tearDown()
 
     def run_collectstatic(self, **kwargs):
@@ -106,7 +107,7 @@ class BuildStaticTestCase(StaticFilesTestCase):
 
     def _get_file(self, filepath):
         assert filepath, 'filepath is empty.'
-        filepath = os.path.join(settings.STATICFILES_ROOT, filepath)
+        filepath = os.path.join(settings.STATIC_ROOT, filepath)
         f = open(filepath)
         try:
             return f.read()
@@ -231,7 +232,7 @@ class TestBuildStaticDryRun(BuildStaticTestCase):
         """
         With --dry-run, no files created in destination dir.
         """
-        self.assertEquals(os.listdir(settings.STATICFILES_ROOT), [])
+        self.assertEquals(os.listdir(settings.STATIC_ROOT), [])
 
 
 if sys.platform != 'win32':
@@ -251,7 +252,7 @@ if sys.platform != 'win32':
             With ``--link``, symbolic links are created.
 
             """
-            self.failUnless(os.path.islink(os.path.join(settings.STATICFILES_ROOT, 'test.txt')))
+            self.failUnless(os.path.islink(os.path.join(settings.STATIC_ROOT, 'test.txt')))
 
 
 class TestServeStatic(StaticFilesTestCase):
@@ -262,7 +263,7 @@ class TestServeStatic(StaticFilesTestCase):
 
     def _response(self, filepath):
         return self.client.get(
-            posixpath.join(settings.STATICFILES_URL, filepath))
+            posixpath.join(settings.STATIC_URL, filepath))
 
     def assertFileContains(self, filepath, text):
         self.assertContains(self._response(filepath), text)
@@ -372,24 +373,3 @@ class TestMiscFinder(TestCase):
             finders.get_finder, "django.contrib.staticfiles.finders.FooBarFinder")
         self.assertRaises(ImproperlyConfigured,
             finders.get_finder, "foo.bar.FooBarFinder")
-
-
-class TemplateTagTest(TestCase):
-    def test_get_staticfiles_prefix(self):
-        """
-        Test the get_staticfiles_prefix helper return the STATICFILES_URL setting.
-        """
-        self.assertEquals(Template(
-            "{% load staticfiles %}"
-            "{% get_staticfiles_prefix %}"
-        ).render(Context()), settings.STATICFILES_URL)
-
-    def test_get_staticfiles_prefix_with_as(self):
-        """
-        Test the get_staticfiles_prefix helper return the STATICFILES_URL setting.
-        """
-        self.assertEquals(Template(
-            "{% load staticfiles %}"
-            "{% get_staticfiles_prefix as staticfiles_prefix %}"
-            "{{ staticfiles_prefix }}"
-        ).render(Context()), settings.STATICFILES_URL)

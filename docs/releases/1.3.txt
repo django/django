@@ -59,7 +59,7 @@ In previous versions of Django, it was common to place static assets in
 app is to make it easier to keep static files separate from user-uploaded
 files. For this reason, you will probably want to make your
 :setting:`MEDIA_ROOT` and :setting:`MEDIA_URL` different from your
-:setting:`STATICFILES_ROOT` and :setting:`STATICFILES_URL`. You will need to
+:setting:`STATIC_ROOT` and :setting:`STATIC_URL`. You will need to
 arrange for serving of files in :setting:`MEDIA_ROOT` yourself;
 ``staticfiles`` does not deal with user-uploaded media at all.
 

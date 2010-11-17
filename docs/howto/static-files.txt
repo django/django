@@ -50,12 +50,12 @@ Here's the basic usage in a nutshell:
        First, you'll need to make sure that ``django.contrib.staticfiles`` is in
        your :setting:`INSTALLED_APPS`.
 
-       Next, you'll need to edit :setting:`STATICFILES_ROOT` to point to where
+       Next, you'll need to edit :setting:`STATIC_ROOT` to point to where
        you'd like your static media stored. For example::
 
-            STATICFILES_ROOT = "/home/jacob/projects/mysite.com/static_media"
+            STATIC_ROOT = "/home/jacob/projects/mysite.com/static_media"
 
-       You may also want to set the :setting:`STATICFILES_URL` setting at this
+       You may also want to set the :setting:`STATIC_URL` setting at this
        time, though the default value (of ``/static/``) is perfect for local
        development.
 
@@ -69,7 +69,7 @@ Here's the basic usage in a nutshell:
             ./manage.py collectstatic
 
        This'll churn through your static file storage and move them into the
-       directory given by :setting:`STATICFILES_ROOT`. (This is not necessary
+       directory given by :setting:`STATIC_ROOT`. (This is not necessary
        in local development if you are using :djadmin:`runserver` or adding
        ``staticfiles_urlpatterns`` to your URLconf; see below).
 
@@ -78,7 +78,7 @@ Here's the basic usage in a nutshell:
        If you're using the built-in development server (the
        :djadmin:`runserver` management command) and have the :setting:`DEBUG`
        setting set to ``True``, your staticfiles will automatically be served
-       from :setting:`STATICFILES_URL` in development.
+       from :setting:`STATIC_URL` in development.
 
        If you are using some other server for local development, you can
        quickly serve static media locally by adding::
@@ -98,7 +98,7 @@ Here's the basic usage in a nutshell:
 
           .. code-block:: html+django
 
-               <img src="{{ STATICFILES_URL }}images/hi.jpg />
+               <img src="{{ STATIC_URL }}images/hi.jpg />
 
        See :ref:`staticfiles-in-templates` for more details, including an
        alternate method (using a template tag).
@@ -115,7 +115,7 @@ the framework see :doc:`the staticfiles reference </ref/contrib/staticfiles>`.
    app is to make it easier to keep static files separate from user-uploaded
    files. For this reason, you will probably want to make your
    :setting:`MEDIA_ROOT` and :setting:`MEDIA_URL` different from your
-   :setting:`STATICFILES_ROOT` and :setting:`STATICFILES_URL`. You will need to
+   :setting:`STATIC_ROOT` and :setting:`STATIC_URL`. You will need to
    arrange for serving of files in :setting:`MEDIA_ROOT` yourself;
    ``staticfiles`` does not deal with user-uploaded media at all.
 
@@ -136,7 +136,7 @@ development, and it makes it *very* hard to change where you've deployed your
 media. If, for example, you wanted to switch to using a content delivery network
 (CDN), then you'd need to change more or less every single template.
 
-A far better way is to use the value of the :setting:`STATICFILES_URL` setting
+A far better way is to use the value of the :setting:`STATIC_URL` setting
 directly in your templates. This means that a switch of media servers only
 requires changing that single value. Much better!
 
@@ -147,7 +147,7 @@ With a context processor
 ------------------------
 
 The included context processor is the easy way. Simply make sure
-``'django.contrib.staticfiles.context_processors.staticfiles'`` is in your
+``'django.core.context_processors.static'`` is in your
 :setting:`TEMPLATE_CONTEXT_PROCESSORS`. It's there by default, and if you're
 editing that setting by hand it should look something like::
 
@@ -155,18 +155,18 @@ editing that setting by hand it should look something like::
         'django.core.context_processors.debug',
         'django.core.context_processors.i18n',
         'django.core.context_processors.media',
+        'django.core.context_processors.static',
         'django.contrib.auth.context_processors.auth',
         'django.contrib.messages.context_processors.messages',
-        'django.contrib.staticfiles.context_processors.staticfiles',
     )
 
-Once that's done, you can refer to :setting:`STATICFILES_URL` in your templates:
+Once that's done, you can refer to :setting:`STATIC_URL` in your templates:
 
 .. code-block:: html+django
 
-     <img src="{{ STATICFILES_URL }}images/hi.jpg />
+     <img src="{{ STATIC_URL }}images/hi.jpg />
 
-If ``{{ STATICFILES_URL }}`` isn't working in your template, you're probably not
+If ``{{ STATIC_URL }}`` isn't working in your template, you're probably not
 using :class:`~django.template.RequestContext` when rendering the template.
 
 As a brief refresher, context processors add variables into the contexts of
@@ -180,23 +180,23 @@ To see how that works, and to read more details, check out
 With a template tag
 -------------------
 
-The second option is the :ttag:`get_staticfiles_prefix` template tag. You can
+The second option is the :ttag:`get_static_prefix` template tag. You can
 use this if you're not using :class:`~django.template.RequestContext`, or if you
-need more control over exactly where and how :setting:`STATICFILES_URL` is
+need more control over exactly where and how :setting:`STATIC_URL` is
 injected into the template. Here's an example:
 
 .. code-block:: html+django
 
-    {% load staticfiles %}
-    <img src="{% get_staticfiles_prefix %}images/hi.jpg" />
+    {% load static %}
+    <img src="{% get_static_prefix %}images/hi.jpg" />
 
 There's also a second form you can use to avoid extra processing if you need the
 value multiple times:
 
 .. code-block:: html+django
 
-    {% load staticfiles %}
-    {% get_staticfiles_prefix as STATIC_PREFIX %}
+    {% load static %}
+    {% get_static_prefix as STATIC_PREFIX %}
 
     <img src="{{ STATIC_PREFIX }}images/hi.jpg" />
     <img src="{{ STATIC_PREFIX }}images/hi2.jpg" />
@@ -213,7 +213,7 @@ Thus, the ``staticfiles`` app ships with a quick and dirty helper view that you
 can use to serve files locally in development.
 
 This view is automatically enabled and will serve your static files at
-:setting:`STATICFILES_URL` when you use the built-in :djadmin:`runserver`.
+:setting:`STATIC_URL` when you use the built-in :djadmin:`runserver`.
 
 To enable this view if you are using some other server for local development,
 you'll add a couple of lines to your URLconf. The first line goes at the top of
@@ -225,11 +225,11 @@ the file, and the last line at the bottom::
 
     urlpatterns += staticfiles_urlpatterns()
 
-This will inspect your :setting:`STATICFILES_URL` and
-:setting:`STATICFILES_ROOT` settings and wire up the view to serve static media
+This will inspect your :setting:`STATIC_URL` and
+:setting:`STATIC_ROOT` settings and wire up the view to serve static media
 accordingly. Don't forget to set the :setting:`STATICFILES_DIRS` setting
 appropriately to let ``django.contrib.staticfiles`` know where to look for
-files.
+(additional) files.
 
 .. warning::
 
@@ -238,6 +238,9 @@ files.
     That's because this view is **grossly inefficient** and probably
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
+
+    Additionally, your :setting:`STATIC_URL` setting can't be either empty
+    or a full URL such as ``http://static.example.com/``.
 
 For a few more details, including an alternate method of enabling this view,
 see :ref:`staticfiles-development-view`.
@@ -249,7 +252,7 @@ Serving static files in production
 
 The basic outline of putting static files into production is simple: run the
 :djadmin:`collectstatic` command when static media changes, then arrange for the
-collected media directory (:setting:`STATICFILES_ROOT`) to be moved to the media
+collected media directory (:setting:`STATIC_ROOT`) to be moved to the media
 server and served.
 
 Of course, as with all deployment tasks, the devil's in the details. Every
@@ -264,8 +267,8 @@ app, the basic outline gets modified to look something like:
 
     * Push your code up to the deployment server.
     * On the server, run :djadmin:`collectstatic` to move all the media into
-      :setting:`STATICFILES_ROOT`.
-    * Point your web server at :setting:`STATICFILES_ROOT`. For example, here's
+      :setting:`STATIC_ROOT`.
+    * Point your web server at :setting:`STATIC_ROOT`. For example, here's
       :ref:`how to do this under Apache and mod_wsgi <serving-media-files>`.
 
 You'll probably want to automate this process, especially if you've got multiple
@@ -322,7 +325,7 @@ Since your media server won't be running Django, you'll need to modify the
 deployment strategy to look something like:
 
     * When your media changes, run :djadmin:`collectstatic` locally.
-    * Push your local :setting:`STATICFILES_ROOT` up to the media server
+    * Push your local :setting:`STATIC_ROOT` up to the media server
       into the directory that's being served. ``rsync`` is a good
       choice for this step since it only needs to transfer the
       bits of static media that have changed.
@@ -402,9 +405,6 @@ you'll need to make a few changes:
 
     * The management commands ``build_static`` and ``resolve_static`` are now
       called :djadmin:`collectstatic` and :djadmin:`findstatic`.
-
-    * The settings ``STATIC_URL`` and ``STATIC_ROOT`` were renamed to
-      :setting:`STATICFILES_URL` and :setting:`STATICFILES_ROOT`.
 
     * The settings ``STATICFILES_PREPEND_LABEL_APPS``,
       ``STATICFILES_MEDIA_DIRNAMES`` and ``STATICFILES_EXCLUDED_APPS`` were

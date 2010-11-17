@@ -21,7 +21,7 @@ changes`_ and an easy upgrade path from Django 1.2.
 
 .. _new features: `What's new in Django 1.3 alpha 1`_
 
-.. _backwards incompatible changes: backwards-incompatible-changes-1.3_
+.. _backwards incompatible changes: backwards-incompatible-changes-1.3-alpha-1_
 
 What's new in Django 1.3 alpha 1
 ================================
@@ -161,7 +161,7 @@ requests. These include:
       easier to test the database activity associated with a view.
 
 
-.. _backwards-incompatible-changes-1.3:
+.. _backwards-incompatible-changes-1.3-alpha-1:
 
 Backwards-incompatible changes in 1.3 alpha 1
 =============================================
@@ -269,8 +269,6 @@ local flavors:
       has been removed from the province list in favor of the new
       official designation "Aceh (ACE)".
 
-
-.. _deprecated-features-1.3:
 
 Features deprecated in 1.3
 ==========================

@@ -8,7 +8,7 @@ from django.contrib.staticfiles.handlers import StaticFilesHandler
 class Command(BaseRunserverCommand):
     option_list = BaseRunserverCommand.option_list + (
         make_option('--nostatic', action="store_false", dest='use_static_handler', default=True,
-            help='Tells Django to NOT automatically serve static files at STATICFILES_URL.'),
+            help='Tells Django to NOT automatically serve static files at STATIC_URL.'),
         make_option('--insecure', action="store_true", dest='insecure_serving', default=False,
             help='Allows serving static files even if DEBUG is False.'),
     )

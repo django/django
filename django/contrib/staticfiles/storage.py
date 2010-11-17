@@ -12,21 +12,22 @@ class StaticFilesStorage(FileSystemStorage):
     Standard file system storage for site media files.
     
     The defaults for ``location`` and ``base_url`` are
-    ``STATICFILES_ROOT`` and ``STATICFILES_URL``.
+    ``STATIC_ROOT`` and ``STATIC_URL``.
     """
     def __init__(self, location=None, base_url=None, *args, **kwargs):
         if location is None:
-            location = settings.STATICFILES_ROOT
+            location = settings.STATIC_ROOT
         if base_url is None:
-            base_url = settings.STATICFILES_URL
+            base_url = settings.STATIC_URL
         if not location:
             raise ImproperlyConfigured("You're using the staticfiles app "
-                "without having set the STATICFILES_ROOT setting. Set it to "
+                "without having set the STATIC_ROOT setting. Set it to "
                 "the absolute path of the directory that holds static media.")
-        if not base_url:
+        # check for None since we might use a root URL (``/``)
+        if base_url is None:
             raise ImproperlyConfigured("You're using the staticfiles app "
-                "without having set the STATICFILES_URL setting. Set it to "
-                "URL that handles the files served from STATICFILES_ROOT.")
+                "without having set the STATIC_URL setting. Set it to "
+                "URL that handles the files served from STATIC_ROOT.")
         if settings.DEBUG:
             utils.check_settings()
         super(StaticFilesStorage, self).__init__(location, base_url, *args, **kwargs)

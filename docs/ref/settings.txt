@@ -53,10 +53,10 @@ Default: ``'/static/admin/'``
 
 The URL prefix for admin media -- CSS, JavaScript and images used by the Django
 administrative interface. Make sure to use a trailing slash, and to have this be
-different from the :setting:``MEDIA_URL`` setting (since the same URL cannot be
+different from the :setting:`MEDIA_URL` setting (since the same URL cannot be
 mapped onto two different sets of files). For integration with :doc:`staticfiles
 </ref/contrib/staticfiles>`, this should be the same as
-:setting:`STATICFILES_URL` followed by ``'admin/'``.
+:setting:`STATIC_URL` followed by ``'admin/'``.
 
 .. setting:: ADMINS
 
@@ -1122,12 +1122,12 @@ Default: ``''`` (Empty string)
 URL that handles the media served from :setting:`MEDIA_ROOT`, used
 for :doc:`managing stored files </topics/files>`.
 
-Example: ``"http://media.lawrence.com"``
+Example: ``"http://media.lawrence.com/"``
 
 Note that this should have a trailing slash if it has a path component.
 
- * Good: ``"http://www.example.com/static/"``
- * Bad: ``"http://www.example.com/static"``
+ * Good: ``"http://www.example.com/media/"``
+ * Bad: ``"http://www.example.com/media"``
 
 MESSAGE_LEVEL
 -------------
@@ -1486,6 +1486,49 @@ See :doc:`/ref/contrib/sites`.
 
 .. _site framework docs: ../sites/
 
+.. setting:: STATIC_ROOT
+
+STATIC_ROOT
+-----------
+
+Default: ``''`` (Empty string)
+
+The absolute path to the directory that contains static content.
+
+Example: ``"/home/example.com/static/"``
+
+When using the :djadmin:`collectstatic` management command of the optional,
+:doc:`staticfiles</ref/contrib/staticfiles>` app this will be used to collect
+static files into and served from :setting:`STATIC_URL`.
+
+In that case this is a **required setting**, unless you've overridden
+:setting:`STATICFILES_STORAGE` and are using a custom storage backend.
+
+This is not a place to store your static files permanently under version
+control; you should do that in directories that will be found by your
+:setting:`STATICFILES_FINDERS` (by default, per-app ``static/`` subdirectories,
+and any directories you include in :setting:`STATICFILES_DIRS`). Files from
+those locations will be collected into :setting:`STATIC_ROOT`.
+
+See :doc:`/ref/contrib/staticfiles` and :setting:`STATIC_URL`.
+
+.. setting:: STATIC_URL
+
+STATIC_URL
+----------
+
+Default: ``None``
+
+URL that handles the files served from :setting:`STATIC_ROOT`.
+
+Example: ``"/site_media/static/"`` or ``"http://static.example.com/"``
+
+If not ``None``, this will be used as the base path for
+:ref:`media definitions<form-media-paths>` and the
+:doc:`staticfiles app</ref/contrib/staticfiles>`.
+
+See :setting:`STATIC_ROOT`.
+
 .. setting:: TEMPLATE_CONTEXT_PROCESSORS
 
 TEMPLATE_CONTEXT_PROCESSORS
@@ -1496,7 +1539,8 @@ Default::
     ("django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
-    "django.contrib.staticfiles.context_processors.staticfiles",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
     "django.contrib.messages.context_processors.messages")
 
 A tuple of callables that are used to populate the context in ``RequestContext``.
@@ -1512,6 +1556,10 @@ of items to be merged into the context.
     The auth context processor was moved in this release from its old location
     ``django.core.context_processors.auth`` to
     ``django.contrib.auth.context_processors.auth``.
+
+.. versionadded:: 1.3
+    The ``django.core.context_processors.static`` context processor
+    was added in this release.
 
 .. setting:: TEMPLATE_DEBUG
 

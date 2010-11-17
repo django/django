@@ -190,27 +190,50 @@ also be defined in a dynamic fashion::
 See the section on `Media objects`_ for more details on how to construct
 return values for dynamic media properties.
 
+.. _form-media-paths:
+
 Paths in media definitions
 --------------------------
+
+.. versionchanged:: 1.3
 
 Paths used to specify media can be either relative or absolute. If a path
 starts with '/', 'http://' or 'https://', it will be interpreted as an absolute
 path, and left as-is. All other paths will be prepended with the value of
-``settings.MEDIA_URL``. For example, if the MEDIA_URL for your site was
-``http://media.example.com/``::
+the appropriate prefix.
 
-    class CalendarWidget(forms.TextInput):
-        class Media:
-            css = {
-                'all': ('/css/pretty.css',),
-            }
-            js = ('animations.js', 'http://othersite.com/actions.js')
+As part of the introduction of the
+:doc:`staticfiles app </ref/contrib/staticfiles>` two new settings were added
+to refer to "static content" (images, CSS, Javascript, etc.) that are needed
+to render a complete web page: :setting:`STATIC_URL` and :setting:`STATIC_ROOT`.
+
+To find the appropriate prefix to use, Django will check if the
+:setting:`STATIC_URL` setting is not ``None`` and automatically fall back
+to using :setting:`MEDIA_URL`. For example, if the :setting:`MEDIA_URL` for
+your site was ``'http://uploads.example.com/'`` and :setting:`STATIC_URL`
+was ``None``::
+
+    >>> class CalendarWidget(forms.TextInput):
+            class Media:
+                css = {
+                    'all': ('/css/pretty.css',),
+                }
+                js = ('animations.js', 'http://othersite.com/actions.js')
 
     >>> w = CalendarWidget()
     >>> print w.media
     <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://uploads.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
+
+But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
+
+    >>> w = CalendarWidget()
+    >>> print w.media
+    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://othersite.com/actions.js"></script>
+
 
 Media objects
 -------------

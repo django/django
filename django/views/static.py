@@ -17,8 +17,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpRespons
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.http import http_date
 
-from django.contrib.staticfiles.views import \
-    directory_index, was_modified_since, serve as staticfiles_serve
+from django.contrib.staticfiles.views import (directory_index,
+    was_modified_since, serve as staticfiles_serve)
 
 
 def serve(request, path, document_root=None, show_indexes=False, insecure=False):
