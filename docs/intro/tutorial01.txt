@@ -566,22 +566,6 @@ of this object. Let's fix that by editing the polls model (in the
         def __unicode__(self):
             return self.choice
 
-.. admonition:: If :meth:`~django.db.models.Model.__unicode__` doesn't seem to work
-
-   If you add the :meth:`~django.db.models.Model.__unicode__` method to your
-   models and don't see any change in how they're represented, you're most
-   likely using an old version of Django. (This version of the tutorial is
-   written for the latest development version of Django.) If you're using a
-   Subversion checkout of Django's development version (see :doc:`the
-   installation docs </topics/install>` for more information), you shouldn't have
-   any problems.
-
-   If you want to stick with an older version of Django, you'll want to switch
-   to `the Django 0.96 tutorial`_, because this tutorial covers several features
-   that only exist in the Django development version.
-
-.. _the Django 0.96 tutorial: http://www.djangoproject.com/documentation/0.96/tutorial01/
-
 It's important to add :meth:`~django.db.models.Model.__unicode__` methods to
 your models, not only for your own sanity when dealing with the interactive
 prompt, but also because objects' representations are used throughout Django's
