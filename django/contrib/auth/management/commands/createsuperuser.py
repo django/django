@@ -3,7 +3,6 @@ Management utility to create superusers.
 """
 
 import getpass
-import os
 import re
 import sys
 from optparse import make_option
@@ -30,10 +29,10 @@ class Command(BaseCommand):
         make_option('--email', dest='email', default=None,
             help='Specifies the email address for the superuser.'),
         make_option('--noinput', action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind. '    \
-                 'You must use --username and --email with --noinput, and '      \
-                 'superusers created with --noinput will not be able to log in '  \
-                 'until they\'re given a valid password.'),
+            help=('Tells Django to NOT prompt the user for input of any kind. '
+                  'You must use --username and --email with --noinput, and '
+                  'superusers created with --noinput will not be able to log '
+                  'in until they\'re given a valid password.')),
     )
     help = 'Used to create a superuser.'
 
@@ -58,12 +57,11 @@ class Command(BaseCommand):
 
         # Try to determine the current system user's username to use as a default.
         try:
-            import pwd
-            default_username = pwd.getpwuid(os.getuid())[0].replace(' ', '').lower()
+            default_username = getpass.getuser().replace(' ', '').lower()
         except (ImportError, KeyError):
-            # KeyError will be raised by getpwuid() if there is no
-            # corresponding entry in the /etc/passwd file (a very restricted
-            # chroot environment, for example).
+            # KeyError will be raised by os.getpwuid() (called by getuser())
+            # if there is no corresponding entry in the /etc/passwd file
+            # (a very restricted chroot environment, for example).
             default_username = ''
 
         # Determine whether the default username is taken, so we don't display
