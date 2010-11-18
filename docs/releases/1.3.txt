@@ -30,7 +30,7 @@ provided, along with a completely generic view base class that can be
 used as the basis for reusable applications that can be easily
 extended.
 
-See :doc:`the documentation on Generic Views</topics/generic-views>`
+See :doc:`the documentation on Class-based Generic Views</topics/class-based-views>`
 for more details. There is also a document to help you :doc:`convert
 your function-based generic views to class-based
 views</topics/generic-views-migration>`.
