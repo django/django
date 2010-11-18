@@ -58,6 +58,8 @@ class BrokenUnicodeMethod(models.Model):
         # object).
         return 'Názov: %s' % self.name
 
+class NonAutoPK(models.Model):
+    name = models.CharField(max_length=10, primary_key=True)
 
 __test__ = {'API_TESTS': """
 (NOTE: Part of the regression test here is merely parsing the model

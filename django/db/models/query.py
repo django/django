@@ -282,6 +282,8 @@ class QuerySet(object):
 
                 # Store the source database of the object
                 obj._state.db = self.db
+                # This object came from the database; it's not being added.
+                obj._state.adding = False
 
             for i, k in enumerate(extra_select):
                 setattr(obj, k, row[i])
@@ -1220,6 +1222,7 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
     # If an object was retrieved, set the database state.
     if obj:
         obj._state.db = using
+        obj._state.adding = False
 
     index_end = index_start + field_count + offset
     # Iterate over each related object, populating any
@@ -1475,6 +1478,7 @@ class RawQuerySet(object):
             setattr(instance, field, value)
 
         instance._state.db = self.query.using
+        instance._state.adding = False
 
         return instance
 
