@@ -3,6 +3,9 @@ from django.forms import *
 from django.utils.unittest import TestCase
 from django.utils.translation import ugettext_lazy, activate, deactivate
 
+from regressiontests.forms.models import Cheese
+
+
 class FormsRegressionsTestCase(TestCase):
     def test_class(self):
         # Tests to prevent against recurrences of earlier bugs.
@@ -120,3 +123,21 @@ class FormsRegressionsTestCase(TestCase):
 
         f = SomeForm({'field': ['<script>']})
         self.assertEqual(t.render(Context({'form': f})), u'<ul class="errorlist"><li>field<ul class="errorlist"><li>&quot;&lt;script&gt;&quot; is not a valid value for a primary key.</li></ul></li></ul>')
+
+    def test_regression_14234(self):
+        """
+        Re-cleaning an instance that was added via a ModelForm should not raise
+        a pk uniqueness error.
+
+        """
+        class CheeseForm(ModelForm):
+            class Meta:
+                model = Cheese
+
+        form = CheeseForm({
+            'name': 'Brie',
+        })
+        if form.is_valid():
+            obj = form.save()
+            obj.name = 'Camembert'
+            obj.full_clean()
