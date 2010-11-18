@@ -254,10 +254,8 @@ class BaseModelForm(BaseForm):
             # if we didn't get an instance, instantiate a new one
             self.instance = opts.model()
             object_data = {}
-            self.instance._state.adding = True
         else:
             self.instance = instance
-            self.instance._state.adding = False
             object_data = model_to_dict(instance, opts.fields, opts.exclude)
         # if initial was provided, it should override the values from instance
         if initial is not None:

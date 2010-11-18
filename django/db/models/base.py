@@ -265,7 +265,7 @@ class ModelState(object):
         # If true, uniqueness validation checks will consider this a new, as-yet-unsaved object.
         # Necessary for correct validation of new instances of objects with explicit (non-auto) PKs.
         # This impacts validation only; it has no effect on the actual save.
-        self.adding = False
+        self.adding = True
 
 class Model(object):
     __metaclass__ = ModelBase
