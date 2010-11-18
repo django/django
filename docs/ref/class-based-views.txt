@@ -975,7 +975,7 @@ ListView
 
     **Mixins**
 
-      * :class:`django.views.generic.base.MultipleObjectMixin`
+      * :class:`django.views.generic.list.MultipleObjectMixin`
       * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
 
 
