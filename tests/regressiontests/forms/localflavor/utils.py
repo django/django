@@ -1,6 +1,7 @@
+from unittest import TestCase
+
 from django.core.exceptions import ValidationError
 from django.core.validators import EMPTY_VALUES
-from django.utils.unittest import TestCase
 
 
 class LocalFlavorTestCase(TestCase):
@@ -23,16 +24,25 @@ class LocalFlavorTestCase(TestCase):
             self.assertEqual(optional.clean(input), output)
         # test invalid inputs
         for input, errors in invalid.items():
-            self.assertRaisesRegexp(ValidationError, unicode(errors),
-                required.clean, input
-            )
-            self.assertRaisesRegexp(ValidationError, unicode(errors),
-                optional.clean, input
-            )
+            try:
+                required.clean(input)
+            except ValidationError, e:
+                self.assertTrue(unicode(errors) in unicode(e))
+            else:
+                self.fail()
+            try:
+                optional.clean(input)
+            except ValidationError, e:
+                self.assertTrue(unicode(errors) in unicode(e))
+            else:
+                self.fail()
         # test required inputs
         error_required = u'This field is required'
-        for e in EMPTY_VALUES:
-            self.assertRaisesRegexp(ValidationError, error_required,
-                required.clean, e
-            )
-            self.assertEqual(optional.clean(e), u'')
+        for val in EMPTY_VALUES:
+            try:
+                required.clean(val)
+            except ValidationError, e:
+                self.assertTrue(error_required in unicode(e))
+            else:
+                self.fail()
+            self.assertEqual(optional.clean(val), u'')
