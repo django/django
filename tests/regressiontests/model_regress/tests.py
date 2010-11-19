@@ -1,6 +1,7 @@
 import datetime
 from operator import attrgetter
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import tzinfo
 
