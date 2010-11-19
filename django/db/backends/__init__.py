@@ -22,7 +22,7 @@ class BaseDatabaseWrapper(local):
         self.alias = alias
 
     def __eq__(self, other):
-        return self.settings_dict == other.settings_dict
+        return self.alias == other.alias
 
     def __ne__(self, other):
         return not self == other
