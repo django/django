@@ -827,29 +827,29 @@ discovered, please follow these guidelines:
       have a reversion policy doesn't relax your responsibility to aim for
       the highest quality possible. Really: double-check your work before
       you commit it in the first place!
-      
+
     * If possible, have the original author revert his/her own commit.
-      
+
     * Don't revert another author's changes without permission from the
       original author.
-      
+
     * If the original author can't be reached (within a reasonable amount
       of time -- a day or so) and the problem is severe -- crashing bug,
       major test failures, etc -- then ask for objections on django-dev
       then revert if there are none.
-      
+
     * If the problem is small (a feature commit after feature freeze,
       say), wait it out.
-      
+
     * If there's a disagreement between the committer and the
       reverter-to-be then try to work it out on the `django-developers`_
       mailing list. If an agreement can't be reached then it should
       be put to a vote.
-      
+
     * If the commit introduced a confirmed, disclosed security
       vulnerability then the commit may be reverted immediately without
       permission from anyone.
-    
+
     * The release branch maintainer may back out commits to the release
       branch without permission if the commit breaks the release branch.
 
@@ -892,28 +892,12 @@ info. Your :setting:`DATABASES` setting needs to define two databases:
       want. It doesn't need to use the same backend as the ``default``
       database (although it can use the same backend if you want to).
 
-If you're using the SQLite database backend, you need to define
-:setting:`ENGINE` for both databases, plus a
-:setting:`TEST_NAME` for the ``other`` database. The
-following is a minimal settings file that can be used to test SQLite::
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3'
-        },
-        'other': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'TEST_NAME': 'other_db'
-        }
-    }
-
-As a convenience, this settings file is included in your Django
-distribution. It is called ``test_sqlite``, and is included in
-the ``tests`` directory. This allows you to get started running
-the tests against the sqlite database without doing anything on
-your filesystem. However it should be noted that running against
-other database backends is recommended for certain types of test
-cases.
+As a convenience, a minimal settings file, using two in memory SQLite
+databases, is included in your Django distribution. It is called
+``test_sqlite``, and is included in the ``tests`` directory. This allows you to
+get started running the tests against the sqlite database without doing
+anything on your filesystem. However it should be noted that running against
+other database backends is recommended for certain types of test cases.
 
 To run the tests with this included settings file, ``cd``
 to the ``tests/`` directory and type:
@@ -1230,9 +1214,9 @@ voting mechanism above. A proposition will be considered carried by the core tea
 if:
 
     * There are three "+1" votes from members of the core team.
-    
+
     * There is no "-1" vote from any member of the core team.
-    
+
     * The BDFLs haven't stepped in and executed their positive or negative
       veto.
 
@@ -1259,7 +1243,7 @@ Core committers
     codebase, a solid track record of being polite and helpful on the
     mailing lists, and a proven desire to dedicate serious time to Django's
     development. The bar is high for full commit access.
-    
+
 Partial committers
     These are people who are "domain experts." They have direct check-in access
     to the subsystems that fall under their jurisdiction, and they're given a

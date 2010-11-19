@@ -18,6 +18,5 @@ DATABASES = {
     },
     'other': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'TEST_NAME': 'other_db'
     }
 }
