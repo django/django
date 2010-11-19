@@ -15,8 +15,12 @@ Sphinx -- ``easy_install Sphinx`` should do the trick.
 
 .. note::
 
-    The Django documentation can be generated with Sphinx version 0.6 or
-    newer, but we recommend using Sphinx 1.0.2 or newer.
+    Building the Django documentation requires Sphinx 1.0.2 or newer. Sphinx
+    also requires the Pygments__ library for syntax highlighting; building the
+    Django documentation requires Pygments 1.1 or newer (a new-enough version
+    should automatically be installed along with Sphinx).
+
+__ http://pygments.org
 
 Then, building the HTML is easy; just ``make html`` from the ``docs`` directory.
 
