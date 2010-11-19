@@ -1,4 +1,3 @@
-from django import template
 from django.db import transaction
 from django.conf import settings
 from django.contrib import admin
@@ -137,6 +136,17 @@ class UserAdmin(admin.ModelAdmin):
             'root_path': self.admin_site.root_path,
         }, context_instance=RequestContext(request))
 
+    def response_add(self, request, obj, post_url_continue='../%s/'):
+        """
+        Determines the HttpResponse for the add_view stage. It mostly defers to
+        its superclass implementation but is customized because the User model
+        has a slightly different workflow.
+        """
+        if '_addanother' not in request.POST:
+            # The 'Save' button should act like the 'Save and continue
+            # editing' button
+            request.POST['_continue'] = 1
+        return super(UserAdmin, self).response_add(request, obj, post_url_continue)
 
 admin.site.register(Group, GroupAdmin)
 admin.site.register(User, UserAdmin)

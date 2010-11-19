@@ -17,7 +17,7 @@ from django.utils import formats
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
-from django.utils.translation import get_date_formats, activate, deactivate
+from django.utils.translation import activate, deactivate
 import django.template.context
 
 # local test models
@@ -1515,7 +1515,7 @@ class AdminActionsTest(TestCase):
     def test_action_column_class(self):
         "Tests that the checkbox column class is present in the response"
         response = self.client.get('/test_admin/admin/admin_views/subscriber/')
-        self.assertNotEquals(response.context["action_form"], None)
+        self.assertNotEqual(response.context["action_form"], None)
         self.assert_('action-checkbox-column' in response.content,
             "Expected an action-checkbox-column in response")
 
@@ -2141,7 +2141,19 @@ class UserAdminTest(TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def test_user_creation(self):
+    def test_save_button(self):
+        user_count = User.objects.count()
+        response = self.client.post('/test_admin/admin/auth/user/add/', {
+            'username': 'newuser',
+            'password1': 'newpassword',
+            'password2': 'newpassword',
+        })
+        new_user = User.objects.order_by('-id')[0]
+        self.assertRedirects(response, '/test_admin/admin/auth/user/%s/' % new_user.pk)
+        self.assertEqual(User.objects.count(), user_count + 1)
+        self.assertNotEqual(new_user.password, UNUSABLE_PASSWORD)
+
+    def test_save_continue_editing_button(self):
         user_count = User.objects.count()
         response = self.client.post('/test_admin/admin/auth/user/add/', {
             'username': 'newuser',
@@ -2151,8 +2163,8 @@ class UserAdminTest(TestCase):
         })
         new_user = User.objects.order_by('-id')[0]
         self.assertRedirects(response, '/test_admin/admin/auth/user/%s/' % new_user.pk)
-        self.assertEquals(User.objects.count(), user_count + 1)
-        self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
+        self.assertEqual(User.objects.count(), user_count + 1)
+        self.assertNotEqual(new_user.password, UNUSABLE_PASSWORD)
 
     def test_password_mismatch(self):
         response = self.client.post('/test_admin/admin/auth/user/add/', {
@@ -2160,21 +2172,22 @@ class UserAdminTest(TestCase):
             'password1': 'newpassword',
             'password2': 'mismatch',
         })
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         adminform = response.context['adminform']
-        self.assert_('password' not in adminform.form.errors)
-        self.assertEquals(adminform.form.errors['password2'],
+        self.assertTrue('password' not in adminform.form.errors)
+        self.assertEqual(adminform.form.errors['password2'],
                           [u"The two password fields didn't match."])
 
     def test_user_fk_popup(self):
         response = self.client.get('/test_admin/admin/admin_views/album/add/')
-        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '/test_admin/admin/auth/user/add')
         self.assertContains(response, 'class="add-another" id="add_id_owner" onclick="return showAddAnotherPopup(this);"')
         response = self.client.get('/test_admin/admin/auth/user/add/?_popup=1')
         self.assertNotContains(response, 'name="_continue"')
+        self.assertNotContains(response, 'name="_addanother"')
 
-    def test_user_add_another(self):
+    def test_save_add_another_button(self):
         user_count = User.objects.count()
         response = self.client.post('/test_admin/admin/auth/user/add/', {
             'username': 'newuser',
@@ -2184,8 +2197,8 @@ class UserAdminTest(TestCase):
         })
         new_user = User.objects.order_by('-id')[0]
         self.assertRedirects(response, '/test_admin/admin/auth/user/add/')
-        self.assertEquals(User.objects.count(), user_count + 1)
-        self.assertNotEquals(new_user.password, UNUSABLE_PASSWORD)
+        self.assertEqual(User.objects.count(), user_count + 1)
+        self.assertNotEqual(new_user.password, UNUSABLE_PASSWORD)
 
 try:
     # If docutils isn't installed, skip the AdminDocs tests.
