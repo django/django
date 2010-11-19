@@ -11,4 +11,4 @@ from util import *
 from validators import TestFieldWithValidators
 from widgets import *
 
-from regressiontests.forms.localflavortests import __test__
+from regressiontests.forms.localflavortests import __test__, DELocalFlavorTests
