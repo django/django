@@ -3,6 +3,7 @@
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
+from django.utils.encoding import smart_str
 
 class InvalidCacheBackendError(ImproperlyConfigured):
     pass
@@ -13,8 +14,17 @@ class CacheKeyWarning(DjangoRuntimeWarning):
 # Memcached does not accept keys longer than this.
 MEMCACHE_MAX_KEY_LENGTH = 250
 
+def default_key_func(key, key_prefix, version):
+    """Default function to generate keys.
+
+    Constructs the key used by all other methods. By default it prepends
+    the `key_prefix'. CACHE_KEY_FUNCTION can be used to specify an alternate
+    function with custom key making behavior.
+    """
+    return ':'.join([key_prefix, str(version), smart_str(key)])
+
 class BaseCache(object):
-    def __init__(self, params):
+    def __init__(self, params, key_prefix='', version=1, key_func=None):
         timeout = params.get('timeout', 300)
         try:
             timeout = int(timeout)
@@ -34,7 +44,25 @@ class BaseCache(object):
         except (ValueError, TypeError):
             self._cull_frequency = 3
 
-    def add(self, key, value, timeout=None):
+        self.key_prefix = smart_str(key_prefix)
+        self.version = version
+        self.key_func = key_func or default_key_func
+
+    def make_key(self, key, version=None):
+        """Constructs the key used by all other methods. By default it
+        uses the key_func to generate a key (which, by default,
+        prepends the `key_prefix' and 'version'). An different key
+        function can be provided at the time of cache construction;
+        alternatively, you can subclass the cache backend to provide
+        custom key making behavior.
+        """
+        if version is None:
+            version = self.version
+
+        new_key = self.key_func(key, self.key_prefix, version)
+        return new_key
+
+    def add(self, key, value, timeout=None, version=None):
         """
         Set a value in the cache if the key does not already exist. If
         timeout is given, that timeout will be used for the key; otherwise
@@ -44,27 +72,27 @@ class BaseCache(object):
         """
         raise NotImplementedError
 
-    def get(self, key, default=None):
+    def get(self, key, default=None, version=None):
         """
         Fetch a given key from the cache. If the key does not exist, return
         default, which itself defaults to None.
         """
         raise NotImplementedError
 
-    def set(self, key, value, timeout=None):
+    def set(self, key, value, timeout=None, version=None):
         """
         Set a value in the cache. If timeout is given, that timeout will be
         used for the key; otherwise the default cache timeout will be used.
         """
         raise NotImplementedError
 
-    def delete(self, key):
+    def delete(self, key, version=None):
         """
         Delete a key from the cache, failing silently.
         """
         raise NotImplementedError
 
-    def get_many(self, keys):
+    def get_many(self, keys, version=None):
         """
         Fetch a bunch of keys from the cache. For certain backends (memcached,
         pgsql) this can be *much* faster when fetching multiple values.
@@ -74,34 +102,35 @@ class BaseCache(object):
         """
         d = {}
         for k in keys:
-            val = self.get(k)
+            val = self.get(k, version=version)
             if val is not None:
                 d[k] = val
         return d
 
-    def has_key(self, key):
+    def has_key(self, key, version=None):
         """
         Returns True if the key is in the cache and has not expired.
         """
-        return self.get(key) is not None
+        return self.get(key, version=version) is not None
 
-    def incr(self, key, delta=1):
+    def incr(self, key, delta=1, version=None):
         """
         Add delta to value in the cache. If the key does not exist, raise a
         ValueError exception.
         """
-        if key not in self:
+        value = self.get(key, version=version)
+        if value is None:
             raise ValueError("Key '%s' not found" % key)
-        new_value = self.get(key) + delta
-        self.set(key, new_value)
+        new_value = value + delta
+        self.set(key, new_value, version=version)
         return new_value
 
-    def decr(self, key, delta=1):
+    def decr(self, key, delta=1, version=None):
         """
         Subtract delta from value in the cache. If the key does not exist, raise
         a ValueError exception.
         """
-        return self.incr(key, -delta)
+        return self.incr(key, -delta, version=version)
 
     def __contains__(self, key):
         """
@@ -112,7 +141,7 @@ class BaseCache(object):
         # if a subclass overrides it.
         return self.has_key(key)
 
-    def set_many(self, data, timeout=None):
+    def set_many(self, data, timeout=None, version=None):
         """
         Set a bunch of values in the cache at once from a dict of key/value
         pairs.  For certain backends (memcached), this is much more efficient
@@ -122,16 +151,16 @@ class BaseCache(object):
         the default cache timeout will be used.
         """
         for key, value in data.items():
-            self.set(key, value, timeout)
+            self.set(key, value, timeout=timeout, version=version)
 
-    def delete_many(self, keys):
+    def delete_many(self, keys, version=None):
         """
         Set a bunch of values in the cache at once.  For certain backends
         (memcached), this is much more efficient than calling delete() multiple
         times.
         """
         for key in keys:
-            self.delete(key)
+            self.delete(key, version=version)
 
     def clear(self):
         """Remove *all* values from the cache at once."""
@@ -154,3 +183,23 @@ class BaseCache(object):
                         'errors if used with memcached: %r' % key,
                               CacheKeyWarning)
 
+    def incr_version(self, key, delta=1, version=None):
+        """Adds delta to the cache version for the supplied key. Returns the
+        new version.
+        """
+        if version is None:
+            version = self.version
+
+        value = self.get(key, version=version)
+        if value is None:
+            raise ValueError("Key '%s' not found" % key)
+
+        self.set(key, value, version=version+delta)
+        self.delete(key, version=version)
+        return version+delta
+
+    def decr_version(self, key, delta=1, version=None):
+        """Substracts delta from the cache version for the supplied key. Returns
+        the new version.
+        """
+        return self.incr_version(key, -delta, version)

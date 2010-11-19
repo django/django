@@ -12,22 +12,23 @@ from django.core.cache.backends.base import BaseCache
 from django.utils.hashcompat import md5_constructor
 
 class CacheClass(BaseCache):
-    def __init__(self, dir, params):
-        BaseCache.__init__(self, params)
+    def __init__(self, dir, params, key_prefix='', version=1, key_func=None):
+        BaseCache.__init__(self, params, key_prefix, version, key_func)
         self._dir = dir
         if not os.path.exists(self._dir):
             self._createdir()
 
-    def add(self, key, value, timeout=None):
-        self.validate_key(key)
-        if self.has_key(key):
+    def add(self, key, value, timeout=None, version=None):
+        if self.has_key(key, version=version):
             return False
 
-        self.set(key, value, timeout)
+        self.set(key, value, timeout, version=version)
         return True
 
-    def get(self, key, default=None):
+    def get(self, key, default=None, version=None):
+        key = self.make_key(key, version=version)
         self.validate_key(key)
+
         fname = self._key_to_file(key)
         try:
             f = open(fname, 'rb')
@@ -44,8 +45,10 @@ class CacheClass(BaseCache):
             pass
         return default
 
-    def set(self, key, value, timeout=None):
+    def set(self, key, value, timeout=None, version=None):
+        key = self.make_key(key, version=version)
         self.validate_key(key)
+
         fname = self._key_to_file(key)
         dirname = os.path.dirname(fname)
 
@@ -68,7 +71,8 @@ class CacheClass(BaseCache):
         except (IOError, OSError):
             pass
 
-    def delete(self, key):
+    def delete(self, key, version=None):
+        key = self.make_key(key, version=version)
         self.validate_key(key)
         try:
             self._delete(self._key_to_file(key))
@@ -85,7 +89,8 @@ class CacheClass(BaseCache):
         except (IOError, OSError):
             pass
 
-    def has_key(self, key):
+    def has_key(self, key, version=None):
+        key = self.make_key(key, version=version)
         self.validate_key(key)
         fname = self._key_to_file(key)
         try:
@@ -140,7 +145,7 @@ class CacheClass(BaseCache):
         Thus, a cache key of "foo" gets turnned into a file named
         ``{cache-dir}ac/bd/18db4cc2f85cedef654fccc4a4d8``.
         """
-        path = md5_constructor(key.encode('utf-8')).hexdigest()
+        path = md5_constructor(key).hexdigest()
         path = os.path.join(path[:2], path[2:4], path[4:])
         return os.path.join(self._dir, path)
 

@@ -155,6 +155,9 @@ requests. These include:
       :meth:`~django.test.client.Client.assertNumQueries` -- making it
       easier to test the database activity associated with a view.
 
+    * :ref:`Versioning <cache_versioning>`, :ref:`site-wide prefixing
+      <cache_key_prefixing>` and :ref:`transformation
+      <cache_key_transformation>` has been added to the cache API.
 
 .. _backwards-incompatible-changes-1.3:
 

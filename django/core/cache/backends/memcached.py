@@ -3,7 +3,6 @@
 import time
 
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
-from django.utils.encoding import smart_unicode, smart_str
 
 try:
     import cmemcache as memcache
@@ -19,8 +18,8 @@ except ImportError:
         raise InvalidCacheBackendError("Memcached cache backend requires either the 'memcache' or 'cmemcache' library")
 
 class CacheClass(BaseCache):
-    def __init__(self, server, params):
-        BaseCache.__init__(self, params)
+    def __init__(self, server, params, key_prefix='', version=1, key_func=None):
+        BaseCache.__init__(self, params, key_prefix, version, key_func)
         self._cache = memcache.Client(server.split(';'))
 
     def _get_memcache_timeout(self, timeout):
@@ -39,30 +38,43 @@ class CacheClass(BaseCache):
             timeout += int(time.time())
         return timeout
 
-    def add(self, key, value, timeout=0):
+    def add(self, key, value, timeout=0, version=None):
+        key = self.make_key(key, version=version)
         if isinstance(value, unicode):
             value = value.encode('utf-8')
-        return self._cache.add(smart_str(key), value, self._get_memcache_timeout(timeout))
+        return self._cache.add(key, value, self._get_memcache_timeout(timeout))
 
-    def get(self, key, default=None):
-        val = self._cache.get(smart_str(key))
+    def get(self, key, default=None, version=None):
+        key = self.make_key(key, version=version)
+        val = self._cache.get(key)
         if val is None:
             return default
         return val
 
-    def set(self, key, value, timeout=0):
-        self._cache.set(smart_str(key), value, self._get_memcache_timeout(timeout))
+    def set(self, key, value, timeout=0, version=None):
+        key = self.make_key(key, version=version)
+        self._cache.set(key, value, self._get_memcache_timeout(timeout))
 
-    def delete(self, key):
-        self._cache.delete(smart_str(key))
+    def delete(self, key, version=None):
+        key = self.make_key(key, version=version)
+        self._cache.delete(key)
 
-    def get_many(self, keys):
-        return self._cache.get_multi(map(smart_str,keys))
+    def get_many(self, keys, version=None):
+        new_keys = map(lambda x: self.make_key(x, version=version), keys)
+        ret = self._cache.get_multi(new_keys)
+        if ret:
+            _ = {}
+            m = dict(zip(new_keys, keys))
+            for k, v in ret.items():
+                _[m[k]] = v
+            ret = _
+        return ret
 
     def close(self, **kwargs):
         self._cache.disconnect_all()
 
-    def incr(self, key, delta=1):
+    def incr(self, key, delta=1, version=None):
+        key = self.make_key(key, version=version)
         try:
             val = self._cache.incr(key, delta)
 
@@ -76,7 +88,8 @@ class CacheClass(BaseCache):
 
         return val
 
-    def decr(self, key, delta=1):
+    def decr(self, key, delta=1, version=None):
+        key = self.make_key(key, version=version)
         try:
             val = self._cache.decr(key, delta)
 
@@ -89,16 +102,18 @@ class CacheClass(BaseCache):
             raise ValueError("Key '%s' not found" % key)
         return val
 
-    def set_many(self, data, timeout=0):
+    def set_many(self, data, timeout=0, version=None):
         safe_data = {}
         for key, value in data.items():
+            key = self.make_key(key, version=version)
             if isinstance(value, unicode):
                 value = value.encode('utf-8')
-            safe_data[smart_str(key)] = value
+            safe_data[key] = value
         self._cache.set_multi(safe_data, self._get_memcache_timeout(timeout))
 
-    def delete_many(self, keys):
-        self._cache.delete_multi(map(smart_str, keys))
+    def delete_many(self, keys, version=None):
+        l = lambda x: self.make_key(x, version=version)
+        self._cache.delete_multi(map(l, keys))
 
     def clear(self):
         self._cache.flush_all()

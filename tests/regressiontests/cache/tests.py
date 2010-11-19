@@ -145,11 +145,21 @@ class DummyCacheTests(unittest.TestCase):
         "clear does nothing for the dummy cache backend"
         self.cache.clear()
 
+    def test_incr_version(self):
+        "Dummy cache versions can't be incremented"
+        self.cache.set('answer', 42)
+        self.assertRaises(ValueError, self.cache.incr_version, 'answer')
+        self.assertRaises(ValueError, self.cache.incr_version, 'does_not_exist')
+
+    def test_decr_version(self):
+        "Dummy cache versions can't be decremented"
+        self.cache.set('answer', 42)
+        self.assertRaises(ValueError, self.cache.decr_version, 'answer')
+        self.assertRaises(ValueError, self.cache.decr_version, 'does_not_exist')
+
 
 class BaseCacheTests(object):
     # A common set of tests to apply to all cache backends
-    def tearDown(self):
-        self.cache.clear()
 
     def test_simple(self):
         # Simple cache set/get works
@@ -162,6 +172,18 @@ class BaseCacheTests(object):
         result = self.cache.add("addkey1", "newvalue")
         self.assertEqual(result, False)
         self.assertEqual(self.cache.get("addkey1"), "value")
+
+    def test_prefix(self):
+        # Test for same cache key conflicts between shared backend
+        self.cache.set('somekey', 'value')
+
+        # should not be set in the prefixed cache
+        self.assertFalse(self.prefix_cache.has_key('somekey'))
+
+        self.prefix_cache.set('somekey', 'value2')
+
+        self.assertEqual(self.cache.get('somekey'), 'value')
+        self.assertEqual(self.prefix_cache.get('somekey'), 'value2')
 
     def test_non_existent(self):
         # Non-existent cache keys return as None/default
@@ -376,6 +398,13 @@ class BaseCacheTests(object):
         with more liberal key rules. Refs #6447.
 
         """
+        # mimic custom ``make_key`` method being defined since the default will
+        # never show the below warnings
+        def func(key, *args):
+            return key
+
+        old_func = self.cache.key_func
+        self.cache.key_func = func
         # On Python 2.6+ we could use the catch_warnings context
         # manager to test this warning nicely. Since we can't do that
         # yet, the cleanest option is to temporarily ask for
@@ -390,6 +419,285 @@ class BaseCacheTests(object):
             self.assertRaises(CacheKeyWarning, self.cache.set, 'a' * 251, 'value')
         finally:
             restore_warnings_state(_warnings_state)
+            self.cache.key_func = old_func
+
+    def test_cache_versioning_get_set(self):
+        # set, using default version = 1
+        self.cache.set('answer1', 42)
+        self.assertEqual(self.cache.get('answer1'), 42)
+        self.assertEqual(self.cache.get('answer1', version=1), 42)
+        self.assertEqual(self.cache.get('answer1', version=2), None)
+
+        self.assertEqual(self.v2_cache.get('answer1'), None)
+        # print '---'
+        # print 'c1',self.cache._cache
+        # print 'v2',self.v2_cache._cache
+        self.assertEqual(self.v2_cache.get('answer1', version=1), 42)
+        self.assertEqual(self.v2_cache.get('answer1', version=2), None)
+
+        # set, default version = 1, but manually override version = 2
+        self.cache.set('answer2', 42, version=2)
+        self.assertEqual(self.cache.get('answer2'), None)
+        self.assertEqual(self.cache.get('answer2', version=1), None)
+        self.assertEqual(self.cache.get('answer2', version=2), 42)
+
+        self.assertEqual(self.v2_cache.get('answer2'), 42)
+        self.assertEqual(self.v2_cache.get('answer2', version=1), None)
+        self.assertEqual(self.v2_cache.get('answer2', version=2), 42)
+
+        # v2 set, using default version = 2
+        self.v2_cache.set('answer3', 42)
+        self.assertEqual(self.cache.get('answer3'), None)
+        self.assertEqual(self.cache.get('answer3', version=1), None)
+        self.assertEqual(self.cache.get('answer3', version=2), 42)
+
+        self.assertEqual(self.v2_cache.get('answer3'), 42)
+        self.assertEqual(self.v2_cache.get('answer3', version=1), None)
+        self.assertEqual(self.v2_cache.get('answer3', version=2), 42)
+
+        # v2 set, default version = 2, but manually override version = 1
+        self.v2_cache.set('answer4', 42, version=1)
+        self.assertEqual(self.cache.get('answer4'), 42)
+        self.assertEqual(self.cache.get('answer4', version=1), 42)
+        self.assertEqual(self.cache.get('answer4', version=2), None)
+
+        self.assertEqual(self.v2_cache.get('answer4'), None)
+        self.assertEqual(self.v2_cache.get('answer4', version=1), 42)
+        self.assertEqual(self.v2_cache.get('answer4', version=2), None)
+
+    def test_cache_versioning_add(self):
+
+        # add, default version = 1, but manually override version = 2
+        self.cache.add('answer1', 42, version=2)
+        self.assertEqual(self.cache.get('answer1', version=1), None)
+        self.assertEqual(self.cache.get('answer1', version=2), 42)
+
+        self.cache.add('answer1', 37, version=2)
+        self.assertEqual(self.cache.get('answer1', version=1), None)
+        self.assertEqual(self.cache.get('answer1', version=2), 42)
+
+        self.cache.add('answer1', 37, version=1)
+        self.assertEqual(self.cache.get('answer1', version=1), 37)
+        self.assertEqual(self.cache.get('answer1', version=2), 42)
+
+        # v2 add, using default version = 2
+        self.v2_cache.add('answer2', 42)
+        self.assertEqual(self.cache.get('answer2', version=1), None)
+        self.assertEqual(self.cache.get('answer2', version=2), 42)
+
+        self.v2_cache.add('answer2', 37)
+        self.assertEqual(self.cache.get('answer2', version=1), None)
+        self.assertEqual(self.cache.get('answer2', version=2), 42)
+
+        self.v2_cache.add('answer2', 37, version=1)
+        self.assertEqual(self.cache.get('answer2', version=1), 37)
+        self.assertEqual(self.cache.get('answer2', version=2), 42)
+
+        # v2 add, default version = 2, but manually override version = 1
+        self.v2_cache.add('answer3', 42, version=1)
+        self.assertEqual(self.cache.get('answer3', version=1), 42)
+        self.assertEqual(self.cache.get('answer3', version=2), None)
+
+        self.v2_cache.add('answer3', 37, version=1)
+        self.assertEqual(self.cache.get('answer3', version=1), 42)
+        self.assertEqual(self.cache.get('answer3', version=2), None)
+
+        self.v2_cache.add('answer3', 37)
+        self.assertEqual(self.cache.get('answer3', version=1), 42)
+        self.assertEqual(self.cache.get('answer3', version=2), 37)
+
+    def test_cache_versioning_has_key(self):
+        self.cache.set('answer1', 42)
+
+        # has_key
+        self.assertTrue(self.cache.has_key('answer1'))
+        self.assertTrue(self.cache.has_key('answer1', version=1))
+        self.assertFalse(self.cache.has_key('answer1', version=2))
+
+        self.assertFalse(self.v2_cache.has_key('answer1'))
+        self.assertTrue(self.v2_cache.has_key('answer1', version=1))
+        self.assertFalse(self.v2_cache.has_key('answer1', version=2))
+
+    def test_cache_versioning_delete(self):
+        self.cache.set('answer1', 37, version=1)
+        self.cache.set('answer1', 42, version=2)
+        self.cache.delete('answer1')
+        self.assertEqual(self.cache.get('answer1', version=1), None)
+        self.assertEqual(self.cache.get('answer1', version=2), 42)
+
+        self.cache.set('answer2', 37, version=1)
+        self.cache.set('answer2', 42, version=2)
+        self.cache.delete('answer2', version=2)
+        self.assertEqual(self.cache.get('answer2', version=1), 37)
+        self.assertEqual(self.cache.get('answer2', version=2), None)
+
+        self.cache.set('answer3', 37, version=1)
+        self.cache.set('answer3', 42, version=2)
+        self.v2_cache.delete('answer3')
+        self.assertEqual(self.cache.get('answer3', version=1), 37)
+        self.assertEqual(self.cache.get('answer3', version=2), None)
+
+        self.cache.set('answer4', 37, version=1)
+        self.cache.set('answer4', 42, version=2)
+        self.v2_cache.delete('answer4', version=1)
+        self.assertEqual(self.cache.get('answer4', version=1), None)
+        self.assertEqual(self.cache.get('answer4', version=2), 42)
+
+    def test_cache_versioning_incr_decr(self):
+        self.cache.set('answer1', 37, version=1)
+        self.cache.set('answer1', 42, version=2)
+        self.cache.incr('answer1')
+        self.assertEqual(self.cache.get('answer1', version=1), 38)
+        self.assertEqual(self.cache.get('answer1', version=2), 42)
+        self.cache.decr('answer1')
+        self.assertEqual(self.cache.get('answer1', version=1), 37)
+        self.assertEqual(self.cache.get('answer1', version=2), 42)
+
+        self.cache.set('answer2', 37, version=1)
+        self.cache.set('answer2', 42, version=2)
+        self.cache.incr('answer2', version=2)
+        self.assertEqual(self.cache.get('answer2', version=1), 37)
+        self.assertEqual(self.cache.get('answer2', version=2), 43)
+        self.cache.decr('answer2', version=2)
+        self.assertEqual(self.cache.get('answer2', version=1), 37)
+        self.assertEqual(self.cache.get('answer2', version=2), 42)
+
+        self.cache.set('answer3', 37, version=1)
+        self.cache.set('answer3', 42, version=2)
+        self.v2_cache.incr('answer3')
+        self.assertEqual(self.cache.get('answer3', version=1), 37)
+        self.assertEqual(self.cache.get('answer3', version=2), 43)
+        self.v2_cache.decr('answer3')
+        self.assertEqual(self.cache.get('answer3', version=1), 37)
+        self.assertEqual(self.cache.get('answer3', version=2), 42)
+
+        self.cache.set('answer4', 37, version=1)
+        self.cache.set('answer4', 42, version=2)
+        self.v2_cache.incr('answer4', version=1)
+        self.assertEqual(self.cache.get('answer4', version=1), 38)
+        self.assertEqual(self.cache.get('answer4', version=2), 42)
+        self.v2_cache.decr('answer4', version=1)
+        self.assertEqual(self.cache.get('answer4', version=1), 37)
+        self.assertEqual(self.cache.get('answer4', version=2), 42)
+
+    def test_cache_versioning_get_set_many(self):
+        # set, using default version = 1
+        self.cache.set_many({'ford1': 37, 'arthur1': 42})
+        self.assertEqual(self.cache.get_many(['ford1','arthur1']),
+                         {'ford1': 37, 'arthur1': 42})
+        self.assertEqual(self.cache.get_many(['ford1','arthur1'], version=1),
+                         {'ford1': 37, 'arthur1': 42})
+        self.assertEqual(self.cache.get_many(['ford1','arthur1'], version=2), {})
+
+        self.assertEqual(self.v2_cache.get_many(['ford1','arthur1']), {})
+        self.assertEqual(self.v2_cache.get_many(['ford1','arthur1'], version=1),
+                         {'ford1': 37, 'arthur1': 42})
+        self.assertEqual(self.v2_cache.get_many(['ford1','arthur1'], version=2), {})
+
+        # set, default version = 1, but manually override version = 2
+        self.cache.set_many({'ford2': 37, 'arthur2': 42}, version=2)
+        self.assertEqual(self.cache.get_many(['ford2','arthur2']), {})
+        self.assertEqual(self.cache.get_many(['ford2','arthur2'], version=1), {})
+        self.assertEqual(self.cache.get_many(['ford2','arthur2'], version=2),
+                         {'ford2': 37, 'arthur2': 42})
+
+        self.assertEqual(self.v2_cache.get_many(['ford2','arthur2']),
+                         {'ford2': 37, 'arthur2': 42})
+        self.assertEqual(self.v2_cache.get_many(['ford2','arthur2'], version=1), {})
+        self.assertEqual(self.v2_cache.get_many(['ford2','arthur2'], version=2),
+                         {'ford2': 37, 'arthur2': 42})
+
+        # v2 set, using default version = 2
+        self.v2_cache.set_many({'ford3': 37, 'arthur3': 42})
+        self.assertEqual(self.cache.get_many(['ford3','arthur3']), {})
+        self.assertEqual(self.cache.get_many(['ford3','arthur3'], version=1), {})
+        self.assertEqual(self.cache.get_many(['ford3','arthur3'], version=2),
+                         {'ford3': 37, 'arthur3': 42})
+
+        self.assertEqual(self.v2_cache.get_many(['ford3','arthur3']),
+                         {'ford3': 37, 'arthur3': 42})
+        self.assertEqual(self.v2_cache.get_many(['ford3','arthur3'], version=1), {})
+        self.assertEqual(self.v2_cache.get_many(['ford3','arthur3'], version=2),
+                         {'ford3': 37, 'arthur3': 42})
+
+        # v2 set, default version = 2, but manually override version = 1
+        self.v2_cache.set_many({'ford4': 37, 'arthur4': 42}, version=1)
+        self.assertEqual(self.cache.get_many(['ford4','arthur4']),
+                         {'ford4': 37, 'arthur4': 42})
+        self.assertEqual(self.cache.get_many(['ford4','arthur4'], version=1),
+                         {'ford4': 37, 'arthur4': 42})
+        self.assertEqual(self.cache.get_many(['ford4','arthur4'], version=2), {})
+
+        self.assertEqual(self.v2_cache.get_many(['ford4','arthur4']), {})
+        self.assertEqual(self.v2_cache.get_many(['ford4','arthur4'], version=1),
+                         {'ford4': 37, 'arthur4': 42})
+        self.assertEqual(self.v2_cache.get_many(['ford4','arthur4'], version=2), {})
+
+    def test_incr_version(self):
+        self.cache.set('answer', 42, version=2)
+        self.assertEqual(self.cache.get('answer'), None)
+        self.assertEqual(self.cache.get('answer', version=1), None)
+        self.assertEqual(self.cache.get('answer', version=2), 42)
+        self.assertEqual(self.cache.get('answer', version=3), None)
+
+        self.assertEqual(self.cache.incr_version('answer', version=2), 3)
+        self.assertEqual(self.cache.get('answer'), None)
+        self.assertEqual(self.cache.get('answer', version=1), None)
+        self.assertEqual(self.cache.get('answer', version=2), None)
+        self.assertEqual(self.cache.get('answer', version=3), 42)
+
+        self.v2_cache.set('answer2', 42)
+        self.assertEqual(self.v2_cache.get('answer2'), 42)
+        self.assertEqual(self.v2_cache.get('answer2', version=1), None)
+        self.assertEqual(self.v2_cache.get('answer2', version=2), 42)
+        self.assertEqual(self.v2_cache.get('answer2', version=3), None)
+
+        self.assertEqual(self.v2_cache.incr_version('answer2'), 3)
+        self.assertEqual(self.v2_cache.get('answer2'), None)
+        self.assertEqual(self.v2_cache.get('answer2', version=1), None)
+        self.assertEqual(self.v2_cache.get('answer2', version=2), None)
+        self.assertEqual(self.v2_cache.get('answer2', version=3), 42)
+
+        self.assertRaises(ValueError, self.cache.incr_version, 'does_not_exist')
+
+    def test_decr_version(self):
+        self.cache.set('answer', 42, version=2)
+        self.assertEqual(self.cache.get('answer'), None)
+        self.assertEqual(self.cache.get('answer', version=1), None)
+        self.assertEqual(self.cache.get('answer', version=2), 42)
+
+        self.assertEqual(self.cache.decr_version('answer', version=2), 1)
+        self.assertEqual(self.cache.get('answer'), 42)
+        self.assertEqual(self.cache.get('answer', version=1), 42)
+        self.assertEqual(self.cache.get('answer', version=2), None)
+
+        self.v2_cache.set('answer2', 42)
+        self.assertEqual(self.v2_cache.get('answer2'), 42)
+        self.assertEqual(self.v2_cache.get('answer2', version=1), None)
+        self.assertEqual(self.v2_cache.get('answer2', version=2), 42)
+
+        self.assertEqual(self.v2_cache.decr_version('answer2'), 1)
+        self.assertEqual(self.v2_cache.get('answer2'), None)
+        self.assertEqual(self.v2_cache.get('answer2', version=1), 42)
+        self.assertEqual(self.v2_cache.get('answer2', version=2), None)
+
+        self.assertRaises(ValueError, self.cache.decr_version, 'does_not_exist', version=2)
+
+    def test_custom_key_func(self):
+        # Two caches with different key functions aren't visible to each other
+        self.cache.set('answer1', 42)
+        self.assertEqual(self.cache.get('answer1'), 42)
+        self.assertEqual(self.custom_key_cache.get('answer1'), None)
+        self.assertEqual(self.custom_key_cache2.get('answer1'), None)
+
+        self.custom_key_cache.set('answer2', 42)
+        self.assertEqual(self.cache.get('answer2'), None)
+        self.assertEqual(self.custom_key_cache.get('answer2'), 42)
+        self.assertEqual(self.custom_key_cache2.get('answer2'), 42)
+
+def custom_key_func(key, key_prefix, version):
+    "A customized cache key function"
+    return 'CUSTOM-' + '-'.join([key_prefix, str(version), key])
 
 class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
@@ -397,6 +705,10 @@ class DBCacheTests(unittest.TestCase, BaseCacheTests):
         self._table_name = 'test cache table'
         management.call_command('createcachetable', self._table_name, verbosity=0, interactive=False)
         self.cache = get_cache('db://%s?max_entries=30' % self._table_name)
+        self.prefix_cache = get_cache('db://%s' % self._table_name, key_prefix='cacheprefix')
+        self.v2_cache = get_cache('db://%s' % self._table_name, version=2)
+        self.custom_key_cache = get_cache('db://%s' % self._table_name, key_func=custom_key_func)
+        self.custom_key_cache2 = get_cache('db://%s' % self._table_name, key_func='regressiontests.cache.tests.custom_key_func')
 
     def tearDown(self):
         from django.db import connection
@@ -413,6 +725,24 @@ class DBCacheTests(unittest.TestCase, BaseCacheTests):
 class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         self.cache = get_cache('locmem://?max_entries=30')
+        self.prefix_cache = get_cache('locmem://', key_prefix='cacheprefix')
+        self.v2_cache = get_cache('locmem://', version=2)
+        self.custom_key_cache = get_cache('locmem://?max_entries=30', key_func=custom_key_func)
+        self.custom_key_cache2 = get_cache('locmem://?max_entries=30', key_func='regressiontests.cache.tests.custom_key_func')
+
+        # LocMem requires a hack to make the other caches
+        # share a data store with the 'normal' cache.
+        self.prefix_cache._cache = self.cache._cache
+        self.prefix_cache._expire_info = self.cache._expire_info
+
+        self.v2_cache._cache = self.cache._cache
+        self.v2_cache._expire_info = self.cache._expire_info
+
+        self.custom_key_cache._cache = self.cache._cache
+        self.custom_key_cache._expire_info = self.cache._expire_info
+
+        self.custom_key_cache2._cache = self.cache._cache
+        self.custom_key_cache2._expire_info = self.cache._expire_info
 
     def test_cull(self):
         self.perform_cull_test(50, 29)
@@ -428,6 +758,13 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
 class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         self.cache = get_cache(settings.CACHE_BACKEND)
+        self.prefix_cache = get_cache(settings.CACHE_BACKEND, key_prefix='cacheprefix')
+        self.v2_cache = get_cache(settings.CACHE_BACKEND, version=2)
+        self.custom_key_cache = get_cache(settings.CACHE_BACKEND, key_func=custom_key_func)
+        self.custom_key_cache2 = get_cache(settings.CACHE_BACKEND, key_func='regressiontests.cache.tests.custom_key_func')
+
+    def tearDown(self):
+        self.cache.clear()
 
     def test_invalid_keys(self):
         """
@@ -443,6 +780,7 @@ class MemcachedCacheTests(unittest.TestCase, BaseCacheTests):
         self.assertRaises(Exception, self.cache.set, 'key with spaces', 'value')
         # memcached limits key length to 250
         self.assertRaises(Exception, self.cache.set, 'a' * 251, 'value')
+
 MemcachedCacheTests = unittest.skipUnless(settings.CACHE_BACKEND.startswith('memcached://'), "memcached not available")(MemcachedCacheTests)
 
 class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
@@ -452,11 +790,19 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
         self.cache = get_cache('file://%s?max_entries=30' % self.dirname)
+        self.prefix_cache = get_cache('file://%s' % self.dirname, key_prefix='cacheprefix')
+        self.v2_cache = get_cache('file://%s' % self.dirname, version=2)
+        self.custom_key_cache = get_cache('file://%s' % self.dirname, key_func=custom_key_func)
+        self.custom_key_cache2 = get_cache('file://%s' % self.dirname, key_func='regressiontests.cache.tests.custom_key_func')
+
+    def tearDown(self):
+        self.cache.clear()
 
     def test_hashing(self):
         """Test that keys are hashed into subdirectories correctly"""
         self.cache.set("foo", "bar")
-        keyhash = md5_constructor("foo").hexdigest()
+        key = self.cache.make_key("foo")
+        keyhash = md5_constructor(key).hexdigest()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
         self.assert_(os.path.exists(keypath))
 
@@ -465,7 +811,8 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         Make sure that the created subdirectories are correctly removed when empty.
         """
         self.cache.set("foo", "bar")
-        keyhash = md5_constructor("foo").hexdigest()
+        key = self.cache.make_key("foo")
+        keyhash = md5_constructor(key).hexdigest()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
         self.assert_(os.path.exists(keypath))
 
@@ -475,7 +822,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         self.assert_(not os.path.exists(os.path.dirname(os.path.dirname(keypath))))
 
     def test_cull(self):
-        self.perform_cull_test(50, 28)
+        self.perform_cull_test(50, 29)
 
 class CustomCacheKeyValidationTests(unittest.TestCase):
     """
@@ -498,16 +845,16 @@ class CacheUtils(unittest.TestCase):
 
     def setUp(self):
         self.path = '/cache/test/'
-        self.old_settings_key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-        self.old_middleware_seconds = settings.CACHE_MIDDLEWARE_SECONDS
+        self.old_cache_middleware_key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.old_cache_middleware_seconds = settings.CACHE_MIDDLEWARE_SECONDS
         self.orig_use_i18n = settings.USE_I18N
         settings.CACHE_MIDDLEWARE_KEY_PREFIX = 'settingsprefix'
         settings.CACHE_MIDDLEWARE_SECONDS = 1
         settings.USE_I18N = False
 
     def tearDown(self):
-        settings.CACHE_MIDDLEWARE_KEY_PREFIX = self.old_settings_key_prefix
-        settings.CACHE_MIDDLEWARE_SECONDS = self.old_middleware_seconds
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX = self.old_cache_middleware_key_prefix
+        settings.CACHE_MIDDLEWARE_SECONDS = self.old_cache_middleware_seconds
         settings.USE_I18N = self.orig_use_i18n
 
     def _get_request(self, path, method='GET'):
@@ -560,6 +907,16 @@ class CacheUtils(unittest.TestCase):
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
         self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.HEAD.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+
+class PrefixedCacheUtils(CacheUtils):
+    def setUp(self):
+        super(PrefixedCacheUtils, self).setUp()
+        self.old_cache_key_prefix = settings.CACHE_KEY_PREFIX
+        settings.CACHE_KEY_PREFIX = 'cacheprefix'
+
+    def tearDown(self):
+        super(PrefixedCacheUtils, self).tearDown()
+        settings.CACHE_KEY_PREFIX = self.old_cache_key_prefix
 
 class CacheHEADTest(unittest.TestCase):
 
@@ -713,6 +1070,16 @@ class CacheI18nTest(unittest.TestCase):
         translation.activate('es')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertEqual(get_cache_data.content, es_message)
+
+class PrefixedCacheI18nTest(CacheI18nTest):
+    def setUp(self):
+        super(PrefixedCacheI18nTest, self).setUp()
+        self.old_cache_key_prefix = settings.CACHE_KEY_PREFIX
+        settings.CACHE_KEY_PREFIX = 'cacheprefix'
+
+    def tearDown(self):
+        super(PrefixedCacheI18nTest, self).tearDown()
+        settings.CACHE_KEY_PREFIX = self.old_cache_key_prefix
 
 if __name__ == '__main__':
     unittest.main()

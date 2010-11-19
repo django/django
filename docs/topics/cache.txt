@@ -643,6 +643,101 @@ nonexistent cache key.::
     However, if the backend doesn't natively provide an increment/decrement
     operation, it will be implemented using a two-step retrieve/update.
 
+.. _cache_key_prefixing:
+
+Cache key prefixing
+-------------------
+
+.. versionadded:: 1.3
+
+If you are sharing a cache instance between servers, or between your
+production and development environments, it's possible for data cached
+by one server to be used by another server. If the format of cached
+data is different between servers, this can lead to some very hard to
+diagnose problems.
+
+To prevent this, Django provides the ability to prefix all cache keys
+used by a server. When a particular cache key is saved or retrieved,
+Django will automatically prefix the cache key with the value of the
+:setting:`CACHE_KEY_PREFIX` setting.
+
+By ensuring each Django instance has a different
+:setting:`CACHE_KEY_PREFIX`, you can ensure that there will be no
+collisions in cache values.
+
+.. _cache_versioning:
+
+Cache versioning
+----------------
+
+.. versionadded:: 1.3
+
+When you change running code that uses cached values, you may need to
+purge any existing cached values. The easiest way to do this is to
+flush the entire cache, but this can lead to the loss of cache values
+that are still valid and useful.
+
+Django provides a better way to target individual cache values.
+Django's cache framework has a system-wide version identifier,
+specified using the :setting:`CACHE_VERSION` setting. The value of
+this setting is automatically combined with the cache prefix and the
+user-provided cache key to obtain the final cache key.
+
+By default, any key request will automatically include the site
+default cache key version. However, the primitive cache functions all
+include a ``version`` argument, so you can specify a particular cache
+key version to set or get. For example::
+
+    # Set version 2 of a cache key
+    >>> cache.set('my_key', 'hello world!', version=2)
+    # Get the default version (assuming version=1)
+    >>> cache.get('my_key')
+    None
+    # Get version 2 of the same key
+    >>> cache.get('my_key', version=2)
+    'hello world!'
+
+The version of a specific key can be incremented and decremented using
+the :func:`incr_version()` and :func:`decr_version()` methods. This
+enables specific keys to be bumped to a new version, leaving other
+keys unaffected. Continuing our previous example::
+
+    # Increment the version of 'my_key'
+    >>> cache.incr_version('my_key')
+    # The default version still isn't available
+    >>> cache.get('my_key')
+    None
+    # Version 2 isn't available, either
+    >>> cache.get('my_key', version=2)
+    None
+    # But version 3 *is* availble
+    >>> cache.get('my_key', version=3)
+    'hello world!'
+
+.. _cache_key_transformation:
+
+Cache key transformation
+------------------------
+
+.. versionadded:: 1.3
+
+As described in the previous two sections, the cache key provided by a
+user is not used verbatim -- it is combined with the cache prefix and
+key version to provide a final cache key. By default, the three parts
+are joined using colons to produce a final string::
+
+    def make_key(key, key_prefix, version):
+        return ':'.join([key_prefix, str(version), smart_str(key)])
+
+If you want to combine the parts in different ways, or apply other
+processing to the final key (e.g., taking a hash digest of the key
+parts), you can provide a custom key function.
+
+The setting :setting:`CACHE_KEY_FUNCTION` specifies a dotted-path to
+a function matching the prototype of :func:`make_key()` above. If
+provided, this custom key function will be used instead of the default
+key combining function.
+
 Cache key warnings
 ------------------
 

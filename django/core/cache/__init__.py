@@ -67,18 +67,30 @@ def parse_backend_uri(backend_uri):
 
     return scheme, host, params
 
-def get_cache(backend_uri):
+def get_cache(backend_uri, key_prefix=None, version=None, key_func=None):
+    if key_prefix is None:
+        key_prefix = settings.CACHE_KEY_PREFIX
+    if version is None:
+        version = settings.CACHE_VERSION
+    if key_func is None:
+        key_func = settings.CACHE_KEY_FUNCTION
+
+    if key_func is not None and not callable(key_func):
+        key_func_module_path, key_func_name = key_func.rsplit('.', 1)
+        key_func_module = importlib.import_module(key_func_module_path)
+        key_func = getattr(key_func_module, key_func_name)
+
     scheme, host, params = parse_backend_uri(backend_uri)
     if scheme in BACKENDS:
         name = 'django.core.cache.backends.%s' % BACKENDS[scheme]
     else:
         name = scheme
     module = importlib.import_module(name)
-    return module.CacheClass(host, params)
+    return module.CacheClass(host, params, key_prefix=key_prefix, version=version, key_func=key_func)
 
 cache = get_cache(settings.CACHE_BACKEND)
 
-# Some caches -- pythont-memcached in particular -- need to do a cleanup at the
+# Some caches -- python-memcached in particular -- need to do a cleanup at the
 # end of a request cycle. If the cache provides a close() method, wire it up
 # here.
 if hasattr(cache, 'close'):

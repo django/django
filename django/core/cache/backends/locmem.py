@@ -10,13 +10,14 @@ from django.core.cache.backends.base import BaseCache
 from django.utils.synch import RWLock
 
 class CacheClass(BaseCache):
-    def __init__(self, _, params):
-        BaseCache.__init__(self, params)
+    def __init__(self, _, params, key_prefix='', version=1, key_func=None):
+        BaseCache.__init__(self, params, key_prefix, version, key_func)
         self._cache = {}
         self._expire_info = {}
         self._lock = RWLock()
 
-    def add(self, key, value, timeout=None):
+    def add(self, key, value, timeout=None, version=None):
+        key = self.make_key(key, version=version)
         self.validate_key(key)
         self._lock.writer_enters()
         try:
@@ -31,7 +32,8 @@ class CacheClass(BaseCache):
         finally:
             self._lock.writer_leaves()
 
-    def get(self, key, default=None):
+    def get(self, key, default=None, version=None):
+        key = self.make_key(key, version=version)
         self.validate_key(key)
         self._lock.reader_enters()
         try:
@@ -64,7 +66,8 @@ class CacheClass(BaseCache):
         self._cache[key] = value
         self._expire_info[key] = time.time() + timeout
 
-    def set(self, key, value, timeout=None):
+    def set(self, key, value, timeout=None, version=None):
+        key = self.make_key(key, version=version)
         self.validate_key(key)
         self._lock.writer_enters()
         # Python 2.4 doesn't allow combined try-except-finally blocks.
@@ -76,7 +79,8 @@ class CacheClass(BaseCache):
         finally:
             self._lock.writer_leaves()
 
-    def has_key(self, key):
+    def has_key(self, key, version=None):
+        key = self.make_key(key, version=version)
         self.validate_key(key)
         self._lock.reader_enters()
         try:
@@ -117,7 +121,8 @@ class CacheClass(BaseCache):
         except KeyError:
             pass
 
-    def delete(self, key):
+    def delete(self, key, version=None):
+        key = self.make_key(key, version=version)
         self.validate_key(key)
         self._lock.writer_enters()
         try:
