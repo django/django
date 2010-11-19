@@ -1,35 +1,49 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ DE form fields.
+from django.contrib.localflavor.de.forms import (DEZipCodeField, DEStateSelect,
+    DEIdentityCardNumberField)
 
-tests = r"""
-# DEZipCodeField ##############################################################
+from utils import LocalFlavorTestCase
 
->>> from django.contrib.localflavor.de.forms import DEZipCodeField
->>> f = DEZipCodeField()
->>> f.clean('99423')
-u'99423'
->>> f.clean(' 99423')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
 
-# DEStateSelect #############################################################
+class DELocalFlavorTests(LocalFlavorTestCase):
+    def test_DEStateSelect(self):
+        f = DEStateSelect()
+        out = u'''<select name="states">
+<option value="BW">Baden-Wuerttemberg</option>
+<option value="BY">Bavaria</option>
+<option value="BE">Berlin</option>
+<option value="BB">Brandenburg</option>
+<option value="HB">Bremen</option>
+<option value="HH">Hamburg</option>
+<option value="HE">Hessen</option>
+<option value="MV">Mecklenburg-Western Pomerania</option>
+<option value="NI">Lower Saxony</option>
+<option value="NW">North Rhine-Westphalia</option>
+<option value="RP">Rhineland-Palatinate</option>
+<option value="SL">Saarland</option>
+<option value="SN">Saxony</option>
+<option value="ST">Saxony-Anhalt</option>
+<option value="SH">Schleswig-Holstein</option>
+<option value="TH" selected="selected">Thuringia</option>
+</select>'''
+        self.assertEqual(f.render('states', 'TH'), out)
 
->>> from django.contrib.localflavor.de.forms import DEStateSelect
->>> w = DEStateSelect()
->>> w.render('states', 'TH')
-u'<select name="states">\n<option value="BW">Baden-Wuerttemberg</option>\n<option value="BY">Bavaria</option>\n<option value="BE">Berlin</option>\n<option value="BB">Brandenburg</option>\n<option value="HB">Bremen</option>\n<option value="HH">Hamburg</option>\n<option value="HE">Hessen</option>\n<option value="MV">Mecklenburg-Western Pomerania</option>\n<option value="NI">Lower Saxony</option>\n<option value="NW">North Rhine-Westphalia</option>\n<option value="RP">Rhineland-Palatinate</option>\n<option value="SL">Saarland</option>\n<option value="SN">Saxony</option>\n<option value="ST">Saxony-Anhalt</option>\n<option value="SH">Schleswig-Holstein</option>\n<option value="TH" selected="selected">Thuringia</option>\n</select>'
+    def test_DEZipCodeField(self):
+        error_format = [u'Enter a zip code in the format XXXXX.']
+        valid = {
+            '99423': '99423',
+        }
+        invalid = {
+            ' 99423': error_format,
+        }
+        self.assertFieldOutput(DEZipCodeField, valid, invalid)
 
-# DEIdentityCardNumberField #################################################
-
->>> from django.contrib.localflavor.de.forms import DEIdentityCardNumberField
->>> f = DEIdentityCardNumberField()
->>> f.clean('7549313035D-6004103-0903042-0')
-u'7549313035D-6004103-0903042-0'
->>> f.clean('9786324830D 6104243 0910271 2')
-u'9786324830D-6104243-0910271-2'
->>> f.clean('0434657485D-6407276-0508137-9')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.']
-"""
+    def test_DEIdentityCardNumberField(self):
+        error_format = [u'Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.']
+        valid = {
+            '7549313035D-6004103-0903042-0': '7549313035D-6004103-0903042-0',
+            '9786324830D 6104243 0910271 2': '9786324830D-6104243-0910271-2',
+        }
+        invalid = {
+            '0434657485D-6407276-0508137-9': error_format,
+        }
+        self.assertFieldOutput(DEIdentityCardNumberField, valid, invalid)

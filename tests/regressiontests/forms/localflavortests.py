@@ -7,7 +7,7 @@ from localflavor.ca import tests as localflavor_ca_tests
 from localflavor.ch import tests as localflavor_ch_tests
 from localflavor.cl import tests as localflavor_cl_tests
 from localflavor.cz import tests as localflavor_cz_tests
-from localflavor.de import tests as localflavor_de_tests
+from localflavor.de import DELocalFlavorTests
 from localflavor.es import tests as localflavor_es_tests
 from localflavor.fi import tests as localflavor_fi_tests
 from localflavor.fr import tests as localflavor_fr_tests
@@ -41,7 +41,6 @@ __test__ = {
     'localflavor_ch_tests': localflavor_ch_tests,
     'localflavor_cl_tests': localflavor_cl_tests,
     'localflavor_cz_tests': localflavor_cz_tests,
-    'localflavor_de_tests': localflavor_de_tests,
     'localflavor_es_tests': localflavor_es_tests,
     'localflavor_fi_tests': localflavor_fi_tests,
     'localflavor_fr_tests': localflavor_fr_tests,
@@ -63,7 +62,3 @@ __test__ = {
     'localflavor_uy_tests': localflavor_uy_tests,
     'localflavor_za_tests': localflavor_za_tests,
 }
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
