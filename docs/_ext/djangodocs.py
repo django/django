@@ -83,10 +83,7 @@ class VersionDirective(Directive):
         if not is_nextversion:
             if len(self.arguments) == 1:
                 linktext = 'Please, see the release notes </releases/%s>' % (arg0)
-                try:
-                    xrefs = roles.XRefRole()('doc', linktext, linktext, self.lineno, self.state) # Sphinx >= 1.0
-                except AttributeError:
-                    xrefs = roles.xfileref_role('doc', linktext, linktext, self.lineno, self.state) # Sphinx < 1.0
+                xrefs = roles.XRefRole()('doc', linktext, linktext, self.lineno, self.state)
                 node.extend(xrefs[0])
             node['version'] = arg0
         else:
@@ -196,10 +193,7 @@ def parse_django_admin_node(env, sig, signode):
 
 def parse_django_adminopt_node(env, sig, signode):
     """A copy of sphinx.directives.CmdoptionDesc.parse_signature()"""
-    try:
-        from sphinx.domains.std import option_desc_re # Sphinx >= 1.0
-    except ImportError:
-        from sphinx.directives.desc import option_desc_re # Sphinx < 1.0
+    from sphinx.domains.std import option_desc_re
     count = 0
     firstname = ''
     for m in option_desc_re.finditer(sig):
