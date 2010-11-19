@@ -549,7 +549,7 @@ Your Django settings.py file should look something like this for Oracle::
             'USER': 'a_user',
             'PASSWORD': 'a_password',
             'HOST': '',
-            'PORT': ''     ,
+            'PORT': '',
         }
     }
 
@@ -571,6 +571,19 @@ recognizes the SID ("xe" in this example), then fill in both
 
 You should supply both ``HOST`` and ``PORT``, or leave both
 as empty strings.
+
+Threaded option
+----------------
+
+If you plan to run Django in a multithreaded environment (e.g. Apache in Windows
+using the default MPM module), then you **must** set the ``threaded`` option of
+your Oracle database configuration to True::
+
+            'OPTIONS': {
+                'threaded': True,
+            },
+
+Failure to do this may result in crashes and other odd behavior.
 
 Tablespace options
 ------------------
