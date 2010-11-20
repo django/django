@@ -131,7 +131,7 @@ Template reference
 While ``admindocs`` does not include a place to document templates by
 themselves, if you use the ``:template:`path/to/template.html``` syntax in a
 docstring the resulting page will verify the path of that template with
-Django’s :ref:`template loaders <template-loaders>`. This can be a handy way to
+Django's :ref:`template loaders <template-loaders>`. This can be a handy way to
 check if the specified template exists and to show where on the filesystem that
 template is stored.
 
