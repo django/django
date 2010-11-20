@@ -234,12 +234,12 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
             return
         self.info(bold("writing templatebuiltins.js..."))
         xrefs = self.env.domaindata["std"]["objects"]
-        templatebuiltins = dict([('ttags', [n for ((t,n), (l,a)) in xrefs.items()
-                                            if t == 'templatetag' and
-                                            l == 'ref/templates/builtins' ]),
-                                 ('tfilters', [n for ((t,n), (l,a)) in xrefs.items()
-                                               if t == 'templatefilter' and
-                                               t == 'ref/templates/builtins'])])
+        templatebuiltins = {
+            "ttags": [n for ((t, n), (l, a)) in xrefs.items()
+                        if t == "templatetag" and l == "ref/templates/builtins"],
+            "tfilters": [n for ((t, n), (l, a)) in xrefs.items()
+                        if t == "templatefilter" and l == "ref/templates/builtins"],
+        }
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")
         f = open(outfilename, 'wb')
         f.write('var django_template_builtins = ')
