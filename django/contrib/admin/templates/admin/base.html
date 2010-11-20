@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% load url from future %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE|default:"en-us" }}" xml:lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
 <title>{% block title %}{% endblock %}</title>
@@ -28,18 +28,18 @@
             {% trans 'Welcome,' %}
             <strong>{% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong>.
             {% block userlinks %}
-                {% url django-admindocs-docroot as docsroot %}
+                {% url 'django-admindocs-docroot' as docsroot %}
                 {% if docsroot %}
                     <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
                 {% endif %}
-                {% url admin:password_change as password_change_url %}
+                {% url 'admin:password_change' as password_change_url %}
                 {% if password_change_url %}
                     <a href="{{ password_change_url }}">
                 {% else %}
                     <a href="{{ root_path }}password_change/">
                 {% endif %}
                 {% trans 'Change password' %}</a> /
-                {% url admin:logout as logout_url %}
+                {% url 'admin:logout' as logout_url %}
                 {% if logout_url %}
                     <a href="{{ logout_url }}">
                 {% else %}

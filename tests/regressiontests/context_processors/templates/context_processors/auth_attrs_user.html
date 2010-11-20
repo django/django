@@ -1,4 +1,4 @@
-unicode: {{ user }}
+{% load url from future %}unicode: {{ user }}
 id: {{ user.id }}
 username: {{ user.username }}
-url: {% url userpage user %}
+url: {% url 'userpage' user %}

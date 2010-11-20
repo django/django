@@ -1,6 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load adminmedia admin_list i18n %}
-
+{% load url from future %}
 {% block extrastyle %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />
   {% endif %}
   {% if cl.formset or action_form %}
-    {% url admin:jsi18n as jsi18nurl %}
+    {% url 'admin:jsi18n' as jsi18nurl %}
     <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/' }}"></script>
   {% endif %}
   {{ media.css }}
@@ -41,11 +41,11 @@
       <a href="../../">
         {% trans "Home" %}
       </a>
-       &rsaquo; 
+       &rsaquo;
        <a href="../">
          {{ app_label|capfirst }}
       </a>
-      &rsaquo; 
+      &rsaquo;
       {{ cl.opts.verbose_name_plural|capfirst }}
     </div>
   {% endblock %}
@@ -84,7 +84,7 @@
           </div>
         {% endif %}
       {% endblock %}
-      
+
       <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>{% csrf_token %}
       {% if cl.formset %}
         {{ cl.formset.management_form }}

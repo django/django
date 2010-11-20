@@ -344,3 +344,44 @@ and Ctrl-C test termination) have been made redundant. In view of this
 redundancy, :class:`~django.test.simple.DjangoTestRunner` has been
 turned into an empty placeholder class, and will be removed entirely
 in Django 1.5.
+
+Changes to :ttag:`url` and :ttag:`ssi`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most template tags will allow you to pass in either constants or
+variables as arguments -- for example::
+
+    {% extends "base.html" %}
+
+allows you to specify a base template as a constant, but if you have a
+context variable ``templ`` that contains the value ``base.html``::
+
+    {% extends templ %}
+
+is also legal.
+
+However, due to an accident of history, the :ttag:`url` and
+:ttag:`ssi` are different. These tags use the second, quoteless
+syntax, but interpret the argument as a constant. This means it isn't
+possible to use a context variable as the target of a :ttag:`url` and
+:ttag:`ssi` tag.
+
+Django 1.3 marks the start of the process to correct this historical
+accident. Django 1.3 adds a new template library -- ``future`` -- that
+provides alternate implementations of the :ttag:`url` and :ttag:`ssi`
+template tags. This ``future`` library implement behavior that makes
+the handling of the first argument consistent with the handling of all
+other variables. So, an existing template that contains::
+
+    {% url sample %}
+
+should be replaced with::
+
+    {% load url from future %}
+    {% url 'sample' %}
+
+The tags implementing the old behavior have been deprecated, and in
+Django 1.5, the old behavior will be replaced with the new behavior.
+To ensure compatibility with future versions of Django, existing
+templates should be modified to use the new ``future`` libraries and
+syntax.

@@ -290,24 +290,30 @@ def include_is_allowed(filepath):
     return False
 
 class SsiNode(Node):
-    def __init__(self, filepath, parsed):
-        self.filepath, self.parsed = filepath, parsed
+    def __init__(self, filepath, parsed, legacy_filepath=True):
+        self.filepath = filepath
+        self.parsed = parsed
+        self.legacy_filepath = legacy_filepath
 
     def render(self, context):
-        if not include_is_allowed(self.filepath):
+        filepath = self.filepath
+        if not self.legacy_filepath:
+           filepath = filepath.resolve(context)
+
+        if not include_is_allowed(filepath):
             if settings.DEBUG:
                 return "[Didn't have permission to include file]"
             else:
                 return '' # Fail silently for invalid includes.
         try:
-            fp = open(self.filepath, 'r')
+            fp = open(filepath, 'r')
             output = fp.read()
             fp.close()
         except IOError:
             output = ''
         if self.parsed:
             try:
-                t = Template(output, name=self.filepath)
+                t = Template(output, name=filepath)
                 return t.render(context)
             except TemplateSyntaxError, e:
                 if settings.DEBUG:
@@ -356,8 +362,9 @@ class TemplateTagNode(Node):
         return self.mapping.get(self.tagtype, '')
 
 class URLNode(Node):
-    def __init__(self, view_name, args, kwargs, asvar):
+    def __init__(self, view_name, args, kwargs, asvar, legacy_view_name=True):
         self.view_name = view_name
+        self.legacy_view_name = legacy_view_name
         self.args = args
         self.kwargs = kwargs
         self.asvar = asvar
@@ -365,8 +372,12 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict([(smart_str(k,'ascii'), v.resolve(context))
+        kwargs = dict([(smart_str(k, 'ascii'), v.resolve(context))
                        for k, v in self.kwargs.items()])
+
+        view_name = self.view_name
+        if not self.legacy_view_name:
+            view_name = view_name.resolve(context)
 
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
@@ -374,13 +385,14 @@ class URLNode(Node):
         # {% url ... as var %} construct in which cause return nothing.
         url = ''
         try:
-            url = reverse(self.view_name, args=args, kwargs=kwargs, current_app=context.current_app)
+            url = reverse(view_name, args=args, kwargs=kwargs, current_app=context.current_app)
         except NoReverseMatch, e:
             if settings.SETTINGS_MODULE:
                 project_name = settings.SETTINGS_MODULE.split('.')[0]
                 try:
-                    url = reverse(project_name + '.' + self.view_name,
-                              args=args, kwargs=kwargs, current_app=context.current_app)
+                    url = reverse(project_name + '.' + view_name,
+                              args=args, kwargs=kwargs,
+                              current_app=context.current_app)
                 except NoReverseMatch:
                     if self.asvar is None:
                         # Re-raise the original exception, not the one with
@@ -922,6 +934,11 @@ def ssi(parser, token):
 
         {% ssi /home/html/ljworld.com/includes/right_generic.html parsed %}
     """
+
+    import warnings
+    warnings.warn('The syntax for the ssi template tag is changing. Load the `ssi` tag from the `future` tag library to start using the new behavior.',
+                  category=PendingDeprecationWarning)
+
     bits = token.contents.split()
     parsed = False
     if len(bits) not in (2, 3):
@@ -933,7 +950,7 @@ def ssi(parser, token):
         else:
             raise TemplateSyntaxError("Second (optional) argument to %s tag"
                                       " must be 'parsed'" % bits[0])
-    return SsiNode(bits[1], parsed)
+    return SsiNode(bits[1], parsed, legacy_filepath=True)
 ssi = register.tag(ssi)
 
 #@register.tag
@@ -945,16 +962,44 @@ def load(parser, token):
     ``django/templatetags/news/photos.py``::
 
         {% load news.photos %}
+
+    Can also be used to load an individual tag/filter from
+    a library::
+
+        {% load byline from news %}
+
     """
     bits = token.contents.split()
-    for taglib in bits[1:]:
-        # add the library to the parser
+    if len(bits) >= 4 and bits[-2] == "from":
         try:
+            taglib = bits[-1]
             lib = get_library(taglib)
-            parser.add_library(lib)
         except InvalidTemplateLibrary, e:
             raise TemplateSyntaxError("'%s' is not a valid tag library: %s" %
                                       (taglib, e))
+        else:
+            temp_lib = Library()
+            for name in bits[1:-2]:
+                if name in lib.tags:
+                    temp_lib.tags[name] = lib.tags[name]
+                    # a name could be a tag *and* a filter, so check for both
+                    if name in lib.filters:
+                        temp_lib.filters[name] = lib.filters[name]
+                elif name in lib.filters:
+                    temp_lib.filters[name] = lib.filters[name]
+                else:
+                    raise TemplateSyntaxError("'%s' is not a valid tag or filter in tag library '%s'" %
+                                              (name, taglib))
+            parser.add_library(temp_lib)
+    else:
+        for taglib in bits[1:]:
+            # add the library to the parser
+            try:
+                lib = get_library(taglib)
+                parser.add_library(lib)
+            except InvalidTemplateLibrary, e:
+                raise TemplateSyntaxError("'%s' is not a valid tag library: %s" %
+                                          (taglib, e))
     return LoadNode()
 load = register.tag(load)
 
@@ -1140,6 +1185,11 @@ def url(parser, token):
 
     The URL will look like ``/clients/client/123/``.
     """
+
+    import warnings
+    warnings.warn('The syntax for the url template tag is changing. Load the `url` tag from the `future` tag library to start using the new behavior.',
+                  category=PendingDeprecationWarning)
+
     bits = token.split_contents()
     if len(bits) < 2:
         raise TemplateSyntaxError("'%s' takes at least one argument"
@@ -1196,7 +1246,7 @@ def url(parser, token):
             else:
                 args.append(parser.compile_filter(value))
 
-    return URLNode(viewname, args, kwargs, asvar)
+    return URLNode(viewname, args, kwargs, asvar, legacy_view_name=True)
 url = register.tag(url)
 
 #@register.tag

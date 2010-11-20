@@ -657,6 +657,17 @@ load
 
 Load a custom template tag set.
 
+For example, the following template would load all the tags and filters registered
+in ``somelibrary`` and ``otherlibrary``::
+
+    {% load somelibrary otherlibrary %}
+
+You can also selectively load individual templates or tags from a library, using
+the ``from`` argument. In this example, the template tags/filters named ``foo``
+and ``bar`` will be loaded from ``somelibrary``::
+
+    {% load foo bar from somelibrary %}
+
 See :doc:`Custom tag and filter libraries </howto/custom-template-tags>` for more information.
 
 .. templatetag:: now
@@ -838,6 +849,30 @@ Note that if you use ``{% ssi %}``, you'll need to define
 
 See also: ``{% include %}``.
 
+.. admonition:: Forwards compatibility
+
+    .. versionchanged:: 1.3
+
+    In Django 1.5, the behavior of the :ttag:`ssi` template tag will
+    change, with the the first argument being made into a context
+    variable, rather than being a special case unquoted constant. This
+    will allow the :ttag:`ssi` tag to use a context variable as the
+    value of the page to be included.
+
+    In order to provide a forwards compatibility path, Django 1.3
+    provides a future compatibility library -- ``future`` -- that
+    implements the new behavior. To use this library, add a
+    :ttag:`load` call at the top of any template using the :ttag:`ssi`
+    tag, and wrap the first argument to the :ttag:`ssi` tag in quotes.
+    For example::
+
+        {% load ssi from future %}
+        {% ssi '/home/html/ljworld.com/includes/right_generic.html' %}
+
+    In Django 1.5, the unquoted constant behavior will be replaced
+    with the behavior provided by the ``future`` tag library.
+    Existing templates be migrated to use the new syntax.
+
 .. templatetag:: templatetag
 
 templatetag
@@ -955,9 +990,36 @@ here's what it looks like::
     {% url path.to.view arg,arg2 %}
     {% url path.to.view arg, arg2 %}
 
-This syntax doesn't support the use of literal commas, or or equals
+This syntax doesn't support the use of literal commas, or equals
 signs. Did we mention you shouldn't use this syntax in any new
 projects?
+
+.. admonition:: Forwards compatibility
+
+    .. versionchanged:: 1.3
+
+    In Django 1.5, the behavior of the :ttag:`url` template tag will
+    change, with the the first argument being made into a context
+    variable, rather than being a special case unquoted constant. This
+    will allow the :ttag:`url` tag to use a context variable as the
+    value of the URL name to be reversed.
+
+    In order to provide a forwards compatibility path, Django 1.3
+    provides a future compatibility library -- ``future`` -- that
+    implements the new behavior. To use this library, add a
+    :ttag:`load` call at the top of any template using the :ttag:`url`
+    tag, and wrap the first argument to the :ttag:`url` tag in quotes.
+    For example::
+
+        {% load url from future %}
+        {% url 'myapp:view-name' %}
+
+    The new library also drops support for the comma syntax for
+    separating arguments to the :ttag:`url` template tag.
+
+    In Django 1.5, the old behavior will be replaced with the behavior
+    provided by the ``future`` tag library. Existing templates be
+    migrated to use the new syntax.
 
 .. templatetag:: widthratio
 
