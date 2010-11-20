@@ -579,7 +579,7 @@ A method on a class isn't quite the same as a standalone function, so
 you can't just apply a function decorator to the method -- you need to
 transform it into a method decorator first. The ``method_decorator``
 decorator transforms a function decorator into a method decorator so
-that it can be used on an instance method.
+that it can be used on an instance method. For example::
 
     from django.contrib.auth.decorators import login_required
     from django.utils.decorators import method_decorator
