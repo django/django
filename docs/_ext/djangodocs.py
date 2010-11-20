@@ -233,18 +233,13 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
             self.warn("cannot create templatebuiltins.js due to missing simplejson dependency")
             return
         self.info(bold("writing templatebuiltins.js..."))
-        try:
-            xrefs = self.env.reftargets.items()
-            templatebuiltins = dict([('ttags', [n for ((t,n),(l,a)) in xrefs
-                                                if t == 'ttag' and
-                                                l == 'ref/templates/builtins']),
-                                     ('tfilters', [n for ((t,n),(l,a)) in xrefs
-                                                   if t == 'tfilter' and
-                                                   l == 'ref/templates/builtins'])])
-        except AttributeError:
-            xrefs = self.env.domaindata["std"]["objects"]
-            templatebuiltins = dict([('ttags', [n for (t,n) in xrefs if t == 'templatetag']),
-                                     ('tfilters', [n for (t,n) in xrefs if t == 'templatefilter'])])
+        xrefs = self.env.domaindata["std"]["objects"]
+        templatebuiltins = dict([('ttags', [n for ((t,n), (l,a)) in xrefs.items()
+                                            if t == 'templatetag' and
+                                            l == 'ref/templates/builtins' ]),
+                                 ('tfilters', [n for ((t,n), (l,a)) in xrefs.items()
+                                               if t == 'templatefilter' and
+                                               t == 'ref/templates/builtins'])])
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")
         f = open(outfilename, 'wb')
         f.write('var django_template_builtins = ')
