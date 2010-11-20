@@ -537,3 +537,60 @@ Because of the way that Python resolves method overloading, the local
 :func:`render_to_response()` implementation will override the
 versions provided by :class:`JSONResponseMixin` and
 :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
+
+Decorating class-based views
+============================
+
+.. highlightlang:: python
+
+The extension of class-based views isn't limited to using mixins. You
+can use also use decorators.
+
+Decorating in URLconf
+---------------------
+
+The simplest way of decorating class-based views is to decorate the
+result of the :meth:`~django.views.generic.base.View.as_view` method.
+The easiest place to do this is in the URLconf where you deploy your
+view::
+
+    from django.contrib.auth.decorators import login_required
+    from django.views.generic import TemplateView
+
+    urlpatterns = patterns('',
+        (r'^about/',login_required(TemplateView.as_view(template_name="secret.html"))),
+    )
+
+This approach applies the decorator on a per-instance basis. If you
+want every instance of a view to be decorated, you need to take a
+different approach.
+
+Decorating the class
+--------------------
+
+To decorate every instance of a class-based view, you need to decorate
+the class definition itself. To do this you apply the decorator to one
+of the view-like methods on the class; that is,
+:meth:`~django.views.generic.base.View.dispatch`, or one of the HTTP
+methods (:meth:`~django.views.generic.base.View.get`,
+:meth:`~django.views.generic.base.View.post` etc).
+
+A method on a class isn't quite the same as a standalone function, so
+you can't just apply a function decorator to the method -- you need to
+transform it into a method decorator first. The ``method_decorator``
+decorator transforms a function decorator into a method decorator so
+that it can be used on an instance method.
+
+    from django.contrib.auth.decorators import login_required
+    from django.utils.decorators import method_decorator
+    from django.views.generic import TemplateView
+
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+        @method_decorator(login_required)
+        def dispatch(self, **kwargs):
+            return super(ProtectedView, self).dispatch(**kwargs)
+
+In this example, every instance of :class:`ProtectedView` will have
+login protection.

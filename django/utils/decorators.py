@@ -1,11 +1,15 @@
 "Functions that help with dynamically creating decorators for views."
 
-import types
 try:
     from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
 except ImportError:
     from django.utils.functional import wraps, update_wrapper, WRAPPER_ASSIGNMENTS  # Python 2.4 fallback.
 
+class classonlymethod(classmethod):
+    def __get__(self, instance, owner):
+        if instance is not None:
+            raise AttributeError("This method is available only on the view class.")
+        return super(classonlymethod, self).__get__(instance, owner)
 
 def method_decorator(decorator):
     """

@@ -1,18 +1,11 @@
-import copy
 from django import http
 from django.core.exceptions import ImproperlyConfigured
 from django.template import RequestContext, loader
-from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import update_wrapper
 from django.utils.log import getLogger
+from django.utils.decorators import classonlymethod
 
 logger = getLogger('django.request')
-
-class classonlymethod(classmethod):
-    def __get__(self, instance, owner):
-        if instance is not None:
-            raise AttributeError("This method is available only on the view class.")
-        return super(classonlymethod, self).__get__(instance, owner)
 
 class View(object):
     """
