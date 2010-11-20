@@ -30,8 +30,9 @@ class GeoDjangoTestSuiteRunner(DjangoTestSuiteRunner):
 
         # Getting and storing the original values of INSTALLED_APPS and
         # the ROOT_URLCONF.
-        self.old_installed = settings.INSTALLED_APPS
-        self.old_root_urlconf = settings.ROOT_URLCONF
+        self.old_installed = getattr(settings, 'INSTALLED_APPS', None)
+        self.old_root_urlconf = getattr(settings, 'ROOT_URLCONF', None)
+        self.old_site_id = getattr(settings, 'SITE_ID', None)
 
         # Tests that require use of a spatial database (e.g., creation of models)
         self.geo_apps = ['geoapp', 'relatedapp']
@@ -62,11 +63,13 @@ class GeoDjangoTestSuiteRunner(DjangoTestSuiteRunner):
 
         # Setting the URLs.
         settings.ROOT_URLCONF = 'django.contrib.gis.tests.urls'
+        settings.SITE_ID = 1
 
     def teardown_test_environment(self, **kwargs):
         super(GeoDjangoTestSuiteRunner, self).teardown_test_environment(**kwargs)
         settings.INSTALLED_APPS = self.old_installed
         settings.ROOT_URLCONF = self.old_root_urlconf
+        settings.SITE_ID = self.old_site_id
 
     def build_suite(self, test_labels, extra_tests=None, **kwargs):
         """
