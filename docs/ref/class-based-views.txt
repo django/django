@@ -779,7 +779,7 @@ BaseDateListView
         ``object_list`` is the list of objects ``extra_context`` is a
         dictionary of context data that will be added to any context data
         provided by the
-        :class:`~django.db.views.generic.list.MultiplObjectMixin`.
+        :class:`~django.views.generic.list.MultipleObjectMixin`.
 
     .. method:: get_dated_queryset(**lookup)
 
