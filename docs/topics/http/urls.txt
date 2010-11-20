@@ -809,7 +809,7 @@ This ``current_app`` argument is used as a hint to resolve application
 namespaces into URLs on specific application instances, according to the
 :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
 
-.. admonition:: Make sure your views are all correct
+.. admonition:: Make sure your views are all correct.
 
     As part of working out which URL names map to which patterns, the
     ``reverse()`` function has to import all of your URLconf files and examine

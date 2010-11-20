@@ -363,8 +363,7 @@ attributes:
         ``'image/jpeg'``.
 
         ``content_length`` is the length of the image given by the browser.
-        Sometimes this won't be provided and will be ``None``., ``None``
-        otherwise.
+        Sometimes this won't be provided and will be ``None``.
 
         ``charset`` is the character set (i.e. ``utf8``) given by the browser.
         Like ``content_length``, this sometimes won't be provided.
