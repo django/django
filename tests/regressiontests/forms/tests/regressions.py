@@ -137,7 +137,9 @@ class FormsRegressionsTestCase(TestCase):
         form = CheeseForm({
             'name': 'Brie',
         })
-        if form.is_valid():
-            obj = form.save()
-            obj.name = 'Camembert'
-            obj.full_clean()
+
+        self.assertTrue(form.is_valid())
+
+        obj = form.save()
+        obj.name = 'Camembert'
+        obj.full_clean()
