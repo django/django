@@ -74,6 +74,26 @@ was appended with the suffix ``'_list'`` to yield the final context
 variable name. In a class-based ``ListView``, the
 ``context_object_name`` is used verbatim.
 
+The context data for ``object_list`` views
+------------------------------------------
+
+The context provided by :class:`~django.views.generic.list.MultipleObjectMixin`
+is quite different from that provided by ``object_list``, with most pagination
+related variables replaced by a single ``page_obj`` object. The following are no
+longer provided:
+
+* ``first_on_page``
+* ``has_next``
+* ``has_previous``
+* ``hits``
+* ``last_on_page``
+* ``next``
+* ``page_range``
+* ``page``
+* ``pages``
+* ``previous``
+* ``results_per_page``
+
 ``extra_context``
 -----------------
 

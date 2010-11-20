@@ -71,10 +71,10 @@ def object_list(request, queryset, paginate_by=None, page=None,
             '%s_list' % template_object_name: page_obj.object_list,
             'paginator': paginator,
             'page_obj': page_obj,
+            'is_paginated': page_obj.has_other_pages(),
 
             # Legacy template context stuff. New templates should use page_obj
             # to access this instead.
-            'is_paginated': page_obj.has_other_pages(),
             'results_per_page': paginator.per_page,
             'has_next': page_obj.has_next(),
             'has_previous': page_obj.has_previous(),
