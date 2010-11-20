@@ -662,7 +662,7 @@ in ``somelibrary`` and ``otherlibrary``::
 
     {% load somelibrary otherlibrary %}
 
-You can also selectively load individual templates or tags from a library, using
+You can also selectively load individual filters or tags from a library, using
 the ``from`` argument. In this example, the template tags/filters named ``foo``
 and ``bar`` will be loaded from ``somelibrary``::
 
