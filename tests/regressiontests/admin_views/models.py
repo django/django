@@ -107,6 +107,25 @@ class ArticleAdmin(admin.ModelAdmin):
     modeladmin_year.admin_order_field = 'date'
     modeladmin_year.short_description = None
 
+    def delete_model(self, request, obj):
+        EmailMessage(
+            'Greetings from a deleted object',
+            'I hereby inform you that some user deleted me',
+            'from@example.com',
+            ['to@example.com']
+        ).send()
+        return super(ArticleAdmin, self).delete_model(request, obj)
+
+    def save_model(self, request, obj, form, change=True):
+        EmailMessage(
+            'Greetings from a created object',
+            'I hereby inform you that some user created me',
+            'from@example.com',
+            ['to@example.com']
+        ).send()
+        return super(ArticleAdmin, self).save_model(request, obj, form, change)
+
+
 class CustomArticle(models.Model):
     content = models.TextField()
     date = models.DateTimeField()

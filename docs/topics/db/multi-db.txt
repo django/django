@@ -458,7 +458,7 @@ database other than that that specified by your router chain, you'll
 need to write custom :class:`~django.contrib.admin.ModelAdmin` classes
 that will direct the admin to use a specific database for content.
 
-``ModelAdmin`` objects have four methods that require customization for
+``ModelAdmin`` objects have five methods that require customization for
 multiple-database support::
 
     class MultiDBModelAdmin(admin.ModelAdmin):
@@ -468,6 +468,10 @@ multiple-database support::
         def save_model(self, request, obj, form, change):
             # Tell Django to save objects to the 'other' database.
             obj.save(using=self.using)
+
+        def delete_model(self, requqest, obj):
+            # Tell Django to delete objects from the 'other' database
+            obj.delete(using=self.using)
 
         def queryset(self, request):
             # Tell Django to look for objects on the 'other' database.

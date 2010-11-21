@@ -757,6 +757,12 @@ templates used by the :class:`ModelAdmin` views:
 ``ModelAdmin`` methods
 ----------------------
 
+.. warning::
+
+    :meth:`ModelAdmin.save_model` and :meth:`ModelAdmin.delete_model` must
+    save/delete the object, they are not for veto purposes, rather they allow
+    you to perform extra operations.
+
 .. method:: ModelAdmin.save_model(self, request, obj, form, change)
 
 The ``save_model`` method is given the ``HttpRequest``, a model instance,
@@ -769,6 +775,13 @@ For example to attach ``request.user`` to the object prior to saving::
         def save_model(self, request, obj, form, change):
             obj.user = request.user
             obj.save()
+
+.. method:: ModelAdmin.delete_model(self, request, obj)
+
+.. versionadded:: 1.3
+
+The ``delete_model`` method is given the ``HttpRequest`` and a model instance.
+Use this method to do pre- or post-delete operations.
 
 .. method:: ModelAdmin.save_formset(self, request, form, formset, change)
 

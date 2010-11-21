@@ -601,6 +601,12 @@ class ModelAdmin(BaseModelAdmin):
         """
         obj.save()
 
+    def delete_model(self, requet, obj):
+        """
+        Given a model instance delete it from the database.
+        """
+        obj.delete()
+
     def save_formset(self, request, form, formset, change):
         """
         Given an inline formset save it to the database.
@@ -1122,7 +1128,7 @@ class ModelAdmin(BaseModelAdmin):
                 raise PermissionDenied
             obj_display = force_unicode(obj)
             self.log_deletion(request, obj, obj_display)
-            obj.delete()
+            self.delete_model(request, obj)
 
             self.message_user(request, _('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
 

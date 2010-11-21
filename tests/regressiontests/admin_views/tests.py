@@ -3,6 +3,7 @@
 import re
 import datetime
 from django.conf import settings
+from django.core import mail
 from django.core.files import temp as tempfile
 from django.contrib.auth import admin # Register auth models with the admin.
 from django.contrib.auth.models import User, Permission, UNUSABLE_PASSWORD
@@ -540,6 +541,8 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.assertRedirects(post, '/test_admin/admin/')
         self.failUnlessEqual(Article.objects.all().count(), 4)
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, 'Greetings from a created object')
         self.client.get('/test_admin/admin/logout/')
 
         # Super can add too, but is redirected to the change list view
@@ -695,6 +698,8 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
         self.assertRedirects(post, '/test_admin/admin/')
         self.failUnlessEqual(Article.objects.all().count(), 2)
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, 'Greetings from a deleted object')
         article_ct = ContentType.objects.get_for_model(Article)
         logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
         self.failUnlessEqual(logged.object_id, u'1')
@@ -1439,8 +1444,6 @@ class AdminInheritedInlinesTest(TestCase):
         self.failUnlessEqual(FooAccount.objects.all()[0].username, "%s-1" % foo_user)
         self.failUnlessEqual(BarAccount.objects.all()[0].username, "%s-1" % bar_user)
         self.failUnlessEqual(Persona.objects.all()[0].accounts.count(), 2)
-
-from django.core import mail
 
 class AdminActionsTest(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
