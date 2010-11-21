@@ -99,8 +99,8 @@ class Signal(object):
         if weak:
             receiver = saferef.safeRef(receiver, onDelete=self._remove_receiver)
 
+        self.lock.acquire()
         try:
-            self.lock.acquire()
             for r_key, _ in self.receivers:
                 if r_key == lookup_key:
                     break
@@ -136,8 +136,8 @@ class Signal(object):
         else:
             lookup_key = (_make_id(receiver), _make_id(sender))
         
+        self.lock.acquire()
         try:
-            self.lock.acquire()
             for index in xrange(len(self.receivers)):
                 (r_key, _) = self.receivers[index]
                 if r_key == lookup_key:
@@ -237,8 +237,8 @@ class Signal(object):
         Remove dead receivers from connections.
         """
 
+        self.lock.acquire()
         try:
-            self.lock.acquire()
             to_remove = []
             for key, connected_receiver in self.receivers:
                 if connected_receiver == receiver:
