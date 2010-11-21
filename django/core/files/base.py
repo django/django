@@ -101,6 +101,12 @@ class File(FileProxyMixin):
         if buffer_ is not None:
             yield buffer_
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, tb):
+        self.close()
+
     def open(self, mode=None):
         if not self.closed:
             self.seek(0)

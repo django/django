@@ -4,8 +4,17 @@ import shutil
 import sys
 import tempfile
 import time
-from cStringIO import StringIO
 from datetime import datetime, timedelta
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
+try:
+    import threading
+except ImportError:
+    import dummy_threading as threading
+
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import ContentFile, File
@@ -14,11 +23,6 @@ from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import unittest
-
-try:
-    import threading
-except ImportError:
-    import dummy_threading as threading
 
 # Try to import PIL in either of the two ways it can end up installed.
 # Checking for the existence of Image is enough for CPython, but
@@ -30,6 +34,7 @@ except ImportError:
         import Image, _imaging
     except ImportError:
         Image = None
+
 
 class GetStorageClassTests(unittest.TestCase):
     def assertRaisesErrorWithMessage(self, error, message, callable,
@@ -430,6 +435,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         Multiple calls of get_image_dimensions() should return the same size.
         """
         from django.core.files.images import ImageFile
+
         img_path = os.path.join(os.path.dirname(__file__), "test.png")
         image = ImageFile(open(img_path, 'rb'))
         image_pil = Image.open(img_path)

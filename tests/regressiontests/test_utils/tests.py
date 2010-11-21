@@ -4,7 +4,7 @@ from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 
 
 if sys.version_info >= (2, 5):
-    from python_25 import AssertNumQueriesTests
+    from tests_25 import AssertNumQueriesTests
 
 
 class SkippingTestCase(TestCase):

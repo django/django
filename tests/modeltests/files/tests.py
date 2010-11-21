@@ -1,4 +1,5 @@
 import shutil
+import sys
 
 from django.core.cache import cache
 from django.core.files.base import ContentFile
@@ -6,6 +7,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
 from models import Storage, temp_storage, temp_storage_location
+if sys.version_info >= (2, 5):
+    from tests_25 import FileObjTests
 
 
 class FileTests(TestCase):
@@ -97,4 +100,3 @@ class FileTests(TestCase):
         obj2.normal.delete()
         obj3.default.delete()
         obj4.random.delete()
-
