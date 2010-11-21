@@ -92,7 +92,7 @@ def typecast_timestamp(s): # does NOT store time zone information
     else:
         microseconds = '0'
     return datetime.datetime(int(dates[0]), int(dates[1]), int(dates[2]),
-        int(times[0]), int(times[1]), int(seconds), int(float('.'+microseconds) * 1000000))
+        int(times[0]), int(times[1]), int(seconds), int((microseconds + '000000')[:6]))
 
 def typecast_boolean(s):
     if s is None: return None
