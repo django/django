@@ -159,6 +159,8 @@ requests. These include:
       <cache_key_prefixing>` and :ref:`transformation
       <cache_key_transformation>` has been added to the cache API.
 
+    * Support for lookups spanning relations in admin's ``list_filter``.
+
 .. _backwards-incompatible-changes-1.3:
 
 Backwards-incompatible changes in 1.3

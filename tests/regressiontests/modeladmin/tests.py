@@ -835,7 +835,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.list_filter\[0\]' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.",
+            "'ValidationTestModelAdmin.list_filter\[0\]' refers to 'non_existent_field' which does not refer to a Field.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,

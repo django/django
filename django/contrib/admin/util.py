@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.sql.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.related import RelatedObject
 from django.forms.forms import pretty_name
@@ -280,3 +281,95 @@ def display_for_field(value, field):
         return formats.number_format(value)
     else:
         return smart_unicode(value)
+
+
+class NotRelationField(Exception):
+    pass
+
+
+def get_model_from_relation(field):
+    if isinstance(field, models.related.RelatedObject):
+        return field.model
+    elif getattr(field, 'rel'): # or isinstance?
+        return field.rel.to
+    else:
+        raise NotRelationField
+
+
+def reverse_field_path(model, path):
+    """ Create a reversed field path.
+
+    E.g. Given (Order, "user__groups"),
+    return (Group, "user__order").
+
+    Final field must be a related model, not a data field.
+
+    """
+    reversed_path = []
+    parent = model
+    pieces = path.split(LOOKUP_SEP)
+    for piece in pieces:
+        field, model, direct, m2m = parent._meta.get_field_by_name(piece)
+        # skip trailing data field if extant:
+        if len(reversed_path) == len(pieces)-1: # final iteration
+            try:
+                get_model_from_relation(field)
+            except NotRelationField:
+                break
+        if direct:
+            related_name = field.related_query_name()
+            parent = field.rel.to
+        else:
+            related_name = field.field.name
+            parent = field.model
+        reversed_path.insert(0, related_name)
+    return (parent, LOOKUP_SEP.join(reversed_path))
+
+
+def get_fields_from_path(model, path):
+    """ Return list of Fields given path relative to model.
+
+    e.g. (ModelX, "user__groups__name") -> [
+        <django.db.models.fields.related.ForeignKey object at 0x...>,
+        <django.db.models.fields.related.ManyToManyField object at 0x...>,
+        <django.db.models.fields.CharField object at 0x...>,
+    ]
+    """
+    pieces = path.split(LOOKUP_SEP)
+    fields = []
+    for piece in pieces:
+        if fields:
+            parent = get_model_from_relation(fields[-1])
+        else:
+            parent = model
+        fields.append(parent._meta.get_field_by_name(piece)[0])
+    return fields
+
+
+def remove_trailing_data_field(fields):
+    """ Discard trailing non-relation field if extant. """
+    try:
+        get_model_from_relation(fields[-1])
+    except NotRelationField:
+        fields = fields[:-1]
+    return fields
+
+
+def get_limit_choices_to_from_path(model, path):
+    """ Return Q object for limiting choices if applicable.
+
+    If final model in path is linked via a ForeignKey or ManyToManyField which
+    has a `limit_choices_to` attribute, return it as a Q object.
+    """
+
+    fields = get_fields_from_path(model, path)
+    fields = remove_trailing_data_field(fields)
+    limit_choices_to = (
+        fields and hasattr(fields[-1], 'rel') and
+        getattr(fields[-1].rel, 'limit_choices_to', None))
+    if not limit_choices_to:
+        return models.Q() # empty Q
+    elif isinstance(limit_choices_to, models.Q):
+        return limit_choices_to # already a Q
+    else:
+        return models.Q(**limit_choices_to) # convert dict to Q

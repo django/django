@@ -90,6 +90,14 @@ class ArticleInline(admin.TabularInline):
 class ChapterInline(admin.TabularInline):
     model = Chapter
 
+class ChapterXtra1Admin(admin.ModelAdmin):
+    list_filter = ('chap',
+                   'chap__title',
+                   'chap__book',
+                   'chap__book__name',
+                   'chap__book__promo',
+                   'chap__book__promo__name',)
+
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
     list_filter = ('date',)
@@ -168,7 +176,7 @@ class Thing(models.Model):
         return self.title
 
 class ThingAdmin(admin.ModelAdmin):
-    list_filter = ('color',)
+    list_filter = ('color', 'color__warm', 'color__value')
 
 class Fabric(models.Model):
     NG_CHOICES = (
@@ -646,7 +654,7 @@ admin.site.register(CyclicTwo)
 # contrib.admin.util's get_deleted_objects function.
 admin.site.register(Book, inlines=[ChapterInline])
 admin.site.register(Promo)
-admin.site.register(ChapterXtra1)
+admin.site.register(ChapterXtra1, ChapterXtra1Admin)
 admin.site.register(Pizza, PizzaAdmin)
 admin.site.register(Topping)
 admin.site.register(Album)

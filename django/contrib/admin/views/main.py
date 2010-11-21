@@ -1,6 +1,6 @@
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import quote
+from django.contrib.admin.util import quote, get_fields_from_path
 from django.core.paginator import Paginator, InvalidPage
 from django.db import models
 from django.utils.encoding import force_unicode, smart_str
@@ -68,9 +68,11 @@ class ChangeList(object):
     def get_filters(self, request):
         filter_specs = []
         if self.list_filter:
-            filter_fields = [self.lookup_opts.get_field(field_name) for field_name in self.list_filter]
-            for f in filter_fields:
-                spec = FilterSpec.create(f, request, self.params, self.model, self.model_admin)
+            for filter_name in self.list_filter:
+                field = get_fields_from_path(self.model, filter_name)[-1]
+                spec = FilterSpec.create(field, request, self.params,
+                                         self.model, self.model_admin,
+                                         field_path=filter_name)
                 if spec and spec.has_output():
                     filter_specs.append(spec)
         return filter_specs, bool(filter_specs)
