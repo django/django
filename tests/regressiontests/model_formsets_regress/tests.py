@@ -196,12 +196,12 @@ class FormfieldCallbackTests(TestCase):
 
     def test_inlineformset_factory_default(self):
         Formset = inlineformset_factory(User, UserSite, form=UserSiteForm)
-        form = Formset({}).forms[0]
+        form = Formset().forms[0]
         self.assertTrue(isinstance(form['data'].field.widget, CustomWidget))
 
     def test_modelformset_factory_default(self):
         Formset = modelformset_factory(UserSite, form=UserSiteForm)
-        form = Formset({}).forms[0]
+        form = Formset().forms[0]
         self.assertTrue(isinstance(form['data'].field.widget, CustomWidget))
 
     def assertCallbackCalled(self, callback):
