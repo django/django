@@ -581,14 +581,23 @@ class URLField(CharField):
 
     def to_python(self, value):
         if value:
-            if '://' not in value:
-                # If no URL scheme given, assume http://
-                value = u'http://%s' % value
             url_fields = list(urlparse.urlsplit(value))
+            if not url_fields[0]:
+                # If no URL scheme given, assume http://
+                url_fields[0] = 'http'
+            if not url_fields[1]:
+                # Assume that if no domain is provided, that the path segment
+                # contains the domain. 
+                url_fields[1] = url_fields[2]
+                url_fields[2] = ''
+                # Rebuild the url_fields list, since the domain segment may now
+                # contain the path too.
+                value = urlparse.urlunsplit(url_fields)
+                url_fields = list(urlparse.urlsplit(value))
             if not url_fields[2]:
                 # the path portion may need to be added before query params
                 url_fields[2] = '/'
-                value = urlparse.urlunsplit(url_fields)
+            value = urlparse.urlunsplit(url_fields)
         return super(URLField, self).to_python(value)
 
 class BooleanField(Field):
