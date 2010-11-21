@@ -3,28 +3,43 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
-from models import Article
+from models import Author, Article, Tag
 
 
 class LookupTests(TestCase):
 
     #def setUp(self):
     def setUp(self):
+        # Create a few Authors.
+        self.au1 = Author(name='Author 1')
+        self.au1.save()
+        self.au2 = Author(name='Author 2')
+        self.au2.save()
         # Create a couple of Articles.
-        self.a1 = Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
+        self.a1 = Article(headline='Article 1', pub_date=datetime(2005, 7, 26), author=self.au1)
         self.a1.save()
-        self.a2 = Article(headline='Article 2', pub_date=datetime(2005, 7, 27))
+        self.a2 = Article(headline='Article 2', pub_date=datetime(2005, 7, 27), author=self.au1)
         self.a2.save()
-        self.a3 = Article(headline='Article 3', pub_date=datetime(2005, 7, 27))
+        self.a3 = Article(headline='Article 3', pub_date=datetime(2005, 7, 27), author=self.au1)
         self.a3.save()
-        self.a4 = Article(headline='Article 4', pub_date=datetime(2005, 7, 28))
+        self.a4 = Article(headline='Article 4', pub_date=datetime(2005, 7, 28), author=self.au1)
         self.a4.save()
-        self.a5 = Article(headline='Article 5', pub_date=datetime(2005, 8, 1, 9, 0))
+        self.a5 = Article(headline='Article 5', pub_date=datetime(2005, 8, 1, 9, 0), author=self.au2)
         self.a5.save()
-        self.a6 = Article(headline='Article 6', pub_date=datetime(2005, 8, 1, 8, 0))
+        self.a6 = Article(headline='Article 6', pub_date=datetime(2005, 8, 1, 8, 0), author=self.au2)
         self.a6.save()
-        self.a7 = Article(headline='Article 7', pub_date=datetime(2005, 7, 27))
+        self.a7 = Article(headline='Article 7', pub_date=datetime(2005, 7, 27), author=self.au2)
         self.a7.save()
+        # Create a few Tags.
+        self.t1 = Tag(name='Tag 1')
+        self.t1.save()
+        self.t1.articles.add(self.a1, self.a2, self.a3)
+        self.t2 = Tag(name='Tag 2')
+        self.t2.save()
+        self.t2.articles.add(self.a3, self.a4, self.a5)
+        self.t3 = Tag(name='Tag 3')
+        self.t3.save()
+        self.t3.articles.add(self.a5, self.a6, self.a7)
 
     def test_exists(self):
         # We can use .exists() to check that there are some
@@ -182,6 +197,42 @@ class LookupTests(TestCase):
                 'id_plus_seven': self.a1.id + 7,
                 'id_plus_eight': self.a1.id + 8,
             }], transform=identity)
+        # You can specify fields from forward and reverse relations, just like filter().
+        self.assertQuerysetEqual(
+            Article.objects.values('headline', 'author__name'),
+            [
+                {'headline': self.a5.headline, 'author__name': self.au2.name},
+                {'headline': self.a6.headline, 'author__name': self.au2.name},
+                {'headline': self.a4.headline, 'author__name': self.au1.name},
+                {'headline': self.a2.headline, 'author__name': self.au1.name},
+                {'headline': self.a3.headline, 'author__name': self.au1.name},
+                {'headline': self.a7.headline, 'author__name': self.au2.name},
+                {'headline': self.a1.headline, 'author__name': self.au1.name},
+            ], transform=identity)
+        self.assertQuerysetEqual(
+            Author.objects.values('name', 'article__headline').order_by('name', 'article__headline'),
+            [
+                {'name': self.au1.name, 'article__headline': self.a1.headline},
+                {'name': self.au1.name, 'article__headline': self.a2.headline},
+                {'name': self.au1.name, 'article__headline': self.a3.headline},
+                {'name': self.au1.name, 'article__headline': self.a4.headline},
+                {'name': self.au2.name, 'article__headline': self.a5.headline},
+                {'name': self.au2.name, 'article__headline': self.a6.headline},
+                {'name': self.au2.name, 'article__headline': self.a7.headline},
+            ], transform=identity)
+        self.assertQuerysetEqual(
+            Author.objects.values('name', 'article__headline', 'article__tag__name').order_by('name', 'article__headline', 'article__tag__name'),
+            [
+                {'name': self.au1.name, 'article__headline': self.a1.headline, 'article__tag__name': self.t1.name},
+                {'name': self.au1.name, 'article__headline': self.a2.headline, 'article__tag__name': self.t1.name},
+                {'name': self.au1.name, 'article__headline': self.a3.headline, 'article__tag__name': self.t1.name},
+                {'name': self.au1.name, 'article__headline': self.a3.headline, 'article__tag__name': self.t2.name},
+                {'name': self.au1.name, 'article__headline': self.a4.headline, 'article__tag__name': self.t2.name},
+                {'name': self.au2.name, 'article__headline': self.a5.headline, 'article__tag__name': self.t2.name},
+                {'name': self.au2.name, 'article__headline': self.a5.headline, 'article__tag__name': self.t3.name},
+                {'name': self.au2.name, 'article__headline': self.a6.headline, 'article__tag__name': self.t3.name},
+                {'name': self.au2.name, 'article__headline': self.a7.headline, 'article__tag__name': self.t3.name},
+            ], transform=identity)
         # However, an exception FieldDoesNotExist will be thrown if you specify
         # a non-existent field name in values() (a field that is neither in the
         # model nor in extra(select)).
@@ -192,6 +243,7 @@ class LookupTests(TestCase):
         self.assertQuerysetEqual(Article.objects.filter(id=self.a5.id).values(),
             [{
                 'id': self.a5.id,
+                'author_id': self.au2.id, 
                 'headline': 'Article 5',
                 'pub_date': datetime(2005, 8, 1, 9, 0)
             }], transform=identity)
@@ -250,6 +302,19 @@ class LookupTests(TestCase):
                 (self.a7.id, self.a7.id+1)
             ],
             transform=identity)
+        self.assertQuerysetEqual(
+            Author.objects.values_list('name', 'article__headline', 'article__tag__name').order_by('name', 'article__headline', 'article__tag__name'),
+            [
+                (self.au1.name, self.a1.headline, self.t1.name),
+                (self.au1.name, self.a2.headline, self.t1.name),
+                (self.au1.name, self.a3.headline, self.t1.name),
+                (self.au1.name, self.a3.headline, self.t2.name),
+                (self.au1.name, self.a4.headline, self.t2.name),
+                (self.au2.name, self.a5.headline, self.t2.name),
+                (self.au2.name, self.a5.headline, self.t3.name),
+                (self.au2.name, self.a6.headline, self.t3.name),
+                (self.au2.name, self.a7.headline, self.t3.name),
+            ], transform=identity)
         self.assertRaises(TypeError, Article.objects.values_list, 'id', 'headline', flat=True)
 
     def test_get_next_previous_by(self):
@@ -402,7 +467,7 @@ class LookupTests(TestCase):
             self.fail('FieldError not raised')
         except FieldError, ex:
             self.assertEqual(str(ex), "Cannot resolve keyword 'pub_date_year' "
-                             "into field. Choices are: headline, id, pub_date")
+                             "into field. Choices are: author, headline, id, pub_date, tag")
         try:
             Article.objects.filter(headline__starts='Article')
             self.fail('FieldError not raised')
