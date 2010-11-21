@@ -51,7 +51,7 @@ class CZBirthNumberField(Field):
     }
 
     def clean(self, value, gender=None):
-        super(CZBirthNumberField, self).__init__(value)
+        super(CZBirthNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
             return u''
@@ -108,7 +108,7 @@ class CZICNumberField(Field):
     }
 
     def clean(self, value):
-        super(CZICNumberField, self).__init__(value)
+        super(CZICNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
             return u''
