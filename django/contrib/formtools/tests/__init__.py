@@ -11,6 +11,13 @@ success_string = "Done was called!"
 
 
 class TestFormPreview(preview.FormPreview):
+    def get_context(self, request, form):
+        context = super(TestFormPreview, self).get_context(request, form)
+        context.update({'custom_context': True})
+        return context
+
+    def get_initial(self, request):
+        return {'field1': 'Works!'}
 
     def done(self, request, cleaned_data):
         return http.HttpResponse(success_string)
@@ -59,6 +66,8 @@ class PreviewTests(TestCase):
         response = self.client.get('/test1/')
         stage = self.input % 1
         self.assertContains(response, stage, 1)
+        self.assertEquals(response.context['custom_context'], True)
+        self.assertEquals(response.context['form'].initial, {'field1': 'Works!'})
 
     def test_form_preview(self):
         """
