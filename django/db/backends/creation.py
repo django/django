@@ -340,10 +340,13 @@ class BaseDatabaseCreation(object):
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
         """
-        if verbosity >= 1:
-            print "Creating test database '%s'..." % self.connection.alias
-
         test_database_name = self._create_test_db(verbosity, autoclobber)
+
+        if verbosity >= 1:
+            test_db_repr = ''
+            if verbosity >= 2:
+                test_db_repr = " ('%s')" % test_database_name
+            print "Creating test database for alias '%s'%s..." % (self.connection.alias, test_db_repr)
 
         self.connection.close()
         self.connection.settings_dict["NAME"] = test_database_name
@@ -411,10 +414,13 @@ class BaseDatabaseCreation(object):
         Destroy a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
         """
-        if verbosity >= 1:
-            print "Destroying test database '%s'..." % self.connection.alias
         self.connection.close()
         test_database_name = self.connection.settings_dict['NAME']
+        if verbosity >= 1:
+            test_db_repr = ''
+            if verbosity >= 2:
+                test_db_repr = " ('%s')" % test_database_name
+            print "Destroying test database for alias '%s'%s..." % (self.connection.alias, test_db_repr)
         self.connection.settings_dict['NAME'] = old_database_name
 
         self._destroy_test_db(test_database_name, verbosity)
