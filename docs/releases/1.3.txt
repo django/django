@@ -266,6 +266,36 @@ local flavors:
       has been removed from the province list in favor of the new
       official designation "Aceh (ACE)".
 
+FormSet updates
+~~~~~~~~~~~~~~~
+
+In Django 1.3 ``FormSet`` creation behavior is modified slightly. Historically
+the class didn't make a distinction between not being passed data and being
+passed empty dictionary. This was inconsistent with behavior in other parts of
+the framework. Starting with 1.3 if you pass in empty dictionary the
+``FormSet`` will raise a ``ValidationError``.
+
+For example with a ``FormSet``::
+
+    >>> class ArticleForm(Form):
+    ...     title = CharField()
+    ...     pub_date = DateField()
+    >>> ArticleFormSet = formset_factory(ArticleForm)
+
+the following code will raise a ``ValidationError``::
+
+    >>> ArticleFormSet({})
+    Traceback (most recent call last):
+    ...
+    ValidationError: [u'ManagementForm data is missing or has been tampered with']
+
+if you need to instantiate an empty ``FormSet``, don't pass in the data or use
+``None``::
+
+    >>> formset = ArticleFormSet()
+    >>> formset = ArticleFormSet(data=None)
+
+
 
 .. _deprecated-features-1.3:
 

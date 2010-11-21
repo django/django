@@ -37,8 +37,8 @@ class BaseFormSet(StrAndUnicode):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or self.get_default_prefix()
         self.auto_id = auto_id
-        self.data = data
-        self.files = files
+        self.data = data or {}
+        self.files = files or {}
         self.initial = initial
         self.error_class = error_class
         self._errors = None
@@ -51,7 +51,7 @@ class BaseFormSet(StrAndUnicode):
 
     def _management_form(self):
         """Returns the ManagementForm instance for this FormSet."""
-        if self.data or self.files:
+        if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
             if not form.is_valid():
                 raise ValidationError('ManagementForm data is missing or has been tampered with')
@@ -66,7 +66,7 @@ class BaseFormSet(StrAndUnicode):
 
     def total_form_count(self):
         """Returns the total number of forms in this FormSet."""
-        if self.data or self.files:
+        if self.is_bound:
             return self.management_form.cleaned_data[TOTAL_FORM_COUNT]
         else:
             initial_forms = self.initial_form_count()
@@ -81,7 +81,7 @@ class BaseFormSet(StrAndUnicode):
 
     def initial_form_count(self):
         """Returns the number of forms that are required in this FormSet."""
-        if self.data or self.files:
+        if self.is_bound:
             return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
         else:
             # Use the length of the inital data if it's there, 0 otherwise.
@@ -101,7 +101,7 @@ class BaseFormSet(StrAndUnicode):
         Instantiates and returns the i-th form instance in a formset.
         """
         defaults = {'auto_id': self.auto_id, 'prefix': self.add_prefix(i)}
-        if self.data or self.files:
+        if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files
         if self.initial:
@@ -133,7 +133,7 @@ class BaseFormSet(StrAndUnicode):
             'prefix': self.add_prefix('__prefix__'),
             'empty_permitted': True,
         }
-        if self.data or self.files:
+        if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files
         defaults.update(kwargs)

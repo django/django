@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.forms import Form, CharField, IntegerField, ValidationError
+from django.forms import Form, CharField, IntegerField, ValidationError, DateField
 from django.forms.formsets import formset_factory, BaseFormSet
 from django.utils.unittest import TestCase
 
@@ -741,7 +741,12 @@ class FormsFormsetTestCase(TestCase):
         formset = FavoriteDrinksFormSet()
         self.assertEqual(formset.management_form.prefix, 'form')
 
-        formset = FavoriteDrinksFormSet(data={})
+        data = {
+            'form-TOTAL_FORMS': '2',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+        }
+        formset = FavoriteDrinksFormSet(data=data)
         self.assertEqual(formset.management_form.prefix, 'form')
 
         formset = FavoriteDrinksFormSet(initial={})
@@ -795,3 +800,43 @@ class FormsetAsFooTests(TestCase):
         self.assertEqual(formset.as_ul(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="text" name="choices-0-votes" value="100" /></li>""")
+
+
+# Regression test for #11418 ################################################# 
+class ArticleForm(Form):
+    title = CharField()
+    pub_date = DateField()
+
+ArticleFormSet = formset_factory(ArticleForm)
+
+class TestIsBoundBehavior(TestCase):
+    def test_no_data_raises_validation_error(self):
+        self.assertRaises(ValidationError, ArticleFormSet, {})
+
+    def test_with_management_data_attrs_work_fine(self):
+        data = {
+            'form-TOTAL_FORMS': u'1',
+            'form-INITIAL_FORMS': u'0',
+        }
+        formset = ArticleFormSet(data)
+        self.assertEquals(0, formset.initial_form_count())
+        self.assertEquals(1, formset.total_form_count())
+        self.assertTrue(formset.is_bound)
+        self.assertTrue(formset.forms[0].is_bound)
+        self.assertTrue(formset.is_valid())
+        self.assertTrue(formset.forms[0].is_valid())
+        self.assertEquals([{}], formset.cleaned_data)
+
+
+    def test_form_errors_are_cought_by_formset(self):
+        data = {
+            'form-TOTAL_FORMS': u'2',
+            'form-INITIAL_FORMS': u'0',
+            'form-0-title': u'Test',
+            'form-0-pub_date': u'1904-06-16',
+            'form-1-title': u'Test',
+            'form-1-pub_date': u'', # <-- this date is missing but required 
+        }
+        formset = ArticleFormSet(data)
+        self.assertFalse(formset.is_valid())
+        self.assertEquals([{}, {'pub_date': [u'This field is required.']}], formset.errors)

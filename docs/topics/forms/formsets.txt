@@ -100,7 +100,12 @@ an ``is_valid`` method on the formset to provide a convenient way to validate
 all forms in the formset::
 
     >>> ArticleFormSet = formset_factory(ArticleForm)
-    >>> formset = ArticleFormSet({})
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'1',
+    ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
     True
 
@@ -113,7 +118,7 @@ provide an invalid article::
     ...     'form-INITIAL_FORMS': u'0',
     ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'16 June 1904',
+    ...     'form-0-pub_date': u'1904-06-16',
     ...     'form-1-title': u'Test',
     ...     'form-1-pub_date': u'', # <-- this date is missing but required
     ... }
@@ -208,9 +213,9 @@ is where you define your own validation that works at the formset level::
     ...     'form-INITIAL_FORMS': u'0',
     ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'16 June 1904',
+    ...     'form-0-pub_date': u'1904-06-16',
     ...     'form-1-title': u'Test',
-    ...     'form-1-pub_date': u'23 June 1912',
+    ...     'form-1-pub_date': u'1912-06-23',
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
