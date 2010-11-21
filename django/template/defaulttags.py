@@ -725,7 +725,7 @@ def do_for(parser, token):
         raise TemplateSyntaxError("'for' statements should use the format"
                                   " 'for x in y': %s" % token.contents)
 
-    loopvars = re.sub(r' *, *', ',', ' '.join(bits[1:in_index])).split(',')
+    loopvars = re.split(r' *, *', ' '.join(bits[1:in_index]))
     for var in loopvars:
         if not var or ' ' in var:
             raise TemplateSyntaxError("'for' tag received an invalid argument:"
