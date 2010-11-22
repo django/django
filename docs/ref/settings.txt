@@ -169,7 +169,7 @@ caches every page that doesn't have GET or POST parameters.
 If you set the value of this setting to ``True``, you should make sure you've
 activated ``AuthenticationMiddleware``.
 
-See the :doc:`cache documentation </topics/cache>` for more information.
+See :doc:`/topics/cache`.
 
 .. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
 
@@ -178,8 +178,9 @@ CACHE_MIDDLEWARE_KEY_PREFIX
 
 Default: ``''`` (Empty string)
 
-The cache key prefix that the cache middleware should use. See
-:doc:`/topics/cache`.
+The cache key prefix that the cache middleware should use.
+
+See :doc:`/topics/cache`.
 
 .. setting:: CACHE_MIDDLEWARE_SECONDS
 
@@ -190,6 +191,8 @@ Default: ``600``
 
 The default number of seconds to cache a page when the caching middleware or
 ``cache_page()`` decorator is used.
+
+See :doc:`/topics/cache`.
 
 .. setting:: CACHE_PREFIX
 

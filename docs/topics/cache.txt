@@ -31,8 +31,8 @@ explaining how this would work for a dynamically generated Web page::
 Django comes with a robust cache system that lets you save dynamic pages so
 they don't have to be calculated for each request. For convenience, Django
 offers different levels of cache granularity: You can cache the output of
-specific views, you can cache only the pieces that are difficult to produce, or
-you can cache your entire site.
+specific views, you can cache only the pieces that are difficult to produce,
+or you can cache your entire site.
 
 Django also works well with "upstream" caches, such as Squid
 (http://www.squid-cache.org/) and browser-based caches. These are the types of
@@ -47,8 +47,9 @@ where your cached data should live -- whether in a database, on the filesystem
 or directly in memory. This is an important decision that affects your cache's
 performance; yes, some cache types are faster than others.
 
-Your cache preference goes in the ``CACHE_BACKEND`` setting in your settings
-file. Here's an explanation of all available values for ``CACHE_BACKEND``.
+Your cache preference goes in the :setting:`CACHE_BACKEND` setting in your
+settings file. Here's an explanation of all available values for
+:setting:`CACHE_BACKEND`.
 
 Memcached
 ---------
@@ -75,7 +76,7 @@ This is available at ftp://ftp.tummy.com/pub/python-memcached/
     a lack of maintenance on the ``cmemcache`` library itself. Support for
     ``cmemcache`` will be removed completely in Django 1.4.
 
-To use Memcached with Django, set ``CACHE_BACKEND`` to
+To use Memcached with Django, set :setting:`CACHE_BACKEND` to
 ``memcached://ip:port/``, where ``ip`` is the IP address of the Memcached
 daemon and ``port`` is the port on which Memcached is running.
 
@@ -87,7 +88,8 @@ One excellent feature of Memcached is its ability to share cache over multiple
 servers. This means you can run Memcached daemons on multiple machines, and the
 program will treat the group of machines as a *single* cache, without the need
 to duplicate cache values on each machine. To take advantage of this feature,
-include all server addresses in ``CACHE_BACKEND``, separated by semicolons.
+include all server addresses in :setting:`CACHE_BACKEND`, separated by
+semicolons.
 
 In this example, the cache is shared over Memcached instances running on IP
 address 172.19.26.240 and 172.19.26.242, both on port 11211::
@@ -123,9 +125,10 @@ not already being used in your database.) This command creates a single table
 in your database that is in the proper format that Django's database-cache
 system expects.
 
-Once you've created that database table, set your ``CACHE_BACKEND`` setting to
-``"db://tablename"``, where ``tablename`` is the name of the database table.
-In this example, the cache table's name is ``my_cache_table``::
+Once you've created that database table, set your :setting:`CACHE_BACKEND`
+setting to ``"db://tablename"``, where ``tablename`` is the name of the
+database table. In this example, the cache table's name is
+``my_cache_table``::
 
     CACHE_BACKEND = 'db://my_cache_table'
 
@@ -181,8 +184,8 @@ Filesystem caching
 ------------------
 
 To store cached items on a filesystem, use the ``"file://"`` cache type for
-``CACHE_BACKEND``. For example, to store cached data in ``/var/tmp/django_cache``,
-use this setting::
+:setting:`CACHE_BACKEND`. For example, to store cached data in
+``/var/tmp/django_cache``, use this setting::
 
     CACHE_BACKEND = 'file:///var/tmp/django_cache'
 
@@ -212,8 +215,8 @@ Local-memory caching
 
 If you want the speed advantages of in-memory caching but don't have the
 capability of running Memcached, consider the local-memory cache backend. This
-cache is multi-process and thread-safe. To use it, set ``CACHE_BACKEND`` to
-``"locmem://"``. For example::
+cache is multi-process and thread-safe. To use it, set :setting:`CACHE_BACKEND`
+to ``"locmem://"``. For example::
 
     CACHE_BACKEND = 'locmem://'
 
@@ -231,7 +234,7 @@ just implements the cache interface without doing anything.
 This is useful if you have a production site that uses heavy-duty caching in
 various places but a development/test environment where you don't want to cache
 and don't want to have to change your code to special-case the latter. To
-activate dummy caching, set ``CACHE_BACKEND`` like so::
+activate dummy caching, set :setting:`CACHE_BACKEND` like so::
 
     CACHE_BACKEND = 'dummy://'
 
@@ -243,7 +246,7 @@ Using a custom cache backend
 While Django includes support for a number of cache backends out-of-the-box,
 sometimes you might want to use a customized cache backend. To use an external
 cache backend with Django, use a Python import path as the scheme portion (the
-part before the initial colon) of the ``CACHE_BACKEND`` URI, like so::
+part before the initial colon) of the :setting:`CACHE_BACKEND` URI, like so::
 
     CACHE_BACKEND = 'path.to.backend://'
 
@@ -259,7 +262,7 @@ CACHE_BACKEND arguments
 -----------------------
 
 Each cache backend may take arguments. They're given in query-string style on
-the ``CACHE_BACKEND`` setting. Valid arguments are as follows:
+the :setting:`CACHE_BACKEND` setting. Valid arguments are as follows:
 
     * ``timeout``: The default timeout, in seconds, to use for the cache.
       This argument defaults to 300 seconds (5 minutes).
@@ -315,22 +318,23 @@ entire site. You'll need to add
 
 Then, add the following required settings to your Django settings file:
 
-* ``CACHE_MIDDLEWARE_SECONDS`` -- The number of seconds each page should be
-  cached.
-* ``CACHE_MIDDLEWARE_KEY_PREFIX`` -- If the cache is shared across multiple
-  sites using the same Django installation, set this to the name of the site,
-  or some other string that is unique to this Django instance, to prevent key
-  collisions. Use an empty string if you don't care.
+* :setting:`CACHE_MIDDLEWARE_SECONDS` -- The number of seconds each page should
+  be cached.
+* :setting:`CACHE_MIDDLEWARE_KEY_PREFIX` -- If the cache is shared across
+  multiple sites using the same Django installation, set this to the name of
+  the site, or some other string that is unique to this Django instance, to
+  prevent key collisions. Use an empty string if you don't care.
 
 The cache middleware caches every page that doesn't have GET or POST
-parameters. Optionally, if the ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is
-``True``, only anonymous requests (i.e., not those made by a logged-in user)
-will be cached. This is a simple and effective way of disabling caching for any
-user-specific pages (include Django's admin interface). Note that if you use
-``CACHE_MIDDLEWARE_ANONYMOUS_ONLY``, you should make sure you've activated
-``AuthenticationMiddleware``. The cache middleware expects that a HEAD request
-is answered with the same response headers exactly like the corresponding GET
-request, in that case it could return cached GET response for HEAD request.
+parameters. Optionally, if the :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY`
+setting is ``True``, only anonymous requests (i.e., not those made by a
+logged-in user) will be cached. This is a simple and effective way of disabling
+caching for any user-specific pages (include Django's admin interface). Note
+that if you use :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY`, you should make
+sure you've activated ``AuthenticationMiddleware``. The cache middleware
+expects that a HEAD request is answered with the same response headers as
+the corresponding GET request; in which case it can return a cached GET
+response for HEAD request.
 
 Additionally, the cache middleware automatically sets a few headers in each
 ``HttpResponse``:
@@ -339,10 +343,10 @@ Additionally, the cache middleware automatically sets a few headers in each
       (uncached) version of the page is requested.
 
     * Sets the ``Expires`` header to the current date/time plus the defined
-      ``CACHE_MIDDLEWARE_SECONDS``.
+      :setting:`CACHE_MIDDLEWARE_SECONDS`.
 
     * Sets the ``Cache-Control`` header to give a max age for the page --
-      again, from the ``CACHE_MIDDLEWARE_SECONDS`` setting.
+      again, from the :setting:`CACHE_MIDDLEWARE_SECONDS` setting.
 
 See :doc:`/topics/http/middleware` for more on middleware.
 
@@ -350,7 +354,7 @@ See :doc:`/topics/http/middleware` for more on middleware.
 
 If a view sets its own cache expiry time (i.e. it has a ``max-age`` section in
 its ``Cache-Control`` header) then the page will be cached until the expiry
-time, rather than ``CACHE_MIDDLEWARE_SECONDS``. Using the decorators in
+time, rather than :setting:`CACHE_MIDDLEWARE_SECONDS`. Using the decorators in
 ``django.views.decorators.cache`` you can easily set a view's expiry time
 (using the ``cache_control`` decorator) or disable caching for a view (using
 the ``never_cache`` decorator). See the `using other headers`__ section for
@@ -372,6 +376,8 @@ __ `Controlling cache: Using other headers`_
 
 The per-view cache
 ==================
+
+.. function ``django.views.decorators.cache.cache_page``
 
 A more granular way to use the caching framework is by caching the output of
 individual views. ``django.views.decorators.cache`` defines a ``cache_page``
@@ -402,9 +408,9 @@ then requests to ``/foo/1/`` and ``/foo/23/`` will be cached separately, as
 you may expect. But once a particular URL (e.g., ``/foo/23/``) has been
 requested, subsequent requests to that URL will use the cache.
 
-``cache_page`` can also take an optional keyword argument, ``key_prefix``, which
-works in the same way as the ``CACHE_MIDDLEWARE_KEY_PREFIX`` setting for the
-middleware.  It can be used like this::
+``cache_page`` can also take an optional keyword argument, ``key_prefix``,
+which works in the same way as the :setting:`CACHE_MIDDLEWARE_KEY_PREFIX`
+setting for the middleware.  It can be used like this::
 
     @cache_page(60 * 15, key_prefix="site1")
     def my_view(request):
@@ -529,7 +535,7 @@ can be pickled; refer to the Python documentation for more information about
 pickling.)
 
 The cache module, ``django.core.cache``, has a ``cache`` object that's
-automatically created from the ``CACHE_BACKEND`` setting::
+automatically created from the :setting:`CACHE_BACKEND` setting::
 
     >>> from django.core.cache import cache
 
@@ -540,8 +546,8 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
     'hello, world!'
 
 The ``timeout`` argument is optional and defaults to the ``timeout``
-argument in the ``CACHE_BACKEND`` setting (explained above). It's the number of
-seconds the value should be stored in the cache.
+argument in the :setting:`CACHE_BACKEND` setting (explained above). It's the
+number of seconds the value should be stored in the cache.
 
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
@@ -957,7 +963,7 @@ Here's a full list:
 For explanation of Cache-Control HTTP directives, see the `Cache-Control spec`_.
 
 (Note that the caching middleware already sets the cache header's max-age with
-the value of the ``CACHE_MIDDLEWARE_SETTINGS`` setting. If you use a custom
+the value of the :setting:`CACHE_MIDDLEWARE_SETTINGS` setting. If you use a custom
 ``max_age`` in a ``cache_control`` decorator, the decorator will take
 precedence, and the header values will be merged correctly.)
 
@@ -984,14 +990,14 @@ site's performance:
       modern browsers to conditionally GET responses based on the ``ETag``
       and ``Last-Modified`` headers.
 
-    * ``django.middleware.gzip.GZipMiddleware`` compresses responses for all
+    * :class:`django.middleware.gzip.GZipMiddleware` compresses responses for all
       moderns browsers, saving bandwidth and transfer time.
 
 Order of MIDDLEWARE_CLASSES
 ===========================
 
 If you use caching middleware, it's important to put each half in the right
-place within the ``MIDDLEWARE_CLASSES`` setting. That's because the cache
+place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache
 middleware needs to know which headers by which to vary the cache storage.
 Middleware always adds something to the ``Vary`` response header when it can.
 
