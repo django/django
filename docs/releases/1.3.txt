@@ -334,9 +334,12 @@ of active projects in its version control repositories, and its lead developer
 has shifted all of his efforts toward the lighter, slimmer, more stable, and
 more flexible ``mod_wsgi`` backend.
 
-If you are currently using the ``mod_python`` request handler, it is strongly
-encouraged you redeploy your Django instances using :doc:`mod_wsgi
-</howto/deployment/modwsgi>`.
+If you are currently using the ``mod_python`` request handler, you
+should redeploy your Django projects using another request handler.
+:doc:`mod_wsgi </howto/deployment/modwsgi>` is the request handler
+recommended by the Django project, but :doc:`FastCGI
+</howto/deployment/fastcgi>` is also supported. Support for
+``mod_python`` deployment will be removed in Django 1.5.
 
 Function-based generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
