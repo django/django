@@ -1091,9 +1091,8 @@ output will be ``[1, 2, 3, 4, 5, 6]``.
 
 .. warning::
 
-    Keep in mind that strings that can both be coerced to integers will be,
-    and thus will be will be *summed*, not concatenated, as in the first
-    example above.
+    Strings that can be coerced to integers will be **summed**, not
+    concatenated, as in the first example above.
 
 .. templatefilter:: addslashes
 
