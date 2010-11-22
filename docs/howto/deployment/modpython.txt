@@ -4,10 +4,11 @@ How to use Django with Apache and mod_python
 
 .. warning::
 
-    Support for mod_python will be deprecated in a future release of Django. If
-    you are configuring a new deployment, you are strongly encouraged to
-    consider using :doc:`mod_wsgi </howto/deployment/modwsgi>` or any of the
-    other :doc:`supported backends </howto/deployment/index>`.
+    Support for mod_python has been deprecated, and will be removed in
+    Django 1.5. If you are configuring a new deployment, you are
+    strongly encouraged to consider using :doc:`mod_wsgi
+    </howto/deployment/modwsgi>` or any of the other :doc:`supported
+    backends </howto/deployment/index>`.
 
 .. highlight:: apache
 
@@ -218,15 +219,15 @@ log and can even `cause response errors`_.
 
 .. _cause response errors: http://blog.dscpl.com.au/2009/04/wsgi-and-printing-to-standard-output.html
 
-If you have the need to print debugging information in a mod_python setup, you 
+If you have the need to print debugging information in a mod_python setup, you
 have a few options. You can print to ``stderr`` explicitly, like so::
- 
+
     print >> sys.stderr, 'debug text'
     sys.stderr.flush()
- 
+
 (note that ``stderr`` is buffered, so calling ``flush`` is necessary if you wish
 debugging information to be displayed promptly.)
- 
+
 A more compact approach is to use an assertion::
 
     assert False, 'debug text'
