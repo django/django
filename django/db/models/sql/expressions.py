@@ -19,7 +19,10 @@ class SQLEvaluator(object):
 
     def relabel_aliases(self, change_map):
         for node, col in self.cols.items():
-            self.cols[node] = (change_map.get(col[0], col[0]), col[1])
+            if hasattr(col, "relabel_aliases"):
+                col.relabel_aliases(change_map)
+            else:
+                self.cols[node] = (change_map.get(col[0], col[0]), col[1])
 
     #####################################################
     # Vistor methods for initial expression preparation #

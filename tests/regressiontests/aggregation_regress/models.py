@@ -1,8 +1,5 @@
 # coding: utf-8
-import pickle
-
-from django.db import connection, models, DEFAULT_DB_ALIAS
-from django.conf import settings
+from django.db import models
 
 
 class Author(models.Model):
@@ -48,7 +45,6 @@ class Store(models.Model):
 
     def __unicode__(self):
         return self.name
-
 
 class Entries(models.Model):
     EntryID = models.AutoField(primary_key=True, db_column='Entry ID')
