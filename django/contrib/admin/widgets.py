@@ -203,7 +203,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         # Backwards compatible check for whether a user can add related
         # objects.
         if can_add_related is None:
-            can_add_related = rel_to in self.admin_site._registry
+            can_add_related = rel.to in admin_site._registry
         self.can_add_related = can_add_related
         # so we can check if the related object is registered with this AdminSite
         self.admin_site = admin_site

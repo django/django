@@ -6,9 +6,9 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import widgets
-from django.contrib.admin.widgets import FilteredSelectMultiple, AdminSplitDateTime
-from django.contrib.admin.widgets import (AdminFileWidget, ForeignKeyRawIdWidget,
-    ManyToManyRawIdWidget)
+from django.contrib.admin.widgets import (FilteredSelectMultiple,
+    AdminSplitDateTime, AdminFileWidget, ForeignKeyRawIdWidget, AdminRadioSelect,
+    RelatedFieldWidgetWrapper, ManyToManyRawIdWidget)
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import DateField
@@ -31,7 +31,8 @@ class AdminFormfieldForDBFieldTests(TestCase):
         and verify that the returned formfield is appropriate.
         """
         # Override any settings on the model admin
-        class MyModelAdmin(admin.ModelAdmin): pass
+        class MyModelAdmin(admin.ModelAdmin):
+            pass
         for k in admin_overrides:
             setattr(MyModelAdmin, k, admin_overrides[k])
 
@@ -314,3 +315,11 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
         self.assertEqual(w._has_changed([1, 2], [u'1', u'2']), False)
         self.assertEqual(w._has_changed([1, 2], [u'1']), True)
         self.assertEqual(w._has_changed([1, 2], [u'1', u'3']), True)
+
+class RelatedFieldWidgetWrapperTests(DjangoTestCase):
+    def test_no_can_add_related(self):
+        rel = models.Inventory._meta.get_field('parent').rel
+        w = AdminRadioSelect()
+        # Used to fail with a name error.
+        w = RelatedFieldWidgetWrapper(w, rel, admin.site)
+        self.assertFalse(w.can_add_related)
