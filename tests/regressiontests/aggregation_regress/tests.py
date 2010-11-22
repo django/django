@@ -1,13 +1,13 @@
 import datetime
+import pickle
 from decimal import Decimal
+from operator import attrgetter
 
 from django.core.exceptions import FieldError
-from django.conf import settings
 from django.test import TestCase, Approximate, skipUnlessDBFeature
-from django.db import DEFAULT_DB_ALIAS
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F
 
-from regressiontests.aggregation_regress.models import *
+from models import Author, Book, Publisher, Clues, Entries, HardbackBook
 
 
 class AggregationTests(TestCase):
@@ -482,7 +482,7 @@ class AggregationTests(TestCase):
         # Regression for #10197 -- Queries with aggregates can be pickled.
         # First check that pickling is possible at all. No crash = success
         qs = Book.objects.annotate(num_authors=Count('authors'))
-        out = pickle.dumps(qs)
+        pickle.dumps(qs)
 
         # Then check that the round trip works.
         query = qs.query.get_compiler(qs.db).as_sql()[0]
@@ -638,6 +638,20 @@ class AggregationTests(TestCase):
         self.assertEqual(
             Author.objects.annotate(c=Count("friends__name")).exclude(friends__name="Joe").count(),
             Author.objects.count()
+        )
+
+    def test_f_expression_annotation(self):
+        # Books with less than 200 pages per author.
+        qs = Book.objects.values("name").annotate(
+            n_authors=Count("authors")
+        ).filter(
+            pages__lt=F("n_authors") * 200
+        ).values_list("pk")
+        self.assertQuerysetEqual(
+            Book.objects.filter(pk__in=qs), [
+                "Python Web Development with Django"
+            ],
+            attrgetter("name")
         )
 
     @skipUnlessDBFeature('supports_stddev')
