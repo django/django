@@ -175,6 +175,13 @@ commonly used groups of widgets:
     Wrapper around three select widgets: one each for month, day, and year.
     Note that this widget lives in a separate file from the standard widgets.
 
+    Takes one optional argument:
+
+    .. attribute:: List.years
+
+        An optional list/tuple of years to use in the "year" select box.
+        The default is a list containing the current year and the next 9 years.
+
     .. code-block:: python
 
         from django.forms.extras.widgets import SelectDateWidget
