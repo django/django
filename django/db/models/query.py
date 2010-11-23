@@ -266,11 +266,14 @@ class QuerySet(object):
                     init_list.append(field.attname)
             model_cls = deferred_class_factory(self.model, skip)
 
-        compiler = self.query.get_compiler(using=self.db)
+        # Cache db and model outside the loop
+        db = self.db
+        model = self.model
+        compiler = self.query.get_compiler(using=db)
         for row in compiler.results_iter():
             if fill_cache:
-                obj, _ = get_cached_row(self.model, row,
-                            index_start, using=self.db, max_depth=max_depth,
+                obj, _ = get_cached_row(model, row,
+                            index_start, using=db, max_depth=max_depth,
                             requested=requested, offset=len(aggregate_select),
                             only_load=only_load)
             else:
@@ -280,19 +283,21 @@ class QuerySet(object):
                     obj = model_cls(**dict(zip(init_list, row_data)))
                 else:
                     # Omit aggregates in object creation.
-                    obj = self.model(*row[index_start:aggregate_start])
+                    obj = model(*row[index_start:aggregate_start])
 
                 # Store the source database of the object
-                obj._state.db = self.db
+                obj._state.db = db
                 # This object came from the database; it's not being added.
                 obj._state.adding = False
 
-            for i, k in enumerate(extra_select):
-                setattr(obj, k, row[i])
+            if extra_select:
+                for i, k in enumerate(extra_select):
+                    setattr(obj, k, row[i])
 
             # Add the aggregates to the model
-            for i, aggregate in enumerate(aggregate_select):
-                setattr(obj, aggregate, row[i+aggregate_start])
+            if aggregate_select:
+                for i, aggregate in enumerate(aggregate_select):
+                    setattr(obj, aggregate, row[i+aggregate_start])
 
             yield obj
 

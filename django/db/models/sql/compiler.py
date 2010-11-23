@@ -672,6 +672,7 @@ class SQLCompiler(object):
         """
         resolve_columns = hasattr(self, 'resolve_columns')
         fields = None
+        has_aggregate_select = bool(self.query.aggregate_select)
         for rows in self.execute_sql(MULTI):
             for row in rows:
                 if resolve_columns:
@@ -692,7 +693,7 @@ class SQLCompiler(object):
                                       f.column in only_load[db_table]]
                     row = self.resolve_columns(row, fields)
 
-                if self.query.aggregate_select:
+                if has_aggregate_select:
                     aggregate_start = len(self.query.extra_select.keys()) + len(self.query.select)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
                     row = tuple(row[:aggregate_start]) + tuple([
