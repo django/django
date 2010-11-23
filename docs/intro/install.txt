@@ -13,7 +13,10 @@ Being a Python Web framework, Django requires Python. It works with any Python
 version from 2.4 to 2.7 (due to backwards
 incompatibilities in Python 3.0, Django does not currently work with
 Python 3.0; see :doc:`the Django FAQ </faq/install>` for more
-information on supported Python versions and the 3.0 transition), but we recommend installing Python 2.5 or later. If you do so, you won't need to set up a database just yet: Python 2.5 or later includes a lightweight database called SQLite_.
+information on supported Python versions and the 3.0 transition), but we
+recommend installing Python 2.5 or later. If you do so, you won't need to set
+up a database just yet: Python 2.5 or later includes a lightweight database
+called SQLite_.
 
 .. _sqlite: http://sqlite.org/
 
@@ -27,7 +30,8 @@ probably already have it installed.
 
 .. _jython: http://www.jython.org/
 
-You can verify that Python's installed by typing ``python`` from your shell; you should see something like::
+You can verify that Python is installed by typing ``python`` from your shell;
+you should see something like::
 
     Python 2.5.1 (r251:54863, Jan 17 2008, 19:35:17)
     [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
@@ -74,7 +78,19 @@ You've got three easy options to install Django:
     documentation marked **new in development version**. That phrase flags
     features that are only available in development versions of Django, and
     they likely won't work with an official release.
-    
+
+
+Verifying
+---------
+
+To verify that Django can be seen by Python, type ``python`` from your shell.
+Then at the Python prompt, try to import Django::
+
+    >>> import django
+    >>> print django.get_version()
+    1.3
+
+
 That's it!
 ----------
 

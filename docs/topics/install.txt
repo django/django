@@ -161,6 +161,8 @@ If you installed Django from a Python egg, remove the Django ``.egg`` file,
 and remove the reference to the egg in the file named ``easy-install.pth``.
 This file should also be located in your ``site-packages`` directory.
 
+.. _finding-site-packages:
+
 .. admonition:: Where are my ``site-packages`` stored?
 
     The location of the ``site-packages`` directory depends on the operating
@@ -250,35 +252,21 @@ latest bug fixes and improvements, follow these instructions:
 
        svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
 
-3. Next, make sure that the Python interpreter can load Django's code. There
-   are various ways of accomplishing this.  One of the most convenient, on
-   Linux, Mac OSX or other Unix-like systems, is to use a symbolic link:
+3. Next, make sure that the Python interpreter can load Django's code. The most
+   convenient way to do this is to
+   `modify Python's search path <modify-python-path>`_. Add a ``.pth``
+   file containing the full path to the ``django-trunk`` directory to your
+   system's ``site-packages`` directory. For example, on a Unix-like system:
 
    .. code-block:: bash
 
-       ln -s WORKING-DIR/django-trunk/django SITE-PACKAGES-DIR/django
+       echo WORKING-DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
 
    (In the above line, change ``SITE-PACKAGES-DIR`` to match the location of
    your system's ``site-packages`` directory, as explained in the
-   "Where are my ``site-packages`` stored?" section above. Change WORKING-DIR
-   to match the full path to your new ``django-trunk`` directory.)
-
-   Alternatively, you can define your ``PYTHONPATH`` environment variable
-   so that it includes the ``django-trunk`` directory. This is perhaps the
-   most convenient solution on Windows systems, which don't support symbolic
-   links. (Environment variables can be defined on Windows systems `from the
-   Control Panel`_.)
-
-   .. admonition:: What about Apache and mod_wsgi?
-
-      If you take the approach of setting ``PYTHONPATH``, you'll need
-      to remember to do the same thing in your WSGI application once
-      you deploy your production site. Do this by appending to
-      ``sys.path`` in your WSGI application.
-
-      More information about deployment is available, of course, in our
-      :doc:`How to use Django with mod_wsgi </howto/deployment/modwsgi>`
-      documentation.
+   :ref:`Where are my site-packages stored? <finding-site-packages>` section
+   above. Change ``WORKING-DIR/django-trunk`` to match the full path to your
+   new ``django-trunk`` directory.)
 
 4. On Unix-like systems, create a symbolic link to the file
    ``django-trunk/django/bin/django-admin.py`` in a directory on your system
@@ -307,4 +295,4 @@ this, Subversion will automatically download any changes.
 
 .. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
-.. _from the Control Panel: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/sysdm_advancd_environmnt_addchange_variable.mspx
+.. _modify-python-path: http://docs.python.org/install/index.html#modifying-python-s-search-path
