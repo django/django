@@ -348,9 +348,14 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
         week = self.get_week()
 
         date_field = self.get_date_field()
+        week_format = self.get_week_format()
+        week_start = {
+            '%W': '1',
+            '%U': '0',
+        }[week_format]
         date = _date_from_string(year, self.get_year_format(),
-                                 '0', '%w',
-                                 week, self.get_week_format())
+                                 week_start, '%w',
+                                 week, week_format)
 
         # Construct a date-range lookup.
         first_day = date

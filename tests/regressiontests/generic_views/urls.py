@@ -149,6 +149,8 @@ urlpatterns = patterns('',
         views.BookWeekArchive.as_view(allow_future=True)),
     (r'^dates/books/(?P<year>\d{4})/week/no_week/$',
         views.BookWeekArchive.as_view()),
+    (r'^dates/books/(?P<year>\d{4})/week/(?P<week>\d{1,2})/monday/$',
+        views.BookWeekArchive.as_view(week_format='%W')),
 
     # DayArchiveView
     (r'^dates/books/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\d{1,2})/$',
