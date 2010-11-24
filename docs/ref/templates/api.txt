@@ -281,6 +281,22 @@ If you ``pop()`` too much, it'll raise
     ...
     django.template.ContextPopException
 
+In addition to ``push()`` and ``pop()``, the ``Context``
+object also defines an ``update()`` method. This works like ``push()``
+but takes a dictionary as an argument and pushes that dictionary onto
+the stack instead of an empty one.
+
+    >>> c = Context()
+    >>> c['foo'] = 'first level'
+    >>> c.update({'foo': 'updated'})
+    {'foo': 'updated'}
+    >>> c['foo']
+    'updated'
+    >>> c.pop()
+    {'foo': 'updated'}
+    >>> c['foo']
+    'first level'
+
 Using a ``Context`` as a stack comes in handy in some custom template tags, as
 you'll see below.
 
