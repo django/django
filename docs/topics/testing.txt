@@ -761,7 +761,7 @@ arguments at time of construction:
         parameters will be made available in the request.GET data. For example,
         if you were to make the request::
 
-        >>> c.post('/login/?vistor=true', {'name': 'fred', 'passwd': 'secret'})
+        >>> c.post('/login/?visitor=true', {'name': 'fred', 'passwd': 'secret'})
 
         ... the view handling this request could interrogate request.POST
         to retrieve the username and password, and could interrogate request.GET
