@@ -217,19 +217,52 @@ class DjangoTestSuiteRunner(object):
 
     def setup_databases(self, **kwargs):
         from django.db import connections
-        old_names = []
-        mirrors = []
+
+        # First pass -- work out which databases actually need to be created,
+        # and which ones are test mirrors or duplicate entries in DATABASES
+        mirrored_aliases = {}
+        test_databases = {}
         for alias in connections:
             connection = connections[alias]
-            # If the database is a test mirror, redirect it's connection
-            # instead of creating a test database.
             if connection.settings_dict['TEST_MIRROR']:
-                mirrors.append((alias, connection))
-                mirror_alias = connection.settings_dict['TEST_MIRROR']
-                connections._connections[alias] = connections[mirror_alias]
+                # If the database is marked as a test mirror, save
+                # the alias.
+                mirrored_aliases[alias] = connection.settings_dict['TEST_MIRROR']
             else:
-                old_names.append((connection, connection.settings_dict['NAME']))
-                connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
+                # Store the (engine, name) pair. If we have two aliases
+                # with the same pair, we only need to create the test database
+                # once.
+                test_databases.setdefault((
+                        connection.settings_dict['HOST'],
+                        connection.settings_dict['PORT'],
+                        connection.settings_dict['ENGINE'],
+                        connection.settings_dict['NAME'],
+                    ), []).append(alias)
+
+        # Second pass -- actually create the databases.
+        old_names = []
+        mirrors = []
+        for (host, port, engine, db_name), aliases in test_databases.items():
+            # Actually create the database for the first connection
+            connection = connections[aliases[0]]
+            old_names.append((connection, db_name, True))
+            test_db_name = connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
+            for alias in aliases[1:]:
+                connection = connections[alias]
+                if db_name:
+                    old_names.append((connection, db_name, False))
+                    connection.settings_dict['NAME'] = test_db_name
+                else:
+                    # If settings_dict['NAME'] isn't defined, we have a backend where
+                    # the name isn't important -- e.g., SQLite, which uses :memory:.
+                    # Force create the database instead of assuming it's a duplicate.
+                    old_names.append((connection, db_name, True))
+                    connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
+
+        for alias, mirror_alias in mirrored_aliases.items():
+            mirrors.append((alias, connections[alias].settings_dict['NAME']))
+            connections[alias].settings_dict['NAME'] = connections[mirror_alias].settings_dict['NAME']
+
         return old_names, mirrors
 
     def run_suite(self, suite, **kwargs):
@@ -239,11 +272,14 @@ class DjangoTestSuiteRunner(object):
         from django.db import connections
         old_names, mirrors = old_config
         # Point all the mirrors back to the originals
-        for alias, connection in mirrors:
-            connections._connections[alias] = connection
+        for alias, old_name in mirrors:
+            connections[alias].settings_dict['NAME'] = old_name
         # Destroy all the non-mirror databases
-        for connection, old_name in old_names:
-            connection.creation.destroy_test_db(old_name, self.verbosity)
+        for connection, old_name, destroy in old_names:
+            if destroy:
+                connection.creation.destroy_test_db(old_name, self.verbosity)
+            else:
+                connection.settings_dict['NAME'] = old_name
 
     def teardown_test_environment(self, **kwargs):
         unittest.removeHandler()
