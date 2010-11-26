@@ -331,10 +331,17 @@ Jeremy Dunck
     decision. His contributions range across many areas in Django, but years of
     copy-editing and an eye for detail lead him to be particularly at home
     while working on Django's documentation.
-    
+
     Gabriel works as a web developer in Berkeley, CA, USA.
 
 .. _gabriel hurley: http://strikeawe.com/
+
+Tim Graham
+    When exploring Web frameworks for an independent study project in the fall
+    of 2008, Tim discovered Django and was lured to it by the documentation.
+    He enjoys contributing to the docs because they're awesome.
+
+    Tim works as a software engineer and lives in Philadelphia, PA, USA.
 
 Developers Emeritus
 ===================
