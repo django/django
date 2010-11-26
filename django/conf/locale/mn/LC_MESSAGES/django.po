@@ -1357,8 +1357,8 @@ msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
 msgstr ""
-"Нууц үгийнхээ хэлбэр </a>-ийг өөрчлөхдөө '[algo]$[salt]$[hexdigest]' буюу <a "
-"href=\"password/\"> хэрэглэнэ үү."
+"Нууц үгийнхээ хэлбэр-ийг өөрчлөхдөө '[algo]$[salt]$[hexdigest]' буюу <a "
+"href=\"password/\">хэрэглэнэ үү</a>."
 
 #: contrib/auth/models.py:201
 msgid "staff status"
