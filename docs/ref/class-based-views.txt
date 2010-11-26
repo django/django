@@ -466,8 +466,8 @@ ModelFormMixin
 
     Since this is a subclass of
     :class:`~django.views.generic.detail.SingleObjectMixin`, instances of this
-    mixin have access to the :attr:`~SingleObjectMixin.model`` and
-    :attr:`~SingleObjectMixin.queryset`` attributes, describing the type of
+    mixin have access to the :attr:`~SingleObjectMixin.model` and
+    :attr:`~SingleObjectMixin.queryset` attributes, describing the type of
     object that the ModelForm is manipulating. The view also provides
     ``self.object``, the instance being manipulated. If the instance is being
     created, ``self.object`` will be ``None``
@@ -486,8 +486,8 @@ ModelFormMixin
         Retrieve the form class to instantiate. If
         :attr:`FormMixin.form_class` is provided, that class will be used.
         Otherwise, a ModelForm will be instantiated using the model associated
-        with the :attr:`~SingleObjectMixin.queryset``, or with the
-        :attr:`~SingleObjectMixin.model``, depending on which attribute is
+        with the :attr:`~SingleObjectMixin.queryset`, or with the
+        :attr:`~SingleObjectMixin.model`, depending on which attribute is
         provided.
 
     .. method:: get_form(form_class)
@@ -624,7 +624,7 @@ MonthMixin
     .. method:: get_next_month(date)
 
         Returns a date object containing the first day of the month after the
-        date provided. Returns `None`` if mixed with a view that sets
+        date provided. Returns ``None`` if mixed with a view that sets
         ``allow_future = False``, and the next month is in the future. If
         ``allow_empty = False``, returns the next month that contains data.
 
@@ -670,7 +670,7 @@ DayMixin
     .. method:: get_next_day(date)
 
         Returns a date object containing the next day after the date provided.
-        Returns `None`` if mixed with a view that sets ``allow_future = False``,
+        Returns ``None`` if mixed with a view that sets ``allow_future = False``,
         and the next day is in the future. If ``allow_empty = False``, returns
         the next day that contains data.
 
@@ -792,7 +792,7 @@ BaseDateListView
         Returns the list of dates of type ``date_type`` for which
         ``queryset`` contains entries. For example, ``get_date_list(qs,
         'year')`` will return the list of years for which ``qs`` has entries.
-        See :meth:``~django.db.models.QuerySet.dates()` for the
+        See :meth:`~django.db.models.QuerySet.dates()` for the
         ways that the ``date_type`` argument can be used.
 
 
