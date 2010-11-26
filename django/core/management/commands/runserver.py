@@ -1,14 +1,21 @@
 from optparse import make_option
 import os
+import re
 import sys
+import socket
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import AdminMediaHandler, run, WSGIServerException
 from django.utils import autoreload
 
+naiveip_re = r'^(?:(?P<addr>\d{1,3}(?:\.\d{1,3}){3}|\[[a-fA-F0-9:]+\]):)?(?P<port>\d+)$'
+DEFAULT_PORT = "8000"
+
 class BaseRunserverCommand(BaseCommand):
     option_list = BaseCommand.option_list + (
+        make_option('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
+            help='Tells Django to use a IPv6 address.'),
         make_option('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.'),
     )
@@ -25,22 +32,31 @@ class BaseRunserverCommand(BaseCommand):
         return WSGIHandler()
 
     def handle(self, addrport='', *args, **options):
+        self.use_ipv6 = options.get('use_ipv6')
+        if self.use_ipv6 and not hasattr(socket, 'AF_INET6'):
+            raise CommandError('Your Python does not support IPv6.')
         if args:
             raise CommandError('Usage is runserver %s' % self.args)
         if not addrport:
             self.addr = ''
-            self.port = '8000'
+            self.port = DEFAULT_PORT
         else:
-            try:
-                self.addr, self.port = addrport.split(':')
-            except ValueError:
-                self.addr, self.port = '', addrport
+            m = re.match(naiveip_re, addrport)
+            if m is None:
+                raise CommandError('%r is not a valid port number'
+                                   'or address:port pair.' % addrport)
+            self.addr, self.port = m.groups()
+            if not self.port.isdigit():
+                raise CommandError("%r is not a valid port number." % self.port)
+            if self.addr:
+                if self.addr.startswith('[') and self.addr.endswith(']'):
+                    self.addr = self.addr[1:-1]
+                    self.use_ipv6 = True
+                elif self.use_ipv6:
+                    raise CommandError('IPv6 addresses must be surrounded '
+                                       'with brackets, e.g. [::1].')
         if not self.addr:
-            self.addr = '127.0.0.1'
-
-        if not self.port.isdigit():
-            raise CommandError("%r is not a valid port number." % self.port)
-
+            self.addr = self.use_ipv6 and '::1' or '127.0.0.1'
         self.run(*args, **options)
 
     def run(self, *args, **options):
@@ -70,7 +86,7 @@ class BaseRunserverCommand(BaseCommand):
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
-            "addr": self.addr,
+            "addr": self.use_ipv6 and '[%s]' % self.addr or self.addr,
             "port": self.port,
             "quit_command": quit_command,
         })
@@ -81,7 +97,7 @@ class BaseRunserverCommand(BaseCommand):
 
         try:
             handler = self.get_handler(*args, **options)
-            run(self.addr, int(self.port), handler)
+            run(self.addr, int(self.port), handler, ipv6=self.use_ipv6)
         except WSGIServerException, e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {

@@ -10,6 +10,7 @@ been reviewed for security issues. Don't use it for production use.
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import os
 import re
+import socket
 import sys
 import urllib
 import warnings
@@ -526,6 +527,11 @@ class WSGIServer(HTTPServer):
     """BaseHTTPServer that implements the Python WSGI protocol"""
     application = None
 
+    def __init__(self, *args, **kwargs):
+        if kwargs.pop('ipv6', False):
+            self.address_family = socket.AF_INET6
+        HTTPServer.__init__(self, *args, **kwargs)
+
     def server_bind(self):
         """Override server_bind to store the server name."""
         try:
@@ -683,9 +689,8 @@ class AdminMediaHandler(handlers.StaticFilesHandler):
         """
         return path.startswith(self.base_url[2]) and not self.base_url[1]
 
-
-def run(addr, port, wsgi_handler):
+def run(addr, port, wsgi_handler, ipv6=False):
     server_address = (addr, port)
-    httpd = WSGIServer(server_address, WSGIRequestHandler)
+    httpd = WSGIServer(server_address, WSGIRequestHandler, ipv6=ipv6)
     httpd.set_app(wsgi_handler)
     httpd.serve_forever()
