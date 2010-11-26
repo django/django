@@ -6,7 +6,7 @@ Related objects reference
 
 .. class:: RelatedManager
 
-    A "related manager" is a on managers used in a one-to-many or many-to-many
+    A "related manager" is a manager used in a one-to-many or many-to-many
     related context. This happens in two cases:
 
         * The "other side" of a ``ForeignKey`` relation. That is::
