@@ -202,7 +202,7 @@ class DateQuery(Query):
         alias = result[3][-1]
         select = Date((alias, field.column), lookup_type)
         self.select = [select]
-        self.select_fields = [None]
+        self.select_fields = []
         self.select_related = False # See #7097.
         self.set_extra_mask([])
         self.distinct = True

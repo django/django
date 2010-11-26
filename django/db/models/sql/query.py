@@ -195,8 +195,9 @@ class Query(object):
         Unpickling support.
         """
         # Rebuild list of field instances
+        opts = obj_dict['model']._meta
         obj_dict['select_fields'] = [
-            name is not None and obj_dict['model']._meta.get_field(name) or None
+            name is not None and opts.get_field(name) or None
             for name in obj_dict['select_fields']
         ]
 
@@ -707,11 +708,18 @@ class Query(object):
         # "group by", "where" and "having".
         self.where.relabel_aliases(change_map)
         self.having.relabel_aliases(change_map)
-        for columns in (self.select, self.aggregates.values(), self.group_by or []):
+        for columns in [self.select, self.group_by or []]:
             for pos, col in enumerate(columns):
                 if isinstance(col, (list, tuple)):
                     old_alias = col[0]
                     columns[pos] = (change_map.get(old_alias, old_alias), col[1])
+                else:
+                    col.relabel_aliases(change_map)
+        for mapping in [self.aggregates]:
+            for key, col in mapping.items():
+                if isinstance(col, (list, tuple)):
+                    old_alias = col[0]
+                    mapping[key] = (change_map.get(old_alias, old_alias), col[1])
                 else:
                     col.relabel_aliases(change_map)
 
@@ -1075,6 +1083,8 @@ class Query(object):
 
 
         if having_clause:
+            if (alias, col) not in self.group_by:
+                self.group_by.append((alias, col))
             self.having.add((Constraint(alias, col, field), lookup_type, value),
                 connector)
         else:

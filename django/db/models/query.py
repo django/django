@@ -965,8 +965,7 @@ class ValuesListQuerySet(ValuesQuerySet):
             # If a field list has been specified, use it. Otherwise, use the
             # full list of fields, including extras and aggregates.
             if self._fields:
-                fields = list(self._fields) + filter(lambda f: f not in self._fields,
-                                                     aggregate_names)
+                fields = list(self._fields) + filter(lambda f: f not in self._fields, aggregate_names)
             else:
                 fields = names
 
@@ -976,7 +975,9 @@ class ValuesListQuerySet(ValuesQuerySet):
 
     def _clone(self, *args, **kwargs):
         clone = super(ValuesListQuerySet, self)._clone(*args, **kwargs)
-        clone.flat = self.flat
+        if not hasattr(clone, "flat"):
+            # Only assign flat if the clone didn't already get it from kwargs
+            clone.flat = self.flat
         return clone
 
 

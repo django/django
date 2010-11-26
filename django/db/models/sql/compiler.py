@@ -469,9 +469,11 @@ class SQLCompiler(object):
         qn = self.quote_name_unless_alias
         result, params = [], []
         if self.query.group_by is not None:
-            if len(self.query.model._meta.fields) == len(self.query.select) and \
-                self.connection.features.allows_group_by_pk:
-                self.query.group_by = [(self.query.model._meta.db_table, self.query.model._meta.pk.column)]
+            if (len(self.query.model._meta.fields) == len(self.query.select) and
+                self.connection.features.allows_group_by_pk):
+                self.query.group_by = [
+                    (self.query.model._meta.db_table, self.query.model._meta.pk.column)
+                ]
 
             group_by = self.query.group_by or []
 
@@ -479,11 +481,13 @@ class SQLCompiler(object):
             for extra_select, extra_params in self.query.extra_select.itervalues():
                 extra_selects.append(extra_select)
                 params.extend(extra_params)
-            for col in group_by + self.query.related_select_cols + extra_selects:
+            cols = (group_by + self.query.select +
+                self.query.related_select_cols + extra_selects)
+            for col in cols:
                 if isinstance(col, (list, tuple)):
                     result.append('%s.%s' % (qn(col[0]), qn(col[1])))
                 elif hasattr(col, 'as_sql'):
-                    result.append(col.as_sql(qn))
+                    result.append(col.as_sql(qn, self.connection))
                 else:
                     result.append('(%s)' % str(col))
         return result, params
