@@ -2,7 +2,6 @@ import datetime
 import os
 import re
 import time
-from Cookie import BaseCookie, SimpleCookie, CookieError
 from pprint import pformat
 from urllib import urlencode
 from urlparse import urljoin
@@ -21,6 +20,39 @@ except ImportError:
         # Python 2.5, 2.4.  Works on Python 2.6 but raises
         # PendingDeprecationWarning
         from cgi import parse_qsl
+
+# httponly support exists in Python 2.6's Cookie library,
+# but not in Python 2.4 or 2.5.
+import Cookie
+if Cookie.Morsel._reserved.has_key('httponly'):
+    SimpleCookie = Cookie.SimpleCookie
+else:
+    class Morsel(Cookie.Morsel):
+        def __setitem__(self, K, V):
+            K = K.lower()
+            if K == "httponly":
+                if V:
+                    # The superclass rejects httponly as a key,
+                    # so we jump to the grandparent.
+                    super(Cookie.Morsel, self).__setitem__(K, V)
+            else:
+                super(Morsel, self).__setitem__(K, V)
+
+        def OutputString(self, attrs=None):
+            output = super(Morsel, self).OutputString(attrs)
+            if "httponly" in self:
+                output += "; httponly"
+            return output
+
+    class SimpleCookie(Cookie.SimpleCookie):
+        def __set(self, key, real_value, coded_value):
+            M = self.get(key, Morsel())
+            M.set(key, real_value, coded_value)
+            dict.__setitem__(self, key, M)
+
+        def __setitem__(self, key, value):
+            rval, cval = self.value_encode(value)
+            self.__set(key, rval, cval)
 
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
@@ -369,11 +401,11 @@ class CompatCookie(SimpleCookie):
 def parse_cookie(cookie):
     if cookie == '':
         return {}
-    if not isinstance(cookie, BaseCookie):
+    if not isinstance(cookie, Cookie.BaseCookie):
         try:
             c = CompatCookie()
             c.load(cookie)
-        except CookieError:
+        except Cookie.CookieError:
             # Invalid cookie
             return {}
     else:
@@ -462,7 +494,7 @@ class HttpResponse(object):
         return self._headers.get(header.lower(), (None, alternate))[1]
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/',
-                   domain=None, secure=False):
+                   domain=None, secure=False, httponly=False):
         """
         Sets a cookie.
 
@@ -495,6 +527,8 @@ class HttpResponse(object):
             self.cookies[key]['domain'] = domain
         if secure:
             self.cookies[key]['secure'] = True
+        if httponly:
+            self.cookies[key]['httponly'] = True
 
     def delete_cookie(self, key, path='/', domain=None):
         self.set_cookie(key, max_age=0, path=path, domain=domain,

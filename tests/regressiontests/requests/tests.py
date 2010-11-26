@@ -89,6 +89,15 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(max_age_cookie['max-age'], 10)
         self.assertEqual(max_age_cookie['expires'], cookie_date(time.time()+10))
 
+    def test_httponly_cookie(self):
+        response = HttpResponse()
+        response.set_cookie('example', httponly=True)
+        example_cookie = response.cookies['example']
+        # A compat cookie may be in use -- check that it has worked
+        # both as an output string, and using the cookie attributes
+        self.assertTrue('; httponly' in str(example_cookie))
+        self.assertTrue(example_cookie['httponly'])
+
     def test_limited_stream(self):
         # Read all of a limited stream
         stream = LimitedStream(StringIO('test'), 2)

@@ -566,7 +566,13 @@ Methods
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
+
+    .. versionchanged:: 1.3
+
+    The possibility of specifying a ``datetime.datetime`` object in
+    ``expires``, and the auto-calculation of ``max_age`` in such case
+    was added. The ``httponly`` argument was also added.
 
     Sets a cookie. The parameters are the same as in the `cookie Morsel`_
     object in the Python standard library.
@@ -583,14 +589,18 @@ Methods
           the domains www.lawrence.com, blogs.lawrence.com and
           calendars.lawrence.com. Otherwise, a cookie will only be readable by
           the domain that set it.
+        * Use ``http_only=True`` if you want to prevent client-side
+          JavaScript from having access to the cookie.
+
+          HTTPOnly_ is a flag included in a Set-Cookie HTTP response
+          header. It is not part of the RFC2109 standard for cookies,
+          and it isn't honored consistently by all browsers. However,
+          when it is honored, it can be a useful way to mitigate the
+          risk of client side script accessing the protected cookie
+          data.
 
     .. _`cookie Morsel`: http://docs.python.org/library/cookie.html#Cookie.Morsel
-
-    .. versionchanged:: 1.3
-
-    Both the possibility of specifying a ``datetime.datetime`` object in
-    ``expires`` and the auto-calculation of ``max_age`` in such case were added
-    in Django 1.3.
+    .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
 
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
 

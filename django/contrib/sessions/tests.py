@@ -11,8 +11,10 @@ from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSe
 from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sessions.models import Session
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.http import HttpResponse
+from django.test import TestCase, RequestFactory
 from django.utils import unittest
 from django.utils.hashcompat import md5_constructor
 
@@ -320,3 +322,43 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
 class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
     backend = CacheSession
+
+
+class SessionMiddlewareTests(unittest.TestCase):
+    def setUp(self):
+        self.old_SESSION_COOKIE_SECURE = settings.SESSION_COOKIE_SECURE
+        self.old_SESSION_COOKIE_HTTPONLY = settings.SESSION_COOKIE_HTTPONLY
+
+    def tearDown(self):
+        settings.SESSION_COOKIE_SECURE = self.old_SESSION_COOKIE_SECURE
+        settings.SESSION_COOKIE_HTTPONLY = self.old_SESSION_COOKIE_HTTPONLY
+
+    def test_secure_session_cookie(self):
+        settings.SESSION_COOKIE_SECURE = True
+
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Simulate a request the modifies the session
+        middleware.process_request(request)
+        request.session['hello'] = 'world'
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+        self.assertTrue(response.cookies[settings.SESSION_COOKIE_NAME]['secure'])
+
+    def test_httponly_session_cookie(self):
+        settings.SESSION_COOKIE_HTTPONLY = True
+
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Simulate a request the modifies the session
+        middleware.process_request(request)
+        request.session['hello'] = 'world'
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+        self.assertTrue(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])

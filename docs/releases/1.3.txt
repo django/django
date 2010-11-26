@@ -161,6 +161,10 @@ requests. These include:
 
     * Support for lookups spanning relations in admin's ``list_filter``.
 
+    * Support for _HTTPOnly cookies.
+
+.. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+
 .. _backwards-incompatible-changes-1.3:
 
 Backwards-incompatible changes in 1.3

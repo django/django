@@ -1392,6 +1392,25 @@ The domain to use for session cookies. Set this to a string such as
 ``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
 domain cookie. See the :doc:`/topics/http/sessions`.
 
+.. setting:: SESSION_COOKIE_HTTPONLY
+
+SESSION_COOKIE_HTTPONLY
+-----------------------
+
+Default: ``False``
+
+Whether to use HTTPOnly flag on the session cookie. If this is set to
+``True``, client-side JavaScript will not to be able to access the
+session cookie.
+
+HTTPOnly_ is a flag included in a Set-Cookie HTTP response header. It
+is not part of the RFC2109 standard for cookies, and it isn't honored
+consistently by all browsers. However, when it is honored, it can be a
+useful way to mitigate the risk of client side script accessing the
+protected cookie data.
+
+.. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+
 .. setting:: SESSION_COOKIE_NAME
 
 SESSION_COOKIE_NAME
