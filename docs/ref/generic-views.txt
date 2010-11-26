@@ -1047,7 +1047,7 @@ contain a form that POSTs to the same URL.
 **Required arguments:**
 
     * ``model``: The Django model class of the object that the form will
-      create.
+      delete.
 
     * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
 
