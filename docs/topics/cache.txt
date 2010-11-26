@@ -34,8 +34,8 @@ offers different levels of cache granularity: You can cache the output of
 specific views, you can cache only the pieces that are difficult to produce,
 or you can cache your entire site.
 
-Django also works well with "upstream" caches, such as Squid
-(http://www.squid-cache.org/) and browser-based caches. These are the types of
+Django also works well with "upstream" caches, such as `Squid
+<http://www.squid-cache.org>`_ and browser-based caches. These are the types of
 caches that you don't directly control but to which you can provide hints (via
 HTTP headers) about which parts of your site should be cached, and how.
 
@@ -60,7 +60,7 @@ loads at LiveJournal.com and subsequently open-sourced by Danga Interactive.
 It's used by sites such as Facebook and Wikipedia to reduce database access and
 dramatically increase site performance.
 
-Memcached is available for free at http://danga.com/memcached/ . It runs as a
+Memcached is available for free at http://memcached.org/. It runs as a
 daemon and is allotted a specified amount of RAM. All it does is provide a
 fast interface for adding, retrieving and deleting arbitrary data in the cache.
 All data is stored directly in memory, so there's no overhead of database or
@@ -337,7 +337,7 @@ the corresponding GET request; in which case it can return a cached GET
 response for HEAD request.
 
 Additionally, the cache middleware automatically sets a few headers in each
-``HttpResponse``:
+:class:`~django.http.HttpResponse`:
 
     * Sets the ``Last-Modified`` header to the current date/time when a fresh
       (uncached) version of the page is requested.
@@ -896,8 +896,9 @@ directly. This function sets, or adds to, the ``Vary header``. For example::
         patch_vary_headers(response, ['Cookie'])
         return response
 
-``patch_vary_headers`` takes an ``HttpResponse`` instance as its first argument
-and a list/tuple of case-insensitive header names as its second argument.
+``patch_vary_headers`` takes an :class:`~django.http.HttpResponse` instance as
+its first argument and a list/tuple of case-insensitive header names as its
+second argument.
 
 For more on Vary headers, see the `official Vary spec`_.
 
@@ -963,7 +964,7 @@ Here's a full list:
 For explanation of Cache-Control HTTP directives, see the `Cache-Control spec`_.
 
 (Note that the caching middleware already sets the cache header's max-age with
-the value of the :setting:`CACHE_MIDDLEWARE_SETTINGS` setting. If you use a custom
+the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. If you use a custom
 ``max_age`` in a ``cache_control`` decorator, the decorator will take
 precedence, and the header values will be merged correctly.)
 
