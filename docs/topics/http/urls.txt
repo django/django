@@ -842,7 +842,7 @@ If the URL does not resolve, the function raises an
 :class:`~django.http.Http404` exception.
 
 For example, it can be used for testing if a view would raise a ``Http404``
-error before redirecting to it:
+error before redirecting to it::
 
     from urlparse import urlparse
     from django.core.urlresolvers import resolve
