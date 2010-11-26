@@ -2,6 +2,7 @@ import datetime
 from warnings import warn
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
+from django.contrib.auth.signals import user_logged_in, user_logged_out
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
@@ -62,8 +63,7 @@ def login(request, user):
     if user is None:
         user = request.user
     # TODO: It would be nice to support different login methods, like signed cookies.
-    user.last_login = datetime.datetime.now()
-    user.save()
+    user_logged_in.send(sender=user.__class__, request=request, user=user)
 
     if SESSION_KEY in request.session:
         if request.session[SESSION_KEY] != user.id:
@@ -83,6 +83,13 @@ def logout(request):
     Removes the authenticated user's ID from the request and flushes their
     session data.
     """
+    # Dispatch the signal before the user is logged out so the receivers have a
+    # chance to find out *who* logged out.
+    user = getattr(request, 'user', None)
+    if hasattr(user, 'is_authenticated') and not user.is_authenticated():
+        user = None
+    user_logged_out.send(sender=user.__class__, request=request, user=user)
+
     request.session.flush()
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser

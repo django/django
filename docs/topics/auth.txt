@@ -665,6 +665,44 @@ How to log a user out
     immediately after logging out, do that *after* calling
     :func:`django.contrib.auth.logout()`.
 
+.. _topics-auth-signals:
+
+Login and logout signals
+------------------------
+
+The auth framework uses two :ref:`signals <topic-signals>` that can be used for
+notification when a user logs in or out.
+
+**:data:`django.contrib.auth.signals.user_logged_in`**
+
+Sent when a user logs in successfully.
+
+Arguments sent with this signal:
+
+    ``sender``
+        As above: the class of the user that just logged in.
+
+    ``request``
+        The current :class:`~django.http.HttpRequest` instance.
+
+    ``user``
+        The user instance that just logged in.
+
+**:data:`django.contrib.auth.signals.user_logged_out`**
+
+Sent when the logout method is called.
+
+    ``sender``
+        As above: the class of the user that just logged out or ``None``
+        if the user was not authenticated.
+
+    ``request``
+        The current :class:`~django.http.HttpRequest` instance.
+
+    ``user``
+        The user instance that just logged out or ``None`` if the
+        user was not authenticated.
+
 Limiting access to logged-in users
 ----------------------------------
 

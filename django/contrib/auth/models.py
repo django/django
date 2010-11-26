@@ -2,6 +2,7 @@ import datetime
 import urllib
 
 from django.contrib import auth
+from django.contrib.auth.signals import user_logged_in
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.manager import EmptyManager
@@ -39,6 +40,15 @@ def check_password(raw_password, enc_password):
     """
     algo, salt, hsh = enc_password.split('$')
     return hsh == get_hexdigest(algo, salt, raw_password)
+
+def update_last_login(sender, user, **kwargs):
+    """
+    A signal receiver which updates the last_login date for
+    the user logging in.
+    """
+    user.last_login = datetime.datetime.now()
+    user.save()
+user_logged_in.connect(update_last_login)
 
 class SiteProfileNotAvailable(Exception):
     pass

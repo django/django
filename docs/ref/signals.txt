@@ -12,6 +12,9 @@ A list of all the signals that Django sends.
     The :doc:`comment framework </ref/contrib/comments/index>` sends a :doc:`set
     of comment-related signals </ref/contrib/comments/signals>`.
 
+    The :ref:`authentication framework <topics-auth>` sends :ref:`signals when
+    a user is logged in / out <topics-auth-signals>`.
+
 Model signals
 =============
 
