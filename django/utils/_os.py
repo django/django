@@ -41,6 +41,6 @@ def safe_join(base, *paths):
     # equal to base_path).
     if not final_path.startswith(base_path) \
        or final_path[base_path_len:base_path_len+1] not in ('', sep):
-        raise ValueError('the joined path is located outside of the base path'
-                         ' component')
+        raise ValueError('The joined path (%s) is located outside of the base '
+                         'path component (%s)' % (final_path, base_path))
     return final_path
