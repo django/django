@@ -29,22 +29,22 @@ Here's a view that returns the current date and time, as an HTML document:
 
 Let's step through this code one line at a time:
 
-    * First, we import the class ``HttpResponse``, which lives in the
-      ``django.http`` module, along with Python's ``datetime`` library.
+    * First, we import the class :class:`~django.http.HttpResponse` from the
+      :mod:`django.http` module, along with Python's ``datetime`` library.
 
     * Next, we define a function called ``current_datetime``. This is the view
-      function. Each view function takes an ``HttpRequest`` object as its first
-      parameter, which is typically named ``request``.
+      function. Each view function takes an :class:`~django.http.HttpRequest`
+      object as its first parameter, which is typically named ``request``.
 
       Note that the name of the view function doesn't matter; it doesn't have to
       be named in a certain way in order for Django to recognize it. We're
       calling it ``current_datetime`` here, because that name clearly indicates
       what it does.
 
-    * The view returns an ``HttpResponse`` object that contains the
-      generated response. Each view function is responsible for returning an
-      ``HttpResponse`` object. (There are exceptions, but we'll get to those
-      later.)
+    * The view returns an :class:`~django.http.HttpResponse` object that
+      contains the generated response. Each view function is responsible for
+      returning an :class:`~django.http.HttpResponse` object. (There are
+      exceptions, but we'll get to those later.)
 
 .. admonition:: Django's Time Zone
     
@@ -97,8 +97,8 @@ The Http404 exception
 
 .. class:: django.http.Http404()
 
-When you return an error such as ``HttpResponseNotFound``, you're responsible
-for defining the HTML of the resulting error page::
+When you return an error such as :class:`~django.http.HttpResponseNotFound`,
+you're responsible for defining the HTML of the resulting error page::
 
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
@@ -164,12 +164,14 @@ Three things to note about 404 views:
       to the template: ``request_path``, which is the URL that resulted
       in the 404.
 
-    * The 404 view is passed a ``RequestContext`` and will have access to
-      variables supplied by your ``TEMPLATE_CONTEXT_PROCESSORS`` setting (e.g.,
-      ``MEDIA_URL``).
+    * The 404 view is passed a :class:`~django.template.RequestContext` and
+      will have access to variables supplied by your
+      :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting (e.g.,
+      :setting:`MEDIA_URL`).
 
-    * If ``DEBUG`` is set to ``True`` (in your settings module), then your 404
-      view will never be used, and the traceback will be displayed instead.
+    * If :setting:`DEBUG` is set to ``True`` (in your settings module), then
+      your 404 view will never be used, and the traceback will be displayed
+      instead.
 
 The 500 (server error) view
 ----------------------------
