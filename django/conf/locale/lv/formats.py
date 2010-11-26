@@ -32,5 +32,5 @@ DATETIME_INPUT_FORMATS = (
     '%d.%m.%y',              # '25.10.06'
 )
 DECIMAL_SEPARATOR = ','
-THOUSAND_SEPARATOR = ' '
+THOUSAND_SEPARATOR = u' ' # Non-breaking space
 NUMBER_GROUPING = 3
