@@ -155,6 +155,18 @@ argument signature.
 
 See the :ref:`cache documentation <cache_key_transformation>` for more information.
 
+.. setting:: CACHE_KEY_PREFIX
+
+CACHE_KEY_PREFIX
+----------------
+
+Default: ``''`` (Empty string)
+
+A string that will be automatically included (prepended by default) to
+all cache keys used by the Django server.
+
+See the :ref:`cache documentation <cache_key_prefixing>` for more information.
+
 .. setting:: CACHE_MIDDLEWARE_ANONYMOUS_ONLY
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY
@@ -193,18 +205,6 @@ The default number of seconds to cache a page when the caching middleware or
 ``cache_page()`` decorator is used.
 
 See :doc:`/topics/cache`.
-
-.. setting:: CACHE_PREFIX
-
-CACHE_PREFIX
-------------
-
-Default: ``''`` (Empty string)
-
-A string that will be automatically included (prepended by default) to
-all cache keys used by the Django server.
-
-See the :ref:`cache documentation <cache_key_prefixing>` for more information.
 
 .. setting:: CACHE_VERSION
 
