@@ -37,14 +37,14 @@ When a user requests a page from your Django-powered site, this is the
 algorithm the system follows to determine which Python code to execute:
 
     1. Django determines the root URLconf module to use. Ordinarily,
-       this is the value of the ``ROOT_URLCONF`` setting, but if the incoming
+       this is the value of the :setting:`ROOT_URLCONF` setting, but if the incoming
        ``HttpRequest`` object has an attribute called ``urlconf`` (set by
        middleware :ref:`request processing <request-middleware>`), its value
-       will be used in place of the ``ROOT_URLCONF`` setting.
+       will be used in place of the :setting:`ROOT_URLCONF` setting.
 
     2. Django loads that Python module and looks for the variable
        ``urlpatterns``. This should be a Python list, in the format returned by
-       the function ``django.conf.urls.defaults.patterns()``.
+       the function :func:`django.conf.urls.defaults.patterns`.
 
     3. Django runs through each URL pattern, in order, and stops at the first
        one that matches the requested URL.
@@ -174,11 +174,13 @@ Syntax of the urlpatterns variable
 ==================================
 
 ``urlpatterns`` should be a Python list, in the format returned by the function
-``django.conf.urls.defaults.patterns()``. Always use ``patterns()`` to create
+:func:`django.conf.urls.defaults.patterns`. Always use ``patterns()`` to create
 the ``urlpatterns`` variable.
 
 Convention is to use ``from django.conf.urls.defaults import *`` at the top of
 your URLconf. This gives your module access to these objects:
+
+.. module:: django.conf.urls.defaults
 
 patterns
 --------
@@ -436,10 +438,11 @@ directly the pattern list as returned by `patterns`_ instead. For example::
 
 This approach can be seen in use when you deploy an instance of the Django
 Admin application. The Django Admin is deployed as instances of a
-:class:`AdminSite`; each :class:`AdminSite` instance has an attribute
-``urls`` that returns the url patterns available to that instance. It is this
-attribute that you ``include()`` into your projects ``urlpatterns`` when you
-deploy the admin instance.
+:class:`~django.contrib.admin.AdminSite`; each
+:class:`~django.contrib.admin.AdminSite` instance has an attribute ``urls``
+that returns the url patterns available to that instance. It is this attribute
+that you ``include()`` into your projects ``urlpatterns`` when you deploy the
+admin instance.
 
 .. _`Django Web site`: http://www.djangoproject.com/
 
@@ -507,9 +510,9 @@ a 3-tuple containing::
 
 This will include the nominated URL patterns into the given application and
 instance namespace. For example, the ``urls`` attribute of Django's
-:class:`AdminSite` object returns a 3-tuple that contains all the patterns in
-an admin site, plus the name of the admin instance, and the application
-namespace ``admin``.
+:class:`~django.contrib.admin.AdminSite` object returns a 3-tuple that contains
+all the patterns in an admin site, plus the name of the admin instance, and the
+application namespace ``admin``.
 
 Once you have defined namespaced URLs, you can reverse them. For details on
 reversing namespaced urls, see the documentation on :ref:`reversing namespaced
@@ -834,13 +837,13 @@ following signature:
 ``path`` is the URL path you want to resolve. As with
 :func:`~django.core.urlresolvers.reverse`, you don't need to
 worry about the ``urlconf`` parameter. The function returns a
-:class:`django.core.urlresolvers.ResolverMatch` object that allows you
+:class:`ResolverMatch` object that allows you
 to access various meta-data about the resolved URL.
 
 If the URL does not resolve, the function raises an
 :class:`~django.http.Http404` exception.
 
-.. class:: ResolverMatch()
+.. class:: ResolverMatch
 
     .. attribute:: ResolverMatch.func
 
@@ -875,19 +878,17 @@ If the URL does not resolve, the function raises an
         The list of individual namespace components in the full
         instance namespace for the URL pattern that matches the URL.
         i.e., if the namespace is ``foo:bar``, then namespaces will be
-        ``[`foo`, `bar`]``.
+        ``['foo', 'bar']``.
 
-A :class:`~django.core.urlresolvers.ResolverMatch` object can then be
-interrogated to provide information about the URL pattern that matches
-a URL::
+A :class:`ResolverMatch` object can then be interrogated to provide
+information about the URL pattern that matches a URL::
 
     # Resolve a URL
     match = resolve('/some/path/')
     # Print the URL pattern that matches the URL
     print match.url_name
 
-A :class:`~django.core.urlresolvers.ResolverMatch` object can also be
-assigned to a triple::
+A :class:`ResolverMatch` object can also be assigned to a triple::
 
     func, args, kwargs = resolve('/some/path/')
 
@@ -895,9 +896,8 @@ assigned to a triple::
     Triple-assignment exists for backwards-compatibility. Prior to
     Django 1.3, :func:`~django.core.urlresolvers.resolve` returned a
     triple containing (view function, arguments, keyword arguments);
-    the :class:`~django.core.urlresolvers.ResolverMatch` object (as
-    well as the namespace and pattern information it provides) is not
-    available in earlier Django releases.
+    the :class:`ResolverMatch` object (as well as the namespace and pattern
+    information it provides) is not available in earlier Django releases.
 
 One possible use of :func:`~django.core.urlresolvers.resolve` would be
 to testing if a view would raise a ``Http404`` error before
