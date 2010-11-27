@@ -89,12 +89,12 @@ dictionary of keyword arguments that will be passed to the view. Neither
 (``request``).
 
 ``process_view()`` is called just before Django calls the view. It should
-return either ``None`` or an :class:`~django.http. HttpResponse` object. If it
+return either ``None`` or an :class:`~django.http.HttpResponse` object. If it
 returns ``None``, Django will continue processing this request, executing any
 other ``process_view()`` middleware and, then, the appropriate view. If it
-returns an :class:`~django.http. HttpResponse` object, Django won't bother
+returns an :class:`~django.http.HttpResponse` object, Django won't bother
 calling ANY other request, view or exception middleware, or the appropriate
-view; it'll return that :class:`~django.http. HttpResponse`. Response
+view; it'll return that :class:`~django.http.HttpResponse`. Response
 middleware is always called on every response.
 
 .. _response-middleware:
@@ -105,16 +105,16 @@ middleware is always called on every response.
 .. method:: process_response(self, request, response)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is the
-:class:`~django.http. HttpResponse` object returned by a Django view.
+:class:`~django.http.HttpResponse` object returned by a Django view.
 
-``process_response()`` must return an :class:`~django.http. HttpResponse`
+``process_response()`` must return an :class:`~django.http.HttpResponse`
 object. It could alter the given ``response``, or it could create and return a
-brand-new :class:`~django.http. HttpResponse`.
+brand-new :class:`~django.http.HttpResponse`.
 
 Unlike the ``process_request()`` and ``process_view()`` methods, the
 ``process_response()`` method is always called, even if the ``process_request()``
 and ``process_view()`` methods of the same middleware class were skipped because
-an earlier middleware method returned an :class:`~django.http. HttpResponse`
+an earlier middleware method returned an :class:`~django.http.HttpResponse`
 (this means that your ``process_response()`` method cannot rely on setup done in
 ``process_request()``, for example). In addition, during the response phase the
 classes are applied in reverse order, from the bottom up. This means classes
@@ -132,8 +132,8 @@ defined at the end of :setting:`MIDDLEWARE_CLASSES` will be run first.
 
 Django calls ``process_exception()`` when a view raises an exception.
 ``process_exception()`` should return either ``None`` or an
-:class:`~django.http. HttpResponse` object. If it returns an
-:class:`~django.http. HttpResponse` object, the response will be returned to
+:class:`~django.http.HttpResponse` object. If it returns an
+:class:`~django.http.HttpResponse` object, the response will be returned to
 the browser. Otherwise, default exception handling kicks in.
 
 Again, middleware are run in reverse order during the response phase, which
