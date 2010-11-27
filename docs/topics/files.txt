@@ -23,7 +23,8 @@ When you use a :class:`~django.db.models.FileField` or
 :class:`~django.db.models.ImageField`, Django provides a set of APIs you can use
 to deal with that file.
 
-Consider the following model, using an ``ImageField`` to store a photo::
+Consider the following model, using an :class:`~django.db.models.ImageField` to
+store a photo::
 
     class Car(models.Model):
         name = models.CharField(max_length=255)
@@ -123,14 +124,14 @@ Argument                Description
 ======================  ===================================================
 ``location``            Optional. Absolute path to the directory that will
                         hold the files. If omitted, it will be set to the
-                        value of your ``MEDIA_ROOT`` setting.
+                        value of your :setting:`MEDIA_ROOT` setting.
 ``base_url``            Optional. URL that serves the files stored at this
                         location. If omitted, it will default to the value
-                        of your ``MEDIA_URL`` setting.
+                        of your :setting:`MEDIA_URL` setting.
 ======================  ===================================================
 
 For example, the following code will store uploaded files under
-``/media/photos`` regardless of what your ``MEDIA_ROOT`` setting is::
+``/media/photos`` regardless of what your :setting:`MEDIA_ROOT` setting is::
 
     from django.db import models
     from django.core.files.storage import FileSystemStorage
@@ -141,5 +142,6 @@ For example, the following code will store uploaded files under
         ...
         photo = models.ImageField(storage=fs)
 
-:doc:`Custom storage systems </howto/custom-file-storage>` work the same way: you
-can pass them in as the ``storage`` argument to a ``FileField``.
+:doc:`Custom storage systems </howto/custom-file-storage>` work the same way:
+you can pass them in as the ``storage`` argument to a
+:class:`~django.db.models.FileField`.
