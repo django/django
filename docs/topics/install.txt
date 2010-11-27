@@ -252,8 +252,7 @@ latest bug fixes and improvements, follow these instructions:
        svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
 
 3. Next, make sure that the Python interpreter can load Django's code. The most
-   convenient way to do this is to
-   `modify Python's search path <modify-python-path>`_. Add a ``.pth``
+   convenient way to do this is to `modify Python's search path`_. Add a ``.pth``
    file containing the full path to the ``django-trunk`` directory to your
    system's ``site-packages`` directory. For example, on a Unix-like system:
 
@@ -294,4 +293,4 @@ this, Subversion will automatically download any changes.
 
 .. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
-.. _modify-python-path: http://docs.python.org/install/index.html#modifying-python-s-search-path
+.. _`modify Python's search path`: http://docs.python.org/install/index.html#modifying-python-s-search-path
