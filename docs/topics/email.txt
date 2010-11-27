@@ -39,10 +39,10 @@ set, are used to authenticate to the SMTP server, and the
 send_mail()
 ===========
 
-The simplest way to send e-mail is using the function
-``django.core.mail.send_mail()``. Here's its definition:
+.. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
-    .. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None)
+The simplest way to send e-mail is using
+``django.core.mail.send_mail()``.
 
 The ``subject``, ``message``, ``from_email`` and ``recipient_list`` parameters
 are required.
@@ -58,10 +58,10 @@ are required.
       possible exceptions, all of which are subclasses of ``SMTPException``.
     * ``auth_user``: The optional username to use to authenticate to the SMTP
       server. If this isn't provided, Django will use the value of the
-      ``EMAIL_HOST_USER`` setting.
+      :setting:`EMAIL_HOST_USER` setting.
     * ``auth_password``: The optional password to use to authenticate to the
       SMTP server. If this isn't provided, Django will use the value of the
-      ``EMAIL_HOST_PASSWORD`` setting.
+      :setting:`EMAIL_HOST_PASSWORD` setting.
     * ``connection``: The optional e-mail backend to use to send the mail.
       If unspecified, an instance of the default backend will be used.
       See the documentation on :ref:`E-mail backends <topic-email-backends>`
@@ -72,10 +72,9 @@ are required.
 send_mass_mail()
 ================
 
-``django.core.mail.send_mass_mail()`` is intended to handle mass e-mailing.
-Here's the definition:
+.. function:: send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
-    .. function:: send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
+``django.core.mail.send_mass_mail()`` is intended to handle mass e-mailing.
 
 ``datatuple`` is a tuple in which each element is in this format::
 
@@ -110,10 +109,10 @@ a single connection for all of its messages. This makes
 mail_admins()
 =============
 
-``django.core.mail.mail_admins()`` is a shortcut for sending an e-mail to the
-site admins, as defined in the :setting:`ADMINS` setting. Here's the definition:
+.. function:: mail_admins(subject, message, fail_silently=False, connection=None)
 
-    .. function:: mail_admins(subject, message, fail_silently=False, connection=None)
+``django.core.mail.mail_admins()`` is a shortcut for sending an e-mail to the
+site admins, as defined in the :setting:`ADMINS` setting.
 
 ``mail_admins()`` prefixes the subject with the value of the
 :setting:`EMAIL_SUBJECT_PREFIX` setting, which is ``"[Django] "`` by default.
@@ -123,14 +122,14 @@ The "From:" header of the e-mail will be the value of the
 
 This method exists for convenience and readability.
 
-mail_managers() function
-========================
+mail_managers()
+===============
+
+.. function:: mail_managers(subject, message, fail_silently=False, connection=None)
 
 ``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
 sends an e-mail to the site managers, as defined in the :setting:`MANAGERS`
-setting. Here's the definition:
-
-    .. function:: mail_managers(subject, message, fail_silently=False, connection=None)
+setting.
 
 Examples
 ========
