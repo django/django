@@ -7,7 +7,7 @@ from django.contrib.auth.tests.remote_user \
 from django.contrib.auth.tests.models import ProfileTestCase
 from django.contrib.auth.tests.signals import SignalTestCase
 from django.contrib.auth.tests.tokens import TokenGeneratorTest
-from django.contrib.auth.tests.views \
-        import PasswordResetTest, ChangePasswordTest, LoginTest, LogoutTest
+from django.contrib.auth.tests.views import PasswordResetTest, \
+    ChangePasswordTest, LoginTest, LogoutTest, LoginURLSettings
 
 # The password for the fixture data users is 'password'

@@ -5,11 +5,12 @@ import urllib
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.sites.models import Site, RequestSite
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
 
 class AuthViewsTestCase(TestCase):
     """
@@ -25,11 +26,8 @@ class AuthViewsTestCase(TestCase):
         settings.LANGUAGE_CODE = 'en'
         self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
         settings.TEMPLATE_DIRS = (
-            os.path.join(
-                os.path.dirname(__file__),
-                'templates'
-            )
-        ,)
+            os.path.join(os.path.dirname(__file__), 'templates'),
+        )
 
     def tearDown(self):
         settings.LANGUAGES = self.old_LANGUAGES
@@ -220,16 +218,20 @@ class LoginTest(AuthViewsTestCase):
                 }
             )
             self.assertEquals(response.status_code, 302)
-            self.assertFalse(bad_url in response['Location'], "%s should be blocked" % bad_url)
+            self.assertFalse(bad_url in response['Location'],
+                             "%s should be blocked" % bad_url)
 
-        # Now, these URLs have an other URL as a GET parameter and therefore
-        # should be allowed
-        for url_ in ('http://example.com', 'https://example.com',
-                    'ftp://exampel.com',  '//example.com'):
-            safe_url = '%(url)s?%(next)s=/view/?param=%(safe_param)s' % {
+        # These URLs *should* still pass the security check
+        for good_url in ('/view/?param=http://example.com',
+                         '/view/?param=https://example.com',
+                         '/view?param=ftp://exampel.com',
+                         'view/?param=//example.com',
+                         'https:///',
+                         '//testserver/'):
+            safe_url = '%(url)s?%(next)s=%(good_url)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
-                'safe_param': urllib.quote(url_)
+                'good_url': urllib.quote(good_url)
             }
             response = self.client.post(safe_url, {
                     'username': 'testclient',
@@ -237,8 +239,66 @@ class LoginTest(AuthViewsTestCase):
                 }
             )
             self.assertEquals(response.status_code, 302)
-            self.assertTrue('/view/?param=%s' % url_ in response['Location'], "/view/?param=%s should be allowed" % url_)
+            self.assertTrue(good_url in response['Location'],
+                            "%s should be allowed" % good_url)
 
+class LoginURLSettings(AuthViewsTestCase):
+    urls = 'django.contrib.auth.tests.urls'
+    
+    def setUp(self):
+        super(LoginURLSettings, self).setUp()
+        self.old_LOGIN_URL = settings.LOGIN_URL
+
+    def tearDown(self):
+        super(LoginURLSettings, self).tearDown()
+        settings.LOGIN_URL = self.old_LOGIN_URL
+
+    def get_login_required_url(self, login_url):
+        settings.LOGIN_URL = login_url
+        response = self.client.get('/login_required/')
+        self.assertEquals(response.status_code, 302)
+        return response['Location']
+
+    def test_standard_login_url(self):
+        login_url = '/login/'
+        login_required_url = self.get_login_required_url(login_url)
+        querystring = QueryDict('', mutable=True)
+        querystring['next'] = '/login_required/'
+        self.assertEqual(login_required_url,
+             'http://testserver%s?%s' % (login_url, querystring.urlencode()))
+
+    def test_remote_login_url(self):
+        login_url = 'http://remote.example.com/login'
+        login_required_url = self.get_login_required_url(login_url)
+        querystring = QueryDict('', mutable=True)
+        querystring['next'] = 'http://testserver/login_required/'
+        self.assertEqual(login_required_url,
+                         '%s?%s' % (login_url, querystring.urlencode()))
+
+    def test_https_login_url(self):
+        login_url = 'https:///login/'
+        login_required_url = self.get_login_required_url(login_url)
+        querystring = QueryDict('', mutable=True)
+        querystring['next'] = 'http://testserver/login_required/'
+        self.assertEqual(login_required_url,
+                         '%s?%s' % (login_url, querystring.urlencode()))
+
+    def test_login_url_with_querystring(self):
+        login_url = '/login/?pretty=1'
+        login_required_url = self.get_login_required_url(login_url)
+        querystring = QueryDict('pretty=1', mutable=True)
+        querystring['next'] = '/login_required/'
+        self.assertEqual(login_required_url, 'http://testserver/login/?%s' %
+                         querystring.urlencode())
+
+    def test_remote_login_url_with_next_querystring(self):
+        login_url = 'http://remote.example.com/login/'
+        login_required_url = self.get_login_required_url('%s?next=/default/' %
+                                                         login_url)
+        querystring = QueryDict('', mutable=True)
+        querystring['next'] = 'http://testserver/login_required/'
+        self.assertEqual(login_required_url, '%s?%s' % (login_url,
+                                                    querystring.urlencode()))
         
 class LogoutTest(AuthViewsTestCase):
     urls = 'django.contrib.auth.tests.urls'
