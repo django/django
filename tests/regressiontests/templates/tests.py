@@ -13,6 +13,7 @@ import sys
 import traceback
 
 from django import template
+from django.template import base as template_base
 from django.core import urlresolvers
 from django.template import loader
 from django.template.loaders import app_directories, filesystem, cached
@@ -375,7 +376,7 @@ class Templates(unittest.TestCase):
                 if isinstance(invalid_string_result, basestring) and '%s' in invalid_string_result:
                     expected_invalid_str = 'INVALID %s'
                     invalid_string_result = invalid_string_result % vals[2][2]
-                    template.invalid_var_format_string = True
+                    template_base.invalid_var_format_string = True
             else:
                 normal_string_result = vals[2]
                 invalid_string_result = vals[2]
@@ -417,9 +418,9 @@ class Templates(unittest.TestCase):
             if 'LANGUAGE_CODE' in vals[1]:
                 deactivate()
 
-            if template.invalid_var_format_string:
+            if template_base.invalid_var_format_string:
                 expected_invalid_str = 'INVALID'
-                template.invalid_var_format_string = False
+                template_base.invalid_var_format_string = False
 
         loader.template_source_loaders = old_template_loaders
         deactivate()
@@ -1463,13 +1464,13 @@ class TemplateTagLoading(unittest.TestCase):
         self.old_path = sys.path[:]
         self.old_apps = settings.INSTALLED_APPS
         self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
-        self.old_tag_modules = template.templatetags_modules
-        template.templatetags_modules = []
+        self.old_tag_modules = template_base.templatetags_modules
+        template_base.templatetags_modules = []
 
     def tearDown(self):
         settings.INSTALLED_APPS = self.old_apps
         sys.path = self.old_path
-        template.templatetags_modules = self.old_tag_modules
+        template_base.templatetags_modules = self.old_tag_modules
 
     def test_load_error(self):
         ttext = "{% load broken_tag %}"

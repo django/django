@@ -8,7 +8,7 @@ try:
 except ImportError:
     from django.utils.functional import wraps  # Python 2.4 fallback.
 
-from django.template import Variable, Library
+from django.template.base import Variable, Library
 from django.conf import settings
 from django.utils import formats
 from django.utils.encoding import force_unicode, iri_to_uri

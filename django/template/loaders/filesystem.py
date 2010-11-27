@@ -3,7 +3,7 @@ Wrapper for loading templates from the filesystem.
 """
 
 from django.conf import settings
-from django.template import TemplateDoesNotExist
+from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.utils._os import safe_join
 

@@ -5,7 +5,7 @@ try:
 except ImportError:
     resource_string = None
 
-from django.template import TemplateDoesNotExist
+from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.conf import settings
 

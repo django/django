@@ -1,8 +1,9 @@
 import re
 
-from django.template import Node, Variable, VariableNode, _render_value_in_context
+from django.template import Node, Variable, VariableNode
 from django.template import TemplateSyntaxError, TokenParser, Library
 from django.template import TOKEN_TEXT, TOKEN_VAR
+from django.template.base import _render_value_in_context
 from django.utils import translation
 from django.utils.encoding import force_unicode
 
