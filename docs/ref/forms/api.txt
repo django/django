@@ -584,36 +584,29 @@ More granular output
 The ``as_p()``, ``as_ul()`` and ``as_table()`` methods are simply shortcuts for
 lazy developers -- they're not the only way a form object can be displayed.
 
-To display the HTML for a single field in your form, use dictionary lookup
-syntax using the field's name as the key, and print the resulting object::
+.. class:: BoundField
 
-    >>> f = ContactForm()
-    >>> print f['subject']
-    <input id="id_subject" type="text" name="subject" maxlength="100" />
-    >>> print f['message']
-    <input type="text" name="message" id="id_message" />
-    >>> print f['sender']
-    <input type="text" name="sender" id="id_sender" />
-    >>> print f['cc_myself']
-    <input type="checkbox" name="cc_myself" id="id_cc_myself" />
+   Used to display HTML or access attributes for a single field of a
+   :class:`Form` instance.
+   
+   The :meth:`__unicode__` and :meth:`__str__` methods of this object displays
+   the HTML for this field.
 
-Call ``str()`` or ``unicode()`` on the field to get its rendered HTML as a
-string or Unicode object, respectively::
+To retrieve a single ``BoundField``, use dictionary lookup syntax on your form
+using the field's name as the key::
 
-    >>> str(f['subject'])
-    '<input id="id_subject" type="text" name="subject" maxlength="100" />'
-    >>> unicode(f['subject'])
-    u'<input id="id_subject" type="text" name="subject" maxlength="100" />'
+	>>> form = ContactForm()
+	>>> print form['subject']
+	<input id="id_subject" type="text" name="subject" maxlength="100" />
 
-Form objects define a custom ``__iter__()`` method, which allows you to loop
-through their fields::
+To retrieve all ``BoundField`` objects, iterate the form::
 
-    >>> f = ContactForm()
-    >>> for field in f: print field
-    <input id="id_subject" type="text" name="subject" maxlength="100" />
-    <input type="text" name="message" id="id_message" />
-    <input type="text" name="sender" id="id_sender" />
-    <input type="checkbox" name="cc_myself" id="id_cc_myself" />
+	>>> form = ContactForm()
+	>>> for boundfield in form: print boundfield
+	<input id="id_subject" type="text" name="subject" maxlength="100" />
+	<input type="text" name="message" id="id_message" />
+	<input type="text" name="sender" id="id_sender" />
+	<input type="checkbox" name="cc_myself" id="id_cc_myself" />
 
 The field-specific output honors the form object's ``auto_id`` setting::
 
@@ -624,26 +617,31 @@ The field-specific output honors the form object's ``auto_id`` setting::
     >>> print f['message']
     <input type="text" name="message" id="id_message" />
 
-For a field's list of errors, access the field's ``errors`` attribute. This
-is a list-like object that is displayed as an HTML ``<ul class="errorlist">``
-when printed::
+For a field's list of errors, access the field's ``errors`` attribute.
 
-    >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
-    >>> f = ContactForm(data, auto_id=False)
-    >>> print f['message']
-    <input type="text" name="message" />
-    >>> f['message'].errors
-    [u'This field is required.']
-    >>> print f['message'].errors
-    <ul class="errorlist"><li>This field is required.</li></ul>
-    >>> f['subject'].errors
-    []
-    >>> print f['subject'].errors
+.. attribute:: BoundField.errors
 
-    >>> str(f['subject'].errors)
-    ''
+    A list-like object that is displayed as an HTML ``<ul class="errorlist">``
+    when printed::
 
-.. versionadded:: 1.2
+        >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
+        >>> f = ContactForm(data, auto_id=False)
+        >>> print f['message']
+        <input type="text" name="message" />
+        >>> f['message'].errors
+        [u'This field is required.']
+        >>> print f['message'].errors
+        <ul class="errorlist"><li>This field is required.</li></ul>
+        >>> f['subject'].errors
+        []
+        >>> print f['subject'].errors
+
+        >>> str(f['subject'].errors)
+	    ''
+
+.. method:: BoundField.css_classes()
+
+   .. versionadded:: 1.2
 
 When you use Django's rendering shortcuts, CSS classes are used to
 indicate required form fields or fields that contain errors. If you're
@@ -661,6 +659,21 @@ those classes as an argument::
 	>>> f = ContactForm(data)
 	>>> f['message'].css_classes('foo bar')
 	'foo bar required'
+
+.. method:: BoundField.values()
+
+   .. versionadded:: 1.3
+
+Use this method to render the raw value of this field as it would be rendered
+by a ``Widget``::
+
+    >>> initial = {'subject': 'welcome'}
+    >>> unbound_form = ContactForm(initial=initial)
+    >>> bound_form = ContactForm(data, initial=initial)
+    >>> print unbound_form['subject'].value
+    welcome
+    >>> print bound_form['subject'].value
+    hi
 
 .. _binding-uploaded-files:
 
