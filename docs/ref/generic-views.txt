@@ -987,7 +987,8 @@ model class.
       ``False``.
 
       If this is ``True``, and a non-logged-in user attempts to visit this page
-      or save the form, Django will redirect the request to ``/accounts/login/``.
+      or save the form, Django will redirect to :setting:`LOGIN_URL` (which
+      defaults to ``/accounts/login/``).
 
     * ``template_name``: The full name of a template to use in rendering the
       page. This lets you override the default template name (see below).
@@ -1069,7 +1070,8 @@ contain a form that POSTs to the same URL.
       ``False``.
 
       If this is ``True``, and a non-logged-in user attempts to visit this page
-      or save the form, Django will redirect the request to ``/accounts/login/``.
+      or save the form, Django will redirect to :setting:`LOGIN_URL` (which
+      defaults to ``/accounts/login/``).
 
     * ``template_name``: The full name of a template to use in rendering the
       page. This lets you override the default template name (see below).
