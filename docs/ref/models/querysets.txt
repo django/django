@@ -119,22 +119,23 @@ described here.
 QuerySet API
 ============
 
-Though you usually won't create one manually -- you'll go through a :class:`Manager` -- here's the formal declaration of a ``QuerySet``:
+Though you usually won't create one manually -- you'll go through a
+:class:`Manager` -- here's the formal declaration of a ``QuerySet``:
 
 .. class:: QuerySet([model=None])
 
 Usually when you'll interact with a ``QuerySet`` you'll use it by :ref:`chaining
 filters <chaining-filters>`. To make this work, most ``QuerySet`` methods return new querysets.
 
-QuerySet methods that return new QuerySets
-------------------------------------------
+Methods that return new QuerySets
+---------------------------------
 
 Django provides a range of ``QuerySet`` refinement methods that modify either
 the types of results returned by the ``QuerySet`` or the way its SQL query is
 executed.
 
-``filter(**kwargs)``
-~~~~~~~~~~~~~~~~~~~~
+filter
+~~~~~~
 
 .. method:: filter(**kwargs)
 
@@ -145,8 +146,8 @@ The lookup parameters (``**kwargs``) should be in the format described in
 `Field lookups`_ below. Multiple parameters are joined via ``AND`` in the
 underlying SQL statement.
 
-``exclude(**kwargs)``
-~~~~~~~~~~~~~~~~~~~~~
+exclude
+~~~~~~~
 
 .. method:: exclude(**kwargs)
 
@@ -180,8 +181,8 @@ In SQL terms, that evaluates to::
 
 Note the second example is more restrictive.
 
-``annotate(*args, **kwargs)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+annotate
+~~~~~~~~
 
 .. method:: annotate(*args, **kwargs)
 
@@ -224,8 +225,8 @@ control the name of the annotation::
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
 
-``order_by(*fields)``
-~~~~~~~~~~~~~~~~~~~~~
+order_by
+~~~~~~~~
 
 .. method:: order_by(*fields)
 
@@ -267,8 +268,8 @@ primary key if there is no ``Meta.ordering`` specified. For example::
 ...since the ``Blog`` model has no default ordering specified.
 
 Be cautious when ordering by fields in related models if you are also using
-``distinct()``. See the note in the `distinct()`_ section for an explanation
-of how related model ordering can change the expected results.
+``distinct()``. See the note in :meth:`distinct` for an explanation of how
+related model ordering can change the expected results.
 
 It is permissible to specify a multi-valued field to order the results by (for
 example, a ``ManyToMany`` field). Normally this won't be a sensible thing to
@@ -277,11 +278,6 @@ queryset's filtering or available data implies that there will only be one
 ordering piece of data for each of the main items you are selecting, the
 ordering may well be exactly what you want to do. Use ordering on multi-valued
 fields with care and make sure the results are what you expect.
-
-.. versionadded:: 1.0
-
-If you don't want any ordering to be applied to a query, not even the default
-ordering, call ``order_by()`` with no parameters.
 
 .. versionadded:: 1.0
 
@@ -294,14 +290,17 @@ There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
 
+If you don't want any ordering to be applied to a query, not even the default
+ordering, call ``order_by()`` with no parameters.
+
 .. versionadded:: 1.1
 
 You can tell if a query is ordered or not by checking the
 :attr:`QuerySet.ordered` attribute, which will be ``True`` if the
 ``QuerySet`` has been ordered in any way.
 
-``reverse()``
-~~~~~~~~~~~~~
+reverse
+~~~~~~~
 
 .. method:: reverse()
 
@@ -330,8 +329,8 @@ a model which defines a default ordering, or when using
 ordering was undefined prior to calling ``reverse()``, and will remain
 undefined afterward).
 
-``distinct()``
-~~~~~~~~~~~~~~
+distinct
+~~~~~~~~
 
 .. method:: distinct()
 
@@ -345,7 +344,7 @@ query spans multiple tables, it's possible to get duplicate results when a
 ``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
 
 .. note::
-    Any fields used in an `order_by(*fields)`_ call are included in the SQL
+    Any fields used in an :meth:`order_by` call are included in the SQL
     ``SELECT`` columns. This can sometimes lead to unexpected results when
     used in conjunction with ``distinct()``. If you order by fields from a
     related model, those fields will be added to the selected columns and they
@@ -363,8 +362,8 @@ query spans multiple tables, it's possible to get duplicate results when a
     ``values()`` together, be careful when ordering by fields not in the
     ``values()`` call.
 
-``values(*fields)``
-~~~~~~~~~~~~~~~~~~~
+values
+~~~~~~
 
 .. method:: values(*fields)
 
@@ -419,9 +418,11 @@ A few subtleties that are worth mentioning:
 
         >>> Entry.objects.values('blog_id')
         [{'blog_id': 1}, ...]
+
     * When using ``values()`` together with ``distinct()``, be aware that
-      ordering can affect the results. See the note in the `distinct()`_
-      section, above, for details.
+      ordering can affect the results. See the note in :meth:`distinct` for
+      details.
+
     * If you use a ``values()`` clause after an ``extra()`` clause,
       any fields defined by a ``select`` argument in the ``extra()``
       must be explicitly included in the ``values()`` clause. However,
@@ -472,8 +473,8 @@ and ``ManyToManyField`` attributes::
    pronounced if you include multiple such fields in your ``values()`` query,
    in which case all possible combinations will be returned.
 
-``values_list(*fields)``
-~~~~~~~~~~~~~~~~~~~~~~~~
+values_list
+~~~~~~~~~~~
 
 .. method:: values_list(*fields)
 
@@ -502,8 +503,8 @@ It is an error to pass in ``flat`` when there is more than one field.
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
 
-``dates(field, kind, order='ASC')``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+dates
+~~~~~
 
 .. method:: dates(field, kind, order='ASC')
 
@@ -538,8 +539,8 @@ Examples::
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.datetime(2005, 3, 20)]
 
-``none()``
-~~~~~~~~~~
+none
+~~~~
 
 .. method:: none()
 
@@ -555,14 +556,14 @@ Examples::
     >>> Entry.objects.none()
     []
 
-``all()``
-~~~~~~~~~
+all
+~~~
 
 .. method:: all()
 
 .. versionadded:: 1.0
 
-Returns a ''copy'' of the current ``QuerySet`` (or ``QuerySet`` subclass you
+Returns a *copy* of the current ``QuerySet`` (or ``QuerySet`` subclass you
 pass in). This can be useful in some situations where you might want to pass
 in either a model manager or a ``QuerySet`` and do further filtering on the
 result. You can safely call ``all()`` on either object and then you'll
@@ -570,8 +571,8 @@ definitely have a ``QuerySet`` to work with.
 
 .. _select-related:
 
-``select_related()``
-~~~~~~~~~~~~~~~~~~~~
+select_related
+~~~~~~~~~~~~~~
 
 .. method:: select_related()
 
@@ -691,8 +692,8 @@ related object.
 ``OneToOneFields`` will not be traversed in the reverse direction if you
 are performing a depth-based ``select_related``.
 
-``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+extra
+~~~~~
 
 .. method:: extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)
 
@@ -854,8 +855,8 @@ of the arguments is required, but you should use at least one of them.
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-``defer(*fields)``
-~~~~~~~~~~~~~~~~~~
+defer
+~~~~~
 
 .. method:: defer(*fields)
 
@@ -882,7 +883,9 @@ deferred set::
     # Defers both the body and headline fields.
     Entry.objects.defer("body").filter(rating=5).defer("headline")
 
-The order in which fields are added to the deferred set does not matter. Calling ``defer()`` with a field name that has already been deferred is harmless (the field will still be deferred).
+The order in which fields are added to the deferred set does not matter.
+Calling ``defer()`` with a field name that has already been deferred is
+harmless (the field will still be deferred).
 
 You can defer loading of fields in related models (if the related models are
 loading via ``select_related()``) by using the standard double-underscore
@@ -914,8 +917,8 @@ eventually).
     bother using ``defer()``; leave it until your query construction has
     settled down and you understand where the hot-points are.
 
-``only(*fields)``
-~~~~~~~~~~~~~~~~~
+only
+~~~~
 
 .. method:: only(*fields)
 
@@ -952,8 +955,8 @@ logically::
     # existing set of fields).
     Entry.objects.defer("body").only("headline", "body")
 
-``using(alias)``
-~~~~~~~~~~~~~~~~
+using
+~~~~~
 
 .. method:: using(alias)
 
@@ -973,8 +976,8 @@ For example::
     >>> Entry.objects.using('backup')
 
 
-QuerySet methods that do not return QuerySets
----------------------------------------------
+Methods that do not return QuerySets
+------------------------------------
 
 The following ``QuerySet`` methods evaluate the ``QuerySet`` and return
 something *other than* a ``QuerySet``.
@@ -982,8 +985,8 @@ something *other than* a ``QuerySet``.
 These methods do not use a cache (see :ref:`caching-and-querysets`). Rather,
 they query the database each time they're called.
 
-``get(**kwargs)``
-~~~~~~~~~~~~~~~~~
+get
+~~~
 
 .. method:: get(**kwargs)
 
@@ -1011,8 +1014,8 @@ The ``DoesNotExist`` exception inherits from
     except ObjectDoesNotExist:
         print "Either the entry or blog doesn't exist."
 
-``create(**kwargs)``
-~~~~~~~~~~~~~~~~~~~~
+create
+~~~~~~
 
 .. method:: create(**kwargs)
 
@@ -1031,12 +1034,12 @@ The :ref:`force_insert <ref-models-force-insert>` parameter is documented
 elsewhere, but all it means is that a new object will always be created.
 Normally you won't need to worry about this. However, if your model contains a
 manual primary key value that you set and if that value already exists in the
-database, a call to ``create()`` will fail with an ``IntegrityError`` since
-primary keys must be unique. So remember to be prepared to handle the
-exception if you are using manual primary keys.
+database, a call to ``create()`` will fail with an :exc:`IntegrityError` since
+primary keys must be unique. So remember to be prepared to handle the exception
+if you are using manual primary keys.
 
-``get_or_create(**kwargs)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+get_or_create
+~~~~~~~~~~~~~
 
 .. method:: get_or_create(**kwargs)
 
@@ -1105,8 +1108,8 @@ has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
-``count()``
-~~~~~~~~~~~
+count
+~~~~~
 
 .. method:: count()
 
@@ -1131,8 +1134,8 @@ Depending on which database you're using (e.g. PostgreSQL vs. MySQL),
 is an underlying implementation quirk that shouldn't pose any real-world
 problems.
 
-``in_bulk(id_list)``
-~~~~~~~~~~~~~~~~~~~~
+in_bulk
+~~~~~~~
 
 .. method:: in_bulk(id_list)
 
@@ -1150,8 +1153,8 @@ Example::
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
-``iterator()``
-~~~~~~~~~~~~~~
+iterator
+~~~~~~~~
 
 .. method:: iterator()
 
@@ -1168,8 +1171,8 @@ been evaluated will force it to evaluate again, repeating the query.
 
 .. _iterator: http://www.python.org/dev/peps/pep-0234/
 
-``latest(field_name=None)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+latest
+~~~~~~
 
 .. method:: latest(field_name=None)
 
@@ -1190,8 +1193,8 @@ exist with the given parameters.
 
 Note ``latest()`` exists purely for convenience and readability.
 
-``aggregate(*args, **kwargs)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+aggregate
+~~~~~~~~~
 
 .. method:: aggregate(*args, **kwargs)
 
@@ -1224,8 +1227,8 @@ control the name of the aggregation value that is returned::
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
 
-``exists()``
-~~~~~~~~~~~~
+exists
+~~~~~~
 
 .. method:: exists()
 
@@ -1240,8 +1243,8 @@ that it will be at some point, then using ``some_query_set.exists()`` will do
 more overall work (an additional query) than simply using
 ``bool(some_query_set)``.
 
-``update(**kwargs)``
-~~~~~~~~~~~~~~~~~~~~
+update
+~~~~~~
 
 .. method:: update(**kwargs)
 
@@ -1265,8 +1268,8 @@ The ``update()`` method does a bulk update and does not call any ``save()``
 methods on your models, nor does it emit the ``pre_save`` or ``post_save``
 signals (which are a consequence of calling ``save()``).
 
-``delete()``
-~~~~~~~~~~~~~~~~~~~~
+delete
+~~~~~~
 
 .. method:: delete()
 
@@ -1736,7 +1739,8 @@ SQL equivalent::
 
 Note this is only available in MySQL and requires direct manipulation of the
 database to add the full-text index. By default Django uses BOOLEAN MODE for
-full text searches. `Please check MySQL documentation for additional details. <http://dev.mysql.com/doc/refman/5.1/en/fulltext-boolean.html>`_
+full text searches. `See the MySQL documentation for additional details.
+<http://dev.mysql.com/doc/refman/5.1/en/fulltext-boolean.html>`_
 
 
 .. fieldlookup:: regex
@@ -1805,8 +1809,8 @@ Django provides the following aggregation functions in the
 aggregate functions, see
 :doc:`the topic guide on aggregation </topics/db/aggregation>`.
 
-``Avg``
-~~~~~~~
+Avg
+~~~
 
 .. class:: Avg(field)
 
@@ -1815,8 +1819,8 @@ Returns the mean value of the given field.
     * Default alias: ``<field>__avg``
     * Return type: float
 
-``Count``
-~~~~~~~~~
+Count
+~~~~~
 
 .. class:: Count(field, distinct=False)
 
@@ -1832,8 +1836,8 @@ Has one optional argument:
     If distinct=True, the count will only include unique instances. This has
     the SQL equivalent of ``COUNT(DISTINCT field)``. Default value is ``False``.
 
-``Max``
-~~~~~~~
+Max
+~~~
 
 .. class:: Max(field)
 
@@ -1842,8 +1846,8 @@ Returns the maximum value of the given field.
     * Default alias: ``<field>__max``
     * Return type: same as input field
 
-``Min``
-~~~~~~~
+Min
+~~~
 
 .. class:: Min(field)
 
@@ -1852,8 +1856,8 @@ Returns the minimum value of the given field.
     * Default alias: ``<field>__min``
     * Return type: same as input field
 
-``StdDev``
-~~~~~~~~~~
+StdDev
+~~~~~~
 
 .. class:: StdDev(field, sample=False)
 
@@ -1875,8 +1879,8 @@ Has one optional argument:
     available as an extension module for SQLite. Consult the SQlite
     documentation for instructions on obtaining and installing this extension.
 
-``Sum``
-~~~~~~~
+Sum
+~~~
 
 .. class:: Sum(field)
 
@@ -1885,8 +1889,8 @@ Computes the sum of all values of the given field.
     * Default alias: ``<field>__sum``
     * Return type: same as input field
 
-``Variance``
-~~~~~~~~~~~~
+Variance
+~~~~~~~~
 
 .. class:: Variance(field, sample=False)
 
