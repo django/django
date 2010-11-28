@@ -241,7 +241,7 @@ supplied, ``save()`` will update that instance. If it's not supplied,
     >>> f.save()
 
 Note that ``save()`` will raise a ``ValueError`` if the data in the form
-doesn't validate -- i.e., ``if form.errors``.
+doesn't validate -- i.e., if form.errors evaluates to True.
 
 This ``save()`` method accepts an optional ``commit`` keyword argument, which
 accepts either ``True`` or ``False``. If you call ``save()`` with
