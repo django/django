@@ -373,7 +373,7 @@ Signals
   ``sender=None``
 
 * Make any custom signals you've declared into instances of
-  :class:`django.dispatch.Signal`` instead of anonymous objects.
+  :class:`django.dispatch.Signal` instead of anonymous objects.
 
 Here's quick summary of the code changes you'll need to make:
 
@@ -626,8 +626,8 @@ Accessing ``HTTPResponse`` headers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``django.http.HttpResponse.headers`` has been renamed to ``_headers`` and
-:class:`HttpResponse`` now supports containment checking directly. So use
-``if header in response:`` instead of ``if header in response.headers:``.
+:class:`~django.http.HttpResponse` now supports containment checking directly.
+So use ``if header in response:`` instead of ``if header in response.headers:``.
 
 Generic relations
 -----------------
@@ -661,7 +661,7 @@ Management commands
 Running management commands from your code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:mod:`django.core.management`` has been greatly refactored.
+:mod:`django.core.management` has been greatly refactored.
 
 Calls to management services in your code now need to use
 ``call_command``. For example, if you have some test code that calls flush and
