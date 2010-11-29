@@ -52,6 +52,8 @@ from the context and executing all block tags.
 Using the template system
 =========================
 
+.. class:: django.template.Template
+
 Using the template system in Python is a two-step process:
 
     * First, you compile the raw template code into a ``Template`` object.
@@ -62,7 +64,7 @@ Compiling a string
 ------------------
 
 The easiest way to create a ``Template`` object is by instantiating it
-directly. The class lives at ``django.template.Template``. The constructor
+directly. The class lives at :class:`django.template.Template`. The constructor
 takes one argument -- the raw template code::
 
     >>> from django.template import Template
@@ -82,9 +84,11 @@ takes one argument -- the raw template code::
 Rendering a context
 -------------------
 
+.. method:: render(context)
+
 Once you have a compiled ``Template`` object, you can render a context -- or
 multiple contexts -- with it. The ``Context`` class lives at
-``django.template.Context``, and the constructor takes two (optional)
+:class:`django.template.Context`, and the constructor takes two (optional)
 arguments:
 
     * A dictionary mapping variable names to variable values.
@@ -177,7 +181,7 @@ some things to keep in mind:
         >>> t.render(Context({"person": p}))
         "My name is ."
 
-      Note that ``django.core.exceptions.ObjectDoesNotExist``, which is the
+      Note that :exc:`django.core.exceptions.ObjectDoesNotExist`, which is the
       base class for all Django database API ``DoesNotExist`` exceptions, has
       ``silent_variable_failure = True``. So if you're using Django templates
       with Django model objects, any ``DoesNotExist`` exception will fail
@@ -190,16 +194,18 @@ some things to keep in mind:
     * Obviously, some methods have side effects, and it'd be either foolish or
       a security hole to allow the template system to access them.
 
-      A good example is the ``delete()`` method on each Django model object.
-      The template system shouldn't be allowed to do something like this::
+      A good example is the :meth:`~django.db.models.Model.delete` method on
+      each Django model object. The template system shouldn't be allowed to do
+      something like this::
 
         I will now delete this valuable data. {{ data.delete }}
 
       To prevent this, set a function attribute ``alters_data`` on the method.
       The template system won't execute a method if the method has
-      ``alters_data=True`` set. The dynamically-generated ``delete()`` and
-      ``save()`` methods on Django model objects get ``alters_data=True``
-      automatically. Example::
+      ``alters_data=True`` set. The dynamically-generated
+      :meth:`~django.db.models.Model.delete` and
+      :meth:`~django.db.models.Model.save` methods on Django model objects get
+      ``alters_data=True`` automatically. Example::
 
         def sensitive_function(self):
             self.database_record.delete()
@@ -245,6 +251,8 @@ be replaced with the name of the invalid variable.
 Playing with Context objects
 ----------------------------
 
+.. class:: django.template.Context
+
 Most of the time, you'll instantiate ``Context`` objects by passing in a
 fully-populated dictionary to ``Context()``. But you can add and delete items
 from a ``Context`` object once it's been instantiated, too, using standard
@@ -259,6 +267,10 @@ dictionary syntax::
     >>> c['newvariable'] = 'hello'
     >>> c['newvariable']
     'hello'
+
+.. method:: pop()
+.. method:: push()
+.. exception:: django.template.ContextPopException
 
 A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
 If you ``pop()`` too much, it'll raise
@@ -280,6 +292,8 @@ If you ``pop()`` too much, it'll raise
     Traceback (most recent call last):
     ...
     django.template.ContextPopException
+
+.. method:: update(other_dict)
 
 In addition to ``push()`` and ``pop()``, the ``Context``
 object also defines an ``update()`` method. This works like ``push()``
@@ -333,7 +347,7 @@ and return a dictionary of items to be merged into the context. By default,
 
 .. versionadded:: 1.2
    In addition to these, ``RequestContext`` always uses
-   ``'django.core.context_processors.csrf'``.  This is a security
+   ``django.core.context_processors.csrf``.  This is a security
    related context processor required by the admin and other contrib apps, and,
    in case of accidental misconfiguration, it is deliberately hardcoded in and
    cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
@@ -499,9 +513,9 @@ Writing your own context processors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A context processor has a very simple interface: It's just a Python function
-that takes one argument, an ``HttpRequest`` object, and returns a dictionary
-that gets added to the template context. Each context processor *must* return
-a dictionary.
+that takes one argument, an :class:`~django.http.HttpRequest` object, and
+returns a dictionary that gets added to the template context. Each context
+processor *must* return a dictionary.
 
 Custom context processors can live anywhere in your code base. All Django cares
 about is that your custom context processors are pointed-to by your
@@ -685,13 +699,15 @@ Django uses the template loaders in order according to the
 :setting:`TEMPLATE_LOADERS` setting. It uses each loader until a loader finds a
 match.
 
-The ``render_to_string()`` shortcut
+The ``render_to_string`` shortcut
 ===================================
+
+.. function:: django.template.loader.render_to_string(template_name, dictionary=None, context_instance=None)
 
 To cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which largely
 automates the process: ``render_to_string()`` in
-``django.template.loader``, which loads a template, renders it and
+:mod:`django.template.loader`, which loads a template, renders it and
 returns the resulting string::
 
     from django.template.loader import render_to_string
@@ -713,7 +729,7 @@ the first template in the list that exists) -- and two optional arguments:
         also be passed as the third positional argument.
 
 See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
-calls ``render_to_string`` and feeds the result into an ``HttpResponse``
+calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`
 suitable for returning directly from a view.
 
 Configuring the template system in standalone mode
@@ -737,7 +753,7 @@ dealing with settings files and pointing to them via environment variables.
 To solve this problem, you need to use the manual configuration option described
 in :ref:`settings-without-django-settings-module`. Simply import the appropriate
 pieces of the templating system and then, *before* you call any of the
-templating functions, call ``django.conf.settings.configure()`` with any
+templating functions, call :func:`django.conf.settings.configure()` with any
 settings you wish to specify. You might want to consider setting at least
 :setting:`TEMPLATE_DIRS` (if you're going to use template loaders),
 :setting:`DEFAULT_CHARSET` (although the default of ``utf-8`` is probably fine)
@@ -763,7 +779,7 @@ features like the Django ``Context`` object and handy shortcuts like
 The core component of the Django templating system is the ``Template`` class.
 This class has a very simple interface: it has a constructor that takes a single
 positional argument specifying the template string, and a ``render()`` method
-that takes a ``django.template.context.Context`` object and returns a string
+that takes a :class:`~django.template.Context` object and returns a string
 containing the rendered response.
 
 Suppose we're using a template language that defines a ``Template`` object with
@@ -783,7 +799,7 @@ That's all that's required to make our fictional ``Template`` class compatible
 with the Django loading and rendering system!
 
 The next step is to write a ``Loader`` class that returns instances of our custom
-template class instead of the default ``django.template.Template``. Custom ``Loader``
+template class instead of the default :class:`~django.template.Template`. Custom ``Loader``
 classes should inherit from ``django.template.loader.BaseLoader`` and override
 the ``load_template_source()`` method, which takes a ``template_name`` argument,
 loads the template from disk (or elsewhere), and returns a tuple:
@@ -794,8 +810,8 @@ string by calling ``load_template_source()``, instantiates a ``Template`` from
 the template source, and returns a tuple: ``(template, template_origin)``. Since
 this is the method that actually instantiates the ``Template``, we'll need to
 override it to use our custom template class instead. We can inherit from the
-builtin ``django.template.loaders.app_directories.Loader`` to take advantage of
-the ``load_template_source()`` method implemented there::
+builtin :class:`django.template.loaders.app_directories.Loader` to take advantage
+of the ``load_template_source()`` method implemented there::
 
     from django.template.loaders import app_directories
     class Loader(app_directories.Loader):
