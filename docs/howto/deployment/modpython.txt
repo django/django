@@ -1,3 +1,5 @@
+.. _howto-deployment-modpython:
+
 ============================================
 How to use Django with Apache and mod_python
 ============================================
