@@ -10,7 +10,10 @@ A set of Django template filters useful for adding a "human touch" to data.
 
 To activate these filters, add ``'django.contrib.humanize'`` to your
 :setting:`INSTALLED_APPS` setting. Once you've done that, use
-``{% load humanize %}`` in a template, and you'll have access to these filters:
+``{% load humanize %}`` in a template, and you'll have access to the following
+filters.
+
+.. templatefilter:: apnumber
 
 apnumber
 --------
@@ -20,11 +23,13 @@ number. This follows Associated Press style.
 
 Examples:
 
-    * ``1`` becomes ``'one'``.
-    * ``2`` becomes ``'two'``.
+    * ``1`` becomes ``one``.
+    * ``2`` becomes ``two``.
     * ``10`` becomes ``10``.
 
 You can pass in either an integer or a string representation of an integer.
+
+.. templatefilter:: intcomma
 
 intcomma
 --------
@@ -33,12 +38,14 @@ Converts an integer to a string containing commas every three digits.
 
 Examples:
 
-    * ``4500`` becomes ``'4,500'``.
-    * ``45000`` becomes ``'45,000'``.
-    * ``450000`` becomes ``'450,000'``.
-    * ``4500000`` becomes ``'4,500,000'``.
+    * ``4500`` becomes ``4,500``.
+    * ``45000`` becomes ``45,000``.
+    * ``450000`` becomes ``450,000``.
+    * ``4500000`` becomes ``4,500,000``.
 
 You can pass in either an integer or a string representation of an integer.
+
+.. templatefilter:: intword
 
 intword
 -------
@@ -48,26 +55,15 @@ numbers over 1 million.
 
 Examples:
 
-    * ``1000000`` becomes ``'1.0 million'``.
-    * ``1200000`` becomes ``'1.2 million'``.
-    * ``1200000000`` becomes ``'1.2 billion'``.
+    * ``1000000`` becomes ``1.0 million``.
+    * ``1200000`` becomes ``1.2 million``.
+    * ``1200000000`` becomes ``1.2 billion``.
 
 Values up to 1000000000000000 (one quadrillion) are supported.
 
 You can pass in either an integer or a string representation of an integer.
 
-ordinal
--------
-
-Converts an integer to its ordinal as a string.
-
-Examples:
-
-    * ``1`` becomes ``'1st'``.
-    * ``2`` becomes ``'2nd'``.
-    * ``3`` becomes ``'3rd'``.
-
-You can pass in either an integer or a string representation of an integer.
+.. templatefilter:: naturalday
 
 naturalday
 ----------
@@ -78,7 +74,7 @@ For dates that are the current day or within one day, return "today",
 "tomorrow" or "yesterday", as appropriate. Otherwise, format the date using
 the passed in format string.
 
-**Argument:** Date formatting string as described in the :ttag:`now` tag.
+**Argument:** Date formatting string as described in the :tfilter:`date` tag.
 
 Examples (when 'today' is 17 Feb 2007):
 
@@ -87,3 +83,18 @@ Examples (when 'today' is 17 Feb 2007):
     * ``18 Feb 2007`` becomes ``tomorrow``.
     * Any other day is formatted according to given argument or the
       :setting:`DATE_FORMAT` setting if no argument is given.
+
+.. templatefilter:: ordinal
+
+ordinal
+-------
+
+Converts an integer to its ordinal as a string.
+
+Examples:
+
+    * ``1`` becomes ``1st``.
+    * ``2`` becomes ``2nd``.
+    * ``3`` becomes ``3rd``.
+
+You can pass in either an integer or a string representation of an integer.
