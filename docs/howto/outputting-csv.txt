@@ -56,12 +56,35 @@ mention:
       about escaping strings with quotes or commas in them. Just pass
       ``writerow()`` your raw strings, and it'll do the right thing.
 
+Handling Unicode
+~~~~~~~~~~~~~~~~
+
+Python's ``csv`` module does not support Unicode input. Since Django uses
+Unicode internally this means strings read from sources such as
+:class:`~django.http.HttpRequest` are potentially problematic. There are a few
+options for handling this:
+
+    * Manually encode all Unicode objects to a compatible encoding.
+
+    * Use the ``UnicodeWriter`` class provided in the `csv module's examples
+      section`_.
+
+    * Use the `python-unicodecsv module`_, which aims to be a drop-in
+      replacement for ``csv`` that gracefully handles Unicode.
+
+For more information, see the Python `CSV File Reading and Writing`_
+documentation.
+
+.. _`csv module's examples section`: http://docs.python.org/library/csv.html#examples
+.. _`python-unicodecsv module`: https://github.com/jdunck/python-unicodecsv
+.. _`CSV File Reading and Writing`: http://docs.python.org/library/csv.html
+
 Using the template system
 =========================
 
 Alternatively, you can use the :doc:`Django template system </topics/templates>`
-to generate CSV. This is lower-level than using the convenient CSV, but the
-solution is presented here for completeness.
+to generate CSV. This is lower-level than using the convenient Python ``csv``
+module, but the solution is presented here for completeness.
 
 The idea here is to pass a list of items to your template, and have the
 template output the commas in a :ttag:`for` loop.
