@@ -216,7 +216,7 @@ class DjangoTestSuiteRunner(object):
         return reorder_suite(suite, (TestCase,))
 
     def setup_databases(self, **kwargs):
-        from django.db import connections
+        from django.db import connections, DEFAULT_DB_ALIAS
 
         # First pass -- work out which databases actually need to be created,
         # and which ones are test mirrors or duplicate entries in DATABASES
@@ -238,11 +238,21 @@ class DjangoTestSuiteRunner(object):
                         connection.settings_dict['ENGINE'],
                         connection.settings_dict['NAME'],
                     ), []).append(alias)
-
-        # Second pass -- actually create the databases.
+        
+        # Re-order the list of databases to create, making sure the default
+        # database is first. Otherwise, creation order is semi-random (i.e. 
+        # dict ordering dependent).
+        dbs_to_create = []
+        for dbinfo, aliases in test_databases.items():
+            if DEFAULT_DB_ALIAS in aliases:
+                dbs_to_create.insert(0, (dbinfo, aliases))
+            else:
+                dbs_to_create.append((dbinfo, aliases))
+                
+        # Final pass -- actually create the databases.
         old_names = []
         mirrors = []
-        for (host, port, engine, db_name), aliases in test_databases.items():
+        for (host, port, engine, db_name), aliases in dbs_to_create:
             # Actually create the database for the first connection
             connection = connections[aliases[0]]
             old_names.append((connection, db_name, True))
