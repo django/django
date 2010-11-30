@@ -1418,7 +1418,7 @@ cause of an failure in your test suite.
     implicit ordering, you will need to apply a ``order_by()`` clause to your
     queryset to ensure that the test will pass reliably.
 
-.. method:: TestCase.assertNumQueries(num, func, *args, **kwargs):
+.. method:: TestCase.assertNumQueries(num, func, *args, **kwargs)
 
     .. versionadded:: 1.3
 
