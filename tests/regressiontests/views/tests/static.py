@@ -69,3 +69,17 @@ class StaticTests(TestCase):
         self.assertEquals(len(response.content),
                           int(response['Content-Length']))
 
+    def test_invalid_if_modified_since2(self):
+        """Handle even more bogus If-Modified-Since values gracefully
+
+        Assume that a file is modified since an invalid timestamp as per RFC
+        2616, section 14.25.
+        """
+        file_name = 'file.txt'
+        invalid_date = ': 1291108438, Wed, 20 Oct 2010 14:05:00 GMT'
+        response = self.client.get('/views/site_media/%s' % file_name,
+                                   HTTP_IF_MODIFIED_SINCE=invalid_date)
+        file = open(path.join(media_dir, file_name))
+        self.assertEquals(file.read(), response.content)
+        self.assertEquals(len(response.content),
+                          int(response['Content-Length']))
