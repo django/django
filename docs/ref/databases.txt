@@ -585,6 +585,23 @@ your Oracle database configuration to True::
 
 Failure to do this may result in crashes and other odd behavior.
 
+INSERT ... RETURNING INTO
+-------------------------
+
+By default, the Oracle backend uses a ``RETURNING INTO`` clause to efficiently
+retrieve the value of an ``AutoField`` when inserting new rows.  This behavior
+may result in a ``DatabaseError`` in certain unusual setups, such as when
+inserting into a remote table, or into a view with an ``INSTEAD OF`` trigger.
+The ``RETURNING INTO`` clause can be disabled by setting the
+``use_returning_into`` option of the database configuration to False::
+
+            'OPTIONS': {
+                'use_returning_into': False,
+            },
+
+In this case, the Oracle backend will use a separate ``SELECT`` query to
+retrieve AutoField values.
+
 Tablespace options
 ------------------
 

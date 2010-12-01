@@ -351,6 +351,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         self.oracle_version = None
         self.features = DatabaseFeatures(self)
+        use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
+        self.features.can_return_id_from_insert = use_returning_into
         self.ops = DatabaseOperations()
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
@@ -377,7 +379,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor = None
         if not self._valid_connection():
             conn_string = convert_unicode(self._connect_string())
-            self.connection = Database.connect(conn_string, **self.settings_dict['OPTIONS'])
+            conn_params = self.settings_dict['OPTIONS'].copy()
+            if 'use_returning_into' in conn_params:
+                del conn_params['use_returning_into']
+            self.connection = Database.connect(conn_string, **conn_params)
             cursor = FormatStylePlaceholderCursor(self.connection)
             # Set oracle date to ansi date format.  This only needs to execute
             # once when we create a new connection. We also set the Territory
