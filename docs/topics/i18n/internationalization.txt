@@ -214,8 +214,7 @@ cardinality of the elements at play.
 
     You would get a ``a format specification for argument 'name', as in
     'msgstr[0]', doesn't exist in 'msgid'`` error when running
-    ``django-admin.py compilemessages`` or a ``KeyError`` Python exception at
-    runtime.
+    ``django-admin.py compilemessages``.
 
 .. _contextual-markers:
 
@@ -469,7 +468,7 @@ A more complex example::
     That will cost $ {{ amount }} per {{ years }} years.
     {% endblocktrans %}
 
-When you both use the pluralization feature and bind values to local variables
+When you use both the pluralization feature and bind values to local variables
 in addition to the counter value, keep in mind that the ``blocktrans``
 construct is internally converted to an ``ungettext`` call. This means the
 same :ref:`notes regarding ungettext variables <pluralization-var-notes>`
