@@ -265,7 +265,7 @@ class LoginURLSettings(AuthViewsTestCase):
         querystring = QueryDict('', mutable=True)
         querystring['next'] = '/login_required/'
         self.assertEqual(login_required_url,
-             'http://testserver%s?%s' % (login_url, querystring.urlencode()))
+             'http://testserver%s?%s' % (login_url, querystring.urlencode('/')))
 
     def test_remote_login_url(self):
         login_url = 'http://remote.example.com/login'
@@ -273,7 +273,7 @@ class LoginURLSettings(AuthViewsTestCase):
         querystring = QueryDict('', mutable=True)
         querystring['next'] = 'http://testserver/login_required/'
         self.assertEqual(login_required_url,
-                         '%s?%s' % (login_url, querystring.urlencode()))
+                         '%s?%s' % (login_url, querystring.urlencode('/')))
 
     def test_https_login_url(self):
         login_url = 'https:///login/'
@@ -281,7 +281,7 @@ class LoginURLSettings(AuthViewsTestCase):
         querystring = QueryDict('', mutable=True)
         querystring['next'] = 'http://testserver/login_required/'
         self.assertEqual(login_required_url,
-                         '%s?%s' % (login_url, querystring.urlencode()))
+                         '%s?%s' % (login_url, querystring.urlencode('/')))
 
     def test_login_url_with_querystring(self):
         login_url = '/login/?pretty=1'
@@ -289,7 +289,7 @@ class LoginURLSettings(AuthViewsTestCase):
         querystring = QueryDict('pretty=1', mutable=True)
         querystring['next'] = '/login_required/'
         self.assertEqual(login_required_url, 'http://testserver/login/?%s' %
-                         querystring.urlencode())
+                         querystring.urlencode('/'))
 
     def test_remote_login_url_with_next_querystring(self):
         login_url = 'http://remote.example.com/login/'
@@ -298,8 +298,9 @@ class LoginURLSettings(AuthViewsTestCase):
         querystring = QueryDict('', mutable=True)
         querystring['next'] = 'http://testserver/login_required/'
         self.assertEqual(login_required_url, '%s?%s' % (login_url,
-                                                    querystring.urlencode()))
-        
+                                                    querystring.urlencode('/')))
+
+
 class LogoutTest(AuthViewsTestCase):
     urls = 'django.contrib.auth.tests.urls'
 

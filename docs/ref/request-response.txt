@@ -430,14 +430,28 @@ In addition, ``QueryDict`` has the following methods:
     Like :meth:`items()`, except it includes all values, as a list, for each
     member of the dictionary. For example::
 
-         >>> q = QueryDict('a=1&a=2&a=3')
-         >>> q.lists()
-         [(u'a', [u'1', u'2', u'3'])]
+        >>> q = QueryDict('a=1&a=2&a=3')
+        >>> q.lists()
+        [(u'a', [u'1', u'2', u'3'])]
 
-.. method:: QueryDict.urlencode()
+.. method:: QueryDict.urlencode([safe])
 
-    Returns a string of the data in query-string format.
-    Example: ``"a=2&b=3&b=5"``.
+    Returns a string of the data in query-string format. Example::
+
+        >>> q = QueryDict('a=2&b=3&b=5')
+        >>> q.urlencode()
+        'a=2&b=3&b=5'
+
+    .. versionchanged:: 1.3
+       The ``safe`` parameter was added.
+
+    Optionally, urlencode can be passed characters which
+    do not require encoding. For example::
+
+        >>> q = QueryDict('', mutable=True)
+        >>> q['next'] = '/a&b/'
+        >>> q.urlencode(safe='/')
+        'next=/a%26b/'
 
 HttpResponse objects
 ====================
