@@ -56,7 +56,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                         col_aliases.add(col[1])
                 else:
                     result.append(col.as_sql(qn, self.connection))
-                    
+
                     if hasattr(col, 'alias'):
                         aliases.add(col.alias)
                         col_aliases.add(col.alias)
