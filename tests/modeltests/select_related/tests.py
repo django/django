@@ -68,11 +68,11 @@ class SelectRelatedTests(TestCase):
         """
         world = Species.objects.all()
         families = [o.genus.family.name for o in world]
-        self.assertEqual(families, [
-            'Drosophilidae',
-            'Hominidae',
-            'Fabaceae',
+        self.assertEqual(sorted(families), [
             'Amanitacae',
+            'Drosophilidae',
+            'Fabaceae',
+            'Hominidae',
         ])
         self.assertEqual(len(db.connection.queries), 9)
 
@@ -83,11 +83,11 @@ class SelectRelatedTests(TestCase):
         """
         world = Species.objects.all().select_related()
         families = [o.genus.family.name for o in world]
-        self.assertEqual(families, [
-            'Drosophilidae',
-            'Hominidae',
-            'Fabaceae',
+        self.assertEqual(sorted(families), [
             'Amanitacae',
+            'Drosophilidae',
+            'Fabaceae',
+            'Hominidae',
         ])
         self.assertEqual(len(db.connection.queries), 1)
 
@@ -118,8 +118,8 @@ class SelectRelatedTests(TestCase):
         """
         world = Species.objects.all().select_related(depth=2)
         orders = [o.genus.family.order.name for o in world]
-        self.assertEqual(orders,
-            ['Diptera', 'Primates', 'Fabales', 'Agaricales'])
+        self.assertEqual(sorted(orders),
+            ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
         self.assertEqual(len(db.connection.queries), 5)
 
     def test_select_related_with_extra(self):
@@ -138,8 +138,8 @@ class SelectRelatedTests(TestCase):
         """
         world = Species.objects.select_related('genus__family')
         families = [o.genus.family.name for o in world]
-        self.assertEqual(families,
-            ['Drosophilidae', 'Hominidae', 'Fabaceae', 'Amanitacae'])
+        self.assertEqual(sorted(families),
+            ['Amanitacae', 'Drosophilidae', 'Fabaceae', 'Hominidae'])
         self.assertEqual(len(db.connection.queries), 1)
 
     def test_more_certain_fields(self):
