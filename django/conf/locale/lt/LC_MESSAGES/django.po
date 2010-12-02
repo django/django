@@ -12,6 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: oldforms/__init__.py:357
 #: db/models/fields/__init__.py:117
@@ -27,11 +28,12 @@ msgid "This field is required."
 msgstr "Šis laukas yra privalomas."
 
 #: oldforms/__init__.py:392
-#, python-format
+#, fuzzy, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] "Įsitikink, kad tavo tekstas turi mažiau nei %s simbolį."
 msgstr[1] "Įsitikink, kad tavo tekstas turi mažiau nei %s simbolių."
+msgstr[2] ""
 
 #: oldforms/__init__.py:397
 msgid "Line breaks are not allowed here."
@@ -145,11 +147,12 @@ msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "Paspausk ir laikyk \"Control\", arba \"Command\" Mac'uose, kad pasirinkti daugiau nei vieną."
 
 #: db/models/fields/related.py:691
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "Įveskite tinkamą %(self)s ID. Reikšmė %(value)r yra netinkama."
 msgstr[1] "Įveskite tinkamą %(self)s ID. Reikšmės %(value)r yra netinkamos."
+msgstr[2] ""
 
 #: conf/global_settings.py:39
 msgid "Arabic"
@@ -435,11 +438,12 @@ msgid "Enter a valid U.S. state abbreviation."
 msgstr "Įvesk tinkamą JAV valstijos sutrumpinimą."
 
 #: core/validators.py:266
-#, python-format
+#, fuzzy, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Kontroliuok liežuvį! %s neleidžiamas."
 msgstr[1] "Kontroliuok liežuvį! %s neleidžiami."
+msgstr[2] ""
 
 #: core/validators.py:273
 #, python-format
@@ -494,25 +498,28 @@ msgid "Please enter a valid decimal number."
 msgstr "Įveskite tinkamą dešimtainį skaičių."
 
 #: core/validators.py:422
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "Įveskite tinkamą dešimtainį skaičių su daugiausiai %s skaitmeniu."
 msgstr[1] "Įveskite tinkamą dešimtainį skaičių su daugiausiai %s skaitmenimis."
+msgstr[2] ""
 
 #: core/validators.py:425
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter a valid decimal number with a whole part of at most %s digit."
 msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr[0] "Įveskite tinkamą dešimtainį skaičių, kurio sveikoji dalis ne didenė nei %s skaitmens."
 msgstr[1] "Įveskite tinkamą dešimtainį skaičių, kurio sveikoji dalis ne didenė nei %s skaitmenų."
+msgstr[2] ""
 
 #: core/validators.py:428
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] "Įveskite tinkamą dešimtainį skaičių, kur po kablelio max %s skaitmuo."
 msgstr[1] "Įveskite tinkamą dešimtainį skaičių, kur po kablelio max %s skaitmenų."
+msgstr[2] ""
 
 #: core/validators.py:438
 #, python-format
@@ -670,25 +677,28 @@ msgid "rd"
 msgstr "rd"
 
 #: contrib/humanize/templatetags/humanize.py:47
-#, python-format
+#, fuzzy, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f milijonas"
 msgstr[1] "%(value).1f milijonas"
+msgstr[2] ""
 
 #: contrib/humanize/templatetags/humanize.py:50
-#, python-format
+#, fuzzy, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f milijardas"
 msgstr[1] "%(value).1f milijardas"
+msgstr[2] ""
 
 #: contrib/humanize/templatetags/humanize.py:53
-#, python-format
+#, fuzzy, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f trilijonas"
 msgstr[1] "%(value).1f trilijonas"
+msgstr[2] ""
 
 #: contrib/humanize/templatetags/humanize.py:68
 msgid "one"
@@ -951,7 +961,7 @@ msgid "This rating is required because you've entered at least one other rating.
 msgstr "Šis reitingas privalomas nes įvedei mažiausiai vieną kitą reitingą."
 
 #: contrib/comments/views/comments.py:111
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "This comment was posted by a user who has posted fewer than %(count)s comment:\n"
 "\n"
@@ -968,6 +978,7 @@ msgstr[1] ""
 "Šis komentaras buvo paskelbtas vartotojo, kuris paskelbė mažiau nei %(count)s komentarų:\n"
 "\n"
 "%(text)s"
+msgstr[2] ""
 
 #: contrib/comments/views/comments.py:116
 #, python-format
@@ -1546,11 +1557,12 @@ msgid "Go"
 msgstr "Eiti!"
 
 #: contrib/admin/templates/admin/search_form.html:10
-#, python-format
+#, fuzzy, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
 msgstr[0] "1 rezultatas"
 msgstr[1] "%(counter)s rezultatai"
+msgstr[2] ""
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -1643,10 +1655,12 @@ msgstr "Matyti saite"
 
 #: contrib/admin/templates/admin/change_form.html:32
 #: contrib/admin/templates/admin/auth/user/change_password.html:24
+#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Ištaisykite klaidą žemiau"
 msgstr[1] "Ištaisykite klaidas žemiau"
+msgstr[2] ""
 
 #: contrib/admin/templates/admin/change_form.html:50
 msgid "Ordering"
@@ -2742,40 +2756,52 @@ msgid "Dec."
 msgstr "Grd."
 
 #: utils/timesince.py:12
+#, fuzzy
 msgid "year"
 msgid_plural "years"
 msgstr[0] "metai"
 msgstr[1] "metai"
+msgstr[2] ""
 
 #: utils/timesince.py:13
+#, fuzzy
 msgid "month"
 msgid_plural "months"
 msgstr[0] "mėnesis"
 msgstr[1] "mėnesiai"
+msgstr[2] ""
 
 #: utils/timesince.py:14
+#, fuzzy
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "savaitė"
 msgstr[1] "savaitės"
+msgstr[2] ""
 
 #: utils/timesince.py:15
+#, fuzzy
 msgid "day"
 msgid_plural "days"
 msgstr[0] "diena"
 msgstr[1] "dienos"
+msgstr[2] ""
 
 #: utils/timesince.py:16
+#, fuzzy
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "valanda"
 msgstr[1] "valandos"
+msgstr[2] ""
 
 #: utils/timesince.py:17
+#, fuzzy
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minutė"
 msgstr[1] "minutės"
+msgstr[2] ""
 
 #: utils/timesince.py:40
 #, python-format
@@ -2845,11 +2871,12 @@ msgid "yes,no,maybe"
 msgstr "taip,ne,galbūt"
 
 #: template/defaultfilters.py:520
-#, python-format
+#, fuzzy, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d baitas"
 msgstr[1] "%(size)d baitai"
+msgstr[2] ""
 
 #: template/defaultfilters.py:522
 #, python-format

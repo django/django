@@ -1,7 +1,6 @@
 # Translation of django.po to Indonesian
 # This file is distributed under the same license as the Django package.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
@@ -445,14 +444,12 @@ msgstr "Database error"
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s berhasil diubah."
-msgstr[1] "%(count)s %(name)s berhasil diubah."
 
 #: contrib/admin/options.py:1066
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s terpilih"
-msgstr[1] "Semua %(total_count)s terpilih"
 
 #: contrib/admin/options.py:1071
 #, python-format
@@ -671,7 +668,6 @@ msgstr "Lihat di situs"
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Mohon perbaiki error di bawah ini."
-msgstr[1] "Mohon perbaiki error-error di bawah ini."
 
 #: contrib/admin/templates/admin/change_list.html:63
 #, python-format
@@ -823,8 +819,7 @@ msgstr "Cari"
 #, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] "1 hasil"
-msgstr[1] "%(counter)s hasil"
+msgstr[0] "%(counter)s hasil"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -1431,7 +1426,6 @@ msgstr "Metadata"
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "ditandai"
-msgstr[1] "ditandai"
 
 #: contrib/comments/admin.py:41
 msgid "Flag selected comments"
@@ -1441,7 +1435,6 @@ msgstr "Tandai komentar-komentar terpilih"
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "disetujui"
-msgstr[1] "disetujui"
 
 #: contrib/comments/admin.py:46
 msgid "Approve selected comments"
@@ -1451,7 +1444,6 @@ msgstr "Setujui komentar-komentar terpilih"
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "dihapus"
-msgstr[1] "dihapus"
 
 #: contrib/comments/admin.py:51
 msgid "Remove selected comments"
@@ -1461,8 +1453,7 @@ msgstr "Hapus komentar-komentar terpilih"
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "Satu komentar berhasil di-%(action)s."
-msgstr[1] "%(count)s komentar berhasil di-%(action)s."
+msgstr[0] "%(count)s komentar berhasil di-%(action)s."
 
 #: contrib/comments/feeds.py:13
 #, python-format
@@ -1496,7 +1487,6 @@ msgstr "Komentar"
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Awas! Kata %s tidak di-ijinkan di sini."
-msgstr[1] "Awas! Kata-kata %s tidak di-ijinkan di sini."
 
 #: contrib/comments/forms.py:182
 msgid ""
@@ -1688,7 +1678,6 @@ msgstr "Preview komentar Anda"
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
 msgstr[0] "Mohon perbaiki kesalahan di bawah ini"
-msgstr[1] "Mohon perbaiki kesalahan-kesalahan di bawah ini"
 
 #: contrib/comments/templates/comments/preview.html:16
 msgid "Post your comment"
@@ -1848,21 +1837,18 @@ msgstr "rd"
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f juta"
-msgstr[1] "%(value).1f juta"
 
 #: contrib/humanize/templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f milyar"
-msgstr[1] "%(value).1f milyar"
 
 #: contrib/humanize/templatetags/humanize.py:57
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f trilyun"
-msgstr[1] "%(value).1f trilyun"
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
@@ -4682,7 +4668,6 @@ msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "Mohon masukkan ID %(self)s yang benar. Nilai %(value)r salah."
-msgstr[1] "Mohon masukkan ID %(self)s yang benar. Nilai-nilai %(value)r salah."
 
 #: forms/fields.py:65
 msgid "This field is required."
@@ -4815,8 +4800,7 @@ msgstr "ya,tidak,mungkin"
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
-msgstr[0] "%(size)d byte"
-msgstr[1] "%(size)d bytes"
+msgstr[0] "%(size)d bytes"
 
 #: template/defaultfilters.py:809
 #, python-format
@@ -5045,37 +5029,31 @@ msgstr "atau"
 msgid "year"
 msgid_plural "years"
 msgstr[0] "tahun"
-msgstr[1] "tahun"
 
 #: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "bulan"
-msgstr[1] "bulan"
 
 #: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "minggu"
-msgstr[1] "minggu"
 
 #: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "hari"
-msgstr[1] "hari"
 
 #: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "jam"
-msgstr[1] "jam"
 
 #: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "menit"
-msgstr[1] "menit"
 
 #: utils/timesince.py:45
 msgid "minutes"

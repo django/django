@@ -512,9 +512,6 @@ msgid_plural ""
 msgstr[0] ""
 "មតិយោបល់នេះត្រូវបានបញ្ជូនដោយសមាជិកម្នាក់ដែលបាន​ផ្តល់មតិយោបល់​តិចជាង %(count)s។\n"
 "%(text)s"
-msgstr[1] ""
-"មតិយោបល់នេះត្រូវបានសរសេរដោយសមាជិកម្នាក់ដែលបាន​ផ្តល់មតិយោបល់​តិចជាង %(count)s។\n"
-"%(text)s"
 
 #: contrib/comments/views/comments.py:116
 #, python-format
@@ -1161,11 +1158,10 @@ msgid "Go"
 msgstr "ស្វែងរក"
 
 #: contrib/admin/templates/admin/search_form.html:10
-#, python-format
+#, fuzzy, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] "លទ្ធផល ១"
-msgstr[1] "លទ្ធផល %(counter)s "
+msgstr[0] "លទ្ធផល %(counter)s "
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -1185,10 +1181,10 @@ msgid "View on site"
 msgstr "មើលនៅលើគេហទំព័រដោយផ្ទាល់"
 
 #: contrib/admin/templates/admin/change_form.html:30
+#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "សូមកែប្រែកំហុសខាងក្រោម ។"
-msgstr[1] "សូមកែប្រែកំហុសខាងក្រោម ។"
 
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Ordering"
@@ -1828,37 +1824,31 @@ msgstr "ធ្នូ"
 msgid "year"
 msgid_plural "years"
 msgstr[0] "ឆ្នាំ"
-msgstr[1] "ឆ្នាំ"
 
 #: utils/timesince.py:13
 msgid "month"
 msgid_plural "months"
 msgstr[0] "ខែ"
-msgstr[1] "ខែ"
 
 #: utils/timesince.py:14
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "សប្តាហ៍"
-msgstr[1] "សប្តាហ៍"
 
 #: utils/timesince.py:15
 msgid "day"
 msgid_plural "days"
 msgstr[0] "ថ្ងៃ"
-msgstr[1] "ថ្ងៃ"
 
 #: utils/timesince.py:16
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "ម៉ោង"
-msgstr[1] "ម៉ោង"
 
 #: utils/timesince.py:17
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "នាទី"
-msgstr[1] "នាទី"
 
 #: utils/translation/trans_real.py:362
 msgid "DATE_FORMAT"
@@ -2146,11 +2136,10 @@ msgid "Enter a valid U.S. state abbreviation."
 msgstr "សូមបំពេញអក្សរកាត់រដ្ឋរបស់សហរដ្ឋអាមេរិកអោយបានត្រឹមត្រូវ។"
 
 #: core/validators.py:256
-#, python-format
+#, fuzzy, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "ពាក្យ %s មិនអនុញ្ញាតអោយប្រើនៅទីនេះទេ។"
-msgstr[1] "ពាក្យ %s មិនអនុញ្ញាតអោយប្រើនៅទីនេះទេ។"
 
 #: core/validators.py:263
 #, python-format
@@ -2190,25 +2179,22 @@ msgid "Please enter a valid decimal number."
 msgstr "សូមបំពេញចំនួនទសភាគអោយបានត្រឹមត្រូវ។"
 
 #: core/validators.py:378
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "សូមបំពេញចំនួនទសភាគយ៉ាងតិច  %sខ្ទង់។"
-msgstr[1] "សូមបំពេញចំនួនទសភាគយ៉ាងតិច  %sខ្ទង់។"
 
 #: core/validators.py:381
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter a valid decimal number with a whole part of at most %s digit."
 msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr[0] "សូមបំពេញចំនួនទសភាគទាំងអស់  %sខ្ទង់។"
-msgstr[1] "សូមបំពេញចំនួនទសភាគទាំងអស់  %sខ្ទង់។"
 
 #: core/validators.py:384
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] "សូមបំពេញចំនួនទសភាគយ៉ាងច្រើន  %sខ្ទង់។"
-msgstr[1] "សូមបំពេញចំនួនទសភាគយ៉ាងច្រើន  %sខ្ទង់។"
 
 #: core/validators.py:394
 #, python-format
@@ -2327,18 +2313,16 @@ msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "សូមចុចប៉ូតុន \"Control\", ឬ \"Command\" ចំពោះកុំព្យូទ័រ Mac, ដើម្បីជ្រើសរើសច្រើនជាងមួយ។"
 
 #: db/models/fields/related.py:664
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "សូមបំពេញលេខ %(self)s អោយបានត្រឹមត្រូវ។ តំលៃ %(value)r នេះមិនត្រឹមត្រូវទេ។"
-msgstr[1] "សូមបំពេញលេខ %(self)s អោយបានត្រឹមត្រូវ។ តំលៃ %(value)r នេះមិនត្រឹមត្រូវទេ។"
 
 #: forms/__init__.py:381
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] "អត្ថបទរបស់អ្នកតិចជាង %s អក្សរ។"
-msgstr[1] ""
 
 msgid "Ensure this value has at most %d characters."
 msgstr "អត្ថបទរបស់អ្នកត្រូវតិចជាង %d អក្សរ។"

@@ -806,7 +806,7 @@ msgstr "Pretraga"
 #, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] "1 rezultat"
+msgstr[0] "%(counter)s rezultat"
 msgstr[1] "%(counter)s rezultata"
 msgstr[2] "%(counter)s rezultata"
 
@@ -1415,7 +1415,7 @@ msgstr "Obriši izabrane komentare"
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "Nad jednim komentarom je uspešno urađeno: %(action)s."
+msgstr[0] "Nad %(count)s komentarom je uspešno urađeno: %(action)s."
 msgstr[1] "Nad %(count)s komentara je uspešno urađeno: %(action)s."
 msgstr[2] "Nad %(count)s komentara je uspešno urađeno: %(action)s."
 

@@ -455,7 +455,7 @@ msgstr[1] "%(count)s %(name)s modificati/e correttamente."
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s selezionati/e"
-msgstr[1] "Nessuna azione selezionata."
+msgstr[1] "%(total_count)s selezionata."
 
 #: contrib/admin/options.py:1071
 #, python-format

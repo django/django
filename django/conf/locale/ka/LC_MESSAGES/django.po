@@ -13,7 +13,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -561,10 +561,10 @@ msgstr "წარმოდგენა საიტზე"
 
 #: contrib/admin/templates/admin/change_form.html:38
 #: contrib/admin/templates/admin/auth/user/change_password.html:22
+#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომა."
-msgstr[1] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომები."
 
 #: contrib/admin/templates/admin/change_list.html:16
 #, python-format
@@ -690,8 +690,7 @@ msgstr "ძებნა"
 #, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] "ერთი შედეგი"
-msgstr[1] "%(counter)s შედეგი"
+msgstr[0] "%(counter)s შედეგი"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -1386,11 +1385,10 @@ msgid "If you enter anything in this field your comment will be treated as spam"
 msgstr "თუ თვენ შეიყვანთ რამეს ამ ველში, თქვენი კომენტარი სპამად აღიქმება"
 
 #: contrib/comments/forms.py:125
-#, python-format
+#, fuzzy, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "ყურადღება მიაქციეთ ლექსიკას! სიტყვა %s აქ დაუშვებელია."
-msgstr[1] "ყურადღება მიაქციეთ ლექსიკას! სიტყვები %s აქ დაუშვებელია."
 
 #: contrib/comments/models.py:23
 msgid "object ID"
@@ -1580,10 +1578,10 @@ msgid "Preview your comment"
 msgstr "კომენტარის წინასწარი ნახვა"
 
 #: contrib/comments/templates/comments/preview.html:10
+#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
 msgstr[0] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომა"
-msgstr[1] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომები"
 
 #: contrib/comments/templates/comments/preview.html:15
 msgid "Post your comment"
@@ -1706,21 +1704,18 @@ msgstr "-ე"
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f მილიონი"
-msgstr[1] "%(value).1f მილიონი"
 
 #: contrib/humanize/templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f მილიარდი"
-msgstr[1] "%(value).1f მილიარდი"
 
 #: contrib/humanize/templatetags/humanize.py:57
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f ტრილიონი"
-msgstr[1] "%(value).1f ტრილიონი"
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
@@ -3721,11 +3716,10 @@ msgstr ""
 "ასარჩევად."
 
 #: db/models/fields/related.py:838
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობა %(value)r არასწორია."
-msgstr[1] "გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობები %(value)r არასწორია."
 
 #: forms/fields.py:54
 msgid "This field is required."
@@ -3868,7 +3862,6 @@ msgstr "კი,არა,შესაძლოა"
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d ბაიტი"
-msgstr[1] "%(size)d ბაიტი"
 
 #: template/defaultfilters.py:747
 #, python-format
@@ -4097,37 +4090,31 @@ msgstr "ან"
 msgid "year"
 msgid_plural "years"
 msgstr[0] "წელი"
-msgstr[1] "წელი"
 
 #: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "თვე"
-msgstr[1] "თვე"
 
 #: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "კვირა"
-msgstr[1] "კვირა"
 
 #: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "დღე"
-msgstr[1] "დღე"
 
 #: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "საათი"
-msgstr[1] "საათი"
 
 #: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "წუთი"
-msgstr[1] "წუთი"
 
 #: utils/timesince.py:43
 msgid "minutes"

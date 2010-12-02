@@ -2,7 +2,6 @@
 # Copyright (C) 2005 Django.
 # This file is distributed under the same license as the Django package.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
@@ -14,6 +13,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural= (n==1) ? 0 : (n==2) ? 1 : (n != 8 && "
+"n != 11) ? 2 : 3;\n"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
 msgid "object ID"
@@ -220,7 +221,7 @@ msgid ""
 msgstr ""
 
 #: contrib/comments/views/comments.py:112
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comment:\n"
@@ -233,6 +234,8 @@ msgid_plural ""
 "%(text)s"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: contrib/comments/views/comments.py:117
 #, python-format
@@ -816,10 +819,13 @@ msgid "View on site"
 msgstr "Gweld ar safle"
 
 #: contrib/admin/templates/admin/change_form.html:30
+#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Ordering"
@@ -1457,40 +1463,58 @@ msgid "Dec."
 msgstr "Rhag."
 
 #: utils/timesince.py:12
+#, fuzzy
 msgid "year"
 msgid_plural "years"
 msgstr[0] "blwyddyn"
 msgstr[1] "blynyddoedd"
+msgstr[2] ""
+msgstr[3] ""
 
 #: utils/timesince.py:13
+#, fuzzy
 msgid "month"
 msgid_plural "months"
 msgstr[0] "mis"
 msgstr[1] "misoedd"
+msgstr[2] ""
+msgstr[3] ""
 
 #: utils/timesince.py:14
+#, fuzzy
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: utils/timesince.py:15
+#, fuzzy
 msgid "day"
 msgid_plural "days"
 msgstr[0] "diwrnod"
 msgstr[1] "diwrnodau"
+msgstr[2] ""
+msgstr[3] ""
 
 #: utils/timesince.py:16
+#, fuzzy
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "awr"
 msgstr[1] "oriau"
+msgstr[2] ""
+msgstr[3] ""
 
 #: utils/timesince.py:17
+#, fuzzy
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "munud"
 msgstr[1] "munudau"
+msgstr[2] ""
+msgstr[3] ""
 
 #: conf/global_settings.py:37
 msgid "Bengali"
@@ -1727,11 +1751,13 @@ msgid "Enter a valid U.S. state abbreviation."
 msgstr "Rhowch talfyriad dalaith U.S. dilys."
 
 #: core/validators.py:229
-#, python-format
+#, fuzzy, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Gwyliwch eich ceg! Ni chaniateir y gair %s yma."
-msgstr[1] "Gwyliwch eich ceg! Ni chaniateir y geiriau %s yma."
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: core/validators.py:236
 #, python-format
@@ -1770,15 +1796,17 @@ msgid "Please enter a valid decimal number."
 msgstr "Rhowch rhif degol dilys, os gwelwch yn dda."
 
 #: core/validators.py:349
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "Rhowch rhif degol dilys gyda cyfanswm %s digidau o fwyaf."
 msgstr[1] "Rhowch rhif degol dilys gyda cyfanswm %s digid o fwyaf."
+msgstr[2] ""
+msgstr[3] ""
 
 #: core/validators.py:352
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
@@ -1786,6 +1814,8 @@ msgstr[0] ""
 "Rhowch rif degol dilydd gyda o fwyaf %s lle degol, os gwelwch yn dda."
 msgstr[1] ""
 "Rhowch rif degol dilydd gyda o fwyaf %s lleoedd degol, os gwelwch yn dda."
+msgstr[2] ""
+msgstr[3] ""
 
 #: core/validators.py:362
 #, python-format
@@ -1924,19 +1954,23 @@ msgstr ""
 "Gafaelwch lawr \"Control\", neu \"Command\" ar Fac, i ddewis mwy nag un."
 
 #: db/models/fields/related.py:625
-#, python-format
+#, fuzzy, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: forms/__init__.py:380
-#, python-format
+#, fuzzy, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: forms/__init__.py:385
 msgid "Line breaks are not allowed here."

@@ -690,8 +690,7 @@ msgstr "去"
 #, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] "1 則结果"
-msgstr[1] "%(counter)s 則结果"
+msgstr[0] "%(counter)s 則结果"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -1381,7 +1380,6 @@ msgstr "如果你在這一個欄位輸入任何內容，會被視為是垃圾評
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "看住你的嘴！此處不允許 %s 這樣的字眼。"
-msgstr[1] ""
 
 #: contrib/comments/models.py:23
 msgid "object ID"
@@ -1566,21 +1564,18 @@ msgstr "rd"
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f 百萬"
-msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f 十億"
-msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:57
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f 兆"
-msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
@@ -3693,7 +3688,6 @@ msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "請輸入有效的 %(self)s ID。輸入值 %(value)r 是錯誤的。"
-msgstr[1] ""
 
 #: forms/fields.py:54
 msgid "This field is required."
@@ -4067,37 +4061,31 @@ msgstr "或"
 msgid "year"
 msgid_plural "years"
 msgstr[0] "年"
-msgstr[1] "年"
 
 #: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "月"
-msgstr[1] "月"
 
 #: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "週"
-msgstr[1] "週"
 
 #: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-msgstr[1] "天"
 
 #: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "小時"
-msgstr[1] "小時"
 
 #: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "分鐘"
-msgstr[1] "分鐘"
 
 #: utils/timesince.py:43
 #, fuzzy

@@ -716,8 +716,7 @@ msgstr "执行"
 #, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] "1 条结果"
-msgstr[1] "%(counter)s 条结果"
+msgstr[0] "%(counter)s 条结果"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format

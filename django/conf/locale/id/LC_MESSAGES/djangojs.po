@@ -1,13 +1,12 @@
 # Translation of django.po to Indonesian
 # This file is distributed under the same license as the Django package.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-09 20:22+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2010-05-09 20:22+0200\n"
 "Last-Translator: Selwin Ong <selwin@ui.co.id>\n"
 "Language-Team: Indonesian <id@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -50,7 +49,6 @@ msgstr "Hapus semua"
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s dari %(cnt)s terpilih"
-msgstr[1] "%(sel)s dari %(cnt)s terpilih"
 
 #: contrib/admin/media/js/actions.js:109
 #: contrib/admin/media/js/actions.min.js:5
