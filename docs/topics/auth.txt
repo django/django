@@ -840,6 +840,7 @@ The login_required decorator
     .. code-block:: html+django
 
         {% extends "base.html" %}
+        {% load url from future %}
 
         {% block content %}
 
@@ -847,7 +848,7 @@ The login_required decorator
         <p>Your username and password didn't match. Please try again.</p>
         {% endif %}
 
-        <form method="post" action="{% url django.contrib.auth.views.login %}">
+        <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
         {% csrf_token %}
         <table>
         <tr>
