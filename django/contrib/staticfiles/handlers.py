@@ -2,6 +2,7 @@ import urllib
 from urlparse import urlparse
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 
 from django.contrib.staticfiles import utils
@@ -25,6 +26,10 @@ class StaticFilesHandler(WSGIHandler):
         return settings.STATIC_ROOT
 
     def get_base_url(self):
+        if not settings.STATIC_URL:
+            raise ImproperlyConfigured("You're using the staticfiles app "
+                "without having set the STATIC_URL setting. Set it to "
+                "URL that handles the files served from STATIC_ROOT.")
         if settings.DEBUG:
             utils.check_settings()
         return settings.STATIC_URL
@@ -42,10 +47,6 @@ class StaticFilesHandler(WSGIHandler):
     def file_path(self, url):
         """
         Returns the relative path to the media file on disk for the given URL.
-
-        The passed URL is assumed to begin with ``base_url``.  If the
-        resultant file path is outside the media directory, then a ValueError
-        is raised.
         """
         relative_url = url[len(self.base_url[2]):]
         return urllib.url2pathname(relative_url)
