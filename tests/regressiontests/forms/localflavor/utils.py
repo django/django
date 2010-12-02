@@ -27,22 +27,22 @@ class LocalFlavorTestCase(TestCase):
             try:
                 required.clean(input)
             except ValidationError, e:
-                self.assertTrue(unicode(errors) in unicode(e))
+                self.assertEqual(errors, e.messages)
             else:
                 self.fail()
             try:
                 optional.clean(input)
             except ValidationError, e:
-                self.assertTrue(unicode(errors) in unicode(e))
+                self.assertEqual(errors, e.messages)
             else:
                 self.fail()
         # test required inputs
-        error_required = u'This field is required'
+        error_required = [u'This field is required.']
         for val in EMPTY_VALUES:
             try:
                 required.clean(val)
             except ValidationError, e:
-                self.assertTrue(error_required in unicode(e))
+                self.assertEqual(error_required, e.messages)
             else:
                 self.fail()
             self.assertEqual(optional.clean(val), u'')
