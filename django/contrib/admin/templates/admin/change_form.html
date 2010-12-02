@@ -1,8 +1,9 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_modify adminmedia %}
+{% load url from future %}
 
 {% block extrahead %}{{ block.super }}
-{% url admin:jsi18n as jsi18nurl %}
+{% url 'admin:jsi18n' as jsi18nurl %}
 <script type="text/javascript" src="{{ jsi18nurl|default:"../../../jsi18n/" }}"></script>
 {{ media }}
 {% endblock %}
