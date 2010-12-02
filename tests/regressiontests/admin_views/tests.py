@@ -5,7 +5,7 @@ import datetime
 from django.conf import settings
 from django.core import mail
 from django.core.files import temp as tempfile
-from django.contrib.auth import admin # Register auth models with the admin.
+from django.contrib.auth import REDIRECT_FIELD_NAME, admin # Register auth models with the admin.
 from django.contrib.auth.models import User, Permission, UNUSABLE_PASSWORD
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry, DELETION
@@ -377,6 +377,19 @@ class SaveAsTests(TestCase):
 class CustomModelAdminTest(AdminViewBasicTest):
     urlbit = "admin2"
 
+    def testCustomAdminSiteLoginForm(self):
+        self.client.logout()
+        request = self.client.get('/test_admin/admin2/')
+        self.failUnlessEqual(request.status_code, 200)
+        login = self.client.post('/test_admin/admin2/', {
+            REDIRECT_FIELD_NAME: '/test_admin/admin2/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'customform',
+            'password': 'secret',
+        })
+        self.failUnlessEqual(login.status_code, 200)
+        self.assertContains(login, 'custom form error')
+
     def testCustomAdminSiteLoginTemplate(self):
         self.client.logout()
         request = self.client.get('/test_admin/admin2/')
@@ -446,36 +459,52 @@ class AdminViewPermissionsTest(TestCase):
 
         # login POST dicts
         self.super_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'super',
-                     'password': 'secret'}
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'super',
+            'password': 'secret',
+        }
         self.super_email_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'super@example.com',
-                     'password': 'secret'}
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'super@example.com',
+            'password': 'secret',
+        }
         self.super_email_bad_login = {
-                      LOGIN_FORM_KEY: 1,
-                      'username': 'super@example.com',
-                      'password': 'notsecret'}
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'super@example.com',
+            'password': 'notsecret',
+        }
         self.adduser_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'adduser',
-                     'password': 'secret'}
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'adduser',
+            'password': 'secret',
+        }
         self.changeuser_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'changeuser',
-                     'password': 'secret'}
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'changeuser',
+            'password': 'secret',
+        }
         self.deleteuser_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'deleteuser',
-                     'password': 'secret'}
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'deleteuser',
+            'password': 'secret',
+        }
         self.joepublic_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'joepublic',
-                     'password': 'secret'}
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'joepublic',
+            'password': 'secret',
+        }
         self.no_username_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'password': 'secret'}
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'password': 'secret',
+        }
 
     def testLogin(self):
         """
@@ -500,12 +529,12 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(login, "Your e-mail address is not your username")
         # only correct passwords get a username hint
         login = self.client.post('/test_admin/admin/', self.super_email_bad_login)
-        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        self.assertContains(login, "Please enter a correct username and password.")
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
         # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/', self.super_email_login)
-        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        self.assertContains(login, "Please enter a correct username and password.")
 
         # Add User
         request = self.client.get('/test_admin/admin/')
@@ -536,23 +565,24 @@ class AdminViewPermissionsTest(TestCase):
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.joepublic_login)
         self.failUnlessEqual(login.status_code, 200)
-        # Login.context is a list of context dicts we just need to check the first one.
-        self.assert_(login.context[0].get('error_message'))
+        self.assertContains(login, "Please enter a correct username and password.")
 
         # Requests without username should not return 500 errors.
         request = self.client.get('/test_admin/admin/')
         self.failUnlessEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.no_username_login)
         self.failUnlessEqual(login.status_code, 200)
-        # Login.context is a list of context dicts we just need to check the first one.
-        self.assert_(login.context[0].get('error_message'))
+        form = login.context[0].get('form')
+        self.failUnlessEqual(form.errors['username'][0], 'This field is required.')
 
     def testLoginSuccessfullyRedirectsToOriginalUrl(self):
         request = self.client.get('/test_admin/admin/')
         self.failUnlessEqual(request.status_code, 200)
-        query_string = "the-answer=42"
-        login = self.client.post('/test_admin/admin/', self.super_login, QUERY_STRING = query_string )
-        self.assertRedirects(login, '/test_admin/admin/?%s' % query_string)
+        query_string = 'the-answer=42'
+        redirect_url = '/test_admin/admin/?%s' % query_string
+        new_next = {REDIRECT_FIELD_NAME: redirect_url}
+        login = self.client.post('/test_admin/admin/', dict(self.super_login, **new_next), QUERY_STRING=query_string)
+        self.assertRedirects(login, redirect_url)
 
     def testAddView(self):
         """Test add view restricts access and actually adds items."""
@@ -967,33 +997,47 @@ class SecureViewTest(TestCase):
     def setUp(self):
         # login POST dicts
         self.super_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'super',
-                     'password': 'secret'}
+            LOGIN_FORM_KEY: 1,
+            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
+            'username': 'super',
+            'password': 'secret',
+        }
         self.super_email_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'super@example.com',
-                     'password': 'secret'}
+            LOGIN_FORM_KEY: 1,
+            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
+            'username': 'super@example.com',
+            'password': 'secret',
+        }
         self.super_email_bad_login = {
-                      LOGIN_FORM_KEY: 1,
-                      'username': 'super@example.com',
-                      'password': 'notsecret'}
+            LOGIN_FORM_KEY: 1,
+            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
+            'username': 'super@example.com',
+            'password': 'notsecret',
+        }
         self.adduser_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'adduser',
-                     'password': 'secret'}
+            LOGIN_FORM_KEY: 1,
+            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
+            'username': 'adduser',
+            'password': 'secret',
+        }
         self.changeuser_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'changeuser',
-                     'password': 'secret'}
+            LOGIN_FORM_KEY: 1,
+            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
+            'username': 'changeuser',
+            'password': 'secret',
+        }
         self.deleteuser_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'deleteuser',
-                     'password': 'secret'}
+            LOGIN_FORM_KEY: 1,
+            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
+            'username': 'deleteuser',
+            'password': 'secret',
+        }
         self.joepublic_login = {
-                     LOGIN_FORM_KEY: 1,
-                     'username': 'joepublic',
-                     'password': 'secret'}
+            LOGIN_FORM_KEY: 1,
+            REDIRECT_FIELD_NAME: '/test_admin/admin/secure-view/',
+            'username': 'joepublic',
+            'password': 'secret',
+        }
 
     def tearDown(self):
         self.client.logout()
@@ -1006,9 +1050,11 @@ class SecureViewTest(TestCase):
     def test_secure_view_login_successfully_redirects_to_original_url(self):
         request = self.client.get('/test_admin/admin/secure-view/')
         self.failUnlessEqual(request.status_code, 200)
-        query_string = "the-answer=42"
-        login = self.client.post('/test_admin/admin/secure-view/', self.super_login, QUERY_STRING = query_string )
-        self.assertRedirects(login, '/test_admin/admin/secure-view/?%s' % query_string)
+        query_string = 'the-answer=42'
+        redirect_url = '/test_admin/admin/secure-view/?%s' % query_string
+        new_next = {REDIRECT_FIELD_NAME: redirect_url}
+        login = self.client.post('/test_admin/admin/secure-view/', dict(self.super_login, **new_next), QUERY_STRING=query_string)
+        self.assertRedirects(login, redirect_url)
 
     def test_staff_member_required_decorator_works_as_per_admin_login(self):
         """
@@ -1035,12 +1081,12 @@ class SecureViewTest(TestCase):
         self.assertContains(login, "Your e-mail address is not your username")
         # only correct passwords get a username hint
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_bad_login)
-        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        self.assertContains(login, "Please enter a correct username and password.")
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
         # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
-        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        self.assertContains(login, "Please enter a correct username and password.")
 
         # Add User
         request = self.client.get('/test_admin/admin/secure-view/')
@@ -1072,7 +1118,7 @@ class SecureViewTest(TestCase):
         login = self.client.post('/test_admin/admin/secure-view/', self.joepublic_login)
         self.failUnlessEqual(login.status_code, 200)
         # Login.context is a list of context dicts we just need to check the first one.
-        self.assert_(login.context[0].get('error_message'))
+        self.assertContains(login, "Please enter a correct username and password.")
 
         # 8509 - if a normal user is already logged in, it is possible
         # to change user into the superuser without error

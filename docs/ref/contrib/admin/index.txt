@@ -1459,6 +1459,13 @@ Path to a custom template that will be used by the admin site main index view.
 
 Path to a custom template that will be used by the admin site login view.
 
+.. versionadded:: 1.3
+
+.. attribute:: AdminSite.login_form
+
+Subclass of :class:`~django.contrib.auth.forms.AuthenticationForm` that will
+be used by the admin site login view.
+
 .. attribute:: AdminSite.logout_template
 
 .. versionadded:: 1.2

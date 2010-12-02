@@ -424,3 +424,20 @@ Django 1.5, the old behavior will be replaced with the new behavior.
 To ensure compatibility with future versions of Django, existing
 templates should be modified to use the new ``future`` libraries and
 syntax.
+
+Changes to the login methods of the admin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous version the admin app defined login methods in multiple locations
+and ignored the almost identical implementation in the already used auth app.
+A side effect of this duplication was the missing adoption of the changes made
+in r12634_ to support a broader set of characters for usernames.
+
+This release refactores the admin's login mechanism to use a subclass of the
+:class:`~django.contrib.auth.forms.AuthenticationForm` instead of a manual
+form validation. The previously undocumented method
+``'django.contrib.admin.sites.AdminSite.display_login_form'`` has been removed
+in favor of a new :attr:`~django.contrib.admin.AdminSite.login_form`
+attribute.
+
+.. _r12634: http://code.djangoproject.com/changeset/12634

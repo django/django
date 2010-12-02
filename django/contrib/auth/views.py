@@ -24,7 +24,7 @@ from django.views.decorators.cache import never_cache
 def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
-          extra_context=None):
+          current_app=None, extra_context=None):
     """Displays the login form and handles the login action."""
 
     redirect_to = request.REQUEST.get(redirect_field_name, '')
@@ -65,12 +65,12 @@ def login(request, template_name='registration/login.html',
     }
     context.update(extra_context or {})
     return render_to_response(template_name, context,
-                              context_instance=RequestContext(request))
+                              context_instance=RequestContext(request, current_app=current_app))
 
 def logout(request, next_page=None,
            template_name='registration/logged_out.html',
            redirect_field_name=REDIRECT_FIELD_NAME,
-           extra_context=None):
+           current_app=None, extra_context=None):
     "Logs out the user and displays 'You are logged out' message."
     from django.contrib.auth import logout
     logout(request)
@@ -87,16 +87,16 @@ def logout(request, next_page=None,
             }
             context.update(extra_context or {})
             return render_to_response(template_name, context,
-                                      context_instance=RequestContext(request))
+                                      context_instance=RequestContext(request, current_app=current_app))
     else:
         # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)
 
-def logout_then_login(request, login_url=None, extra_context=None):
+def logout_then_login(request, login_url=None, current_app=None, extra_context=None):
     "Logs out the user if he is logged in. Then redirects to the log-in page."
     if not login_url:
         login_url = settings.LOGIN_URL
-    return logout(request, login_url, extra_context=extra_context)
+    return logout(request, login_url, current_app=current_app, extra_context=extra_context)
 
 def redirect_to_login(next, login_url=None,
                       redirect_field_name=REDIRECT_FIELD_NAME):
@@ -127,6 +127,7 @@ def password_reset(request, is_admin_site=False,
                    token_generator=default_token_generator,
                    post_reset_redirect=None,
                    from_email=None,
+                   current_app=None,
                    extra_context=None):
     if post_reset_redirect is None:
         post_reset_redirect = reverse('django.contrib.auth.views.password_reset_done')
@@ -151,15 +152,15 @@ def password_reset(request, is_admin_site=False,
     }
     context.update(extra_context or {})
     return render_to_response(template_name, context,
-                              context_instance=RequestContext(request))
+                              context_instance=RequestContext(request, current_app=current_app))
 
 def password_reset_done(request,
                         template_name='registration/password_reset_done.html',
-                        extra_context=None):
+                        current_app=None, extra_context=None):
     context = {}
     context.update(extra_context or {})
     return render_to_response(template_name, context,
-                              context_instance=RequestContext(request))
+                              context_instance=RequestContext(request, current_app=current_app))
 
 # Doesn't need csrf_protect since no-one can guess the URL
 def password_reset_confirm(request, uidb36=None, token=None,
@@ -167,7 +168,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
                            token_generator=default_token_generator,
                            set_password_form=SetPasswordForm,
                            post_reset_redirect=None,
-                           extra_context=None):
+                           current_app=None, extra_context=None):
     """
     View that checks the hash in a password reset link and presents a
     form for entering a new password.
@@ -199,17 +200,17 @@ def password_reset_confirm(request, uidb36=None, token=None,
     }
     context.update(extra_context or {})
     return render_to_response(template_name, context,
-                              context_instance=RequestContext(request))
+                              context_instance=RequestContext(request, current_app=current_app))
 
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
-                            extra_context=None):
+                            current_app=None, extra_context=None):
     context = {
         'login_url': settings.LOGIN_URL
     }
     context.update(extra_context or {})
     return render_to_response(template_name, context,
-                              context_instance=RequestContext(request))
+                              context_instance=RequestContext(request, current_app=current_app))
 
 @csrf_protect
 @login_required
@@ -217,7 +218,7 @@ def password_change(request,
                     template_name='registration/password_change_form.html',
                     post_change_redirect=None,
                     password_change_form=PasswordChangeForm,
-                    extra_context=None):
+                    current_app=None, extra_context=None):
     if post_change_redirect is None:
         post_change_redirect = reverse('django.contrib.auth.views.password_change_done')
     if request.method == "POST":
@@ -232,12 +233,12 @@ def password_change(request,
     }
     context.update(extra_context or {})
     return render_to_response(template_name, context,
-                              context_instance=RequestContext(request))
+                              context_instance=RequestContext(request, current_app=current_app))
 
 def password_change_done(request,
                          template_name='registration/password_change_done.html',
-                         extra_context=None):
+                         current_app=None, extra_context=None):
     context = {}
     context.update(extra_context or {})
     return render_to_response(template_name, context,
-                              context_instance=RequestContext(request))
+                              context_instance=RequestContext(request, current_app=current_app))
