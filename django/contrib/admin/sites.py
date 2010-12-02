@@ -327,13 +327,11 @@ class AdminSite(object):
                 try:
                     user = User.objects.get(email=username)
                 except (User.DoesNotExist, User.MultipleObjectsReturned):
-                    message = _("Usernames cannot contain the '@' character.")
+                    pass
                 else:
                     if user.check_password(password):
                         message = _("Your e-mail address is not your username."
                                     " Try '%s' instead.") % user.username
-                    else:
-                        message = _("Usernames cannot contain the '@' character.")
             return self.display_login_form(request, message)
 
         # The user data is correct; log in the user in and continue.

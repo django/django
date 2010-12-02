@@ -453,12 +453,12 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(login, "Your e-mail address is not your username")
         # only correct passwords get a username hint
         login = self.client.post('/test_admin/admin/', self.super_email_bad_login)
-        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        self.assertContains(login, "Please enter a correct username and password")
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
         # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/', self.super_email_login)
-        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        self.assertContains(login, "Please enter a correct username and password")
 
         # Add User
         request = self.client.get('/test_admin/admin/')
@@ -962,12 +962,12 @@ class SecureViewTest(TestCase):
         self.assertContains(login, "Your e-mail address is not your username")
         # only correct passwords get a username hint
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_bad_login)
-        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        self.assertContains(login, "Please enter a correct username and password")
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
         # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
-        self.assertContains(login, "Usernames cannot contain the &#39;@&#39; character")
+        self.assertContains(login, "Please enter a correct username and password")
 
         # Add User
         request = self.client.get('/test_admin/admin/secure-view/')
