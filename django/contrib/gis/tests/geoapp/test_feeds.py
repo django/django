@@ -1,13 +1,12 @@
 from xml.dom import minidom
-
-from django.test import Client
-from django.utils import unittest
+from django.test import TestCase
 
 from models import City
 
 
-class GeoFeedTest(unittest.TestCase):
-    client = Client()
+class GeoFeedTest(TestCase):
+
+    urls = 'django.contrib.gis.tests.geoapp.urls'
 
     def assertChildNodes(self, elem, expected):
         "Taken from regressiontests/syndication/tests.py."
@@ -18,9 +17,9 @@ class GeoFeedTest(unittest.TestCase):
     def test_geofeed_rss(self):
         "Tests geographic feeds using GeoRSS over RSSv2."
         # Uses `GEOSGeometry` in `item_geometry`
-        doc1 = minidom.parseString(self.client.get('/geoapp/feeds/rss1/').content)
+        doc1 = minidom.parseString(self.client.get('/feeds/rss1/').content)
         # Uses a 2-tuple in `item_geometry`
-        doc2 = minidom.parseString(self.client.get('/geoapp/feeds/rss2/').content)
+        doc2 = minidom.parseString(self.client.get('/feeds/rss2/').content)
         feed1, feed2 = doc1.firstChild, doc2.firstChild
 
         # Making sure the box got added to the second GeoRSS feed.
@@ -43,8 +42,8 @@ class GeoFeedTest(unittest.TestCase):
 
     def test_geofeed_atom(self):
         "Testing geographic feeds using GeoRSS over Atom."
-        doc1 = minidom.parseString(self.client.get('/geoapp/feeds/atom1/').content)
-        doc2 = minidom.parseString(self.client.get('/geoapp/feeds/atom2/').content)
+        doc1 = minidom.parseString(self.client.get('/feeds/atom1/').content)
+        doc2 = minidom.parseString(self.client.get('/feeds/atom2/').content)
         feed1, feed2 = doc1.firstChild, doc2.firstChild
 
         # Making sure the box got added to the second GeoRSS feed.
@@ -62,7 +61,7 @@ class GeoFeedTest(unittest.TestCase):
 
     def test_geofeed_w3c(self):
         "Testing geographic feeds using W3C Geo."
-        doc = minidom.parseString(self.client.get('/geoapp/feeds/w3cgeo1/').content)
+        doc = minidom.parseString(self.client.get('/feeds/w3cgeo1/').content)
         feed = doc.firstChild
         # Ensuring the geo namespace was added to the <feed> element.
         self.assertEqual(feed.getAttribute(u'xmlns:geo'), u'http://www.w3.org/2003/01/geo/wgs84_pos#')
@@ -75,5 +74,5 @@ class GeoFeedTest(unittest.TestCase):
             self.assertChildNodes(item, ['title', 'link', 'description', 'guid', 'geo:lat', 'geo:lon'])
 
         # Boxes and Polygons aren't allowed in W3C Geo feeds.
-        self.assertRaises(ValueError, self.client.get, '/geoapp/feeds/w3cgeo2/') # Box in <channel>
-        self.assertRaises(ValueError, self.client.get, '/geoapp/feeds/w3cgeo3/') # Polygons in <entry>
+        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo2/') # Box in <channel>
+        self.assertRaises(ValueError, self.client.get, '/feeds/w3cgeo3/') # Polygons in <entry>

@@ -1,18 +1,17 @@
-import os, unittest
+import os
 from decimal import Decimal
 
 from django.db import connection
 from django.db.models import Q
-from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import GEOSGeometry, Point, LineString
 from django.contrib.gis.measure import D # alias for Distance
 from django.contrib.gis.tests.utils import oracle, postgis, spatialite, no_oracle, no_spatialite
+from django.test import TestCase
 
 from models import AustraliaCity, Interstate, SouthTexasInterstate, \
     SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode
-from data import au_cities, interstates, stx_interstates, stx_cities, stx_zips
 
-class DistanceTest(unittest.TestCase):
+class DistanceTest(TestCase):
 
     # A point we are testing distances with -- using a WGS84
     # coordinate that'll be implicitly transormed to that to
@@ -28,37 +27,12 @@ class DistanceTest(unittest.TestCase):
         return cities
 
     def test01_init(self):
-        "Initialization of distance models."
-
-        # Loading up the cities.
-        def load_cities(city_model, data_tup):
-            for name, x, y in data_tup:
-                city_model(name=name, point=Point(x, y, srid=4326)).save()
-
-        def load_interstates(imodel, data_tup):
-            for name, wkt in data_tup:
-                imodel(name=name, path=wkt).save()
-
-        load_cities(SouthTexasCity, stx_cities)
-        load_cities(SouthTexasCityFt, stx_cities)
-        load_cities(AustraliaCity, au_cities)
-
+        "Test initialization of distance models."
         self.assertEqual(9, SouthTexasCity.objects.count())
         self.assertEqual(9, SouthTexasCityFt.objects.count())
         self.assertEqual(11, AustraliaCity.objects.count())
-
-        # Loading up the South Texas Zip Codes.
-        for name, wkt in stx_zips:
-            poly = GEOSGeometry(wkt, srid=4269)
-            SouthTexasZipcode(name=name, poly=poly).save()
-            CensusZipcode(name=name, poly=poly).save()
         self.assertEqual(4, SouthTexasZipcode.objects.count())
         self.assertEqual(4, CensusZipcode.objects.count())
-
-        # Loading up the Interstates.
-        load_interstates(Interstate, interstates)
-        load_interstates(SouthTexasInterstate, stx_interstates)
-
         self.assertEqual(1, Interstate.objects.count())
         self.assertEqual(1, SouthTexasInterstate.objects.count())
 
@@ -382,8 +356,3 @@ class DistanceTest(unittest.TestCase):
         z = SouthTexasZipcode.objects.distance(htown.point).area().get(name='78212')
         self.assertEqual(None, z.distance)
         self.assertEqual(None, z.area)
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(DistanceTest))
-    return s

@@ -1,15 +1,14 @@
 import cStringIO
 from xml.dom import minidom
 import zipfile
-
-from django.test import Client
-from django.utils import unittest
+from django.test import TestCase
 
 from models import City, Country
 
 
-class GeoSitemapTest(unittest.TestCase):
-    client = Client()
+class GeoSitemapTest(TestCase):
+
+    urls = 'django.contrib.gis.tests.geoapp.urls'
 
     def assertChildNodes(self, elem, expected):
         "Taken from regressiontests/syndication/tests.py."
@@ -20,7 +19,7 @@ class GeoSitemapTest(unittest.TestCase):
     def test_geositemap_index(self):
         "Tests geographic sitemap index."
         # Getting the geo index.
-        doc = minidom.parseString(self.client.get('/geoapp/sitemap.xml').content)
+        doc = minidom.parseString(self.client.get('/sitemap.xml').content)
         index = doc.firstChild
         self.assertEqual(index.getAttribute(u'xmlns'), u'http://www.sitemaps.org/schemas/sitemap/0.9')
         self.assertEqual(3, len(index.getElementsByTagName('sitemap')))
@@ -28,7 +27,7 @@ class GeoSitemapTest(unittest.TestCase):
     def test_geositemap_kml(self):
         "Tests KML/KMZ geographic sitemaps."
         for kml_type in ('kml', 'kmz'):
-            doc = minidom.parseString(self.client.get('/geoapp/sitemaps/%s.xml' % kml_type).content)
+            doc = minidom.parseString(self.client.get('/sitemaps/%s.xml' % kml_type).content)
 
             # Ensuring the right sitemaps namespaces are present.
             urlset = doc.firstChild
@@ -68,7 +67,7 @@ class GeoSitemapTest(unittest.TestCase):
         "Tests GeoRSS geographic sitemaps."
         from feeds import feed_dict
 
-        doc = minidom.parseString(self.client.get('/geoapp/sitemaps/georss.xml').content)
+        doc = minidom.parseString(self.client.get('/sitemaps/georss.xml').content)
 
         # Ensuring the right sitemaps namespaces are present.
         urlset = doc.firstChild
