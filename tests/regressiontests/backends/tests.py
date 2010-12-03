@@ -11,7 +11,7 @@ from django.test import TestCase, TransactionTestCase
 
 import models
 
-class Callproc(unittest.TestCase):
+class OracleChecks(unittest.TestCase):
 
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
@@ -34,9 +34,6 @@ class Callproc(unittest.TestCase):
             cursor.execute("BEGIN %s := 'X'; END; ", [var])
             self.assertEqual(var.getvalue(), 'X')
 
-
-class LongString(unittest.TestCase):
-
     def test_long_string(self):
         # If the backend is Oracle, test that we can save a text longer
         # than 4000 chars and read it properly
@@ -49,6 +46,14 @@ class LongString(unittest.TestCase):
             row = c.fetchone()
             self.assertEquals(long_str, row[0].read())
             c.execute('DROP TABLE ltext')
+
+    def test_client_encoding(self):
+        # If the backend is Oracle, test that the client encoding is set
+        # correctly.  This was broken under Cygwin prior to r14781.
+        if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] == 'django.db.backends.oracle':
+            c = connection.cursor()  # Ensure the connection is initialized.
+            self.assertEqual(connection.connection.encoding, "UTF-8")
+            self.assertEqual(connection.connection.nencoding, "UTF-8")
 
 class DateQuotingTest(TestCase):
 
