@@ -1310,8 +1310,12 @@ class RawQuerySet(object):
 
         # Cache some things for performance reasons outside the loop.
         db = self.db
-        compiler = connections[db].ops.compiler('SQLCompiler')(self.query, connections[db], db)
+        compiler = connections[db].ops.compiler('SQLCompiler')(
+            self.query, connections[db], db
+        )
         need_resolv_columns = hasattr(compiler, 'resolve_columns')
+
+        query = iter(self.query)
 
         # Find out which columns are model's fields, and which ones should be
         # annotated to the model.
@@ -1341,7 +1345,7 @@ class RawQuerySet(object):
         if need_resolv_columns:
             fields = [self.model_fields.get(c, None) for c in self.columns]
         # Begin looping through the query values.
-        for values in self.query:
+        for values in query:
             if need_resolv_columns:
                 values = compiler.resolve_columns(values, fields)
             # Associate fields to values
