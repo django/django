@@ -11,6 +11,7 @@ class BaseDatabaseWrapper(local):
     Represents a database connection.
     """
     ops = None
+    vendor = 'unknown'
 
     def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         # `settings_dict` should be a dictionary containing keys such as
@@ -20,7 +21,6 @@ class BaseDatabaseWrapper(local):
         self.queries = []
         self.settings_dict = settings_dict
         self.alias = alias
-        self.vendor = 'unknown'
         self.use_debug_cursor = None
 
     def __eq__(self, other):

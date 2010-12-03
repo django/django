@@ -47,6 +47,15 @@ class OracleChecks(unittest.TestCase):
         self.assertEqual(long_str, row[0].read())
         c.execute('DROP TABLE ltext')
 
+    @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle connection semantics")
+    def test_client_encoding(self):
+        # If the backend is Oracle, test that the client encoding is set
+        # correctly.  This was broken under Cygwin prior to r14781.
+        c = connection.cursor()  # Ensure the connection is initialized.
+        self.assertEqual(connection.connection.encoding, "UTF-8")
+        self.assertEqual(connection.connection.nencoding, "UTF-8")
+
 class DateQuotingTest(TestCase):
 
     def test_django_date_trunc(self):
