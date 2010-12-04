@@ -21,7 +21,6 @@ class DeferRegressionTest(TestCase):
             settings.DEBUG = old_DEBUG
         self.assertEqual(starting_queries + n, len(connection.queries))
 
-
     def test_basic(self):
         # Deferred fields should really be deferred and not accidentally use
         # the field's default value just because they aren't passed to __init__
