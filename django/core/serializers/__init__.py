@@ -36,7 +36,7 @@ except ImportError:
 _serializers = {}
 
 def register_serializer(format, serializer_module, serializers=None):
-    """"Register a new serializer.
+    """Register a new serializer.
 
     ``serializer_module`` should be the fully qualified module name
     for the serializer.
