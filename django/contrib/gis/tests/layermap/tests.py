@@ -10,7 +10,7 @@ from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, I
 
 from models import City, County, CountyFeat, Interstate, ICity1, ICity2, State, city_mapping, co_mapping, cofeat_mapping, inter_mapping
 
-shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
+shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
 co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
 inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')
@@ -265,8 +265,4 @@ class LayerMapTest(unittest.TestCase):
 
         self.assertEqual(6, ICity1.objects.count())
         self.assertEqual(3, ICity2.objects.count())
-        
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(LayerMapTest))
-    return s
+

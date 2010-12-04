@@ -1,29 +1,26 @@
-import os, unittest
-from django.contrib.gis.geos import *
+from django.test import TestCase
+
+from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.geometry.backend import Geometry
-from django.contrib.gis.tests.utils import mysql, oracle, postgis, spatialite, no_mysql, no_oracle, no_spatialite
-from django.conf import settings
+from django.contrib.gis.tests.utils import mysql, oracle, no_mysql, no_oracle, no_spatialite
+
 from models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
 
-cities = (('Aurora', 'TX', -97.516111, 33.058333),
-          ('Roswell', 'NM', -104.528056, 33.387222),
-          ('Kecksburg', 'PA',  -79.460734, 40.18476),
-           )
-
-class RelatedGeoModelTest(unittest.TestCase):
-
-    def test01_setup(self):
-        "Setting up for related model tests."
-        for name, state, lon, lat in cities:
-            loc = Location.objects.create(point=Point(lon, lat))
-            c = City.objects.create(name=name, state=state, location=loc)
+class RelatedGeoModelTest(TestCase):
 
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
         qs1 = City.objects.all()
         qs2 = City.objects.select_related()
         qs3 = City.objects.select_related('location')
+
+        # Reference data for what's in the fixtures.
+        cities = (
+            ('Aurora', 'TX', -97.516111, 33.058333),
+            ('Roswell', 'NM', -104.528056, 33.387222),
+            ('Kecksburg', 'PA',  -79.460734, 40.18476),
+        )
 
         for qs in (qs1, qs2, qs3):
             for ref, c in zip(cities, qs):
@@ -63,11 +60,11 @@ class RelatedGeoModelTest(unittest.TestCase):
         # This combines the Extent and Union aggregates into one query
         aggs = City.objects.aggregate(Extent('location__point'))
 
-        # One for all locations, one that excludes Roswell.
-        all_extent = (-104.528060913086, 33.0583305358887,-79.4607315063477, 40.1847610473633)
-        txpa_extent = (-97.51611328125, 33.0583305358887,-79.4607315063477, 40.1847610473633)
+        # One for all locations, one that excludes New Mexico (Roswell).
+        all_extent = (-104.528056, 29.763374, -79.460734, 40.18476)
+        txpa_extent = (-97.516111, 29.763374, -79.460734, 40.18476)
         e1 = City.objects.extent(field_name='location__point')
-        e2 = City.objects.exclude(name='Roswell').extent(field_name='location__point')
+        e2 = City.objects.exclude(state='NM').extent(field_name='location__point')
         e3 = aggs['location__point__extent']
 
         # The tolerance value is to four decimal places because of differences
@@ -83,10 +80,12 @@ class RelatedGeoModelTest(unittest.TestCase):
         aggs = City.objects.aggregate(Union('location__point'))
 
         # These are the points that are components of the aggregate geographic
-        # union that is returned.
+        # union that is returned.  Each point # corresponds to City PK.
         p1 = Point(-104.528056, 33.387222)
         p2 = Point(-97.516111, 33.058333)
         p3 = Point(-79.460734, 40.18476)
+        p4 = Point(-96.801611, 32.782057)
+        p5 = Point(-95.363151, 29.763374)
 
         # Creating the reference union geometry depending on the spatial backend,
         # as Oracle will have a different internal ordering of the component
@@ -94,14 +93,15 @@ class RelatedGeoModelTest(unittest.TestCase):
         # query that includes limiting information in the WHERE clause (in other
         # words a `.filter()` precedes the call to `.unionagg()`).
         if oracle:
-            ref_u1 = MultiPoint(p3, p1, p2, srid=4326)
+            ref_u1 = MultiPoint(p4, p5, p3, p1, p2, srid=4326)
             ref_u2 = MultiPoint(p3, p2, srid=4326)
         else:
-            ref_u1 = MultiPoint(p1, p2, p3, srid=4326)
+            # Looks like PostGIS points by longitude value.
+            ref_u1 = MultiPoint(p1, p2, p4, p5, p3, srid=4326)
             ref_u2 = MultiPoint(p2, p3, srid=4326)
 
         u1 = City.objects.unionagg(field_name='location__point')
-        u2 = City.objects.exclude(name='Roswell').unionagg(field_name='location__point')
+        u2 = City.objects.exclude(name__in=('Roswell', 'Houston', 'Dallas', 'Fort Worth')).unionagg(field_name='location__point')
         u3 = aggs['location__point__union']
 
         self.assertEqual(ref_u1, u1)
@@ -187,17 +187,10 @@ class RelatedGeoModelTest(unittest.TestCase):
 
     def test09_pk_relations(self):
         "Ensuring correct primary key column is selected across relations. See #10757."
-        # Adding two more cities, but this time making sure that their location
-        # ID values do not match their City ID values.
-        loc1 = Location.objects.create(point='POINT (-95.363151 29.763374)')
-        loc2 = Location.objects.create(point='POINT (-96.801611 32.782057)')
-        dallas = City.objects.create(name='Dallas', state='TX', location=loc2)
-        houston = City.objects.create(name='Houston', state='TX', location=loc1)
-
         # The expected ID values -- notice the last two location IDs
-        # are out of order.  We want to make sure that the related
-        # location ID column is selected instead of ID column for
-        # the city.
+        # are out of order.  Dallas and Houston have location IDs that differ
+        # from their PKs -- this is done to ensure that the related location
+        # ID column is selected instead of ID column for the city.
         city_ids = (1, 2, 3, 4, 5)
         loc_ids = (1, 2, 3, 5, 4)
         ids_qs = City.objects.order_by('id').values('id', 'location__id')
@@ -232,10 +225,8 @@ class RelatedGeoModelTest(unittest.TestCase):
     @no_oracle
     def test12a_count(self):
         "Testing `Count` aggregate use with the `GeoManager` on geo-fields."
-        # Creating a new City, 'Fort Worth', that uses the same location
-        # as Dallas.
+        # The City, 'Fort Worth' uses the same location as Dallas.
         dallas = City.objects.get(name='Dallas')
-        ftworth = City.objects.create(name='Fort Worth', state='TX', location=dallas.location)
 
         # Count annotation should be 2 for the Dallas location now.
         loc = Location.objects.annotate(num_cities=Count('city')).get(id=dallas.location.id)
@@ -243,18 +234,9 @@ class RelatedGeoModelTest(unittest.TestCase):
 
     def test12b_count(self):
         "Testing `Count` aggregate use with the `GeoManager` on non geo-fields. See #11087."
-        # Creating some data for the Book/Author non-geo models that
-        # use GeoManager.  See #11087.
-        tp = Author.objects.create(name='Trevor Paglen')
-        Book.objects.create(title='Torture Taxi', author=tp)
-        Book.objects.create(title='I Could Tell You But Then You Would Have to be Destroyed by Me', author=tp)
-        Book.objects.create(title='Blank Spots on the Map', author=tp)
-        wp = Author.objects.create(name='William Patry')
-        Book.objects.create(title='Patry on Copyright', author=wp)
-
         # Should only be one author (Trevor Paglen) returned by this query, and
-        # the annotation should have 3 for the number of books.  Also testing
-        # with a `GeoValuesQuerySet` (see #11489).
+        # the annotation should have 3 for the number of books, see #11087.
+        # Also testing with a `GeoValuesQuerySet`, see #11489.
         qs = Author.objects.annotate(num_books=Count('books')).filter(num_books__gt=1)
         vqs = Author.objects.values('name').annotate(num_books=Count('books')).filter(num_books__gt=1)
         self.assertEqual(1, len(qs))
@@ -280,7 +262,7 @@ class RelatedGeoModelTest(unittest.TestCase):
         # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
         #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id")
         #    WHERE "relatedapp_city"."state" = 'TX';
-        ref_geom = fromstr('MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,-95.363151 29.763374,-96.801611 32.782057)')
+        ref_geom = GEOSGeometry('MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,-95.363151 29.763374,-96.801611 32.782057)')
 
         c1 = City.objects.filter(state='TX').collect(field_name='location__point')
         c2 = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']
@@ -298,10 +280,5 @@ class RelatedGeoModelTest(unittest.TestCase):
         # keyword.  The TypeError is swallowed if QuerySet is actually
         # evaluated as list generation swallows TypeError in CPython.
         sql = str(qs.query)
-        
-    # TODO: Related tests for KML, GML, and distance lookups.
 
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(RelatedGeoModelTest))
-    return s
+    # TODO: Related tests for KML, GML, and distance lookups.

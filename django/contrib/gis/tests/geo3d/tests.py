@@ -1,4 +1,6 @@
-import os, re, unittest
+import os
+import re
+from django.utils.unittest import TestCase
 from django.contrib.gis.db.models import Union, Extent3D
 from django.contrib.gis.geos import GEOSGeometry, Point, Polygon
 from django.contrib.gis.utils import LayerMapping, LayerMapError
@@ -49,7 +51,7 @@ def gen_bbox():
     bbox_3d = Polygon(tuple((x, y, z) for (x, y), z in zip(bbox_2d[0].coords, bbox_z)), srid=32140)    
     return bbox_2d, bbox_3d
 
-class Geo3DTest(unittest.TestCase):
+class Geo3DTest(TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
     tries to test the features that can handle 3D and that are also 
@@ -227,8 +229,3 @@ class Geo3DTest(unittest.TestCase):
         for ztrans in ztranslations:
             for city in City3D.objects.translate(0, 0, ztrans):
                 self.assertEqual(city_dict[city.name][2] + ztrans, city.translate.z)
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(Geo3DTest))
-    return s
