@@ -1,16 +1,3 @@
-"""
-Decorator for views that tries getting the page from the cache and
-populates the cache if the page isn't in the cache yet.
-
-The cache is keyed by the URL and some data from the headers. Additionally
-there is the key prefix that is used to distinguish different cache areas
-in a multi-site setup. You could use the sites.get_current().domain, for
-example, as that is unique across a Django project.
-
-Additionally, all headers from the response's Vary header will be taken into
-account on caching -- just like the middleware does.
-"""
-
 try:
     from functools import wraps
 except ImportError:
@@ -22,6 +9,19 @@ from django.middleware.cache import CacheMiddleware
 
 
 def cache_page(*args, **kwargs):
+    """
+    Decorator for views that tries getting the page from the cache and
+    populates the cache if the page isn't in the cache yet.
+
+    The cache is keyed by the URL and some data from the headers.
+    Additionally there is the key prefix that is used to distinguish different
+    cache areas in a multi-site setup. You could use the
+    sites.get_current().domain, for example, as that is unique across a Django
+    project.
+
+    Additionally, all headers from the response's Vary header will be taken
+    into account on caching -- just like the middleware does.
+    """
     # We need backwards compatibility with code which spells it this way:
     #   def my_view(): pass
     #   my_view = cache_page(my_view, 123)
