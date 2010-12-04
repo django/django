@@ -15,6 +15,7 @@ class BackendTest(TestCase):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
         settings.AUTHENTICATION_BACKENDS = (self.backend,)
         User.objects.create_user('test', 'test@example.com', 'test')
+        User.objects.create_superuser('test2', 'test2@example.com', 'test')
 
     def tearDown(self):
         settings.AUTHENTICATION_BACKENDS = self.curr_auth
@@ -90,6 +91,10 @@ class BackendTest(TestCase):
         self.assertEqual(user.has_perm('auth.test'), True)
         self.assertEqual(user.get_all_permissions(), set(['auth.test']))
 
+    def test_get_all_superuser_permissions(self):
+        "A superuser has all permissions. Refs #14795"
+        user = User.objects.get(username='test2')
+        self.assertEqual(len(user.get_all_permissions()), len(Permission.objects.all()))
 
 class TestObj(object):
     pass
