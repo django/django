@@ -1,6 +1,6 @@
 #! -*- coding: utf-8 -*-
-import os
 import errno
+import os
 import shutil
 from StringIO import StringIO
 
@@ -14,6 +14,7 @@ from django.utils.hashcompat import sha_constructor
 
 from models import FileModel, temp_storage, UPLOAD_TO
 import uploadhandler
+
 
 UNICODE_FILENAME = u'test-0123456789_中文_Orléans.jpg'
 

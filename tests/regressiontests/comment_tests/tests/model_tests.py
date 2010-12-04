@@ -1,12 +1,13 @@
 from django.contrib.comments.models import Comment
+
 from regressiontests.comment_tests.models import Author, Article
 from regressiontests.comment_tests.tests import CommentTestCase
 
-class CommentModelTests(CommentTestCase):
 
+class CommentModelTests(CommentTestCase):
     def testSave(self):
         for c in self.createSomeComments():
-            self.failIfEqual(c.submit_date, None)
+            self.assertNotEqual(c.submit_date, None)
 
     def testUserProperties(self):
         c1, c2, c3, c4 = self.createSomeComments()

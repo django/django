@@ -52,10 +52,10 @@ class QueryDictTests(unittest.TestCase):
         self.assertRaises(AttributeError, q.setlist, 'foo', ['bar'])
         self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
 
-        self.failUnless(q.has_key('foo'))
-        self.failUnless('foo' in q)
-        self.failIf(q.has_key('bar'))
-        self.failIf('bar' in q)
+        self.assertTrue(q.has_key('foo'))
+        self.assertTrue('foo' in q)
+        self.assertFalse(q.has_key('bar'))
+        self.assertFalse('bar' in q)
 
         self.assertEqual(q.items(), [(u'foo', u'bar')])
         self.assertEqual(q.lists(), [(u'foo', [u'bar'])])
@@ -92,7 +92,7 @@ class QueryDictTests(unittest.TestCase):
         q = QueryDict('').copy()
         q['name'] = 'john'
         del q['name']
-        self.failIf('name' in q)
+        self.assertFalse('name' in q)
 
     def test_basic_mutable_operations(self):
         q = QueryDict('').copy()
@@ -109,8 +109,8 @@ class QueryDictTests(unittest.TestCase):
         q.appendlist('foo', 'another')
         self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another'])
         self.assertEqual(q['foo'], 'another')
-        self.failUnless(q.has_key('foo'))
-        self.failUnless('foo' in q)
+        self.assertTrue(q.has_key('foo'))
+        self.assertTrue('foo' in q)
 
         self.assertEqual(q.items(),  [(u'foo', u'another'), (u'name', u'john')])
         self.assertEqual(q.lists(), [(u'foo', [u'bar', u'baz', u'another']), (u'name', [u'john'])])
@@ -213,7 +213,7 @@ class HttpResponseTests(unittest.TestCase):
 
         # If we insert a unicode value it will be converted to an ascii
         r['value'] = u'test value'
-        self.failUnless(isinstance(r['value'], str))
+        self.assertTrue(isinstance(r['value'], str))
 
         # An error is raised ~hen a unicode object with non-ascii is assigned.
         self.assertRaises(UnicodeEncodeError, r.__setitem__, 'value', u't\xebst value')

@@ -1,22 +1,21 @@
-import tempfile
-import shutil
 import os
-import sys
 import posixpath
+import shutil
+import sys
+import tempfile
 from StringIO import StringIO
 
-from django.test import TestCase
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
-from django.core.files.storage import default_storage
 from django.core.exceptions import ImproperlyConfigured
+from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.db.models.loading import load_app
 from django.template import Template, Context
+from django.test import TestCase
 
 
 TEST_ROOT = os.path.dirname(__file__)
-
 
 class StaticFilesTestCase(TestCase):
     """
@@ -73,7 +72,7 @@ class StaticFilesTestCase(TestCase):
         settings.INSTALLED_APPS = self.old_installed_apps
 
     def assertFileContains(self, filepath, text):
-        self.failUnless(text in self._get_file(filepath),
+        self.assertTrue(text in self._get_file(filepath),
                         "'%s' not in '%s'" % (text, filepath))
 
     def assertFileNotFound(self, filepath):
@@ -178,8 +177,8 @@ class TestFindStatic(BuildStaticTestCase, TestDefaults):
         finally:
             sys.stdout = _stdout
         self.assertEquals(len(lines), 3) # three because there is also the "Found <file> here" line
-        self.failUnless('project' in lines[1])
-        self.failUnless('apps' in lines[2])
+        self.assertTrue('project' in lines[1])
+        self.assertTrue('apps' in lines[2])
 
 
 class TestBuildStatic(BuildStaticTestCase, TestDefaults):
@@ -252,7 +251,7 @@ if sys.platform != 'win32':
             With ``--link``, symbolic links are created.
 
             """
-            self.failUnless(os.path.islink(os.path.join(settings.STATIC_ROOT, 'test.txt')))
+            self.assertTrue(os.path.islink(os.path.join(settings.STATIC_ROOT, 'test.txt')))
 
 
 class TestServeStatic(StaticFilesTestCase):

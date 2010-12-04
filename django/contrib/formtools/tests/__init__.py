@@ -1,14 +1,13 @@
 import os
 
-from django import forms
-from django import http
+from django import forms, http
 from django.conf import settings
 from django.contrib.formtools import preview, wizard, utils
 from django.test import TestCase
 from django.utils import unittest
 
-success_string = "Done was called!"
 
+success_string = "Done was called!"
 
 class TestFormPreview(preview.FormPreview):
     def get_context(self, request, form):
@@ -100,7 +99,7 @@ class PreviewTests(TestCase):
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
         response = self.client.post('/test1/', self.test_data)
-        self.failIfEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string)
         hash = self.preview.security_hash(None, TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/test1/', self.test_data)
@@ -134,7 +133,7 @@ class PreviewTests(TestCase):
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
         response = self.client.post('/test1/', self.test_data)
-        self.failIfEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string)
         hash = utils.security_hash(None, TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/test1/', self.test_data)
@@ -151,11 +150,11 @@ class PreviewTests(TestCase):
         self.test_data.update({'stage':2})
         response = self.client.post('/test2/', self.test_data)
         self.assertEqual(response.status_code, 200)
-        self.failIfEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string)
         hash = utils.security_hash(None, TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/test2/', self.test_data)
-        self.failIfEqual(response.content, success_string)
+        self.assertNotEqual(response.content, success_string)
 
 
 class SecurityHashTests(unittest.TestCase):
@@ -392,4 +391,3 @@ class WizardTests(TestCase):
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
-

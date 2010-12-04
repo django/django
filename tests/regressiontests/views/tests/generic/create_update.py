@@ -19,7 +19,7 @@ class CreateObjectTest(TestCase):
         self.assertRedirects(response, '/accounts/login/?next=%s' % view_url)
         # Now login and try again.
         login = self.client.login(username='testclient', password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'views/article_form.html')

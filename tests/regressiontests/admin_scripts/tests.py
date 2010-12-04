@@ -12,6 +12,7 @@ from django import conf, bin, get_version
 from django.conf import settings
 from django.utils import unittest
 
+
 class AdminScriptTestCase(unittest.TestCase):
     def write_settings(self, filename, apps=None, is_dir=False, sdict=None):
         test_dir = os.path.dirname(os.path.dirname(__file__))
@@ -156,7 +157,7 @@ class AdminScriptTestCase(unittest.TestCase):
         self.assertEquals(len(stream), 0, "Stream should be empty: actually contains '%s'" % stream)
     def assertOutput(self, stream, msg):
         "Utility assertion: assert that the given message exists in the output"
-        self.failUnless(msg in stream, "'%s' does not match actual output text '%s'" % (msg, stream))
+        self.assertTrue(msg in stream, "'%s' does not match actual output text '%s'" % (msg, stream))
 
 ##########################################################################
 # DJANGO ADMIN TESTS

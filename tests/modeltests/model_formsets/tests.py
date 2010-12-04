@@ -2,13 +2,13 @@ import datetime
 import re
 from datetime import date
 from decimal import Decimal
+
 from django import forms
 from django.db import models
-from django.forms.models import _get_foreign_key
-from django.forms.models import inlineformset_factory
-from django.forms.models import modelformset_factory
-from django.forms.models import modelformset_factory
+from django.forms.models import (_get_foreign_key, inlineformset_factory,
+    modelformset_factory, modelformset_factory)
 from django.test import TestCase
+
 from modeltests.model_formsets.models import (
     Author, BetterAuthor, Book, BookWithCustomPK, Editor,
     BookWithOptionalAltEditor, AlternateBook, AuthorMeeting, CustomPrimaryKey,
@@ -30,7 +30,7 @@ class DeletionTests(TestCase):
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
         formset.save()
-        self.failUnless(formset.is_valid())
+        self.assertTrue(formset.is_valid())
         self.assertEqual(Poet.objects.count(), 0)
 
     def test_add_form_deletion_when_invalid(self):

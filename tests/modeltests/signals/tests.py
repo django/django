@@ -171,6 +171,6 @@ class SignalTests(TestCase):
         signals.post_save.connect(sender=Person, receiver=b)
         p = Person.objects.create(first_name='John', last_name='Smith')
 
-        self.failUnless(a._run)
-        self.failUnless(b._run)
+        self.assertTrue(a._run)
+        self.assertTrue(b._run)
         self.assertEqual(signals.post_save.receivers, [])

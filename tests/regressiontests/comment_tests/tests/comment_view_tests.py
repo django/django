@@ -199,7 +199,7 @@ class CommentViewTests(CommentTestCase):
         signals.comment_will_be_posted.connect(receive)
         self.testCreateValidComment()
         c = Comment.objects.all()[0]
-        self.failIf(c.is_public)
+        self.assertFalse(c.is_public)
 
     def testCommentNext(self):
         """Test the different "next" actions the comment view can take"""
@@ -208,14 +208,14 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = post_redirect_re.match(location)
-        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
 
         data["next"] = "/somewhere/else/"
         data["comment"] = "This is another comment"
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = re.search(r"^http://testserver/somewhere/else/\?c=\d+$", location)
-        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
 
     def testCommentDoneView(self):
         a = Article.objects.get(pk=1)
@@ -223,7 +223,7 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = post_redirect_re.match(location)
-        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
         pk = int(match.group('pk'))
         response = self.client.get(location)
         self.assertTemplateUsed(response, "comments/posted.html")
@@ -240,7 +240,7 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = re.search(r"^http://testserver/somewhere/else/\?foo=bar&c=\d+$", location)
-        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
 
     def testCommentPostRedirectWithInvalidIntegerPK(self):
         """

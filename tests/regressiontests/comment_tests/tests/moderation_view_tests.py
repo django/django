@@ -1,8 +1,10 @@
-from django.contrib.comments.models import Comment, CommentFlag
 from django.contrib.auth.models import User, Permission
-from django.contrib.contenttypes.models import ContentType
-from regressiontests.comment_tests.tests import CommentTestCase
 from django.contrib.comments import signals
+from django.contrib.comments.models import Comment, CommentFlag
+from django.contrib.contenttypes.models import ContentType
+
+from regressiontests.comment_tests.tests import CommentTestCase
+
 
 class FlagViewTests(CommentTestCase):
 
@@ -35,7 +37,7 @@ class FlagViewTests(CommentTestCase):
     def testFlagAnon(self):
         """GET/POST the flag view while not logged in: redirect to log in."""
         comments = self.createSomeComments()
-        pk = comments[0].pk        
+        pk = comments[0].pk
         response = self.client.get("/flag/%d/" % pk)
         self.assertEqual(response["Location"], "http://testserver/accounts/login/?next=/flag/%d/" % pk)
         response = self.client.post("/flag/%d/" % pk)
@@ -43,7 +45,7 @@ class FlagViewTests(CommentTestCase):
 
     def testFlaggedView(self):
         comments = self.createSomeComments()
-        pk = comments[0].pk        
+        pk = comments[0].pk
         response = self.client.get("/flagged/", data={"c":pk})
         self.assertTemplateUsed(response, "comments/flagged.html")
 
@@ -75,7 +77,7 @@ class DeleteViewTests(CommentTestCase):
     def testDeletePermissions(self):
         """The delete view should only be accessible to 'moderators'"""
         comments = self.createSomeComments()
-        pk = comments[0].pk        
+        pk = comments[0].pk
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get("/delete/%d/" % pk)
         self.assertEqual(response["Location"], "http://testserver/accounts/login/?next=/delete/%d/" % pk)
@@ -93,7 +95,7 @@ class DeleteViewTests(CommentTestCase):
         response = self.client.post("/delete/%d/" % pk)
         self.assertEqual(response["Location"], "http://testserver/deleted/?c=%d" % pk)
         c = Comment.objects.get(pk=pk)
-        self.failUnless(c.is_removed)
+        self.assertTrue(c.is_removed)
         self.assertEqual(c.flags.filter(flag=CommentFlag.MODERATOR_DELETION, user__username="normaluser").count(), 1)
 
     def testDeleteSignals(self):
@@ -110,7 +112,7 @@ class DeleteViewTests(CommentTestCase):
 
     def testDeletedView(self):
         comments = self.createSomeComments()
-        pk = comments[0].pk        
+        pk = comments[0].pk
         response = self.client.get("/deleted/", data={"c":pk})
         self.assertTemplateUsed(response, "comments/deleted.html")
 
@@ -119,7 +121,7 @@ class ApproveViewTests(CommentTestCase):
     def testApprovePermissions(self):
         """The delete view should only be accessible to 'moderators'"""
         comments = self.createSomeComments()
-        pk = comments[0].pk        
+        pk = comments[0].pk
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get("/approve/%d/" % pk)
         self.assertEqual(response["Location"], "http://testserver/accounts/login/?next=/approve/%d/" % pk)
@@ -138,7 +140,7 @@ class ApproveViewTests(CommentTestCase):
         response = self.client.post("/approve/%d/" % c1.pk)
         self.assertEqual(response["Location"], "http://testserver/approved/?c=%d" % c1.pk)
         c = Comment.objects.get(pk=c1.pk)
-        self.failUnless(c.is_public)
+        self.assertTrue(c.is_public)
         self.assertEqual(c.flags.filter(flag=CommentFlag.MODERATOR_APPROVAL, user__username="normaluser").count(), 1)
 
     def testApproveSignals(self):
@@ -155,21 +157,21 @@ class ApproveViewTests(CommentTestCase):
 
     def testApprovedView(self):
         comments = self.createSomeComments()
-        pk = comments[0].pk        
+        pk = comments[0].pk
         response = self.client.get("/approved/", data={"c":pk})
         self.assertTemplateUsed(response, "comments/approved.html")
 
 class AdminActionsTests(CommentTestCase):
     urls = "regressiontests.comment_tests.urls_admin"
-    
+
     def setUp(self):
         super(AdminActionsTests, self).setUp()
-        
+
         # Make "normaluser" a moderator
         u = User.objects.get(username="normaluser")
         u.is_staff = True
         perms = Permission.objects.filter(
-            content_type__app_label = 'comments', 
+            content_type__app_label = 'comments',
             codename__endswith = 'comment'
         )
         for perm in perms:

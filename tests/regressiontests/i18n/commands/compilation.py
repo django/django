@@ -32,4 +32,4 @@ class PoFileTests(MessageCompilationTests):
         # underlying compile_messages function instead
         out = StringIO()
         self.assertRaises(CommandError, compile_messages, out, locale=LOCALE)
-        self.failIf(os.path.exists(self.MO_FILE))
+        self.assertFalse(os.path.exists(self.MO_FILE))

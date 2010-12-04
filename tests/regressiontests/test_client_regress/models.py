@@ -3,15 +3,16 @@
 Regression tests for the Test Client, especially the customized assertions.
 """
 import os
-from django.conf import settings
 
-from django.test import Client, TestCase
-from django.test.utils import ContextList
-from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
-from django.template import TemplateDoesNotExist, TemplateSyntaxError, Context, Template
-from django.template import loader
+from django.core.urlresolvers import reverse
+from django.template import (TemplateDoesNotExist, TemplateSyntaxError,
+    Context, Template, loader)
+from django.test import Client, TestCase
 from django.test.client import encode_file
+from django.test.utils import ContextList
+
 
 class AssertContainsTests(TestCase):
     def setUp(self):
@@ -484,7 +485,7 @@ class LoginTests(TestCase):
         # Create a second client, and log in.
         c = Client()
         login = c.login(username='testclient', password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
 
         # Get a redirection page with the second client.
         response = c.get("/test_client_regress/login_protected_redirect_view/")
@@ -508,7 +509,7 @@ class SessionEngineTests(TestCase):
     def test_login(self):
         "A session engine that modifies the session key can be used to log in"
         login = self.client.login(username='testclient', password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
 
         # Try to access a login protected page.
         response = self.client.get("/test_client/login_protected_view/")
@@ -547,7 +548,7 @@ class ExceptionTests(TestCase):
         "#5836 - A stale user exception isn't re-raised by the test client."
 
         login = self.client.login(username='testclient',password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
         try:
             response = self.client.get("/test_client_regress/staff_only/")
             self.fail("General users should not be able to visit this page")
@@ -558,7 +559,7 @@ class ExceptionTests(TestCase):
 
         # This next operation should be successful; if it isn't we have a problem.
         login = self.client.login(username='staff', password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
         try:
             self.client.get("/test_client_regress/staff_only/")
         except SuspiciousOperation:
@@ -670,7 +671,7 @@ class SessionTests(TestCase):
 
         # Log in
         login = self.client.login(username='testclient',password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
 
         # Session should still contain the modified value
         response = self.client.get('/test_client_regress/check_session/')
@@ -681,7 +682,7 @@ class SessionTests(TestCase):
         """Logout should work whether the user is logged in or not (#9978)."""
         self.client.logout()
         login = self.client.login(username='testclient',password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
         self.client.logout()
         self.client.logout()
 
@@ -875,4 +876,3 @@ class ResponseTemplateDeprecationTests(TestCase):
     def test_response_no_template(self):
         response = self.client.get("/test_client_regress/request_methods/")
         self.assertEqual(response.template, None)
-
