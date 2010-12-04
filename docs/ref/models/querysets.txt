@@ -709,151 +709,151 @@ principle, so you should avoid them if possible.
 Specify one or more of ``params``, ``select``, ``where`` or ``tables``. None
 of the arguments is required, but you should use at least one of them.
 
-``select``
-    The ``select`` argument lets you put extra fields in the ``SELECT`` clause.
-    It should be a dictionary mapping attribute names to SQL clauses to use to
-    calculate that attribute.
+    * ``select``
+        The ``select`` argument lets you put extra fields in the ``SELECT`` clause.
+        It should be a dictionary mapping attribute names to SQL clauses to use to
+        calculate that attribute.
 
-    Example::
+        Example::
 
-        Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+            Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
 
-    As a result, each ``Entry`` object will have an extra attribute,
-    ``is_recent``, a boolean representing whether the entry's ``pub_date`` is
-    greater than Jan. 1, 2006.
+        As a result, each ``Entry`` object will have an extra attribute,
+        ``is_recent``, a boolean representing whether the entry's ``pub_date`` is
+        greater than Jan. 1, 2006.
 
-    Django inserts the given SQL snippet directly into the ``SELECT``
-    statement, so the resulting SQL of the above example would be something
-    like::
+        Django inserts the given SQL snippet directly into the ``SELECT``
+        statement, so the resulting SQL of the above example would be something
+        like::
 
-        SELECT blog_entry.*, (pub_date > '2006-01-01') AS is_recent
-        FROM blog_entry;
+            SELECT blog_entry.*, (pub_date > '2006-01-01') AS is_recent
+            FROM blog_entry;
 
 
-    The next example is more advanced; it does a subquery to give each
-    resulting ``Blog`` object an ``entry_count`` attribute, an integer count
-    of associated ``Entry`` objects::
+        The next example is more advanced; it does a subquery to give each
+        resulting ``Blog`` object an ``entry_count`` attribute, an integer count
+        of associated ``Entry`` objects::
 
-        Blog.objects.extra(
-            select={
-                'entry_count': 'SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id'
-            },
-        )
+            Blog.objects.extra(
+                select={
+                    'entry_count': 'SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id'
+                },
+            )
 
-    (In this particular case, we're exploiting the fact that the query will
-    already contain the ``blog_blog`` table in its ``FROM`` clause.)
+        (In this particular case, we're exploiting the fact that the query will
+        already contain the ``blog_blog`` table in its ``FROM`` clause.)
 
-    The resulting SQL of the above example would be::
+        The resulting SQL of the above example would be::
 
-        SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id) AS entry_count
-        FROM blog_blog;
+            SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id) AS entry_count
+            FROM blog_blog;
 
-    Note that the parenthesis required by most database engines around
-    subqueries are not required in Django's ``select`` clauses. Also note that
-    some database backends, such as some MySQL versions, don't support
-    subqueries.
+        Note that the parenthesis required by most database engines around
+        subqueries are not required in Django's ``select`` clauses. Also note that
+        some database backends, such as some MySQL versions, don't support
+        subqueries.
 
-    .. versionadded:: 1.0
+        .. versionadded:: 1.0
 
-    In some rare cases, you might wish to pass parameters to the SQL fragments
-    in ``extra(select=...)``. For this purpose, use the ``select_params``
-    parameter. Since ``select_params`` is a sequence and the ``select``
-    attribute is a dictionary, some care is required so that the parameters
-    are matched up correctly with the extra select pieces.  In this situation,
-    you should use a ``django.utils.datastructures.SortedDict`` for the
-    ``select`` value, not just a normal Python dictionary.
+        In some rare cases, you might wish to pass parameters to the SQL fragments
+        in ``extra(select=...)``. For this purpose, use the ``select_params``
+        parameter. Since ``select_params`` is a sequence and the ``select``
+        attribute is a dictionary, some care is required so that the parameters
+        are matched up correctly with the extra select pieces.  In this situation,
+        you should use a ``django.utils.datastructures.SortedDict`` for the
+        ``select`` value, not just a normal Python dictionary.
 
-    This will work, for example::
+        This will work, for example::
 
-        Blog.objects.extra(
-            select=SortedDict([('a', '%s'), ('b', '%s')]),
-            select_params=('one', 'two'))
+            Blog.objects.extra(
+                select=SortedDict([('a', '%s'), ('b', '%s')]),
+                select_params=('one', 'two'))
 
-    The only thing to be careful about when using select parameters in
-    ``extra()`` is to avoid using the substring ``"%%s"`` (that's *two*
-    percent characters before the ``s``) in the select strings. Django's
-    tracking of parameters looks for ``%s`` and an escaped ``%`` character
-    like this isn't detected. That will lead to incorrect results.
+        The only thing to be careful about when using select parameters in
+        ``extra()`` is to avoid using the substring ``"%%s"`` (that's *two*
+        percent characters before the ``s``) in the select strings. Django's
+        tracking of parameters looks for ``%s`` and an escaped ``%`` character
+        like this isn't detected. That will lead to incorrect results.
 
-``where`` / ``tables``
-    You can define explicit SQL ``WHERE`` clauses -- perhaps to perform
-    non-explicit joins -- by using ``where``. You can manually add tables to
-    the SQL ``FROM`` clause by using ``tables``.
+    * ``where`` / ``tables``
+        You can define explicit SQL ``WHERE`` clauses -- perhaps to perform
+        non-explicit joins -- by using ``where``. You can manually add tables to
+        the SQL ``FROM`` clause by using ``tables``.
 
-    ``where`` and ``tables`` both take a list of strings. All ``where``
-    parameters are "AND"ed to any other search criteria.
+        ``where`` and ``tables`` both take a list of strings. All ``where``
+        parameters are "AND"ed to any other search criteria.
 
-    Example::
+        Example::
 
-        Entry.objects.extra(where=['id IN (3, 4, 5, 20)'])
+            Entry.objects.extra(where=['id IN (3, 4, 5, 20)'])
 
-    ...translates (roughly) into the following SQL::
+        ...translates (roughly) into the following SQL::
 
-        SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
+            SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
 
-    Be careful when using the ``tables`` parameter if you're specifying
-    tables that are already used in the query. When you add extra tables
-    via the ``tables`` parameter, Django assumes you want that table included
-    an extra time, if it is already included. That creates a problem,
-    since the table name will then be given an alias. If a table appears
-    multiple times in an SQL statement, the second and subsequent occurrences
-    must use aliases so the database can tell them apart. If you're
-    referring to the extra table you added in the extra ``where`` parameter
-    this is going to cause errors.
+        Be careful when using the ``tables`` parameter if you're specifying
+        tables that are already used in the query. When you add extra tables
+        via the ``tables`` parameter, Django assumes you want that table included
+        an extra time, if it is already included. That creates a problem,
+        since the table name will then be given an alias. If a table appears
+        multiple times in an SQL statement, the second and subsequent occurrences
+        must use aliases so the database can tell them apart. If you're
+        referring to the extra table you added in the extra ``where`` parameter
+        this is going to cause errors.
 
-    Normally you'll only be adding extra tables that don't already appear in
-    the query. However, if the case outlined above does occur, there are a few
-    solutions. First, see if you can get by without including the extra table
-    and use the one already in the query. If that isn't possible, put your
-    ``extra()`` call at the front of the queryset construction so that your
-    table is the first use of that table. Finally, if all else fails, look at
-    the query produced and rewrite your ``where`` addition to use the alias
-    given to your extra table. The alias will be the same each time you
-    construct the queryset in the same way, so you can rely upon the alias
-    name to not change.
+        Normally you'll only be adding extra tables that don't already appear in
+        the query. However, if the case outlined above does occur, there are a few
+        solutions. First, see if you can get by without including the extra table
+        and use the one already in the query. If that isn't possible, put your
+        ``extra()`` call at the front of the queryset construction so that your
+        table is the first use of that table. Finally, if all else fails, look at
+        the query produced and rewrite your ``where`` addition to use the alias
+        given to your extra table. The alias will be the same each time you
+        construct the queryset in the same way, so you can rely upon the alias
+        name to not change.
 
-``order_by``
-    If you need to order the resulting queryset using some of the new fields
-    or tables you have included via ``extra()`` use the ``order_by`` parameter
-    to ``extra()`` and pass in a sequence of strings. These strings should
-    either be model fields (as in the normal ``order_by()`` method on
-    querysets), of the form ``table_name.column_name`` or an alias for a column
-    that you specified in the ``select`` parameter to ``extra()``.
+    * ``order_by``
+        If you need to order the resulting queryset using some of the new fields
+        or tables you have included via ``extra()`` use the ``order_by`` parameter
+        to ``extra()`` and pass in a sequence of strings. These strings should
+        either be model fields (as in the normal ``order_by()`` method on
+        querysets), of the form ``table_name.column_name`` or an alias for a column
+        that you specified in the ``select`` parameter to ``extra()``.
 
-    For example::
+        For example::
 
-        q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
-        q = q.extra(order_by = ['-is_recent'])
+            q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+            q = q.extra(order_by = ['-is_recent'])
 
-    This would sort all the items for which ``is_recent`` is true to the front
-    of the result set (``True`` sorts before ``False`` in a descending
-    ordering).
+        This would sort all the items for which ``is_recent`` is true to the front
+        of the result set (``True`` sorts before ``False`` in a descending
+        ordering).
 
-    This shows, by the way, that you can make multiple calls to
-    ``extra()`` and it will behave as you expect (adding new constraints each
-    time).
+        This shows, by the way, that you can make multiple calls to
+        ``extra()`` and it will behave as you expect (adding new constraints each
+        time).
 
-``params``
-    The ``where`` parameter described above may use standard Python database
-    string placeholders -- ``'%s'`` to indicate parameters the database engine
-    should automatically quote. The ``params`` argument is a list of any extra
-    parameters to be substituted.
+    * ``params``
+        The ``where`` parameter described above may use standard Python database
+        string placeholders -- ``'%s'`` to indicate parameters the database engine
+        should automatically quote. The ``params`` argument is a list of any extra
+        parameters to be substituted.
 
-    Example::
+        Example::
 
-        Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
+            Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-    Always use ``params`` instead of embedding values directly into ``where``
-    because ``params`` will ensure values are quoted correctly according to
-    your particular backend. (For example, quotes will be escaped correctly.)
+        Always use ``params`` instead of embedding values directly into ``where``
+        because ``params`` will ensure values are quoted correctly according to
+        your particular backend. (For example, quotes will be escaped correctly.)
 
-    Bad::
+        Bad::
 
-        Entry.objects.extra(where=["headline='Lennon'"])
+            Entry.objects.extra(where=["headline='Lennon'"])
 
-    Good::
+        Good::
 
-        Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
+            Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
 defer
 ~~~~~
