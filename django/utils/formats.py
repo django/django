@@ -6,6 +6,7 @@ from django.utils.translation import get_language, to_locale, check_for_language
 from django.utils.importlib import import_module
 from django.utils.encoding import smart_str
 from django.utils import dateformat, numberformat, datetime_safe
+from django.utils.safestring import mark_safe
 
 # format_cache is a mapping from (format_type, lang) to the format string.
 # By using the cache, it is possible to avoid running get_format_modules
@@ -93,7 +94,9 @@ def localize(value):
     Checks if value is a localizable type (date, number...) and returns it
     formatted as a string using current locale format
     """
-    if isinstance(value, (decimal.Decimal, float, int, long)):
+    if isinstance(value, bool):
+        return mark_safe(unicode(value))
+    elif isinstance(value, (decimal.Decimal, float, int, long)):
         return number_format(value)
     elif isinstance(value, datetime.datetime):
         return date_format(value, 'DATETIME_FORMAT')
