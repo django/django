@@ -212,7 +212,7 @@ Methods
 
     .. method:: models.User.get_group_permissions(obj=None)
 
-        Returns a list of permission strings that the user has, through his/her
+        Returns a set of permission strings that the user has, through his/her
         groups.
 
         .. versionadded:: 1.2
@@ -222,7 +222,7 @@ Methods
 
     .. method:: models.User.get_all_permissions(obj=None)
 
-        Returns a list of permission strings that the user has, both through
+        Returns a set of permission strings that the user has, both through
         group and user permissions.
 
         .. versionadded:: 1.2
