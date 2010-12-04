@@ -4,7 +4,7 @@ from django.forms import *
 from django.contrib.localflavor.be.forms import (BEPostalCodeField,
     BEPhoneNumberField, BERegionSelect, BEProvinceSelect)
 
-class BETests(TestCase):
+class BELocalFlavorTests(TestCase):
     """
     Test case to validate BE localflavor
     """

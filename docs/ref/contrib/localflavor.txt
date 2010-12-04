@@ -67,6 +67,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Spain_
     * Sweden_
     * Switzerland_
+    * Turkey_
     * `United Kingdom`_
     * `United States of America`_
     * Uruguay_
@@ -115,6 +116,7 @@ Here's an example of how to use them::
 .. _Spain: `Spain (es)`_
 .. _Sweden: `Sweden (se)`_
 .. _Switzerland: `Switzerland (ch)`_
+.. _Turkey: `Turkey (tr)`_
 .. _United Kingdom: `United Kingdom (uk)`_
 .. _United States of America: `United States of America (us)`_
 .. _Uruguay: `Uruguay (uy)`_
@@ -852,6 +854,35 @@ Switzerland (``ch``)
 .. class:: ch.forms.CHStateSelect
 
     A ``Select`` widget that uses a list of Swiss states as its choices.
+
+Turkey (``tr``)
+===============
+
+.. class:: tr.forms.TRZipCodeField
+
+    A form field that validates input as a Turkish zip code. Valid codes
+    consist of five digits.
+
+.. class:: tr.forms.TRPhoneNumberField
+
+    A form field that validates input as a Turkish phone number. The correct
+    format is 0xxx xxx xxxx. +90xxx xxx xxxx and inputs without spaces also
+    validates. The result is normalized to xxx xxx xxxx format.
+
+.. class:: tr.forms.TRIdentificationNumberField
+
+    A form field that validates input as a TR identification number. A valid
+    number must satisfy the following:
+
+    * The number consist of 11 digits.
+    * The first digit cannot be 0.
+    * (sum(1st, 3rd, 5th, 7th, 9th)*7 - sum(2nd,4th,6th,8th)) % 10) must be
+    equal to the 10th digit.
+    * (sum(1st to 10th) % 10) must be equal to the 11th digit.
+
+.. class:: tr.forms.TRProvinceSelect
+
+    A ``select`` widget that uses a list of Turkish provinces as its choices.
 
 United Kingdom (``uk``)
 =======================

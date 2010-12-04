@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils.unittest import TestCase
 
 
-class IsraelLocalFlavorTests(TestCase):
+class ILLocalFlavorTests(TestCase):
     def test_postal_code_field(self):
         f = ILPostalCodeField()
         self.assertRaisesRegexp(ValidationError,

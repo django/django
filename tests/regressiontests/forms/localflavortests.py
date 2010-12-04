@@ -14,7 +14,7 @@ from localflavor.fr import tests as localflavor_fr_tests
 from localflavor.generic import tests as localflavor_generic_tests
 from localflavor.id import tests as localflavor_id_tests
 from localflavor.ie import tests as localflavor_ie_tests
-from localflavor.il import IsraelLocalFlavorTests
+from localflavor.il import ILLocalFlavorTests
 from localflavor.is_ import tests as localflavor_is_tests
 from localflavor.it import tests as localflavor_it_tests
 from localflavor.jp import tests as localflavor_jp_tests
@@ -25,12 +25,13 @@ from localflavor.pt import tests as localflavor_pt_tests
 from localflavor.ro import tests as localflavor_ro_tests
 from localflavor.se import tests as localflavor_se_tests
 from localflavor.sk import tests as localflavor_sk_tests
+from localflavor.tr import TRLocalFlavorTests
 from localflavor.uk import tests as localflavor_uk_tests
 from localflavor.us import tests as localflavor_us_tests
 from localflavor.uy import tests as localflavor_uy_tests
 from localflavor.za import tests as localflavor_za_tests
 
-from localflavor.be import BETests
+from localflavor.be import BELocalFlavorTests
 
 __test__ = {
     'localflavor_ar_tests': localflavor_ar_tests,
