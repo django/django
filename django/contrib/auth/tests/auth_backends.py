@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
 
@@ -245,3 +246,18 @@ class NoAnonymousUserBackendTest(TestCase):
 
     def test_get_all_permissions(self):
         self.assertEqual(self.user1.get_all_permissions(TestObj()), set())
+
+class NoBackendsTest(TestCase):
+    """
+    Tests that an appropriate error is raised if no auth backends are provided.
+    """
+    def setUp(self):
+        self.old_AUTHENTICATION_BACKENDS = settings.AUTHENTICATION_BACKENDS
+        settings.AUTHENTICATION_BACKENDS = []
+        self.user = User.objects.create_user('test', 'test@example.com', 'test')
+
+    def tearDown(self):
+        settings.AUTHENTICATION_BACKENDS = self.old_AUTHENTICATION_BACKENDS
+
+    def test_raises_exception(self):
+        self.assertRaises(ImproperlyConfigured, self.user.has_perm, ('perm', TestObj(),))
