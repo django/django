@@ -268,6 +268,7 @@ class FormattingTests(TestCase):
             self.assertEqual(u'66.666,666', localize(self.n))
             self.assertEqual(u'99.999,999', localize(self.f))
             self.assertEqual(u'10.000', localize(self.l))
+            self.assertEqual(u'True', localize(True))
 
             settings.USE_THOUSAND_SEPARATOR = False
             self.assertEqual(u'66666,666', localize(self.n))
