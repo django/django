@@ -97,7 +97,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
 
     def get_success_url(self):
         if self.success_url:
-            url = self.success_url
+            url = self.success_url % self.object.__dict__
         else:
             try:
                 url = self.object.get_absolute_url()

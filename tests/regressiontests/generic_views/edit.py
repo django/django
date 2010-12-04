@@ -47,6 +47,14 @@ class CreateViewTests(TestCase):
         self.assertRedirects(res, 'http://testserver/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe>'])
 
+    def test_create_with_interpolated_redirect(self):
+        res = self.client.post('/edit/authors/create/interpolate_redirect/',
+                            {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
+        self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe>'])
+        self.assertEqual(res.status_code, 302)
+        pk = Author.objects.all()[0].pk
+        self.assertRedirects(res, 'http://testserver/edit/author/%d/update/' % pk)
+
     def test_create_with_special_properties(self):
         res = self.client.get('/edit/authors/create/special/')
         self.assertEqual(res.status_code, 200)
@@ -144,6 +152,18 @@ class UpdateViewTests(TestCase):
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
+
+    def test_update_with_interpolated_redirect(self):
+        a = Author.objects.create(
+            name='Randall Munroe',
+            slug='randall-munroe',
+        )
+        res = self.client.post('/edit/author/%d/update/interpolate_redirect/' % a.pk,
+                        {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'})
+        self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
+        self.assertEqual(res.status_code, 302)
+        pk = Author.objects.all()[0].pk
+        self.assertRedirects(res, 'http://testserver/edit/author/%d/update/' % pk)
 
     def test_update_with_special_properties(self):
         a = Author.objects.create(

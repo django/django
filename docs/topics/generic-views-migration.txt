@@ -113,6 +113,13 @@ For example::
             })
             return context
 
+``post_save_redirect`` argument to create and update views
+----------------------------------------------------------
+
+The ``post_save_redirect`` argument to the create and update views
+has been renamed ``success_url`` on the
+:class:`~django.views.generic.edit.ModelFormMixin`.
+
 ``mimetype``
 ------------
 
