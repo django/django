@@ -104,8 +104,8 @@ def to_locale(language):
 def get_language_from_request(request):
     return _trans.get_language_from_request(request)
 
-def templatize(src):
-    return _trans.templatize(src)
+def templatize(src, origin=None):
+    return _trans.templatize(src, origin)
 
 def deactivate_all():
     return _trans.deactivate_all()

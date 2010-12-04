@@ -59,6 +59,18 @@ class BasicExtractorTests(ExtractorTests):
         self.assertMsgId('I think that 100%% is more that 50%% of anything.', po_contents)
         self.assertMsgId('I think that 100%% is more that 50%% of %\(obj\)s.', po_contents)
 
+    def test_extraction_error(self):
+        os.chdir(self.test_dir)
+        shutil.copyfile('./templates/template_with_error.txt', './templates/template_with_error.html')
+        self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=LOCALE, verbosity=0)
+        try:
+            management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        except SyntaxError, e:
+            self.assertEqual(str(e), 'Translation blocks must not include other block tags: blocktrans (file templates/template_with_error.html, line 3)')
+        finally:
+            os.remove('./templates/template_with_error.html')
+            os.remove('./templates/template_with_error.html.py') # Waiting for #8536 to be fixed
+
 
 class JavascriptExtractorTests(ExtractorTests):
 

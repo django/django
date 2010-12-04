@@ -139,6 +139,7 @@ class Token(object):
     def __init__(self, token_type, contents):
         # token_type must be TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK or TOKEN_COMMENT.
         self.token_type, self.contents = token_type, contents
+        self.lineno = None
 
     def __str__(self):
         return '<%s token: "%s...">' % \
@@ -164,6 +165,7 @@ class Lexer(object):
     def __init__(self, template_string, origin):
         self.template_string = template_string
         self.origin = origin
+        self.lineno = 1
 
     def tokenize(self):
         "Return a list of tokens from a given template_string."
@@ -193,6 +195,8 @@ class Lexer(object):
                 token = Token(TOKEN_COMMENT, content)
         else:
             token = Token(TOKEN_TEXT, token_string)
+        token.lineno = self.lineno
+        self.lineno += token_string.count('\n')
         return token
 
 class Parser(object):

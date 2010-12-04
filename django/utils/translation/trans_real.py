@@ -421,7 +421,7 @@ endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 
-def templatize(src):
+def templatize(src, origin=None):
     """
     Turns a Django template into something that is understood by xgettext. It
     does so by translating the Django translation tags into standard gettext
@@ -435,7 +435,7 @@ def templatize(src):
     plural = []
     incomment = False
     comment = []
-    for t in Lexer(src, None).tokenize():
+    for t in Lexer(src, origin).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
                 out.write(' # %s' % ''.join(comment))
@@ -465,7 +465,10 @@ def templatize(src):
                 elif pluralmatch:
                     inplural = True
                 else:
-                    raise SyntaxError("Translation blocks must not include other block tags: %s" % t.contents)
+                    filemsg = ''
+                    if origin:
+                        filemsg = 'file %s, ' % origin
+                    raise SyntaxError("Translation blocks must not include other block tags: %s (%sline %d)" % (t.contents, filemsg, t.lineno))
             elif t.token_type == TOKEN_VAR:
                 if inplural:
                     plural.append('%%(%s)s' % t.contents)

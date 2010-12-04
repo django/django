@@ -220,18 +220,15 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                 os.unlink(os.path.join(dirpath, thefile))
             elif domain == 'django' and (file_ext == '.py' or file_ext in extensions):
                 thefile = file
+                orig_file = os.path.join(dirpath, file)
                 if file_ext in extensions:
-                    src = open(os.path.join(dirpath, file), "rU").read()
+                    src = open(orig_file, "rU").read()
                     thefile = '%s.py' % file
+                    f = open(os.path.join(dirpath, thefile), "w")
                     try:
-                        f = open(os.path.join(dirpath, thefile), "w")
-                        try:
-                            f.write(templatize(src))
-                        finally:
-                            f.close()
-                    except SyntaxError, msg:
-                        msg = "%s (file: %s)" % (msg, os.path.join(dirpath, file))
-                        raise SyntaxError(msg)
+                        f.write(templatize(src, orig_file[2:]))
+                    finally:
+                        f.close()
                 if verbosity > 1:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                 cmd = (
@@ -250,7 +247,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
 
                 if thefile != file:
                     old = '#: '+os.path.join(dirpath, thefile)[2:]
-                    new = '#: '+os.path.join(dirpath, file)[2:]
+                    new = '#: '+orig_file[2:]
                     msgs = msgs.replace(old, new)
                 if os.path.exists(potfile):
                     # Strip the header
