@@ -546,7 +546,7 @@ msgstr "Kör markerade operationer"
 #: contrib/admin/templates/admin/actions.html:4
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
-msgstr "Sök"
+msgstr "Utför"
 
 #: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/index.html:19
