@@ -143,3 +143,7 @@ class BookTodayArchive(BookConfig, generic.TodayArchiveView):
 
 class BookDetail(BookConfig, generic.DateDetailView):
     pass
+
+class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
+    def get_queryset(self):
+        return Author.objects.all()

@@ -72,10 +72,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         if self.form_class:
             return self.form_class
         else:
-            if self.model is None:
-                model = self.queryset.model
-            else:
-                model = self.model
+            model = self.get_queryset().model
             return model_forms.modelform_factory(model)
 
     def get_form(self, form_class):

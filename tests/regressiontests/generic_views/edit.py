@@ -7,6 +7,10 @@ from django.utils.unittest import expectedFailure
 from regressiontests.generic_views.models import Artist, Author
 from regressiontests.generic_views import views
 
+class ModelFormMixinTests(TestCase):
+    def test_get_form(self):
+        form_class = views.AuthorGetQuerySetFormView().get_form_class()
+        self.assertEqual(form_class.Meta.model, Author)
 
 class CreateViewTests(TestCase):
     urls = 'regressiontests.generic_views.urls'
