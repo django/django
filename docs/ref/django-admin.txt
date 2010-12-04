@@ -1338,3 +1338,27 @@ distribution. It enables tab-completion of ``django-admin.py`` and
 
 
 See :doc:`/howto/custom-management-commands` for how to add customized actions.
+
+
+==========================================
+Running management commands from your code
+==========================================
+
+.. function:: django.core.management.call_command(name, *args, **options)
+
+To call a management command from code use ``call_command``.
+
+``name``
+  the name of the command to call.
+
+``*args``
+  a list of arguments accepted by the command.
+
+``**options``
+  named options accepted on the command-line.
+
+Examples::
+
+      from django.core import management
+      management.call_command('flush', verbosity=0, interactive=False)
+      management.call_command('loaddata', 'test_data', verbosity=0)
