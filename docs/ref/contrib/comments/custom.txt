@@ -110,6 +110,18 @@ point Django at these classes we've created::
     def get_form():
         return CommentFormWithTitle
 
+
+.. warning::
+
+    Be careful not to create cyclic imports in your custom comments app.
+    If you feel your comment configuration isn't being used as defined --
+    for example, if your comment moderation policy isn't being applied --
+    you may have a cyclic import problem.
+
+    If you are having unexplained problems with comments behavior, check
+    if your custom comments application imports (even indirectly)
+    any module that itself imports Django's comments module.
+
 The above process should take care of most common situations. For more
 advanced usage, there are additional methods you can define. Those are
 explained in the next section.
