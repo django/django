@@ -24,7 +24,10 @@ Required arguments
 ------------------
 
 ``template``
-    The full name of a template to use or sequence of template names.
+    The full name of a template to use or sequence of template names. If a
+    sequence is given, the first template that exists will be used. See the
+    :ref:`template loader documentation <ref-templates-api-the-python-api>`
+    for more information on how templates are found.
 
 Optional arguments
 ------------------
@@ -47,9 +50,6 @@ Optional arguments
                                   context_instance=RequestContext(request))
 
 ``mimetype``
-
-    .. versionadded:: 1.0
-
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
