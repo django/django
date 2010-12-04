@@ -13,7 +13,7 @@ class Bug8245Test(TestCase):
         try:
             admin.autodiscover()
         except Exception, e:
-            self.failUnlessEqual(str(e), "Bad admin module")
+            self.assertEqual(str(e), "Bad admin module")
         else:
             self.fail(
                 'autodiscover should have raised a "Bad admin module" error.')
@@ -23,7 +23,7 @@ class Bug8245Test(TestCase):
         try:
             admin.autodiscover()
         except Exception, e:
-            self.failUnlessEqual(str(e), "Bad admin module")
+            self.assertEqual(str(e), "Bad admin module")
         else:
             self.fail(
                 'autodiscover should have raised a "Bad admin module" error.')

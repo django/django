@@ -12,8 +12,8 @@ class DebugViewTests(TestCase):
     def setUp(self):
         self.old_debug = settings.DEBUG
         settings.DEBUG = True
-        self.old_template_debug = settings.TEMPLATE_DEBUG 
-        settings.TEMPLATE_DEBUG = True 
+        self.old_template_debug = settings.TEMPLATE_DEBUG
+        settings.TEMPLATE_DEBUG = True
 
     def tearDown(self):
         settings.DEBUG = self.old_debug
@@ -27,8 +27,8 @@ class DebugViewTests(TestCase):
             'file_data.txt': SimpleUploadedFile('file_data.txt', 'haha'),
         }
         response = self.client.post('/views/raises/', data)
-        self.failUnless('file_data.txt' in response.content)
-        self.failIf('haha' in response.content)
+        self.assertTrue('file_data.txt' in response.content)
+        self.assertFalse('haha' in response.content)
 
     def test_404(self):
         response = self.client.get('/views/raises404/')
@@ -45,7 +45,6 @@ class DebugViewTests(TestCase):
                 self.client.get(reverse('template_exception', args=(n,)))
             except TemplateSyntaxError, e:
                 raising_loc = inspect.trace()[-1][-2][0].strip()
-                self.failIf(raising_loc.find('raise BrokenException') == -1,
-                    "Failed to find 'raise BrokenException' in last frame of traceback, instead found: %s" % 
-                        raising_loc) 
-
+                self.assertFalse(raising_loc.find('raise BrokenException') == -1,
+                    "Failed to find 'raise BrokenException' in last frame of traceback, instead found: %s" %
+                        raising_loc)

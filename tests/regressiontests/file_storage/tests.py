@@ -7,13 +7,13 @@ import time
 import unittest
 from cStringIO import StringIO
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.core.files.base import ContentFile, File
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
-from django.core.exceptions import ImproperlyConfigured
 from unittest import TestCase
+
 try:
     import threading
 except ImportError:
@@ -81,21 +81,21 @@ class GetStorageClassTests(unittest.TestCase):
 
 class FileStorageTests(unittest.TestCase):
     storage_class = FileSystemStorage
-    
+
     def setUp(self):
         self.temp_dir = tempfile.mktemp()
         os.makedirs(self.temp_dir)
         self.storage = self.storage_class(location=self.temp_dir,
             base_url='/test_media_url/')
-    
+
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
-        
+
     def test_file_access_options(self):
         """
         Standard file access options are available, and work as expected.
         """
-        self.failIf(self.storage.exists('storage_test'))
+        self.assertFalse(self.storage.exists('storage_test'))
         f = self.storage.open('storage_test', 'w')
         f.write('storage contents')
         f.close()
@@ -104,16 +104,16 @@ class FileStorageTests(unittest.TestCase):
         f = self.storage.open('storage_test', 'r')
         self.assertEqual(f.read(), 'storage contents')
         f.close()
-        
+
         self.storage.delete('storage_test')
-        self.failIf(self.storage.exists('storage_test'))
+        self.assertFalse(self.storage.exists('storage_test'))
 
     def test_file_save_without_name(self):
         """
         File storage extracts the filename from the content object if no
         name is given explicitly.
         """
-        self.failIf(self.storage.exists('test.file'))
+        self.assertFalse(self.storage.exists('test.file'))
 
         f = ContentFile('custom contents')
         f.name = 'test.file'
@@ -130,7 +130,7 @@ class FileStorageTests(unittest.TestCase):
         """
         File storage returns the full path of a file
         """
-        self.failIf(self.storage.exists('test.file'))
+        self.assertFalse(self.storage.exists('test.file'))
 
         f = ContentFile('custom contents')
         f_name = self.storage.save('test.file', f)
@@ -155,7 +155,7 @@ class FileStorageTests(unittest.TestCase):
         File storage can get a mixin to extend the functionality of the
         returned file.
         """
-        self.failIf(self.storage.exists('test.file'))
+        self.assertFalse(self.storage.exists('test.file'))
 
         class TestFileMixin(object):
             mixed_in = True
@@ -174,9 +174,9 @@ class FileStorageTests(unittest.TestCase):
         """
         File storage returns a tuple containing directories and files.
         """
-        self.failIf(self.storage.exists('storage_test_1'))
-        self.failIf(self.storage.exists('storage_test_2'))
-        self.failIf(self.storage.exists('storage_dir_1'))
+        self.assertFalse(self.storage.exists('storage_test_1'))
+        self.assertFalse(self.storage.exists('storage_test_2'))
+        self.assertFalse(self.storage.exists('storage_dir_1'))
 
         f = self.storage.save('storage_test_1', ContentFile('custom content'))
         f = self.storage.save('storage_test_2', ContentFile('custom content'))
@@ -215,7 +215,7 @@ class CustomStorage(FileSystemStorage):
 
 class CustomStorageTests(FileStorageTests):
     storage_class = CustomStorage
-    
+
     def test_custom_get_available_name(self):
         first = self.storage.save('custom_storage', ContentFile('custom contents'))
         self.assertEqual(first, 'custom_storage')
@@ -299,7 +299,7 @@ class FileStoragePathParsing(TestCase):
         self.storage.save('dotted.path/test', ContentFile("1"))
         self.storage.save('dotted.path/test', ContentFile("2"))
 
-        self.failIf(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
+        self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
         self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
         self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_1')))
 

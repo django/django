@@ -1,5 +1,6 @@
-from django.test import TestCase
 from django.forms.models import inlineformset_factory
+from django.test import TestCase
+
 from regressiontests.inline_formsets.models import Poet, Poem, School, Parent, Child
 
 
@@ -20,7 +21,7 @@ class DeletionTests(TestCase):
         }
         formset = PoemFormSet(data, instance=poet)
         formset.save()
-        self.failUnless(formset.is_valid())
+        self.assertTrue(formset.is_valid())
         self.assertEqual(Poem.objects.count(), 0)
 
     def test_add_form_deletion_when_invalid(self):

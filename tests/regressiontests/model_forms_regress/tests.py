@@ -1,9 +1,8 @@
 from datetime import date
 
-from django import db
-from django import forms
-from django.forms.models import modelform_factory, ModelChoiceField
+from django import db, forms
 from django.conf import settings
+from django.forms.models import modelform_factory, ModelChoiceField
 from django.test import TestCase
 
 from models import Person, RealPerson, Triple, FilePathModel, Article, \
@@ -47,10 +46,10 @@ class UniqueTogetherTests(TestCase):
         Triple.objects.create(left=1, middle=2, right=3)
 
         form = TripleForm({'left': '1', 'middle': '2', 'right': '3'})
-        self.failIf(form.is_valid())
+        self.assertFalse(form.is_valid())
 
         form = TripleForm({'left': '1', 'middle': '3', 'right': '1'})
-        self.failUnless(form.is_valid())
+        self.assertTrue(form.is_valid())
 
 class TripleFormWithCleanOverride(forms.ModelForm):
     class Meta:
@@ -68,7 +67,7 @@ class OverrideCleanTests(TestCase):
         optional.
         """
         form = TripleFormWithCleanOverride({'left': 1, 'middle': 2, 'right': 1})
-        self.failUnless(form.is_valid())
+        self.assertTrue(form.is_valid())
         # form.instance.left will be None if the instance was not constructed
         # by form.full_clean().
         self.assertEquals(form.instance.left, 1)
@@ -293,4 +292,3 @@ class FormFieldCallbackTests(TestCase):
         # A bad callback provided by user still gives an error
         self.assertRaises(TypeError, modelform_factory, Person,
                           formfield_callback='not a function or callable')
-

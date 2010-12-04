@@ -70,7 +70,7 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['data'], '37')
         self.assertEqual(response.template.name, 'POST Template')
-        self.failUnless('Data received' in response.content)
+        self.assertTrue('Data received' in response.content)
 
     def test_response_headers(self):
         "Check the value of HTTP headers returned in a response"
@@ -275,7 +275,7 @@ class ClientTest(TestCase):
 
         # Log in
         login = self.client.login(username='testclient', password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
 
         # Request a page that requires a login
         response = self.client.get('/test_client/login_protected_view/')
@@ -291,7 +291,7 @@ class ClientTest(TestCase):
 
         # Log in
         login = self.client.login(username='testclient', password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
 
         # Request a page that requires a login
         response = self.client.get('/test_client/login_protected_method_view/')
@@ -307,7 +307,7 @@ class ClientTest(TestCase):
 
         # Log in
         login = self.client.login(username='testclient', password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
 
         # Request a page that requires a login
         response = self.client.get('/test_client/login_protected_view_custom_redirect/')
@@ -318,13 +318,13 @@ class ClientTest(TestCase):
         "Request a page that is protected with @login, but use bad credentials"
 
         login = self.client.login(username='otheruser', password='nopassword')
-        self.failIf(login)
+        self.assertFalse(login)
 
     def test_view_with_inactive_login(self):
         "Request a page that is protected with @login, but use an inactive login"
 
         login = self.client.login(username='inactive', password='password')
-        self.failIf(login)
+        self.assertFalse(login)
 
     def test_logout(self):
         "Request a logout after logging in"
@@ -352,7 +352,7 @@ class ClientTest(TestCase):
 
         # Log in
         login = self.client.login(username='testclient', password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
 
         # Log in with wrong permissions. Should result in 302.
         response = self.client.get('/test_client/permission_protected_view/')
@@ -369,7 +369,7 @@ class ClientTest(TestCase):
 
         # Log in
         login = self.client.login(username='testclient', password='password')
-        self.failUnless(login, 'Could not log in')
+        self.assertTrue(login, 'Could not log in')
 
         # Log in with wrong permissions. Should result in 302.
         response = self.client.get('/test_client/permission_protected_method_view/')

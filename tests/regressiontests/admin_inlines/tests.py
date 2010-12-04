@@ -1,12 +1,10 @@
-from django.test import TestCase
-
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
+
 # local test models
-from models import Holder, Inner, InnerInline
-from models import Holder2, Inner2, Holder3, Inner3
-from models import Person, OutfitItem, Fashionista
-from models import Teacher, Parent, Child
+from models import (Holder, Inner, InnerInline, Holder2, Inner2, Holder3,
+    Inner3, Person, OutfitItem, Fashionista, Teacher, Parent, Child)
 
 
 class TestInline(TestCase):
@@ -19,7 +17,7 @@ class TestInline(TestCase):
         self.change_url = '/test_admin/admin/admin_inlines/holder/%i/' % holder.id
 
         result = self.client.login(username='super', password='secret')
-        self.failUnlessEqual(result, True)
+        self.assertEqual(result, True)
 
     def tearDown(self):
         self.client.logout()
@@ -75,7 +73,7 @@ class TestInlineMedia(TestCase):
     def setUp(self):
 
         result = self.client.login(username='super', password='secret')
-        self.failUnlessEqual(result, True)
+        self.assertEqual(result, True)
 
     def tearDown(self):
         self.client.logout()

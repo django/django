@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase
+from django.conf import settings
 from django.http import HttpRequest
 from django.middleware.common import CommonMiddleware
-from django.conf import settings
+from django.test import TestCase
+
 
 class CommonMiddlewareTest(TestCase):
     def setUp(self):
@@ -74,7 +75,7 @@ class CommonMiddlewareTest(TestCase):
         try:
             CommonMiddleware().process_request(request)
         except RuntimeError, e:
-            self.failUnless('end in a slash' in str(e))
+            self.assertTrue('end in a slash' in str(e))
         settings.DEBUG = False
 
     def test_append_slash_disabled(self):
@@ -125,7 +126,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEquals(r.status_code, 301)
         self.assertEquals(r['Location'],
                           'http://www.testserver/middleware/slash/')
-   
+
 
     # The following tests examine expected behavior given a custom urlconf that
     # overrides the default one through the request object.
@@ -165,7 +166,7 @@ class CommonMiddlewareTest(TestCase):
       request = self._get_request('customurlconf/slash')
       request.urlconf = 'regressiontests.middleware.extra_urls'
       r = CommonMiddleware().process_request(request)
-      self.failIf(r is None, 
+      self.assertFalse(r is None,
           "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
       self.assertEquals(r.status_code, 301)
       self.assertEquals(r['Location'], 'http://testserver/middleware/customurlconf/slash/')
@@ -188,7 +189,7 @@ class CommonMiddlewareTest(TestCase):
       try:
           CommonMiddleware().process_request(request)
       except RuntimeError, e:
-          self.failUnless('end in a slash' in str(e))
+          self.assertTrue('end in a slash' in str(e))
       settings.DEBUG = False
 
     def test_append_slash_disabled_custom_urlconf(self):
@@ -209,7 +210,7 @@ class CommonMiddlewareTest(TestCase):
       request = self._get_request('customurlconf/needsquoting#')
       request.urlconf = 'regressiontests.middleware.extra_urls'
       r = CommonMiddleware().process_request(request)
-      self.failIf(r is None, 
+      self.assertFalse(r is None,
           "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
       self.assertEquals(r.status_code, 301)
       self.assertEquals(
