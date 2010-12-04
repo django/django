@@ -37,6 +37,8 @@ def get_backends():
     backends = []
     for backend_path in settings.AUTHENTICATION_BACKENDS:
         backends.append(load_backend(backend_path))
+    if not backends:
+        raise ImproperlyConfigured('No authentication backends have been defined. Does AUTHENTICATION_BACKENDS contain anything?')
     return backends
 
 def authenticate(**credentials):
