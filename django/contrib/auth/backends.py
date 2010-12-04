@@ -25,9 +25,11 @@ class ModelBackend(object):
         groups.
         """
         if not hasattr(user_obj, '_group_perm_cache'):
-            perms = Permission.objects.filter(group__user=user_obj
-                ).values_list('content_type__app_label', 'codename'
-                ).order_by()
+            if user_obj.is_superuser:
+                perms = Permission.objects.all()
+            else:
+                perms = Permission.objects.filter(group__user=user_obj)
+            perms = perms.values_list('content_type__app_label', 'codename').order_by()
             user_obj._group_perm_cache = set(["%s.%s" % (ct, name) for ct, name in perms])
         return user_obj._group_perm_cache
 
