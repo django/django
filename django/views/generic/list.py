@@ -10,6 +10,7 @@ class MultipleObjectMixin(object):
     model = None
     paginate_by = None
     context_object_name = None
+    paginator_class = Paginator
 
     def get_queryset(self):
         """
@@ -32,7 +33,7 @@ class MultipleObjectMixin(object):
         Paginate the queryset, if needed.
         """
         if queryset.count() > page_size:
-            paginator = Paginator(queryset, page_size, allow_empty_first_page=self.get_allow_empty())
+            paginator = self.get_paginator(queryset, page_size, allow_empty_first_page=self.get_allow_empty())
             page = self.kwargs.get('page', None) or self.request.GET.get('page', 1)
             try:
                 page_number = int(page)
@@ -54,6 +55,12 @@ class MultipleObjectMixin(object):
         Get the number of items to paginate by, or ``None`` for no pagination.
         """
         return self.paginate_by
+
+    def get_paginator(self, queryset, per_page, orphans=0, allow_empty_first_page=True):
+        """
+        Return an instance of the paginator for this view.
+        """
+        return self.paginator_class(queryset, per_page, orphans=orphans, allow_empty_first_page=allow_empty_first_page)
 
     def get_allow_empty(self):
         """

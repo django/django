@@ -2,7 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
 from regressiontests.generic_views.models import Author
-
+from regressiontests.generic_views.views import CustomPaginator
 
 class ListViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
@@ -85,6 +85,21 @@ class ListViewTests(TestCase):
         self._make_authors(100)
         res = self.client.get('/list/authors/paginated/?page=frog')
         self.assertEqual(res.status_code, 404)
+
+    def test_paginated_custom_paginator_class(self):
+        self._make_authors(7)
+        res = self.client.get('/list/authors/paginated/custom_class/')
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context['paginator'], CustomPaginator)
+        # Custom pagination allows for 2 orphans on a page size of 5
+        self.assertEqual(len(res.context['object_list']), 7)
+
+    def test_paginated_custom_paginator_constructor(self):
+        self._make_authors(7)
+        res = self.client.get('/list/authors/paginated/custom_constructor/')
+        self.assertEqual(res.status_code, 200)
+        # Custom pagination allows for 2 orphans on a page size of 5
+        self.assertEqual(len(res.context['object_list']), 7)
 
     def test_allow_empty_false(self):
         res = self.client.get('/list/authors/notempty/')

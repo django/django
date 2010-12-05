@@ -305,6 +305,14 @@ MultipleObjectMixin
         expect either a ``page`` query string parameter (via ``GET``) or a
         ``page`` variable specified in the URLconf.
 
+    .. attribute:: paginator_class
+
+       The paginator class to be used for pagination. By default,
+       :class:`django.core.paginator.Paginator` is used. If the custom paginator
+       class doesn't have the same constructor interface as
+       :class:`django.core.paginator.Paginator`, you will also need to
+       provide an implementation for :meth:`MultipleObjectMixin.get_paginator`.
+
     .. attribute:: context_object_name
 
         Designates the name of the variable to use in the context.
@@ -328,6 +336,11 @@ MultipleObjectMixin
         Returns the number of items to paginate by, or ``None`` for no
         pagination. By default this simply returns the value of
         :attr:`MultipleObjectMixin.paginate_by`.
+
+    .. method:: get_paginator(queryset, queryset, per_page, orphans=0, allow_empty_first_page=True)
+
+        Returns an instance of the paginator to use for this view. By default,
+        instantiates an instance of :attr:`paginator_class`.
 
     .. method:: get_allow_empty()
 

@@ -117,6 +117,10 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(context_object_name='object_list')),
     (r'^list/authors/invalid/$',
         views.AuthorList.as_view(queryset=None)),
+    (r'^list/authors/paginated/custom_class/$',
+        views.AuthorList.as_view(paginate_by=5, paginator_class=views.CustomPaginator)),
+    (r'^list/authors/paginated/custom_constructor/$',
+        views.AuthorListCustomPaginator.as_view()),
 
     # YearArchiveView
     # Mixing keyword and possitional captures below is intentional; the views
