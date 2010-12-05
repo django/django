@@ -115,8 +115,8 @@ determine a few things:
 
     * The database column type (e.g. ``INTEGER``, ``VARCHAR``).
 
-    * The widget to use in Django's admin interface, if you care to use it
-      (e.g. ``<input type="text">``, ``<select>``).
+    * The :doc:`widget </ref/forms/widgets>` to use in Django's admin interface,
+      if you care to use it (e.g. ``<input type="text">``, ``<select>``).
 
     * The minimal validation requirements, used in Django's admin and in
       automatically-generated forms.
@@ -492,9 +492,10 @@ disabled for many-to-many relationships that use an intermediate model.
 The only way to create this type of relationship is to create instances of the
 intermediate model.
 
-The ``remove`` method is disabled for similar reasons. However, the
-``clear()`` method can be used to remove all many-to-many relationships
-for an instance::
+The :meth:`~django.db.models.fields.related.RelatedManager.remove` method is
+disabled for similar reasons. However, the
+:meth:`~django.db.models.fields.related.RelatedManager.clear` method can be
+used to remove all many-to-many relationships for an instance::
 
     # Beatles have broken up
     >>> beatles.members.clear()
@@ -972,8 +973,8 @@ right).
 So a child model does not have access to its parent's :ref:`Meta
 <meta-options>` class. However, there are a few limited cases where the child
 inherits behavior from the parent: if the child does not specify an
-:attr:`django.db.models.Options.ordering` attribute or a
-:attr:`django.db.models.Options.get_latest_by` attribute, it will inherit
+:attr:`~django.db.models.Options.ordering` attribute or a
+:attr:`~django.db.models.Options.get_latest_by` attribute, it will inherit
 these from its parent.
 
 If the parent has an ordering and you don't want the child to have any natural
@@ -989,12 +990,12 @@ Inheritance and reverse relations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Because multi-table inheritance uses an implicit
-:class:`~django.db.models.fields.OneToOneField` to link the child and
+:class:`~django.db.models.OneToOneField` to link the child and
 the parent, it's possible to move from the parent down to the child,
 as in the above example. However, this uses up the name that is the
 default :attr:`~django.db.models.ForeignKey.related_name` value for
-:class:`django.db.models.fields.ForeignKey` and
-:class:`django.db.models.fields.ManyToManyField` relations.  If you
+:class:`~django.db.models.ForeignKey` and
+:class:`~django.db.models.ManyToManyField` relations.  If you
 are putting those types of relations on a subclass of another model,
 you **must** specify the
 :attr:`~django.db.models.ForeignKey.related_name` attribute on each
@@ -1002,7 +1003,7 @@ such field. If you forget, Django will raise an error when you run
 :djadmin:`validate` or :djadmin:`syncdb`.
 
 For example, using the above ``Place`` class again, let's create another
-subclass with a :class:`~django.db.models.fields.ManyToManyField`::
+subclass with a :class:`~django.db.models.ManyToManyField`::
 
     class Supplier(Place):
         # Must specify related_name on all relations.
@@ -1013,11 +1014,11 @@ Specifying the parent link field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As mentioned, Django will automatically create a
-:class:`~django.db.models.fields.OneToOneField` linking your child
+:class:`~django.db.models.OneToOneField` linking your child
 class back any non-abstract parent models. If you want to control the
 name of the attribute linking back to the parent, you can create your
-own :class:`~django.db.models.fields.OneToOneField` and set
-:attr:`parent_link=True <django.db.models.fields.OneToOneField.parent_link>`
+own :class:`~django.db.models.OneToOneField` and set
+:attr:`parent_link=True <django.db.models.OneToOneField.parent_link>`
 to indicate that your field is the link back to the parent class.
 
 .. _proxy-models:
@@ -1045,8 +1046,9 @@ Proxy models are declared like normal models. You tell Django that it's a
 proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute of
 the ``Meta`` class to ``True``.
 
-For example, suppose you want to add a method to the standard ``User`` model
-that will be used in your templates. You can do it like this::
+For example, suppose you want to add a method to the standard
+:class:`~django.contrib.auth.models.User` model that will be used in your
+templates. You can do it like this::
 
     from django.contrib.auth.models import User
 
@@ -1058,37 +1060,38 @@ that will be used in your templates. You can do it like this::
             ...
 
 The ``MyUser`` class operates on the same database table as its parent
-``User`` class. In particular, any new instances of ``User`` will also be
-accessible through ``MyUser``, and vice-versa::
+:class:`~django.contrib.auth.models.User` class. In particular, any new
+instances of :class:`~django.contrib.auth.models.User` will also be accessible
+through ``MyUser``, and vice-versa::
 
     >>> u = User.objects.create(username="foobar")
     >>> MyUser.objects.get(username="foobar")
     <MyUser: foobar>
 
 You could also use a proxy model to define a different default ordering on a
-model. The standard ``User`` model has no ordering defined on it
-(intentionally; sorting is expensive and we don't want to do it all the time
-when we fetch users). You might want to regularly order by the ``username``
-attribute when you use the proxy. This is easy::
+model. The standard :class:`~django.contrib.auth.models.User` model has no
+ordering defined on it (intentionally; sorting is expensive and we don't want
+to do it all the time when we fetch users). You might want to regularly order
+by the ``username`` attribute when you use the proxy. This is easy::
 
     class OrderedUser(User):
         class Meta:
             ordering = ["username"]
             proxy = True
 
-Now normal ``User`` queries will be unordered and ``OrderedUser`` queries will
-be ordered by ``username``.
+Now normal :class:`~django.contrib.auth.models.User` queries will be unordered
+and ``OrderedUser`` queries will be ordered by ``username``.
 
 QuerySets still return the model that was requested
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There is no way to have Django return, say, a ``MyUser`` object whenever you
-query for ``User`` objects. A queryset for ``User`` objects will return those
-types of objects. The whole point of proxy objects is that code relying on the
-original ``User`` will use those and your own code can use the extensions you
-included (that no other code is relying on anyway). It is not a way to replace
-the ``User`` (or any other) model everywhere with something of your own
-creation.
+query for :class:`~django.contrib.auth.models.User` objects. A queryset for
+``User`` objects will return those types of objects. The whole point of proxy
+objects is that code relying on the original ``User`` will use those and your
+own code can use the extensions you included (that no other code is relying on
+anyway). It is not a way to replace the ``User`` (or any other) model
+everywhere with something of your own creation.
 
 Base class restrictions
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1227,5 +1230,5 @@ column name, you can have the same column name appearing in both a child and
 an ancestor model for multi-table inheritance (they are columns in two
 different database tables).
 
-Django will raise a ``FieldError`` exception if you override any model field
-in any ancestor model.
+Django will raise a :exc:`~django.core.exceptions.FieldError` if you override
+any model field in any ancestor model.
