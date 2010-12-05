@@ -40,7 +40,7 @@ __all__ = (
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField', 'IPAddressField', 'FilePathField', 'SlugField',
-    'TypedChoiceField'
+    'TypedChoiceField', 'TypedMultipleChoiceField'
 )
 
 def en_format(name):
@@ -700,7 +700,7 @@ class TypedChoiceField(ChoiceField):
 
     def to_python(self, value):
         """
-        Validate that the value is in self.choices and can be coerced to the
+        Validates that the value is in self.choices and can be coerced to the
         right type.
         """
         value = super(TypedChoiceField, self).to_python(value)
@@ -741,6 +741,32 @@ class MultipleChoiceField(ChoiceField):
         for val in value:
             if not self.valid_value(val):
                 raise ValidationError(self.error_messages['invalid_choice'] % {'value': val})
+
+class TypedMultipleChoiceField(MultipleChoiceField):
+    def __init__(self, *args, **kwargs):
+        self.coerce = kwargs.pop('coerce', lambda val: val)
+        self.empty_value = kwargs.pop('empty_value', [])
+        super(TypedMultipleChoiceField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        """
+        Validates that the values are in self.choices and can be coerced to the
+        right type.
+        """
+        value = super(TypedMultipleChoiceField, self).to_python(value)
+        super(TypedMultipleChoiceField, self).validate(value)
+        if value == self.empty_value or value in validators.EMPTY_VALUES:
+            return self.empty_value
+        new_value = []
+        for choice in value:
+            try:
+                new_value.append(self.coerce(choice))
+            except (ValueError, TypeError, ValidationError):
+                raise ValidationError(self.error_messages['invalid_choice'] % {'value': choice})
+        return new_value
+
+    def validate(self, value):
+        pass
 
 class ComboField(Field):
     """

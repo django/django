@@ -361,13 +361,14 @@ Takes one extra required argument:
 
 .. class:: TypedChoiceField(**kwargs)
 
-Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes an
-extra ``coerce`` argument.
+Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes two
+extra arguments, ``coerce`` and ``empty_value``.
 
     * Default widget: ``Select``
     * Empty value: Whatever you've given as ``empty_value``
-    * Normalizes to: the value returned by the ``coerce`` argument.
-    * Validates that the given value exists in the list of choices.
+    * Normalizes to: A value of the type provided by the ``coerce`` argument.
+    * Validates that the given value exists in the list of choices and can be
+      coerced.
     * Error message keys: ``required``, ``invalid_choice``
 
 Takes extra arguments:
@@ -635,7 +636,25 @@ Takes two optional arguments for validation:
       of choices.
     * Error message keys: ``required``, ``invalid_choice``, ``invalid_list``
 
-Takes one extra argument, ``choices``, as for ``ChoiceField``.
+Takes one extra required argument, ``choices``, as for ``ChoiceField``.
+
+``TypedMultipleChoiceField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: TypedMultipleChoiceField(**kwargs)
+
+Just like a :class:`MultipleChoiceField`, except :class:`TypedMultipleChoiceField`
+takes two extra arguments, ``coerce`` and ``empty_value``.
+
+    * Default widget: ``SelectMultiple``
+    * Empty value: Whatever you've given as ``empty_value``
+    * Normalizes to: A list of values of the type provided by the ``coerce``
+      argument.
+    * Validates that the given values exists in the list of choices and can be
+      coerced.
+    * Error message keys: ``required``, ``invalid_choice``
+
+Takes two extra arguments, ``coerce`` and ``empty_value``, as for ``TypedChoiceField``.
 
 ``NullBooleanField``
 ~~~~~~~~~~~~~~~~~~~~

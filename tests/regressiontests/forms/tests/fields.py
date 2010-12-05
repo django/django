@@ -750,7 +750,49 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 6 is not one of the available choices.']", f.clean, ['6'])
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 6 is not one of the available choices.']", f.clean, ['1','6'])
 
-    # ComboField ##################################################################
+    # TypedMultipleChoiceField ############################################################
+    # TypedMultipleChoiceField is just like MultipleChoiceField, except that coerced types
+    # will be returned:
+
+    def test_typedmultiplechoicefield_1(self):
+        f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int)
+        self.assertEqual([1], f.clean(['1']))
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 2 is not one of the available choices.']", f.clean, ['2'])
+
+    def test_typedmultiplechoicefield_2(self):
+        # Different coercion, same validation.
+        f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=float)
+        self.assertEqual([1.0], f.clean(['1']))
+
+    def test_typedmultiplechoicefield_3(self):
+        # This can also cause weirdness: be careful (bool(-1) == True, remember)
+        f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=bool)
+        self.assertEqual([True], f.clean(['-1']))
+
+    def test_typedmultiplechoicefield_4(self):
+        f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int)
+        self.assertEqual([1, -1], f.clean(['1','-1']))
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. 2 is not one of the available choices.']", f.clean, ['1','2'])
+
+    def test_typedmultiplechoicefield_5(self):
+        # Even more weirdness: if you have a valid choice but your coercion function
+        # can't coerce, you'll still get a validation error. Don't do this!
+        f = TypedMultipleChoiceField(choices=[('A', 'A'), ('B', 'B')], coerce=int)
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'Select a valid choice. B is not one of the available choices.']", f.clean, ['B'])
+        # Required fields require values
+        self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, [])
+
+    def test_typedmultiplechoicefield_6(self):
+        # Non-required fields aren't required
+        f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False)
+        self.assertEqual([], f.clean([]))
+
+    def test_typedmultiplechoicefield_7(self):
+        # If you want cleaning an empty value to return a different type, tell the field
+        f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False, empty_value=None)
+        self.assertEqual(None, f.clean([]))
+
+   # ComboField ##################################################################
 
     def test_combofield_1(self):
         f = ComboField(fields=[CharField(max_length=20), EmailField()])
