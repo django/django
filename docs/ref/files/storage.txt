@@ -1,52 +1,119 @@
 File storage API
 ================
 
-``Storage.exists(name)``
-~~~~~~~~~~~~~~~~~~~~~~~~
+.. module:: django.core.files.storage
 
-``True`` if a file exists given some ``name``.
+Getting the current storage class
+---------------------------------
 
-``Storage.path(name)``
-~~~~~~~~~~~~~~~~~~~~~~
+Django provides two convenient ways to access the current storage class:
 
-The local filesystem path where the file can be opened using Python's standard
-``open()``. For storage systems that aren't accessible from the local
-filesystem, this will raise ``NotImplementedError`` instead.
+.. class:: DefaultStorage
 
-``Storage.size(name)``
-~~~~~~~~~~~~~~~~~~~~~~
+    :class:`~django.core.files.storage.DefaultStorage` provides
+    lazy access to the current default storage system as defined by
+    :setting:`DEFAULT_FILE_STORAGE`. :class:`DefaultStorage` uses
+    :func:`~django.core.files.storage.get_storage_class` internally.
 
-Returns the total size, in bytes, of the file referenced by ``name``.
+.. function:: get_storage_class([import_path=None])
 
-``Storage.url(name)``
-~~~~~~~~~~~~~~~~~~~~~
+    Returns a class or module which implements the storage API.
+    
+    When called without the ``import_path`` parameter ``get_storage_class``
+    will return the current default storage system as defined by
+    :setting:`DEFAULT_FILE_STORAGE`. If ``import_path`` is provided,
+    ``get_storage_class`` will attempt to import the class or module from the
+    given path and will return it if successful. An exception will be
+    raised if the import is unsuccessful.
 
-Returns the URL where the contents of the file referenced by ``name`` can be
-accessed.
+The FileSystemStorage Class
+---------------------------
 
-``Storage.open(name, mode='rb')``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. class:: FileSystemStorage
 
-Opens the file given by ``name``. Note that although the returned file is
-guaranteed to be a ``File`` object, it might actually be some subclass. In the
-case of remote file storage this means that reading/writing could be quite slow,
-so be warned.
+    The :class:`~django.core.files.storage.FileSystemStorage` class implements
+    basic file storage on a local filesystem. It inherits from
+    :class:`~django.core.files.storage.Storage` and provides implementations
+    for all the public methods thereof.
+    
+    .. note::
+    
+        The :class:`FileSystemStorage.delete` method will not raise
+        raise an exception if the given file name does not exist.
 
-``Storage.save(name, content)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The Storage Class
+-----------------
 
-Saves a new file using the storage system, preferably with the name specified.
-If there already exists a file with this name ``name``, the storage system may
-modify the filename as necessary to get a unique name. The actual name of the
-stored file will be returned.
+.. class:: Storage
 
-The ``content`` argument must be an instance of
-:class:`django.core.files.File` or of a subclass of
-:class:`~django.core.files.File`.
+    The :class:`~django.core.files.storage.Storage` class provides a
+    standardized API for storing files, along with a set of default
+    behaviors that all other storage systems can inherit or override
+    as necessary.
 
-``Storage.delete(name)``
-~~~~~~~~~~~~~~~~~~~~~~~~
+    .. method:: delete(name)
 
-Deletes the file referenced by ``name``. This method won't raise an exception if
-the file doesn't exist.
+        Deletes the file referenced by ``name``. If deletion is not supported
+        on the targest storage system this will raise ``NotImplementedError``
+        instead
 
+    .. method:: exists(name)
+
+        Returns ``True`` if a file referened by the given name already exists
+        in the storage system, or ``False`` if the name is available for a new
+        file.
+
+    .. method:: get_available_name(name)
+
+        Returns a filename based on the ``name`` parameter that's free and
+        available for new content to be written to on the target storage
+        system.
+
+
+    .. method:: get_valid_name(name)
+
+        Returns a filename based on the ``name`` parameter that's suitable
+        for use on the target storage system.
+
+    .. method:: listdir(path)
+
+        Lists the contents of the specified path, returning a 2-tuple of lists;
+        the first item being directories, the second item being files. For
+        storage systems that aren't ale to provide such a listing, this will
+        raise a ``NotImplementedError`` instead.
+
+    .. method:: open(name, mode='rb')
+
+        Opens the file given by ``name``. Note that although the returned file
+        is guaranteed to be a ``File`` object, it might actually be some
+        subclass. In the case of remote file storage this means that
+        reading/writing could be quite slow, so be warned.
+
+    .. method:: path(name)
+
+        The local filesystem path where the file can be opened using Python's
+        standard ``open()``. For storage systems that aren't accessible from
+        the local filesystem, this will raise ``NotImplementedError`` instead.
+
+    .. method:: save(name, content)
+
+        Saves a new file using the storage system, preferably with the name
+        specified. If there already exists a file with this name ``name``, the
+        storage system may modify the filename as necessary to get a unique
+        name. The actual name of the stored file will be returned.
+
+        The ``content`` argument must be an instance of
+        :class:`django.core.files.File` or of a subclass of
+        :class:`~django.core.files.File`.
+
+    .. method:: size(name)
+
+        Returns the total size, in bytes, of the file referenced by ``name``.
+        For storage systems that aren't able to return the file size this will
+        raise ``NotImplementedError`` instead.
+
+    .. method:: url(name)
+
+        Returns the URL where the contents of the file referenced by ``name``
+        can be accessed. For storage systems that don't support access by URL
+        this will raise ``NotImplementedError`` instead.
