@@ -39,11 +39,11 @@ Optional arguments
 
 ``context_instance``
     The context instance to render the template with. By default, the template
-    will be rendered with a ``Context`` instance (filled with values from
-    ``dictionary``). If you need to use :ref:`context processors
-    <subclassing-context-requestcontext>`, render the template with a
-    ``RequestContext`` instance instead. Your code might look something like
-    this::
+    will be rendered with a :class:`~django.template.Context` instance (filled
+    with values from ``dictionary``). If you need to use :ref:`context
+    processors <subclassing-context-requestcontext>`, render the template with
+    a :class:`~django.template.RequestContext` instance instead. Your code
+    might look something like this::
 
         return render_to_response('my_template.html',
                                   my_data_dictionary,
@@ -85,8 +85,8 @@ This example is equivalent to::
 
    .. versionadded:: 1.1
 
-   Returns an HttpResponseRedirect to the apropriate URL for the arguments
-   passed.
+   Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
+   for the arguments passed.
 
    The arguments could be:
 
@@ -97,7 +97,7 @@ This example is equivalent to::
 
        * A URL, which will be used as-is for the redirect location.
 
-   By default issues a temporary redirect; pass permanent=True to issue a
+   By default issues a temporary redirect; pass ``permanent=True`` to issue a
    permanent redirect
 
 Examples
@@ -149,15 +149,15 @@ will be returned::
 .. function:: get_object_or_404(klass, *args, **kwargs)
 
    Calls :meth:`~django.db.models.QuerySet.get()` on a given model manager,
-   but it raises ``django.http.Http404`` instead of the model's
-   ``DoesNotExist`` exception.
+   but it raises :class:`~django.http.Http404` instead of the model's
+   :class:`~django.core.exceptions.DoesNotExist` exception.
 
 Required arguments
 ------------------
 
 ``klass``
-    A ``Model``, ``Manager`` or ``QuerySet`` instance from which to get the
-    object.
+    A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
+    :class:`~django.db.models.QuerySet` instance from which to get the object.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -184,8 +184,9 @@ This example is equivalent to::
         except MyModel.DoesNotExist:
             raise Http404
 
-Note: As with ``get()``, an ``MultipleObjectsReturned`` exception will be
-raised if more than one object is found.
+Note: As with ``get()``, a
+:class:`~django.core.exceptions.MultipleObjectsReturned` exception
+will be raised if more than one object is found.
 
 ``get_list_or_404``
 ===================
@@ -193,15 +194,16 @@ raised if more than one object is found.
 .. function:: get_list_or_404(klass, *args, **kwargs)
 
    Returns the result of :meth:`~django.db.models.QuerySet.filter()` on a
-   given model manager, raising ``django.http.Http404`` if the resulting list
-   is empty.
+   given model manager, raising :class:`~django.http.Http404` if the resulting
+   list is empty.
 
 Required arguments
 ------------------
 
 ``klass``
-    A ``Model``, ``Manager`` or ``QuerySet`` instance from which to get the
-    object.
+    A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
+    :class:`~django.db.models.query.QuerySet` instance from which to get the
+    list.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
