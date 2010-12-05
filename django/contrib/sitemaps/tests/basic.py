@@ -33,19 +33,20 @@ class SitemapTests(TestCase):
 </urlset>
 """ % date.today().strftime('%Y-%m-%d'))
 
-    def test_localized_priority(self):
-        "The priority value should not be localized (Refs #14164)"
-        # Localization should be active
-        settings.USE_L10N = True
-        activate('fr')
-        self.assertEqual(u'0,3', localize(0.3))
+    if settings.USE_I18N:
+        def test_localized_priority(self):
+            "The priority value should not be localized (Refs #14164)"
+            # Localization should be active
+            settings.USE_L10N = True
+            activate('fr')
+            self.assertEqual(u'0,3', localize(0.3))
 
-        # Retrieve the sitemap. Check that priorities
-        # haven't been rendered in localized format
-        response = self.client.get('/simple/sitemap.xml')
-        self.assertContains(response, '<priority>0.5</priority>')
-        self.assertContains(response, '<lastmod>%s</lastmod>' % date.today().strftime('%Y-%m-%d'))
-        deactivate()
+            # Retrieve the sitemap. Check that priorities
+            # haven't been rendered in localized format
+            response = self.client.get('/simple/sitemap.xml')
+            self.assertContains(response, '<priority>0.5</priority>')
+            self.assertContains(response, '<lastmod>%s</lastmod>' % date.today().strftime('%Y-%m-%d'))
+            deactivate()
 
     def test_generic_sitemap(self):
         "A minimal generic sitemap can be rendered"
