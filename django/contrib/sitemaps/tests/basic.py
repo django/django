@@ -34,6 +34,7 @@ class SitemapTests(TestCase):
 </urlset>
 """ % date.today().strftime('%Y-%m-%d'))
 
+    @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     def test_localized_priority(self):
         "The priority value should not be localized (Refs #14164)"
         # Localization should be active
