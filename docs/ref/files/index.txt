@@ -6,7 +6,7 @@ File handling
    :synopsis: File handling and storage
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    file
    storage

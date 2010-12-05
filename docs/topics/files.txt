@@ -50,9 +50,9 @@ it has all the methods and attributes described below.
 The ``File`` object
 ===================
 
-Internally, Django uses a ``django.core.files.File`` any time it needs to
-represent a file. This object is a thin wrapper around Python's `built-in file
-object`_ with some Django-specific additions.
+Internally, Django uses a :class:`django.core.files.File` instance any time it
+needs to represent a file. This object is a thin wrapper around Python's
+`built-in file object`_ with some Django-specific additions.
 
 .. _built-in file object: http://docs.python.org/library/stdtypes.html#bltin-file-objects
 
@@ -68,8 +68,8 @@ using a Python built-in ``file`` object::
     >>> f = open('/tmp/hello.world', 'w')
     >>> myfile = File(f)
 
-Now you can use any of the ``File`` attributes and methods documented in
-:doc:`/ref/files/file`.
+Now you can use any of the documented attributes and methods
+of the :class:`~django.core.files.File` class.
 
 File storage
 ============
