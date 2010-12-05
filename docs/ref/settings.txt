@@ -655,7 +655,7 @@ isn't manually specified. Used with ``DEFAULT_CHARSET`` to construct the
 DEFAULT_FILE_STORAGE
 --------------------
 
-Default: ``'django.core.files.storage.FileSystemStorage'``
+Default: :class:`django.core.files.storage.FileSystemStorage`
 
 Default file storage class to be used for any file-related operations that don't
 specify a particular storage system. See :doc:`/topics/files`.
