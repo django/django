@@ -432,6 +432,8 @@ Only supported for the ``mysql`` backend (see the `MySQL manual`_ for details).
 TEST_DEPENDENCIES
 ~~~~~~~~~~~~~~~~~
 
+.. versionadded:: 1.3
+
 Default: ``['default']``, for all databases other than ``default``,
 which has no dependencies.
 
