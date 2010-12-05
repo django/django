@@ -427,6 +427,18 @@ Only supported for the ``mysql`` backend (see the `MySQL manual`_ for details).
 
 .. _MySQL manual: MySQL_
 
+.. setting:: TEST_DEPENDENCIES
+
+TEST_DEPENDENCIES
+~~~~~~~~~~~~~~~~~
+
+Default: ``['default']``, for all databases other than ``default``,
+which has no dependencies.
+
+The creation-order dependencies of the database. See the documentation
+on :ref:`controlling the creation order of test databases
+<topics-testing-creation-dependencies>` for details.
+
 .. setting:: TEST_MIRROR
 
 TEST_MIRROR

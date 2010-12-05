@@ -473,22 +473,22 @@ can specify the dependencies that exist using the
     DATABASES = {
         'default': {
              # ... db settings
-             TEST_DEPENDENCIES = ['diamonds']
+             'TEST_DEPENDENCIES': ['diamonds']
         },
         'diamonds': {
             # ... db settings
-        }
+        },
         'clubs': {
             # ... db settings
-            TEST_DEPENDENCIES = ['diamonds']
-        }
+            'TEST_DEPENDENCIES': ['diamonds']
+        },
         'spades': {
             # ... db settings
-            TEST_DEPENDENCIES = ['diamonds','hearts']
-        }
+            'TEST_DEPENDENCIES': ['diamonds','hearts']
+        },
         'hearts': {
             # ... db settings
-            TEST_DEPENDENCIES = ['diamonds','clubs']
+            'TEST_DEPENDENCIES': ['diamonds','clubs']
         }
     }
 
