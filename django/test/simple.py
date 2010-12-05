@@ -2,11 +2,20 @@ import sys
 import signal
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models import get_app, get_apps
 from django.test import _doctest as doctest
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.testcases import OutputChecker, DocTestRunner, TestCase
 from django.utils import unittest
+
+try:
+    all
+except NameError:
+    from django.utils.itercompat import all
+
+
+__all__ = ('DjangoTestRunner', 'DjangoTestSuiteRunner', 'run_tests')
 
 # The module name for tests outside models.py
 TEST_MODULE = 'tests'
@@ -183,6 +192,40 @@ def reorder_suite(suite, classes):
         bins[0].addTests(bins[i+1])
     return bins[0]
 
+def dependency_ordered(test_databases, dependencies):
+    """Reorder test_databases into an order that honors the dependencies
+    described in TEST_DEPENDENCIES.
+    """
+    ordered_test_databases = []
+    resolved_databases = set()
+    while test_databases:
+        changed = False
+        deferred = []
+
+        while test_databases:
+            signature, aliases = test_databases.pop()
+            dependencies_satisfied = True
+            for alias in aliases:
+                if alias in dependencies:
+                    if all(a in resolved_databases for a in dependencies[alias]):
+                        # all dependencies for this alias are satisfied
+                        dependencies.pop(alias)
+                        resolved_databases.add(alias)
+                    else:
+                        dependencies_satisfied = False
+                else:
+                    resolved_databases.add(alias)
+
+            if dependencies_satisfied:
+                ordered_test_databases.append((signature, aliases))
+                changed = True
+            else:
+                deferred.append((signature, aliases))
+
+        if not changed:
+            raise ImproperlyConfigured("Circular dependency in TEST_DEPENDENCIES")
+        test_databases = deferred
+    return ordered_test_databases
 
 class DjangoTestSuiteRunner(object):
     def __init__(self, verbosity=1, interactive=True, failfast=True, **kwargs):
@@ -222,6 +265,7 @@ class DjangoTestSuiteRunner(object):
         # and which ones are test mirrors or duplicate entries in DATABASES
         mirrored_aliases = {}
         test_databases = {}
+        dependencies = {}
         for alias in connections:
             connection = connections[alias]
             if connection.settings_dict['TEST_MIRROR']:
@@ -238,21 +282,17 @@ class DjangoTestSuiteRunner(object):
                         connection.settings_dict['ENGINE'],
                         connection.settings_dict['NAME'],
                     ), []).append(alias)
-        
-        # Re-order the list of databases to create, making sure the default
-        # database is first. Otherwise, creation order is semi-random (i.e. 
-        # dict ordering dependent).
-        dbs_to_create = []
-        for dbinfo, aliases in test_databases.items():
-            if DEFAULT_DB_ALIAS in aliases:
-                dbs_to_create.insert(0, (dbinfo, aliases))
-            else:
-                dbs_to_create.append((dbinfo, aliases))
-                
-        # Final pass -- actually create the databases.
+
+                if 'TEST_DEPENDENCIES' in connection.settings_dict:
+                    dependencies[alias] = connection.settings_dict['TEST_DEPENDENCIES']
+                else:
+                    if alias != 'default':
+                        dependencies[alias] = connection.settings_dict.get('TEST_DEPENDENCIES', ['default'])
+
+        # Second pass -- actually create the databases.
         old_names = []
         mirrors = []
-        for (host, port, engine, db_name), aliases in dbs_to_create:
+        for (host, port, engine, db_name), aliases in dependency_ordered(test_databases.items(), dependencies):
             # Actually create the database for the first connection
             connection = connections[aliases[0]]
             old_names.append((connection, db_name, True))

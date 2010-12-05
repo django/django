@@ -454,6 +454,53 @@ will be redirected to point at ``default``. As a result, writes to
 the same database, not because there is data replication between the
 two databases.
 
+.. _topics-testing-creation-dependencies:
+
+Controlling creation order for test databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.3
+
+By default, Django will always create the ``default`` database first.
+However, no guarantees are made on the creation order of any other
+databases in your test setup.
+
+If your database configuration requires a specific creation order, you
+can specify the dependencies that exist using the
+:setting:`TEST_DEPENDENCIES` setting. Consider the following
+(simplified) example database configuration::
+
+    DATABASES = {
+        'default': {
+             # ... db settings
+             TEST_DEPENDENCIES = ['diamonds']
+        },
+        'diamonds': {
+            # ... db settings
+        }
+        'clubs': {
+            # ... db settings
+            TEST_DEPENDENCIES = ['diamonds']
+        }
+        'spades': {
+            # ... db settings
+            TEST_DEPENDENCIES = ['diamonds','hearts']
+        }
+        'hearts': {
+            # ... db settings
+            TEST_DEPENDENCIES = ['diamonds','clubs']
+        }
+    }
+
+Under this configuration, the ``diamonds`` database will be created first,
+as it is the only database alias without dependencies. The ``default``` and
+``clubs`` alias will be created next (although the order of creation of this
+pair is not guaranteed); then ``hearts``; and finally ``spades``.
+
+If there are any circular dependencies in the
+:setting:`TEST_DEPENDENCIES` definition, an ``ImproperlyConfigured``
+exception will be raised.
+
 Other test conditions
 ---------------------
 
