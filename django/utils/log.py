@@ -87,7 +87,7 @@ class AdminEmailHandler(logging.Handler):
             stack_trace = 'No stack trace available'
 
         message = "%s\n\n%s" % (stack_trace, request_repr)
-        reporter = ExceptionReporter(request, *exc_info, is_email=True)
+        reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = reporter.get_traceback_html()
         mail.mail_admins(subject, message, fail_silently=True,
                          html_message=html_message)
