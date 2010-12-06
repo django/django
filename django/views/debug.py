@@ -62,11 +62,12 @@ class ExceptionReporter:
     """
     A class to organize and coordinate reporting on exceptions.
     """
-    def __init__(self, request, exc_type, exc_value, tb):
+    def __init__(self, request, exc_type, exc_value, tb, is_email=False):
         self.request = request
         self.exc_type = exc_type
         self.exc_value = exc_value
         self.tb = tb
+        self.is_email = is_email
 
         self.template_info = None
         self.template_does_not_exist = False
@@ -118,6 +119,7 @@ class ExceptionReporter:
         from django import get_version
         t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
         c = Context({
+            'is_email': self.is_email,
             'exception_type': self.exc_type.__name__,
             'exception_value': smart_unicode(self.exc_value, errors='replace'),
             'unicode_hint': unicode_hint,
@@ -324,7 +326,7 @@ TECHNICAL_500_TEMPLATE = """
     table.vars { margin:5px 0 2px 40px; }
     table.vars td, table.req td { font-family:monospace; }
     table td.code { width:100%; }
-    table td.code div { overflow:hidden; }
+    table td.code pre { overflow:hidden; }
     table.source th { color:#666; }
     table.source td { font-family:monospace; white-space:pre; border-bottom:1px solid #eee; }
     ul.traceback { list-style-type:none; }
@@ -353,6 +355,7 @@ TECHNICAL_500_TEMPLATE = """
     span.commands a:link {color:#5E5694;}
     pre.exception_value { font-family: sans-serif; color: #666; font-size: 1.5em; margin: 10px 0 10px 0; }
   </style>
+  {% if not is_email %}
   <script type="text/javascript">
   //<!--
     function getElementsByClassName(oElm, strTagName, strClassName){
@@ -408,10 +411,11 @@ TECHNICAL_500_TEMPLATE = """
     }
     //-->
   </script>
+  {% endif %}
 </head>
 <body>
 <div id="summary">
-  <h1>{{ exception_type }} at {{ request.path_info|escape }}</h1>
+  <h1>{{ exception_type }}{% if request %} at {{ request.path_info|escape }}{% endif %}</h1>
   <pre class="exception_value">{{ exception_value|force_escape }}</pre>
   <table class="meta">
     <tr>
@@ -448,7 +452,7 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
     <tr>
       <th>Python Path:</th>
-      <td>{{ sys_path }}</td>
+      <td><pre>{{ sys_path|pprint }}</pre></td>
     </tr>
     <tr>
       <th>Server time:</th>
@@ -498,7 +502,7 @@ TECHNICAL_500_TEMPLATE = """
 </div>
 {% endif %}
 <div id="traceback">
-  <h2>Traceback <span class="commands"><a href="#" onclick="return switchPastebinFriendly(this);">Switch to copy-and-paste view</a></span></h2>
+  <h2>Traceback <span class="commands">{% if not is_email %}<a href="#" onclick="return switchPastebinFriendly(this);">Switch to copy-and-paste view</a></span>{% endif %}</h2>
   {% autoescape off %}
   <div id="browserTraceback">
     <ul class="traceback">
@@ -508,19 +512,23 @@ TECHNICAL_500_TEMPLATE = """
 
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
-              {% if frame.pre_context %}
-                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+              {% if frame.pre_context and not is_email %}
+                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>{% endfor %}</ol>
               {% endif %}
-              <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
-              {% if frame.post_context %}
-                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+              <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ frame.context_line|escape }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li></ol>
+              {% if frame.post_context and not is_email  %}
+                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>{% endfor %}</ol>
               {% endif %}
             </div>
           {% endif %}
 
           {% if frame.vars %}
             <div class="commands">
-                <a href="#" onclick="return varToggle(this, '{{ frame.id }}')"><span>&#x25b6;</span> Local vars</a>
+                {% if is_email %}
+                    <h2>Local Vars</h2>
+                {% else %}
+                    <a href="#" onclick="return varToggle(this, '{{ frame.id }}')"><span>&#x25b6;</span> Local vars</a>
+                {% endif %}
             </div>
             <table class="vars" id="v{{ frame.id }}">
               <thead>
@@ -533,7 +541,7 @@ TECHNICAL_500_TEMPLATE = """
                 {% for var in frame.vars|dictsort:"0" %}
                   <tr>
                     <td>{{ var.0|force_escape }}</td>
-                    <td class="code"><div>{{ var.1|pprint|force_escape }}</div></td>
+                    <td class="code"><pre>{{ var.1|pprint|force_escape }}</pre></td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -545,16 +553,19 @@ TECHNICAL_500_TEMPLATE = """
   </div>
   {% endautoescape %}
   <form action="http://dpaste.com/" name="pasteform" id="pasteform" method="post">
+{% if not is_email %}
   <div id="pastebinTraceback" class="pastebin">
     <input type="hidden" name="language" value="PythonConsole">
-    <input type="hidden" name="title" value="{{ exception_type|escape }} at {{ request.path_info|escape }}">
+    <input type="hidden" name="title" value="{{ exception_type|escape }}{% if request %} at {{ request.path_info|escape }}{% endif %}">
     <input type="hidden" name="source" value="Django Dpaste Agent">
     <input type="hidden" name="poster" value="Django">
     <textarea name="content" id="traceback_area" cols="140" rows="25">
 Environment:
 
+{% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
 Request URL: {{ request.build_absolute_uri|escape }}
+{% endif %}
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}
 Installed Applications:
@@ -581,7 +592,7 @@ Traceback:
 {% for frame in frames %}File "{{ frame.filename|escape }}" in {{ frame.function|escape }}
 {% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line|escape }}{% endif %}
 {% endfor %}
-Exception Type: {{ exception_type|escape }} at {{ request.path_info|escape }}
+Exception Type: {{ exception_type|escape }}{% if request %} at {{ request.path_info|escape }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}
 </textarea>
   <br><br>
@@ -589,10 +600,12 @@ Exception Value: {{ exception_value|force_escape }}
   </div>
 </form>
 </div>
+{% endif %}
 
 <div id="requestinfo">
   <h2>Request information</h2>
 
+{% if request %}
   <h3 id="get-info">GET</h3>
   {% if request.GET %}
     <table class="req">
@@ -606,7 +619,7 @@ Exception Value: {{ exception_value|force_escape }}
         {% for var in request.GET.items %}
           <tr>
             <td>{{ var.0 }}</td>
-            <td class="code"><div>{{ var.1|pprint }}</div></td>
+            <td class="code"><pre>{{ var.1|pprint }}</pre></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -628,7 +641,7 @@ Exception Value: {{ exception_value|force_escape }}
         {% for var in request.POST.items %}
           <tr>
             <td>{{ var.0 }}</td>
-            <td class="code"><div>{{ var.1|pprint }}</div></td>
+            <td class="code"><pre>{{ var.1|pprint }}</pre></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -649,7 +662,7 @@ Exception Value: {{ exception_value|force_escape }}
             {% for var in request.FILES.items %}
                 <tr>
                     <td>{{ var.0 }}</td>
-                    <td class="code"><div>{{ var.1|pprint }}</div></td>
+                    <td class="code"><pre>{{ var.1|pprint }}</pre></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -672,7 +685,7 @@ Exception Value: {{ exception_value|force_escape }}
         {% for var in request.COOKIES.items %}
           <tr>
             <td>{{ var.0 }}</td>
-            <td class="code"><div>{{ var.1|pprint }}</div></td>
+            <td class="code"><pre>{{ var.1|pprint }}</pre></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -693,11 +706,12 @@ Exception Value: {{ exception_value|force_escape }}
       {% for var in request.META.items|dictsort:"0" %}
         <tr>
           <td>{{ var.0 }}</td>
-          <td class="code"><div>{{ var.1|pprint }}</div></td>
+          <td class="code"><pre>{{ var.1|pprint }}</pre></td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
+{% endif %}
 
   <h3 id="settings-info">Settings</h3>
   <h4>Using settings module <code>{{ settings.SETTINGS_MODULE }}</code></h4>
@@ -712,7 +726,7 @@ Exception Value: {{ exception_value|force_escape }}
       {% for var in settings.items|dictsort:"0" %}
         <tr>
           <td>{{ var.0 }}</td>
-          <td class="code"><div>{{ var.1|pprint }}</div></td>
+          <td class="code"><pre>{{ var.1|pprint }}</pre></td>
         </tr>
       {% endfor %}
     </tbody>

@@ -232,7 +232,7 @@ class MailTests(TestCase):
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(mail.outbox[0].subject, 'Subject')
         self.assertEqual(mail.outbox[1].subject, 'Subject 2')
-        
+
         # Make sure that multiple locmem connections share mail.outbox
         mail.outbox = []
         connection2 = locmem.EmailBackend()
@@ -362,6 +362,36 @@ class MailTests(TestCase):
         self.assertEqual(message.subject, '[Django] Subject')
 
         settings.ADMINS = old_admins
+        settings.MANAGERS = old_managers
+
+    def test_html_mail_admins(self):
+        """Test html_message argument to mail_admins and mail_managers"""
+        old_admins = settings.ADMINS
+        settings.ADMINS = [('nobody','nobody@example.com')]
+
+        mail.outbox = []
+        mail_admins('Subject', 'Content', html_message='HTML Content')
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(message.subject, '[Django] Subject')
+        self.assertEqual(message.body, 'Content')
+        self.assertEqual(message.alternatives, [('HTML Content', 'text/html')])
+
+        settings.ADMINS = old_admins
+
+    def test_html_mail_managers(self):
+        """Test html_message argument to mail_admins and mail_managers"""
+        old_managers = settings.MANAGERS
+        settings.MANAGERS = [('nobody','nobody@example.com')]
+
+        mail.outbox = []
+        mail_managers('Subject', 'Content', html_message='HTML Content')
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(message.subject, '[Django] Subject')
+        self.assertEqual(message.body, 'Content')
+        self.assertEqual(message.alternatives, [('HTML Content', 'text/html')])
+
         settings.MANAGERS = old_managers
 
     def test_idn_validation(self):

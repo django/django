@@ -109,7 +109,7 @@ a single connection for all of its messages. This makes
 mail_admins()
 =============
 
-.. function:: mail_admins(subject, message, fail_silently=False, connection=None)
+.. function:: mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
 
 ``django.core.mail.mail_admins()`` is a shortcut for sending an e-mail to the
 site admins, as defined in the :setting:`ADMINS` setting.
@@ -122,10 +122,16 @@ The "From:" header of the e-mail will be the value of the
 
 This method exists for convenience and readability.
 
+.. versionchanged:: 1.3
+
+If ``html_message`` is provided, the resulting e-mail will be a
+multipart/alternative e-mail with ``message`` as the "text/plain"
+content type and ``html_message`` as the "text/html" content type.
+
 mail_managers()
 ===============
 
-.. function:: mail_managers(subject, message, fail_silently=False, connection=None)
+.. function:: mail_managers(subject, message, fail_silently=False, connection=None, html_message=None)
 
 ``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
 sends an e-mail to the site managers, as defined in the :setting:`MANAGERS`

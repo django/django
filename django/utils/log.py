@@ -56,6 +56,7 @@ class AdminEmailHandler(logging.Handler):
     def emit(self, record):
         import traceback
         from django.conf import settings
+        from django.views.debug import ExceptionReporter
 
         try:
             if sys.version_info < (2,5):
@@ -75,12 +76,18 @@ class AdminEmailHandler(logging.Handler):
             request_repr = repr(request)
         except:
             subject = 'Error: Unknown URL'
+            request = None
             request_repr = "Request repr() unavailable"
 
         if record.exc_info:
+            exc_info = record.exc_info
             stack_trace = '\n'.join(traceback.format_exception(*record.exc_info))
         else:
+            exc_info = ()
             stack_trace = 'No stack trace available'
 
         message = "%s\n\n%s" % (stack_trace, request_repr)
-        mail.mail_admins(subject, message, fail_silently=True)
+        reporter = ExceptionReporter(request, *exc_info, is_email=True)
+        html_message = reporter.get_traceback_html()
+        mail.mail_admins(subject, message, fail_silently=True,
+                         html_message=html_message)
