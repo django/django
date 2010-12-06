@@ -9,7 +9,8 @@ Related objects reference
     A "related manager" is a manager used in a one-to-many or many-to-many
     related context. This happens in two cases:
 
-        * The "other side" of a ``ForeignKey`` relation. That is::
+        * The "other side" of a :class:`~django.db.models.ForeignKey` relation.
+          That is::
 
                 class Reporter(models.Model):
                     ...
@@ -20,7 +21,7 @@ Related objects reference
           In the above example, the methods below will be available on
           the manager ``reporter.article_set``.
 
-        * Both sides of a ``ManyToManyField`` relation::
+        * Both sides of a :class:`~django.db.models.ManyToManyField` relation::
 
                 class Topping(models.Model):
                     ...
@@ -82,11 +83,12 @@ Related objects reference
             >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
 
         In order to prevent database inconsistency, this method only exists on
-        ``ForeignKey`` objects where ``null=True``. If the related field can't
-        be set to ``None`` (``NULL``), then an object can't be removed from a
-        relation without being added to another. In the above example, removing
-        ``e`` from ``b.entry_set()`` is equivalent to doing ``e.blog = None``,
-        and because the ``blog`` ``ForeignKey`` doesn't have ``null=True``, this
+        :class:`~django.db.models.ForeignKey` objects where ``null=True``. If
+        the related field can't be set to ``None`` (``NULL``), then an object
+        can't be removed from a relation without being added to another. In the
+        above example, removing ``e`` from ``b.entry_set()`` is equivalent to
+        doing ``e.blog = None``, and because the ``blog``
+        :class:`~django.db.models.ForeignKey` doesn't have ``null=True``, this
         is invalid.
 
     .. method:: clear()
@@ -100,4 +102,4 @@ Related objects reference
         them.
 
         Just like ``remove()``, ``clear()`` is only available on
-        ``ForeignKey``\s where ``null=True``.
+        :class:`~django.db.models.ForeignKey`\s where ``null=True``.
