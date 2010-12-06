@@ -62,24 +62,22 @@ All attributes except ``session`` should be considered read-only.
 
 .. attribute:: HttpRequest.encoding
 
-    .. versionadded:: 1.0
-
     A string representing the current encoding used to decode form submission
-    data (or ``None``, which means the ``DEFAULT_CHARSET`` setting is used).
-    You can write to this attribute to change the encoding used when accessing
-    the form data. Any subsequent attribute accesses (such as reading from
-    ``GET`` or ``POST``) will use the new ``encoding`` value.  Useful if you
-    know the form data is not in the ``DEFAULT_CHARSET`` encoding.
+    data (or ``None``, which means the :setting:`DEFAULT_CHARSET` setting is
+    used). You can write to this attribute to change the encoding used when
+    accessing the form data. Any subsequent attribute accesses (such as reading
+    from ``GET`` or ``POST``) will use the new ``encoding`` value.  Useful if
+    you know the form data is not in the :setting:`DEFAULT_CHARSET` encoding.
 
 .. attribute:: HttpRequest.GET
 
     A dictionary-like object containing all given HTTP GET parameters. See the
-    ``QueryDict`` documentation below.
+    :class:`QueryDict` documentation below.
 
 .. attribute:: HttpRequest.POST
 
     A dictionary-like object containing all given HTTP POST parameters. See the
-    ``QueryDict`` documentation below.
+    :class:`QueryDict` documentation below.
 
     It's possible that a request can come in via POST with an empty ``POST``
     dictionary -- if, say, a form is requested via the POST HTTP method but
@@ -110,14 +108,7 @@ All attributes except ``session`` should be considered read-only.
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
-    value in ``FILES`` is an ``UploadedFile`` object containing the following
-    attributes:
-
-        * ``read(num_bytes=None)`` -- Read a number of bytes from the file.
-        * ``name`` -- The name of the uploaded file.
-        * ``size`` -- The size, in bytes, of the uploaded file.
-        * ``chunks(chunk_size=None)`` -- A generator that yields sequential
-          chunks of data.
+    value in ``FILES`` is an :class:`UploadedFile` as described below.
 
     See :doc:`/topics/files` for more information.
 
@@ -130,11 +121,11 @@ All attributes except ``session`` should be considered read-only.
 
     In previous versions of Django, ``request.FILES`` contained simple ``dict``
     objects representing uploaded files. This is no longer true -- files are
-    represented by ``UploadedFile`` objects as described below.
+    represented by :class:`UploadedFile` objects.
 
-    These ``UploadedFile`` objects will emulate the old-style ``dict``
-    interface, but this is deprecated and will be removed in the next release of
-    Django.
+    These :class:`UploadedFile` objects will emulate the old-style ``dict``
+    interface, but this is deprecated and will be removed in the next release
+    of Django.
 
 .. attribute:: HttpRequest.META
 
@@ -202,15 +193,13 @@ All attributes except ``session`` should be considered read-only.
 
     Not defined by Django itself, but will be read if other code (e.g., a custom
     middleware class) sets it. When present, this will be used as the root
-    URLconf for the current request, overriding the ``ROOT_URLCONF`` setting.
-    See :ref:`how-django-processes-a-request` for details.
+    URLconf for the current request, overriding the :setting:`ROOT_URLCONF`
+    setting. See :ref:`how-django-processes-a-request` for details.
 
 Methods
 -------
 
 .. method:: HttpRequest.get_host()
-
-    .. versionadded:: 1.0
 
     Returns the originating host of the request using information from the
     ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
@@ -252,8 +241,6 @@ Methods
 
 .. method:: HttpRequest.build_absolute_uri(location)
 
-   .. versionadded:: 1.0
-
    Returns the absolute URI form of ``location``. If no location is provided,
    the location will be set to ``request.get_full_path()``.
 
@@ -269,8 +256,6 @@ Methods
    HTTPS.
 
 .. method:: HttpRequest.is_ajax()
-
-   .. versionadded:: 1.0
 
    Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
    checking the ``HTTP_X_REQUESTED_WITH`` header for the string
@@ -300,8 +285,38 @@ Methods
             process(element)
 
 
+UploadedFile objects
+====================
+
+.. class:: UploadedFile
+
+
+Attributes
+----------
+
+.. attribute::  UploadedFile.name
+
+    The name of the uploaded file.
+
+.. attribute:: UploadedFile.size
+
+    The size, in bytes, of the uploaded file.
+
+Methods
+----------
+
+.. method:: UploadedFile.chunks(chunk_size=None)
+
+    Returns a generator that yields sequential chunks of data.
+
+.. method:: UploadedFile.read(num_bytes=None)
+
+    Read a number of bytes from the file.
+
+
+
 QueryDict objects
------------------
+=================
 
 .. class:: QueryDict
 
@@ -463,7 +478,7 @@ Django, :class:`HttpResponse` objects are your responsibility. Each view you
 write is responsible for instantiating, populating and returning an
 :class:`HttpResponse`.
 
-The :class:`HttpResponse` class lives in the ``django.http`` module.
+The :class:`HttpResponse` class lives in the :mod:`django.http` module.
 
 Usage
 -----
@@ -543,7 +558,8 @@ Methods
 .. method:: HttpResponse.__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)
 
     Instantiates an ``HttpResponse`` object with the given page content (a
-    string) and MIME type. The ``DEFAULT_CONTENT_TYPE`` is ``'text/html'``.
+    string) and MIME type. The :setting:`DEFAULT_CONTENT_TYPE` is
+    ``'text/html'``.
 
     ``content`` can be an iterator or a string. If it's an iterator, it should
     return strings, and those strings will be joined together to form the
@@ -551,15 +567,13 @@ Methods
 
     ``status`` is the `HTTP Status code`_ for the response.
 
-    .. versionadded:: 1.0
-
     ``content_type`` is an alias for ``mimetype``. Historically, this parameter
     was only called ``mimetype``, but since this is actually the value included
     in the HTTP ``Content-Type`` header, it can also include the character set
     encoding, which makes it more than just a MIME type specification.
     If ``mimetype`` is specified (not ``None``), that value is used.
     Otherwise, ``content_type`` is used. If neither is given, the
-    ``DEFAULT_CONTENT_TYPE`` setting is used.
+    :setting:`DEFAULT_CONTENT_TYPE` setting is used.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -667,8 +681,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     page hasn't been modified since the user's last request (status code 304).
 
 .. class:: HttpResponseBadRequest
-
-    .. versionadded:: 1.0
 
     Acts just like :class:`HttpResponse` but uses a 400 status code.
 
