@@ -143,6 +143,32 @@ do this::
         class Meta:
             order_with_respect_to = 'question'
 
+When ``order_with_respect_to`` is set, two additional methods are provided to
+retrieve and to set the order of the related objects: ``get_RELATED_order()``
+and ``set_RELATED_order()``, where ``RELATED`` is the lowercased model name. For
+example, assuming that a ``Question`` object has multiple related ``Answer``
+objects, the list returned contains the primary keys of the related ``Answer``
+objects::
+
+    >>> question = Question.objects.get(id=1)
+    >>> question.get_answer_order()
+    [1, 2, 3]
+
+The order of a ``Question`` object's related ``Answer`` objects can be set by
+passing in a list of ``Answer`` primary keys::
+
+    >>> question.set_answer_order([3, 1, 2])
+
+The related objects also get two methods, ``get_next_in_order()`` and
+``get_previous_in_order()``, which can be used to access those objects in their
+proper order. Assuming the ``Answer`` objects are ordered by ``id``::
+
+    >>> answer = Answer.objects.get(id=2)
+    >>> answer.get_next_in_order()
+    <Answer: 3>
+    >>> answer.get_previous_in_order()
+    <Answer: 1>
+
 ``ordering``
 ------------
 
