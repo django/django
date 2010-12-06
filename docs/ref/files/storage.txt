@@ -95,7 +95,7 @@ The Storage Class
 
         Lists the contents of the specified path, returning a 2-tuple of lists;
         the first item being directories, the second item being files. For
-        storage systems that aren't ale to provide such a listing, this will
+        storage systems that aren't able to provide such a listing, this will
         raise a ``NotImplementedError`` instead.
 
     .. method:: modified_time(name)
