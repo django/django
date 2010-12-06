@@ -877,7 +877,7 @@ Turkey (``tr``)
     * The number consist of 11 digits.
     * The first digit cannot be 0.
     * (sum(1st, 3rd, 5th, 7th, 9th)*7 - sum(2nd,4th,6th,8th)) % 10) must be
-    equal to the 10th digit.
+      equal to the 10th digit.
     * (sum(1st to 10th) % 10) must be equal to the 11th digit.
 
 .. class:: tr.forms.TRProvinceSelect
