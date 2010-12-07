@@ -112,11 +112,11 @@ middleware is always called on every response.
 Django view.
 
 ``process_template_response()`` must return an
-:class:`~django.template.response.SimpleTemplateResponse` (or it's subclass)
+:class:`~django.template.response.SimpleTemplateResponse` (or its subclass)
 object. It could alter the given ``response`` by changing
 ``response.template_name`` and ``response.template_context``, or it could
 create and return a brand-new
-:class:`~django.template.response.SimpleTemplateResponse` (or it's subclass)
+:class:`~django.template.response.SimpleTemplateResponse` (or its subclass)
 instance.
 
 ``process_template_response()`` will only be called if the response
