@@ -76,39 +76,25 @@ TemplateResponseMixin
 
         The path to the template to use when rendering the view.
 
-    .. method:: render_to_response(context)
+    .. attribute:: response_class
 
-        Returns a full composed HttpResponse instance, ready to be returned to
-        the user.
+        The response class to be returned by ``render_to_response`` method.
+        Default is
+        :class:`TemplateResponse <django.template.response.TemplateResponse>`.
+        The template and context of TemplateResponse instances can be
+        altered later (e.g. in
+        :ref:`template response middleware <template-response-middleware>`).
 
-        Calls :meth:`~TemplateResponseMixin.render_template()` to build the
-        content of the response, and
-        :meth:`~TemplateResponseMixin.get_response()` to construct the
-        :class:`~django.http.HttpResponse` object.
+        Create TemplateResponse subclass and pass set it to
+        ``template_response_class`` if you need custom template loading or
+        custom context object instantiation.
 
-    .. method:: get_response(content, **httpresponse_kwargs)
+    .. method:: render_to_response(context, **response_kwargs)
 
-        Constructs the :class:`~django.http.HttpResponse` object around the
-        given content. If any keyword arguments are provided, they will be
-        passed to the constructor of the :class:`~django.http.HttpResponse`
-        instance.
+        Returns a ``self.template_response_class`` instance.
 
-    .. method:: render_template(context)
-
-        Calls :meth:`~TemplateResponseMixin.get_context_instance()` to obtain
-        the :class:`Context` instance to use for rendering, and calls
-        :meth:`TemplateReponseMixin.get_template()` to load the template that
-        will be used to render the final content.
-
-    .. method:: get_context_instance(context)
-
-        Turns the data dictionary ``context`` into an actual context instance
-        that can be used for rendering.
-
-        By default, constructs a :class:`~django.template.RequestContext`
-        instance.
-
-    .. method:: get_template()
+        If any keyword arguments are provided, they will be
+        passed to the constructor of the response instance.
 
         Calls :meth:`~TemplateResponseMixin.get_template_names()` to obtain the
         list of template names that will be searched looking for an existent
@@ -123,10 +109,6 @@ TemplateResponseMixin
         default implementation will return a list containing
         :attr:`TemplateResponseMixin.template_name` (if it is specified).
 
-    .. method:: load_template(names)
-
-        Loads and returns a template found by searching the list of ``names``
-        for a match. Uses Django's default template loader.
 
 Single object mixins
 --------------------

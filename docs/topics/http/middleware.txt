@@ -97,6 +97,39 @@ calling ANY other request, view or exception middleware, or the appropriate
 view; it'll return that :class:`~django.http.HttpResponse`. Response
 middleware is always called on every response.
 
+.. _template-response-middleware:
+
+``process_template_response``
+-----------------------------
+
+.. versionadded:: 1.3
+
+.. method:: process_template_response(self, request, response)
+
+``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is the
+:class:`~django.template.response.SimpleTemplateResponse` subclass (e.g.
+:class:`~django.template.response.TemplateResponse`) object returned by a
+Django view.
+
+``process_template_response()`` must return an
+:class:`~django.template.response.SimpleTemplateResponse` (or it's subclass)
+object. It could alter the given ``response`` by changing
+``response.template_name`` and ``response.template_context``, or it could
+create and return a brand-new
+:class:`~django.template.response.SimpleTemplateResponse` (or it's subclass)
+instance.
+
+``process_template_response()`` will only be called if the response
+instance has a ``render()`` method, indicating that it is a
+:class:`~django.template.response.TemplateResponse`.
+
+You don't need to explicitly render responses -- responses will be
+automatically rendered once all template response middleware has been
+called.
+
+Middleware are run in reverse order during the response phase, which
+includes process_template_response.
+
 .. _response-middleware:
 
 ``process_response``
@@ -120,6 +153,7 @@ an earlier middleware method returned an :class:`~django.http.HttpResponse`
 classes are applied in reverse order, from the bottom up. This means classes
 defined at the end of :setting:`MIDDLEWARE_CLASSES` will be run first.
 
+
 .. _exception-middleware:
 
 ``process_exception``
@@ -137,7 +171,7 @@ Django calls ``process_exception()`` when a view raises an exception.
 the browser. Otherwise, default exception handling kicks in.
 
 Again, middleware are run in reverse order during the response phase, which
-includes ``process_exception``. If an exception middleware return a response,
+includes ``process_exception``. If an exception middleware returns a response,
 the middleware classes above that middleware will not be called at all.
 
 ``__init__``

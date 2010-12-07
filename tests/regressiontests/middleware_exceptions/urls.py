@@ -9,4 +9,7 @@ urlpatterns = patterns('',
     (r'^error/$', views.server_error),
     (r'^null_view/$', views.null_view),
     (r'^permission_denied/$', views.permission_denied),
+
+    (r'^template_response/$', views.template_response),
+    (r'^template_response_error/$', views.template_response_error),
 )

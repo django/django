@@ -16,6 +16,7 @@ API Reference
    middleware
    models/index
    request-response
+   template-response
    settings
    signals
    templates/index

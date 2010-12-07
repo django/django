@@ -93,7 +93,9 @@ The view layer
       :doc:`View functions <topics/http/views>` |
       :doc:`Shortcuts <topics/http/shortcuts>`
 
-    * **Reference:**  :doc:`Request/response objects <ref/request-response>`
+    * **Reference:**
+      :doc:`Request/response objects <ref/request-response>` |
+      :doc:`TemplateResponse objects <ref/template-response>`
 
     * **File uploads:**
       :doc:`Overview <topics/http/file-uploads>` |

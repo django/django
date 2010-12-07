@@ -28,6 +28,7 @@ from parser import ParserTests
 from unicode import UnicodeTests
 from nodelist import NodelistTest
 from smartif import *
+from response import *
 
 try:
     from loaders import *

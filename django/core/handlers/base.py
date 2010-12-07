@@ -21,6 +21,7 @@ class BaseHandler(object):
     def __init__(self):
         self._request_middleware = self._view_middleware = self._response_middleware = self._exception_middleware = None
 
+
     def load_middleware(self):
         """
         Populate middleware lists from settings.MIDDLEWARE_CLASSES.
@@ -30,16 +31,16 @@ class BaseHandler(object):
         from django.conf import settings
         from django.core import exceptions
         self._view_middleware = []
+        self._template_response_middleware = []
         self._response_middleware = []
         self._exception_middleware = []
 
         request_middleware = []
         for middleware_path in settings.MIDDLEWARE_CLASSES:
             try:
-                dot = middleware_path.rindex('.')
+                mw_module, mw_classname = middleware_path.rsplit('.', 1)
             except ValueError:
                 raise exceptions.ImproperlyConfigured('%s isn\'t a middleware module' % middleware_path)
-            mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
             try:
                 mod = import_module(mw_module)
             except ImportError, e:
@@ -48,7 +49,6 @@ class BaseHandler(object):
                 mw_class = getattr(mod, mw_classname)
             except AttributeError:
                 raise exceptions.ImproperlyConfigured('Middleware module "%s" does not define a "%s" class' % (mw_module, mw_classname))
-
             try:
                 mw_instance = mw_class()
             except exceptions.MiddlewareNotUsed:
@@ -58,6 +58,8 @@ class BaseHandler(object):
                 request_middleware.append(mw_instance.process_request)
             if hasattr(mw_instance, 'process_view'):
                 self._view_middleware.append(mw_instance.process_view)
+            if hasattr(mw_instance, 'process_template_response'):
+                self._template_response_middleware.insert(0, mw_instance.process_template_response)
             if hasattr(mw_instance, 'process_response'):
                 self._response_middleware.insert(0, mw_instance.process_response)
             if hasattr(mw_instance, 'process_exception'):
@@ -164,6 +166,13 @@ class BaseHandler(object):
             urlresolvers.set_urlconf(None)
 
         try:
+            # If the response supports deferred rendering, apply template
+            # response middleware and the render the response
+            if hasattr(response, 'render') and callable(response.render):
+                for middleware_method in self._template_response_middleware:
+                    response = middleware_method(request, response)
+                response.render()
+
             # Apply response middleware, regardless of the response
             for middleware_method in self._response_middleware:
                 response = middleware_method(request, response)

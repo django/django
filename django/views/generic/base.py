@@ -1,6 +1,7 @@
 from django import http
 from django.core.exceptions import ImproperlyConfigured
 from django.template import RequestContext, loader
+from django.template.response import TemplateResponse
 from django.utils.functional import update_wrapper
 from django.utils.log import getLogger
 from django.utils.decorators import classonlymethod
@@ -81,58 +82,28 @@ class TemplateResponseMixin(object):
     A mixin that can be used to render a template.
     """
     template_name = None
+    response_class = TemplateResponse
 
-    def render_to_response(self, context):
+    def render_to_response(self, context, **response_kwargs):
         """
         Returns a response with a template rendered with the given context.
         """
-        return self.get_response(self.render_template(context))
-
-    def get_response(self, content, **httpresponse_kwargs):
-        """
-        Construct an `HttpResponse` object.
-        """
-        return http.HttpResponse(content, **httpresponse_kwargs)
-
-    def render_template(self, context):
-        """
-        Render the template with a given context.
-        """
-        context_instance = self.get_context_instance(context)
-        return self.get_template().render(context_instance)
-
-    def get_context_instance(self, context):
-        """
-        Get the template context instance. Must return a Context (or subclass)
-        instance.
-        """
-        return RequestContext(self.request, context)
-
-    def get_template(self):
-        """
-        Get a ``Template`` object for the given request.
-        """
-        names = self.get_template_names()
-        if not names:
-            raise ImproperlyConfigured(u"'%s' must provide template_name."
-                                       % self.__class__.__name__)
-        return self.load_template(names)
+        return self.response_class(
+            request = self.request,
+            template = self.get_template_names(),
+            context = context,
+            **response_kwargs
+        )
 
     def get_template_names(self):
         """
-        Return a list of template names to be used for the request. Must return
-        a list. May not be called if get_template is overridden.
+        Returns a list of template names to be used for the request. Must return
+        a list. May not be called if render_to_response is overridden.
         """
         if self.template_name is None:
             return []
         else:
             return [self.template_name]
-
-    def load_template(self, names):
-        """
-        Load a list of templates using the default template loader.
-        """
-        return loader.select_template(names)
 
 
 class TemplateView(TemplateResponseMixin, View):

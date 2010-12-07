@@ -1,0 +1,211 @@
+===========================================
+TemplateResponse and SimpleTemplateResponse
+===========================================
+
+.. versionadded:: 1.3
+
+.. module:: django.template.response
+   :synopsis: Classes dealing with lazy-rendered HTTP responses.
+
+Standard HttpResponse objects are static structures. They are provided
+with a block of pre-rendered content at time of construction, and
+while that content can be modified, it isn't in a form that makes it
+easy to perform modifications.
+
+However, it can sometimes be beneficial to allow decorators or
+middleware to modify a response *after* it has been constructed by the
+view. For example, you may want to change the template that is used,
+or put additional data into the context.
+
+TemplateResponse provides a way to do just that. Unlike basic
+HttpResponse objects, TemplateResponse objects retain the details of
+the template and context that was provided by the view to compute the
+response. The final output of the response is not computed until
+it is needed, later in the response process.
+
+TemplateResponse objects
+========================
+
+.. class:: SimpleTemplateResponse()
+
+Attributes
+----------
+
+.. attribute:: SimpleTemplateResponse.template_name
+
+    The name of the template to be rendered. Accepts
+    :class:`django.template.Template` object, path to template or list
+    of paths.
+
+    Example: ``['foo.html', 'path/to/bar.html']``
+
+.. attribute:: SimpleTemplateResponse.context_data
+
+    The context data to be used when rendering the template. It can be
+    a dictionary or a context object.
+
+    Example: ``{'foo': 123}``
+
+.. attr:: SimpleTemplateResponse.rendered_content:
+
+    The current rendered value of the response content, using the current
+    template and context data.
+
+.. attr:: SimpleTemplateResponse.is_rendered:
+
+    A boolean indicating whether the response content has been rendered.
+
+
+Methods
+-------
+
+.. method:: SimpleTemplateResponse.__init__(template, context=None, mimetype=None, status=None, content_type=None)
+
+    Instantiates an
+    :class:`~django.template.response.SimpleTemplateResponse` object
+    with the given template, context, MIME type and HTTP status.
+
+    ``template`` is a full name of a template, or a sequence of
+    template names. :class:`django.template.Template` instances can
+    also be used.
+
+    ``context`` is a dictionary of values to add to the template
+    context. By default, this is an empty dictionary.
+    :class:`~django.template.Context` objects are also accepted as
+    ``context`` values.
+
+    ``status`` is the HTTP Status code for the response.
+
+    ``content_type`` is an alias for ``mimetype``. Historically, this
+    parameter was only called ``mimetype``, but since this is actually
+    the value included in the HTTP ``Content-Type`` header, it can
+    also include the character set encoding, which makes it more than
+    just a MIME type specification. If ``mimetype`` is specified (not
+    ``None``), that value is used. Otherwise, ``content_type`` is
+    used. If neither is given, the ``DEFAULT_CONTENT_TYPE`` setting is
+    used.
+
+
+.. method:: SimpleTemplateResponse.resolve_context(context)
+
+    Converts context data into a context instance that can be used for
+    rendering a template. Accepts a dictionary of context data or a
+    context object. Returns a :class:`~django.template.Context`
+    instance containing the provided data.
+
+    Override this method in order to customize context instantiation.
+
+.. method:: SimpleTemplateResponse.resolve_template(template)
+
+    Resolves the template instance to use for rendering. Accepts a
+    path of a template to use, or a sequence of template paths.
+    :class:`~django.template.Template` instances may also be provided.
+    Returns the :class:`~django.template.Template` instance to be
+    rendered.
+
+    Override this method in order to customize template rendering.
+
+.. method:: SimpleTemplateResponse.render():
+
+    Sets :attr:`response.content` to the result obtained by
+    :attr:`SimpleTemplateResponse.rendered_content`.
+
+    :meth:`~SimpleTemplateResponse.render()` will only have an effect
+    the first time it is called. On subsequent calls, it will return
+    the result obtained from the first call.
+
+
+.. class:: TemplateResponse()
+
+   TemplateResponse is a subclass of :class:`SimpleTemplateResponse
+   <django.template.response.SimpleTemplateResponse>` that uses
+   RequestContext instead of Context.
+
+.. method:: TemplateResponse.__init__(request, template, context=None, mimetype=None, status=None, content_type=None)
+
+   Instantiates an ``TemplateResponse`` object with the given
+   template, context, MIME type and HTTP status.
+
+   ``request`` is a HttpRequest instance.
+
+   ``template`` is a full name of a template to use or sequence of
+   template names. :class:`django.template.Template` instances are
+   also accepted.
+
+   ``context`` is a dictionary of values to add to the template
+   context. By default, this is an empty dictionary; context objects
+   are also accepted as ``context`` values.
+
+   ``status`` is the HTTP Status code for the response.
+
+   ``content_type`` is an alias for ``mimetype``. Historically, this
+   parameter was only called ``mimetype``, but since this is actually
+   the value included in the HTTP ``Content-Type`` header, it can also
+   include the character set encoding, which makes it more than just a
+   MIME type specification. If ``mimetype`` is specified (not
+   ``None``), that value is used. Otherwise, ``content_type`` is used.
+   If neither is given, the ``DEFAULT_CONTENT_TYPE`` setting is used.
+
+
+The rendering process
+=====================
+
+Before a :class:`TemplateResponse()` instance can be returned to the
+client, it must be rendered. The rendering process takes the
+intermediate representation of template and context, and turns it into
+the final byte stream that can be served to the client.
+
+There are three circumstances under which a TemplateResponse will be
+rendered:
+
+    * When the TemplateResponse instance is explicitly rendered, using
+      the :meth:`SimpleTemplateResponse.render()` method.
+
+    * When the content of the response is explicitly set by assigning
+      :attr:`response.content`.
+
+    * After passing through template response middleware, but before
+      passing through response middleware.
+
+A TemplateResponse can only be rendered once. The first call to
+:meth:`SimpleTemplateResponse.render()` sets the content of the
+response; subsequent rendering calls do not change the response
+content.
+
+However, when :attr:`response.content` is explicitly assigned, the
+change is always applied. If you want to force the content to be
+re-rendered, you can re-evaluate the rendered content, and assign
+the content of the response manually::
+
+    # Set up a baked TemplateResponse
+    >>> t = TemplateResponse(request, 'original.html', {})
+    >>> t.render()
+    >>> print t.content
+    Original content
+
+    # Rebaking doesn't change content
+    >>> t.template_name = 'new.html'
+    >>> t.render()
+    >>> print t.content
+    Original content
+
+    # Assigning content does change, no render() call required
+    >>> t.content = t.rendered_content
+    >>> print t.content
+    New content
+
+Using TemplateResponse and SimpleTemplateResponse
+=================================================
+
+A TemplateResponse object can be used anywhere that a normal
+HttpResponse can be used. It can also be used as an alternative to
+calling :method:`~django.shortcuts.render_to_response()`.
+
+For example, the following simple view returns a
+:class:`TemplateResponse()` with a simple template, and a context
+containing a queryset::
+
+    from django.template.response import TemplateResponse
+
+    def blog_index(request):
+        return TemplateResponse(request, 'entry_list.html', {'entries': Entry.objects.all()})

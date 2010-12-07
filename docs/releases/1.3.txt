@@ -133,6 +133,27 @@ can also add special translator comments in the source.
 For more information, see :ref:`contextual-markers` and
 :ref:`translator-comments`.
 
+TemplateResponse
+~~~~~~~~~~~~~~~~
+
+It can sometimes be beneficial to allow decorators or middleware to
+modify a response *after* it has been constructed by the view. For
+example, you may want to change the template that is used, or put
+additional data into the context.
+
+However, you can't (easily) modify the content of a basic
+:class:`~django.http.HttpResponse` after it has been constructed. To
+overcome this limitation, Django 1.3 adds a new
+:class:`~django.template.TemplateResponse` class. Unlike basic
+:class:`~django.http.HttpResponse` objects,
+:class:`~django.template.TemplateResponse` objects retain the details
+of the template and context that was provided by the view to compute
+the response. The final output of the response is not computed until
+it is needed, later in the response process.
+
+For more details, see the :ref:`documentation </ref/template-response>`
+on the :class:`~django.template.TemplateResponse` class.
+
 Everything else
 ~~~~~~~~~~~~~~~
 

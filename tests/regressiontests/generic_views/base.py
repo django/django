@@ -156,6 +156,7 @@ class TemplateViewTest(TestCase):
     rf = RequestFactory()
 
     def _assert_about(self, response):
+        response.render()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, '<h1>About</h1>')
 

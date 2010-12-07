@@ -103,7 +103,7 @@ class BaseTest(TestCase):
         storage = self.get_storage()
         self.assertFalse(storage.added_new)
         storage.add(constants.INFO, 'Test message 1')
-        self.assert_(storage.added_new)
+        self.assertTrue(storage.added_new)
         storage.add(constants.INFO, 'Test message 2', extra_tags='tag')
         self.assertEqual(len(storage), 2)
 
@@ -179,6 +179,26 @@ class BaseTest(TestCase):
             self.assertEqual(list(response.context['messages']), messages)
             for msg in data['messages']:
                 self.assertContains(response, msg)
+
+    def test_with_template_response(self):
+        settings.MESSAGE_LEVEL = constants.DEBUG
+        data = {
+            'messages': ['Test message %d' % x for x in xrange(10)],
+        }
+        show_url = reverse('django.contrib.messages.tests.urls.show_template_response')
+        for level in self.levels.keys():
+            add_url = reverse('django.contrib.messages.tests.urls.add_template_response',
+                              args=(level,))
+            response = self.client.post(add_url, data, follow=True)
+            self.assertRedirects(response, show_url)
+            self.assertTrue('messages' in response.context)
+            for msg in data['messages']:
+                self.assertContains(response, msg)
+
+            # there shouldn't be any messages on second GET request
+            response = self.client.get(show_url)
+            for msg in data['messages']:
+                self.assertNotContains(response, msg)
 
     def test_multiple_posts(self):
         """
