@@ -119,6 +119,7 @@ class AdminScriptTestCase(unittest.TestCase):
             from subprocess import Popen, PIPE
             p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
             stdin, stdout, stderr = (p.stdin, p.stdout, p.stderr)
+            p.wait()
         except ImportError:
             stdin, stdout, stderr = os.popen3(cmd)
         out, err = stdout.read(), stderr.read()
