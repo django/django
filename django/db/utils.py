@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
+
 DEFAULT_DB_ALIAS = 'default'
 
 # Define some exceptions that mirror the PEP249 interface.
@@ -125,12 +126,15 @@ class ConnectionRouter(object):
             chosen_db = None
             for router in self.routers:
                 try:
-                    chosen_db = getattr(router, action)(model, **hints)
-                    if chosen_db:
-                        return chosen_db
+                    method = getattr(router, action)
                 except AttributeError:
                     # If the router doesn't have a method, skip to the next one.
                     pass
+                else:
+                    chosen_db = method(model, **hints
+                    )
+                    if chosen_db:
+                        return chosen_db
             try:
                 return hints['instance']._state.db or DEFAULT_DB_ALIAS
             except KeyError:
@@ -143,21 +147,25 @@ class ConnectionRouter(object):
     def allow_relation(self, obj1, obj2, **hints):
         for router in self.routers:
             try:
-                allow = router.allow_relation(obj1, obj2, **hints)
-                if allow is not None:
-                    return allow
+                method = router.allow_relation
             except AttributeError:
                 # If the router doesn't have a method, skip to the next one.
                 pass
+            else:
+                allow = method(obj1, obj2, **hints)
+                if allow is not None:
+                    return allow
         return obj1._state.db == obj2._state.db
 
     def allow_syncdb(self, db, model):
         for router in self.routers:
             try:
-                allow = router.allow_syncdb(db, model)
-                if allow is not None:
-                    return allow
+                method = router.allow_syncdb
             except AttributeError:
                 # If the router doesn't have a method, skip to the next one.
                 pass
+            else:
+                allow = method(db, model)
+                if allow is not None:
+                    return allow
         return True
