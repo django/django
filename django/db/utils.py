@@ -131,8 +131,7 @@ class ConnectionRouter(object):
                     # If the router doesn't have a method, skip to the next one.
                     pass
                 else:
-                    chosen_db = method(model, **hints
-                    )
+                    chosen_db = method(model, **hints)
                     if chosen_db:
                         return chosen_db
             try:
