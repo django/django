@@ -18,8 +18,11 @@ def _setup_environment(environ):
     if platform.system().upper().startswith('CYGWIN'):
         try:
             import ctypes
-        except ImportError:
-            raise ImportError("ctypes not found. The Oracle backend requires ctypes to operate correctly under Cygwin.")
+        except ImportError, e:
+            from django.core.exceptions import ImproperlyConfigured
+            raise ImproperlyConfigured("Error loading ctypes: %s; "
+                                       "the Oracle backend requires ctypes to "
+                                       "operate correctly under Cygwin." % e)
         kernel32 = ctypes.CDLL('kernel32')
         for name, value in environ:
             kernel32.SetEnvironmentVariableA(name, value)
