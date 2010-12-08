@@ -32,8 +32,6 @@ class BaseDatabaseCreation(object):
         Returns the SQL required to create a single model, as a tuple of:
             (list_of_sql, pending_references_dict)
         """
-        from django.db import models
-
         opts = model._meta
         if not opts.managed or opts.proxy:
             return [], {}
@@ -340,13 +338,15 @@ class BaseDatabaseCreation(object):
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
         """
-        test_database_name = self._create_test_db(verbosity, autoclobber)
+        test_database_name = self._get_test_db_name()
 
         if verbosity >= 1:
             test_db_repr = ''
             if verbosity >= 2:
                 test_db_repr = " ('%s')" % test_database_name
             print "Creating test database for alias '%s'%s..." % (self.connection.alias, test_db_repr)
+
+        self._create_test_db(verbosity, autoclobber)
 
         self.connection.close()
         self.connection.settings_dict["NAME"] = test_database_name
@@ -372,14 +372,22 @@ class BaseDatabaseCreation(object):
 
         return test_database_name
 
+    def _get_test_db_name(self):
+        """
+        Internal implementation - returns the name of the test DB that wll be
+        created. Only useful when called from create_test_db() and
+        _create_test_db() and when no external munging is done with the 'NAME'
+        or 'TEST_NAME' settings.
+        """
+        if self.connection.settings_dict['TEST_NAME']:
+            return self.connection.settings_dict['TEST_NAME']
+        return TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
+
     def _create_test_db(self, verbosity, autoclobber):
         "Internal implementation - creates the test db tables."
         suffix = self.sql_table_creation_suffix()
 
-        if self.connection.settings_dict['TEST_NAME']:
-            test_database_name = self.connection.settings_dict['TEST_NAME']
-        else:
-            test_database_name = TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
+        test_database_name = self._get_test_db_name()
 
         qn = self.connection.ops.quote_name
 
