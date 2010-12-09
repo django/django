@@ -98,6 +98,8 @@ urlpatterns = patterns('',
     # ListView
     (r'^list/dict/$',
         views.DictList.as_view()),
+    (r'^list/dict/paginated/$',
+        views.DictList.as_view(paginate_by=1)),
     url(r'^list/authors/$',
         views.AuthorList.as_view(),
         name="authors_list"),

@@ -90,7 +90,7 @@ class ListViewTests(TestCase):
         self._make_authors(7)
         res = self.client.get('/list/authors/paginated/custom_class/')
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context['paginator'], CustomPaginator)
+        self.assertIsNone(res.context['paginator'])
         # Custom pagination allows for 2 orphans on a page size of 5
         self.assertEqual(len(res.context['object_list']), 7)
 
@@ -100,6 +100,11 @@ class ListViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         # Custom pagination allows for 2 orphans on a page size of 5
         self.assertEqual(len(res.context['object_list']), 7)
+
+    def test_paginated_non_queryset(self):
+        res = self.client.get('/list/dict/paginated/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.context['object_list']), 1)
 
     def test_allow_empty_false(self):
         res = self.client.get('/list/authors/notempty/')

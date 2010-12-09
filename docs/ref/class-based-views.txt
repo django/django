@@ -344,22 +344,22 @@ MultipleObjectMixin
 
     **Context**
 
-        * ``object_list``: The list of object that this view is displaying. If
+        * ``object_list``: The list of objects that this view is displaying. If
           ``context_object_name`` is specified, that variable will also be set
           in the context, with the same value as ``object_list``.
 
         * ``is_paginated``: A boolean representing whether the results are
           paginated. Specifically, this is set to ``False`` if no page size has
-          been specified, or if the number of available objects is less than or
-          equal to ``paginate_by``.
+          been specified, or if the available objects do not span multiple
+          pages.
 
         * ``paginator``: An instance of
           :class:`django.core.paginator.Paginator`. If the page is not
-          paginated, this context variable will be ``None``
+          paginated, this context variable will be ``None``.
 
         * ``page_obj``: An instance of
           :class:`django.core.paginator.Page`. If the page is not paginated,
-          this context variable will be ``None``
+          this context variable will be ``None``.
 
 MultipleObjectTemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
