@@ -189,13 +189,13 @@ change is always applied. If you want to force the content to be
 re-rendered, you can re-evaluate the rendered content, and assign
 the content of the response manually::
 
-    # Set up a baked TemplateResponse
+    # Set up a rendered TemplateResponse
     >>> t = TemplateResponse(request, 'original.html', {})
     >>> t.render()
     >>> print t.content
     Original content
 
-    # Rebaking doesn't change content
+    # Re-rendering doesn't change content
     >>> t.template_name = 'new.html'
     >>> t.render()
     >>> print t.content
