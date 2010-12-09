@@ -493,7 +493,7 @@ can specify the dependencies that exist using the
     }
 
 Under this configuration, the ``diamonds`` database will be created first,
-as it is the only database alias without dependencies. The ``default``` and
+as it is the only database alias without dependencies. The ``default`` and
 ``clubs`` alias will be created next (although the order of creation of this
 pair is not guaranteed); then ``hearts``; and finally ``spades``.
 

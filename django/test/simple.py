@@ -273,9 +273,9 @@ class DjangoTestSuiteRunner(object):
                 # the alias.
                 mirrored_aliases[alias] = connection.settings_dict['TEST_MIRROR']
             else:
-                # Store the (engine, name) pair. If we have two aliases
-                # with the same pair, we only need to create the test database
-                # once.
+                # Store a tuple with DB parameters that uniquely identify it.
+                # If we have two aliases with the same values for that tuple,
+                # we only need to create the test database once.
                 test_databases.setdefault((
                         connection.settings_dict['HOST'],
                         connection.settings_dict['PORT'],
@@ -286,8 +286,8 @@ class DjangoTestSuiteRunner(object):
                 if 'TEST_DEPENDENCIES' in connection.settings_dict:
                     dependencies[alias] = connection.settings_dict['TEST_DEPENDENCIES']
                 else:
-                    if alias != 'default':
-                        dependencies[alias] = connection.settings_dict.get('TEST_DEPENDENCIES', ['default'])
+                    if alias != DEFAULT_DB_ALIAS:
+                        dependencies[alias] = connection.settings_dict.get('TEST_DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
         # Second pass -- actually create the databases.
         old_names = []
