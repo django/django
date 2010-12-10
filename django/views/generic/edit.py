@@ -31,16 +31,19 @@ class FormMixin(object):
         """
         Returns an instance of the form to be used in this view.
         """
+        return form_class(**self.get_form_kwargs())
+
+    def get_form_kwargs(self):
+        """
+        Returns the keyword arguments for instanciating the form.
+        """
+        kwargs = {'initial': self.get_initial()}
         if self.request.method in ('POST', 'PUT'):
-            return form_class(
-                data=self.request.POST,
-                files=self.request.FILES,
-                initial=self.get_initial()
-            )
-        else:
-            return form_class(
-                initial=self.get_initial()
-            )
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+        return kwargs
 
     def get_context_data(self, **kwargs):
         return kwargs
@@ -75,22 +78,13 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
             model = self.get_queryset().model
             return model_forms.modelform_factory(model)
 
-    def get_form(self, form_class):
+    def get_form_kwargs(self):
         """
-        Returns a form instantiated with the model instance from get_object().
+        Returns the keyword arguments for instanciating the form.
         """
-        if self.request.method in ('POST', 'PUT'):
-            return form_class(
-                data=self.request.POST,
-                files=self.request.FILES,
-                initial=self.get_initial(),
-                instance=self.object,
-            )
-        else:
-            return form_class(
-                initial=self.get_initial(),
-                instance=self.object,
-            )
+        kwargs = super(ModelFormMixin, self).get_form_kwargs()
+        kwargs.update({'instance': self.object})
+        return kwargs
 
     def get_success_url(self):
         if self.success_url:

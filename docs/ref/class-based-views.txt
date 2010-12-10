@@ -413,27 +413,34 @@ FormMixin
     .. method:: get_initial()
 
         Retrieve initial data for the form. By default, returns
-        :attr:`FormMixin.initial`.
+        :attr:`.initial`.
 
     .. method:: get_form_class()
 
-        Retrieve the form class to instantiate. By default,
-        :attr:`FormMixin.form_class`.
+        Retrieve the form class to instantiate. By default
+        :attr:`.form_class`.
 
     .. method:: get_form(form_class)
 
-        Instantiate an instance of ``form_class``. If the request is a ``POST``
-        or ``PUT``, the request data (``request.POST`` and ``request.FILES``)
-        will be provided to the form at time of construction.
+        Instantiate an instance of ``form_class`` using
+        :meth:`.get_form_kwargs`.
+
+    .. method:: get_form_kwargs()
+
+        Build the keyword arguments requried to instanciate an the form.
+        
+        The ``initial`` argument is set to :meth:`.get_initial`. If the
+        request is a ``POST`` or ``PUT``, the request data (``request.POST``
+        and ``request.FILES``) will also be provided.
 
     .. method:: get_success_url()
 
         Determine the URL to redirect to when the form is successfully
-        validated. Returns :attr:`FormMixin.success_url` by default.
+        validated. Returns :attr:`.success_url` by default.
 
     .. method:: form_valid()
 
-        Redirects to :attr:`ModelFormMixin.success_url`.
+        Redirects to :meth:`.get_success_url`.
 
     .. method:: form_invalid()
 
@@ -449,9 +456,9 @@ FormMixin
 
     .. note::
 
-        Views mixing :class:`~django.views.generic.edit.FormMixin` must
-        provide an implementation of :meth:`~FormMixin.form_valid` and
-        :meth:`~FormMixin.form_invalid`.
+        Views mixing :class:`FormMixin` must
+        provide an implementation of :meth:`.form_valid` and
+        :meth:`.form_invalid`.
 
 ModelFormMixin
 ~~~~~~~~~~~~~~
@@ -490,12 +497,10 @@ ModelFormMixin
         :attr:`~SingleObjectMixin.model`, depending on which attribute is
         provided.
 
-    .. method:: get_form(form_class)
+    .. method:: get_form_kwargs()
 
-        Instantiate an instance of ``form_class``. If the request is a ``POST``
-        or ``PUT``, the request data (``request.POST`` and ``request.FILES``)
-        will be provided to the form at time of construction. The current
-        instance (``self.object``) will also be provided.
+        Add the current instance (``self.object``) to the standard
+        :meth:`FormMixin.get_form_kwargs`.
 
     .. method:: get_success_url()
 
@@ -506,7 +511,7 @@ ModelFormMixin
     .. method:: form_valid()
 
         Saves the form instance, sets the current object for the view, and
-        redirects to :attr:`ModelFormMixin.success_url`.
+        redirects to :meth:`.get_success_url`.
 
     .. method:: form_invalid()
 
