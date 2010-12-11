@@ -901,6 +901,12 @@ to show objects owned by the logged-in user::
                 return qs
             return qs.filter(author=request.user)
 
+.. method:: ModelAdmin.message_user(request, message)
+
+    Sends a message to the user. The default implementation creates a message
+    using the :mod:`django.contrib.messages` backend. See the
+    :ref:`custom ModelAdmin example <custom-admin-action>`.
+
 Other methods
 ~~~~~~~~~~~~~
 
