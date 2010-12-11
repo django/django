@@ -225,6 +225,8 @@ come with Django:
     * :mod:`django.contrib.sites` -- A framework for managing multiple sites
       with one Django installation.
 
+    * :mod:`django.contrib.messages` -- A messaging framework.
+
 These applications are included by default as a convenience for the common case.
 
 Each of these applications makes use of at least one database table, though,
