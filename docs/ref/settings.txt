@@ -1825,8 +1825,9 @@ USE_ETAGS
 Default: ``False``
 
 A boolean that specifies whether to output the "Etag" header. This saves
-bandwidth but slows down performance. This is only used if ``CommonMiddleware``
-is installed (see :doc:`/topics/http/middleware`).
+bandwidth but slows down performance. This is used by the ``CommonMiddleware``
+(see :doc:`/topics/http/middleware`) and in the``Cache Framework``
+(see :doc:`/topics/cache`).
 
 .. setting:: USE_I18N
 

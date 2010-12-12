@@ -1048,6 +1048,7 @@ class CacheI18nTest(unittest.TestCase):
         settings.CACHE_MIDDLEWARE_SECONDS = 60
         settings.CACHE_MIDDLEWARE_KEY_PREFIX="test"
         settings.CACHE_BACKEND='locmem:///'
+        settings.USE_ETAGS = True
         settings.USE_I18N = True
         en_message ="Hello world!"
         es_message ="Hola mundo!"
@@ -1058,6 +1059,14 @@ class CacheI18nTest(unittest.TestCase):
         # Check that we can recover the cache
         self.assertNotEqual(get_cache_data.content, None)
         self.assertEqual(en_message, get_cache_data.content)
+        # Check that we use etags
+        self.assertTrue(get_cache_data.has_header('ETag'))
+        # Check that we can disable etags
+        settings.USE_ETAGS = False
+        request._cache_update_cache = True
+        set_cache(request, 'en', en_message)
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertFalse(get_cache_data.has_header('ETag'))
         # change the session language and set content
         request = self._get_request_cache()
         set_cache(request, 'es', es_message)

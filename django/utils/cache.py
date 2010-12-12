@@ -101,7 +101,7 @@ def patch_response_headers(response, cache_timeout=None):
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     if cache_timeout < 0:
         cache_timeout = 0 # Can't have max-age negative
-    if not response.has_header('ETag'):
+    if settings.USE_ETAGS and not response.has_header('ETag'):
         response['ETag'] = '"%s"' % md5_constructor(response.content).hexdigest()
     if not response.has_header('Last-Modified'):
         response['Last-Modified'] = http_date()
