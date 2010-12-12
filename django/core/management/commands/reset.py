@@ -20,6 +20,12 @@ class Command(AppCommand):
     output_transaction = True
 
     def handle_app(self, app, **options):
+        # This command breaks a lot and should be deprecated
+        import warnings
+        warnings.warn(
+            'This command has been deprecated. The command ``flush`` can be used to delete everything. You can also use ALTER TABLE or DROP TABLE statements manually.',
+            PendingDeprecationWarning
+        )
         using = options.get('database', DEFAULT_DB_ALIAS)
         connection = connections[using]
 

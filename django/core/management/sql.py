@@ -98,6 +98,12 @@ def sql_delete(app, style, connection):
 
 def sql_reset(app, style, connection):
     "Returns a list of the DROP TABLE SQL, then the CREATE TABLE SQL, for the given module."
+    # This command breaks a lot and should be deprecated
+    import warnings
+    warnings.warn(
+        'This command has been deprecated. The command ``sqlflush`` can be used to delete everything. You can also use ALTER TABLE or DROP TABLE statements manually.',
+        PendingDeprecationWarning
+    )
     return sql_delete(app, style, connection) + sql_all(app, style, connection)
 
 def sql_flush(style, connection, only_django=False):

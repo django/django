@@ -491,6 +491,10 @@ several lines in language files.
 reset <appname appname ...>
 ---------------------------
 
+.. deprecated:: 1.3
+    This command has been deprecated. The ``flush`` can be used to delete
+    everything. You can also use ALTER TABLE or DROP TABLE statements manually.
+
 .. django-admin:: reset
 
 Executes the equivalent of ``sqlreset`` for the given app name(s).
@@ -843,6 +847,10 @@ which to print the SQL.
 
 sqlreset <appname appname ...>
 ------------------------------
+
+.. deprecated:: 1.3
+    This command has been deprecated. The ``sqlflush`` can be used to delete
+    everything. You can also use ALTER TABLE or DROP TABLE statements manually.
 
 .. django-admin:: sqlreset
 
