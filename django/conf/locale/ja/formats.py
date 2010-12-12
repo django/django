@@ -2,6 +2,8 @@
 # This file is distributed under the same license as the Django package.
 #
 
+# The *_FORMAT strings use the Django date format syntax,
+# see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = 'Y年n月j日'
 TIME_FORMAT = 'G:i:s'
 DATETIME_FORMAT = 'Y年n月j日G:i:s'
@@ -10,6 +12,9 @@ MONTH_DAY_FORMAT = 'n月j日'
 SHORT_DATE_FORMAT = 'Y/m/d'
 SHORT_DATETIME_FORMAT = 'Y/m/d G:i:s'
 # FIRST_DAY_OF_WEEK = 
+
+# The *_INPUT_FORMATS strings use the Python strftime format syntax,
+# see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 # DATE_INPUT_FORMATS = 
 # TIME_INPUT_FORMATS = 
 # DATETIME_INPUT_FORMATS = 

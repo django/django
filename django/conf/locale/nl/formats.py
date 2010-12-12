@@ -2,6 +2,8 @@
 # This file is distributed under the same license as the Django package.
 #
 
+# The *_FORMAT strings use the Django date format syntax,
+# see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = 'j F Y'                   # '20 januari 2009'
 TIME_FORMAT = 'H:i'                     # '15:23'
 DATETIME_FORMAT = 'j F Y H:i'           # '20 januari 2009 15:23'
@@ -10,6 +12,9 @@ MONTH_DAY_FORMAT = 'j F'                # '20 januari'
 SHORT_DATE_FORMAT = 'j-n-Y'             # '20-1-2009'
 SHORT_DATETIME_FORMAT = 'j-n-Y H:i'     # '20-1-2009 15:23'
 FIRST_DAY_OF_WEEK = 1                   # Monday (in Dutch 'maandag')
+
+# The *_INPUT_FORMATS strings use the Python strftime format syntax,
+# see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 DATE_INPUT_FORMATS = (
     '%d-%m-%Y', '%d-%m-%y', '%Y-%m-%d', # '20-01-2009', '20-01-09', '2009-01-20'
     # '%d %b %Y', '%d %b %y',             # '20 jan 2009', '20 jan 09'
