@@ -107,6 +107,12 @@ subclass::
 
         date_hierarchy = 'pub_date'
 
+    .. versionadded:: 1.3
+
+        This will intelligently populate itself based on available data,
+        e.g. if all the dates are in one month, it'll show the day-level
+        drill-down only.
+
 .. attribute:: ModelAdmin.form
 
     By default a ``ModelForm`` is dynamically created for your model. It is

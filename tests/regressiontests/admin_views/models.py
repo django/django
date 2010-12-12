@@ -320,7 +320,7 @@ class Podcast(Media):
 class PodcastAdmin(admin.ModelAdmin):
     list_display = ('name', 'release_date')
     list_editable = ('release_date',)
-
+    date_hierarchy = 'release_date'
     ordering = ('name',)
 
 class Vodcast(Media):

@@ -231,6 +231,16 @@ def date_hierarchy(cl):
 
         link = lambda d: cl.get_query_string(d, [field_generic])
 
+        if not (year_lookup or month_lookup or day_lookup):
+            # select appropriate start level
+            date_range = cl.query_set.aggregate(first=models.Min(field_name),
+                                                last=models.Max(field_name))
+            if date_range['first'] and date_range['last']:
+                if date_range['first'].year == date_range['last'].year:
+                    year_lookup = date_range['first'].year
+                    if date_range['first'].month == date_range['last'].month:
+                        month_lookup = date_range['first'].month
+
         if year_lookup and month_lookup and day_lookup:
             day = datetime.date(int(year_lookup), int(month_lookup), int(day_lookup))
             return {
