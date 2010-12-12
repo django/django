@@ -368,6 +368,6 @@ Pinging Google via `manage.py`
 .. versionadded:: 1.0
 
 Once the sitemaps application is added to your project, you may also
-ping the Google server's through the command line manage.py interface::
+ping Google using the ``ping_google`` management command::
 
     python manage.py ping_google [/sitemap.xml]

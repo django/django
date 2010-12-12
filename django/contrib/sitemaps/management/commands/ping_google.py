@@ -3,7 +3,7 @@ from django.contrib.sitemaps import ping_google
 
 
 class Command(BaseCommand):
-    help = "Ping google with an updated sitemap, pass optional url of sitemap"
+    help = "Ping Google with an updated sitemap, pass optional url of sitemap"
 
     def execute(self, *args, **options):
         if len(args) == 1:
