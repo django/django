@@ -1,7 +1,7 @@
 import re
 from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext_lazy, ugettext as _
 from htmlentitydefs import name2codepoint
 
 # Capitalizes the first letter of a string.
@@ -148,7 +148,10 @@ def get_text_list(list_, last_word=ugettext_lazy(u'or')):
     """
     if len(list_) == 0: return u''
     if len(list_) == 1: return force_unicode(list_[0])
-    return u'%s %s %s' % (', '.join([force_unicode(i) for i in list_][:-1]), force_unicode(last_word), force_unicode(list_[-1]))
+    return u'%s %s %s' % (
+        # Translators: This string is used as a separator between list elements
+        _(', ').join([force_unicode(i) for i in list_][:-1]),
+        force_unicode(last_word), force_unicode(list_[-1]))
 get_text_list = allow_lazy(get_text_list, unicode)
 
 def normalize_newlines(text):

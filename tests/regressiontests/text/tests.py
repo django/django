@@ -4,11 +4,22 @@ from django.test import TestCase
 from django.utils.text import *
 from django.utils.http import urlquote, urlquote_plus, cookie_date, http_date
 from django.utils.encoding import iri_to_uri
+from django.utils.translation import activate, deactivate
 
 class TextTests(TestCase):
     """
     Tests for stuff in django.utils.text and other text munging util functions.
     """
+
+    def test_get_text_list(self):
+        self.assertEqual(get_text_list(['a', 'b', 'c', 'd']), u'a, b, c or d')
+        self.assertEqual(get_text_list(['a', 'b', 'c'], 'and'), u'a, b and c')
+        self.assertEqual(get_text_list(['a', 'b'], 'and'), u'a and b')
+        self.assertEqual(get_text_list(['a']), u'a')
+        self.assertEqual(get_text_list([]), u'')
+        activate('ar')
+        self.assertEqual(get_text_list(['a', 'b', 'c']), u"a، b أو c")
+        deactivate()
 
     def test_smart_split(self):
 

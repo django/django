@@ -5022,6 +5022,11 @@ msgstr "ديسمبر"
 msgid "or"
 msgstr "أو"
 
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr "، "
+
 #: utils/timesince.py:21
 msgid "year"
 msgid_plural "years"
