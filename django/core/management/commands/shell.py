@@ -8,8 +8,33 @@ class Command(NoArgsCommand):
             help='Tells Django to use plain Python, not IPython.'),
     )
     help = "Runs a Python interactive interpreter. Tries to use IPython, if it's available."
-
+    shells = ['ipython']
     requires_model_validation = False
+
+    def ipython(self):
+        try:
+            from IPython.frontend.terminal.embed import TerminalInteractiveShell
+            shell = TerminalInteractiveShell()
+            shell.mainloop()
+        except ImportError:
+            # IPython < 0.11
+            # Explicitly pass an empty list as arguments, because otherwise
+            # IPython would use sys.argv from this script.
+            try:
+                from IPython.Shell import IPShell
+                shell = IPShell(argv=[])
+                shell.mainloop()
+            except ImportError:
+                # IPython not found at all, raise ImportError
+                raise
+
+    def run_shell(self):
+        for shell in self.shells:
+            try:
+                return getattr(self, shell)()
+            except ImportError:
+                pass
+        raise ImportError
 
     def handle_noargs(self, **options):
         # XXX: (Temporary) workaround for ticket #1796: force early loading of all
@@ -23,11 +48,7 @@ class Command(NoArgsCommand):
             if use_plain:
                 # Don't bother loading IPython, because the user wants plain Python.
                 raise ImportError
-            import IPython
-            # Explicitly pass an empty list as arguments, because otherwise IPython
-            # would use sys.argv from this script.
-            shell = IPython.Shell.IPShell(argv=[])
-            shell.mainloop()
+            self.run_shell()
         except ImportError:
             import code
             # Set up a dictionary to serve as the environment for the shell, so
