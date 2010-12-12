@@ -595,10 +595,9 @@ class SelectMultiple(Select):
             data = []
         if len(initial) != len(data):
             return True
-        for value1, value2 in zip(initial, data):
-            if force_unicode(value1) != force_unicode(value2):
-                return True
-        return False
+        initial_set = set([force_unicode(value) for value in initial])
+        data_set = set([force_unicode(value) for value in data])
+        return data_set != initial_set
 
 class RadioInput(StrAndUnicode):
     """

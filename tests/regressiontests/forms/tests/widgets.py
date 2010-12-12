@@ -824,6 +824,7 @@ beatle J R Ringo False""")
         self.assertFalse(w._has_changed([1, 2], [u'1', u'2']))
         self.assertTrue(w._has_changed([1, 2], [u'1']))
         self.assertTrue(w._has_changed([1, 2], [u'1', u'3']))
+        self.assertFalse(w._has_changed([2, 1], [u'1', u'2']))
 
         # Unicode choices are correctly rendered as HTML
         self.assertEqual(w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')]), u'<ul>\n<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums" value="2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>')
