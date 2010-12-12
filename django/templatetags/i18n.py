@@ -18,6 +18,34 @@ class GetAvailableLanguagesNode(Node):
         context[self.variable] = [(k, translation.ugettext(v)) for k, v in settings.LANGUAGES]
         return ''
 
+class GetLanguageInfoNode(Node):
+    def __init__(self, lang_code, variable):
+        self.lang_code = Variable(lang_code)
+        self.variable = variable
+
+    def render(self, context):
+        lang_code = self.lang_code.resolve(context)
+        context[self.variable] = translation.get_language_info(lang_code)
+        return ''
+
+class GetLanguageInfoListNode(Node):
+    def __init__(self, languages, variable):
+        self.languages = Variable(languages)
+        self.variable = variable
+
+    def get_language_info(self, language):
+        # ``language`` is either a language code string or a sequence
+        # with the language code as its first item
+        if len(language[0]) > 1:
+            return translation.get_language_info(language[0])
+        else:
+            return translation.get_language_info(str(language))
+
+    def render(self, context):
+        langs = self.languages.resolve(context)
+        context[self.variable] = [self.get_language_info(lang) for lang in langs]
+        return ''
+
 class GetCurrentLanguageNode(Node):
     def __init__(self, variable):
         self.variable = variable
@@ -108,6 +136,55 @@ def do_get_available_languages(parser, token):
     if len(args) != 3 or args[1] != 'as':
         raise TemplateSyntaxError("'get_available_languages' requires 'as variable' (got %r)" % args)
     return GetAvailableLanguagesNode(args[2])
+
+def do_get_language_info(parser, token):
+    """
+    This will store the language information dictionary for the given language
+    code in a context variable.
+
+    Usage::
+
+        {% get_language_info for LANGUAGE_CODE as l %}
+        {{ l.code }}
+        {{ l.name }}
+        {{ l.name_local }}
+        {{ l.bidi|yesno:"bi-directional,uni-directional" }}
+    """
+    args = token.contents.split()
+    if len(args) != 5 or args[1] != 'for' or args[3] != 'as':
+        raise TemplateSyntaxError("'%s' requires 'for string as variable' (got %r)" % (args[0], args[1:]))
+    return GetLanguageInfoNode(args[2], args[4])
+
+def do_get_language_info_list(parser, token):
+    """
+    This will store a list of language information dictionaries for the given
+    language codes in a context variable. The language codes can be specified
+    either as a list of strings or a settings.LANGUAGES style tuple (or any
+    sequence of sequences whose first items are language codes).
+
+    Usage::
+
+        {% get_language_info_list for LANGUAGES as langs %}
+        {% for l in langs %}
+          {{ l.code }}
+          {{ l.name }}
+          {{ l.name_local }}
+          {{ l.bidi|yesno:"bi-directional,uni-directional" }}
+        {% endfor %}
+    """
+    args = token.contents.split()
+    if len(args) != 5 or args[1] != 'for' or args[3] != 'as':
+        raise TemplateSyntaxError("'%s' requires 'for sequence as variable' (got %r)" % (args[0], args[1:]))
+    return GetLanguageInfoListNode(args[2], args[4])
+
+def language_name(lang_code):
+    return translation.get_language_info(lang_code)['name']
+
+def language_name_local(lang_code):
+    return translation.get_language_info(lang_code)['name_local']
+
+def language_bidi(lang_code):
+    return translation.get_language_info(lang_code)['bidi']
 
 def do_get_current_language(parser, token):
     """
@@ -269,7 +346,13 @@ def do_block_translate(parser, token):
             counter)
 
 register.tag('get_available_languages', do_get_available_languages)
+register.tag('get_language_info', do_get_language_info)
+register.tag('get_language_info_list', do_get_language_info_list)
 register.tag('get_current_language', do_get_current_language)
 register.tag('get_current_language_bidi', do_get_current_language_bidi)
 register.tag('trans', do_translate)
 register.tag('blocktrans', do_block_translate)
+
+register.filter(language_name)
+register.filter(language_name_local)
+register.filter(language_bidi)

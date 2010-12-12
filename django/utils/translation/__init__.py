@@ -11,7 +11,7 @@ __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
         'get_partial_date_formats', 'check_for_language', 'to_locale',
         'get_language_from_request', 'templatize', 'ugettext', 'ugettext_lazy',
         'ungettext', 'ungettext_lazy', 'pgettext', 'pgettext_lazy',
-        'npgettext', 'npgettext_lazy', 'deactivate_all']
+        'npgettext', 'npgettext_lazy', 'deactivate_all', 'get_language_info']
 
 # Here be dragons, so a short explanation of the logic won't hurt:
 # We are trying to solve two problems: (1) access settings, in particular
@@ -117,3 +117,10 @@ def _string_concat(*strings):
     """
     return u''.join([force_unicode(s) for s in strings])
 string_concat = lazy(_string_concat, unicode)
+
+def get_language_info(lang_code):
+    from django.conf.locale import LANG_INFO
+    try:
+        return LANG_INFO[lang_code]
+    except KeyError:
+        raise KeyError("Unknown language code %r." % lang_code)

@@ -7,12 +7,14 @@ import pickle
 
 from django.conf import settings
 from django.template import Template, Context
-from django.test import TestCase
 from django.utils.formats import get_format, date_format, time_format, localize, localize_input, iter_format_modules
+from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import mark_safe, SafeString, SafeUnicode
-from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy, pgettext, npgettext, to_locale
-from django.utils.importlib import import_module
+from django.utils.translation import (ugettext, ugettext_lazy, activate,
+        deactivate, gettext_lazy, pgettext, npgettext, to_locale,
+        get_language_info)
+from django.utils.unittest import TestCase
 
 
 from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
@@ -709,3 +711,12 @@ class TestModels(TestCase):
         c.save()
         c.name = SafeString(u'Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
         c.save()
+
+
+class TestLanguageInfo(TestCase):
+    def test_localized_language_info(self):
+        li = get_language_info('de')
+        self.assertEqual(li['code'], 'de')
+        self.assertEqual(li['name_local'], u'Deutsch')
+        self.assertEqual(li['name'], 'German')
+        self.assertEqual(li['bidi'], False)
