@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList
 from django.template import Context, Template
 from django.test import TransactionTestCase
@@ -70,6 +71,28 @@ class ChangeListTests(TransactionTestCase):
         editable_name_field = '<input name="form-0-name" value="name" class="vTextField" maxlength="30" type="text" id="id_form-0-name" />'
         self.assertFalse('<td>%s</td>' % editable_name_field == -1,
             'Failed to find "name" list_editable field in: %s' % table_output)
+
+    def test_result_list_editable(self):
+        """
+        Regression test for #14312: list_editable with pagination
+        """
+
+        new_parent = Parent.objects.create(name='parent')
+        for i in range(200):
+            new_child = Child.objects.create(name='name %s' % i, parent=new_parent)
+        request = MockRequest()
+        request.GET['p'] = -1 # Anything outside range
+        m = ChildAdmin(Child, admin.site)
+
+        # Test with list_editable fields
+        m.list_display = ['id', 'name', 'parent']
+        m.list_display_links = ['id']
+        m.list_editable = ['name']
+        self.assertRaises(IncorrectLookupParameters, lambda: \
+            ChangeList(request, Child, m.list_display, m.list_display_links,
+                    m.list_filter, m.date_hierarchy, m.search_fields,
+                    m.list_select_related, m.list_per_page, m.list_editable, m))
+
 
 class ChildAdmin(admin.ModelAdmin):
     list_display = ['name', 'parent']

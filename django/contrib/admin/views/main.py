@@ -117,7 +117,7 @@ class ChangeList(object):
             try:
                 result_list = paginator.page(self.page_num+1).object_list
             except InvalidPage:
-                result_list = ()
+                raise IncorrectLookupParameters
 
         self.result_count = result_count
         self.full_result_count = full_result_count
