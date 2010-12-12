@@ -376,6 +376,12 @@ input[type=text], input[type=password], textarea, select, .vTextField {
     background-position: top;
 }
 
+.button[disabled], input[type=submit][disabled], input[type=button][disabled] {
+	background-image: url(../img/admin/nav-bg.gif);
+	background-position: bottom;
+	opacity: 0.4;
+}
+
 .button.default, input[type=submit].default, .submit-row input.default {
     border: 2px solid #5b80b2;
     background: #7CA0C7 url(../img/admin/default-bg.gif) bottom repeat-x;
@@ -388,6 +394,13 @@ input[type=text], input[type=password], textarea, select, .vTextField {
     background-image: url(../img/admin/default-bg-reverse.gif);
     background-position: top;
 }
+
+.button[disabled].default, input[type=submit][disabled].default, input[type=button][disabled].default {
+	background-image: url(../img/admin/default-bg.gif);
+	background-position: bottom;
+	opacity: 0.4;
+}
+
 
 /* MODULES */
 
