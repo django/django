@@ -163,6 +163,7 @@ def password_reset_done(request,
                               context_instance=RequestContext(request, current_app=current_app))
 
 # Doesn't need csrf_protect since no-one can guess the URL
+@never_cache
 def password_reset_confirm(request, uidb36=None, token=None,
                            template_name='registration/password_reset_confirm.html',
                            token_generator=default_token_generator,
