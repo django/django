@@ -8,7 +8,7 @@ class Command(NoArgsCommand):
             help='Tells Django to use plain Python, not IPython.'),
     )
     help = "Runs a Python interactive interpreter. Tries to use IPython, if it's available."
-    shells = ['ipython']
+    shells = ['ipython', 'bpython']
     requires_model_validation = False
 
     def ipython(self):
@@ -27,6 +27,10 @@ class Command(NoArgsCommand):
             except ImportError:
                 # IPython not found at all, raise ImportError
                 raise
+
+    def bpython(self):
+        import bpython
+        bpython.embed()
 
     def run_shell(self):
         for shell in self.shells:

@@ -747,13 +747,14 @@ shell
 
 Starts the Python interactive interpreter.
 
-Django will use IPython_, if it's installed. If you have IPython installed and
-want to force use of the "plain" Python interpreter, use the ``--plain``
-option, like so::
+Django will use IPython_ or bpython_ if either is installed. If you have a
+rich shell installed but want to force use of the "plain" Python interpreter,
+use the ``--plain`` option, like so::
 
     django-admin.py shell --plain
 
 .. _IPython: http://ipython.scipy.org/
+.. _bpython: http://bpython-interpreter.org/
 
 sql <appname appname ...>
 -------------------------
