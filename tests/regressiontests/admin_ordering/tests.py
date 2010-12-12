@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.admin.options import ModelAdmin
 
-from models import Band
+from models import Band, Song, SongInlineDefaultOrdering, SongInlineNewOrdering
 
 class TestAdminOrdering(TestCase):
     """
@@ -37,3 +37,37 @@ class TestAdminOrdering(TestCase):
         ma = BandAdmin(Band, None)
         names = [b.name for b in ma.queryset(None)]
         self.assertEqual([u'Radiohead', u'Van Halen', u'Aerosmith'], names)
+
+class TestInlineModelAdminOrdering(TestCase):
+    """
+    Let's make sure that InlineModelAdmin.queryset uses the ordering we define
+    in InlineModelAdmin.
+    """
+
+    def setUp(self):
+        b = Band(name='Aerosmith', bio='', rank=3)
+        b.save()
+        self.b = b
+        s1 = Song(band=b, name='Pink', duration=235)
+        s1.save()
+        s2 = Song(band=b, name='Dude (Looks Like a Lady)', duration=264)
+        s2.save()
+        s3 = Song(band=b, name='Jaded', duration=214)
+        s3.save()
+
+    def test_default_ordering(self):
+        """
+        The default ordering should be by name, as specified in the inner Meta
+        class.
+        """
+        inline = SongInlineDefaultOrdering(self.b, None)
+        names = [s.name for s in inline.queryset(None)]
+        self.assertEqual([u'Dude (Looks Like a Lady)', u'Jaded', u'Pink'], names)
+
+    def test_specified_ordering(self):
+        """
+        Let's check with ordering set to something different than the default.
+        """
+        inline = SongInlineNewOrdering(self.b, None)
+        names = [s.name for s in inline.queryset(None)]
+        self.assertEqual([u'Jaded', u'Pink', u'Dude (Looks Like a Lady)'], names)

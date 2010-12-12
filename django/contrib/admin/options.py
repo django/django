@@ -67,6 +67,7 @@ class BaseModelAdmin(object):
     prepopulated_fields = {}
     formfield_overrides = {}
     readonly_fields = ()
+    ordering = None
 
     def __init__(self):
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
@@ -189,6 +190,18 @@ class BaseModelAdmin(object):
     def get_readonly_fields(self, request, obj=None):
         return self.readonly_fields
 
+    def queryset(self, request):
+        """
+        Returns a QuerySet of all model instances that can be edited by the
+        admin site. This is used by changelist_view.
+        """
+        qs = self.model._default_manager.get_query_set()
+        # TODO: this should be handled by some parameter to the ChangeList.
+        ordering = self.ordering or () # otherwise we might try to *None, which is bad ;)
+        if ordering:
+            qs = qs.order_by(*ordering)
+        return qs
+
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
 
@@ -202,7 +215,6 @@ class ModelAdmin(BaseModelAdmin):
     date_hierarchy = None
     save_as = False
     save_on_top = False
-    ordering = None
     inlines = []
 
     # Custom templates (designed to be over-ridden in subclasses)
@@ -324,18 +336,6 @@ class ModelAdmin(BaseModelAdmin):
             'change': self.has_change_permission(request),
             'delete': self.has_delete_permission(request),
         }
-
-    def queryset(self, request):
-        """
-        Returns a QuerySet of all model instances that can be edited by the
-        admin site. This is used by changelist_view.
-        """
-        qs = self.model._default_manager.get_query_set()
-        # TODO: this should be handled by some parameter to the ChangeList.
-        ordering = self.ordering or () # otherwise we might try to *None, which is bad ;)
-        if ordering:
-            qs = qs.order_by(*ordering)
-        return qs
 
     def get_fieldsets(self, request, obj=None):
         "Hook for specifying fieldsets for the add form."
@@ -1256,9 +1256,6 @@ class InlineModelAdmin(BaseModelAdmin):
         form = self.get_formset(request).form
         fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
-
-    def queryset(self, request):
-        return self.model._default_manager.all()
 
 class StackedInline(InlineModelAdmin):
     template = 'admin/edit_inline/stacked.html'
