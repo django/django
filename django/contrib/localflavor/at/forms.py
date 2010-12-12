@@ -4,11 +4,13 @@ AT-specific Form helpers
 
 import re
 
-from django.utils.translation import ugettext_lazy as _
-from django.forms.fields import Field, RegexField, Select
+from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
+from django.forms.fields import Field, RegexField, Select
+from django.utils.translation import ugettext_lazy as _
 
 re_ssn = re.compile(r'^\d{4} \d{6}')
+
 
 class ATZipCodeField(RegexField):
     """
@@ -49,6 +51,9 @@ class ATSocialSecurityNumberField(Field):
     }
 
     def clean(self, value):
+        value = super(ATSocialSecurityNumberField, self).clean(value)
+        if value in EMPTY_VALUES:
+            return u""
         if not re_ssn.search(value):
             raise ValidationError(self.error_messages['invalid'])
         sqnr, date = value.split(" ")
@@ -62,4 +67,3 @@ class ATSocialSecurityNumberField(Field):
         if res != int(check):
            raise ValidationError(self.error_messages['invalid'])
         return u'%s%s %s'%(sqnr, check, date,)
-

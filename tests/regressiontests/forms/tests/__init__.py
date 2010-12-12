@@ -13,8 +13,10 @@ from widgets import *
 
 from regressiontests.forms.localflavortests import (
     __test__,
+    ARLocalFlavorTests,
+    ATLocalFlavorTests,
     BELocalFlavorTests,
     DELocalFlavorTests,
     ILLocalFlavorTests,
-    TRLocalFlavorTests
+    TRLocalFlavorTests,
 )

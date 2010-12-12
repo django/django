@@ -1,80 +1,45 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ AT form fields.
+from django.contrib.localflavor.at.forms import (ATZipCodeField, ATStateSelect,
+    ATSocialSecurityNumberField)
 
-tests = r"""
-# ATZipCodeField ###########################################################
-
->>> from django.contrib.localflavor.at.forms import ATZipCodeField 
->>> f = ATZipCodeField()
->>> f.clean('1150')
-u'1150'
->>> f.clean('4020')
-u'4020'
->>> f.clean('8020')
-u'8020'
->>> f.clean('111222')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXX.']
->>> f.clean('eeffee')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXX.']
->>> f.clean(u'')
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
->>> f.clean(None)
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
->>> f.clean('')
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
+from utils import LocalFlavorTestCase
 
 
->>> f = ATZipCodeField(required=False)
->>> f.clean('1150')
-u'1150'
->>> f.clean('4020')
-u'4020'
->>> f.clean('8020')
-u'8020'
->>> f.clean('111222')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXX.']
->>> f.clean('eeffee')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXX.']
->>> f.clean(None)
-u''
->>> f.clean('')
-u''
->>> f.clean(u'')
-u''
+class ATLocalFlavorTests(LocalFlavorTestCase):
+    def test_ATStateSelect(self):
+        f = ATStateSelect()
+        out = u'''<select name="bundesland">
+<option value="BL">Burgenland</option>
+<option value="KA">Carinthia</option>
+<option value="NO">Lower Austria</option>
+<option value="OO">Upper Austria</option>
+<option value="SA">Salzburg</option>
+<option value="ST">Styria</option>
+<option value="TI">Tyrol</option>
+<option value="VO">Vorarlberg</option>
+<option value="WI" selected="selected">Vienna</option>
+</select>'''
+        self.assertEqual(f.render('bundesland', 'WI'), out)
 
-# ATStateSelect ##################################################################
+    def test_ATZipCodeField(self):
+        error_format = [u'Enter a zip code in the format XXXX.']
+        valid = {
+            '1150': '1150',
+            '4020': '4020',
+            '8020': '8020',
+        }
+        invalid = {
+            '111222': error_format,
+            'eeffee': error_format,
+        }
+        self.assertFieldOutput(ATZipCodeField, valid, invalid)
 
->>> from django.contrib.localflavor.at.forms import ATStateSelect
->>> f = ATStateSelect()
->>> f.render('bundesland', 'WI')
-u'<select name="bundesland">\n<option value="BL">Burgenland</option>\n<option value="KA">Carinthia</option>\n<option value="NO">Lower Austria</option>\n<option value="OO">Upper Austria</option>\n<option value="SA">Salzburg</option>\n<option value="ST">Styria</option>\n<option value="TI">Tyrol</option>\n<option value="VO">Vorarlberg</option>\n<option value="WI" selected="selected">Vienna</option>\n</select>'
-
-# ATSocialSecurityNumberField ################################################
-
->>> from django.contrib.localflavor.at.forms import ATSocialSecurityNumberField
->>> f = ATSocialSecurityNumberField()
->>> f.clean('1237 010180')
-u'1237 010180'
->>> f.clean('1237 010181')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Austrian Social Security Number in XXXX XXXXXX format.']
->>> f.clean('12370 010180')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Austrian Social Security Number in XXXX XXXXXX format.']
-"""
+    def test_ATSocialSecurityNumberField(self):
+        error_format = [u'Enter a valid Austrian Social Security Number in XXXX XXXXXX format.']
+        valid = {
+            '1237 010180': '1237 010180',
+        }
+        invalid = {
+            '1237 010181': error_format,
+            '12370 010180': error_format,
+        }
+        self.assertFieldOutput(ATSocialSecurityNumberField, valid, invalid)
