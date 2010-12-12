@@ -1045,6 +1045,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
         for val in value:
             if force_unicode(val) not in pks:
                 raise ValidationError(self.error_messages['invalid_choice'] % val)
+        # Since this overrides the inherited ModelChoiceField.clean
+        # we run custom validators here
+        self.run_validators(value)
         return qs
 
     def prepare_value(self, value):
