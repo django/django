@@ -1,3 +1,4 @@
+import os
 from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -16,12 +17,40 @@ class SitemapTests(TestCase):
     def setUp(self):
         self.old_USE_L10N = settings.USE_L10N
         self.old_Site_meta_installed = Site._meta.installed
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(os.path.dirname(__file__), 'templates'),
+        )
         # Create a user that will double as sitemap content
         User.objects.create_user('testuser', 'test@example.com', 's3krit')
 
     def tearDown(self):
         settings.USE_L10N = self.old_USE_L10N
         Site._meta.installed = self.old_Site_meta_installed
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+
+    def test_simple_sitemap_index(self):
+        "A simple sitemap index can be rendered"
+        # Retrieve the sitemap.
+        response = self.client.get('/simple/index.xml')
+        # Check for all the important bits:
+        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<sitemap><loc>http://example.com/simple/sitemap-simple.xml</loc></sitemap>
+</sitemapindex>
+""")
+
+    def test_simple_sitemap_custom_index(self):
+        "A simple sitemap index can be rendered with a custom template"
+        # Retrieve the sitemap.
+        response = self.client.get('/simple/custom-index.xml')
+        # Check for all the important bits:
+        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is a customised template -->
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<sitemap><loc>http://example.com/simple/sitemap-simple.xml</loc></sitemap>
+</sitemapindex>
+""")
 
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
@@ -29,6 +58,18 @@ class SitemapTests(TestCase):
         response = self.client.get('/simple/sitemap.xml')
         # Check for all the important bits:
         self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>http://example.com/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
+</urlset>
+""" % date.today().strftime('%Y-%m-%d'))
+
+    def test_simple_custom_sitemap(self):
+        "A simple sitemap can be rendered with a custom template"
+        # Retrieve the sitemap.
+        response = self.client.get('/simple/custom-sitemap.xml')
+        # Check for all the important bits:
+        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is a customised template -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://example.com/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>

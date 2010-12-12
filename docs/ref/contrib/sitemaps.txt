@@ -279,8 +279,10 @@ references individual sitemap files, one per each section defined in your
 
 Here's what the relevant URLconf lines would look like for the example above::
 
-   (r'^sitemap\.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps}),
-   (r'^sitemap-(?P<section>.+)\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
+    urlpatterns = patterns('django.contrib.sitemaps.views',
+        (r'^sitemap\.xml$', 'index', {'sitemaps': sitemaps}),
+        (r'^sitemap-(?P<section>.+)\.xml$', 'sitemap', {'sitemaps': sitemaps}),
+    )
 
 This will automatically generate a :file:`sitemap.xml` file that references both
 :file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
@@ -290,6 +292,26 @@ don't change at all.
 You should create an index file if one of your sitemaps has more than 50,000
 URLs. In this case, Django will automatically paginate the sitemap, and the
 index will reflect that.
+
+.. versionadded:: 1.3
+
+Template customization
+======================
+
+If you wish to use a different template for each sitemap or sitemap index available on your site,
+you may specify it by passing a `template_name` parameter to the `sitemap` and `index` views via
+the URLconf::
+
+    urlpatterns = patterns('django.contrib.sitemaps.views',
+        (r'^custom-sitemap\.xml$', 'index', {
+            'sitemaps': sitemaps,
+            'template_name': 'custom_sitemap.html'
+        }),
+        (r'^custom-sitemap-(?P<section>.+)\.xml$', 'sitemap', {
+            'sitemaps': sitemaps,
+            'template_name': 'custom_sitemap.html'
+        }),
+    )
 
 Pinging Google
 ==============
