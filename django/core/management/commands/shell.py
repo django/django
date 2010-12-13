@@ -23,11 +23,21 @@ class Command(NoArgsCommand):
             if use_plain:
                 # Don't bother loading IPython, because the user wants plain Python.
                 raise ImportError
-            import IPython
-            # Explicitly pass an empty list as arguments, because otherwise IPython
-            # would use sys.argv from this script.
-            shell = IPython.Shell.IPShell(argv=[])
-            shell.mainloop()
+            try:
+                from IPython.frontend.terminal.embed import TerminalInteractiveShell
+                shell = TerminalInteractiveShell()
+                shell.mainloop()
+            except ImportError:
+                # IPython < 0.11
+                # Explicitly pass an empty list as arguments, because otherwise
+                # IPython would use sys.argv from this script.
+                try:
+                    from IPython.Shell import IPShell
+                    shell = IPShell(argv=[])
+                    shell.mainloop()
+                except ImportError:
+                    # IPython not found at all, raise ImportError
+                    raise
         except ImportError:
             import code
             # Set up a dictionary to serve as the environment for the shell, so
