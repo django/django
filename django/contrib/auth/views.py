@@ -129,7 +129,7 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
 def password_reset_done(request, template_name='registration/password_reset_done.html'):
     return render_to_response(template_name, context_instance=RequestContext(request))
 
-# Doesn't need csrf_protect since no-one can guess the URL
+@never_cache
 def password_reset_confirm(request, uidb36=None, token=None, template_name='registration/password_reset_confirm.html',
                            token_generator=default_token_generator, set_password_form=SetPasswordForm,
                            post_reset_redirect=None):
