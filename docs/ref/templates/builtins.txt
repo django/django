@@ -1175,6 +1175,9 @@ Available format strings:
     f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
                       with minutes left off if they're zero.
                       Proprietary extension.
+    E                 Month, locale specific alternative
+                      representation usually used for long
+                      date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
     F                 Month, textual, long.                     ``'January'``
     g                 Hour, 12-hour format without leading      ``'1'`` to ``'12'``
                       zeros.

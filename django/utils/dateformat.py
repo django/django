@@ -14,12 +14,12 @@ Usage:
 import re
 import time
 import calendar
-from django.utils.dates import MONTHS, MONTHS_3, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
+from django.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
 
-re_formatchars = re.compile(r'(?<!\\)([aAbBcdDfFgGhHiIjlLmMnNOPrsStTUuwWyYzZ])')
+re_formatchars = re.compile(r'(?<!\\)([aAbBcdDEfFgGhHiIjlLmMnNOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
 
 class Formatter(object):
@@ -137,6 +137,10 @@ class DateFormat(TimeFormat):
     def D(self):
         "Day of the week, textual, 3 letters; e.g. 'Fri'"
         return WEEKDAYS_ABBR[self.data.weekday()]
+
+    def E(self):
+        "Alternative month names as required by some locales. Proprietary extension."
+        return MONTHS_ALT[self.data.month]
 
     def F(self):
         "Month, textual, long; e.g. 'January'"
