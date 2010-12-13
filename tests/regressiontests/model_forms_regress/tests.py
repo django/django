@@ -31,6 +31,22 @@ class ModelMultipleChoiceFieldTests(TestCase):
         selected = f.clean([1, 3, 5, 7, 9])
         self.assertEquals(len(db.connection.queries), 1)
 
+    def test_model_multiple_choice_run_validators(self):
+        """
+        Test that ModelMultipleChoiceField run given validators (#14144).
+        """
+        for i in range(30):
+            Person.objects.create(name="Person %s" % i)
+
+        self._validator_run = False
+        def my_validator(value):
+            self._validator_run = True
+
+        f = forms.ModelMultipleChoiceField(queryset=Person.objects.all(),
+                                           validators=[my_validator])
+        f.clean([1,2])
+        self.assertTrue(self._validator_run)
+
 class TripleForm(forms.ModelForm):
     class Meta:
         model = Triple
