@@ -73,7 +73,7 @@ class FieldFile(File):
     def _get_size(self):
         self._require_file()
         if not self._committed:
-            return len(self.file)
+            return self.file.size
         return self.storage.size(self.name)
     size = property(_get_size)
 
@@ -93,7 +93,7 @@ class FieldFile(File):
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
-        self._size = len(content)
+        self._size = content.size
         self._committed = True
 
         # Save the object because it has changed, unless save is False
