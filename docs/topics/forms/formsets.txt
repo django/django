@@ -381,6 +381,7 @@ management form inside the template. Let's look at a sample view:
             formset = ArticleFormSet(request.POST, request.FILES)
             if formset.is_valid():
                 # do something with the formset.cleaned_data
+                pass
         else:
             formset = ArticleFormSet()
         return render_to_response('manage_articles.html', {'formset': formset})
@@ -430,6 +431,7 @@ a look at how this might be accomplished:
             book_formset = BookFormSet(request.POST, request.FILES, prefix='books')
             if article_formset.is_valid() and book_formset.is_valid():
                 # do something with the cleaned_data on the formsets.
+                pass
         else:
             article_formset = ArticleFormSet(prefix='articles')
             book_formset = BookFormSet(prefix='books')
