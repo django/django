@@ -4565,6 +4565,66 @@ msgstr "Лис."
 msgid "Dec."
 msgstr "Груд."
 
+#: utils/dates.py:45
+msgctxt "alt. month"
+msgid "January"
+msgstr "січня"
+
+#: utils/dates.py:46
+msgctxt "alt. month"
+msgid "February"
+msgstr "лютого"
+
+#: utils/dates.py:47
+msgctxt "alt. month"
+msgid "March"
+msgstr "березня"
+
+#: utils/dates.py:48
+msgctxt "alt. month"
+msgid "April"
+msgstr "квітня"
+
+#: utils/dates.py:49
+msgctxt "alt. month"
+msgid "May"
+msgstr "травня"
+
+#: utils/dates.py:50
+msgctxt "alt. month"
+msgid "June"
+msgstr "червня"
+
+#: utils/dates.py:51
+msgctxt "alt. month"
+msgid "July"
+msgstr "липня"
+
+#: utils/dates.py:52
+msgctxt "alt. month"
+msgid "August"
+msgstr "серпня"
+
+#: utils/dates.py:53
+msgctxt "alt. month"
+msgid "September"
+msgstr "вересня"
+
+#: utils/dates.py:54
+msgctxt "alt. month"
+msgid "October"
+msgstr "жовтня"
+
+#: utils/dates.py:55
+msgctxt "alt. month"
+msgid "November"
+msgstr "листопада"
+
+#: utils/dates.py:56
+msgctxt "alt. month"
+msgid "December"
+msgstr "грудня"
+
 #: .\utils\text.py:128
 msgid "or"
 msgstr "або"

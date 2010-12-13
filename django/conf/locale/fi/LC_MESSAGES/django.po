@@ -5029,6 +5029,66 @@ msgstr "marras"
 msgid "Dec."
 msgstr "joulu"
 
+#: utils/dates.py:45
+msgctxt "alt. month"
+msgid "January"
+msgstr "tammikuuta"
+
+#: utils/dates.py:46
+msgctxt "alt. month"
+msgid "February"
+msgstr "helmikuuta"
+
+#: utils/dates.py:47
+msgctxt "alt. month"
+msgid "March"
+msgstr "maaliskuuta"
+
+#: utils/dates.py:48
+msgctxt "alt. month"
+msgid "April"
+msgstr "huhtikuuta"
+
+#: utils/dates.py:49
+msgctxt "alt. month"
+msgid "May"
+msgstr "toukokuuta"
+
+#: utils/dates.py:50
+msgctxt "alt. month"
+msgid "June"
+msgstr "kesäkuuta"
+
+#: utils/dates.py:51
+msgctxt "alt. month"
+msgid "July"
+msgstr "heinäkuuta"
+
+#: utils/dates.py:52
+msgctxt "alt. month"
+msgid "August"
+msgstr "elokuuta"
+
+#: utils/dates.py:53
+msgctxt "alt. month"
+msgid "September"
+msgstr "syyskuuta"
+
+#: utils/dates.py:54
+msgctxt "alt. month"
+msgid "October"
+msgstr "lokakuuta"
+
+#: utils/dates.py:55
+msgctxt "alt. month"
+msgid "November"
+msgstr "marraskuuta"
+
+#: utils/dates.py:56
+msgctxt "alt. month"
+msgid "December"
+msgstr "joulukuuta"
+
 #: utils/text.py:130
 msgid "or"
 msgstr "tai"

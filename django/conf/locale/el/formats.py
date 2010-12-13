@@ -4,7 +4,7 @@
 
 # The *_FORMAT strings use the Django date format syntax,
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-DATE_FORMAT = 'd F Y'
+DATE_FORMAT = 'd E Y'
 TIME_FORMAT = 'g:i:s A'
 # DATETIME_FORMAT = 
 YEAR_MONTH_FORMAT = 'F Y'

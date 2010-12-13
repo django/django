@@ -4929,6 +4929,66 @@ msgstr "Нояб."
 msgid "Dec."
 msgstr "Дек."
 
+#: utils/dates.py:45
+msgctxt "alt. month"
+msgid "January"
+msgstr "января"
+
+#: utils/dates.py:46
+msgctxt "alt. month"
+msgid "February"
+msgstr "февраля"
+
+#: utils/dates.py:47
+msgctxt "alt. month"
+msgid "March"
+msgstr "марта"
+
+#: utils/dates.py:48
+msgctxt "alt. month"
+msgid "April"
+msgstr "апреля"
+
+#: utils/dates.py:49
+msgctxt "alt. month"
+msgid "May"
+msgstr "мая"
+
+#: utils/dates.py:50
+msgctxt "alt. month"
+msgid "June"
+msgstr "июня"
+
+#: utils/dates.py:51
+msgctxt "alt. month"
+msgid "July"
+msgstr "июля"
+
+#: utils/dates.py:52
+msgctxt "alt. month"
+msgid "August"
+msgstr "августа"
+
+#: utils/dates.py:53
+msgctxt "alt. month"
+msgid "September"
+msgstr "сентября"
+
+#: utils/dates.py:54
+msgctxt "alt. month"
+msgid "October"
+msgstr "октября"
+
+#: utils/dates.py:55
+msgctxt "alt. month"
+msgid "November"
+msgstr "ноября"
+
+#: utils/dates.py:56
+msgctxt "alt. month"
+msgid "December"
+msgstr "декабря"
+
 #: utils/text.py:130
 msgid "or"
 msgstr "или"
