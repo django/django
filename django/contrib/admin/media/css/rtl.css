@@ -82,6 +82,10 @@ div.breadcrumbs {
 
 /* changelists styles */
 
+.change-list ul.toplinks li {
+    float: right;
+}
+
 .change-list .filtered {
     background: white url(../img/admin/changelist-bg_rtl.gif) top left repeat-y !important;
 }
