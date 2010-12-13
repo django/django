@@ -16,6 +16,11 @@ js_info_dict = {
     'packages': ('regressiontests.views',),
 }
 
+js_info_dict_english_translation = {
+    'domain': 'djangojs',
+    'packages': ('regressiontests.views.app0',),
+}
+
 js_info_dict_multi_packages1 = {
     'domain': 'djangojs',
     'packages': ('regressiontests.views.app1', 'regressiontests.views.app2'),
@@ -56,6 +61,7 @@ urlpatterns = patterns('',
     # i18n views
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    (r'^jsi18n_english_translation/$', 'django.views.i18n.javascript_catalog', js_info_dict_english_translation),
     (r'^jsi18n_multi_packages1/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages1),
     (r'^jsi18n_multi_packages2/$', 'django.views.i18n.javascript_catalog', js_info_dict_multi_packages2),
 

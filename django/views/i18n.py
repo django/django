@@ -194,7 +194,8 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     locale = to_locale(get_language())
     t = {}
     paths = []
-    en_catalog_missing = False
+    en_selected = locale.startswith('en')
+    en_catalog_missing = True
     # first load all english languages files for defaults
     for package in packages:
         p = importlib.import_module(package)
@@ -204,13 +205,12 @@ def javascript_catalog(request, domain='djangojs', packages=None):
             catalog = gettext_module.translation(domain, path, ['en'])
             t.update(catalog._catalog)
         except IOError:
-            # 'en' catalog was missing.
-            if locale.startswith('en'):
-                # If 'en' is the selected language this would cause issues
-                # later on if default_locale is something other than 'en'.
-                en_catalog_missing = True
-            # Otherwise it is harmless.
             pass
+        else:
+            # 'en' is the selected language and at least one of the packages
+            # listed in `packages` has an 'en' catalog
+            if en_selected:
+                en_catalog_missing = False
     # next load the settings.LANGUAGE_CODE translations if it isn't english
     if default_locale != 'en':
         for path in paths:
@@ -222,12 +222,11 @@ def javascript_catalog(request, domain='djangojs', packages=None):
                 t.update(catalog._catalog)
     # last load the currently selected language, if it isn't identical to the default.
     if locale != default_locale:
-        # If the flag en_catalog_missing has been set, the currently
-        # selected language is English but it doesn't have a translation
-        # catalog (presumably due to being the language translated from).
-        # If that is the case, a wrong language catalog might have been
-        # loaded in the previous step. It needs to be discarded.
-        if en_catalog_missing:
+        # If the currently selected language is English but it doesn't have a
+        # translation catalog (presumably due to being the language translated
+        # from) then a wrong language catalog might have been loaded in the
+        # previous step. It needs to be discarded.
+        if en_selected and en_catalog_missing:
             t = {}
         else:
             locale_t = {}

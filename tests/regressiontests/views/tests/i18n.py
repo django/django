@@ -43,9 +43,12 @@ class JsI18NTests(TestCase):
 
     def setUp(self):
         self.old_language_code = settings.LANGUAGE_CODE
+        self.old_installed_apps = settings.INSTALLED_APPS
 
     def tearDown(self):
+        deactivate()
         settings.LANGUAGE_CODE = self.old_language_code
+        settings.INSTALLED_APPS = self.old_installed_apps
 
     def test_jsi18n_with_missing_en_files(self):
         """
@@ -75,14 +78,26 @@ class JsI18NTests(TestCase):
     def testI18NLanguageNonEnglishDefault(self):
         """
         Check if the Javascript i18n view returns an empty language catalog
-        if the default language is non-English but the selected language
-        is English. See #13388 and #3594 for more details.
+        if the default language is non-English, the selected language
+        is English and there is not 'en' translation available. See #13388,
+        #3594 and #13726 for more details.
         """
         settings.LANGUAGE_CODE = 'fr'
         activate('en-us')
         response = self.client.get('/views/jsi18n/')
         self.assertNotContains(response, 'Choisir une heure')
-        deactivate()
+
+    def test_nonenglish_default_english_userpref(self):
+        """
+        Same as above with the difference that there IS an 'en' translation
+        available. The Javascript i18n view must return a NON empty language catalog
+        with the proper English translations. See #13726 for more details.
+        """
+        settings.LANGUAGE_CODE = 'fr'
+        settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ['regressiontests.views.app0']
+        activate('en-us')
+        response = self.client.get('/views/jsi18n_english_translation/')
+        self.assertContains(response, javascript_quote('this app0 string is to be translated'))
 
     def testI18NLanguageNonEnglishFallback(self):
         """
@@ -93,7 +108,6 @@ class JsI18NTests(TestCase):
         activate('none')
         response = self.client.get('/views/jsi18n/')
         self.assertContains(response, 'Choisir une heure')
-        deactivate()
 
 
 class JsI18NTestsMultiPackage(TestCase):
