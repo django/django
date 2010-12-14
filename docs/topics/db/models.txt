@@ -253,9 +253,9 @@ argument -- a verbose name. If the verbose name isn't given, Django will
 automatically create it using the field's attribute name, converting underscores
 to spaces.
 
-In this example, the verbose name is ``"Person's first name"``::
+In this example, the verbose name is ``"person's first name"``::
 
-    first_name = models.CharField("Person's first name", max_length=30)
+    first_name = models.CharField("person's first name", max_length=30)
 
 In this example, the verbose name is ``"first name"``::
 
