@@ -4,7 +4,7 @@
 Fixtures are a way of loading data into the database in bulk. Fixure data
 can be stored in any serializable format (including JSON and XML). Fixtures
 are identified by name, and are stored in either a directory named 'fixtures'
-in the application directory, on in one of the directories named in the
+in the application directory, or in one of the directories named in the
 ``FIXTURE_DIRS`` setting.
 """
 
