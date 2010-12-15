@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-14 12:41+0100\n"
+"POT-Creation-Date: 2010-12-15 15:42+0100\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "Language-Team: PL <pl@li.org>\n"
@@ -5140,10 +5140,71 @@ msgstr "Lis."
 msgid "Dec."
 msgstr "Gru."
 
+#: utils/dates.py:35
+msgctxt "alt. month"
+msgid "January"
+msgstr "stycznia"
+
+#: utils/dates.py:36
+msgctxt "alt. month"
+msgid "February"
+msgstr "lutego"
+
+#: utils/dates.py:37
+msgctxt "alt. month"
+msgid "March"
+msgstr "marca"
+
+#: utils/dates.py:38
+msgctxt "alt. month"
+msgid "April"
+msgstr "kwietnia"
+
+#: utils/dates.py:39
+msgctxt "alt. month"
+msgid "May"
+msgstr "maja"
+
+#: utils/dates.py:40
+msgctxt "alt. month"
+msgid "June"
+msgstr "czerwca"
+
+#: utils/dates.py:41
+msgctxt "alt. month"
+msgid "July"
+msgstr "lipca"
+
+#: utils/dates.py:42
+msgctxt "alt. month"
+msgid "August"
+msgstr "sierpnia"
+
+#: utils/dates.py:43
+msgctxt "alt. month"
+msgid "September"
+msgstr "września"
+
+#: utils/dates.py:44
+msgctxt "alt. month"
+msgid "October"
+msgstr "października"
+
+#: utils/dates.py:45
+msgctxt "alt. month"
+msgid "November"
+msgstr "listopada"
+
+#: utils/dates.py:46
+msgctxt "alt. month"
+msgid "December"
+msgstr "grudnia"
+
 #: utils/text.py:136
 msgid "or"
 msgstr "lub"
 
+#. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
 msgstr ", "
@@ -5274,54 +5335,6 @@ msgstr "%(verbose_name)s zostało usunięte."
 #~ msgstr[2] ""
 #~ "Proszę podać poprawne identyfikatory %(self)s. Wartości %(value)r są "
 #~ "niepoprawne."
-
-#~ msgctxt "alt. month"
-#~ msgid "January"
-#~ msgstr "stycznia"
-
-#~ msgctxt "alt. month"
-#~ msgid "February"
-#~ msgstr "lutego"
-
-#~ msgctxt "alt. month"
-#~ msgid "March"
-#~ msgstr "marca"
-
-#~ msgctxt "alt. month"
-#~ msgid "April"
-#~ msgstr "kwietnia"
-
-#~ msgctxt "alt. month"
-#~ msgid "May"
-#~ msgstr "maja"
-
-#~ msgctxt "alt. month"
-#~ msgid "June"
-#~ msgstr "czerwca"
-
-#~ msgctxt "alt. month"
-#~ msgid "July"
-#~ msgstr "lipca"
-
-#~ msgctxt "alt. month"
-#~ msgid "August"
-#~ msgstr "sierpnia"
-
-#~ msgctxt "alt. month"
-#~ msgid "September"
-#~ msgstr "września"
-
-#~ msgctxt "alt. month"
-#~ msgid "October"
-#~ msgstr "października"
-
-#~ msgctxt "alt. month"
-#~ msgid "November"
-#~ msgstr "listopada"
-
-#~ msgctxt "alt. month"
-#~ msgid "December"
-#~ msgstr "grudnia"
 
 #~ msgid "Change:"
 #~ msgstr "Zmień:"
