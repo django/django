@@ -853,7 +853,7 @@ def do_if(parser, token):
         {% endif %}
 
     Comparison operators are also available, and the use of filters is also
-    allowed, for example:
+    allowed, for example::
 
         {% if articles|length >= 5 %}...{% endif %}
 

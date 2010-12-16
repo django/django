@@ -16,8 +16,8 @@
     {% if library.grouper %}<p class="small quiet">To use these filters, put <code>{% templatetag openblock %} load {{ library.grouper }} {% templatetag closeblock %}</code> in your template before using the filter.</p><hr />{% endif %}
     {% for filter in library.list|dictsort:"name" %}
     <h3 id="{{ library.grouper|default_if_none:"built_in" }}-{{ filter.name }}">{{ filter.name }}</h3>
-    <p>{{ filter.title }}</p>
-    <p>{{ filter.body }}</p>
+    {{ filter.title }}
+    {{ filter.body }}
     {% if not forloop.last %}<hr />{% endif %}
     {% endfor %}
 </div>
