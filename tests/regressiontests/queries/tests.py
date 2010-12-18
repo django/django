@@ -27,6 +27,12 @@ class BaseQuerysetTest(TestCase):
         except Exception, e:
             self.assertEqual(msg, str(e))
             self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
+        else:
+            if hasattr(exc, '__name__'):
+                excName = exc.__name__
+            else:
+                excName = str(exc)
+            raise AssertionError, "%s not raised" % excName
 
 
 class Queries1Tests(BaseQuerysetTest):
@@ -1528,12 +1534,12 @@ class ConditionalTests(BaseQuerysetTest):
         self.assertRaisesMessage(
             FieldError,
             'Infinite loop caused by ordering.',
-            LoopX.objects.all
+            lambda: list(LoopX.objects.all()) # Force queryset evaluation with list()
         )
         self.assertRaisesMessage(
             FieldError,
             'Infinite loop caused by ordering.',
-            LoopZ.objects.all
+            lambda: list(LoopZ.objects.all()) # Force queryset evaluation with list()
         )
 
         # Note that this doesn't cause an infinite loop, since the default
