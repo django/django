@@ -1780,6 +1780,11 @@ For example::
 If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
 output will be ``"Joel <button>is</button> a slug"``.
 
+Note that this filter is case-sensitive.
+
+If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
+output will be ``"<B>Joel</B> <button>is</button> a slug"``.
+
 .. templatefilter:: rjust
 
 rjust
