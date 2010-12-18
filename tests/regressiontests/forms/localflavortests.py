@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from localflavor.cz import tests as localflavor_cz_tests
-from localflavor.generic import tests as localflavor_generic_tests
 from localflavor.id import tests as localflavor_id_tests
 from localflavor.ie import tests as localflavor_ie_tests
 from localflavor.is_ import tests as localflavor_is_tests
@@ -30,13 +29,13 @@ from localflavor.de import DELocalFlavorTests
 from localflavor.es import ESLocalFlavorTests
 from localflavor.fi import FILocalFlavorTests
 from localflavor.fr import FRLocalFlavorTests
+from localflavor.generic import GenericLocalFlavorTests
 from localflavor.il import ILLocalFlavorTests
 from localflavor.tr import TRLocalFlavorTests
 
 
 __test__ = {
     'localflavor_cz_tests': localflavor_cz_tests,
-    'localflavor_generic_tests': localflavor_generic_tests,
     'localflavor_id_tests': localflavor_id_tests,
     'localflavor_ie_tests': localflavor_ie_tests,
     'localflavor_is_tests': localflavor_is_tests,
