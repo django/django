@@ -1,72 +1,62 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ NL form fields.
+from django.contrib.localflavor.nl.forms import (NLPhoneNumberField,
+    NLZipCodeField, NLSoFiNumberField, NLProvinceSelect)
 
-tests = r"""
-# NLPhoneNumberField ########################################################
+from utils import LocalFlavorTestCase
 
->>> from django.contrib.localflavor.nl.forms import NLPhoneNumberField
->>> f = NLPhoneNumberField(required=False)
->>> f.clean('')
-u''
->>> f.clean('012-3456789')
-'012-3456789'
->>> f.clean('0123456789')
-'0123456789'
->>> f.clean('+31-12-3456789')
-'+31-12-3456789'
->>> f.clean('(0123) 456789')
-'(0123) 456789'
->>> f.clean('foo')
-Traceback (most recent call last):
-    ...
-ValidationError: [u'Enter a valid phone number']
 
-# NLZipCodeField ############################################################
+class NLLocalFlavorTests(LocalFlavorTestCase):
+    def test_NLProvinceSelect(self):
+        f = NLProvinceSelect()
+        out = u'''<select name="provinces">
+<option value="DR">Drenthe</option>
+<option value="FL">Flevoland</option>
+<option value="FR">Friesland</option>
+<option value="GL">Gelderland</option>
+<option value="GR">Groningen</option>
+<option value="LB">Limburg</option>
+<option value="NB">Noord-Brabant</option>
+<option value="NH">Noord-Holland</option>
+<option value="OV" selected="selected">Overijssel</option>
+<option value="UT">Utrecht</option>
+<option value="ZE">Zeeland</option>
+<option value="ZH">Zuid-Holland</option>
+</select>'''
+        self.assertEqual(f.render('provinces', 'OV'), out)
 
->>> from django.contrib.localflavor.nl.forms import NLZipCodeField
->>> f = NLZipCodeField(required=False)
->>> f.clean('')
-u''
->>> f.clean('1234ab')
-u'1234 AB'
->>> f.clean('1234 ab')
-u'1234 AB'
->>> f.clean('1234 AB')
-u'1234 AB'
->>> f.clean('0123AB')
-Traceback (most recent call last):
-    ...
-ValidationError: [u'Enter a valid postal code']
->>> f.clean('foo')
-Traceback (most recent call last):
-    ...
-ValidationError: [u'Enter a valid postal code']
+    def test_NLPhoneNumberField(self):
+        error_invalid = [u'Enter a valid phone number']
+        valid = {
+                '012-3456789': '012-3456789',
+                '0123456789': '0123456789',
+                '+31-12-3456789': '+31-12-3456789',
+                '(0123) 456789': '(0123) 456789',
+        }
+        invalid = {
+                'foo': error_invalid,
+        }
+        self.assertFieldOutput(NLPhoneNumberField, valid, invalid)
 
-# NLSoFiNumberField #########################################################
+    def test_NLZipCodeField(self):
+        error_invalid = [u'Enter a valid postal code']
+        valid = {
+            '1234ab': '1234 AB',
+            '1234 ab': '1234 AB',
+            '1234 AB': '1234 AB',
+        }
+        invalid = {
+            '0123AB': error_invalid,
+            'foo': error_invalid,
+        }
+        self.assertFieldOutput(NLZipCodeField, valid, invalid)
 
->>> from django.contrib.localflavor.nl.forms import NLSoFiNumberField
->>> f = NLSoFiNumberField(required=False)
->>> f.clean('')
-u''
->>> f.clean('123456782')
-'123456782'
->>> f.clean('000000000')
-Traceback (most recent call last):
-    ...
-ValidationError: [u'Enter a valid SoFi number']
->>> f.clean('123456789')
-Traceback (most recent call last):
-    ...
-ValidationError: [u'Enter a valid SoFi number']
->>> f.clean('foo')
-Traceback (most recent call last):
-    ...
-ValidationError: [u'Enter a valid SoFi number']
-
-# NLProvinceSelect ##########################################################
-
->>> from django.contrib.localflavor.nl.forms import NLProvinceSelect
->>> s = NLProvinceSelect()
->>> s.render('provinces', 'OV')
-u'<select name="provinces">\n<option value="DR">Drenthe</option>\n<option value="FL">Flevoland</option>\n<option value="FR">Friesland</option>\n<option value="GL">Gelderland</option>\n<option value="GR">Groningen</option>\n<option value="LB">Limburg</option>\n<option value="NB">Noord-Brabant</option>\n<option value="NH">Noord-Holland</option>\n<option value="OV" selected="selected">Overijssel</option>\n<option value="UT">Utrecht</option>\n<option value="ZE">Zeeland</option>\n<option value="ZH">Zuid-Holland</option>\n</select>'
-"""
+    def test_NLSoFiNumberField(self):
+        error_invalid = [u'Enter a valid SoFi number']
+        valid = {
+            '123456782': '123456782',
+        }
+        invalid = {
+            '000000000': error_invalid,
+            '123456789': error_invalid,
+            'foo': error_invalid,
+        }
+        self.assertFieldOutput(NLSoFiNumberField, valid, invalid)
