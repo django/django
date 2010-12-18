@@ -1,58 +1,75 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ CH form fields.
+from django.contrib.localflavor.ch.forms import (CHZipCodeField,
+    CHPhoneNumberField, CHIdentityCardNumberField, CHStateSelect)
 
-tests = r"""
-# CHZipCodeField ############################################################
+from utils import LocalFlavorTestCase
 
->>> from django.contrib.localflavor.ch.forms import CHZipCodeField
->>> f = CHZipCodeField()
->>> f.clean('800x')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXX.']
->>> f.clean('80 00')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXX.']
->>> f.clean('8000')
-u'8000'
 
-# CHPhoneNumberField ########################################################
+class CHLocalFlavorTests(LocalFlavorTestCase):
+    def test_CHStateSelect(self):
+        f = CHStateSelect()
+        out = u'''<select name="state">
+<option value="AG" selected="selected">Aargau</option>
+<option value="AI">Appenzell Innerrhoden</option>
+<option value="AR">Appenzell Ausserrhoden</option>
+<option value="BS">Basel-Stadt</option>
+<option value="BL">Basel-Land</option>
+<option value="BE">Berne</option>
+<option value="FR">Fribourg</option>
+<option value="GE">Geneva</option>
+<option value="GL">Glarus</option>
+<option value="GR">Graubuenden</option>
+<option value="JU">Jura</option>
+<option value="LU">Lucerne</option>
+<option value="NE">Neuchatel</option>
+<option value="NW">Nidwalden</option>
+<option value="OW">Obwalden</option>
+<option value="SH">Schaffhausen</option>
+<option value="SZ">Schwyz</option>
+<option value="SO">Solothurn</option>
+<option value="SG">St. Gallen</option>
+<option value="TG">Thurgau</option>
+<option value="TI">Ticino</option>
+<option value="UR">Uri</option>
+<option value="VS">Valais</option>
+<option value="VD">Vaud</option>
+<option value="ZG">Zug</option>
+<option value="ZH">Zurich</option>
+</select>'''
+        self.assertEqual(f.render('state', 'AG'), out)
+    
+    def test_CHZipCodeField(self):
+        error_format = [u'Enter a zip code in the format XXXX.']
+        valid = {
+            '1234': '1234',
+            '0000': '0000',
+        }
+        invalid = {
+            '800x': error_format,
+            '80 00': error_format,
+        }
+        self.assertFieldOutput(CHZipCodeField, valid, invalid)
+    
+    def test_CHPhoneNumberField(self):
+        error_format = [u'Phone numbers must be in 0XX XXX XX XX format.']
+        valid = {
+            '012 345 67 89': '012 345 67 89',
+            '0123456789': '012 345 67 89',
+        }
+        invalid = {
+            '01234567890': error_format,
+            '1234567890': error_format,
+        }
+        self.assertFieldOutput(CHPhoneNumberField, valid, invalid)
+    
+    def test_CHIdentityCardNumberField(self):
+        error_format = [u'Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.']
+        valid = {
+            'C1234567<0': 'C1234567<0',
+            '2123456700': '2123456700',
+        }
+        invalid = {
+            'C1234567<1': error_format,
+            '2123456701': error_format,
+        }
+        self.assertFieldOutput(CHIdentityCardNumberField, valid, invalid)
 
->>> from django.contrib.localflavor.ch.forms import CHPhoneNumberField
->>> f = CHPhoneNumberField()
->>> f.clean('01234567890')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in 0XX XXX XX XX format.']
->>> f.clean('1234567890')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in 0XX XXX XX XX format.']
->>> f.clean('0123456789')
-u'012 345 67 89'
-
-# CHIdentityCardNumberField #################################################
-
->>> from django.contrib.localflavor.ch.forms import CHIdentityCardNumberField
->>> f = CHIdentityCardNumberField()
->>> f.clean('C1234567<0')
-u'C1234567<0'
->>> f.clean('C1234567<1')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.']
->>> f.clean('2123456700')
-u'2123456700'
->>> f.clean('2123456701')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.']
-
-# CHStateSelect #############################################################
-
->>> from django.contrib.localflavor.ch.forms import CHStateSelect
->>> w = CHStateSelect()
->>> w.render('state', 'AG')
-u'<select name="state">\n<option value="AG" selected="selected">Aargau</option>\n<option value="AI">Appenzell Innerrhoden</option>\n<option value="AR">Appenzell Ausserrhoden</option>\n<option value="BS">Basel-Stadt</option>\n<option value="BL">Basel-Land</option>\n<option value="BE">Berne</option>\n<option value="FR">Fribourg</option>\n<option value="GE">Geneva</option>\n<option value="GL">Glarus</option>\n<option value="GR">Graubuenden</option>\n<option value="JU">Jura</option>\n<option value="LU">Lucerne</option>\n<option value="NE">Neuchatel</option>\n<option value="NW">Nidwalden</option>\n<option value="OW">Obwalden</option>\n<option value="SH">Schaffhausen</option>\n<option value="SZ">Schwyz</option>\n<option value="SO">Solothurn</option>\n<option value="SG">St. Gallen</option>\n<option value="TG">Thurgau</option>\n<option value="TI">Ticino</option>\n<option value="UR">Uri</option>\n<option value="VS">Valais</option>\n<option value="VD">Vaud</option>\n<option value="ZG">Zug</option>\n<option value="ZH">Zurich</option>\n</select>'
-"""
