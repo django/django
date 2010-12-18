@@ -1,117 +1,40 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ FR form fields.
+from django.contrib.localflavor.fr.forms import (FRZipCodeField,
+        FRPhoneNumberField, FRDepartmentSelect)
 
-tests = r"""
-# FRZipCodeField #############################################################
-
-FRZipCodeField validates that the data is a valid FR zipcode.
->>> from django.contrib.localflavor.fr.forms import FRZipCodeField
->>> f = FRZipCodeField()
->>> f.clean('75001')
-u'75001'
->>> f.clean('93200')
-u'93200'
->>> f.clean('2A200')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
->>> f.clean('980001')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
->>> f.clean(None)
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
->>> f.clean('')
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
-
->>> f = FRZipCodeField(required=False)
->>> f.clean('75001')
-u'75001'
->>> f.clean('93200')
-u'93200'
->>> f.clean('2A200')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
->>> f.clean('980001')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
->>> f.clean(None)
-u''
->>> f.clean('')
-u''
+from utils import LocalFlavorTestCase
 
 
-# FRPhoneNumberField ##########################################################
+class FRLocalFlavorTests(LocalFlavorTestCase):
+    def test_FRZipCodeField(self):
+        error_format = [u'Enter a zip code in the format XXXXX.']
+        valid = {
+            '75001': '75001',
+            '93200': '93200',
+        }
+        invalid = {
+            '2A200': error_format,
+            '980001': error_format,
+        }
+        self.assertFieldOutput(FRZipCodeField, valid, invalid)
 
-FRPhoneNumberField validates that the data is a valid french phone number.
-It's normalized to 0X XX XX XX XX format. Dots are valid too.
->>> from django.contrib.localflavor.fr.forms import FRPhoneNumberField
->>> f = FRPhoneNumberField()
->>> f.clean('01 55 44 58 64')
-u'01 55 44 58 64'
->>> f.clean('0155445864')
-u'01 55 44 58 64'
->>> f.clean('01 5544 5864')
-u'01 55 44 58 64'
->>> f.clean('01 55.44.58.64')
-u'01 55 44 58 64'
->>> f.clean('01.55.44.58.64')
-u'01 55 44 58 64'
->>> f.clean('01,55,44,58,64')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in 0X XX XX XX XX format.']
->>> f.clean('555 015 544')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in 0X XX XX XX XX format.']
->>> f.clean(None)
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
->>> f.clean('')
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
+    def test_FRPhoneNumberField(self):
+        error_format = [u'Phone numbers must be in 0X XX XX XX XX format.']
+        valid = {
+            '01 55 44 58 64': '01 55 44 58 64',
+            '0155445864': '01 55 44 58 64',
+            '01 5544 5864': '01 55 44 58 64',
+            '01 55.44.58.64': '01 55 44 58 64',
+            '01.55.44.58.64': '01 55 44 58 64',
+        }
+        invalid = {
+            '01,55,44,58,64': error_format,
+            '555 015 544': error_format,
+        }
+        self.assertFieldOutput(FRPhoneNumberField, valid, invalid)
 
->>> f = FRPhoneNumberField(required=False)
->>> f.clean('01 55 44 58 64')
-u'01 55 44 58 64'
->>> f.clean('0155445864')
-u'01 55 44 58 64'
->>> f.clean('01 5544 5864')
-u'01 55 44 58 64'
->>> f.clean('01 55.44.58.64')
-u'01 55 44 58 64'
->>> f.clean('01.55.44.58.64')
-u'01 55 44 58 64'
->>> f.clean('01,55,44,58,64')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in 0X XX XX XX XX format.']
->>> f.clean('555 015 544')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in 0X XX XX XX XX format.']
->>> f.clean(None)
-u''
->>> f.clean('')
-u''
-
-# FRDepartmentSelect ###############################################################
-
-FRDepartmentSelect is a Select widget that uses a list of french departments
-including DOM TOM
->>> from django.contrib.localflavor.fr.forms import FRDepartmentSelect
->>> w = FRDepartmentSelect()
->>> print w.render('dep', 'Paris')
-<select name="dep">
+    def test_FRDepartmentSelect(self):
+        f = FRDepartmentSelect()
+        out = u'''<select name="dep">
 <option value="01">01 - Ain</option>
 <option value="02">02 - Aisne</option>
 <option value="03">03 - Allier</option>
@@ -218,5 +141,5 @@ including DOM TOM
 <option value="986">986 - Wallis et Futuna</option>
 <option value="987">987 - Polynesie Francaise</option>
 <option value="988">988 - Nouvelle-Caledonie</option>
-</select>
-"""
+</select>'''
+        self.assertEqual(f.render('dep', 'Paris'), out)
