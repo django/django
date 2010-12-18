@@ -1,15 +1,16 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ KW form fields.
+from django.contrib.localflavor.kw.forms import KWCivilIDNumberField
 
-tests = r"""
-# KWCivilIDNumberField ########################################################
+from utils import LocalFlavorTestCase
 
->>> from django.contrib.localflavor.kw.forms import KWCivilIDNumberField
->>> f = KWCivilIDNumberField()
->>> f.clean('282040701483')
-'282040701483'
->>> f.clean('289332013455')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Kuwaiti Civil ID number']
-"""
+
+class KWLocalFlavorTests(LocalFlavorTestCase):
+    def test_KWCivilIDNumberField(self):
+        error_invalid = [u'Enter a valid Kuwaiti Civil ID number']
+        valid = {
+            '282040701483': '282040701483',
+        }
+        invalid = {
+            '289332013455': error_invalid,
+        }
+        self.assertFieldOutput(KWCivilIDNumberField, valid, invalid)
+
