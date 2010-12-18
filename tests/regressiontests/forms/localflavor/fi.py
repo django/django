@@ -1,58 +1,13 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ FI form fields.
+from django.contrib.localflavor.fi.forms import (FIZipCodeField,
+    FISocialSecurityNumber, FIMunicipalitySelect)
 
-tests = r"""
-# FIZipCodeField #############################################################
+from utils import LocalFlavorTestCase
 
-FIZipCodeField validates that the data is a valid FI zipcode.
->>> from django.contrib.localflavor.fi.forms import FIZipCodeField
->>> f = FIZipCodeField()
->>> f.clean('20540')
-u'20540'
->>> f.clean('20101')
-u'20101'
->>> f.clean('20s40')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
->>> f.clean('205401')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
->>> f.clean(None)
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
->>> f.clean('')
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
 
->>> f = FIZipCodeField(required=False)
->>> f.clean('20540')
-u'20540'
->>> f.clean('20101')
-u'20101'
->>> f.clean('20s40')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
->>> f.clean('205401')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
->>> f.clean(None)
-u''
->>> f.clean('')
-u''
-
-# FIMunicipalitySelect ###############################################################
-
-A Select widget that uses a list of Finnish municipalities as its choices.
->>> from django.contrib.localflavor.fi.forms import FIMunicipalitySelect
->>> w = FIMunicipalitySelect()
->>> unicode(w.render('municipalities', 'turku'))
-u'<select name="municipalities">
+class FILocalFlavorTests(LocalFlavorTestCase):
+    def test_FIMunicipalitySelect(self):
+        f = FIMunicipalitySelect()
+        out = u'''<select name="municipalities">
 <option value="akaa">Akaa</option>
 <option value="alajarvi">Alaj\xe4rvi</option>
 <option value="alavieska">Alavieska</option>
@@ -395,49 +350,33 @@ u'<select name="municipalities">
 <option value="ypaja">Yp\xe4j\xe4</option>
 <option value="ahtari">\xc4ht\xe4ri</option>
 <option value="aanekoski">\xc4\xe4nekoski</option>
-</select>'
+</select>'''
+        self.assertEquals(f.render('municipalities', 'turku'), out)
 
+    def test_FIZipCodeField(self):
+        error_format = [u'Enter a zip code in the format XXXXX.']
+        valid = {
+            '20540': '20540',
+            '20101': '20101',
+        }
+        invalid = {
+            '20s40': error_format,
+            '205401': error_format
+        }
+        self.assertFieldOutput(FIZipCodeField, valid, invalid)
 
-# FISocialSecurityNumber ##############################################################
+    def test_FISocialSecurityNumber(self):
+        error_invalid = [u'Enter a valid Finnish social security number.']
+        valid = {
+            '010101-0101': '010101-0101',
+            '010101+0101': '010101+0101',
+            '010101A0101': '010101A0101',
+        }
+        invalid = {
+            '101010-0102': error_invalid,
+            '10a010-0101': error_invalid,
+            '101010-0\xe401': error_invalid,
+            '101010b0101': error_invalid,
+        }
+        self.assertFieldOutput(FISocialSecurityNumber, valid, invalid)
 
->>> from django.contrib.localflavor.fi.forms import FISocialSecurityNumber
->>> f = FISocialSecurityNumber()
->>> f.clean('010101-0101')
-u'010101-0101'
->>> f.clean('010101+0101')
-u'010101+0101'
->>> f.clean('010101A0101')
-u'010101A0101'
->>> f.clean('101010-0102')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Finnish social security number.']
->>> f.clean('10a010-0101')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Finnish social security number.']
->>> f.clean('101010-0\xe401')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Finnish social security number.']
->>> f.clean('101010b0101')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Finnish social security number.']
->>> f.clean('')
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
-
->>> f.clean(None)
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
->>> f = FISocialSecurityNumber(required=False)
->>> f.clean('010101-0101')
-u'010101-0101'
->>> f.clean(None)
-u''
->>> f.clean('')
-u''
-"""
