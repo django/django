@@ -37,7 +37,8 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
         f = forms.ModelMultipleChoiceField(queryset=Person.objects.all(),
                                            validators=[my_validator])
-        f.clean([1,2])
+
+        f.clean([p.pk for p in Person.objects.all()[8:9]])
         self.assertTrue(self._validator_run)
 
 class TripleForm(forms.ModelForm):
