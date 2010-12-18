@@ -1,190 +1,13 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ US form fields.
+from django.contrib.localflavor.us.forms import (USZipCodeField,
+    USPhoneNumberField, USStateField, USStateSelect, USSocialSecurityNumberField)
 
-tests = r"""
-# USZipCodeField ##############################################################
+from utils import LocalFlavorTestCase
 
-USZipCodeField validates that the data is either a five-digit U.S. zip code or
-a zip+4.
->>> from django.contrib.localflavor.us.forms import USZipCodeField
->>> f = USZipCodeField()
->>> f.clean('60606')
-u'60606'
->>> f.clean(60606)
-u'60606'
->>> f.clean('04000')
-u'04000'
->>> f.clean('4000')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
->>> f.clean('60606-1234')
-u'60606-1234'
->>> f.clean('6060-1234')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
->>> f.clean('60606-')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
->>> f.clean(None)
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
->>> f.clean('')
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
 
->>> f = USZipCodeField(required=False)
->>> f.clean('60606')
-u'60606'
->>> f.clean(60606)
-u'60606'
->>> f.clean('04000')
-u'04000'
->>> f.clean('4000')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
->>> f.clean('60606-1234')
-u'60606-1234'
->>> f.clean('6060-1234')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
->>> f.clean('60606-')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
->>> f.clean(None)
-u''
->>> f.clean('')
-u''
-
-# USPhoneNumberField ##########################################################
-
-USPhoneNumberField validates that the data is a valid U.S. phone number,
-including the area code. It's normalized to XXX-XXX-XXXX format.
->>> from django.contrib.localflavor.us.forms import USPhoneNumberField
->>> f = USPhoneNumberField()
->>> f.clean('312-555-1212')
-u'312-555-1212'
->>> f.clean('3125551212')
-u'312-555-1212'
->>> f.clean('312 555-1212')
-u'312-555-1212'
->>> f.clean('(312) 555-1212')
-u'312-555-1212'
->>> f.clean('312 555 1212')
-u'312-555-1212'
->>> f.clean('312.555.1212')
-u'312-555-1212'
->>> f.clean('312.555-1212')
-u'312-555-1212'
->>> f.clean(' (312) 555.1212 ')
-u'312-555-1212'
->>> f.clean('555-1212')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
->>> f.clean('312-55-1212')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
->>> f.clean(None)
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
->>> f.clean('')
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
-
->>> f = USPhoneNumberField(required=False)
->>> f.clean('312-555-1212')
-u'312-555-1212'
->>> f.clean('3125551212')
-u'312-555-1212'
->>> f.clean('312 555-1212')
-u'312-555-1212'
->>> f.clean('(312) 555-1212')
-u'312-555-1212'
->>> f.clean('312 555 1212')
-u'312-555-1212'
->>> f.clean('312.555.1212')
-u'312-555-1212'
->>> f.clean('312.555-1212')
-u'312-555-1212'
->>> f.clean(' (312) 555.1212 ')
-u'312-555-1212'
->>> f.clean('555-1212')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
->>> f.clean('312-55-1212')
-Traceback (most recent call last):
-...
-ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
->>> f.clean(None)
-u''
->>> f.clean('')
-u''
-
-# USStateField ################################################################
-
-USStateField validates that the data is either an abbreviation or name of a
-U.S. state.
->>> from django.contrib.localflavor.us.forms import USStateField
->>> f = USStateField()
->>> f.clean('il')
-u'IL'
->>> f.clean('IL')
-u'IL'
->>> f.clean('illinois')
-u'IL'
->>> f.clean('  illinois ')
-u'IL'
->>> f.clean(60606)
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a U.S. state or territory.']
->>> f.clean(None)
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
->>> f.clean('')
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
-
->>> f = USStateField(required=False)
->>> f.clean('il')
-u'IL'
->>> f.clean('IL')
-u'IL'
->>> f.clean('illinois')
-u'IL'
->>> f.clean('  illinois ')
-u'IL'
->>> f.clean(60606)
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a U.S. state or territory.']
->>> f.clean(None)
-u''
->>> f.clean('')
-u''
-
-# USStateSelect ###############################################################
-
-USStateSelect is a Select widget that uses a list of U.S. states/territories
-as its choices.
->>> from django.contrib.localflavor.us.forms import USStateSelect
->>> w = USStateSelect()
->>> print w.render('state', 'IL')
-<select name="state">
+class USLocalFlavorTests(LocalFlavorTestCase):
+    def test_USStateSelect(self):
+        f = USStateSelect()
+        out = u'''<select name="state">
 <option value="AL">Alabama</option>
 <option value="AK">Alaska</option>
 <option value="AS">American Samoa</option>
@@ -241,17 +64,63 @@ as its choices.
 <option value="WV">West Virginia</option>
 <option value="WI">Wisconsin</option>
 <option value="WY">Wyoming</option>
-</select>
+</select>'''
+        self.assertEquals(f.render('state', 'IL'), out)
 
-# USSocialSecurityNumberField #################################################
->>> from django.contrib.localflavor.us.forms import USSocialSecurityNumberField
->>> f = USSocialSecurityNumberField()
->>> f.clean('987-65-4330')
-u'987-65-4330'
->>> f.clean('987654330')
-u'987-65-4330'
->>> f.clean('078-05-1120')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid U.S. Social Security number in XXX-XX-XXXX format.']
-"""
+    def test_USZipCodeField(self):
+        error_format = [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+        valid = {
+            '60606': '60606',
+            60606: '60606',
+            '04000': '04000',
+            '60606-1234': '60606-1234',
+        }
+        invalid = {
+            '4000': error_format,
+            '6060-1234': error_format,
+            '60606-': error_format,
+        }
+        self.assertFieldOutput(USZipCodeField, valid, invalid)
+
+    def test_USPhoneNumberField(self):
+        error_format = [u'Phone numbers must be in XXX-XXX-XXXX format.']
+        valid = {
+            '312-555-1212': '312-555-1212',
+            '3125551212': '312-555-1212',
+            '312 555-1212': '312-555-1212',
+            '(312) 555-1212': '312-555-1212',
+            '312 555 1212': '312-555-1212',
+            '312.555.1212': '312-555-1212',
+            '312.555-1212': '312-555-1212',
+            ' (312) 555.1212 ': '312-555-1212',
+        }
+        invalid = {
+            '555-1212': error_format,
+            '312-55-1212': error_format,
+        }
+        self.assertFieldOutput(USPhoneNumberField, valid, invalid)
+
+    def test_USStateField(self):
+        error_invalid = [u'Enter a U.S. state or territory.']
+        valid = {
+            'il': 'IL',
+            'IL': 'IL',
+            'illinois': 'IL',
+            '  illinois ': 'IL',
+        }
+        invalid = {
+            60606: error_invalid,
+        }
+        self.assertFieldOutput(USStateField, valid, invalid)
+
+    def test_USSocialSecurityNumberField(self):
+        error_invalid = [u'Enter a valid U.S. Social Security number in XXX-XX-XXXX format.']
+
+        valid = {
+            '987-65-4330': '987-65-4330',
+            '987654330': '987-65-4330',
+        }
+        invalid = {
+            '078-05-1120': error_invalid,
+        }
+        self.assertFieldOutput(USSocialSecurityNumberField, valid, invalid)
