@@ -26,4 +26,5 @@ from regressiontests.forms.localflavortests import (
     FRLocalFlavorTests,
     GenericLocalFlavorTests,
     IDLocalFlavorTests,
+    IELocalFlavorTests,
 )

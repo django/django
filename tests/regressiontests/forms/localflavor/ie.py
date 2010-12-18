@@ -1,12 +1,43 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ie form fields.
+from django.contrib.localflavor.ie.forms import IECountySelect
 
-tests = r"""
-# IECountySelect #########################################################
+from utils import LocalFlavorTestCase
 
->>> from django.contrib.localflavor.ie.forms import IECountySelect
->>> f = IECountySelect()
->>> f.render('counties', 'dublin')
-u'<select name="counties">\n<option value="antrim">Antrim</option>\n<option value="armagh">Armagh</option>\n<option value="carlow">Carlow</option>\n<option value="cavan">Cavan</option>\n<option value="clare">Clare</option>\n<option value="cork">Cork</option>\n<option value="derry">Derry</option>\n<option value="donegal">Donegal</option>\n<option value="down">Down</option>\n<option value="dublin" selected="selected">Dublin</option>\n<option value="fermanagh">Fermanagh</option>\n<option value="galway">Galway</option>\n<option value="kerry">Kerry</option>\n<option value="kildare">Kildare</option>\n<option value="kilkenny">Kilkenny</option>\n<option value="laois">Laois</option>\n<option value="leitrim">Leitrim</option>\n<option value="limerick">Limerick</option>\n<option value="longford">Longford</option>\n<option value="louth">Louth</option>\n<option value="mayo">Mayo</option>\n<option value="meath">Meath</option>\n<option value="monaghan">Monaghan</option>\n<option value="offaly">Offaly</option>\n<option value="roscommon">Roscommon</option>\n<option value="sligo">Sligo</option>\n<option value="tipperary">Tipperary</option>\n<option value="tyrone">Tyrone</option>\n<option value="waterford">Waterford</option>\n<option value="westmeath">Westmeath</option>\n<option value="wexford">Wexford</option>\n<option value="wicklow">Wicklow</option>\n</select>'
 
-"""
+class IELocalFlavorTests(LocalFlavorTestCase):
+    def test_IECountySelect(self):
+        f = IECountySelect()
+        out = u'''<select name="counties">
+<option value="antrim">Antrim</option>
+<option value="armagh">Armagh</option>
+<option value="carlow">Carlow</option>
+<option value="cavan">Cavan</option>
+<option value="clare">Clare</option>
+<option value="cork">Cork</option>
+<option value="derry">Derry</option>
+<option value="donegal">Donegal</option>
+<option value="down">Down</option>
+<option value="dublin" selected="selected">Dublin</option>
+<option value="fermanagh">Fermanagh</option>
+<option value="galway">Galway</option>
+<option value="kerry">Kerry</option>
+<option value="kildare">Kildare</option>
+<option value="kilkenny">Kilkenny</option>
+<option value="laois">Laois</option>
+<option value="leitrim">Leitrim</option>
+<option value="limerick">Limerick</option>
+<option value="longford">Longford</option>
+<option value="louth">Louth</option>
+<option value="mayo">Mayo</option>
+<option value="meath">Meath</option>
+<option value="monaghan">Monaghan</option>
+<option value="offaly">Offaly</option>
+<option value="roscommon">Roscommon</option>
+<option value="sligo">Sligo</option>
+<option value="tipperary">Tipperary</option>
+<option value="tyrone">Tyrone</option>
+<option value="waterford">Waterford</option>
+<option value="westmeath">Westmeath</option>
+<option value="wexford">Wexford</option>
+<option value="wicklow">Wicklow</option>
+</select>'''
+        self.assertEqual(f.render('counties', 'dublin'), out)
