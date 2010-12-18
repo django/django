@@ -36,5 +36,6 @@ from regressiontests.forms.localflavortests import (
     NLLocalFlavorTests,
     PLLocalFlavorTests,
     PTLocalFlavorTests,
+    ROLocalFlavorTests,
     TRLocalFlavorTests,
 )
