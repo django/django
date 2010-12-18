@@ -1,31 +1,116 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ SK form fields.
+from django.contrib.localflavor.sk.forms import (SKRegionSelect,
+    SKPostalCodeField, SKDistrictSelect)
 
-tests = r"""
-# SKPostalCodeField #########################################################
+from utils import LocalFlavorTestCase
 
->>> from django.contrib.localflavor.sk.forms import SKPostalCodeField
->>> f = SKPostalCodeField()
->>> f.clean('84545x')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a postal code in the format XXXXX or XXX XX.']
->>> f.clean('91909')
-u'91909'
->>> f.clean('917 01')
-u'91701'
 
-# SKRegionSelect ############################################################
+class SKLocalFlavorTests(LocalFlavorTestCase):
+    def test_SKRegionSelect(self):
+        f = SKRegionSelect()
+        out = u'''<select name="regions">
+<option value="BB">Banska Bystrica region</option>
+<option value="BA">Bratislava region</option>
+<option value="KE">Kosice region</option>
+<option value="NR">Nitra region</option>
+<option value="PO">Presov region</option>
+<option value="TN">Trencin region</option>
+<option value="TT" selected="selected">Trnava region</option>
+<option value="ZA">Zilina region</option>
+</select>'''
+        self.assertEqual(f.render('regions', 'TT'), out)
 
->>> from django.contrib.localflavor.sk.forms import SKRegionSelect
->>> w = SKRegionSelect()
->>> w.render('regions', 'TT')
-u'<select name="regions">\n<option value="BB">Banska Bystrica region</option>\n<option value="BA">Bratislava region</option>\n<option value="KE">Kosice region</option>\n<option value="NR">Nitra region</option>\n<option value="PO">Presov region</option>\n<option value="TN">Trencin region</option>\n<option value="TT" selected="selected">Trnava region</option>\n<option value="ZA">Zilina region</option>\n</select>'
+    def test_SKDistrictSelect(self):
+        f = SKDistrictSelect()
+        out = u'''<select name="Districts">
+<option value="BB">Banska Bystrica</option>
+<option value="BS">Banska Stiavnica</option>
+<option value="BJ">Bardejov</option>
+<option value="BN">Banovce nad Bebravou</option>
+<option value="BR">Brezno</option>
+<option value="BA1">Bratislava I</option>
+<option value="BA2">Bratislava II</option>
+<option value="BA3">Bratislava III</option>
+<option value="BA4">Bratislava IV</option>
+<option value="BA5">Bratislava V</option>
+<option value="BY">Bytca</option>
+<option value="CA">Cadca</option>
+<option value="DT">Detva</option>
+<option value="DK">Dolny Kubin</option>
+<option value="DS">Dunajska Streda</option>
+<option value="GA">Galanta</option>
+<option value="GL">Gelnica</option>
+<option value="HC">Hlohovec</option>
+<option value="HE">Humenne</option>
+<option value="IL">Ilava</option>
+<option value="KK">Kezmarok</option>
+<option value="KN">Komarno</option>
+<option value="KE1">Kosice I</option>
+<option value="KE2">Kosice II</option>
+<option value="KE3">Kosice III</option>
+<option value="KE4">Kosice IV</option>
+<option value="KEO">Kosice - okolie</option>
+<option value="KA">Krupina</option>
+<option value="KM">Kysucke Nove Mesto</option>
+<option value="LV">Levice</option>
+<option value="LE">Levoca</option>
+<option value="LM">Liptovsky Mikulas</option>
+<option value="LC">Lucenec</option>
+<option value="MA">Malacky</option>
+<option value="MT">Martin</option>
+<option value="ML">Medzilaborce</option>
+<option value="MI">Michalovce</option>
+<option value="MY">Myjava</option>
+<option value="NO">Namestovo</option>
+<option value="NR">Nitra</option>
+<option value="NM">Nove Mesto nad Vahom</option>
+<option value="NZ">Nove Zamky</option>
+<option value="PE">Partizanske</option>
+<option value="PK">Pezinok</option>
+<option value="PN">Piestany</option>
+<option value="PT">Poltar</option>
+<option value="PP">Poprad</option>
+<option value="PB">Povazska Bystrica</option>
+<option value="PO">Presov</option>
+<option value="PD">Prievidza</option>
+<option value="PU">Puchov</option>
+<option value="RA">Revuca</option>
+<option value="RS">Rimavska Sobota</option>
+<option value="RV">Roznava</option>
+<option value="RK" selected="selected">Ruzomberok</option>
+<option value="SB">Sabinov</option>
+<option value="SC">Senec</option>
+<option value="SE">Senica</option>
+<option value="SI">Skalica</option>
+<option value="SV">Snina</option>
+<option value="SO">Sobrance</option>
+<option value="SN">Spisska Nova Ves</option>
+<option value="SL">Stara Lubovna</option>
+<option value="SP">Stropkov</option>
+<option value="SK">Svidnik</option>
+<option value="SA">Sala</option>
+<option value="TO">Topolcany</option>
+<option value="TV">Trebisov</option>
+<option value="TN">Trencin</option>
+<option value="TT">Trnava</option>
+<option value="TR">Turcianske Teplice</option>
+<option value="TS">Tvrdosin</option>
+<option value="VK">Velky Krtis</option>
+<option value="VT">Vranov nad Toplou</option>
+<option value="ZM">Zlate Moravce</option>
+<option value="ZV">Zvolen</option>
+<option value="ZC">Zarnovica</option>
+<option value="ZH">Ziar nad Hronom</option>
+<option value="ZA">Zilina</option>
+</select>'''
+        self.assertEqual(f.render('Districts', 'RK'), out)
 
-# SKDistrictSelect ##########################################################
-
->>> from django.contrib.localflavor.sk.forms import SKDistrictSelect
->>> w = SKDistrictSelect()
->>> w.render('Districts', 'RK')
-u'<select name="Districts">\n<option value="BB">Banska Bystrica</option>\n<option value="BS">Banska Stiavnica</option>\n<option value="BJ">Bardejov</option>\n<option value="BN">Banovce nad Bebravou</option>\n<option value="BR">Brezno</option>\n<option value="BA1">Bratislava I</option>\n<option value="BA2">Bratislava II</option>\n<option value="BA3">Bratislava III</option>\n<option value="BA4">Bratislava IV</option>\n<option value="BA5">Bratislava V</option>\n<option value="BY">Bytca</option>\n<option value="CA">Cadca</option>\n<option value="DT">Detva</option>\n<option value="DK">Dolny Kubin</option>\n<option value="DS">Dunajska Streda</option>\n<option value="GA">Galanta</option>\n<option value="GL">Gelnica</option>\n<option value="HC">Hlohovec</option>\n<option value="HE">Humenne</option>\n<option value="IL">Ilava</option>\n<option value="KK">Kezmarok</option>\n<option value="KN">Komarno</option>\n<option value="KE1">Kosice I</option>\n<option value="KE2">Kosice II</option>\n<option value="KE3">Kosice III</option>\n<option value="KE4">Kosice IV</option>\n<option value="KEO">Kosice - okolie</option>\n<option value="KA">Krupina</option>\n<option value="KM">Kysucke Nove Mesto</option>\n<option value="LV">Levice</option>\n<option value="LE">Levoca</option>\n<option value="LM">Liptovsky Mikulas</option>\n<option value="LC">Lucenec</option>\n<option value="MA">Malacky</option>\n<option value="MT">Martin</option>\n<option value="ML">Medzilaborce</option>\n<option value="MI">Michalovce</option>\n<option value="MY">Myjava</option>\n<option value="NO">Namestovo</option>\n<option value="NR">Nitra</option>\n<option value="NM">Nove Mesto nad Vahom</option>\n<option value="NZ">Nove Zamky</option>\n<option value="PE">Partizanske</option>\n<option value="PK">Pezinok</option>\n<option value="PN">Piestany</option>\n<option value="PT">Poltar</option>\n<option value="PP">Poprad</option>\n<option value="PB">Povazska Bystrica</option>\n<option value="PO">Presov</option>\n<option value="PD">Prievidza</option>\n<option value="PU">Puchov</option>\n<option value="RA">Revuca</option>\n<option value="RS">Rimavska Sobota</option>\n<option value="RV">Roznava</option>\n<option value="RK" selected="selected">Ruzomberok</option>\n<option value="SB">Sabinov</option>\n<option value="SC">Senec</option>\n<option value="SE">Senica</option>\n<option value="SI">Skalica</option>\n<option value="SV">Snina</option>\n<option value="SO">Sobrance</option>\n<option value="SN">Spisska Nova Ves</option>\n<option value="SL">Stara Lubovna</option>\n<option value="SP">Stropkov</option>\n<option value="SK">Svidnik</option>\n<option value="SA">Sala</option>\n<option value="TO">Topolcany</option>\n<option value="TV">Trebisov</option>\n<option value="TN">Trencin</option>\n<option value="TT">Trnava</option>\n<option value="TR">Turcianske Teplice</option>\n<option value="TS">Tvrdosin</option>\n<option value="VK">Velky Krtis</option>\n<option value="VT">Vranov nad Toplou</option>\n<option value="ZM">Zlate Moravce</option>\n<option value="ZV">Zvolen</option>\n<option value="ZC">Zarnovica</option>\n<option value="ZH">Ziar nad Hronom</option>\n<option value="ZA">Zilina</option>\n</select>'
-"""
+    def test_SKPostalCodeField(self):
+        error_format = [u'Enter a postal code in the format XXXXX or XXX XX.']
+        valid = {
+            '91909': '91909',
+            '917 01': '91701',
+        }
+        invalid = {
+            '84545x': error_format,
+        }
+        self.assertFieldOutput(SKPostalCodeField, valid, invalid)
