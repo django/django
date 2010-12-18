@@ -266,12 +266,16 @@ class ModelInheritanceTests(TestCase):
         # select_related works with fields from the parent object as if they
         # were a normal part of the model.
         old_DEBUG = settings.DEBUG
-        starting_queries = len(connection.queries)
-        settings.DEBUG = True
+        try:
+            settings.DEBUG = True
+            starting_queries = len(connection.queries)
+            ItalianRestaurant.objects.all()[0].chef
+            self.assertEqual(len(connection.queries) - starting_queries, 2)
 
-        ItalianRestaurant.objects.all()[0].chef
-        self.assertEqual(len(connection.queries) - starting_queries, 2)
+            starting_queries = len(connection.queries)
+            ItalianRestaurant.objects.select_related("chef")[0].chef
+            self.assertEqual(len(connection.queries) - starting_queries, 1)
+        finally:
+            settings.DEBUG = old_DEBUG
 
-        starting_queries = len(connection.queries)
-        ItalianRestaurant.objects.select_related("chef")[0].chef
-        self.assertEqual(len(connection.queries) - starting_queries, 1)
+

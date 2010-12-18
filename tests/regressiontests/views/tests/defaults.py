@@ -60,11 +60,16 @@ class DefaultsTests(TestCase):
         The 404 page should have the csrf_token available in the context
         """
         # See ticket #14565
-        for url in self.non_existing_urls:
-            response = self.client.get(url)
-            csrf_token = response.context['csrf_token']
-            self.assertNotEqual(str(csrf_token), 'NOTPROVIDED')
-            self.assertNotEqual(str(csrf_token), '')
+        old_DEBUG = settings.DEBUG
+        try:
+            settings.DEBUG = False # so we get real 404, not technical
+            for url in self.non_existing_urls:
+                response = self.client.get(url)
+                csrf_token = response.context['csrf_token']
+                self.assertNotEqual(str(csrf_token), 'NOTPROVIDED')
+                self.assertNotEqual(str(csrf_token), '')
+        finally:
+            settings.DEBUG = old_DEBUG
 
     def test_server_error(self):
         "The server_error view raises a 500 status"
