@@ -20,6 +20,7 @@ from regressiontests.forms.localflavortests import (
     BRLocalFlavorTests,
     CALocalFlavorTests,
     CHLocalFlavorTests,
+    CLLocalFlavorTests,
     DELocalFlavorTests,
     ILLocalFlavorTests,
     TRLocalFlavorTests,
