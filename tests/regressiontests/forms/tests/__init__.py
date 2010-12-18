@@ -15,6 +15,7 @@ from regressiontests.forms.localflavortests import (
     __test__,
     ARLocalFlavorTests,
     ATLocalFlavorTests,
+    AULocalFlavorTests,
     BELocalFlavorTests,
     DELocalFlavorTests,
     ILLocalFlavorTests,
