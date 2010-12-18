@@ -30,5 +30,6 @@ from regressiontests.forms.localflavortests import (
     IELocalFlavorTests,
     ILLocalFlavorTests,
     ISLocalFlavorTests,
+    ITLocalFlavorTests,
     TRLocalFlavorTests,
 )

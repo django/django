@@ -50,8 +50,8 @@ class ITSocialSecurityNumberField(RegexField):
 
     def clean(self, value):
         value = super(ITSocialSecurityNumberField, self).clean(value)
-        if value == u'':
-            return value
+        if value in EMPTY_VALUES:
+            return u''
         value = re.sub('\s', u'', value).upper()
         try:
             check_digit = ssn_check_digit(value)
@@ -71,8 +71,8 @@ class ITVatNumberField(Field):
 
     def clean(self, value):
         value = super(ITVatNumberField, self).clean(value)
-        if value == u'':
-            return value
+        if value in EMPTY_VALUES:
+            return u''
         try:
             vat_number = int(value)
         except ValueError:

@@ -1,62 +1,70 @@
-# -*- coding: utf-8 -*-
-# Tests for the contrib/localflavor/ IT form fields.
+from django.contrib.localflavor.it.forms import (ITZipCodeField, ITRegionSelect,
+    ITSocialSecurityNumberField, ITVatNumberField)
 
-tests = r"""
-# ITZipCodeField #############################################################
+from utils import LocalFlavorTestCase
 
->>> from django.contrib.localflavor.it.forms import ITZipCodeField
->>> f = ITZipCodeField()
->>> f.clean('00100')
-u'00100'
->>> f.clean(' 00100')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid zip code.']
 
-# ITRegionSelect #############################################################
+class ITLocalFlavorTests(LocalFlavorTestCase):
+    def test_ITRegionSelect(self):
+        f = ITRegionSelect()
+        out = u'''<select name="regions">
+<option value="ABR">Abruzzo</option>
+<option value="BAS">Basilicata</option>
+<option value="CAL">Calabria</option>
+<option value="CAM">Campania</option>
+<option value="EMR">Emilia-Romagna</option>
+<option value="FVG">Friuli-Venezia Giulia</option>
+<option value="LAZ">Lazio</option>
+<option value="LIG">Liguria</option>
+<option value="LOM">Lombardia</option>
+<option value="MAR">Marche</option>
+<option value="MOL">Molise</option>
+<option value="PMN" selected="selected">Piemonte</option>
+<option value="PUG">Puglia</option>
+<option value="SAR">Sardegna</option>
+<option value="SIC">Sicilia</option>
+<option value="TOS">Toscana</option>
+<option value="TAA">Trentino-Alto Adige</option>
+<option value="UMB">Umbria</option>
+<option value="VAO">Valle d\u2019Aosta</option>
+<option value="VEN">Veneto</option>
+</select>'''
+        self.assertEqual(f.render('regions', 'PMN'), out)
 
->>> from django.contrib.localflavor.it.forms import ITRegionSelect
->>> w = ITRegionSelect()
->>> w.render('regions', 'PMN')
-u'<select name="regions">\n<option value="ABR">Abruzzo</option>\n<option value="BAS">Basilicata</option>\n<option value="CAL">Calabria</option>\n<option value="CAM">Campania</option>\n<option value="EMR">Emilia-Romagna</option>\n<option value="FVG">Friuli-Venezia Giulia</option>\n<option value="LAZ">Lazio</option>\n<option value="LIG">Liguria</option>\n<option value="LOM">Lombardia</option>\n<option value="MAR">Marche</option>\n<option value="MOL">Molise</option>\n<option value="PMN" selected="selected">Piemonte</option>\n<option value="PUG">Puglia</option>\n<option value="SAR">Sardegna</option>\n<option value="SIC">Sicilia</option>\n<option value="TOS">Toscana</option>\n<option value="TAA">Trentino-Alto Adige</option>\n<option value="UMB">Umbria</option>\n<option value="VAO">Valle d\u2019Aosta</option>\n<option value="VEN">Veneto</option>\n</select>'
+    def test_ITZipCodeField(self):
+        error_invalid = [u'Enter a valid zip code.']
+        valid = {
+            '00100': '00100',
+        }
+        invalid = {
+            ' 00100': error_invalid,
+        }
+        self.assertFieldOutput(ITZipCodeField, valid, invalid)
+    
+    def test_ITSocialSecurityNumberField(self):
+        error_invalid = [u'Enter a valid Social Security number.']
+        valid = {
+            'LVSGDU99T71H501L': 'LVSGDU99T71H501L',
+            'LBRRME11A01L736W': 'LBRRME11A01L736W',
+            'lbrrme11a01l736w': 'LBRRME11A01L736W',
+            'LBR RME 11A01 L736W': 'LBRRME11A01L736W',
+        }
+        invalid = {
+            'LBRRME11A01L736A': error_invalid,
+            '%BRRME11A01L736W': error_invalid,
+        }
+        self.assertFieldOutput(ITSocialSecurityNumberField, valid, invalid)
+    
+    def test_ITVatNumberField(self):
+        error_invalid = [u'Enter a valid VAT number.']
+        valid = {
+            '07973780013': '07973780013',
+            '7973780013': '07973780013',
+            7973780013: '07973780013',
+        }
+        invalid = {
+            '07973780014': error_invalid,
+            'A7973780013': error_invalid,
+        }
+        self.assertFieldOutput(ITVatNumberField, valid, invalid)
 
-# ITSocialSecurityNumberField #################################################
-
->>> from django.contrib.localflavor.it.forms import ITSocialSecurityNumberField
->>> f = ITSocialSecurityNumberField()
->>> f.clean('LVSGDU99T71H501L')
-u'LVSGDU99T71H501L'
->>> f.clean('LBRRME11A01L736W')
-u'LBRRME11A01L736W'
->>> f.clean('lbrrme11a01l736w')
-u'LBRRME11A01L736W'
->>> f.clean('LBR RME 11A01 L736W')
-u'LBRRME11A01L736W'
->>> f.clean('LBRRME11A01L736A')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Social Security number.']
->>> f.clean('%BRRME11A01L736W')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid Social Security number.']
-
-# ITVatNumberField ###########################################################
-
->>> from django.contrib.localflavor.it.forms import ITVatNumberField
->>> f = ITVatNumberField()
->>> f.clean('07973780013')
-u'07973780013'
->>> f.clean('7973780013')
-u'07973780013'
->>> f.clean(7973780013)
-u'07973780013'
->>> f.clean('07973780014')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid VAT number.']
->>> f.clean('A7973780013')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid VAT number.']
-"""
