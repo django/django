@@ -438,6 +438,9 @@ It's not possible to mix a template variable inside a string within ``{% trans
 ``blocktrans`` template tag
 ---------------------------
 
+.. versionchanged:: 1.3
+   New keyword argument format.
+
 Contrarily to the ``trans`` tag, the ``blocktrans`` tag allows you to mark
 complex sentences consisting of literals and variable content for translation
 by making use of placeholders::
@@ -448,18 +451,18 @@ To translate a template expression -- say, accessing object attributes or
 using template filters -- you need to bind the expression to a local variable
 for use within the translation block. Examples::
 
-    {% blocktrans with article.price as amount %}
+    {% blocktrans with amount=article.price %}
     That will cost $ {{ amount }}.
     {% endblocktrans %}
 
-    {% blocktrans with value|filter as myvar %}
+    {% blocktrans with myvar=value|filter %}
     This will have {{ myvar }} inside.
     {% endblocktrans %}
 
 If you need to bind more than one expression inside a ``blocktrans`` tag,
 separate the pieces with ``and``::
 
-    {% blocktrans with book|title as book_t and author|title as author_t %}
+    {% blocktrans with book_t=book|title author_t=author|title %}
     This is {{ book_t }} by {{ author_t }}
     {% endblocktrans %}
 
@@ -474,7 +477,7 @@ This tag also provides for pluralization. To use it:
 
 An example::
 
-    {% blocktrans count list|length as counter %}
+    {% blocktrans count counter=list|length %}
     There is only one {{ name }} object.
     {% plural %}
     There are {{ counter }} {{ name }} objects.
@@ -482,7 +485,7 @@ An example::
 
 A more complex example::
 
-    {% blocktrans with article.price as amount count i.length as years %}
+    {% blocktrans with amount=article.price count years=i.length %}
     That will cost $ {{ amount }} per year.
     {% plural %}
     That will cost $ {{ amount }} per {{ years }} years.
@@ -493,6 +496,9 @@ in addition to the counter value, keep in mind that the ``blocktrans``
 construct is internally converted to an ``ungettext`` call. This means the
 same :ref:`notes regarding ungettext variables <pluralization-var-notes>`
 apply.
+
+.. note:: The previous more verbose format is still supported:
+   ``{% blocktrans with book|title as book_t and author|title as author_t %}``
 
 .. _template-translation-vars:
 

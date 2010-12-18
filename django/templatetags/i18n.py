@@ -6,6 +6,7 @@ from django.template import TOKEN_TEXT, TOKEN_VAR
 from django.template.base import _render_value_in_context
 from django.utils import translation
 from django.utils.encoding import force_unicode
+from django.template.defaulttags import token_kwargs
 
 register = Library()
 
@@ -97,7 +98,7 @@ class BlockTranslateNode(Node):
     def render(self, context):
         tmp_context = {}
         for var, val in self.extra_context.items():
-            tmp_context[var] = val.render(context)
+            tmp_context[var] = val.resolve(context)
         # Update() works like a push(), so corresponding context.pop() is at
         # the end of function
         context.update(tmp_context)
@@ -284,43 +285,54 @@ def do_block_translate(parser, token):
 
     Usage::
 
-        {% blocktrans with foo|filter as bar and baz|filter as boo %}
+        {% blocktrans with bar=foo|filter boo=baz|filter %}
         This is {{ bar }} and {{ boo }}.
         {% endblocktrans %}
 
     Additionally, this supports pluralization::
 
-        {% blocktrans count var|length as count %}
+        {% blocktrans count count=var|length %}
         There is {{ count }} object.
         {% plural %}
         There are {{ count }} objects.
         {% endblocktrans %}
 
     This is much like ngettext, only in template syntax.
-    """
-    class BlockTranslateParser(TokenParser):
-        def top(self):
-            countervar = None
-            counter = None
-            extra_context = {}
-            while self.more():
-                tag = self.tag()
-                if tag == 'with' or tag == 'and':
-                    value = self.value()
-                    if self.tag() != 'as':
-                        raise TemplateSyntaxError("variable bindings in 'blocktrans' must be 'with value as variable'")
-                    extra_context[self.tag()] = VariableNode(
-                            parser.compile_filter(value))
-                elif tag == 'count':
-                    counter = parser.compile_filter(self.value())
-                    if self.tag() != 'as':
-                        raise TemplateSyntaxError("counter specification in 'blocktrans' must be 'count value as variable'")
-                    countervar = self.tag()
-                else:
-                    raise TemplateSyntaxError("unknown subtag %s for 'blocktrans' found" % tag)
-            return (countervar, counter, extra_context)
 
-    countervar, counter, extra_context = BlockTranslateParser(token.contents).top()
+    The "var as value" legacy format is still supported::
+
+        {% blocktrans with foo|filter as bar and baz|filter as boo %}
+        {% blocktrans count var|length as count %}
+    """
+    bits = token.split_contents()
+
+    options = {}
+    remaining_bits = bits[1:]
+    while remaining_bits:
+        option = remaining_bits.pop(0)
+        if option in options:
+            raise TemplateSyntaxError('The %r option was specified more '
+                                      'than once.' % option)
+        if option == 'with':
+            value = token_kwargs(remaining_bits, parser, support_legacy=True)
+            if not value:
+                raise TemplateSyntaxError('"with" in %r tag needs at least '
+                                          'one keyword argument.' % bits[0])
+        elif option == 'count':
+            value = token_kwargs(remaining_bits, parser, support_legacy=True)
+            if len(value) != 1:
+                raise TemplateSyntaxError('"count" in %r tag expected exactly '
+                                          'one keyword argument.' % bits[0])
+        else:
+            raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %
+                                      (bits[0], option))
+        options[option] = value
+
+    if 'count' in options:
+        countervar, counter = options['count'].items()[0]
+    else:
+        countervar, counter = None, None
+    extra_context = options.get('with', {}) 
 
     singular = []
     plural = []

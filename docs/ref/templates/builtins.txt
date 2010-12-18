@@ -639,9 +639,19 @@ including it. This example produces the output ``"Hello, John"``:
 
     * The ``name_snippet.html`` template::
 
-        Hello, {{ person }}
+        {{ greeting }}, {{ person|default:"friend" }}!
 
-See also: ``{% ssi %}``.
+.. versionchanged:: 1.3
+   Additional context and exclusive context.
+
+You can pass additional context to the template using keyword arguments::
+
+    {% include "name_snippet.html" with person="Jane" greeting="Hello" "%}
+
+If you want to only render the context with the variables provided (or even
+no variables at all), use the ``only`` option::
+
+    {% include "name_snippet.html" with greeting="Hi" only %}
 
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
@@ -649,6 +659,8 @@ See also: ``{% ssi %}``.
     subtemplate and include its contents as if it were part of the parent".
     This means that there is no shared state between included templates --
     each include is a completely independent rendering process.
+
+See also: ``{% ssi %}``.
 
 .. templatetag:: load
 
@@ -1044,17 +1056,29 @@ with
 
 .. versionadded:: 1.0
 
+.. versionchanged:: 1.3
+   New keyword argument format and multiple variable assignments.
+
 Caches a complex variable under a simpler name. This is useful when accessing
 an "expensive" method (e.g., one that hits the database) multiple times.
 
 For example::
 
-    {% with business.employees.count as total %}
+    {% with total=business.employees.count %}
         {{ total }} employee{{ total|pluralize }}
     {% endwith %}
 
 The populated variable (in the example above, ``total``) is only available
 between the ``{% with %}`` and ``{% endwith %}`` tags.
+
+You can assign more than one context variable::
+
+    {% with alpha=1 beta=2 %}
+        ...
+    {% endwith %}
+
+.. note:: The previous more verbose format is still supported:
+   ``{% with business.employees.count as total %}``
 
 .. _ref-templates-builtins-filters:
 

@@ -930,13 +930,30 @@ class Templates(unittest.TestCase):
             'ifnotequal03': ("{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 2}, "yes"),
             'ifnotequal04': ("{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 1}, "no"),
 
-            ### INCLUDE TAG ###########################################################
+            ## INCLUDE TAG ###########################################################
             'include01': ('{% include "basic-syntax01" %}', {}, "something cool"),
             'include02': ('{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"),
             'include03': ('{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"),
             'include04': ('a{% include "nonexistent" %}b', {}, "ab"),
             'include 05': ('template with a space', {}, 'template with a space'),
             'include06': ('{% include "include 05"%}', {}, 'template with a space'),
+
+            # extra inline context
+            'include07': ('{% include "basic-syntax02" with headline="Inline" %}', {'headline': 'Included'}, 'Inline'),
+            'include08': ('{% include headline with headline="Dynamic" %}', {'headline': 'basic-syntax02'}, 'Dynamic'),
+            'include09': ('{{ first }}--{% include "basic-syntax03" with first=second|lower|upper second=first|upper %}--{{ second }}', {'first': 'Ul', 'second': 'lU'}, 'Ul--LU --- UL--lU'),
+
+            # isolated context
+            'include10': ('{% include "basic-syntax03" only %}', {'first': '1'}, (' --- ', 'INVALID --- INVALID')),
+            'include11': ('{% include "basic-syntax03" only with second=2 %}', {'first': '1'}, (' --- 2', 'INVALID --- 2')),
+            'include12': ('{% include "basic-syntax03" with first=1 only %}', {'second': '2'}, ('1 --- ', '1 --- INVALID')),
+
+            'include-error01': ('{% include "basic-syntax01" with %}', {}, template.TemplateSyntaxError),
+            'include-error02': ('{% include "basic-syntax01" with "no key" %}', {}, template.TemplateSyntaxError),
+            'include-error03': ('{% include "basic-syntax01" with dotted.arg="error" %}', {}, template.TemplateSyntaxError),
+            'include-error04': ('{% include "basic-syntax01" something_random %}', {}, template.TemplateSyntaxError),
+            'include-error05': ('{% include "basic-syntax01" foo="duplicate" foo="key" %}', {}, template.TemplateSyntaxError),
+            'include-error06': ('{% include "basic-syntax01" only only %}', {}, template.TemplateSyntaxError),
 
             ### NAMED ENDBLOCKS #######################################################
 
@@ -1098,7 +1115,8 @@ class Templates(unittest.TestCase):
             'i18n03': ('{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}', {'anton': '\xc3\x85'}, u"Å"),
 
             # simple translation of a variable and filter
-            'i18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': '\xc3\x85'}, u'å'),
+            'i18n04': ('{% load i18n %}{% blocktrans with berta=anton|lower %}{{ berta }}{% endblocktrans %}', {'anton': '\xc3\x85'}, u'å'),
+            'legacyi18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': '\xc3\x85'}, u'å'),
 
             # simple translation of a string with interpolation
             'i18n05': ('{% load i18n %}{% blocktrans %}xxx{{ anton }}xxx{% endblocktrans %}', {'anton': 'yyy'}, "xxxyyyxxx"),
@@ -1107,10 +1125,12 @@ class Templates(unittest.TestCase):
             'i18n06': ('{% load i18n %}{% trans "Page not found" %}', {'LANGUAGE_CODE': 'de'}, "Seite nicht gefunden"),
 
             # translation of singular form
-            'i18n07': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}{{ counter }} plural{% endblocktrans %}', {'number': 1}, "singular"),
+            'i18n07': ('{% load i18n %}{% blocktrans count counter=number %}singular{% plural %}{{ counter }} plural{% endblocktrans %}', {'number': 1}, "singular"),
+            'legacyi18n07': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}{{ counter }} plural{% endblocktrans %}', {'number': 1}, "singular"),
 
             # translation of plural form
             'i18n08': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}{{ counter }} plural{% endblocktrans %}', {'number': 2}, "2 plural"),
+            'legacyi18n08': ('{% load i18n %}{% blocktrans count counter=number %}singular{% plural %}{{ counter }} plural{% endblocktrans %}', {'number': 2}, "2 plural"),
 
             # simple non-translation (only marking) of a string to german
             'i18n09': ('{% load i18n %}{% trans "Page not found" noop %}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
@@ -1132,12 +1152,14 @@ class Templates(unittest.TestCase):
 
             # Escaping inside blocktrans and trans works as if it was directly in the
             # template.
-            'i18n17': ('{% load i18n %}{% blocktrans with anton|escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
-            'i18n18': ('{% load i18n %}{% blocktrans with anton|force_escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
+            'i18n17': ('{% load i18n %}{% blocktrans with berta=anton|escape %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
+            'i18n18': ('{% load i18n %}{% blocktrans with berta=anton|force_escape %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
             'i18n19': ('{% load i18n %}{% blocktrans %}{{ andrew }}{% endblocktrans %}', {'andrew': 'a & b'}, u'a &amp; b'),
             'i18n20': ('{% load i18n %}{% trans andrew %}', {'andrew': 'a & b'}, u'a &amp; b'),
             'i18n21': ('{% load i18n %}{% blocktrans %}{{ andrew }}{% endblocktrans %}', {'andrew': mark_safe('a & b')}, u'a & b'),
             'i18n22': ('{% load i18n %}{% trans andrew %}', {'andrew': mark_safe('a & b')}, u'a & b'),
+            'legacyi18n17': ('{% load i18n %}{% blocktrans with anton|escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
+            'legacyi18n18': ('{% load i18n %}{% blocktrans with anton|force_escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
 
             # Use filters with the {% trans %} tag, #5972
             'i18n23': ('{% load i18n %}{% trans "Page not found"|capfirst|slice:"6:" %}', {'LANGUAGE_CODE': 'de'}, u'nicht gefunden'),
@@ -1145,10 +1167,16 @@ class Templates(unittest.TestCase):
             'i18n25': ('{% load i18n %}{% trans somevar|upper %}', {'somevar': 'Page not found', 'LANGUAGE_CODE': 'de'}, u'SEITE NICHT GEFUNDEN'),
 
             # translation of plural form with extra field in singular form (#13568)
-            'i18n26': ('{% load i18n %}{% blocktrans with myextra_field as extra_field count number as counter %}singular {{ extra_field }}{% plural %}plural{% endblocktrans %}', {'number': 1, 'myextra_field': 'test'}, "singular test"),
+            'i18n26': ('{% load i18n %}{% blocktrans with extra_field=myextra_field count counter=number %}singular {{ extra_field }}{% plural %}plural{% endblocktrans %}', {'number': 1, 'myextra_field': 'test'}, "singular test"),
+            'legacyi18n26': ('{% load i18n %}{% blocktrans with myextra_field as extra_field count number as counter %}singular {{ extra_field }}{% plural %}plural{% endblocktrans %}', {'number': 1, 'myextra_field': 'test'}, "singular test"),
 
             # translation of singular form in russian (#14126)
-            'i18n27': ('{% load i18n %}{% blocktrans count number as counter %}1 result{% plural %}{{ counter }} results{% endblocktrans %}', {'number': 1, 'LANGUAGE_CODE': 'ru'}, u'1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442'),
+            'i18n27': ('{% load i18n %}{% blocktrans count counter=number %}1 result{% plural %}{{ counter }} results{% endblocktrans %}', {'number': 1, 'LANGUAGE_CODE': 'ru'}, u'1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442'),
+            'legacyi18n27': ('{% load i18n %}{% blocktrans count number as counter %}1 result{% plural %}{{ counter }} results{% endblocktrans %}', {'number': 1, 'LANGUAGE_CODE': 'ru'}, u'1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442'),
+
+            # simple translation of multiple variables
+            'i18n28': ('{% load i18n %}{% blocktrans with a=anton b=berta %}{{ a }} + {{ b }}{% endblocktrans %}', {'anton': 'α', 'berta': 'β'}, u'α + β'),
+            'legacyi18n28': ('{% load i18n %}{% blocktrans with anton as a and berta as b %}{{ a }} + {{ b }}{% endblocktrans %}', {'anton': 'α', 'berta': 'β'}, u'α + β'),
 
             # retrieving language information
             'i18n28': ('{% load i18n %}{% get_language_info for "de" as l %}{{ l.code }}: {{ l.name }}/{{ l.name_local }} bidi={{ l.bidi }}', {}, 'de: German/Deutsch bidi=False'),
@@ -1273,11 +1301,16 @@ class Templates(unittest.TestCase):
             'widthratio11': ('{% widthratio a b c %}', {'a':50,'b':100, 'c': 100}, '50'),
 
             ### WITH TAG ########################################################
-            'with01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, '50'),
-            'with02': ('{{ key }}{% with dict.key as key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key':50}}, ('50-50-50', 'INVALID50-50-50INVALID')),
+            'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
+            'legacywith01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
 
-            'with-error01': ('{% with dict.key xx key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
-            'with-error02': ('{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
+            'with02': ('{{ key }}{% with key=dict.key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key': 50}}, ('50-50-50', 'INVALID50-50-50INVALID')),
+            'legacywith02': ('{{ key }}{% with dict.key as key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key': 50}}, ('50-50-50', 'INVALID50-50-50INVALID')),
+
+            'with03': ('{% with a=alpha b=beta %}{{ a }}{{ b }}{% endwith %}', {'alpha': 'A', 'beta': 'B'}, 'AB'),
+
+            'with-error01': ('{% with dict.key xx key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, template.TemplateSyntaxError),
+            'with-error02': ('{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, template.TemplateSyntaxError),
 
             ### NOW TAG ########################################################
             # Simple case

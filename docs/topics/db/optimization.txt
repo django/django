@@ -206,7 +206,7 @@ many-to-many relation to User, the following template code is optimal:
 .. code-block:: html+django
 
    {% if display_inbox %}
-     {% with user.emails.all as emails %}
+     {% with emails=user.emails.all %}
        {% if emails %}
          <p>You have {{ emails|length }} email(s)</p>
          {% for email in emails %}

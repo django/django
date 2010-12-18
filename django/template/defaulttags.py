@@ -16,6 +16,55 @@ register = Library()
 # Regex for token keyword arguments
 kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
 
+def token_kwargs(bits, parser, support_legacy=False):
+    """
+    A utility method for parsing token keyword arguments.
+
+    :param bits: A list containing remainder of the token (split by spaces)
+        that is to be checked for arguments. Valid arguments will be removed
+        from this list.
+
+    :param support_legacy: If set to true ``True``, the legacy format
+        ``1 as foo`` will be accepted. Otherwise, only the standard ``foo=1``
+        format is allowed.
+
+    :returns: A dictionary of the arguments retrieved from the ``bits`` token
+        list.
+
+    There is no requirement for all remaining token ``bits`` to be keyword
+    arguments, so the dictionary will be returned as soon as an invalid
+    argument format is reached.
+    """
+    if not bits:
+        return {}
+    match = kwarg_re.match(bits[0])
+    kwarg_format = match and match.group(1)
+    if not kwarg_format:
+        if not support_legacy:
+            return {}
+        if len(bits) < 3 or bits[1] != 'as':
+            return {}
+
+    kwargs = {}
+    while bits:
+        if kwarg_format: 
+            match = kwarg_re.match(bits[0])
+            if not match or not match.group(1):
+                return kwargs
+            key, value = match.groups()
+            del bits[:1]
+        else:
+            if len(bits) < 3 or bits[1] != 'as':
+                return kwargs
+            key, value = bits[2], bits[0]
+            del bits[:3]
+        kwargs[key] = parser.compile_filter(value)
+        if bits and not kwarg_format:
+            if bits[0] != 'and':
+                return kwargs
+            del bits[:1]
+    return kwargs
+
 class AutoEscapeControlNode(Node):
     """Implements the actions of the autoescape tag."""
     def __init__(self, setting, nodelist):
@@ -298,7 +347,7 @@ class SsiNode(Node):
     def render(self, context):
         filepath = self.filepath
         if not self.legacy_filepath:
-           filepath = filepath.resolve(context)
+            filepath = filepath.resolve(context)
 
         if not include_is_allowed(filepath):
             if settings.DEBUG:
@@ -433,18 +482,25 @@ class WidthRatioNode(Node):
         return str(int(round(ratio)))
 
 class WithNode(Node):
-    def __init__(self, var, name, nodelist):
-        self.var = var
-        self.name = name
+    def __init__(self, var, name, nodelist, extra_context=None,
+                 isolated_context=False):
         self.nodelist = nodelist
+        # var and name are legacy attributes, being left in case they are used
+        # by third-party subclasses of this Node.
+        self.extra_context = extra_context or {}
+        if name:
+            self.extra_context[name] = var
+        self.isolated_context = isolated_context
 
     def __repr__(self):
         return "<WithNode>"
 
     def render(self, context):
-        val = self.var.resolve(context)
-        context.push()
-        context[self.name] = val
+        values = dict([(key, val.resolve(context)) for key, val in
+                       self.extra_context.iteritems()])
+        if self.isolated_context:
+            return self.nodelist.render(Context(values))
+        context.update(values)
         output = self.nodelist.render(context)
         context.pop()
         return output
@@ -1276,22 +1332,34 @@ widthratio = register.tag(widthratio)
 #@register.tag
 def do_with(parser, token):
     """
-    Adds a value to the context (inside of this block) for caching and easy
-    access.
+    Adds one or more values to the context (inside of this block) for caching
+    and easy access.
 
     For example::
 
-        {% with person.some_sql_method as total %}
+        {% with total=person.some_sql_method %}
             {{ total }} object{{ total|pluralize }}
         {% endwith %}
+
+    Multiple values can be added to the context::
+
+        {% with foo=1 bar=2 %}
+            ...
+        {% endwith %}
+
+    The legacy format of ``{% with person.some_sql_method as total %}`` is
+    still accepted.
     """
-    bits = list(token.split_contents())
-    if len(bits) != 4 or bits[2] != "as":
-        raise TemplateSyntaxError("%r expected format is 'value as name'" %
-                                  bits[0])
-    var = parser.compile_filter(bits[1])
-    name = bits[3]
+    bits = token.split_contents()
+    remaining_bits = bits[1:]
+    extra_context = token_kwargs(remaining_bits, parser, support_legacy=True)
+    if not extra_context:
+        raise TemplateSyntaxError("%r expected at least one variable "
+                                  "assignment" % bits[0])
+    if remaining_bits:
+        raise TemplateSyntaxError("%r received an invalid token: %r" %
+                                  (bits[0], remaining_bits[0]))
     nodelist = parser.parse(('endwith',))
     parser.delete_first_token()
-    return WithNode(var, name, nodelist)
+    return WithNode(None, None, nodelist, extra_context=extra_context)
 do_with = register.tag('with', do_with)

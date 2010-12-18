@@ -371,12 +371,11 @@ using the :ttag:`include` tag to reuse it in other templates::
     {% endfor %}
 
 If the form object passed to a template has a different name within the
-context, you can alias it using the :ttag:`with` tag::
+context, you can alias it using the ``with`` argument of the :ttag:`include`
+tag::
 
     <form action="/comments/add/" method="post">
-        {% with comment_form as form %}
-            {% include "form_snippet.html" %}
-        {% endwith %}
+        {% include "form_snippet.html" with form=comment_form %}
         <p><input type="submit" value="Submit comment" /></p>
     </form>
 
