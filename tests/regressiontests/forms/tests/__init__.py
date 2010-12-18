@@ -38,4 +38,5 @@ from regressiontests.forms.localflavortests import (
     SKLocalFlavorTests,
     UKLocalFlavorTests,
     USLocalFlavorTests,
+    UYLocalFlavorTests,
 )
