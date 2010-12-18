@@ -1,9 +1,18 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import EMPTY_VALUES
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils.unittest import TestCase
 
 
 class LocalFlavorTestCase(TestCase):
+    # NOTE: These are copied from the TestCase Django uses for tests which
+    # access the database
+    def save_warnings_state(self):
+        self._warnings_state = get_warnings_state()
+
+    def restore_warnings_state(self):
+        restore_warnings_state(self._warnings_state)
+
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=[],
         field_kwargs={}, empty_value=u''):
         """Asserts that a field behaves correctly with various inputs.
