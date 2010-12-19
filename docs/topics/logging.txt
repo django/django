@@ -396,8 +396,8 @@ Django provides three built-in loggers.
 ``django`` is the catch-all logger. No messages are posted directly to
 this logger.
 
-``django.requests``
-~~~~~~~~~~~~~~~~~~~
+``django.request``
+~~~~~~~~~~~~~~~~~~
 
 Log messages related to the handling of requests. 5XX responses are
 raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
