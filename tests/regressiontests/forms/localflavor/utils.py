@@ -28,7 +28,7 @@ class LocalFlavorTestCase(TestCase):
             emptyvalue: the expected clean output for inputs in EMPTY_VALUES
         """
         required = fieldclass(*field_args, **field_kwargs)
-        optional = fieldclass(*field_args, required=False, **field_kwargs)
+        optional = fieldclass(*field_args, **dict(field_kwargs, required=False))
         # test valid inputs
         for input, output in valid.items():
             self.assertEqual(required.clean(input), output)
