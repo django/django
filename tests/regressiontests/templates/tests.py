@@ -91,6 +91,21 @@ class SomeClass:
     def method4(self):
         raise SomeOtherException
 
+    def __getitem__(self, key):
+        if key == 'silent_fail_key':
+            raise SomeException
+        elif key == 'noisy_fail_key':
+            raise SomeOtherException
+        raise KeyError
+
+    def silent_fail_attribute(self):
+        raise SomeException
+    silent_fail_attribute = property(silent_fail_attribute)
+
+    def noisy_fail_attribute(self):
+        raise SomeOtherException
+    noisy_fail_attribute = property(noisy_fail_attribute)
+
 class OtherClass:
     def method(self):
         return "OtherClass.method"
@@ -529,6 +544,12 @@ class Templates(unittest.TestCase):
             'basic-syntax35': ("{{ 1 }}", {"1": "abc"}, "1"),
             'basic-syntax36': ("{{ 1.2 }}", {"1": "abc"}, "1.2"),
 
+            # Call methods in the top level of the context
+            'basic-syntax37': ('{{ callable }}', {"callable": lambda: "foo bar"}, "foo bar"),
+
+            # Call methods returned from dictionary lookups
+            'basic-syntax38': ('{{ var.callable }}', {"var": {"callable": lambda: "foo bar"}}, "foo bar"),
+
             # List-index syntax allows a template to access a certain item of a subscriptable object.
             'list-index01': ("{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"),
 
@@ -615,6 +636,17 @@ class Templates(unittest.TestCase):
 
             #filters should accept empty string constants
             'filter-syntax20': ('{{ ""|default_if_none:"was none" }}', {}, ""),
+
+            # Fail silently for non-callable attribute and dict lookups which
+            # raise an exception with a "silent_variable_failure" attribute
+            'filter-syntax21': (r'1{{ var.silent_fail_key }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
+            'filter-syntax22': (r'1{{ var.silent_fail_attribute }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
+
+            # In attribute and dict lookups that raise an unexpected exception
+            # without a "silent_variable_attribute" set to True, the exception
+            # propagates
+            'filter-syntax23': (r'1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, SomeOtherException),
+            'filter-syntax24': (r'1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, SomeOtherException),
 
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),

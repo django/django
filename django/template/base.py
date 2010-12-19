@@ -674,46 +674,37 @@ class Variable(object):
         instead.
         """
         current = context
-        for bit in self.lookups:
-            try: # dictionary lookup
-                current = current[bit]
-            except (TypeError, AttributeError, KeyError):
-                try: # attribute lookup
-                    current = getattr(current, bit)
-                    if callable(current):
-                        if getattr(current, 'alters_data', False):
-                            current = settings.TEMPLATE_STRING_IF_INVALID
-                        else:
-                            try: # method call (assuming no args required)
-                                current = current()
-                            except TypeError: # arguments *were* required
-                                # GOTCHA: This will also catch any TypeError
-                                # raised in the function itself.
-                                current = settings.TEMPLATE_STRING_IF_INVALID # invalid method call
-                            except Exception, e:
-                                if getattr(e, 'silent_variable_failure', False):
-                                    current = settings.TEMPLATE_STRING_IF_INVALID
-                                else:
-                                    raise
-                except (TypeError, AttributeError):
-                    try: # list-index lookup
-                        current = current[int(bit)]
-                    except (IndexError, # list index out of range
-                            ValueError, # invalid literal for int()
-                            KeyError,   # current is a dict without `int(bit)` key
-                            TypeError,  # unsubscriptable object
-                            ):
-                        raise VariableDoesNotExist("Failed lookup for key [%s] in %r", (bit, current)) # missing attribute
-                except Exception, e:
-                    if getattr(e, 'silent_variable_failure', False):
+        try: # catch-all for silent variable failures
+            for bit in self.lookups:
+                try: # dictionary lookup
+                    current = current[bit]
+                except (TypeError, AttributeError, KeyError):
+                    try: # attribute lookup
+                        current = getattr(current, bit)
+                    except (TypeError, AttributeError):
+                        try: # list-index lookup
+                            current = current[int(bit)]
+                        except (IndexError, # list index out of range
+                                ValueError, # invalid literal for int()
+                                KeyError,   # current is a dict without `int(bit)` key
+                                TypeError,  # unsubscriptable object
+                                ):
+                            raise VariableDoesNotExist("Failed lookup for key [%s] in %r", (bit, current)) # missing attribute
+                if callable(current):
+                    if getattr(current, 'alters_data', False):
                         current = settings.TEMPLATE_STRING_IF_INVALID
                     else:
-                        raise
-            except Exception, e:
-                if getattr(e, 'silent_variable_failure', False):
-                    current = settings.TEMPLATE_STRING_IF_INVALID
-                else:
-                    raise
+                        try: # method call (assuming no args required)
+                            current = current()
+                        except TypeError: # arguments *were* required
+                            # GOTCHA: This will also catch any TypeError
+                            # raised in the function itself.
+                            current = settings.TEMPLATE_STRING_IF_INVALID # invalid method call
+        except Exception, e:
+            if getattr(e, 'silent_variable_failure', False):
+                current = settings.TEMPLATE_STRING_IF_INVALID
+            else:
+                raise
 
         return current
 
