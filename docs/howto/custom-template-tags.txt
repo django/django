@@ -669,9 +669,27 @@ A couple of things to note about the ``simple_tag`` helper function:
     * If the argument was a template variable, our function is passed the
       current value of the variable, not the variable itself.
 
-When your template tag does not need access to the current context, writing a
-function to work with the input values and using the ``simple_tag`` helper is
-the easiest way to create a new tag.
+.. versionadded:: 1.3
+
+If your template tag needs to access the current context, you can use the
+``takes_context`` argument when registering your tag::
+
+    # The first argument *must* be called "context" here.
+    def current_time(context, format_string):
+        timezone = context['timezone']
+        return your_get_current_time_method(timezone)
+
+    register.simple_tag(takes_context=True)(current_time)
+
+Or, using decorator syntax::
+
+    @register.simple_tag(takes_context=True)
+    def current_time(context, format_string):
+        timezone = context['timezone']
+        return your_get_current_time_method(timezone)
+
+For more information on how the ``takes_context`` option works, see the section
+on `inclusion tags`_.
 
 .. _howto-custom-template-tags-inclusion-tags:
 

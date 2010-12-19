@@ -184,11 +184,15 @@ requests. These include:
 
     * Support for _HTTPOnly cookies.
 
-    * mail_admins() and mail_managers() now support easily attaching
-      HTML content to messages.
+    * :meth:`mail_admins()` and :meth:`mail_managers()` now support
+      easily attaching HTML content to messages.
 
     * Error emails now include more of the detail and formatting of
       the debug server error page.
+
+    * :meth:`simple_tag` now accepts a :attr:`takes_context` argument,
+      making it easier to write simple template tags that require
+      access to template context.
 
 .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
 

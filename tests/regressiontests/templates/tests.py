@@ -23,7 +23,7 @@ from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
 
 from context import ContextTests
-from custom import CustomTests
+from custom import CustomTagTests, CustomFilterTests
 from parser import ParserTests
 from unicode import UnicodeTests
 from nodelist import NodelistTest
