@@ -11,6 +11,12 @@ from django.test import TestCase
 
 
 class TestAuthPermissions(TestCase):
+    def tearDown(self):
+        # These tests mess with content types, but content type lookups
+        # are cached, so we need to make sure the effects of this test
+        # are cleaned up.
+        contenttypes_models.ContentType.objects.clear_cache()
+
     def test_permission_register_order(self):
         """Test that the order of registered permissions doesn't break"""
         # Changeset 14413 introduced a regression in the ordering of
