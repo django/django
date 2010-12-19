@@ -684,7 +684,7 @@ so long as the total number of forms does not exceed ``max_num``::
 
     >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=2)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
-    >>> for form in formset.forms:
+    >>> for form in formset:
     ...     print form.as_table()
     <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" value="Charles Baudelaire" maxlength="100" /><input type="hidden" name="form-0-id" value="1" id="id_form-0-id" /></td></tr>
     <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100" /><input type="hidden" name="form-1-id" value="3" id="id_form-1-id" /></td></tr>
@@ -778,7 +778,7 @@ itself::
 
     <form method="post" action="">
         {{ formset.management_form }}
-        {% for form in formset.forms %}
+        {% for form in formset %}
             {{ form }}
         {% endfor %}
     </form>
@@ -791,7 +791,7 @@ Third, you can manually render each field::
 
     <form method="post" action="">
         {{ formset.management_form }}
-        {% for form in formset.forms %}
+        {% for form in formset %}
             {% for field in form %}
                 {{ field.label_tag }}: {{ field }}
             {% endfor %}
@@ -804,7 +804,7 @@ if you were rendering the ``name`` and ``age`` fields of a model::
 
     <form method="post" action="">
         {{ formset.management_form }}
-        {% for form in formset.forms %}
+        {% for form in formset %}
             {{ form.id }}
             <ul>
                 <li>{{ form.name }}</li>

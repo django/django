@@ -767,6 +767,38 @@ class FormsFormsetTestCase(TestCase):
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), [u'You may only specify a drink once.'])
 
+    def test_formset_iteration(self):
+        # Regression tests for #16455 -- formset instances are iterable
+        ChoiceFormset = formset_factory(Choice, extra=3)
+        formset = ChoiceFormset()
+
+        # confirm iterated formset yields formset.forms
+        forms = list(formset)
+        self.assertEqual(forms, formset.forms)
+        self.assertEqual(len(formset), len(forms))
+
+        # confirm indexing of formset
+        self.assertEqual(formset[0], forms[0])
+        try:
+            formset[3]
+            self.fail('Requesting an invalid formset index should raise an exception')
+        except IndexError:
+            pass
+
+        # Formets can override the default iteration order
+        class BaseReverseFormSet(BaseFormSet):
+            def __iter__(self):
+                for form in reversed(self.forms):
+                    yield form
+
+        ReverseChoiceFormset = formset_factory(Choice, BaseReverseFormSet, extra=3)
+        reverse_formset = ReverseChoiceFormset()
+
+        # confirm that __iter__ modifies rendering order
+        # compare forms from "reverse" formset with forms from original formset
+        self.assertEqual(str(reverse_formset[0]), str(forms[-1]))
+        self.assertEqual(str(reverse_formset[1]), str(forms[-2]))
+        self.assertEqual(len(reverse_formset), len(forms))
 
 data = {
     'choices-TOTAL_FORMS': '1', # the number of forms rendered
@@ -802,7 +834,7 @@ class FormsetAsFooTests(TestCase):
 <li>Votes: <input type="text" name="choices-0-votes" value="100" /></li>""")
 
 
-# Regression test for #11418 ################################################# 
+# Regression test for #11418 #################################################
 class ArticleForm(Form):
     title = CharField()
     pub_date = DateField()
@@ -835,7 +867,7 @@ class TestIsBoundBehavior(TestCase):
             'form-0-title': u'Test',
             'form-0-pub_date': u'1904-06-16',
             'form-1-title': u'Test',
-            'form-1-pub_date': u'', # <-- this date is missing but required 
+            'form-1-pub_date': u'', # <-- this date is missing but required
         }
         formset = ArticleFormSet(data)
         self.assertFalse(formset.is_valid())
