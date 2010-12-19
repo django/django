@@ -187,6 +187,8 @@ requests. These include:
     * :meth:`mail_admins()` and :meth:`mail_managers()` now support
       easily attaching HTML content to messages.
 
+    * :class:`EmailMessage` now supports CC's.
+
     * Error emails now include more of the detail and formatting of
       the debug server error page.
 
