@@ -47,7 +47,7 @@ the formset you iterated over the ``forms`` attribute::
 Iterating over ``formset.forms`` will render the forms in the order
 they were created. The default formset iterator also renders the forms
 in this order, but you can change this order by providing an alternate
-implementation for the :method:`__iter__()` method.
+implementation for the :meth:`__iter__()` method.
 
 Using initial data with a formset
 ---------------------------------
