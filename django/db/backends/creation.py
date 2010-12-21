@@ -2,7 +2,6 @@ import sys
 import time
 
 from django.conf import settings
-from django.core.management import call_command
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -338,6 +337,9 @@ class BaseDatabaseCreation(object):
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
         """
+        # Don't import django.core.management if it isn't needed.
+        from django.core.management import call_command
+
         test_database_name = self._get_test_db_name()
 
         if verbosity >= 1:
