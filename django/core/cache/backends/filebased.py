@@ -11,9 +11,9 @@ except ImportError:
 from django.core.cache.backends.base import BaseCache
 from django.utils.hashcompat import md5_constructor
 
-class CacheClass(BaseCache):
-    def __init__(self, dir, params, key_prefix='', version=1, key_func=None):
-        BaseCache.__init__(self, params, key_prefix, version, key_func)
+class FileBasedCache(BaseCache):
+    def __init__(self, dir, params):
+        BaseCache.__init__(self, params)
         self._dir = dir
         if not os.path.exists(self._dir):
             self._createdir()
@@ -161,3 +161,7 @@ class CacheClass(BaseCache):
             shutil.rmtree(self._dir)
         except (IOError, OSError):
             pass
+
+# For backwards compatibility
+class CacheClass(FileBasedCache):
+    pass

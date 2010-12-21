@@ -40,23 +40,24 @@ def cache_page(*args, **kwargs):
 
     # We also add some asserts to give better error messages in case people are
     # using other ways to call cache_page that no longer work.
+    cache_alias = kwargs.pop('cache', None)
     key_prefix = kwargs.pop('key_prefix', None)
-    assert not kwargs, "The only keyword argument accepted is key_prefix"
+    assert not kwargs, "The only keyword arguments are cache and key_prefix"
     if len(args) > 1:
         assert len(args) == 2, "cache_page accepts at most 2 arguments"
         if callable(args[0]):
-            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[1], key_prefix=key_prefix)(args[0])
+            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[1], cache_alias=cache_alias, key_prefix=key_prefix)(args[0])
         elif callable(args[1]):
-            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], key_prefix=key_prefix)(args[1])
+            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], cache_alias=cache_alias, key_prefix=key_prefix)(args[1])
         else:
             assert False, "cache_page must be passed a view function if called with two arguments"
     elif len(args) == 1:
         if callable(args[0]):
-            return decorator_from_middleware_with_args(CacheMiddleware)(key_prefix=key_prefix)(args[0])
+            return decorator_from_middleware_with_args(CacheMiddleware)(cache_alias=cache_alias, key_prefix=key_prefix)(args[0])
         else:
-            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], key_prefix=key_prefix)
+            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], cache_alias=cache_alias, key_prefix=key_prefix)
     else:
-        return decorator_from_middleware_with_args(CacheMiddleware)(key_prefix=key_prefix)
+        return decorator_from_middleware_with_args(CacheMiddleware)(cache_alias=cache_alias, key_prefix=key_prefix)
 
 
 def cache_control(**kwargs):

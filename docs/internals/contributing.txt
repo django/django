@@ -940,7 +940,7 @@ dependencies:
     *  gettext_ (:ref:`gettext_on_windows`)
 
 If you want to test the memcached cache backend, you will also need to define
-a :setting:`CACHE_BACKEND` setting that points at your memcached instance.
+a :setting:`CACHES` setting that points at your memcached instance.
 
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.

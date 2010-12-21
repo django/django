@@ -1453,8 +1453,6 @@ class Templates(unittest.TestCase):
             'url-asvar03': ('{% load url from future %}{% url "no_such_view" as url %}{{ url }}', {}, ''),
 
             ### CACHE TAG ######################################################
-            'cache01': ('{% load cache %}{% cache -1 test %}cache01{% endcache %}', {}, 'cache01'),
-            'cache02': ('{% load cache %}{% cache -1 test %}cache02{% endcache %}', {}, 'cache02'),
             'cache03': ('{% load cache %}{% cache 2 test %}cache03{% endcache %}', {}, 'cache03'),
             'cache04': ('{% load cache %}{% cache 2 test %}cache04{% endcache %}', {}, 'cache03'),
             'cache05': ('{% load cache %}{% cache 2 test foo %}cache05{% endcache %}', {'foo': 1}, 'cache05'),
@@ -1463,8 +1461,6 @@ class Templates(unittest.TestCase):
 
             # Allow first argument to be a variable.
             'cache08': ('{% load cache %}{% cache time test foo %}cache08{% endcache %}', {'foo': 2, 'time': 2}, 'cache06'),
-            'cache09': ('{% load cache %}{% cache time test foo %}cache09{% endcache %}', {'foo': 3, 'time': -1}, 'cache09'),
-            'cache10': ('{% load cache %}{% cache time test foo %}cache10{% endcache %}', {'foo': 3, 'time': -1}, 'cache10'),
 
             # Raise exception if we don't have at least 2 args, first one integer.
             'cache11': ('{% load cache %}{% cache %}{% endcache %}', {}, template.TemplateSyntaxError),

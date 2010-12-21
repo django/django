@@ -2,7 +2,7 @@
 
 from django.core.cache.backends.base import BaseCache
 
-class CacheClass(BaseCache):
+class DummyCache(BaseCache):
     def __init__(self, host, *args, **kwargs):
         BaseCache.__init__(self, *args, **kwargs)
 
@@ -40,3 +40,7 @@ class CacheClass(BaseCache):
 
     def clear(self):
         pass
+
+# For backwards compatibility
+class CacheClass(DummyCache):
+    pass

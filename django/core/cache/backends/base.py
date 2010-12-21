@@ -2,8 +2,10 @@
 
 import warnings
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
 from django.utils.encoding import smart_str
+from django.utils.importlib import import_module
 
 class InvalidCacheBackendError(ImproperlyConfigured):
     pass
@@ -15,38 +17,55 @@ class CacheKeyWarning(DjangoRuntimeWarning):
 MEMCACHE_MAX_KEY_LENGTH = 250
 
 def default_key_func(key, key_prefix, version):
-    """Default function to generate keys.
+    """
+    Default function to generate keys.
 
     Constructs the key used by all other methods. By default it prepends
-    the `key_prefix'. CACHE_KEY_FUNCTION can be used to specify an alternate
+    the `key_prefix'. KEY_FUNCTION can be used to specify an alternate
     function with custom key making behavior.
     """
     return ':'.join([key_prefix, str(version), smart_str(key)])
 
+def get_key_func(key_func):
+    """
+    Function to decide which key function to use.
+
+    Defaults to ``default_key_func``.
+    """
+    if key_func is not None:
+        if callable(key_func):
+            return key_func
+        else:
+            key_func_module_path, key_func_name = key_func.rsplit('.', 1)
+            key_func_module = import_module(key_func_module_path)
+            return getattr(key_func_module, key_func_name)
+    return default_key_func
+
 class BaseCache(object):
-    def __init__(self, params, key_prefix='', version=1, key_func=None):
-        timeout = params.get('timeout', 300)
+    def __init__(self, params):
+        timeout = params.get('timeout', params.get('TIMEOUT', 300))
         try:
             timeout = int(timeout)
         except (ValueError, TypeError):
             timeout = 300
         self.default_timeout = timeout
 
-        max_entries = params.get('max_entries', 300)
+        options = params.get('OPTIONS', {})
+        max_entries = params.get('max_entries', options.get('MAX_ENTRIES', 300))
         try:
             self._max_entries = int(max_entries)
         except (ValueError, TypeError):
             self._max_entries = 300
 
-        cull_frequency = params.get('cull_frequency', 3)
+        cull_frequency = params.get('cull_frequency', options.get('CULL_FREQUENCY', 3))
         try:
             self._cull_frequency = int(cull_frequency)
         except (ValueError, TypeError):
             self._cull_frequency = 3
 
-        self.key_prefix = smart_str(key_prefix)
-        self.version = version
-        self.key_func = key_func or default_key_func
+        self.key_prefix = smart_str(params.get('KEY_PREFIX', ''))
+        self.version = params.get('VERSION', 1)
+        self.key_func = get_key_func(params.get('KEY_FUNCTION', None))
 
     def make_key(self, key, version=None):
         """Constructs the key used by all other methods. By default it

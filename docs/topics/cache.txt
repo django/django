@@ -47,9 +47,16 @@ where your cached data should live -- whether in a database, on the filesystem
 or directly in memory. This is an important decision that affects your cache's
 performance; yes, some cache types are faster than others.
 
-Your cache preference goes in the :setting:`CACHE_BACKEND` setting in your
+Your cache preference goes in the :setting:`CACHES` setting in your
 settings file. Here's an explanation of all available values for
-:setting:`CACHE_BACKEND`.
+:setting:`CACHES`.
+
+.. versionchanged:: 1.3
+    The settings used to configure caching changed in Django 1.3. In
+    Django 1.2 and earlier, you used a single string-based
+    :setting:`CACHE_BACKEND` setting to configure caches. This has
+    been replaced with the new dictionary-based :setting:`CACHES`
+    setting.
 
 Memcached
 ---------
@@ -66,9 +73,12 @@ fast interface for adding, retrieving and deleting arbitrary data in the cache.
 All data is stored directly in memory, so there's no overhead of database or
 filesystem usage.
 
-After installing Memcached itself, you'll need to install
-``python-memcached``, which provides Python bindings to Memcached.
-This is available at ftp://ftp.tummy.com/pub/python-memcached/
+After installing Memcached itself, you'll need to install a memcached
+binding. There are several python memcached bindings available; the
+two most common are `python-memcached`_ and `pylibmc`_.
+
+.. _`python-memcached`: ftp://ftp.tummy.com/pub/python-memcached/
+.. _`pylibmc`: http://sendapatch.se/projects/pylibmc/
 
 .. versionchanged:: 1.2
     In Django 1.0 and 1.1, you could also use ``cmemcache`` as a binding.
@@ -76,31 +86,64 @@ This is available at ftp://ftp.tummy.com/pub/python-memcached/
     a lack of maintenance on the ``cmemcache`` library itself. Support for
     ``cmemcache`` will be removed completely in Django 1.4.
 
-To use Memcached with Django, set :setting:`CACHE_BACKEND` to
-``memcached://ip:port/``, where ``ip`` is the IP address of the Memcached
-daemon and ``port`` is the port on which Memcached is running.
+.. versionchanged:: 1.3
+    Support for ``pylibmc`` was added.
 
-In this example, Memcached is running on localhost (127.0.0.1) port 11211::
+To use Memcached with Django:
 
-    CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+    * Set :setting:`BACKEND <CACHES-BACKEND>` to
+      ``django.core.cache.backends.memcached.MemcachedCache`` or
+      ``django.core.cache.backends.memcached.PyLibMCCache`` (depending
+      on your chosen memcached binding)
+
+    * Set :setting:`LOCATION <CACHES-LOCATION>` to ``ip:port`` values,
+      where ``ip`` is the IP address of the Memcached daemon and
+      ``port`` is the port on which Memcached is running.
+
+In this example, Memcached is running on localhost (127.0.0.1) port 11211, using
+the ``python-memcached`` binding::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+        }
+    }
 
 One excellent feature of Memcached is its ability to share cache over multiple
 servers. This means you can run Memcached daemons on multiple machines, and the
 program will treat the group of machines as a *single* cache, without the need
 to duplicate cache values on each machine. To take advantage of this feature,
-include all server addresses in :setting:`CACHE_BACKEND`, separated by
-semicolons.
+include all server addresses in :setting:`BACKEND <CACHES-BACKEND>`, either
+separated by semicolons or as a list.
 
 In this example, the cache is shared over Memcached instances running on IP
 address 172.19.26.240 and 172.19.26.242, both on port 11211::
 
-    CACHE_BACKEND = 'memcached://172.19.26.240:11211;172.19.26.242:11211/'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': [
+                '172.19.26.240:11211',
+                '172.19.26.242:11211',
+            ]
+        }
+    }
 
 In the following example, the cache is shared over Memcached instances running
 on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
 172.19.26.244 (port 11213)::
 
-    CACHE_BACKEND = 'memcached://172.19.26.240:11211;172.19.26.242:11212;172.19.26.244:11213/'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': [
+                '172.19.26.240:11211',
+                '172.19.26.242:11211',
+                '172.19.26.244:11213',
+            ]
+        }
+    }
 
 A final point about Memcached is that memory-based caching has one
 disadvantage: Because the cached data is stored in memory, the data will be
@@ -125,12 +168,19 @@ not already being used in your database.) This command creates a single table
 in your database that is in the proper format that Django's database-cache
 system expects.
 
-Once you've created that database table, set your :setting:`CACHE_BACKEND`
-setting to ``"db://tablename"``, where ``tablename`` is the name of the
-database table. In this example, the cache table's name is
-``my_cache_table``::
+Once you've created that database table, set your
+:setting:`BACKEND <CACHES-BACKEND>` setting to
+``"django.core.cache.backends.db.DatabaseCache"``, and
+:setting:`LOCATION <CACHES-LOCATION>` to ``tablename`` -- the name of the
+database table. In this example, the cache table's name is ``my_cache_table``::
 
-    CACHE_BACKEND = 'db://my_cache_table'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'my_cache_table',
+        }
+    }
+
 
 The database caching backend uses the same database as specified in your
 settings file. You can't use a different database backend for your cache table.
@@ -183,18 +233,28 @@ model.
 Filesystem caching
 ------------------
 
-To store cached items on a filesystem, use the ``"file://"`` cache type for
-:setting:`CACHE_BACKEND`. For example, to store cached data in
+To store cached items on a filesystem, use
+``"django.core.cache.backends.filebased.FileBasedCache"`` for
+:setting:`BACKEND <CACHES-BACKEND>`. For example, to store cached data in
 ``/var/tmp/django_cache``, use this setting::
 
-    CACHE_BACKEND = 'file:///var/tmp/django_cache'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/django_cache',
+        }
+    }
 
-Note that there are three forward slashes toward the beginning of that example.
-The first two are for ``file://``, and the third is the first character of the
-directory path, ``/var/tmp/django_cache``. If you're on Windows, put the
-drive letter after the ``file://``, like this::
 
-    file://c:/foo/bar
+If you're on Windows, put the drive letter at the beginning of the path,
+like this::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': 'c:/foo/bar',
+        }
+    }
 
 The directory path should be absolute -- that is, it should start at the root
 of your filesystem. It doesn't matter whether you put a slash at the end of the
@@ -215,10 +275,22 @@ Local-memory caching
 
 If you want the speed advantages of in-memory caching but don't have the
 capability of running Memcached, consider the local-memory cache backend. This
-cache is multi-process and thread-safe. To use it, set :setting:`CACHE_BACKEND`
-to ``"locmem://"``. For example::
+cache is multi-process and thread-safe. To use it, set
+:setting:`BACKEND <CACHES-BACKEND>` to
+``"django.core.cache.backends.locmem.LocMemCache"``. For example::
 
-    CACHE_BACKEND = 'locmem://'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake'
+        }
+    }
+
+The cache :setting:`LOCATION <CACHES-LOCATION>` is used to identify individual
+memory stores. If you only have one locmem cache, you can omit the
+:setting:`LOCATION <CACHES-LOCATION>`; however, if you have more that one local
+memory cache, you will need to assign a name to at least one of them in
+order to keep them separate.
 
 Note that each process will have its own private cache instance, which means no
 cross-process caching is possible. This obviously also means the local memory
@@ -234,9 +306,13 @@ just implements the cache interface without doing anything.
 This is useful if you have a production site that uses heavy-duty caching in
 various places but a development/test environment where you don't want to cache
 and don't want to have to change your code to special-case the latter. To
-activate dummy caching, set :setting:`CACHE_BACKEND` like so::
+activate dummy caching, set :setting:`BACKEND <CACHES-BACKEND>` like so::
 
-    CACHE_BACKEND = 'dummy://'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
 
 Using a custom cache backend
 ----------------------------
@@ -245,10 +321,14 @@ Using a custom cache backend
 
 While Django includes support for a number of cache backends out-of-the-box,
 sometimes you might want to use a customized cache backend. To use an external
-cache backend with Django, use a Python import path as the scheme portion (the
-part before the initial colon) of the :setting:`CACHE_BACKEND` URI, like so::
+cache backend with Django, use the Python import path as the
+:setting:`BACKEND <CACHES-BACKEND>` of the :setting:`CACHES` setting, like so::
 
-    CACHE_BACKEND = 'path.to.backend://'
+    CACHES = {
+        'default': {
+            'BACKEND': 'path.to.backend',
+        }
+    }
 
 If you're building your own backend, you can use the standard cache backends
 as reference implementations. You'll find the code in the
@@ -258,35 +338,77 @@ Note: Without a really compelling reason, such as a host that doesn't support
 them, you should stick to the cache backends included with Django. They've
 been well-tested and are easy to use.
 
-CACHE_BACKEND arguments
------------------------
+Cache arguments
+---------------
 
-Each cache backend may take arguments. They're given in query-string style on
-the :setting:`CACHE_BACKEND` setting. Valid arguments are as follows:
+In addition to the defining the engine and name of the each cache
+backend, each cache backend can be given additional arguments to
+control caching behavior. These arguments are provided as additional
+keys in the :setting:`CACHES` setting. Valid arguments are as follows:
 
-    * ``timeout``: The default timeout, in seconds, to use for the cache.
-      This argument defaults to 300 seconds (5 minutes).
+    * :setting:`TIMEOUT <CACHES-TIMEOUT>`: The default timeout, in
+      seconds, to use for the cache. This argument defaults to 300
+      seconds (5 minutes).
 
-    * ``max_entries``: For the ``locmem``, ``filesystem`` and ``database``
-      backends, the maximum number of entries allowed in the cache before old
-      values are deleted. This argument defaults to 300.
+    * :setting:`OPTIONS <CACHES-OPTIONS>`: Any options that should be
+      passed to cache backend. The list options understood by each
+      backend vary with each backend.
 
-    * ``cull_frequency``: The fraction of entries that are culled when
-      ``max_entries`` is reached. The actual ratio is ``1/cull_frequency``, so
-      set ``cull_frequency=2`` to cull half of the entries when ``max_entries``
-      is reached.
+      Cache backends that implement their own culling strategy (i.e.,
+      the ``locmem``, ``filesystem`` and ``database`` backends) will
+      honor the following options:
 
-      A value of ``0`` for ``cull_frequency`` means that the entire cache will
-      be dumped when ``max_entries`` is reached. This makes culling *much*
-      faster at the expense of more cache misses.
+        * ``MAX_ENTRIES``: the maximum number of entries allowed in
+          the cache before old values are deleted. This argument
+          defaults to ``300``.
 
-In this example, ``timeout`` is set to ``60``::
+        * ``CULL_FREQUENCY``: The fraction of entries that are culled
+          when ``MAX_ENTRIES`` is reached. The actual ratio is
+          ``1/CULL_FREQUENCY``, so set ``CULL_FREQUENCY``: to ``2`` to
+          cull half of the entries when ``MAX_ENTRIES`` is reached.
 
-    CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=60"
+          A value of ``0`` for ``CULL_FREQUENCY`` means that the
+          entire cache will be dumped when ``MAX_ENTRIES`` is reached.
+          This makes culling *much* faster at the expense of more
+          cache misses.
 
-In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
+      Cache backends backed by a third-party library will pass their
+      options directly to the underlying cache library. As a result,
+      the list of valid options depends on the library in use.
 
-    CACHE_BACKEND = "locmem://?timeout=30&max_entries=400"
+    * :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`: A string that will be
+      automatically included (prepended by default) to all cache keys
+      used by the Django server.
+
+      See the :ref:`cache documentation <cache_key_prefixing>` for
+      more information.
+
+    * :setting:`VERSION <CACHES-VERSION>`: The default version number
+      for cache keys generated by the Django server.
+
+      See the :ref:`cache documentation <cache_versioning>` for more
+      information.
+
+    * :setting:`KEY_FUNCTION <CACHES-KEY_FUNCTION>`
+      A string containing a dotted path to a function that defines how
+      to compose a prefix, version and key into a final cache key.
+
+      See the :ref:`cache documentation <cache_key_transformation>`
+      for more information.
+
+In this example, a filesystem backend is being configured with a timeout
+of 60 seconds, and a maximum capacity of 1000 items::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.filebased.FileCache',
+            'LOCATION': '127.0.0.1:11211',
+            'TIMEOUT': 60,
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000
+            }
+        }
+    }
 
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
@@ -318,6 +440,7 @@ entire site. You'll need to add
 
 Then, add the following required settings to your Django settings file:
 
+* :setting:`CACHE_MIDDLEWARE_ALIAS` -- The cache alias to use for storage.
 * :setting:`CACHE_MIDDLEWARE_SECONDS` -- The number of seconds each page should
   be cached.
 * :setting:`CACHE_MIDDLEWARE_KEY_PREFIX` -- If the cache is shared across
@@ -408,13 +531,27 @@ then requests to ``/foo/1/`` and ``/foo/23/`` will be cached separately, as
 you may expect. But once a particular URL (e.g., ``/foo/23/``) has been
 requested, subsequent requests to that URL will use the cache.
 
-``cache_page`` can also take an optional keyword argument, ``key_prefix``,
+``cache_page`` can also take an optional keyword argument, ``cache``,
+which directs the decorator to use a specific cache alias when caching view
+results. By default, the ``default`` alias will be used, but you can specify
+any cache alias you want::
+
+    @cache_page(60 * 15, cache="special_cache")
+    def my_view(request):
+        ...
+
+You can also override the cache prefix on a per-view basis. ``cache_page``
+takes an optional keyword argument, ``key_prefix``,
 which works in the same way as the :setting:`CACHE_MIDDLEWARE_KEY_PREFIX`
 setting for the middleware.  It can be used like this::
 
     @cache_page(60 * 15, key_prefix="site1")
     def my_view(request):
         ...
+
+The two settings can also be combined. If you specify a ``cache`` *and*
+a ``key_prefix``, you will get all the settings of the requested cache
+alias, but with the key_prefix overridden.
 
 Specifying per-view cache in the URLconf
 ----------------------------------------
@@ -535,7 +672,8 @@ can be pickled; refer to the Python documentation for more information about
 pickling.)
 
 The cache module, ``django.core.cache``, has a ``cache`` object that's
-automatically created from the :setting:`CACHE_BACKEND` setting::
+automatically created from the ``'default'`` entry in the :setting:`CACHES`
+setting::
 
     >>> from django.core.cache import cache
 
@@ -546,8 +684,9 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
     'hello, world!'
 
 The ``timeout`` argument is optional and defaults to the ``timeout``
-argument in the :setting:`CACHE_BACKEND` setting (explained above). It's the
-number of seconds the value should be stored in the cache.
+argument of the ``'default'`` backend in :setting:`CACHES` setting
+(explained above). It's the number of seconds the value should be stored
+in the cache.
 
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
@@ -665,10 +804,10 @@ diagnose problems.
 To prevent this, Django provides the ability to prefix all cache keys
 used by a server. When a particular cache key is saved or retrieved,
 Django will automatically prefix the cache key with the value of the
-:setting:`CACHE_KEY_PREFIX` setting.
+:setting:`KEY_PREFIX <CACHES-KEY_PREFIX>` cache setting.
 
 By ensuring each Django instance has a different
-:setting:`CACHE_KEY_PREFIX`, you can ensure that there will be no
+:setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`, you can ensure that there will be no
 collisions in cache values.
 
 .. _cache_versioning:
@@ -685,9 +824,9 @@ that are still valid and useful.
 
 Django provides a better way to target individual cache values.
 Django's cache framework has a system-wide version identifier,
-specified using the :setting:`CACHE_VERSION` setting. The value of
-this setting is automatically combined with the cache prefix and the
-user-provided cache key to obtain the final cache key.
+specified using the :setting:`VERSION <CACHES-VERSION>` cache setting.
+The value of this setting is automatically combined with the cache
+prefix and the user-provided cache key to obtain the final cache key.
 
 By default, any key request will automatically include the site
 default cache key version. However, the primitive cache functions all
@@ -739,10 +878,10 @@ If you want to combine the parts in different ways, or apply other
 processing to the final key (e.g., taking a hash digest of the key
 parts), you can provide a custom key function.
 
-The setting :setting:`CACHE_KEY_FUNCTION` specifies a dotted-path to
-a function matching the prototype of :func:`make_key()` above. If
-provided, this custom key function will be used instead of the default
-key combining function.
+The :setting:`KEY_FUNCTION <CACHES-KEY_FUNCTION>` cache setting
+specifies a dotted-path to a function matching the prototype of
+:func:`make_key()` above. If provided, this custom key function will
+be used instead of the default key combining function.
 
 Cache key warnings
 ------------------
@@ -773,15 +912,15 @@ built-in backends, you can subclass it, override just the ``validate_key``
 method, and follow the instructions for `using a custom cache backend`_. For
 instance, to do this for the ``locmem`` backend, put this code in a module::
 
-    from django.core.cache.backends.locmem import CacheClass as LocMemCacheClass
+    from django.core.cache.backends.locmem import LocMemCache
 
-    class CacheClass(LocMemCacheClass):
+    class CustomLocMemCache(LocMemCache):
         def validate_key(self, key):
             """Custom validation, raising exceptions or warnings as needed."""
             # ...
 
-...and use the dotted Python path to this module as the scheme portion of your
-:setting:`CACHE_BACKEND`.
+...and use the dotted Python path to this class in the
+:setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
 
 Upstream caches
 ===============
