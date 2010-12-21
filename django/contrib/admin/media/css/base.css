@@ -509,7 +509,7 @@ td ul.errorlist li {
     background: #ffc;
 }
 
-.errors input, .errors select {
+.errors input, .errors select, .errors textarea {
     border: 1px solid red;
 }
 

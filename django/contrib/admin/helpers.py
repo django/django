@@ -127,6 +127,9 @@ class AdminField(object):
         attrs = classes and {'class': u' '.join(classes)} or {}
         return self.field.label_tag(contents=contents, attrs=attrs)
 
+    def errors(self):
+        return mark_safe(self.field.errors.as_ul())
+
 class AdminReadonlyField(object):
     def __init__(self, form, field, is_first, model_admin=None):
         label = label_for_field(field, form._meta.model, model_admin)
