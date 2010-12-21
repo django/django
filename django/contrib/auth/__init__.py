@@ -30,6 +30,11 @@ def load_backend(path):
         warn("Authentication backends without a `supports_anonymous_user` attribute are deprecated. Please define it in %s." % cls,
              DeprecationWarning)
         cls.supports_anonymous_user = False
+
+    if not hasattr(cls, 'supports_inactive_user'):
+        warn("Authentication backends without a `supports_inactive_user` attribute are deprecated. Please define it in %s." % cls,
+             DeprecationWarning)
+        cls.supports_inactive_user = False
     return cls()
 
 def get_backends():

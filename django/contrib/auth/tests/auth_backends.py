@@ -102,9 +102,12 @@ class TestObj(object):
 
 class SimpleRowlevelBackend(object):
     supports_object_permissions = True
+    supports_inactive_user = False
 
-    # This class also supports tests for anonymous user permissions,
-    # via subclasses which just set the 'supports_anonymous_user' attribute.
+    # This class also supports tests for anonymous user permissions, and
+    # inactive user permissions via subclasses which just set the
+    # 'supports_anonymous_user' or 'supports_inactive_user' attribute.
+
 
     def has_perm(self, user, perm, obj=None):
         if not obj:
@@ -116,9 +119,13 @@ class SimpleRowlevelBackend(object):
             elif user.is_anonymous() and perm == 'anon':
                 # not reached due to supports_anonymous_user = False
                 return True
+            elif not user.is_active and perm == 'inactive':
+                return True
         return False
 
     def has_module_perms(self, user, app_label):
+        if not user.is_anonymous() and not user.is_active:
+            return False
         return app_label == "app1"
 
     def get_all_permissions(self, user, obj=None):
@@ -192,11 +199,13 @@ class RowlevelBackendTest(TestCase):
 class AnonymousUserBackend(SimpleRowlevelBackend):
 
     supports_anonymous_user = True
+    supports_inactive_user = False
 
 
 class NoAnonymousUserBackend(SimpleRowlevelBackend):
 
     supports_anonymous_user = False
+    supports_inactive_user = False
 
 
 class AnonymousUserBackendTest(TestCase):
@@ -258,6 +267,7 @@ class NoAnonymousUserBackendTest(TestCase):
     def test_get_all_permissions(self):
         self.assertEqual(self.user1.get_all_permissions(TestObj()), set())
 
+
 class NoBackendsTest(TestCase):
     """
     Tests that an appropriate error is raised if no auth backends are provided.
@@ -272,3 +282,67 @@ class NoBackendsTest(TestCase):
 
     def test_raises_exception(self):
         self.assertRaises(ImproperlyConfigured, self.user.has_perm, ('perm', TestObj(),))
+
+
+class InActiveUserBackend(SimpleRowlevelBackend):
+
+    supports_anonymous_user = False
+    supports_inactive_user = True
+
+
+class NoInActiveUserBackend(SimpleRowlevelBackend):
+
+    supports_anonymous_user = False
+    supports_inactive_user = False
+
+
+class InActiveUserBackendTest(TestCase):
+    """
+    Tests for a inactive user delegating to backend if it has 'supports_inactive_user' = True
+    """
+
+    backend = 'django.contrib.auth.tests.auth_backends.InActiveUserBackend'
+
+    def setUp(self):
+        self.curr_auth = settings.AUTHENTICATION_BACKENDS
+        settings.AUTHENTICATION_BACKENDS = (self.backend,)
+        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+        self.user1.is_active = False
+        self.user1.save()
+
+    def tearDown(self):
+        settings.AUTHENTICATION_BACKENDS = self.curr_auth
+
+    def test_has_perm(self):
+        self.assertEqual(self.user1.has_perm('perm', TestObj()), False)
+        self.assertEqual(self.user1.has_perm('inactive', TestObj()), True)
+
+    def test_has_module_perms(self):
+        self.assertEqual(self.user1.has_module_perms("app1"), False)
+        self.assertEqual(self.user1.has_module_perms("app2"), False)
+
+
+class NoInActiveUserBackendTest(TestCase):
+    """
+    Tests that an inactive user does not delegate to backend if it has 'supports_inactive_user' = False
+    """
+    backend = 'django.contrib.auth.tests.auth_backends.NoInActiveUserBackend'
+
+    def setUp(self):
+        self.curr_auth = settings.AUTHENTICATION_BACKENDS
+        settings.AUTHENTICATION_BACKENDS = tuple(self.curr_auth) + (self.backend,)
+        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+        self.user1.is_active = False
+        self.user1.save()
+
+    def tearDown(self):
+        settings.AUTHENTICATION_BACKENDS = self.curr_auth
+
+    def test_has_perm(self):
+        self.assertEqual(self.user1.has_perm('perm', TestObj()), False)
+        self.assertEqual(self.user1.has_perm('inactive', TestObj()), True)
+
+    def test_has_module_perms(self):
+        self.assertEqual(self.user1.has_module_perms("app1"), False)
+        self.assertEqual(self.user1.has_module_perms("app2"), False)
+

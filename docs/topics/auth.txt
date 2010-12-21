@@ -741,7 +741,7 @@ The login_required decorator
         @login_required
         def my_view(request):
             ...
-    
+
     :func:`~django.contrib.auth.decorators.login_required` does the following:
 
     * If the user isn't logged in, redirect to
@@ -1644,6 +1644,31 @@ warning will be upgraded to a ``DeprecationWarning``, which will be displayed
 loudly. Additionally ``supports_anonymous_user`` will be set to ``False``.
 Django 1.4 will assume that every backend supports anonymous users being
 passed to the authorization methods.
+
+Authorization for inactive users
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.3
+
+An inactive user is a one that is authenticated but has its attribute
+``is_active`` set to ``False``. However this does not mean they are not
+authrozied to do anything. For example they are allowed to activate their
+account.
+
+The support for anonymous users in the permission system allows for
+anonymous users to have permissions to do something while inactive
+authenticated users do not.
+
+To enable this on your own backend, you must set the class attribute
+``supports_inactive_user`` to ``True``.
+
+A nonexisting ``supports_inactive_user`` attribute will raise a
+``PendingDeprecationWarning`` if used in Django 1.3. In Django 1.4, this
+warning will be updated to a ``DeprecationWarning`` which will be displayed
+loudly. Additionally ``supports_inactive_user`` will be set to ``False``.
+Django 1.5 will assume that every backend supports inactive users being
+passed to the authorization methods.
+
 
 Handling object permissions
 ---------------------------

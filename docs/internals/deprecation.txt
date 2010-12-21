@@ -98,6 +98,9 @@ their deprecation, as per the :ref:`Django deprecation policy
         * The ``no`` language code has been deprecated in favor of the ``nb``
           language code.
 
+        * Authentication backends need to define the boolean attribute
+          ``supports_inactive_user``.
+
     * 1.5
         * The ``mod_python`` request handler has been deprecated since the 1.3
           release. The ``mod_wsgi`` handler should be used instead.
@@ -138,6 +141,11 @@ their deprecation, as per the :ref:`Django deprecation policy
 
         * The :djadmin:`reset` and :djadmin:`sqlreset` management commands
           are deprecated.
+
+        * Authentication backends need to support a inactive user
+          being passed to all methods dealing with permissions.
+          The ``supports_inactive_user`` variable is not checked any
+          longer and can be removed.
 
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
