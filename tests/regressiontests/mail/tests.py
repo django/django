@@ -408,3 +408,25 @@ class MailTests(TestCase):
         self.assertEqual(message.from_email, from_email)
         self.assertEqual(message.to, [to_email])
         self.assertTrue(message.message().as_string().startswith('Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: =?utf-8?b?ZnLDtm1Aw7bDpMO8LmNvbQ==?=\nTo: =?utf-8?b?dMO2QMO2w6TDvC5jb20=?='))
+
+    def test_idn_smtp_send(self):
+        import smtplib
+        smtplib.SMTP = MockSMTP
+        from_email = u'fröm@öäü.com'
+        to_email = u'tö@öäü.com'
+        connection = mail.get_connection('django.core.mail.backends.smtp.EmailBackend')
+        self.assertTrue(send_mail('Subject', 'Content', from_email, [to_email], connection=connection))
+
+class MockSMTP(object):
+    def __init__(self, host='', port=0, local_hostname=None,
+                 timeout=1):
+        pass
+
+    def sendmail(self, from_addr, to_addrs, msg, mail_options=[],
+                 rcpt_options=[]):
+        for addr in to_addrs:
+            str(addr.split('@', 1)[-1])
+        return {}
+
+    def quit(self):
+        return 0
