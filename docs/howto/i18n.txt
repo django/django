@@ -6,11 +6,11 @@ Using internationalization in your own projects
 
 At runtime, Django looks for translations by following this algorithm:
 
-    * First, it looks for a ``locale`` directory in the application directory
-      of the view that's being called. If it finds a translation for the
-      selected language, the translation will be installed.
-    * Next, it looks for a ``locale`` directory in the project directory. If it
-      finds a translation, the translation will be installed.
+    * First, it looks for a ``locale`` directory in the directory containing
+      your settings file.
+    * Second, it looks for a ``locale`` directory in the project directory.
+    * Third, it looks for a ``locale`` directory in each of the installed apps.
+      It does this in the reverse order of INSTALLED_APPS
     * Finally, it checks the Django-provided base translation in
       ``django/conf/locale``.
 
