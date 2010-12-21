@@ -32,24 +32,29 @@ class HumanizeTests(unittest.TestCase):
 
     def test_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
-                     '100', '1000', '10123', '10311', '1000000', '1234567.1234567')
+                     '100', '1000', '10123', '10311', '1000000', '1234567.1234567',
+                     None)
         result_list = ('100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
-                       '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567')
+                       '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567',
+                     None)
 
         self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_intword(self):
         test_list = ('100', '1000000', '1200000', '1290000',
-                     '1000000000','2000000000','6000000000000')
+                     '1000000000','2000000000','6000000000000',
+                     None)
         result_list = ('100', '1.0 million', '1.2 million', '1.3 million',
-                       '1.0 billion', '2.0 billion', '6.0 trillion')
+                       '1.0 billion', '2.0 billion', '6.0 trillion',
+                       None)
 
         self.humanize_tester(test_list, result_list, 'intword')
 
     def test_apnumber(self):
         test_list = [str(x) for x in range(1, 11)]
+        test_list.append(None)
         result_list = (u'one', u'two', u'three', u'four', u'five', u'six',
-                       u'seven', u'eight', u'nine', u'10')
+                       u'seven', u'eight', u'nine', u'10', None)
 
         self.humanize_tester(test_list, result_list, 'apnumber')
 
@@ -61,10 +66,10 @@ class HumanizeTests(unittest.TestCase):
         someday = today - timedelta(days=10)
         notdate = u"I'm not a date value"
 
-        test_list = (today, yesterday, tomorrow, someday, notdate)
+        test_list = (today, yesterday, tomorrow, someday, notdate, None)
         someday_result = defaultfilters.date(someday)
         result_list = (_(u'today'), _(u'yesterday'), _(u'tomorrow'),
-                       someday_result, u"I'm not a date value")
+                       someday_result, u"I'm not a date value", None)
         self.humanize_tester(test_list, result_list, 'naturalday')
 
 if __name__ == '__main__':

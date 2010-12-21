@@ -43,7 +43,10 @@ def intword(value):
     numbers over 1 million. For example, 1000000 becomes '1.0 million', 1200000
     becomes '1.2 million' and '1200000000' becomes '1.2 billion'.
     """
-    value = int(value)
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        return value
     if value < 1000000:
         return value
     if value < 1000000000:
@@ -66,7 +69,7 @@ def apnumber(value):
     """
     try:
         value = int(value)
-    except ValueError:
+    except (TypeError, ValueError):
         return value
     if not 0 < value < 10:
         return value
