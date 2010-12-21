@@ -1,9 +1,12 @@
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList
+from django.core.paginator import Paginator
 from django.template import Context, Template
 from django.test import TransactionTestCase
+
 from regressiontests.admin_changelist.models import Child, Parent
+
 
 class ChangeListTests(TransactionTestCase):
     def test_select_related_preserved(self):
@@ -14,7 +17,8 @@ class ChangeListTests(TransactionTestCase):
         m = ChildAdmin(Child, admin.site)
         cl = ChangeList(MockRequest(), Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_editable, m)
+                m.list_select_related, m.list_per_page, m.list_editable,
+                m.paginator, m)
         self.assertEqual(cl.query_set.query.select_related, {'parent': {'name': {}}})
 
     def test_result_list_html(self):
@@ -28,7 +32,8 @@ class ChangeListTests(TransactionTestCase):
         m = ChildAdmin(Child, admin.site)
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_editable, m)
+                m.list_select_related, m.list_per_page, m.list_editable,
+                m.paginator, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
@@ -57,7 +62,8 @@ class ChangeListTests(TransactionTestCase):
         m.list_editable = ['name']
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_editable, m)
+                m.list_select_related, m.list_per_page, m.list_editable,
+                m.paginator, m)
         FormSet = m.get_changelist_formset(request)
         cl.formset = FormSet(queryset=cl.result_list)
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
@@ -91,7 +97,28 @@ class ChangeListTests(TransactionTestCase):
         self.assertRaises(IncorrectLookupParameters, lambda: \
             ChangeList(request, Child, m.list_display, m.list_display_links,
                     m.list_filter, m.date_hierarchy, m.search_fields,
-                    m.list_select_related, m.list_per_page, m.list_editable, m))
+                    m.list_select_related, m.list_per_page, m.list_editable,
+                    m.paginator, m))
+
+    def test_custom_paginator(self):
+        new_parent = Parent.objects.create(name='parent')
+        for i in range(200):
+            new_child = Child.objects.create(name='name %s' % i, parent=new_parent)
+
+        request = MockRequest()
+        m = ChildAdmin(Child, admin.site)
+        m.list_display = ['id', 'name', 'parent']
+        m.list_display_links = ['id']
+        m.list_editable = ['name']
+        m.paginator = CustomPaginator
+
+        cl = ChangeList(request, Child, m.list_display, m.list_display_links,
+                m.list_filter, m.date_hierarchy, m.search_fields,
+                m.list_select_related, m.list_per_page, m.list_editable,
+                m.paginator, m)
+
+        cl.get_results(request)
+        self.assertIsInstance(cl.paginator, CustomPaginator)
 
 
 class ChildAdmin(admin.ModelAdmin):
@@ -99,5 +126,15 @@ class ChildAdmin(admin.ModelAdmin):
     def queryset(self, request):
         return super(ChildAdmin, self).queryset(request).select_related("parent__name")
 
+
 class MockRequest(object):
     GET = {}
+
+
+class CustomPaginator(Paginator):
+    def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
+        super(CustomPaginator, self).__init__(
+            queryset,
+            5,
+            orphans=2,
+            allow_empty_first_page=allow_empty_first_page)

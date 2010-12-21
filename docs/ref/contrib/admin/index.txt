@@ -516,6 +516,16 @@ subclass::
         Django will only honor the first element in the list/tuple; any others
         will be ignored.
 
+.. attribute:: ModelAdmin.paginator
+
+    .. versionadded:: 1.3
+
+    The paginator class to be used for pagination. By default,
+    :class:`django.core.paginator.Paginator` is used. If the custom paginator
+    class doesn't have the same constructor interface as
+    :class:`django.core.paginator.Paginator`, you will also need to
+    provide an implementation for :meth:`MultipleObjectMixin.get_paginator`.
+
 .. attribute:: ModelAdmin.prepopulated_fields
 
     Set ``prepopulated_fields`` to a dictionary mapping field names to the
@@ -944,6 +954,13 @@ templates used by the :class:`ModelAdmin` views:
     Sends a message to the user. The default implementation creates a message
     using the :mod:`django.contrib.messages` backend. See the
     :ref:`custom ModelAdmin example <custom-admin-action>`.
+
+.. method:: ModelAdmin.get_paginator(queryset, per_page, orphans=0, allow_empty_first_page=True)
+
+    .. versionadded:: 1.3
+
+    Returns an instance of the paginator to use for this view. By default,
+    instantiates an instance of :attr:`paginator`.
 
 Other methods
 ~~~~~~~~~~~~~
