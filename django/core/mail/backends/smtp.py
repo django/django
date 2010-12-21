@@ -91,13 +91,19 @@ class EmailBackend(BaseEmailBackend):
             self._lock.release()
         return num_sent
 
+    def _sanitize(self, email):
+        name, domain = email.split('@', 1)
+        email = '@'.join([name, domain.encode('idna')])
+        return email
+
     def _send(self, email_message):
         """A helper method that does the actual sending."""
         if not email_message.recipients():
             return False
+        from_email = self._sanitize(email_message.from_email)
+        recipients = map(self._sanitize, email_message.recipients())
         try:
-            self.connection.sendmail(email_message.from_email,
-                    email_message.recipients(),
+            self.connection.sendmail(from_email, recipients,
                     email_message.message().as_string())
         except:
             if not self.fail_silently:
