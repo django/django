@@ -8,6 +8,12 @@ from django.contrib.comments.models import Comment
 admin_site = admin.AdminSite()
 admin_site.register(Comment, CommentsAdmin)
 
+# To demonstrate proper functionality even when ``delete_selected`` is removed.
+admin_site2 = admin.AdminSite()
+admin_site2.disable_action('delete_selected')
+admin_site2.register(Comment, CommentsAdmin)
+
 urlpatterns = patterns('',
     (r'^admin/', include(admin_site.urls)),
+    (r'^admin2/', include(admin_site2.urls)),
 )
