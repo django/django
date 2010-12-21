@@ -1,11 +1,12 @@
 import sys
 
-from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import get_resolver
+from django.shortcuts import render_to_response, render
+from django.template import Context, RequestContext
 from django.views.debug import technical_500_response
 from django.views.generic.create_update import create_object
-from django.core.urlresolvers import get_resolver
-from django.shortcuts import render_to_response
 
 from regressiontests.views import BrokenException, except_args
 
@@ -57,3 +58,40 @@ def template_exception(request, n):
     return render_to_response('debug/template_exception.html',
         {'arg': except_args[int(n)]})
 
+# Some views to exercise the shortcuts
+
+def render_to_response_view(request):
+    return render_to_response('debug/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    })
+
+def render_to_response_view_with_request_context(request):
+    return render_to_response('debug/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    }, context_instance=RequestContext(request))
+
+def render_to_response_view_with_mimetype(request):
+    return render_to_response('debug/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    }, mimetype='application/x-rendertest')
+
+def render_view(request):
+    return render(request, 'debug/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    })
+
+def render_view_with_base_context(request):
+    return render(request, 'debug/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    }, context_instance=Context())
+
+def render_view_with_mimetype(request):
+    return render(request, 'debug/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    }, mimetype='application/x-rendertest')

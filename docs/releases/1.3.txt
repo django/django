@@ -215,6 +215,11 @@ requests. These include:
       making it easier to write simple template tags that require
       access to template context.
 
+    * A new :meth:`~django.shortcuts.render()` shortcut -- an
+      alternative to :meth:`~django.shortcuts.render_to_response()`
+      providing a :class:`~django.template.RequestContext` by
+      default.
+
 .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
 
 .. _backwards-incompatible-changes-1.3:

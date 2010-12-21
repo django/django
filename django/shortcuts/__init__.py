@@ -4,7 +4,7 @@ of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
 
-from django.template import loader
+from django.template import loader, RequestContext
 from django.http import HttpResponse, Http404
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.db.models.manager import Manager
@@ -19,20 +19,31 @@ def render_to_response(*args, **kwargs):
     httpresponse_kwargs = {'mimetype': kwargs.pop('mimetype', None)}
     return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
 
+def render(request, *args, **kwargs):
+    """
+    Returns a HttpResponse whose content is filled with the result of calling
+    django.template.loader.render_to_string() with the passed arguments.
+    Uses a RequestContext by default.
+    """
+    httpresponse_kwargs = {'mimetype': kwargs.pop('mimetype', None)}
+    kwargs['context_instance'] = kwargs.get('context_instance', RequestContext(request))
+    return HttpResponse(loader.render_to_string(*args, **kwargs),
+                        **httpresponse_kwargs)
+
 def redirect(to, *args, **kwargs):
     """
     Returns an HttpResponseRedirect to the apropriate URL for the arguments
     passed.
-    
+
     The arguments could be:
-    
+
         * A model: the model's `get_absolute_url()` function will be called.
-    
+
         * A view name, possibly with arguments: `urlresolvers.reverse()` will
           be used to reverse-resolve the name.
-         
+
         * A URL, which will be used as-is for the redirect location.
-        
+
     By default issues a temporary redirect; pass permanent=True to issue a
     permanent redirect
     """
@@ -40,11 +51,11 @@ def redirect(to, *args, **kwargs):
         redirect_class = HttpResponsePermanentRedirect
     else:
         redirect_class = HttpResponseRedirect
-    
+
     # If it's a model, use get_absolute_url()
     if hasattr(to, 'get_absolute_url'):
         return redirect_class(to.get_absolute_url())
-    
+
     # Next try a reverse URL resolution.
     try:
         return redirect_class(urlresolvers.reverse(to, args=args, kwargs=kwargs))
@@ -55,7 +66,7 @@ def redirect(to, *args, **kwargs):
         # If this doesn't "feel" like a URL, re-raise.
         if '/' not in to and '.' not in to:
             raise
-        
+
     # Finally, fall back and assume it's a URL
     return redirect_class(to)
 
@@ -102,3 +113,4 @@ def get_list_or_404(klass, *args, **kwargs):
     if not obj_list:
         raise Http404('No %s matches the given query.' % queryset.model._meta.object_name)
     return obj_list
+

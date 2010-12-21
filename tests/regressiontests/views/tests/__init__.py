@@ -5,5 +5,6 @@ from generic.date_based import *
 from generic.object_list import *
 from generic.simple import *
 from i18n import *
+from shortcuts import *
 from specials import *
 from static import *
