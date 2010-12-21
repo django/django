@@ -17,7 +17,7 @@ def run_gis_tests(test_labels, verbosity=1, interactive=True, failfast=False, ex
     return test_runner.run_tests(test_labels, extra_tests=extra_tests)
 
 
-def geo_apps(namespace=True):
+def geo_apps(namespace=True, runtests=False):
     """
     Returns a list of GeoDjango test applications that reside in
     `django.contrib.gis.tests` that can be used with the current
@@ -45,14 +45,16 @@ def geo_apps(namespace=True):
 
         apps.append('layermap')
 
-    if namespace:
+    if runtests:
+        return [('django.contrib.gis.tests', app) for app in apps]
+    elif namespace:
         return ['django.contrib.gis.tests.%s' % app
                 for app in apps]
     else:
         return apps
 
 
-def geodjango_suite():
+def geodjango_suite(apps=True):
     """
     Returns a TestSuite consisting only of GeoDjango tests that can be run.
     """
@@ -89,8 +91,9 @@ def geodjango_suite():
         suite.addTest(test_geoip.suite())
 
     # Finally, adding the suites for each of the GeoDjango test apps.
-    for app_name in geo_apps(namespace=False):
-        suite.addTest(build_suite(get_app(app_name)))
+    if apps:
+        for app_name in geo_apps(namespace=False):
+            suite.addTest(build_suite(get_app(app_name)))
 
     return suite
 

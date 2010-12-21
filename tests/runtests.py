@@ -30,6 +30,12 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+def geodjango(settings):
+    # All databases must have spatial backends to run GeoDjango tests.
+    spatial_dbs = [name for name, db_dict in settings.DATABASES.items()
+                   if db_dict['ENGINE'].startswith('django.contrib.gis')]
+    return len(spatial_dbs) == len(settings.DATABASES)
+
 def get_test_models():
     models = []
     for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR), (CONTRIB_DIR_NAME, CONTRIB_DIR):
@@ -124,7 +130,15 @@ def setup(verbosity, test_labels):
 
     # Load all the test model apps.
     test_labels_set = set([label.split('.')[0] for label in test_labels])
-    for model_dir, model_name in get_test_models():
+    test_models = get_test_models()
+
+    # If GeoDjango, then we'll want to add in the test applications
+    # that are a part of its test suite.
+    if geodjango(settings):
+        from django.contrib.gis.tests import geo_apps
+        test_models.extend(geo_apps(runtests=True))
+
+    for model_dir, model_name in test_models:
         model_label = '.'.join([model_dir, model_name])
         # if the model was named on the command line, or
         # no models were named (i.e., run all), import
@@ -161,6 +175,12 @@ def django_tests(verbosity, interactive, failfast, test_labels):
                 test_labels.remove(model_name)
             except ValueError:
                 pass
+
+    # If GeoDjango is used, add it's tests that aren't a part of
+    # an application (e.g., GEOS, GDAL, Distance objects).
+    if geodjango(settings):
+        from django.contrib.gis.tests import geodjango_suite
+        extra_tests.append(geodjango_suite(apps=False))
 
     # Run the test suite, including the extra validation tests.
     from django.test.utils import get_runner
