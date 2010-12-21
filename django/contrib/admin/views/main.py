@@ -26,7 +26,7 @@ ERROR_FLAG = 'e'
 EMPTY_CHANGELIST_VALUE = '(None)'
 
 class ChangeList(object):
-    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page, list_editable, paginator, model_admin):
+    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page, list_editable, model_admin):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -40,7 +40,6 @@ class ChangeList(object):
         self.list_per_page = list_per_page
         self.list_editable = list_editable
         self.model_admin = model_admin
-        self.paginator = paginator
 
         # Get search parameters from the query string.
         try:
@@ -95,7 +94,7 @@ class ChangeList(object):
         return '?%s' % urlencode(p)
 
     def get_results(self, request):
-        paginator = self.get_paginator(self.query_set, self.list_per_page)
+        paginator = self.model_admin.get_paginator(request, self.query_set, self.list_per_page)
         # Get the number of objects, with admin filters applied.
         result_count = paginator.count
 
@@ -245,6 +244,3 @@ class ChangeList(object):
 
     def url_for_result(self, result):
         return "%s/" % quote(getattr(result, self.pk_attname))
-
-    def get_paginator(self, queryset, per_page, orphans=0, allow_empty_first_page=True):
-        return self.paginator(queryset, per_page, orphans, allow_empty_first_page)

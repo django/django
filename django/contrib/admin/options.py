@@ -422,6 +422,9 @@ class ModelAdmin(BaseModelAdmin):
         for inline in self.inline_instances:
             yield inline.get_formset(request, obj)
 
+    def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
+        return self.paginator(queryset, per_page, orphans, allow_empty_first_page)
+
     def log_addition(self, request, object):
         """
         Log that an object has been successfully added.
@@ -979,7 +982,7 @@ class ModelAdmin(BaseModelAdmin):
         try:
             cl = ChangeList(request, self.model, list_display, self.list_display_links,
                 self.list_filter, self.date_hierarchy, self.search_fields,
-                self.list_select_related, self.list_per_page, self.list_editable, self.paginator, self)
+                self.list_select_related, self.list_per_page, self.list_editable, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'

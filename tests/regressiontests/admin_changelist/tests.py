@@ -17,8 +17,7 @@ class ChangeListTests(TransactionTestCase):
         m = ChildAdmin(Child, admin.site)
         cl = ChangeList(MockRequest(), Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_editable,
-                m.paginator, m)
+                m.list_select_related, m.list_per_page, m.list_editable, m)
         self.assertEqual(cl.query_set.query.select_related, {'parent': {'name': {}}})
 
     def test_result_list_html(self):
@@ -32,8 +31,7 @@ class ChangeListTests(TransactionTestCase):
         m = ChildAdmin(Child, admin.site)
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_editable,
-                m.paginator, m)
+                m.list_select_related, m.list_per_page, m.list_editable, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
@@ -62,8 +60,7 @@ class ChangeListTests(TransactionTestCase):
         m.list_editable = ['name']
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_editable,
-                m.paginator, m)
+                m.list_select_related, m.list_per_page, m.list_editable, m)
         FormSet = m.get_changelist_formset(request)
         cl.formset = FormSet(queryset=cl.result_list)
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
@@ -97,8 +94,7 @@ class ChangeListTests(TransactionTestCase):
         self.assertRaises(IncorrectLookupParameters, lambda: \
             ChangeList(request, Child, m.list_display, m.list_display_links,
                     m.list_filter, m.date_hierarchy, m.search_fields,
-                    m.list_select_related, m.list_per_page, m.list_editable,
-                    m.paginator, m))
+                    m.list_select_related, m.list_per_page, m.list_editable, m))
 
     def test_custom_paginator(self):
         new_parent = Parent.objects.create(name='parent')
@@ -114,8 +110,7 @@ class ChangeListTests(TransactionTestCase):
 
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_editable,
-                m.paginator, m)
+                m.list_select_related, m.list_per_page, m.list_editable, m)
 
         cl.get_results(request)
         self.assertIsInstance(cl.paginator, CustomPaginator)
@@ -133,8 +128,5 @@ class MockRequest(object):
 
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        super(CustomPaginator, self).__init__(
-            queryset,
-            5,
-            orphans=2,
+        super(CustomPaginator, self).__init__(queryset, 5, orphans=2,
             allow_empty_first_page=allow_empty_first_page)

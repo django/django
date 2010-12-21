@@ -524,7 +524,7 @@ subclass::
     :class:`django.core.paginator.Paginator` is used. If the custom paginator
     class doesn't have the same constructor interface as
     :class:`django.core.paginator.Paginator`, you will also need to
-    provide an implementation for :meth:`MultipleObjectMixin.get_paginator`.
+    provide an implementation for :meth:`ModelAdmin.get_paginator`.
 
 .. attribute:: ModelAdmin.prepopulated_fields
 
