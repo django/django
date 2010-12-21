@@ -307,6 +307,12 @@ into the primary key of an actual ``Person`` object.
     fields will be effectively unique, you can still use those fields
     as a natural key.
 
+.. versionchanged:: 1.3
+
+Deserialization of objects with no primary key will always check whether the
+model's manager has a ``get_by_natural_key()`` method and if so, use it to
+populate the deserialized object's primary key.
+
 Serialization of natural keys
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -352,6 +358,23 @@ use the `--natural` command line flag to generate natural keys.
     Conversely, if (for some strange reason) you want Django to output
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
+
+.. versionchanged:: 1.3
+
+When ``use_natural_keys=True`` is specified, the primary key is no longer
+provided in the serialized data of this object since it can be calculated
+during deserialization::
+
+    ...
+    {
+        "model": "store.person",
+        "fields": {
+            "first_name": "Douglas",
+            "last_name": "Adams",
+            "birth_date": "1952-03-11",
+        }
+    }
+    ...
 
 Dependencies during serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

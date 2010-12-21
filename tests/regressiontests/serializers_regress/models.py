@@ -264,3 +264,17 @@ class LengthModel(models.Model):
 
     def __len__(self):
         return self.data
+
+#Tests for natural keys.
+class BookManager(models.Manager):
+    def get_by_natural_key(self, isbn13):
+        return self.get(isbn13=isbn13)
+
+class Book(models.Model):
+    isbn13 = models.CharField(max_length=14)
+    title = models.CharField(max_length=100)
+
+    objects = BookManager()
+
+    def natural_key(self):
+        return (self.isbn13,)

@@ -170,3 +170,21 @@ class DeserializedObject(object):
         # prevent a second (possibly accidental) call to save() from saving
         # the m2m data twice.
         self.m2m_data = None
+
+def build_instance(Model, data, db):
+    """
+    Build a model instance.
+
+    If the model instance doesn't have a primary key and the model supports
+    natural keys, try to retrieve it from the database.
+    """
+    obj = Model(**data)
+    if obj.pk is None and hasattr(Model, 'natural_key') and\
+            hasattr(Model._default_manager, 'get_by_natural_key'):
+        pk = obj.natural_key()
+        try:
+            obj.pk = Model._default_manager.db_manager(db)\
+                                           .get_by_natural_key(*pk).pk
+        except Model.DoesNotExist:
+            pass
+    return obj
