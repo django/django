@@ -1,0 +1,6 @@
+syntax:glob
+
+*.egg-info
+*.pot
+*.py[co]
+docs/_build/
