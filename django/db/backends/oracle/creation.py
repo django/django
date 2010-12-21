@@ -43,7 +43,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         super(DatabaseCreation, self).__init__(connection)
 
     def _create_test_db(self, verbosity=1, autoclobber=False):
-        TEST_NAME = self._get_test_db_name()
+        TEST_NAME = self._test_database_name()
         TEST_USER = self._test_database_user()
         TEST_PASSWD = self._test_database_passwd()
         TEST_TBLSPACE = self._test_database_tblspace()
@@ -201,7 +201,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 sys.stderr.write("Failed (%s)\n" % (err))
                 raise
 
-    def _get_test_db_name(self):
+    def _test_database_name(self):
         name = TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
         try:
             if self.connection.settings_dict['TEST_NAME']:
@@ -251,3 +251,11 @@ class DatabaseCreation(BaseDatabaseCreation):
         except KeyError:
             pass
         return name
+
+    def _get_test_db_name(self):
+        """
+        We need to return the 'production' DB name to get the test DB creation
+        machinery to work. This isn't a great deal in this case because DB
+        names as handled by Django haven't real counterparts in Oracle.
+        """
+        return self.connection.settings_dict['NAME']
