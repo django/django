@@ -147,6 +147,10 @@ their deprecation, as per the :ref:`Django deprecation policy
           The ``supports_inactive_user`` variable is not checked any
           longer and can be removed.
 
+        * :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` will raise 
+          a :class:`~django.contrib.gis.geos.GEOSException` when called 
+          on a geometry with no SRID value.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the

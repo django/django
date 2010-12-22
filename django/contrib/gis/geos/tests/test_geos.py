@@ -852,6 +852,114 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
 
+    def test23_transform_noop(self):
+        """ Testing `transform` method (SRID match) """
+        # transform() should no-op if source & dest SRIDs match,
+        # regardless of whether GDAL is available.
+        if gdal.HAS_GDAL:
+            g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
+            gt = g.tuple
+            g.transform(4326)
+            self.assertEqual(g.tuple, gt)
+            self.assertEqual(g.srid, 4326)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
+            g1 = g.transform(4326, clone=True)
+            self.assertEqual(g1.tuple, g.tuple)
+            self.assertEqual(g1.srid, 4326)
+            self.assert_(g1 is not g, "Clone didn't happen")
+
+        old_has_gdal = gdal.HAS_GDAL
+        try:
+            gdal.HAS_GDAL = False
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
+            gt = g.tuple
+            g.transform(4326)
+            self.assertEqual(g.tuple, gt)
+            self.assertEqual(g.srid, 4326)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
+            g1 = g.transform(4326, clone=True)
+            self.assertEqual(g1.tuple, g.tuple)
+            self.assertEqual(g1.srid, 4326)
+            self.assert_(g1 is not g, "Clone didn't happen")
+        finally:
+            gdal.HAS_GDAL = old_has_gdal
+
+    def test23_transform_nosrid(self):
+        """ Testing `transform` method (no SRID) """
+        # raise a warning if SRID <0/None
+        import warnings
+        print "\nBEGIN - expecting Warnings; safe to ignore.\n"
+
+        # test for do-nothing behaviour.
+        try:
+            # Keeping line-noise down by only printing the relevant
+            # warnings once.
+            warnings.simplefilter('once', UserWarning)
+            warnings.simplefilter('once', FutureWarning)    
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
+            g.transform(2774)
+            self.assertEqual(g.tuple, (-104.609, 38.255))
+            self.assertEqual(g.srid, None)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
+            g1 = g.transform(2774, clone=True)
+            self.assert_(g1 is None)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
+            g.transform(2774)
+            self.assertEqual(g.tuple, (-104.609, 38.255))
+            self.assertEqual(g.srid, -1)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
+            g1 = g.transform(2774, clone=True)
+            self.assert_(g1 is None)
+
+        finally:
+            warnings.simplefilter('default', UserWarning)
+            warnings.simplefilter('default', FutureWarning)
+
+        print "\nEND - expecting Warnings; safe to ignore.\n"
+
+
+        # test warning is raised
+        try:
+            warnings.simplefilter('error', FutureWarning)
+            warnings.simplefilter('ignore', UserWarning)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
+            self.assertRaises(FutureWarning, g.transform, 2774)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
+            self.assertRaises(FutureWarning, g.transform, 2774, clone=True)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
+            self.assertRaises(FutureWarning, g.transform, 2774)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
+            self.assertRaises(FutureWarning, g.transform, 2774, clone=True)
+        finally:
+            warnings.simplefilter('default', FutureWarning)
+            warnings.simplefilter('default', UserWarning)
+
+
+    def test23_transform_nogdal(self):
+        """ Testing `transform` method (GDAL not available) """
+        old_has_gdal = gdal.HAS_GDAL
+        try:
+            gdal.HAS_GDAL = False
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
+            self.assertRaises(GEOSException, g.transform, 2774)
+
+            g = GEOSGeometry('POINT (-104.609 38.255)', 4326)
+            self.assertRaises(GEOSException, g.transform, 2774, clone=True)
+        finally:
+            gdal.HAS_GDAL = old_has_gdal
+
     def test24_extent(self):
         "Testing `extent` method."
         # The xmin, ymin, xmax, ymax of the MultiPoint should be returned.

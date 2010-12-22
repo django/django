@@ -528,6 +528,14 @@ statements manually.
 GeoDjango
 ~~~~~~~~~
 
-The :setting:`TEST_RUNNER` previously used to execute the GeoDjango test suite,
-:func:`django.contrib.gis.tests.run_gis_tests`, is deprecated in favor of
-the :class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner` class.
+  * The function-based :setting:`TEST_RUNNER` previously used to execute
+    the GeoDjango test suite, :func:`django.contrib.gis.tests.run_gis_tests`,
+    was deprecated for the class-bassed runner,
+    :class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner`.
+
+  * Previously, calling :meth:`~django.contrib.gis.geos.GEOSGeometry.transform`
+    would silently do nothing when GDAL wasn't available.  Now,
+    a :class:`~django.contrib.gis.geos.GEOSException` is properly raised
+    to indicate possible faulty application code.  A warning is now raised
+    if :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` is called when
+    the SRID of the geometry is less than 0 or ``None``.

@@ -523,7 +523,9 @@ corresponding to the SRID of the geometry or ``None``.
 
     Requires GDAL.
 
-.. method:: transform(ct, clone=False)
+.. method:: GEOSGeometry.transform(ct, clone=False)
+
+.. versionchanged:: 1.3
 
 Transforms the geometry according to the given coordinate transformation paramter
 (``ct``), which may be an integer SRID, spatial reference WKT string,
@@ -536,6 +538,16 @@ is returned instead.
 .. note::
 
     Requires GDAL.
+
+.. note::
+
+   Prior to 1.3, this method would silently no-op if GDAL was not available.
+   Now, a :class:`~django.contrib.gis.geos.GEOSException` is raised as
+   application code relying on this behavior is in error. In addition,
+   use of this method when the SRID is ``None`` or less than 0 now generates
+   a warning because a :class:`~django.contrib.gis.geos.GEOSException` will
+   be raised instead in version 1.5.
+
 
 ``Point``
 ---------

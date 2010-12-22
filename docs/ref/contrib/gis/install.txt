@@ -98,8 +98,9 @@ Program                   Description                           Required        
 .. admonition::  Install GDAL
 
     While :ref:`gdalbuild` is technically not required, it is *recommended*.
-    Some features of GeoDjango (including the :ref:`ref-layermapping` and the geographic
-    admin) depend on its functionality.
+    Important features of GeoDjango (including the :ref:`ref-layermapping`, 
+    geometry reprojection, and the geographic admin) depend on its 
+    functionality.
 
 .. note::
 
@@ -273,9 +274,9 @@ supports :ref:`GDAL's vector data <ref-gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/gdal-1.7.2.tar.gz
-    $ tar xzf gdal-1.7.2.tar.gz
-    $ cd gdal-1.7.2
+    $ wget http://download.osgeo.org/gdal/gdal-1.7.3.tar.gz
+    $ tar xzf gdal-1.7.3.tar.gz
+    $ cd gdal-1.7.3
 
 Configure, make and install::
 
