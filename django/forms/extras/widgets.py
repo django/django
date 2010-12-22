@@ -77,7 +77,7 @@ class SelectDateWidget(Widget):
                 escaped = True
             elif char in 'Yy':
                 output.append(year_html)
-            elif char in 'bFMmNn':
+            elif char in 'bEFMmNn':
                 output.append(month_html)
             elif char in 'dj':
                 output.append(day_html)
