@@ -269,6 +269,13 @@ class ClientTest(TestCase):
         # Check that the response was a 404
         self.assertEqual(response.status_code, 404)
 
+    def test_url_parameters(self):
+        "Make sure that URL ;-parameters are not stripped."
+        response = self.client.get('/test_client/unknown_view/;some-parameter')
+
+        # Check that the path in the response includes it (ignore that it's a 404)
+        self.assertEqual(response.request['PATH_INFO'], '/test_client/unknown_view/;some-parameter')
+
     def test_view_with_login(self):
         "Request a page that is protected with @login_required"
 
