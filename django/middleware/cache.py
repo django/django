@@ -85,7 +85,7 @@ class UpdateCacheMiddleware(object):
             return response
         patch_response_headers(response, timeout)
         if timeout:
-            cache_key = learn_cache_key(request, response, timeout, self.key_prefix)
+            cache_key = learn_cache_key(request, response, timeout, self.key_prefix, cache=self.cache)
             self.cache.set(cache_key, response, timeout)
         return response
 
@@ -120,17 +120,14 @@ class FetchFromCacheMiddleware(object):
             return None # Don't cache requests from authenticated users.
 
         # try and get the cached GET response
-        cache_key = get_cache_key(request, self.key_prefix, 'GET')
-
+        cache_key = get_cache_key(request, self.key_prefix, 'GET', cache=self.cache)
         if cache_key is None:
             request._cache_update_cache = True
             return None # No cache information available, need to rebuild.
-
         response = self.cache.get(cache_key, None)
-
         # if it wasn't found and we are looking for a HEAD, try looking just for that
         if response is None and request.method == 'HEAD':
-            cache_key = get_cache_key(request, self.key_prefix, 'HEAD')
+            cache_key = get_cache_key(request, self.key_prefix, 'HEAD', cache=self.cache)
             response = self.cache.get(cache_key, None)
 
         if response is None:
@@ -149,28 +146,33 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
     using the decorator-from-middleware utility.
     """
     def __init__(self, cache_timeout=None, cache_anonymous_only=None, **kwargs):
-        self.cache_timeout = cache_timeout
-        if cache_timeout is None:
-            self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
-
         # We need to differentiate between "provided, but using default value",
         # and "not provided". If the value is provided using a default, then
         # we fall back to system defaults. If it is not provided at all,
         # we need to use middleware defaults.
+
+        cache_kwargs = {}
+        try:
+            self.key_prefix = kwargs.get('key_prefix')
+            if self.key_prefix is not None:
+                cache_kwargs['KEY_PREFIX'] = self.key_prefix
+            else:
+                self.key_prefix = ''
+        except KeyError:
+            self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+            cache_kwargs['KEY_PREFIX'] = self.key_prefix
         try:
             cache_alias = kwargs.get('cache_alias')
             if cache_alias is None:
                 cache_alias = DEFAULT_CACHE_ALIAS
+            if cache_timeout is not None:
+                cache_kwargs['TIMEOUT'] = cache_timeout
         except KeyError:
             cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
-
-        cache_kwargs = {}
-        try:
-            key_prefix = kwargs.get('key_prefix')
-            if key_prefix is not None:
-                cache_kwargs['KEY_PREFIX'] = key_prefix
-        except KeyError:
-            cache_kwargs['KEY_PREFIX'] = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+            if cache_timeout is None:
+                cache_kwargs['TIMEOUT'] = settings.CACHE_MIDDLEWARE_SECONDS
+            else:
+                cache_kwargs['TIMEOUT'] = cache_timeout
 
         if cache_anonymous_only is None:
             self.cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
@@ -178,3 +180,4 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
             self.cache_anonymous_only = cache_anonymous_only
 
         self.cache = get_cache(cache_alias, **cache_kwargs)
+        self.cache_timeout = self.cache.default_timeout

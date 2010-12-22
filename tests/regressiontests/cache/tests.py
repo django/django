@@ -14,12 +14,14 @@ from django.core import management
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
 from django.core.cache.backends.base import InvalidCacheBackendError, CacheKeyWarning
 from django.http import HttpResponse, HttpRequest
-from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware
+from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware, CacheMiddleware
+from django.test import RequestFactory
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import translation
 from django.utils import unittest
 from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
 from django.utils.hashcompat import md5_constructor
+from django.views.decorators.cache import cache_page
 from regressiontests.cache.models import Poll, expensive_calculation
 
 # functions/classes for complex data type tests
@@ -759,6 +761,15 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
         self.cache = get_cache('locmem://?max_entries=30&cull_frequency=0')
         self.perform_cull_test(50, 19)
 
+    def test_multiple_caches(self):
+        "Check that multiple locmem caches are isolated"
+        mirror_cache = get_cache('django.core.cache.backends.locmem.LocMemCache')
+        other_cache = get_cache('django.core.cache.backends.locmem.LocMemCache', LOCATION='other')
+
+        self.cache.set('value1', 42)
+        self.assertEquals(mirror_cache.get('value1'), 42)
+        self.assertEquals(other_cache.get('value1'), None)
+
 # memcached backend isn't guaranteed to be available.
 # To check the memcached backend, the test settings file will
 # need to contain a cache backend setting that points at
@@ -1116,6 +1127,147 @@ class PrefixedCacheI18nTest(CacheI18nTest):
             del settings.CACHES['default']['KEY_PREFIX']
         else:
             settings.CACHES['default']['KEY_PREFIX'] = self.old_cache_key_prefix
+
+class CacheMiddlewareTest(unittest.TestCase):
+
+    def setUp(self):
+        self.orig_cache_middleware_alias = settings.CACHE_MIDDLEWARE_ALIAS
+        self.orig_cache_middleware_key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.orig_caches = settings.CACHES
+
+        settings.CACHE_MIDDLEWARE_ALIAS = 'other'
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX = 'middlewareprefix'
+        settings.CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+            },
+            'other': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'other',
+                'TIMEOUT': '1'
+            }
+        }
+
+    def tearDown(self):
+        settings.CACHE_MIDDLEWARE_ALIAS = self.orig_cache_middleware_alias
+        settings.CACHE_MIDDLEWARE_KEY_PREFIX = self.orig_cache_middleware_key_prefix
+        settings.CACHES = self.orig_caches
+
+    def test_middleware(self):
+        def view(request, value):
+            return HttpResponse('Hello World %s' % value)
+
+        factory = RequestFactory()
+
+        middleware = CacheMiddleware()
+        prefix_middleware = CacheMiddleware(key_prefix='prefix1')
+        timeout_middleware = CacheMiddleware(cache_timeout=1)
+
+        request = factory.get('/view/')
+
+        # Put the request through the request middleware
+        result = middleware.process_request(request)
+        self.assertEquals(result, None)
+
+        response = view(request, '1')
+
+        # Now put the response through the response middleware
+        response = middleware.process_response(request, response)
+
+        # Repeating the request should result in a cache hit
+        result = middleware.process_request(request)
+        self.assertNotEquals(result, None)
+        self.assertEquals(result.content, 'Hello World 1')
+
+        # The same request through a different middleware won't hit
+        result = prefix_middleware.process_request(request)
+        self.assertEquals(result, None)
+
+        # The same request with a timeout _will_ hit
+        result = timeout_middleware.process_request(request)
+        self.assertNotEquals(result, None)
+        self.assertEquals(result.content, 'Hello World 1')
+
+    def test_view_decorator(self):
+        def view(request, value):
+            return HttpResponse('Hello World %s' % value)
+
+        # decorate the same view with different cache decorators
+        default_view = cache_page(view)
+        default_with_prefix_view = cache_page(key_prefix='prefix1')(view)
+
+        explicit_default_view = cache_page(cache='default')(view)
+        explicit_default_with_prefix_view = cache_page(cache='default', key_prefix='prefix1')(view)
+
+        other_view = cache_page(cache='other')(view)
+        other_with_prefix_view = cache_page(cache='other', key_prefix='prefix2')(view)
+
+        factory = RequestFactory()
+        request = factory.get('/view/')
+
+        # Request the view once
+        response = default_view(request, '1')
+        self.assertEquals(response.content, 'Hello World 1')
+
+        # Request again -- hit the cache
+        response = default_view(request, '2')
+        self.assertEquals(response.content, 'Hello World 1')
+
+        # Requesting the same view with the explicit cache should yield the same result
+        response = explicit_default_view(request, '3')
+        self.assertEquals(response.content, 'Hello World 1')
+
+        # Requesting with a prefix will hit a different cache key
+        response = explicit_default_with_prefix_view(request, '4')
+        self.assertEquals(response.content, 'Hello World 4')
+
+        # Hitting the same view again gives a cache hit
+        response = explicit_default_with_prefix_view(request, '5')
+        self.assertEquals(response.content, 'Hello World 4')
+
+        # And going back to the implicit cache will hit the same cache
+        response = default_with_prefix_view(request, '6')
+        self.assertEquals(response.content, 'Hello World 4')
+
+        # Requesting from an alternate cache won't hit cache
+        response = other_view(request, '7')
+        self.assertEquals(response.content, 'Hello World 7')
+
+        # But a repeated hit will hit cache
+        response = other_view(request, '8')
+        self.assertEquals(response.content, 'Hello World 7')
+
+        # And prefixing the alternate cache yields yet another cache entry
+        response = other_with_prefix_view(request, '9')
+        self.assertEquals(response.content, 'Hello World 9')
+
+        # But if we wait a couple of seconds...
+        time.sleep(2)
+
+        # ... the default cache will still hit
+        cache = get_cache('default')
+        response = default_view(request, '10')
+        self.assertEquals(response.content, 'Hello World 1')
+
+        # ... the default cache with a prefix will still hit
+        response = default_with_prefix_view(request, '11')
+        self.assertEquals(response.content, 'Hello World 4')
+
+        # ... the explicit default cache will still hit
+        response = explicit_default_view(request, '12')
+        self.assertEquals(response.content, 'Hello World 1')
+
+        # ... the explicit default cache with a prefix will still hit
+        response = explicit_default_with_prefix_view(request, '13')
+        self.assertEquals(response.content, 'Hello World 4')
+
+        # .. but a rapidly expiring cache won't hit
+        response = other_view(request, '14')
+        self.assertEquals(response.content, 'Hello World 14')
+
+        # .. even if it has a prefix
+        response = other_with_prefix_view(request, '15')
+        self.assertEquals(response.content, 'Hello World 15')
 
 if __name__ == '__main__':
     unittest.main()
