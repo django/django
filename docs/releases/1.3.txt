@@ -185,6 +185,13 @@ If you provide a custom auth backend with ``supports_inactive_user`` set to
 This is useful for further centralizing the permission handling. See the
 :ref:`authentication docs <topics-auth>` for more details.
 
+GeoDjango
+~~~~~~~~~
+
+The GeoDjango test suite is now included when
+:ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
+when using :ref:`spatial database backends <spatial-backends>`.
+
 Everything else
 ~~~~~~~~~~~~~~~
 
@@ -513,3 +520,11 @@ attribute.
 Those commands have been deprecated. The ``flush`` and ``sqlflush`` commands
 can be used to delete everything. You can also use ALTER TABLE or DROP TABLE
 statements manually.
+
+
+GeoDjango
+~~~~~~~~~
+
+The :setting:`TEST_RUNNER` previously used to execute the GeoDjango test suite,
+:func:`django.contrib.gis.tests.run_gis_tests`, is deprecated in favor of
+the :class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner` class.

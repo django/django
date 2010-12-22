@@ -853,6 +853,8 @@ discovered, please follow these guidelines:
     * The release branch maintainer may back out commits to the release
       branch without permission if the commit breaks the release branch.
 
+.. _unit-tests:
+
 Unit tests
 ==========
 
@@ -870,6 +872,8 @@ We appreciate any and all contributions to the test suite!
 The Django tests all use the testing infrastructure that ships with Django for
 testing applications. See :doc:`Testing Django applications </topics/testing>`
 for an explanation of how to write new tests.
+
+.. _running-unit-tests:
 
 Running the unit tests
 ----------------------

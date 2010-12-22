@@ -4,17 +4,12 @@ Testing GeoDjango Apps
 
 .. versionchanged:: 1.2
 
-In Django 1.2, the addition of :ref:`spatial-backends`
-simplified the process of testing GeoDjango applications.  Specifically, testing
-GeoDjango applications is now the same as :doc:`/topics/testing`.
+In Django 1.2, the addition of :ref:`spatial-backends` simplified the
+process of testing GeoDjango applications -- the process is now the
+same as :doc:`/topics/testing`.
 
 Included in this documentation are some additional notes and settings
 for :ref:`testing-postgis` and :ref:`testing-spatialite` users.
-
-.. note::
-
-    Django 1.1 users are still required to use a custom :setting:`TEST_RUNNER`.
-    See the :ref:`testing-1.1` section for more details.
 
 .. _testing-postgis:
 
@@ -42,24 +37,21 @@ database to use.  In Django versions 1.2 and above, it automatically
 defaults to ``'template_postgis'`` (the same name used in the
 :ref:`installation documentation <spatialdb_template>`).
 
-.. note::
-
-    Django 1.1 users will still have to define the :setting:`POSTGIS_TEMPLATE`
-    with a value, for example::
-
-        POSTGIS_TEMPLATE='template_postgis'
-
 .. setting:: POSTGIS_VERSION
 
 ``POSTGIS_VERSION``
 ^^^^^^^^^^^^^^^^^^^
+
 .. versionadded:: 1.1
 
 When GeoDjango's spatial backend initializes on PostGIS, it has to perform
-a SQL query to determine the version.  Setting the version manually
-prevents this query to the database::
+a SQL query to determine the version in order to figure out what
+features are available.  Advanced users wishing to prevent this additional
+query may set the version manually using a 3-tuple of integers specifying
+the major, minor, and subminor version numbers for PostGIS.  For example,
+to configure for PostGIS 1.5.2 you would use::
 
-    POSTGIS_VERSION=('1.3.6', 1, 3, 6)
+    POSTGIS_VERSION = (1, 5, 2)
 
 Obtaining Sufficient Privileges
 -------------------------------
@@ -74,6 +66,7 @@ you may be required to use a database superuser.
 
 Create Database User
 ^^^^^^^^^^^^^^^^^^^^
+
 To make database user with the ability to create databases, use the
 following command::
 
@@ -89,6 +82,7 @@ Alternatively, you may alter an existing user's role from the SQL shell
 
 Create Database Superuser
 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
 This may be done at the time the user is created, for example::
 
     $ createuser --superuser <user_name>
@@ -112,6 +106,7 @@ Create Local PostgreSQL Database
 
 Windows
 -------
+
 On Windows platforms the pgAdmin III utility may also be used as
 a simple way to add superuser privileges to your database user.
 
@@ -142,6 +137,7 @@ Settings
 
 ``SPATIALITE_SQL``
 ^^^^^^^^^^^^^^^^^^
+
 .. versionadded:: 1.1
 
 By default, the GeoDjango test runner looks for the SpatiaLite SQL in the
@@ -153,29 +149,83 @@ you may add the following to your settings::
 
 __ http://www.gaia-gis.it/spatialite/init_spatialite-2.3.zip
 
-.. _testing-1.1:
 
-Testing GeoDjango Applications in 1.1
-=====================================
+.. _geodjango-tests:
 
-In Django 1.1, to accommodate the extra steps required to scaffalod a
-spatial database automatically, a test runner customized for GeoDjango
-must be used.  To use this runner, configure :setting:`TEST_RUNNER` as follows::
+GeoDjango Tests
+===============
 
-    TEST_RUNNER='django.contrib.gis.tests.run_tests'
+.. versionchanged:: 1.3
 
-.. note::
+GeoDjango's test suite may be run in one of two ways, either by itself or
+with the rest of :ref:`Django's unit tests <unit-tests>`.
 
-    In order to create a spatial database, the :setting:`USER` setting
-    (or :setting:`TEST_USER`, if optionally defined on Oracle) requires
-    elevated privileges.  When using PostGIS or MySQL, the database user
-    must have at least the ability to create databases.  When testing on Oracle,
-    the user should be a superuser.
+Run only GeoDjango tests
+------------------------
 
-GeoDjango Test Suite
-====================
+To run *only* the tests for GeoDjango, the :setting:`TEST_RUNNER`
+setting must be changed to use the
+:class:`~django.contrib.gis.tests.GeoDjangoTestSuiteRunner`::
 
-To run GeoDjango's own internal test suite, configure the
-:setting:`TEST_RUNNER` setting as follows::
+    TEST_RUNNER = 'django.contrib.gis.tests.GeoDjangoTestSuiteRunner'
 
-    TEST_RUNNER='django.contrib.gis.tests.run_gis_tests'
+Example
+^^^^^^^
+
+First, you'll need a bare-bones settings file, like below, that is
+customized with your spatial database name and user::
+
+    TEST_RUNNER = 'django.contrib.gis.tests.GeoDjangoTestSuiteRunner'
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'NAME': 'a_spatial_database',
+            'USER': 'db_user'
+        }
+    }
+
+Assuming the above is in a file called ``postgis.py`` that is in the
+the same directory as ``manage.py`` of your Django project, then
+you may run the tests with the following command::
+
+    $ python manage.py test --settings=postgis
+
+Run with ``runtests.py``
+------------------------
+
+To have the GeoDjango tests executed when
+:ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
+all of the databases in the settings file must be using one of the
+:ref:`spatial database backends <spatial-backends>`.
+
+.. warning::
+
+    Do not change the :setting:`TEST_RUNNER` setting 
+    when running the GeoDjango tests with ``runtests.py``.
+
+Example
+^^^^^^^
+
+The following is an example bare-bones settings file with spatial backends
+that can be used to run the entire Django test suite, including those
+in :mod:`django.contrib.gis`::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'NAME': 'geodjango',
+            'USER': 'geodjango',
+        },
+       'other': {
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'NAME': 'other',
+            'USER': 'geodjango',
+       }
+    }
+
+Assuming the settings above were in a ``postgis.py`` file in the same
+directory as ``runtests.py``, then all Django and GeoDjango tests would
+be performed when executing the command::
+
+    $ ./runtests.py --settings=postgis
