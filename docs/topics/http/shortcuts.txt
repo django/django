@@ -15,7 +15,7 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template[, dictionary][, context_instance][, mimetype])
+.. function:: render(request, template[, dictionary][, context_instance][, content_type][, status])
 
    .. versionadded:: 1.3
 
@@ -48,9 +48,12 @@ Optional arguments
     will be rendered with a ``RequestContext`` instance (filled with values from
     ``request`` and ```dictionary``).
 
-``mimetype``
+``content_type``
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
+
+``status``
+    The status code for the response. Defaults to ``200``.
 
 Example
 -------
@@ -58,12 +61,12 @@ Example
 The following example renders the template ``myapp/index.html`` with the
 MIME type ``application/xhtml+xml``::
 
-    from django.shortcuts import render_to_response
+    from django.shortcuts import render
 
     def my_view(request):
         # View code here...
-        return render_to_response('myapp/index.html', {"foo": "bar"},
-            mimetype="application/xhtml+xml")
+        return render(request, 'myapp/index.html', {"foo": "bar"},
+            content_type="application/xhtml+xml")
 
 This example is equivalent to::
 
@@ -75,7 +78,7 @@ This example is equivalent to::
         t = loader.get_template('myapp/template.html')
         c = RequestContext(request, {'foo': 'bar'})
         return HttpResponse(t.render(c),
-            mimetype="application/xhtml+xml")
+            content_type="application/xhtml+xml")
 
 
 ``render_to_response``

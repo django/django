@@ -25,7 +25,10 @@ def render(request, *args, **kwargs):
     django.template.loader.render_to_string() with the passed arguments.
     Uses a RequestContext by default.
     """
-    httpresponse_kwargs = {'mimetype': kwargs.pop('mimetype', None)}
+    httpresponse_kwargs = {
+        'content_type': kwargs.pop('content_type', None),
+        'status': kwargs.pop('status', None),
+    }
     kwargs['context_instance'] = kwargs.get('context_instance', RequestContext(request))
     return HttpResponse(loader.render_to_string(*args, **kwargs),
                         **httpresponse_kwargs)

@@ -45,9 +45,14 @@ class ShortcutTests(TestCase):
         self.assertEquals(response.content, 'FOO.BAR..\n')
         self.assertEquals(response['Content-Type'], 'text/html; charset=utf-8')
 
-    def test_render_with_mimetype(self):
-        response = self.client.get('/views/shortcuts/render/mimetype/')
+    def test_render_with_content_type(self):
+        response = self.client.get('/views/shortcuts/render/content_type/')
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.content, 'FOO.BAR../path/to/static/media\n')
         self.assertEquals(response['Content-Type'], 'application/x-rendertest')
+
+    def test_render_with_status(self):
+        response = self.client.get('/views/shortcuts/render/status/')
+        self.assertEquals(response.status_code, 403)
+        self.assertEquals(response.content, 'FOO.BAR../path/to/static/media\n')
 

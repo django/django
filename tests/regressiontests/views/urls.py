@@ -149,7 +149,8 @@ urlpatterns += patterns('regressiontests.views.views',
     (r'^shortcuts/render_to_response/mimetype/$', 'render_to_response_view_with_mimetype'),
     (r'^shortcuts/render/$', 'render_view'),
     (r'^shortcuts/render/base_context/$', 'render_view_with_base_context'),
-    (r'^shortcuts/render/mimetype/$', 'render_view_with_mimetype'),
+    (r'^shortcuts/render/content_type/$', 'render_view_with_content_type'),
+    (r'^shortcuts/render/status/$', 'render_view_with_status'),
 
 )
 

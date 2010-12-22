@@ -90,8 +90,14 @@ def render_view_with_base_context(request):
         'bar': 'BAR',
     }, context_instance=Context())
 
-def render_view_with_mimetype(request):
+def render_view_with_content_type(request):
     return render(request, 'debug/render_test.html', {
         'foo': 'FOO',
         'bar': 'BAR',
-    }, mimetype='application/x-rendertest')
+    }, content_type='application/x-rendertest')
+
+def render_view_with_status(request):
+    return render(request, 'debug/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    }, status=403)
