@@ -37,3 +37,16 @@ documentation on :ref:`controlling the creation order of test
 databases <topics-testing-creation-dependencies>` for details.
 
 .. _original problem report: http://code.djangoproject.com/ticket/14415
+
+GeoDjango
+=========
+
+The function-based :setting:`TEST_RUNNER` previously used to execute
+the GeoDjango test suite, :func:`django.contrib.gis.tests.run_gis_tests`,
+was finally deprecated in favor of a class-based test runner,
+:class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner`, added in this
+release.
+
+In addition, the GeoDjango test suite is now included when
+:ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
+and using :ref:`spatial database backends <spatial-backends>`.
