@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from django.utils import tree
 from django.utils.copycompat import deepcopy
@@ -26,6 +26,9 @@ class ExpressionNode(tree.Node):
         super(ExpressionNode, self).__init__(children, connector, negated)
 
     def _combine(self, other, connector, reversed, node=None):
+        if isinstance(other, datetime.timedelta):
+            return DateModifierNode([self, other], connector)
+
         if reversed:
             obj = ExpressionNode([other], connector)
             obj.add(node or self, connector)
@@ -111,3 +114,41 @@ class F(ExpressionNode):
 
     def evaluate(self, evaluator, qn, connection):
         return evaluator.evaluate_leaf(self, qn, connection)
+
+class DateModifierNode(ExpressionNode):
+    """
+    Node that implements the following syntax:
+    filter(end_date__gt=F('start_date') + datetime.timedelta(days=3, seconds=200))
+
+    which translates into:
+    POSTGRES:
+        WHERE end_date > (start_date + INTERVAL '3 days 200 seconds')
+
+    MYSQL:
+        WHERE end_date > (start_date + INTERVAL '3 0:0:200:0' DAY_MICROSECOND)
+
+    ORACLE:
+        WHERE end_date > (start_date + INTERVAL '3 00:03:20.000000' DAY(1) TO SECOND(6))
+
+    SQLITE:
+        WHERE end_date > django_format_dtdelta(start_date, "+" "3", "200", "0")
+        (A custom function is used in order to preserve six digits of fractional
+        second information on sqlite, and to format both date and datetime values.)
+
+    Note that microsecond comparisons are not well supported with MySQL, since 
+    MySQL does not store microsecond information.
+
+    Only adding and subtracting timedeltas is supported, attempts to use other 
+    operations raise a TypeError.
+    """
+    def __init__(self, children, connector, negated=False):
+        if len(children) != 2:
+            raise TypeError('Must specify a node and a timedelta.')
+        if not isinstance(children[1], datetime.timedelta):
+            raise TypeError('Second child must be a timedelta.')
+        if connector not in (self.ADD, self.SUB):
+            raise TypeError('Connector must be + or -, not %s' % connector)
+        super(DateModifierNode, self).__init__(children, connector, negated)
+
+    def evaluate(self, evaluator, qn, connection):
+        return evaluator.evaluate_date_modifier_node(self, qn, connection)

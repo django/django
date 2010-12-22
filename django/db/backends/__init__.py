@@ -154,6 +154,9 @@ class BaseDatabaseFeatures(object):
     # deferred
     can_defer_constraint_checks = False
 
+    # date_interval_sql can properly handle mixed Date/DateTime fields and timedeltas
+    supports_mixed_date_datetime_comparisons = True
+
     # Features that need to be confirmed at runtime
     # Cache whether the confirmation has been performed.
     _confirmed = False
@@ -217,6 +220,12 @@ class BaseDatabaseOperations(object):
         """
         Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
         extracts a value from the given date field field_name.
+        """
+        raise NotImplementedError()
+
+    def date_interval_sql(self, sql, connector, timedelta):
+        """
+        Implements the date interval functionality for expressions
         """
         raise NotImplementedError()
 

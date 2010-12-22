@@ -118,6 +118,20 @@ WHEN (new.%(col_name)s IS NULL)
         else:
             return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
 
+    def date_interval_sql(self, sql, connector, timedelta):
+        """
+        Implements the interval functionality for expressions
+        format for Oracle:
+        (datefield + INTERVAL '3 00:03:20.000000' DAY(1) TO SECOND(6))
+        """
+        minutes, seconds = divmod(timedelta.seconds, 60)
+        hours, minutes = divmod(minutes, 60)
+        days = str(timedelta.days)
+        day_precision = len(days)
+        fmt = "(%s %s INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6))"
+        return fmt % (sql, connector, days, hours, minutes, seconds,
+                timedelta.microseconds, day_precision)
+
     def date_trunc_sql(self, lookup_type, field_name):
         # Oracle uses TRUNC() for both dates and numbers.
         # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions155a.htm#SQLRF06151

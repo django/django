@@ -36,6 +36,7 @@ models, which comprise a Weblog application:
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
         pub_date = models.DateTimeField()
+        mod_date = models.DateTimeField()
         authors = models.ManyToManyField(Author)
         n_comments = models.IntegerField()
         n_pingbacks = models.IntegerField()
@@ -566,9 +567,18 @@ You can also use the double underscore notation to span relationships in
 an ``F()`` object. An ``F()`` object with a double underscore will introduce
 any joins needed to access the related object. For example, to retrieve all
 the entries where the author's name is the same as the blog name, we could
-issue the query:
+issue the query::
 
     >>> Entry.objects.filter(authors__name=F('blog__name'))
+
+.. versionadded:: 1.3
+
+For date and date/time fields, you can add or subtract a ``datetime.timedelta``
+object.  The following would return all entries that were modified more than 3 days
+after they were published::
+   
+    >>> from datetime import timedelta
+    >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
 The pk lookup shortcut
 ----------------------
