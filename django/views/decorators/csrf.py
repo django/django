@@ -24,7 +24,7 @@ class _EnsureCsrfToken(CsrfViewMiddleware):
 
 requires_csrf_token = decorator_from_middleware(_EnsureCsrfToken)
 requires_csrf_token.__name__ = 'requires_csrf_token'
-csrf_protect.__doc__ = """
+requires_csrf_token.__doc__ = """
 Use this decorator on views that need a correct csrf_token available to
 RequestContext, but without the CSRF protection that csrf_protect
 enforces.
