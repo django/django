@@ -17,6 +17,8 @@ introduce controlled coupling for convenience's sake.
 
 .. function:: render(request, template[, dictionary][, context_instance][, mimetype])
 
+   .. versionadded:: 1.3
+
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
 
