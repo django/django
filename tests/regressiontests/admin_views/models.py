@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.core.mail import EmailMessage
 from django import forms
 from django.forms.models import BaseModelFormSet
-
+from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
@@ -89,7 +89,7 @@ class ChapterInline(admin.TabularInline):
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
-    list_filter = ('date',)
+    list_filter = ('date', 'section')
 
     def changelist_view(self, request):
         "Test that extra_context works"
@@ -505,6 +505,13 @@ class CyclicTwo(models.Model):
     def __unicode__(self):
         return self.name
 
+class Album(models.Model):
+    owner = models.ForeignKey(User)
+    title = models.CharField(max_length=30)
+
+class AlbumAdmin(admin.ModelAdmin):
+    list_filter = ['title']
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -547,3 +554,4 @@ admin.site.register(CyclicTwo)
 admin.site.register(Book, inlines=[ChapterInline])
 admin.site.register(Promo)
 admin.site.register(ChapterXtra1)
+admin.site.register(Album, AlbumAdmin)
