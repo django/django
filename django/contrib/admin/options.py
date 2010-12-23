@@ -10,7 +10,9 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
-from django.db.models.fields import BLANK_CHOICE_DASH
+from django.db.models.related import RelatedObject
+from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
+from django.db.models.sql.constants import LOOKUP_SEP, QUERY_TERMS
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.decorators import method_decorator
@@ -182,6 +184,30 @@ class BaseModelAdmin(object):
 
     def get_readonly_fields(self, request, obj=None):
         return self.readonly_fields
+
+    def lookup_allowed(self, lookup):
+        parts = lookup.split(LOOKUP_SEP)
+
+        # Last term in lookup is a query term (__exact, __startswith etc)
+        # This term can be ignored.
+        if len(parts) > 1 and parts[-1] in QUERY_TERMS:
+            parts.pop()
+
+        # Special case -- foo__id__exact and foo__id queries are implied
+        # if foo has been specificially included in the lookup list; so
+        # drop __id if it is the last part.
+        if len(parts) > 1 and parts[-1] == self.model._meta.pk.name:
+            parts.pop()
+
+        try:
+            self.model._meta.get_field_by_name(parts[0])
+        except FieldDoesNotExist:
+            # Lookups on non-existants fields are ok, since they're ignored
+            # later.
+            return True
+        else:
+            clean_lookup = LOOKUP_SEP.join(parts)
+            return clean_lookup in self.list_filter or clean_lookup == self.date_hierarchy
 
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
