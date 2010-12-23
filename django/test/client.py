@@ -198,6 +198,13 @@ class Client(object):
         return {}
     session = property(_session)
 
+    def _get_path(self, parsed):
+        # If there are parameters, add them
+        if parsed[3]:
+             return urllib.unquote(parsed[2] + ";" + parsed[3])
+        else:
+             return urllib.unquote(parsed[2])
+
     def request(self, **request):
         """
         The master request method. Composes the environment dictionary
@@ -288,7 +295,7 @@ class Client(object):
         parsed = urlparse(path)
         r = {
             'CONTENT_TYPE':    'text/html; charset=utf-8',
-            'PATH_INFO':       urllib.unquote(parsed[2]),
+            'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
             'REQUEST_METHOD': 'GET',
             'wsgi.input':      FakePayload('')
@@ -320,7 +327,7 @@ class Client(object):
         r = {
             'CONTENT_LENGTH': len(post_data),
             'CONTENT_TYPE':   content_type,
-            'PATH_INFO':      urllib.unquote(parsed[2]),
+            'PATH_INFO':      self._get_path(parsed),
             'QUERY_STRING':   parsed[4],
             'REQUEST_METHOD': 'POST',
             'wsgi.input':     FakePayload(post_data),
@@ -339,7 +346,7 @@ class Client(object):
         parsed = urlparse(path)
         r = {
             'CONTENT_TYPE':    'text/html; charset=utf-8',
-            'PATH_INFO':       urllib.unquote(parsed[2]),
+            'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
             'REQUEST_METHOD': 'HEAD',
             'wsgi.input':      FakePayload('')
@@ -357,7 +364,7 @@ class Client(object):
         """
         parsed = urlparse(path)
         r = {
-            'PATH_INFO':       urllib.unquote(parsed[2]),
+            'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
             'REQUEST_METHOD': 'OPTIONS',
             'wsgi.input':      FakePayload('')
@@ -389,7 +396,7 @@ class Client(object):
         r = {
             'CONTENT_LENGTH': len(post_data),
             'CONTENT_TYPE':   content_type,
-            'PATH_INFO':      urllib.unquote(parsed[2]),
+            'PATH_INFO':      self._get_path(parsed),
             'QUERY_STRING':   query_string or parsed[4],
             'REQUEST_METHOD': 'PUT',
             'wsgi.input':     FakePayload(post_data),
@@ -407,7 +414,7 @@ class Client(object):
         """
         parsed = urlparse(path)
         r = {
-            'PATH_INFO':       urllib.unquote(parsed[2]),
+            'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
             'REQUEST_METHOD': 'DELETE',
             'wsgi.input':      FakePayload('')
