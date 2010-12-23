@@ -66,6 +66,23 @@ This is useful for further centralizing the permission handling. See the
 Backwards-incompatible changes in 1.3 alpha 2
 =============================================
 
+Change to admin lookup filters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Django admin has long had an undocumented "feature" allowing savvy
+users to manipulate the query string of changelist pages to filter the
+list of objects displayed. However, this also creates a security
+issue, as a staff user with sufficient knowledge of model structure
+could use this "feature" to gain access to information he or she would
+not normally have.
+
+As a result, changelist filtering now explicitly validates all lookup
+arguments in the query string, and permits only fields which are
+directly on the model, or relations explicitly permitted by the
+``ModelAdmin`` definition. If you were relying on this undocumented
+feature, you will need to update your ``ModelAdmin`` definitions to
+whitelist the relations you choose to expose for filtering.
+
 Introduction of STATIC_URL and STATIC_ROOT settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
