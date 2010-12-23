@@ -72,3 +72,14 @@ class TokenGeneratorTest(TestCase):
         p0 = PasswordResetTokenGenerator()
         tk1 = _make_token(user)
         self.assertTrue(p0.check_token(user, tk1))
+
+    def test_date_length(self):
+        """
+        Make sure we don't allow overly long dates, causing a potential DoS.
+        """
+        user = User.objects.create_user('ima1337h4x0r', 'test4@example.com', 'p4ssw0rd')
+        p0 = PasswordResetTokenGenerator()
+
+        # This will put a 14-digit base36 timestamp into the token, which is too large.
+        tk1 = p0._make_token_with_timestamp(user, 175455491841851871349)
+        self.assertFalse(p0.check_token(user, tk1))
