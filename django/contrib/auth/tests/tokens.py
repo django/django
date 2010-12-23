@@ -34,4 +34,9 @@ True
 >>> p2.check_token(u, tk1)
 False
 
+This will put a 14-digit base36 timestamp into the token, which is too large.
+>>> tk1 = p0._make_token_with_timestamp(u, 175455491841851871349)
+>>> p0.check_token(u, tk1)
+False
+
 """

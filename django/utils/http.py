@@ -73,8 +73,13 @@ def http_date(epoch_seconds=None):
 
 def base36_to_int(s):
     """
-    Convertd a base 36 string to an integer
+    Converts a base 36 string to an ``int``. To prevent
+    overconsumption of server resources, raises ``ValueError` if the
+    input is longer than 13 base36 digits (13 digits is sufficient to
+    base36-encode any 64-bit integer).
     """
+    if len(s) > 13:
+        raise ValueError("Base36 input too large")
     return int(s, 36)
 
 def int_to_base36(i):
