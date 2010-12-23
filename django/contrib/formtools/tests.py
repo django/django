@@ -116,7 +116,7 @@ class SecurityHashTests(unittest.TestCase):
         hash1 = utils.security_hash(None, f1)
         hash2 = utils.security_hash(None, f2)
         self.assertEqual(hash1, hash2)
-        
+
     def test_empty_permitted(self):
         """
         Regression test for #10643: the security hash should allow forms with
@@ -214,3 +214,26 @@ class WizardTests(TestCase):
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
+    def test_14576(self):
+        """
+        Regression test for ticket #14576.
+
+        The form of the last step is not passed to the done method.
+        """
+        reached = [False]
+        that = self
+
+        class Wizard(WizardClass):
+            def done(self, request, form_list):
+                reached[0] = True
+                that.assertTrue(len(form_list) == 2)
+
+        wizard = Wizard([WizardPageOneForm,
+                         WizardPageTwoForm])
+
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": "2fdbefd4c0cad51509478fbacddf8b13",
+                "wizard_step": "1"}
+        wizard(DummyRequest(POST=data))
+        self.assertTrue(reached[0])
