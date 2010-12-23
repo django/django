@@ -111,3 +111,12 @@ class USStateSelect(Select):
     def __init__(self, attrs=None):
         from us_states import STATE_CHOICES
         super(USStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
+
+class USPSSelect(Select):
+    """
+    A Select widget that uses a list of US Postal Service codes as its
+    choices.
+    """
+    def __init__(self, attrs=None):
+        from us_states import USPS_CHOICES
+        super(USPSSelect, self).__init__(attrs, choices=USPS_CHOICES)

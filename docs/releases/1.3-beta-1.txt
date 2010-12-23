@@ -120,6 +120,52 @@ attribute.
 
 .. _r12634: http://code.djangoproject.com/changeset/12634
 
+Changes to ``USStateField``
+===========================
+
+The :mod:`django.contrib.localflavor` application contains collections
+of code relevant to specific countries or cultures. One such is
+:class:`~django.contrib.localflavor.us.models.USStateField`, which
+provides a field for storing the two-letter postal abbreviation of a
+U.S. state. This field has consistently caused problems, however,
+because it is often used to store the state portion of a U.S postal
+address, but not all "states" recognized by the U.S Postal Service are
+actually states of the U.S. or even U.S. territory. Several
+compromises over the list of choices resulted in some users feeling
+the field supported too many locations, while others felt it supported
+too few.
+
+In Django 1.3 we're taking a new approach to this problem, implemented
+as a pair of changes:
+
+* The choice list for `USStateField` has changed. Previously, it
+  consisted of the 50 U.S. states, the District of Columbia and
+  U.S. overseas territories. As of Django 1.3 it includes all previous
+  choices, plus the U.S. Armed Forces postal codes.
+
+* A new model field,
+  :class:`django.contrib.localflavor.us.models.USPostalCodeField`, has
+  been added which draws its choices from a list of all postal
+  abbreviations recognized by the U.S Postal Service. This includes
+  all abbreviations recognized by `USStateField`, plus three
+  independent nations -- the Federated States of Micronesia, the
+  Republic of the Marshall Islands and the Republic of Palau -- which
+  are serviced under treaty by the U.S. postal system. A new form
+  widget, :class:`django.contrib.localflavor.us.forms.USPSSelect`, is
+  also available and provides the same set of choices.
+
+Additionally, several finer-grained choice tuples are provided which
+allow mixing and matching of subsets of the U.S. states and
+territories, and other locations serviced by the U.S. postal
+system. Consult the :mod:`django.contrib.localflavor` documentation
+for more details.
+
+The change to `USStateField` is technically backwards-incompatible for
+users who expect this field to exclude Armed Forces locations. If you
+need to support U.S. mailing addresses without Armed Forces locations,
+see the list of choice tuples available in the localflavor
+documentation.
+
 The Django 1.3 roadmap
 ======================
 

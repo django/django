@@ -1,15 +1,16 @@
 """
-A mapping of state misspellings/abbreviations to normalized abbreviations, and
-an alphabetical list of states for use as `choices` in a formfield.
+A mapping of state misspellings/abbreviations to normalized
+abbreviations, and alphabetical lists of US states, territories,
+military mail regions and non-US states to which the US provides
+postal service.
 
 This exists in this standalone file so that it's only imported into memory
 when explicitly needed.
 """
 
-STATE_CHOICES = (
+# The 48 contiguous states, plus the District of Columbia.
+CONTIGUOUS_STATES = (
     ('AL', 'Alabama'),
-    ('AK', 'Alaska'),
-    ('AS', 'American Samoa'),
     ('AZ', 'Arizona'),
     ('AR', 'Arkansas'),
     ('CA', 'California'),
@@ -19,7 +20,60 @@ STATE_CHOICES = (
     ('DC', 'District of Columbia'),
     ('FL', 'Florida'),
     ('GA', 'Georgia'),
-    ('GU', 'Guam'),
+    ('ID', 'Idaho'),
+    ('IL', 'Illinois'),
+    ('IN', 'Indiana'),
+    ('IA', 'Iowa'),
+    ('KS', 'Kansas'),
+    ('KY', 'Kentucky'),
+    ('LA', 'Louisiana'),
+    ('ME', 'Maine'),
+    ('MD', 'Maryland'),
+    ('MA', 'Massachusetts'),
+    ('MI', 'Michigan'),
+    ('MN', 'Minnesota'),
+    ('MS', 'Mississippi'),
+    ('MO', 'Missouri'),
+    ('MT', 'Montana'),
+    ('NE', 'Nebraska'),
+    ('NV', 'Nevada'),
+    ('NH', 'New Hampshire'),
+    ('NJ', 'New Jersey'),
+    ('NM', 'New Mexico'),
+    ('NY', 'New York'),
+    ('NC', 'North Carolina'),
+    ('ND', 'North Dakota'),
+    ('OH', 'Ohio'),
+    ('OK', 'Oklahoma'),
+    ('OR', 'Oregon'),
+    ('PA', 'Pennsylvania'),
+    ('RI', 'Rhode Island'),
+    ('SC', 'South Carolina'),
+    ('SD', 'South Dakota'),
+    ('TN', 'Tennessee'),
+    ('TX', 'Texas'),
+    ('UT', 'Utah'),
+    ('VT', 'Vermont'),
+    ('VA', 'Virginia'),
+    ('WA', 'Washington'),
+    ('WV', 'West Virginia'),
+    ('WI', 'Wisconsin'),
+    ('WY', 'Wyoming'),
+)
+
+# All 50 states, plus the District of Columbia.
+US_STATES = (
+    ('AL', 'Alabama'),
+    ('AK', 'Alaska'),
+    ('AZ', 'Arizona'),
+    ('AR', 'Arkansas'),
+    ('CA', 'California'),
+    ('CO', 'Colorado'),
+    ('CT', 'Connecticut'),
+    ('DE', 'Delaware'),
+    ('DC', 'District of Columbia'),
+    ('FL', 'Florida'),
+    ('GA', 'Georgia'),
     ('HI', 'Hawaii'),
     ('ID', 'Idaho'),
     ('IL', 'Illinois'),
@@ -44,12 +98,10 @@ STATE_CHOICES = (
     ('NY', 'New York'),
     ('NC', 'North Carolina'),
     ('ND', 'North Dakota'),
-    ('MP', 'Northern Mariana Islands'),
     ('OH', 'Ohio'),
     ('OK', 'Oklahoma'),
     ('OR', 'Oregon'),
     ('PA', 'Pennsylvania'),
-    ('PR', 'Puerto Rico'),
     ('RI', 'Rhode Island'),
     ('SC', 'South Carolina'),
     ('SD', 'South Dakota'),
@@ -57,13 +109,53 @@ STATE_CHOICES = (
     ('TX', 'Texas'),
     ('UT', 'Utah'),
     ('VT', 'Vermont'),
-    ('VI', 'Virgin Islands'),
     ('VA', 'Virginia'),
     ('WA', 'Washington'),
     ('WV', 'West Virginia'),
     ('WI', 'Wisconsin'),
     ('WY', 'Wyoming'),
 )
+
+# Non-state territories.
+US_TERRITORIES = (
+    ('AS', 'American Samoa'),
+    ('GU', 'Guam'),
+    ('MP', 'Northern Mariana Islands'),
+    ('PR', 'Puerto Rico'),
+    ('VI', 'Virgin Islands'),
+)
+
+# Military postal "states". Note that 'AE' actually encompasses
+# Europe, Canada, Africa and the Middle East.
+ARMED_FORCES_STATES = (
+    ('AA', 'Armed Forces Americas'),
+    ('AE', 'Armed Forces Europe'),
+    ('AP', 'Armed Forces Pacific'),
+)
+
+# Non-US locations serviced by USPS (under Compact of Free
+# Association).
+COFA_STATES = (
+    ('FM', 'Federated States of Micronesia'),
+    ('MH', 'Marshall Islands'),
+    ('PW', 'Palau'),
+)
+
+# Obsolete abbreviations (no longer US territories/USPS service, or
+# code changed).
+OBSOLETE_STATES = (
+    ('CM', 'Commonwealth of the Northern Mariana Islands'), # Is now 'MP'
+    ('CZ', 'Panama Canal Zone'),                            # Reverted to Panama 1979
+    ('PI', 'Philippine Islands'),                           # Philippine independence 1946
+    ('TT', 'Trust Territory of the Pacific Islands'),       # Became the independent COFA states + Northern Mariana Islands 1979-1994
+)
+
+
+# All US states and territories plus DC and military mail.
+STATE_CHOICES = US_STATES + US_TERRITORIES + ARMED_FORCES_STATES
+
+# All US Postal Service locations.
+USPS_CHOICES = US_STATES + US_TERRITORIES + ARMED_FORCES_STATES + COFA_STATES
 
 STATES_NORMALIZED = {
     'ak': 'AK',

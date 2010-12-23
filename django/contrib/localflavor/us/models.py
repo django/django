@@ -2,6 +2,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.fields import CharField
 from django.contrib.localflavor.us.us_states import STATE_CHOICES
+from django.contrib.localflavor.us.us_states import USPS_CHOICES
 
 class USStateField(CharField):
 
@@ -11,6 +12,15 @@ class USStateField(CharField):
         kwargs['choices'] = STATE_CHOICES
         kwargs['max_length'] = 2
         super(USStateField, self).__init__(*args, **kwargs)
+
+class USPostalCodeField(CharField):
+
+    description = _("U.S. postal code (two uppercase letters)")
+
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = USPS_CHOICES
+        kwargs['max_length'] = 2
+        super(USPostalCodeField, self).__init__(*args, **kwargs)
 
 class PhoneNumberField(CharField):
 

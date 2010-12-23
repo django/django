@@ -937,6 +937,11 @@ United States of America (``us``)
     A form ``Select`` widget that uses a list of U.S. states/territories as its
     choices.
 
+.. class:: us.forms.USPSSelect
+
+    A form ``Select`` widget that uses a list of U.S Postal Service
+    state, territory and country abbreviations as its choices.
+
 .. class:: us.models.PhoneNumberField
 
     A :class:`CharField` that checks that the value is a valid U.S.A.-style phone
@@ -946,6 +951,66 @@ United States of America (``us``)
 
     A model field that forms represent as a ``forms.USStateField`` field and
     stores the two-letter U.S. state abbreviation in the database.
+
+.. class:: us.models.USPostalCodeField
+
+    A model field that forms represent as a ``forms.USPSSelect`` field
+    and stores the two-letter U.S Postal Service abbreviation in the
+    database.
+
+Additionally, a variety of choice tuples are provided in
+``django.contrib.localflavor.us.us_states``, allowing customized model
+and form fields, and form presentations, for subsets of U.S states,
+territories and U.S Postal Service abbreviations:
+
+.. data:: us.us_states.CONTIGUOUS_STATES
+
+    A tuple of choices of the postal abbreviations for the
+    contiguous or "lower 48" states (i.e., all except Alaska and
+    Hawaii), plus the District of Columbia.
+
+.. data:: us.us_states.US_STATES
+
+    A tuple of choices of the postal abbreviations for all
+    50 U.S. states, plus the District of Columbia.
+
+.. data:: us.us_states.US_TERRITORIES
+
+    A tuple of choices of the postal abbreviations for U.S
+    territories: American Samoa, Guam, the Northern Mariana Islands,
+    Puerto Rico and the U.S. Virgin Islands.
+
+.. data:: us.us_states.ARMED_FORCES_STATES
+
+    A tuple of choices of the postal abbreviations of the three U.S
+    military postal "states": Armed Forces Americas, Armed Forces
+    Europe and Armed Forces Pacific.
+
+.. data:: us.us_states.COFA_STATES
+
+    A tuple of choices of the postal abbreviations of the three
+    independent nations which, under the Compact of Free Association,
+    are served by the U.S. Postal Service: the Federated States of
+    Micronesia, the Marshall Islands and Palau.
+
+.. data:: us.us_states.OBSOLETE_STATES
+
+    A tuple of choices of obsolete U.S Postal Service state
+    abbreviations: the former abbreviation for the Northern Mariana
+    Islands, plus the Panama Canal Zone, the Philippines and the
+    former Pacific trust territories.
+
+.. data:: us.us_states.STATE_CHOICES
+
+    A tuple of choices of all postal abbreviations corresponding to U.S states or
+    territories, and the District of Columbia..
+
+.. data:: us.us_states.USPS_CHOICES
+
+    A tuple of choices of all postal abbreviations recognized by the
+    U.S Postal Service (including all states and territories, the
+    District of Columbia, armed forces "states" and independent
+    nations serviced by USPS).
 
 Uruguay (``uy``)
 ================
