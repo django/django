@@ -5,6 +5,7 @@ import datetime
 
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import SuspiciousOperation
 from django.core.files import temp as tempfile
 from django.core.urlresolvers import reverse
 # Register auth models with the admin.
@@ -348,6 +349,15 @@ class AdminViewBasicTest(TestCase):
         self.assertContains(response, 'Choisir une heure')
         deactivate()
 
+    def test_disallowed_filtering(self):
+        self.assertRaises(SuspiciousOperation,
+            self.client.get, "/test_admin/admin/admin_views/album/?owner__email__startswith=fuzzy"
+        )
+
+        try:
+            self.client.get("/test_admin/admin/admin_views/stuff/?color__value__startswith=red")
+        except SuspiciousOperation:
+            self.fail("Filters are allowed if explicitly included in list_filter")
 
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']

@@ -100,7 +100,7 @@ class ChapterXtra1Admin(admin.ModelAdmin):
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('content', 'date', callable_year, 'model_year', 'modeladmin_year')
-    list_filter = ('date',)
+    list_filter = ('date', 'section')
 
     def changelist_view(self, request):
         "Test that extra_context works"
@@ -611,6 +611,9 @@ class Album(models.Model):
     owner = models.ForeignKey(User)
     title = models.CharField(max_length=30)
 
+class AlbumAdmin(admin.ModelAdmin):
+    list_filter = ['title']
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -657,4 +660,4 @@ admin.site.register(Promo)
 admin.site.register(ChapterXtra1, ChapterXtra1Admin)
 admin.site.register(Pizza, PizzaAdmin)
 admin.site.register(Topping)
-admin.site.register(Album)
+admin.site.register(Album, AlbumAdmin)
