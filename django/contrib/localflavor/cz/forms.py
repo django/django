@@ -62,14 +62,18 @@ class CZBirthNumberField(Field):
 
         birth, id = match.groupdict()['birth'], match.groupdict()['id']
 
-        # Three digits for verificatin number were used until 1. january 1954
+        # Three digits for verification number were used until 1. january 1954
         if len(id) == 3:
             return u'%s' % value
 
         # Birth number is in format YYMMDD. Females have month value raised by 50.
         # In case that all possible number are already used (for given date),
-        #  the month field is raised by 20.
+        # the month field is raised by 20.
         if gender is not None:
+            import warnings
+            warnings.warn(
+                "Support for validating the gender of a CZ Birth number has been deprecated.",
+                DeprecationWarning)
             if gender == 'f':
                 female_const = 50
             elif gender == 'm':
