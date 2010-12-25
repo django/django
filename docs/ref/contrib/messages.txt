@@ -86,7 +86,7 @@ Four storage classes are included:
 ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
     This is the default temporary storage class.
 
-    This class extends FallbackStorage and adds compatibility methods to
+    This class extends FallbackStorage and adds compatibility methods
     to retrieve any messages stored in the user Message model by code that
     has not yet been updated to use the new API. This storage is temporary
     (because it makes use of code that is pending deprecation) and will be
