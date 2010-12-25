@@ -110,7 +110,7 @@ model handling are exactly the same as normal. This includes
     2. If a model with ``managed=False`` contains a
        :class:`~django.db.models.ManyToManyField` that points to another
        unmanaged model, then the intermediate table for the many-to-many join
-       will also not be created. However, a the intermediary table between one
+       will also not be created. However, the intermediary table between one
        managed and one unmanaged model *will* be created.
 
        If you need to change this default behavior, create the intermediary
