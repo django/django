@@ -139,7 +139,11 @@ While you could access ``request.POST`` directly at this point, it is better to
 access ``form.cleaned_data``. This data has not only been validated but will
 also be converted in to the relevant Python types for you. In the above example,
 ``cc_myself`` will be a boolean value. Likewise, fields such as ``IntegerField``
-and ``FloatField`` convert values to a Python int and float respectively.
+and ``FloatField`` convert values to a Python int and float respectively. Note
+that read-only fields are not available in ``form.cleaned_data`` (and setting
+a value in a custom ``clean()`` method won't have any effect) because these
+fields are displayed as text rather than as input elements, and thus are not
+posted back to the server.
 
 Extending the above example, here's how the form data could be processed:
 
@@ -390,5 +394,5 @@ This covers the basics, but forms can do a whole lot more:
 .. seealso::
 
     :doc:`The Forms Reference </ref/forms/index>`
-        Covers the full API reference, including form fields, form widgets, 
+        Covers the full API reference, including form fields, form widgets,
         and form and field validation.
