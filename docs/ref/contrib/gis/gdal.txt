@@ -459,8 +459,6 @@ systems and coordinate transformation::
 
    .. classmethod:: from_bbox(bbox)
 
-   .. versionadded:: 1.1
-
    Constructs a :class:`Polygon` from the given bounding-box (a 4-tuple).
 
    .. method:: __len__
@@ -600,8 +598,6 @@ systems and coordinate transformation::
 
 
    .. attribute:: kml
-
-   .. versionadded:: 1.1
 
    Returns a string representation of this geometry in KML format.
 
@@ -889,8 +885,6 @@ systems and coordinate transformation::
 
    .. method:: expand_to_include(self, *args)
 
-   .. versionadded:: 1.1
-
 Coordinate System Objects
 =========================
 
@@ -992,8 +986,6 @@ Coordinate System Objects
    Import spatial reference from PROJ.4 string.
 
    .. method:: import_user_input(user_input)
-  
-   .. versionadded:: 1.1
 
    .. method:: import_wkt(wkt)
 

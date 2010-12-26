@@ -155,8 +155,6 @@ will use the function's name as the filter name.
 Filters and auto-escaping
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 When writing a custom filter, give some thought to how the filter will interact
 with Django's auto-escaping behavior. Note that three types of strings can be
 passed around inside the template code:
@@ -426,8 +424,6 @@ without having to be parsed multiple times.
 Auto-escaping considerations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 The output from template tags is **not** automatically run through the
 auto-escaping filters. However, there are still a couple of things you should
 keep in mind when writing a template tag.
@@ -604,10 +600,6 @@ Now your tag should begin to look like this::
         if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
             raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
         return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
-
-.. versionchanged:: 1.0
-    Variable resolution has changed in the 1.0 release of Django. ``template.resolve_variable()``
-    has been deprecated in favor of a new ``template.Variable`` class.
 
 You also have to change the renderer to retrieve the actual contents of the
 ``date_updated`` property of the ``blog_entry`` object.  This can be

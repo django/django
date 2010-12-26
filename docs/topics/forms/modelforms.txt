@@ -111,11 +111,6 @@ the full list of conversions:
                                      ``widget=forms.Textarea``
     ===============================  ========================================
 
-
-.. versionadded:: 1.0
-    The ``FloatField`` form field and ``DecimalField`` model and form fields
-    are new in Django 1.0.
-
 .. versionadded:: 1.2
     The ``BigIntegerField`` is new in Django 1.2.
 
@@ -311,12 +306,8 @@ model fields:
 
 2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta``
    class.  This attribute, if given, should be a list of field names
-   to include in the form.
-
-   .. versionchanged:: 1.1
-
-   The form will render the fields in the same order they are specified in the
-   ``fields`` attribute.
+   to include in the form. The order in which the fields names are specified
+   in that list is respected when the form renders them.
 
 3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta``
    class.  This attribute, if given, should be a list of field names
@@ -455,8 +446,6 @@ parameter when declaring the form field::
 
 Changing the order of fields
 ----------------------------
-
-.. versionadded:: 1.1
 
 By default, a ``ModelForm`` will render fields in the same order that they are
 defined on the model, with ``ManyToManyField`` instances appearing last. If

@@ -459,8 +459,6 @@ See :doc:`/topics/i18n/index` for more.
 django.core.context_processors.media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
 value of the :setting:`MEDIA_URL` setting.

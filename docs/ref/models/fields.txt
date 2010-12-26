@@ -173,8 +173,6 @@ If ``True``, djadmin:`django-admin.py sqlindexes <sqlindexes>` will output a
 
 .. attribute:: Field.db_tablespace
 
-.. versionadded:: 1.0
-
 The name of the database tablespace to use for this field's index, if this field
 is indexed. The default is the project's :setting:`DEFAULT_INDEX_TABLESPACE`
 setting, if set, or the :attr:`~Field.db_tablespace` of the model, if any. If
@@ -432,8 +430,6 @@ JavaScript shortcuts.
 ``DecimalField``
 ----------------
 
-.. versionadded:: 1.0
-
 .. class:: DecimalField(max_digits=None, decimal_places=None, [**options])
 
 A fixed-precision decimal number, represented in Python by a
@@ -489,8 +485,6 @@ Has one **required** argument:
     date/time of the file upload (so that uploaded files don't fill up the given
     directory).
 
-    .. versionchanged:: 1.0
-
     This may also be a callable, such as a function, which will be called to
     obtain the upload path, including the filename. This callable must be able
     to accept two arguments, and return a Unix-style path (with forward slashes)
@@ -518,8 +512,6 @@ Has one **required** argument:
 Also has one optional argument:
 
 .. attribute:: FileField.storage
-
-    .. versionadded:: 1.0
 
     Optional. A storage object, which handles the storage and retrieval of your
     files. See :doc:`/topics/files` for details on how to provide this object.
@@ -566,9 +558,6 @@ what you think they are. For example, if you blindly let somebody upload files,
 without validation, to a directory that's within your Web server's document
 root, then somebody could upload a CGI or PHP script and execute that script by
 visiting its URL on your site. Don't allow that.
-
-.. versionadded:: 1.0
-   The ``max_length`` argument was added in this version.
 
 By default, :class:`FileField` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you
@@ -652,9 +641,6 @@ base filename, not the full path. So, this example::
 because the :attr:`~FilePathField.match` applies to the base filename
 (``foo.gif`` and ``bar.gif``).
 
-.. versionadded:: 1.0
-   The ``max_length`` argument was added in this version.
-
 By default, :class:`FilePathField` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
@@ -663,8 +649,6 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 --------------
 
 .. class:: FloatField([**options])
-
-.. versionchanged:: 1.0
 
 A floating-point number represented in Python by a ``float`` instance.
 
@@ -698,9 +682,6 @@ optional arguments:
 Requires the `Python Imaging Library`_.
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
-
-.. versionadded:: 1.0
-   The ``max_length`` argument was added in this version.
 
 By default, :class:`ImageField` instances are created as ``varchar(100)``
 columns in your database. As with other fields, you can change the maximum
@@ -873,8 +854,6 @@ you can use the name of the model, rather than the model object itself::
 
     class Manufacturer(models.Model):
         # ...
-
-.. versionadded:: 1.0
 
 To refer to models defined in another application, you can explicitly specify
 a model with the full application label. For example, if the ``Manufacturer``

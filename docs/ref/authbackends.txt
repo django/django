@@ -26,8 +26,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: RemoteUserBackend
 
-    .. versionadded:: 1.1
-
     Use this backend to take advantage of external-to-Django-handled
     authentication.  It authenticates using usernames passed in
     :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See

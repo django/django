@@ -288,9 +288,6 @@ with this command::
 
 Note that we used ``animals``, not ``myproject.animals``.
 
-.. versionadded:: 1.0
-   You can now choose which test to run.
-
 You can be even *more* specific by naming an individual test case. To
 run a single test case in an application (for example, the
 ``AnimalTestCase`` described in the "Writing unit tests" section), add
@@ -392,8 +389,6 @@ use all of the same database settings you have in your settings file:
 database is created by the user specified by ``USER``, so you'll need
 to make sure that the given user account has sufficient privileges to
 create a new database on the system.
-
-.. versionadded:: 1.0
 
 For fine-grained control over the character encoding of your test
 database, use the :setting:`TEST_CHARSET` option. If you're using
@@ -718,8 +713,6 @@ arguments at time of construction:
         details	view, which is a good way to test code paths that use the
         :meth:`django.http.HttpRequest.is_ajax()` method.
 
-        .. versionadded:: 1.1
-
         If you already have the GET arguments in URL-encoded form, you can
         use that encoding instead of using the data argument. For example,
         the previous GET request could also be posed as::
@@ -802,8 +795,6 @@ arguments at time of construction:
 
         The ``extra`` argument acts the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 1.1
-
         If the URL you request with a POST contains encoded parameters, these
         parameters will be made available in the request.GET data. For example,
         if you were to make the request::
@@ -820,8 +811,6 @@ arguments at time of construction:
 
     .. method:: Client.head(path, data={}, follow=False, **extra)
 
-        .. versionadded:: 1.1
-
         Makes a HEAD request on the provided ``path`` and returns a ``Response``
         object. Useful for testing RESTful interfaces. Acts just like
         :meth:`Client.get` except it does not return a message body.
@@ -831,8 +820,6 @@ arguments at time of construction:
         containing tuples of the intermediate urls and status codes.
 
     .. method:: Client.options(path, data={}, follow=False, **extra)
-
-        .. versionadded:: 1.1
 
         Makes an OPTIONS request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
@@ -845,8 +832,6 @@ arguments at time of construction:
 
     .. method:: Client.put(path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra)
 
-        .. versionadded:: 1.1
-
         Makes a PUT request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces. Acts just
         like :meth:`Client.post` except with the PUT request method.
@@ -856,8 +841,6 @@ arguments at time of construction:
         containing tuples of the intermediate urls and status codes.
 
     .. method:: Client.delete(path, follow=False, **extra)
-
-        .. versionadded:: 1.1
 
         Makes an DELETE request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
@@ -869,8 +852,6 @@ arguments at time of construction:
         The ``extra`` argument acts the same as for :meth:`Client.get`.
 
     .. method:: Client.login(**credentials)
-
-        .. versionadded:: 1.0
 
         If your site uses Django's :doc:`authentication system</topics/auth>`
         and you deal with logging in users, you can use the test client's
@@ -916,8 +897,6 @@ arguments at time of construction:
 
     .. method:: Client.logout()
 
-        .. versionadded:: 1.0
-
         If your site uses Django's :doc:`authentication system</topics/auth>`,
         the ``logout()`` method can be used to simulate the effect of a user
         logging out of your site.
@@ -955,8 +934,6 @@ Specifically, a ``Response`` object has the following attributes:
 
         If the rendered page used multiple templates, then ``context`` will be a
         list of ``Context`` objects, in the order in which they were rendered.
-
-        .. versionadded:: 1.1
 
         Regardless of the number of templates used during rendering, you can
         retrieve context values using the ``[]`` operator. For example, the
@@ -1127,8 +1104,6 @@ just change the base class of your test from ``unittest.TestCase`` to
 will continue to be available, but it will be augmented with some useful
 additions.
 
-.. versionadded:: 1.1
-
 .. class:: TransactionTestCase()
 
 Django ``TestCase`` classes make use of database transaction facilities, if
@@ -1175,8 +1150,6 @@ by truncating tables and reloading initial data.
 
 Default test client
 ~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 .. attribute:: TestCase.client
 
@@ -1305,8 +1278,6 @@ or by the order of test execution.
 URLconf configuration
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 .. attribute:: TestCase.urls
 
 If your application provides views, you may want to include tests that use the
@@ -1374,8 +1345,6 @@ This test case will flush *all* the test databases before running
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 If you use Django's custom ``TestCase`` class, the test runner will clear the
 contents of the test e-mail outbox at the start of each test case.
 
@@ -1383,8 +1352,6 @@ For more detail on e-mail services during tests, see `E-mail services`_.
 
 Assertions
 ~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 .. versionchanged:: 1.2
     Addded ``msg_prefix`` argument.
@@ -1444,8 +1411,6 @@ cause of an failure in your test suite.
     redirected to ``expected_url`` (including any GET data), and the final
     page was received with ``target_status_code``.
 
-    .. versionadded:: 1.1
-
     If your request used the ``follow`` argument, the ``expected_url`` and
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
@@ -1495,8 +1460,6 @@ cause of an failure in your test suite.
 
 E-mail services
 ---------------
-
-.. versionadded:: 1.0
 
 If any of your Django views send e-mail using :doc:`Django's e-mail
 functionality </topics/email>`, you probably don't want to send e-mail each time
@@ -1800,9 +1763,6 @@ also provides some utilities that can be useful during testing.
     ``create_test_db()`` has the side effect of modifying the value of
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
-
-    .. versionchanged:: 1.0
-       ``create_test_db()`` now returns the name of the test database.
 
 .. function:: destroy_test_db(old_database_name, verbosity=1)
 

@@ -475,8 +475,6 @@ those latter objects, you could write::
 Spanning multi-valued relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 When you are filtering an object based on a ``ManyToManyField`` or a reverse
 ``ForeignKey``, there are two different sorts of filter you may be
 interested in. Consider the ``Blog``/``Entry`` relationship (``Blog`` to
@@ -531,8 +529,6 @@ filtering on different linked objects.
 
 Filters can reference fields on the model
 -----------------------------------------
-
-.. versionadded:: 1.1
 
 In the examples given so far, we have constructed filters that compare
 the value of a model field with a constant. But what if you want to compare
@@ -818,8 +814,6 @@ complete query set::
 Updating multiple objects at once
 =================================
 
-.. versionadded:: 1.0
-
 Sometimes you want to set a field to a particular value for all the objects in
 a ``QuerySet``. You can do this with the ``update()`` method. For example::
 
@@ -857,8 +851,6 @@ Just loop over them and call ``save()``::
 
     for item in my_queryset:
         item.save()
-
-.. versionadded:: 1.1
 
 Calls to update can also use :ref:`F() objects <query-expressions>` to update
 one field based on the value of another field in the model. This is especially

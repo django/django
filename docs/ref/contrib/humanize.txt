@@ -68,8 +68,6 @@ You can pass in either an integer or a string representation of an integer.
 naturalday
 ----------
 
-.. versionadded:: 1.0
-
 For dates that are the current day or within one day, return "today",
 "tomorrow" or "yesterday", as appropriate. Otherwise, format the date using
 the passed in format string.

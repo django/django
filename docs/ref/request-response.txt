@@ -117,16 +117,6 @@ All attributes except ``session`` should be considered read-only.
     ``enctype="multipart/form-data"``. Otherwise, ``FILES`` will be a blank
     dictionary-like object.
 
-    .. versionchanged:: 1.0
-
-    In previous versions of Django, ``request.FILES`` contained simple ``dict``
-    objects representing uploaded files. This is no longer true -- files are
-    represented by :class:`UploadedFile` objects.
-
-    These :class:`UploadedFile` objects will emulate the old-style ``dict``
-    interface, but this is deprecated and will be removed in the next release
-    of Django.
-
 .. attribute:: HttpRequest.META
 
     A standard Python dictionary containing all available HTTP headers.
@@ -521,8 +511,6 @@ To set or remove a header in your response, treat it like a dictionary::
 
 Note that unlike a dictionary, ``del`` doesn't raise ``KeyError`` if the header
 doesn't exist.
-
-.. versionadded:: 1.1
 
 HTTP headers cannot contain newlines. An attempt to set a header containing a
 newline character (CR or LF) will raise ``BadHeaderError``

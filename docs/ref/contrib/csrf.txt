@@ -241,7 +241,6 @@ it.
 Exceptions
 ----------
 
-.. versionadded:: 1.1
 .. versionchanged:: 1.2
     Import paths for the decorators below were changed.
 

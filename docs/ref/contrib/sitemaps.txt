@@ -365,8 +365,6 @@ Pinging Google via `manage.py`
 
 .. django-admin:: ping_google
 
-.. versionadded:: 1.0
-
 Once the sitemaps application is added to your project, you may also
 ping Google using the ``ping_google`` management command::
 

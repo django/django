@@ -835,8 +835,6 @@ Reverse the coordinate order of the geometry field, and attaches as a
 
 .. method:: GeoQuerySet.snap_to_grid(*args, **kwargs)
 
-.. versionadded:: 1.1
-
 Snap all points of the input geometry to the grid.  How the
 geometry is snapped to the grid depends on how many numeric
 (either float, integer, or long) arguments are given.
@@ -956,8 +954,6 @@ __ http://geohash.org/
 ~~~~~~~~~~~
 
 .. method:: GeoQuerySet.geojson(**kwargs)
-
-.. versionadded:: 1.1
 
 *Availability*: PostGIS
 
@@ -1102,7 +1098,6 @@ the ``GeoQuerySet``; otherwise sets with ``None``.
 
 Spatial Aggregates
 ==================
-.. versionadded:: 1.1
 
 Aggregate Methods
 -----------------
@@ -1111,8 +1106,6 @@ Aggregate Methods
 ~~~~~~~~~~~
 
 .. method:: GeoQuerySet.collect(**kwargs)
-
-.. versionadded:: 1.1
 
 *Availability*: PostGIS
 

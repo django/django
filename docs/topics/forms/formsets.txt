@@ -176,8 +176,6 @@ itself. When rendering a formset in a template, you can include all
 the management data by rendering ``{{ my_formset.management_form }}``
 (substituting the name of your formset as appropriate).
 
-.. versionadded:: 1.1
-
 ``total_form_count`` and ``initial_form_count``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

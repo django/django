@@ -2,8 +2,6 @@
 Aggregation
 ===========
 
-.. versionadded:: 1.1
-
 .. currentmodule:: django.db.models
 
 The topic guide on :doc:`Django's database-abstraction API </topics/db/queries>`

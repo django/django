@@ -33,10 +33,10 @@ features include:
 * A BSD-licensed interface to the GEOS geometry routines, implemented purely
   in Python using ``ctypes``.
 * Loosely-coupled to GeoDjango.  For example, :class:`GEOSGeometry` objects
-  may be used outside of a django project/application.  In other words, 
+  may be used outside of a django project/application.  In other words,
   no need to have ``DJANGO_SETTINGS_MODULE`` set or use a database, etc.
 * Mutability: :class:`GEOSGeometry` objects may be modified.
-* Cross-platform and tested; compatible with Windows, Linux, Solaris, and Mac 
+* Cross-platform and tested; compatible with Windows, Linux, Solaris, and Mac
   OS X platforms.
 
 .. _geos-tutorial:
@@ -44,7 +44,7 @@ features include:
 Tutorial
 ========
 
-This section contains a brief introduction and tutorial to using 
+This section contains a brief introduction and tutorial to using
 :class:`GEOSGeometry` objects.
 
 Creating a Geometry
@@ -75,7 +75,7 @@ return a :class:`GEOSGeometry` object from an input string or a file::
     >>> pnt = fromfile('/path/to/pnt.wkt')
     >>> pnt = fromfile(open('/path/to/pnt.wkt'))
 
-Geometries are Pythonic 
+Geometries are Pythonic
 -----------------------
 :class:`GEOSGeometry` objects are 'Pythonic', in other words components may
 be accessed, modified, and iterated over using standard Python conventions.
@@ -146,7 +146,7 @@ are accepted:
 =============  ======================
 Format         Input Type
 =============  ======================
-WKT / EWKT     ``str`` or ``unicode`` 
+WKT / EWKT     ``str`` or ``unicode``
 HEX / HEXEWKB  ``str`` or ``unicode``
 WKB / EWKB     ``buffer``
 GeoJSON        ``str`` or ``unicode``
@@ -161,7 +161,7 @@ Returns the coordinates of the geometry as a tuple.
 
 .. attribute:: GEOSGeometry.empty
 
-Returns whether or not the set of points in the geometry is empty. 
+Returns whether or not the set of points in the geometry is empty.
 
 .. attribute:: GEOSGeometry.geom_type
 
@@ -219,11 +219,11 @@ definition.
 
 Returns a boolean indicating whether the geometry is valid.
 
-.. attribute:: GEOSGeometry.valid_reason 
+.. attribute:: GEOSGeometry.valid_reason
 
-.. versionadded:: 1.3 
+.. versionadded:: 1.3
 
-Returns a string describing the reason why a geometry is invalid. 
+Returns a string describing the reason why a geometry is invalid.
 
 .. attribute:: GEOSGeometry.srid
 
@@ -248,27 +248,27 @@ another object.
 
 Returns the "extended" Well-Known Text of the geometry.  This representation
 is specific to PostGIS and is a super set of the OGC WKT standard. [#fnogc]_
-Essentially the SRID is prepended to the WKT representation, for example 
-``SRID=4326;POINT(5 23)``. 
+Essentially the SRID is prepended to the WKT representation, for example
+``SRID=4326;POINT(5 23)``.
 
 .. note::
 
-   The output from this property does not include the 3dm, 3dz, and 4d 
+   The output from this property does not include the 3dm, 3dz, and 4d
    information that PostGIS supports in its EWKT representations.
 
 .. attribute:: GEOSGeometry.hex
 
 Returns the WKB of this Geometry in hexadecimal form.  Please note
 that the SRID and Z values are not included in this representation
-because it is not a part of the OGC specification (use the 
+because it is not a part of the OGC specification (use the
 :attr:`GEOSGeometry.hexewkb` property instead).
 
 .. attribute:: GEOSGeometry.hexewkb
 
 .. versionadded:: 1.2
 
-Returns the EWKB of this Geometry in hexadecimal form.  This is an 
-extension of the WKB specification that includes SRID and Z values 
+Returns the EWKB of this Geometry in hexadecimal form.  This is an
+extension of the WKB specification that includes SRID and Z values
 that are a part of this geometry.
 
 .. note::
@@ -290,12 +290,12 @@ Alias for :attr:`GEOSGeometry.json`.
 .. attribute:: GEOSGeometry.kml
 
 Returns a `KML`__ (Keyhole Markup Language) representation of the
-geometry.  This should only be used for geometries with an SRID of 
+geometry.  This should only be used for geometries with an SRID of
 4326 (WGS84), but this restriction is not enforced.
 
 .. attribute:: GEOSGeometry.ogr
 
-Returns an :class:`~django.contrib.gis.gdal.OGRGeometry` object 
+Returns an :class:`~django.contrib.gis.gdal.OGRGeometry` object
 correspondg to the GEOS geometry.
 
 .. note::
@@ -344,7 +344,7 @@ Returns ``True`` if :meth:`GEOSGeometry.within` is ``False``.
 .. method:: GEOSGeometry.crosses(other)
 
 Returns ``True`` if the DE-9IM intersection matrix for the two Geometries
-is ``T*T******`` (for a point and a curve,a point and an area or a line 
+is ``T*T******`` (for a point and a curve,a point and an area or a line
 and an area) ``0********`` (for two curves).
 
 .. method:: GEOSGeometry.disjoint(other)
@@ -354,7 +354,7 @@ is ``FF*FF****``.
 
 .. method:: GEOSGeometry.equals(other)
 
-Returns ``True`` if the DE-9IM intersection matrix for the two geometries 
+Returns ``True`` if the DE-9IM intersection matrix for the two geometries
 is ``T*F**FFF*``.
 
 .. method:: GEOSGeometry.equals_exact(other, tolerance=0)
@@ -377,8 +377,8 @@ is ``T*T***T**`` (for two points or two surfaces) ``1*T***T**``
 
 .. method:: GEOSGeometry.relate_pattern(other, pattern)
 
-Returns ``True`` if the elements in the DE-9IM intersection matrix 
-for this geometry and the other matches the given ``pattern`` -- 
+Returns ``True`` if the elements in the DE-9IM intersection matrix
+for this geometry and the other matches the given ``pattern`` --
 a string of nine characters from the alphabet: {``T``, ``F``, ``*``, ``0``}.
 
 .. method:: GEOSGeometry.touches(other)
@@ -397,8 +397,8 @@ Topological Methods
 .. method:: GEOSGeometry.buffer(width, quadsegs=8)
 
 Returns a :class:`GEOSGeometry` that represents all points whose distance
-from this geometry is less than or equal to the given ``width``. The optional 
-``quadsegs`` keyword sets the number of segments used to approximate a 
+from this geometry is less than or equal to the given ``width``. The optional
+``quadsegs`` keyword sets the number of segments used to approximate a
 quarter circle (defaults is 8).
 
 .. method:: GEOSGeometry.difference(other)
@@ -423,21 +423,21 @@ algorithm to the specified tolerance.  A higher tolerance value implies
 less points in the output.  If no tolerance is tolerance provided,
 it defaults to 0.
 
-By default, this function does not preserve topology - e.g., 
+By default, this function does not preserve topology - e.g.,
 :class:`Polygon` objects can be split, collapsed into lines or disappear.
 :class:`Polygon` holes can be created or disappear, and lines can cross.
 By specifying ``preserve_topology=True``, the result will have the same
-dimension and number of components as the input, however, this is 
-significantly slower.   
+dimension and number of components as the input, however, this is
+significantly slower.
 
 .. method:: GEOSGeometry.sym_difference(other)
 
-Returns a :class:`GEOSGeometry` combining the points in this geometry 
+Returns a :class:`GEOSGeometry` combining the points in this geometry
 not in other, and the points in other not in this geometry.
 
 .. method:: GEOSGeometry.union(other)
 
-Returns a :class:`GEOSGeometry` representing all the points in this 
+Returns a :class:`GEOSGeometry` representing all the points in this
 geometry and the other.
 
 Topological Properties
@@ -477,7 +477,7 @@ This property returns the area of the Geometry.
 
 .. attribute:: GEOSGeometry.extent
 
-This property returns the extent of this geometry as a 4-tuple, 
+This property returns the extent of this geometry as a 4-tuple,
 consisting of (xmin, ymin, xmax, ymax).
 
 .. method:: GEOSGeometry.clone()
@@ -492,24 +492,22 @@ Returns the distance between the closest points on this geometry and the given
 .. note::
 
     GEOS distance calculations are  linear -- in other words, GEOS does not
-    perform a spherical calculation even if the SRID specifies a geographic 
+    perform a spherical calculation even if the SRID specifies a geographic
     coordinate system.
 
 .. attribute:: GEOSGeometry.length
 
-Returns the length of this geometry (e.g., 0 for a :class:`Point`, 
-the length of a :class:`LineString`, or the circumference of 
+Returns the length of this geometry (e.g., 0 for a :class:`Point`,
+the length of a :class:`LineString`, or the circumference of
 a :class:`Polygon`).
 
 .. attribute:: GEOSGeometry.prepared
-
-.. versionadded:: 1.1
 
 .. note::
 
     Support for prepared geometries requires GEOS 3.1.
 
-Returns a GEOS ``PreparedGeometry`` for the contents of this geometry.  
+Returns a GEOS ``PreparedGeometry`` for the contents of this geometry.
 ``PreparedGeometry`` objects are optimized for the contains, intersects,
 and covers operations.  Refer to the :ref:`prepared-geometries` documentation
 for more information.
@@ -529,7 +527,7 @@ corresponding to the SRID of the geometry or ``None``.
 
 Transforms the geometry according to the given coordinate transformation paramter
 (``ct``), which may be an integer SRID, spatial reference WKT string,
-a PROJ.4 string, a :class:`~django.contrib.gis.gdal.SpatialReference` object, or a 
+a PROJ.4 string, a :class:`~django.contrib.gis.gdal.SpatialReference` object, or a
 :class:`~django.contrib.gis.gdal.CoordTransform` object. By default, the geometry
 is transformed in-place and nothing is returned. However if the ``clone`` keyword
 is set, then the geometry is not modified and a transformed clone of the geometry
@@ -611,8 +609,6 @@ is returned instead.
 
    .. classmethod:: from_bbox(bbox)
 
-   .. versionadded:: 1.1
-
    Returns a polygon object from the given bounding-box, a 4-tuple
    comprising (xmin, ymin, xmax, ymax).
 
@@ -651,11 +647,9 @@ Geometry Collections
 
    .. attribute:: merged
 
-   .. versionadded:: 1.1
-
    Returns a :class:`LineString` representing the line merge of
    all the components in this ``MultiLineString``.
-       
+
 
 ``MultiPolygon``
 ----------------
@@ -672,8 +666,6 @@ Geometry Collections
        >>> mp = MultiPolygon([p1, p2])
 
    .. attribute:: cascaded_union
-
-   .. versionadded:: 1.1
 
    Returns a :class:`Polygon` that is the union of all of the component
    polygons in this collection.  The algorithm employed is significantly
@@ -702,13 +694,11 @@ Geometry Collections
 Prepared Geometries
 ===================
 
-.. versionadded: 1.1
-
 In order to obtain a prepared geometry, just access the
 :attr:`GEOSGeometry.prepared` property.  Once you have a
 ``PreparedGeometry`` instance its spatial predicate methods, listed below,
 may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
-geometry can be orders of magnitude faster -- the more complex the geometry 
+geometry can be orders of magnitude faster -- the more complex the geometry
 that is prepared, the larger the speedup in the operation.  For more information,
 please consult the `GEOS wiki page on prepared geometries <http://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
 
@@ -770,8 +760,6 @@ Example::
 I/O Objects
 ===========
 
-.. versionadded: 1.1
-
 Reader Objects
 --------------
 
@@ -807,7 +795,7 @@ include the SRID and 3D values (in other words, EWKB).
 .. class:: WKBWriter
 
 ``WKBWriter`` provides the most control over its output.  By default it
-returns OGC-compliant WKB when it's ``write`` method is called.  However, 
+returns OGC-compliant WKB when it's ``write`` method is called.  However,
 it has properties that allow for the creation of EWKB, a superset of the
 WKB standard that includes additional information.
 
@@ -925,5 +913,5 @@ location (e.g., ``/home/bob/lib/libgeos_c.so``).
 
 .. note::
 
-    The setting must be the *full* path to the **C** shared library; in 
+    The setting must be the *full* path to the **C** shared library; in
     other words you want to use ``libgeos_c.so``, not ``libgeos.so``.

@@ -56,8 +56,6 @@ commonly used groups of widgets:
 
 .. class:: DateInput
 
-    .. versionadded:: 1.1
-
     Date input as a simple text box: ``<input type='text' ...>``
 
     Takes one optional argument:
@@ -69,8 +67,6 @@ commonly used groups of widgets:
     If no ``format`` argument is provided, the default format is ``'%Y-%m-%d'``.
 
 .. class:: DateTimeInput
-
-    .. versionadded:: 1.0
 
     Date/time input as a simple text box: ``<input type='text' ...>``
 
@@ -94,9 +90,6 @@ commonly used groups of widgets:
         The format in which this field's initial value will be displayed.
 
     If no ``format`` argument is provided, the default format is ``'%H:%M:%S'``.
-
-    .. versionchanged:: 1.1
-       The ``format`` argument was not supported in Django 1.0.
 
 .. class:: Textarea
 
@@ -166,9 +159,6 @@ commonly used groups of widgets:
 
     Takes two optional arguments, ``date_format`` and ``time_format``, which
     work just like the ``format`` argument for ``DateInput`` and ``TimeInput``.
-
-    .. versionchanged:: 1.1
-       The ``date_format`` and ``time_format`` arguments were not supported in Django 1.0.
 
 .. class:: SelectDateWidget
 

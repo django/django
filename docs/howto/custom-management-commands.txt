@@ -2,8 +2,6 @@
 Writing custom django-admin commands
 ====================================
 
-.. versionadded:: 1.0
-
 Applications can register their own actions with ``manage.py``. For example,
 you might want to add a ``manage.py`` action for a Django app that you're
 distributing. In this document, we will be building a custom ``closepoll``

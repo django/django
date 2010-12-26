@@ -338,8 +338,6 @@ In this example, ``a.save()`` will not be undone in the case where
 Database-level autocommit
 -------------------------
 
-.. versionadded:: 1.1
-
 With PostgreSQL 8.2 or later, there is an advanced option to run PostgreSQL
 with :doc:`database-level autocommit </ref/databases>`. If you use this option,
 there is no constantly open transaction, so it is always possible to continue

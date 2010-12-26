@@ -64,9 +64,6 @@ This tells Apache: "Use mod_python for any URL at or under '/mysite/', using the
 Django mod_python handler." It passes the value of :ref:`DJANGO_SETTINGS_MODULE
 <django-settings-module>` so mod_python knows which settings to use.
 
-.. versionadded:: 1.0
-    The ``PythonOption django.root ...`` is new in this version.
-
 Because mod_python does not know we are serving this site from underneath the
 ``/mysite/`` prefix, this value needs to be passed through to the mod_python
 handler in Django, via the ``PythonOption django.root ...`` line. The value set

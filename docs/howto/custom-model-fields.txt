@@ -2,7 +2,6 @@
 Writing custom model fields
 ===========================
 
-.. versionadded:: 1.0
 .. currentmodule:: django.db.models
 
 Introduction

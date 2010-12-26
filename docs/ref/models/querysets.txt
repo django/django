@@ -186,8 +186,6 @@ annotate
 
 .. method:: annotate(*args, **kwargs)
 
-.. versionadded:: 1.1
-
 Annotates each object in the ``QuerySet`` with the provided list of
 aggregate values (averages, sums, etc) that have been computed over
 the objects that are related to the objects in the ``QuerySet``.
@@ -279,21 +277,12 @@ ordering piece of data for each of the main items you are selecting, the
 ordering may well be exactly what you want to do. Use ordering on multi-valued
 fields with care and make sure the results are what you expect.
 
-.. versionadded:: 1.0
-
-The syntax for ordering across related models has changed. See the `Django 0.96
-documentation`_ for the old behaviour.
-
-.. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
-
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
 
 If you don't want any ordering to be applied to a query, not even the default
 ordering, call ``order_by()`` with no parameters.
-
-.. versionadded:: 1.1
 
 You can tell if a query is ordered or not by checking the
 :attr:`QuerySet.ordered` attribute, which will be ``True`` if the
@@ -303,8 +292,6 @@ reverse
 ~~~~~~~
 
 .. method:: reverse()
-
-.. versionadded:: 1.0
 
 Use the ``reverse()`` method to reverse the order in which a queryset's
 elements are returned. Calling ``reverse()`` a second time restores the
@@ -429,11 +416,6 @@ A few subtleties that are worth mentioning:
       if the ``extra()`` clause is used after the ``values()``, the
       fields added by the select will be included automatically.
 
-.. versionadded:: 1.0
-
-Previously, it was not possible to pass ``blog_id`` to ``values()`` in the above
-example, only ``blog``.
-
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
 functionality of a model instance object. It's more efficient to select only
@@ -477,8 +459,6 @@ values_list
 ~~~~~~~~~~~
 
 .. method:: values_list(*fields)
-
-.. versionadded:: 1.0
 
 This is similar to ``values()`` except that instead of returning dictionaries,
 it returns tuples when iterated over. Each tuple contains the value from the
@@ -544,8 +524,6 @@ none
 
 .. method:: none()
 
-.. versionadded:: 1.0
-
 Returns an ``EmptyQuerySet`` -- a ``QuerySet`` that always evaluates to
 an empty list. This can be used in cases where you know that you should
 return an empty result set and your caller is expecting a ``QuerySet``
@@ -560,8 +538,6 @@ all
 ~~~
 
 .. method:: all()
-
-.. versionadded:: 1.0
 
 Returns a *copy* of the current ``QuerySet`` (or ``QuerySet`` subclass you
 pass in). This can be useful in some situations where you might want to pass
@@ -676,11 +652,6 @@ call). It's an error to use both a list of fields and the ``depth``
 parameter in the same ``select_related()`` call, since they are
 conflicting options.
 
-.. versionadded:: 1.0
-
-Both the ``depth`` argument and the ability to specify field names in the call
-to ``select_related()`` are new in Django version 1.0.
-
 .. versionchanged:: 1.2
 
 You can also refer to the reverse direction of a ``OneToOneFields`` in
@@ -752,8 +723,6 @@ of the arguments is required, but you should use at least one of them.
         subqueries are not required in Django's ``select`` clauses. Also note that
         some database backends, such as some MySQL versions, don't support
         subqueries.
-
-        .. versionadded:: 1.0
 
         In some rare cases, you might wish to pass parameters to the SQL fragments
         in ``extra(select=...)``. For this purpose, use the ``select_params``
@@ -860,8 +829,6 @@ defer
 
 .. method:: defer(*fields)
 
-.. versionadded:: 1.1
-
 In some complex data-modeling situations, your models might contain a lot of
 fields, some of which could contain a lot of data (for example, text fields),
 or require expensive processing to convert them to Python objects. If you are
@@ -921,8 +888,6 @@ only
 ~~~~
 
 .. method:: only(*fields)
-
-.. versionadded:: 1.1
 
 The ``only()`` method is more or less the opposite of ``defer()``. You
 call it with the fields that should *not* be deferred when retrieving a model.
@@ -1198,8 +1163,6 @@ aggregate
 
 .. method:: aggregate(*args, **kwargs)
 
-.. versionadded:: 1.1
-
 Returns a dictionary of aggregate values (averages, sums, etc) calculated
 over the ``QuerySet``. Each argument to ``aggregate()`` specifies
 a value that will be included in the dictionary that is returned.
@@ -1253,7 +1216,7 @@ the number of rows affected. The ``update()`` method is applied instantly and
 the only restriction on the :class:`QuerySet` that is updated is that it can
 only update columns in the model's main table. Filtering based on related
 fields is still possible. You cannot call ``update()`` on a
-:class:`QuerySet` that has had a slice taken or can otherwise no longer be 
+:class:`QuerySet` that has had a slice taken or can otherwise no longer be
 filtered.
 
 For example, if you wanted to update all the entries in a particular blog
@@ -1333,12 +1296,6 @@ SQL equivalents::
 
     SELECT ... WHERE id = 14;
     SELECT ... WHERE id IS NULL;
-
-.. versionchanged:: 1.0
-   The semantics of ``id__exact=None`` have changed in Django 1.0. Previously,
-   it was (intentionally) converted to ``WHERE id = NULL`` at the SQL level,
-   which would never match anything. It has now been changed to behave the
-   same as ``id__isnull=True``.
 
 .. admonition:: MySQL comparisons
 
@@ -1445,10 +1402,6 @@ The above code fragment could also be written as follows::
 
     inner_q = Blog.objects.filter(name__contains='Cheddar').values('pk').query
     entries = Entry.objects.filter(blog__in=inner_q)
-
-
-.. versionchanged:: 1.1
-    In Django 1.0, only the latter piece of code is valid.
 
 This second form is a bit less readable and unnatural to write, since it
 accesses the internal ``query`` attribute and requires a ``ValuesQuerySet``.
@@ -1687,8 +1640,6 @@ such as January 3, July 3, etc.
 week_day
 ~~~~~~~~
 
-.. versionadded:: 1.1
-
 For date/datetime fields, a 'day of the week' match.
 
 Takes an integer value representing the day of week from 1 (Sunday) to 7
@@ -1748,8 +1699,6 @@ full text searches. `See the MySQL documentation for additional details.
 regex
 ~~~~~
 
-.. versionadded:: 1.0
-
 Case-sensitive regular expression match.
 
 The regular expression syntax is that of the database backend in use.
@@ -1779,8 +1728,6 @@ regular expression syntax is recommended.
 iregex
 ~~~~~~
 
-.. versionadded:: 1.0
-
 Case-insensitive regular expression match.
 
 Example::
@@ -1801,8 +1748,6 @@ SQL equivalents::
 
 Aggregation Functions
 ---------------------
-
-.. versionadded:: 1.1
 
 Django provides the following aggregation functions in the
 ``django.db.models`` module. For details on how to use these

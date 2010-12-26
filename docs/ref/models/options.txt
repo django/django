@@ -65,8 +65,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.db_tablespace
 
-.. versionadded:: 1.0
-
 The name of the database tablespace to use for the model. If the backend doesn't
 support tablespaces, this option is ignored.
 
@@ -89,8 +87,6 @@ See the docs for :meth:`~django.db.models.QuerySet.latest` for more.
 -----------------------
 
 .. attribute:: Options.managed
-
-.. versionadded:: 1.1
 
 Defaults to ``True``, meaning Django will create the appropriate database
 tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`reset`
@@ -219,8 +215,6 @@ human_readable_permission_name)``.
 
 .. attribute:: Options.proxy
 
-.. versionadded:: 1.1
-
 If set to ``True``, a model which subclasses another model will be treated as
 a :ref:`proxy model <proxy-models>`.
 
@@ -237,8 +231,6 @@ This is a list of lists of fields that must be unique when considered together.
 It's used in the Django admin and is enforced at the database level (i.e., the
 appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
 statement).
-
-.. versionadded:: 1.0
 
 For convenience, unique_together can be a single list when dealing with a single
 set of fields::

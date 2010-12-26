@@ -88,8 +88,6 @@ cleanup
 
 .. django-admin:: cleanup
 
-.. versionadded:: 1.0
-
 Can be run as a cronjob or directly to clean out old data from the database
 (only expired sessions at the moment).
 
@@ -97,9 +95,6 @@ compilemessages
 ---------------
 
 .. django-admin:: compilemessages
-
-.. versionchanged:: 1.0
-   Before 1.0 this was the "bin/compile-messages.py" command.
 
 Compiles .po files created with ``makemessages`` to .mo files for use with
 the builtin gettext support. See :doc:`/topics/i18n/index`.
@@ -197,8 +192,6 @@ By default, ``dumpdata`` will output all data on a single line. This isn't
 easy for humans to read, so you can use the ``--indent`` option to
 pretty-print the output with a number of indentation spaces.
 
-.. versionadded:: 1.0
-
 The :djadminopt:`--exclude` option may be provided to prevent specific
 applications from being dumped.
 
@@ -206,8 +199,6 @@ applications from being dumped.
 
 The :djadminopt:`--exclude` option may also be provided to prevent specific
 models (specified as in the form of ``appname.ModelName``) from being dumped.
-
-.. versionadded:: 1.1
 
 In addition to specifying application names, you can provide a list of
 individual models, in the form of ``appname.Model``. If you specify a model
@@ -405,9 +396,6 @@ makemessages
 ------------
 
 .. django-admin:: makemessages
-
-.. versionchanged:: 1.0
-   Before 1.0 this was the ``bin/make-messages.py`` command.
 
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
@@ -963,8 +951,6 @@ testserver <fixture fixture ...>
 
 .. django-admin:: testserver
 
-.. versionadded:: 1.0
-
 Runs a Django development server (as in ``runserver``) using data from the
 given fixture(s).
 
@@ -1066,8 +1052,6 @@ createsuperuser
 ~~~~~~~~~~~~~~~
 
 .. django-admin:: createsuperuser
-
-.. versionadded:: 1.0
 
 This command is only available if Django's :doc:`authentication system
 </topics/auth>` (``django.contrib.auth``) is installed.

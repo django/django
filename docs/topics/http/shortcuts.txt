@@ -152,8 +152,6 @@ This example is equivalent to::
 
 .. function:: redirect(to[, permanent=False], *args, **kwargs)
 
-   .. versionadded:: 1.1
-
    Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.
 

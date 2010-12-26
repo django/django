@@ -28,8 +28,6 @@ Settings
 ``POSTGIS_TEMPLATE``
 ^^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 1.1
-
 .. versionchanged:: 1.2
 
 This setting may be used to customize the name of the PostGIS template
@@ -41,8 +39,6 @@ defaults to ``'template_postgis'`` (the same name used in the
 
 ``POSTGIS_VERSION``
 ^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 1.1
 
 When GeoDjango's spatial backend initializes on PostGIS, it has to perform
 a SQL query to determine the version in order to figure out what
@@ -118,8 +114,6 @@ spatial database entitled ``template_postgis``.
 SpatiaLite
 ==========
 
-.. versionadded:: 1.1
-
 You will need to download the `initialization SQL`__ script for SpatiaLite::
 
     $ wget http://www.gaia-gis.it/spatialite/init_spatialite-2.3.zip
@@ -137,8 +131,6 @@ Settings
 
 ``SPATIALITE_SQL``
 ^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 1.1
 
 By default, the GeoDjango test runner looks for the SpatiaLite SQL in the
 same directory where it was invoked (by default the same directory where
@@ -201,7 +193,7 @@ all of the databases in the settings file must be using one of the
 
 .. warning::
 
-    Do not change the :setting:`TEST_RUNNER` setting 
+    Do not change the :setting:`TEST_RUNNER` setting
     when running the GeoDjango tests with ``runtests.py``.
 
 Example

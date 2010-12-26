@@ -5,9 +5,6 @@ Pagination
 .. module:: django.core.paginator
    :synopsis: Classes to help you easily manage paginated data.
 
-.. versionchanged:: 1.0
-   Pagination facilities have been almost fully reworked.
-
 Django provides a few classes that help you manage paginated data -- that is,
 data that's split across several pages, with "Previous/Next" links. These
 classes live in :file:`django/core/paginator.py`.

@@ -357,7 +357,6 @@ file::
 
 SpatiaLite
 ----------
-.. versionadded:: 1.1
 
 .. note::
 

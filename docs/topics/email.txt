@@ -201,8 +201,6 @@ from the request's POST data, sends that to admin@example.com and redirects to
 The EmailMessage class
 ======================
 
-.. versionadded:: 1.0
-
 Django's :meth:`~django.core.mail.send_mail()` and
 :meth:`~django.core.mail.send_mass_mail()` functions are actually thin
 wrappers that make use of the :class:`~django.core.mail.EmailMessage` class.

@@ -317,8 +317,6 @@ activate dummy caching, set :setting:`BACKEND <CACHES-BACKEND>` like so::
 Using a custom cache backend
 ----------------------------
 
-.. versionadded:: 1.0
-
 While Django includes support for a number of cache backends out-of-the-box,
 sometimes you might want to use a customized cache backend. To use an external
 cache backend with Django, use the Python import path as the
@@ -416,10 +414,6 @@ arguments.
 The per-site cache
 ==================
 
-.. versionchanged:: 1.0
-    (previous versions of Django only provided a single ``CacheMiddleware`` instead
-    of the two pieces described below).
-
 Once the cache is set up, the simplest way to use caching is to cache your
 entire site. You'll need to add
 ``'django.middleware.cache.UpdateCacheMiddleware'`` and
@@ -472,8 +466,6 @@ Additionally, the cache middleware automatically sets a few headers in each
       again, from the :setting:`CACHE_MIDDLEWARE_SECONDS` setting.
 
 See :doc:`/topics/http/middleware` for more on middleware.
-
-.. versionadded:: 1.0
 
 If a view sets its own cache expiry time (i.e. it has a ``max-age`` section in
 its ``Cache-Control`` header) then the page will be cached until the expiry
@@ -585,8 +577,6 @@ URLconf.
 
 Template fragment caching
 =========================
-
-.. versionadded:: 1.0
 
 If you're after even more control, you can also cache template fragments using
 the ``cache`` template tag. To give your template access to this tag, put
@@ -705,8 +695,6 @@ return if the object doesn't exist in the cache::
     >>> cache.get('my_key', 'has expired')
     'has expired'
 
-.. versionadded:: 1.0
-
 To add a key only if it doesn't already exist, use the ``add()`` method.
 It takes the same parameters as ``set()``, but it will not attempt to
 update the cache if the key specified is already present::
@@ -760,8 +748,6 @@ Finally, if you want to delete all the keys in the cache, use
 from the cache, not just the keys set by your application. ::
 
     >>> cache.clear()
-
-.. versionadded:: 1.1
 
 You can also increment or decrement a key that already exists using the
 ``incr()`` or ``decr()`` methods, respectively. By default, the existing cache

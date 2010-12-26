@@ -474,8 +474,6 @@ connection_created
 .. data:: django.db.backends.signals.connection_created
    :module:
 
-.. versionadded:: 1.1
-
 .. versionchanged:: 1.2
    The connection argument was added
 

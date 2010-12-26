@@ -2,8 +2,6 @@
 Admin actions
 =============
 
-.. versionadded:: 1.1
-
 .. currentmodule:: django.contrib.admin
 
 The basic workflow of Django's admin is, in a nutshell, "select an object,

@@ -240,8 +240,6 @@ To do this, you can use the sites framework. A simple example::
 Caching the current ``Site`` object
 ===================================
 
-.. versionadded:: 1.0
-
 As the current site is stored in the database, each call to
 ``Site.objects.get_current()`` could result in a database query. But Django is a
 little cleverer than that: on the first request, the current site is cached, and
@@ -394,8 +392,6 @@ Here's how Django uses the sites framework:
 =======================
 
 .. _requestsite-objects:
-
-.. versionadded:: 1.0
 
 Some :doc:`django.contrib </ref/contrib/index>` applications take advantage of
 the sites framework but are architected in a way that doesn't *require* the

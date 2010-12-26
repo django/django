@@ -4,8 +4,6 @@ File Uploads
 
 .. currentmodule:: django.core.files
 
-.. versionadded:: 1.0
-
 When Django handles a file upload, the file data ends up placed in
 :attr:`request.FILES <django.http.HttpRequest.FILES>` (for more on the
 ``request`` object see the documentation for :doc:`request and response objects

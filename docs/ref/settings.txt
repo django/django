@@ -699,8 +699,6 @@ Never deploy a site into production with ``DEBUG`` turned on.
 DEBUG_PROPAGATE_EXCEPTIONS
 --------------------------
 
-.. versionadded:: 1.0
-
 Default: ``False``
 
 If set to True, Django's normal exception handling of view functions
@@ -766,8 +764,6 @@ site manager(s).
 DEFAULT_INDEX_TABLESPACE
 ------------------------
 
-.. versionadded:: 1.0
-
 Default: ``''`` (Empty string)
 
 Default tablespace to use for indexes on fields that don't specify
@@ -777,8 +773,6 @@ one, if the backend supports it.
 
 DEFAULT_TABLESPACE
 ------------------
-
-.. versionadded:: 1.0
 
 Default: ``''`` (Empty string)
 
@@ -882,8 +876,6 @@ trailing space.
 EMAIL_USE_TLS
 -------------
 
-.. versionadded:: 1.0
-
 Default: ``False``
 
 Whether to use a TLS (secure) connection when talking to the SMTP server.
@@ -892,8 +884,6 @@ Whether to use a TLS (secure) connection when talking to the SMTP server.
 
 FILE_CHARSET
 ------------
-
-.. versionadded:: 1.0
 
 Default: ``'utf-8'``
 
@@ -904,8 +894,6 @@ template files and initial SQL data files.
 
 FILE_UPLOAD_HANDLERS
 --------------------
-
-.. versionadded:: 1.0
 
 Default::
 
@@ -918,8 +906,6 @@ A tuple of handlers to use for uploading. See :doc:`/topics/files` for details.
 
 FILE_UPLOAD_MAX_MEMORY_SIZE
 ---------------------------
-
-.. versionadded:: 1.0
 
 Default: ``2621440`` (i.e. 2.5 MB).
 
@@ -958,8 +944,6 @@ system's standard umask.
 
 FILE_UPLOAD_TEMP_DIR
 --------------------
-
-.. versionadded:: 1.0
 
 Default: ``None``
 
@@ -1106,8 +1090,6 @@ standard :term:`language format<language code>`. For example, U.S. English is
 LANGUAGE_COOKIE_NAME
 --------------------
 
-.. versionadded:: 1.0
-
 Default: ``'django_language'``
 
 The name of the cookie to use for the language cookie. This can be whatever you
@@ -1206,8 +1188,6 @@ configuration process will be skipped.
 LOGIN_REDIRECT_URL
 ------------------
 
-.. versionadded:: 1.0
-
 Default: ``'/accounts/profile/'``
 
 The URL where requests are redirected after login when the
@@ -1221,8 +1201,6 @@ decorator, for example.
 LOGIN_URL
 ---------
 
-.. versionadded:: 1.0
-
 Default: ``'/accounts/login/'``
 
 The URL where requests are redirected for login, especially when using the
@@ -1232,8 +1210,6 @@ The URL where requests are redirected for login, especially when using the
 
 LOGOUT_URL
 ----------
-
-.. versionadded:: 1.0
 
 Default: ``'/accounts/logout/'``
 
@@ -1531,8 +1507,6 @@ should be different from ``LANGUAGE_COOKIE_NAME``). See the :doc:`/topics/http/s
 SESSION_COOKIE_PATH
 -------------------
 
-.. versionadded:: 1.0
-
 Default: ``'/'``
 
 The path set on the session cookie. This should either match the URL path of your
@@ -1559,11 +1533,6 @@ See the :doc:`/topics/http/sessions`.
 SESSION_ENGINE
 --------------
 
-.. versionadded:: 1.0
-
-.. versionchanged:: 1.1
-   The ``cached_db`` backend was added
-
 Default: ``django.contrib.sessions.backends.db``
 
 Controls where Django stores session data. Valid values are:
@@ -1589,8 +1558,6 @@ See the :doc:`/topics/http/sessions`.
 
 SESSION_FILE_PATH
 -----------------
-
-.. versionadded:: 1.0
 
 Default: ``None``
 

@@ -61,10 +61,6 @@ See :doc:`/topics/auth`.
 comments
 ========
 
-.. versionchanged:: 1.0
-   The comments application has been rewriten. See :doc:`/ref/contrib/comments/upgrade`
-   for information on howto upgrade.
-
 A simple yet flexible comments system. See :doc:`/ref/contrib/comments/index`.
 
 contenttypes

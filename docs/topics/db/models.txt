@@ -387,8 +387,6 @@ work; all are optional.
 Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 When you're only dealing with simple many-to-many relationships such as
 mixing and matching pizzas and toppings, a standard :class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
 you may need to associate data with the relationship between two models.
@@ -553,8 +551,6 @@ can be made; see :ref:`the model field reference <ref-onetoone>` for details.
 
 .. _One-to-one relationship model example: http://www.djangoproject.com/documentation/models/one_to_one/
 
-.. versionadded:: 1.0
-
 :class:`~django.db.models.OneToOneField` fields also accept one optional argument
 described in the :ref:`model field reference <ref-onetoone>`.
 
@@ -605,8 +601,6 @@ particular database engine.
 
 Custom field types
 ------------------
-
-.. versionadded:: 1.0
 
 If one of the existing model fields cannot be used to fit your purposes, or if
 you wish to take advantage of some less common database column types, you can
@@ -768,8 +762,6 @@ on :doc:`using raw SQL</topics/db/sql>`.
 
 Model inheritance
 =================
-
-.. versionadded:: 1.0
 
 Model inheritance in Django works almost identically to the way normal
 class inheritance works in Python. The only decision you have to make
@@ -1025,8 +1017,6 @@ to indicate that your field is the link back to the parent class.
 
 Proxy models
 ------------
-
-.. versionadded:: 1.1
 
 When using :ref:`multi-table inheritance <multi-table-inheritance>`, a new
 database table is created for each subclass of a model. This is usually the
