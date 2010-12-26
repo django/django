@@ -13,6 +13,9 @@ class USLocalFlavorTests(LocalFlavorTestCase):
 <option value="AS">American Samoa</option>
 <option value="AZ">Arizona</option>
 <option value="AR">Arkansas</option>
+<option value="AA">Armed Forces Americas</option>
+<option value="AE">Armed Forces Europe</option>
+<option value="AP">Armed Forces Pacific</option>
 <option value="CA">California</option>
 <option value="CO">Colorado</option>
 <option value="CT">Connecticut</option>
