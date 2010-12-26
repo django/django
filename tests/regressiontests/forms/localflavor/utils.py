@@ -6,8 +6,9 @@ from django.core.validators import EMPTY_VALUES
 
 class LocalFlavorTestCase(TestCase):
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=[],
-        field_kwargs={}, empty_value=u''):
-        """Asserts that a field behaves correctly with various inputs.
+            field_kwargs={}, empty_value=u''):
+        """
+        Asserts that a field behaves correctly with various inputs.
 
         Args:
             fieldclass: the class of the field to be tested.
@@ -15,9 +16,10 @@ class LocalFlavorTestCase(TestCase):
                     cleaned values.
             invalid: a dictionary mapping invalid inputs to one or more
                     raised error messages.
-            fieldargs: the args passed to instantiate the field
-            fieldkwargs: the kwargs passed to instantiate the field
-            emptyvalue: the expected clean output for inputs in EMPTY_VALUES
+            field_args: the args passed to instantiate the field
+            field_kwargs: the kwargs passed to instantiate the field
+            empty_value: the expected clean output for inputs in EMPTY_VALUES
+
         """
         required = fieldclass(*field_args, **field_kwargs)
         optional = fieldclass(*field_args, **dict(field_kwargs, required=False))
