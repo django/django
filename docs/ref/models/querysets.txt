@@ -279,13 +279,6 @@ ordering piece of data for each of the main items you are selecting, the
 ordering may well be exactly what you want to do. Use ordering on multi-valued
 fields with care and make sure the results are what you expect.
 
-.. versionadded:: 1.0
-
-The syntax for ordering across related models has changed. See the `Django 0.96
-documentation`_ for the old behaviour.
-
-.. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
-
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
@@ -303,8 +296,6 @@ reverse
 ~~~~~~~
 
 .. method:: reverse()
-
-.. versionadded:: 1.0
 
 Use the ``reverse()`` method to reverse the order in which a queryset's
 elements are returned. Calling ``reverse()`` a second time restores the
@@ -432,11 +423,6 @@ A couple of subtleties that are worth mentioning:
       if the ``extra()`` clause is used after the ``values()``, the
       fields added by the select will be included automatically.
 
-.. versionadded:: 1.0
-
-Previously, it was not possible to pass ``blog_id`` to ``values()`` in the above
-example, only ``blog``.
-
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
 functionality of a model instance object. It's more efficient to select only
@@ -458,8 +444,6 @@ values_list
 ~~~~~~~~~~~
 
 .. method:: values_list(*fields)
-
-.. versionadded:: 1.0
 
 This is similar to ``values()`` except that instead of returning dictionaries,
 it returns tuples when iterated over. Each tuple contains the value from the
@@ -525,8 +509,6 @@ none
 
 .. method:: none()
 
-.. versionadded:: 1.0
-
 Returns an ``EmptyQuerySet`` -- a ``QuerySet`` that always evaluates to
 an empty list. This can be used in cases where you know that you should
 return an empty result set and your caller is expecting a ``QuerySet``
@@ -541,8 +523,6 @@ all
 ~~~
 
 .. method:: all()
-
-.. versionadded:: 1.0
 
 Returns a *copy* of the current ``QuerySet`` (or ``QuerySet`` subclass you
 pass in). This can be useful in some situations where you might want to pass
@@ -657,11 +637,6 @@ call). It's an error to use both a list of fields and the ``depth``
 parameter in the same ``select_related()`` call, since they are
 conflicting options.
 
-.. versionadded:: 1.0
-
-Both the ``depth`` argument and the ability to specify field names in the call
-to ``select_related()`` are new in Django version 1.0.
-
 .. versionchanged:: 1.2
 
 You can also refer to the reverse direction of a ``OneToOneFields`` in
@@ -733,8 +708,6 @@ of the arguments is required, but you should use at least one of them.
         subqueries are not required in Django's ``select`` clauses. Also note that
         some database backends, such as some MySQL versions, don't support
         subqueries.
-
-        .. versionadded:: 1.0
 
         In some rare cases, you might wish to pass parameters to the SQL fragments
         in ``extra(select=...)``. For this purpose, use the ``select_params``
@@ -1309,12 +1282,6 @@ SQL equivalents::
     SELECT ... WHERE id = 14;
     SELECT ... WHERE id IS NULL;
 
-.. versionchanged:: 1.0
-   The semantics of ``id__exact=None`` have changed in Django 1.0. Previously,
-   it was (intentionally) converted to ``WHERE id = NULL`` at the SQL level,
-   which would never match anything. It has now been changed to behave the
-   same as ``id__isnull=True``.
-
 .. admonition:: MySQL comparisons
 
     In MySQL, a database table's "collation" setting determines whether
@@ -1723,8 +1690,6 @@ full text searches. `See the MySQL documentation for additional details.
 regex
 ~~~~~
 
-.. versionadded:: 1.0
-
 Case-sensitive regular expression match.
 
 The regular expression syntax is that of the database backend in use.
@@ -1753,8 +1718,6 @@ regular expression syntax is recommended.
 
 iregex
 ~~~~~~
-
-.. versionadded:: 1.0
 
 Case-insensitive regular expression match.
 

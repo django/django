@@ -2,8 +2,6 @@
 Managing files
 ==============
 
-.. versionadded:: 1.0
-
 This document describes Django's file access APIs.
 
 By default, Django stores files locally, using the :setting:`MEDIA_ROOT` and

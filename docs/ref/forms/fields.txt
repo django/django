@@ -230,8 +230,6 @@ fields. We've specified ``auto_id=False`` to simplify the output::
 ``error_messages``
 ~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 .. attribute:: Field.error_messages
 
 The ``error_messages`` argument lets you override the default messages that the
@@ -302,11 +300,6 @@ For each field, we describe the default widget used if you don't specify
     * Validates that the value is ``True`` (e.g. the check box is checked) if
       the field has ``required=True``.
     * Error message keys: ``required``
-
-.. versionchanged:: 1.0
-   The empty value for a ``CheckboxInput`` (and hence the standard
-   ``BooleanField``) has changed to return ``False`` instead of ``None`` in
-   the Django 1.0.
 
 .. note::
 
@@ -445,13 +438,8 @@ If no ``input_formats`` argument is provided, the default input formats are::
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
     '%m/%d/%y',              # '10/25/06'
 
-.. versionchanged:: 1.0
-   The ``DateTimeField`` used to use a ``TextInput`` widget by default. This has now changed.
-
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 .. class:: DecimalField(**kwargs)
 
@@ -505,8 +493,6 @@ given length.
 ``FileField``
 ~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 .. class:: FileField(**kwargs)
 
     * Default widget: ``FileInput``
@@ -524,8 +510,6 @@ When you use a ``FileField`` in a form, you must also remember to
 
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 .. class:: FilePathField(**kwargs)
 
@@ -570,8 +554,6 @@ These control the range of values permitted in the field.
 
 ``ImageField``
 ~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 .. class:: ImageField(**kwargs)
 

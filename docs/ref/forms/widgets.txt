@@ -57,8 +57,6 @@ commonly used groups of widgets:
 
 .. class:: DateTimeInput
 
-    .. versionadded:: 1.0
-
     Date/time input as a simple text box: ``<input type='text' ...>``
 
     Takes one optional argument:

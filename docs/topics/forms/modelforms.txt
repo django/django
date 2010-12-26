@@ -111,11 +111,6 @@ the full list of conversions:
                                      ``widget=forms.Textarea``
     ===============================  ========================================
 
-
-.. versionadded:: 1.0
-    The ``FloatField`` form field and ``DecimalField`` model and form fields
-    are new in Django 1.0.
-
 .. versionadded:: 1.2
     The ``BigIntegerField`` is new in Django 1.2.
 

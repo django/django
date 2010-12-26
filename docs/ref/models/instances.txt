@@ -133,9 +133,6 @@ To save an object back to the database, call ``save()``:
 
 .. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS])
 
-.. versionadded:: 1.0
-   The ``force_insert`` and ``force_update`` arguments were added.
-
 .. versionadded:: 1.2
    The ``using`` argument was added.
 
@@ -167,8 +164,6 @@ documentation for ``AutoField`` for more details.
 
 The ``pk`` property
 ~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 .. attribute:: Model.pk
 
@@ -277,8 +272,6 @@ auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
 
 Forcing an INSERT or UPDATE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 In some rare circumstances, it's necessary to be able to force the ``save()``
 method to perform an SQL ``INSERT`` and not fall back to doing an ``UPDATE``.

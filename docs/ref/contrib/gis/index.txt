@@ -4,8 +4,6 @@
 GeoDjango
 =========
 
-.. versionadded:: 1.0
-
 .. module:: django.contrib.gis
    :synopsis: Geographic Information System (GIS) extensions for Django
 

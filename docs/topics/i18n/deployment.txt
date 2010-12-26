@@ -81,12 +81,8 @@ following this algorithm:
 
     * Failing that, it looks for a cookie.
 
-      .. versionchanged:: 1.0
-
-      In Django version 0.96 and before, the cookie's name is hard-coded to
-      ``django_language``. In Django 1,0, The cookie name is set by the
-      ``LANGUAGE_COOKIE_NAME`` setting. (The default name is
-      ``django_language``.)
+      The name of the cookie used is set by the ``LANGUAGE_COOKIE_NAME``
+      setting. (The default name is ``django_language``.)
 
     * Failing that, it looks at the ``Accept-Language`` HTTP header. This
       header is sent by your browser and tells the server which language(s) you

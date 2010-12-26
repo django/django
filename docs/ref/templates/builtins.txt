@@ -19,8 +19,6 @@ Built-in tag reference
 autoescape
 ~~~~~~~~~~
 
-.. versionadded:: 1.0
-
 Control the current auto-escaping behavior. This tag takes either ``on`` or
 ``off`` as an argument and that determines whether auto-escaping is in effect
 inside the block. The block is closed with an ``endautoescape`` ending tag.
@@ -72,8 +70,7 @@ Forgeries </ref/contrib/csrf>`.
 cycle
 ~~~~~
 
-.. versionchanged:: 1.0
-    Cycle among the given strings or variables each time this tag is encountered.
+Cycle among the given strings or variables each time this tag is encountered.
 
 Within a loop, cycles among the given strings each time through the
 loop::
@@ -238,8 +235,6 @@ provided in ``athlete_list``::
     </ul>
 
 You can loop over a list in reverse by using ``{% for obj in list reversed %}``.
-
-.. versionadded:: 1.0
 
 If you need to loop over a list of lists, you can unpack the values
 in each sub-list into individual variables. For example, if your context
@@ -887,8 +882,6 @@ such as this:
 
 The template tag will output the string ``/clients/client/123/``.
 
-.. versionadded:: 1.0
-
 If you're using :ref:`named URL patterns <naming-url-patterns>`, you can
 refer to the name of the pattern in the ``url`` tag instead of using the
 path to the view.
@@ -896,8 +889,6 @@ path to the view.
 Note that if the URL you're reversing doesn't exist, you'll get an
 :exc:`NoReverseMatch` exception raised, which will cause your site to display an
 error page.
-
-.. versionadded:: 1.0
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
 different call::
@@ -959,8 +950,6 @@ which is rounded up to 88).
 
 with
 ~~~~
-
-.. versionadded:: 1.0
 
 Caches a complex variable under a simpler name. This is useful when accessing
 an "expensive" method (e.g., one that hits the database) multiple times.
@@ -1281,17 +1270,10 @@ applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
 multiple escaping passes to be applied, use the ``force_escape`` filter.
 
-.. versionchanged:: 1.0
-    Due to auto-escaping, the behavior of this filter has changed slightly.
-    The replacements are only made once, after
-    all other filters are applied -- including filters before and after it.
-
 .. templatefilter:: escapejs
 
 escapejs
 ~~~~~~~~
-
-.. versionadded:: 1.0
 
 Escapes characters for use in JavaScript strings. This does *not* make the
 string safe for use in HTML, but does protect you from syntax errors when using
@@ -1336,8 +1318,9 @@ If ``value`` is the list ``['a', 'b', 'c']``, the output will be ``'a'``.
 fix_ampersands
 ~~~~~~~~~~~~~~
 
-.. versionchanged:: 1.0
-    This is rarely useful as ampersands are now automatically escaped. See escape_ for more information.
+..note::
+
+    This is rarely useful as ampersands are automatically escaped. See escape_ for more information.
 
 Replaces ampersands with ``&amp;`` entities.
 
@@ -1393,8 +1376,6 @@ with an argument of ``-1``.
 
 force_escape
 ~~~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 Applies HTML escaping to a string (see the ``escape`` filter for details).
 This filter is applied *immediately* and returns a new, escaped string. This
@@ -1454,8 +1435,6 @@ If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 
 last
 ~~~~
-
-.. versionadded:: 1.0
 
 Returns the last item in a list.
 
@@ -1926,9 +1905,6 @@ unordered_list
 Recursively takes a self-nested list and returns an HTML unordered list --
 WITHOUT opening and closing <ul> tags.
 
-.. versionchanged:: 1.0
-   The format accepted by ``unordered_list`` has changed to be easier to understand.
-
 The list is assumed to be in the proper format. For example, if ``var`` contains
 ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
 ``{{ var|unordered_list }}`` would return::
@@ -1945,7 +1921,7 @@ The list is assumed to be in the proper format. For example, if ``var`` contains
     </ul>
     </li>
 
-Note: the previous more restrictive and verbose format is still supported:
+Note: An older, more restrictive and verbose input format is also supported:
 ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
 
 .. templatefilter:: upper

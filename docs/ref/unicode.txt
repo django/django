@@ -2,8 +2,6 @@
 Unicode data
 ============
 
-.. versionadded:: 1.0
-
 Django natively supports Unicode data everywhere. Providing your database can
 somehow store the data, you can safely pass around Unicode strings to
 templates, models and the database.

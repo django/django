@@ -225,8 +225,6 @@ The remaining arguments should be tuples in this format::
 url
 ---
 
-.. versionadded:: 1.0
-
 .. function:: url(regex, view, kwargs=None, name=None, prefix='')
 
 You can use the ``url()`` function, instead of a tuple, as an argument to
@@ -637,8 +635,6 @@ the view prefix (as explained in "The view prefix" above) will have no effect.
 Naming URL patterns
 ===================
 
-.. versionadded:: 1.0
-
 It's fairly common to use the same view function in multiple URL patterns in
 your URLconf. For example, these two URL patterns both point to the ``archive``
 view::
@@ -870,21 +866,19 @@ The :func:`django.db.models.permalink` decorator is useful for writing short
 methods that return a full URL path. For example, a model's
 ``get_absolute_url()`` method. See :func:`django.db.models.permalink` for more.
 
-get_script_prefix() 
-------------------- 
- 
-.. function:: get_script_prefix() 
- 
-.. versionadded:: 1.0 
- 
-Normally, you should always use :func:`~django.core.urlresolvers.reverse` or 
-:func:`~django.db.models.permalink` to define URLs within your application. 
-However, if your application constructs part of the URL hierarchy itself, you 
-may occasionally need to generate URLs. In that case, you need to be able to 
-find the base URL of the Django project within its web server 
-(normally, :func:`~django.core.urlresolvers.reverse` takes care of this for  
-you). In that case, you can call ``get_script_prefix()``, which will return the 
-script prefix portion of the URL for your Django project. If your Django 
-project is at the root of its webserver, this is always ``"/"``, but it can be 
-changed, for instance  by using ``django.root`` (see :ref:`How to use 
-Django with Apache and mod_python <howto-deployment-modpython>`). 
+get_script_prefix()
+-------------------
+
+.. function:: get_script_prefix()
+
+Normally, you should always use :func:`~django.core.urlresolvers.reverse` or
+:func:`~django.db.models.permalink` to define URLs within your application.
+However, if your application constructs part of the URL hierarchy itself, you
+may occasionally need to generate URLs. In that case, you need to be able to
+find the base URL of the Django project within its web server
+(normally, :func:`~django.core.urlresolvers.reverse` takes care of this for
+you). In that case, you can call ``get_script_prefix()``, which will return the
+script prefix portion of the URL for your Django project. If your Django
+project is at the root of its webserver, this is always ``"/"``, but it can be
+changed, for instance  by using ``django.root`` (see :ref:`How to use
+Django with Apache and mod_python <howto-deployment-modpython>`).

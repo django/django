@@ -191,8 +191,6 @@ Methods
 
     .. method:: models.User.set_unusable_password()
 
-        .. versionadded:: 1.0
-
         Marks the user as having no password set.  This isn't the same as
         having a blank string for a password.
         :meth:`~django.contrib.auth.models.User.check_password()` for this user
@@ -203,8 +201,6 @@ Methods
         against an existing external source such as an LDAP directory.
 
     .. method:: models.User.has_usable_password()
-
-        .. versionadded:: 1.0
 
         Returns ``False`` if
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
@@ -396,9 +392,6 @@ to salt the raw password to create the hash. Note that the ``crypt`` method is
 only supported on platforms that have the standard Python ``crypt`` module
 available.
 
-.. versionadded:: 1.0
-    Support for the ``crypt`` module is new in Django 1.0.
-
 For example::
 
     sha1$a1976$a36cc8cbf81742a8fb52e221aaeab48ed7f58ab4
@@ -450,9 +443,6 @@ they're used by Web requests, as explained in the next section.
 
 Creating superusers
 -------------------
-
-.. versionadded:: 1.0
-   The ``manage.py createsuperuser`` command is new.
 
 :djadmin:`manage.py syncdb <syncdb>` prompts you to create a superuser the
 first time you run it after adding ``'django.contrib.auth'`` to your
@@ -653,9 +643,6 @@ How to log a user out
 
     Note that :func:`~django.contrib.auth.logout()` doesn't throw any errors if
     the user wasn't logged in.
-
-    .. versionchanged:: 1.0
-       Calling ``logout()`` now cleans session data.
 
     When you call :func:`~django.contrib.auth.logout()`, the session data for
     the current request is completely cleaned out. All existing data is
