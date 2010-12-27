@@ -98,6 +98,9 @@ compress content bodies less than 200 bytes long, when the response code is
 something other than 200, JavaScript files (for IE compatibility), or
 responses that have the ``Content-Encoding`` header already specified.
 
+GZip compression can be applied to individual views using the
+:func:`~django.views.decorators.http.gzip_page()` decorator.
+
 Conditional GET middleware
 --------------------------
 
