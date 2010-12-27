@@ -73,7 +73,7 @@ class CZBirthNumberField(Field):
             import warnings
             warnings.warn(
                 "Support for validating the gender of a CZ Birth number has been deprecated.",
-                DeprecationWarning)
+                PendingDeprecationWarning)
             if gender == 'f':
                 female_const = 50
             elif gender == 'm':

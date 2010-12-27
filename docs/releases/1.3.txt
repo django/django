@@ -539,3 +539,11 @@ GeoDjango
     to indicate possible faulty application code.  A warning is now raised
     if :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` is called when
     the SRID of the geometry is less than 0 or ``None``.
+
+``CZBirthNumberField.clean``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously this field's ``clean()`` method accepted a second, gender, argument
+which allowed stronger validation checks to be made, however since this
+argument could never actually be passed from the Django form machinery it is
+now pending deprecation.
