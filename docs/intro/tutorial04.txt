@@ -238,7 +238,7 @@ Change it like so::
     urlpatterns = patterns('',
         (r'^$',
             ListView.as_view(
-                model=Poll,
+                queryset=Poll.objects.order_by('-pub_date')[:5],
                 context_object_name='latest_poll_list',
                 template_name='polls/index.html')),
         (r'^(?P<pk>\d+)/$',
