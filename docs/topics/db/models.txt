@@ -751,6 +751,14 @@ built-in model methods, adding new arguments. If you use ``*args,
 **kwargs`` in your method definitions, you are guaranteed that your
 code will automatically support those arguments when they are added.
 
+.. admonition:: Overriding Delete
+
+    Note that the :meth:`~Model.delete()` method for an object is not
+    necessarily called when :ref:`deleting objects in bulk using a
+    QuerySet<topics-db-queries-delete>`. To ensure customized delete logic
+    gets executed, you can use :data:`~django.db.models.signals.pre_save`
+    and/or :data:`~django.db.models.signals.post_save` signals.
+
 Executing custom SQL
 --------------------
 
