@@ -138,4 +138,3 @@ class CZICNumberField(Field):
             return u'%s' % value
 
         raise ValidationError(self.error_messages['invalid'])
-
