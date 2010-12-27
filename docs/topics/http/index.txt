@@ -8,6 +8,7 @@ Information on handling HTTP requests in Django:
    
    urls
    views
+   decorators
    file-uploads
    shortcuts
    generic-views

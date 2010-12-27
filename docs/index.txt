@@ -91,7 +91,8 @@ The view layer
     * **The basics:**
       :doc:`URLconfs <topics/http/urls>` |
       :doc:`View functions <topics/http/views>` |
-      :doc:`Shortcuts <topics/http/shortcuts>`
+      :doc:`Shortcuts <topics/http/shortcuts>` |
+      :doc:`Decorators <topics/http/decorators>`
 
     * **Reference:**
       :doc:`Request/response objects <ref/request-response>` |

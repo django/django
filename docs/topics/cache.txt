@@ -950,6 +950,8 @@ exist to instruct upstream caches to differ their cache contents depending on
 designated variables, and to tell caching mechanisms not to cache particular
 pages. We'll look at some of these headers in the sections that follow.
 
+.. _using-vary-headers:
+
 Using Vary headers
 ==================
 

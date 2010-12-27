@@ -1,0 +1,71 @@
+===============
+View Decorators
+===============
+
+.. currentmodule:: django.views.decorators.http
+
+Django provides several decorators that can be applied to views to support
+various HTTP features.
+
+Allowed HTTP Methods
+====================
+
+.. function:: require_http_methods(request_method_list)
+
+This decorator is used to make a view only accept particular request methods.
+Usage::
+
+    from django.views.decorators.http import require_http_methods
+    @require_http_methods(["GET", "POST"])
+    def my_view(request):
+        # I can assume now that only GET or POST requests make it this far
+        # ...
+        pass
+
+Note that request methods should be in uppercase.
+
+.. function:: require_GET()
+
+Decorator to require that a view only accept the GET method.
+
+.. function:: require_POST()
+
+Decorator to require that a view only accept the POST method.
+
+Conditional view processing
+===========================
+
+.. function:: condition(etag_func=None, last_modified_func=None)
+
+.. function:: etag(etag_func)
+
+.. function:: last_modified(last_modified_func)
+
+These decorators can be used to generate ``ETag`` and ``Last-Modified``
+headers; see
+:doc:`conditional view processing </topics/conditional-view-processing>`.
+
+.. currentmodule:: django.views.decorators.http
+
+GZip Compression
+================
+
+.. function:: gzip_page()
+
+This decorator compresses content if the browser allows gzip compression.
+It sets the ``Vary`` header accordingly, so that caches will base their
+storage on the ``Accept-Encoding`` header.
+
+.. currentmodule:: django.views.decorators.vary
+
+Vary Headers
+============
+
+The ``Vary`` header defines which request headers a cache mechanism should take
+into account when building its cache key.
+
+.. function:: vary_on_cookie(func)
+
+.. function:: vary_on_headers(*headers)
+
+See :ref:`using vary headers <using-vary-headers>`.
