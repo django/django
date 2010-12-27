@@ -29,7 +29,7 @@ application, you might have the following views:
 
 In our poll application, we'll have the following four views:
 
-    * Poll "archive" page -- displays the latest few polls.
+    * Poll "index" page -- displays the latest few polls.
 
     * Poll "detail" page -- displays a poll question, with no results but
       with a form to vote.
