@@ -921,6 +921,27 @@ templates used by the :class:`ModelAdmin` views:
                     kwargs["queryset"] = Car.objects.filter(owner=request.user)
                 return super(MyModelAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
+.. method:: ModelAdmin.has_add_permission(self, request)
+
+    Should return ``True`` if adding an object is permitted, ``False``
+    otherwise.
+
+.. method:: ModelAdmin.has_change_permission(self, request, obj=None)
+
+    Should return ``True`` if editing obj is permitted, ``False`` otherwise.
+    If obj is ``None``, should return ``True`` or ``False`` to indicate whether
+    editing of objects of this type is permitted in general (e.g., ``False``
+    will be interpreted as meaning that the current user is not permitted to
+    edit any object of this type).
+
+.. method:: ModelAdmin.has_delete_permission(self, request, obj=None)
+
+    Should return ``True`` if deleting obj is permitted, ``False`` otherwise.
+    If obj is ``None``, should return ``True`` or ``False`` to indicate whether
+    deleting objects of this type is permitted in general (e.g., ``False`` will
+    be interpreted as meaning that the current user is not permitted to delete
+    any object of this type).
+
 .. method:: ModelAdmin.queryset(self, request)
 
     The ``queryset`` method on a ``ModelAdmin`` returns a
