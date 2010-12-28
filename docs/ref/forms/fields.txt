@@ -460,7 +460,8 @@ Takes four optional arguments:
 .. attribute:: DecimalField.max_value
 .. attribute:: DecimalField.min_value
 
-    These attributes define the limits for the fields value.
+    These control the range of values permitted in the field, and should be
+    given as ``decimal.Decimal`` values.
 
 .. attribute:: DecimalField.max_digits
 
