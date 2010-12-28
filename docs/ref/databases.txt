@@ -360,6 +360,14 @@ Furthermore, if you are using a version of MySQL prior to 5.0.3, all of those
 column types have a maximum length restriction of 255 characters, regardless
 of whether ``unique=True`` is specified or not.
 
+DateTime fields
+~~~~~~~~~~~~~~~
+
+MySQL does not have a timezone-aware column type. If an attempt is made to
+store a timezone-aware ``time`` or ``datetime`` to a
+:class:`~django.db.models.TimeField` or :class:`~django.db.models.DateTimeField`
+respectively, a ``ValueError`` is raised rather than truncating data.
+
 .. _sqlite-notes:
 
 SQLite notes
