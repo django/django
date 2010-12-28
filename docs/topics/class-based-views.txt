@@ -154,6 +154,13 @@ name. In this case, the inferred template will be
 app that defines the model, while the "publisher" bit is just the lowercased
 version of the model's name.
 
+.. note::
+    Thus, when (for example) the :class:`django.template.loaders.app_directories.Loader`
+    template loader is enabled in :setting:`TEMPLATE_LOADERS`, the template
+    location would be::
+
+        /path/to/project/books/templates/books/publisher_list.html
+
 .. highlightlang:: html+django
 
 This template will be rendered against a context containing a variable called
