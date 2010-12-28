@@ -340,6 +340,9 @@ Has two optional arguments for validation:
     * Validates that the given value exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
 
+The ``invalid_choice`` error message may contain ``%(value)s``, which will be
+replaced with the selected choice.
+
 Takes one extra required argument:
 
 .. attribute:: ChoiceField.choices
@@ -449,6 +452,9 @@ If no ``input_formats`` argument is provided, the default input formats are::
       ``min_value``, ``max_digits``, ``max_decimal_places``,
       ``max_whole_digits``
 
+The ``max_value`` and ``min_value`` error messages may contain
+``%(limit_value)s``, which will be substituted by the appropriate limit.
+
 Takes four optional arguments:
 
 .. attribute:: DecimalField.max_value
@@ -497,13 +503,18 @@ given length.
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
     * Validates that non-empty file data has been bound to the form.
-    * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``
+    * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
+      ``max_length``
 
 To learn more about the ``UploadedFile`` object, see the :doc:`file uploads
 documentation </topics/http/file-uploads>`.
 
 When you use a ``FileField`` in a form, you must also remember to
 :ref:`bind the file data to the form <binding-uploaded-files>`.
+
+The ``max_length`` error refers to the length of the filename. In the error
+message for that key, ``%(max)d`` will be replaced with the maximum filename
+length and ``%(length)d`` will be replaced with the current filename length.
 
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
@@ -583,6 +594,9 @@ When you use an ``ImageField`` on a form, you must also remember to
     * Error message keys: ``required``, ``invalid``, ``max_value``,
       ``min_value``
 
+The ``max_value`` and ``min_value`` error messages may contain
+``%(limit_value)s``, which will be substituted by the appropriate limit.
+
 Takes two optional arguments for validation:
 
 .. attribute:: IntegerField.max_value
@@ -614,6 +628,9 @@ Takes two optional arguments for validation:
       of choices.
     * Error message keys: ``required``, ``invalid_choice``, ``invalid_list``
 
+The ``invalid_choice`` error message may contain ``%(value)s``, which will be
+replaced with the selected choice.
+
 Takes one extra required argument, ``choices``, as for ``ChoiceField``.
 
 ``TypedMultipleChoiceField``
@@ -631,6 +648,9 @@ takes two extra arguments, ``coerce`` and ``empty_value``.
     * Validates that the given values exists in the list of choices and can be
       coerced.
     * Error message keys: ``required``, ``invalid_choice``
+
+The ``invalid_choice`` error message may contain ``%(value)s``, which will be
+replaced with the selected choice.
 
 Takes two extra arguments, ``coerce`` and ``empty_value``, as for ``TypedChoiceField``.
 
