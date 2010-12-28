@@ -1,0 +1,52 @@
+==========================
+Django 1.2.4 release notes
+==========================
+
+Welcome to Django 1.2.4!
+
+This is the fourth "bugfix" release in the Django 1.2 series,
+improving the stability and performance of the Django 1.2 codebase.
+
+Django 1.2.4 maintains backwards compatibility with Django
+1.2.3, but contain a number of fixes and other
+improvements. Django 1.2.4 is a recommended upgrade for any
+development or deployment currently using or targeting Django 1.2.
+
+For full details on the new features, backwards incompatibilities, and
+deprecated features in the 1.2 branch, see the :doc:`/releases/1.2`.
+
+One new feature
+===============
+
+Ordinarily, a point release would not include new features, but in the
+case of Django 1.2.4, we have made an exception to this rule.
+
+One of the bugs fixed in Django 1.2.4 involves a set of
+circumstances whereby a running a test suite on a multiple database
+configuration could cause the original source database (i.e., the
+actual production database) to be dropped, causing catastrophic loss
+of data. In order to provide a fix for this problem, it was necessary
+to introduce a new setting -- :setting:`TEST_DEPENDENCIES` -- that
+allows you to define any creation order dependencies in your database
+configuration.
+
+Most users -- even users with multiple-database configurations -- need
+not be concerned about the data loss bug, or the manual configuration of
+:setting:`TEST_DEPENDENCIES`. See the `original problem report`_
+documentation on :ref:`controlling the creation order of test
+databases <topics-testing-creation-dependencies>` for details.
+
+.. _original problem report: http://code.djangoproject.com/ticket/14415
+
+GeoDjango
+=========
+
+The function-based :setting:`TEST_RUNNER` previously used to execute
+the GeoDjango test suite, :func:`django.contrib.gis.tests.run_gis_tests`,
+was finally deprecated in favor of a class-based test runner,
+:class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner`, added in this
+release.
+
+In addition, the GeoDjango test suite is now included when
+:ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
+and using :ref:`spatial database backends <spatial-backends>`.
