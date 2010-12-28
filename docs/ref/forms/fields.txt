@@ -638,6 +638,8 @@ Takes one extra required argument, ``choices``, as for ``ChoiceField``.
 
 .. class:: TypedMultipleChoiceField(**kwargs)
 
+.. versionadded:: 1.3
+
 Just like a :class:`MultipleChoiceField`, except :class:`TypedMultipleChoiceField`
 takes two extra arguments, ``coerce`` and ``empty_value``.
 
