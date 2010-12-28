@@ -943,7 +943,8 @@ For more details, please see the Debian instructions for :ref:`etch` below.
 
 Use the synaptic package manager to install the following packages::
 
-    $ sudo apt-get install binutils libgdal1-1.5.0 postgresql-8.3-postgis postgresql-server-dev-8.3 python-psycopg2 python-setuptools
+    $ sudo apt-get install binutils libgdal1-1.5.0 postgresql-8.3-postgis \
+        postgresql-server-dev-8.3 python-psycopg2 python-setuptools
 
 Afterwards, you may install Django with Python's ``easy_install`` script (the
 Ubuntu package ``python-django`` uses an older version missing several
@@ -968,6 +969,17 @@ Optional packages to consider:
 * ``libgeoip1``: for :ref:`GeoIP <ref-geoip>` support
 * ``gdal-bin``: for GDAL command line programs like ``ogr2ogr``
 * ``python-gdal`` for GDAL's own Python bindings -- includes interfaces for raster manipulation
+
+10.04
+~~~~~
+
+In Ubuntu 10.04 LTS PostgreSQL was upgraded to 8.4, as was GDAL, which is now
+at version 1.6.0. Because of that, the package installation mentioned above
+has to be slightly changed::
+
+	$ sudo apt-get install binutils libgdal1-1.6.0 postgresql-8.4-postgis \
+        postgresql-server-dev-8.4 python-psycopg2 python-setuptools
+
 
 .. note::
 
