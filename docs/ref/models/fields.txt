@@ -546,10 +546,17 @@ four-digit year, ``'%m'`` is the two-digit month and ``'%d'`` is the two-digit
 day. If you upload a file on Jan. 15, 2007, it will be saved in the directory
 ``/home/media/photos/2007/01/15``.
 
-If you want to retrieve the upload file's on-disk filename, or a URL that refers
-to that file, or the file's size, you can use the
-:attr:`~django.core.files.File.name`, :attr:`~django.core.files.File.url`
-and :attr:`~django.core.files.File.size` attributes; see :doc:`/topics/files`.
+If you wanted to retrieve the uploaded file's on-disk filename, or the file's
+size, you could use the :attr:`~django.core.files.File.name` and
+:attr:`~django.core.files.File.size` attributes respectively; for more 
+information on the available attributes and methods, see the
+:class:`~django.core.files.File` class reference and the :doc:`/topics/files`
+topic guide.
+
+The uploaded file's relative URL can be obtained using the
+:attr:`~django.db.models.fields.FileField.url` attribute. Internally,
+this calls the :meth:`~django.core.files.storage.Storage.url` method of the
+underlying :class:`~django.core.files.storage.Storage` class.
 
 Note that whenever you deal with uploaded files, you should pay close attention
 to where you're uploading them and what type of files they are, to avoid
