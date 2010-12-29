@@ -199,11 +199,9 @@ conversion. We will:
 
     1. Convert the URLconf.
 
-    2. Rename a few templates.
+    2. Delete some of the old, unneeded views.
 
-    3. Delete some of the old, unneeded views.
-
-    4. Fix up URL handling for the new views.
+    3. Fix up URL handling for the new views.
 
 Read on for details.
 
