@@ -455,6 +455,12 @@ decimal places::
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 
+.. note::
+
+    For more information about the differences between the
+    :class:`FloatField` and :class:`DecimalField` classes, please
+    see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`. 
+
 ``EmailField``
 --------------
 
@@ -660,6 +666,20 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 A floating-point number represented in Python by a ``float`` instance.
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
+
+.. _floatfield_vs_decimalfield:
+
+.. admonition:: ``FloatField`` vs. ``DecimalField``
+
+    The :class:`FloatField` class is sometimes mixed up with the
+    :class:`DecimalField` class. Although they both represent real numbers, they
+    represent those numbers differently. ``FloatField`` uses Python's ``float``
+    type internally, while ``DecimalField`` uses Python's ``Decimal`` type. For
+    information on the difference between the two, see Python's documentation on
+    `Decimal fixed point and floating point arithmetic`_.
+
+.. _Decimal fixed point and floating point arithmetic: http://docs.python.org/library/decimal.html
+
 
 ``ImageField``
 --------------
