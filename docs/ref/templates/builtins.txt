@@ -800,6 +800,27 @@ filter, if your data is in a list of dictionaries::
 
     {% regroup people|dictsort:"gender" by gender as gender_list %}
 
+
+Grouping on other properties
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Any valid template lookup is a legal grouping attribute for the regroup
+tag, including methods, attributes, dictionary keys and list items. For
+example, if the "gender" field is a foreign key to a class with
+an attribute "description," you could use::
+
+    {% regroup people by gender.description as gender_list %}
+
+Or, if ``gender`` is a field with ``choices``, it will have a
+:meth:`~django.db.models.Model.get_FOO_display` method available as an
+attribute, allowing  you to group on the display string rather than the
+``choices`` key::
+
+    {% regroup people by get_gender_display as gender_list %}
+
+``{{ gender.grouper }}`` will now display the value fields from the
+``choices`` set rather than the keys.
+
 .. templatetag:: spaceless
 
 spaceless
@@ -2074,7 +2095,7 @@ urlize
 
 Converts URLs in text into clickable links.
 
-Works on links beginning with ``http://``, ``https://``, or ``www.`` and 
+Works on links beginning with ``http://``, ``https://``, or ``www.`` and
 ending with ``.org``, ``.net`` or ``.com``. Links can have trailing punctuation
 (periods, commas, close-parens) and leading punctuation (opening parens) and
 ``urlize`` will still do the right thing.
@@ -2108,7 +2129,7 @@ urlizetrunc
 Converts URLs into clickable links just like urlize_, but truncates URLs
 longer than the given character limit.
 
-**Argument:** Number of characters that link text should be truncated to, 
+**Argument:** Number of characters that link text should be truncated to,
 including the ellipsis that's added if truncation is necessary.
 
 For example::
