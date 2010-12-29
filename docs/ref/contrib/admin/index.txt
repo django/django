@@ -847,12 +847,20 @@ templates used by the :class:`ModelAdmin` views:
                 )
                 return my_urls + urls
 
+            def my_view(self, request):
+                # custom view which should return an HttpResponse
+                pass
+
     .. note::
 
         Notice that the custom patterns are included *before* the regular admin
         URLs: the admin URL patterns are very permissive and will match nearly
         anything, so you'll usually want to prepend your custom URLs to the
         built-in ones.
+
+        In this example, ``my_view`` will be accessed at
+        ``/admin/myapp/mymodel/my_view/`` (assuming the admin URLs are included
+        at ``/admin/``.)
 
     However, the ``self.my_view`` function registered above suffers from two
     problems:
