@@ -417,6 +417,14 @@ construct is internally converted to an ``ungettext`` call. This means the
 same :ref:`notes regarding ungettext variables <pluralization-var-notes>`
 apply.
 
+Reverse URL lookups cannot be carried out within the ``blocktrans`` and should
+be retrieved (and stored) beforehand::
+
+    {% url path.to.view arg arg2 as the_url %}
+    {% blocktrans %}
+    This is a URL: {{ the_url }}
+    {% endblocktrans %}
+
 .. _template-translation-vars:
 
 Other tags
