@@ -12,8 +12,10 @@ This document contains all the gory details about all the `field options`_ and
 
 .. seealso::
 
-    If the built-in fields don't do the trick, you can easily :doc:`write your
-    own custom model fields </howto/custom-model-fields>`.
+    If the built-in fields don't do the trick, you can try 
+    :mod:`django.contrib.localflavor`, which contains assorted pieces of code
+    that are useful for particular countries or cultures. Also, you can easily
+    :doc:`write your own custom model fields </howto/custom-model-fields>`.
 
 .. note::
 
