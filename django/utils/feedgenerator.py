@@ -29,15 +29,22 @@ from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_unicode, iri_to_uri
 
 def rfc2822_date(date):
+    # We can't use strftime() because it produces locale-dependant results, so
+    # we have to map english month and day names manually
+    months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',)
+    days = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
+
     # We do this ourselves to be timezone aware, email.Utils is not tz aware.
+    dow = days[date.weekday()]
+    month = months[date.month - 1]
+    time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
     if date.tzinfo:
-        time_str = date.strftime('%a, %d %b %Y %H:%M:%S ')
         offset = date.tzinfo.utcoffset(date)
         timezone = (offset.days * 24 * 60) + (offset.seconds / 60)
         hour, minute = divmod(timezone, 60)
         return time_str + "%+03d%02d" % (hour, minute)
     else:
-        return date.strftime('%a, %d %b %Y %H:%M:%S -0000')
+        return time_str + '-0000'
 
 def rfc3339_date(date):
     if date.tzinfo:
