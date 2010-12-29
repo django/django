@@ -1179,12 +1179,12 @@ Available format strings:
     d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
                       leading zeros.
     D                 Day of the week, textual, 3 letters.      ``'Fri'``
-    f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
-                      with minutes left off if they're zero.
-                      Proprietary extension.
     E                 Month, locale specific alternative
                       representation usually used for long
                       date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
+    f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
+                      with minutes left off if they're zero.
+                      Proprietary extension.
     F                 Month, textual, long.                     ``'January'``
     g                 Hour, 12-hour format without leading      ``'1'`` to ``'12'``
                       zeros.
