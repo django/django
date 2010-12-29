@@ -378,6 +378,17 @@ Arguments sent with this signal:
         For example, the :mod:`django.contrib.auth` app only prompts to create a
         superuser when ``interactive`` is ``True``.
 
+For example, yourapp/signals/__init__.py could be written like::
+
+    from django.db.models.signals import post_syncdb
+    import yourapp.models
+
+    def my_callback(sender, **kwargs):
+        # Your specific logic here
+        pass
+
+    post_syncdb.connect(my_callback, sender=yourapp.models)
+
 Request/response signals
 ========================
 
