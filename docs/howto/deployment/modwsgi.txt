@@ -47,12 +47,12 @@ mentioned in the second part of ``WSGIScriptAlias`` and add::
 
 If your project is not on your ``PYTHONPATH`` by default you can add::
 
-    path = '/usr/local/django'
+    path = '/path/to/mysite'
     if path not in sys.path:
         sys.path.append(path)
 
-just above the final ``import`` line to place your project on the path. Remember to
-replace 'mysite.settings' with your correct settings file, and '/usr/local/django'
+just below the ``import sys`` line to place your project on the path. Remember to
+replace 'mysite.settings' with your correct settings file, and '/path/to/mysite'
 with your own project's location.
 
 .. _serving-media-files:
