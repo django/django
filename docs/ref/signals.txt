@@ -485,8 +485,8 @@ Arguments sent with this signal:
 
     sender
         The database wrapper class -- i.e.
-        :class: `django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
-        :class: `django.db.backends.mysql.DatabaseWrapper`, etc.
+        :class:`django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
+        :class:`django.db.backends.mysql.DatabaseWrapper`, etc.
 
     connection
         The database connection that was opened. This can be used in a
