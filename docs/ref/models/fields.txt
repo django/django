@@ -437,11 +437,12 @@ A fixed-precision decimal number, represented in Python by a
 
 .. attribute:: DecimalField.max_digits
 
-    The maximum number of digits allowed in the number
+    The maximum number of digits allowed in the number. Note that this number
+    must be greater than ``decimal_places``, if it exists.
 
 .. attribute:: DecimalField.decimal_places
 
-    The number of decimal places to store with the number
+    The number of decimal places to store with the number.
 
 For example, to store numbers up to 999 with a resolution of 2 decimal places,
 you'd use::
