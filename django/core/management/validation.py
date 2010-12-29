@@ -53,11 +53,14 @@ def get_validation_errors(outfile, app=None):
                 except (ValueError, TypeError):
                     e.add(opts, '"%s": CharFields require a "max_length" attribute that is a positive integer.' % f.name)
             if isinstance(f, models.DecimalField):
+                decimalp_ok, mdigits_ok = False, False
                 decimalp_msg ='"%s": DecimalFields require a "decimal_places" attribute that is a non-negative integer.'
                 try:
                     decimal_places = int(f.decimal_places)
                     if decimal_places < 0:
                         e.add(opts, decimalp_msg % f.name)
+                    else:
+                        decimalp_ok = True
                 except (ValueError, TypeError):
                     e.add(opts, decimalp_msg % f.name)
                 mdigits_msg = '"%s": DecimalFields require a "max_digits" attribute that is a positive integer.'
@@ -65,8 +68,14 @@ def get_validation_errors(outfile, app=None):
                     max_digits = int(f.max_digits)
                     if max_digits <= 0:
                         e.add(opts,  mdigits_msg % f.name)
+                    else:
+                        mdigits_ok = True
                 except (ValueError, TypeError):
                     e.add(opts, mdigits_msg % f.name)
+                invalid_values_msg = '"%s": DecimalFields require a "max_digits" attribute value that is greater than the value of the "decimal_places" attribute.'
+                if decimalp_ok and mdigits_ok:
+                    if decimal_places >= max_digits:
+                        e.add(opts, invalid_values_msg % f.name)
             if isinstance(f, models.FileField) and not f.upload_to:
                 e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):

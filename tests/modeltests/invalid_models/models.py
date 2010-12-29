@@ -14,6 +14,8 @@ class FieldErrors(models.Model):
     decimalfield = models.DecimalField()
     decimalfield2 = models.DecimalField(max_digits=-1, decimal_places=-1)
     decimalfield3 = models.DecimalField(max_digits="bad", decimal_places="bad")
+    decimalfield4 = models.DecimalField(max_digits=9, decimal_places=10)
+    decimalfield5 = models.DecimalField(max_digits=10, decimal_places=10)
     filefield = models.FileField()
     choices = models.CharField(max_length=10, choices='bad')
     choices2 = models.CharField(max_length=10, choices=[(1,2,3),(1,2,3)])
@@ -241,6 +243,8 @@ invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_pl
 invalid_models.fielderrors: "decimalfield2": DecimalFields require a "max_digits" attribute that is a positive integer.
 invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
 invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than the value of the "decimal_places" attribute.
+invalid_models.fielderrors: "decimalfield5": DecimalFields require a "max_digits" attribute value that is greater than the value of the "decimal_places" attribute.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
