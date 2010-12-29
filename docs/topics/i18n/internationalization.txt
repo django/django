@@ -312,6 +312,39 @@ name::
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
+Notes on model classes translation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Your model classes may not only contain normal fields: you may have relations
+(with a ``ForeignKey`` field) or additional model methods you may use for
+columns in the Django admin site.
+
+If you have models with foreign keys and you use the Django admin site, you can
+provide translations for the relation itself by using the ``verbose_name``
+parameter on the ``ForeignKey`` object::
+
+    class MyThing(models.Model):
+        kind = models.ForeignKey(ThingKind, related_name='kinds',
+                                 verbose_name=_('kind'))
+
+As you would do for the ``verbose_name`` and ``verbose_name_plural`` settings of
+a model Meta class, you should provide a lowercase verbose name text for the
+relation as Django will automatically titlecase it when required.
+
+For model methods, you can provide translations to Django and the admin site
+with the ``short_description`` parameter set on the corresponding method::
+
+    class MyThing(models.Model):
+        kind = models.ForeignKey(ThingKind, related_name='kinds',
+                                 verbose_name=_('kind'))
+
+        def is_mouse(self):
+            return self.kind.type == MOUSE_TYPE
+        is_mouse.short_description = _('Is it a mouse?')
+
+As always with model classes translations, don't forget to use the lazy
+translation method!
+
 Working with lazy translation objects
 -------------------------------------
 
