@@ -27,3 +27,4 @@ recursive-include django/contrib/gis/tests/data *
 recursive-include django/contrib/gis/tests/geoapp/fixtures *
 recursive-include django/contrib/gis/tests/geogapp/fixtures *
 recursive-include django/contrib/sitemaps/templates *
+recursive-include django/contrib/sitemaps/tests/templates *
