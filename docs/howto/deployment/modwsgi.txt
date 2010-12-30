@@ -83,7 +83,7 @@ file. All other URLs will be served using mod_wsgi::
     Alias /robots.txt /usr/local/wsgi/static/robots.txt
     Alias /favicon.ico /usr/local/wsgi/static/favicon.ico
 
-    AliasMatch /([^/]*\.css) /usr/local/wsgi/static/styles/$1
+    AliasMatch ^/([^/]*\.css) /usr/local/wsgi/static/styles/$1
 
     Alias /media/ /usr/local/wsgi/static/media/
 
