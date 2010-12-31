@@ -369,12 +369,15 @@ relations, you'll need to calculate them without using the aggregation API.
 Generic relations in forms and admin
 ------------------------------------
 
-:mod:`django.contrib.contenttypes.generic` provides both a
-:class:`~django.contrib.contenttypes.generic.GenericInlineFormSet`
-and :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`.
+:mod:`django.contrib.contenttypes.generic` provides
+:class:`~django.contrib.contenttypes.generic.GenericInlineFormSet`,
+:class:`~django.contrib.contenttypes.generic.GenericTabularInline`
+and :class:`~django.contrib.contenttypes.generic.GenericStackedInline`
+(the last two subclasses of :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`).
 This enables the use of generic relations in forms and the admin. See the
 :doc:`model formset </topics/forms/modelforms>` and
-:doc:`admin </ref/contrib/admin/index>` documentation for more information.
+:ref:`admin <using-generic-relations-as-an-inline>` documentation for more
+information.
 
 .. class:: generic.GenericInlineModelAdmin
 

@@ -1364,6 +1364,8 @@ Finally, register your ``Person`` and ``Group`` models with the admin site::
 Now your admin site is set up to edit ``Membership`` objects inline from
 either the ``Person`` or the ``Group`` detail pages.
 
+.. _using-generic-relations-as-an-inline:
+
 Using generic relations as an inline
 ------------------------------------
 
@@ -1380,9 +1382,12 @@ you have the following models::
         name = models.CharField(max_length=100)
 
 If you want to allow editing and creating ``Image`` instance on the ``Product``
-add/change views you can simply use ``GenericInlineModelAdmin`` provided by
-``django.contrib.contenttypes.generic``. In your ``admin.py`` for this
-example app::
+add/change views you can use ``GenericTabularInline`` or
+``GenericStackedInline`` (both subclasses of ``GenericInlineModelAdmin``)
+provided by ``django.contrib.contenttypes.generic``, they implement tabular and
+stacked visual layouts for the forms representing the inline objects
+respectively just like their non-generic counterparts and behave just like any
+other inline. In your ``admin.py`` for this example app::
 
     from django.contrib import admin
     from django.contrib.contenttypes import generic
@@ -1399,10 +1404,8 @@ example app::
 
     admin.site.register(Product, ProductAdmin)
 
-``django.contrib.contenttypes.generic`` provides both a ``GenericTabularInline``
-and ``GenericStackedInline`` and behave just like any other inline. See the
-:doc:`contenttypes documentation </ref/contrib/contenttypes>` for more specific
-information.
+See the :doc:`contenttypes documentation </ref/contrib/contenttypes>` for more
+specific information.
 
 Overriding Admin Templates
 ==========================
