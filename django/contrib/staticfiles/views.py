@@ -47,6 +47,7 @@ def serve(request, path, document_root=None, show_indexes=False, insecure=False)
                                    "the --insecure option of 'runserver' is "
                                    "used")
     if not document_root:
+        path = os.path.normpath(path)
         absolute_path = finders.find(path)
         if not absolute_path:
             raise Http404('"%s" could not be found' % path)

@@ -15,7 +15,8 @@ from django.template import Template, Context
 from django.test import TestCase
 
 
-TEST_ROOT = os.path.dirname(__file__)
+TEST_ROOT = os.path.normcase(os.path.dirname(__file__))
+
 
 class StaticFilesTestCase(TestCase):
     """
@@ -51,8 +52,8 @@ class StaticFilesTestCase(TestCase):
             'django.contrib.staticfiles.finders.DefaultStorageFinder',
         )
         settings.INSTALLED_APPS = [
-            "django.contrib.staticfiles",
-            "regressiontests.staticfiles_tests",
+            'django.contrib.staticfiles',
+            'regressiontests.staticfiles_tests',
         ]
 
         # Clear the cached default_storage out, this is because when it first
@@ -121,7 +122,6 @@ class TestDefaults(object):
     def test_staticfiles_dirs(self):
         """
         Can find a file in a STATICFILES_DIRS directory.
-
         """
         self.assertFileContains('test.txt', 'Can we find')
 
@@ -129,21 +129,18 @@ class TestDefaults(object):
         """
         Can find a file in a subdirectory of a STATICFILES_DIRS
         directory.
-
         """
         self.assertFileContains('subdir/test.txt', 'Can we find')
 
     def test_staticfiles_dirs_priority(self):
         """
         File in STATICFILES_DIRS has priority over file in app.
-
         """
         self.assertFileContains('test/file.txt', 'STATICFILES_DIRS')
 
     def test_app_files(self):
         """
         Can find a file in an app media/ directory.
-
         """
         self.assertFileContains('test/file1.txt', 'file1 in the app dir')
 
@@ -249,7 +246,6 @@ if sys.platform != 'win32':
         def test_links_created(self):
             """
             With ``--link``, symbolic links are created.
-
             """
             self.assertTrue(os.path.islink(os.path.join(settings.STATIC_ROOT, 'test.txt')))
 
@@ -258,7 +254,7 @@ class TestServeStatic(StaticFilesTestCase):
     """
     Test static asset serving view.
     """
-    urls = "regressiontests.staticfiles_tests.urls.default"
+    urls = 'regressiontests.staticfiles_tests.urls.default'
 
     def _response(self, filepath):
         return self.client.get(
@@ -280,8 +276,8 @@ class TestServeDisabled(TestServeStatic):
         settings.DEBUG = False
 
     def test_disabled_serving(self):
-        self.assertRaisesRegexp(ImproperlyConfigured, "The view to serve "
-            "static files can only be used if the DEBUG setting is True",
+        self.assertRaisesRegexp(ImproperlyConfigured, 'The view to serve '
+            'static files can only be used if the DEBUG setting is True',
             self._response, 'test.txt')
 
 
@@ -295,7 +291,7 @@ class TestServeStaticWithURLHelper(TestServeStatic, TestDefaults):
     """
     Test static asset serving view with staticfiles_urlpatterns helper.
     """
-    urls = "regressiontests.staticfiles_tests.urls.helper"
+    urls = 'regressiontests.staticfiles_tests.urls.helper'
 
 
 class TestServeAdminMedia(TestServeStatic):
@@ -330,9 +326,9 @@ class TestFileSystemFinder(StaticFilesTestCase, FinderTestCase):
     def setUp(self):
         super(TestFileSystemFinder, self).setUp()
         self.finder = finders.FileSystemFinder()
-        test_file_path = os.path.join(TEST_ROOT, 'project/documents/test/file.txt')
-        self.find_first = ("test/file.txt", test_file_path)
-        self.find_all = ("test/file.txt", [test_file_path])
+        test_file_path = os.path.join(TEST_ROOT, 'project', 'documents', 'test', 'file.txt')
+        self.find_first = (os.path.join('test', 'file.txt'), test_file_path)
+        self.find_all = (os.path.join('test', 'file.txt'), [test_file_path])
 
 
 class TestAppDirectoriesFinder(StaticFilesTestCase, FinderTestCase):
@@ -342,9 +338,9 @@ class TestAppDirectoriesFinder(StaticFilesTestCase, FinderTestCase):
     def setUp(self):
         super(TestAppDirectoriesFinder, self).setUp()
         self.finder = finders.AppDirectoriesFinder()
-        test_file_path = os.path.join(TEST_ROOT, 'apps/test/static/test/file1.txt')
-        self.find_first = ("test/file1.txt", test_file_path)
-        self.find_all = ("test/file1.txt", [test_file_path])
+        test_file_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test', 'file1.txt')
+        self.find_first = (os.path.join('test', 'file1.txt'), test_file_path)
+        self.find_all = (os.path.join('test', 'file1.txt'), [test_file_path])
 
 
 class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
@@ -356,8 +352,8 @@ class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
         self.finder = finders.DefaultStorageFinder(
             storage=storage.StaticFilesStorage(location=settings.MEDIA_ROOT))
         test_file_path = os.path.join(settings.MEDIA_ROOT, 'media-file.txt')
-        self.find_first = ("media-file.txt", test_file_path)
-        self.find_all = ("media-file.txt", [test_file_path])
+        self.find_first = ('media-file.txt', test_file_path)
+        self.find_all = ('media-file.txt', [test_file_path])
 
 
 class TestMiscFinder(TestCase):
@@ -366,9 +362,9 @@ class TestMiscFinder(TestCase):
     """
     def test_get_finder(self):
         self.assertTrue(isinstance(finders.get_finder(
-            "django.contrib.staticfiles.finders.FileSystemFinder"),
+            'django.contrib.staticfiles.finders.FileSystemFinder'),
             finders.FileSystemFinder))
         self.assertRaises(ImproperlyConfigured,
-            finders.get_finder, "django.contrib.staticfiles.finders.FooBarFinder")
+            finders.get_finder, 'django.contrib.staticfiles.finders.FooBarFinder')
         self.assertRaises(ImproperlyConfigured,
-            finders.get_finder, "foo.bar.FooBarFinder")
+            finders.get_finder, 'foo.bar.FooBarFinder')
