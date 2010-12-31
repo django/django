@@ -200,7 +200,7 @@ Don't overuse ``count()`` and ``exists()``
 
 If you are going to need other data from the QuerySet, just evaluate it.
 
-For example, assuming an Email class that has a ``body`` attribute and a
+For example, assuming an Email model that has a ``body`` attribute and a
 many-to-many relation to User, the following template code is optimal:
 
 .. code-block:: html+django
@@ -221,7 +221,8 @@ many-to-many relation to User, the following template code is optimal:
 
 It is optimal because:
 
- 1. Since QuerySets are lazy, this does no database if 'display_inbox' is False.
+ 1. Since QuerySets are lazy, this does no database queries if 'display_inbox'
+    is False.
 
  #. Use of ``with`` means that we store ``user.emails.all`` in a variable for
     later use, allowing its cache to be re-used.
