@@ -13,6 +13,7 @@ from django.core.management import call_command
 from django.db.models.loading import load_app
 from django.template import Template, Context
 from django.test import TestCase
+from django.utils._os import rmtree_errorhandler
 
 
 TEST_ROOT = os.path.normcase(os.path.dirname(__file__))
@@ -97,7 +98,9 @@ class BuildStaticTestCase(StaticFilesTestCase):
         self.run_collectstatic()
 
     def tearDown(self):
-        shutil.rmtree(settings.STATIC_ROOT)
+        # Use our own error handler that can handle .svn dirs on Windows
+        shutil.rmtree(settings.STATIC_ROOT, ignore_errors=True,
+                      onerror=rmtree_errorhandler)
         settings.STATIC_ROOT = self.old_root
         super(BuildStaticTestCase, self).tearDown()
 
