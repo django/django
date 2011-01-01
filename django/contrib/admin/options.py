@@ -340,17 +340,23 @@ class ModelAdmin(BaseModelAdmin):
     media = property(_media)
 
     def has_add_permission(self, request):
-        "Returns True if the given request has permission to add an object."
+        """
+        Returns True if the given request has permission to add an object.
+        Can be overriden by the user in subclasses.
+        """
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_add_permission())
 
     def has_change_permission(self, request, obj=None):
         """
         Returns True if the given request has permission to change the given
-        Django model instance.
+        Django model instance, the default implementation doesn't examine the
+        `obj` parameter.
 
-        If `obj` is None, this should return True if the given request has
-        permission to change *any* object of the given type.
+        Can be overriden by the user in subclasses. In such case it should
+        return True if the given request has permission to change the `obj`
+        model instance. If `obj` is None, this should return True if the given
+        request has permission to change *any* object of the given type.
         """
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
@@ -358,10 +364,13 @@ class ModelAdmin(BaseModelAdmin):
     def has_delete_permission(self, request, obj=None):
         """
         Returns True if the given request has permission to change the given
-        Django model instance.
+        Django model instance, the default implementation doesn't examine the
+        `obj` parameter.
 
-        If `obj` is None, this should return True if the given request has
-        permission to delete *any* object of the given type.
+        Can be overriden by the user in subclasses. In such case it should
+        return True if the given request has permission to delete the `obj`
+        model instance. If `obj` is None, this should return True if the given
+        request has permission to delete *any* object of the given type.
         """
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
