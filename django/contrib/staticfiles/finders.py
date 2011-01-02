@@ -6,6 +6,7 @@ from django.core.files.storage import default_storage, Storage, FileSystemStorag
 from django.utils.datastructures import SortedDict
 from django.utils.functional import memoize, LazyObject
 from django.utils.importlib import import_module
+from django.utils._os import safe_join
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.storage import AppStaticStorage
@@ -83,7 +84,7 @@ class FileSystemFinder(BaseFinder):
             if not path.startswith(prefix):
                 return None
             path = path[len(prefix):]
-        path = os.path.join(root, path)
+        path = safe_join(root, path)
         if os.path.exists(path):
             return path
 
