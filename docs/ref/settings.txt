@@ -1251,10 +1251,8 @@ for :doc:`managing stored files </topics/files>`.
 
 Example: ``"http://media.lawrence.com/"``
 
-Note that this should have a trailing slash if it has a path component.
-
- * Good: ``"http://www.example.com/media/"``
- * Bad: ``"http://www.example.com/media"``
+.. versionchanged:: 1.3
+   It must end in a slash if set to a non-empty value.
 
 MESSAGE_LEVEL
 -------------
@@ -1663,6 +1661,8 @@ Example: ``"/site_media/static/"`` or ``"http://static.example.com/"``
 If not ``None``, this will be used as the base path for
 :ref:`media definitions<form-media-paths>` and the
 :doc:`staticfiles app</ref/contrib/staticfiles>`.
+
+It must end in a slash if set to a non-empty value.
 
 See :setting:`STATIC_ROOT`.
 

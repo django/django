@@ -101,6 +101,10 @@ their deprecation, as per the :ref:`Django deprecation policy
         * Authentication backends need to define the boolean attribute
           ``supports_inactive_user``.
 
+        * The ``MEDIA_URL`` or ``STATIC_URL`` settings are required to end
+          with a trailing slash to ensure there is a consistent way to
+          combine paths in templates.
+
     * 1.5
         * The ``mod_python`` request handler has been deprecated since the 1.3
           release. The ``mod_wsgi`` handler should be used instead.

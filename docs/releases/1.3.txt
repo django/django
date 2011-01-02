@@ -192,6 +192,22 @@ The GeoDjango test suite is now included when
 :ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
 when using :ref:`spatial database backends <spatial-backends>`.
 
+``MEDIA_URL`` and ``STATIC_URL`` must end in a slash
+----------------------------------------------------
+
+Previously, the ``MEDIA_URL`` setting only required a trailing slash if it
+contained a suffix beyond the domain name.
+
+A trailing slash is now *required* for ``MEDIA_URL`` and the new
+``STATIC_URL`` setting as long as it is not blank. This ensures there is
+a consistent way to combine paths in templates.
+
+Project settings which provide either of both settings without a trailing
+slash will now raise a ``PendingDeprecation`` warning.
+
+In Django 1.4 this same condition will raise an ``ImproperlyConfigured``
+exception.
+
 Everything else
 ~~~~~~~~~~~~~~~
 
