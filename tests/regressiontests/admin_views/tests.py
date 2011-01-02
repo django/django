@@ -16,6 +16,7 @@ from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.forms.util import ErrorList
 import django.template.context
 from django.test import TestCase
@@ -1450,7 +1451,14 @@ class AdminViewListEditable(TestCase):
         self.assertEqual(Person.objects.get(name="John Mauchly").alive, False)
         self.assertEqual(Person.objects.get(name="Grace Hopper").gender, 2)
 
-
+    def test_list_editable_popup(self):
+        """
+        Fields should not be list-editable in popups.
+        """
+        response = self.client.get('/test_admin/admin/admin_views/person/')
+        self.assertNotEqual(response.context['cl'].list_editable, ())
+        response = self.client.get('/test_admin/admin/admin_views/person/?%s' % IS_POPUP_VAR)
+        self.assertEqual(response.context['cl'].list_editable, ())
 
 
 class AdminSearchTest(TestCase):
@@ -1700,6 +1708,14 @@ class AdminActionsTest(TestCase):
         """
         response = self.client.get('/test_admin/admin/admin_views/subscriber/')
         self.assertContains(response, '0 of 2 selected')
+
+    def test_popup_actions(self):
+        """ Actions should not be shown in popups. """
+        response = self.client.get('/test_admin/admin/admin_views/subscriber/')
+        self.assertNotEquals(response.context["action_form"], None)
+        response = self.client.get(
+            '/test_admin/admin/admin_views/subscriber/?%s' % IS_POPUP_VAR)
+        self.assertEquals(response.context["action_form"], None)
 
 
 class TestCustomChangeList(TestCase):

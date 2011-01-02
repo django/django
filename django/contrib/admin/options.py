@@ -535,7 +535,8 @@ class ModelAdmin(BaseModelAdmin):
         """
         # If self.actions is explicitally set to None that means that we don't
         # want *any* actions enabled on this page.
-        if self.actions is None:
+        from django.contrib.admin.views.main import IS_POPUP_VAR
+        if self.actions is None or IS_POPUP_VAR in request.GET:
             return []
 
         actions = []
@@ -1081,7 +1082,7 @@ class ModelAdmin(BaseModelAdmin):
         formset = cl.formset = None
 
         # Handle POSTed bulk-edit data.
-        if (request.method == "POST" and self.list_editable and
+        if (request.method == "POST" and cl.list_editable and
                 '_save' in request.POST and not action_failed):
             FormSet = self.get_changelist_formset(request)
             formset = cl.formset = FormSet(request.POST, request.FILES, queryset=cl.result_list)
@@ -1111,7 +1112,7 @@ class ModelAdmin(BaseModelAdmin):
                 return HttpResponseRedirect(request.get_full_path())
 
         # Handle GET -- construct a formset for display.
-        elif self.list_editable:
+        elif cl.list_editable:
             FormSet = self.get_changelist_formset(request)
             formset = cl.formset = FormSet(queryset=cl.result_list)
 

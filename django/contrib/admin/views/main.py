@@ -39,7 +39,6 @@ class ChangeList(object):
         self.search_fields = search_fields
         self.list_select_related = list_select_related
         self.list_per_page = list_per_page
-        self.list_editable = list_editable
         self.model_admin = model_admin
 
         # Get search parameters from the query string.
@@ -58,6 +57,10 @@ class ChangeList(object):
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
 
+        if self.is_popup:
+            self.list_editable = ()
+        else:
+            self.list_editable = list_editable
         self.order_field, self.order_type = self.get_ordering()
         self.query = request.GET.get(SEARCH_VAR, '')
         self.query_set = self.get_query_set()
