@@ -100,7 +100,7 @@ Type 'yes' to continue, or 'no' to cancel: """)
         except (OSError, NotImplementedError):
             source_last_modified = None
         if prefix:
-            destination = '/'.join([prefix, source])
+            destination = os.path.join(prefix, source)
         else:
             destination = source
         symlink = options['link']

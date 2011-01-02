@@ -82,6 +82,6 @@ class AppStaticStorage(FileSystemStorage):
         prefix = self.get_prefix()
         for path in utils.get_files(self, ignore_patterns):
             if prefix:
-                path = '/'.join([prefix, path])
+                path = os.path.join(prefix, path)
             files.append(path)
         return files
