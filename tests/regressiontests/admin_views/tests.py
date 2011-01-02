@@ -107,6 +107,22 @@ class AdminViewBasicTest(TestCase):
         response = self.client.post('/test_admin/%s/admin_views/section/add/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 302) # redirect somewhere
 
+    def testPopupAddPost(self):
+        """
+        Ensure http response from a popup is properly escaped.
+        """
+        post_data = {
+            '_popup': u'1',
+            'title': u'title with a new\nline',
+            'content': u'some content',
+            'date_0': u'2010-09-10',
+            'date_1': u'14:55:39',
+        }
+        response = self.client.post('/test_admin/%s/admin_views/article/add/' % self.urlbit, post_data)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertContains(response, 'dismissAddAnotherPopup')
+        self.assertContains(response, 'title with a new\u000Aline')
+
     # Post data for edit inline
     inline_post_data = {
         "name": u"Test section",
