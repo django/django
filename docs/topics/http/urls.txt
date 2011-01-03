@@ -462,7 +462,7 @@ included URLconf, as expected.
 
 .. _topics-http-defining-url-namespaces:
 
-Defining URL Namespaces
+Defining URL namespaces
 -----------------------
 
 When you need to deploy multiple instances of a single application, it can be

@@ -21,7 +21,7 @@ the details about how to use mod_wsgi. You'll probably want to start with the
 .. _official mod_wsgi documentation: http://code.google.com/p/modwsgi/
 .. _installation and configuration documentation: http://code.google.com/p/modwsgi/wiki/InstallationInstructions
 
-Basic Configuration
+Basic configuration
 ===================
 
 Once you've got mod_wsgi installed and activated, edit your ``httpd.conf`` file

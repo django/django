@@ -281,7 +281,7 @@ custom form field, and/or implementing the :meth:`formfield` method on
 your field to return a form field class whose `to_python()` returns the
 correct datatype.
 
-Documenting your Custom Field
+Documenting your custom field
 -----------------------------
 
 .. class:: django.db.models.Field

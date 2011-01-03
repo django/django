@@ -1746,7 +1746,7 @@ SQL equivalents::
 
 .. _aggregation-functions:
 
-Aggregation Functions
+Aggregation functions
 ---------------------
 
 Django provides the following aggregation functions in the
