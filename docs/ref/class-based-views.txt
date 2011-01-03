@@ -428,7 +428,7 @@ FormMixin
     .. method:: get_form_kwargs()
 
         Build the keyword arguments requried to instanciate an the form.
-        
+
         The ``initial`` argument is set to :meth:`.get_initial`. If the
         request is a ``POST`` or ``PUT``, the request data (``request.POST``
         and ``request.FILES``) will also be provided.

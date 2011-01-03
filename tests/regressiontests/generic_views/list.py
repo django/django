@@ -1,7 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from regressiontests.generic_views.models import Author
+from regressiontests.generic_views.models import Author, Artist
 from regressiontests.generic_views.views import CustomPaginator
 
 class ListViewTests(TestCase):
@@ -105,6 +105,16 @@ class ListViewTests(TestCase):
         res = self.client.get('/list/dict/paginated/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(len(res.context['object_list']), 1)
+
+    def test_verbose_name(self):
+        res = self.client.get('/list/artists/')
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, 'generic_views/list.html')
+        self.assertEqual(list(res.context['object_list']), list(Artist.objects.all()))
+        self.assertIs(res.context['professional_artists'], res.context['object_list'])
+        self.assertIsNone(res.context['paginator'])
+        self.assertIsNone(res.context['page_obj'])
+        self.assertFalse(res.context['is_paginated'])
 
     def test_allow_empty_false(self):
         res = self.client.get('/list/authors/notempty/')

@@ -206,14 +206,23 @@ their attributes or methods.
 Making "friendly" template contexts
 -----------------------------------
 
-You might have noticed that our sample publisher list template stores all the
-publishers in a variable named ``object_list``. While this works just fine, it
-isn't all that "friendly" to template authors: they have to "just know" that
-they're dealing with publishers here. A more obvious name for that variable
-would be ``publisher_list``.
+You might have noticed that our sample publisher list template stores
+all the publishers in a variable named ``object_list``. While this
+works just fine, it isn't all that "friendly" to template authors:
+they have to "just know" that they're dealing with publishers here.
 
-We can change the name of that variable easily with the ``context_object_name``
-attribute - here, we'll override it in the URLconf, since it's a simple change:
+Well, if you're dealing with a Django object, this is already done for
+you. When you are dealing with an object or queryset, Django is able
+to populate the context using the verbose name (or the plural verbose
+name, in the case of a list of objects) of the object being displayed.
+This is provided in addition to the default ``object_list`` entry, but
+contains exactly the same data.
+
+If the verbose name (or plural verbose name) still isn't a good match,
+you can manually set the name of the context variable. The
+``context_object_name`` attribute on a generic view specifies the
+context variable to use. In this example, we'll override it in the
+URLconf, since it's a simple change:
 
 .. parsed-literal::
 

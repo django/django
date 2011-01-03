@@ -5,6 +5,8 @@ class Artist(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name = 'professional artist'
+        verbose_name_plural = 'professional artists'
 
     def __unicode__(self):
         return self.name

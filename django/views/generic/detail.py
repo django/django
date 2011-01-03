@@ -2,6 +2,7 @@ import re
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import Http404
+from django.utils.encoding import smart_str
 from django.views.generic.base import TemplateResponseMixin, View
 
 
@@ -79,8 +80,8 @@ class SingleObjectMixin(object):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(obj, '_meta'):
-            return re.sub('[^a-zA-Z0-9]+', '_',
-                    obj._meta.verbose_name.lower())
+            return smart_str(re.sub('[^a-zA-Z0-9]+', '_',
+                    obj._meta.verbose_name.lower()))
         else:
             return None
 

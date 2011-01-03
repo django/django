@@ -1,8 +1,11 @@
+import re
+
 from django.core.paginator import Paginator, InvalidPage
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
 from django.utils.encoding import smart_str
 from django.views.generic.base import TemplateResponseMixin, View
+
 
 class MultipleObjectMixin(object):
     allow_empty = True
@@ -76,7 +79,8 @@ class MultipleObjectMixin(object):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(object_list, 'model'):
-            return smart_str(object_list.model._meta.verbose_name_plural)
+            return smart_str(re.sub('[^a-zA-Z0-9]+', '_',
+                    object_list.model._meta.verbose_name_plural.lower()))
         else:
             return None
 

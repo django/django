@@ -1,7 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from regressiontests.generic_views.models import Author, Page
+from regressiontests.generic_views.models import Artist, Author, Page
 
 
 class DetailViewTest(TestCase):
@@ -27,6 +27,13 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
         self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_verbose_name(self):
+        res = self.client.get('/detail/artist/1/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], Artist.objects.get(pk=1))
+        self.assertEqual(res.context['professional_artist'], Artist.objects.get(pk=1))
+        self.assertTemplateUsed(res, 'generic_views/artist_detail.html')
 
     def test_template_name(self):
         res = self.client.get('/detail/author/1/template_name/')

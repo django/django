@@ -47,6 +47,11 @@ class DictList(generic.ListView):
     template_name = 'generic_views/list.html'
 
 
+class ArtistList(generic.ListView):
+    template_name = 'generic_views/list.html'
+    queryset = Artist.objects.all()
+
+
 class AuthorList(generic.ListView):
     queryset = Author.objects.all()
 

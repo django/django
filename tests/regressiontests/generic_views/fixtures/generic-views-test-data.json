@@ -1,5 +1,12 @@
 [
  {
+   "model": "generic_views.artist",
+   "pk": 1,
+   "fields": {
+     "name": "Rene Magritte"
+   }
+ },
+ {
    "model": "generic_views.author",
    "pk": 1,
    "fields": {
