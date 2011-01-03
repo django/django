@@ -1537,6 +1537,11 @@ object the first time a user authenticates::
         ADMIN_LOGIN = 'admin'
         ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
         """
+        
+        supports_object_permissions = False
+        supports_anonymous_user = False
+        supports_inactive_user = False
+        
         def authenticate(self, username=None, password=None):
             login_valid = (settings.ADMIN_LOGIN == username)
             pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
