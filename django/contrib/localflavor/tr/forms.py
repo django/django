@@ -50,7 +50,7 @@ class TRPhoneNumberField(CharField):
 class TRIdentificationNumberField(Field):
     """
     A Turkey Identification Number number.
-	See: http://tr.wikipedia.org/wiki/T%C3%BCrkiye_Cumhuriyeti_Kimlik_Numaras%C4%B1
+    See: http://tr.wikipedia.org/wiki/T%C3%BCrkiye_Cumhuriyeti_Kimlik_Numaras%C4%B1
 
     Checks the following rules to determine whether the number is valid:
 
@@ -76,7 +76,7 @@ class TRIdentificationNumberField(Field):
         if int(value[0]) == 0:
             raise ValidationError(self.error_messages['invalid'])
         chksum = (sum([int(value[i]) for i in xrange(0,9,2)])*7-
-				          sum([int(value[i]) for i in xrange(1,9,2)])) % 10
+                          sum([int(value[i]) for i in xrange(1,9,2)])) % 10
         if chksum != int(value[9]) or \
            (sum([int(value[i]) for i in xrange(10)]) % 10) != int(value[10]):
             raise ValidationError(self.error_messages['invalid'])
