@@ -1,5 +1,5 @@
 ===============
-View Decorators
+View decorators
 ===============
 
 .. currentmodule:: django.views.decorators.http
@@ -7,7 +7,7 @@ View Decorators
 Django provides several decorators that can be applied to views to support
 various HTTP features.
 
-Allowed HTTP Methods
+Allowed HTTP methods
 ====================
 
 .. function:: require_http_methods(request_method_list)
@@ -47,7 +47,7 @@ headers; see
 
 .. currentmodule:: django.views.decorators.http
 
-GZip Compression
+GZip compression
 ================
 
 .. function:: gzip_page()
@@ -58,7 +58,7 @@ storage on the ``Accept-Encoding`` header.
 
 .. currentmodule:: django.views.decorators.vary
 
-Vary Headers
+Vary headers
 ============
 
 The ``Vary`` header defines which request headers a cache mechanism should take

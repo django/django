@@ -1,5 +1,5 @@
 =============
-Writing Views
+Writing views
 =============
 
 A view function, or *view* for short, is simply a Python function that takes a
@@ -52,7 +52,7 @@ Let's step through this code one line at a time:
     ``America/Chicago``. This probably isn't where you live, so you might want
     to change it in your settings file.
 
-Mapping URLs to Views
+Mapping URLs to views
 =====================
 
 So, to recap, this view function returns an HTML page that includes the current

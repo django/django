@@ -276,7 +276,7 @@ it into the inheritance hierarchy *after* the defaults::
 
 .. _manager-types:
 
-Controlling Automatic Manager Types
+Controlling automatic Manager types
 ===================================
 
 This document has already mentioned a couple of places where Django creates a
@@ -326,7 +326,7 @@ it will use :class:`django.db.models.Manager`.
     so that existing code will :doc:`continue to work </misc/api-stability>` in
     future Django versions.
 
-Writing Correct Managers For Use In Automatic Manager Instances
+Writing correct Managers for use in automatic Manager instances
 ---------------------------------------------------------------
 
 As already suggested by the `django.contrib.gis` example, above, the

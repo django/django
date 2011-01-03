@@ -1737,7 +1737,7 @@ SQL equivalents::
 
 .. _aggregation-functions:
 
-Aggregation Functions
+Aggregation functions
 ---------------------
 
 .. versionadded:: 1.1
