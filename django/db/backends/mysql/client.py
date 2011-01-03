@@ -27,7 +27,7 @@ class DatabaseClient(BaseDatabaseClient):
             if '/' in host:
                 args += ["--socket=%s" % host]
             else:
-             	args += ["--host=%s" % host]
+                args += ["--host=%s" % host]
         if port:
             args += ["--port=%s" % port]
         if db:
