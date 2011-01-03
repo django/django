@@ -71,7 +71,7 @@ class AdminEmailHandler(logging.Handler):
             subject = '%s (%s IP): %s' % (
                 record.levelname,
                 (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'),
-                request.path
+                record.msg
             )
             request_repr = repr(request)
         except:
