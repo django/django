@@ -239,6 +239,8 @@ class BaseModelAdmin(object):
             # later.
             return True
         else:
+            if len(parts) == 1:
+                return True
             clean_lookup = LOOKUP_SEP.join(parts)
             return clean_lookup in self.list_filter or clean_lookup == self.date_hierarchy
 

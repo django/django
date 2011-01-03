@@ -176,7 +176,7 @@ class Thing(models.Model):
         return self.title
 
 class ThingAdmin(admin.ModelAdmin):
-    list_filter = ('color', 'color__warm', 'color__value')
+    list_filter = ('color__warm', 'color__value')
 
 class Fabric(models.Model):
     NG_CHOICES = (
@@ -200,6 +200,7 @@ class Person(models.Model):
     )
     name = models.CharField(max_length=100)
     gender = models.IntegerField(choices=GENDER_CHOICES)
+    age = models.IntegerField(default=21)
     alive = models.BooleanField()
 
     def __unicode__(self):
