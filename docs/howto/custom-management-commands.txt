@@ -98,6 +98,55 @@ In addition to being able to add custom command line options, all
 :doc:`management commands</ref/django-admin>` can accept some
 default options such as :djadminopt:`--verbosity` and :djadminopt:`--traceback`.
 
+.. admonition:: Management commands and locales
+
+    The :meth:`BaseCommand.execute` method sets the hardcoded ``en-us`` locale
+    because the commands shipped with Django perform several tasks
+    (for example, user-visible content and database population) that require
+    a system-neutral string language (for which we use ``en-us``).
+
+    If your custom management command uses another locale, you should manually
+    activate and deactivate it in your :meth:`~BaseCommand.handle` or
+    :meth:`~NoArgsCommand.handle_noargs` method using the functions provided by
+    the I18N support code:
+
+    .. code-block:: python
+
+        from django.core.management.base import BaseCommand, CommandError
+        from django.utils import translation
+
+        class Command(BaseCommand):
+            ...
+            self.can_import_settings = True
+
+            def handle(self, *args, **options):
+
+                # Activate a fixed locale, e.g. Russian
+                translation.activate('ru')
+
+                # Or you can activate the LANGUAGE_CODE
+                # chosen in the settings:
+                #
+                #from django.conf import settings
+                #translation.activate(settings.LANGUAGE_CODE)
+
+                # Your command logic here
+                # ...
+
+                translation.deactivate()
+
+    Take into account though, that system management commands typically have to
+    be very careful about running in non-uniform locales, so:
+
+    * Make sure the :setting:`USE_I18N` setting is always ``True`` when running
+      the command (this is one good example of the potential problems stemming
+      from a dynamic runtime environment that Django commands avoid offhand by
+      always using a fixed locale).
+
+    * Review the code of your command and the code it calls for behavioral
+      differences when locales are changed and evaluate its impact on
+      predictable behavior of your command.
+
 Command objects
 ===============
 
