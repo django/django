@@ -104,7 +104,8 @@ class CommonMiddleware(object):
                     ip = request.META.get('REMOTE_ADDR', '<none>')
                     mail_managers("Broken %slink on %s" % ((is_internal and 'INTERNAL ' or ''), domain),
                         "Referrer: %s\nRequested URL: %s\nUser agent: %s\nIP address: %s\n" \
-                                  % (referer, request.get_full_path(), ua, ip))
+                                  % (referer, request.get_full_path(), ua, ip),
+                                  fail_silently=True)
                 return response
 
         # Use ETags, if requested.
