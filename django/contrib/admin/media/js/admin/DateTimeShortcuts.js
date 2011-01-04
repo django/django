@@ -94,7 +94,7 @@ var DateTimeShortcuts = {
     openClock: function(num) {
         var clock_box = document.getElementById(DateTimeShortcuts.clockDivName+num)
         var clock_link = document.getElementById(DateTimeShortcuts.clockLinkName+num)
-    
+
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
         if (getStyle(document.body,'direction')!='rtl') {
@@ -107,8 +107,8 @@ var DateTimeShortcuts = {
             //       (it returns as it was left aligned), needs to be fixed.
             clock_box.style.left = findPosX(clock_link) - 110 + 'px';
         }
-        clock_box.style.top = findPosY(clock_link) - 30 + 'px';
-    
+        clock_box.style.top = Math.max(0, findPosY(clock_link) - 30) + 'px';
+
         // Show the clock box
         clock_box.style.display = 'block';
         addEvent(window.document, 'click', function() { DateTimeShortcuts.dismissClock(num); return true; });
@@ -224,8 +224,8 @@ var DateTimeShortcuts = {
             //       (it returns as it was left aligned), needs to be fixed.
             cal_box.style.left = findPosX(cal_link) - 180 + 'px';
         }
-        cal_box.style.top = findPosY(cal_link) - 75 + 'px';
-    
+        cal_box.style.top = Math.max(0, findPosY(cal_link) - 75) + 'px';
+
         cal_box.style.display = 'block';
         addEvent(window.document, 'click', function() { DateTimeShortcuts.dismissCalendar(num); return true; });
     },
