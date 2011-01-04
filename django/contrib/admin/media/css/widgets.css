@@ -70,6 +70,7 @@
     height: 16px;
     display: block;
     text-indent: -3000px;
+    overflow: hidden;
 }
 
 .selector-add {
