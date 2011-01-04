@@ -41,7 +41,8 @@ class CreateViewTests(TestCase):
         res = self.client.post('/edit/artists/create/',
                         {'name': 'Rene Magritte'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/detail/artist/1/')
+        artist = Artist.objects.get(name='Rene Magritte')
+        self.assertRedirects(res, 'http://testserver/detail/artist/%d/' % artist.pk)
         self.assertQuerysetEqual(Artist.objects.all(), ['<Artist: Rene Magritte>'])
 
     def test_create_with_redirect(self):
