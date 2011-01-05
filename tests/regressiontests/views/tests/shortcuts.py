@@ -38,6 +38,7 @@ class ShortcutTests(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.content, 'FOO.BAR../path/to/static/media\n')
         self.assertEquals(response['Content-Type'], 'text/html; charset=utf-8')
+        self.assertEquals(response.context.current_app, None)
 
     def test_render_with_base_context(self):
         response = self.client.get('/views/shortcuts/render/base_context/')
@@ -55,4 +56,11 @@ class ShortcutTests(TestCase):
         response = self.client.get('/views/shortcuts/render/status/')
         self.assertEquals(response.status_code, 403)
         self.assertEquals(response.content, 'FOO.BAR../path/to/static/media\n')
+
+    def test_render_with_current_app(self):
+        response = self.client.get('/views/shortcuts/render/current_app/')
+        self.assertEquals(response.context.current_app, "foobar_app")
+
+    def test_render_with_current_app_conflict(self):
+        self.assertRaises(ValueError, self.client.get, '/views/shortcuts/render/current_app_conflict/')
 

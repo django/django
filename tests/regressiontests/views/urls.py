@@ -151,7 +151,8 @@ urlpatterns += patterns('regressiontests.views.views',
     (r'^shortcuts/render/base_context/$', 'render_view_with_base_context'),
     (r'^shortcuts/render/content_type/$', 'render_view_with_content_type'),
     (r'^shortcuts/render/status/$', 'render_view_with_status'),
-
+    (r'^shortcuts/render/current_app/$', 'render_view_with_current_app'),
+    (r'^shortcuts/render/current_app_conflict/$', 'render_view_with_current_app_conflict'),
 )
 
 # simple generic views.

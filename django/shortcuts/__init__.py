@@ -29,7 +29,18 @@ def render(request, *args, **kwargs):
         'content_type': kwargs.pop('content_type', None),
         'status': kwargs.pop('status', None),
     }
-    kwargs['context_instance'] = kwargs.get('context_instance', RequestContext(request))
+
+    if 'context_instance' in kwargs:
+        context_instance = kwargs.pop('context_instance')
+        if kwargs.get('current_app', None):
+            raise ValueError('If you provide a context_instance you must '
+                             'set its current_app before calling render()')
+    else:
+        current_app = kwargs.pop('current_app', None)
+        context_instance = RequestContext(request, current_app=current_app)
+
+    kwargs['context_instance'] = context_instance
+
     return HttpResponse(loader.render_to_string(*args, **kwargs),
                         **httpresponse_kwargs)
 

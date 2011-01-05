@@ -90,11 +90,14 @@ class SimpleTemplateResponse(HttpResponse):
 
 class TemplateResponse(SimpleTemplateResponse):
     def __init__(self, request, template, context=None, mimetype=None,
-            status=None, content_type=None):
+            status=None, content_type=None, current_app=None):
         # self.request gets over-written by django.test.client.Client - and
         # unlike context_data and template_name the _request should not
         # be considered part of the public API.
         self._request = request
+        # As a convenience we'll allow callers to provide current_app without
+        # having to avoid needing to create the RequestContext directly
+        self._current_app = current_app
         super(TemplateResponse, self).__init__(
             template, context, mimetype, status, content_type)
 
@@ -105,4 +108,4 @@ class TemplateResponse(SimpleTemplateResponse):
         if isinstance(context, Context):
             return context
         else:
-            return RequestContext(self._request, context)
+            return RequestContext(self._request, context, current_app=self._current_app)

@@ -15,7 +15,7 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template[, dictionary][, context_instance][, content_type][, status])
+.. function:: render(request, template[, dictionary][, context_instance][, content_type][, status][, current_app])
 
    .. versionadded:: 1.3
 
@@ -23,7 +23,7 @@ introduce controlled coupling for convenience's sake.
    :class:`~django.http.HttpResponse` object with that rendered text.
 
    :func:`render()` is the same as a call to
-   :func:`render_to_response()` with a context_instance argument that
+   :func:`render_to_response()` with a `context_instance` argument that
    that forces the use of a :class:`RequestContext`.
 
 Required arguments
@@ -54,6 +54,11 @@ Optional arguments
 
 ``status``
     The status code for the response. Defaults to ``200``.
+
+``current_app``
+    A hint indicating which application contains the current view. See the
+    :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
+    for more information.
 
 Example
 -------

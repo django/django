@@ -129,7 +129,7 @@ TemplateResponse objects
 Methods
 -------
 
-.. method:: TemplateResponse.__init__(request, template, context=None, mimetype=None, status=None, content_type=None)
+.. method:: TemplateResponse.__init__(request, template, context=None, mimetype=None, status=None, content_type=None, current_app=None)
 
     Instantiates an ``TemplateResponse`` object with the given
     template, context, MIME type and HTTP status.
@@ -157,6 +157,11 @@ Methods
         is specified (not ``None``), that value is used. Otherwise,
         ``content_type`` is used. If neither is given,
         :setting:`DEFAULT_CONTENT_TYPE` is used.
+
+    ``current_app``
+        A hint indicating which application contains the current view. See the
+        :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
+        for more information.
 
 
 The rendering process

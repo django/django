@@ -172,3 +172,10 @@ class TemplateResponseTest(BaseTemplateResponseTest):
                                     'application/json', 504)
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
+
+    def test_custom_app(self):
+        response = self._response('{{ foo }}', current_app="foobar")
+
+        rc = response.resolve_context(response.context_data)
+
+        self.assertEqual(rc.current_app, 'foobar')

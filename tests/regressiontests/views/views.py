@@ -101,3 +101,17 @@ def render_view_with_status(request):
         'foo': 'FOO',
         'bar': 'BAR',
     }, status=403)
+
+def render_view_with_current_app(request):
+    return render(request, 'debug/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    }, current_app="foobar_app")
+
+def render_view_with_current_app_conflict(request):
+    # This should fail because we don't passing both a current_app and
+    # context_instance:
+    return render(request, 'debug/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    }, current_app="foobar_app", context_instance=RequestContext(request))
