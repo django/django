@@ -24,10 +24,17 @@ var SelectFilter = {
         from_box.id += '_from'; // change its ID
         from_box.className = 'filtered';
 
-        // Remove <p class="info">, because it just gets in the way.
         var ps = from_box.parentNode.getElementsByTagName('p');
         for (var i=0; i<ps.length; i++) {
-            from_box.parentNode.removeChild(ps[i]);
+            if (ps[i].className.indexOf("info") != -1) {
+                // Remove <p class="info">, because it just gets in the way.
+                from_box.parentNode.removeChild(ps[i]);
+            } else if (ps[i].className.indexOf("help") != -1) {
+                // Move help text up to the top so it isn't below the select
+                // boxes or wrapped off on the side to the right of the add
+                // button:
+                from_box.parentNode.insertBefore(ps[i], from_box.parentNode.firstChild);
+            }
         }
 
         // <div class="selector"> or <div class="selector stacked">
