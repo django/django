@@ -47,8 +47,14 @@ var SelectFilter = {
         quickElement('h2', selector_available, interpolate(gettext('Available %s'), [field_name]));
         var filter_p = quickElement('p', selector_available, '');
         filter_p.className = 'selector-filter';
-        quickElement('img', filter_p, '', 'src', admin_media_prefix + 'img/admin/selector-search.gif');
+
+        var search_filter_label = quickElement('label', filter_p, '', 'for', field_id + "_input", 'style', 'width:16px;padding:2px');
+
+        var search_selector_img = quickElement('img', search_filter_label, '', 'src', admin_media_prefix + 'img/admin/selector-search.gif');
+        search_selector_img.alt = gettext("Filter");
+
         filter_p.appendChild(document.createTextNode(' '));
+
         var filter_input = quickElement('input', filter_p, '', 'type', 'text');
         filter_input.id = field_id + '_input';
         selector_available.appendChild(from_box);
