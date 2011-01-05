@@ -8,7 +8,7 @@
 <table cellspacing="0" id="result_list">
 <thead>
 <tr>
-{% for header in result_headers %}<th{{ header.class_attrib }}>
+{% for header in result_headers %}<th scope="col"{{ header.class_attrib }}>
 {% if header.sortable %}<a href="{{ header.url }}">{% endif %}
 {{ header.text|capfirst }}
 {% if header.sortable %}</a>{% endif %}</th>{% endfor %}
