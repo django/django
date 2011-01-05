@@ -17,7 +17,6 @@ _finders = {}
 class BaseFinder(object):
     """
     A base file finder to be used for custom staticfiles finder classes.
-
     """
     def find(self, path, all=False):
         """
@@ -62,7 +61,7 @@ class FileSystemFinder(BaseFinder):
 
     def find(self, path, all=False):
         """
-        Looks for files in the extra media locations
+        Looks for files in the extra locations
         as defined in ``STATICFILES_DIRS``.
         """
         matches = []
@@ -76,7 +75,7 @@ class FileSystemFinder(BaseFinder):
 
     def find_location(self, root, path, prefix=None):
         """
-        Find a requested static file in a location, returning the found
+        Finds a requested static file in a location, returning the found
         absolute path (or ``None`` if no match).
         """
         if prefix:
@@ -100,7 +99,8 @@ class FileSystemFinder(BaseFinder):
 
 class AppDirectoriesFinder(BaseFinder):
     """
-    A static files finder that looks in the ``media`` directory of each app.
+    A static files finder that looks in the directory of each app as
+    specified in the source_dir attribute of the given storage class.
     """
     storage_class = AppStaticStorage
 
@@ -140,7 +140,7 @@ class AppDirectoriesFinder(BaseFinder):
 
     def find_in_app(self, app, path):
         """
-        Find a requested static file in an app's media locations.
+        Find a requested static file in an app's static locations.
         """
         storage = self.storages[app]
         prefix = storage.get_prefix()
@@ -207,16 +207,10 @@ class DefaultStorageFinder(BaseStorageFinder):
 
 def find(path, all=False):
     """
-    Find a requested static file, first looking in any defined extra media
-    locations and next in any (non-excluded) installed apps.
-    
-    If no matches are found and the static location is local, look for a match
-    there too.
-    
+    Find a static file with the given path using all enabled finders.
+
     If ``all`` is ``False`` (default), return the first matching
-    absolute path (or ``None`` if no match). Otherwise return a list of
-    found absolute paths.
-    
+    absolute path (or ``None`` if no match). Otherwise return a list.
     """
     matches = []
     for finder in get_finders():
@@ -237,7 +231,7 @@ def get_finders():
 
 def _get_finder(import_path):
     """
-    Imports the message storage class described by import_path, where
+    Imports the staticfiles finder class described by import_path, where
     import_path is the full Python path to the class.
     """
     module, attr = import_path.rsplit('.', 1)

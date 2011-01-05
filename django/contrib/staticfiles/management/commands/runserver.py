@@ -12,7 +12,7 @@ class Command(BaseRunserverCommand):
         make_option('--insecure', action="store_true", dest='insecure_serving', default=False,
             help='Allows serving static files even if DEBUG is False.'),
     )
-    help = "Starts a lightweight Web server for development, including static files serving."
+    help = "Starts a lightweight Web server for development and also serves static files."
 
     def get_handler(self, *args, **options):
         """

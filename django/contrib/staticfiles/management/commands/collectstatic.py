@@ -16,8 +16,7 @@ class Command(NoArgsCommand):
     """
     option_list = NoArgsCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive',
-            default=True, help="Do NOT prompt the user for input of any "
-                "kind."),
+            default=True, help="Do NOT prompt the user for input of any kind."),
         make_option('-i', '--ignore', action='append', default=[],
             dest='ignore_patterns', metavar='PATTERN',
             help="Ignore files or directories matching this glob-style "
@@ -69,7 +68,7 @@ Are you sure you want to do this?
 
 Type 'yes' to continue, or 'no' to cancel: """)
             if confirm != 'yes':
-                raise CommandError("Static files build cancelled.")
+                raise CommandError("Collecting static files cancelled.")
 
         # Use ints for file times (ticket #14665)
         os.stat_float_times(False)
