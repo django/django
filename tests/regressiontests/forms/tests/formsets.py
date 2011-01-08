@@ -29,6 +29,11 @@ class BaseFavoriteDrinksFormSet(BaseFormSet):
             seen_drinks.append(drink['name'])
 
 
+class EmptyFsetWontValidate(BaseFormSet):
+    def clean(self):
+        raise ValidationError("Clean method called")
+
+
 # Let's define a FormSet that takes a list of favorite drinks, but raises an
 # error if there are any duplicates. Used in ``test_clean_hook``,
 # ``test_regression_6926`` & ``test_regression_12878``.
@@ -761,3 +766,13 @@ class FormsFormsetTestCase(TestCase):
         formset = FavoriteDrinksFormSet(data, prefix='drinks')
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), [u'You may only specify a drink once.'])
+
+class TestEmptyFormSet(TestCase): 
+    "Test that an empty formset still calls clean()"
+    def test_empty_formset_is_valid(self): 
+        EmptyFsetWontValidateFormset = formset_factory(FavoriteDrinkForm, extra=0, formset=EmptyFsetWontValidate) 
+        formset = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS':'0', 'form-TOTAL_FORMS':'0'},prefix="form") 
+        formset2 = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS':'0', 'form-TOTAL_FORMS':'1', 'form-0-name':'bah' },prefix="form") 
+        self.assertFalse(formset.is_valid()) 
+        self.assertFalse(formset2.is_valid())
+
