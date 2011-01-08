@@ -92,7 +92,6 @@ class BuildStaticTestCase(StaticFilesTestCase):
     """
     def setUp(self):
         super(BuildStaticTestCase, self).setUp()
-        self.old_staticfiles_storage = settings.STATICFILES_STORAGE
         self.old_root = settings.STATIC_ROOT
         settings.STATIC_ROOT = tempfile.mkdtemp()
         self.run_collectstatic()
@@ -220,18 +219,35 @@ class TestBuildStaticExcludeNoDefaultIgnore(BuildStaticTestCase, TestDefaults):
         self.assertFileContains('test/CVS', 'should be ignored')
 
 
-class TestBuildStaticDryRun(BuildStaticTestCase):
+class TestNoFilesCreated(object):
+
+    def test_no_files_created(self):
+        """
+        Make sure no files were create in the destination directory.
+        """
+        self.assertEquals(os.listdir(settings.STATIC_ROOT), [])
+
+
+class TestBuildStaticDryRun(BuildStaticTestCase, TestNoFilesCreated):
     """
     Test ``--dry-run`` option for ``collectstatic`` management command.
     """
     def run_collectstatic(self):
         super(TestBuildStaticDryRun, self).run_collectstatic(dry_run=True)
 
-    def test_no_files_created(self):
-        """
-        With --dry-run, no files created in destination dir.
-        """
-        self.assertEquals(os.listdir(settings.STATIC_ROOT), [])
+
+class TestBuildStaticNonLocalStorage(BuildStaticTestCase, TestNoFilesCreated):
+    """
+    Tests for #15035
+    """
+    def setUp(self):
+        self.old_staticfiles_storage = settings.STATICFILES_STORAGE
+        settings.STATICFILES_STORAGE = 'regressiontests.staticfiles_tests.storage.DummyStorage'
+        super(TestBuildStaticNonLocalStorage, self).setUp()
+
+    def tearDown(self):
+        super(TestBuildStaticNonLocalStorage, self).tearDown()
+        settings.STATICFILES_STORAGE = self.old_staticfiles_storage
 
 
 if sys.platform != 'win32':
