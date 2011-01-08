@@ -21,7 +21,7 @@ class GetOrCreateTests(TestCase):
         # Add an author to the book.
         ed, created = book.authors.get_or_create(name="Ed")
         self.assertTrue(created)
-        # Book should have one author.
+        # The book should have one author.
         self.assertEqual(book.authors.count(), 1)
 
         # Try get_or_create again, this time nothing should be created.
@@ -51,3 +51,12 @@ class GetOrCreateTests(TestCase):
         # Now Ed has two Books, Fred just one.
         self.assertEqual(ed.books.count(), 2)
         self.assertEqual(fred.books.count(), 1)
+
+        # Use the publisher's primary key value instead of a model instance.
+        _, created = ed.books.get_or_create(name='The Great Book of Ed', publisher_id=p.id)
+        self.assertTrue(created)
+        # Try get_or_create again, this time nothing should be created.
+        _, created = ed.books.get_or_create(name='The Great Book of Ed', publisher_id=p.id)
+        self.assertFalse(created)
+        # The publisher should have three books.
+        self.assertEqual(p.books.count(), 3)
