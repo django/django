@@ -38,14 +38,15 @@ class ListViewTests(TestCase):
         self.assertEqual(list(res.context['authors'])[-1].name, 'Author 29')
 
     def test_paginated_queryset_shortdata(self):
+        # Test that short datasets ALSO result in a paginated view.
         res = self.client.get('/list/authors/paginated/')
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed(res, 'generic_views/author_list.html')
         self.assertEqual(list(res.context['object_list']), list(Author.objects.all()))
         self.assertIs(res.context['authors'], res.context['object_list'])
-        self.assertIsNone(res.context['paginator'])
-        self.assertIsNone(res.context['page_obj'])
-        self.assertFalse(res.context['is_paginated'])
+        self.assertEqual(res.context['page_obj'].number, 1)
+        self.assertEqual(res.context['paginator'].num_pages, 1)
+        self.assertTrue(res.context['is_paginated'])
 
     def test_paginated_get_page_by_query_string(self):
         self._make_authors(100)
@@ -90,7 +91,7 @@ class ListViewTests(TestCase):
         self._make_authors(7)
         res = self.client.get('/list/authors/paginated/custom_class/')
         self.assertEqual(res.status_code, 200)
-        self.assertIsNone(res.context['paginator'])
+        self.assertEqual(res.context['paginator'].num_pages, 1)
         # Custom pagination allows for 2 orphans on a page size of 5
         self.assertEqual(len(res.context['object_list']), 7)
 
