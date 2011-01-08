@@ -38,9 +38,6 @@ class Serializer(PythonSerializer):
             super(Serializer, self).handle_field(obj, field)
 
     def end_serialization(self):
-        self.options.pop('stream', None)
-        self.options.pop('fields', None)
-        self.options.pop('use_natural_keys', None)
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):
