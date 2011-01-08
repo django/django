@@ -11,13 +11,6 @@ interface that content producers can immediately use to start adding content to
 the site. In this document, we discuss how to activate, use and customize
 Django's admin interface.
 
-.. admonition:: Note
-
-    The admin site has been refactored significantly since Django 0.96. This
-    document describes the newest version of the admin site, which allows for
-    much richer customization. If you follow the development of Django itself,
-    you may have heard this described as "newforms-admin."
-
 Overview
 ========
 
@@ -26,8 +19,8 @@ There are six steps in activating the Django admin site:
     1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS`
        setting.
 
-    2. Admin has two dependencies - ``django.contrib.auth`` and
-       ``django.contrib.contenttypes``. If these applications are not
+    2. Admin has two dependencies - :mod:`django.contrib.auth` and
+       :mod:`django.contrib.contenttypes`. If these applications are not
        in your :setting:`INSTALLED_APPS` list, add them.
 
     3. Determine which of your application's models should be editable in the
@@ -87,7 +80,7 @@ Other topics
 
             admin.site.register(Author)
 
-``ModelAdmin`` Options
+``ModelAdmin`` options
 ----------------------
 
 The ``ModelAdmin`` is very flexible. It has several options for dealing with
@@ -96,6 +89,26 @@ subclass::
 
     class AuthorAdmin(admin.ModelAdmin):
         date_hierarchy = 'pub_date'
+
+.. attribute:: ModelAdmin.actions
+
+    A list of actions to make available on the change list page. See
+    :doc:`/ref/contrib/admin/actions` for details.
+
+.. attribute:: ModelAdmin.actions_on_top
+.. attribute:: ModelAdmin.actions_on_bottom
+
+    Controls where on the page the actions bar appears. By default, the admin
+    changelist displays actions at the top of the page (``actions_on_top = True;
+    actions_on_bottom = False``).
+
+.. attribute:: ModelAdmin.actions_selection_counter
+
+    .. versionadded:: 1.2
+
+    Controls whether a selection counter is display next to the action dropdown.
+    By default, the admin changelist will display it
+    (``actions_selection_counter = True``).
 
 .. attribute:: ModelAdmin.date_hierarchy
 
@@ -109,18 +122,59 @@ subclass::
 
     .. versionadded:: 1.3
 
-        This will intelligently populate itself based on available data,
-        e.g. if all the dates are in one month, it'll show the day-level
-        drill-down only.
+    This will intelligently populate itself based on available data,
+    e.g. if all the dates are in one month, it'll show the day-level
+    drill-down only.
 
-.. attribute:: ModelAdmin.form
+.. attribute:: ModelAdmin.exclude
 
-    By default a ``ModelForm`` is dynamically created for your model. It is
-    used to create the form presented on both the add/change pages. You can
-    easily provide your own ``ModelForm`` to override any default form behavior
-    on the add/change pages.
+    This attribute, if given, should be a list of field names to exclude from
+    the form.
 
-    For an example see the section `Adding custom validation to the admin`_.
+    For example, let's consider the following model::
+
+        class Author(models.Model):
+            name = models.CharField(max_length=100)
+            title = models.CharField(max_length=3)
+            birth_date = models.DateField(blank=True, null=True)
+
+    If you want a form for the ``Author`` model that includes only the ``name``
+    and ``title`` fields, you would specify ``fields`` or ``exclude`` like
+    this::
+
+        class AuthorAdmin(admin.ModelAdmin):
+            fields = ('name', 'title')
+
+        class AuthorAdmin(admin.ModelAdmin):
+            exclude = ('birth_date',)
+
+    Since the Author model only has three fields, ``name``, ``title``, and
+    ``birth_date``, the forms resulting from the above declarations will
+    contain exactly the same fields.
+
+.. attribute:: ModelAdmin.fields
+
+    Use this option as an alternative to ``fieldsets`` if the layout does not
+    matter and if you want to only show a subset of the available fields in the
+    form. For example, you could define a simpler version of the admin form for
+    the ``django.contrib.flatpages.FlatPage`` model as follows::
+
+        class FlatPageAdmin(admin.ModelAdmin):
+            fields = ('url', 'title', 'content')
+
+    In the above example, only the fields 'url', 'title' and 'content' will be
+    displayed, sequentially, in the form.
+
+    .. versionadded:: 1.2
+
+    ``fields`` can contain values defined in :attr:`ModelAdmin.readonly_fields`
+    to be displayed as read-only.
+
+    .. admonition:: Note
+
+        This ``fields`` option should not be confused with the ``fields``
+        dictionary key that is within the ``fieldsets`` option, as described in
+        the previous section.
 
 .. attribute:: ModelAdmin.fieldsets
 
@@ -207,56 +261,6 @@ subclass::
             ``django.utils.html.escape()`` to escape any HTML special
             characters.
 
-.. attribute:: ModelAdmin.fields
-
-    Use this option as an alternative to ``fieldsets`` if the layout does not
-    matter and if you want to only show a subset of the available fields in the
-    form. For example, you could define a simpler version of the admin form for
-    the ``django.contrib.flatpages.FlatPage`` model as follows::
-
-        class FlatPageAdmin(admin.ModelAdmin):
-            fields = ('url', 'title', 'content')
-
-    In the above example, only the fields 'url', 'title' and 'content' will be
-    displayed, sequentially, in the form.
-
-    .. versionadded:: 1.2
-
-    ``fields`` can contain values defined in :attr:`ModelAdmin.readonly_fields`
-    to be displayed as read-only.
-
-    .. admonition:: Note
-
-        This ``fields`` option should not be confused with the ``fields``
-        dictionary key that is within the ``fieldsets`` option, as described in
-        the previous section.
-
-.. attribute:: ModelAdmin.exclude
-
-    This attribute, if given, should be a list of field names to exclude from
-    the form.
-
-    For example, let's consider the following model::
-
-        class Author(models.Model):
-            name = models.CharField(max_length=100)
-            title = models.CharField(max_length=3)
-            birth_date = models.DateField(blank=True, null=True)
-
-    If you want a form for the ``Author`` model that includes only the ``name``
-    and ``title`` fields, you would specify ``fields`` or ``exclude`` like
-    this::
-
-        class AuthorAdmin(admin.ModelAdmin):
-            fields = ('name', 'title')
-
-        class AuthorAdmin(admin.ModelAdmin):
-            exclude = ('birth_date',)
-
-    Since the Author model only has three fields, ``name``, ``title``, and
-    ``birth_date``, the forms resulting from the above declarations will
-    contain exactly the same fields.
-
 .. attribute:: ModelAdmin.filter_horizontal
 
     Use a nifty unobtrusive JavaScript "filter" interface instead of the
@@ -268,6 +272,61 @@ subclass::
 
     Same as ``filter_horizontal``, but is a vertical display of the filter
     interface.
+
+.. attribute:: ModelAdmin.form
+
+    By default a ``ModelForm`` is dynamically created for your model. It is
+    used to create the form presented on both the add/change pages. You can
+    easily provide your own ``ModelForm`` to override any default form behavior
+    on the add/change pages.
+
+    For an example see the section `Adding custom validation to the admin`_.
+
+.. attribute:: ModelAdmin.formfield_overrides
+
+    This provides a quick-and-dirty way to override some of the
+    :class:`~django.forms.Field` options for use in the admin.
+    ``formfield_overrides`` is a dictionary mapping a field class to a dict of
+    arguments to pass to the field at construction time.
+
+    Since that's a bit abstract, let's look at a concrete example. The most
+    common use of ``formfield_overrides`` is to add a custom widget for a
+    certain type of field. So, imagine we've written a ``RichTextEditorWidget``
+    that we'd like to use for large text fields instead of the default
+    ``<textarea>``. Here's how we'd do that::
+
+        from django.db import models
+        from django.contrib import admin
+
+        # Import our custom widget and our model from where they're defined
+        from myapp.widgets import RichTextEditorWidget
+        from myapp.models import MyModel
+
+        class MyModelAdmin(admin.ModelAdmin):
+            formfield_overrides = {
+                models.TextField: {'widget': RichTextEditorWidget},
+            }
+
+    Note that the key in the dictionary is the actual field class, *not* a
+    string. The value is another dictionary; these arguments will be passed to
+    :meth:`~django.forms.Field.__init__`. See :doc:`/ref/forms/api` for
+    details.
+
+    .. warning::
+
+        If you want to use a custom widget with a relation field (i.e.
+        :class:`~django.db.models.ForeignKey` or
+        :class:`~django.db.models.ManyToManyField`), make sure you haven't
+        included that field's name in ``raw_id_fields`` or ``radio_fields``.
+
+        ``formfield_overrides`` won't let you change the widget on relation
+        fields that have ``raw_id_fields`` or ``radio_fields`` set. That's
+        because ``raw_id_fields`` and ``radio_fields`` imply custom widgets of
+        their own.
+
+.. attribute:: ModelAdmin.inlines
+
+    See :class:`InlineModelAdmin` objects below.
 
 .. attribute:: ModelAdmin.list_display
 
@@ -496,15 +555,11 @@ subclass::
     regardless of this setting if one of the ``list_display`` fields is a
     ``ForeignKey``.
 
-.. attribute:: ModelAdmin.inlines
-
-    See :class:`InlineModelAdmin` objects below.
-
 .. attribute:: ModelAdmin.ordering
 
     Set ``ordering`` to specify how lists of objects should be ordered in the
     Django admin views. This should be a list or tuple in the same format as a
-    model's ``ordering`` parameter.
+    model's :attr:`~django.db.models.Options.ordering` parameter.
 
     If this isn't provided, the Django admin will use the model's default
     ordering.
@@ -673,68 +728,6 @@ subclass::
     ``@``
         Performs a full-text match. This is like the default search method but
         uses an index. Currently this is only available for MySQL.
-
-.. attribute:: ModelAdmin.formfield_overrides
-
-    This provides a quick-and-dirty way to override some of the
-    :class:`~django.forms.Field` options for use in the admin.
-    ``formfield_overrides`` is a dictionary mapping a field class to a dict of
-    arguments to pass to the field at construction time.
-
-    Since that's a bit abstract, let's look at a concrete example. The most
-    common use of ``formfield_overrides`` is to add a custom widget for a
-    certain type of field. So, imagine we've written a ``RichTextEditorWidget``
-    that we'd like to use for large text fields instead of the default
-    ``<textarea>``. Here's how we'd do that::
-
-        from django.db import models
-        from django.contrib import admin
-
-        # Import our custom widget and our model from where they're defined
-        from myapp.widgets import RichTextEditorWidget
-        from myapp.models import MyModel
-
-        class MyModelAdmin(admin.ModelAdmin):
-            formfield_overrides = {
-                models.TextField: {'widget': RichTextEditorWidget},
-            }
-
-    Note that the key in the dictionary is the actual field class, *not* a
-    string. The value is another dictionary; these arguments will be passed to
-    :meth:`~django.forms.Field.__init__`. See :doc:`/ref/forms/api` for
-    details.
-
-    .. warning::
-
-        If you want to use a custom widget with a relation field (i.e.
-        :class:`~django.db.models.ForeignKey` or
-        :class:`~django.db.models.ManyToManyField`), make sure you haven't
-        included that field's name in ``raw_id_fields`` or ``radio_fields``.
-
-        ``formfield_overrides`` won't let you change the widget on relation
-        fields that have ``raw_id_fields`` or ``radio_fields`` set. That's
-        because ``raw_id_fields`` and ``radio_fields`` imply custom widgets of
-        their own.
-
-.. attribute:: ModelAdmin.actions
-
-    A list of actions to make available on the change list page. See
-    :doc:`/ref/contrib/admin/actions` for details.
-
-.. attribute:: ModelAdmin.actions_on_top
-.. attribute:: ModelAdmin.actions_on_bottom
-
-    Controls where on the page the actions bar appears. By default, the admin
-    changelist displays actions at the top of the page (``actions_on_top = True;
-    actions_on_bottom = False``).
-
-.. attribute:: ModelAdmin.actions_selection_counter
-
-    .. versionadded:: 1.2
-
-    Controls whether a selection counter is display next to the action dropdown.
-    By default, the admin changelist will display it
-    (``actions_selection_counter = True``).
 
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1043,8 +1036,8 @@ on your ``ModelAdmin``::
             }
             js = ("my_code.js",)
 
-Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
-apply as :doc:`regular media definitions on forms </topics/forms/media>`.
+Keep in mind that this will be prepended with :setting:`MEDIA_URL`. The same
+rules apply as :doc:`regular media definitions on forms </topics/forms/media>`.
 
 Django admin Javascript makes use of the `jQuery`_ library. To avoid
 conflict with user scripts, Django's jQuery is namespaced as
@@ -1255,17 +1248,18 @@ automatically::
             FriendshipInline,
         ]
 
-Working with Many-to-Many Models
+Working with many-to-many models
 --------------------------------
 
 .. versionadded:: 1.2
 
 By default, admin widgets for many-to-many relations will be displayed
-on whichever model contains the actual reference to the ``ManyToManyField``.
-Depending on your ``ModelAdmin`` definition, each many-to-many field in your
-model will be represented by a standard HTML ``<select multiple>``, a
-horizontal or vertical filter, or a ``raw_id_admin`` widget. However, it is
-also possible to to replace these widgets with inlines.
+on whichever model contains the actual reference to the
+:class:`~django.db.models.ManyToManyField`. Depending on your ``ModelAdmin``
+definition, each many-to-many field in your model will be represented by a
+standard HTML ``<select multiple>``, a horizontal or vertical filter, or a
+``raw_id_admin`` widget. However, it is also possible to to replace these
+widgets with inlines.
 
 Suppose we have the following models::
 
@@ -1311,14 +1305,15 @@ In all other respects, the ``InlineModelAdmin`` is exactly the same as any
 other. You can customize the appearance using any of the normal
 ``ModelAdmin`` properties.
 
-Working with Many-to-Many Intermediary Models
-----------------------------------------------
+Working with many-to-many intermediary models
+---------------------------------------------
 
 When you specify an intermediary model using the ``through`` argument to a
-``ManyToManyField``, the admin will not display a widget by default. This is
-because each instance of that intermediary model requires more information
-than could be displayed in a single widget, and the layout required for
-multiple widgets will vary depending on the intermediate model.
+:class:`~django.db.models.ManyToManyField`, the admin will not display a
+widget by default. This is because each instance of that intermediary model
+requires more information than could be displayed in a single widget, and the
+layout required for multiple widgets will vary depending on the intermediate
+model.
 
 However, we still want to be able to edit that information inline. Fortunately,
 this is easy to do with inline admin models. Suppose we have the following
@@ -1407,7 +1402,7 @@ other inline. In your ``admin.py`` for this example app::
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>` for more
 specific information.
 
-Overriding Admin Templates
+Overriding admin templates
 ==========================
 
 It is relatively easy to override many of the templates which the admin module
@@ -1422,7 +1417,7 @@ directory.
 
 In order to override one or more of them, first create an ``admin`` directory
 in your project's ``templates`` directory. This can be any of the directories
-you specified in ``TEMPLATE_DIRS``.
+you specified in :setting:`TEMPLATE_DIRS`.
 
 Within this ``admin`` directory, create sub-directories named after your app.
 Within these app subdirectories create sub-directories named after your models.
@@ -1548,9 +1543,9 @@ Templates can override or extend base admin templates as described in
 
     Path to a custom template that will be used by the admin site login view.
 
-.. versionadded:: 1.3
-
 .. attribute:: AdminSite.login_form
+
+    .. versionadded:: 1.3
 
     Subclass of :class:`~django.contrib.auth.forms.AuthenticationForm` that
     will be used by the admin site login view.
@@ -1652,13 +1647,14 @@ a pattern for your new view.
 .. note::
     Any view you render that uses the admin templates, or extends the base
     admin template, should provide the ``current_app`` argument to
-    ``RequestContext`` or ``Context`` when rendering the template.  It should
-    be set to either ``self.name`` if your view is on an ``AdminSite`` or
-    ``self.admin_site.name`` if your view is on a ``ModelAdmin``.
+    :class:`~django.template.RequestContext` or :class:`~django.template.Context`
+    when rendering the template.  It should be set to either ``self.name`` if
+    your view is on an ``AdminSite`` or ``self.admin_site.name`` if your view
+    is on a ``ModelAdmin``.
 
 .. _admin-reverse-urls:
 
-Reversing Admin URLs
+Reversing admin URLs
 ====================
 
 When an :class:`AdminSite` is deployed, the views provided by that site are
