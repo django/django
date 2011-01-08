@@ -369,9 +369,13 @@ class QuerySet(object):
         assert kwargs, \
                 'get_or_create() must be passed at least one keyword argument'
         defaults = kwargs.pop('defaults', {})
+        lookup = kwargs.copy()
+        for f in self.model._meta.fields:
+            if f.column in lookup:
+                lookup[f.name] = lookup.pop(f.column)
         try:
             self._for_write = True
-            return self.get(**kwargs), False
+            return self.get(**lookup), False
         except self.model.DoesNotExist:
             try:
                 params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
@@ -384,7 +388,7 @@ class QuerySet(object):
             except IntegrityError, e:
                 transaction.savepoint_rollback(sid, using=self.db)
                 try:
-                    return self.get(**kwargs), False
+                    return self.get(**lookup), False
                 except self.model.DoesNotExist:
                     raise e
 
