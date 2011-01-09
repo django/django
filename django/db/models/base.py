@@ -648,7 +648,7 @@ class Model(object):
         called from a ModelForm, some fields may have been excluded; we can't
         perform a unique check on a model that is missing fields involved
         in that check.
-        Fields that did not validate should also be exluded, but they need
+        Fields that did not validate should also be excluded, but they need
         to be passed in via the exclude argument.
         """
         if exclude is None:
@@ -740,6 +740,8 @@ class Model(object):
             # there's a ticket to add a date lookup, we can remove this special
             # case if that makes it's way in
             date = getattr(self, unique_for)
+            if date is None:
+                continue
             if lookup_type == 'date':
                 lookup_kwargs['%s__day' % unique_for] = date.day
                 lookup_kwargs['%s__month' % unique_for] = date.month

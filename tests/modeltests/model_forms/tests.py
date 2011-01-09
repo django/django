@@ -1,9 +1,10 @@
 import datetime
 from django.test import TestCase
 from django import forms
-from models import Category, Writer, Book, DerivedBook, Post
-from mforms import (ProductForm, PriceForm, BookForm, DerivedBookForm, 
-                   ExplicitPKForm, PostForm, DerivedPostForm, CustomWriterForm)
+from models import Category, Writer, Book, DerivedBook, Post, FlexibleDatePost
+from mforms import (ProductForm, PriceForm, BookForm, DerivedBookForm,
+                   ExplicitPKForm, PostForm, DerivedPostForm, CustomWriterForm,
+                   FlexDatePostForm)
 
 
 class IncompleteCategoryFormWithFields(forms.ModelForm):
@@ -183,3 +184,16 @@ class UniqueTest(TestCase):
             "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
         self.assertTrue(form.is_valid())
 
+    def test_unique_for_date_with_nullable_date(self):
+        p = FlexibleDatePost.objects.create(title="Django 1.0 is released",
+            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+
+        form = FlexDatePostForm({'title': "Django 1.0 is released"})
+        self.assertTrue(form.is_valid())
+        form = FlexDatePostForm({'slug': "Django 1.0"})
+        self.assertTrue(form.is_valid())
+        form = FlexDatePostForm({'subtitle': "Finally"})
+        self.assertTrue(form.is_valid())
+        form = FlexDatePostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
+            "slug": "Django 1.0"}, instance=p)
+        self.assertTrue(form.is_valid())
