@@ -371,8 +371,8 @@ class QuerySet(object):
         defaults = kwargs.pop('defaults', {})
         lookup = kwargs.copy()
         for f in self.model._meta.fields:
-            if f.column in lookup:
-                lookup[f.name] = lookup.pop(f.column)
+            if f.attname in lookup:
+                lookup[f.name] = lookup.pop(f.attname)
         try:
             self._for_write = True
             return self.get(**lookup), False
