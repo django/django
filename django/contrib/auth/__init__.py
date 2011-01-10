@@ -70,8 +70,6 @@ def login(request, user):
     if user is None:
         user = request.user
     # TODO: It would be nice to support different login methods, like signed cookies.
-    user_logged_in.send(sender=user.__class__, request=request, user=user)
-
     if SESSION_KEY in request.session:
         if request.session[SESSION_KEY] != user.id:
             # To avoid reusing another user's session, create a new, empty
@@ -84,6 +82,7 @@ def login(request, user):
     request.session[BACKEND_SESSION_KEY] = user.backend
     if hasattr(request, 'user'):
         request.user = user
+    user_logged_in.send(sender=user.__class__, request=request, user=user)
 
 def logout(request):
     """
