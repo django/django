@@ -55,8 +55,10 @@ class GetOrCreateTests(TestCase):
         # Use the publisher's primary key value instead of a model instance.
         _, created = ed.books.get_or_create(name='The Great Book of Ed', publisher_id=p.id)
         self.assertTrue(created)
+
         # Try get_or_create again, this time nothing should be created.
         _, created = ed.books.get_or_create(name='The Great Book of Ed', publisher_id=p.id)
         self.assertFalse(created)
+
         # The publisher should have three books.
         self.assertEqual(p.books.count(), 3)
