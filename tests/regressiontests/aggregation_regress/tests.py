@@ -6,7 +6,7 @@ from operator import attrgetter
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DEFAULT_DB_ALIAS
-from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F
+from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
 from django.test import TestCase, Approximate
 
 from models import Author, Book, Publisher, Clues, Entries, HardbackBook
@@ -693,6 +693,59 @@ class AggregationTests(TestCase):
         self.assertEqual(
             list(qs), list(Book.objects.values_list("name", flat=True))
         )
+
+    def test_annotation_disjunction(self):
+        qs = Book.objects.annotate(n_authors=Count("authors")).filter(
+            Q(n_authors=2) | Q(name="Python Web Development with Django")
+        )
+        self.assertQuerysetEqual(
+            qs, [
+                "Artificial Intelligence: A Modern Approach",
+                "Python Web Development with Django",
+                "The Definitive Guide to Django: Web Development Done Right",
+            ],
+            attrgetter("name")
+        )
+
+        qs = Book.objects.annotate(n_authors=Count("authors")).filter(
+            Q(name="The Definitive Guide to Django: Web Development Done Right") | (Q(name="Artificial Intelligence: A Modern Approach") & Q(n_authors=3))
+        )
+        self.assertQuerysetEqual(
+            qs, [
+                "The Definitive Guide to Django: Web Development Done Right",
+            ],
+            attrgetter("name")
+        )
+
+        qs = Publisher.objects.annotate(
+            rating_sum=Sum("book__rating"),
+            book_count=Count("book")
+        ).filter(
+            Q(rating_sum__gt=5.5) | Q(rating_sum__isnull=True)
+        ).order_by('pk')
+        self.assertQuerysetEqual(
+            qs, [
+                "Apress",
+                "Prentice Hall",
+                "Jonno's House of Books",
+            ],
+            attrgetter("name")
+        )
+
+        qs = Publisher.objects.annotate(
+            rating_sum=Sum("book__rating"),
+            book_count=Count("book")
+        ).filter(
+            Q(pk__lt=F("book_count")) | Q(rating_sum=None)
+        ).order_by("pk")
+        self.assertQuerysetEqual(
+            qs, [
+                "Apress",
+                "Jonno's House of Books",
+            ],
+            attrgetter("name")
+        )
+
 
     if run_stddev_tests():
         def test_stddev(self):

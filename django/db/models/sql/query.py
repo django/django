@@ -922,6 +922,19 @@ class Query(object):
                 self.unref_alias(alias)
         self.included_inherited_models = {}
 
+    def need_force_having(self, q_object):
+        """
+        Returns whether or not all elements of this q_object need to be put
+        together in the HAVING clause.
+        """
+        for child in q_object.children:
+            if isinstance(child, Node):
+                if self.need_force_having(child):
+                    return True
+            else:
+                if child[0].split(LOOKUP_SEP)[0] in self.aggregates:
+                    return True
+        return False
 
     def add_aggregate(self, aggregate, model, alias, is_summary):
         """
@@ -972,7 +985,7 @@ class Query(object):
         aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
 
     def add_filter(self, filter_expr, connector=AND, negate=False, trim=False,
-            can_reuse=None, process_extras=True):
+            can_reuse=None, process_extras=True, force_having=False):
         """
         Add a single filter to the query. The 'filter_expr' is a pair:
         (filter_string, value). E.g. ('name__contains', 'fred')
@@ -1026,14 +1039,14 @@ class Query(object):
             value = SQLEvaluator(value, self)
             having_clause = value.contains_aggregate
 
-        for alias, aggregate in self.aggregates.items():
-            if alias == parts[0]:
-                entry = self.where_class()
-                entry.add((aggregate, lookup_type, value), AND)
-                if negate:
-                    entry.negate()
-                self.having.add(entry, AND)
-                return
+        if parts[0] in self.aggregates:
+            aggregate = self.aggregates[parts[0]]
+            entry = self.where_class()
+            entry.add((aggregate, lookup_type, value), AND)
+            if negate:
+                entry.negate()
+            self.having.add(entry, connector)
+            return
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
@@ -1082,7 +1095,7 @@ class Query(object):
             self.promote_alias_chain(table_it, table_promote)
 
 
-        if having_clause:
+        if having_clause or force_having:
             if (alias, col) not in self.group_by:
                 self.group_by.append((alias, col))
             self.having.add((Constraint(alias, col, field), lookup_type, value),
@@ -1123,7 +1136,7 @@ class Query(object):
                 self.add_filter(filter, negate=negate, can_reuse=can_reuse,
                         process_extras=False)
 
-    def add_q(self, q_object, used_aliases=None):
+    def add_q(self, q_object, used_aliases=None, force_having=False):
         """
         Adds a Q-object to the current filter.
 
@@ -1141,16 +1154,25 @@ class Query(object):
             else:
                 subtree = False
             connector = AND
+            if q_object.connector == OR and not force_having:
+                force_having = self.need_force_having(q_object)
             for child in q_object.children:
                 if connector == OR:
                     refcounts_before = self.alias_refcount.copy()
-                self.where.start_subtree(connector)
+                if force_having:
+                    self.having.start_subtree(connector)
+                else:
+                    self.where.start_subtree(connector)
                 if isinstance(child, Node):
-                    self.add_q(child, used_aliases)
+                    self.add_q(child, used_aliases, force_having=force_having)
                 else:
                     self.add_filter(child, connector, q_object.negated,
-                            can_reuse=used_aliases)
-                self.where.end_subtree()
+                            can_reuse=used_aliases, force_having=force_having)
+                if force_having:
+                    self.having.end_subtree()
+                else:
+                    self.where.end_subtree()
+
                 if connector == OR:
                     # Aliases that were newly added or not used at all need to
                     # be promoted to outer joins if they are nullable relations.
