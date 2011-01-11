@@ -414,7 +414,7 @@ calendar, and a shortcut for "Today".  The JavaScript calendar will always
 start the week on a Sunday.
 
 .. note::
-    As currently implemented, setting ``auto_now`` or ``auto_add_now`` to
+    As currently implemented, setting ``auto_now`` or ``auto_now_add`` to
     ``True`` will cause the field to have ``editable=False`` and ``blank=True``
     set.
 
