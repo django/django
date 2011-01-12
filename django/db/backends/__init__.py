@@ -1,10 +1,12 @@
 import decimal
 from threading import local
 
+from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import util
 from django.utils import datetime_safe
 from django.utils.importlib import import_module
+
 
 class BaseDatabaseWrapper(local):
     """
@@ -73,7 +75,6 @@ class BaseDatabaseWrapper(local):
             self.connection = None
 
     def cursor(self):
-        from django.conf import settings
         cursor = self._cursor()
         if (self.use_debug_cursor or
             (self.use_debug_cursor is None and settings.DEBUG)):
@@ -205,7 +206,7 @@ class BaseDatabaseOperations(object):
     compiler_module = "django.db.models.sql.compiler"
 
     def __init__(self):
-        self._cache = {}
+        self._cache = None
 
     def autoinc_sql(self, table, column):
         """
@@ -388,11 +389,9 @@ class BaseDatabaseOperations(object):
         in the namespace corresponding to the `compiler_module` attribute
         on this backend.
         """
-        if compiler_name not in self._cache:
-            self._cache[compiler_name] = getattr(
-                import_module(self.compiler_module), compiler_name
-            )
-        return self._cache[compiler_name]
+        if self._cache is None:
+            self._cache = import_module(self.compiler_module)
+        return getattr(self._cache, compiler_name)
 
     def quote_name(self, name):
         """
