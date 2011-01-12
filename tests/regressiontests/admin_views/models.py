@@ -168,6 +168,7 @@ class Person(models.Model):
     )
     name = models.CharField(max_length=100)
     gender = models.IntegerField(choices=GENDER_CHOICES)
+    age = models.IntegerField(default=21)
     alive = models.BooleanField()
 
     def __unicode__(self):

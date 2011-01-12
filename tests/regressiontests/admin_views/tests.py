@@ -295,6 +295,11 @@ class AdminViewBasicTest(TestCase):
             self.client.get, "/test_admin/admin/admin_views/album/?owner__email__startswith=fuzzy"
         )
 
+        try:
+            self.client.get("/test_admin/admin/admin_views/person/?age__gt=30")
+        except SuspiciousOperation:
+            self.fail("Filters should be allowed if they involve a local field without the need to whitelist them in list_filter or date_hierarchy.")
+
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
 
@@ -306,7 +311,7 @@ class SaveAsTests(TestCase):
 
     def test_save_as_duplication(self):
         """Ensure save as actually creates a new person"""
-        post_data = {'_saveasnew':'', 'name':'John M', 'gender':1}
+        post_data = {'_saveasnew':'', 'name':'John M', 'gender':1, 'age': 42}
         response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
         self.assertEqual(len(Person.objects.filter(name='John M')), 1)
         self.assertEqual(len(Person.objects.filter(id=1)), 1)
