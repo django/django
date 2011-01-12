@@ -195,8 +195,21 @@ class BaseModelAdmin(object):
 
         # Special case -- foo__id__exact and foo__id queries are implied
         # if foo has been specificially included in the lookup list; so
-        # drop __id if it is the last part.
-        if len(parts) > 1 and parts[-1] == self.model._meta.pk.name:
+        # drop __id if it is the last part. However, first we need to find
+        # the pk attribute name.
+        model = self.model
+        pk_attr_name = None
+        for part in parts[:-1]:
+            field, _, _, _ = model._meta.get_field_by_name(part)
+            if hasattr(field, 'rel'):
+                model = field.rel.to
+                pk_attr_name = model._meta.pk.name
+            elif isinstance(field, RelatedObject):
+                model = field.model
+                pk_attr_name = model._meta.pk.name
+            else:
+                pk_attr_name = None
+        if pk_attr_name and len(parts) > 1 and parts[-1] == pk_attr_name:
             parts.pop()
 
         try:
