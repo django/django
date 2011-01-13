@@ -109,3 +109,15 @@ class TestUtilsHtml(unittest.TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+
+    def test_escapejs(self):
+        f = html.escapejs
+        items = (
+            (u'"double quotes" and \'single quotes\'', u'\\u0022double quotes\\u0022 and \\u0027single quotes\\u0027'),
+            (ur'\ : backslashes, too', u'\\u005C : backslashes, too'),
+            (u'and lots of whitespace: \r\n\t\v\f\b', u'and lots of whitespace: \\u000D\\u000A\\u0009\\u000B\\u000C\\u0008'),
+            (ur'<script>and this</script>', u'\\u003Cscript\\u003Eand this\\u003C/script\\u003E'),
+            (u'paragraph separator:\u2029and line separator:\u2028', u'paragraph separator:\\u2029and line separator:\\u2028'),
+        )
+        for value, output in items:
+            self.check_output(f, value, output)
