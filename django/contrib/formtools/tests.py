@@ -146,6 +146,9 @@ class WizardPageOneForm(forms.Form):
 class WizardPageTwoForm(forms.Form):
     field = forms.CharField()
 
+class WizardPageTwoAlternativeForm(forms.Form):
+    field = forms.CharField()
+
 class WizardPageThreeForm(forms.Form):
     field = forms.CharField()
 
@@ -194,7 +197,8 @@ class WizardTests(TestCase):
 
     def test_14498(self):
         """
-        Regression test for ticket #14498.
+        Regression test for ticket #14498.  All previous steps' forms should be
+        validated.
         """
         that = self
         reached = [False]
@@ -237,3 +241,26 @@ class WizardTests(TestCase):
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
+
+    def test_15075(self):
+        """
+        Regression test for ticket #15075.  Allow modifying wizard's form_list
+        in process_step.
+        """
+        that = self
+
+        class WizardWithProcessStep(WizardClass):
+            def process_step(self, request, form, step):
+                if step == 0:
+                    self.form_list[1] = WizardPageTwoAlternativeForm
+                if step == 1:
+                    that.assertTrue(isinstance(form, WizardPageTwoAlternativeForm))
+
+        wizard = WizardWithProcessStep([WizardPageOneForm,
+                                        WizardPageTwoForm,
+                                        WizardPageThreeForm])
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": "2fdbefd4c0cad51509478fbacddf8b13",
+                "wizard_step": "1"}
+        wizard(DummyRequest(POST=data))
