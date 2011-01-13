@@ -247,6 +247,7 @@ class WizardTests(TestCase):
         Regression test for ticket #15075.  Allow modifying wizard's form_list
         in process_step.
         """
+        reached = [False]
         that = self
 
         class WizardWithProcessStep(WizardClass):
@@ -255,6 +256,7 @@ class WizardTests(TestCase):
                     self.form_list[1] = WizardPageTwoAlternativeForm
                 if step == 1:
                     that.assertTrue(isinstance(form, WizardPageTwoAlternativeForm))
+                    reached[0] = True
 
         wizard = WizardWithProcessStep([WizardPageOneForm,
                                         WizardPageTwoForm,
@@ -264,3 +266,4 @@ class WizardTests(TestCase):
                 "hash_0": "2fdbefd4c0cad51509478fbacddf8b13",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
+        self.assertTrue(reached[0])
