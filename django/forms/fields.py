@@ -224,6 +224,7 @@ class IntegerField(Field):
     }
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
+        self.max_value, self.min_value = max_value, min_value
         super(IntegerField, self).__init__(*args, **kwargs)
 
         if max_value is not None:
@@ -279,6 +280,7 @@ class DecimalField(Field):
     }
 
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
+        self.max_value, self.min_value = max_value, min_value
         self.max_digits, self.decimal_places = max_digits, decimal_places
         Field.__init__(self, *args, **kwargs)
 
@@ -587,7 +589,7 @@ class URLField(CharField):
                 url_fields[0] = 'http'
             if not url_fields[1]:
                 # Assume that if no domain is provided, that the path segment
-                # contains the domain. 
+                # contains the domain.
                 url_fields[1] = url_fields[2]
                 url_fields[2] = ''
                 # Rebuild the url_fields list, since the domain segment may now
