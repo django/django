@@ -553,7 +553,7 @@ def create_many_related_manager(superclass, rel=False):
                         raise TypeError("'%s' instance expected" % self.model._meta.object_name)
                     else:
                         new_ids.add(obj)
-                db = router.db_for_write(self.through.__class__, instance=self.instance)
+                db = router.db_for_write(self.through, instance=self.instance)
                 vals = self.through._default_manager.using(db).values_list(target_field_name, flat=True)
                 vals = vals.filter(**{
                     source_field_name: self._pk_val,
@@ -601,7 +601,7 @@ def create_many_related_manager(superclass, rel=False):
                         instance=self.instance, reverse=self.reverse,
                         model=self.model, pk_set=old_ids)
                 # Remove the specified objects from the join table
-                db = router.db_for_write(self.through.__class__, instance=self.instance)
+                db = router.db_for_write(self.through, instance=self.instance)
                 self.through._default_manager.using(db).filter(**{
                     source_field_name: self._pk_val,
                     '%s__in' % target_field_name: old_ids
@@ -621,7 +621,7 @@ def create_many_related_manager(superclass, rel=False):
                 signals.m2m_changed.send(sender=rel.through, action="pre_clear",
                     instance=self.instance, reverse=self.reverse,
                     model=self.model, pk_set=None)
-            db = router.db_for_write(self.through.__class__, instance=self.instance)
+            db = router.db_for_write(self.through, instance=self.instance)
             self.through._default_manager.using(db).filter(**{
                 source_field_name: self._pk_val
             }).delete()
