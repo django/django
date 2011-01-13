@@ -36,6 +36,11 @@ def custom_create(request):
         form_class=SlugChangingArticleForm)
 
 def raises(request):
+    # Make sure that a callable that raises an exception in the stack frame's
+    # local vars won't hijack the technical 500 response. See:
+    # http://code.djangoproject.com/ticket/15025
+    def callable():
+        raise Exception
     try:
         raise Exception
     except Exception:

@@ -8,10 +8,10 @@ from django.conf import settings
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
 from django.template import (Template, Context, TemplateDoesNotExist,
     TemplateSyntaxError)
+from django.template.defaultfilters import force_escape, pprint
 from django.utils.html import escape
 from django.utils.importlib import import_module
 from django.utils.encoding import smart_unicode, smart_str
-
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST|SIGNATURE')
 
@@ -109,6 +109,9 @@ class ExceptionReporter:
             self.get_template_exception_info()
 
         frames = self.get_traceback_frames()
+        for i, frame in enumerate(frames):
+            frame['vars'] = [(k, force_escape(pprint(v))) for k, v in frame['vars']]
+            frames[i] = frame
 
         unicode_hint = ''
         if issubclass(self.exc_type, UnicodeError):
@@ -547,7 +550,7 @@ TECHNICAL_500_TEMPLATE = """
                 {% for var in frame.vars|dictsort:"0" %}
                   <tr>
                     <td>{{ var.0|force_escape }}</td>
-                    <td class="code"><pre>{{ var.1|pprint|force_escape }}</pre></td>
+                    <td class="code"><pre>{{ var.1 }}</pre></td>
                   </tr>
                 {% endfor %}
               </tbody>
