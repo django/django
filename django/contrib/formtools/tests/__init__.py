@@ -393,7 +393,7 @@ class WizardTests(TestCase):
 
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "2fdbefd4c0cad51509478fbacddf8b13",
+                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
