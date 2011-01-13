@@ -17,6 +17,10 @@ class BackendTest(TestCase):
 
     def tearDown(self):
         settings.AUTHENTICATION_BACKENDS = self.curr_auth
+        # The custom_perms test messes with ContentTypes, which will
+        # be cached; flush the cache to ensure there are no side effects
+        # Refs #14975, #14925
+        ContentType.objects.clear_cache()
 
     def test_has_perm(self):
         user = User.objects.get(username='test')
@@ -161,6 +165,10 @@ class RowlevelBackendTest(TestCase):
 
     def tearDown(self):
         settings.AUTHENTICATION_BACKENDS = self.curr_auth
+        # The get_group_permissions test messes with ContentTypes, which will
+        # be cached; flush the cache to ensure there are no side effects
+        # Refs #14975, #14925
+        ContentType.objects.clear_cache()
 
     def test_has_perm(self):
         self.assertEqual(self.user1.has_perm('perm', TestObj()), False)
