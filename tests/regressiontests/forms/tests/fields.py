@@ -66,6 +66,8 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, None)
         self.assertRaisesErrorWithMessage(ValidationError, "[u'This field is required.']", f.clean, '')
         self.assertEqual(u'[1, 2, 3]', f.clean([1, 2, 3]))
+        self.assertEqual(f.max_length, None)
+        self.assertEqual(f.min_length, None)
 
     def test_charfield_2(self):
         f = CharField(required=False)
@@ -74,12 +76,16 @@ class FieldsTests(TestCase):
         self.assertEqual(u'', f.clean(None))
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'[1, 2, 3]', f.clean([1, 2, 3]))
+        self.assertEqual(f.max_length, None)
+        self.assertEqual(f.min_length, None)
 
     def test_charfield_3(self):
         f = CharField(max_length=10, required=False)
         self.assertEqual(u'12345', f.clean('12345'))
         self.assertEqual(u'1234567890', f.clean('1234567890'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at most 10 characters (it has 11).']", f.clean, '1234567890a')
+        self.assertEqual(f.max_length, 10)
+        self.assertEqual(f.min_length, None)
 
     def test_charfield_4(self):
         f = CharField(min_length=10, required=False)
@@ -87,6 +93,8 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 10 characters (it has 5).']", f.clean, '12345')
         self.assertEqual(u'1234567890', f.clean('1234567890'))
         self.assertEqual(u'1234567890a', f.clean('1234567890a'))
+        self.assertEqual(f.max_length, None)
+        self.assertEqual(f.min_length, 10)
 
     def test_charfield_5(self):
         f = CharField(min_length=10, required=True)
@@ -94,6 +102,8 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value has at least 10 characters (it has 5).']", f.clean, '12345')
         self.assertEqual(u'1234567890', f.clean('1234567890'))
         self.assertEqual(u'1234567890a', f.clean('1234567890a'))
+        self.assertEqual(f.max_length, None)
+        self.assertEqual(f.min_length, 10)
 
     # IntegerField ################################################################
 
@@ -111,6 +121,8 @@ class FieldsTests(TestCase):
         self.assertEqual(1, f.clean(' 1'))
         self.assertEqual(1, f.clean(' 1 '))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a whole number.']", f.clean, '1a')
+        self.assertEqual(f.max_value, None)
+        self.assertEqual(f.min_value, None)
 
     def test_integerfield_2(self):
         f = IntegerField(required=False)
@@ -126,6 +138,8 @@ class FieldsTests(TestCase):
         self.assertEqual(1, f.clean(' 1'))
         self.assertEqual(1, f.clean(' 1 '))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a whole number.']", f.clean, '1a')
+        self.assertEqual(f.max_value, None)
+        self.assertEqual(f.min_value, None)
 
     def test_integerfield_3(self):
         f = IntegerField(max_value=10)
@@ -135,6 +149,8 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is less than or equal to 10.']", f.clean, 11)
         self.assertEqual(10, f.clean('10'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is less than or equal to 10.']", f.clean, '11')
+        self.assertEqual(f.max_value, 10)
+        self.assertEqual(f.min_value, None)
 
     def test_integerfield_4(self):
         f = IntegerField(min_value=10)
@@ -144,6 +160,8 @@ class FieldsTests(TestCase):
         self.assertEqual(11, f.clean(11))
         self.assertEqual(10, f.clean('10'))
         self.assertEqual(11, f.clean('11'))
+        self.assertEqual(f.max_value, None)
+        self.assertEqual(f.min_value, 10)
 
     def test_integerfield_5(self):
         f = IntegerField(min_value=10, max_value=20)
@@ -155,6 +173,8 @@ class FieldsTests(TestCase):
         self.assertEqual(11, f.clean('11'))
         self.assertEqual(20, f.clean(20))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is less than or equal to 20.']", f.clean, 21)
+        self.assertEqual(f.max_value, 20)
+        self.assertEqual(f.min_value, 10)
 
     # FloatField ##################################################################
 
@@ -173,12 +193,16 @@ class FieldsTests(TestCase):
         self.assertEqual(1.0, f.clean(' 1.0'))
         self.assertEqual(1.0, f.clean(' 1.0 '))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, '1.0a')
+        self.assertEqual(f.max_value, None)
+        self.assertEqual(f.min_value, None)
 
     def test_floatfield_2(self):
         f = FloatField(required=False)
         self.assertEqual(None, f.clean(''))
         self.assertEqual(None, f.clean(None))
         self.assertEqual(1.0, f.clean('1'))
+        self.assertEqual(f.max_value, None)
+        self.assertEqual(f.min_value, None)
 
     def test_floatfield_3(self):
         f = FloatField(max_value=1.5, min_value=0.5)
@@ -186,6 +210,8 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure this value is greater than or equal to 0.5.']", f.clean, '0.4')
         self.assertEqual(1.5, f.clean('1.5'))
         self.assertEqual(0.5, f.clean('0.5'))
+        self.assertEqual(f.max_value, 1.5)
+        self.assertEqual(f.min_value, 0.5)
 
     # DecimalField ################################################################
 
@@ -219,12 +245,20 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure that there are no more than 2 decimal places.']", f.clean, '-000.123')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Ensure that there are no more than 4 digits in total.']", f.clean, '-000.12345')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a number.']", f.clean, '--0.12')
+        self.assertEqual(f.max_digits, 4)
+        self.assertEqual(f.decimal_places, 2)
+        self.assertEqual(f.max_value, None)
+        self.assertEqual(f.min_value, None)
 
     def test_decimalfield_2(self):
         f = DecimalField(max_digits=4, decimal_places=2, required=False)
         self.assertEqual(None, f.clean(''))
         self.assertEqual(None, f.clean(None))
         self.assertEqual(f.clean('1'), Decimal("1"))
+        self.assertEqual(f.max_digits, 4)
+        self.assertEqual(f.decimal_places, 2)
+        self.assertEqual(f.max_value, None)
+        self.assertEqual(f.min_value, None)
 
     def test_decimalfield_3(self):
         f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
@@ -234,6 +268,10 @@ class FieldsTests(TestCase):
         self.assertEqual(f.clean('0.5'), Decimal("0.5"))
         self.assertEqual(f.clean('.5'), Decimal("0.5"))
         self.assertEqual(f.clean('00.50'), Decimal("0.50"))
+        self.assertEqual(f.max_digits, 4)
+        self.assertEqual(f.decimal_places, 2)
+        self.assertEqual(f.max_value, Decimal('1.5'))
+        self.assertEqual(f.min_value, Decimal('0.5'))
 
     def test_decimalfield_4(self):
         f = DecimalField(decimal_places=2)
