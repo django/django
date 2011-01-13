@@ -1791,3 +1791,56 @@ class SignalTests(TestCase):
         b.authors.clear()
         self._write_to_default()
         self.assertEqual(receiver._database, "other")
+
+class AttributeErrorRouter(object):
+    "A router to test the exception handling of ConnectionRouter"
+    def db_for_read(self, model, **hints):
+        raise AttributeError
+
+    def db_for_write(self, model, **hints):
+        raise AttributeError
+
+class RouterAttributeErrorTestCase(TestCase):
+    multi_db = True
+
+    def setUp(self):
+        self.old_routers = router.routers
+        router.routers = [AttributeErrorRouter()]
+
+    def tearDown(self):
+        router.routers = self.old_routers
+
+    def test_attribute_error(self):
+        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        dive = Book()
+        dive.title="Dive into Python"
+        dive.published = datetime.date(2009, 5, 4)
+        self.assertRaises(AttributeError, dive.save)
+
+class ModelMetaRouter(object):
+    "A router to ensure model arguments are real model classes"
+    def db_for_write(self, model, **hints):
+        if not hasattr(model, '_meta'):
+            raise ValueError
+
+class RouterM2MThroughTestCase(TestCase):
+    multi_db = True
+
+    def setUp(self):
+        self.old_routers = router.routers
+        router.routers = [ModelMetaRouter()]
+
+    def tearDown(self):
+        router.routers = self.old_routers
+
+    def test_m2m_through(self):
+        b = Book.objects.create(title="Pro Django",
+                                published=datetime.date(2008, 12, 16))
+
+        p = Person.objects.create(name="Marty Alchin")
+        # test add
+        b.authors.add(p)
+        # test remove
+        b.authors.remove(p)
+        # test clear
+        b.authors.clear()

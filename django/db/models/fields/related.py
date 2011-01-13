@@ -555,7 +555,7 @@ def create_many_related_manager(superclass, rel=False):
                         raise TypeError("'%s' instance expected" % self.model._meta.object_name)
                     else:
                         new_ids.add(obj)
-                db = router.db_for_write(self.through.__class__, instance=self.instance)
+                db = router.db_for_write(self.through, instance=self.instance)
                 vals = self.through._default_manager.using(db).values_list(target_field_name, flat=True)
                 vals = vals.filter(**{
                     source_field_name: self._pk_val,
@@ -597,7 +597,7 @@ def create_many_related_manager(superclass, rel=False):
                     else:
                         old_ids.add(obj)
                 # Work out what DB we're operating on
-                db = router.db_for_write(self.through.__class__, instance=self.instance)
+                db = router.db_for_write(self.through, instance=self.instance)
                 # Send a signal to the other end if need be.
                 if self.reverse or source_field_name == self.source_field_name:
                     # Don't send the signal when we are deleting the
@@ -618,7 +618,7 @@ def create_many_related_manager(superclass, rel=False):
                         model=self.model, pk_set=old_ids, using=db)
 
         def _clear_items(self, source_field_name):
-            db = router.db_for_write(self.through.__class__, instance=self.instance)
+            db = router.db_for_write(self.through, instance=self.instance)
             # source_col_name: the PK colname in join_table for the source object
             if self.reverse or source_field_name == self.source_field_name:
                 # Don't send the signal when we are clearing the
