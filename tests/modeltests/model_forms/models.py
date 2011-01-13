@@ -236,6 +236,12 @@ class CustomFieldForExclusionModel(models.Model):
     name = models.CharField(max_length=10)
     markup = MarkupField()
 
+class FlexibleDatePost(models.Model):
+    title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
+    slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
+    subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
+    posted = models.DateField(blank=True, null=True)
+
 __test__ = {'API_TESTS': """
 >>> from django import forms
 >>> from django.forms.models import ModelForm, model_to_dict
