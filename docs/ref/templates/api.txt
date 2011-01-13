@@ -115,18 +115,15 @@ Variable names must consist of any letter (A-Z), any digit (0-9), an underscore
 or a dot.
 
 Dots have a special meaning in template rendering. A dot in a variable name
-signifies **lookup**. Specifically, when the template system encounters a dot
-in a variable name, it tries the following lookups, in this order:
+signifies a **lookup**. Specifically, when the template system encounters a
+dot in a variable name, it tries the following lookups, in this order:
 
     * Dictionary lookup. Example: ``foo["bar"]``
     * Attribute lookup. Example: ``foo.bar``
-    * Method call. Example: ``foo.bar()``
     * List-index lookup. Example: ``foo[bar]``
 
 The template system uses the first lookup type that works. It's short-circuit
-logic.
-
-Here are a few examples::
+logic. Here are a few examples::
 
     >>> from django.template import Context, Template
     >>> t = Template("My name is {{ person.first_name }}.")
@@ -141,26 +138,34 @@ Here are a few examples::
     >>> t.render(Context({"person": p}))
     "My name is Ron."
 
-    >>> class PersonClass2:
-    ...     def first_name(self):
-    ...         return "Samantha"
-    >>> p = PersonClass2()
-    >>> t.render(Context({"person": p}))
-    "My name is Samantha."
-
     >>> t = Template("The first stooge in the list is {{ stooges.0 }}.")
     >>> c = Context({"stooges": ["Larry", "Curly", "Moe"]})
     >>> t.render(c)
     "The first stooge in the list is Larry."
 
-Method lookups are slightly more complex than the other lookup types. Here are
-some things to keep in mind:
+If any part of the variable is callable, the template system will try calling
+it. Example::
 
-    * If, during the method lookup, a method raises an exception, the exception
-      will be propagated, unless the exception has an attribute
+    >>> class PersonClass2:
+    ...     def name(self):
+    ...         return "Samantha"
+    >>> t = Template("My name is {{ person.name }}.")
+    >>> t.render(Context({"person": PersonClass2}))
+    "My name is Samantha."
+
+.. versionchanged:: 1.3
+    Previously, only variables that originated with an attribute lookup would
+    be called by the template system. This change was made for consistency
+    across lookup types.
+
+Callable variables are slightly more complex than variables which only require
+straight lookups. Here are some things to keep in mind:
+
+    * If the variable raises an exception when called, the exception will be
+      propagated, unless the exception has an attribute
       ``silent_variable_failure`` whose value is ``True``. If the exception
-      *does* have a ``silent_variable_failure`` attribute, the variable will
-      render as an empty string. Example::
+      *does* have a ``silent_variable_failure`` attribute whose value is
+      ``True``, the variable will render as an empty string. Example::
 
         >>> t = Template("My name is {{ person.first_name }}.")
         >>> class PersonClass3:
@@ -187,12 +192,12 @@ some things to keep in mind:
       with Django model objects, any ``DoesNotExist`` exception will fail
       silently.
 
-    * A method call will only work if the method has no required arguments.
-      Otherwise, the system will move to the next lookup type (list-index
-      lookup).
+    * A variable can only be called if it has no required arguments. Otherwise,
+      the system will return an empty string.
 
-    * Obviously, some methods have side effects, and it'd be either foolish or
-      a security hole to allow the template system to access them.
+    * Obviously, there can be side effects when calling some variables, and
+      it'd be either foolish or a security hole to allow the template system
+      to access them.
 
       A good example is the :meth:`~django.db.models.Model.delete` method on
       each Django model object. The template system shouldn't be allowed to do
@@ -200,8 +205,8 @@ some things to keep in mind:
 
         I will now delete this valuable data. {{ data.delete }}
 
-      To prevent this, set a function attribute ``alters_data`` on the method.
-      The template system won't execute a method if the method has
+      To prevent this, set an ``alters_data`` attribute on the callable
+      variable. The template system won't call a variable if it has
       ``alters_data=True`` set. The dynamically-generated
       :meth:`~django.db.models.Model.delete` and
       :meth:`~django.db.models.Model.save` methods on Django model objects get
