@@ -24,7 +24,9 @@ def iter_format_modules(lang):
             format_locations.append(settings.FORMAT_MODULE_PATH + '.%s')
             format_locations.reverse()
         locale = to_locale(lang)
-        locales = set((locale, locale.split('_')[0]))
+        locales = [locale]
+        if '_' in locale:
+            locales.append(locale.split('_')[0])
         for location in format_locations:
             for loc in locales:
                 try:
