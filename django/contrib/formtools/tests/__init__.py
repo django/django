@@ -356,11 +356,13 @@ class WizardTests(TestCase):
         Regression test for ticket #14498.  All previous steps' forms should be
         validated.
         """
+        reached = [False]
         that = self
 
         class WizardWithProcessStep(WizardClass):
             def process_step(self, request, form, step):
                 that.assertTrue(hasattr(form, 'cleaned_data'))
+                reached[0] = True
 
         wizard = WizardWithProcessStep([WizardPageOneForm,
                                         WizardPageTwoForm,
@@ -370,6 +372,7 @@ class WizardTests(TestCase):
                 "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
+        self.assertTrue(reached[0])
 
     def test_14576(self):
         """
@@ -400,6 +403,7 @@ class WizardTests(TestCase):
         Regression test for ticket #15075.  Allow modifying wizard's form_list
         in process_step.
         """
+        reached = [False]
         that = self
 
         class WizardWithProcessStep(WizardClass):
@@ -408,6 +412,7 @@ class WizardTests(TestCase):
                     self.form_list[1] = WizardPageTwoAlternativeForm
                 if step == 1:
                     that.assertTrue(isinstance(form, WizardPageTwoAlternativeForm))
+                    reached[0] = True
 
         wizard = WizardWithProcessStep([WizardPageOneForm,
                                         WizardPageTwoForm,
@@ -417,3 +422,4 @@ class WizardTests(TestCase):
                 "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
+        self.assertTrue(reached[0])
