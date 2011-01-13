@@ -81,6 +81,7 @@ class CommentTestCase(TestCase):
         return d
 
 from regressiontests.comment_tests.tests.app_api_tests import *
+from regressiontests.comment_tests.tests.feed_tests import *
 from regressiontests.comment_tests.tests.model_tests import *
 from regressiontests.comment_tests.tests.comment_form_tests import *
 from regressiontests.comment_tests.tests.templatetag_tests import *

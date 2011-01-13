@@ -143,18 +143,35 @@ enable it in your project's ``urls.py``:
   from django.conf.urls.defaults import *
   from django.contrib.comments.feeds import LatestCommentFeed
 
-  feeds = {
-      'latest': LatestCommentFeed,
-  }
-
   urlpatterns = patterns('',
   # ...
-      (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
-          {'feed_dict': feeds}),
+      (r'^feeds/latest/$', LatestCommentFeed()),
   # ...
   )
 
 Now you should have the latest comment feeds being served off ``/feeds/latest/``.
+
+.. versionchanged:: 1.3
+
+Prior to Django 1.3, the LatestCommentFeed was deployed using the
+syndication feed view:
+
+.. code-block:: python
+
+    from django.conf.urls.defaults import *
+    from django.contrib.comments.feeds import LatestCommentFeed
+
+    feeds = {
+        'latest': LatestCommentFeed,
+    }
+
+    urlpatterns = patterns('',
+    # ...
+        (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
+            {'feed_dict': feeds}),
+    # ...
+    )
+
 
 Moderation
 ==========

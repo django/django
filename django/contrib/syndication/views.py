@@ -188,6 +188,7 @@ class Feed(object):
 
 def feed(request, url, feed_dict=None):
     """Provided for backwards compatibility."""
+    from django.contrib.syndication.feeds import Feed as LegacyFeed
     import warnings
     warnings.warn('The syndication feed() view is deprecated. Please use the '
                   'new class based view API.',
@@ -205,6 +206,18 @@ def feed(request, url, feed_dict=None):
         f = feed_dict[slug]
     except KeyError:
         raise Http404("Slug %r isn't registered." % slug)
+
+    # Backwards compatibility within the backwards compatibility;
+    # Feeds can be updated to be class-based, but still be deployed
+    # using the legacy feed view. This only works if the feed takes
+    # no arguments (i.e., get_object returns None). Refs #14176.
+    if not issubclass(f, LegacyFeed):
+        instance = f()
+        instance.feed_url = getattr(f, 'feed_url', None) or request.path
+        instance.title_template = f.title_template or ('feeds/%s_title.html' % slug)
+        instance.description_template = f.description_template or ('feeds/%s_description.html' % slug)
+
+        return instance(request)
 
     try:
         feedgen = f(slug, request).get_feed(param)
