@@ -1,4 +1,9 @@
 from django.conf.urls.defaults import *
+from django.contrib.comments.feeds import LatestCommentFeed
+
+feeds = {
+     'comments': LatestCommentFeed,
+}
 
 urlpatterns = patterns('regressiontests.comment_tests.custom_comments.views',
     url(r'^post/$',          'custom_submit_comment'),
@@ -7,3 +12,7 @@ urlpatterns = patterns('regressiontests.comment_tests.custom_comments.views',
     url(r'^approve/(\d+)/$', 'custom_approve_comment'),
 )
 
+urlpatterns += patterns('',
+    (r'^rss/legacy/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': feeds}),
+    (r'^rss/comments/$', LatestCommentFeed()),
+)
