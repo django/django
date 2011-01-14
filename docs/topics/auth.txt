@@ -1644,7 +1644,7 @@ Authorization for inactive users
 
 An inactive user is a one that is authenticated but has its attribute
 ``is_active`` set to ``False``. However this does not mean they are not
-authrozied to do anything. For example they are allowed to activate their
+authorized to do anything. For example they are allowed to activate their
 account.
 
 The support for anonymous users in the permission system allows for

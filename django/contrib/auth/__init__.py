@@ -33,7 +33,7 @@ def load_backend(path):
 
     if not hasattr(cls, 'supports_inactive_user'):
         warn("Authentication backends without a `supports_inactive_user` attribute are deprecated. Please define it in %s." % cls,
-             DeprecationWarning)
+             PendingDeprecationWarning)
         cls.supports_inactive_user = False
     return cls()
 

@@ -151,7 +151,7 @@ of the template and context that was provided by the view to compute
 the response. The final output of the response is not computed until
 it is needed, later in the response process.
 
-For more details, see the :ref:`documentation </ref/template-response>`
+For more details, see the :doc:`documentation </ref/template-response>`
 on the :class:`~django.template.TemplateResponse` class.
 
 Caching changes
@@ -172,8 +172,8 @@ prefixing <cache_key_prefixing>` and :ref:`transformation
 Lastly, support for pylibmc_ has been added to the memcached cache
 backend.
 
-For more details, see the :ref:`documentation on
-caching in Django<topics/cache>`.
+For more details, see the :doc:`documentation on
+caching in Django</topics/cache>`.
 
 .. _pylibmc: http://sendapatch.se/projects/pylibmc/
 
@@ -183,7 +183,7 @@ Permissions for inactive users
 If you provide a custom auth backend with ``supports_inactive_user`` set to
 ``True``, an inactive user model will check the backend for permissions.
 This is useful for further centralizing the permission handling. See the
-:ref:`authentication docs <topics-auth>` for more details.
+:doc:`authentication docs </topics/auth>` for more details.
 
 GeoDjango
 ~~~~~~~~~
