@@ -1810,12 +1810,40 @@ class RouterAttributeErrorTestCase(TestCase):
     def tearDown(self):
         router.routers = self.old_routers
 
-    def test_attribute_error(self):
+    def test_attribute_error_read(self):
+        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        router.routers = [] # Reset routers so we can save a Book instance
+        b = Book.objects.create(title="Pro Django",
+                                published=datetime.date(2008, 12, 16))
+        router.routers = [AttributeErrorRouter()] # Install our router
+        self.assertRaises(AttributeError, Book.objects.get, pk=b.pk)
+
+    def test_attribute_error_save(self):
         "Check that the AttributeError from AttributeErrorRouter bubbles up"
         dive = Book()
         dive.title="Dive into Python"
         dive.published = datetime.date(2009, 5, 4)
         self.assertRaises(AttributeError, dive.save)
+
+    def test_attribute_error_delete(self):
+        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        router.routers = [] # Reset routers so we can save our Book, Person instances
+        b = Book.objects.create(title="Pro Django",
+                                published=datetime.date(2008, 12, 16))
+        p = Person.objects.create(name="Marty Alchin")
+        b.authors = [p]
+        b.editor = p
+        router.routers = [AttributeErrorRouter()] # Install our router
+        self.assertRaises(AttributeError, b.delete)
+
+    def test_attribute_error_m2m(self):
+        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        router.routers = [] # Reset routers so we can save our Book, Person instances
+        b = Book.objects.create(title="Pro Django",
+                                published=datetime.date(2008, 12, 16))
+        p = Person.objects.create(name="Marty Alchin")
+        router.routers = [AttributeErrorRouter()] # Install our router
+        self.assertRaises(AttributeError, setattr, b, 'authors', [p])
 
 class ModelMetaRouter(object):
     "A router to ensure model arguments are real model classes"
