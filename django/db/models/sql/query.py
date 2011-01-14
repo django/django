@@ -1212,11 +1212,10 @@ class Query(object):
         dupe_set = set()
         exclusions = set()
         extra_filters = []
+        int_alias = None
         for pos, name in enumerate(names):
-            try:
+            if int_alias is not None:
                 exclusions.add(int_alias)
-            except NameError:
-                pass
             exclusions.add(alias)
             last.append(len(joins))
             if name == 'pk':
@@ -1375,10 +1374,11 @@ class Query(object):
                     joins.append(alias)
 
             for (dupe_opts, dupe_col) in dupe_set:
-                try:
-                    self.update_dupe_avoidance(dupe_opts, dupe_col, int_alias)
-                except NameError:
-                    self.update_dupe_avoidance(dupe_opts, dupe_col, alias)
+                if int_alias is None:
+                    to_avoid = alias
+                else:
+                    to_avoid = int_alias
+                self.update_dupe_avoidance(dupe_opts, dupe_col, to_avoid)
 
         if pos != len(names) - 1:
             if pos == len(names) - 2:
