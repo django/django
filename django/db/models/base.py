@@ -612,7 +612,7 @@ class Model(object):
 
         for related in self._meta.get_all_related_many_to_many_objects():
             if related.field.rel.through:
-                db = router.db_for_write(related.field.rel.through.__class__, instance=self)
+                db = router.db_for_write(related.field.rel.through, instance=self)
                 opts = related.field.rel.through._meta
                 reverse_field_name = related.field.m2m_reverse_field_name()
                 nullable = opts.get_field(reverse_field_name).null
@@ -622,7 +622,7 @@ class Model(object):
 
         for f in self._meta.many_to_many:
             if f.rel.through:
-                db = router.db_for_write(f.rel.through.__class__, instance=self)
+                db = router.db_for_write(f.rel.through, instance=self)
                 opts = f.rel.through._meta
                 field_name = f.m2m_field_name()
                 nullable = opts.get_field(field_name).null

@@ -1739,7 +1739,7 @@ class ModelMetaRouter(object):
         if not hasattr(model, '_meta'):
             raise ValueError
 
-class RouterM2MThroughTestCase(TestCase):
+class RouterModelArgumentTestCase(TestCase):
     multi_db = True
 
     def setUp(self):
@@ -1749,7 +1749,7 @@ class RouterM2MThroughTestCase(TestCase):
     def tearDown(self):
         router.routers = self.old_routers
 
-    def test_m2m_through(self):
+    def test_m2m_collection(self):
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
 
@@ -1760,3 +1760,13 @@ class RouterM2MThroughTestCase(TestCase):
         b.authors.remove(p)
         # test clear
         b.authors.clear()
+        # test setattr
+        b.authors = [p]
+        # Test M2M collection (_collect_sub_objects() in Django <= 1.2.X)
+        b.delete()
+
+    def test_foreignkey_collection(self):
+        person = Person.objects.create(name='Bob')
+        pet = Pet.objects.create(owner=person, name='Wart')
+        # Test related FK collection (_collect_sub_objects() in Django <= 1.2.X)
+        person.delete()
