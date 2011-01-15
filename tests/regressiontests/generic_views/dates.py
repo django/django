@@ -221,10 +221,10 @@ class WeekArchiveViewTests(TestCase):
         future = datetime.date(datetime.date.today().year + 1, 1, 1)
         b = Book.objects.create(name="The New New Testement", pages=600, pubdate=future)
 
-        res = self.client.get('/dates/books/%s/week/0/' % future.year)
+        res = self.client.get('/dates/books/%s/week/1/' % future.year)
         self.assertEqual(res.status_code, 404)
 
-        res = self.client.get('/dates/books/%s/week/0/allow_future/' % future.year)
+        res = self.client.get('/dates/books/%s/week/1/allow_future/' % future.year)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['books']), [b])
 
