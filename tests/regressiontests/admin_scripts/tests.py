@@ -999,6 +999,61 @@ class ManageValidate(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, '0 errors found')
 
+class ManageRunserver(AdminScriptTestCase):
+    def setUp(self):
+        from django.core.management.commands.runserver import BaseRunserverCommand
+        def monkey_run(*args, **options): return
+
+        self.cmd = BaseRunserverCommand()
+        self.cmd.run = monkey_run
+
+    def assertServerSettings(self, addr, port, ipv6=None, raw_ipv6=False):
+        self.assertEqual(self.cmd.addr, addr)
+        self.assertEqual(self.cmd.port, port)
+        self.assertEqual(self.cmd.use_ipv6, ipv6)
+        self.assertEqual(self.cmd._raw_ipv6, raw_ipv6)
+
+    def test_runserver_addrport(self):
+        self.cmd.handle()
+        self.assertServerSettings('127.0.0.1', '8000')
+
+        self.cmd.handle(addrport="1.2.3.4:8000")
+        self.assertServerSettings('1.2.3.4', '8000')
+
+        self.cmd.handle(addrport="7000")
+        self.assertServerSettings('127.0.0.1', '7000')
+
+        # IPv6
+        self.cmd.handle(addrport="", use_ipv6=True)
+        self.assertServerSettings('::1', '8000', ipv6=True)
+
+        self.cmd.handle(addrport="7000", use_ipv6=True)
+        self.assertServerSettings('::1', '7000', ipv6=True)
+
+        self.cmd.handle(addrport="[2001:0db8:1234:5678::9]:7000")
+        self.assertServerSettings('2001:0db8:1234:5678::9', '7000', ipv6=True, raw_ipv6=True)
+
+        # Hostname
+        self.cmd.handle(addrport="localhost:8000")
+        self.assertServerSettings('localhost', '8000')
+
+        self.cmd.handle(addrport="test.domain.local:7000")
+        self.assertServerSettings('test.domain.local', '7000')
+
+        self.cmd.handle(addrport="test.domain.local:7000", use_ipv6=True)
+        self.assertServerSettings('test.domain.local', '7000', ipv6=True)
+
+        # Potentially ambiguous
+
+        # Only 4 characters, all of which coudl be in an ipv6 address
+        self.cmd.handle(addrport="beef:7654")
+        self.assertServerSettings('beef', '7654')
+
+        # Uses only characters that could be in an ipv6 address
+        self.cmd.handle(addrport="deadbeef:7654")
+        self.assertServerSettings('deadbeef', '7654')
+
+
 ##########################################################################
 # COMMAND PROCESSING TESTS
 # Check that user-space commands are correctly handled - in particular,

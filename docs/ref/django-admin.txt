@@ -616,7 +616,7 @@ Example usage::
 
 Run a FastCGI server as a daemon and write the spawned PID in a file.
 
-runserver [port or ipaddr:port]
+runserver [port or address:port]
 -------------------------------
 
 .. django-admin:: runserver
@@ -653,8 +653,10 @@ machines on the network, use its own IP address (e.g. ``192.168.2.1``) or
 
 .. versionchanged:: 1.3
 
-You can also provide an IPv6 address surrounded by brackets
-(eg. ``[200a::1]:8000``). This will automaticaly enable IPv6 support.
+You can provide an IPv6 address surrounded by brackets
+(e.g. ``[200a::1]:8000``). This will automatically enable IPv6 support.
+
+A hostname containing ASCII-only characters can also be used.
 
 .. django-admin-option:: --adminmedia
 
@@ -720,6 +722,14 @@ Port 7000 on IPv6 address ``::1``::
 Port 7000 on IPv6 address ``2001:0db8:1234:5678::9``::
 
     django-admin.py runserver [2001:0db8:1234:5678::9]:7000
+
+Port 8000 on IPv4 address of host ``localhost``::
+
+    django-admin.py runserver localhost:8000
+
+Port 8000 on IPv6 address of host ``localhost``::
+
+    django-admin.py runserver -6 localhost:8000
 
 Serving static files with the development server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
