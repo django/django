@@ -400,7 +400,7 @@ of 60 seconds, and a maximum capacity of 1000 items::
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.filebased.FileCache',
-            'LOCATION': '127.0.0.1:11211',
+            'LOCATION': '/var/tmp/django_cache',
             'TIMEOUT': 60,
             'OPTIONS': {
                 'MAX_ENTRIES': 1000
