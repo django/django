@@ -18,6 +18,7 @@ from django.conf import settings
 from django.core import signals
 from django.core.cache.backends.base import (
     InvalidCacheBackendError, CacheKeyWarning, BaseCache)
+from django.core.exceptions import ImproperlyConfigured
 from django.utils import importlib
 
 try:
