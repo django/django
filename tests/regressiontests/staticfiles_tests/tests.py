@@ -34,9 +34,6 @@ class StaticFilesTestCase(TestCase):
         self.old_debug = settings.DEBUG
         self.old_installed_apps = settings.INSTALLED_APPS
 
-        # We have to load these apps to test staticfiles.
-        load_app('regressiontests.staticfiles_tests.apps.test')
-        load_app('regressiontests.staticfiles_tests.apps.no_label')
         site_media = os.path.join(TEST_ROOT, 'project', 'site_media')
         settings.DEBUG = True
         settings.MEDIA_ROOT =  os.path.join(site_media, 'media')
@@ -53,8 +50,11 @@ class StaticFilesTestCase(TestCase):
             'django.contrib.staticfiles.finders.DefaultStorageFinder',
         )
         settings.INSTALLED_APPS = [
+            'django.contrib.admin',
             'django.contrib.staticfiles',
             'regressiontests.staticfiles_tests',
+            'regressiontests.staticfiles_tests.apps.test',
+            'regressiontests.staticfiles_tests.apps.no_label',
         ]
 
         # Clear the cached default_storage out, this is because when it first

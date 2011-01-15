@@ -75,8 +75,8 @@ Type 'yes' to continue, or 'no' to cancel: """)
                 raise CommandError("Collecting static files cancelled.")
 
         for finder in finders.get_finders():
-            for source, prefix, storage in finder.list(ignore_patterns):
-                self.copy_file(source, prefix, storage, **options)
+            for source, storage in finder.list(ignore_patterns):
+                self.copy_file(source, storage, **options)
 
         actual_count = len(self.copied_files) + len(self.symlinked_files)
         unmodified_count = len(self.unmodified_files)
@@ -97,7 +97,7 @@ Type 'yes' to continue, or 'no' to cancel: """)
         if self.verbosity >= level:
             self.stdout.write(msg)
 
-    def copy_file(self, source, prefix, source_storage, **options):
+    def copy_file(self, source, source_storage, **options):
         """
         Attempt to copy (or symlink) ``source`` to ``destination``,
         returning True if successful.
@@ -107,8 +107,8 @@ Type 'yes' to continue, or 'no' to cancel: """)
             source_last_modified = source_storage.modified_time(source)
         except (OSError, NotImplementedError):
             source_last_modified = None
-        if prefix:
-            destination = os.path.join(prefix, source)
+        if getattr(source_storage, 'prefix', None):
+            destination = os.path.join(source_storage.prefix, source)
         else:
             destination = source
         symlink = options['link']

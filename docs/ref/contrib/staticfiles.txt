@@ -103,9 +103,8 @@ setting.
 
 .. note::
 
-    When using the :class:`AppDirectoriesFinder` finder, make sure your apps can
-    be found by Django's app loading mechanism. Simply include a ``models``
-    module (an empty ``models.py`` file suffices) and add the app to the
+    When using the :class:`AppDirectoriesFinder` finder, make sure your apps
+    can be found by staticfiles. Simply add the app to the
     :setting:`INSTALLED_APPS` setting of your site.
 
 Static file finders are currently considered a private interface, and this
