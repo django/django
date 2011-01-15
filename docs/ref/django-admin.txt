@@ -617,7 +617,7 @@ Example usage::
 Run a FastCGI server as a daemon and write the spawned PID in a file.
 
 runserver [port or address:port]
--------------------------------
+--------------------------------
 
 .. django-admin:: runserver
 
