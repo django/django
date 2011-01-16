@@ -102,15 +102,21 @@ class RequestsTests(unittest.TestCase):
         # Read all of a limited stream
         stream = LimitedStream(StringIO('test'), 2)
         self.assertEqual(stream.read(), 'te')
+        # Reading again returns nothing.
+        self.assertEqual(stream.read(), '')
 
         # Read a number of characters greater than the stream has to offer
         stream = LimitedStream(StringIO('test'), 2)
         self.assertEqual(stream.read(5), 'te')
+        # Reading again returns nothing.
+        self.assertEqual(stream.readline(5), '')
 
         # Read sequentially from a stream
         stream = LimitedStream(StringIO('12345678'), 8)
         self.assertEqual(stream.read(5), '12345')
         self.assertEqual(stream.read(5), '678')
+        # Reading again returns nothing.
+        self.assertEqual(stream.readline(5), '')
 
         # Read lines from a stream
         stream = LimitedStream(StringIO('1234\n5678\nabcd\nefgh\nijkl'), 24)
@@ -128,6 +134,26 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(stream.readline(), '\n')
         # Read everything else.
         self.assertEqual(stream.readline(), 'ijkl')
+
+        # Regression for #15018
+        # If a stream contains a newline, but the provided length
+        # is less than the number of provided characters, the newline
+        # doesn't reset the available character count
+        stream = LimitedStream(StringIO('1234\nabcdef'), 9)
+        self.assertEqual(stream.readline(10), '1234\n')
+        self.assertEqual(stream.readline(3), 'abc')
+        # Now expire the available characters
+        self.assertEqual(stream.readline(3), 'd')
+        # Reading again returns nothing.
+        self.assertEqual(stream.readline(2), '')
+
+        # Same test, but with read, not readline.
+        stream = LimitedStream(StringIO('1234\nabcdef'), 9)
+        self.assertEqual(stream.read(6), '1234\na')
+        self.assertEqual(stream.read(2), 'bc')
+        self.assertEqual(stream.read(2), 'd')
+        self.assertEqual(stream.read(2), '')
+        self.assertEqual(stream.read(), '')
 
     def test_stream(self):
         request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})

@@ -96,9 +96,10 @@ class LimitedStream(object):
         return result
 
     def readline(self, size=None):
-        while '\n' not in self.buffer or \
-              (size is not None and len(self.buffer) < size):
+        while '\n' not in self.buffer and \
+              (size is None or len(self.buffer) < size):
             if size:
+                # since size is not None here, len(self.buffer) < size
                 chunk = self._read_limited(size - len(self.buffer))
             else:
                 chunk = self._read_limited()
