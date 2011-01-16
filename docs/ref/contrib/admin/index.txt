@@ -1014,6 +1014,7 @@ provided some extra mapping data that would not otherwise be available::
 
         def get_osm_info(self):
             # ...
+            pass
 
         def change_view(self, request, object_id, extra_context=None):
             my_context = {
@@ -1036,8 +1037,12 @@ on your ``ModelAdmin``::
             }
             js = ("my_code.js",)
 
-Keep in mind that this will be prepended with :setting:`MEDIA_URL`. The same
-rules apply as :doc:`regular media definitions on forms </topics/forms/media>`.
+.. versionchanged:: 1.3
+
+The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
+:setting:`STATIC_URL` (or :setting:`MEDIA_URL` if :setting:`STATIC_URL` is
+``None``) to any media paths. The same rules apply as :ref:`regular media
+definitions on forms <form-media-paths>`.
 
 Django admin Javascript makes use of the `jQuery`_ library. To avoid
 conflict with user scripts, Django's jQuery is namespaced as
