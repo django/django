@@ -474,6 +474,28 @@ class AggregationTests(TestCase):
         # Regression for #11256 - providing an aggregate name that conflicts with an m2m name on the model raises ValueError
         self.assertRaises(ValueError, Author.objects.annotate, friends=Count('friends'))
 
+    def test_values_queryset_non_conflict(self):
+        # Regression for #14707 -- If you're using a values query set, some potential conflicts are avoided.
+
+        # age is a field on Author, so it shouldn't be allowed as an aggregate.
+        # But age isn't included in the ValuesQuerySet, so it is.
+        results = Author.objects.values('name').annotate(age=Count('book_contact_set'))
+        self.assertEquals(len(results), 9)
+        self.assertEquals(results[0]['name'], u'Adrian Holovaty')
+        self.assertEquals(results[0]['age'], 1)
+
+        # Same problem, but aggregating over m2m fields
+        results = Author.objects.values('name').annotate(age=Avg('friends__age'))
+        self.assertEquals(len(results), 9)
+        self.assertEquals(results[0]['name'], u'Adrian Holovaty')
+        self.assertEquals(results[0]['age'], 32.0)
+
+        # Same problem, but colliding with an m2m field
+        results = Author.objects.values('name').annotate(friends=Count('friends'))
+        self.assertEquals(len(results), 9)
+        self.assertEquals(results[0]['name'], u'Adrian Holovaty')
+        self.assertEquals(results[0]['friends'], 2)
+
     def test_reverse_relation_name_conflict(self):
         # Regression for #11256 - providing an aggregate name that conflicts with a reverse-related name on the model raises ValueError
         self.assertRaises(ValueError, Author.objects.annotate, book_contact_set=Avg('friends__age'))

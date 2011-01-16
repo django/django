@@ -620,17 +620,18 @@ class QuerySet(object):
         """
         for arg in args:
             if arg.default_alias in kwargs:
-                raise ValueError("The %s named annotation conflicts with the "
+                raise ValueError("The named annotation '%s' conflicts with the "
                                  "default name for another annotation."
                                  % arg.default_alias)
             kwargs[arg.default_alias] = arg
 
-        names = set(self.model._meta.get_all_field_names())
+        names = getattr(self, '_fields', None)
+        if names is None:
+            names = set(self.model._meta.get_all_field_names())
         for aggregate in kwargs:
             if aggregate in names:
-                raise ValueError("The %s annotation conflicts with a field on "
+                raise ValueError("The annotation '%s' conflicts with a field on "
                     "the model." % aggregate)
-
 
         obj = self._clone()
 
