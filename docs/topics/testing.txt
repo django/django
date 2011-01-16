@@ -35,6 +35,17 @@ There are two primary ways to write tests with Django, corresponding to the
 two test frameworks that ship in the Python standard library. The two
 frameworks are:
 
+    * **Unit tests** -- tests that are expressed as methods on a Python class
+      that subclasses ``unittest.TestCase``. For example::
+
+          import unittest
+
+          class MyFuncTestCase(unittest.TestCase):
+              def testBasic(self):
+                  a = ['larry', 'curly', 'moe']
+                  self.assertEqual(my_func(a, 0), 'larry')
+                  self.assertEqual(my_func(a, 1), 'curly')
+
     * **Doctests** -- tests that are embedded in your functions' docstrings and
       are written in a way that emulates a session of the Python interactive
       interpreter. For example::
@@ -49,21 +60,87 @@ frameworks are:
               """
               return a_list[idx]
 
-    * **Unit tests** -- tests that are expressed as methods on a Python class
-      that subclasses ``unittest.TestCase``. For example::
+We'll discuss choosing the appropriate test framework later, however, most
+experienced developers prefer unit tests. You can also use any *other* Python
+test framework, as we'll explain in a bit.
 
-          import unittest
+Writing unit tests
+------------------
 
-          class MyFuncTestCase(unittest.TestCase):
-              def testBasic(self):
-                  a = ['larry', 'curly', 'moe']
-                  self.assertEqual(my_func(a, 0), 'larry')
-                  self.assertEqual(my_func(a, 1), 'curly')
+Django's unit tests use a Python standard library module: unittest_. This
+module defines tests in class-based approach.
 
-You can choose the test framework you like, depending on which syntax you
-prefer, or you can mix and match, using one framework for some of your code and
-the other framework for other code. You can also use any *other* Python test
-frameworks, as we'll explain in a bit.
+.. admonition:: unittest2
+
+    .. versionchanged:: 1.3
+
+    Python 2.7 introduced some major changes to the unittest library,
+    adding some extremely useful features. To ensure that every Django
+    project can benefit from these new features, Django ships with a
+    copy of unittest2_, a copy of the Python 2.7 unittest library,
+    backported for Python 2.4 compatibility.
+
+    To access this library, Django provides the
+    ``django.utils.unittest`` module alias. If you are using Python
+    2.7, or you have installed unittest2 locally, Django will map the
+    alias to the installed version of the unittest library. Otherwise,
+    Django will use it's own bundled version of unittest2.
+
+    To use this alias, simply use::
+
+        from django.utils import unittest
+
+    wherever you would have historically used::
+
+        import unittest
+
+    If you want to continue to use the base unittest libary, you can --
+    you just won't get any of the nice new unittest2 features.
+
+.. _unittest2: http://pypi.python.org/pypi/unittest2
+
+For a given Django application, the test runner looks for unit tests in two
+places:
+
+    * The ``models.py`` file. The test runner looks for any subclass of
+      ``unittest.TestCase`` in this module.
+
+    * A file called ``tests.py`` in the application directory -- i.e., the
+      directory that holds ``models.py``. Again, the test runner looks for any
+      subclass of ``unittest.TestCase`` in this module.
+
+Here is an example ``unittest.TestCase`` subclass::
+
+    from django.utils import unittest
+    from myapp.models import Animal
+
+    class AnimalTestCase(unittest.TestCase):
+        def setUp(self):
+            self.lion = Animal.objects.create(name="lion", sound="roar")
+            self.cat = Animal.objects.create(name="cat", sound="meow")
+
+        def testSpeaking(self):
+            self.assertEqual(self.lion.speak(), 'The lion says "roar"')
+            self.assertEqual(self.cat.speak(), 'The cat says "meow"')
+
+When you :ref:`run your tests <running-tests>`, the default behavior of the
+test utility is to find all the test cases (that is, subclasses of
+``unittest.TestCase``) in ``models.py`` and ``tests.py``, automatically build a
+test suite out of those test cases, and run that suite.
+
+There is a second way to define the test suite for a module: if you define a
+function called ``suite()`` in either ``models.py`` or ``tests.py``, the
+Django test runner will use that function to construct the test suite for that
+module. This follows the `suggested organization`_ for unit tests. See the
+Python documentation for more details on how to construct a complex test
+suite.
+
+For more details about ``unittest``, see the `standard library unittest
+documentation`_.
+
+.. _unittest: http://docs.python.org/library/unittest.html
+.. _standard library unittest documentation: unittest_
+.. _suggested organization: http://docs.python.org/library/unittest.html#organizing-tests
 
 Writing doctests
 ----------------
@@ -85,14 +162,14 @@ read Python's official documentation for the details.
     For example, this function has a docstring that describes what it does::
 
         def add_two(num):
-          "Return the result of adding two to the provided number."
-           return num + 2
+            "Return the result of adding two to the provided number."
+            return num + 2
 
     Because tests often make great documentation, putting tests directly in
     your docstrings is an effective way to document *and* test your code.
 
-For a given Django application, the test runner looks for doctests in two
-places:
+As with unit tests, for a given Django application, the test runner looks for
+doctests in two places:
 
     * The ``models.py`` file. You can define module-level doctests and/or a
       doctest for individual models. It's common practice to put
@@ -103,7 +180,8 @@ places:
       directory that holds ``models.py``. This file is a hook for any and all
       doctests you want to write that aren't necessarily related to models.
 
-Here is an example model doctest::
+This example doctest is equivalent to the example given in the unittest section
+above::
 
     # models.py
 
@@ -148,86 +226,6 @@ documentation for doctest`_.
 .. _doctest: http://docs.python.org/library/doctest.html
 .. _standard library documentation for doctest: doctest_
 
-Writing unit tests
-------------------
-
-Like doctests, Django's unit tests use a Python standard library
-module: unittest_. This module uses a different way of defining tests,
-taking a class-based approach.
-
-.. admonition:: unittest2
-
-    .. versionchanged:: 1.3
-
-    Python 2.7 introduced some major changes to the unittest library,
-    adding some extremely useful features. To ensure that every Django
-    project can benefit from these new features, Django ships with a
-    copy of unittest2_, a copy of the Python 2.7 unittest library,
-    backported for Python 2.4 compatibility.
-
-    To access this library, Django provides the
-    ``django.utils.unittest`` module alias. If you are using Python
-    2.7, or you have installed unittest2 locally, Django will map the
-    alias to the installed version of the unittest library. Otherwise,
-    Django will use it's own bundled version of unittest2.
-
-    To use this alias, simply use::
-
-        from django.utils import unittest
-
-    wherever you would have historically used::
-
-        import unittest
-
-    If you want to continue to use the base unittest libary, you can --
-    you just won't get any of the nice new unittest2 features.
-
-.. _unittest2: http://pypi.python.org/pypi/unittest2
-
-As with doctests, for a given Django application, the test runner looks for
-unit tests in two places:
-
-    * The ``models.py`` file. The test runner looks for any subclass of
-      ``unittest.TestCase`` in this module.
-
-    * A file called ``tests.py`` in the application directory -- i.e., the
-      directory that holds ``models.py``. Again, the test runner looks for any
-      subclass of ``unittest.TestCase`` in this module.
-
-This example ``unittest.TestCase`` subclass is equivalent to the example given
-in the doctest section above::
-
-    from django.utils import unittest
-    from myapp.models import Animal
-
-    class AnimalTestCase(unittest.TestCase):
-        def setUp(self):
-            self.lion = Animal.objects.create(name="lion", sound="roar")
-            self.cat = Animal.objects.create(name="cat", sound="meow")
-
-        def testSpeaking(self):
-            self.assertEqual(self.lion.speak(), 'The lion says "roar"')
-            self.assertEqual(self.cat.speak(), 'The cat says "meow"')
-
-When you :ref:`run your tests <running-tests>`, the default behavior of the
-test utility is to find all the test cases (that is, subclasses of
-``unittest.TestCase``) in ``models.py`` and ``tests.py``, automatically build a
-test suite out of those test cases, and run that suite.
-
-There is a second way to define the test suite for a module: if you define a
-function called ``suite()`` in either ``models.py`` or ``tests.py``, the
-Django test runner will use that function to construct the test suite for that
-module. This follows the `suggested organization`_ for unit tests. See the
-Python documentation for more details on how to construct a complex test
-suite.
-
-For more details about ``unittest``, see the `standard library unittest
-documentation`_.
-
-.. _unittest: http://docs.python.org/library/unittest.html
-.. _standard library unittest documentation: unittest_
-.. _suggested organization: http://docs.python.org/library/unittest.html#organizing-tests
-
 
 Which should I use?
 -------------------
@@ -244,10 +242,12 @@ you:
       more "pythonic". It's designed to make writing tests as easy as possible,
       so it requires no overhead of writing classes or methods. You simply put
       tests in docstrings. This has the added advantage of serving as
-      documentation (and correct documentation, at that!).
-
-      If you're just getting started with testing, using doctests will probably
-      get you started faster.
+      documentation (and correct documentation, at that!). However, while
+      doctests are good for some simple example code, they are not very good if
+      you want to produce either high quality, comprehensive tests or high
+      quality documentation. Test failures are often difficult to debug
+      as it can be unclear exactly why the test failed. Thus, doctests should
+      generally be avoided and used primarily for documentation examples only.
 
     * The ``unittest`` framework will probably feel very familiar to developers
       coming from Java. ``unittest`` is inspired by Java's JUnit, so you'll
@@ -262,10 +262,6 @@ you:
       in which your test cases are run.
 
     * If you're writing tests for Django itself, you should use ``unittest``.
-
-Again, remember that you can use both systems side-by-side (even in the same
-app). In the end, most projects will eventually end up using both. Each shines
-in different circumstances.
 
 .. _running-tests:
 
@@ -710,7 +706,7 @@ arguments at time of construction:
             ...       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         ...will send the HTTP header ``HTTP_X_REQUESTED_WITH`` to the
-        details	view, which is a good way to test code paths that use the
+        details view, which is a good way to test code paths that use the
         :meth:`django.http.HttpRequest.is_ajax()` method.
 
         If you already have the GET arguments in URL-encoded form, you can
@@ -1715,7 +1711,7 @@ set up, execute and tear down the test suite.
 .. method:: DjangoTestSuiteRunner.suite_result(suite, result, **kwargs)
 
     Computes and returns a return code based on a test suite, and the result
-	from that test suite.
+    from that test suite.
 
 
 Testing utilities
