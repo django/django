@@ -297,7 +297,7 @@ like::
 
     def deploy_static():
         with cd(env.project_root):
-            run('./manage.py collectstatic')
+            run('./manage.py collectstatic -v0 --noinput')
 
 Serving static files from a dedicated media server
 --------------------------------------------------
