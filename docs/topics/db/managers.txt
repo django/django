@@ -274,6 +274,28 @@ it into the inheritance hierarchy *after* the defaults::
         # Default manager is CustomManager, but OtherManager is
         # also available via the "extra_manager" attribute.
 
+Implementation concerns
+-----------------------
+
+Whatever features you add to your custom ``Manager``, it must be
+possible to make a shallow copy of a ``Manager`` instance; i.e., the
+following code must work::
+
+    >>> import copy
+    >>> manager = MyManager()
+    >>> my_copy = copy.copy(manager)
+
+Django makes shallow copies of manager objects during certain queries;
+if your Manager cannot be copied, those queries will fail.
+
+This won't be an issue for most custom managers. If you are just
+adding simple methods to your ``Manager``, it is unlikely that you
+will inadvertently make instances of your ``Manager`` uncopyable.
+However, if you're overriding ``__getattr__`` or some other private
+method of your ``Manager`` object that controls object state, you
+should ensure that you don't affect the ability of your ``Manager`` to
+be copied.
+
 .. _manager-types:
 
 Controlling automatic Manager types
