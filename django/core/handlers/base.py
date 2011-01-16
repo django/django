@@ -128,6 +128,13 @@ class BaseHandler(object):
                         view_name = callback.__class__.__name__ + '.__call__' # If it's a class
                     raise ValueError("The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name))
 
+                # If the response supports deferred rendering, apply template
+                # response middleware and the render the response
+                if hasattr(response, 'render') and callable(response.render):
+                    for middleware_method in self._template_response_middleware:
+                        response = middleware_method(request, response)
+                    response.render()
+
             except http.Http404, e:
                 logger.warning('Not Found: %s' % request.path,
                             extra={
@@ -166,13 +173,6 @@ class BaseHandler(object):
             urlresolvers.set_urlconf(None)
 
         try:
-            # If the response supports deferred rendering, apply template
-            # response middleware and the render the response
-            if hasattr(response, 'render') and callable(response.render):
-                for middleware_method in self._template_response_middleware:
-                    response = middleware_method(request, response)
-                response.render()
-
             # Apply response middleware, regardless of the response
             for middleware_method in self._response_middleware:
                 response = middleware_method(request, response)

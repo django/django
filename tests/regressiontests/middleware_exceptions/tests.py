@@ -503,9 +503,9 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_exceptions_handled('/middleware_exceptions/template_response/', ['Test Template Response Exception'])
 
         # Check that the right middleware methods have been invoked
-        self.assert_middleware_usage(pre_middleware,  True, True, False, False, False)
-        self.assert_middleware_usage(bad_middleware,  True, True, True,  False, False)
-        self.assert_middleware_usage(post_middleware, True, True, True,  False, False)
+        self.assert_middleware_usage(pre_middleware,  True, True, False, True, False)
+        self.assert_middleware_usage(bad_middleware,  True, True, True,  True, False)
+        self.assert_middleware_usage(post_middleware, True, True, True,  True, False)
 
     def test_process_response_bad_middleware(self):
         pre_middleware = TestMiddleware()
