@@ -75,7 +75,7 @@ def reloader_thread():
 
 def restart_with_reloader():
     while True:
-        args = [sys.executable] + sys.argv
+        args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions] + sys.argv
         if sys.platform == "win32":
             args = ['"%s"' % arg for arg in args]
         new_environ = os.environ.copy()
