@@ -8,6 +8,7 @@ a string) and returns a tuple in this format:
 """
 
 import re
+from threading import local
 
 from django.http import Http404
 from django.conf import settings
@@ -17,7 +18,6 @@ from django.utils.encoding import iri_to_uri, force_unicode, smart_str
 from django.utils.functional import memoize
 from django.utils.importlib import import_module
 from django.utils.regex_helper import normalize
-from django.utils.thread_support import currentThread
 
 _resolver_cache = {} # Maps URLconf modules to RegexURLResolver instances.
 _callable_cache = {} # Maps view and url pattern names to their view functions.
@@ -25,10 +25,11 @@ _callable_cache = {} # Maps view and url pattern names to their view functions.
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to
 # be empty.
-_prefixes = {}
+_prefixes = local()
 
 # Overridden URLconfs for each thread are stored here.
-_urlconfs = {}
+_urlconfs = local()
+
 
 class ResolverMatch(object):
     def __init__(self, func, args, kwargs, url_name=None, app_name=None, namespaces=None):
@@ -401,7 +402,7 @@ def set_script_prefix(prefix):
     """
     if not prefix.endswith('/'):
         prefix += '/'
-    _prefixes[currentThread()] = prefix
+    _prefixes.value = prefix
 
 def get_script_prefix():
     """
@@ -409,27 +410,22 @@ def get_script_prefix():
     wishes to construct their own URLs manually (although accessing the request
     instance is normally going to be a lot cleaner).
     """
-    return _prefixes.get(currentThread(), u'/')
+    return getattr(_prefixes, "value", u'/')
 
 def set_urlconf(urlconf_name):
     """
     Sets the URLconf for the current thread (overriding the default one in
     settings). Set to None to revert back to the default.
     """
-    thread = currentThread()
     if urlconf_name:
-        _urlconfs[thread] = urlconf_name
+        _urlconfs.value = urlconf_name
     else:
-        # faster than wrapping in a try/except
-        if thread in _urlconfs:
-            del _urlconfs[thread]
+        if hasattr(_urlconfs, "value"):
+            del _urlconfs.value
 
 def get_urlconf(default=None):
     """
     Returns the root URLconf to use for the current thread if it has been
     changed from the default one.
     """
-    thread = currentThread()
-    if thread in _urlconfs:
-        return _urlconfs[thread]
-    return default
+    return getattr(_urlconfs, "value", default)

@@ -25,6 +25,11 @@ class BaseDatabaseWrapper(local):
         self.alias = alias
         self.use_debug_cursor = None
 
+        # Transaction related attributes
+        self.transaction_state = []
+        self.savepoint_state = 0
+        self.dirty = None
+
     def __eq__(self, other):
         return self.alias == other.alias
 

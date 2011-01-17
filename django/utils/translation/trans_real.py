@@ -7,15 +7,16 @@ import sys
 import warnings
 import gettext as gettext_module
 from cStringIO import StringIO
+from threading import local
 
 from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe, SafeData
-from django.utils.thread_support import currentThread
+
 
 # Translations are cached in a dictionary for every language+app tuple.
 # The active translations are stored by threadid to make them thread local.
 _translations = {}
-_active = {}
+_active = local()
 
 # The default translation is based on the settings file.
 _default = None
@@ -197,16 +198,15 @@ def activate(language):
             "Please use the 'nb' translation instead.",
             DeprecationWarning
         )
-    _active[currentThread()] = translation(language)
+    _active.value = translation(language)
 
 def deactivate():
     """
     Deinstalls the currently active translation object so that further _ calls
     will resolve against the default translation object, again.
     """
-    global _active
-    if currentThread() in _active:
-        del _active[currentThread()]
+    if hasattr(_active, "value"):
+        del _active.value
 
 def deactivate_all():
     """
@@ -214,11 +214,11 @@ def deactivate_all():
     useful when we want delayed translations to appear as the original string
     for some reason.
     """
-    _active[currentThread()] = gettext_module.NullTranslations()
+    _active.value = gettext_module.NullTranslations()
 
 def get_language():
     """Returns the currently selected language."""
-    t = _active.get(currentThread(), None)
+    t = getattr(_active, "value", None)
     if t is not None:
         try:
             return t.to_language()
@@ -246,8 +246,9 @@ def catalog():
     This can be used if you need to modify the catalog or want to access the
     whole message catalog instead of just translating one string.
     """
-    global _default, _active
-    t = _active.get(currentThread(), None)
+    global _default
+
+    t = getattr(_active, "value", None)
     if t is not None:
         return t
     if _default is None:
@@ -262,9 +263,10 @@ def do_translate(message, translation_function):
     translation object to use. If no current translation is activated, the
     message will be run through the default translation object.
     """
+    global _default
+
     eol_message = message.replace('\r\n', '\n').replace('\r', '\n')
-    global _default, _active
-    t = _active.get(currentThread(), None)
+    t = getattr(_active, "value", None)
     if t is not None:
         result = getattr(t, translation_function)(eol_message)
     else:
@@ -300,9 +302,9 @@ def gettext_noop(message):
     return message
 
 def do_ntranslate(singular, plural, number, translation_function):
-    global _default, _active
+    global _default
 
-    t = _active.get(currentThread(), None)
+    t = getattr(_active, "value", None)
     if t is not None:
         return getattr(t, translation_function)(singular, plural, number)
     if _default is None:
@@ -587,4 +589,3 @@ def get_partial_date_formats():
     if month_day_format == 'MONTH_DAY_FORMAT':
         month_day_format = settings.MONTH_DAY_FORMAT
     return year_month_format, month_day_format
-
