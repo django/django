@@ -1277,6 +1277,11 @@ class Queries6Tests(TestCase):
             []
         )
 
+        # This next makes exactly *zero* sense, but it works. It's needed
+        # because MySQL fails to give the right results the first time this
+        # query is executed. If you run the same query a second time, it
+        # works fine. It's a hack, but it works...
+        list(Tag.objects.exclude(children=None))
         self.assertQuerysetEqual(
             Tag.objects.exclude(children=None),
             ['<Tag: t1>', '<Tag: t3>']
