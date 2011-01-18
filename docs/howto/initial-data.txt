@@ -121,6 +121,17 @@ the order in which they're executed. The only thing you can assume is
 that, by the time your custom data files are executed, all the
 database tables already will have been created.
 
+.. admonition:: Initial SQL data and testing
+
+    This technique *cannot* be used to provide initial data for
+    testing purposes. Django's test framework flushes the contents of
+    the test database after each test; as a result, any data added
+    using the custom SQL hook will be lost.
+
+    If you require data for a test case, you should add it using
+    either a :ref:`test fixture <topics-testing-fixtures>`, or
+    programatically add it during the ``setUp()`` of your test case.
+
 Database-backend-specific SQL data
 ----------------------------------
 

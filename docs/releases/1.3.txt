@@ -410,6 +410,36 @@ Bloggs'``. Although the previous behaviour was not useful for a template languag
 designed for web designers, and was never deliberately supported, it is possible
 that some templates may be broken by this change.
 
+Use of custom SQL to load initial data in tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django provides a custom SQL hooks as a way to inject hand-crafted SQL
+into the database synchronization process. One of the possible uses
+for this custom SQL is to insert data into your database. If your
+custom SQL contains ``INSERT`` statements, those insertions will be
+performed every time your database is synchronized. This includes the
+synchronization of any test databases that are created when you run a
+test suite.
+
+However, in the process of testing the Django 1.3, it was discovered
+that this feature has never completely worked as advertised. When
+using database backends that don't support transactions, or when using
+a TransactionTestCase, data that has been inserted using custom SQL
+will not be visible during the testing process.
+
+Unfortunately, there was no way to rectify this problem without
+introducing a backwards incompatibility. Rather than leave
+SQL-inserted initial data in an uncertain state, Django now enforces
+the policy that data inserted by custom SQL will *not* be visible
+during testing.
+
+This change only affects the testing process. You can still use custom
+SQL to load data into your production database as part of the syncdb
+process. If you require data to exist during test conditions, you
+should either insert it using :ref:`test fixtures
+<topics-testing-fixtures>`, or using the ``setUp()`` method of your
+test case.
+
 .. _deprecated-features-1.3:
 
 Features deprecated in 1.3

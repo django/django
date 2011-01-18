@@ -1237,6 +1237,15 @@ documentation<dumpdata>` for more details.
     Fixtures with other names can always be installed manually using
     the :djadmin:`manage.py loaddata<loaddata>` command.
 
+.. admonition:: Initial SQL data and testing
+
+    Django provides a second way to insert initial data into models --
+    the :ref:`custom SQL hook <initial-sql>`. However, this technique
+    *cannot* be used to provide initial data for testing purposes.
+    Django's test framework flushes the contents of the test database
+    after each test; as a result, any data added using the custom SQL
+    hook will be lost.
+
 Once you've created a fixture and placed it in a ``fixtures`` directory in one
 of your :setting:`INSTALLED_APPS`, you can use it in your unit tests by
 specifying a ``fixtures`` class attribute on your :class:`django.test.TestCase`
