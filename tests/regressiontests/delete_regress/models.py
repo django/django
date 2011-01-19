@@ -35,3 +35,12 @@ class PlayedWith(models.Model):
 class PlayedWithNote(models.Model):
     played = models.ForeignKey(PlayedWith)
     note = models.TextField()
+
+class Contact(models.Model):
+    label = models.CharField(max_length=100)
+
+class Email(Contact):
+    email_address = models.EmailField(max_length=100)
+
+class Researcher(models.Model):
+    contacts = models.ManyToManyField(Contact, related_name="research_contacts")

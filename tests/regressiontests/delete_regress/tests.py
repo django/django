@@ -4,7 +4,8 @@ from django.conf import settings
 from django.db import backend, connection, transaction, DEFAULT_DB_ALIAS
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from models import Book, Award, AwardNote, Person, Child, Toy, PlayedWith, PlayedWithNote
+from models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
+    PlayedWithNote, Contact, Email, Researcher)
 
 
 # Can't run this test under SQLite, because you can't
@@ -62,17 +63,12 @@ class DeleteLockingTest(TransactionTestCase):
         transaction.commit()
         self.assertEqual(1, Book.objects.count())
 
+
 class DeleteCascadeTests(TestCase):
     def test_generic_relation_cascade(self):
         """
-        Test that Django cascades deletes through generic-related
-        objects to their reverse relations.
-
-        This might falsely succeed if the database cascades deletes
-        itself immediately; the postgresql_psycopg2 backend does not
-        give such a false success because ForeignKeys are created with
-        DEFERRABLE INITIALLY DEFERRED, so its internal cascade is
-        delayed until transaction commit.
+        Django cascades deletes through generic-related objects to their
+        reverse relations.
 
         """
         person = Person.objects.create(name='Nelson Mandela')
@@ -87,13 +83,10 @@ class DeleteCascadeTests(TestCase):
 
     def test_fk_to_m2m_through(self):
         """
-        Test that if a M2M relationship has an explicitly-specified
-        through model, and some other model has an FK to that through
-        model, deletion is cascaded from one of the participants in
-        the M2M, to the through model, to its related model.
-
-        Like the above test, this could in theory falsely succeed if
-        the DB cascades deletes itself immediately.
+        If an M2M relationship has an explicitly-specified through model, and
+        some other model has an FK to that through model, deletion is cascaded
+        from one of the participants in the M2M, to the through model, to its
+        related model.
 
         """
         juan = Child.objects.create(name='Juan')
@@ -107,6 +100,24 @@ class DeleteCascadeTests(TestCase):
         self.assertEquals(PlayedWith.objects.count(), 0)
         # first two asserts just sanity checks, this is the kicker:
         self.assertEquals(PlayedWithNote.objects.count(), 0)
+
+
+class DeleteCascadeTransactionTests(TransactionTestCase):
+    def test_inheritance(self):
+        """
+        Auto-created many-to-many through tables referencing a parent model are
+        correctly found by the delete cascade when a child of that parent is
+        deleted.
+
+        Refs #14896.
+        """
+        r = Researcher.objects.create()
+        email = Email.objects.create(
+            label="office-email", email_address="carl@science.edu"
+        )
+        r.contacts.add(email)
+
+        email.delete()
 
 class LargeDeleteTests(TestCase):
     def test_large_deletes(self):

@@ -371,7 +371,7 @@ class Options(object):
         cache = SortedDict()
         parent_list = self.get_parent_list()
         for parent in self.parents:
-            for obj, model in parent._meta.get_all_related_objects_with_model():
+            for obj, model in parent._meta.get_all_related_objects_with_model(include_hidden=True):
                 if (obj.field.creation_counter < 0 or obj.field.rel.parent_link) and obj.model not in parent_list:
                     continue
                 if not model:
