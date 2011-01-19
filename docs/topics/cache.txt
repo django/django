@@ -58,6 +58,8 @@ settings file. Here's an explanation of all available values for
     been replaced with the new dictionary-based :setting:`CACHES`
     setting.
 
+.. _memcached:
+
 Memcached
 ---------
 

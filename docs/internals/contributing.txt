@@ -939,8 +939,7 @@ dependencies:
     *  Textile_
     *  Docutils_
     *  setuptools_
-    *  memcached_, plus the either the python-memcached_ or cmemcached_
-       Python binding
+    *  memcached_, plus a :ref:`supported Python binding <memcached>`
     *  gettext_ (:ref:`gettext_on_windows`)
 
 If you want to test the memcached cache backend, you will also need to define
@@ -955,8 +954,6 @@ associated tests will be skipped.
 .. _docutils: http://pypi.python.org/pypi/docutils/0.4
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
 .. _memcached: http://www.danga.com/memcached/
-.. _python-memcached: http://pypi.python.org/pypi/python-memcached/
-.. _cmemcached: http://gijsbert.org/cmemcache/index.html
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
 
 To run a subset of the unit tests, append the names of the test modules to the
