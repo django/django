@@ -33,6 +33,7 @@ class Command(NoArgsCommand):
     help = "Collect static files from apps and other locations in a single location."
 
     def __init__(self, *args, **kwargs):
+        super(NoArgsCommand, self).__init__(*args, **kwargs)
         self.copied_files = set()
         self.symlinked_files = set()
         self.unmodified_files = set()
