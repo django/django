@@ -58,7 +58,8 @@ def force_managed(func):
 class Collector(object):
     def __init__(self, using):
         self.using = using
-        self.data = {} # {model: [instances]}
+        # Initially, {model: set([instances])}, later values become lists.
+        self.data = {}
         self.batches = {} # {model: {field: set([instances])}}
         self.field_updates = {} # {model: {(field, value): set([instances])}}
         self.dependencies = {} # {model: set([models])}
@@ -75,11 +76,11 @@ class Collector(object):
             return []
         new_objs = []
         model = objs[0].__class__
-        instances = self.data.setdefault(model, [])
+        instances = self.data.setdefault(model, set())
         for obj in objs:
             if obj not in instances:
                 new_objs.append(obj)
-        instances.extend(new_objs)
+        instances.update(new_objs)
         # Nullable relationships can be ignored -- they are nulled out before
         # deleting, and therefore do not affect the order in which objects have
         # to be deleted.
@@ -190,8 +191,8 @@ class Collector(object):
     @force_managed
     def delete(self):
         # sort instance collections
-        for instances in self.data.itervalues():
-            instances.sort(key=attrgetter("pk"))
+        for model, instances in self.data.items():
+            self.data[model] = sorted(instances, key=attrgetter("pk"))
 
         # if possible, bring the models in an order suitable for databases that
         # don't support transactions or cannot defer contraint checks until the
