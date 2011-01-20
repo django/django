@@ -48,3 +48,7 @@ class DebugViewTests(TestCase):
                 self.assertFalse(raising_loc.find('raise BrokenException') == -1,
                     "Failed to find 'raise BrokenException' in last frame of traceback, instead found: %s" %
                         raising_loc)
+
+    def test_template_loader_postmortem(self):
+        response = self.client.get(reverse('raises_template_does_not_exist'))
+        self.assertContains(response, 'templates/i_dont_exist.html</code> (File does not exist)</li>', status_code=500)
