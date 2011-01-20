@@ -2,20 +2,13 @@ import sys
 
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 
+from models import Person
 
 if sys.version_info >= (2, 5):
-    from tests_25 import AssertNumQueriesTests
+    from tests_25 import AssertNumQueriesContextManagerTests
 
 
 class SkippingTestCase(TestCase):
-    def test_assert_num_queries(self):
-        def test_func():
-            raise ValueError
-
-        self.assertRaises(ValueError,
-            self.assertNumQueries, 2, test_func
-        )
-
     def test_skip_unless_db_feature(self):
         "A test that might be skipped is actually called."
         # Total hack, but it works, just want an attribute that's always true.
@@ -26,8 +19,37 @@ class SkippingTestCase(TestCase):
         self.assertRaises(ValueError, test_func)
 
 
-class SaveRestoreWarningState(TestCase):
+class AssertNumQueriesTests(TestCase):
+    def test_assert_num_queries(self):
+        def test_func():
+            raise ValueError
 
+        self.assertRaises(ValueError,
+            self.assertNumQueries, 2, test_func
+        )
+
+    def test_assert_num_queries_with_client(self):
+        person = Person.objects.create(name='test')
+
+        self.assertNumQueries(
+            1,
+            self.client.get,
+            "/test_utils/get_person/%s/" % person.pk
+        )
+
+        self.assertNumQueries(
+            1,
+            self.client.get,
+            "/test_utils/get_person/%s/" % person.pk
+        )
+
+        def test_func():
+            self.client.get("/test_utils/get_person/%s/" % person.pk)
+            self.client.get("/test_utils/get_person/%s/" % person.pk)
+        self.assertNumQueries(2, test_func)
+
+
+class SaveRestoreWarningState(TestCase):
     def test_save_restore_warnings_state(self):
         """
         Ensure save_warnings_state/restore_warnings_state work correctly.

@@ -5,7 +5,7 @@ from django.test import TestCase
 from models import Person
 
 
-class AssertNumQueriesTests(TestCase):
+class AssertNumQueriesContextManagerTests(TestCase):
     def test_simple(self):
         with self.assertNumQueries(0):
             pass
@@ -26,3 +26,16 @@ class AssertNumQueriesTests(TestCase):
         with self.assertRaises(TypeError):
             with self.assertNumQueries(4000):
                 raise TypeError
+
+    def test_with_client(self):
+        person = Person.objects.create(name="test")
+
+        with self.assertNumQueries(1):
+            self.client.get("/test_utils/get_person/%s/" % person.pk)
+
+        with self.assertNumQueries(1):
+            self.client.get("/test_utils/get_person/%s/" % person.pk)
+
+        with self.assertNumQueries(2):
+            self.client.get("/test_utils/get_person/%s/" % person.pk)
+            self.client.get("/test_utils/get_person/%s/" % person.pk)
