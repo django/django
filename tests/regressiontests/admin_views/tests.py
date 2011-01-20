@@ -1632,7 +1632,7 @@ class AdminActionsTest(TestCase):
             'post': 'yes',
         }
         confirmation = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
-        self.assertContains(confirmation, "Are you sure you want to delete the selected subscriber objects")
+        self.assertContains(confirmation, "Are you sure you want to delete the selected subscribers")
         self.assertTrue(confirmation.content.count(ACTION_CHECKBOX_NAME) == 2)
         response = self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)

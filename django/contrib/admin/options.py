@@ -1193,9 +1193,16 @@ class ModelAdmin(BaseModelAdmin):
                 return HttpResponseRedirect("../../../../")
             return HttpResponseRedirect("../../")
 
+        object_name = force_unicode(opts.verbose_name)
+
+        if perms_needed or protected:
+            title = _("Cannot delete %(name)s") % {"name": object_name}
+        else:
+            title = _("Are you sure?")
+
         context = {
-            "title": _("Are you sure?"),
-            "object_name": force_unicode(opts.verbose_name),
+            "title": title,
+            "object_name": object_name,
             "object": obj,
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,

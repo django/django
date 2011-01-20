@@ -22,7 +22,7 @@
         </ul>
     {% endif %}
     {% if protected %}
-        <p>{% blocktrans with object as escaped_object %}Deleting the {{ object_name }} '{{ escaped_object }}' is not possible, because it would require deleting the following protected related objects:{% endblocktrans %}</p>
+        <p>{% blocktrans with object as escaped_object %}Deleting the {{ object_name }} '{{ escaped_object }}' would require deleting the following protected related objects:{% endblocktrans %}</p>
         <ul>
         {% for obj in protected %}
             <li>{{ obj }}</li>
