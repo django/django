@@ -143,6 +143,7 @@ urlpatterns += patterns('django.views.generic.simple',
 urlpatterns += patterns('regressiontests.views.views',
     url(r'view_exception/(?P<n>\d+)/$', 'view_exception', name='view_exception'),
     url(r'template_exception/(?P<n>\d+)/$', 'template_exception', name='template_exception'),
+    url(r'^raises_template_does_not_exist/$', 'raises_template_does_not_exist', name='raises_template_does_not_exist'),
 
     (r'^shortcuts/render_to_response/$', 'render_to_response_view'),
     (r'^shortcuts/render_to_response/request_context/$', 'render_to_response_view_with_request_context'),
