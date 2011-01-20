@@ -1177,7 +1177,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        (deleted_objects, perms_needed) = get_deleted_objects(
+        (deleted_objects, perms_needed, protected) = get_deleted_objects(
             [obj], opts, request.user, self.admin_site, using)
 
         if request.POST: # The user has already confirmed the deletion.
@@ -1199,6 +1199,7 @@ class ModelAdmin(BaseModelAdmin):
             "object": obj,
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
+            "protected": protected,
             "opts": opts,
             "root_path": self.admin_site.root_path,
             "app_label": app_label,

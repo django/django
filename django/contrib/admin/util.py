@@ -104,13 +104,16 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
     to_delete = collector.nested(format_callback)
 
-    return to_delete, perms_needed
+    protected = [format_callback(obj) for obj in collector.protected]
+
+    return to_delete, perms_needed, protected
 
 
 class NestedObjects(Collector):
     def __init__(self, *args, **kwargs):
         super(NestedObjects, self).__init__(*args, **kwargs)
         self.edges = {} # {from_instance: [to_instances]}
+        self.protected = set()
 
     def add_edge(self, source, target):
         self.edges.setdefault(source, []).append(target)
@@ -121,7 +124,10 @@ class NestedObjects(Collector):
                 self.add_edge(getattr(obj, source_attr), obj)
             else:
                 self.add_edge(None, obj)
-        return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
+        try:
+            return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
+        except models.ProtectedError, e:
+            self.protected.update(e.protected_objects)
 
     def related_objects(self, related, objs):
         qs = super(NestedObjects, self).related_objects(related, objs)

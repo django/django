@@ -32,7 +32,7 @@ def delete_selected(modeladmin, request, queryset):
 
     # Populate deletable_objects, a data structure of all related objects that
     # will also be deleted.
-    deletable_objects, perms_needed = get_deleted_objects(
+    deletable_objects, perms_needed, protected = get_deleted_objects(
         queryset, opts, request.user, modeladmin.admin_site, using)
 
     # The user has already confirmed the deletion.
@@ -58,6 +58,7 @@ def delete_selected(modeladmin, request, queryset):
         "deletable_objects": [deletable_objects],
         'queryset': queryset,
         "perms_lacking": perms_needed,
+        "protected": protected,
         "opts": opts,
         "root_path": modeladmin.admin_site.root_path,
         "app_label": app_label,

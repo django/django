@@ -7,17 +7,27 @@ from django.utils.datastructures import SortedDict
 from django.utils.functional import wraps
 
 
+class ProtectedError(IntegrityError):
+    def __init__(self, msg, protected_objects):
+        self.protected_objects = protected_objects
+        super(ProtectedError, self).__init__(msg, protected_objects)
+
+
 def CASCADE(collector, field, sub_objs, using):
     collector.collect(sub_objs, source=field.rel.to,
                       source_attr=field.name, nullable=field.null)
     if field.null and not connections[using].features.can_defer_constraint_checks:
         collector.add_field_update(field, None, sub_objs)
 
+
 def PROTECT(collector, field, sub_objs, using):
-    raise IntegrityError("Cannot delete some instances of model '%s' because "
+    raise ProtectedError("Cannot delete some instances of model '%s' because "
         "they are referenced through a protected foreign key: '%s.%s'" % (
             field.rel.to.__name__, sub_objs[0].__class__.__name__, field.name
-    ))
+        ),
+        sub_objs
+    )
+
 
 def SET(value):
     if callable(value):
@@ -28,13 +38,17 @@ def SET(value):
             collector.add_field_update(field, value, sub_objs)
     return set_on_delete
 
+
 SET_NULL = SET(None)
+
 
 def SET_DEFAULT(collector, field, sub_objs, using):
     collector.add_field_update(field, field.get_default(), sub_objs)
 
+
 def DO_NOTHING(collector, field, sub_objs, using):
     pass
+
 
 def force_managed(func):
     @wraps(func)
@@ -54,6 +68,7 @@ def force_managed(func):
             if forced_managed:
                 transaction.leave_transaction_management(using=self.using)
     return decorated
+
 
 class Collector(object):
     def __init__(self, using):

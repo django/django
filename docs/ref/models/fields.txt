@@ -971,7 +971,8 @@ define the details of how the relation works.
     * :attr:`~django.db.models.CASCADE`: Cascade deletes; the default.
 
     * :attr:`~django.db.models.PROTECT`: Prevent deletion of the referenced
-      object by raising :exc:`django.db.IntegrityError`.
+      object by raising :exc:`django.db.models.ProtectedError`, a subclass of
+      :exc:`django.db.IntegrityError`.
 
     * :attr:`~django.db.models.SET_NULL`: Set the :class:`ForeignKey` null;
       this is only possible if :attr:`null` is ``True``.

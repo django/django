@@ -626,6 +626,16 @@ class WorkHourAdmin(admin.ModelAdmin):
     list_display = ('datum', 'employee')
     list_filter = ('employee',)
 
+class Question(models.Model):
+    question = models.CharField(max_length=20)
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.PROTECT)
+    answer = models.CharField(max_length=20)
+
+    def __unicode__(self):
+        return self.answer
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -674,3 +684,5 @@ admin.site.register(ChapterXtra1, ChapterXtra1Admin)
 admin.site.register(Pizza, PizzaAdmin)
 admin.site.register(Topping)
 admin.site.register(Album, AlbumAdmin)
+admin.site.register(Question)
+admin.site.register(Answer)
