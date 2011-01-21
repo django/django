@@ -1,0 +1,104 @@
+# Translation of Django to Malayalam.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# RAJEESH R NAIR <rajeeshrnair@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-05-28 15:09+0530\n"
+"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"Language-Team: MALAYALAM <ML@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Malayalam\n"
+"X-Poedit-Country: INDIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "ആം"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "ആം"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "ആം"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "ആം"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f മില്ല്യണ്‍ (ദശലക്ഷം)"
+msgstr[1] "%(value).1f മില്ല്യണ്‍ (ദശലക്ഷം)"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f ബില്ല്യണ്‍ (ശതകോടി)"
+msgstr[1] "%(value).1f ബില്ല്യണ്‍ (ശതകോടി)"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f ട്രില്ല്യണ്‍ (ലക്ഷം കോടി)"
+msgstr[1] "%(value).1f ട്രില്ല്യണ്‍ (ലക്ഷം കോടി)"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "ഒന്ന്"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "രണ്ട്"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "മൂന്ന്"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "നാല്"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "അഞ്ച്"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "ആറ്"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "ഏഴ്"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "എട്ട്"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "ഒന്‍പത്"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "ഇന്ന്"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "നാളെ"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "ഇന്നലെ"

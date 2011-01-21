@@ -1,0 +1,103 @@
+# translation of Django.
+# Copyright (C) 2008 The Django Project
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-05-09 15:10-0500\n"
+"Last-Translator: Alex <alex.gaynor@gmail.com>\n"
+"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Bookmarks: -1,988,-1,-1,-1,-1,-1,-1,-1,-1\n"
+"X-Generator: Lokalize 1.0\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "רביעי"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "ראשון"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "שני"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "שלישי"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f מיליון"
+msgstr[1] "%(value).1f מיליונים"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f מיליארד"
+msgstr[1] "%(value).1f מיליארדים"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f טריליון"
+msgstr[1] "%(value).1f טריליונים"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "אחד"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "שניים"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "שלושה"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "ארבעה"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "חמישה"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "שישה"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "שבעה"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "שמונה"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "תשעה"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "היום"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "מחר"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "אתמול"

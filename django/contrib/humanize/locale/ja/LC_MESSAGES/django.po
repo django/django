@@ -1,0 +1,95 @@
+# Translation of django.po to japanese.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-05-09 12:41+0900\n"
+"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
+"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "番目"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "番目"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "番目"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "番目"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f 百万"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f 十億"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f 兆"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "1"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "2"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "3"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "4"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "5"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "6"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "7"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "8"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "9"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "今日"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "明日"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "昨日"

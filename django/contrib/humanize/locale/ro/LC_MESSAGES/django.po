@@ -1,0 +1,101 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2008-04-25 21:44+0200\n"
+"Last-Translator: \n"
+"Language-Team: Romanian <ro@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "ul"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "ul"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "lea"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "lea"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f milion"
+msgstr[1] "%(value).1f milioane"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f miliard"
+msgstr[1] "%(value).1f miliarde"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f mie de miliarde"
+msgstr[1] "%(value).1f mii de miliarde"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "unu"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "doi"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "trei"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "patru"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "cinci"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "șase"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "șapte"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "opt"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "nouă"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "astăzi"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "mâine"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "ieri"

@@ -1,0 +1,105 @@
+# French translation of Django.
+# This file is distributed under the same license as the Django package.
+# Copyright (C) 2008 Django Software Foundation and individual contributors.
+#
+# Stéphane Raimbault <stephane.raimbault@gmail.com>, 2009-2010.
+# Claude Paroz <claude@2xlibre.net>, 2009
+# David Larlet <http://larlet.fr>, 2009-2010
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-08-09 14:38+0200\n"
+"Last-Translator: Stéphane Raimbault <stephane.raimbault@gmail.com>\n"
+"Language-Team: French <http://django-fr.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "<sup>e</sup>"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "<sup>er</sup>"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "<sup>e</sup>"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "<sup>e</sup>"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f million"
+msgstr[1] "%(value).1f millions"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f milliard"
+msgstr[1] "%(value).1f milliards"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f billion"
+msgstr[1] "%(value).1f billions"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "un"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "deux"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "trois"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "quatre"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "cinq"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "six"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "sept"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "huit"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "neuf"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "aujourd'hui"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "demain"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "hier"

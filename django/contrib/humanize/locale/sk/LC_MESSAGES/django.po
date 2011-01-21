@@ -1,0 +1,103 @@
+# Slovak translation of Django
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-05-08 16:32+0200\n"
+"Last-Translator: Martin Kosír <martin@martinkosir.net>\n"
+"Language-Team: Slovak <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>1 && n<5 ? 1 : 2;\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "th"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "st"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "nd"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "rd"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f milión"
+msgstr[1] "%(value).1f milióny"
+msgstr[2] "%(value).1f miliónov"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f miliárda"
+msgstr[1] "%(value).1f miliardy"
+msgstr[2] "%(value).1f miliárd"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f bilión"
+msgstr[1] "%(value).1f bilióny"
+msgstr[2] "%(value).1f biliónov"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "jeden"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "dva"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "tri"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "štyri"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "päť"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "šesť"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "sedem"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "osem"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "deväť"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "dnes"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "zajtra"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "včera"

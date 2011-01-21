@@ -1,0 +1,103 @@
+# Swedish translation of Django
+# Copyright (C) 2005-2007
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2008-05-26 11:15+0200\n"
+"Last-Translator: Mikko Hellsing <mikko@aino.se>\n"
+"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Swedish\n"
+"X-Poedit-Country: SWEDEN\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr ":a"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr ":a"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr ":e"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr ":e"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f miljon"
+msgstr[1] "%(value).1f miljoner"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value)1.f miljard"
+msgstr[1] "%(value)1.f miljarder"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value)1.f biljon"
+msgstr[1] "%(value)1.f biljoner"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "ett"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "två"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "tre"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "fyra"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "fem"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "sex"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "sju"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "åtta"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "nio"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "idag"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "imorgon"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "igår"

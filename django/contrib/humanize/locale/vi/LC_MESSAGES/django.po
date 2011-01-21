@@ -1,0 +1,96 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-02-07 16:11+0700\n"
+"Last-Translator: Hung. NGUYEN Manh <loveleeyoungae@yahoo.com>\n"
+"Language-Team: Vietnamese <vi@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "th"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "st"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "nd"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "rd"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] ""
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] ""
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] ""
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "Một"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "Hai"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "Ba"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "Bốn"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "Năm"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "Sáu"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "Bảy"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "Tám"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "Chín"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "Hôm nay"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "Ngày mai"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "Hôm qua"

@@ -1,0 +1,102 @@
+# translation of django.po to Catalan
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2009-03-24 13:28+0100\n"
+"Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
+"Language-Team: Catalan <ca@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "è"
+
+# problema: 4t, 5è, 6è...
+# o posem t o posem è, i t només aplica a 4t.
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "r"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "n"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "r"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f milió"
+msgstr[1] "%(value).1f  milions"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f bilió"
+msgstr[1] "%(value).1f bilions"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f trilió"
+msgstr[1] "%(value).1f trilions"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "un"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "dos"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "tres"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "quatre"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "cinc"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "sis"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "set"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "vuit"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "nou"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "avui"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "demà"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "ahir"

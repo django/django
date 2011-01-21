@@ -1,0 +1,104 @@
+# Finnish translation of Django
+# Copyright (C) 2006-2007
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2007-09-15 00:34+0300\n"
+"Last-Translator: Aku Kotkavuo <aku.kotkavuo@norfello.com>\n"
+"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Finnish\n"
+"X-Poedit-Country: FINLAND\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "."
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "."
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "."
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "."
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f miljoona"
+msgstr[1] "%(value).1f miljoonaa"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f miljardi"
+msgstr[1] "%(value).1f miljardia"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f biljoona"
+msgstr[1] "%(value).1f biljoonaa"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "yksi"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "kaksi"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "kolme"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "neljä"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "viisi"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "kuusi"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "seitsemän"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "kahdeksan"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "yhdeksän"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "tänään"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "huomenna"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "eilen"

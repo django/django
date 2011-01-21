@@ -1,0 +1,102 @@
+# translation of django.po to Telugu
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2008-09-09 21:24+0530\n"
+"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
+"Language-Team: Telugu <indlinux-telugu@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "వ"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "వ"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "వ"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "వ"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "ఒక్కటి"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "రెండు"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "మూడు"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "నాలుగు"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "ఐదు"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "ఆరు"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "ఏడు"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "యెనిమిధి"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "తొమ్మిది"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "ఈ రోజు"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "రెపు"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "నిన్న"

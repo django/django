@@ -1,0 +1,100 @@
+# translation of django.po to Hungarian
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2008-08-30 01:11+0200\n"
+"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "."
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "."
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "."
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "."
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value)1f millió"
+msgstr[1] "%(value)1f millió"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value)1f milliárd"
+msgstr[1] "%(value)1f milliárd"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value)1f trilliárd"
+msgstr[1] "%(value)1f trilliárd"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "egy"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "kettő"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "három"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "négy"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "öt"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "hat"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "hét"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "nyolc"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "kilenc"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "ma"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "holnap"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "tegnap"

@@ -1,0 +1,112 @@
+# translation of django-new.po to tamil
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2007-03-15 16:48+0530\n"
+"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
+"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr ""
+
+#: templatetags/humanize.py:19
+#, fuzzy
+msgid "st"
+msgstr "வலைத்தளம்"
+
+#: templatetags/humanize.py:19
+#, fuzzy
+msgid "nd"
+msgstr "மற்றும்"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr ""
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:76
+#, fuzzy
+msgid "one"
+msgstr "பொருளடக்கம்"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr ""
+
+#: templatetags/humanize.py:76
+#, fuzzy
+msgid "three"
+msgstr "கிரேக்கம்"
+
+#: templatetags/humanize.py:76
+#, fuzzy
+msgid "four"
+msgstr "மணி"
+
+#: templatetags/humanize.py:76
+#, fuzzy
+msgid "five"
+msgstr "செயல்படும்"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr ""
+
+#: templatetags/humanize.py:76
+#, fuzzy
+msgid "nine"
+msgstr "நிமிடம்"
+
+#: templatetags/humanize.py:96
+#, fuzzy
+msgid "today"
+msgstr "இன்று"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr ""
+
+#: templatetags/humanize.py:100
+#, fuzzy
+msgid "yesterday"
+msgstr "செவ்வாய்"

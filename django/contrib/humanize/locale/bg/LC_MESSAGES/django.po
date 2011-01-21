@@ -1,0 +1,99 @@
+# translation of django.po to Bulgarian
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2008-03-12 13:01+0200\n"
+"Last-Translator: Vladislav <vladislav.mitov@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "и"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "ви"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "ри"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "ти"
+
+#: templatetags/humanize.py:54
+#, fuzzy, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f милион"
+msgstr[1] "%(value).1f милион"
+
+#: templatetags/humanize.py:57
+#, fuzzy, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f милиард"
+msgstr[1] "%(value).1f милиард"
+
+#: templatetags/humanize.py:60
+#, fuzzy, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f трилион"
+msgstr[1] "%(value).1f трилион"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "един"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "два"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "три"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "четири"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "пет"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "шест"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "седем"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "осем"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "девет"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "днес"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "Утре"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "вчера"

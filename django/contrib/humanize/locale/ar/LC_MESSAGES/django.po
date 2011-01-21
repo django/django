@@ -1,0 +1,111 @@
+# translation of django.po to Arabic
+# This file is distributed under the same license as the django package.
+#
+# Ossama M. Khayat <okhayat@yahoo.com>, 2009, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-05-12 11:20+0300\n"
+"Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
+"Language-Team: Arabic <support@arabeyes.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.0\n"
+"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : "
+"3)))\n"
+"\n"
+"\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr " "
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr " "
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr " "
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr " "
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "مليون"
+msgstr[1] "مليونان"
+msgstr[2] "%(value).1f ملايين"
+msgstr[3] "%(value).1f مليون"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "مليار"
+msgstr[1] "ملياران"
+msgstr[2] "%(value).1f مليارات"
+msgstr[3] "%(value).1f مليار"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "بليار"
+msgstr[1] "بلياران"
+msgstr[2] "%(value).1f بليارات"
+msgstr[3] "%(value).1f بليار"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "واحد"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "إثنان"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "ثلالثة"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "أربعة"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "خمسة"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "ستة"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "سبعة"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "ثمانية"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "تسعة"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "اليوم"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "غداً"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "أمس"

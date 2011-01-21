@@ -1,0 +1,100 @@
+# Icelandic translation of Django.
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2008-09-09 16:34-0000\n"
+"Last-Translator: Jökull Sólberg Auðunsson <jokullsolberg@gmail.com>\n"
+"Language-Team:  <dagurp@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "."
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "."
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "."
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "."
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f milljón"
+msgstr[1] "%(value).1f milljónir"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f milljarður"
+msgstr[1] "%(value).1f milljarðar"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f billjarður"
+msgstr[1] "%(value).1f billjónir"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "einn"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "tveir"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "þrír"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "fjórir"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "fimm"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "sex"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "sjö"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "átta"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "níu"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "í dag"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "morgundagur"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "gærdagur"

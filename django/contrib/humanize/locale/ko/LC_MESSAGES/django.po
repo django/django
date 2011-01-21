@@ -1,0 +1,99 @@
+# Django Korean Translation
+# Copyright (C) 2009
+# This file is distributed under the same license as the django package.
+# Hyun Mi Ae, Joongi Kim (me@daybreaker.info), Sung-Jin Hong (serialx.net@gmail.com)
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2007-04-06 11:04+0900\n"
+"Last-Translator: Joongi Kim (me@daybreaker.info)\n"
+"Language-Team: Korean\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "번째"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "번째"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "번째"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "번째"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f백만"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f십억"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f조"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "1"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "2"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "3"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "4"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "5"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "6"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "7"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "8"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "9"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "오늘"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "내일"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "어제"

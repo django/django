@@ -1,0 +1,99 @@
+# translation of django.po to Macedonian
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-04-05 15:53+0100\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"Language-Team: Macedonian <ossm-members@hedona.on.net.mk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "th"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "st"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "nd"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "rd"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f милион"
+msgstr[1] "%(value).1f милион"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f милијарда"
+msgstr[1] "%(value).1f милијарда"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f трилион"
+msgstr[1] "%(value).1f трилион"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "еден"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "два"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "три"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "четири"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "пет"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "шест"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "седум"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "осум"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "девет"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "денеска"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "утре"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "вчера"

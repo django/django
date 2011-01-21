@@ -1,0 +1,97 @@
+# Translation of django.po to Indonesian
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-05-08 18:39+0700\n"
+"Last-Translator: Selwin Ong <selwin@ui.co.id>\n"
+"Language-Team: Indonesian <id@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "th"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "st"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "nd"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "rd"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f juta"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f milyar"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f trilyun"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "satu"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "dua"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "tiga"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "empat"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "lima"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "enam"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "tujuh"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "delapan"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "sembilan"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "hari ini"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "besok"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "kemarin"

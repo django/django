@@ -1,0 +1,101 @@
+# Português do Brasil translation of django.
+# This file is distributed under the same license as the django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-03-19 17:58-0300\n"
+"Last-Translator: Guilherme Gondim <semente@taurinus.org>\n"
+"Language-Team: Grupo de Localização para o Português <django-l10n-"
+"portuguese@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "º"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "º"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "º"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "º"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f milhão"
+msgstr[1] "%(value).1f milhões"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f bilhão"
+msgstr[1] "%(value).1f bilhões"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f trilhão"
+msgstr[1] "%(value).1f trilhões"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "um"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "dois"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "três"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "quatro"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "cinco"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "seis"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "sete"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "oito"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "nove"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "hoje"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "amanhã"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "ontem"

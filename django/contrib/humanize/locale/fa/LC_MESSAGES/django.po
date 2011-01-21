@@ -1,0 +1,99 @@
+# Persian translation of Django.
+# Copyright (C) 2007 THE Django'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Django package.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2008-09-01 02:00+0430\n"
+"Last-Translator: Reza Mohammadi <reza@zeerak.ir>\n"
+"Language-Team: Persian <farsi@lists.sharif.edu>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "اُم"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "اُم"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "اُم"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "اُم"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f میلیون"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f بیلیون"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f تریلون"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "یک"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "دو"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "سه"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "چهار"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "پنج"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "شش"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "هفت"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "هشت"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "نُه"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "امروز"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "فردا"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "دیروز"

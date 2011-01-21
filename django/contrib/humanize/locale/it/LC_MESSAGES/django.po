@@ -1,0 +1,102 @@
+# translation of django.po to Italian
+# Italian translation of Django.
+# Copyright (C) 2006 the Lawrence Journal-World
+# This file is distributed under the same license as the Django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-05-10 14:44+0200\n"
+"Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
+"Language-Team: Italian <django-it@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "º"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "º"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "º"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "º"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f milione"
+msgstr[1] "%(value).1f milioni"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f miliardo"
+msgstr[1] "%(value).1f miliardi"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f migliaio di miliardi"
+msgstr[1] "%(value).1f migliaia di miliardi"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "uno"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "due"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "tre"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "quattro"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "cinque"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "sei"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "sette"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "otto"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "nove"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "oggi"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "domani"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "ieri"

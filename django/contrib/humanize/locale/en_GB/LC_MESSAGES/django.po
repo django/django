@@ -1,0 +1,98 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:27+0100\n"
+"PO-Revision-Date: 2010-03-25 08:00+1000\n"
+"Last-Translator: Simon Meers <DrMeers@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr ""
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr ""
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr ""
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr ""
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr ""
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr ""
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr ""
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr ""
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr ""
