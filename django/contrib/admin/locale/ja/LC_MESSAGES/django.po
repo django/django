@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"POT-Creation-Date: 2011-01-20 16:11+0100\n"
 "PO-Revision-Date: 2010-05-09 12:41+0900\n"
 "Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
 "Language-Team: Japanese <django-ja@googlegroups.com>\n"
@@ -17,11 +17,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d 個の %(items)sを削除しました。"
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "よろしいですか？"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "選択された %(verbose_name_plural)s の削除"
@@ -124,112 +129,112 @@ msgstr "ログエントリ"
 msgid "None"
 msgstr "None"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "%s を変更しました。"
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "と"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\"を追加しました。"
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" の %(list)s を変更しました。"
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" を削除しました。"
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "変更はありませんでした。"
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" を追加しました。"
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "続けて編集できます。"
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "続けて別の %s を追加できます。"
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" を変更しました。"
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" を追加しました。続けて編集できます。"
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "操作を実行するには、対象を選択する必要があります。何も変更されませんでした。"
 
-#: options.py:814
+#: options.py:826
 msgid "No action selected."
 msgstr "操作が選択されていません。"
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "%s を追加"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "主キーが %(key)r である %(name)s オブジェクトは存在しません。"
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "%s を変更"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "データベースエラー"
 
-#: options.py:1095
+#: options.py:1107
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s 個の %(name)s を変更しました。"
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s 個選択されました"
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s個の内ひとつも選択されていません"
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" を削除しました。"
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "変更履歴: %s"
@@ -404,7 +409,7 @@ msgstr "フィルタ"
 msgid "Delete"
 msgstr "削除"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -415,7 +420,17 @@ msgstr ""
 "除しようとしましたが、あなたのアカウントには以下のタイプのオブジェクトを削除"
 "するパーミッションがありません:"
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' の削除時に関連づけられたオブジェクトも削"
+"除しようとしましたが、あなたのアカウントには以下のタイプのオブジェクトを削除"
+"するパーミッションがありません:"
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -424,8 +439,8 @@ msgstr ""
 "%(object_name)s \"%(escaped_object)s\"を削除しますか？ 関連づけられている以下"
 "のオブジェクトも全て削除されます:"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "はい。"
 
@@ -433,22 +448,32 @@ msgstr "はい。"
 msgid "Delete multiple objects"
 msgstr "複数のオブジェクトを削除します"
 
-#: templates/admin/delete_selected_confirmation.html:15
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:16
+#, fuzzy, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 "%(object_name)s の削除時に関連づけられたオブジェクトも削除しようとしました"
 "が、あなたのアカウントには以下のタイプのオブジェクトを削除するパーミッション"
 "がありません:"
 
-#: templates/admin/delete_selected_confirmation.html:22
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:24
+#, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"%(object_name)s の削除時に関連づけられたオブジェクトも削除しようとしました"
+"が、あなたのアカウントには以下のタイプのオブジェクトを削除するパーミッション"
+"がありません:"
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 "%(object_name)s を削除しますか？ 関連づけられている以下のオブジェクトと関連す"
 "る項目も全て削除されます:"
@@ -764,12 +789,12 @@ msgstr "パスワードをリセット"
 msgid "All dates"
 msgstr "いつでも"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "%s を選択"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "変更する %s を選択"

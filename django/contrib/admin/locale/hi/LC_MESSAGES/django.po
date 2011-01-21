@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django SVN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:21+0100\n"
+"POT-Creation-Date: 2011-01-20 16:11+0100\n"
 "PO-Revision-Date: 2008-11-12 08:14+0530\n"
 "Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
 "Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
@@ -23,11 +23,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "क्या आप निश्चित हैं?"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr ""
@@ -129,115 +134,115 @@ msgstr "लॉग प्रविष्टियाँ"
 msgid "None"
 msgstr "कोई नहीं"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "%s को बदला गया हैं"
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "और"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" को जोडा गया हैं"
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" की %(list)s बदला गया है"
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" निकाला गया है"
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "कोई क्षेत्र नहीं बदला"
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" को कामयाबी से जोडा गया है"
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "आप इसे फिर से संपादित कर सकते हैं"
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "आप नीचे एक और %s जोड सकते हैं"
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" को कामयाबी से बदला गया हैं"
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" कामयाबी से जोडा गया हैं । आप इसे फिर से संपादित कर सकते हैं"
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:814
+#: options.py:826
 #, fuzzy
 msgid "No action selected."
 msgstr "कार्य समय"
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "%s बढाएं"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "%s बदलो"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "डेटाबेस त्रुटि"
 
-#: options.py:1095
+#: options.py:1107
 #, fuzzy, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(name)s \"%(obj)s\" को कामयाबी से बदला गया हैं"
 msgstr[1] "%(name)s \"%(obj)s\" को कामयाबी से बदला गया हैं"
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" को कामयाबी से निकाला गया है"
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "चरित्र बदलो: %s"
@@ -411,7 +416,7 @@ msgstr "छन्नी"
 msgid "Delete"
 msgstr "मिटाएँ"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -419,15 +424,22 @@ msgid ""
 "following types of objects:"
 msgstr ""
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "हाँ, मैं निश्चित हूँ"
 
@@ -436,19 +448,26 @@ msgstr "हाँ, मैं निश्चित हूँ"
 msgid "Delete multiple objects"
 msgstr "%(name)s \"%(object)s\" निकाला गया है"
 
-#: templates/admin/delete_selected_confirmation.html:15
+#: templates/admin/delete_selected_confirmation.html:16
 #, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 
-#: templates/admin/delete_selected_confirmation.html:22
+#: templates/admin/delete_selected_confirmation.html:24
 #, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 
 #: templates/admin/filter.html:2
@@ -758,12 +777,12 @@ msgstr "शब्दकूट पुनस्थाप"
 msgid "All dates"
 msgstr "सभी तारीख"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "%s चुनें"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "%s के बदली के लिए चयन करें"

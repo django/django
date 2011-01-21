@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"POT-Creation-Date: 2011-01-20 16:11+0100\n"
 "PO-Revision-Date: 2010-03-11 17:23+0800\n"
 "Last-Translator: Urangua <urangua@adsolux.com>\n"
 "Language-Team: mn <translate@opensource.com>\n"
@@ -19,11 +19,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "Итгэлтэй байна уу?"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr ""
@@ -128,54 +133,54 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "Өөрчлөгдсөн %s."
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "ба"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Нэмэгдсэн %(name)s \"%(object)s\"."
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\"-ийн өөрчлөгдсөн %(list)s"
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Устгасан %(name)s \"%(object)s\"."
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "Өөрчилсөн зүйл байхгүй байна."
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай нэмэгдлээ."
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "Доорх хэсэгт үүнийг ахин засварлах боломжтой."
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "Доорх хэсэгт өөр %s нэмэх боломжтой."
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. "
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -183,61 +188,61 @@ msgstr ""
 "%(name)s \"%(obj)s\" амжилттай нэмэгдлээ. Доорх хэсэгт үүнийг ахин засварлах "
 "боломжтой."
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:814
+#: options.py:826
 #, fuzzy
 msgid "No action selected."
 msgstr "үйлдлийн хугацаа"
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "%s-ийг нэмэх"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "%s-ийг өөрчлөх"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "Өгөгдлийн сангийн алдаа"
 
-#: options.py:1095
+#: options.py:1107
 #, fuzzy, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] " %(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. "
 msgstr[1] " %(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. "
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай устгагдлаа."
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "Өөрчлөлтийн түүх: %s"
@@ -413,7 +418,7 @@ msgstr "Шүүлтүүр"
 msgid "Delete"
 msgstr "Устгах"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -423,7 +428,16 @@ msgstr ""
 "%(object_name)s '%(escaped_object)s'-ийг устгавал холбогдох объект нь устах "
 "ч бүртгэл тань дараах төрлийн объектуудийг устгах зөвшөөрөлгүй байна:"
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s'-ийг устгавал холбогдох объект нь устах "
+"ч бүртгэл тань дараах төрлийн объектуудийг устгах зөвшөөрөлгүй байна:"
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -432,8 +446,8 @@ msgstr ""
 "Та %(object_name)s \"%(escaped_object)s\"-ийг устгахдаа итгэлтэй байна уу? "
 "Үүнийг устгавал дараах холбогдох зүйлс нь бүгд устана:"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "Тийм, итгэлтэй байна."
 
@@ -442,21 +456,30 @@ msgstr "Тийм, итгэлтэй байна."
 msgid "Delete multiple objects"
 msgstr "Устгасан %(name)s \"%(object)s\"."
 
-#: templates/admin/delete_selected_confirmation.html:15
+#: templates/admin/delete_selected_confirmation.html:16
 #, fuzzy, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 "%(object_name)s '%(escaped_object)s'-ийг устгавал холбогдох объект нь устах "
 "ч бүртгэл тань дараах төрлийн объектуудийг устгах зөвшөөрөлгүй байна:"
 
-#: templates/admin/delete_selected_confirmation.html:22
+#: templates/admin/delete_selected_confirmation.html:24
 #, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s'-ийг устгавал холбогдох объект нь устах "
+"ч бүртгэл тань дараах төрлийн объектуудийг устгах зөвшөөрөлгүй байна:"
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 "Та %(object_name)s \"%(escaped_object)s\"-ийг устгахдаа итгэлтэй байна уу? "
 "Үүнийг устгавал дараах холбогдох зүйлс нь бүгд устана:"
@@ -776,12 +799,12 @@ msgstr "Нууц үгээ шинэчлэх"
 msgid "All dates"
 msgstr "Бүх огноо"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "%s-ийг сонго"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "%s-ийг өөрчлөхөөр сонго"

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"POT-Creation-Date: 2011-01-20 16:12+0100\n"
 "PO-Revision-Date: 2008-02-25 15:53+0100\n"
 "Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
 "Language-Team: PL <pl@li.org>\n"
@@ -21,11 +21,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Usunięto %(count)d %(items)s."
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "Jesteś pewien?"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Usuń wybrane %(verbose_name_plural)s"
@@ -128,91 +133,91 @@ msgstr "logi"
 msgid "None"
 msgstr "brak"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "Zmieniono %s"
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "i"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Zmieniono %(list)s w %(name)s \"%(object)s\"."
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Usunięto %(name)s \"%(object)s\"."
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "Żadne pole nie zmienione."
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "Możesz ponownie edytować wpis poniżej."
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "Możesz dodać nowy wpis %s poniżej."
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" dodane pomyślnie. Możesz edytować ponownie wpis poniżej."
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Wykonanie akcji wymaga wybrania obiektów. Żaden obiekt nie został zmieniony."
 
-#: options.py:814
+#: options.py:826
 msgid "No action selected."
 msgstr "Nie wybrano akcji."
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj %s"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "Zmień %s"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
-#: options.py:1095
+#: options.py:1107
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -220,7 +225,7 @@ msgstr[0] "%(count)s %(name)s został pomyślnie zmieniony."
 msgstr[1] "%(count)s %(name)s zostały pomyślnie zmienione."
 msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -228,17 +233,17 @@ msgstr[0] "%(total_count)s wybrany"
 msgstr[1] "%(total_count)s wybrane"
 msgstr[2] "%(total_count)s wybranych"
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 z %(cnt)s wybranych"
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" usunięty pomyślnie."
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
@@ -415,7 +420,7 @@ msgstr "Filtr"
 msgid "Delete"
 msgstr "Usuń"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -426,7 +431,17 @@ msgstr ""
 "zależnych obiektów, lecz nie posiadasz uprawnień do usunięcia następujących "
 "typów obiektów:"
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Skasowanie %(object_name)s '%(escaped_object)s' spowoduje usunięcie "
+"zależnych obiektów, lecz nie posiadasz uprawnień do usunięcia następujących "
+"typów obiektów:"
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -435,8 +450,8 @@ msgstr ""
 "Czy chcesz skasować %(object_name)s \"%(escaped_object)s\"? Następujące "
 "zależne obiekty zostaną skasowane:"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "Tak, na pewno"
 
@@ -444,21 +459,30 @@ msgstr "Tak, na pewno"
 msgid "Delete multiple objects"
 msgstr "Usuwanie wielu obiektów"
 
-#: templates/admin/delete_selected_confirmation.html:15
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:16
+#, fuzzy, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 "Skasowanie %(object_name)s spowoduje usunięcie zależnych obiektów, lecz nie "
 "posiadasz uprawnień do usunięcia następujących typów obiektów:"
 
-#: templates/admin/delete_selected_confirmation.html:22
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:24
+#, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Skasowanie %(object_name)s spowoduje usunięcie zależnych obiektów, lecz nie "
+"posiadasz uprawnień do usunięcia następujących typów obiektów:"
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 "Czy chcesz skasować wybrane %(object_name)s? Następujące obiekty i zależne "
 "od nich zostaną skasowane:"
@@ -773,12 +797,12 @@ msgstr "Zresetuj moje hasło"
 msgid "All dates"
 msgstr "Wszystkie daty"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "Zaznacz %s"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "Zaznacz %s aby zmienić"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:21+0100\n"
+"POT-Creation-Date: 2011-01-20 16:11+0100\n"
 "PO-Revision-Date: 2010-05-09 15:10-0500\n"
 "Last-Translator: Alex <alex.gaynor@gmail.com>\n"
 "Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
@@ -22,11 +22,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s  נמחקו בהצלחה."
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "האם את/ה בטוח/ה ?"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "מחק %(verbose_name_plural)s שנבחרו"
@@ -128,113 +133,113 @@ msgstr "רישומי יומן"
 msgid "None"
 msgstr "ללא"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "%s שונה."
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "ו"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "התווסף %(name)s \"%(object)s\"."
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "שונה %(list)s עבור %(name)s \"%(object)s\"."
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "נמחק %(name)s \"%(object)s\"."
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "אף שדה לא השתנה."
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "ניתן לערוך שוב מתחת"
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "ניתן להוסיף %s נוסף מתחת."
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "שינוי %(name)s \"%(obj)s\" בוצע בהצלחה."
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לערוך אותו שוב מתחת."
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "יש לסמן פריטים כדי לבצע עליהם פעולות. לא שונו פריטים."
 
-#: options.py:814
+#: options.py:826
 msgid "No action selected."
 msgstr "לא נבחרה פעולה."
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "הוספת %s"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "הפריט %(name)s עם המפתח הראשי %(key)r אינו קיים."
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "שינוי %s"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "שגיאת בסיס נתונים"
 
-#: options.py:1095
+#: options.py:1107
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "שינוי %(count)s %(name)s בהצלחה."
 msgstr[1] "שינוי %(count)s %(name)s בהצלחה."
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s נבחר"
 msgstr[1] "כל ה־%(total_count)s נבחרו"
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 מ %(cnt)s נבחרות"
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "מחיקת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "היסטוריית שינוי: %s"
@@ -409,7 +414,7 @@ msgstr "סינון"
 msgid "Delete"
 msgstr "מחיקה"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -419,7 +424,16 @@ msgstr ""
 "מחיקת %(object_name)s '%(escaped_object)s' מצריכה מחיקת אובייקטים מקושרים, "
 "אך לחשבון שלך אין הרשאות למחיקת סוגי האובייקטים הבאים:"
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"מחיקת %(object_name)s '%(escaped_object)s' מצריכה מחיקת אובייקטים מקושרים, "
+"אך לחשבון שלך אין הרשאות למחיקת סוגי האובייקטים הבאים:"
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -428,8 +442,8 @@ msgstr ""
 "האם ברצונך למחוק את %(object_name)s \"%(escaped_object)s\"? כל הפריטים "
 "הקשורים הבאים יימחקו:"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "כן, אני בטוח/ה"
 
@@ -437,21 +451,30 @@ msgstr "כן, אני בטוח/ה"
 msgid "Delete multiple objects"
 msgstr "מחק כמה פריטים"
 
-#: templates/admin/delete_selected_confirmation.html:15
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:16
+#, fuzzy, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 "מחיקת %(object_name)s מצריכה מחיקת אובייקטים מקושרים, אך לחשבון שלך אין "
 "הרשאות למחיקת סוגי האובייקטים הבאים:"
 
-#: templates/admin/delete_selected_confirmation.html:22
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:24
+#, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"מחיקת %(object_name)s מצריכה מחיקת אובייקטים מקושרים, אך לחשבון שלך אין "
+"הרשאות למחיקת סוגי האובייקטים הבאים:"
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 "האם אתה בטוח שאתה רוצה למחוק את פריטי ה %(object_name)s שנבחרו.  כל הפריטים "
 "הבאים והחומר הנלווה אליהם יימחקו."
@@ -763,12 +786,12 @@ msgstr "אפס את סיסמתי"
 msgid "All dates"
 msgstr "כל התאריכים"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "בחירת %s"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "בחירת %s לשינוי"

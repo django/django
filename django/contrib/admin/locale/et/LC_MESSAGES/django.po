@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:21+0100\n"
+"POT-Creation-Date: 2011-01-20 16:11+0100\n"
 "PO-Revision-Date: 2008-09-03 00:35+0200\n"
 "Last-Translator: Erik Allik <removethis-eallik_at_gmail-com>\n"
 "Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
@@ -19,11 +19,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s kustutamine õnnestus"
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "Kas olete kindel?"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Kustuta valitud %(verbose_name_plural)s"
@@ -126,114 +131,114 @@ msgstr "logisissekanded"
 msgid "None"
 msgstr "Puudub"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "Muutsin %s."
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "ja"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lisatud %(name)s \"%(object)s\"."
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Muudetud %(list)s objektil %(name)s \"%(object)s\"."
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Kustutatud %(name)s \"%(object)s\"."
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "Ühtegi välja ei muudetud."
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" lisamine õnnestus."
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "Võite jätkata redigeerimist."
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "Võite jätkata uue %s lisamisega."
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" muutmine õnnestus."
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" lisamine õnnestus. Te võite seda muuta."
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:814
+#: options.py:826
 #, fuzzy
 msgid "No action selected."
 msgstr "toimingu aeg"
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "Lisa %s"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s primaarvõtmega %(key)r ei eksisteeri."
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "Muuda %s"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "Andmebaasi viga"
 
-#: options.py:1095
+#: options.py:1107
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s muutmine õnnestus."
 msgstr[1] "%(count)s %(name)s muutmine õnnestus."
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" kustutati."
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "Muudatuste ajalugu: %s"
@@ -410,7 +415,7 @@ msgstr "Filtreeri"
 msgid "Delete"
 msgstr "Kustuta"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -421,7 +426,17 @@ msgstr ""
 "kustutada lisaks ka kõik seotud objecktid, aga teil puudub õigus järgnevat "
 "tüüpi objektide kustutamiseks:"
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Selleks, et kustutada %(object_name)s '%(escaped_object)s', on vaja "
+"kustutada lisaks ka kõik seotud objecktid, aga teil puudub õigus järgnevat "
+"tüüpi objektide kustutamiseks:"
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -431,8 +446,8 @@ msgstr ""
 "(escaped_object)s\"? Kõik järgnevad seotud objektid kustutatakse koos "
 "sellega:"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "Jah, olen kindel"
 
@@ -440,21 +455,30 @@ msgstr "Jah, olen kindel"
 msgid "Delete multiple objects"
 msgstr "Kustuta mitu objekti"
 
-#: templates/admin/delete_selected_confirmation.html:15
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:16
+#, fuzzy, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 "%(object_name)s kustutamiseks on vaja kustutada ka seotud objektid, aga teil "
 "puudub õigus järgnevat tüüpi objektide kustutamiseks:"
 
-#: templates/admin/delete_selected_confirmation.html:22
+#: templates/admin/delete_selected_confirmation.html:24
 #, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"%(object_name)s kustutamiseks on vaja kustutada ka seotud objektid, aga teil "
+"puudub õigus järgnevat tüüpi objektide kustutamiseks:"
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 "Kas olete kindel, et soovite kustutada valitud %(object_name)s objektid? "
 "Kõik järgnevad objektid ja seotud objektid kustutatakse:"
@@ -773,12 +797,12 @@ msgstr "Reseti parool"
 msgid "All dates"
 msgstr "Kõik kuupäevad"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "Vali %s"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "Vali %s mida muuta"

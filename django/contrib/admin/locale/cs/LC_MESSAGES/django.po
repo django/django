@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:21+0100\n"
+"POT-Creation-Date: 2011-01-20 16:11+0100\n"
 "PO-Revision-Date: 2010-08-06 18:33+0100\n"
 "Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech\n"
@@ -22,11 +22,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Úspěšně odstraněno: %(count)d %(items)s."
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "Jste si jisti?"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Odstranit vybrané %(verbose_name_plural)s"
@@ -130,55 +135,55 @@ msgstr "položky protokolu"
 msgid "None"
 msgstr "Žádný"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "Změněno: %s"
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "a"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Položka \"%(object)s\" typu %(name)s byla přidána."
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr ""
 "Pole \"%(list)s\" pro položku \"%(object)s\" typu %(name)s změněno/změněna."
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Položka \"%(object)s\" typu %(name)s byla odstraněna."
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "Nebyla změněna žádná pole."
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně přidána."
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "V úpravách můžete pokračovat níže."
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "Níže můžete přidat další položku typu %s."
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně změněna."
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -186,7 +191,7 @@ msgstr ""
 "Položka \"%(obj)s\" typu %(name)s byla úspěšně přidána. Níže můžete v "
 "úpravách pokračovat."
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -194,30 +199,30 @@ msgstr ""
 "K provedení hromadných operací je třeba vybrat nějaké položky. Nedošlo k "
 "žádným změnám."
 
-#: options.py:814
+#: options.py:826
 msgid "No action selected."
 msgstr "Nebyla vybrána žádná operace."
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "%s: přidat"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Položka \"%(name)s\" s primárním klíčem \"%(key)r\" neexistuje."
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "%s: změnit"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "Chyba databáze"
 
-#: options.py:1095
+#: options.py:1107
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -225,7 +230,7 @@ msgstr[0] "Položka %(name)s byla úspěšně změněna."
 msgstr[1] "%(count)s položky %(name)s byly úspěšně změněny."
 msgstr[2] "%(count)s položek %(name)s bylo úspěšně změněno."
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -233,17 +238,17 @@ msgstr[0] "%(total_count)s položka vybrána."
 msgstr[1] "Všechny %(total_count)s položky vybrány."
 msgstr[2] "Vybráno všech %(total_count)s položek."
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Vybraných je 0 položek z celkem %(cnt)s."
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně odstraněna."
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "Historie změn: %s"
@@ -420,7 +425,7 @@ msgstr "Filtr"
 msgid "Delete"
 msgstr "Odstranit"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -431,7 +436,17 @@ msgstr ""
 "odstranění souvisejících položek. Nemáte však oprávnění k odstranění položek "
 "následujících typů:"
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Odstranění položky \"%(escaped_object)s\" typu %(object_name)s by vyústilo v "
+"odstranění souvisejících položek. Nemáte však oprávnění k odstranění položek "
+"následujících typů:"
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -440,8 +455,8 @@ msgstr ""
 "Opravdu má být odstraněna položka \"%(escaped_object)s\" typu %(object_name)"
 "s? Následující související položky budou všechny odstraněny:"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "Ano, jsem si jist(a)"
 
@@ -449,22 +464,32 @@ msgstr "Ano, jsem si jist(a)"
 msgid "Delete multiple objects"
 msgstr "Odstranit vybrané položky"
 
-#: templates/admin/delete_selected_confirmation.html:15
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:16
+#, fuzzy, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 "Odstranění položky \"%(object_name)s\" by vyústilo v odstranění "
 "souvisejících položek. Nemáte však oprávnění k odstranění položek "
 "následujících typů:"
 
-#: templates/admin/delete_selected_confirmation.html:22
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:24
+#, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Odstranění položky \"%(object_name)s\" by vyústilo v odstranění "
+"souvisejících položek. Nemáte však oprávnění k odstranění položek "
+"následujících typů:"
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 "Opravdu mají být odstraněny vybrané položky typu %(object_name)s? "
 "Následující položky a položky s nimi související budou všechny odstraněny:"
@@ -779,12 +804,12 @@ msgstr "Obnovit heslo"
 msgid "All dates"
 msgstr "Všechna data"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "%s: vybrat"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "Vyberte položku %s ke změně"

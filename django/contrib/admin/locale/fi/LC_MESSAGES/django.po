@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:21+0100\n"
+"POT-Creation-Date: 2011-01-20 16:11+0100\n"
 "PO-Revision-Date: 2007-09-15 00:34+0300\n"
 "Last-Translator: Aku Kotkavuo <aku.kotkavuo@norfello.com>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
@@ -23,11 +23,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Onnistuneesti poistettu %(count)d \"%(items)s\"-kohdetta."
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "Oletko varma?"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Poista valitut \"%(verbose_name_plural)s\"-kohteet"
@@ -130,60 +135,60 @@ msgstr "lokimerkinnät"
 msgid "None"
 msgstr "Ei arvoa"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "Muokattu: %s."
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "ja"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lisätty %(name)s \"%(object)s\"."
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Muutettu %(list)s kohteelle %(name)s \"%(object)s\"."
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Poistettu %(name)s \"%(object)s\"."
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "Ei muutoksia kenttiin."
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" on lisätty."
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "Voit muokata sitä edelleen alla."
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "Uusi %s on lisättävissä alla."
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" on muutettu."
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" on lisätty. Voit muokata sitä uudelleen alla."
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -191,54 +196,54 @@ msgstr ""
 "Kohteiden täytyy olla valittuna, jotta niihin voi kohdistaa toimintoja. "
 "Kohteita ei ole muutettu."
 
-#: options.py:814
+#: options.py:826
 msgid "No action selected."
 msgstr "Ei toimintoa valittuna."
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "Lisää %s"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s perusavaimella %(key)r ei ole olemassa."
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "Muokkaa %s"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "Tietokantavirhe"
 
-#: options.py:1095
+#: options.py:1107
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s on muokattu."
 msgstr[1] "%(count)s \"%(name)s\"-kohdetta on muokattu."
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s valittu"
 msgstr[1] "Kaikki %(total_count)s valittu"
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 valittuna %(cnt)s mahdollisesta"
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" on poistettu."
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "Muokkaushistoria: %s"
@@ -414,7 +419,7 @@ msgstr "Suodatin"
 msgid "Delete"
 msgstr "Poista"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -425,7 +430,17 @@ msgstr ""
 "liittyviä kohteita, mutta sinulla ei ole oikeutta näiden kohteiden "
 "poistamiseen:"
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Kohteen '%(escaped_object)s' (%(object_name)s) poisto poistaisi myös siihen "
+"liittyviä kohteita, mutta sinulla ei ole oikeutta näiden kohteiden "
+"poistamiseen:"
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -434,8 +449,8 @@ msgstr ""
 "Haluatko varmasti poistaa kohteen \"%(escaped_object)s\" (%(object_name)s)? "
 "Myös seuraavat kohteet poistettaisiin samalla:"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "Kyllä, olen varma"
 
@@ -443,21 +458,30 @@ msgstr "Kyllä, olen varma"
 msgid "Delete multiple objects"
 msgstr "Poista useita kohteita"
 
-#: templates/admin/delete_selected_confirmation.html:15
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:16
+#, fuzzy, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 "Kohteen (%(object_name)s) poisto poistaisi myös siihen liittyviä kohteita, "
 "mutta sinulla ei ole oikeutta näiden kohteiden poistamiseen:"
 
-#: templates/admin/delete_selected_confirmation.html:22
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:24
+#, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Kohteen (%(object_name)s) poisto poistaisi myös siihen liittyviä kohteita, "
+"mutta sinulla ei ole oikeutta näiden kohteiden poistamiseen:"
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 "Haluatko varmasti poistaa valitut (%(object_name)s) kohteet? Myös seuraavat "
 "kohteet ja niihin liittyvät kohteet poistettaisiin samalla:"
@@ -773,12 +797,12 @@ msgstr "Nollaa salasanani"
 msgid "All dates"
 msgstr "Kaikki päivät"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "Valitse %s"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "Valitse muokattava %s"

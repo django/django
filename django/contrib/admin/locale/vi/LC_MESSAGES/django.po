@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"POT-Creation-Date: 2011-01-20 16:12+0100\n"
 "PO-Revision-Date: 2010-02-07 16:11+0700\n"
 "Last-Translator: Hung. NGUYEN Manh <loveleeyoungae@yahoo.com>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
@@ -18,11 +18,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "Bạn có chắc chắn không?"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr ""
@@ -121,54 +126,54 @@ msgstr ""
 msgid "None"
 msgstr "Không"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "%s đã được thay đổi."
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "và"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" đã được thêm vào."
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(list)s for %(name)s \"%(object)s\" đã được thay đổi."
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" đã bị xóa."
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "Không có trường nào thay đổi"
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" được thêm vào thành công."
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "Bạn có thể sửa lại dưới đây."
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "Bạn có thể thêm vào %s dưới đây."
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" đã được thay đổi thành công."
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -176,59 +181,59 @@ msgstr ""
 "%(name)s \"%(obj)s\" đã được thêm vào thành công. Bạn có thể sửa lại dưới "
 "đây."
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:814
+#: options.py:826
 msgid "No action selected."
 msgstr ""
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "Thêm %s"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "Thay đổi %s"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "Cơ sở dữ liệu bị lỗi"
 
-#: options.py:1095
+#: options.py:1107
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" đã được xóa thành công."
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "Thay đổi bản ghi: %s"
@@ -403,7 +408,7 @@ msgstr "Bộ lọc"
 msgid "Delete"
 msgstr "Xóa"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -413,7 +418,16 @@ msgstr ""
 "Xóa %(object_name)s '%(escaped_object)s' sẽ làm mất những dữ liệu có liên "
 "quan. Tài khoản của bạn không được cấp quyển xóa những dữ liệu đi kèm theo."
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Xóa %(object_name)s '%(escaped_object)s' sẽ làm mất những dữ liệu có liên "
+"quan. Tài khoản của bạn không được cấp quyển xóa những dữ liệu đi kèm theo."
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -422,8 +436,8 @@ msgstr ""
 "Bạn có chắc là muốn xóa %(object_name)s \"%(escaped_object)s\"?Tất cả những "
 "dữ liệu đi kèm dưới đây cũng sẽ bị mất:"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "Có, tôi chắc chắn."
 
@@ -431,20 +445,31 @@ msgstr "Có, tôi chắc chắn."
 msgid "Delete multiple objects"
 msgstr ""
 
-#: templates/admin/delete_selected_confirmation.html:15
+#: templates/admin/delete_selected_confirmation.html:16
+#, fuzzy, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Xóa %(object_name)s '%(escaped_object)s' sẽ làm mất những dữ liệu có liên "
+"quan. Tài khoản của bạn không được cấp quyển xóa những dữ liệu đi kèm theo."
+
+#: templates/admin/delete_selected_confirmation.html:24
 #, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
 msgstr ""
 
-#: templates/admin/delete_selected_confirmation.html:22
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
+"Bạn có chắc là muốn xóa %(object_name)s \"%(escaped_object)s\"?Tất cả những "
+"dữ liệu đi kèm dưới đây cũng sẽ bị mất:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -750,12 +775,12 @@ msgstr "Làm lại mật khẩu"
 msgid "All dates"
 msgstr "Tất cả các ngày"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "Chọn %s"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "Chọn %s để thay đổi"

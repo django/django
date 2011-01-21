@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django-1.1-rc-1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"POT-Creation-Date: 2011-01-20 16:12+0100\n"
 "PO-Revision-Date: 2009-07-28 22:31+0700\n"
 "Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
 "Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin "
@@ -22,11 +22,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "แน่ใจหรือ"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr ""
@@ -128,112 +133,112 @@ msgstr "log entries"
 msgid "None"
 msgstr "ไม่มี"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "%s เปลี่ยนแล้ว"
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "และ"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "เพิ่ม %(name)s \"%(object)s\" แล้ว"
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "เปลี่ยน %(list)s สำหรับ %(name)s \"%(object)s\" แล้ว"
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "ลบ %(name)s \"%(object)s\" แล้ว"
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "สามารถแก้ไขเพิ่มเติมได้ที่ด้านล่าง"
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "คุณสามารถเพิ่ม %s ได้อีกที่ด้านล่าง"
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว แก้ไขได้อีกที่ด้านล่าง"
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:814
+#: options.py:826
 #, fuzzy
 msgid "No action selected."
 msgstr "เวลาลงมือ"
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "เพิ่ม %s"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "เปลี่ยน %s"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "เกิดความผิดพลาดที่ฐานข้อมูล"
 
-#: options.py:1095
+#: options.py:1107
 #, fuzzy, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "ลบ %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "เปลี่ยนแปลงประวัติ: %s"
@@ -408,7 +413,7 @@ msgstr "ตัวกรอง"
 msgid "Delete"
 msgstr "ลบ"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -418,7 +423,16 @@ msgstr ""
 "กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
 "แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
+"แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -427,8 +441,8 @@ msgstr ""
 "คุณแน่ใจหรือที่จะลบ %(object_name)s \"%(escaped_object)s\"?"
 "ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย:"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "ใช่, ฉันแน่ใจ"
 
@@ -437,21 +451,30 @@ msgstr "ใช่, ฉันแน่ใจ"
 msgid "Delete multiple objects"
 msgstr "ลบ %(name)s \"%(object)s\" แล้ว"
 
-#: templates/admin/delete_selected_confirmation.html:15
+#: templates/admin/delete_selected_confirmation.html:16
 #, fuzzy, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 "กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
 "แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
 
-#: templates/admin/delete_selected_confirmation.html:22
+#: templates/admin/delete_selected_confirmation.html:24
 #, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
+"แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 "คุณแน่ใจหรือที่จะลบ %(object_name)s \"%(escaped_object)s\"?"
 "ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย:"
@@ -758,12 +781,12 @@ msgstr "ตั้งรหัสผ่านของฉันใหม่"
 msgid "All dates"
 msgstr "ทุกวัน"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "เลือก %s"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "เลือก %s เพื่อเปลี่ยนแปลง"

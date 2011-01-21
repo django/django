@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"POT-Creation-Date: 2011-01-20 16:11+0100\n"
 "PO-Revision-Date: 2007-04-06 11:04+0900\n"
 "Last-Translator: Joongi Kim (me@daybreaker.info)\n"
 "Language-Team: Korean\n"
@@ -21,11 +21,16 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d개의 %(items)s (을)를 성공적으로 삭제하였습니다."
 
-#: actions.py:56 options.py:1185
+#: actions.py:61 options.py:1199
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: actions.py:63 options.py:1201
 msgid "Are you sure?"
 msgstr "확실합니까?"
 
-#: actions.py:74
+#: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "선택된 %(verbose_name_plural)s (을)를 삭제합니다."
@@ -126,60 +131,60 @@ msgstr "로그 엔트리"
 msgid "None"
 msgstr "없음"
 
-#: options.py:608
+#: options.py:620
 #, python-format
 msgid "Changed %s."
 msgstr "%s (이)가 변경되었습니다."
 
-#: options.py:608 options.py:618
+#: options.py:620 options.py:630
 msgid "and"
 msgstr "또한"
 
-#: options.py:613
+#: options.py:625
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" (을)를 추가하였습니다."
 
-#: options.py:617
+#: options.py:629
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(list)s에 대한 %(name)s \"%(object)s\" (을)를 변경하였습니다."
 
-#: options.py:622
+#: options.py:634
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" (을)를 삭제하였습니다."
 
-#: options.py:626
+#: options.py:638
 msgid "No fields changed."
 msgstr "변경된 필드가 없습니다."
 
-#: options.py:698
+#: options.py:710
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" (이)가 추가되었습니다."
 
-#: options.py:702 options.py:735
+#: options.py:714 options.py:747
 msgid "You may edit it again below."
 msgstr "계속해서 편집하실 수 있습니다."
 
-#: options.py:712 options.py:745
+#: options.py:724 options.py:757
 #, python-format
 msgid "You may add another %s below."
 msgstr "계속해서 다른 %s (을)를 추가하세요."
 
-#: options.py:733
+#: options.py:745
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" (이)가 변경되었습니다."
 
-#: options.py:741
+#: options.py:753
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" (이)가 추가되었습니다. 계속해서 편집하세요."
 
-#: options.py:795 options.py:1053
+#: options.py:807 options.py:1065
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -187,52 +192,52 @@ msgstr ""
 "항목들에 액션을 적용하기 위해선 먼저 항목들이 선택되어 있어야 합니다. 아무 항"
 "목도 변경되지 않았습니다."
 
-#: options.py:814
+#: options.py:826
 msgid "No action selected."
 msgstr "액션이 선택되지 않았습니다."
 
-#: options.py:895
+#: options.py:907
 #, python-format
 msgid "Add %s"
 msgstr "%s 추가"
 
-#: options.py:921 options.py:1162
+#: options.py:933 options.py:1174
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Primary key %(key)r에 대한 오브젝트 %(name)s(이)가 존재하지 않습니다."
 
-#: options.py:986
+#: options.py:998
 #, python-format
 msgid "Change %s"
 msgstr "%s 변경"
 
-#: options.py:1033
+#: options.py:1045
 msgid "Database error"
 msgstr "데이터베이스 오류"
 
-#: options.py:1095
+#: options.py:1107
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s개의 %(name)s(이)가 변경되었습니다."
 
-#: options.py:1122
+#: options.py:1134
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "모두 %(total_count)s개가 선택되었습니다."
 
-#: options.py:1127
+#: options.py:1139
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s 중 아무것도 선택되지 않았습니다."
 
-#: options.py:1178
+#: options.py:1190
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\"(이)가 삭제되었습니다."
 
-#: options.py:1215
+#: options.py:1235
 #, python-format
 msgid "Change history: %s"
 msgstr "변경 히스토리: %s"
@@ -408,7 +413,7 @@ msgstr "필터"
 msgid "Delete"
 msgstr "삭제"
 
-#: templates/admin/delete_confirmation.html:16
+#: templates/admin/delete_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -419,7 +424,17 @@ msgstr ""
 "하고자 했으나, 지금 사용하시는 계정은 다음 타입의 오브젝트를 제거할 권한이 없"
 "습니다. :"
 
-#: templates/admin/delete_confirmation.html:23
+#: templates/admin/delete_confirmation.html:25
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"%(object_name)s \"%(escaped_object)s\" (을)를 삭제하면서관련 오브젝트를 제거"
+"하고자 했으나, 지금 사용하시는 계정은 다음 타입의 오브젝트를 제거할 권한이 없"
+"습니다. :"
+
+#: templates/admin/delete_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -428,8 +443,8 @@ msgstr ""
 "정말로 %(object_name)s \"%(escaped_object)s\"(을)를 삭제하시겠습니까? 다음의 "
 "관련 항목들이 모두 삭제됩니다. :"
 
-#: templates/admin/delete_confirmation.html:28
-#: templates/admin/delete_selected_confirmation.html:33
+#: templates/admin/delete_confirmation.html:38
+#: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
 msgstr "네, 확실합니다."
 
@@ -437,21 +452,30 @@ msgstr "네, 확실합니다."
 msgid "Delete multiple objects"
 msgstr "여러 개의 오브젝트 삭제"
 
-#: templates/admin/delete_selected_confirmation.html:15
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:16
+#, fuzzy, python-format
 msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
 "%(object_name)s(을)를 삭제하면서 관련 오브젝트를 제거하고자 했으나, 지금 사용"
 "하시는 계정은 다음 타입의 오브젝트를 제거할 권한이 없습니다. :"
 
-#: templates/admin/delete_selected_confirmation.html:22
-#, python-format
+#: templates/admin/delete_selected_confirmation.html:24
+#, fuzzy, python-format
 msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"%(object_name)s(을)를 삭제하면서 관련 오브젝트를 제거하고자 했으나, 지금 사용"
+"하시는 계정은 다음 타입의 오브젝트를 제거할 권한이 없습니다. :"
+
+#: templates/admin/delete_selected_confirmation.html:32
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 msgstr ""
 "정말로 선택된 %(object_name)s(을)를 삭제하시겠습니까? 다음의 항목들과 그 관"
 "련 항목들이 모두 삭제됩니다. :"
@@ -763,12 +787,12 @@ msgstr "비밀번호 초기화"
 msgid "All dates"
 msgstr "언제나"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s"
 msgstr "%s 선택"
 
-#: views/main.py:65
+#: views/main.py:68
 #, python-format
 msgid "Select %s to change"
 msgstr "변경할 %s 선택"
