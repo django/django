@@ -1,0 +1,311 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django-1.1-rc-1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2009-07-28 22:31+0700\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
+"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin "
+"Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Thai\n"
+"X-Poedit-Country: THAILAND\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "เนื้อหา"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Metadata"
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "flat page"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "ใช้งานข้อติชม"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] ""
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "ใช้งานข้อติชม"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "ถอดออกแล้ว"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "ใช้งานข้อติชม"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "ใช้งานข้อติชม"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "สำหรับบัญชีการใช้งานของคุณที่ %(site_name)s "
+
+#: forms.py:109
+msgid "Name"
+msgstr "ชื่อ"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "อีเมล"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "ข้อคิดเห็น"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "ระวังนะ ไม่สามารถใช้คำว่า %s ที่นี่ได้"
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "ถ้าคุณใส่ข้อมูลใดๆ ก็ตามในส่วนนี้ มันจะกลายเป็นสแปม"
+
+#: models.py:22
+msgid "content type"
+msgstr "content type"
+
+#: models.py:24
+msgid "object ID"
+msgstr "อ็อบเจ็กต์ไอดี"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "ผู้ใช้"
+
+#: models.py:52
+msgid "user's name"
+msgstr "ชื่อของผู้ใช้"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "อีเมลของผู้ใช้"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "URL ของผู้ใช้"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "ข้อคิดเห็น"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "วันและเวลาที่ส่งข้อมูล"
+
+#: models.py:60
+msgid "IP address"
+msgstr "หมายเลขไอพี"
+
+#: models.py:61
+msgid "is public"
+msgstr "สาธารณะ"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "เลือกออกเพื่อที่จะทำให้ข้อคิดเห็นนั้นหายไปจากเว็บไซต์"
+
+#: models.py:64
+msgid "is removed"
+msgstr "ถอดออกแล้ว"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"เลือกเมื่อเห็นว่าข้อคิดเห็นไหนไม่เหมาะสม เมื่อข้อคิดเห็นนี้ได้ถูกลบแล้ว ข้อมูลอื่นจะถูกแสดงขึ้นแทน"
+
+#: models.py:77
+#, fuzzy
+msgid "comments"
+msgstr "ข้อคิดเห็น"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "ข้อคิดเห็นนี้ได้ถูกเขียนไว้โดยผู้ใช้ที่สามารถเชื่อถือได้ จะถูกอ่านได้เพียงอย่างเดียว"
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr "ข้อคิดเห็นนี้ถูกเขียนไว้โดยผู้ใช้ที่สามารถเชื่อถือได้ ดังนั้นอีเมลนั้นจะถูกอ่านเท่านั้น"
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"โพสต์โดย %(user)s ที่ %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "flat page"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "วันไหนก็ได้"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "ข้อคิดเห็น"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "ข้อคิดเห็น"
+
+#: templates/comments/approve.html:4
+#, fuzzy
+msgid "Approve a comment"
+msgstr "ใช้งานข้อติชม"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+#, fuzzy
+msgid "Thanks for approving"
+msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+#, fuzzy
+msgid "Remove a comment"
+msgstr "ใช้งานข้อติชม"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+#, fuzzy
+msgid "Remove"
+msgstr "ถอดออกแล้ว"
+
+#: templates/comments/deleted.html:4
+#, fuzzy
+msgid "Thanks for removing"
+msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+#, fuzzy
+msgid "Flag"
+msgstr "มายอกา"
+
+#: templates/comments/flagged.html:4
+#, fuzzy
+msgid "Thanks for flagging"
+msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+#, fuzzy
+msgid "Post"
+msgstr "st"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+#, fuzzy
+msgid "Preview"
+msgstr "ดู:"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr ""
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr ""
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "โปรดแก้ไขข้อผิดพลาดด้านล่าง"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "และ"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr ""
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "or make changes"
+msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"

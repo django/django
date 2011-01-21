@@ -1,0 +1,323 @@
+# Icelandic translation of Django.
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2008-09-09 16:34-0000\n"
+"Last-Translator: Jökull Sólberg Auðunsson <jokullsolberg@gmail.com>\n"
+"Language-Team:  <dagurp@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Innihald"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Hengigögn"
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "flatskrá"
+msgstr[1] "flatskrá"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "virkja athugasemdir"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "samþykkt af umsjónarmönnum"
+msgstr[1] "samþykkt af umsjónarmönnum"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "frjálsar athugasemdir"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "hefur verið fjarlægt"
+msgstr[1] "hefur verið fjarlægt"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "virkja athugasemdir"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "virkja athugasemdir"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "fyrir notandareikning þinn á %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Nafn"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "Netfang"
+
+#: forms.py:111
+msgid "URL"
+msgstr "Veffang"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Athugasemd"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Passaðu orðbragðið! Orðið %s er ekki leyft hér."
+msgstr[1] "Passaðu orðbragðið! Orðin %s eru ekki leyfð hér."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Ef þú skrifar eitthvað hérna verður athugasemdin sjálfkrafa meðhöndluð sem "
+"ruslpóstur"
+
+#: models.py:22
+msgid "content type"
+msgstr "efnistag"
+
+#: models.py:24
+msgid "object ID"
+msgstr "kenni hlutar"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "notandi"
+
+#: models.py:52
+msgid "user's name"
+msgstr "nafn notanda"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "netfang notanda"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "veffang notanda"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "athugasemd"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "innsent dags/tími"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP tala"
+
+#: models.py:61
+msgid "is public"
+msgstr "er öllum sýnilegt"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Taktu hakið úr til að fjarlægja athugasemdina af vefsíðunni."
+
+#: models.py:64
+msgid "is removed"
+msgstr "hefur verið fjarlægt"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Hakaðu við þennan reit ef athugasemdin er óviðeigandi. Skilaboðin „Þessi "
+"athugasemd hefur verið fjarlægð“ birtist í staðinn."
+
+#: models.py:77
+msgid "comments"
+msgstr "athugasemdir"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Athugasemdin var send inn af innskráðum notanda og því er ekki hægt að "
+"breyta nafninu."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Athugasemdin var send inn af innskráðum notanda og því er ekki hægt að "
+"breyta netfanginu."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"%(user)s sendi inn %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "flatskrá"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "Allar dagsetningar"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "athugasemd"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "athugasemdir"
+
+#: templates/comments/approve.html:4
+#, fuzzy
+msgid "Approve a comment"
+msgstr "frjáls athugasemd"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+#, fuzzy
+msgid "Thanks for approving"
+msgstr "Takk fyrir að nota vefinn okkar!"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+#, fuzzy
+msgid "Remove a comment"
+msgstr "frjáls athugasemd"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+#, fuzzy
+msgid "Remove"
+msgstr "hefur verið fjarlægt"
+
+#: templates/comments/deleted.html:4
+#, fuzzy
+msgid "Thanks for removing"
+msgstr "Takk fyrir að nota vefinn okkar!"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr ""
+
+#: templates/comments/flagged.html:4
+#, fuzzy
+msgid "Thanks for flagging"
+msgstr "Takk fyrir að nota vefinn okkar!"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+#, fuzzy
+msgid "Post"
+msgstr "."
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+#, fuzzy
+msgid "Preview"
+msgstr "skoða:"
+
+#: templates/comments/posted.html:4
+#, fuzzy
+msgid "Thanks for commenting"
+msgstr "frjáls athugasemd"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+#, fuzzy
+msgid "Preview your comment"
+msgstr "Forskoða athugasemd"
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Vinsamlegast leiðréttu villuna hér að neðan:"
+msgstr[1] "Vinsamlegast leiðréttu villurnar hér að neðan:"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "og"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "Post your comment"
+msgstr "Forskoða athugasemd"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "or make changes"
+msgstr "Engum reitum breytt."

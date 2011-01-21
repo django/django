@@ -1,0 +1,309 @@
+# Swedish translation of Django
+# Copyright (C) 2005-2007
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-05-26 11:15+0200\n"
+"Last-Translator: Mikko Hellsing <mikko@aino.se>\n"
+"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Swedish\n"
+"X-Poedit-Country: SWEDEN\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Innehåll"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Metadata"
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "flagga"
+msgstr[1] "flagga"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "Flagga denna kommentar"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "Godkänn"
+msgstr[1] "Godkänn"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "Godkänn en kommentar"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "är borttaget"
+msgstr[1] "är borttaget"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "Tag bort en kommentar"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s kommentarer"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Senaste kommentarer på %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Namn"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "E-postadress"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Kommentar"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Akta din tunga! Ordet %s är inte tillåtet här."
+msgstr[1] "Akta din tunga! Orden %s är inte tillåtna här."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Om du fyller i detta fält kommer din kommentar att betraktas som spam"
+
+#: models.py:22
+msgid "content type"
+msgstr "innehålls typ"
+
+#: models.py:24
+msgid "object ID"
+msgstr "objektets ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "användare"
+
+#: models.py:52
+msgid "user's name"
+msgstr "användares namn"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "användares e-postadress"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "användares URL"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "kommentar"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "skickat datum/tid"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP-adress"
+
+#: models.py:61
+msgid "is public"
+msgstr "är offentlig"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Avmarkeras detta kommer kommentaren inte synas på webbplatsen."
+
+#: models.py:64
+msgid "is removed"
+msgstr "är borttaget"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Bocka för denna ruta om kommentaren är olämplig. Ett \"Denna kommentar har "
+"tagits bort\"-meddelande kommer visas istället."
+
+#: models.py:77
+msgid "comments"
+msgstr "kommentarer"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Denna kommentar postades av en autentiserad användare och därför är namnet "
+"skrivskyddat."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Denna kommentar postades av en autentiserad användare och därför är e-"
+"postadressen skrivskyddad."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Inlagt av %(user)s %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "flagga"
+
+#: models.py:171
+msgid "date"
+msgstr "datum"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "kommentarsflagga"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "kommentarsflaggor"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Godkänn en kommentar"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Är du säker på att du vill offentliggöra kommentaren?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Godkänn"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Tack för ditt godkännande"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Tack för att du tog dig tid att förbättra kvaliteten på denna sites "
+"diskussioner"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Tag bort en kommentar"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Är du säker på att du vill ta bort denna kommentar?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Tag bort"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Tack för att du tog bort"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Flagga denna kommentar"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Är du säker på att du vill flagga kommentaren?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Flagga"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Tack för att ditt flaggande"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Skicka"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Förhandsgranska"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Tack för din kommentar"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Tack för din kommentar"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Förhandsgranska din kommentar"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Rätta till felet nedan."
+msgstr[1] "Rätta till felen nedan."
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "och"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Skicka kommentar"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "eller gör ändringar"

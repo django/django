@@ -1,0 +1,312 @@
+# translation of django.po to Arabic
+# This file is distributed under the same license as the django package.
+#
+# Ossama M. Khayat <okhayat@yahoo.com>, 2009, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-05-12 11:20+0300\n"
+"Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
+"Language-Team: Arabic <support@arabeyes.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.0\n"
+"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : "
+"3)))\n"
+"\n"
+"\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "محتوى"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "ميتاداتا"
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "مُعلّم"
+msgstr[1] "مُعلّمان"
+msgstr[2] "مُعلّمة"
+msgstr[3] "مُعلّمة"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "تعليم التعليقات المحددة"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "مُعتمد"
+msgstr[1] "مُعتمدان"
+msgstr[2] "مُعتمدة"
+msgstr[3] "مُعتمد"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "اعتماد التعليقات المحددة"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "تم حذفه"
+msgstr[1] "تم حذفهما"
+msgstr[2] "تم حذفها"
+msgstr[3] "تم حذفها"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "احذف التعليقات المحددة"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "تم %(action)s التعليق بنجاح."
+msgstr[1] "تم %(action)s التعليقين بنجاح."
+msgstr[2] "%(count)s تعليقات تم %(action)s بنجاح."
+msgstr[3] "%(count)s تعليق تم %(action)s بنجاح."
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "تعليقات %(site_name)s"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "آخر التعليقات على %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "الاسم"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "عنوان بريد إلكتروني"
+
+#: forms.py:111
+msgid "URL"
+msgstr "رابط"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "تعليق"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "انتبه إلى ما تقول! الكلمة %s غير مسموح بها هنا."
+msgstr[1] "انتبه إلى ما تقول! الكلمتان %s غير مسموح بهما هنا."
+msgstr[2] "انتبه إلى ما تقول! الكلمات %s غير مسموح بها هنا."
+msgstr[3] "انتبه إلى ما تقول! الكلمات %s غير مسموح بها هنا."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "إن كتبت أي شيء في هذا الحقل فسيُعتبر تعليقك غير مرغوب به"
+
+#: models.py:22
+msgid "content type"
+msgstr "نوع البيانات"
+
+#: models.py:24
+msgid "object ID"
+msgstr "معرف العنصر"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "مستخدم"
+
+#: models.py:52
+msgid "user's name"
+msgstr "اسم المستخدم"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "عنوان البريد الإلكتروني للمستخدم"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "عنوان URL للمستخدم"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "تعليق"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "تاريخ ووقت الإرسال"
+
+#: models.py:60
+msgid "IP address"
+msgstr "عنوان IP"
+
+#: models.py:61
+msgid "is public"
+msgstr "عام"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "أزل اختيار هذا المربّع كي تُزيل التعليق نهائياً من الموقع."
+
+#: models.py:64
+msgid "is removed"
+msgstr "محذوف"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"انتق هذا المربع إذا كان التعليق غير لائق، سيتم عرض الرسالة \"تم حذف هذا "
+"التعليق\" بدلا منه."
+
+#: models.py:77
+msgid "comments"
+msgstr "تعليقات"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "كتب هذا التعليق مستخدم مُسجّل ولذا كان اسمهللقراءة فقط."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"كتب هذا التعليق مستخدم مُسجّل ولذا كان عنوان بريده الالكتروني للقراءة فقط."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"كتبه %(user)s في %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "علم"
+
+#: models.py:171
+msgid "date"
+msgstr "التاريخ"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "علَم التعليق"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "أعلام التعليقات"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "وافق على تعليق"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "تريد فعلاً جعل هذا التعليق عامّاً؟"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "وافق"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "شكراً لموافقتك"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "شكراً لك على قضاء وقتك في تحسين جودة النقاش على موقعنا"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "أزل تعليق"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "تريد فعلاً إزالة هذا التعليق؟"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "أزل"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "شكراً لإزالته"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "سِم هذا التعليق"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "تريد فعلاً وسم هذا التعليق؟"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "سٍم"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "شكراً لك على الوَسم"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "أرسل "
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "عاين"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "شكراً على تعليقك"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "شكراً لك على تعليقك"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "عاين تعليقك"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "رجاءً صحّح الخطأ التالي."
+msgstr[1] "رجاءً صحّح الخطأين التاليين."
+msgstr[2] "رجاءً صحّح الأخطاء التالية."
+msgstr[3] "رجاءً صحّح الأخطاء التالية."
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "و"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "أرسال تعليقك"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "أو قم ببعض التغيير"

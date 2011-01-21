@@ -1,0 +1,303 @@
+# This is the *old* Norwegian (Bokmål) translation of Django
+# For future updates please use the translation in the "nb" directory.
+# Copyright (C) 2005-2010
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-03-11 14:22+0100\n"
+"Last-Translator: Christian Mikalsen and Jon Lønne\n"
+"Language-Team: Norsk <no@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Innhold"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Metadata"
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "flagget"
+msgstr[1] "flagget"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "Flagg valgte kommentarer"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "godkjent"
+msgstr[1] "godkjent"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "Tillat valgte kommentarer"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "fjernet"
+msgstr[1] "fjernet"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "Fjern valgte kommentarer"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "1 kommentar ble %(action)s."
+msgstr[1] "%(count)s kommentarer ble %(action)s."
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s kommentarer"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Siste kommentarer fra %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Navn"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "E-postadresse"
+
+#: forms.py:111
+msgid "URL"
+msgstr "Nettadresse"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Kommentar"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Pass munnen din! Ordet %s er ikke tillatt her."
+msgstr[1] "Pass munnen din! Ordene %s er ikke tillatt her."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Hvis du oppgir noe i dette feltet, vil kommentaren bli behandlet som spam"
+
+#: models.py:22
+msgid "content type"
+msgstr "innholdstype"
+
+#: models.py:24
+msgid "object ID"
+msgstr "objekt-ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "bruker"
+
+#: models.py:52
+msgid "user's name"
+msgstr "brukerens navn"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "brukerens e-postadresse"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "brukerens nettadresse"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "kommentar"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "dato/tid for innsendelse"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP-adresse"
+
+#: models.py:61
+msgid "is public"
+msgstr "er tilgjengelig for alle"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Avmerk denne boksen for å fjerne kommentaren fra siden."
+
+#: models.py:64
+msgid "is removed"
+msgstr "er fjernet"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Huk av denne hvis kommentaren er upassende. Meldingen \"Denne kommentaren "
+"har blitt fjernet\" vil bli vist i stedet."
+
+#: models.py:77
+msgid "comments"
+msgstr "kommentarer"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Denne kommentaren er skrevet av en innlogget bruker og navnet kan derfor "
+"ikke endres."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Denne kommentaren er skrevet av en innlogget bruker og e-postadressen kan "
+"derfor ikke endres."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Skrevet av %(user)s, %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "flagg"
+
+#: models.py:171
+msgid "date"
+msgstr "dato"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "kommentarflagg"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "kommentarflagg"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Tillat en kommentar"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Gjør denne kommentaren offentlig?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Godkjenn"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Takk for godkjennelse"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Takk for at du tok deg tid til å forbedre kvaliteten på diskusjonen på siden "
+"vår"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Fjern en kommentar"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Fjerne denne kommentaren?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Fjern"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Takk for fjerningen"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Flagg denne kommentaren"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Flagg denne kommentaren?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Flagg"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Takk for flagging"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Publiser"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Forhåndsvisning"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Takk for kommentar"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Takk for din kommentar"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Forhåndsvis kommentaren din"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Vennligst korriger feilen under"
+msgstr[1] "Vennligst korriger feilene under"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "og"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Publiser din kommentar"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "eller gjør endringer"

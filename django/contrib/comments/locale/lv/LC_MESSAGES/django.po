@@ -1,0 +1,308 @@
+# Django Latvian translation.
+# Copyright (C) 2008 THE Django'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Django package.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-05-10 20:18+0200\n"
+"Last-Translator: Reinis Veips <reinis.veips@wot.lv>\n"
+"Language-Team: Latvian translators' team <reinis.veips@wot.lv>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Saturs"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Metadati"
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "atzīmēts"
+msgstr[1] "atzīmēti"
+msgstr[2] "atzīmēts"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "Atzīmēt izvēlētos komentārus"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "apstiprināts"
+msgstr[1] "apstiprināti"
+msgstr[2] "apstiprināti"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "Apstiprināt izvēlētos komentārus"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "dzēsts"
+msgstr[1] "dzēsti"
+msgstr[2] "dzēsts"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "Dzēst izvēlētos komentārus"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "%(count)s komentārs tika veiksmīgi %(action)s."
+msgstr[1] "%(count)s komentāri tika veiksmīgi %(action)s."
+msgstr[2] "%(count)s komentāru tika veiksmīgi %(action)s."
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s komentāri"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Pēdējie komentāri lapā %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Vārds"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "E-pasta adrese"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Komentārs"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Lūdzam ievērot pieklājību! Vārds %s šeit nav atļauts."
+msgstr[1] "Lūdzam ievērot pieklājību! Vārdi %s šeit nav atļauti."
+msgstr[2] "Lūdzam ievērot pieklājību! Vārdi %s šeit nav atļauti."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Ja aizpildīsiet šo lauku, tad komentārs tiks uzskatīts par spamu"
+
+#: models.py:22
+msgid "content type"
+msgstr "satura tips"
+
+#: models.py:24
+msgid "object ID"
+msgstr "objekta ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "lietotājs"
+
+#: models.py:52
+msgid "user's name"
+msgstr "lietotāja vārds"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "lietotāja e-pasta adrese"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "lietotāja URL"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "komentārs"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "nosūtīšanas datums/laiks"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP adrese"
+
+#: models.py:61
+msgid "is public"
+msgstr "publisks"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Noņemiet ķeksi, lai komentārs neparādītos lapā."
+
+#: models.py:64
+msgid "is removed"
+msgstr "dzēsts"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Atķeksējiet, ja komentārs ir neatbilstošs (nepieklājīgs). Tā vietā tiks "
+"rādīts paziņojums \"Šis komentārs ir izdzēsts\"."
+
+#: models.py:77
+msgid "comments"
+msgstr "komentāri"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Šo komentāru rakstīja autentificēts lietotājs, tāpēc vārds ir tikai "
+"lasīšanas režīmā."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Šo komentāru rakstīja autentificēts lietotājs, tāpēc e-pasts ir tikai "
+"lasīšanas režīmā."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Pievienojis  %(user)s, %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "atzīmēt"
+
+#: models.py:171
+msgid "date"
+msgstr "datums"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "komentāra atzīmējums"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "komentāra atzīmējumi"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Apstiprināt komentāru"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Patiešām padarīt šo komentāru publisku?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Apstiprināt"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Paldies par apstiprināšanu"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Paldies par laika veltīšanu mūsu lapas diskusiju kvalitātes uzlabošanai"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Dzēst komentāru"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Patiešām dzēst šo komentāru?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Dzēst"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Paldies par dzēšanu"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Atzīmēt šo komentāru"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Patiešām atzīmēt šo komentāru?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Atzīmējums"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Paldies par komentāra atzīmēšanu"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Iesūtīt"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Priekšskats"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Paldies par komentēšanu"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Paldies par Jūsu komentāru"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Pirmsskatīt komentāru"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Lūdzu izlabojiet kļūdu zemāk."
+msgstr[1] "Lūdzu izlabojiet kļūdas zemāk."
+msgstr[2] "Lūdzu, izlabojiet kļūdu zemāk."
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "un"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Iesūtīt komentāru"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "vai veikt izmaiņas"

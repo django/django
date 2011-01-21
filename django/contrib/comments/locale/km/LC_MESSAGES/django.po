@@ -1,0 +1,324 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2007-08-10 00:21+0900\n"
+"Last-Translator: Chay Sengtha <sengtha@e-khmer.com>\n"
+"Language-Team: Chay Sengtha <sengtha@e-khmer.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "អត្ថបទ"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr ""
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "កាល​បរិច្ឆេទ​កត់​សំគាល់​ទុក"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "អនុញ្ញាត"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "យល់ព្រម​ដោយ​បុគ្គលិក"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "មតិ​យោបល់(មិនចាំបាច់សមាជិក)"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "ត្រូវ​បាន​លប់​ចេញ"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "អនុញ្ញាត"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "អនុញ្ញាត"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "សំរាប់សមាជិកនៅឯគេហទំព័រ %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "ឈ្មោះ"
+
+#: forms.py:110
+#, fuzzy
+msgid "Email address"
+msgstr "អ៊ីម៉ែល"
+
+#: forms.py:111
+msgid "URL"
+msgstr "អាស័យដ្ឋានគេហទំព័រ(URL)"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "ផ្សេងៗ"
+
+#: forms.py:191
+#, fuzzy, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "ពាក្យ %s មិនអនុញ្ញាតអោយប្រើនៅទីនេះទេ។"
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: models.py:22
+msgid "content type"
+msgstr "ប្រភេទអត្ថន័យ"
+
+#: models.py:24
+msgid "object ID"
+msgstr "លេខ​សំគាល់​កម្មវិធី"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "សមាជិក"
+
+#: models.py:52
+#, fuzzy
+msgid "user's name"
+msgstr "ឈ្មោះជាសមាជិក"
+
+#: models.py:53
+#, fuzzy
+msgid "user's email address"
+msgstr "អ៊ីមែល"
+
+#: models.py:54
+#, fuzzy
+msgid "user's URL"
+msgstr "សមាជិក"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "មតិ​យោបល់"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "កាល​បរិច្ឆេទនៃ​ការ​សរសេរ​​"
+
+#: models.py:60
+msgid "IP address"
+msgstr "លេខ IP"
+
+#: models.py:61
+msgid "is public"
+msgstr "ផ្សព្វផ្សាយ​ជាសធារណៈ"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: models.py:64
+msgid "is removed"
+msgstr "ត្រូវ​បាន​លប់​ចេញ"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"សូម​ចុច​ជ្រើសរើស​យក​ប្រអប់​នេះ​ ប្រសិន​បើ​មតិ​យោបល់​មិនសមរម្យ។ ឃ្លា \" មតិ​យោបល់​នេះ​ត្រូវបាន​គេលប់​\" នឹងត្រូវ​"
+"បង្ហាញ​ជំនួស​វិញ។"
+
+#: models.py:77
+msgid "comments"
+msgstr "មតិ​យោបល់"
+
+#: models.py:119
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"មតិយោបល់បានសរសេរដោយសមាជិកមិនសូវប្រាកដប្រជា:\n"
+"\n"
+"%(text)s"
+
+#: models.py:128
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"មតិយោបល់បានសរសេរដោយសមាជិកមិនសូវប្រាកដប្រជា:\n"
+"\n"
+"%(text)s"
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"សរសេរ​ដោយ %(user)s នៅថ្ងៃ​ %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "កាល​បរិច្ឆេទ​កត់​សំគាល់​ទុក"
+
+#: models.py:171
+msgid "date"
+msgstr "​កាលបរិច្ឆេទ"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "មតិ​យោបល់"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "មតិ​យោបល់"
+
+#: templates/comments/approve.html:4
+#, fuzzy
+msgid "Approve a comment"
+msgstr "មតិ​យោបល់(មិនចាំបាច់សមាជិក)"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+#, fuzzy
+msgid "Thanks for approving"
+msgstr "សូមអរគុណដែលបានប្រើប្រាស់សេវាកម្មរបស់យើងខ្ញុំ"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+#, fuzzy
+msgid "Remove a comment"
+msgstr "មតិ​យោបល់(មិនចាំបាច់សមាជិក)"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+#, fuzzy
+msgid "Remove"
+msgstr "ព្រឹត្តិការណ៍ និង ផលិតផលថ្មីៗ"
+
+#: templates/comments/deleted.html:4
+#, fuzzy
+msgid "Thanks for removing"
+msgstr "សូមអរគុណដែលបានប្រើប្រាស់សេវាកម្មរបស់យើងខ្ញុំ"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+#, fuzzy
+msgid "Flag"
+msgstr "ការគ្រប់គ្រងទំព័រថ្មី"
+
+#: templates/comments/flagged.html:4
+#, fuzzy
+msgid "Thanks for flagging"
+msgstr "សូមអរគុណដែលបានប្រើប្រាស់សេវាកម្មរបស់យើងខ្ញុំ"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr ""
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+#, fuzzy
+msgid "Preview"
+msgstr "ព្រឹត្តិការណ៍ និង ផលិតផលថ្មីៗ"
+
+#: templates/comments/posted.html:4
+#, fuzzy
+msgid "Thanks for commenting"
+msgstr "សូមអរគុណដែលបានបញ្ជេញមតិយោបល់ទាក់ទងនឹងអត្ថបទនេះ"
+
+#: templates/comments/posted.html:7
+#, fuzzy
+msgid "Thank you for your comment"
+msgstr "សូមអរគុណដែលបានបញ្ជេញមតិយោបល់ទាក់ទងនឹងអត្ថបទនេះ"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+#, fuzzy
+msgid "Preview your comment"
+msgstr "មើល​ មតិយោបល់"
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "សូមកែប្រែកំហុសខាងក្រោម ។"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "និង"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "Post your comment"
+msgstr "សូមអរគុណដែលបានបញ្ជេញមតិយោបល់ទាក់ទងនឹងអត្ថបទនេះ"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "or make changes"
+msgstr "ពុំមានទិន្នន័យត្រូវបានផ្លាស់ប្តូរ។"

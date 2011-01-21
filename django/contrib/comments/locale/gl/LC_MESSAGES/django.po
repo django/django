@@ -1,0 +1,334 @@
+# Translation of django.po to Galego
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2007-05-28 17:29+0200\n"
+"Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
+"Language-Team: Galego\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Galician\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:12
+#, fuzzy
+msgid "Content"
+msgstr "contido"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr ""
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "data da marca"
+msgstr[1] "data da marca"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "activar comentarios"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "aprobado polos moderadores"
+msgstr[1] "aprobado polos moderadores"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "comentarios libres"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "está borrado"
+msgstr[1] "está borrado"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "activar comentarios"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "activar comentarios"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "para a súa conta de usuario en %(site_name)s"
+
+#: forms.py:109
+#, fuzzy
+msgid "Name"
+msgstr "nome"
+
+#: forms.py:110
+#, fuzzy
+msgid "Email address"
+msgstr "Enderezo de correo electrónico"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Comentario"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Sen palabrotas, por favor! Aquí non se pode usar a palabra %s."
+msgstr[1] "Sen palabrotas, por favor! Aquí non se poden usar as palabras %s."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: models.py:22
+msgid "content type"
+msgstr "tipo de contido"
+
+#: models.py:24
+msgid "object ID"
+msgstr "ID do obxecto"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "usuario"
+
+#: models.py:52
+#, fuzzy
+msgid "user's name"
+msgstr "nome de usuario"
+
+#: models.py:53
+#, fuzzy
+msgid "user's email address"
+msgstr "enderezo de correo electrónico"
+
+#: models.py:54
+#, fuzzy
+msgid "user's URL"
+msgstr "usuarios"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "comentario"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "data/hora do envío"
+
+#: models.py:60
+msgid "IP address"
+msgstr "Enderezo IP"
+
+#: models.py:61
+msgid "is public"
+msgstr "é público"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: models.py:64
+msgid "is removed"
+msgstr "está borrado"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Marque esta caixa se o comentario non é apropiado. Verase a mensaxe \"Este "
+"comentario foi borrado\" no canto do seu contido."
+
+#: models.py:77
+msgid "comments"
+msgstr "comentarios"
+
+#: models.py:119
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Este comentario foi enviado por un usuario conflitivo:\n"
+"\n"
+"%(text)s"
+
+#: models.py:128
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Este comentario foi enviado por un usuario conflitivo:\n"
+"\n"
+"%(text)s"
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Publicado por %(user)s o %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "data da marca"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "Calquera data"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "comentario"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "comentarios"
+
+#: templates/comments/approve.html:4
+#, fuzzy
+msgid "Approve a comment"
+msgstr "comentario libre"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+#, fuzzy
+msgid "Thanks for approving"
+msgstr "Grazas por usar o noso sitio web!"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+#, fuzzy
+msgid "Remove a comment"
+msgstr "comentario libre"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+#, fuzzy
+msgid "Remove"
+msgstr "está borrado"
+
+#: templates/comments/deleted.html:4
+#, fuzzy
+msgid "Thanks for removing"
+msgstr "Grazas por usar o noso sitio web!"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr ""
+
+#: templates/comments/flagged.html:4
+#, fuzzy
+msgid "Thanks for flagging"
+msgstr "Grazas por usar o noso sitio web!"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+#, fuzzy
+msgid "Post"
+msgstr "º"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+#, fuzzy
+msgid "Preview"
+msgstr "vista:"
+
+#: templates/comments/posted.html:4
+#, fuzzy
+msgid "Thanks for commenting"
+msgstr "comentario libre"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+#, fuzzy
+msgid "Preview your comment"
+msgstr "Previsualizar comentario"
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Por favor, corrixa o erro de embaixo."
+msgstr[1] "Por favor, corrixa os erros de embaixo."
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "e"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "Post your comment"
+msgstr "Previsualizar comentario"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "or make changes"
+msgstr "Non se modificou ningún campo."

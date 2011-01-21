@@ -1,0 +1,309 @@
+# Dutch translation for Django.
+# Copyright (C) 2008, Django Software Foundation
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-08-28 13:58+0100\n"
+"Last-Translator: Rudolph Froger <rudolphfroger@estrate.nl>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Inhoud"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Metadata"
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "vlag"
+msgstr[1] "vlag"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "Vlag deze opmerking"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "Goedkeuren"
+msgstr[1] "Goedkeuren"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "Een opmerking toestaan"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "is verwijderd"
+msgstr[1] "is verwijderd"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "Een opmerking verwijderen"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s opmerkingen"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Laatste opmerkingen op %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Naam"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "E-mailadres"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Opmerking"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Pas op uw taalgebruik! Gebruik van %s niet toegestaan."
+msgstr[1] ""
+"Pas op uw taalgebruik! Gebruik van de woorden %s is niet toegestaan."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Indien u hier iets invuld dan wordt uw opmerking behandeld als spam"
+
+#: models.py:22
+msgid "content type"
+msgstr "inhoudstype"
+
+#: models.py:24
+msgid "object ID"
+msgstr "object-ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "gebruiker"
+
+#: models.py:52
+msgid "user's name"
+msgstr "naam gebruiker"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "e-mailadres gebruiker"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "URL gebruiker"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "opmerking"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "datum/tijd toegevoegd"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP-adres"
+
+#: models.py:61
+msgid "is public"
+msgstr "is openbaar"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Vink dit vakje uit zodat de opmerking niet meer zichtbaar is op de site."
+
+#: models.py:64
+msgid "is removed"
+msgstr "is verwijderd"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Vink dit vak aan indien de opmerking niet gepast is. Een \"Dit commentaar is "
+"verwijderd\" bericht wordt dan getoond."
+
+#: models.py:77
+msgid "comments"
+msgstr "opmerkingen"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Deze opmerking is gepost door een ingelogde gebruiker en daardoor is de naam "
+"niet aan te passen."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Deze opmerking is gepost door een ingelogde gebruiker en daardoor is het e-"
+"mailadres niet aan te passen."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Geplaatst door %(user)s op %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "vlag"
+
+#: models.py:171
+msgid "date"
+msgstr "datum"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "opmerking vlag"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "opmerking vlaggen"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Een opmerking toestaan"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Weet u zeker dat u deze opmerking openbaar wilt maken?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Goedkeuren"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Bedankt voor het goedkeuren"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Bedankt dat u de tijd heeft genomen om de kwaliteit van de discussie op onze "
+"site te verbeteren"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Een opmerking verwijderen"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Weet u zeker dat u deze opmerking wilt verwijderen?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Verwijderen"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Bedankt voor het verwijderen"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Vlag deze opmerking"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Weet u zeker dat u deze opmerking wilt vlaggen?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Vlag"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Bedankt voor het vlaggen"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Bericht"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Voorbeeld"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Bedankt voor uw opmerking"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Bedankt voor uw opmerking"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Toon voorbeeld van uw opmerking"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Herstel de fout hieronder"
+msgstr[1] "Herstel de fouten hieronder"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "en"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Plaats uw opmerking"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "of maak aanpassingen"

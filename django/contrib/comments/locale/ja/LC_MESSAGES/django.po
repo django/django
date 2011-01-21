@@ -1,0 +1,291 @@
+# Translation of django.po to japanese.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-05-09 12:41+0900\n"
+"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
+"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "内容"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "メタデータ"
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "にフラグが付きました"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "選択したコメントにフラグを付ける"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "は承認されました"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "選択したコメントを承認する"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "は削除されました"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "コメントを削除する"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "%(count)s個のコメント%(action)s。"
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s のコメント"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "%(site_name)s の最新コメント"
+
+#: forms.py:109
+msgid "Name"
+msgstr "名前"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "メールアドレス"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "コメント"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "言葉使いに気を付けて！ %s という言葉は使えません。"
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "このフィールドに入力するとコメントはスパム扱いされます"
+
+#: models.py:22
+msgid "content type"
+msgstr "コンテンツタイプ"
+
+#: models.py:24
+msgid "object ID"
+msgstr "オブジェクト ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "ユーザ"
+
+#: models.py:52
+msgid "user's name"
+msgstr "名前"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "メールアドレス"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "URL"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "コメント"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "コメント投稿日時"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP アドレス"
+
+#: models.py:61
+msgid "is public"
+msgstr "は公開中です"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"手っ取り早くコメントをサイトから消すにはここのチェックを外してください。"
+
+#: models.py:64
+msgid "is removed"
+msgstr "は削除されました"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"コメントが不適切な場合はチェックを入れてください。「コメントは削除されまし"
+"た」と表示されるようになります。"
+
+#: models.py:77
+msgid "comments"
+msgstr "コメント"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"このコメントは認証済みユーザーによって投稿されたため、名前は読み取り専用で"
+"す。"
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"このコメントは認証済みユーザーによって投稿されたため、メールアドレスは読み取"
+"り専用です。"
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"%(user)s が %(date)s に投稿\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "フラグ"
+
+#: models.py:171
+msgid "date"
+msgstr "フラグを付けた日時"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "コメントフラグ"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "コメントフラグ"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "コメントを承認する"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "本当にこのコメントを承認しますか？"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "承認"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "ご利用ありがとうございました！"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "当サイトの品質向上にご協力いただきありがとうございました"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "コメントを削除する"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "本当にこのコメントを削除しますか？"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "削除"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "ご利用ありがとうございました！"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "このコメントにフラグを付ける"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "本当にこのコメントにフラグを付けますか？"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "フラグを付ける"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "ご利用ありがとうございました！"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "投稿"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "プレビュー"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "コメントしてくれてありがとうございました"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "コメントありがとうございました"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "コメントのプレビュー"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "下記のエラーを修正してください。"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "と"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "コメントを投稿"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "さらに編集"

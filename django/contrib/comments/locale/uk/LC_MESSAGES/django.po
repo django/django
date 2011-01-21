@@ -1,0 +1,318 @@
+# Django, ukrainian translation.
+# Copyright (C) 2008-2010
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-04-06 00:02+0300\n"
+"Last-Translator: Mykola Zamkovoy <nickzam@gmail.com>\n"
+"Language-Team: UK <uk@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Зміст"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Мета-дані"
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "проста сторінка"
+msgstr[1] "проста сторінка"
+msgstr[2] "проста сторінка"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "Відмітити цей коментар?"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "Затвердити"
+msgstr[1] "Затвердити"
+msgstr[2] "Затвердити"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "Затвердіть коментар"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "видалений"
+msgstr[1] "видалений"
+msgstr[2] "видалений"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "Видалити коментар"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "увімкнути коментарі"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "для вашого рахунку користувача на сайті %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Ім'я"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "E-mail адреса"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Коментар"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Слідкуйте за виразами! Слово %s тут заборонено."
+msgstr[1] "Слідкуйте за виразами! Слова %s тут заборонені."
+msgstr[2] "Слідкуйте за виразами! Слова %s тут заборонені."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Якщо ви введете щось в це поле, ваш коментар буде вважатися спамом"
+
+#: models.py:22
+msgid "content type"
+msgstr "content type"
+
+#: models.py:24
+msgid "object ID"
+msgstr "ID об'єкту"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "користувач"
+
+#: models.py:52
+msgid "user's name"
+msgstr "ім'я користувача"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "e-mail адреса користувача"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "URL користувачів"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "коментар"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "дата/час додавання"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP адреса"
+
+#: models.py:61
+msgid "is public"
+msgstr "публічний"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Заберіть галочку звідси, щоб коментар зник з сайту."
+
+#: models.py:64
+msgid "is removed"
+msgstr "видалений"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Поставте тут галочку, якщо коментар неприйнятний. Повідомлення \"Цей "
+"коментар було видалено\" буде відображено замість цього коментаря."
+
+#: models.py:77
+msgid "comments"
+msgstr "коментарі"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Цей коментар був розміщений зареєстрованим користувачем і тому ім'я не може "
+"бути відредаговано."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Цей коментар був розміщений зареєстрованим користувачем і тому email не може "
+"бути відредагований."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Додав %(user)s %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "Відмітити"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "Будь-яка дата"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "коментар"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "коментарі"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Затвердіть коментар"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Дійсно, зробити цей коментар публічним?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Затвердити"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Дякуємо за затвердження."
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Дякуємо за те, що ви приділили увагу покращенню якості дискусії на нашому "
+"сайті"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Видалити коментар"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Дійсно, видалити цей коментар?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Видалити"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Дякуємо за видалення."
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Відмітити цей коментар?"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Дійсно відмітити цей коментар?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Відмітити"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Дякуємо за користування нашим сайтом."
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Надіслати"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Попередній перегляд"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Дякуємо за коментування"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Дякуємо за ваш коментар"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Попередній перегляд коментаря"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Будь ласка, виправте помилку, що зазначена нижче"
+msgstr[1] "Будь ласка, виправте помилки, що зазначені нижче"
+msgstr[2] "Будь ласка, виправте помилки, що зазначені нижче"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "та"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Опублікуйте коментар"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "або зробіть зміни."

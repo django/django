@@ -1,0 +1,300 @@
+# Translation of Django to Malayalam.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# RAJEESH R NAIR <rajeeshrnair@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-05-28 15:09+0530\n"
+"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"Language-Team: MALAYALAM <ML@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Malayalam\n"
+"X-Poedit-Country: INDIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "ഉള്ളടക്കം"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr ""
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "അടയാളപ്പെടുത്തി"
+msgstr[1] "അടയാളപ്പെടുത്തി"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "തെരഞ്ഞെടുത്ത അഭിപ്രായങ്ങള്‍ അടയാളപ്പെടുത്തുക"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "അംഗീകരിച്ചു"
+msgstr[1] "അംഗീകരിച്ചു"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "തെരഞ്ഞെടുത്ത അഭിപ്രായങ്ങള്‍ അംഗീകരിക്കുക"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "നീക്കം ചെയ്തു"
+msgstr[1] "നീക്കം ചെയ്തു"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "തെരഞ്ഞെടുത്ത അഭിപ്രായങ്ങള്‍ നീക്കം ചെയ്യുക"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "1 അഭിപ്രായം വിജയകരമായി %(action)s."
+msgstr[1] "%(count)s അഭിപ്രായങ്ങള്‍ വിജയകരമായി %(action)s."
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s അഭിപ്രായങ്ങള്‍"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "%(site_name)s ലെ ഏറ്റവും പുതിയ അഭിപ്രായങ്ങള്‍"
+
+#: forms.py:109
+msgid "Name"
+msgstr "പേര്"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "ഇ-മെയില്‍ വിലാസം"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL(വെബ്-വിലാസം)"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "അഭിപ്രായം"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "ശ്ശ്ശ്! %s എന്ന വാക്ക് ഇവിടെ അനുവദനീയമല്ല."
+msgstr[1] "ശ്ശ്ശ്! %s എന്നീ വാക്കുകള്‍ ഇവിടെ അനുവദനീയമല്ല."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "ഈ കള്ളിയില്‍ എന്തെങ്കിലും രേഖപ്പെടുത്തിയാല്‍ നിങ്ങളുടെ അഭിപ്രായം സ്പാം ആയി കണക്കാക്കും"
+
+#: models.py:22
+msgid "content type"
+msgstr "ഏതു തരം ഉള്ളടക്കം"
+
+#: models.py:24
+msgid "object ID"
+msgstr "വസ്തു ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "യൂസര്‍ (ഉപയോക്താവ്)"
+
+#: models.py:52
+msgid "user's name"
+msgstr "യൂസറുടെ പേര്"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "യൂസറുടെ ഇ-മെയില്‍ വിലാസം"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "യൂസറുടെ URL"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "അഭിപ്രായം"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "സമര്‍പ്പിച്ച തീയതി/സമയം"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP വിലാസം"
+
+#: models.py:61
+msgid "is public"
+msgstr "പരസ്യമാണ്"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "അഭിപ്രായം സൈറ്റില്‍ നിന്നും ഫലപ്രദമായി നീക്കം ചെയ്യാന്‍ ഈ ബോക്സിലെ ടിക് ഒഴിവാക്കുക."
+
+#: models.py:64
+msgid "is removed"
+msgstr "നീക്കം ചെയ്തു."
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"അഭിപ്രായം അനുചിതമെങ്കില്‍ ഈ ബോക്സ് ടിക് ചെയ്യുക. \"ഈ അഭിപ്രായം നീക്കം ചെയ്തു \" എന്ന "
+"സന്ദേശംആയിരിക്കും പകരം കാണുക."
+
+#: models.py:77
+msgid "comments"
+msgstr "അഭിപ്രായങ്ങള്‍"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "ഈ അഭിപ്രായം ഒരു അംഗീകൃത യൂസര്‍ രേഖപ്പെടുത്തിയതാണ്. അതിനാല്‍ പേര് വായിക്കാന്‍ മാത്രം."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"ഈ അഭിപ്രായം ഒരു അംഗീകൃത യൂസര്‍ രേഖപ്പെടുത്തിയതാണ്. അതിനാല്‍ ഇ-മെയില്‍ വിലാസം വായിക്കാന്‍ "
+"മാത്രം."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"%(date)sന് %(user)s രേഖപ്പെടുത്തിയത്:\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "അടയാളം"
+
+#: models.py:171
+msgid "date"
+msgstr "തീയതി"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "അഭിപ്രായ അടയാളം"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "അഭിപ്രായ അടയാളങ്ങള്‍"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "അഭിപ്രായം അംഗീകരിക്കൂ"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "ശരിക്കും ഈ അഭിപ്രായം പരസ്യമാക്കണോ?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "അംഗീകരിക്കൂ"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "അംഗീകരിച്ചതിനു നന്ദി"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "നമ്മുടെ സൈറ്റിലെ ചര്‍ച്ചകളുടെ നിലവാരം ഉയര്‍ത്താന്‍ സമയം ചെലവഴിച്ചതിനു നന്ദി."
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "അഭിപ്രായം നീക്കം ചെയ്യൂ"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "ഈ അഭിപ്രായം ശരിക്കും നീക്കം ചെയ്യണോ?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "നീക്കം ചെയ്യുക"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "നീക്കം ചെയ്തതിനു നന്ദി"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "ഈ അഭിപ്രായം അടയാളപ്പെടുത്തൂ"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "ഈ അഭിപ്രായം ശരിക്കും അടയാളപ്പെടുത്തണോ?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "അടയാളം"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "അടയാളപ്പെടുത്തിയതിനു നന്ദി"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "രേഖപ്പെടുത്തൂ"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "അവലോകനം"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "അഭിപ്രായം രേഖപ്പെടുത്തിയതിനു നന്ദി"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "അഭിപ്രായത്തിനു നന്ദി"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "അഭിപ്രായം അവലോകനം ചെയ്യുക"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "ദയവായി താഴെ പറയുന്ന തെറ്റ് തിരുത്തുക"
+msgstr[1] "ദയവായി താഴെ പറയുന്ന തെറ്റുകള്‍ തിരുത്തുക"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "ഉം"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "അഭിപ്രായം രേഖപ്പെടുത്തുക"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "അല്ലെങ്കില്‍ മാറ്റം വരുത്തുക."

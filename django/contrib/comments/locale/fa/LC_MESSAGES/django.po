@@ -1,0 +1,310 @@
+# Persian translation of Django.
+# Copyright (C) 2007 THE Django'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Django package.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2008-09-01 02:00+0430\n"
+"Last-Translator: Reza Mohammadi <reza@zeerak.ir>\n"
+"Language-Team: Persian <farsi@lists.sharif.edu>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "محتوا"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "فوق داده"
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "صفحه تخت"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "فعال کردن نظرات"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] ""
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "فعال کردن نظرات"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "حذف شده است"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "فعال کردن نظرات"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "فعال کردن نظرات"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "برای حساب کاربریتان در %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "نام"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "نشانی پست الکترونیکی"
+
+#: forms.py:111
+msgid "URL"
+msgstr "نشانی اینترنتی"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "نظر:"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "حرف دهنت رو بفهم! کلمهٔ %s اینجا قابل قبول نیست"
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "اگر چیزی در این فیلد وارد کنید، نظر شما به عنوان اسپم شناخته خواهد شد"
+
+#: models.py:22
+msgid "content type"
+msgstr "نوع محتوا"
+
+#: models.py:24
+msgid "object ID"
+msgstr "مشخصهٔ شیء"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "کاربر"
+
+#: models.py:52
+msgid "user's name"
+msgstr "نام کاربر"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "نشانی پست الکترونیکی کاربر"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "نشانی اینترنتی کاربر"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "نظر"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "تاریخ/زمان فرستاده شد"
+
+#: models.py:60
+msgid "IP address"
+msgstr "نشانی IP"
+
+#: models.py:61
+msgid "is public"
+msgstr "عمومی است"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "تیک این جعبه را بردارید تا نظر به طور کارا از وبگاه ناپدید شود."
+
+#: models.py:64
+msgid "is removed"
+msgstr "حذف شده است"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+
+#: models.py:77
+#, fuzzy
+msgid "comments"
+msgstr "نظر"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "این نظر توسط یک کاربر ثبت‌شده فرستاده شده و لذا نامش فقط-خواندنی است."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"این نظر توسط یک کاربر ثبت‌شده فرستاده شده و لذا پست الکترونیکی‌اش فقط-خواندنی "
+"است."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"ارسال‌شده توسط %(user)s در تاریخ %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "صفحه تخت"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "هر تاریخی"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "نظر"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "نظر"
+
+#: templates/comments/approve.html:4
+#, fuzzy
+msgid "Approve a comment"
+msgstr "فعال کردن نظرات"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+#, fuzzy
+msgid "Thanks for approving"
+msgstr "متشکر از استفادهٔ شما از وبگاه ما"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+#, fuzzy
+msgid "Remove a comment"
+msgstr "فعال کردن نظرات"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+#, fuzzy
+msgid "Remove"
+msgstr "حذف شده است"
+
+#: templates/comments/deleted.html:4
+#, fuzzy
+msgid "Thanks for removing"
+msgstr "متشکر از استفادهٔ شما از وبگاه ما"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr ""
+
+#: templates/comments/flagged.html:4
+#, fuzzy
+msgid "Thanks for flagging"
+msgstr "متشکر از استفادهٔ شما از وبگاه ما"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+#, fuzzy
+msgid "Post"
+msgstr "اُم"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+#, fuzzy
+msgid "Preview"
+msgstr "نمایش:"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr ""
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr ""
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "لطفاً خطای زیر را حل کنید."
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "و"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr ""
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "or make changes"
+msgstr "فیلدی تغییر نیافته است."

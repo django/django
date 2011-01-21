@@ -1,0 +1,308 @@
+# Translation of django.po to russian.
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-05-11 17:36+0300\n"
+"Last-Translator: alexey boriskin <sun.void@gmail.com>\n"
+"Language-Team: Russian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: RUSSIAN FEDERATION\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Содержание"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Метаданные"
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "отмечен"
+msgstr[1] "отмечены"
+msgstr[2] "отмечены"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "Отметить выбранные комментарии"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "подтвержден"
+msgstr[1] "подтверждены"
+msgstr[2] "подтверждены"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "Подтвердить выбранные комментарии"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "удален"
+msgstr[1] "удалены"
+msgstr[2] "удалены"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "Удалить выбранные комментарии"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "%(count)s комментарий был успешно %(action)s"
+msgstr[1] "%(count)s комментария были успешно %(action)s"
+msgstr[2] "%(count)s комментариев были успешно %(action)s"
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "Комментарии %(site_name)s"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Последние комментарии на %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Имя"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "Адрес электронной почты"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Комментарий"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Следите за своими словами! Слово %s здесь запрещено."
+msgstr[1] "Следите за своими словами! Слова %s здесь запрещены."
+msgstr[2] "Следите за своими словами! Слова %s здесь запрещены."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Если что-нибудь введете в это поле, то ваш комментарий будет признан спамом"
+
+#: models.py:22
+msgid "content type"
+msgstr "тип содержимого"
+
+#: models.py:24
+msgid "object ID"
+msgstr "идентификатор объекта"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "пользователь"
+
+#: models.py:52
+msgid "user's name"
+msgstr "имя пользователя"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "адрес электронной почты пользователя"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "URL пользователя"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "комментарий"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "дата и время добавления"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP-адрес"
+
+#: models.py:61
+msgid "is public"
+msgstr "публичный"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Снимите выделение, чтобы убрать комментарий с сайта."
+
+#: models.py:64
+msgid "is removed"
+msgstr "удален"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Отметьте, если комментарий нежелателен. Взамен будет показано сообщение "
+"\"Этот комментарий был удален\"."
+
+#: models.py:77
+msgid "comments"
+msgstr "Комментарии"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Комментарий был добавлен зарегистрированным пользователем, поэтому имя "
+"пользователя доступно только для чтения."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Комментарий был добавлен зарегистрированным пользователем, поэтому адрес "
+"электронной почты доступен только для чтения."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Добавил %(user)s %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "отметка"
+
+#: models.py:171
+msgid "date"
+msgstr "дата"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "отметка комментария"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "отметки комментариев"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Подтвердить комментарий"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Вы уверены, что хотите опубликовать этот комментарий?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Подтвердить"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Спасибо за подтверждение"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "Спасибо, что заботитесь о качестве общения на нашем сайте"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Удалить комментарий"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Вы уверены, что хотите удалить этот комментарий?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Удалить"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Спасибо за удаление"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Отметить этот комментарий"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Вы уверены, что хотите отметить этот комментарий?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Отметить"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Спасибо"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Опубликовать"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Предпросмотр"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Спасибо за комментарий"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Спасибо за ваш комментарий"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Предпросмотр вашего комментария"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Пожалуйста, исправьте ошибку ниже."
+msgstr[1] "Пожалуйста, исправьте ошибки ниже."
+msgstr[2] "Пожалуйста, исправьте ошибки ниже."
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "и"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Опубликуйте ваш комментарий"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "или внесите изменения"

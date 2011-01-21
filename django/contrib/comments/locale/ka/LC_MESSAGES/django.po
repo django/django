@@ -1,0 +1,306 @@
+# translation of django.po to Georgian
+# Django translation to Georgian language.
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-10-05 14:34+0400\n"
+"Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
+"Language-Team: Georgian <ka@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "კონტენტი"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "მეტა-მონაცემები"
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "უბრალო გვერდი"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "კომენტარის მარკირება"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "დასტური"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "კომენტარის დადასტურება"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "წაშლილია"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "წავშალოთ კომენტარები"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "ჩავრთოთ კომენტარები"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "თქვენი მომხმარებლის ანგარიშისათვის %(site_name)s-საიტზე"
+
+#: forms.py:109
+msgid "Name"
+msgstr "სახელი"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "ელ. ფოსტის მისამართი"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "კომენტარი"
+
+#: forms.py:191
+#, fuzzy, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "ყურადღება მიაქციეთ ლექსიკას! სიტყვა %s აქ დაუშვებელია."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "თუ თვენ შეიყვანთ რამეს ამ ველში, თქვენი კომენტარი სპამად აღიქმება"
+
+#: models.py:22
+msgid "content type"
+msgstr "კონტენტის ტიპი"
+
+#: models.py:24
+msgid "object ID"
+msgstr "ობიექტის ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "მომხმარებელი"
+
+#: models.py:52
+msgid "user's name"
+msgstr "მომხმარებლის სახელი"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "მომხმარებლის ელ. ფოსტა"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "მომხმარებლის URL"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "კომენტარი"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "გაგზავნის თარიღი და დრო"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP-მისამართი"
+
+#: models.py:61
+msgid "is public"
+msgstr "საყოველთაოა"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "გადანიშნეთ ეს დროშა, რათა კომენტარი რეალურად გაქრეს საიტიდან."
+
+#: models.py:64
+msgid "is removed"
+msgstr "წაშლილია"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"მონიშნეთ ეს დროშა, თუ კომენტარი შეუსაბამოა. მის ნაცვლად გაჩნდება "
+"შეტყობინება: \"კომენტარი წაშლილია\"."
+
+#: models.py:77
+#, fuzzy
+msgid "comments"
+msgstr "კომენტარი"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"ეს კომენტარი გამოგზავნილია აუდენტიფიცირებული მომხმარებლის მიერ, და ამიტომ "
+"სახელის შეცვლა შეუძლებელია."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"ეს კომენტარი გამოგზავნილია აუდენტიფიცირებული მომხმარებლის მიერ, და ამიტომ "
+"ელ. ფოსტის შეცვლა შეუძლებელია."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"გამოგზავნილია %(user)s-ს მიერ, %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "დროშა"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "ნებისმიერი თარიღი"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "კომენტარი"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "კომენტარი"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "კომენტარის დადასტურება"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "ნამდვილად გსურთ ამ კომენტარის გამოქვეყნება?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "დასტური"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "გმადლობთ, კომენტარის დადასტურებისათვის"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"გმადლობთ, რომ დრო დახარჯეთ ჩვენს საიტზე დისკუსიის ხარისხის გასაუმჯობესებლად"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "წავშალოთ კომენტარები"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "ნამდვილად გსურთ ამ კომენტარის წაშლა?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "წაშლა"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "გმადლობთ, წაშლისათვის"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "კომენტარის მარკირება"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "ნამდვილად გსურთ ამ კომენტარის მარკირება?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "დროშა"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "გმადლობთ, მარკირებისათვის"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "გაგზავნა"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "წინასწარი ნახვა"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "გმადლობთ კომენტარისთვის"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "გმადლობთ თქვენი კომენტარისათვის"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "კომენტარის წინასწარი ნახვა"
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომა"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "და"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "კომენტარის გაგზავნა"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "ან შეიტანეთ ცვლილებები"

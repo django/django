@@ -1,0 +1,302 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2008-11-12 08:14+0530\n"
+"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
+"Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Hindi\n"
+"X-Poedit-Country: INDIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "विषय सूची"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr ""
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "चपटा पृष्ट"
+msgstr[1] "चपटा पृष्ट"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "टिप्पनी को फ्लैग करो"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "पसंद करें"
+msgstr[1] "पसंद करें"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "टिप्पणी पसंद करें"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "हटाया गया"
+msgstr[1] "हटाया गया"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "टिप्पणी निकालें"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "टिप्पणी सक्षम करें"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "%(site_name)s पर आपके प्रवोक्ता खाता के लिए"
+
+#: forms.py:109
+msgid "Name"
+msgstr "नाम"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "ईमेल पता"
+
+#: forms.py:111
+msgid "URL"
+msgstr "यू.आर.एल"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "टिप्पणी"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] ""
+msgstr[1] ""
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: models.py:22
+msgid "content type"
+msgstr "विषय-सूची प्रकार"
+
+#: models.py:24
+msgid "object ID"
+msgstr "वस्तु आइ डी"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "उपभोक्ता"
+
+#: models.py:52
+msgid "user's name"
+msgstr "प्रयोक्ता नाम"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "प्रयोक्ता ईमेल पता"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "प्रयोक्ता यू.आर.एल"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "टिप्पणी"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "तिथि/समय निवेदित"
+
+#: models.py:60
+msgid "IP address"
+msgstr "आइ.पि पता"
+
+#: models.py:61
+msgid "is public"
+msgstr "सार्वजनिक है"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: models.py:64
+msgid "is removed"
+msgstr "हटाया गया"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+
+#: models.py:77
+#, fuzzy
+msgid "comments"
+msgstr "टिप्पणी"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "फ्लैग"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "कोई भी तारीख"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "टिप्पणी"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "टिप्पणी"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "टिप्पणी पसंद करें"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "क्या इस टिप्पणी को सार्वजनिक बनाएँ ?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "पसंद करें"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "पसंद करने के लिए धन्यवाद"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "टिप्पणी निकालें"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "क्या आप इस टिप्पणी को हटाना चाहते हैं ?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "निकालें"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "निकालने के लिये धन्यवाद"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "टिप्पनी को फ्लैग करो"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "क्या आप इस टिप्पणी को फ्लैग करना चाहते हैं ?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "फ्लैग"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "फ्लैग करने के लिए धन्यवाद"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "प्रस्तुत"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "पूर्व दर्शन"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "टिप्पणी के लिये धन्यवाद"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "टिप्पणी के लिये धन्यवाद"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "आपके टिप्पणी का पूर्व दर्शन देखे`"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "कृपया नीचे पायी गयी गलती को ठीक करें"
+msgstr[1] "कृपया नीचे पाये गये गलतियाँ को ठीक करें"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "और"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "टिप्पणी प्रस्तुत करें"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "अथवा बदलें"

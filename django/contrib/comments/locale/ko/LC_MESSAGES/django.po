@@ -1,0 +1,290 @@
+# Django Korean Translation
+# Copyright (C) 2009
+# This file is distributed under the same license as the django package.
+# Hyun Mi Ae, Joongi Kim (me@daybreaker.info), Sung-Jin Hong (serialx.net@gmail.com)
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2007-04-06 11:04+0900\n"
+"Last-Translator: Joongi Kim (me@daybreaker.info)\n"
+"Language-Team: Korean\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "내용"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "메타데이터"
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "플래그되었습니다"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "선택된 코멘트에 플래그 달기"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "승인되었습니다"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "선택된 코멘트 승인하기"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "삭제되었습니다"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "선택된 코멘트 삭제"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "%(count)s개의 코멘트가 성공적으로 %(action)s."
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s 의 코멘트"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "%(site_name)s 의 사용자 비밀번호가 초기화 되었습니다."
+
+#: forms.py:109
+msgid "Name"
+msgstr "이름"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "이메일 주소"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "코멘트:"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "비속어/욕설입니다. %s (은)는 사용하실 수 없습니다."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "이 필드에 무엇이라도 입력하면 코멘트는 스팸으로 처리될 것입니다."
+
+#: models.py:22
+msgid "content type"
+msgstr "콘텐츠 타입"
+
+#: models.py:24
+msgid "object ID"
+msgstr "오브젝트 ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "사용자"
+
+#: models.py:52
+msgid "user's name"
+msgstr "사용자명"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "사용자 이메일 주소"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "사용자 URL"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "코멘트"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "날짜/시간 확인"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP 주소"
+
+#: models.py:61
+msgid "is public"
+msgstr "공개합니다."
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "이 사이트에서 코멘트가 나타나지 않게 하려면 체크 해제하세요."
+
+#: models.py:64
+msgid "is removed"
+msgstr "삭제합니다."
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"코멘트가 부적절한 경우 체크하세요. \"코멘트가 삭제되었습니다.\" 메시지가 표시"
+"됩니다."
+
+#: models.py:77
+msgid "comments"
+msgstr "코멘트(들)"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "이 코멘트는 등록된 사용자가 작성하였으므로 읽기 전용입니다."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr "이 코멘트는 등록된 사용자가 작성하였으므로 읽기 전용입니다."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"%(user)s (이)가 %(date)s 등록\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "플래그"
+
+#: models.py:171
+msgid "date"
+msgstr "날짜"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "코멘트 플래그"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "코멘트 플래그"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "코멘트 승인"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "정말로 이 코멘트를 공개하시겠습니까?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "승인"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "승인해주셔서 고맙습니다."
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "우리 사이트의 토론에 기여해주셔서 감사합니다."
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "코멘트 삭제"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "정말로 이 코멘트를 삭제하시겠습니까?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "삭제하기"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "삭제해주셔서 고맙습니다."
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "코멘트에 플래그 달기"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "정말로 플래그를 다시겠습니까?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "플래그를 답니다."
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "플래그를 달아주셔서 고맙습니다."
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "작성하기"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "미리보기"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "코멘트 작성 완료"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "코멘트를 달아주셔서 고맙습니다."
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "코멘트 미리보기"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "아래의 오류를 수정해 주세요."
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "또한"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "코멘트 작성하기"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "또는 변경하기"

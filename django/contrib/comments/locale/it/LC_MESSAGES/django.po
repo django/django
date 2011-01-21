@@ -1,0 +1,305 @@
+# translation of django.po to Italian
+# Italian translation of Django.
+# Copyright (C) 2006 the Lawrence Journal-World
+# This file is distributed under the same license as the Django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-05-10 14:44+0200\n"
+"Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
+"Language-Team: Italian <django-it@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Contenuto"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Metadati"
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "segnalato"
+msgstr[1] "segnalati/e"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "Segnala i commenti selezionati"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "approvato"
+msgstr[1] "approvati/e"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "Approva i commenti selezionati"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "eliminato"
+msgstr[1] "eliminati/e"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "Elimina i commenti selezionati"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "Ad 1 commento è stata applicata con successo l'azione %(action)s."
+msgstr[1] ""
+"A %(count)s commenti è stata applicata con successo l'azione %(action)s."
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "commenti su %(site_name)s "
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Commenti più recenti su %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Nome"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "Indirizzo email"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Commento"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Modera i termini: la parola %s non è ammessa qui."
+msgstr[1] "Modera i termini: le parole %s non sono ammesse qui."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Se inserisci qualcosa in questo campo il tuo commento verrà considerato spam"
+
+#: models.py:22
+msgid "content type"
+msgstr "content type"
+
+#: models.py:24
+msgid "object ID"
+msgstr "ID dell'oggetto"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "utente"
+
+#: models.py:52
+msgid "user's name"
+msgstr "nome utente"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "indirizzo email utente"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "URL utente"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "commento"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "data/ora di inserimento"
+
+#: models.py:60
+msgid "IP address"
+msgstr "indirizzo IP"
+
+#: models.py:61
+msgid "is public"
+msgstr "è pubblico"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Deseleziona questa casella per far sparire del tutto il commento dal sito."
+
+#: models.py:64
+msgid "is removed"
+msgstr "è eliminato"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Spunta la casella se il commento è inappropriato. Verrà sostituito dal "
+"messaggio \"Questo commento è stato rimosso\"."
+
+#: models.py:77
+msgid "comments"
+msgstr "commenti"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Questo commento è stato inserito da un utente autenticato e quindi il nome "
+"non è modificabile."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Questo commento è stato inserito da un utente autenticato e quindi l'email "
+"non è modificabile."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Inserito da %(user)s il %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "Segnala"
+
+#: models.py:171
+msgid "date"
+msgstr "data"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "segnalazione commento"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "segnalazioni commenti"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Approva un commento"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Sicuro di voler pubblicare questo commento?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Approva"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Grazie per aver approvato"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Grazie per aver speso tempo a migliorare la qualità della discussione sul "
+"nostro sito"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Elimina un commento"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Sicuro di voler eliminare questo commento?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Elimina"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Grazie per aver eliminato"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Segnala questo commento"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Sicuro di voler segnalare questo commento?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Segnala"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Grazie per aver segnalato"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Pubblica"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Anteprima"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Grazie per aver commentato"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Grazie per il tuo commento"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Mostra l'anteprima del tuo commento"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Correggi l'errore qui sotto"
+msgstr[1] "Correggi gli errori qui sotto"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "e"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Pubblica il tuo commento"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "o fai dei cambiamenti"

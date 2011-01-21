@@ -1,0 +1,312 @@
+# translation of django.po to Telugu
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-09-09 21:24+0530\n"
+"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
+"Language-Team: Telugu <indlinux-telugu@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr ""
+
+#: admin.py:15
+msgid "Metadata"
+msgstr ""
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "ఫ్లాగ్ తేది "
+msgstr[1] "ఫ్లాగ్ తేది "
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "నిరాటంకము గావ్యాఖ్యానములు"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] " అధికారుల చేత ఆమోదించబడినది"
+msgstr[1] " అధికారుల చేత ఆమోదించబడినది"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "నిరాటంకము గావ్యాఖ్యానములు"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "తీసివేయబడినది"
+msgstr[1] "తీసివేయబడినది"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr ""
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s జట్టు"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr ""
+
+#: forms.py:109
+msgid "Name"
+msgstr "నామము"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "ఇటపా "
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "వ్యాఖ్యానము"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] ""
+msgstr[1] ""
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: models.py:22
+msgid "content type"
+msgstr "సూచన రకం"
+
+#: models.py:24
+msgid "object ID"
+msgstr "వస్తువు ఐడి"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "వినియొగదారి"
+
+#: models.py:52
+msgid "user's name"
+msgstr "వినియొగదారి నామము"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "వినియోగదారుని ఇటపా "
+
+#: models.py:54
+msgid "user's URL"
+msgstr "వినియొగదారి URL"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "వ్యాఖ్యానము"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "తేది /వేళ సమర్పించినది"
+
+#: models.py:60
+msgid "IP address"
+msgstr "ఐపి అడ్రస్"
+
+#: models.py:61
+msgid "is public"
+msgstr "బహిరంగమయినది"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: models.py:64
+msgid "is removed"
+msgstr "తీసివేయబడినది"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr " ఈ వ్యాఖ్యానము సరిగ్గా లేదని తోచినచో ఈ  డబ్బా ని చెక్ చేయండి "
+
+#: models.py:77
+msgid "comments"
+msgstr "వ్యాఖ్యానములు"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "ఫ్లాగ్ తేది "
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "ఏ రోజైన"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "వ్యాఖ్యానము"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "వ్యాఖ్యానములు"
+
+#: templates/comments/approve.html:4
+#, fuzzy
+msgid "Approve a comment"
+msgstr "నిరాటంకమైన వ్యాఖ్యానము"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+#, fuzzy
+msgid "Thanks for approving"
+msgstr "మా సైట్  వాడినందుకు ధన్యవాదములు!"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+#, fuzzy
+msgid "Remove a comment"
+msgstr "నిరాటంకమైన వ్యాఖ్యానము"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+#, fuzzy
+msgid "Remove"
+msgstr "తీసివేయబడినది"
+
+#: templates/comments/deleted.html:4
+#, fuzzy
+msgid "Thanks for removing"
+msgstr "మా సైట్  వాడినందుకు ధన్యవాదములు!"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+#, fuzzy
+msgid "Flag"
+msgstr "మలగా"
+
+#: templates/comments/flagged.html:4
+#, fuzzy
+msgid "Thanks for flagging"
+msgstr "మా సైట్  వాడినందుకు ధన్యవాదములు!"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+#, fuzzy
+msgid "Post"
+msgstr "వ"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+#, fuzzy
+msgid "Preview"
+msgstr "దర్శనం:"
+
+#: templates/comments/posted.html:4
+#, fuzzy
+msgid "Thanks for commenting"
+msgstr "నిరాటంకమైన వ్యాఖ్యానము"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+#, fuzzy
+msgid "Preview your comment"
+msgstr "వ్యాఖ్యానము ని ప్రివ్యీవ్ చేయండి"
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "క్రింద ఉన్న తప్పు  సరిదిద్దుకోండి"
+msgstr[1] "క్రింద ఉన్న తప్పులు  సరిదిద్దుకోండి"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "మరియు"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "Post your comment"
+msgstr "వ్యాఖ్యానము ని ప్రివ్యీవ్ చేయండి"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "or make changes"
+msgstr "క్షేత్రములు  ఏమి మార్చబడలేదు"

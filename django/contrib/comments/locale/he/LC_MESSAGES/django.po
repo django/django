@@ -1,0 +1,297 @@
+# translation of Django.
+# Copyright (C) 2008 The Django Project
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-05-09 15:10-0500\n"
+"Last-Translator: Alex <alex.gaynor@gmail.com>\n"
+"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Bookmarks: -1,988,-1,-1,-1,-1,-1,-1,-1,-1\n"
+"X-Generator: Lokalize 1.0\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "תוכן"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "מטא־נתונים"
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "סומנה"
+msgstr[1] "סומנו"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "סמן תגובות שנבחרו"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "אושרה"
+msgstr[1] "אושרו"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "אשר תגובות שנבחרו"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "הוסרה"
+msgstr[1] "הוסרו"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "הסר תגובות שנבחרו"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "תגובה אחת %(action)s בהצלחה"
+msgstr[1] "%(count)s תגובות %(action)s בהצלחה"
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "תגובות עבור %(site_name)s"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "התגובות האחרונות על %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "שם"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "כתובת דוא\"ל"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "תגובה"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "שמור על לשונך! המילה %s אסורה לשימוש כאן."
+msgstr[1] "שמור על לשונך! המילים %s אסורות לשימוש כאן."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "אם יוזן משהו בשדה זה תגובתך תטופל כספאם"
+
+#: models.py:22
+msgid "content type"
+msgstr "סוג תוכן"
+
+#: models.py:24
+msgid "object ID"
+msgstr "מזהה אובייקט"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "משתמש"
+
+#: models.py:52
+msgid "user's name"
+msgstr "שם משתמש"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "כתובת דוא\"ל משתמש"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "אתר המשתמש"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "תגובה"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "תאריך/שעת הגשה"
+
+#: models.py:60
+msgid "IP address"
+msgstr "כתובת IP"
+
+#: models.py:61
+msgid "is public"
+msgstr "פומבי "
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "ביטול סימון התיבה יעלים בפועל את התגובה מהאתר"
+
+#: models.py:64
+msgid "is removed"
+msgstr "האם הוסר"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"יש לסמן תיבה זו עבור תגובה לא נאותה. הודעת \"תגובה זו נמחקה\" תוצג במקום "
+"התגובה."
+
+#: models.py:77
+msgid "comments"
+msgstr "תגובות"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "הודעה זו נשלחה ע\"י משתמש מחובר לכן השם אינו ניתן לשינוי."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr "הודעה זו נשלחה ע\"י משתמש מחובר לכן כתובת הדוא\"ל אינה ניתנת לשינוי."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"הוגש ע\"י %(user)s ב %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "סימן"
+
+#: models.py:171
+msgid "date"
+msgstr "תאריך"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "סמן הערה"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "סמני הערה"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "אשר הערה"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "באמת להפוך את התגובה לפומבית?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "אשר"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "תודה על אישור התגובה"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "תודה על שהקדשת מזמנך כדי לשפר את איכות הדיון באתר שלנו"
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "הסר תגובה"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "באמת להסיר תגובה זו?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "להסיר"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "תודה על ההסרה"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "סמן תגובה זו"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "באמת לסמן תגובה זו?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "סימן"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "תודה על הסימון"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "פוסט"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "תצוגה מקדימה"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "תודה על התגובה"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "תודה על התגובה"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "תצוגה מקדימה של התגובה"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "בבקשה לתקן את השגיאה למטה"
+msgstr[1] "אנא תקן את שגיאות למטה"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "ו"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "פרסם את התגובה"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "או לבצע שינויים"

@@ -1,0 +1,325 @@
+# translation of django.po to Hungarian
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2008-08-30 01:11+0200\n"
+"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Tartalom"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Metaadat"
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "egyszerű oldal"
+msgstr[1] "egyszerű oldal"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "megjegyzések engedélyezése"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "megjegyzések engedélyezése"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "eltávolítva"
+msgstr[1] "eltávolítva"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "megjegyzések engedélyezése"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "megjegyzések engedélyezése"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "hozzáféréséhez a következő honlapon: %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Név"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "E-mail cím"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Hozzászólás"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Vigyázzon a szájára! Az ilyen szó (%s) itt nem megengedett."
+msgstr[1] "Vigyázzon a szájára! Az ilyen szavak (%s) itt nem megengedettek."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+"Ha bármit begépel ebbe a mezőbe, akkor azt szemétként fogja kezelni a "
+"rendszer"
+
+#: models.py:22
+msgid "content type"
+msgstr "tartalom típusa"
+
+#: models.py:24
+msgid "object ID"
+msgstr "objektum ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "felhasználó"
+
+#: models.py:52
+msgid "user's name"
+msgstr "felhasználó neve"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "felhasználó e-mail címe"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "felhasználó URL-je"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "megjegyzés"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "dátum/idő beállítva"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP cím"
+
+#: models.py:61
+msgid "is public"
+msgstr "publikus"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Vegye ki a pipát a jelölőnégyzetből, hogy eltűntesse a hozzászólást az "
+"oldalról."
+
+#: models.py:64
+msgid "is removed"
+msgstr "eltávolítva"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Jelöld be a négyzetet, ha a megjegyzés nem megfelelő. Az \"Ezt a megjegyzést "
+"törölték\" üzenet fog megjelenni helyette."
+
+#: models.py:77
+#, fuzzy
+msgid "comments"
+msgstr "megjegyzés"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Ezt a hozzászólást egy hitelesített felhasználó küldte be, ezért a név csak "
+"olvasható."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Ezt a hozzászólást egy hitelesített felhasználó küldte be, ezért az e-mail "
+"csak olvasható."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Beküldte %(user)s ekkor: %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "egyszerű oldal"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "Bármely dátum"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "megjegyzés"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "megjegyzés"
+
+#: templates/comments/approve.html:4
+#, fuzzy
+msgid "Approve a comment"
+msgstr "Megjegyzés előnézete"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+#, fuzzy
+msgid "Thanks for approving"
+msgstr "Köszönjük, hogy használta honlapunkat!"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+#, fuzzy
+msgid "Remove a comment"
+msgstr "Megjegyzés előnézete"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+#, fuzzy
+msgid "Remove"
+msgstr "eltávolítva"
+
+#: templates/comments/deleted.html:4
+#, fuzzy
+msgid "Thanks for removing"
+msgstr "Köszönjük, hogy használta honlapunkat!"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+#, fuzzy
+msgid "Flag"
+msgstr "Malaga"
+
+#: templates/comments/flagged.html:4
+#, fuzzy
+msgid "Thanks for flagging"
+msgstr "Köszönjük, hogy használta honlapunkat!"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+#, fuzzy
+msgid "Post"
+msgstr "."
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+#, fuzzy
+msgid "Preview"
+msgstr "nézet:"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr ""
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+#, fuzzy
+msgid "Preview your comment"
+msgstr "Megjegyzés előnézete"
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Kérem javítsa az alábbi hibát."
+msgstr[1] "Kérlem javítsa az alábbi hibákat."
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "és"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "Post your comment"
+msgstr "Megjegyzés előnézete"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "or make changes"
+msgstr "Egy mező sem változott."

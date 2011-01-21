@@ -1,0 +1,334 @@
+# translation of django-new.po to tamil
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2007-03-15 16:48+0530\n"
+"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
+"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: admin.py:12
+#, fuzzy
+msgid "Content"
+msgstr "பொருளடக்கம்"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr ""
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "குறியின் தேதி"
+msgstr[1] "குறியின் தேதி"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "விமர்சனங்களை செயலாக்கு"
+
+#: admin.py:47
+#, fuzzy
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "பணியாளர்களால் அனுமதிக்கப்பட்டது"
+msgstr[1] "பணியாளர்களால் அனுமதிக்கப்பட்டது"
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "சுதந்தரமான குறிப்புகள்"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "நீக்கபட்டது"
+msgstr[1] "நீக்கபட்டது"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "விமர்சனங்களை செயலாக்கு"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "விமர்சனங்களை செயலாக்கு"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "%(site_name)s -இல் உள்ள உங்களது பயனாளர் கணக்கு"
+
+#: forms.py:109
+#, fuzzy
+msgid "Name"
+msgstr "பெயர்"
+
+#: forms.py:110
+#, fuzzy
+msgid "Email address"
+msgstr "மின் அஞ்சல்"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+#, fuzzy
+msgid "Comment"
+msgstr "விவரம்:"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "வார்த்தைகளை அளன்து பேசுங்கள்! %s என்ற வார்த்தை இங்கு அனுமதி இல்லை"
+msgstr[1] "வார்த்தைகளை அளந்து பேசுங்கள்! %s என்ற வார்த்தைகள் இங்கு அனுமதி இல்லை"
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: models.py:22
+msgid "content type"
+msgstr "பொருளடக்க வகை"
+
+#: models.py:24
+msgid "object ID"
+msgstr "அடையாளம்"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "பயனர்"
+
+#: models.py:52
+#, fuzzy
+msgid "user's name"
+msgstr "பயனர் பெயர்"
+
+#: models.py:53
+#, fuzzy
+msgid "user's email address"
+msgstr "மின்னஞ்சல் முகவரி"
+
+#: models.py:54
+#, fuzzy
+msgid "user's URL"
+msgstr "பயனர்கள்"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "குறிப்பு"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "தேதி/நேரம் சமர்ப்பிக்கப்பட்டுள்ளது"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP விலாசம்"
+
+#: models.py:61
+msgid "is public"
+msgstr "பொதுவானது"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: models.py:64
+msgid "is removed"
+msgstr "நீக்கபட்டது"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"குறிப்பு சரியாக இல்லையென்றால் இந்த பெட்டியில் குறியிடவும். இதற்கு பதிலாக \"இந்த "
+"குறிப்பு நீக்கபட்டது\" காண்பிக்கபடும்."
+
+#: models.py:77
+msgid "comments"
+msgstr "குறிப்பு"
+
+#: models.py:119
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"முழுமையான விவரங்களை அளிக்காத பயனாளரால் கொடுக்கப்பட்டது:\n"
+"\n"
+"%(text)s"
+
+#: models.py:128
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"முழுமையான விவரங்களை அளிக்காத பயனாளரால் கொடுக்கப்பட்டது:\n"
+"\n"
+"%(text)s"
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"%(user)s ஆல் %(date)s இல் அளிக்கப்பட்டது \n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "குறியின் தேதி"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "எந்த தேதியும்"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "குறிப்பு"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "குறிப்பு"
+
+#: templates/comments/approve.html:4
+#, fuzzy
+msgid "Approve a comment"
+msgstr "சுதந்தரமான குறிப்பு"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+#, fuzzy
+msgid "Thanks for approving"
+msgstr "எங்களது வலைத்தளத்தை பயன் படுத்தியதற்கு மிகுந்த நன்றி"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+#, fuzzy
+msgid "Remove a comment"
+msgstr "சுதந்தரமான குறிப்பு"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+#, fuzzy
+msgid "Remove"
+msgstr "நீக்கபட்டது"
+
+#: templates/comments/deleted.html:4
+#, fuzzy
+msgid "Thanks for removing"
+msgstr "எங்களது வலைத்தளத்தை பயன் படுத்தியதற்கு மிகுந்த நன்றி"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr ""
+
+#: templates/comments/flagged.html:4
+#, fuzzy
+msgid "Thanks for flagging"
+msgstr "எங்களது வலைத்தளத்தை பயன் படுத்தியதற்கு மிகுந்த நன்றி"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr ""
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+#, fuzzy
+msgid "Preview"
+msgstr "நோற்றமிடு:"
+
+#: templates/comments/posted.html:4
+#, fuzzy
+msgid "Thanks for commenting"
+msgstr "சுதந்தரமான குறிப்பு"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+#, fuzzy
+msgid "Preview your comment"
+msgstr "குறிப்பை முன்னேற்றமிடு"
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "கீழே உள்ள தவறுயைத் திருத்துக"
+msgstr[1] "கீழே உள்ள தவறுகளைத் திருத்துக"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "மற்றும்"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "Post your comment"
+msgstr "குறிப்பை முன்னேற்றமிடு"
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "or make changes"
+msgstr "எந்த புலமும் மாறவில்லை."

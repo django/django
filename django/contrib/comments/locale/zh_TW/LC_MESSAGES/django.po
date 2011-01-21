@@ -1,0 +1,315 @@
+# This file is distributed under the same license as the django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2007-04-05 01:32+1000\n"
+"Last-Translator: Terry Huang <terryh.tp@gmail.com>\n"
+"Language-Team: Terry Huang <terryh.tp@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:12
+#, fuzzy
+msgid "Content"
+msgstr "內容"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "元資料"
+
+#: admin.py:42
+#, fuzzy
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "簡平頁面"
+
+#: admin.py:43
+#, fuzzy
+msgid "Flag selected comments"
+msgstr "啟用評論"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] ""
+
+#: admin.py:48
+#, fuzzy
+msgid "Approve selected comments"
+msgstr "啟用評論"
+
+#: admin.py:52
+#, fuzzy
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "已刪除"
+
+#: admin.py:53
+#, fuzzy
+msgid "Remove selected comments"
+msgstr "啟用評論"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+
+#: feeds.py:13
+#, fuzzy, python-format
+msgid "%(site_name)s comments"
+msgstr "啟用評論"
+
+#: feeds.py:23
+#, fuzzy, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "你在 %(site_name)s 裡的使用者帳號"
+
+#: forms.py:109
+#, fuzzy
+msgid "Name"
+msgstr "名稱"
+
+#: forms.py:110
+#, fuzzy
+msgid "Email address"
+msgstr "電子郵件地址"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+#, fuzzy
+msgid "Comment"
+msgstr "評論"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "看住你的嘴！此處不允許 %s 這樣的字眼。"
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "如果你在這一個欄位輸入任何內容，會被視為是垃圾評論"
+
+#: models.py:22
+msgid "content type"
+msgstr "內容類型"
+
+#: models.py:24
+msgid "object ID"
+msgstr "物件 ID"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "使用者"
+
+#: models.py:52
+#, fuzzy
+msgid "user's name"
+msgstr "使用者名稱"
+
+#: models.py:53
+#, fuzzy
+msgid "user's email address"
+msgstr "使用者電子郵件地址"
+
+#: models.py:54
+#, fuzzy
+msgid "user's URL"
+msgstr "使用者的網址"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "評論"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "日期/時間已送出"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP 位址"
+
+#: models.py:61
+msgid "is public"
+msgstr "公開"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: models.py:64
+msgid "is removed"
+msgstr "已刪除"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr "如果此評論不恰當則選取這個檢查框，其將以 \"此評論已被移除\" 訊息取代。"
+
+#: models.py:77
+#, fuzzy
+msgid "comments"
+msgstr "評論"
+
+#: models.py:119
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "此評論由一位已驗證的使用者發佈，該名稱是唯讀的。"
+
+#: models.py:128
+#, fuzzy
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr "此評論由一位已驗證的使用者發佈，該 email 是唯讀的。"
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"由 %(user)s 在 %(date)s 張貼\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+#, fuzzy
+msgid "flag"
+msgstr "簡平頁面"
+
+#: models.py:171
+#, fuzzy
+msgid "date"
+msgstr "任何日期"
+
+#: models.py:181
+#, fuzzy
+msgid "comment flag"
+msgstr "評論"
+
+#: models.py:182
+#, fuzzy
+msgid "comment flags"
+msgstr "評論"
+
+#: templates/comments/approve.html:4
+#, fuzzy
+msgid "Approve a comment"
+msgstr "啟用評論"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+#, fuzzy
+msgid "Thanks for approving"
+msgstr "感謝使用本網站！"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+#, fuzzy
+msgid "Remove a comment"
+msgstr "啟用評論"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+#, fuzzy
+msgid "Remove"
+msgstr "已刪除"
+
+#: templates/comments/deleted.html:4
+#, fuzzy
+msgid "Thanks for removing"
+msgstr "感謝使用本網站！"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+#, fuzzy
+msgid "Flag"
+msgstr "左賀"
+
+#: templates/comments/flagged.html:4
+#, fuzzy
+msgid "Thanks for flagging"
+msgstr "感謝使用本網站！"
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+#, fuzzy
+msgid "Post"
+msgstr "st"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+#, fuzzy
+msgid "Preview"
+msgstr "視圖："
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr ""
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr ""
+
+#: templates/comments/preview.html:11
+#, fuzzy
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "请更正下面的錯誤。"
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "和"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr ""
+
+#: templates/comments/preview.html:16
+#, fuzzy
+msgid "or make changes"
+msgstr "沒有欄位被變更。"

@@ -1,0 +1,306 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-04-28 13:45+0100\n"
+"Last-Translator: Filip Dupanović <kron@kron.ba>\n"
+"Language-Team: Filip Dupanović <kron@kron.ba>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr "Sadržaj"
+
+#: admin.py:15
+msgid "Metadata"
+msgstr "Metapodaci"
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] "oznaka"
+msgstr[1] "oznake"
+msgstr[2] "oznaka"
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr "Označite izabrane komentare"
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] "odobren"
+msgstr[1] "odobrena"
+msgstr[2] "odobreno"
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr "Odobri izabrane komentare"
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "uklonjen"
+msgstr[1] "uklonjena"
+msgstr[2] "uklonjeno"
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr "Obriši izabrane komentare"
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] "%(count)s komentar je uspješno %(action)s."
+msgstr[1] "%(count)s komentara su uspješno %(action)s."
+msgstr[2] "%(count)s komentara su uspješno %(action)s."
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "Komentari na sajtu %(site_name)s"
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Skoriji komentari na sajtu %(site_name)s"
+
+#: forms.py:109
+msgid "Name"
+msgstr "Ime"
+
+#: forms.py:110
+msgid "Email address"
+msgstr "Email adresa"
+
+#: forms.py:111
+msgid "URL"
+msgstr "URL"
+
+#: forms.py:112
+msgid "Comment"
+msgstr "Komentari"
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Pazi na jezik! Riječ „%s“ ovdje nije dozvoljena."
+msgstr[1] "Pazi na jezik! Riječi „%s“ ovdje nisu dozvoljene."
+msgstr[2] "Pazi na jezik! Riječi „%s“ ovdje nisu dozvoljene."
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Ako bilo šta unesete u ovo polje, Vaš komentar će se smatrati spamom."
+
+#: models.py:22
+msgid "content type"
+msgstr "tip sadržaja"
+
+#: models.py:24
+msgid "object ID"
+msgstr "ID objekta"
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr "korisnik"
+
+#: models.py:52
+msgid "user's name"
+msgstr "korisnikovo ime"
+
+#: models.py:53
+msgid "user's email address"
+msgstr "korisnikova email adresa"
+
+#: models.py:54
+msgid "user's URL"
+msgstr "korisnikov URL"
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr "komentar"
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr "datum/vrijeme postavljanja"
+
+#: models.py:60
+msgid "IP address"
+msgstr "IP adresa"
+
+#: models.py:61
+msgid "is public"
+msgstr "javno"
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Uklonite izbor ovog polja ako želite da poruka faktični nestane sa ovog "
+"sajta."
+
+#: models.py:64
+msgid "is removed"
+msgstr "uklonjen"
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Obilježite ovu polje ako je komentar neprikladan. Poruka o uklanjanju će "
+"biti prikazana umjesto komentara."
+
+#: models.py:77
+msgid "comments"
+msgstr "komentari"
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Ovaj komentar je postavio prijavljen korisnik i zato je polje sa imenom "
+"zaključano."
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Ovaj komentar je postavio prijavljen korisnik i zato je polje sa email  "
+"adresom zaključano."
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Postavio %(user)s, %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: models.py:170
+msgid "flag"
+msgstr "oznaka"
+
+#: models.py:171
+msgid "date"
+msgstr "datum"
+
+#: models.py:181
+msgid "comment flag"
+msgstr "oznaka komentara"
+
+#: models.py:182
+msgid "comment flags"
+msgstr "oznake komentara"
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Odobrenje komentara"
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Da li zaista želite da označite ovaj komentar javnim?"
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Odobri"
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Hvala na odobrenju!"
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "Hvala na učešću u unapređenju kvaliteta diskusija na našem sajtu."
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Obriši komentar"
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Da li zaista želite da obrišete ovaj komentar?"
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Obriši"
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Hvala što koristite naš sajt!"
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Označavanje komentara"
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Da li zaista želite da označite ovaj komentar?"
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Označi"
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Hvala što ste označili komentar."
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr "Postavi"
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Pregled"
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Hvala na komentaru"
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Hvala što ste ostavili svoj komentar"
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr "Pregledaj komentar"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] "Ispravite grešku dole."
+msgstr[1] "Ispravite greške dole."
+msgstr[2] "Ispravite greške dole."
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr "i"
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Postavi komentar"
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "ili izvrši izmjene"

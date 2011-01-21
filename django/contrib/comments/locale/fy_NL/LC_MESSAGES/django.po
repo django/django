@@ -1,0 +1,286 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-01-27 22:36-0700\n"
+"Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
+"Language-Team: FRISIAN <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:12
+msgid "Content"
+msgstr ""
+
+#: admin.py:15
+msgid "Metadata"
+msgstr ""
+
+#: admin.py:42
+msgid "flagged"
+msgid_plural "flagged"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin.py:43
+msgid "Flag selected comments"
+msgstr ""
+
+#: admin.py:47
+msgid "approved"
+msgid_plural "approved"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin.py:48
+msgid "Approve selected comments"
+msgstr ""
+
+#: admin.py:52
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin.py:53
+msgid "Remove selected comments"
+msgstr ""
+
+#: admin.py:65
+#, python-format
+msgid "1 comment was successfully %(action)s."
+msgid_plural "%(count)s comments were successfully %(action)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: feeds.py:13
+#, python-format
+msgid "%(site_name)s comments"
+msgstr ""
+
+#: feeds.py:23
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr ""
+
+#: forms.py:109
+msgid "Name"
+msgstr ""
+
+#: forms.py:110
+msgid "Email address"
+msgstr ""
+
+#: forms.py:111
+msgid "URL"
+msgstr ""
+
+#: forms.py:112
+msgid "Comment"
+msgstr ""
+
+#: forms.py:191
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] ""
+msgstr[1] ""
+
+#: forms.py:198
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: models.py:22
+msgid "content type"
+msgstr ""
+
+#: models.py:24
+msgid "object ID"
+msgstr ""
+
+#: models.py:50 models.py:168
+msgid "user"
+msgstr ""
+
+#: models.py:52
+msgid "user's name"
+msgstr ""
+
+#: models.py:53
+msgid "user's email address"
+msgstr ""
+
+#: models.py:54
+msgid "user's URL"
+msgstr ""
+
+#: models.py:56 models.py:76 models.py:169
+msgid "comment"
+msgstr ""
+
+#: models.py:59
+msgid "date/time submitted"
+msgstr ""
+
+#: models.py:60
+msgid "IP address"
+msgstr ""
+
+#: models.py:61
+msgid "is public"
+msgstr ""
+
+#: models.py:62
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: models.py:64
+msgid "is removed"
+msgstr ""
+
+#: models.py:65
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+
+#: models.py:77
+msgid "comments"
+msgstr ""
+
+#: models.py:119
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+
+#: models.py:128
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+
+#: models.py:153
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+
+#: models.py:170
+msgid "flag"
+msgstr ""
+
+#: models.py:171
+msgid "date"
+msgstr ""
+
+#: models.py:181
+msgid "comment flag"
+msgstr ""
+
+#: models.py:182
+msgid "comment flags"
+msgstr ""
+
+#: templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr ""
+
+#: templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr ""
+
+#: templates/comments/approve.html:12
+msgid "Approve"
+msgstr ""
+
+#: templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr ""
+
+#: templates/comments/approved.html:7 templates/comments/deleted.html:7
+#: templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+
+#: templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr ""
+
+#: templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr ""
+
+#: templates/comments/delete.html:12
+msgid "Remove"
+msgstr ""
+
+#: templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr ""
+
+#: templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr ""
+
+#: templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr ""
+
+#: templates/comments/flag.html:12
+msgid "Flag"
+msgstr ""
+
+#: templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr ""
+
+#: templates/comments/form.html:17 templates/comments/preview.html:32
+msgid "Post"
+msgstr ""
+
+#: templates/comments/form.html:18 templates/comments/preview.html:33
+msgid "Preview"
+msgstr ""
+
+#: templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr ""
+
+#: templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr ""
+
+#: templates/comments/preview.html:4 templates/comments/preview.html.py:13
+msgid "Preview your comment"
+msgstr ""
+
+#: templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgid_plural "Please correct the errors below"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/comments/preview.html:16
+msgid "and"
+msgstr ""
+
+#: templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr ""
+
+#: templates/comments/preview.html:16
+msgid "or make changes"
+msgstr ""
