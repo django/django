@@ -1,0 +1,260 @@
+# Translation of Django to Malayalam.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# RAJEESH R NAIR <rajeeshrnair@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-05-28 15:09+0530\n"
+"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"Language-Team: MALAYALAM <ML@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Malayalam\n"
+"X-Poedit-Country: INDIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "വ്യക്തിപരമായ വിവരങ്ങള്‍"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "അനുമതികള്‍"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "പ്രധാന തീയതികള്‍"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "ഗ്രൂപ്പുകള്‍"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "പാസ് വേര്‍ഡ് മാറ്റിയിരിക്കുന്നു."
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "പാസ് വേര്‍ഡ് മാറ്റുക: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "യൂസര്‍ നാമം (ഉപയോക്ത്രു നാമം)"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"നിര്‍ബന്ധം. 30 ഓ അതില്‍ കുറവോ ചിഹ്നങ്ങള്‍. അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, പിന്നെ @/./+/-/_എന്നിവയും "
+"മാത്രം."
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, പിന്നെ @/./+/-/_എന്നിവയും മാത്രം."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "പാസ് വേര്‍ഡ്"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "പാസ് വേര്‍ഡ് ഉറപ്പാക്കല്‍"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "പാസ് വേര്‍ഡ് മുകളിലെ പോലെ തന്നെ നല്കുക. (ഉറപ്പു വരുത്താനാണ്.)"
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "ആ പേരുള്ള ഒരു ഉപയോക്താവ് നിലവിലുണ്ട്."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "പാസ് വേര്‍ഡ് നല്കിയ കള്ളികള്‍ രണ്ടും തമ്മില്‍ സാമ്യമില്ല."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"ദയവായി ശരിയായ യൂസര്‍നാമവും പാസ്വേര്ഡും നല്കുക. ഇംഗ്ളീഷ് അക്ഷരങ്ങള്‍ വല്യക്ഷരമാണോ അല്ലയോ എന്നത് "
+"ശ്രദ്ധിക്കണം"
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "ഈ അക്കൗണ്ട് മരവിപ്പിച്ചതാണ്."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"നിങ്ങളുടെ വെബ്-ബ്രൗസറിലെ കുക്കീസൊന്നും പ്രവര്‍ത്തിക്കുന്നില്ല. ഇതിലേക്ക് പ്രവേശിക്കാന്‍ അവ ആവശ്യമാണ്."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "ഇ-മെയില്‍"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"ആ ഇ-മെയിലുമായി ബന്ധപ്പെട്ട യൂസര് അക്കൗണ്ടൊന്നും നിലവിലില്ല. രജിസ്റ്റര്‍ ചെയ്തെന്നു തീര്‍ച്ചയാണോ?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "%s ലെ പാസ് വേര്‍ഡ് പുനസ്ഥാപിച്ചു."
+
+#: forms.py:151
+msgid "New password"
+msgstr "പുതിയ പാസ് വേര്‍ഡ്"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "പുതിയ പാസ് വേര്‍ഡ് ഉറപ്പാക്കല്‍"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "പഴയ പാസ് വേര്‍ഡ്"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "നിങ്ങളുടെ പഴയ പാസ് വേര്‍ഡ് തെറ്റായാണ് നല്കിയത്. തിരുത്തുക."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "പാസ് വേര്‍ഡ് (വീണ്ടും)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "പേര്"
+
+#: models.py:78
+msgid "codename"
+msgstr "കോഡ്-നാമം"
+
+#: models.py:82
+msgid "permission"
+msgstr "അനുമതി"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "അനുമതികള്‍"
+
+#: models.py:108
+msgid "group"
+msgstr "ഗ്രൂപ്പ്"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "ഗ്രൂപ്പുകള്‍"
+
+#: models.py:206
+msgid "username"
+msgstr "യൂസര്‍ നാമം (ഉപയോക്ത്രു നാമം)"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"നിര്‍ബന്ധം. 30 ഓ അതില്‍ കുറവോ ചിഹ്നങ്ങള്‍. അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, പിന്നെ @/./+/-/_എന്നിവയും "
+"മാത്രം."
+
+#: models.py:207
+msgid "first name"
+msgstr "പേര് - ആദ്യഭാഗം"
+
+#: models.py:208
+msgid "last name"
+msgstr "പേര് - അന്ത്യഭാഗം"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "ഇ-മെയില്‍ വിലാസം"
+
+#: models.py:210
+msgid "password"
+msgstr "പാസ് വേര്‍ഡ്"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"'[algo]$[salt]$[hexdigest]' അല്ലെങ്കില്‍ <a href=\"password/\">പാസ് വേര്‍ഡ് മാറ്റാനുള്ള "
+"ഫോം</a> ഉപയോഗിക്കുക."
+
+#: models.py:211
+msgid "staff status"
+msgstr "സ്റ്റാഫ് പദവി"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "ഈ യൂസര്‍ക്ക് ഈ അഡ്മിന് സൈറ്റിലേക്ക് പ്രവേശിക്കാമോ എന്നു വ്യക്തമാക്കാന്‍"
+
+#: models.py:212
+msgid "active"
+msgstr "സജീവം"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"ഈ യൂസര്‍ സജീവമാണോയെന്ന് വ്യക്തമാക്കുന്നു. അക്കൗണ്ട് ഡിലീറ്റ് ചെയ്യുന്നതിനു പകരം ഇത് ഒഴിവാക്കുക."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "സൂപ്പര്‍-യൂസര്‍ പദവി"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "ഈ ഉപയോക്താവിന് എടുത്തു പറയാതെ തന്നെ എല്ലാ അനുമതികളും ലഭിക്കുന്നതാണെന്ന് വ്യക്തമാക്കുന്നു"
+
+#: models.py:214
+msgid "last login"
+msgstr "അവസാനമായി ലോഗിന്‍ ചെയ്തതു"
+
+#: models.py:215
+msgid "date joined"
+msgstr "ചേര്‍ന്ന തീയതി"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"ഈ ഉപയോക്താവിന് നേരിട്ട് ലഭിച്ചതു കൂടാതെ അവര്‍ അംഗമായ ഗ്രൂപ്പിന് ലഭിച്ച അനുമതികളും അനുഭവിക്കാം"
+
+#: models.py:218
+msgid "user permissions"
+msgstr "യൂസര്‍ (ഉപയോക്താവ്)നുള്ള അനുമതികള്‍"
+
+#: models.py:222
+msgid "user"
+msgstr "യൂസര്‍ (ഉപയോക്താവ്)"
+
+#: models.py:223
+msgid "users"
+msgstr "യൂസേര്‍സ് (ഉപയോക്താക്കള്‍)"
+
+#: models.py:406
+msgid "message"
+msgstr "സന്ദേശം"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "ലോഗ്-ഔട്ട് ചെയ്തു (പുറത്തിറങ്ങി)"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "ശരിയായ ഇ-മെയില്‍ വിലാസം നല്കുക."

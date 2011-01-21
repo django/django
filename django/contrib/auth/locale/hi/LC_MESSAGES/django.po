@@ -1,0 +1,250 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2008-11-12 08:14+0530\n"
+"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
+"Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Hindi\n"
+"X-Poedit-Country: INDIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "व्यक्तिगत सूचना"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "अनुमतियाँ"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "आवश्यक तिथियाँ"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "वर्गों"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "शब्दकूट बदली कामयाब"
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "शब्दकूट बदलें: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "प्रवोक्ता नाम"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr ""
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "कूटशब्द"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "कूटशब्द पुष्टि"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "सत्याप्ती के लिए ऊपर दर्ज किए शब्दकूट को फिर से प्रवेश करें"
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "इस नाम के साथ प्रवोक्ता अस्तित्व है"
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "यह दो शब्दकूट क्षेत्रों का मेल नहीं होता "
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "यस खाता सुस्त है"
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "ईमेल"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "%s पर शब्दकूट पुनस्थाप"
+
+#: forms.py:151
+msgid "New password"
+msgstr "नया शब्दकूट"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "नया शब्दकूट पुष्टि"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "पुराना शब्दकूट"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "आपने पुराना शब्दकूट गलत दर्ज किया है । कृपया फिर से दर्ज करें"
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "शब्दकूट (दुबारा)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "नाम"
+
+#: models.py:78
+msgid "codename"
+msgstr "कोडनेम"
+
+#: models.py:82
+msgid "permission"
+msgstr "अनुमति"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "अनुमतियाँ"
+
+#: models.py:108
+msgid "group"
+msgstr "वर्ग"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "वर्गों"
+
+#: models.py:206
+msgid "username"
+msgstr "प्रयोक्ता नाम"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+
+#: models.py:207
+msgid "first name"
+msgstr "पहला नाम"
+
+#: models.py:208
+msgid "last name"
+msgstr "आखिरी नाम"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "ईमेल पता"
+
+#: models.py:210
+msgid "password"
+msgstr "शब्दकूट"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"'[algo]$[salt]$[hexdigest]' अथ‌वा <a href=\"password/\">शब्दकूट बदली फार्म</a> "
+"प्रयोग करें"
+
+#: models.py:211
+msgid "staff status"
+msgstr "कर्मचारी स्थिति"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: models.py:212
+msgid "active"
+msgstr "सक्रिय"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: models.py:213
+msgid "superuser status"
+msgstr "सर्वोच्च प्रयोक्ता स्थिति"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+
+#: models.py:214
+msgid "last login"
+msgstr "पिछला लॉगिन"
+
+#: models.py:215
+msgid "date joined"
+msgstr "तिथि भरती"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+
+#: models.py:218
+msgid "user permissions"
+msgstr "प्रयोक्ता अनुमतियाँ"
+
+#: models.py:222
+msgid "user"
+msgstr "उपभोक्ता"
+
+#: models.py:223
+msgid "users"
+msgstr "उपभोक्ताऐं"
+
+#: models.py:406
+msgid "message"
+msgstr "सन्देश"
+
+#: views.py:86
+msgid "Logged out"
+msgstr ""
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "मान्य ईमेल पता भरें"

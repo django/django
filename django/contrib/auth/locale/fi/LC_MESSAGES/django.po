@@ -1,0 +1,264 @@
+# Finnish translation of Django
+# Copyright (C) 2006-2007
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2007-09-15 00:34+0300\n"
+"Last-Translator: Aku Kotkavuo <aku.kotkavuo@norfello.com>\n"
+"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Finnish\n"
+"X-Poedit-Country: FINLAND\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "Henkilökohtaiset tiedot"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "Oikeudet"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Tärkeät päivämäärät"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Ryhmät"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "Salasana muutettu onnistuneesti."
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Vaihda salasana: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Käyttäjätunnus"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+" Vaaditaan. Enintään 30 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat "
+"sallittuja."
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Tässä voidaan käyttää vain kirjaimia, numeroita ja @/./+/-/_ merkkejä."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Salasana"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "Salasanan vahvistaminen"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Syötä sama salasana tarkistuksen vuoksi toistamiseen."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Käyttäjätunnus on jo rekisteröity."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "Salasanat eivät täsmää."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Käyttäjätunnus tai salasana ei kelpaa. Huomaa, että isot ja pienet kirjaimet "
+"ovat merkitseviä."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "Tämä käyttäjätili ei ole voimassa."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Selaimesi ei näytä sallivan evästeitä. Sisäänkirjautuminen vaatii evästeen."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "Sähköposti"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Sähköpostiosoitetta vastaavaa käyttäjätunnusta ei löydy. Oletko varmasti jo "
+"rekisteröitynyt?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "Salasanan nollaus sivustolla %s"
+
+#: forms.py:151
+msgid "New password"
+msgstr "Uusi salasana"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "Uusi salasana uudelleen"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "Vanha salasana"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Vanha salasana on virheellinen. Yritä uudelleen."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Salasana toistamiseen"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "nimi"
+
+#: models.py:78
+msgid "codename"
+msgstr "tunniste"
+
+#: models.py:82
+msgid "permission"
+msgstr "oikeus"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "oikeudet"
+
+#: models.py:108
+msgid "group"
+msgstr "ryhmä"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "ryhmät"
+
+#: models.py:206
+msgid "username"
+msgstr "käyttäjätunnus"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+" Vaaditaan. Enintään 30 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat "
+"sallittuja."
+
+#: models.py:207
+msgid "first name"
+msgstr "etunimi"
+
+#: models.py:208
+msgid "last name"
+msgstr "sukunimi"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "sähköposti"
+
+#: models.py:210
+msgid "password"
+msgstr "salasana"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Syötä muodossa '[algo]$[suola]$[heksa-digest]' tai käytä <a href=\"password/"
+"\">muutoslomaketta</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "ylläpitäjä"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "Määrittää, pääseekö käyttäjä tähän sivuston ylläpito-osioon."
+
+#: models.py:212
+msgid "active"
+msgstr "voimassa"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Määrää, voiko käyttäjä kirjautua sisään. Tällä voi estää käyttäjätilin "
+"käytön poistamatta sitä."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "pääkäyttäjä"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella."
+
+#: models.py:214
+msgid "last login"
+msgstr "viimeisin kirjautuminen"
+
+#: models.py:215
+msgid "date joined"
+msgstr "liittynyt"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Erikseen mainittujen oikeuksien lisäksi käyttäjä saa myös kaikki niiden "
+"ryhmien oikeudet, joiden jäsen hän on."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "käyttäjän oikeudet"
+
+#: models.py:222
+msgid "user"
+msgstr "käyttäjä"
+
+#: models.py:223
+msgid "users"
+msgstr "käyttäjät"
+
+#: models.py:406
+msgid "message"
+msgstr "viesti"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Kirjautunut ulos"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Syötä kelvollinen sähköpostiosoite."

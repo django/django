@@ -1,0 +1,259 @@
+# translation of django.po to Catalan
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2009-03-24 13:28+0100\n"
+"Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
+"Language-Team: Catalan <ca@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "Informació personal"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "Permisos"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Dates importants"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Grups"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "Contrasenya canviada amb èxit"
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Canviar contrasenya: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Nom d'usuari"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Obligatori. 30 o menys caràcters. Només lletres, dígits i @/./+/-/_."
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Aquest valor ha de contenir només lletres, números i @/./+/-/_."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Contrasenya"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "Confirmació de contrasenya"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Introduïu la mateixa contrasenya de dalt, per fer-ne la verificació."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Ja existeix un usuari amb aquest nom."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "Els dos camps de contrasenya no coincideixen."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Si us plau, introduïu un nom d'usuari i contrasenya vàlids. Tingueu en "
+"compte que tots dos camps son sensibles a majúscules i minúscules."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "Aquest compte està inactiu"
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"El vostre navegador no sembla tenir les galetes ('cookies') activades. "
+"Aquestes són necessàries per iniciar la sessió."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "Correu electrònic"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Aquesta adreça de correu no té associat cap compte d'usuari. Esteu segurs "
+"que s'ha registrat?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "Restablir contrasenya en %s"
+
+#: forms.py:151
+msgid "New password"
+msgstr "Contrasenya nova"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "Contrasenya nova confirmada"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "Contrasenya antiga"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"La vostra antiga contrasenya no és correcta. Si us plau, introduïu-la de nou."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Contrasenya (de nou)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "nom"
+
+#: models.py:78
+msgid "codename"
+msgstr "nom en clau"
+
+#: models.py:82
+msgid "permission"
+msgstr "permís"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "permisos"
+
+#: models.py:108
+msgid "group"
+msgstr "grup"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "grups"
+
+#: models.py:206
+msgid "username"
+msgstr "nom d'usuari"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "Obligatori. 30 o menys caràcters. Només lletres, números i @/./+/-/_"
+
+#: models.py:207
+msgid "first name"
+msgstr "nom propi"
+
+#: models.py:208
+msgid "last name"
+msgstr "cognoms"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "adreça de correu electrònic"
+
+#: models.py:210
+msgid "password"
+msgstr "contrasenya"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Utilitzeu '[algo]$[salt]$[hexdigest]' o el <a href=\"password/\">formulari "
+"de canvi de contrasenya</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "membre del personal"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "Designa si l'usuari pot entrar al lloc administratiu."
+
+#: models.py:212
+msgid "active"
+msgstr "actiu"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Designa si aquest usuari ha de ser tractat com a actiu. Deseleccioneu-ho "
+"enlloc d'esborrar comptes d'usuari."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "estat de superusuari"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Designa que aquest usuari té tots els permisos sense assignar-los "
+"explícitament."
+
+#: models.py:214
+msgid "last login"
+msgstr "últim inici de sessió"
+
+#: models.py:215
+msgid "date joined"
+msgstr "data d'incorporació"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"A més dels permisos assignats manualment, aquest usuari tindrà també els "
+"permisos dels grups dels que sigui membre."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "permisos de l'usuari"
+
+#: models.py:222
+msgid "user"
+msgstr "usuari"
+
+#: models.py:223
+msgid "users"
+msgstr "usuaris"
+
+#: models.py:406
+msgid "message"
+msgstr "missatge"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Sessió finalitzada"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Introduïu una adreça de correu vàlida."

@@ -1,0 +1,274 @@
+# Translation of django.po to Galego
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2007-05-28 17:29+0200\n"
+"Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
+"Language-Team: Galego\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Galician\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "Información persoal"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "Permisos"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Datas importantes"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Grupos"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "O contrasinal cambiouse correctamente."
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Cambiar contrasinal: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Usuario"
+
+#: forms.py:15 forms.py:49
+#, fuzzy
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Requirido. 30 caracteres ou menos. Soamente caracteres alfanuméricos "
+"(letras, díxitos ou guións baixos)."
+
+#: forms.py:16 forms.py:50
+#, fuzzy
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Este valor soamente pode conter letras, números e guións baixos (_)."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Contrasinal"
+
+#: forms.py:18
+#, fuzzy
+msgid "Password confirmation"
+msgstr "Cambiar o contrasinal"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Insira o mesmo contrasinal ca enriba para verificalo."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Xa existe un usuario con ese nome de usuario."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "Os dous campos de contrasinal non coinciden."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Insira un nome de usuario e un contrasinal correctos. Teña en conta que nos "
+"dous campos se distingue entre maiúsculas e minúsculas."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "Esta conta está inactiva."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Semella que o seu navegador non acepta 'cookies'. Requírense 'cookies' para "
+"iniciar sesión."
+
+#: forms.py:108
+#, fuzzy
+msgid "E-mail"
+msgstr "Enderezo de correo electrónico"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Este enderezo de correo electrónico non ten unha conta de usuario asociada. "
+"Está seguro de que está rexistrado?"
+
+#: forms.py:143
+#, fuzzy, python-format
+msgid "Password reset on %s"
+msgstr "Recuperar o contrasinal"
+
+#: forms.py:151
+#, fuzzy
+msgid "New password"
+msgstr "Contrasinal novo:"
+
+#: forms.py:152
+#, fuzzy
+msgid "New password confirmation"
+msgstr "Contrasinal novo:"
+
+#: forms.py:177
+#, fuzzy
+msgid "Old password"
+msgstr "Contrasinal actual:"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"Inseriu incorrectamente o seu contrasinal actual. Por favor, insírao de novo."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Contrasinal (outra vez)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "nome"
+
+#: models.py:78
+msgid "codename"
+msgstr "código"
+
+#: models.py:82
+msgid "permission"
+msgstr "permiso"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "permisos"
+
+#: models.py:108
+msgid "group"
+msgstr "grupo"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "grupos"
+
+#: models.py:206
+msgid "username"
+msgstr "nome de usuario"
+
+#: models.py:206
+#, fuzzy
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"Requirido. 30 caracteres ou menos. Soamente caracteres alfanuméricos "
+"(letras, díxitos ou guións baixos)."
+
+#: models.py:207
+msgid "first name"
+msgstr "nome"
+
+#: models.py:208
+msgid "last name"
+msgstr "apelidos"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "enderezo de correo electrónico"
+
+#: models.py:210
+msgid "password"
+msgstr "contrasinal"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Use '[algo]$[salt]$[hexdigest]' ou utilice o <a href=\"password/"
+"\">formulario de cambio de contrasinal</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "membro do persoal"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "Indica se o usuario pode entrar neste sitio de administración."
+
+#: models.py:212
+msgid "active"
+msgstr "activo"
+
+#: models.py:212
+#, fuzzy
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Indica se o usuario pode entrar na sección de administración. Desactíveo no "
+"canto de borrar contas de usuario."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "estatus de superusuario"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Indica que este usuario ten todos os permisos sen asignarllos explicitamente."
+
+#: models.py:214
+msgid "last login"
+msgstr "última sesión"
+
+#: models.py:215
+msgid "date joined"
+msgstr "data de rexistro"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Ademais dos permisos asignados manualmente, este usuario gozará de todos os "
+"permisos concedidos a cada un dos grupos aos que pertence."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "permisos de usuario"
+
+#: models.py:222
+msgid "user"
+msgstr "usuario"
+
+#: models.py:223
+msgid "users"
+msgstr "usuarios"
+
+#: models.py:406
+msgid "message"
+msgstr "mensaxe"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Rematou a sesión"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Insira un enderezo de correo electrónico válido."

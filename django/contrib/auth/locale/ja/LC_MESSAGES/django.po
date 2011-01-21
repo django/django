@@ -1,0 +1,255 @@
+# Translation of django.po to japanese.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-05-09 12:41+0900\n"
+"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
+"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "個人情報"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "パーミッション"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "重要な日程"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "グループ"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "パスワードを変更しました"
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "パスワードの変更: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "ユーザ名"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"この項目は必須です。半角アルファベット、半角数字、@/./+/-/_ で30文字以下にし"
+"てください。"
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "半角の英数字および次の記号 @/./+/-/_ 以外は使用できません。"
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "パスワード"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "パスワードの確認"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "確認のため、再度パスワードを入力してください。"
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "同じユーザ名が既に登録済みです。"
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "確認用パスワードが一致しません。"
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"正しいユーザ名とパスワードを入力してください (大文字小文字は区別します) 。"
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "アカウントが無効です。"
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"お使いのブラウザはクッキーを有効にしていないようです。ログインにはクッキーが"
+"必要です。"
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "メールアドレス"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr "メールアドレスの一致するユーザはいません。本当に登録しましたか？"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "%s のパスワードのリセット"
+
+#: forms.py:151
+msgid "New password"
+msgstr "新しいパスワード"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "新しいパスワード(確認用)"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "元のパスワード"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "元のパスワードが間違っています。もう一度入力してください。"
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "パスワード(確認用)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "名前"
+
+#: models.py:78
+msgid "codename"
+msgstr "コード名"
+
+#: models.py:82
+msgid "permission"
+msgstr "パーミッション"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "パーミッション"
+
+#: models.py:108
+msgid "group"
+msgstr "グループ"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "グループ"
+
+#: models.py:206
+msgid "username"
+msgstr "ユーザ名"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"この項目は必須です。半角アルファベット、半角数字、次の記号 @/./+/-/_ で30文字"
+"以下にしてください。"
+
+#: models.py:207
+msgid "first name"
+msgstr "名"
+
+#: models.py:208
+msgid "last name"
+msgstr "姓"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "メールアドレス"
+
+#: models.py:210
+msgid "password"
+msgstr "パスワード"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"'[algo]$[salt]$[hexdigest]'形式か、<a href=\"password/\">パスワード変更フォー"
+"ム</a>を使ってください。"
+
+#: models.py:211
+msgid "staff status"
+msgstr "スタッフ権限"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "ユーザが管理サイトにログイン可能かどうかを示します。"
+
+#: models.py:212
+msgid "active"
+msgstr "有効"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"ユーザがアクティブかどうかを示します。アカウントを消す代わりに選択を解除して"
+"ください。"
+
+#: models.py:213
+msgid "superuser status"
+msgstr "スーパーユーザ権限"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "全ての権限を持っているとみなされます。"
+
+#: models.py:214
+msgid "last login"
+msgstr "最終ログイン"
+
+#: models.py:215
+msgid "date joined"
+msgstr "登録日"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"手動で付与したパーミッションに加え、所属しているグループに付与された全ての"
+"パーミッションを獲得します。"
+
+#: models.py:218
+msgid "user permissions"
+msgstr "ユーザパーミッション"
+
+#: models.py:222
+msgid "user"
+msgstr "ユーザ"
+
+#: models.py:223
+msgid "users"
+msgstr "ユーザ"
+
+#: models.py:406
+msgid "message"
+msgstr "メッセージ"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "ログアウト"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "有効なメールアドレスを入力してください。"

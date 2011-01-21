@@ -1,0 +1,267 @@
+# Django, ukrainian translation.
+# Copyright (C) 2008-2010
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-04-06 00:02+0300\n"
+"Last-Translator: Mykola Zamkovoy <nickzam@gmail.com>\n"
+"Language-Team: UK <uk@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "Персональна інформація"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "Дозволи"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Важливі дати"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Групи"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "Зміна паролю успішна"
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Змінити пароль: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Користувач:"
+
+#: forms.py:15 forms.py:49
+#, fuzzy
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Необхідне поле. 30 символів або менше. Тільки букви, цифри та символ "
+"підкреслювання."
+
+#: forms.py:16 forms.py:50
+#, fuzzy
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr ""
+"Це значення може містити тільки літери, числа та символи підкреслювання"
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Пароль:"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "Підтвердження паролю"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Повторіть пароль для перевірки."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Користувач з таким ім'ям вже існує."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "Паролі у двох полях не співпадають."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Будь-ласка введіть правильне ім'я та пароль. Зауважте, що обидва поля "
+"розрізняють великі і маленькі літери."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "Цей запис користувача не активний."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Схоже, що у вашому браузері на увімкнені cookies. Cookies необхідні для "
+"входу."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "E-mail"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Ця e-mail адреса не пов'язана з користувацьким запитом. Ви впевнені, що ви "
+"реєструвалися?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "Пароль перевстановлено %s"
+
+#: forms.py:151
+msgid "New password"
+msgstr "Новий пароль:"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "Новий пароль (підтвердження):"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "Старий пароль:"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"Старий пароль було введено неправильно. Будь ласка, введіть його знову."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Зміна пароля"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "ім'я"
+
+#: models.py:78
+msgid "codename"
+msgstr "код"
+
+#: models.py:82
+msgid "permission"
+msgstr "дозвіл"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "дозволи"
+
+#: models.py:108
+msgid "group"
+msgstr "група"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "групи"
+
+#: models.py:206
+msgid "username"
+msgstr "ім'я користувача"
+
+#: models.py:206
+#, fuzzy
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"Необхідне поле. 30 символів або менше. Тільки букви, цифри та символ "
+"підкреслювання."
+
+#: models.py:207
+msgid "first name"
+msgstr "ім'я"
+
+#: models.py:208
+msgid "last name"
+msgstr "прізвище"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "e-mail адреса"
+
+#: models.py:210
+msgid "password"
+msgstr "пароль"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Використайте '[algo]$[salt]$[hexdigest]' або використайте <a href=\"password/"
+"\">форму зміни паролю</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "Статус персоналу"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "Визначає, чи може користувач увійти до цього сайту адміністрування."
+
+#: models.py:212
+msgid "active"
+msgstr "Активний"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Визначає, чи можна цього користувача вважати діючим. Заберіть галочку, "
+"замість відалення запису користувача."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "Статус суперкористувача"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "Визначає, що цей користувач має всі дозволи без їх точного зазначення."
+
+#: models.py:214
+msgid "last login"
+msgstr "Останній вхід"
+
+#: models.py:215
+msgid "date joined"
+msgstr "Дата приєднання"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"На додаток до прав, які призначені вручну, цей користувач також отримує усі "
+"права, що має група, в якій він знаходиться."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "дозволи користувача"
+
+#: models.py:222
+msgid "user"
+msgstr "користувач"
+
+#: models.py:223
+msgid "users"
+msgstr "користувачі"
+
+#: models.py:406
+msgid "message"
+msgstr "повідомлення"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Вихід"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Уведіть коректну e-mail адресу."

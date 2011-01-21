@@ -1,0 +1,254 @@
+# Django Korean Translation
+# Copyright (C) 2009
+# This file is distributed under the same license as the django package.
+# Hyun Mi Ae, Joongi Kim (me@daybreaker.info), Sung-Jin Hong (serialx.net@gmail.com)
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2007-04-06 11:04+0900\n"
+"Last-Translator: Joongi Kim (me@daybreaker.info)\n"
+"Language-Team: Korean\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "개인정보"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "권한"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "중요한 일정"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "그룹"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "비밀번호가 변경되었습니다."
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "비밀번호 변경: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "사용자명"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"필수항목입니다. 30자 이내로 입력하세요. (알파벳, 숫자, @/./+/-/_만 가능)"
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "알파벳, 숫자 및 @/./+/-/_만 가능합니다."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "비밀번호"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "비밀번호 확인"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "확인을 위해 위와 동일한 비밀번호를 입력하세요. "
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "해당 사용자명은 이미 존재합니다."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "비밀번호가 일치하지 않습니다."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr "사용자명과 비밀번호를 입력하세요. (대소문자 구별)"
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "이 계정은 유효하지 않습니다."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"사용하시는 브라우저가 쿠키를 허용하지 않습니다.로그인하기 위해서는 쿠키 사용"
+"이 필요합니다."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "이메일 주소"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"이메일주소와 일치하는 사용자가 없습니다.이 이메일주소로 등록하셨습니까?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "%s에 대한 비밀번호 초기화"
+
+#: forms.py:151
+msgid "New password"
+msgstr "새 비밀번호:"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "새 비밀번호 확인:"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "기존 비밀번호:"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "기존 비밀번호를 잘못 입력하셨습니다. 다시 입력해 주세요."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "비밀번호 (확인)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "이름"
+
+#: models.py:78
+msgid "codename"
+msgstr "코드명"
+
+#: models.py:82
+msgid "permission"
+msgstr "허가"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "허가"
+
+#: models.py:108
+msgid "group"
+msgstr "그룹"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "그룹"
+
+#: models.py:206
+msgid "username"
+msgstr "사용자명"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"필수항목입니다. 30자 이내로 입력하세요. (알파벳, 숫자, @/./+/-/_만 가능)"
+
+#: models.py:207
+msgid "first name"
+msgstr "이름"
+
+#: models.py:208
+msgid "last name"
+msgstr "성"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "이메일 주소"
+
+#: models.py:210
+msgid "password"
+msgstr "비밀번호"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"'[algo]$[salt]$[hexdigest]' 또는 <a href=\"password/\">비밀번호 변경</a>"
+
+#: models.py:211
+msgid "staff status"
+msgstr "스태프 권한"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "사용자가 관리사이트에 로그인이 가능한지를 나타냅니다."
+
+#: models.py:212
+msgid "active"
+msgstr "활성"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"사용자가 'Django 관리'에 로그인이 가능한지를 나타냅니다.계정을 삭제하는 대신 "
+"이것을 선택 해제하세요."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "최상위 사용자 권한"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "해당 사용자에게 모든 권한을 허가합니다."
+
+#: models.py:214
+msgid "last login"
+msgstr "마지막 로그인"
+
+#: models.py:215
+msgid "date joined"
+msgstr "등록일"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr "해당 사용자에게 속해있는 그룹의 모든 권한을 허가합니다."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "사용자 권한"
+
+#: models.py:222
+msgid "user"
+msgstr "사용자"
+
+#: models.py:223
+msgid "users"
+msgstr "사용자(들)"
+
+#: models.py:406
+msgid "message"
+msgstr "메시지"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "로그 아웃"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "올바른 이메일 주소를 입력하세요."

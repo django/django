@@ -1,0 +1,267 @@
+# translation of django-new.po to tamil
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2007-03-15 16:48+0530\n"
+"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
+"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "தனிப்பட்ட விவரம்"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "அனுமதிகள்"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "முக்கியமான தேதிகள்"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "குழுக்கள்"
+
+#: admin.py:113
+#, fuzzy
+msgid "Password changed successfully."
+msgstr "வெற்றிகரமாக கடவுச்சொல் மாற்றபட்டது"
+
+#: admin.py:123
+#, fuzzy, python-format
+msgid "Change password: %s"
+msgstr "கடவுச்சொல்லை மாற்று"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "பயனர்ப்பெயர்"
+
+#: forms.py:15 forms.py:49
+#, fuzzy
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"தேவை. 30 எழுத்துகள் அல்லது கொஞ்சம். அகர வரிசை எழுத்துக்கள் மட்டுமே ( எழுத்துகள்,எண்கள்,"
+"அன்டர்ஸ்கோர்). "
+
+#: forms.py:16 forms.py:50
+#, fuzzy
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "இந்த மதிப்பு எழுத்துகள், எண்கள் மேலும் அன்டர்ஸ்கோர் உள்ளடக்க வேண்டும். "
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "கடவுச்சொல்"
+
+#: forms.py:18
+#, fuzzy
+msgid "Password confirmation"
+msgstr "கடவுச்சொல் மாற்று"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "மேலே அதே கடவுச்சொல்லை உள்ளிடவும், சரிபார்ப்பதற்காக ."
+
+#: forms.py:31
+#, fuzzy
+msgid "A user with that username already exists."
+msgstr "%(fieldname)s உடன் உள்ள %(optname)s ஏற்கனவே உள்ளது"
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"தயவுசெய்து சரியான பயனர்ப்பெயர் மற்றும் கடவுச்சொல்லை உள்ளிடவும். இரண்டும் எழுத்துவகையைச் "
+"சார்ந்தது."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "இந்த கணக்கு செயல்பட துவங்கவில்லை"
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+" உங்கள் இணைய உலாவியில்  குக்கிகள்  செயலாக்கம் பெறவில்லை. உள்நுழைவதற்கு குக்கிகள் அவசியம்."
+
+#: forms.py:108
+#, fuzzy
+msgid "E-mail"
+msgstr "மின் அஞ்சல்"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: forms.py:143
+#, fuzzy, python-format
+msgid "Password reset on %s"
+msgstr "கடவுச்சொல்லை மாற்றியமை"
+
+#: forms.py:151
+#, fuzzy
+msgid "New password"
+msgstr "புதிய கடவுச்சொல்:"
+
+#: forms.py:152
+#, fuzzy
+msgid "New password confirmation"
+msgstr "புதிய கடவுச்சொல்:"
+
+#: forms.py:177
+#, fuzzy
+msgid "Old password"
+msgstr "பழைய கடவுச்சொல் :"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "கடவுச்சொல்(மறுபடியும்)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "பெயர்"
+
+#: models.py:78
+msgid "codename"
+msgstr "குறிமுறை பெயர்"
+
+#: models.py:82
+msgid "permission"
+msgstr "அனுமதி"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "அனுமதிகள்"
+
+#: models.py:108
+msgid "group"
+msgstr "குழு"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "குழுக்கள்"
+
+#: models.py:206
+msgid "username"
+msgstr "பயனர் பெயர்"
+
+#: models.py:206
+#, fuzzy
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"தேவை. 30 எழுத்துகள் அல்லது கொஞ்சம். அகர வரிசை எழுத்துக்கள் மட்டுமே ( எழுத்துகள்,எண்கள்,"
+"அன்டர்ஸ்கோர்). "
+
+#: models.py:207
+msgid "first name"
+msgstr "முதல் பெயர்"
+
+#: models.py:208
+msgid "last name"
+msgstr "கடைசி பெயர்"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "மின்னஞ்சல் முகவரி"
+
+#: models.py:210
+msgid "password"
+msgstr "கடவுச்சொல்"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+
+#: models.py:211
+msgid "staff status"
+msgstr "பணியாளர் நிலை"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "பயனர், 'மேலாளலர்' பக்கத்தில் நுழைவதை முடிவு செய்கிறது"
+
+#: models.py:212
+msgid "active"
+msgstr "செயல்படும்"
+
+#: models.py:212
+#, fuzzy
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"பயனர்,டிஜாங்ஙோ 'மேலாளலர்' பக்கத்தில் நுழைவதை முடிவு செய்கிறது . இதை தேர்வு செய்யப்படாத "
+"கணக்கு உடனடியாகஅழிக்கப்படும்"
+
+#: models.py:213
+msgid "superuser status"
+msgstr "மேலாளர் இருப்பு நிலை"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "இந்த பயனருக்கு எல்லா அங்கீகாரங்களும் வழங்கப்படவில்லை."
+
+#: models.py:214
+msgid "last login"
+msgstr "கடைசி உள்நுழைவு"
+
+#: models.py:215
+msgid "date joined"
+msgstr "சேர்ந்த தேதி"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr "பயனர் தனது அனுமதிகளோடு ,தான் உள்ள குழுவினது அனுமதிகளையும் பெறுவார்."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "பயனர் அனுமதிகள்"
+
+#: models.py:222
+msgid "user"
+msgstr "பயனர்"
+
+#: models.py:223
+msgid "users"
+msgstr "பயனர்கள்"
+
+#: models.py:406
+msgid "message"
+msgstr "செய்தி"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "வெளியே வந்துவீட்டீர்"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "முறையான e முகவரிகள் மட்டும் எழுதவும்"

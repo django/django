@@ -1,0 +1,246 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-10-15 22:47+0530\n"
+"Last-Translator: A S Alam <aalam@users.sf.net>\n"
+"Language-Team: Punjabi/Panjabi <punjabi-users@lists.sf.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "ਨਿੱਜੀ ਜਾਣਕਾਰੀ"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "ਅਧਿਕਾਰ"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "ਖਾਸ ਮਿਤੀਆਂ"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "ਗਰੁੱਪ"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "ਪਾਸਵਰਡ ਠੀਕ ਤਰ੍ਹਾਂ ਬਦਲਿਆ ਗਿਆ ਹੈ।"
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "ਪਾਸਵਰਡ ਬਦਲੋ: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "ਯੂਜ਼ਰ ਨਾਂ"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "ਲਾਜ਼ਮੀ। ੩੦ ਜਾਂ ਘੱਟ ਅੱਖਰ ਚਾਹੀਦੇ ਹਨ। ਅੱਖਰ, ਅੰਕ @/./+/-/_ ਹੀ।"
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr ""
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "ਪਾਸਵਰਡ"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "ਪਾਸਵਰਡ ਪੁਸ਼ਟੀ"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "ਜਾਂਚ ਲਈ, ਉੱਤੇ ਦਿੱਤਾ ਪਾਸਵਰਡ ਹੀ ਦਿਓ।"
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "ਉਸ ਯੂਜ਼ਰ ਨਾਂ ਨਾਲ ਯੂਜ਼ਰ ਪਹਿਲਾਂ ਹੀ ਮੌਜੂਦ ਹੈ।"
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "ਦੋਵੇਂ ਪਾਸਵਰਡ ਖੇਤਰ ਮਿਲਦੇ ਨਹੀਂ ਹਨ।"
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"ਠੀਕ ਯੂਜ਼ਰ ਨਾਂ ਤੇ ਪਾਸਵਰਡ ਦਿਉ ਜੀ। ਯਾਦ ਰੱਖੋ ਕਿ ਦੋਵੇਂ ਖੇਤਰਾਂ ਅੱਖਰ ਆਕਾਰ ਪ੍ਰਤੀ ਸੰਵੇਦਨਸ਼ੀਲ ਹਨ।"
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "ਇਹ ਅਕਾਊਂਟ ਗ਼ੈਰ-ਸਰਗਰਮ ਹੈ।"
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr "ਤੁਹਾਡੇ ਵੈੱਬ ਬਰਾਊਜ਼ਰ ਉੱਤੇ ਕੂਕੀਜ਼ ਚਾਲੂ ਨਹੀਂ ਜਾਪਦੇ ਹਨ। ਲਾਗਇਨ ਕਰਨ ਲਈ ਕੂਕੀਜ਼ ਚਾਹੀਦੇ ਹਨ।"
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "ਈਮੇਲ"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "%s ਉੱਤੇ ਪਾਸਵਰਡ ਮੁੜ-ਸੈੱਟ"
+
+#: forms.py:151
+msgid "New password"
+msgstr "ਨਵਾਂ ਪਾਸਵਰਡ"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "ਨਵਾਂ ਪਾਸਵਰਡ ਪੁਸ਼ਟੀ"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "ਪੁਰਾਣਾ ਪਾਸਵਰਡ"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "ਤੁਹਾਡਾ ਪੁਰਾਣਾ ਪਾਸਵਰਡ ਗਲਤ ਦਿੱਤਾ ਗਿਆ ਸੀ। ਇਸ ਨੂੰ ਫੇਰ ਦਿਉ ਜੀ।"
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "ਪਾਸਵਰਡ (ਫੇਰ)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "ਨਾਂ"
+
+#: models.py:78
+msgid "codename"
+msgstr "ਕੋਡ-ਨਾਂ"
+
+#: models.py:82
+msgid "permission"
+msgstr "ਅਧਿਕਾਰ"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "ਅਧਿਕਾਰ"
+
+#: models.py:108
+msgid "group"
+msgstr "ਗਰੁੱਪ"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "ਗਰੁੱਪ"
+
+#: models.py:206
+msgid "username"
+msgstr "ਯੂਜ਼ਰ ਨਾਂ"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "ਲਾਜ਼ਮੀ। ੩੦ ਜਾਂ ਘੱਟ ਅੱਖਰ ਚਾਹੀਦੇ ਹਨ। ਅੱਖਰ, ਅੰਕ @//+/-/_ ਹੀ।"
+
+#: models.py:207
+msgid "first name"
+msgstr "ਪਹਿਲਾਂ ਨਾਂ"
+
+#: models.py:208
+msgid "last name"
+msgstr "ਆਖਰੀ ਨਾਂ"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "ਈਮੇਲ ਐਡਰੈੱਸ"
+
+#: models.py:210
+msgid "password"
+msgstr "ਪਾਸਵਰਡ"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"'[algo]$[salt]$[hexdigest]' ਵਰਤੋਂ ਜਾਂ <a href=\"password/\">ਪਾਸਵਰਡ ਬਦਲੋ ਫਾਰਮ</a> "
+"ਵਰਤੋਂ।"
+
+#: models.py:211
+msgid "staff status"
+msgstr "ਸਟਾਫ ਹਾਲਤ"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: models.py:212
+msgid "active"
+msgstr "ਸਰਗਰਮ"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: models.py:213
+msgid "superuser status"
+msgstr "ਸੁਪਰਯੂਜ਼ਰ ਹਾਲਤ"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+
+#: models.py:214
+msgid "last login"
+msgstr "ਆਖਰੀ ਲਾਗਇਨ"
+
+#: models.py:215
+msgid "date joined"
+msgstr "ਜੁਆਇੰਨ ਕਰਨ ਦੀ ਮਿਤੀ"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+
+#: models.py:218
+msgid "user permissions"
+msgstr "ਯੂਜ਼ਰ ਅਧਿਕਾਰ"
+
+#: models.py:222
+msgid "user"
+msgstr "ਯੂਜ਼ਰ"
+
+#: models.py:223
+msgid "users"
+msgstr "ਯੂਜ਼ਰ"
+
+#: models.py:406
+msgid "message"
+msgstr "ਸੁਨੇਹਾ"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "ਲਾਗ ਆਉਟ ਕੀਤਾ"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "ਠੀਕ ਈਮੇਲ ਐਡਰੈੱਸ ਦਿਓ ਜੀ।"

@@ -1,0 +1,260 @@
+# translation of django.po to Polish
+# Polish .po file.
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2008-02-25 15:53+0100\n"
+"Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
+"Language-Team: PL <pl@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"Plural-Forms:  nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%"
+"100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "Dane osobowe"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "Uprawnienia"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Ważne daty"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Grupy"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "Hasło zostało zmienione pomyślnie."
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Zmień hasło: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Nazwa użytkownika"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Wymagane. 30 znaków lub mniej. Tylko litery, cyfry i znaki @/./+/-/_."
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "To pole może zawierać tylko litery, cyfry i znaki @/./+/-/_."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Hasło"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "Potwierdzenie hasła"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Podaj powyższe hasło w celu weryfikacji."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Użytkownik o tej nazwie już istnieje."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "Hasła się nie zgadzają."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Proszę wpisać poprawną nazwę użytkownika i hasło. Uwaga: wielkość liter ma "
+"znaczenie."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "To konto jest nieaktywne."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Twoja przeglądarka nie chce akceptować ciasteczek. Są one wymagane do "
+"zalogowania się."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "E-mail"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Ten adres e-mail nie ma przypisanego konta. Jesteś pewien, że "
+"zarejestrowałeś się?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "Hasło zresetowane dla %s"
+
+#: forms.py:151
+msgid "New password"
+msgstr "Nowe hasło"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "Nowe hasło ponownie"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "Stare hasło"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Podane stare hasło jest niepoprawne. Proszę podać je jeszcze raz."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Hasło (powtórz)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "nazwa"
+
+#: models.py:78
+msgid "codename"
+msgstr "nazwa kodowa"
+
+#: models.py:82
+msgid "permission"
+msgstr "uprawnienie"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "uprawnienia"
+
+#: models.py:108
+msgid "group"
+msgstr "grupa"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "grupy"
+
+#: models.py:206
+msgid "username"
+msgstr "użytkownik"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "Wymagane. 30 znaków lub mniej. Tylko litery, cyfry i znaki @/./+/-/_."
+
+#: models.py:207
+msgid "first name"
+msgstr "imię"
+
+#: models.py:208
+msgid "last name"
+msgstr "nazwisko"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "adres e-mail"
+
+#: models.py:210
+msgid "password"
+msgstr "hasło"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Użyj '[algo]$[salt]$[hexdigest]' lub <a href=\"password/\">formularza zmiany "
+"hasła</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "w zespole"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "Oznacza czy użytkownik może zalogować się do panelu admina."
+
+#: models.py:212
+msgid "active"
+msgstr "aktywny"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Oznacza czy użytkownika należy uważać za aktywnego. Odznacz to, zamiast "
+"usuwać konta."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "status administratora"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Oznacza, że ten użytkownik ma wszystkie uprawnienia bez jawnego "
+"przypisywania ich."
+
+#: models.py:214
+msgid "last login"
+msgstr "ostatnio zalogowany"
+
+#: models.py:215
+msgid "date joined"
+msgstr "data przyłączenia"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Oprócz uprawnień przypisanych bezpośrednio użytkownikowi otrzyma on "
+"uprawnienia grup, do których należy."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "uprawnienia użytkownika"
+
+#: models.py:222
+msgid "user"
+msgstr "użytkownik"
+
+#: models.py:223
+msgid "users"
+msgstr "użytkownicy"
+
+#: models.py:406
+msgid "message"
+msgstr "wiadomość"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Wylogowany"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Wprowadź poprawny adres e-mail."

@@ -1,0 +1,266 @@
+# translation of django.po to Hungarian
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2008-08-30 01:11+0200\n"
+"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "személyes információ"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "jogosultságok"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Fontos dátumok"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Csoportok"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "Sikeres jelszóváltoztatás."
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Jelszó megváltoztatása: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Felhasználó"
+
+#: forms.py:15 forms.py:49
+#, fuzzy
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Kötelező. Legfeljebb 30 karakter. Csak alfanumerikus karaktereket "
+"tartalmazhat (betűk, számok és aláhúzás)."
+
+#: forms.py:16 forms.py:50
+#, fuzzy
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Az érték csak betűket, számokat és aláhúzást tartalmazhat."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Jelszó"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "Jelszó megerősítése"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Írja be a fenti jelszót ellenőrzés céljából."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Létezik már egy felhasználó ezzel a névvel."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "A két jelszó mező tartalma nem egyezik meg."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Írjon be egy helyes felhasználónevet és jelszót. Mindkét mező kisbetű-"
+"nagybetű érzékeny."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "Ez a fiók inaktív."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"A böngészője úgy tűnik nem támogatja a cookie-kat. A cookie-k engedélyezése "
+"szükséges a bejelentkezéshez."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "E-mail cím"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Ehhez az e-mail címhez nem tartozik felhasználói fiók. Biztos benne, hogy "
+"regisztrált?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "Jelszó beállítása: %s"
+
+#: forms.py:151
+msgid "New password"
+msgstr "Új jelszó"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "Új jelszó megerősítése"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "Régi jelszó"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "A régi jelszó hibásan lett megadva. Írja be újra."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Jelszó újra"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "név"
+
+#: models.py:78
+msgid "codename"
+msgstr "kódnév"
+
+#: models.py:82
+msgid "permission"
+msgstr "jogosultság"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "jogosultságok"
+
+#: models.py:108
+msgid "group"
+msgstr "csoport"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "csoportok"
+
+#: models.py:206
+msgid "username"
+msgstr "felhasználónév"
+
+#: models.py:206
+#, fuzzy
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"Kötelező. Legfeljebb 30 karakter. Csak alfanumerikus karaktereket "
+"tartalmazhat (betűk, számok és aláhúzás)."
+
+#: models.py:207
+msgid "first name"
+msgstr "keresztnév"
+
+#: models.py:208
+msgid "last name"
+msgstr "vezetéknév"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "e-mail cím"
+
+#: models.py:210
+msgid "password"
+msgstr "jelszó"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Használja az \"[algo]$[salt]$[hexdigest]\" formátumot, vagy a <a href="
+"\"password/\">jelszó megváltoztatása űrlapot</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "személyzet státusz"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+"Megadja, hogy a felhasználó bejelentkezhet-e erre az adminisztrációs oldalra."
+
+#: models.py:212
+msgid "active"
+msgstr "aktív"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Megadja, hogy a felhasználó aktív-e. Állítsa át ezt az értéket a fiók "
+"törlése helyett."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "rendszergazda státusz"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Megadja, hogy ez a felhasználó rendelkezik-e minden jogosultsággal anélkül, "
+"hogy azt külön meg kellene adni."
+
+#: models.py:214
+msgid "last login"
+msgstr "utolsó bejelentkezés"
+
+#: models.py:215
+msgid "date joined"
+msgstr "csatlakozás dátuma"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"A kézzel beállított jogosultságok mellett a felhasználó a csoportjának "
+"jogait is megkapja."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "felhasználói jogosultságok"
+
+#: models.py:222
+msgid "user"
+msgstr "felhasználó"
+
+#: models.py:223
+msgid "users"
+msgstr "felhasználók"
+
+#: models.py:406
+msgid "message"
+msgstr "üzenet"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Kijelentkezve"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Írjon be egy érvényes e-mail címet."

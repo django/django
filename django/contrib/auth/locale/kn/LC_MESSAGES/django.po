@@ -1,0 +1,267 @@
+# Kannada translation of Django.
+# Copyright (C) 2007 Translation Team <translation@sampada.info>
+# This file is distributed under the same license as the Django package.
+# Kannada Localization Team <translation@sampada.info>, 2007.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2007-01-08 20:22+0530\n"
+"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
+"Language-Team: Kannada <translation@sampada.info>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "ವೈಯುಕ್ತಿಕ ಮಾಹಿತಿ"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "ಅನುಮತಿಗಳು"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "ಮಹತ್ವದ ದಿನಾಂಕಗಳು"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "ಗುಂಪುಗಳು"
+
+#: admin.py:113
+#, fuzzy
+msgid "Password changed successfully."
+msgstr "ಪ್ರವೇಶಪದ ಬದಲಾವಣೆ ಯಶಸ್ವಿ"
+
+#: admin.py:123
+#, fuzzy, python-format
+msgid "Change password: %s"
+msgstr "ಪ್ರವೇಶಪದ ಬದಲಿಸಿ"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "ಬಳಕೆದಾರ-ಹೆಸರು"
+
+#: forms.py:15 forms.py:49
+#, fuzzy
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"೩೦ ಅಥವಾ ಕಡಿಮೆ ಅಕ್ಷರಗಳು ಅವಶ್ಯ. ( ಅಕ್ಷರಗಳು , ಅಂಕೆಗಳು ಮತ್ತು ಅಂಡರ್ಸ್ಕೋರ್(_) ಗಳು ಮಾತ್ರ)"
+
+#: forms.py:16 forms.py:50
+#, fuzzy
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "ಈ ಬೆಲೆಯು ಕೇವಲ ಅಕ್ಷರಗಳು , ಅಂಕೆಗಳು ಮತ್ತು ಅಂಡರ್ಸ್ಕೋರ್(_) ಗಳನ್ನು ಒಳಗೊಂಡಿರಬೇಕು"
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "ಪ್ರವೇಶಪದ"
+
+#: forms.py:18
+#, fuzzy
+msgid "Password confirmation"
+msgstr "ಪ್ರವೇಶಪದ ಬದಲಾವಣೆ"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "ಖಚಿತಗೊಳಿಸಲು ಮೇಲಿನ ಪ್ರವೇಶಪದವನ್ನು ಇನ್ನೊಮ್ಮೆ ಬರೆಯಿರಿ."
+
+#: forms.py:31
+#, fuzzy
+msgid "A user with that username already exists."
+msgstr "ಈ %(fieldname)s ಹೊಂದಿರುವ %(optname)s ಈಗಾಗಲೇ ಇದೆ."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"ದಯವಿಟ್ಟು ಸರಿಯಾದ ಬಳಕೆದಾರ-ಪದ ಮತ್ತು  ಪ್ರವೇಶಪದ ಬರೆಯಿರಿ .ಎರಡೂ ಇಂಗ್ಲೀಷಿನ  ಸಣ್ಣ ಮತ್ತು "
+"ದೊಡ್ಡ ಅಕ್ಷರ ಸಂವೇದಿ  ಎಂಬುದನ್ನು ಗಮನದಲ್ಲಿಡಿ"
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "ಈ ಖಾತೆಯು ನಿಷ್ಕ್ರಿಯವಾಗಿದೆ"
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr "ನಿಮ್ಮ ಜಾಲವೀಕ್ಷಕದಲ್ಲಿ ಕುಕೀಗಳು ಸಕ್ರಿಯಗೊಳಿಸಲ್ಪಟ್ಟಂತಿಲ್ಲ. ಒಳಬರಲು ಕುಕೀಗಳು ಅಗತ್ಯ. "
+
+#: forms.py:108
+#, fuzzy
+msgid "E-mail"
+msgstr "ವಿ-ಅಂಚೆ ವಿಳಾಸ"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: forms.py:143
+#, fuzzy, python-format
+msgid "Password reset on %s"
+msgstr "ಪ್ರವೇಶಪದವನ್ನು ಬದಲಿಸುವಿಕೆ"
+
+#: forms.py:151
+#, fuzzy
+msgid "New password"
+msgstr "ಹೊಸ ಪ್ರವೇಶಪದ:"
+
+#: forms.py:152
+#, fuzzy
+msgid "New password confirmation"
+msgstr "ಹೊಸ ಪ್ರವೇಶಪದ:"
+
+#: forms.py:177
+#, fuzzy
+msgid "Old password"
+msgstr "ಹಳೆಯ ಪ್ರವೇಶಪದ:"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "ಪ್ರವೇಶಪದ(ಇನ್ನೊಮ್ಮೆ)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "ಹೆಸರು"
+
+#: models.py:78
+msgid "codename"
+msgstr "ಸಾಂಕೇತಿಕ ಹೆಸರು"
+
+#: models.py:82
+msgid "permission"
+msgstr "ಅನುಮತಿ"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "ಅನುಮತಿಗಳು"
+
+#: models.py:108
+msgid "group"
+msgstr "ಗುಂಪು"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "ಗುಂಪುಗಳು"
+
+#: models.py:206
+msgid "username"
+msgstr "ಬಳಕೆದಾರ-ಹೆಸರು"
+
+#: models.py:206
+#, fuzzy
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"೩೦ ಅಥವಾ ಕಡಿಮೆ ಅಕ್ಷರಗಳು ಅವಶ್ಯ. ( ಅಕ್ಷರಗಳು , ಅಂಕೆಗಳು ಮತ್ತು ಅಂಡರ್ಸ್ಕೋರ್(_) ಗಳು ಮಾತ್ರ)"
+
+#: models.py:207
+msgid "first name"
+msgstr "ಮೊದಲ ಹೆಸರು"
+
+#: models.py:208
+msgid "last name"
+msgstr "ಕೊನೆಯ ಹೆಸರು"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "ವಿ-ಅಂಚೆ ವಿಳಾಸ"
+
+#: models.py:210
+msgid "password"
+msgstr "ಪ್ರವೇಶಪದ"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+
+#: models.py:211
+msgid "staff status"
+msgstr "ಸಿಬ್ಬಂದಿ ಸ್ಥಿತಿ"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "ಬಲಕೆದಾರರು ಈ ಆಡಳಿತ ತಾಣಕ್ಕೆ  ಪ್ರವೇಶಪಡೆಯಬಹುದೇ ಎಂಬುದನ್ನು ತಿಳಿಸುತ್ತದೆ."
+
+#: models.py:212
+msgid "active"
+msgstr "ಸಕ್ರಿಯ"
+
+#: models.py:212
+#, fuzzy
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"ಈ ಬಳಕೆದಾರರು ಜಾಂಗೋ ಆಡಳಿತಪುಟಕ್ಕೆ ಪ್ರವೇಶಪಡೆಯಬಹುದೇ ಎಂಬುದನ್ನು ತಿಳಿಸುತ್ತದೆ. ಖಾತೆಗಳನ್ನು "
+"ಕಿತ್ತುಹಾಕುವ ಬದಲು ಇದನ್ನು ಆಯ್ಕೆಯನ್ನು ತೆಗೆದುಹಾಕಿರಿ."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "ಮಹಾಬಳಕೆದಾರನ ಸ್ಧಿತಿ"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"ಈ ಸದಸ್ಯರು ಸುವ್ಯಕ್ತವಾಗಿ  ನೀಡದಿದ್ದರೂ ಎಲ್ಲಾ ಅನುಮತಿಗಳನ್ನು ಪಡೆದಿರುವರು ಎಂಬುದನ್ನು "
+"ಸೂಚಿಸುತ್ತದೆ."
+
+#: models.py:214
+msgid "last login"
+msgstr "ಕಡೇ ಸಾರಿ ಒಳಬಂದದ್ದು"
+
+#: models.py:215
+msgid "date joined"
+msgstr "ಸೇರಿದ ದಿನಾಂಕ"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"ವೈಯಕ್ತಿಕವಾಗಿ ನೀಡಲಾಗಿರುವ ಅನುಮತಿಗಳ ಜೊತೆಗೆ, ಈ ಸದಸ್ಯರು ತಮ್ಮ ಗುಂಪಿಗೆ ನೀಡಲಾಗಿರುವ "
+"ಅನುಮತಿಗಳನ್ನೂ ಕೂಡ ಪಡೆಯುತ್ತಾರೆ."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "ಬಳಕೆದಾರ ಅನುಮತಿಗಳು"
+
+#: models.py:222
+msgid "user"
+msgstr "ಬಳಕೆದಾರ"
+
+#: models.py:223
+msgid "users"
+msgstr "ಬಳಕೆದಾರರು"
+
+#: models.py:406
+msgid "message"
+msgstr "ಸಂದೇಶ"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "ಹೊರಬರಲಾಗಿದೆ"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "ಕ್ರಮಬದ್ಧ ವಿ-ವಿಳಾಸವೊಂದನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ"

@@ -1,0 +1,261 @@
+# translation of django.po to Italian
+# Italian translation of Django.
+# Copyright (C) 2006 the Lawrence Journal-World
+# This file is distributed under the same license as the Django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-05-10 14:44+0200\n"
+"Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
+"Language-Team: Italian <django-it@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "Informazioni personali"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "Permessi"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Date importanti"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Gruppi"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "La password è stata cambiata correttamente."
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Cambia la password: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Nome utente"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Obbligatorio. 30 caratteri o meno. Solo lettere, cifre e @/./+/-/_ ."
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Questo valore può contenere solo lettere, cifre e @/./+/-/_ ."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Password"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "Conferma password"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Inserisci la stessa password inserita sopra, come verifica."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Un utente con questo nome è già presente."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "I due campi password non corrispondono."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Inserisci nome utente e password corretti. In entrambi i campi le maiuscole "
+"sono significative."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "Questo account non è attivo."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Il browser web sembra non avere i cookie abilitati. I cookie sono necessari "
+"per poter accedere."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "E-mail"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Questo indirizzo email non è associato ad alcun account utente. Sei sicuro "
+"di esserti registrato?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "Password reimpostata su %s"
+
+#: forms.py:151
+msgid "New password"
+msgstr "Nuova password"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "Conferma nuova password"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "Password attuale"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"La password attuale non è stata inserita correttamente: va inserita di nuovo."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Password (di nuovo)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "nome"
+
+#: models.py:78
+msgid "codename"
+msgstr "nome in codice"
+
+#: models.py:82
+msgid "permission"
+msgstr "permesso"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "permessi"
+
+#: models.py:108
+msgid "group"
+msgstr "gruppo"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "gruppi"
+
+#: models.py:206
+msgid "username"
+msgstr "nome utente"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "Obbligatorio. 30 caratteri o meno. Solo lettere, cifre e @/./+/-/_"
+
+#: models.py:207
+msgid "first name"
+msgstr "nome"
+
+#: models.py:208
+msgid "last name"
+msgstr "cognome"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "indirizzo e-mail"
+
+#: models.py:210
+msgid "password"
+msgstr "password"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Usa '[algo]$[salt]$[hexdigest]' oppure la <a href=\"password/\">maschera di "
+"cambio password</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "privilegi di staff"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "Indica se l'utente può accedere a questo sito di amministrazione."
+
+#: models.py:212
+msgid "active"
+msgstr "attivo"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Indica se l'utente debba essere considerato attivo. Deseleziona qui, "
+"piuttosto che cancellare gli account."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "privilegi di superutente"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Indica che l'utente ha tutti i privilegi, senza che siano stati assegnati "
+"esplicitamente."
+
+#: models.py:214
+msgid "last login"
+msgstr "ultimo accesso"
+
+#: models.py:215
+msgid "date joined"
+msgstr "iscritto in data"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"In aggiunta ai privilegi assegnati manualmente, l'utente riceverà anche "
+"tutti i privilegi assegnati ad ogni gruppo cui appartiene."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "privilegi utente"
+
+#: models.py:222
+msgid "user"
+msgstr "utente"
+
+#: models.py:223
+msgid "users"
+msgstr "utenti"
+
+#: models.py:406
+msgid "message"
+msgstr "messaggio"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Accesso annullato"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Inserisci un indirizzo e-mail valido."

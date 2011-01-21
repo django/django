@@ -1,0 +1,265 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-08-06 19:47+0100\n"
+"Last-Translator: Janos Guljas <janos@janos.in.rs>\n"
+"Language-Team: Branko Vukelic <bg.branko@gmail.com> & Janos Guljas "
+"<janos@janos.in.rs> & Nesh <djnesh@gmail.com> & Petar <petar.maric@gmail."
+"com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "Лични подаци"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "Дозволе"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Важни датуми"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Групе"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "Лозинка успешно измењена."
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Измени лозинку: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Корисник"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Неопходно. Највише 30 словних места. Само алфанумерички знаци (слова, бројке "
+"и @/./+/-/_)."
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Ова вредност може садржати само слова, бројке и @/./+/-/_."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Лозинка"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "Потврда лозинке"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Ради провере тачности поново унесите лозинку коју сте унели горе."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Корисник са тим корисничким именом већ постоји."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "Два поља за лозинке се нису поклопила."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Унесите тачно корисничко име и лозинку. Пазите на разлику између малих и "
+"великих слова у оба поља."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "Овај налог је неактиван."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Изгледа да су колачићи искључени у вашем браузеру. Они морају бити укључени "
+"да би сте се пријавили."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "Имејл адреса"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Та имејл адреса није у вези ни са једним налогом. Да ли сте сигурни да сте "
+"се већ регистровали?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "Ресетовање лозинке на %s"
+
+#: forms.py:151
+msgid "New password"
+msgstr "Нова лозинка"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "Потврда нове лозинке"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "Стара лозинка"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Ваша стара лознка није правилно унесена. Унесите је поново."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Лозинка (поновите)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "име"
+
+#: models.py:78
+msgid "codename"
+msgstr "шифра дозволе"
+
+#: models.py:82
+msgid "permission"
+msgstr "дозвола"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "дозволе"
+
+#: models.py:108
+msgid "group"
+msgstr "група"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "групе"
+
+#: models.py:206
+msgid "username"
+msgstr "корисничко име"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"Неопходно. Највише 30 словних места. Само алфанумерички знаци (слова, бројке "
+"и @/./+/-/_)."
+
+#: models.py:207
+msgid "first name"
+msgstr "име"
+
+#: models.py:208
+msgid "last name"
+msgstr "презиме"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "имејл адреса"
+
+#: models.py:210
+msgid "password"
+msgstr "лозинка"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Користите '[algo]$[salt]$[hexdigest]' или <a href=\"password/\">формулар за "
+"унос лозинке</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "статус члана посаде"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+"Означава да ли корисник може да се пријави на овај сајт за администрацију."
+
+#: models.py:212
+msgid "active"
+msgstr "активан"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Означава да ли се корисник сматра активним. Деселектујте ово уместо да "
+"бришете налог."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "статус администратора"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Означава да ли корисник има све дозволе без додељивања појединачних дозвола."
+
+#: models.py:214
+msgid "last login"
+msgstr "последња пријава"
+
+#: models.py:215
+msgid "date joined"
+msgstr "датум регистрације"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Поред ручно додељених дозвола, овај корисник ће имати и дозволе додељене "
+"гурпама којима припада."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "корисничке дозволе"
+
+#: models.py:222
+msgid "user"
+msgstr "корисник"
+
+#: models.py:223
+msgid "users"
+msgstr "корисници"
+
+#: models.py:406
+msgid "message"
+msgstr "порука"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Одјављен"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Унесите важећу имејл адресу."

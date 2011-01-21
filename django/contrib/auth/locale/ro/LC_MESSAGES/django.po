@@ -1,0 +1,274 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2008-04-25 21:44+0200\n"
+"Last-Translator: \n"
+"Language-Team: Romanian <ro@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "Informaţii personale"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "Permisiuni"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Date importante"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Grupuri"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "Schimbare reuşită a parolei"
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Schimbă parola: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Utilizator"
+
+#: forms.py:15 forms.py:49
+#, fuzzy
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Necesar. 30 de caractere sau mai puțin. Doar caractere alfanumerice (litere, "
+"cifre, liniuțe de subliniere)."
+
+#: forms.py:16 forms.py:50
+#, fuzzy
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr ""
+"Această valoare trebuie să conţină numai litere, numere şi liniuţe de "
+"subliniere."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Parolă"
+
+#: forms.py:18
+#, fuzzy
+msgid "Password confirmation"
+msgstr "Schimbă parola"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Introduceți parola din nou pentru verificare."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Un utilizator cu acest nume de utilizator exista deja,"
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "Cele doua câmpuri pentru parole nu au coincis."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Va rugăm să introduceți numele de utilizator și parola corecte. Aveți grijă "
+"deoarece căsuțele sunt case sensitive."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "Acest cont este inactiv."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Se pare că browserul dumneavoastra nu suporta cookies. Aveti nevoie de un "
+"browser care suporta cookies ca să vă logati."
+
+#: forms.py:108
+#, fuzzy
+msgid "E-mail"
+msgstr "Adresa email"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Acea adresa de e-mail nu are un nume de utilizator asociat. Sunteți sigur că "
+"v-ați înregistrat?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "Parola resetată pe %s"
+
+#: forms.py:151
+#, fuzzy
+msgid "New password"
+msgstr "Noua parolă:"
+
+#: forms.py:152
+#, fuzzy
+msgid "New password confirmation"
+msgstr "Noua parolă:"
+
+#: forms.py:177
+#, fuzzy
+msgid "Old password"
+msgstr "Vechea parolă:"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"Parola dumneavoastră veche a fost introdusă incorect. Vă rugăm să o "
+"introduceți din nou."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Parolă (din nou)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "nume"
+
+#: models.py:78
+msgid "codename"
+msgstr "nume cod"
+
+#: models.py:82
+msgid "permission"
+msgstr "permisiune"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "permisiuni"
+
+#: models.py:108
+msgid "group"
+msgstr "grup"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "grupuri"
+
+#: models.py:206
+msgid "username"
+msgstr "nume utilizator"
+
+#: models.py:206
+#, fuzzy
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"Necesar. 30 de caractere sau mai puțin. Doar caractere alfanumerice (litere, "
+"cifre, liniuțe de subliniere)."
+
+#: models.py:207
+msgid "first name"
+msgstr "Prenume"
+
+#: models.py:208
+msgid "last name"
+msgstr "Nume"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "adresă email"
+
+#: models.py:210
+msgid "password"
+msgstr "parolă"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Folosiți '[algo]$[salt]$[hexdigest]' sau folosiți <a href=\"password/"
+"\">formularul de schimbare a parolei</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "stare staff"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "Decide când utilizatorul se poate loga în acest sit de adminstrare."
+
+#: models.py:212
+msgid "active"
+msgstr "activ"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Indică dacă acest utilizator va fi tratat ca activ sau nu. Deselectează-l în "
+"loc de a șterge conturi."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "stare superutilizator"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Indică daca acest user are toate permisiunile fără a le selecta explicit."
+
+#: models.py:214
+msgid "last login"
+msgstr "ultima logare"
+
+#: models.py:215
+msgid "date joined"
+msgstr "data aderării"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Suplimentar permisiunilor manual alocate, acest utilizator va primi toate "
+"permisiunile alocate fiecărui grup din care el/ea face parte."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "permisiuni utilizator"
+
+#: models.py:222
+msgid "user"
+msgstr "utilizator"
+
+#: models.py:223
+msgid "users"
+msgstr "utilizatori"
+
+#: models.py:406
+msgid "message"
+msgstr "mesaj"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Deautentificat"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Introduceţi o adresă de email validă."

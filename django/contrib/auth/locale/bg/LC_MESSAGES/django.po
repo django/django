@@ -1,0 +1,266 @@
+# translation of django.po to Bulgarian
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2008-03-12 13:01+0200\n"
+"Last-Translator: Vladislav <vladislav.mitov@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "Лична информация"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "Права"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "Важни дати"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "Групи"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "Паролата бе успешно сменена.  "
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "Смени парола: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "Потребител"
+
+#: forms.py:15 forms.py:49
+#, fuzzy
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Въведете не-повече от 30 символа (само букви, цифри, и подчертавка)"
+
+#: forms.py:16 forms.py:50
+#, fuzzy
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Тази стойност може да съдържа само букви, цифри и подчертавки.  "
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "Парола"
+
+#: forms.py:18
+#, fuzzy
+msgid "Password confirmation"
+msgstr "Промяна на парола"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "Въведете същата парола още веднъж за проверка.  "
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "Потребител с това потребителско име вече съществува.  "
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "Двете полета за паролата не съвпадат.  "
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Въведете правилно потребителско име и парола.  И двете полета правят разлика "
+"между малки и големи букви!"
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "Този акаунт е деактивиран."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Браузерът, който използвате не поддържа cookies, а те са необходими за да "
+"можете да се логнете.  "
+
+#: forms.py:108
+#, fuzzy
+msgid "E-mail"
+msgstr "E-mail адрес"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"С този email адрес няма обвързан потребителски акаунт.  Сигурни ли сте, че "
+"сте се регистрирали?"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "Паролата се сменя на %s"
+
+#: forms.py:151
+#, fuzzy
+msgid "New password"
+msgstr "Нова парола:"
+
+#: forms.py:152
+#, fuzzy
+msgid "New password confirmation"
+msgstr "Нова парола:"
+
+#: forms.py:177
+#, fuzzy
+msgid "Old password"
+msgstr "Стара парола:"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Въвели сте погрешна стара парола.  Въведете я пак.  "
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "Парола (пак)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "име"
+
+#: models.py:78
+msgid "codename"
+msgstr "код"
+
+#: models.py:82
+msgid "permission"
+msgstr "право"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "права"
+
+#: models.py:108
+msgid "group"
+msgstr "група"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "групи"
+
+#: models.py:206
+msgid "username"
+msgstr "потребител"
+
+#: models.py:206
+#, fuzzy
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "Въведете не-повече от 30 символа (само букви, цифри, и подчертавка)"
+
+#: models.py:207
+msgid "first name"
+msgstr "собствено име"
+
+#: models.py:208
+msgid "last name"
+msgstr "фамилно име"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "e-mail адрес"
+
+#: models.py:210
+msgid "password"
+msgstr "парола"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Въведете '[algo]$[salt]$[hexdigest]' или използвайте <a href=\"password/"
+"\">формата за смяна на парола</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "персонал"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "Указва дали този потребител има достъп до административния панел."
+
+#: models.py:212
+msgid "active"
+msgstr "активен"
+
+#: models.py:212
+#, fuzzy
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Указва дали този потребител може да влезе в административния панел .  "
+"Премахнете тази маркировка вместо да изтривате акаунти.  "
+
+#: models.py:213
+msgid "superuser status"
+msgstr "статут на супер-потребител"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Указва, че този потребител има всички права (без да има нужда да се указват "
+"изрично)."
+
+#: models.py:214
+msgid "last login"
+msgstr "последен логин"
+
+#: models.py:215
+msgid "date joined"
+msgstr "дата на регистриране"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Освен ръчно указаните права, този потребител също ще получи правата на всяка "
+"група, към която принадлежи.  "
+
+#: models.py:218
+msgid "user permissions"
+msgstr "потребителски права"
+
+#: models.py:222
+msgid "user"
+msgstr "потребител"
+
+#: models.py:223
+msgid "users"
+msgstr "потребители"
+
+#: models.py:406
+msgid "message"
+msgstr "съобщение"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "Извън системата"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "Въведете валиден e-mail адрес.  "

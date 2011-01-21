@@ -1,0 +1,260 @@
+# translation of django.po to Arabic
+# This file is distributed under the same license as the django package.
+#
+# Ossama M. Khayat <okhayat@yahoo.com>, 2009, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-05-12 11:20+0300\n"
+"Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
+"Language-Team: Arabic <support@arabeyes.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.0\n"
+"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : "
+"3)))\n"
+"\n"
+"\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "المعلومات الشخصية"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "الصلاحيات"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "تواريخ مهمة"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "المجموعات"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "تم تغيير كلمة المرور بنجاح."
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "غيّر كلمة المرور: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "اسم المستخدم"
+
+#: forms.py:15 forms.py:49
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "مطلوب. 30 حرف أو أقل. يتكوّن من حروف، وأرقام، والرموز @/./+/-/_ فقط."
+
+#: forms.py:16 forms.py:50
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "هذه القيمة يجب أن تحتوي الأحرف، والأرقام، والرموز @/./+/-/_ فقط."
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "كلمة المرور"
+
+#: forms.py:18
+msgid "Password confirmation"
+msgstr "تأكيد كلمة المرور"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "أدخل كلمة المرور ذاتها التي أعلاه لتأكيدها."
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "هناك مستخدم موجود مسبقاً بهذا الاسم."
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "حقلا كلمتي المرور غير متطابقين."
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"رجاءً أدخل اسم مستخدم وكلمة مرور صحيحين، وانتبه إلى أن كلا الحقلين حساس لحالة "
+"الأحرف."
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "هذا الحساب غير نشط."
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr "يبدو بأن الكوكيز غير مفعله في متصفحك، الكوكيز مطلوبة للتمكن من الدخول."
+
+#: forms.py:108
+msgid "E-mail"
+msgstr "عنوان بريد إلكتروني"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"عنوان البريد الإلكتروني هذا ليس مرتبط بأي حساب مستخدم. أأنت متأكد أنك قمت "
+"بالتسجيل؟"
+
+#: forms.py:143
+#, python-format
+msgid "Password reset on %s"
+msgstr "استعادة كلمة المرور في %s"
+
+#: forms.py:151
+msgid "New password"
+msgstr "كلمة المرور الجديدة"
+
+#: forms.py:152
+msgid "New password confirmation"
+msgstr "تأكيد كلمة المرور الجديدة"
+
+#: forms.py:177
+msgid "Old password"
+msgstr "كلمة المرور القديمة"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "كلمة مرورك القديمة غير صحيحة. رجاءً أدخلها مرة أخرى."
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "كلمة المرور (مجدداً)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "الاسم"
+
+#: models.py:78
+msgid "codename"
+msgstr "الاسم الرمزي"
+
+#: models.py:82
+msgid "permission"
+msgstr "الصلاحية"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "الصلاحيات"
+
+#: models.py:108
+msgid "group"
+msgstr "مجموعة"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "المجموعات"
+
+#: models.py:206
+msgid "username"
+msgstr "اسم المستخدم"
+
+#: models.py:206
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "مطلوب. 30 حرف أو أقل. يتكوّن من حروف، وأرقام، والرموز @/./+/-/_ فقط."
+
+#: models.py:207
+msgid "first name"
+msgstr "الاسم الأول"
+
+#: models.py:208
+msgid "last name"
+msgstr "الاسم الأخير"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "عنوان البريد الإلكتروني"
+
+#: models.py:210
+msgid "password"
+msgstr "كلمة المرور"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"استخدم '[algo]$[salt]$[hexdigest]' أو استخدم <a href=\"password/\">استمارة "
+"تغيير كلمة المرور</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "حالة الطاقم"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "يحدد ما إذا كان المستخدم يستطيع الدخول إلى موقع الإدارة هذا."
+
+#: models.py:212
+msgid "active"
+msgstr "نشط"
+
+#: models.py:212
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"يحدد ما إذا كان المستخدم سيُعامل على أنّه نشط. أزل تحديد ها الخيار بدلاً من حذف "
+"الحسابات."
+
+#: models.py:213
+msgid "superuser status"
+msgstr "حالة المستخدم الخارق"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"حدد بأن هذا المستخدم يمتلك كافة الصلاحيات دون الحاجة لتحديدها له تصريحا."
+
+#: models.py:214
+msgid "last login"
+msgstr "آخر دخول"
+
+#: models.py:215
+msgid "date joined"
+msgstr "تاريخ الانضمام"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"بالإضافة إلى الصلاحيات المحددة للمستخدم يدويا، فإن المستخدم يحصل أيضا على "
+"كافة صلاحيات المجموعة التي ينتمي إليها."
+
+#: models.py:218
+msgid "user permissions"
+msgstr "صلاحيات المستخدم"
+
+#: models.py:222
+msgid "user"
+msgstr "مستخدم"
+
+#: models.py:223
+msgid "users"
+msgstr "المستخدمين"
+
+#: models.py:406
+msgid "message"
+msgstr "رسالة"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "تم الخروج"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "أدخل عنوان بريد إلكتروني صحيح."

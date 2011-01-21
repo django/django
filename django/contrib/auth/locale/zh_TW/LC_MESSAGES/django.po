@@ -1,0 +1,253 @@
+# This file is distributed under the same license as the django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2007-04-05 01:32+1000\n"
+"Last-Translator: Terry Huang <terryh.tp@gmail.com>\n"
+"Language-Team: Terry Huang <terryh.tp@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:28
+msgid "Personal info"
+msgstr "個人資訊"
+
+#: admin.py:29
+msgid "Permissions"
+msgstr "權限"
+
+#: admin.py:30
+msgid "Important dates"
+msgstr "重要日期"
+
+#: admin.py:31
+msgid "Groups"
+msgstr "群組"
+
+#: admin.py:113
+msgid "Password changed successfully."
+msgstr "密碼修改成功"
+
+#: admin.py:123
+#, python-format
+msgid "Change password: %s"
+msgstr "密碼變更: %s"
+
+#: forms.py:14 forms.py:48 forms.py:66
+msgid "Username"
+msgstr "使用者名稱"
+
+#: forms.py:15 forms.py:49
+#, fuzzy
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "必須。不超過30字。只能用能字母數字與底線(字母、數字和底線)。"
+
+#: forms.py:16 forms.py:50
+#, fuzzy
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "此值僅能包含字母、數字與底線。"
+
+#: forms.py:17 forms.py:67 forms.py:193
+msgid "Password"
+msgstr "密碼"
+
+#: forms.py:18
+#, fuzzy
+msgid "Password confirmation"
+msgstr "密碼確認"
+
+#: forms.py:19
+msgid "Enter the same password as above, for verification."
+msgstr "為檢查用，請輸入與上面相同的密碼。"
+
+#: forms.py:31
+msgid "A user with that username already exists."
+msgstr "一個相同名稱的使用者已經存在。"
+
+#: forms.py:37 forms.py:163 forms.py:205
+msgid "The two password fields didn't match."
+msgstr "兩個密碼欄位不同。"
+
+#: forms.py:87
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr "請輸入有效的使用者名稱與密碼。請注意兩個欄位都有分大小寫"
+
+#: forms.py:89
+msgid "This account is inactive."
+msgstr "這個帳戶未啟用"
+
+#: forms.py:96
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr "你的Web瀏覽器好像不允許使用cookie。登入時需要使用cookie。"
+
+#: forms.py:108
+#, fuzzy
+msgid "E-mail"
+msgstr "電子郵件地址"
+
+#: forms.py:117
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr "這個電子郵件地址没有和任何用户帳號有關聯。你確定你已經註冊了？"
+
+#: forms.py:143
+#, fuzzy, python-format
+msgid "Password reset on %s"
+msgstr "為 %s 密碼重設"
+
+#: forms.py:151
+#, fuzzy
+msgid "New password"
+msgstr "新密碼"
+
+#: forms.py:152
+#, fuzzy
+msgid "New password confirmation"
+msgstr "新密碼確認"
+
+#: forms.py:177
+#, fuzzy
+msgid "Old password"
+msgstr "舊密碼"
+
+#: forms.py:185
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "你的舊密碼不正確。請重新輸入。"
+
+#: forms.py:194
+msgid "Password (again)"
+msgstr "密碼(重複)"
+
+#: models.py:76 models.py:104
+msgid "name"
+msgstr "名稱"
+
+#: models.py:78
+msgid "codename"
+msgstr "代碼"
+
+#: models.py:82
+msgid "permission"
+msgstr "權限"
+
+#: models.py:83 models.py:105
+msgid "permissions"
+msgstr "權限"
+
+#: models.py:108
+msgid "group"
+msgstr "群組"
+
+#: models.py:109 models.py:216
+msgid "groups"
+msgstr "群組"
+
+#: models.py:206
+msgid "username"
+msgstr "使用者名稱"
+
+#: models.py:206
+#, fuzzy
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "必須。不超過30字。只能用能字母數字與底線(字母、數字和底線)。"
+
+#: models.py:207
+msgid "first name"
+msgstr "名字"
+
+#: models.py:208
+msgid "last name"
+msgstr "姓氏"
+
+#: models.py:209
+msgid "e-mail address"
+msgstr "電子郵件地址"
+
+#: models.py:210
+msgid "password"
+msgstr "密碼"
+
+#: models.py:210
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"使用 '[algo]$[salt]$[hexdigest]' 或是 <a href=\"password/\">修改密碼表單</a>."
+
+#: models.py:211
+msgid "staff status"
+msgstr "工作人員狀態"
+
+#: models.py:211
+msgid "Designates whether the user can log into this admin site."
+msgstr "指定是否使用者可以登入此管理網站。"
+
+#: models.py:212
+msgid "active"
+msgstr "有效"
+
+#: models.py:212
+#, fuzzy
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr "指定是否使用者可以登入此管理網站。用取消選擇來取代刪除帳號。"
+
+#: models.py:213
+msgid "superuser status"
+msgstr "超級使用者狀態"
+
+#: models.py:213
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "指定是否使用者可以登入到這個管理網站"
+
+#: models.py:214
+msgid "last login"
+msgstr "上次登入"
+
+#: models.py:215
+msgid "date joined"
+msgstr "加入日期"
+
+#: models.py:217
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr "除了手動指定的權限之外，這個使用者也會得到其群組擁有的所有權限。"
+
+#: models.py:218
+msgid "user permissions"
+msgstr "使用者權限"
+
+#: models.py:222
+msgid "user"
+msgstr "使用者"
+
+#: models.py:223
+msgid "users"
+msgstr "使用者"
+
+#: models.py:406
+msgid "message"
+msgstr "訊息"
+
+#: views.py:86
+msgid "Logged out"
+msgstr "登出"
+
+#: management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr "輸入有效的電子郵件地址。"
