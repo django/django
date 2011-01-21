@@ -1,0 +1,148 @@
+# translation of django.po to Georgian
+# Django translation to Georgian language.
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2008-10-05 14:34+0400\n"
+"Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
+"Language-Team: Georgian <ka@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "ტეგი:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "ფილტრი:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "წარმოდგენა:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "აპლიკაცია %r ვერ მოიძებნა"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "მოდელი %(model_name)r ვერ მოიძებნა აპლიკაციაში %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "`%(app_label)s.%(data_type)s` დაკავშირებული ობიექტი"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "მოდელი:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "`%(app_label)s.%(object_name)s` დაკავშირებული ობიექტები"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "ყველა %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "%s - რაოდენობა"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s ობიექტების ველები"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s არ არის urlpattern-ის შესაბამისი ობიექტი"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "საწყისი გვერდი"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "დოკუმენტაცია"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "სანიშნები"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "დოკუმენტაციის სანიშნები"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">სანიშნების დასაყენებლად გადაათრიეთ ბმული თქვენი "
+"სანიშნების\n"
+"პანელზე, ან დააწკაპეთ ბმულზე მარჯვენა ღილაკით და დაამატეთ იგი სანიშნებში.\n"
+"ამის შემდეგ თქვენ შეძლებთ სანიშნის არჩევას საიტის ნებისმიერი გვერდიდან.\n"
+"გაითვალისწინეთ, რომ ზოგიერთი სანიშნის მოხმარებისათვის საჭიროა, რომ თქვენ\n"
+"იყოთ შესული ამ საიტზე ე.წ. \"შიდა\" კომპიუტერიდან (შეუთანხმდით თქვენს\n"
+"ადმინისტრატორს, თუ არ ხართ დარწმუნებული, რომ თქვენი კომპიუტერი არის\n"
+"\"შიდა\" კომპიუტერი).</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "ამ გვერდის დოკუმენტაცია"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"გადასვლა ნებისმიერი გვერდიდან იმ წარმოდგენის დოკუმენტაციაზე, რომელიც ამ "
+"გვერდს აგენერირებს."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "ობიექტის ID-ის ჩვენება"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"ერთი ობიექტის ამსახველი გვერდის content-type-ის და უნიკალური ID-ის ჩვენება."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "შევცვალოთ ეს ობიექტი (იმავე ფანჯარაში)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "ერთი ობიექტის ამსახველი გვერდების ადმინისტრირებაზე გადასვლა."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "შევცვალოთ ეს ობიექტი (ახალ ფანჯარაში)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "იგივე, ოღონდ ხსნის ადმინისტრირების გვერდს ახალ ფანჯარაში."

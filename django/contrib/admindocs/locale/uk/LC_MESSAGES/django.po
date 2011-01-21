@@ -1,0 +1,152 @@
+# Django, ukrainian translation.
+# Copyright (C) 2008-2010
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-04-06 00:02+0300\n"
+"Last-Translator: Mykola Zamkovoy <nickzam@gmail.com>\n"
+"Language-Team: UK <uk@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "тег:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "відфільтрувати:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "переглянути:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "Прикладна система(app) %r не знайдена"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Модель %(model_name)r не знайдено в прикладній системі %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "пов'язаний `%(app_label)s.%(data_type)s` об'єкт"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "модель:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "пов'язані з `%(app_label)s.%(object_name)s` об'єкти"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "всі %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "кількість з %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Поля об'єктів %s"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s не є об'єктом urlpattern"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Домівка"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Документація"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Інтерактивні закладки"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "Інтерактивні закладки документації"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Щоб встановити інтерактивні закладки, перетягніть лінк до\n"
+"тулбару закладок, або клікніть правою кнопкою миші та додайте у\n"
+"свої закладки. Тепер ви можете обрати інтерактивні закладки з будь-якої\n"
+"сторінки сайту. Зауважте, що деякі з цих інтерактивних закладок на сайті\n"
+"можуть переглядатися тільки з комп'ютера, що є в одній внутрішній мережі з \n"
+"даним сайтом (запитайте у вашого системного адміністратора, якщо ви не "
+"впевнені,\n"
+"що сайт і ваш комп'ютер є в одній внутрішній мережі).</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "Документація для цієї сторінки"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Перекидає вас з будь-якої сторінки в документацію для функції, що "
+"сгенерувала цю сторінку."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "Показати ID об'єкту"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Показує content-type та унікальний ID для сторінок, які являють собою єдиний "
+"об'єкт."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "Редагувати цей об'єкт (поточне вікно)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+"Перекидає до адміністраторської сторінки для сторінок, що відображають "
+"окремий об'єкт."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "Редагувати цей об'єкт (нове вікно)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "Як і вище, але відкриває сторінку адміністрування у новому вікні."

@@ -1,0 +1,147 @@
+# translation of django-new.po to tamil
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2007-03-15 16:48+0530\n"
+"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
+"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "ஒட்டு:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "வடிகட்டி:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "நோற்றமிடு:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "பக்கம் %r இல்லை"
+
+#: views.py:201
+#, fuzzy, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "மாதரி %r பக்கம் %rல் இல்லை "
+
+#: views.py:213
+#, fuzzy, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "சம்மந்தப்பட்ட '%s.%s' பொருள்"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "மாதிரி:"
+
+#: views.py:228 views.py:260
+#, fuzzy, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "மாதரி %s பக்கம் %s ல் இல்லை"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "அனைத்து %s "
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "எண்ணிக்கை %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "புலத்தின் %s பொருள்"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s -ல் urlpattern தோன்றுவதில்லை"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "வீடு"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "ஆவனமாக்கம்"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "புத்தகக்குறிகள்"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "ஆவணமாக்கக் குறியீடுகள்"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\"> புத்தக குறியீடுகளை நிறுவ இந்த இணைப்பினை புத்தகக்குறியீட்டுப் \n"
+"பட்டைக்கு இழுக்கவும். அல்லது வலது கிளிக் செய்து புத்தகக்குறியீடுகளில் சேர்க்கவும். \n"
+" இனி தளத்தில் எந்தப் பக்கத்தில் இருந்தும் புத்தகக்குறியீட்டினை தேர்வுசெய்ய முடியும். \n"
+" நீங்கள் இந்த தளத்தை  \"internal\" என  குறிக்கப்பட்ட கணிணியில் இருந்து மட்டுமே \n"
+" ஒருசில புத்தகக்குறிகளை செயல்படுத்தமுடியும்\n"
+"  உங்களுக்கு, கணிணி  \"internal\" என உறுதி செய்ய கணிணிமேளாலரை அணுகவும்.</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "இந்த பக்கத்திற்கான ஆவணம்"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"எந்த ஒரு பக்கத்திலிருந்தும் ஆவணப்பக்கத்தை பார்வையிடுதல், அந்த பக்கத்தை உருவாக்குகிறது."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "object ID-ஐ காட்டு"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"ஒரே object-ஐ குறிக்கும் பக்கங்களின் பொருளடக்க வகை மற்றும் unique ID-ஐ   காட்டுகிறது."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "இதை திருத்துக (தற்போதைய சாளரம்)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "ஒரே object-ஐ குறிக்கும் பக்கங்களைக் காண மேலாளர் பக்கத்திற்கு செல்க."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "இதை திருத்துக. (புதிய சாளரம்)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "மேளாலர் பக்கத்தை முன்பு கண்டதுபோல், ஆனால் புதிய சாளரத்தில் திறக்கிறது."

@@ -1,0 +1,152 @@
+# Dutch translation for Django.
+# Copyright (C) 2008, Django Software Foundation
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2008-08-28 13:58+0100\n"
+"Last-Translator: Rudolph Froger <rudolphfroger@estrate.nl>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "tag:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "filter:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "view:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "Toepassing %r niet gevonden"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Model %(model_name)r niet gevonden in toepassing %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "het gerelateerde `%(app_label)s.%(data_type)s` object"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "model:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "gerelateerde `%(app_label)s.%(object_name)s` objecten"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "alle %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "aantal %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Velden van %s objecten"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s lijkt geen urlpattern-object te zijn"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Voorpagina"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Documentatie"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Bookmarklets"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "Documentatie bookmarklets"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Om bookmarklets te installeren, sleep de link naar uw "
+"bladwijzers\n"
+"werkbalk, of rechtermuis klik op de link en voeg het toe aan de bladwijzer. "
+"Nu kan\n"
+"de bookmarklet vanuit elke pagina op de site worden gekozen. Let erop dat "
+"het soms\n"
+"noodzakelijk is dat de computer van waaruit de pagina wordt bekeken intern "
+"is.\n"
+"(Raadpleeg uw systeembeheerder of uw computer zich op het interne netwerk "
+"bevind).<p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "Documentatie voor deze pagina"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Springt vanuit elke pagina naar de documentatie voor de view die gegenereerd "
+"wordt door die pagina."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "Toon object-ID"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Toont het content-type en unieke ID voor pagina's die een enkel object "
+"voorstellen."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "Bewerk dit object (huidig venster)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+"Gaat naar de beheerpagina voor pagina's die een enkel object weergeven."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "Bewerk dit object (nieuw venster)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "Zoals hierboven, maar opent de beheerpagina in een nieuw venster."

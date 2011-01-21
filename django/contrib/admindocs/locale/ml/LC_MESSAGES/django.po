@@ -1,0 +1,149 @@
+# Translation of Django to Malayalam.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# RAJEESH R NAIR <rajeeshrnair@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2010-05-28 15:09+0530\n"
+"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"Language-Team: MALAYALAM <ML@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Malayalam\n"
+"X-Poedit-Country: INDIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "ടാഗ്:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "അരിപ്പ:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "വ്യൂ"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "%r എന്ന App കണ്ടില്ല."
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "%(app_label)r എന്ന Appല്‍ %(model_name)r എന്ന മാത്രുക കണ്ടില്ല."
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "ബന്ധപ്പെട്ട `%(app_label)s.%(data_type)s` വസ്തു"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "മാത്രുക:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "ബന്ധപ്പെട്ട `%(app_label)s.%(object_name)s` വസ്തുക്കള്‍"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "%s എല്ലാം"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "%sന്റെ എണ്ണം"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s വസ്തുക്കളിലെ വിവരങ്ങള്‍"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s വിലാസ മാത്രുക (urlpattern object) ആണെന്ന് തോന്നുന്നില്ല."
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "പൂമുഖം"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "സഹായക്കുറിപ്പുകള്‍"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "ബുക്ക് മാര്‍ക്കുകള്‍"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "സഹായക്കുറിപ്പുകളുടെ ബുക്ക്മാര്‍ക്കുകള്‍"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">ബുക്ക്മാര്‍ക്ക്ലെറ്റുകള്‍ ഇന്‍സ്റ്റാള്‍ ചെയ്യാന്‍, ലിങ്കിനെ  നിങ്ങളുടെ ബുക്ക്മാര്‍ക് "
+"ടൂള്‍ബാറിലേക്ക് \n"
+"വലിച്ചിടുകയോ, ലിങ്കിന്‍മേല്‍ റൈറ്റ്ക്ളിക് ചെയ്ത് ബുക്ക്മാര്‍ക്കായി ചേര്‍ക്കുകയോ ചെയ്യുക. ഇനി സൈറ്റിലെ "
+"ഏതു പേജില്‍ നിന്നും\n"
+" ഈ ബുക്ക്മാര്ക് തെരഞ്ഞെടുക്കാം. ചില ബുക്ക്മാര്‍ക്കുകള്‍  ഇന്റേണല്‍ ആയ കമ്പ്യൂട്ടറില്‍ നിന്നേ ലഭ്യമാവൂ എന്നു "
+"ശ്രദ്ധിക്കണം.\n"
+"നിങ്ങളുടെ കംപ്യൂട്ടര്‍ അത്തരത്തില്‍ പെട്ടതാണോ എന്നറിയാന്‍ സിസ്റ്റം അഡ്മിനിസ്ട്രേട്ടറെ ബന്ധപ്പെടുക.</"
+"p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "ഈ പേജിന്റെ സഹായക്കുറിപ്പുകള്‍"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr "ഏതു പേജില്‍ നിന്നും അതിന്റെ ഉദ്ഭവമായ വ്യൂവിന്റെ സഹായക്കുറിപ്പിലേക്കു ചാടാന്‍"
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "വസ്തുവിന്റെ ഐഡി കാണിക്കുക."
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"ഒറ്റ വസ്തുവിനെ പ്രതിനിധീകരിക്കുന്ന പേജുകളുടെ ഉള്ളടക്കത്തിന്റെ തരവും തനതായ IDയും കാണിക്കുന്നു."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "ഈ വസ്തുവില് മാറ്റം വരുത്തുക (ഇതേ വിന്‍ഡോ)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "ഒറ്റ വസ്തുവിനെ പ്രതിനിധീകരിക്കുന്ന പേജുകള്‍ക്കുള്ള അഡ്മിന്‍ പേജിലേക്ക് ചാടുന്നു."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "ഈ വസ്തുവില് മാറ്റം വരുത്തുക (പുതിയ വിന്‍ഡോ)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "മുകളിലേതു പോലെ, പക്ഷെ, അഡ്മിന്‍ പേജ് പുതിയ വിന്ഡോവിലാണ് തുറക്കുക."

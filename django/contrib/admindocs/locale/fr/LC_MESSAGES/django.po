@@ -1,0 +1,155 @@
+# French translation of Django.
+# This file is distributed under the same license as the Django package.
+# Copyright (C) 2008 Django Software Foundation and individual contributors.
+#
+# Stéphane Raimbault <stephane.raimbault@gmail.com>, 2009-2010.
+# Claude Paroz <claude@2xlibre.net>, 2009
+# David Larlet <http://larlet.fr>, 2009-2010
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2010-08-09 14:38+0200\n"
+"Last-Translator: Stéphane Raimbault <stephane.raimbault@gmail.com>\n"
+"Language-Team: French <http://django-fr.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "mot-clé :"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "filtre :"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "vue :"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "L'application %r n'a pas été trouvée"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr ""
+"Le modèle %(model_name)r n'a pas été trouvé dans l'application %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "l'objet « %(app_label)s.%(data_type)s » en relation"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "modèle :"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "les objets « %(app_label)s.%(object_name)s » en relation"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "tous les %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "nombre de %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Champs sur les objets %s"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s ne semble pas être un objet urlpattern"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Accueil"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Documentation"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Signets"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "Documentation des signets"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Pour installer des signets, faites glisser le lien vers "
+"votre barre \n"
+"de marques-pages, ou effectuez un clic droit dessus et ajoutez-le.\n"
+"Maintenant, vous pouvez le sélectionner depuis n'importe quelle page\n"
+"du site. Notez que certains d'entre eux nécessitent que vous visionniez\n"
+"le site depuis un ordinateur dit « interne » (contactez votre administrateur\n"
+"système si vous n'êtes pas sûr que votre ordinateur le soit).</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "Documentation pour cette page"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Vous envoie de n'importe quelle page vers la documentation de la vue qui a "
+"généré cette page."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "Afficher l'identifiant de l'objet"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Affiche le content-type et l'identifiant unique pour les pages qui "
+"représentent un objet unique."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "Modifier cet objet (fenêtre actuelle)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "Renvoie à la page d'administration qui représente un objet seul."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "Modifier cet objet (nouvelle fenêtre)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr ""
+"Comme ci-dessus, mais ouvre la page d'administration dans une nouvelle "
+"fenêtre."

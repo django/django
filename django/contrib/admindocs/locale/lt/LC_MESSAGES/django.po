@@ -1,0 +1,149 @@
+# Lithuanian translation of Django.
+# Copyright (C) 2008 The Django Software Foundation
+# This file is distributed under the same license as the Django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2008-06-18 22:37+0200\n"
+"Last-Translator: Rapolas Kaselis <rapolas@gmail.com>\n"
+"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%"
+"100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "tagas"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "filtras:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "vaizdas:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "Programa %r nerasta"
+
+#: views.py:201
+#, fuzzy, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Modelis %(name)r programoje %(label)r nerastas"
+
+#: views.py:213
+#, fuzzy, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "susijęs `%(label)s.%(type)s` objektas"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "modelis:"
+
+#: views.py:228 views.py:260
+#, fuzzy, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "susiję `%(label)s.%(name)s` objektai"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "visi %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "%s skaičius"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Objekto %s laukai"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s neatrodo kaip urlpattern objektas"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Pradinis"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Greitosios žymės"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "Doumentacijos greitosios žymės"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Greitųjų žymių įdiegimui, nutempkite nuorodą į greitųjų "
+"žymių\n"
+"juostą, arba spauskite dešinį pelės klavišą ir pridėkite prie greitųjų "
+"žymių. Dabar galite\n"
+"pasirinkti greitąją žymę iš bet kurio saito puslapio. Pastebėjimas, kad "
+"keletas iš šių\n"
+"greitųjų žymių reikalauja, kad saitas būtų žiūrimas iš vidinio kompiuterio \n"
+"(pasitarkite su administratorium, jei nežinai ar tavo kompiuteris yra "
+"vidinis).</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "Šio puslapio dokumentacija"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Pereina iš bet kurio puslapio į jo view funkcijos dokumentaciją, kuri "
+"sukūria tą puslapį"
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "Parodyti objekto ID"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Parodyti content-type ir unikalų puslapių ID, kuris parodo vieną objektą."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "Redaguoti šį objektą (einamajame lange)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "Pereina į administravimo puslapį, kuris parodo vieną objektą."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "Redaguoti šį objektą (naujame lange)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "Kaip ir viršuje, bet administravimo puslapį atidaro naujame lange."

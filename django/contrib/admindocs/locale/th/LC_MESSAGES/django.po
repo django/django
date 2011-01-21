@@ -1,0 +1,145 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django-1.1-rc-1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2009-07-28 22:31+0700\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
+"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin "
+"Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Thai\n"
+"X-Poedit-Country: THAILAND\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "ป้ายกำกับ:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "ตัวกรอง:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "ดู:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "ไม่พบแอป %r "
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "ไม่พบโมเดล %(model_name)r ในแอป %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "ความสัมพันธ์`%(app_label)s.%(data_type)s` อ็อบเจ็กต์"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "โมเดล:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "ความสัมพันธ์`%(app_label)s.%(object_name)s` อ็อบเจ็กต์"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "ทั้งหมด %s "
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "จำนวนของ %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "ฟิลด์บน %s อ็อบเจ็กต์"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s ดูเหมือนจะไม่ใช่ urlpattern อ็อบเจ็กต์"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "หน้าหลัก"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "เอกสารประกอบ"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Bookmarklets"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "Documentation bookmarklets"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">เพื่อติดตั้ง bookmarklets, ลากลิ้งก์ไปที่แถบเครื่องมือบุ๊กมาร์ค\n"
+", หรือคลิกขวาที่ลิ้งและเพิ่มเข้าบุ๊กมาร์คของคุณ. ตอนนี้คุณสามารถ\n"
+"เลือก bookmarklet จากหน้าใดๆในเว็บไซต์.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "เอกสารสำหรับหน้านี้"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr "ย้ายจากทุกหน้าไปที่วิวที่สร้างหน้านั้นขึ้นมา"
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "แสดงอ็อบเจ็กต์ไอดี"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr "แสดง content-type และ unique ID เพื่อแสดงอ็อบเจ็กต์เพียงอย่างเดียว."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "แก้ไขออปเจ็กนี้ (ในหน้าต่างปัจจุบัน)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "ไปที่หน้าแอดมินเพื่อแสดงอ็อบเจ็กต์เพียงอย่างเดียว."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "แก้ไขออปเจ็กนี้ (หน้าใหม่)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "เหมือนด้านบน แต่เปิดหน้าต่างผู้ดูแลระบบในหน้าต่างใหม่"

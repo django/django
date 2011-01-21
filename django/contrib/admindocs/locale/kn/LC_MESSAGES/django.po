@@ -1,0 +1,148 @@
+# Kannada translation of Django.
+# Copyright (C) 2007 Translation Team <translation@sampada.info>
+# This file is distributed under the same license as the Django package.
+# Kannada Localization Team <translation@sampada.info>, 2007.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2007-01-08 20:22+0530\n"
+"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
+"Language-Team: Kannada <translation@sampada.info>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "ಟ್ಯಾಗ್:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "ಸೋಸಕ:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "ನೋಟ:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "%r ಅನ್ವಯಾಂಶ ಸಿಗಲಿಲ್ಲ"
+
+#: views.py:201
+#, fuzzy, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "%r ಅನ್ವಯಾಂಶದಲ್ಲಿ %r  ಮಾಡೆಲ್ಲು ಸಿಗಲಿಲ್ಲ"
+
+#: views.py:213
+#, fuzzy, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "ಸಂಬಂಧಿಸಿದ `%s.%s` ವಸ್ತು"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "ಮಾಡೆಲ್:"
+
+#: views.py:228 views.py:260
+#, fuzzy, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "ಸಂಬಂಧಿಸಿದ `%s.%s` ವಸ್ತುಗಳು"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "ಎಲ್ಲಾ %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "%s ಗಳ ಸಂಖ್ಯೆ"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s ವಸ್ತುಗಳ ಅಂಶಗಳು"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s  URL ಸ್ವರೂಪದ್ದಾಗಿ ತೋರುವದಿಲ್ಲ."
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "ಪ್ರಾರಂಭಸ್ಥಳ(ಮನೆ)"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "ವಿವರಮಾಹಿತಿ"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "ಚಿಕ್ಕ ಪುಟಗುರುತುಗಳು"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "ಮಾಹಿತಿಯ ಚಿಕ್ಕ ಪುಟಗುರುತುಗಳು"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">ಸಣ್ಣ್ಪುಟಗುರುತುಗಳನ್ನು ಅನುಸ್ಥಾಪಿಸಲು ಕೊಂಡಿಯನ್ನು ಪುಟಗುರುತು ಉಪಕರಣಪಟ್ಟಿ"
+"(ಟೂಲ್ ಬಾರ್)ಕಡೆಗೆ ಎಳೆದೊಯ್ಯಿರಿ,\n"
+" ಅಥವಾ ಕೊಂಡಿಯ ಮೇಲೆ ಮೂಷಿಕ(ಮೌಸ್)ದ ಬಲಬಟನ್ನನ್ನು ಒತ್ತಿ ಪುಟಗುರುತುಗಳಿಗೆ ಸೇರಿಸಿಕೊಳ್ಳಿ. ಈಗ \n"
+" ನೀವು ಸಣ್ಣಪುಟಗುರುತುಗಳನ್ನು ತಾಣದ ಯಾವ ಪುಟದಿಂದ ಬೇಕಾದರೂ ಆಯ್ಕೆಮಾಡಿಕೊಳ್ಳಬಹುದು.\n"
+"ನೆನಪಿರಲಿ, ಕೆಲವು ಸಣ್ಣಪುಟಗುರುತುಗಳಿಗೆ ನೀವು ಈ ತಾಣವನ್ನು ಆಂತರಿಕ (\"internal\") ಎಂದು "
+"ಸೂಚಿತವಾಗಿರುವ ಗಣಕದಿಂದ ವೀಕ್ಷಿಸಬೇಕಾಗುತ್ತದೆ.\n"
+"(  ನಿಮ್ಮ ಗಣಕವು \"internal\" ಹೌದೇ ಅಲ್ಲವೇ ಎಂದು ಗೊತ್ತಿಲ್ಲದಿದ್ದರೆ , ಗಣಕದ ಆಡಳಿತಗಾರರನ್ನು "
+"ಕೇಳಿರಿ).</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "ಈ ಪುಟದ ಬಗೆಗಿನ ಮಾಹಿತಿ"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"ನಿಮ್ಮನ್ನು ಯಾವುದೇ ಪುಟದಿಂದ ಆ ಪುಟವನ್ನು ಸೃಷ್ಟಿಸುವ ನೋಟದ ಮಾಹಿತಿಪುಟಕ್ಕೆ ಕೊಂಡೊಯ್ಯುವದು"
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "ವಸ್ತುವಿನ ಐಡಿ ತೋರಿಸಿ"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"ಏಕೈಕ ವಸ್ತುವನ್ನು ಪ್ರತಿನಿಧಿಸುವ ಪುಟಗಳ ವಿಶಿಷ್ಠ ಐಡಿ ಮತ್ತು ಒಳವಿಷಯಬಗೆಯನ್ನು ತೋರಿಸುತ್ತದೆ."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "ಈ ವಸ್ತುವನ್ನು ಬದಲಿಸಿ(ಈಗಿನ ಕಿಟಕಿಯಲ್ಲಿ)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "ಏಕೈಕ ವಸ್ತುವನ್ನು ಪ್ರತಿನಿಧಿಸುವ ಪುಟಗಳಿಗಾಗಿ ಆಡಳಿತಪುಟಕ್ಕೆ ಒಯ್ಯುತ್ತದೆ"
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "ಈ ವಸ್ತುವನ್ನು ಬದಲಿಸಿ(ಹೊಸ ಕಿಟಕಿಯಲ್ಲಿ)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "ಮೇಲಿನಂತೆ, ಆದರೆ ಆಡಳಿತಪುಟವನ್ನು ಹೊಸ ಕಿಟಕಿಯಲ್ಲಿ ತೆರೆಯುವದು."

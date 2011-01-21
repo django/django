@@ -1,0 +1,150 @@
+# Spanish translation for the django project
+# Copyright (C) 2008, The Django Project
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2009-11-30 11:31+0100\n"
+"Last-Translator: Django Spanish Team, <django-cat@googlegroups.com>\n"
+"Language-Team: Django Spanish Team, <django-cat@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "etiqueta:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "filtro:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "vista:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "Aplicación %r no encontrada"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr ""
+"El modelo %(model_name)r no se ha encontrado en la aplicación %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "el objeto relacionado `%(app_label)s.%(data_type)s`"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "modelo:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "los objetos relacionados `%(app_label)s.%(object_name)s`"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "todo %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "número de %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Campos en %s objetos"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s no parece ser un objeto urlpattern"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Inicio"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Documentación"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Bookmarklets"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "Bookmarklets de documentación"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Para instalar bookmarklets, arrastre el enlace a su barra\n"
+"de favoritos, o pulse con el botón derecho el enlace y añádalo a sus "
+"favoritos.\n"
+"Ahora puede escoger el bookmarklet desde cualquier página del sitio.\n"
+"Observe que algunos de estos bookmarklets precisan que esté viendo\n"
+"el sitio desde un ordenador señalado como \"interno\" (hable\n"
+"con su administrador de sistemas si no está seguro si el suyo lo es).</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "Documentación para esta página"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Lleva desde cualquier página a la documentación de la vista que la genera."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "Mostrar ID de objeto"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Muestra el tipo de contenido e ID único de las páginas que representan un "
+"simple objeto."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "Editar este objeto (ventana actual)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+"Lleva a la página de administración de páginas que representan un único "
+"objeto."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "Editar este objeto (nueva ventana)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr ""
+"Como antes, pero abre la página de administración en una nueva ventana."

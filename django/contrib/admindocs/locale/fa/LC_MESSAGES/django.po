@@ -1,0 +1,139 @@
+# Persian translation of Django.
+# Copyright (C) 2007 THE Django'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Django package.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2008-09-01 02:00+0430\n"
+"Last-Translator: Reza Mohammadi <reza@zeerak.ir>\n"
+"Language-Team: Persian <farsi@lists.sharif.edu>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "برچسب:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "فیلتر"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "نمایش:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "برنامهٔ %r یافت نشد"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "مدل %(model_name)r در برنامهٔ %(app_label)r یافت نشد"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "شیء «%(app_label)s.%(data_type)s» مرتبط"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "مدل:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "اشیاء «%(app_label)s.%(object_name)s» مرتبط"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "همهٔ %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "تعداد %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "فیلدهای شیء %s"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "به نظر نمی رسد %s یک شیء از نوع urlpattern باشد"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "آغازه"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "مستندات"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr ""
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr ""
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "مستندات این صفحه"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"شما را از هر صفحه‌ای که باشید به مستندات نمایی که صفحه را ایجاد کرده می‌برد"
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "نمایش مشخصهٔ شیء"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"نمایش محتوا و مشخصهٔ منحصر به فرد برای صفحاتی که یک شیء را نمایش می‌دهند."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "ویرایش این شیء (پنجرهٔ کنونی)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "پرش به صفحهٔ مدیر برای صفحاتی که یک شیء را نمایش می‌دهند."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "ویرایش این شیء (پنجرهٔ جدید)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "مانند بالا، اما صفحهٔ مدیر را در پنجرهٔ جدیدی باز می‌کند."

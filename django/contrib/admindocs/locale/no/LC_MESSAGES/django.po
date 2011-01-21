@@ -1,0 +1,149 @@
+# This is the *old* Norwegian (Bokmål) translation of Django
+# For future updates please use the translation in the "nb" directory.
+# Copyright (C) 2005-2010
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2010-03-11 14:22+0100\n"
+"Last-Translator: Christian Mikalsen and Jon Lønne\n"
+"Language-Team: Norsk <no@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "tag:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "filter:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "view:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "Fant ikke applikasjonen %r"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Fant ikke modellen %(model_name)r i applikasjonen %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "det relaterte `%(app_label)s.%(data_type)s`-objektet"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "modell:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "relaterte `%(app_label)s.%(object_name)s`-objekter"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "alle %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "antall %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Felter på %s-objekter"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s ser ikke ut til å være et urlpattern-objekt"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Hjem"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Dokumentasjon"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Bokmerker"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "Dokumentasjonsbokmerker"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">For å installere bokmerker, dra linken til verktøylinja\n"
+"for bokmerker, eller høyreklikk og legg til i bokmerker. Nå kan du du velge\n"
+"bokmerket fra hvilken som helst side på nettstedet. Noen av disse\n"
+"bokmerkene krever at datamaskinen du bruker er markert som \"intern\"\n"
+"(kontakt din systemadministrator hvis du er usikker på om maskinen din er "
+"\"intern\").</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "Dokumentasjon for denne siden"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Hopp fra hvilken som helst side til dokumentasjonen for visningsfunksjonen "
+"som genererte den siden."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "Vis objekt-ID"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Viser \"content-type\" og en unik ID for sider som representerer et enkelt "
+"objekt."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "Endre dette objektet (nåværende vindu)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+"Hopper til administrasjonssiden for sider som representerer et enkelt objekt."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "Endre dette objektet (nytt vindu)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "Samme som over, men åpner administrasjonssiden i et nytt vindu."

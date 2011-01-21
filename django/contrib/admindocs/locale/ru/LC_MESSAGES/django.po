@@ -1,0 +1,152 @@
+# Translation of django.po to russian.
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:23+0100\n"
+"PO-Revision-Date: 2010-05-11 17:36+0300\n"
+"Last-Translator: alexey boriskin <sun.void@gmail.com>\n"
+"Language-Team: Russian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: RUSSIAN FEDERATION\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "метка:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "фильтр:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "view:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "Приложение %r не найдено"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Модель %(model_name)r не найдена в приложении %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "зависимый `%(app_label)s.%(data_type)s` объект"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "модель:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "зависимые `%(app_label)s.%(object_name)s` объекты"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "все %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "количество %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Поля для %s объектов"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s не похож на объект urlpattern"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Начало"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Документация"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Закладки"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "Закладки документации"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Для установки закладок перетащите ссылку к себе на панель\n"
+"закладок или щелкните правой кнопкой мыши по ссылке и добавьте ее в\n"
+"закладки. Теперь у вас есть возможность выбрать закладку с любой страницы\n"
+"сайта. Обратите внимание: некоторые из этих закладок требуют, чтобы вы\n"
+"просматривали сайт с компьютера, определенного как \"внутренний\" (уточните\n"
+"у своего системного администратора, если не уверены, является ли ваш\n"
+"компьютер \"внутренним\").</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "Документация для данной страницы"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Перенаправляет вас с любой страницы к документации для view, который "
+"генерирует эту страницу."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "Показать идентификатор объекта"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Показывает content-type и уникальный ID для страниц, представляющих один "
+"объект."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "Редактировать данный объект (в текущем окне)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+"Перейдет на административную страницу для страниц, представляющих один "
+"объект."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "Редактировать данный объект (в новом окне)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "То же, что и выше, но откроет административную страницу в новом окне."

@@ -1,0 +1,146 @@
+# Django Korean Translation
+# Copyright (C) 2009
+# This file is distributed under the same license as the django package.
+# Hyun Mi Ae, Joongi Kim (me@daybreaker.info), Sung-Jin Hong (serialx.net@gmail.com)
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2007-04-06 11:04+0900\n"
+"Last-Translator: Joongi Kim (me@daybreaker.info)\n"
+"Language-Team: Korean\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "태그:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "필터:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "뷰:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "어플리케이션 %r (이)가 없습니다."
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "모델 %(model_name)r (이)가 어플리케이션 %(app_label)r 에 없습니다."
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "`%(app_label)s.%(data_type)s` 관련 오브젝트"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "모델:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "`%(app_label)s.%(object_name)s` 관련 오브젝트(들)"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "모든 %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "%s 의 수"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s 오브젝트의 필드"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s (은)는 url 패턴의 오브젝트가 아닙니다."
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "홈"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "문서"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "북마크릿"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "문서 북마크릿"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\"> 북마크릿을 설치하시려면 링크를 북마크 툴바로 드래그 하거"
+"나,\n"
+"오른쪽 클릭으로 해당 링크를 북마크에 추가하세요.\n"
+"이제 사이트 내의 모든 페이지에서 북마크릿 선택이 가능합니다.\n"
+"북마크릿에 따라 내부 네트워크 상의 컴퓨터로부터 이 사이트를 참조해야하는 경우"
+"가 있습니다.\n"
+"(내부 네트워크가 있는지 불명확한 경우 시스템 관리자에게 확인하시기 바랍니다.)"
+"</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "이 페이지의 문서"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr "각 페이지로에서 해당 페이지를 생성한 뷰의 문서로 갑니다."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "오브젝트 아이디 표시"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr "단일 오브젝트 페이지의 고유 아이디와 컨텐츠 타입을 표시합니다."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "오브젝트 편집(현재 창)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "단일 오브젝트 페이지의 관리 페이지로 이동"
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "오브젝트 편집(새로운 창)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "위와 동일하며, 새로운 창에서 관리 페이지를 엽니다."

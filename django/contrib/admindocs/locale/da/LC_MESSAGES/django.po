@@ -1,0 +1,149 @@
+# Translation of django.po to Danish
+# This file is distributed under the same license as the Django package.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2010-02-20 20:41+0200\n"
+"Last-Translator: Finn Gruwier Larsen<finn@gruwier.dk>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "tag:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "filter:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "view:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "Applikationen %r blev ikke fundet"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Modellen %(model_name)r ikke fundet i applikationen %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "det relaterede `%(app_label)s.%(data_type)s`-objekt"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "model:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "relaterede `%(app_label)s.%(object_name)s`-objekter"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "alle %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "antal %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Felter på %s-objekter"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s ser ikke ud til at være et urlpattern-objekt"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Hjem"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Dokumentation"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Bookmarklets"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "Dokumentations-bookmarklets"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">For at installere bookmarklets, træk linket til din\n"
+"bogmærkelinje eller højreklik på linket og tilføj det til dine bogmærker.\n"
+"Du kan nu markere bookmarkletten fra enhver side på websitet.\n"
+"Bemærk, at nogle af disse bookmarkletter kræver, at du ser på websitet fra\n"
+"en computer der opfattes som \"intern\" (tal med din systemadministrator,\n"
+"hvis du ikke er sikker på om din computer er \"intern\").</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "Dokumentation for denne side"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Bringer dig fra en hvilken som helst side til dokumentationen for det view, "
+"der genererer den pågældende side."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "Vis objekt-ID"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Viser indholdstypen og det unikke ID for sider, der repræsenterer et enkelt "
+"objekt."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "Rediger dette objekt (i det aktuelle vindue)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+"Springer til administrationssiden for sider, der repræsenterer et enkelt "
+"objekt."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "Rediger dette objekt (i nyt vindue)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "Som ovenfor, men åbner administrationssiden i et nyt vindue."

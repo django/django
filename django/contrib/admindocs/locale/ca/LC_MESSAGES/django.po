@@ -1,0 +1,149 @@
+# translation of django.po to Catalan
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2009-03-24 13:28+0100\n"
+"Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
+"Language-Team: Catalan <ca@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "etiqueta:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "filtre:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "vista:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "No s'ha pogut trobar l'aplicació %r"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "El model %(model_name)r no s'ha trobat a l'aplicació %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "l'objecte relacionat `%(app_label)s.%(data_type)s`"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "model:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "objectes relacionats `%(app_label)s.%(object_name)s`"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "tots %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "nombre de %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Camps en objectes %s"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s no sembla ser un objecte 'urlpattern'"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Inici"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Documentació"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "'Bookmarklets'"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "'Bookmarklets' de documentació"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Per tal d'instal·lar 'bookmarklets', arrosegueu l'enllaç\n"
+"a la vostra barra de marcadors, o feu click amb el botó dret a l'enllaç i\n"
+"afegiu-lo als marcadors.\n"
+"Ara podeu escollir el 'bookmarklet' des de qualsevol pàgina del lloc.\n"
+"Observeu que per a alguns d'aquests 'bookmarklets' cal que estigueu veient\n"
+"el lloc des d'un ordinador designat com a \"intern\" (parleu\n"
+"amb el vostre administrador de sistemes si no esteu segurs si el vostre "
+"ordinador és \"intern\").</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "Documentació d'aquesta pàgina"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Us porta des de qualsevol pàgina a la documentació de la vista que la genera."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "Mostra l'ID de l'objecte"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Mostra el 'content-type' (tipus de contingut) i l'ID inequívoc de les "
+"pàgines que representen un únic objecte."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "Editar aquest objecte (finestra actual)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+"El porta a la pàgina d'administració de pàgines que representen un únic "
+"objecte."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "Editar aquest objecte (nova finestra)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "Com abans, però obre la pàgina d'administració en una nova finestra."

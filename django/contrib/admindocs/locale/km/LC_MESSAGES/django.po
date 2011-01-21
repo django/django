@@ -1,0 +1,143 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2007-08-10 00:21+0900\n"
+"Last-Translator: Chay Sengtha <sengtha@e-khmer.com>\n"
+"Language-Team: Chay Sengtha <sengtha@e-khmer.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "ប្រភេទ:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "ពាក្យស្វែងរក"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "មើល"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "ស្វែងរក App %r មិនឃើញ ។"
+
+#: views.py:201
+#, fuzzy, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Model %r រកមិនឃើញនៅក្នុង app %r"
+
+#: views.py:213
+#, fuzzy, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr " `%s.%s` object ដែលពាក់ព័ន្ធ"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "model:"
+
+#: views.py:228 views.py:260
+#, fuzzy, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "ជាប់​ទាក់ទង​ជាមួយ​នឹងកម្មវិធី​  `%s.%s` "
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "ទាំងអស់ %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "ចំនួន​នៃ​%s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "ទិន្នន័យអំពី %s កម្មវិធី"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s ហាក់បីដូចជា URL ដែល​ត្រឹមត្រូវទេ"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "គេហទំព័រ"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "ឯកសារ"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "កំរងចំណាំ"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "កំរងចំណាំអំពីឯកសារ"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">ដើម្បីតំលើងកំរងចំណាំ សូមទាញយកអត្ថបទភ្ជាប់ទៅ​កាន់​"
+"របាឧបករណ៍ ឬក៏ចុចខាងស្តាំលើអត្ថបទភ្ជាប់ហើយ​បញ្ជូលទៅក្នុងកំរងចំណាំរបស់លោកអ្នក។</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "ឯកសារសំរាប់ទំព័រនេះ"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "បង្ហាញលេខសំគាល់កម្មវិធី"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "កែប្រែកម្មវិធីនេះ(វីនដូវកំពុងប្រើ)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "បង្វែរទៅកាន់​ ទំព័រគ្រប់គ្រង សំរាប់ទំព័រណាដែលតំណាងអោយកម្មវិធីតែមួយ។"
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "កែប្រែកម្មវិធីនេះ(វីនដូវថ្មី)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "ដូចខាងលើ តែបើកនៅទំព័រវីនដូវថ្មី"

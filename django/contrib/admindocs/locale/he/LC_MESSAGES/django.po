@@ -1,0 +1,145 @@
+# translation of Django.
+# Copyright (C) 2008 The Django Project
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2010-05-09 15:10-0500\n"
+"Last-Translator: Alex <alex.gaynor@gmail.com>\n"
+"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Bookmarks: -1,988,-1,-1,-1,-1,-1,-1,-1,-1\n"
+"X-Generator: Lokalize 1.0\n"
+
+#: views.py:63 views.py:65 views.py:67
+msgid "tag:"
+msgstr "תג:"
+
+#: views.py:98 views.py:100 views.py:102
+msgid "filter:"
+msgstr "סינון:"
+
+#: views.py:162 views.py:164 views.py:166
+msgid "view:"
+msgstr "ה־view:"
+
+#: views.py:194
+#, python-format
+msgid "App %r not found"
+msgstr "יישום %r לא נמצא"
+
+#: views.py:201
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "מודל %(model_name)r לא נמצא ביישום %(app_label)r"
+
+#: views.py:213
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "אוביקטי `%(app_label)s.%(data_type)s` קשורים"
+
+#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
+#: views.py:270
+msgid "model:"
+msgstr "מודל:"
+
+#: views.py:228 views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "אובייקטי `%(app_label)s.%(object_name)s` קשורים"
+
+#: views.py:232 views.py:265
+#, python-format
+msgid "all %s"
+msgstr "כל %s"
+
+#: views.py:237 views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "מספר %s"
+
+#: views.py:275
+#, python-format
+msgid "Fields on %s objects"
+msgstr "שדות באובייקטי %s"
+
+#: views.py:365
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "לא נראה ש-%s הוא אובייקט urlpattern"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "דף הבית"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "תיעוד"
+
+#: templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "ייסומניות"
+
+#: templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "ייסומוניות תיעוד"
+
+#: templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">כדי להתקין ייסומניות, יש לגרור את הקישור לסרגל הסימניות\n"
+"שלך, או קליק ימני והוספה לסימניות. כעת ניתן\n"
+"לבחור את הייסומניה מכל עמוד באתר.  יש לשים לב כי חלק מהייסומניות\n"
+"ניתנות לצפיה רק ממחשב שמסווג\n"
+"כ\"פנימי\" (יש לדבר עם מנהל המערכת שלך אם אינך בטוח/ה\n"
+"שהמחשב מסווג ככזה).</p>\n"
+
+#: templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "תיעוד לדף זה"
+
+#: templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr "מקפיץ אותך מכל עמוד לתיעוד התצוגה שייצרה אותו."
+
+#: templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "הצג מזהה אובייקט"
+
+#: templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr "מציג את סוג התוכן והמזהה הייחודי לעמודים המייצגים אובייקט בודד."
+
+#: templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "עריכת אובייקט זה (בחלון הנוכחי)"
+
+#: templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "קופץ לעמוד הניהול לעמודים אשר מייצגים אובייקטים בודד."
+
+#: templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "עריכת אובייקט זה (בחלון חדש)"
+
+#: templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "כנ\"ל, אך דף הניהול ייפתח בחלון חדש."
