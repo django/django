@@ -1,0 +1,34 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2009-07-19 22:49+0000\n"
+"Last-Translator: Nasimul Haque <nasim.haque@gmail.com>\n"
+"Language-Team: Nasimul Haque <nasim.haque@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:41
+msgid "session key"
+msgstr "সেশন কি"
+
+#: models.py:43
+msgid "session data"
+msgstr "সেশন ডাটা"
+
+#: models.py:44
+msgid "expire date"
+msgstr "মেয়াদ শেষের তারিখ"
+
+#: models.py:49
+msgid "session"
+msgstr "সেশন"
+
+#: models.py:50
+msgid "sessions"
+msgstr "সেশনসমূহ"

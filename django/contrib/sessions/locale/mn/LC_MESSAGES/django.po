@@ -1,0 +1,35 @@
+# This file is distributed under the same license as the Django package.
+#
+# Urangua <urangua@adsolux.com>, 2010, 2002, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:30+0100\n"
+"PO-Revision-Date: 2010-03-11 17:23+0800\n"
+"Last-Translator: Urangua <urangua@adsolux.com>\n"
+"Language-Team: mn <translate@opensource.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:41
+msgid "session key"
+msgstr ""
+
+#: models.py:43
+msgid "session data"
+msgstr ""
+
+#: models.py:44
+msgid "expire date"
+msgstr "дуусах хугацаа"
+
+#: models.py:49
+msgid "session"
+msgstr ""
+
+#: models.py:50
+msgid "sessions"
+msgstr ""

@@ -1,0 +1,33 @@
+# Translation of django.po to japanese.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:30+0100\n"
+"PO-Revision-Date: 2010-05-09 12:41+0900\n"
+"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
+"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: models.py:41
+msgid "session key"
+msgstr "セッションキー"
+
+#: models.py:43
+msgid "session data"
+msgstr "セッションデータ"
+
+#: models.py:44
+msgid "expire date"
+msgstr "有効期限"
+
+#: models.py:49
+msgid "session"
+msgstr "セッション"
+
+#: models.py:50
+msgid "sessions"
+msgstr "セッション"

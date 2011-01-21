@@ -1,0 +1,38 @@
+# Translation of django.po to Galego
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:30+0100\n"
+"PO-Revision-Date: 2007-05-28 17:29+0200\n"
+"Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
+"Language-Team: Galego\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Galician\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:41
+msgid "session key"
+msgstr "clave da sesión"
+
+#: models.py:43
+msgid "session data"
+msgstr "datos da sesión"
+
+#: models.py:44
+msgid "expire date"
+msgstr "data de caducidade"
+
+#: models.py:49
+msgid "session"
+msgstr "sesión"
+
+#: models.py:50
+msgid "sessions"
+msgstr "sesións"

@@ -1,0 +1,39 @@
+# Translation of Django to Malayalam.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# RAJEESH R NAIR <rajeeshrnair@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:30+0100\n"
+"PO-Revision-Date: 2010-05-28 15:09+0530\n"
+"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"Language-Team: MALAYALAM <ML@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Malayalam\n"
+"X-Poedit-Country: INDIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:41
+msgid "session key"
+msgstr "സെഷന്‍ കീ"
+
+#: models.py:43
+msgid "session data"
+msgstr "സെഷന്‍ വിവരം"
+
+#: models.py:44
+msgid "expire date"
+msgstr "കാലാവധി (തീയതി)"
+
+#: models.py:49
+msgid "session"
+msgstr "സെഷന്‍"
+
+#: models.py:50
+msgid "sessions"
+msgstr "സെഷനുകള്‍"
