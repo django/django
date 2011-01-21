@@ -1,0 +1,25 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-03-25 08:00+1000\n"
+"Last-Translator: Simon Meers <DrMeers@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: models.py:77
+msgid "python model class name"
+msgstr ""
+
+#: models.py:81
+msgid "content type"
+msgstr ""
+
+#: models.py:82
+msgid "content types"
+msgstr ""

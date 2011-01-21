@@ -1,0 +1,25 @@
+# Translation of django.po to japanese.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-05-09 12:41+0900\n"
+"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
+"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: models.py:77
+msgid "python model class name"
+msgstr "Python モデルクラス名"
+
+#: models.py:81
+msgid "content type"
+msgstr "コンテンツタイプ"
+
+#: models.py:82
+msgid "content types"
+msgstr "コンテンツタイプ"

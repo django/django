@@ -1,0 +1,26 @@
+# This file is distributed under the same license as the django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2007-04-05 01:32+1000\n"
+"Last-Translator: Terry Huang <terryh.tp@gmail.com>\n"
+"Language-Team: Terry Huang <terryh.tp@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: models.py:77
+msgid "python model class name"
+msgstr "python 模組名稱"
+
+#: models.py:81
+msgid "content type"
+msgstr "內容類型"
+
+#: models.py:82
+msgid "content types"
+msgstr "內容類型"

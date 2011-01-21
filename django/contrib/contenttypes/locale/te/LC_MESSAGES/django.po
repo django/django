@@ -1,0 +1,29 @@
+# translation of django.po to Telugu
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-09-09 21:24+0530\n"
+"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
+"Language-Team: Telugu <indlinux-telugu@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: models.py:77
+msgid "python model class name"
+msgstr "పైతాన్ మొడల్ క్లాస్  పేరు"
+
+#: models.py:81
+msgid "content type"
+msgstr "సూచన రకం"
+
+#: models.py:82
+msgid "content types"
+msgstr "సూచన రకాలు"

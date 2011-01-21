@@ -1,0 +1,27 @@
+# translation of django.po to Hungarian
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-08-30 01:11+0200\n"
+"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: models.py:77
+msgid "python model class name"
+msgstr "python modell osztály neve"
+
+#: models.py:81
+msgid "content type"
+msgstr "tartalom típusa"
+
+#: models.py:82
+msgid "content types"
+msgstr "tartalom típusok"

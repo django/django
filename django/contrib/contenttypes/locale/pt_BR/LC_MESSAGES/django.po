@@ -1,0 +1,28 @@
+# Português do Brasil translation of django.
+# This file is distributed under the same license as the django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-03-19 17:58-0300\n"
+"Last-Translator: Guilherme Gondim <semente@taurinus.org>\n"
+"Language-Team: Grupo de Localização para o Português <django-l10n-"
+"portuguese@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: models.py:77
+msgid "python model class name"
+msgstr "nome da classe model em python"
+
+#: models.py:81
+msgid "content type"
+msgstr "tipo de conteúdo"
+
+#: models.py:82
+msgid "content types"
+msgstr "tipos de conteúdo"

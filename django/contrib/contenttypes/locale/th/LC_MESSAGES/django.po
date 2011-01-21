@@ -1,0 +1,30 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django-1.1-rc-1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2009-07-28 22:31+0700\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
+"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin "
+"Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Thai\n"
+"X-Poedit-Country: THAILAND\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: models.py:77
+msgid "python model class name"
+msgstr "python model class name"
+
+#: models.py:81
+msgid "content type"
+msgstr "content type"
+
+#: models.py:82
+msgid "content types"
+msgstr "content types"

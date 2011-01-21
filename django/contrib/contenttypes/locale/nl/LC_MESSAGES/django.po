@@ -1,0 +1,28 @@
+# Dutch translation for Django.
+# Copyright (C) 2008, Django Software Foundation
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-08-28 13:58+0100\n"
+"Last-Translator: Rudolph Froger <rudolphfroger@estrate.nl>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:77
+msgid "python model class name"
+msgstr "klassenaam van pythonmodel"
+
+#: models.py:81
+msgid "content type"
+msgstr "inhoudstype"
+
+#: models.py:82
+msgid "content types"
+msgstr "inhoudstypen"
