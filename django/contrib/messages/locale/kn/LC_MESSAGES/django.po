@@ -1,0 +1,22 @@
+# Kannada translation of Django.
+# Copyright (C) 2007 Translation Team <translation@sampada.info>
+# This file is distributed under the same license as the Django package.
+# Kannada Localization Team <translation@sampada.info>, 2007.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2007-01-08 20:22+0530\n"
+"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
+"Language-Team: Kannada <translation@sampada.info>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: tests/base.py:114
+#, fuzzy
+msgid "lazy message"
+msgstr "ಸಂದೇಶ"
