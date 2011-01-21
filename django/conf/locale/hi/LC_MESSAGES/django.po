@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django SVN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 21:02+0100\n"
+"POT-Creation-Date: 2011-01-21 22:58+0100\n"
 "PO-Revision-Date: 2008-11-12 08:14+0530\n"
 "Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
 "Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
@@ -289,24 +289,24 @@ msgstr "पारम्परिक चीनी"
 msgid "Enter a valid value."
 msgstr "एक मान्य मूल्य दर्ज करें"
 
-#: core/validators.py:87 forms/fields.py:572
+#: core/validators.py:87 forms/fields.py:574
 msgid "Enter a valid URL."
 msgstr "वैध यू.आर.एल भरें ।"
 
-#: core/validators.py:89 forms/fields.py:573
+#: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr ""
 
-#: core/validators.py:120 forms/fields.py:447
+#: core/validators.py:120 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "मान्य ईमेल पता भरें"
 
-#: core/validators.py:123 forms/fields.py:956
+#: core/validators.py:123 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 
-#: core/validators.py:126 forms/fields.py:949
+#: core/validators.py:126 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "वैध आइ.पि वी 4 पता भरें ।"
 
@@ -319,12 +319,12 @@ msgstr "अल्पविराम अंक मात्र ही भरे�
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
@@ -343,17 +343,17 @@ msgid ""
 "(show_value)d)."
 msgstr ""
 
-#: db/models/base.py:765
+#: db/models/base.py:767
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 
-#: db/models/base.py:780 db/models/base.py:788
+#: db/models/base.py:782 db/models/base.py:790
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "इस %(field_label)s के साथ एक %(model_name)s पहले से ही उपस्थित है ।"
 
-#: db/models/base.py:787 forms/models.py:581
+#: db/models/base.py:789 forms/models.py:581
 msgid "and"
 msgstr "और"
 
@@ -516,71 +516,71 @@ msgstr "यह क्षेत्र अपेक्षित हैं"
 msgid "Enter a whole number."
 msgstr "एक पूर्ण संख्या दर्ज करें ।"
 
-#: forms/fields.py:252 forms/fields.py:273
+#: forms/fields.py:253 forms/fields.py:274
 msgid "Enter a number."
 msgstr "एक संख्या दर्ज करें ।"
 
-#: forms/fields.py:276
+#: forms/fields.py:277
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr ""
 
-#: forms/fields.py:277
+#: forms/fields.py:278
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr ""
 
-#: forms/fields.py:278
+#: forms/fields.py:279
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr ""
 
-#: forms/fields.py:340 forms/fields.py:916
+#: forms/fields.py:342 forms/fields.py:918
 msgid "Enter a valid date."
 msgstr "वैध तिथि भरें ।"
 
-#: forms/fields.py:368 forms/fields.py:917
+#: forms/fields.py:370 forms/fields.py:919
 msgid "Enter a valid time."
 msgstr "वैध समय भरें ।"
 
-#: forms/fields.py:394
+#: forms/fields.py:396
 msgid "Enter a valid date/time."
 msgstr "वैध तिथि/समय भरें ।"
 
-#: forms/fields.py:458
+#: forms/fields.py:460
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "कोई संचिका निवेदित नहीं हुई । कृपया कूटलेखन की जाँच करें ।"
 
-#: forms/fields.py:459
+#: forms/fields.py:461
 msgid "No file was submitted."
 msgstr "कोई संचिका निवेदित नहीं हुई ।"
 
-#: forms/fields.py:460
+#: forms/fields.py:462
 msgid "The submitted file is empty."
 msgstr "निवेदित संचिका खाली है ।"
 
-#: forms/fields.py:461
+#: forms/fields.py:463
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 
-#: forms/fields.py:462
+#: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
-#: forms/fields.py:516
+#: forms/fields.py:518
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr "वैध चित्र निवेदन करें । आप के द्वारा निवेदित संचिका अमान्य अथवा दूषित है ।"
 
-#: forms/fields.py:648 forms/fields.py:723
+#: forms/fields.py:650 forms/fields.py:725
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "मान्य इच्छा चयन करें । %(value)s लभ्य इच्छाओं में उप्लब्ध नहीं हैं ।"
 
-#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
 msgid "Enter a list of values."
 msgstr "मूल्य सूची दर्ज करें ।"
 
@@ -658,38 +658,38 @@ msgstr "हाँ"
 msgid "No"
 msgstr "नहीं"
 
-#: template/defaultfilters.py:794
+#: template/defaultfilters.py:774
 msgid "yes,no,maybe"
 msgstr "हाँ, नहीं, शायद"
 
-#: template/defaultfilters.py:825
+#: template/defaultfilters.py:805
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d बाइट"
 msgstr[1] "%(size)d बाइट"
 
-#: template/defaultfilters.py:827
+#: template/defaultfilters.py:807
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f के.बी"
 
-#: template/defaultfilters.py:829
+#: template/defaultfilters.py:809
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f एम.बी"
 
-#: template/defaultfilters.py:831
+#: template/defaultfilters.py:811
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f जी.बी"
 
-#: template/defaultfilters.py:833
+#: template/defaultfilters.py:813
 #, fuzzy, python-format
 msgid "%.1f TB"
 msgstr "%.1f के.बी"
 
-#: template/defaultfilters.py:834
+#: template/defaultfilters.py:814
 #, fuzzy, python-format
 msgid "%.1f PB"
 msgstr "%.1f के.बी"
@@ -782,23 +782,23 @@ msgstr "जनवरी"
 msgid "February"
 msgstr "फ़रवरी"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "March"
 msgstr "मार्च"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "April"
 msgstr "अप्रैल"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "May"
 msgstr "मई"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "June"
 msgstr "जून"
 
-#: utils/dates.py:19 utils/dates.py:31
+#: utils/dates.py:19
 msgid "July"
 msgstr "जुलाई"
 
@@ -871,100 +871,144 @@ msgid "dec"
 msgstr "दिस्"
 
 #: utils/dates.py:31
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "जन."
 
-#: utils/dates.py:31
+#: utils/dates.py:32
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "फ़र."
 
-#: utils/dates.py:32
+#: utils/dates.py:33
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "मार्च"
+
+#: utils/dates.py:34
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "अप्रैल"
+
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "मई"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "जून"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "जुलाई"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "अग."
 
-#: utils/dates.py:32
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "सितम्."
 
-#: utils/dates.py:32
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "अक्ट."
 
-#: utils/dates.py:32
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "नव."
 
-#: utils/dates.py:32
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "दिस्."
 
-#: utils/dates.py:35
+#: utils/dates.py:45
 #, fuzzy
 msgctxt "alt. month"
 msgid "January"
 msgstr "जनवरी"
 
-#: utils/dates.py:36
+#: utils/dates.py:46
 #, fuzzy
 msgctxt "alt. month"
 msgid "February"
 msgstr "फ़रवरी"
 
-#: utils/dates.py:37
+#: utils/dates.py:47
 #, fuzzy
 msgctxt "alt. month"
 msgid "March"
 msgstr "मार्च"
 
-#: utils/dates.py:38
+#: utils/dates.py:48
 #, fuzzy
 msgctxt "alt. month"
 msgid "April"
 msgstr "अप्रैल"
 
-#: utils/dates.py:39
+#: utils/dates.py:49
 #, fuzzy
 msgctxt "alt. month"
 msgid "May"
 msgstr "मई"
 
-#: utils/dates.py:40
+#: utils/dates.py:50
 #, fuzzy
 msgctxt "alt. month"
 msgid "June"
 msgstr "जून"
 
-#: utils/dates.py:41
+#: utils/dates.py:51
 #, fuzzy
 msgctxt "alt. month"
 msgid "July"
 msgstr "जुलाई"
 
-#: utils/dates.py:42
+#: utils/dates.py:52
 #, fuzzy
 msgctxt "alt. month"
 msgid "August"
 msgstr "अगस्त"
 
-#: utils/dates.py:43
+#: utils/dates.py:53
 #, fuzzy
 msgctxt "alt. month"
 msgid "September"
 msgstr "सितमबर"
 
-#: utils/dates.py:44
+#: utils/dates.py:54
 #, fuzzy
 msgctxt "alt. month"
 msgid "October"
 msgstr "अक्टूबर"
 
-#: utils/dates.py:45
+#: utils/dates.py:55
 #, fuzzy
 msgctxt "alt. month"
 msgid "November"
 msgstr "नवमबर"
 
-#: utils/dates.py:46
+#: utils/dates.py:56
 #, fuzzy
 msgctxt "alt. month"
 msgid "December"
@@ -1029,23 +1073,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:560
+#: utils/translation/trans_real.py:562
 msgid "DATE_FORMAT"
 msgstr "तिथि_प्रारूप"
 
-#: utils/translation/trans_real.py:561
+#: utils/translation/trans_real.py:563
 msgid "DATETIME_FORMAT"
 msgstr "तिथिसमय_प्रारूप"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:564
 msgid "TIME_FORMAT"
 msgstr "समय_प्रारूप"
 
-#: utils/translation/trans_real.py:583
+#: utils/translation/trans_real.py:585
 msgid "YEAR_MONTH_FORMAT"
 msgstr "वर्ष_महीना_प्रारूप"
 
-#: utils/translation/trans_real.py:584
+#: utils/translation/trans_real.py:586
 msgid "MONTH_DAY_FORMAT"
 msgstr "महीना_दिन_प्रारूप"
 

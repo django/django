@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 21:00+0100\n"
+"POT-Creation-Date: 2011-01-21 22:57+0100\n"
 "PO-Revision-Date: 2007-09-03 04:19+0100\n"
 "Last-Translator: Dimitris Glezos <dimitris@glezos.com>\n"
 "Language-Team: el <fedora-trans-el@redhat.com>\n"
@@ -293,20 +293,20 @@ msgstr "Παραδοσιακά Κινέζικα"
 msgid "Enter a valid value."
 msgstr "Εισάγετε μια έγκυρη τιμή."
 
-#: core/validators.py:87 forms/fields.py:572
+#: core/validators.py:87 forms/fields.py:574
 msgid "Enter a valid URL."
 msgstr "Εισάγετε ένα έγκυρο URL."
 
-#: core/validators.py:89 forms/fields.py:573
+#: core/validators.py:89 forms/fields.py:575
 #, fuzzy
 msgid "This URL appears to be a broken link."
 msgstr "Το URL %s είναι χαλασμένος σύνδεσμος."
 
-#: core/validators.py:120 forms/fields.py:447
+#: core/validators.py:120 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
 
-#: core/validators.py:123 forms/fields.py:956
+#: core/validators.py:123 forms/fields.py:958
 #, fuzzy
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
@@ -314,7 +314,7 @@ msgstr ""
 "Αυτή η τιμή πρέπει να περιέχει μόνο γράμματα, αριθμούς, υπογεγραμμένες, "
 "παύλες ή καθέτους."
 
-#: core/validators.py:126 forms/fields.py:949
+#: core/validators.py:126 forms/fields.py:951
 #, fuzzy
 msgid "Enter a valid IPv4 address."
 msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
@@ -328,12 +328,12 @@ msgstr "Εισάγετε μόνο ψηφία χωρισμένα με κόμμα�
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος τουλάχιστον %d χαρακτήρες."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
 #, fuzzy, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "τιμή a από."
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
 #, fuzzy, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "τιμή a από."
@@ -352,17 +352,17 @@ msgid ""
 "(show_value)d)."
 msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος το πολύ %d χαρακτήρες."
 
-#: db/models/base.py:765
+#: db/models/base.py:767
 #, fuzzy, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "πεδίο πεδίο είναι τιμή"
 
-#: db/models/base.py:780 db/models/base.py:788
+#: db/models/base.py:782 db/models/base.py:790
 #, fuzzy, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "με."
 
-#: db/models/base.py:787 forms/models.py:581
+#: db/models/base.py:789 forms/models.py:581
 msgid "and"
 msgstr "και"
 
@@ -530,73 +530,73 @@ msgstr "Αυτό το πεδίο είναι απαραίτητο."
 msgid "Enter a whole number."
 msgstr "Εισάγετε έναν ακέραιο αριθμό."
 
-#: forms/fields.py:252 forms/fields.py:273
+#: forms/fields.py:253 forms/fields.py:274
 #, fuzzy
 msgid "Enter a number."
 msgstr "Εισάγετε έναν ακέραιο αριθμό."
 
-#: forms/fields.py:276
+#: forms/fields.py:277
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr ""
 
-#: forms/fields.py:277
+#: forms/fields.py:278
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr ""
 
-#: forms/fields.py:278
+#: forms/fields.py:279
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr ""
 
-#: forms/fields.py:340 forms/fields.py:916
+#: forms/fields.py:342 forms/fields.py:918
 msgid "Enter a valid date."
 msgstr "Εισάγετε μια έγκυρη ημερομηνία."
 
-#: forms/fields.py:368 forms/fields.py:917
+#: forms/fields.py:370 forms/fields.py:919
 msgid "Enter a valid time."
 msgstr "Εισάγετε μια έγκυρη ώρα."
 
-#: forms/fields.py:394
+#: forms/fields.py:396
 msgid "Enter a valid date/time."
 msgstr "Εισάγετε μια έγκυρη ημερομηνία/ώρα."
 
-#: forms/fields.py:458
+#: forms/fields.py:460
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 
-#: forms/fields.py:459
+#: forms/fields.py:461
 msgid "No file was submitted."
 msgstr ""
 
-#: forms/fields.py:460
+#: forms/fields.py:462
 msgid "The submitted file is empty."
 msgstr "Το αρχείο που υποβλήθηκε είναι κενό."
 
-#: forms/fields.py:461
+#: forms/fields.py:463
 #, fuzzy, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος το πολύ %d χαρακτήρες."
 
-#: forms/fields.py:462
+#: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
-#: forms/fields.py:516
+#: forms/fields.py:518
 #, fuzzy
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr "a εικόνα αρχείο υποφαινόμενο όχι εικόνα ή a εικόνα."
 
-#: forms/fields.py:648 forms/fields.py:723
+#: forms/fields.py:650 forms/fields.py:725
 #, fuzzy, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
 
-#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
 #, fuzzy
 msgid "Enter a list of values."
 msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
@@ -677,38 +677,38 @@ msgstr "Ναι"
 msgid "No"
 msgstr "Όχι"
 
-#: template/defaultfilters.py:794
+#: template/defaultfilters.py:774
 msgid "yes,no,maybe"
 msgstr "ναι,όχι,ίσως"
 
-#: template/defaultfilters.py:825
+#: template/defaultfilters.py:805
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: template/defaultfilters.py:827
+#: template/defaultfilters.py:807
 #, python-format
 msgid "%.1f KB"
 msgstr ""
 
-#: template/defaultfilters.py:829
+#: template/defaultfilters.py:809
 #, python-format
 msgid "%.1f MB"
 msgstr ""
 
-#: template/defaultfilters.py:831
+#: template/defaultfilters.py:811
 #, python-format
 msgid "%.1f GB"
 msgstr ""
 
-#: template/defaultfilters.py:833
+#: template/defaultfilters.py:813
 #, python-format
 msgid "%.1f TB"
 msgstr ""
 
-#: template/defaultfilters.py:834
+#: template/defaultfilters.py:814
 #, python-format
 msgid "%.1f PB"
 msgstr ""
@@ -805,23 +805,23 @@ msgstr "Ιανουάριος"
 msgid "February"
 msgstr "Φεβρουάριος"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "March"
 msgstr "Μάρτιος"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "April"
 msgstr "Απρίλιος"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "May"
 msgstr "Μάιος"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "June"
 msgstr "Ιούνιος"
 
-#: utils/dates.py:19 utils/dates.py:31
+#: utils/dates.py:19
 msgid "July"
 msgstr "Ιούλιος"
 
@@ -894,89 +894,133 @@ msgid "dec"
 msgstr "Δεκ"
 
 #: utils/dates.py:31
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "Ιάν."
 
-#: utils/dates.py:31
+#: utils/dates.py:32
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "Φεβ."
 
-#: utils/dates.py:32
+#: utils/dates.py:33
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Μάρτιος"
+
+#: utils/dates.py:34
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Απρίλιος"
+
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Μάιος"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Ιούνιος"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Ιούλιος"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "Αύγ."
 
-#: utils/dates.py:32
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "Σεπτ."
 
-#: utils/dates.py:32
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "Οκτ."
 
-#: utils/dates.py:32
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "Νοέ."
 
-#: utils/dates.py:32
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "Δεκ."
 
-#: utils/dates.py:35
+#: utils/dates.py:45
 msgctxt "alt. month"
 msgid "January"
 msgstr "Ιανουαρίου"
 
-#: utils/dates.py:36
+#: utils/dates.py:46
 msgctxt "alt. month"
 msgid "February"
 msgstr "Φεβρουαρίου"
 
-#: utils/dates.py:37
+#: utils/dates.py:47
 msgctxt "alt. month"
 msgid "March"
 msgstr "Μαρτίου"
 
-#: utils/dates.py:38
+#: utils/dates.py:48
 msgctxt "alt. month"
 msgid "April"
 msgstr "Απριλίου"
 
-#: utils/dates.py:39
+#: utils/dates.py:49
 msgctxt "alt. month"
 msgid "May"
 msgstr "Μαΐου"
 
-#: utils/dates.py:40
+#: utils/dates.py:50
 msgctxt "alt. month"
 msgid "June"
 msgstr "Ιουνίου"
 
-#: utils/dates.py:41
+#: utils/dates.py:51
 msgctxt "alt. month"
 msgid "July"
 msgstr "Ιουλίου"
 
-#: utils/dates.py:42
+#: utils/dates.py:52
 msgctxt "alt. month"
 msgid "August"
 msgstr "Αυγούστου"
 
-#: utils/dates.py:43
+#: utils/dates.py:53
 msgctxt "alt. month"
 msgid "September"
 msgstr "Σεπτεμβρίου"
 
-#: utils/dates.py:44
+#: utils/dates.py:54
 msgctxt "alt. month"
 msgid "October"
 msgstr "Οκτωβρίου"
 
-#: utils/dates.py:45
+#: utils/dates.py:55
 msgctxt "alt. month"
 msgid "November"
 msgstr "Νοεμβρίου"
 
-#: utils/dates.py:46
+#: utils/dates.py:56
 msgctxt "alt. month"
 msgid "December"
 msgstr "Δεκεμβρίου"
@@ -1042,23 +1086,23 @@ msgstr ""
 msgid ", %(number)d %(type)s"
 msgstr ""
 
-#: utils/translation/trans_real.py:560
+#: utils/translation/trans_real.py:562
 msgid "DATE_FORMAT"
 msgstr "j N Y"
 
-#: utils/translation/trans_real.py:561
+#: utils/translation/trans_real.py:563
 msgid "DATETIME_FORMAT"
 msgstr "j N Y, P"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:564
 msgid "TIME_FORMAT"
 msgstr "P"
 
-#: utils/translation/trans_real.py:583
+#: utils/translation/trans_real.py:585
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:584
+#: utils/translation/trans_real.py:586
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 

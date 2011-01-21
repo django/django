@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 21:01+0100\n"
+"POT-Creation-Date: 2011-01-21 22:57+0100\n"
 "PO-Revision-Date: 2007-09-15 00:34+0300\n"
 "Last-Translator: Aku Kotkavuo <aku.kotkavuo@norfello.com>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
@@ -276,26 +276,26 @@ msgstr "kiina (perinteinen)"
 msgid "Enter a valid value."
 msgstr "Syötä oikea arvo."
 
-#: core/validators.py:87 forms/fields.py:572
+#: core/validators.py:87 forms/fields.py:574
 msgid "Enter a valid URL."
 msgstr "Syötä oikea URL-osoite."
 
-#: core/validators.py:89 forms/fields.py:573
+#: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "Tämä URL-osoite on rikkinäinen linkki."
 
-#: core/validators.py:120 forms/fields.py:447
+#: core/validators.py:120 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "Syötä kelvollinen sähköpostiosoite."
 
-#: core/validators.py:123 forms/fields.py:956
+#: core/validators.py:123 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) sekä ala- ja "
 "tavuviivoja (_ -)."
 
-#: core/validators.py:126 forms/fields.py:949
+#: core/validators.py:126 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "Syötä kelvollinen IPv4-osoite."
 
@@ -308,12 +308,12 @@ msgstr "Vain pilkulla erotetut kokonaisluvut kelpaavat tässä."
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "Tämän arvon on oltava %(limit_value)s (nyt %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Tämän arvon on oltava enintään %(limit_value)s."
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Tämän luvun on oltava vähintään %(limit_value)s."
@@ -334,19 +334,19 @@ msgid ""
 "(show_value)d)."
 msgstr "Tähän kelpaa enintään %(limit_value)d merkkiä (nyt on %(show_value)d)."
 
-#: db/models/base.py:765
+#: db/models/base.py:767
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 "\"%(field_name)s\"-kentän on oltava uniikki suhteessa: %(date_field)s %"
 "(lookup)s."
 
-#: db/models/base.py:780 db/models/base.py:788
+#: db/models/base.py:782 db/models/base.py:790
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s jolla on tämä %(field_label)s, on jo olemassa."
 
-#: db/models/base.py:787 forms/models.py:581
+#: db/models/base.py:789 forms/models.py:581
 msgid "and"
 msgstr "ja"
 
@@ -509,50 +509,50 @@ msgstr "Tämä kenttä vaaditaan."
 msgid "Enter a whole number."
 msgstr "Syötä kokonaisluku."
 
-#: forms/fields.py:252 forms/fields.py:273
+#: forms/fields.py:253 forms/fields.py:274
 msgid "Enter a number."
 msgstr "Syötä kokonaisluku."
 
-#: forms/fields.py:276
+#: forms/fields.py:277
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Tässä luvussa voi olla yhteensä enintään %s numeroa."
 
-#: forms/fields.py:277
+#: forms/fields.py:278
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Tässä luvussa saa olla enintään %s desimaalia."
 
-#: forms/fields.py:278
+#: forms/fields.py:279
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Tässä luvussa saa olla enintään %s numeroa ennen desimaalipilkkua."
 
-#: forms/fields.py:340 forms/fields.py:916
+#: forms/fields.py:342 forms/fields.py:918
 msgid "Enter a valid date."
 msgstr "Syötä oikea päivämäärä."
 
-#: forms/fields.py:368 forms/fields.py:917
+#: forms/fields.py:370 forms/fields.py:919
 msgid "Enter a valid time."
 msgstr "Syötä oikea kellonaika."
 
-#: forms/fields.py:394
+#: forms/fields.py:396
 msgid "Enter a valid date/time."
 msgstr "Syötä oikea pvm/kellonaika."
 
-#: forms/fields.py:458
+#: forms/fields.py:460
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tiedostoa ei lähetetty. Tarkista lomakkeen koodaus (encoding)."
 
-#: forms/fields.py:459
+#: forms/fields.py:461
 msgid "No file was submitted."
 msgstr "Yhtään tiedostoa ei ole lähetetty."
 
-#: forms/fields.py:460
+#: forms/fields.py:462
 msgid "The submitted file is empty."
 msgstr "Lähetetty tiedosto on tyhjä."
 
-#: forms/fields.py:461
+#: forms/fields.py:463
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -560,23 +560,23 @@ msgstr ""
 "Tähän tiedostonimeen kelpaa enintään %(max)d merkkiä (nyt niitä on %(length)"
 "d)."
 
-#: forms/fields.py:462
+#: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
-#: forms/fields.py:516
+#: forms/fields.py:518
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
 "Kuva ei kelpaa. Lähettämäsi tiedosto ei ole kuva, tai tiedosto on vioittunut."
 
-#: forms/fields.py:648 forms/fields.py:723
+#: forms/fields.py:650 forms/fields.py:725
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. %(value)s ei ole vaihtoehtojen joukossa."
 
-#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
 msgid "Enter a list of values."
 msgstr "Syötä lista."
 
@@ -655,38 +655,38 @@ msgstr "Kyllä"
 msgid "No"
 msgstr "Ei"
 
-#: template/defaultfilters.py:794
+#: template/defaultfilters.py:774
 msgid "yes,no,maybe"
 msgstr "kyllä,ei,ehkä"
 
-#: template/defaultfilters.py:825
+#: template/defaultfilters.py:805
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d tavu"
 msgstr[1] "%(size)d tavua"
 
-#: template/defaultfilters.py:827
+#: template/defaultfilters.py:807
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f Kt"
 
-#: template/defaultfilters.py:829
+#: template/defaultfilters.py:809
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f Mt"
 
-#: template/defaultfilters.py:831
+#: template/defaultfilters.py:811
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f Gt"
 
-#: template/defaultfilters.py:833
+#: template/defaultfilters.py:813
 #, fuzzy, python-format
 msgid "%.1f TB"
 msgstr "%.1f Kt"
 
-#: template/defaultfilters.py:834
+#: template/defaultfilters.py:814
 #, fuzzy, python-format
 msgid "%.1f PB"
 msgstr "%.1f Kt"
@@ -779,23 +779,23 @@ msgstr "tammikuu"
 msgid "February"
 msgstr "helmikuu"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "March"
 msgstr "maaliskuu"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "April"
 msgstr "huhtikuu"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "May"
 msgstr "toukokuu"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "June"
 msgstr "kesäkuu"
 
-#: utils/dates.py:19 utils/dates.py:31
+#: utils/dates.py:19
 msgid "July"
 msgstr "heinäkuu"
 
@@ -868,89 +868,133 @@ msgid "dec"
 msgstr "jou"
 
 #: utils/dates.py:31
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "tammi"
 
-#: utils/dates.py:31
+#: utils/dates.py:32
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "helmi"
 
-#: utils/dates.py:32
+#: utils/dates.py:33
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "maaliskuu"
+
+#: utils/dates.py:34
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "huhtikuu"
+
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "toukokuu"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "kesäkuu"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "heinäkuu"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "elo"
 
-#: utils/dates.py:32
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "syys"
 
-#: utils/dates.py:32
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "loka"
 
-#: utils/dates.py:32
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "marras"
 
-#: utils/dates.py:32
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "joulu"
 
-#: utils/dates.py:35
+#: utils/dates.py:45
 msgctxt "alt. month"
 msgid "January"
 msgstr "tammikuuta"
 
-#: utils/dates.py:36
+#: utils/dates.py:46
 msgctxt "alt. month"
 msgid "February"
 msgstr "helmikuuta"
 
-#: utils/dates.py:37
+#: utils/dates.py:47
 msgctxt "alt. month"
 msgid "March"
 msgstr "maaliskuuta"
 
-#: utils/dates.py:38
+#: utils/dates.py:48
 msgctxt "alt. month"
 msgid "April"
 msgstr "huhtikuuta"
 
-#: utils/dates.py:39
+#: utils/dates.py:49
 msgctxt "alt. month"
 msgid "May"
 msgstr "toukokuuta"
 
-#: utils/dates.py:40
+#: utils/dates.py:50
 msgctxt "alt. month"
 msgid "June"
 msgstr "kesäkuuta"
 
-#: utils/dates.py:41
+#: utils/dates.py:51
 msgctxt "alt. month"
 msgid "July"
 msgstr "heinäkuuta"
 
-#: utils/dates.py:42
+#: utils/dates.py:52
 msgctxt "alt. month"
 msgid "August"
 msgstr "elokuuta"
 
-#: utils/dates.py:43
+#: utils/dates.py:53
 msgctxt "alt. month"
 msgid "September"
 msgstr "syyskuuta"
 
-#: utils/dates.py:44
+#: utils/dates.py:54
 msgctxt "alt. month"
 msgid "October"
 msgstr "lokakuuta"
 
-#: utils/dates.py:45
+#: utils/dates.py:55
 msgctxt "alt. month"
 msgid "November"
 msgstr "marraskuuta"
 
-#: utils/dates.py:46
+#: utils/dates.py:56
 msgctxt "alt. month"
 msgid "December"
 msgstr "joulukuuta"
@@ -1014,23 +1058,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:560
+#: utils/translation/trans_real.py:562
 msgid "DATE_FORMAT"
 msgstr "j.n.Y"
 
-#: utils/translation/trans_real.py:561
+#: utils/translation/trans_real.py:563
 msgid "DATETIME_FORMAT"
 msgstr "j.n.Y H:i"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:564
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:583
+#: utils/translation/trans_real.py:585
 msgid "YEAR_MONTH_FORMAT"
 msgstr "N Y"
 
-#: utils/translation/trans_real.py:584
+#: utils/translation/trans_real.py:586
 msgid "MONTH_DAY_FORMAT"
 msgstr "N j, Y"
 

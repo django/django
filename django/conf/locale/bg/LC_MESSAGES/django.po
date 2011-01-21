@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:59+0100\n"
+"POT-Creation-Date: 2011-01-21 22:56+0100\n"
 "PO-Revision-Date: 2008-03-12 13:01+0200\n"
 "Last-Translator: Vladislav <vladislav.mitov@gmail.com>\n"
 "Language-Team: \n"
@@ -285,26 +285,26 @@ msgstr "традиционен китайски"
 msgid "Enter a valid value."
 msgstr "Въведете валидна стойност.  "
 
-#: core/validators.py:87 forms/fields.py:572
+#: core/validators.py:87 forms/fields.py:574
 msgid "Enter a valid URL."
 msgstr "Въведете валиден URL.  "
 
-#: core/validators.py:89 forms/fields.py:573
+#: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "Този URL май е счупен линк.  "
 
-#: core/validators.py:120 forms/fields.py:447
+#: core/validators.py:120 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "Въведете валиден e-mail адрес.  "
 
-#: core/validators.py:123 forms/fields.py:956
+#: core/validators.py:123 forms/fields.py:958
 #, fuzzy
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Тази стойност трябва да съдържа само букви, цифри, подчертавки или тиренца.  "
 
-#: core/validators.py:126 forms/fields.py:949
+#: core/validators.py:126 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "Въведете валиден IPv4 адрес."
 
@@ -319,12 +319,12 @@ msgstr ""
 "Уверете се, че тази стойност съдържа поне %(min)d символа (в момента %"
 "(length)d)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
 #, fuzzy, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Тази стойност трябва да е по-малка или равна на %s.  "
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
 #, fuzzy, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Тази стойност трябва да е по-голяма или равна на %s."
@@ -347,17 +347,17 @@ msgstr ""
 "Уверете се, че стойността съдържа максимално %(max)d символа (в момента %"
 "(length)d)."
 
-#: db/models/base.py:765
+#: db/models/base.py:767
 #, fuzzy, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "Това поле трябва да е зададено ако %(field)s е %(value)s"
 
-#: db/models/base.py:780 db/models/base.py:788
+#: db/models/base.py:782 db/models/base.py:790
 #, fuzzy, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(optname)s с този %(fieldname)s вече съществува."
 
-#: db/models/base.py:787 forms/models.py:581
+#: db/models/base.py:789 forms/models.py:581
 msgid "and"
 msgstr "и"
 
@@ -524,50 +524,50 @@ msgstr "Това поле е задължително."
 msgid "Enter a whole number."
 msgstr "Въведете цяло число.  "
 
-#: forms/fields.py:252 forms/fields.py:273
+#: forms/fields.py:253 forms/fields.py:274
 msgid "Enter a number."
 msgstr "Въведечисло."
 
-#: forms/fields.py:276
+#: forms/fields.py:277
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Уверете си че не сте въвели повече от %s цифри."
 
-#: forms/fields.py:277
+#: forms/fields.py:278
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Уверете се, че няма повече от %s знака след запетаята."
 
-#: forms/fields.py:278
+#: forms/fields.py:279
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Уверете се, че няма повече от %s цифри преди десетичната запетая."
 
-#: forms/fields.py:340 forms/fields.py:916
+#: forms/fields.py:342 forms/fields.py:918
 msgid "Enter a valid date."
 msgstr "Въведете валидна дата.  "
 
-#: forms/fields.py:368 forms/fields.py:917
+#: forms/fields.py:370 forms/fields.py:919
 msgid "Enter a valid time."
 msgstr "Въведете валиден час."
 
-#: forms/fields.py:394
+#: forms/fields.py:396
 msgid "Enter a valid date/time."
 msgstr "Въведете валидна дата / час.  "
 
-#: forms/fields.py:458
+#: forms/fields.py:460
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Не е получен файл.  Проверете типът кодиране на формата.  "
 
-#: forms/fields.py:459
+#: forms/fields.py:461
 msgid "No file was submitted."
 msgstr "Няма изпратен фаил."
 
-#: forms/fields.py:460
+#: forms/fields.py:462
 msgid "The submitted file is empty."
 msgstr "Каченият файл е празен.  "
 
-#: forms/fields.py:461
+#: forms/fields.py:463
 #, fuzzy, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -575,11 +575,11 @@ msgstr ""
 "Уверете се, че стойността съдържа максимално %(max)d символа (в момента %"
 "(length)d)."
 
-#: forms/fields.py:462
+#: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
-#: forms/fields.py:516
+#: forms/fields.py:518
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -587,12 +587,12 @@ msgstr ""
 "Качете валидна картинка.  Файлът, който сте качили или не е картинка или е "
 "развалена.  "
 
-#: forms/fields.py:648 forms/fields.py:723
+#: forms/fields.py:650 forms/fields.py:725
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Направете валиден избор. %(value)s не е един от възможните избори."
 
-#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
 msgid "Enter a list of values."
 msgstr "Въведете списък от стойности"
 
@@ -671,38 +671,38 @@ msgstr "Да"
 msgid "No"
 msgstr "Не"
 
-#: template/defaultfilters.py:794
+#: template/defaultfilters.py:774
 msgid "yes,no,maybe"
 msgstr "да,не,може-би"
 
-#: template/defaultfilters.py:825
+#: template/defaultfilters.py:805
 #, fuzzy, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d байт"
 msgstr[1] "%(size)d байт"
 
-#: template/defaultfilters.py:827
+#: template/defaultfilters.py:807
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f КБ"
 
-#: template/defaultfilters.py:829
+#: template/defaultfilters.py:809
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f МБ"
 
-#: template/defaultfilters.py:831
+#: template/defaultfilters.py:811
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f ГБ"
 
-#: template/defaultfilters.py:833
+#: template/defaultfilters.py:813
 #, fuzzy, python-format
 msgid "%.1f TB"
 msgstr "%.1f КБ"
 
-#: template/defaultfilters.py:834
+#: template/defaultfilters.py:814
 #, fuzzy, python-format
 msgid "%.1f PB"
 msgstr "%.1f КБ"
@@ -795,23 +795,23 @@ msgstr "Януари"
 msgid "February"
 msgstr "Февруари"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "March"
 msgstr "Март"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "April"
 msgstr "Април"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "May"
 msgstr "Май"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "June"
 msgstr "Юни"
 
-#: utils/dates.py:19 utils/dates.py:31
+#: utils/dates.py:19
 msgid "July"
 msgstr "Юли"
 
@@ -884,100 +884,144 @@ msgid "dec"
 msgstr "дек"
 
 #: utils/dates.py:31
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "Яну."
 
-#: utils/dates.py:31
+#: utils/dates.py:32
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "Фев."
 
-#: utils/dates.py:32
+#: utils/dates.py:33
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Март"
+
+#: utils/dates.py:34
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Април"
+
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Май"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Юни"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Юли"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "Авг."
 
-#: utils/dates.py:32
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "Септ."
 
-#: utils/dates.py:32
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "Окт."
 
-#: utils/dates.py:32
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "Ное."
 
-#: utils/dates.py:32
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "Дек."
 
-#: utils/dates.py:35
+#: utils/dates.py:45
 #, fuzzy
 msgctxt "alt. month"
 msgid "January"
 msgstr "Януари"
 
-#: utils/dates.py:36
+#: utils/dates.py:46
 #, fuzzy
 msgctxt "alt. month"
 msgid "February"
 msgstr "Февруари"
 
-#: utils/dates.py:37
+#: utils/dates.py:47
 #, fuzzy
 msgctxt "alt. month"
 msgid "March"
 msgstr "Март"
 
-#: utils/dates.py:38
+#: utils/dates.py:48
 #, fuzzy
 msgctxt "alt. month"
 msgid "April"
 msgstr "Април"
 
-#: utils/dates.py:39
+#: utils/dates.py:49
 #, fuzzy
 msgctxt "alt. month"
 msgid "May"
 msgstr "Май"
 
-#: utils/dates.py:40
+#: utils/dates.py:50
 #, fuzzy
 msgctxt "alt. month"
 msgid "June"
 msgstr "Юни"
 
-#: utils/dates.py:41
+#: utils/dates.py:51
 #, fuzzy
 msgctxt "alt. month"
 msgid "July"
 msgstr "Юли"
 
-#: utils/dates.py:42
+#: utils/dates.py:52
 #, fuzzy
 msgctxt "alt. month"
 msgid "August"
 msgstr "Август"
 
-#: utils/dates.py:43
+#: utils/dates.py:53
 #, fuzzy
 msgctxt "alt. month"
 msgid "September"
 msgstr "Септември"
 
-#: utils/dates.py:44
+#: utils/dates.py:54
 #, fuzzy
 msgctxt "alt. month"
 msgid "October"
 msgstr "Октомври"
 
-#: utils/dates.py:45
+#: utils/dates.py:55
 #, fuzzy
 msgctxt "alt. month"
 msgid "November"
 msgstr "Ноември"
 
-#: utils/dates.py:46
+#: utils/dates.py:56
 #, fuzzy
 msgctxt "alt. month"
 msgid "December"
@@ -1048,23 +1092,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:560
+#: utils/translation/trans_real.py:562
 msgid "DATE_FORMAT"
 msgstr "j N, Y"
 
-#: utils/translation/trans_real.py:561
+#: utils/translation/trans_real.py:563
 msgid "DATETIME_FORMAT"
 msgstr "j N, Y, P"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:564
 msgid "TIME_FORMAT"
 msgstr "P"
 
-#: utils/translation/trans_real.py:583
+#: utils/translation/trans_real.py:585
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:584
+#: utils/translation/trans_real.py:586
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 

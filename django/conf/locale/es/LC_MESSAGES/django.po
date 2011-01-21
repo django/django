@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 21:00+0100\n"
+"POT-Creation-Date: 2011-01-21 22:57+0100\n"
 "PO-Revision-Date: 2009-11-30 11:31+0100\n"
 "Last-Translator: Django Spanish Team, <django-cat@googlegroups.com>\n"
 "Language-Team: Django Spanish Team, <django-cat@googlegroups.com>\n"
@@ -278,26 +278,26 @@ msgstr "chino tradicional"
 msgid "Enter a valid value."
 msgstr "Introduzca un valor correcto."
 
-#: core/validators.py:87 forms/fields.py:572
+#: core/validators.py:87 forms/fields.py:574
 msgid "Enter a valid URL."
 msgstr "Introduzca una URL válida."
 
-#: core/validators.py:89 forms/fields.py:573
+#: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "La URL parece ser un enlace roto."
 
-#: core/validators.py:120 forms/fields.py:447
+#: core/validators.py:120 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "Introduzca una dirección de correo electrónico válida."
 
-#: core/validators.py:123 forms/fields.py:956
+#: core/validators.py:123 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Introduzca un 'slug' válido, consistente en letras, números, guiones bajos o "
 "medios."
 
-#: core/validators.py:126 forms/fields.py:949
+#: core/validators.py:126 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "Introduzca una dirección IPv4 válida."
 
@@ -312,12 +312,12 @@ msgstr ""
 "Asegúrese de que este valor es %(limit_value)s (actualmente es %(show_value)"
 "s)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Asegúrese de que este valor es menor o igual a %(limit_value)s."
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Asegúrese de que este valor es mayor o igual a %(limit_value)s."
@@ -340,17 +340,17 @@ msgstr ""
 "Asegúrese de que este valor tiene a lo más %(limit_value)d caracteres "
 "(actualmente tiene %(show_value)d)."
 
-#: db/models/base.py:765
+#: db/models/base.py:767
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "El campo %(field_name)s debe ser único para %(lookup)s %(date_field)s"
 
-#: db/models/base.py:780 db/models/base.py:788
+#: db/models/base.py:782 db/models/base.py:790
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ya existe %(model_name)s con este %(field_label)s."
 
-#: db/models/base.py:787 forms/models.py:581
+#: db/models/base.py:789 forms/models.py:581
 msgid "and"
 msgstr "y"
 
@@ -514,52 +514,52 @@ msgstr "Este campo es obligatorio."
 msgid "Enter a whole number."
 msgstr "Introduzca un número entero."
 
-#: forms/fields.py:252 forms/fields.py:273
+#: forms/fields.py:253 forms/fields.py:274
 msgid "Enter a number."
 msgstr "Introduzca un número."
 
-#: forms/fields.py:276
+#: forms/fields.py:277
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Asegúrese de que no hay más de %s dígitos en total."
 
-#: forms/fields.py:277
+#: forms/fields.py:278
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Asegúrese de que no hay más de %s decimales."
 
-#: forms/fields.py:278
+#: forms/fields.py:279
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Asegúrese de que no hay más de %s dígitos antes de la coma decimal."
 
-#: forms/fields.py:340 forms/fields.py:916
+#: forms/fields.py:342 forms/fields.py:918
 msgid "Enter a valid date."
 msgstr "Introduzca una fecha válida."
 
-#: forms/fields.py:368 forms/fields.py:917
+#: forms/fields.py:370 forms/fields.py:919
 msgid "Enter a valid time."
 msgstr "Introduzca una hora válida."
 
-#: forms/fields.py:394
+#: forms/fields.py:396
 msgid "Enter a valid date/time."
 msgstr "Introduzca una fecha/hora válida."
 
-#: forms/fields.py:458
+#: forms/fields.py:460
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "No se ha enviado ningún fichero. Compruebe el tipo de codificación en el "
 "formulario."
 
-#: forms/fields.py:459
+#: forms/fields.py:461
 msgid "No file was submitted."
 msgstr "No se ha enviado ningún fichero"
 
-#: forms/fields.py:460
+#: forms/fields.py:462
 msgid "The submitted file is empty."
 msgstr "El fichero enviado está vacío."
 
-#: forms/fields.py:461
+#: forms/fields.py:463
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -567,11 +567,11 @@ msgstr ""
 "Asegúrese de que su texto tiene no más de %(max)d caracteres (actualmente "
 "tiene %(length)d)."
 
-#: forms/fields.py:462
+#: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
-#: forms/fields.py:516
+#: forms/fields.py:518
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -579,13 +579,13 @@ msgstr ""
 "Envíe una imagen válida. El fichero que ha enviado no era una imagen o se "
 "trataba de una imagen corrupta."
 
-#: forms/fields.py:648 forms/fields.py:723
+#: forms/fields.py:650 forms/fields.py:725
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "Escoja una opción válida. %(value)s no es una de las opciones disponibles."
 
-#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
 msgid "Enter a list of values."
 msgstr "Introduzca una lista de valores."
 
@@ -667,38 +667,38 @@ msgstr "Sí"
 msgid "No"
 msgstr "No"
 
-#: template/defaultfilters.py:794
+#: template/defaultfilters.py:774
 msgid "yes,no,maybe"
 msgstr "sí,no,tal vez"
 
-#: template/defaultfilters.py:825
+#: template/defaultfilters.py:805
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: template/defaultfilters.py:827
+#: template/defaultfilters.py:807
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:829
+#: template/defaultfilters.py:809
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:831
+#: template/defaultfilters.py:811
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: template/defaultfilters.py:833
+#: template/defaultfilters.py:813
 #, fuzzy, python-format
 msgid "%.1f TB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:834
+#: template/defaultfilters.py:814
 #, fuzzy, python-format
 msgid "%.1f PB"
 msgstr "%.1f KB"
@@ -791,23 +791,23 @@ msgstr "enero"
 msgid "February"
 msgstr "febrero"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "March"
 msgstr "marzo"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "April"
 msgstr "abril"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "May"
 msgstr "mayo"
 
-#: utils/dates.py:18 utils/dates.py:31
+#: utils/dates.py:18
 msgid "June"
 msgstr "junio"
 
-#: utils/dates.py:19 utils/dates.py:31
+#: utils/dates.py:19
 msgid "July"
 msgstr "julio"
 
@@ -880,100 +880,144 @@ msgid "dec"
 msgstr "dic"
 
 #: utils/dates.py:31
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "ene."
 
-#: utils/dates.py:31
+#: utils/dates.py:32
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "feb."
 
-#: utils/dates.py:32
+#: utils/dates.py:33
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "marzo"
+
+#: utils/dates.py:34
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "abril"
+
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "mayo"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "junio"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "julio"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "ago."
 
-#: utils/dates.py:32
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "sept."
 
-#: utils/dates.py:32
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "oct."
 
-#: utils/dates.py:32
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "nov."
 
-#: utils/dates.py:32
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "dic."
 
-#: utils/dates.py:35
+#: utils/dates.py:45
 #, fuzzy
 msgctxt "alt. month"
 msgid "January"
 msgstr "enero"
 
-#: utils/dates.py:36
+#: utils/dates.py:46
 #, fuzzy
 msgctxt "alt. month"
 msgid "February"
 msgstr "febrero"
 
-#: utils/dates.py:37
+#: utils/dates.py:47
 #, fuzzy
 msgctxt "alt. month"
 msgid "March"
 msgstr "marzo"
 
-#: utils/dates.py:38
+#: utils/dates.py:48
 #, fuzzy
 msgctxt "alt. month"
 msgid "April"
 msgstr "abril"
 
-#: utils/dates.py:39
+#: utils/dates.py:49
 #, fuzzy
 msgctxt "alt. month"
 msgid "May"
 msgstr "mayo"
 
-#: utils/dates.py:40
+#: utils/dates.py:50
 #, fuzzy
 msgctxt "alt. month"
 msgid "June"
 msgstr "junio"
 
-#: utils/dates.py:41
+#: utils/dates.py:51
 #, fuzzy
 msgctxt "alt. month"
 msgid "July"
 msgstr "julio"
 
-#: utils/dates.py:42
+#: utils/dates.py:52
 #, fuzzy
 msgctxt "alt. month"
 msgid "August"
 msgstr "agosto"
 
-#: utils/dates.py:43
+#: utils/dates.py:53
 #, fuzzy
 msgctxt "alt. month"
 msgid "September"
 msgstr "septiembre"
 
-#: utils/dates.py:44
+#: utils/dates.py:54
 #, fuzzy
 msgctxt "alt. month"
 msgid "October"
 msgstr "octubre"
 
-#: utils/dates.py:45
+#: utils/dates.py:55
 #, fuzzy
 msgctxt "alt. month"
 msgid "November"
 msgstr "noviembre"
 
-#: utils/dates.py:46
+#: utils/dates.py:56
 #, fuzzy
 msgctxt "alt. month"
 msgid "December"
@@ -1038,23 +1082,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:560
+#: utils/translation/trans_real.py:562
 msgid "DATE_FORMAT"
 msgstr "j N Y"
 
-#: utils/translation/trans_real.py:561
+#: utils/translation/trans_real.py:563
 msgid "DATETIME_FORMAT"
 msgstr "j N Y P"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:564
 msgid "TIME_FORMAT"
 msgstr "P"
 
-#: utils/translation/trans_real.py:583
+#: utils/translation/trans_real.py:585
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:584
+#: utils/translation/trans_real.py:586
 msgid "MONTH_DAY_FORMAT"
 msgstr "j \\de F"
 

@@ -28,8 +28,18 @@ MONTHS_3_REV = {
     'sep':9, 'oct':10, 'nov':11, 'dec':12
 }
 MONTHS_AP = { # month names in Associated Press style
-    1:_('Jan.'), 2:_('Feb.'), 3:_('March'), 4:_('April'), 5:_('May'), 6:_('June'), 7:_('July'),
-    8:_('Aug.'), 9:_('Sept.'), 10:_('Oct.'), 11:_('Nov.'), 12:_('Dec.')
+    1: pgettext_lazy('abbrev. month', 'Jan.'),
+    2: pgettext_lazy('abbrev. month', 'Feb.'),
+    3: pgettext_lazy('abbrev. month', 'March'),
+    4: pgettext_lazy('abbrev. month', 'April'),
+    5: pgettext_lazy('abbrev. month', 'May'),
+    6: pgettext_lazy('abbrev. month', 'June'),
+    7: pgettext_lazy('abbrev. month', 'July'),
+    8: pgettext_lazy('abbrev. month', 'Aug.'),
+    9: pgettext_lazy('abbrev. month', 'Sept.'),
+    10: pgettext_lazy('abbrev. month', 'Oct.'),
+    11: pgettext_lazy('abbrev. month', 'Nov.'),
+    12: pgettext_lazy('abbrev. month', 'Dec.')
 }
 MONTHS_ALT = { # required for long date representation by some locales
     1: pgettext_lazy('alt. month', 'January'),
