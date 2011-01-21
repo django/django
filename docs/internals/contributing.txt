@@ -411,34 +411,45 @@ translated, here's what to do:
 
     * Make sure you read the notes about :ref:`specialties-of-django-i18n`.
 
-    * Create translations using the methods described in the
-      :doc:`localization documentation </topics/i18n/localization>`. For this
-      you will use the ``django-admin.py makemessages`` tool. In this
-      particular case it should be run from the top-level ``django`` directory
-      of the Django source tree.
+    * Signup at `Transifex`_ and visit the `Django project page`_.
 
-      The script runs over the entire Django source tree and pulls out all
-      strings marked for translation. It creates (or updates) a message file in
-      the directory ``conf/locale`` (for example for ``pt_BR``, the file will be
-      ``conf/locale/pt_BR/LC_MESSAGES/django.po``).
+    * On the "`Translation Teams`_" page, choose the language team you want
+      to work with, **or** -- in case the language team doesn't exist yet --
+      request a new team by clicking on the "Request a new team" button
+      and select the appropriate language.
 
-    * Make sure that ``django-admin.py compilemessages -l <lang>`` runs without
-      producing any warnings.
+    * Then, click the "Join this Team" button to become a member of this team.
+      Every team has at least one coordinator who is responsible to review
+      your membership request. You can of course also contact the team
+      coordinator to clarify procedual problems and handle the actual
+      translation process.
 
-    * Repeat the last two steps for the ``djangojs`` domain (by appending the
-      ``-d djangojs`` command line option to the ``django-admin.py``
-      invocations).
+    * Once you are a member of a team choose the translation resource you
+      want update on the team page. For example the "core" resource refers
+      to the translation catalogue that contains all non-app translations.
+      Each of the contrib apps also have a resource -- prefixed with "contrib-".
+
+      .. note::
+         For more information about how to use Transifex, see the
+         `Transifex Help`_
 
     * Optionally, review and update the ``conf/locale/<locale>/formats.py``
-      file to describe the date, time and numbers formatting particularities of
-      your locale. See :ref:`format-localization` for details.
+      file to describe the date, time and numbers formatting particularities
+      of your locale. These files aren't covered by the use of Transifex and
+      require a patch against the Django source tree, just as a code change
+      would:
 
-    * Create a diff against the current Subversion trunk.
+      * Create a diff against the current Subversion trunk.
 
-    * Open a ticket in Django's ticket system, set its ``Component`` field to
-      ``Translations``, and attach the patch to it.
+      * Open a ticket in Django's ticket system, set its ``Component`` field
+        to ``Translations``, and attach the patch to it. See
+        :ref:`format-localization` for details.
 
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
+.. _Transifex: http://www.transifex.net/
+.. _Django project page: http://www.transifex.net/projects/p/django/
+.. _translation teams: http://www.transifex.net/projects/p/django/teams/
+.. _Transifex Help: http://help.transifex.net/
 
 Submitting javascript patches
 =============================
