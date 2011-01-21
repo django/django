@@ -7,1423 +7,742 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-25 15:43+0200\n"
+"POT-Creation-Date: 2010-12-29 21:05+0100\n"
 "PO-Revision-Date: 2007-03-15 16:48+0530\n"
 "Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
+"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=n>1;"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
 
-#: contrib/comments/models.py:67 contrib/comments/models.py:166
-msgid "object ID"
-msgstr "அடையாளம்"
+#: conf/global_settings.py:44
+msgid "Arabic"
+msgstr "அரபிக்"
 
-#: contrib/comments/models.py:68
-msgid "headline"
-msgstr "தலையங்கம்"
+#: conf/global_settings.py:45
+#, fuzzy
+msgid "Bulgarian"
+msgstr "ஹங்கேரியன்"
 
-#: contrib/comments/models.py:69 contrib/comments/models.py:90
-#: contrib/comments/models.py:167
-msgid "comment"
-msgstr "குறிப்பு"
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "பெங்காலி"
 
-#: contrib/comments/models.py:70
-msgid "rating #1"
-msgstr "#1 தரவரிசை"
+#: conf/global_settings.py:47
+#, fuzzy
+msgid "Bosnian"
+msgstr "ரோமானியன்"
 
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr "#2 தரவரிசை"
+#: conf/global_settings.py:48
+#, fuzzy
+msgid "Catalan"
+msgstr "இத்தாலியன்"
 
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr "#3 தரவரிசை"
+#: conf/global_settings.py:49
+msgid "Czech"
+msgstr "செக்"
 
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr "#4 தரவரிசை"
+#: conf/global_settings.py:50
+msgid "Welsh"
+msgstr "வெல்ஸ்"
 
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr "#5 தரவரிசை"
+#: conf/global_settings.py:51
+msgid "Danish"
+msgstr "டேனிஷ்"
 
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr "#6 தரவரிசை"
+#: conf/global_settings.py:52
+msgid "German"
+msgstr "ஜெர்மன்"
 
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr "#7 தரவரிசை"
+#: conf/global_settings.py:53
+msgid "Greek"
+msgstr "கிரேக்கம்"
 
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr "#8 தரவரிசை"
+#: conf/global_settings.py:54
+msgid "English"
+msgstr "ஆங்கிலம்"
 
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr "அங்கீகரிக்கப்பட்ட தரவரிசை"
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "British English"
+msgstr "ஆங்கிலம்"
 
-#: contrib/comments/models.py:83 contrib/comments/models.py:169
-msgid "date/time submitted"
-msgstr "தேதி/நேரம் சமர்ப்பிக்கப்பட்டுள்ளது"
+#: conf/global_settings.py:56
+msgid "Spanish"
+msgstr "ஸ்பானிஷ்"
 
-#: contrib/comments/models.py:84 contrib/comments/models.py:170
-msgid "is public"
-msgstr "பொதுவானது"
+#: conf/global_settings.py:57
+#, fuzzy
+msgid "Argentinian Spanish"
+msgstr "அர்ஜெண்டியன் ஸ்பானிஷ் "
 
-#: contrib/comments/models.py:85 contrib/admin/views/doc.py:304
-msgid "IP address"
-msgstr "IP விலாசம்"
+#: conf/global_settings.py:58
+#, fuzzy
+msgid "Estonian"
+msgstr "ரோமானியன்"
 
-#: contrib/comments/models.py:86
-msgid "is removed"
-msgstr "நீக்கபட்டது"
-
-#: contrib/comments/models.py:86
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr "குறிப்பு சரியாக இல்லையென்றால் இந்த பெட்டியில் குறியிடவும். இதற்கு பதிலாக \"இந்த குறிப்பு நீக்கபட்டது\" காண்பிக்கபடும்."
-
-#: contrib/comments/models.py:91
-msgid "comments"
-msgstr "குறிப்பு"
-
-#: contrib/comments/models.py:131 contrib/comments/models.py:207
-msgid "Content object"
-msgstr "பொருள் அடக்க object"
-
-#: contrib/comments/models.py:159
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
+#: conf/global_settings.py:59
+msgid "Basque"
 msgstr ""
-"%(user)s ஆல் %(date)s இல் அளிக்கப்பட்டது \n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
 
-#: contrib/comments/models.py:168
-msgid "person's name"
-msgstr "நபரின் பெயர்"
+#: conf/global_settings.py:60
+#, fuzzy
+msgid "Persian"
+msgstr "செர்பியன்"
 
-#: contrib/comments/models.py:171
-msgid "ip address"
-msgstr "ip விலாசம்"
+#: conf/global_settings.py:61
+msgid "Finnish"
+msgstr "பீனீஷ்"
 
-#: contrib/comments/models.py:173
-msgid "approved by staff"
-msgstr "பணியாளர்களால் அனுமதிக்கப்பட்டது"
+#: conf/global_settings.py:62
+msgid "French"
+msgstr "ப்ரென்சு"
 
-#: contrib/comments/models.py:176
-msgid "free comment"
-msgstr "சுதந்தரமான குறிப்பு"
+#: conf/global_settings.py:63
+#, fuzzy
+msgid "Frisian"
+msgstr "பிரேசிலியன்"
 
-#: contrib/comments/models.py:177
-msgid "free comments"
-msgstr "சுதந்தரமான குறிப்புகள்"
+#: conf/global_settings.py:64
+#, fuzzy
+msgid "Irish"
+msgstr "துருக்கிஷ்"
 
-#: contrib/comments/models.py:233
-msgid "score"
-msgstr "மதிப்பீடு "
+#: conf/global_settings.py:65
+msgid "Galician"
+msgstr "கலீஷீயன்"
 
-#: contrib/comments/models.py:234
-msgid "score date"
-msgstr "மதிப்பீட்டு தேதி"
+#: conf/global_settings.py:66
+msgid "Hebrew"
+msgstr "ஹீப்ரு"
 
-#: contrib/comments/models.py:237
-msgid "karma score"
-msgstr "கர்மா மதிப்பீடு"
-
-#: contrib/comments/models.py:238
-msgid "karma scores"
-msgstr "கர்மா மதிப்பீடு"
-
-#: contrib/comments/models.py:242
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "%(user)s ஈட்டய %(score)d "
-
-#: contrib/comments/models.py:258
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
+#: conf/global_settings.py:67
+msgid "Hindi"
 msgstr ""
-"இந்த குறிப்பு %(user)s ஆல் குறிக்கபட்டது:\n"
-"\n"
-"%(text)s"
 
-#: contrib/comments/models.py:265
-msgid "flag date"
-msgstr "குறியின் தேதி"
+#: conf/global_settings.py:68
+#, fuzzy
+msgid "Croatian"
+msgstr "ரோமானியன்"
 
-#: contrib/comments/models.py:268
-msgid "user flag"
-msgstr "பயனாளர் குறி"
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr "ஹங்கேரியன்"
 
-#: contrib/comments/models.py:269
-msgid "user flags"
-msgstr "பயனாளர் குறிகள்"
-
-#: contrib/comments/models.py:273
-#, python-format
-msgid "Flag by %r"
-msgstr "%r ஆல் குறிக்கப்பட்டது"
-
-#: contrib/comments/models.py:278
-msgid "deletion date"
-msgstr "நீக்கப்பட்ட தேதி"
-
-#: contrib/comments/models.py:280
-msgid "moderator deletion"
-msgstr "மட்டொறுத்தால் நீக்கப்பட்டது"
-
-#: contrib/comments/models.py:281
-msgid "moderator deletions"
-msgstr "மட்டொறுத்தர்களால் நீக்கப்பட்டது"
-
-#: contrib/comments/models.py:285
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "மட்டொறுத்தால் நீக்கப்பட்டது %r"
-
-#: contrib/comments/views/karma.py:19
-msgid "Anonymous users cannot vote"
-msgstr "அடையாளம் இல்லாத பயனாளறால் வாக்களிக்க முடியாது"
-
-#: contrib/comments/views/karma.py:23
-msgid "Invalid comment ID"
-msgstr "செல்லாத குறிப்பு ID"
-
-#: contrib/comments/views/karma.py:25
-msgid "No voting for yourself"
-msgstr "உங்களை நீங்களே தேர்வு செய்து கொள்ள முடியாது"
-
-#: contrib/comments/views/comments.py:27
-msgid "This rating is required because you've entered at least one other rating."
-msgstr "இந்த தரவரிசை தேவைப்படுகிறது ஏனெனில் மற்றொரு தரவரிசை அளிக்கப்பட்டு விட்டதால்"
-
-#: contrib/comments/views/comments.py:111
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"இந்த குறிப்பானது குறைவாக அளித்த பயனாளரால் %(count)s "
-"அளிக்கப்பட்டது:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"இந்த குறிப்பானது குறைவாக அளித்த பயனாளர்களால் %(count)s"
-" அளிக்கப்பட்டது:\n"
-"\n"
-"%(text)s"
-
-
-#: contrib/comments/views/comments.py:116
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
+#: conf/global_settings.py:70
+msgid "Indonesian"
 msgstr ""
-"முழுமையான விவரங்களை அளிக்காத பயனாளரால் கொடுக்கப்பட்டது:\n"
-"\n"
-"%(text)s"
 
-#: contrib/comments/views/comments.py:188
-#: contrib/comments/views/comments.py:280
-msgid "Only POSTs are allowed"
-msgstr "POSTகளுக்கு மட்டும் அனுமதி உண்டு"
+#: conf/global_settings.py:71
+msgid "Icelandic"
+msgstr "ஐஸ்லான்டிக்"
 
-#: contrib/comments/views/comments.py:192
-#: contrib/comments/views/comments.py:284
-msgid "One or more of the required fields wasn't submitted"
-msgstr "ஒன்று அல்லது ஒன்றிற்கு மேற்ப்பட்ட புலங்கள் சமற்பிக்கப்படவில்லை"
+#: conf/global_settings.py:72
+msgid "Italian"
+msgstr "இத்தாலியன்"
 
-#: contrib/comments/views/comments.py:196
-#: contrib/comments/views/comments.py:286
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "எவறோ குறிப்புறையைச்  சேதப்படுத்திவிட்டர்கள் (பாதுகாப்பு மீறல்)"
+#: conf/global_settings.py:73
+msgid "Japanese"
+msgstr "ஜப்பானிய"
 
-#: contrib/comments/views/comments.py:206
-#: contrib/comments/views/comments.py:292
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr "குறிப்புறை படிவத்தில் முறையான இலக்கு அளவுருக்கவில்லை -- object ID முறையானதாக இல்லை"
+#: conf/global_settings.py:74
+#, fuzzy
+msgid "Georgian"
+msgstr "ஜெர்மன்"
 
-#: contrib/comments/views/comments.py:257
-#: contrib/comments/views/comments.py:321
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "குறிப்பு படிவம் முன்னோட்டம் அல்லது பிற்பட்டதை வழங்குவது இல்லை"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:17
-msgid "Username:"
-msgstr "பயனர் பெயர்:"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Log out"
-msgstr "வெளியேறு"
-
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:20
-msgid "Password:"
-msgstr "கடவுச்சொல்:"
-
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "கடவுச்சொல்லை மறந்துவிட்டீரா?"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "விகிதம்"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "தேவைப்படுகிறது"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "விருப்பத்தேர்வு"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "புகைப்படத்தை அனுப்பு"
-
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "விவரம்:"
-
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "குறிப்பை முன்னேற்றமிடு"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "உங்கள் பெயர்:"
-
-#: contrib/admin/filterspecs.py:40
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
+#: conf/global_settings.py:75
+msgid "Khmer"
 msgstr ""
-"<h3> %s ஆல்:</h3>\n"
-"<ul>\n"
 
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
-msgid "All"
-msgstr "அனைத்தும்"
+#: conf/global_settings.py:76
+#, fuzzy
+msgid "Kannada"
+msgstr "மற்றும்"
 
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "எந்த தேதியும்"
+#: conf/global_settings.py:77
+#, fuzzy
+msgid "Korean"
+msgstr "நார்வீசியன்"
 
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "இன்று"
+#: conf/global_settings.py:78
+msgid "Lithuanian"
+msgstr ""
 
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "கடந்த 7 நாட்களில்"
+#: conf/global_settings.py:79
+msgid "Latvian"
+msgstr ""
 
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "இந்த மாதம்"
+#: conf/global_settings.py:80
+msgid "Macedonian"
+msgstr ""
 
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "இந்த வருடம்"
+#: conf/global_settings.py:81
+msgid "Malayalam"
+msgstr ""
 
-#: contrib/admin/filterspecs.py:143
-msgid "Yes"
-msgstr "ஆம்"
+#: conf/global_settings.py:82
+msgid "Mongolian"
+msgstr ""
 
-#: contrib/admin/filterspecs.py:143
-msgid "No"
-msgstr "இல்லை"
+#: conf/global_settings.py:83
+msgid "Dutch"
+msgstr "டச்சு"
 
-#: contrib/admin/filterspecs.py:150
-msgid "Unknown"
-msgstr "தெரியாத"
+#: conf/global_settings.py:84
+msgid "Norwegian"
+msgstr "நார்வீசியன்"
 
-#: contrib/admin/models.py:16
-msgid "action time"
-msgstr "செயல் நேரம்"
+#: conf/global_settings.py:85
+#, fuzzy
+msgid "Norwegian Bokmal"
+msgstr "நார்வீசியன்"
 
-#: contrib/admin/models.py:19
-msgid "object id"
-msgstr "பொருள் அடையாளம்"
+#: conf/global_settings.py:86
+#, fuzzy
+msgid "Norwegian Nynorsk"
+msgstr "நார்வீசியன்"
 
-#: contrib/admin/models.py:20
-msgid "object repr"
-msgstr "பொருள் உருவகித்தம்"
+#: conf/global_settings.py:87
+msgid "Punjabi"
+msgstr ""
 
-#: contrib/admin/models.py:21
-msgid "action flag"
-msgstr "செயர்குறி"
+#: conf/global_settings.py:88
+#, fuzzy
+msgid "Polish"
+msgstr "ஆங்கிலம்"
 
-#: contrib/admin/models.py:22
-msgid "change message"
-msgstr "செய்தியை மாற்று"
+#: conf/global_settings.py:89
+msgid "Portuguese"
+msgstr ""
 
-#: contrib/admin/models.py:25
-msgid "log entry"
-msgstr "புகுபதிவு உள்ளீடு"
+#: conf/global_settings.py:90
+#, fuzzy
+msgid "Brazilian Portuguese"
+msgstr "பிரேசிலியன்"
 
-#: contrib/admin/models.py:26
-msgid "log entries"
-msgstr "புகுபதிவு உள்ளீடுகள்"
+#: conf/global_settings.py:91
+msgid "Romanian"
+msgstr "ரோமானியன்"
 
-#: contrib/admin/templatetags/admin_list.py:230
-msgid "All dates"
-msgstr "அனைத்து தேதியும்"
+#: conf/global_settings.py:92
+msgid "Russian"
+msgstr "ரஷ்யன்"
 
-#: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:59
+#: conf/global_settings.py:93
+msgid "Slovak"
+msgstr "சுலோவாக்"
+
+#: conf/global_settings.py:94
+msgid "Slovenian"
+msgstr "ஸ்லோவேனியன்"
+
+#: conf/global_settings.py:95
+#, fuzzy
+msgid "Albanian"
+msgstr "ரோமானியன்"
+
+#: conf/global_settings.py:96
+msgid "Serbian"
+msgstr "செர்பியன்"
+
+#: conf/global_settings.py:97
+#, fuzzy
+msgid "Serbian Latin"
+msgstr "செர்பியன்"
+
+#: conf/global_settings.py:98
+msgid "Swedish"
+msgstr "சுவிடிஷ்"
+
+#: conf/global_settings.py:99
+msgid "Tamil"
+msgstr "தமிழ்"
+
+#: conf/global_settings.py:100
+msgid "Telugu"
+msgstr ""
+
+#: conf/global_settings.py:101
+#, fuzzy
+msgid "Thai"
+msgstr "தமிழ்"
+
+#: conf/global_settings.py:102
+msgid "Turkish"
+msgstr "துருக்கிஷ்"
+
+#: conf/global_settings.py:103
+msgid "Ukrainian"
+msgstr "உக்ரேனியன்"
+
+#: conf/global_settings.py:104
+#, fuzzy
+msgid "Vietnamese"
+msgstr "முதல் பெயர்"
+
+#: conf/global_settings.py:105
+msgid "Simplified Chinese"
+msgstr "எளிய சீன மொழி"
+
+#: conf/global_settings.py:106
+msgid "Traditional Chinese"
+msgstr "மரபு சீன மொழி"
+
+#: core/validators.py:20 forms/fields.py:67
+#, fuzzy
+msgid "Enter a valid value."
+msgstr "முறையான கோப்புப் பெயரை எழுதவும்"
+
+#: core/validators.py:87 forms/fields.py:572
+#, fuzzy
+msgid "Enter a valid URL."
+msgstr "முறையான கோப்புப் பெயரை எழுதவும்"
+
+#: core/validators.py:89 forms/fields.py:573
+#, fuzzy
+msgid "This URL appears to be a broken link."
+msgstr "%s என்ற இணையதள முகவரி உடைந்துள்ளது"
+
+#: core/validators.py:120 forms/fields.py:447
+msgid "Enter a valid e-mail address."
+msgstr "முறையான e முகவரிகள் மட்டும் எழுதவும்"
+
+#: core/validators.py:123 forms/fields.py:956
+#, fuzzy
 msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr "தயவுசெய்து சரியான பயனர்ப்பெயர் மற்றும் கடவுச்சொல்லை உள்ளிடவும். இரண்டும் எழுத்துவகையைச் சார்ந்தது."
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr "இந்த மதிப்பு எழுத்துகள், எண்கள், அன்டர்ஸ்கோர் டஷ் அல்லது கைப்பன் மற்றும் உள்ளடக்க வேண்டும்"
 
-#: contrib/admin/views/decorators.py:24
-#: contrib/admin/templates/admin/login.html:25
-msgid "Log in"
-msgstr "உள்ளே போ"
+#: core/validators.py:126 forms/fields.py:949
+#, fuzzy
+msgid "Enter a valid IPv4 address."
+msgstr "முறையான e முகவரிகள் மட்டும் எழுதவும்"
 
-#: contrib/admin/views/decorators.py:62
+#: core/validators.py:129 db/models/fields/__init__.py:575
+msgid "Enter only digits separated by commas."
+msgstr "இங்கு எண்களை மட்டுமே எழுதவும் காமவாள் தனிமைபடுத்தவும் "
+
+#: core/validators.py:135
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+
+#: core/validators.py:164
+#, python-format
 msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr "தயவுசெய்து மறுபடியும் புகுபதிவு செய்க. ஏனென்றால் காலம் முடிவடைந்தது. கவலை படவேண்டாம்: உங்களுடைய அனுப்புதல் சேமிக்கப்பட்டுள்ளது."
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
 
-#: contrib/admin/views/decorators.py:69
+#: core/validators.py:170
+#, python-format
 msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr "உங்களுடைய உலாவி தற்கால நிரல்களை அமதிக்காதவாறு உள்ளமைக்கப் பட்டவாறு தெரிகிறது. தயவுசெய்து தற்காலிக நிரலை செயல்பட செய்து, பக்கத்தை மறுபடி உள் வாங்கவும். "
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
 
-#: contrib/admin/views/decorators.py:83
-msgid "Usernames cannot contain the '@' character."
-msgstr "பயனர் பெயர் '@' குறியீட்டை கொண்டிருக்க முடியாது."
+#: db/models/base.py:765
+#, fuzzy, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "%(field)s, %(value)s ஆக இருந்தால் இந்த புலம் இருக்க வேண்டும்"
 
-#: contrib/admin/views/decorators.py:85
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "உங்கள் மின் அஞ்சல் முகவரி உங்கள் பயனர் பெயராக இல்லை. '%s'யை முயற்சி செய்யவும்."
+#: db/models/base.py:780 db/models/base.py:788
+#, fuzzy, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(fieldname)s உடன் உள்ள %(optname)s ஏற்கனவே உள்ளது"
 
-#: contrib/admin/views/main.py:223
-msgid "Site administration"
-msgstr "இணைய மேலான்மை"
-
-#: contrib/admin/views/main.py:257 contrib/admin/views/auth.py:17
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" வெற்றிகரமாகச் சேர்க்கப்பட்டது."
-
-#: contrib/admin/views/main.py:261 contrib/admin/views/main.py:347
-#: contrib/admin/views/auth.py:22
-msgid "You may edit it again below."
-msgstr "நீங்கள் மறுபடியும் தொகுக்க முடியும். "
-
-#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
-#, python-format
-msgid "You may add another %s below."
-msgstr "நீங்கள் மற்ற %s யை கீழே சேர்க்க முடியும்."
-
-#: contrib/admin/views/main.py:289
-#, python-format
-msgid "Add %s"
-msgstr "%s யை சேர்க்க"
-
-#: contrib/admin/views/main.py:335
-#, python-format
-msgid "Added %s."
-msgstr "%s சேர்க்கப்பட்டுள்ளது."
-
-#: contrib/admin/views/main.py:335 contrib/admin/views/main.py:337
-#: contrib/admin/views/main.py:339
+#: db/models/base.py:787 forms/models.py:581
 msgid "and"
 msgstr "மற்றும்"
 
-#: contrib/admin/views/main.py:337
+#: db/models/fields/__init__.py:63
 #, python-format
-msgid "Changed %s."
-msgstr "%s மாற்றபட்டுள்ளது."
+msgid "Value %r is not a valid choice."
+msgstr ""
 
-#: contrib/admin/views/main.py:339
+#: db/models/fields/__init__.py:64
+msgid "This field cannot be null."
+msgstr "இந்த புலம் காலியாக இருக்கக் கூடாது"
+
+#: db/models/fields/__init__.py:65
+#, fuzzy
+msgid "This field cannot be blank."
+msgstr "இந்த புலம் காலியாக இருக்கக் கூடாது"
+
+#: db/models/fields/__init__.py:70
 #, python-format
-msgid "Deleted %s."
-msgstr "%s அழிக்கப்பட்டது."
+msgid "Field of type: %(field_type)s"
+msgstr ""
 
-#: contrib/admin/views/main.py:342
-msgid "No fields changed."
-msgstr "எந்த புலமும் மாறவில்லை."
-
-#: contrib/admin/views/main.py:345
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" வெற்றிகரமாக மாற்றப்பட்டது."
-
-#: contrib/admin/views/main.py:353
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" வெற்றிகரமாக சேர்க்கப்பட்டுள்ளது. நீங்கள் கீழே தொகுக்க முடியும்."
-
-#: contrib/admin/views/main.py:391
-#, python-format
-msgid "Change %s"
-msgstr "%s யை மாற்று"
-
-#: contrib/admin/views/main.py:473
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "%(name)s ல் உள்ள %(fieldname)s: %(obj)s"
-
-#: contrib/admin/views/main.py:478
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "%(name)s ல் உள்ள %(fieldname)s:"
-
-#: contrib/admin/views/main.py:511
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" வெற்றிகரமாக அழிக்கப்பட்டுள்ளது."
-
-#: contrib/admin/views/main.py:514
-msgid "Are you sure?"
-msgstr "உறுதியாக சொல்கிறீர்களா?"
-
-#: contrib/admin/views/main.py:536
-#, python-format
-msgid "Change history: %s"
-msgstr "வரலாற்றை மாற்று: %s"
-
-#: contrib/admin/views/main.py:570
-#, python-format
-msgid "Select %s"
-msgstr "%s யை தேர்ந்தெடு"
-
-#: contrib/admin/views/main.py:570
-#, python-format
-msgid "Select %s to change"
-msgstr "%s யை மாற்ற தேர்ந்தெடு"
-
-#: contrib/admin/views/main.py:758
-msgid "Database error"
-msgstr "தகவல்சேமிப்பு  பிழை"
-
-#: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
-#: contrib/admin/views/doc.py:50
-msgid "tag:"
-msgstr "ஒட்டு:"
-
-#: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
-#: contrib/admin/views/doc.py:81
-msgid "filter:"
-msgstr "வடிகட்டி:"
-
-#: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
-#: contrib/admin/views/doc.py:139
-msgid "view:"
-msgstr "நோற்றமிடு:"
-
-#: contrib/admin/views/doc.py:164
-#, python-format
-msgid "App %r not found"
-msgstr "பக்கம் %r இல்லை"
-
-#: contrib/admin/views/doc.py:171
-#, python-format
-msgid "Model %r not found in app %r"
-msgstr "மாதரி %r பக்கம் %rல் இல்லை "
-
-#: contrib/admin/views/doc.py:183
-#, python-format
-msgid "the related `%s.%s` object"
-msgstr "சம்மந்தப்பட்ட '%s.%s' பொருள்"
-
-#: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
-#: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
-msgid "model:"
-msgstr "மாதிரி:"
-
-#: contrib/admin/views/doc.py:214
-#, python-format
-msgid "related `%s.%s` objects"
-msgstr "மாதரி %s பக்கம் %s ல் இல்லை"
-
-#: contrib/admin/views/doc.py:219
-#, python-format
-msgid "all %s"
-msgstr "அனைத்து %s "
-
-#: contrib/admin/views/doc.py:224
-#, python-format
-msgid "number of %s"
-msgstr "எண்ணிக்கை %s"
-
-#: contrib/admin/views/doc.py:229
-#, python-format
-msgid "Fields on %s objects"
-msgstr "புலத்தின் %s பொருள்"
-
-#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
-#: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
-#: contrib/admin/views/doc.py:310 contrib/admin/views/doc.py:312
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
 msgid "Integer"
 msgstr "முழு எண்"
 
-#: contrib/admin/views/doc.py:292
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
+msgid "This value must be an integer."
+msgstr "இந்த மதிப்பு முழுவெண்ணாக இருக்க வேண்டும"
+
+#: db/models/fields/__init__.py:493
+msgid "This value must be either True or False."
+msgstr "இந்த மதிப்பு சரி அல்லது தவறாக இருக்க வேண்டும்"
+
+#: db/models/fields/__init__.py:495
 msgid "Boolean (Either True or False)"
 msgstr "பூலியன் (சரி அல்லது தவறு)"
 
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:311
-#, python-format
-msgid "String (up to %(maxlength)s)"
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
+#, fuzzy, python-format
+msgid "String (up to %(max_length)s)"
 msgstr "உரை (%(maxlength)s வரைக்கும்)"
 
-#: contrib/admin/views/doc.py:294
+#: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
 msgstr "கமாவாள் பிரிக்கப்பட்ட முழு எண்"
 
-#: contrib/admin/views/doc.py:295
+#: db/models/fields/__init__.py:584
 msgid "Date (without time)"
 msgstr "தேதி (நேரமில்லாமல்)"
 
-#: contrib/admin/views/doc.py:296
+#: db/models/fields/__init__.py:588
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "வவவவ-மாமா-நாநா என்ற அமைப்பில் உள்ள முறையான தேதி மட்டுமே எழுதவும்"
+
+#: db/models/fields/__init__.py:589
+#, fuzzy, python-format
+msgid "Invalid date: %s"
+msgstr "முறையல்லாத தேதி: %s"
+
+#: db/models/fields/__init__.py:670
+#, fuzzy
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr ""
+"வவவவ-மாமா-நாநா மம-நிநி என்ற அமைப்பில் உள்ள முறையான தேதி/நேரம் மட்டுமே எழுதவும்"
+
+#: db/models/fields/__init__.py:672
 msgid "Date (with time)"
 msgstr "தேதி (நேரமுடன்)"
 
-#: contrib/admin/views/doc.py:297
-msgid "E-mail address"
-msgstr "மின் அஞ்சல்"
+#: db/models/fields/__init__.py:746
+#, fuzzy
+msgid "This value must be a decimal number."
+msgstr "இந்த மதிப்பு முழுவெண்ணாக இருக்க வேண்டும"
 
-#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:299
-#: contrib/admin/views/doc.py:302
-msgid "File path"
-msgstr "கோப்புப் பாதை"
-
-#: contrib/admin/views/doc.py:300
+#: db/models/fields/__init__.py:748
 msgid "Decimal number"
 msgstr "தசம எண்கள்"
 
-#: contrib/admin/views/doc.py:306
+#: db/models/fields/__init__.py:803
+msgid "E-mail address"
+msgstr "மின் அஞ்சல்"
+
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
+msgid "File path"
+msgstr "கோப்புப் பாதை"
+
+#: db/models/fields/__init__.py:841
+#, fuzzy
+msgid "This value must be a float."
+msgstr "இந்த மதிப்பு முழுவெண்ணாக இருக்க வேண்டும"
+
+#: db/models/fields/__init__.py:843
+msgid "Floating point number"
+msgstr ""
+
+#: db/models/fields/__init__.py:902
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "IP விலாசம்"
+
+#: db/models/fields/__init__.py:931
+#, fuzzy
+msgid "This value must be either None, True or False."
+msgstr "இந்த மதிப்பு சரி அல்லது தவறாக இருக்க வேண்டும்"
+
+#: db/models/fields/__init__.py:933
 msgid "Boolean (Either True, False or None)"
 msgstr "இலக்கு முறை (சரி, தவறு அல்லது ஒன்றும் இல்லை)"
 
-#: contrib/admin/views/doc.py:307
-msgid "Relation to parent model"
-msgstr "ஆதி மாதிரிக்கு தொடர்புடையது"
-
-#: contrib/admin/views/doc.py:308
-msgid "Phone number"
-msgstr "தொலைபேசி எண்"
-
-#: contrib/admin/views/doc.py:313
+#: db/models/fields/__init__.py:1024
 msgid "Text"
 msgstr "உரை"
 
-#: contrib/admin/views/doc.py:314
+#: db/models/fields/__init__.py:1040
 msgid "Time"
 msgstr "நேரம்"
 
-#: contrib/admin/views/doc.py:315 contrib/flatpages/models.py:7
+#: db/models/fields/__init__.py:1044
+#, fuzzy
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "மம-நிநி என்ற அமைப்பில் உள்ள முறையான நேரம் மட்டுமே எழுதவும்"
+
+#: db/models/fields/__init__.py:1120
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admin/views/doc.py:316
-msgid "U.S. state (two uppercase letters)"
-msgstr "U.S. மாநிலம் (இரண்டு மேல் எழுத்துவகை எழுத்து"
-
-#: contrib/admin/views/doc.py:317
+#: db/models/fields/__init__.py:1136
 msgid "XML text"
 msgstr "XML உரை"
 
-#: contrib/admin/views/doc.py:343
+#: db/models/fields/related.py:804
 #, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s -ல் urlpattern தோன்றுவதில்லை"
-
-#: contrib/admin/views/auth.py:28
-msgid "Add user"
-msgstr "புதிய பயனர்"
-
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "ஆவனமாக்கம்"
-
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Change password"
-msgstr "கடவுச்சொல்லை மாற்று"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Home"
-msgstr "வீடு"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "History"
-msgstr "வரலாறு"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "தேதி/நேரம் "
-
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "பயனர்"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "செயல்"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "தேதியும் முழு நேரமும்"
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
+msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr ""
-"இந்த பொருள் மாற்று வரலாற்றில் இல்லை"
-"ஒரு வேளை நிர்வாகத்தளத்தின் மூலம் சேர்க்கப்படாமலிருக்கலாம்"
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "டிஜாங்ஙோ தள நிர்வாகி"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "டிஜாங்ஙோ நிர்வாகம் "
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "சேவகன் பிழை"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "சேவையகம் தவறு(500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "சேவையகம் பிழை<em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+#: db/models/fields/related.py:806
+msgid "Foreign Key (type determined by related field)"
 msgstr ""
-"தவறு ஏற்பட்டுள்ளது"
-"வலைத்தள நிர்வாகிக்கு மின்னஞ்சல் அனுப்பப்பட்டுள்ளது. விரைவில் சரி செய்யப்படும். உங்களது பொறுமைக்கு நன்றி"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "பக்கத்தைக் காணவில்லை"
+#: db/models/fields/related.py:928
+msgid "One-to-one relationship"
+msgstr ""
 
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "நீங்கள் விரும்பிய பக்கத்தை காண இயலவில்லை,அதற்காக நாங்கள் வருந்துகிறோம்."
+#: db/models/fields/related.py:990
+msgid "Many-to-many relationship"
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:17
+#: db/models/fields/related.py:1010
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Mac இல், ஒன்றுக்கு மேற்பட்டவற்றை தேர்வு செய்ய \"Control\" அல்லது \"Command\" ஐ "
+"அழுத்தவும்"
+
+#: forms/fields.py:66
+msgid "This field is required."
+msgstr "இந்த  புலத்தில் மதிப்பு தேவை"
+
+#: forms/fields.py:221
+msgid "Enter a whole number."
+msgstr "முழு எண் மட்டுமே எழுதவும்"
+
+#: forms/fields.py:252 forms/fields.py:273
+#, fuzzy
+msgid "Enter a number."
+msgstr "முழு எண் மட்டுமே எழுதவும்"
+
+#: forms/fields.py:276
 #, python-format
-msgid "Models available in the %(name)s application."
-msgstr "செயலியில் கிடைக்கக் கூடிய  %(name)s  மாதிரிகள்"
+msgid "Ensure that there are no more than %s digits in total."
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:18
+#: forms/fields.py:277
 #, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
+msgid "Ensure that there are no more than %s decimal places."
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:28
-#: contrib/admin/templates/admin/change_form.html:15
-msgid "Add"
-msgstr "சேர்க்க"
-
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "மாற்றுக"
-
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "உங்களுக்கு மாற்றுவதற்குரிய உரிமையில்லை"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "தற்போதைய செயல்கள்"
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "எனது செயல்கள்"
-
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "எதுவும் கிடைக்கவில்லை"
-
-#: contrib/admin/templates/admin/change_list.html:11
+#: forms/fields.py:278
 #, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s சேர்க்க"
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr ""
 
-#: contrib/admin/templates/admin/login.html:22
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "நீங்கள் தங்களது கடவுச்சொல்லை  <a href=\"/password_reset/\"> மறந்து விட்டீர்களா?"
+#: forms/fields.py:340 forms/fields.py:916
+#, fuzzy
+msgid "Enter a valid date."
+msgstr "முறையான கோப்புப் பெயரை எழுதவும்"
 
-#: contrib/admin/templates/admin/base.html:25
-msgid "Welcome,"
-msgstr "நல்வரவு,"
+#: forms/fields.py:368 forms/fields.py:917
+#, fuzzy
+msgid "Enter a valid time."
+msgstr "முறையான கோப்புப் பெயரை எழுதவும்"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-#: contrib/admin/templates/admin/submit_line.html:3
+#: forms/fields.py:394
+#, fuzzy
+msgid "Enter a valid date/time."
+msgstr "முறையான கோப்புப் பெயரை எழுதவும்"
+
+#: forms/fields.py:458
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "அந்த பக்கத்தின் encoding வகையைப் பரிசோதிக்க.கோப்பு சமர்பிக்கப் பட்டவில்லை "
+
+#: forms/fields.py:459
+msgid "No file was submitted."
+msgstr ""
+
+#: forms/fields.py:460
+msgid "The submitted file is empty."
+msgstr "சமர்பிக்கப் பட்ட கோப்புக் காலியாக உள்ளது"
+
+#: forms/fields.py:461
+#, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: forms/fields.py:516
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"முறையான படம் மட்டுமே பதிவேற்றம் செய்யவும். நீங்கள் பதிவேற்றம் செய்த கோப்பு படம் அள்ளாத "
+"அல்லது கெட்டுப்போன கோப்பாகும்"
+
+#: forms/fields.py:648 forms/fields.py:723
+#, fuzzy, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "முறையான விருப்பத்தைத் தேர்வு செய்யவும்; '%(data)s என்பது %(choices)s இல் இல்லை"
+
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+#, fuzzy
+msgid "Enter a list of values."
+msgstr "முறையான கோப்புப் பெயரை எழுதவும்"
+
+#: forms/formsets.py:308 forms/formsets.py:310
+#, fuzzy
+msgid "Order"
+msgstr "வரிசைப்படுத்து:"
+
+#: forms/formsets.py:312
 msgid "Delete"
 msgstr "நீக்குக"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr "நீக்கும் '%(escaped_object)s' ஆனது %(object_name)s தொடர்புடைய மற்றவற்றையும் நீக்கும். ஆனால்  அதை நீக்குவதற்குரிய  உரிமை  உங்களுக்கு  இல்லை"
+#: forms/models.py:575
+#, fuzzy, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "கீழே உள்ள தவறுயைத் திருத்துக"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:21
+#: forms/models.py:579
 #, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
-"நீங்கள் இந்த \"%(escaped_object)s\" %(object_name)s நீக்குவதில் நிச்சயமா?"
-"தொடர்புடைய மற்றவையும் நீக்கப்படும். "
 
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "ஆம், எனக்கு உறுதி"
-
-#: contrib/admin/templates/admin/filter.html:2
+#: forms/models.py:585
 #, python-format
-msgid " By %(filter_title)s "
-msgstr "%(filter_title)s ஆல்"
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "செல்"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "1 விடை"
-msgstr[1] "%(counter)s விடைகள்"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s மொத்தம்"
-
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "எல்லாவற்றையும் காட்டு"
-
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr "வடிகட்டி"
-
-#: contrib/admin/templates/admin/change_form.html:21
-msgid "View on site"
-msgstr "தளத்தில் பார்"
-
-#: contrib/admin/templates/admin/change_form.html:30
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "கீழே உள்ள தவறுயைத் திருத்துக"
-msgstr[1] "கீழே உள்ள தவறுகளைத் திருத்துக"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Ordering"
-msgstr "வரிசைப்படுத்துதல்"
-
-#: contrib/admin/templates/admin/change_form.html:51
-msgid "Order:"
-msgstr "வரிசைப்படுத்து:"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "புதியதாக சேமி"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "சேமித்து இன்னுமொன்றைச் சேர்"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "சேமித்து மாற்றத்தை தொடருக"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "சேமிக்க"
-
-#: contrib/admin/templates/admin/invalid_setup.html:8
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr "உங்களுடைய தகவல்சேமிப்பகத்தை  நிறுவுவதில் சில தவறுகள் உள்ளது. அதற்கு இணையான தகவல்சேமிப்பு அட்டவணையை" "தயாரிக்கவும். மேலும் பயனர் படிக்கும்  படியான தகவல்சேமிப்பகத்தை உருவாக்கவும்."
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr "முதலில்,பயனர்ப்பெயர் மற்றும் கடவுச்சொல்லை உள்ளிடவும்.அதன் பிறகு தான் நீங்கள் உங்கள் பெயரின் விவரங்களை திருத்த முடியும்"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
-msgid "Username"
-msgstr "பயனர்ப்பெயர்"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
-msgid "Password"
-msgstr "கடவுச்சொல்"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-msgid "Password (again)"
-msgstr "கடவுச்சொல்(மறுபடியும்)"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-msgid "Enter the same password as above, for verification."
-msgstr "மேலே அதே கடவுச்சொல்லை உள்ளிடவும், சரிபார்ப்பதற்காக ."
-
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-msgid "Password change"
-msgstr "கடவுச்சொல் மாற்று"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "வெற்றிகரமாக கடவுச்சொல் மாற்றபட்டது"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "உங்களுடைய கடவுச்சொல் மாற்றபட்டது"
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "கடவுச்சொல்லை மாற்றியமை"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
 msgstr ""
-"கடவுச்சொல்லை மறந்துவிட்டீரா? உங்களது மின்னஞ்சல்  முகவரியை உள்ளிடுக,அதன் பிறகு உங்கள் கடவுச்சொல்"
-" மாற்றியமைக்கப்பட்டு உங்களது மின்னஞ்சல்  முகவரிக்கு அனுப்பப்படும்"
 
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "மின்அஞ்சல் முகவரி:"
+#: forms/models.py:593
+#, fuzzy
+msgid "Please correct the duplicate values below."
+msgstr "கீழே உள்ள தவறுயைத் திருத்துக"
 
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "எனது கடவுச்சொல்லை மாற்றியமை"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "வலைத்தளத்தில் உங்களது பொன்னான நேரத்தை செலவழித்தமைக்கு மிகுந்த நன்றி"
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "மீண்டும் உள்ளே பதிவு செய்யவும்"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "கடவுச்சொல் மாற்றியமைத்தல் வெற்றி"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
+#: forms/models.py:868
+msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
-"கடவுச்சொல்லை  மறந்து விட்டால் உங்களது மின்னஞ்சல்  முகவரியை உள்ளிடுக புதிய கடவுச்சொல்  "
-"உங்களது மின்னஞ்சல்  முகவரிக்கு அனுப்பப்பட்டுள்ளது. விரைவில் அது உங்களுக்கு கிடைக்கும்"
 
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr "பாதுகாப்பு காரணங்களுக்காக , முதலில் உங்களது பழைய கடவுச்சொல்லை உள்ளிடுக. அதன் பிறகு புதிய கடவுச்சொல்லை இரு முறை உள்ளிடுக.  இது உங்களது உள்ளிடுதலை சரிபார்க்க உதவும். "
+#: forms/models.py:929
+#, fuzzy
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "முறையான விருப்பத்தைத் தேர்வு செய்யவும்; '%(data)s என்பது %(choices)s இல் இல்லை"
 
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "பழைய கடவுச்சொல் :"
+#: forms/models.py:1019
+#, fuzzy, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "முறையான விருப்பத்தைத் தேர்வு செய்யவும்; '%(data)s என்பது %(choices)s இல் இல்லை"
 
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "New password:"
-msgstr "புதிய கடவுச்சொல்:"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid "Confirm password:"
-msgstr "கடவுச்சொலின் மாற்றத்தை உறுதிப்படுத்து:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-msgid "Change my password"
-msgstr "கடவுச் சொல்லை மாற்றவும்"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "கடவுச்சொல்லை மாற்றியமைக்க நீங்கள் கேட்டதனால் உங்களுக்கு இந்த மின்னஞ்சல் அனுப்பப்பட்டுள்ளது"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
+#: forms/models.py:1021
 #, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "%(site_name)s -இல் உள்ள உங்களது பயனாளர் கணக்கு"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "உங்களது  புதிய  கடவுச்சொல் : %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "கடவுச்சொல்லை மாற்றியமைக்க நீங்கள் இந்த பக்கத்திற்கு தாராளமாக போகலாம்."
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "உங்களது பயனாளர் பெயர், நீங்கள் மறந்திருந்தால்:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "எங்களது வலைத்தளத்தை பயன் படுத்தியதற்கு மிகுந்த நன்றி"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "இந்த %(site_name)s -இன்  குழு"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "புத்தகக்குறிகள்"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
-msgid "Documentation bookmarklets"
-msgstr "ஆவணமாக்கக் குறியீடுகள்"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+msgid "\"%s\" is not a valid value for a primary key."
 msgstr ""
-"\n"
-"<p class=\"help\"> புத்தக குறியீடுகளை நிறுவ இந்த இணைப்பினை புத்தகக்குறியீட்டுப் \n"
-"பட்டைக்கு இழுக்கவும். அல்லது வலது கிளிக் செய்து புத்தகக்குறியீடுகளில் சேர்க்கவும். \n"
-" இனி தளத்தில் எந்தப் பக்கத்தில் இருந்தும் புத்தகக்குறியீட்டினை தேர்வுசெய்ய முடியும். \n"
-" நீங்கள் இந்த தளத்தை  \"internal\" என  குறிக்கப்பட்ட கணிணியில் இருந்து மட்டுமே \n"
-" ஒருசில புத்தகக்குறிகளை செயல்படுத்தமுடியும்\n "
-" உங்களுக்கு, கணிணி  \"internal\" என உறுதி செய்ய கணிணிமேளாலரை அணுகவும்.</p>\n"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-msgid "Documentation for this page"
-msgstr "இந்த பக்கத்திற்கான ஆவணம்"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr "எந்த ஒரு பக்கத்திலிருந்தும் ஆவணப்பக்கத்தை பார்வையிடுதல், அந்த பக்கத்தை உருவாக்குகிறது."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-msgid "Show object ID"
-msgstr "object ID-ஐ காட்டு"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr "ஒரே object-ஐ குறிக்கும் பக்கங்களின் பொருளடக்க வகை மற்றும் unique ID-ஐ   காட்டுகிறது."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-msgid "Edit this object (current window)"
-msgstr "இதை திருத்துக (தற்போதைய சாளரம்)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "ஒரே object-ஐ குறிக்கும் பக்கங்களைக் காண மேலாளர் பக்கத்திற்கு செல்க."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-msgid "Edit this object (new window)"
-msgstr "இதை திருத்துக. (புதிய சாளரம்)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
-msgid "As above, but opens the admin page in a new window."
-msgstr "மேளாலர் பக்கத்தை முன்பு கண்டதுபோல், ஆனால் புதிய சாளரத்தில் திறக்கிறது."
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "தேதி:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "நேரம்:"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
+#: forms/widgets.py:299
+#, fuzzy
+msgid "Currently"
 msgstr "தற்போது:"
 
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "மாற்று:"
+#: forms/widgets.py:300
+msgid "Change"
+msgstr "மாற்றுக"
 
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "லிருந்து திசைமாற்று"
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "வருடம்"
 
-#: contrib/redirects/models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr "தெரியாத"
+
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "ஆம்"
+
+#: forms/widgets.py:547
+msgid "No"
+msgstr "இல்லை"
+
+#: template/defaultfilters.py:794
+msgid "yes,no,maybe"
+msgstr "ஆம், இல்லை, இருக்கலாம்"
+
+#: template/defaultfilters.py:825
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/defaultfilters.py:827
+#, python-format
+msgid "%.1f KB"
 msgstr ""
-"இது ஒரு முழுமையான பாதையாக இருக்கவேண்டும். "
-"இணையத்தளப்பெயராக இருக்கக்கூடாது. உதாரணம்:'/"
-"events/search/'."
 
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "திரும்ப அனுப்பு"
-
-#: contrib/redirects/models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr "இது முழுமையான பாதையாக (மேலே உள்ளது போல) அல்லது  \"http\"//\" என தொடங்கும் வலை  முகவரியாக இருக்கலாம்."
-
-#: contrib/redirects/models.py:13
-msgid "redirect"
-msgstr "திரும்ப அனுப்பு"
-
-#: contrib/redirects/models.py:14
-msgid "redirects"
-msgstr "திரும்ப அனுப்புகிறது. "
-
-#: contrib/flatpages/models.py:8
-msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "உதாரணம்: '/about/contact/'. முன்னும் பின்னும் '/' உள்ளதை உறுதி செய்க."
-
-#: contrib/flatpages/models.py:9
-msgid "title"
-msgstr "தலைப்பு"
-
-#: contrib/flatpages/models.py:10
-msgid "content"
-msgstr "பொருளடக்கம்"
-
-#: contrib/flatpages/models.py:11
-msgid "enable comments"
-msgstr "விமர்சனங்களை செயலாக்கு"
-
-#: contrib/flatpages/models.py:12
-msgid "template name"
-msgstr "வார்ப்புரு பெயர்"
-
-#: contrib/flatpages/models.py:13
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr "உதாரணம்  'flatpages/contact_page'. இது இல்லையெனில் 'flatpages/default' என்பதே பயன்படுத்தப்படும்.ப்படும்."
-
-#: contrib/flatpages/models.py:14
-msgid "registration required"
-msgstr "முன்பதிவு தேவை"
-
-#: contrib/flatpages/models.py:14
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "இது தெரிவு செய்யப்பட்டிருந்தால், உள்நுழைந்த பயனர்கள் மட்டுமே இந்தப் பக்கத்தை பார்க்க முடியும்."
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "எளிய பக்கம்"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "எளிய பக்கங்கள்"
-
-#: contrib/auth/views.py:39
-msgid "Logged out"
-msgstr "வெளியே வந்துவீட்டீர்"
-
-#: contrib/auth/models.py:38 contrib/auth/models.py:57
-msgid "name"
-msgstr "பெயர்"
-
-#: contrib/auth/models.py:40
-msgid "codename"
-msgstr "குறிமுறை பெயர்"
-
-#: contrib/auth/models.py:42
-msgid "permission"
-msgstr "அனுமதி"
-
-#: contrib/auth/models.py:43 contrib/auth/models.py:58
-msgid "permissions"
-msgstr "அனுமதிகள்"
-
-#: contrib/auth/models.py:60
-msgid "group"
-msgstr "குழு"
-
-#: contrib/auth/models.py:61 contrib/auth/models.py:100
-msgid "groups"
-msgstr "குழுக்கள்"
-
-#: contrib/auth/models.py:90
-msgid "username"
-msgstr "பயனர் பெயர்"
-
-#: contrib/auth/models.py:90
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr "தேவை. 30 எழுத்துகள் அல்லது கொஞ்சம். அகர வரிசை எழுத்துக்கள் மட்டுமே ( எழுத்துகள்,எண்கள்,அன்டர்ஸ்கோர்). "
-
-#: contrib/auth/models.py:91
-msgid "first name"
-msgstr "முதல் பெயர்"
-
-#: contrib/auth/models.py:92
-msgid "last name"
-msgstr "கடைசி பெயர்"
-
-#: contrib/auth/models.py:93
-msgid "e-mail address"
-msgstr "மின்னஞ்சல் முகவரி"
-
-#: contrib/auth/models.py:94
-msgid "password"
-msgstr "கடவுச்சொல்"
-
-#: contrib/auth/models.py:94
-msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr "பயன்படுத்து '[algo]$[salt]$[hexdigest]'"
-
-#: contrib/auth/models.py:95
-msgid "staff status"
-msgstr "பணியாளர் நிலை"
-
-#: contrib/auth/models.py:95
-msgid "Designates whether the user can log into this admin site."
-msgstr "பயனர், 'மேலாளலர்' பக்கத்தில் நுழைவதை முடிவு செய்கிறது"
-
-#: contrib/auth/models.py:96
-msgid "active"
-msgstr "செயல்படும்"
-
-#: contrib/auth/models.py:96
-msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
-"instead of deleting accounts."
+#: template/defaultfilters.py:829
+#, python-format
+msgid "%.1f MB"
 msgstr ""
-"பயனர்,டிஜாங்ஙோ 'மேலாளலர்' பக்கத்தில் நுழைவதை முடிவு செய்கிறது . இதை தேர்வு செய்யப்படாத கணக்கு உடனடியாக"
-"அழிக்கப்படும்"
 
-#: contrib/auth/models.py:97
-msgid "superuser status"
-msgstr "மேலாளர் இருப்பு நிலை"
+#: template/defaultfilters.py:831
+#, python-format
+msgid "%.1f GB"
+msgstr ""
 
-#: contrib/auth/models.py:97
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr "இந்த பயனருக்கு எல்லா அங்கீகாரங்களும் வழங்கப்படவில்லை."
+#: template/defaultfilters.py:833
+#, python-format
+msgid "%.1f TB"
+msgstr ""
 
-#: contrib/auth/models.py:98
-msgid "last login"
-msgstr "கடைசி உள்நுழைவு"
+#: template/defaultfilters.py:834
+#, python-format
+msgid "%.1f PB"
+msgstr ""
 
-#: contrib/auth/models.py:99
-msgid "date joined"
-msgstr "சேர்ந்த தேதி"
+#: utils/dateformat.py:42
+msgid "p.m."
+msgstr ""
 
-#: contrib/auth/models.py:101
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr "பயனர் தனது அனுமதிகளோடு ,தான் உள்ள குழுவினது அனுமதிகளையும் பெறுவார்."
+#: utils/dateformat.py:43
+msgid "a.m."
+msgstr ""
 
-#: contrib/auth/models.py:102
-msgid "user permissions"
-msgstr "பயனர் அனுமதிகள்"
+#: utils/dateformat.py:48
+msgid "PM"
+msgstr ""
 
-#: contrib/auth/models.py:105
-msgid "user"
-msgstr "பயனர்"
+#: utils/dateformat.py:49
+msgid "AM"
+msgstr ""
 
-#: contrib/auth/models.py:106
-msgid "users"
-msgstr "பயனர்கள்"
+#: utils/dateformat.py:98
+msgid "midnight"
+msgstr ""
 
-#: contrib/auth/models.py:111
-msgid "Personal info"
-msgstr "தனிப்பட்ட விவரம்"
-
-#: contrib/auth/models.py:112
-msgid "Permissions"
-msgstr "அனுமதிகள்"
-
-#: contrib/auth/models.py:113
-msgid "Important dates"
-msgstr "முக்கியமான தேதிகள்"
-
-#: contrib/auth/models.py:114
-msgid "Groups"
-msgstr "குழுக்கள்"
-
-#: contrib/auth/models.py:256
-msgid "message"
-msgstr "செய்தி"
-
-#: contrib/auth/forms.py:52
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr " உங்கள் இணைய உலாவியில்  குக்கிகள்  செயலாக்கம் பெறவில்லை. உள்நுழைவதற்கு குக்கிகள் அவசியம்."
-
-#: contrib/auth/forms.py:61
-msgid "This account is inactive."
-msgstr "இந்த கணக்கு செயல்பட துவங்கவில்லை"
-
-#: contrib/contenttypes/models.py:20
-msgid "python model class name"
-msgstr "python model class name"
-
-#: contrib/contenttypes/models.py:23
-msgid "content type"
-msgstr "பொருளடக்க வகை"
-
-#: contrib/contenttypes/models.py:24
-msgid "content types"
-msgstr "பொருளடக்க வகைகள்"
-
-#: contrib/sessions/models.py:51
-msgid "session key"
-msgstr "அமர்வு குறியீ"
-
-#: contrib/sessions/models.py:52
-msgid "session data"
-msgstr "அமர்வு தகவல்"
-
-#: contrib/sessions/models.py:53
-msgid "expire date"
-msgstr "காலாவதியாகும் தேதி"
-
-#: contrib/sessions/models.py:57
-msgid "session"
-msgstr "அமர்வு"
-
-#: contrib/sessions/models.py:58
-msgid "sessions"
-msgstr "அமர்வுகள்"
-
-#: contrib/sites/models.py:10
-msgid "domain name"
-msgstr "களப் பெயர்"
-
-#: contrib/sites/models.py:11
-msgid "display name"
-msgstr "காட்டும்  பெயர்"
-
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr "வலைத்தளம்"
-
-#: contrib/sites/models.py:16
-msgid "sites"
-msgstr "வலைத்தளங்கள்"
+#: utils/dateformat.py:100
+msgid "noon"
+msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -1453,684 +772,326 @@ msgstr "சனி"
 msgid "Sunday"
 msgstr "ஞாயிறு"
 
-#: utils/dates.py:14
+#: utils/dates.py:10
+#, fuzzy
+msgid "Mon"
+msgstr "திங்கள்"
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Tue"
+msgstr "செவ்வாய்"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr ""
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr ""
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Fri"
+msgstr "வெள்ளி"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr ""
+
+#: utils/dates.py:11
+#, fuzzy
+msgid "Sun"
+msgstr "ஞாயிறு"
+
+#: utils/dates.py:18
 msgid "January"
 msgstr "ஜனவரி"
 
-#: utils/dates.py:14
+#: utils/dates.py:18
 msgid "February"
 msgstr "பிப்ரவரி"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "மார்ச்"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "ஏப்ரல்"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "மே"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "ஜூன்"
 
-#: utils/dates.py:15 utils/dates.py:27
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "ஜூலை"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "August"
 msgstr "ஆகஸ்டு"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "September"
 msgstr "செப்டம்பர்"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "October"
 msgstr "அக்டோபர்"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "November"
 msgstr "நவம்பர்"
 
-#: utils/dates.py:16
+#: utils/dates.py:20
 msgid "December"
 msgstr "டிசம்பர்"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jan"
 msgstr "ஜன"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "feb"
 msgstr "பிப்"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "mar"
 msgstr "மார்"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "apr"
 msgstr "ஏப்"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "may"
 msgstr "மே"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jun"
 msgstr "ஜூன்"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "jul"
 msgstr "ஜூலை"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "aug"
 msgstr "ஆக"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "sep"
 msgstr "செப்"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "oct"
 msgstr "அக்"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "nov"
 msgstr "நவ"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "dec"
 msgstr "டிச"
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "ஜன."
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "பிப்."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "ஆக."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "செப்."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "அக்."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "நவ."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "டிச."
 
-#: utils/timesince.py:12
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "alt. month"
+msgid "January"
+msgstr "ஜனவரி"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "alt. month"
+msgid "February"
+msgstr "பிப்ரவரி"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "alt. month"
+msgid "March"
+msgstr "மார்ச்"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "alt. month"
+msgid "April"
+msgstr "ஏப்ரல்"
+
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "alt. month"
+msgid "May"
+msgstr "மே"
+
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "alt. month"
+msgid "June"
+msgstr "ஜூன்"
+
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "alt. month"
+msgid "July"
+msgstr "ஜூலை"
+
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "alt. month"
+msgid "August"
+msgstr "ஆகஸ்டு"
+
+#: utils/dates.py:43
+#, fuzzy
+msgctxt "alt. month"
+msgid "September"
+msgstr "செப்டம்பர்"
+
+#: utils/dates.py:44
+#, fuzzy
+msgctxt "alt. month"
+msgid "October"
+msgstr "அக்டோபர்"
+
+#: utils/dates.py:45
+#, fuzzy
+msgctxt "alt. month"
+msgid "November"
+msgstr "நவம்பர்"
+
+#: utils/dates.py:46
+#, fuzzy
+msgctxt "alt. month"
+msgid "December"
+msgstr "டிசம்பர்"
+
+#: utils/text.py:136
+#, fuzzy
+msgid "or"
+msgstr "மணி"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
+
+#: utils/timesince.py:21
 msgid "year"
 msgid_plural "years"
 msgstr[0] "வருடம்"
 msgstr[1] "வருடங்கள்"
 
-#: utils/timesince.py:13
+#: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "மாதம்"
 msgstr[1] "மாதங்கள்"
 
-#: utils/timesince.py:14
+#: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "வாரம்"
 msgstr[1] "வாரங்கள்"
 
-#: utils/timesince.py:15
+#: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "நாள்"
 msgstr[1] "நாட்கள்"
 
-#: utils/timesince.py:16
+#: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "மணி"
 msgstr[1] "மணி"
 
-#: utils/timesince.py:17
+#: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "நிமிடம்"
 msgstr[1] "நிமிடங்கள்"
 
-#: utils/translation/trans_real.py:362
+#: utils/timesince.py:45
+#, fuzzy
+msgid "minutes"
+msgstr "நிமிடம்"
+
+#: utils/timesince.py:50
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr ""
+
+#: utils/timesince.py:56
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ""
+
+#: utils/translation/trans_real.py:560
 msgid "DATE_FORMAT"
 msgstr "தேதி_முறை"
 
-#: utils/translation/trans_real.py:363
+#: utils/translation/trans_real.py:561
 msgid "DATETIME_FORMAT"
 msgstr "தேதிநேரம்_முறை"
 
-#: utils/translation/trans_real.py:364
+#: utils/translation/trans_real.py:562
 msgid "TIME_FORMAT"
 msgstr "நேரம்_முறை"
 
-#: utils/translation/trans_real.py:380
+#: utils/translation/trans_real.py:583
 msgid "YEAR_MONTH_FORMAT"
 msgstr "வருடம்_மாதம்_முறை"
 
-#: utils/translation/trans_real.py:381
+#: utils/translation/trans_real.py:584
 msgid "MONTH_DAY_FORMAT"
 msgstr "மாதம்_நாள்_முறை"
 
-#: conf/global_settings.py:39
-msgid "Arabic"
-msgstr "அரபிக்"
-
-#: conf/global_settings.py:40
-msgid "Bengali"
-msgstr "பெங்காலி"
-
-#: conf/global_settings.py:41
-msgid "Czech"
-msgstr "செக்"
-
-#: conf/global_settings.py:42
-msgid "Welsh"
-msgstr "வெல்ஸ்"
-
-#: conf/global_settings.py:43
-msgid "Danish"
-msgstr "டேனிஷ்"
-
-#: conf/global_settings.py:44
-msgid "German"
-msgstr "ஜெர்மன்"
-
-#: conf/global_settings.py:45
-msgid "Greek"
-msgstr "கிரேக்கம்"
-
-#: conf/global_settings.py:46
-msgid "English"
-msgstr "ஆங்கிலம்"
-
-#: conf/global_settings.py:47
-msgid "Spanish"
-msgstr "ஸ்பானிஷ்"
-
-#: conf/global_settings.py:48
-msgid "Argentinean Spanish"
-msgstr "அர்ஜெண்டியன் ஸ்பானிஷ் "
-
-#: conf/global_settings.py:49
-msgid "Finnish"
-msgstr "பீனீஷ்"
-
-#: conf/global_settings.py:50
-msgid "French"
-msgstr "ப்ரென்சு"
-
-#: conf/global_settings.py:51
-msgid "Galician"
-msgstr "கலீஷீயன்"
-
-#: conf/global_settings.py:52
-msgid "Hungarian"
-msgstr "ஹங்கேரியன்"
-
-#: conf/global_settings.py:53
-msgid "Hebrew"
-msgstr "ஹீப்ரு"
-
-#: conf/global_settings.py:54
-msgid "Icelandic"
-msgstr "ஐஸ்லான்டிக்"
-
-#: conf/global_settings.py:55
-msgid "Italian"
-msgstr "இத்தாலியன்"
-
-#: conf/global_settings.py:56
-msgid "Japanese"
-msgstr "ஜப்பானிய"
-
-#: conf/global_settings.py:57
-msgid "Dutch"
-msgstr "டச்சு"
-
-#: conf/global_settings.py:58
-msgid "Norwegian"
-msgstr "நார்வீசியன்"
-
-#: conf/global_settings.py:59
-msgid "Brazilian"
-msgstr "பிரேசிலியன்"
-
-#: conf/global_settings.py:60
-msgid "Romanian"
-msgstr "ரோமானியன்"
-
-#: conf/global_settings.py:61
-msgid "Russian"
-msgstr "ரஷ்யன்"
-
-#: conf/global_settings.py:62
-msgid "Slovak"
-msgstr "சுலோவாக்"
-
-#: conf/global_settings.py:63
-msgid "Slovenian"
-msgstr "ஸ்லோவேனியன்"
-
-#: conf/global_settings.py:64
-msgid "Serbian"
-msgstr "செர்பியன்"
-
-#: conf/global_settings.py:65
-msgid "Swedish"
-msgstr "சுவிடிஷ்"
-
-#: conf/global_settings.py:66
-msgid "Tamil"
-msgstr "தமிழ்"
-
-#: conf/global_settings.py:67
-msgid "Turkish"
-msgstr "துருக்கிஷ்"
-
-#: conf/global_settings.py:68
-msgid "Ukrainian"
-msgstr "உக்ரேனியன்"
-
-#: conf/global_settings.py:69
-msgid "Simplified Chinese"
-msgstr "எளிய சீன மொழி"
-
-#: conf/global_settings.py:70
-msgid "Traditional Chinese"
-msgstr "மரபு சீன மொழி"
-
-#: core/validators.py:63
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "இந்த மதிப்பு எழுத்துகள், எண்கள் மேலும் அன்டர்ஸ்கோர் உள்ளடக்க வேண்டும். "
-
-#: core/validators.py:67
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr "இந்த மதிப்பு எழுத்துகள், எண்கள், அன்டர்ஸ்கோர், டஷ் அல்லது சலஷ் மற்றும் உள்ளடக்க வேண்டும்"
-
-#: core/validators.py:71
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "இந்த மதிப்பு எழுத்துகள், எண்கள், அன்டர்ஸ்கோர் டஷ் அல்லது கைப்பன் மற்றும் உள்ளடக்க வேண்டும்"
-
-#: core/validators.py:75
-msgid "Uppercase letters are not allowed here."
-msgstr "பெரிய எழுத்துகளுக்கு இங்கு அனுமதி இல்லை"
-
-#: core/validators.py:79
-msgid "Lowercase letters are not allowed here."
-msgstr "சிறிய எழுத்துகளுக்கு இங்கு அனுமதி இல்லை"
-
-#: core/validators.py:86
-msgid "Enter only digits separated by commas."
-msgstr "இங்கு எண்களை மட்டுமே எழுதவும் காமவாள் தனிமைபடுத்தவும் "
-
-#: core/validators.py:98
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "காற்புள்ளிகளால் தனிமைப்படுத்திய முறையான e முகவரிகள் மட்டும் எழுதவும்"
-
-#: core/validators.py:102
-msgid "Please enter a valid IP address."
-msgstr "தயவு செய்து முறையான ஐ.பி முகவரி மட்டும் எழுதவும்"
-
-#: core/validators.py:106
-msgid "Empty values are not allowed here."
-msgstr "காலியான மதிப்புக்கள் அனுமதி இல்லை"
-
-#: core/validators.py:110
-msgid "Non-numeric characters aren't allowed here."
-msgstr "எண் வடிவமில்லாத எழுத்துக்கள் அனுமதி இல்லை"
-
-#: core/validators.py:114
-msgid "This value can't be comprised solely of digits."
-msgstr "இந்த மதிப்பு இலக்கங்கள் மட்டுமே கொண்டதாக இருக்க கூடாது"
-
-#: core/validators.py:119
-msgid "Enter a whole number."
-msgstr "முழு எண் மட்டுமே எழுதவும்"
-
-#: core/validators.py:123
-msgid "Only alphabetical characters are allowed here."
-msgstr "அகர வரிசை எழுத்துக்கள் மட்டுமே அனுமதி உன்டு"
-
-#: core/validators.py:138
-msgid "Year must be 1900 or later."
-msgstr "வருடம் கண்டிப்பாக 1900 அல்லது அதற்கு மேல்"
-
-#: core/validators.py:142
-#, python-format
-msgid "Invalid date: %s."
-msgstr "முறையல்லாத தேதி: %s"
-
-#: core/validators.py:146 db/models/fields/__init__.py:415
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "வவவவ-மாமா-நாநா என்ற அமைப்பில் உள்ள முறையான தேதி மட்டுமே எழுதவும்"
-
-#: core/validators.py:151
-msgid "Enter a valid time in HH:MM format."
-msgstr "மம-நிநி என்ற அமைப்பில் உள்ள முறையான நேரம் மட்டுமே எழுதவும்"
-
-#: core/validators.py:155 db/models/fields/__init__.py:477
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "வவவவ-மாமா-நாநா மம-நிநி என்ற அமைப்பில் உள்ள முறையான தேதி/நேரம் மட்டுமே எழுதவும்"
-
-#: core/validators.py:160
-msgid "Enter a valid e-mail address."
-msgstr "முறையான e முகவரிகள் மட்டும் எழுதவும்"
-
-#: core/validators.py:172 core/validators.py:401 forms/__init__.py:661
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "அந்த பக்கத்தின் encoding வகையைப் பரிசோதிக்க.கோப்பு சமர்பிக்கப் பட்டவில்லை "
-
-#: core/validators.py:176
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr "முறையான படம் மட்டுமே பதிவேற்றம் செய்யவும். நீங்கள் பதிவேற்றம் செய்த கோப்பு படம் அள்ளாத அல்லது கெட்டுப்போன கோப்பாகும்"
-
-#: core/validators.py:183
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "%s என்ற இணையதள முகவரி சரியான படத்தைச் சுட்டவில்லை"
-
-#: core/validators.py:187
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "தொலைபேசி எண்கள் XXX-XXX-XXXX என்ற அமைப்பில் இருக்க வேண்டும். \"%s\" என்பது முறையள்ள"
-
-#: core/validators.py:195
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "%s என்ற இணையதள முகவரி முறையான குயிக் டைம் படக்காட்சியைச் சுட்டவில்லை"
-
-#: core/validators.py:199
-msgid "A valid URL is required."
-msgstr "முறையான இணையதள முகவரி தேவை"
-
-#: core/validators.py:213
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"முறையான இணையதள முகவரி தேவை. குறிப்பிடத்தக்கத் தவறுகளாவன:\n"
-"%s"
-
-#: core/validators.py:220
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "முறைப்படுத்தப்படாத XML: %s"
-
-#: core/validators.py:230
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "முறைப்படுத்தப்படாத இணையதள முகவறி: %s"
-
-#: core/validators.py:234 core/validators.py:236
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "%s என்ற இணையதள முகவரி உடைந்துள்ளது"
-
-#: core/validators.py:242
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "முறையான U.S மாநில பெயர் சுருக்கம் எழுதவும்"
-
-#: core/validators.py:256
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "வார்த்தைகளை அளன்து பேசுங்கள்! %s என்ற வார்த்தை இங்கு அனுமதி இல்லை"
-msgstr[1] "வார்த்தைகளை அளந்து பேசுங்கள்! %s என்ற வார்த்தைகள் இங்கு அனுமதி இல்லை"
-
-#: core/validators.py:263
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "இந்த புலம் %s என்ற புலத்துடன் ஒத்திறுக்க வேண்டும்"
-
-#: core/validators.py:282
-msgid "Please enter something for at least one field."
-msgstr "தயவு செய்து ஒரு புலத்திலாவது ஏதாவது எழுதவும்"
-
-#: core/validators.py:291 core/validators.py:302
-msgid "Please enter both fields or leave them both empty."
-msgstr "தயவு செய்து இரு புலங்கலையும் நிரப்பவும் அல்லது இரண்டையும் காலியாக விடவும்"
-
-#: core/validators.py:309
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "%(field)s, %(value)s ஆக இருந்தால் இந்த புலம் இருக்க வேண்டும்"
-
-#: core/validators.py:321
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "%(field)s, %(value)s ஆக இல்லை என்றால் இந்த புலம் இருக்க வேண்டும்"
-
-#: core/validators.py:340
-msgid "Duplicate values are not allowed."
-msgstr "போலியான மதிப்புகள் அனுமதி இல்லை"
-
-#: core/validators.py:363
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "இந்த மதிப்பு %s இன் அடுக்காக இருக்க வேன்டும்"
-
-#: core/validators.py:374
-msgid "Please enter a valid decimal number."
-msgstr "தயவுசெய்து முறையான பதின்ம எண்ணை நுழைக்கவும்"
-
-#: core/validators.py:378
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "தயவுசெய்து முறையான பதின்ம எண்களுடன் %s மொத்த இலக்கத்தை நுழைக்கவும்"
-msgstr[1] "தயவுசெய்து முறையான பதின்ம எண்களுடன் %s மொத்த இலக்கங்களையும் நுழைக்கவும்"
-
-#: core/validators.py:381
-#, python-format
-msgid "Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "அதிகபட்சம் %s எண்ணை உள்ள பதின்ம எண்ணை நுழை."
-msgstr[1] "அதிகபட்சம் %s எண்கள் உள்ள பதின்ம எண்ணை நுழை."
-
-#: core/validators.py:384
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "அதிகபட்சம் %s புள்ளி இடம் உள்ள பதின்ம எண்ணை  நுழை"
-msgstr[1] "அதிகபட்சம் %s புள்ளி இடங்கள் உள்ள பதின்ம எண்ணை  நுழை"
-
-#: core/validators.py:394
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "மேல்ஏற்று செய்யப்பட்ட கோப்பு குறைந்தபட்சம்  %s  பைட்டுகள் உள்ளனவா என சரி பார்க்கவும்"
-
-#: core/validators.py:395
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "மேல்ஏற்று செய்யப்பட்ட கோப்பு அதிகபட்சம்  %s  பைட்டுகள் உள்ளனவா என சரி பார்க்கவும்."
-
-#: core/validators.py:412
-msgid "The format for this field is wrong."
-msgstr "புலனுடைய அமைப்பு தவறு"
-
-#: core/validators.py:427
-msgid "This field is invalid."
-msgstr "இந்த புலம் செல்லாது.ள"
-
-#: core/validators.py:463
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "%s இருந்து எதுவும் எடுக்க முடியவில்லை"
-
-#: core/validators.py:466
-#, python-format
-msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr "வலைமனை %(url)s என்பது செல்லாத உள்ளடக்க-வகை தலைப்பான  '%(contenttype)s' ஐ திருப்பி தந்துள்ளது."
-
-#: core/validators.py:499
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr "%(line)s கோடு லிருந்து மூடாத %(tag)s டாகை மூடு. ( வரி,\"%(start)s\"வுடன் துவங்குகின்றது)"
-
-#: core/validators.py:503
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr "வரி %(line)s இல் உள்ள  சில உரைகள் இருப்பதற்கு அனுமதி இல்லை.( வரி,\"%(start)s\"வுடன் துவங்குகின்றது)"
-
-#: core/validators.py:508
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr "வரி %(line)s இல் உள்ள  \"%(attr)s\" என்பது தவறான பண்பாகும.( வரி,\"%(start)s\"வுடன் துவங்குகின்றது)"
-
-#: core/validators.py:513
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr "வரி %(line)s இல் உள்ள \"<%(tag)s>\" என்பது தவறான ஒட்டாகும் .( வரி,\"%(start)s\"வுடன் துவங்குகின்றது)"
-
-#: core/validators.py:517
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr "வரி %(line)s இல் உள்ள ஒட்டு இன பண்புகள்  தேவைப்படுகின்றன.(வரி,\"%(start)s\" வுடன் துவங்குகின்றது)"
-
-#: core/validators.py:522
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr "வரி %(line)s இல் உள்ள \"%(attr)s\"  பண்பின் மதிப்பு தவறானது.(வரி \"%(start)s\" இருந்து ஆரம்பம்)"
-
-#: views/generic/create_update.py:43
+#: views/generic/create_update.py:121
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s வெற்றிகரமாக சேர்க்கப்பட்டு விட்டது"
 
-#: views/generic/create_update.py:117
+#: views/generic/create_update.py:164
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s வெற்றிகரமாக மாற்றபட்டு விட்டது"
 
-#: views/generic/create_update.py:184
+#: views/generic/create_update.py:207
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s நீக்கப்பட்டுள்ளது"
-
-#: db/models/manipulators.py:302
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(type)s உடன் உள்ள %(object)s ஏற்கனவே %(field)s கொடுக்கப்பட்டு  உள்ளது"
-
-#: db/models/fields/__init__.py:40
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(fieldname)s உடன் உள்ள %(optname)s ஏற்கனவே உள்ளது"
-
-#: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
-#: db/models/fields/__init__.py:551 db/models/fields/__init__.py:562
-#: forms/__init__.py:346
-msgid "This field is required."
-msgstr "இந்த  புலத்தில் மதிப்பு தேவை"
-
-#: db/models/fields/__init__.py:340
-msgid "This value must be an integer."
-msgstr "இந்த மதிப்பு முழுவெண்ணாக இருக்க வேண்டும"
-
-#: db/models/fields/__init__.py:372
-msgid "This value must be either True or False."
-msgstr "இந்த மதிப்பு சரி அல்லது தவறாக இருக்க வேண்டும்"
-
-#: db/models/fields/__init__.py:388
-msgid "This field cannot be null."
-msgstr "இந்த புலம் காலியாக இருக்கக் கூடாது"
-
-#: db/models/fields/__init__.py:571
-msgid "Enter a valid filename."
-msgstr "முறையான கோப்புப் பெயரை எழுதவும்"
-
-#: db/models/fields/related.py:51
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "தயவு செய்து முறையான %s எழுதவும்"
-
-#: db/models/fields/related.py:618
-msgid "Separate multiple IDs with commas."
-msgstr "பன்மையிலுள்ள அடையாளங்களை காற்புள்ளிகளால் பிரிக்கவும்"
-
-#: db/models/fields/related.py:620
-msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "Mac இல், ஒன்றுக்கு மேற்பட்டவற்றை தேர்வு செய்ய \"Control\" அல்லது \"Command\" ஐ அழுத்தவும்"
-
-#: db/models/fields/related.py:664
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "தயவு செய்து முறையான %(self)s அடையாளங்களை எழுதவும். %(value)r என்ற மதிப்பு முறையானதல்ல."
-msgstr[1] "தயவு செய்து முறையான %(self)s அடையாளங்களை எழுதவும். %(value)r என்ற மதிப்புகள் முறையானதல்ல."
-
-#: forms/__init__.py:381
-#, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "உங்கள் உரை %s ஐ விட குறைவான எழுத்து உடையது என்று உறுதி செய்து கொள்ளுங்கள்"
-msgstr[1] "உங்கள் உரை %s ஐ விட குறைவான எழுத்துகள் உடையது என்று உறுதி செய்து கொள்ளுங்கள்"
-
-#: forms/__init__.py:386
-msgid "Line breaks are not allowed here."
-msgstr "வரி உடைவுகள் அனுமதி இல்லை"
-
-#: forms/__init__.py:487 forms/__init__.py:560 forms/__init__.py:599
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "முறையான விருப்பத்தைத் தேர்வு செய்யவும்; '%(data)s என்பது %(choices)s இல் இல்லை"
-
-#: forms/__init__.py:663
-msgid "The submitted file is empty."
-msgstr "சமர்பிக்கப் பட்ட கோப்புக் காலியாக உள்ளது"
-
-#: forms/__init__.py:719
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "-32,768 மற்றும் 32,767 க்கு நடுவில் ஒரு முழு எண்ணை எழுதவும்"
-
-#: forms/__init__.py:729
-msgid "Enter a positive number."
-msgstr "ஒரு நேர்க்குறி எண்ணை எழுதவும்"
-
-#: forms/__init__.py:739
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "0 மற்றும் 32,767 க்கு நடுவில் ஒரு முழு எண்ணை எழுதவும்"
-
-#: template/defaultfilters.py:401
-msgid "yes,no,maybe"
-msgstr "ஆம், இல்லை, இருக்கலாம்"
-

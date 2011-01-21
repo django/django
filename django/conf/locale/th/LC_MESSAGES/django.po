@@ -3,11 +3,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Django-1.1-rc-1\n"
-"Report-Msgid-Bugs-To: kowito@felspar.com\n"
-"POT-Creation-Date: 2008-09-02 22:36-0700\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 21:05+0100\n"
 "PO-Revision-Date: 2009-07-28 22:31+0700\n"
 "Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
-"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
+"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin "
+"Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,3650 +22,698 @@ msgid "Arabic"
 msgstr "อารบิก"
 
 #: conf/global_settings.py:45
-msgid "Bengali"
-msgstr "เบ็งกาลี"
-
-#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "บัลแกเรีย"
 
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "เบ็งกาลี"
+
 #: conf/global_settings.py:47
+#, fuzzy
+msgid "Bosnian"
+msgstr "เอสโตเนีย"
+
+#: conf/global_settings.py:48
 msgid "Catalan"
 msgstr "คาตะลาน"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Czech"
 msgstr "เช็ก"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Welsh"
 msgstr "เวลส์"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Danish"
 msgstr "เดนมาร์ก"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "German"
 msgstr "เยอรมัน"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Greek"
 msgstr "กรีก"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "English"
 msgstr "อังกฤษ"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "British English"
+msgstr "อังกฤษ"
+
+#: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "สเปน"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:57
+#, fuzzy
+msgid "Argentinian Spanish"
+msgstr "สเปน (อาร์เจนตินา)"
+
+#: conf/global_settings.py:58
 msgid "Estonian"
 msgstr "เอสโตเนีย"
 
-#: conf/global_settings.py:56
-msgid "Argentinean Spanish"
-msgstr "สเปน (อาร์เจนตินา)"
-
-#: conf/global_settings.py:57
+#: conf/global_settings.py:59
 msgid "Basque"
 msgstr "แบ็ซค์"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:60
 msgid "Persian"
 msgstr "เปอร์เชีย"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:61
 msgid "Finnish"
 msgstr "ฟินแลนด์"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:62
 msgid "French"
 msgstr "ฝรั่งเศส"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:63
+#, fuzzy
+msgid "Frisian"
+msgstr "ฟรายส์แลนด์"
+
+#: conf/global_settings.py:64
 msgid "Irish"
 msgstr "ไอริช"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:65
 msgid "Galician"
 msgstr "กาลิเซีย"
 
-#: conf/global_settings.py:63
-msgid "Hungarian"
-msgstr "ฮังการี"
-
-#: conf/global_settings.py:64
+#: conf/global_settings.py:66
 msgid "Hebrew"
 msgstr "ฮีบรู"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:67
+#, fuzzy
+msgid "Hindi"
+msgstr "ไฮแลนด์"
+
+#: conf/global_settings.py:68
 msgid "Croatian"
 msgstr "โครเอเชีย"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr "ฮังการี"
+
+#: conf/global_settings.py:70
+#, fuzzy
+msgid "Indonesian"
+msgstr "มาซิโดเนีย"
+
+#: conf/global_settings.py:71
 msgid "Icelandic"
 msgstr "ไอซ์แลนด์"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:72
 msgid "Italian"
 msgstr "อิตาลี"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:73
 msgid "Japanese"
 msgstr "ญี่ปุ่น"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:74
 msgid "Georgian"
 msgstr "จอร์เจีย"
 
-#: conf/global_settings.py:70
-msgid "Korean"
-msgstr "เกาหลี"
-
-#: conf/global_settings.py:71
+#: conf/global_settings.py:75
 msgid "Khmer"
 msgstr "เขมร"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:76
 msgid "Kannada"
 msgstr "กัณณาท"
 
-#: conf/global_settings.py:73
-msgid "Latvian"
-msgstr "ลัตเวีย"
+#: conf/global_settings.py:77
+msgid "Korean"
+msgstr "เกาหลี"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:78
 msgid "Lithuanian"
 msgstr "ลิทัวเนีย"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:79
+msgid "Latvian"
+msgstr "ลัตเวีย"
+
+#: conf/global_settings.py:80
 msgid "Macedonian"
 msgstr "มาซิโดเนีย"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:81
+#, fuzzy
+msgid "Malayalam"
+msgstr "มายอกา"
+
+#: conf/global_settings.py:82
+#, fuzzy
+msgid "Mongolian"
+msgstr "มาซิโดเนีย"
+
+#: conf/global_settings.py:83
 msgid "Dutch"
 msgstr "ดัตช์"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:84
 msgid "Norwegian"
 msgstr "นอร์เวย์"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:85
+#, fuzzy
+msgid "Norwegian Bokmal"
+msgstr "นอร์เวย์"
+
+#: conf/global_settings.py:86
+#, fuzzy
+msgid "Norwegian Nynorsk"
+msgstr "นอร์เวย์"
+
+#: conf/global_settings.py:87
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Polish"
 msgstr "โปแลนด์"
 
-#: conf/global_settings.py:79
-msgid "Portugese"
+#: conf/global_settings.py:89
+#, fuzzy
+msgid "Portuguese"
 msgstr "โปรตุเกส"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:90
 msgid "Brazilian Portuguese"
 msgstr "โปรตุเกส (บราซิล)"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:91
 msgid "Romanian"
 msgstr "โรมาเนีย"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:92
 msgid "Russian"
 msgstr "รัสเซีย"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:93
 msgid "Slovak"
 msgstr "สโลวัก"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:94
 msgid "Slovenian"
 msgstr "สโลวีเนีย"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:95
+#, fuzzy
+msgid "Albanian"
+msgstr "อลาแคนท์"
+
+#: conf/global_settings.py:96
 msgid "Serbian"
 msgstr "เซอร์เบีย"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:97
+#, fuzzy
+msgid "Serbian Latin"
+msgstr "เซอร์เบีย"
+
+#: conf/global_settings.py:98
 msgid "Swedish"
 msgstr "สวีเดน"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:99
 msgid "Tamil"
 msgstr "ทมิฬ"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:100
 msgid "Telugu"
 msgstr "เตลุคู"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:101
+#, fuzzy
+msgid "Thai"
+msgstr "ทมิฬ"
+
+#: conf/global_settings.py:102
 msgid "Turkish"
 msgstr "ตุรกี"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:103
 msgid "Ukrainian"
 msgstr "ยูเครน"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:104
+#, fuzzy
+msgid "Vietnamese"
+msgstr "เวียนนา"
+
+#: conf/global_settings.py:105
 msgid "Simplified Chinese"
 msgstr "จีนตัวย่อ"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:106
 msgid "Traditional Chinese"
 msgstr "จีนตัวเต็ม"
 
-#: contrib/admin/filterspecs.py:44
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>โดย %s:</h3>\n"
-"<ul>\n"
-
-#: contrib/admin/filterspecs.py:74
-#: contrib/admin/filterspecs.py:92
-#: contrib/admin/filterspecs.py:147
-#: contrib/admin/filterspecs.py:173
-msgid "All"
-msgstr "ทั้งหมด"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Any date"
-msgstr "วันไหนก็ได้"
-
-#: contrib/admin/filterspecs.py:114
-msgid "Today"
-msgstr "วันนี้"
-
-#: contrib/admin/filterspecs.py:117
-msgid "Past 7 days"
-msgstr "สัปดาห์ที่แล้ว"
-
-#: contrib/admin/filterspecs.py:119
-msgid "This month"
-msgstr "เดือนนี้"
-
-#: contrib/admin/filterspecs.py:121
-msgid "This year"
-msgstr "ปีนี้"
-
-#: contrib/admin/filterspecs.py:147
-#: forms/widgets.py:391
-msgid "Yes"
-msgstr "ใช่"
-
-#: contrib/admin/filterspecs.py:147
-#: forms/widgets.py:391
-msgid "No"
-msgstr "ไม่ใช่"
-
-#: contrib/admin/filterspecs.py:154
-#: forms/widgets.py:391
-msgid "Unknown"
-msgstr "ไม่รู้"
-
-#: contrib/admin/models.py:19
-msgid "action time"
-msgstr "เวลาลงมือ"
-
-#: contrib/admin/models.py:22
-msgid "object id"
-msgstr "อ็อบเจ็กต์ไอดี"
-
-#: contrib/admin/models.py:23
-msgid "object repr"
-msgstr "object repr"
-
-#: contrib/admin/models.py:24
-msgid "action flag"
-msgstr "action flag"
-
-#: contrib/admin/models.py:25
-msgid "change message"
-msgstr "เปลี่ยนข้อความ"
-
-#: contrib/admin/models.py:28
-msgid "log entry"
-msgstr "log entry"
-
-#: contrib/admin/models.py:29
-msgid "log entries"
-msgstr "log entries"
-
-#: contrib/admin/options.py:60
-#: contrib/admin/options.py:121
-msgid "None"
-msgstr "ไม่มี"
-
-#: contrib/admin/options.py:338
-#, python-format
-msgid "Changed %s."
-msgstr "%s เปลี่ยนแล้ว"
-
-#: contrib/admin/options.py:338
-#: contrib/admin/options.py:348
-#: forms/models.py:275
-msgid "and"
-msgstr "และ"
-
-#: contrib/admin/options.py:343
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "เพิ่ม %(name)s \"%(object)s\" แล้ว"
-
-#: contrib/admin/options.py:347
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "เปลี่ยน %(list)s สำหรับ %(name)s \"%(object)s\" แล้ว"
-
-#: contrib/admin/options.py:352
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "ลบ %(name)s \"%(object)s\" แล้ว"
-
-#: contrib/admin/options.py:356
-msgid "No fields changed."
-msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
-
-#: contrib/admin/options.py:417
-#: contrib/auth/admin.py:51
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
-
-#: contrib/admin/options.py:421
-#: contrib/admin/options.py:454
-#: contrib/auth/admin.py:59
-msgid "You may edit it again below."
-msgstr "สามารถแก้ไขเพิ่มเติมได้ที่ด้านล่าง"
-
-#: contrib/admin/options.py:431
-#: contrib/admin/options.py:464
-#, python-format
-msgid "You may add another %s below."
-msgstr "คุณสามารถเพิ่ม %s ได้อีกที่ด้านล่าง"
-
-#: contrib/admin/options.py:452
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
-
-#: contrib/admin/options.py:460
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว แก้ไขได้อีกที่ด้านล่าง"
-
-#: contrib/admin/options.py:536
-#, python-format
-msgid "Add %s"
-msgstr "เพิ่ม %s"
-
-#: contrib/admin/options.py:614
-#, python-format
-msgid "Change %s"
-msgstr "เปลี่ยน %s"
-
-#: contrib/admin/options.py:646
-msgid "Database error"
-msgstr "เกิดความผิดพลาดที่ฐานข้อมูล"
-
-#: contrib/admin/options.py:696
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "ลบ %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
-
-#: contrib/admin/options.py:703
-msgid "Are you sure?"
-msgstr "แน่ใจหรือ"
-
-#: contrib/admin/options.py:732
-#, python-format
-msgid "Change history: %s"
-msgstr "เปลี่ยนแปลงประวัติ: %s"
-
-#: contrib/admin/sites.py:16
-#: contrib/admin/views/decorators.py:14
-#: contrib/auth/forms.py:80
-msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
-msgstr "กรุณาใส่ชื่อผู้ใช้และรหัสผ่านให้ถูกต้อง มีการแยกแยะตัวพิมพ์ใหญ่-เล็ก"
-
-#: contrib/admin/sites.py:227
-#: contrib/admin/views/decorators.py:40
-msgid "Please log in again, because your session has expired."
-msgstr "กรุณาลงชื่อเข้าใช้อีกครั้ง, เนื่องจากคุณไม่ได้ใช้งานนานเกินไป"
-
-#: contrib/admin/sites.py:234
-#: contrib/admin/views/decorators.py:47
-msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
-msgstr "ดูเหมือนเบราว์เซอร์ของคุณจะไม่เปิดรับคุกกี้ กรุณาเปิดรับคุกกี้และลองเรียกหน้านี้ใหม่อีกครั้ง"
-
-#: contrib/admin/sites.py:250
-#: contrib/admin/sites.py:256
-#: contrib/admin/views/decorators.py:66
-msgid "Usernames cannot contain the '@' character."
-msgstr "ชื่อผู้ใช้ไม่สามารถใช้อักขระ '@' ได้"
-
-#: contrib/admin/sites.py:253
-#: contrib/admin/views/decorators.py:62
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "ที่อยู่อีเมลไม่ใช่ชื่อผู้ใช้ของคุณ ลองใช้ '%s' แทน"
-
-#: contrib/admin/sites.py:313
-msgid "Site administration"
-msgstr "การจัดการไซต์"
-
-#: contrib/admin/sites.py:326
-#: contrib/admin/templates/admin/login.html:26
-#: contrib/admin/templates/registration/password_reset_complete.html:14
-#: contrib/admin/views/decorators.py:20
-msgid "Log in"
-msgstr "เข้าสู่ระบบ"
-
-#: contrib/admin/sites.py:373
-#, python-format
-msgid "%s administration"
-msgstr "%s การจัดการ"
-
-#: contrib/admin/util.py:138
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "จำเป็นต้องมี %(fieldname)s ใน %(name)s: %(obj)s "
-
-#: contrib/admin/util.py:143
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "จำเป็นต้องมี %(fieldname)s ใน %(name)s: "
-
-#: contrib/admin/widgets.py:70
-msgid "Date:"
-msgstr "วันที่ :"
-
-#: contrib/admin/widgets.py:70
-msgid "Time:"
-msgstr "เวลา :"
-
-#: contrib/admin/widgets.py:94
-msgid "Currently:"
-msgstr "ปัจจุบัน:"
-
-#: contrib/admin/widgets.py:94
-msgid "Change:"
-msgstr "เปลี่ยนแปลง:"
-
-#: contrib/admin/widgets.py:121
-msgid "Lookup"
-msgstr "ดูที่"
-
-#: contrib/admin/widgets.py:228
-msgid "Add Another"
-msgstr "เพิ่มอีก"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "ไม่พบหน้านี้"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "เสียใจด้วย ไม่พบหน้าที่ต้องการ"
-
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/change_form.html:17
-#: contrib/admin/templates/admin/change_list.html:8
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/admin/auth/user/change_password.html:10
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_reset_complete.html:4
-#: contrib/admin/templates/registration/password_reset_confirm.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
-msgid "Home"
-msgstr "หน้าหลัก"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "เซิร์ฟเวอร์ขัดข้อง"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "เซิร์ฟเวอร์ขัดข้อง (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "เซิร์ฟเวอร์ขัดข้อง <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
-msgstr "เกิดเหตุขัดข้องขี้น ทางเราได้รายงานไปยังผู้ดูแลระบบแล้ว และจะดำเนินการแก้ไขอย่างเร่งด่วน ขอบคุณที่ราบงานความผิดพลาด"
-
-#: contrib/admin/templates/admin/app_index.html:10
-#: contrib/admin/templates/admin/index.html:19
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: contrib/admin/templates/admin/base.html:25
-msgid "Welcome,"
-msgstr "ยินดีต้อนรับ,"
-
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "เอกสารประกอบ"
-
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/auth/user/change_password.html:46
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-msgid "Change password"
-msgstr "เปลี่ยนรหัสผ่าน"
-
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-msgid "Log out"
-msgstr "ออกจากระบบ"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "ผู้ดูแลระบบ Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "การจัดการ Django"
-
-#: contrib/admin/templates/admin/change_form.html:20
-#: contrib/admin/templates/admin/index.html:29
-msgid "Add"
-msgstr "เพิ่ม"
-
-#: contrib/admin/templates/admin/change_form.html:27
-#: contrib/admin/templates/admin/object_history.html:10
-msgid "History"
-msgstr "ประวัติ"
-
-#: contrib/admin/templates/admin/change_form.html:28
-#: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:25
-msgid "View on site"
-msgstr "ดูที่หน้าเว็บ"
-
-#: contrib/admin/templates/admin/change_form.html:38
-#: contrib/admin/templates/admin/auth/user/change_password.html:22
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "โปรดแก้ไขข้อผิดพลาดด้านล่าง"
-
-#: contrib/admin/templates/admin/change_list.html:16
-#, python-format
-msgid "Add %(name)s"
-msgstr "เพิ่ม %(name)s"
-
-#: contrib/admin/templates/admin/change_list.html:26
-msgid "Filter"
-msgstr "ตัวกรอง"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4
-#: forms/formsets.py:246
-msgid "Delete"
-msgstr "ลบ"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:16
-#, python-format
-msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
-msgstr "กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:23
-#, python-format
-msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
-msgstr "คุณแน่ใจหรือที่จะลบ %(object_name)s \"%(escaped_object)s\"?ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:28
-msgid "Yes, I'm sure"
-msgstr "ใช่, ฉันแน่ใจ"
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr " โดย %(filter_title)s "
-
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "โมเดลใช้ได้ในแอป %(name)s ."
-
-#: contrib/admin/templates/admin/index.html:35
-msgid "Change"
-msgstr "เปลี่ยนแปลง"
-
-#: contrib/admin/templates/admin/index.html:45
-msgid "You don't have permission to edit anything."
-msgstr "คุณไม่สิทธิ์ในการเปลี่ยนแปลงข้อมูลใดๆ ได้"
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "Recent Actions"
-msgstr "คำสั่งที่ผ่านมา"
-
-#: contrib/admin/templates/admin/index.html:54
-msgid "My Actions"
-msgstr "คำสั่งของฉัน"
-
-#: contrib/admin/templates/admin/index.html:58
-msgid "None available"
-msgstr "ไม่ว่าง"
-
-#: contrib/admin/templates/admin/invalid_setup.html:7
-msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
-msgstr "มีสิ่งผิดปกติเกิดขึ้นกับการติดตั้งฐานข้อมูล กรุณาตรวจสอบอีกครั้งว่าฐานข้อมูลได้ถูกติดตั้งแล้ว หรือฐานข้อมูลสามารถอ่านและเขียนได้โคยผู้ใช้นี้"
-
-#: contrib/admin/templates/admin/login.html:19
-msgid "Username:"
-msgstr "ชื่อผู้ใช้:"
-
-#: contrib/admin/templates/admin/login.html:22
-msgid "Password:"
-msgstr "รหัสผ่าน:"
-
-#: contrib/admin/templates/admin/object_history.html:22
-msgid "Date/time"
-msgstr "วันที่/เวลา"
-
-#: contrib/admin/templates/admin/object_history.html:23
-msgid "User"
-msgstr "ผู้ใช้"
-
-#: contrib/admin/templates/admin/object_history.html:24
-msgid "Action"
-msgstr "คำสั่ง"
-
-#: contrib/admin/templates/admin/object_history.html:30
-#: utils/translation/trans_real.py:404
-msgid "DATETIME_FORMAT"
-msgstr "N j, Y, P"
-
-#: contrib/admin/templates/admin/object_history.html:38
-msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
-msgstr "อ็อบเจ็กต์นี้ไม่ได้แก้ไขประวัติ เป็นไปได้ว่ามันอาจจะไม่ได้ถูกเพิ่มเข้าไปโดยระบบ"
-
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "แสดงทั้งหมด"
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "ไป"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "%(counter)s ผลลัพท์"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s ทั้งหมด"
-
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Save"
-msgstr "บันทึก"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save as new"
-msgstr "บันทึกใหม่"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and add another"
-msgstr "บันทึกและเพิ่ม"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save and continue editing"
-msgstr "บันทึกและกลับมาแก้ไข"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid "First, enter a username and password. Then, you'll be able to edit more user options."
-msgstr "ขั้นตอนแรก ใส่ชื่อผู้ใช้และรหัสผ่าน หลังจากนั้นคุณจะสามารถแก้ไขข้อมูลผู้ใช้ได้มากขึ้น"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:13
-#: contrib/auth/forms.py:14
-#: contrib/auth/forms.py:47
-#: contrib/auth/forms.py:59
-msgid "Username"
-msgstr "ชื่อผู้ใช้"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:20
-#: contrib/admin/templates/admin/auth/user/change_password.html:33
-#: contrib/auth/forms.py:17
-#: contrib/auth/forms.py:60
-#: contrib/auth/forms.py:184
-msgid "Password"
-msgstr "รหัสผ่าน"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:26
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
-#: contrib/auth/forms.py:185
-msgid "Password (again)"
-msgstr "รหัสผ่าน (อีกครั้ง)"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:27
-#: contrib/admin/templates/admin/auth/user/change_password.html:40
-msgid "Enter the same password as above, for verification."
-msgstr "ใส่รหัสผ่านเหมือนด้านบน เพื่อตรวจสอบความถูกต้อง"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:26
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "ใส่รหัสผ่านใหม่สำหรับผู้ใช้ <strong>%(username)s</strong>."
-
-#: contrib/admin/templates/admin/edit_inline/tabular.html:15
-msgid "Delete?"
-msgstr "ลบ?"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "ขอบคุณที่สละเวลาอันมีค่าให้กับเว็บไซต์ของเราในวันนี้"
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "เข้าสู่ระบบอีกครั้ง"
-
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-msgid "Password change"
-msgstr "เปลี่ยนรหัสผ่าน"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "เปลี่ยนรหัสผ่านสำเร็จ"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "รหัสผ่านของคุณถูกเปลี่ยนไปแล้ว"
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
-msgstr "กรุณาใส่รหัสผ่านเดิม ด้วยเหตุผลทางด้านการรักษาความปลอดภัย หลังจากนั้นให้ใส่รหัสผ่านใหม่อีกสองครั้ง เพื่อตรวจสอบว่าคุณได้พิมพ์รหัสอย่างถูกต้อง"
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "รหัสผ่านเก่า:"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-#: contrib/admin/templates/registration/password_reset_confirm.html:18
-msgid "New password:"
-msgstr "รหัสผ่านใหม่:"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-#: contrib/admin/templates/registration/password_reset_confirm.html:20
-msgid "Confirm password:"
-msgstr "ยืนยันรหัสผ่าน:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
-msgid "Change my password"
-msgstr "เปลี่ยนรหัสผ่านของฉัน"
-
-#: contrib/admin/templates/registration/password_reset_complete.html:4
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-msgid "Password reset"
-msgstr "ตั้งค่ารหัสผ่านใหม่"
-
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_complete.html:10
-msgid "Password reset complete"
-msgstr "ตั้งค่ารหัสผ่านใหม่เรียบร้อย"
-
-#: contrib/admin/templates/registration/password_reset_complete.html:12
-msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "รหัสผ่านของคุณได้รับการตั้งค่าแล้ว คุณสามารถเข้าสู่ระบบได้ทันที"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:4
-msgid "Password reset confirmation"
-msgstr "การยืนยันตั้งค่ารหัสผ่านใหม่"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:12
-msgid "Enter new password"
-msgstr "ใส่รหัสผ่านใหม่"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:14
-msgid "Please enter your new password twice so we can verify you typed it in correctly."
-msgstr "กรุณาใส่รหัสผ่านใหม่สองครั้ง เพื่อตรวจสอบว่าคุณได้พิมพ์รหัสอย่างถูกต้อง"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:26
-msgid "Password reset unsuccessful"
-msgstr "การตั้งค่ารหัสผ่านใหม่ ไม่สำเร็จ"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:28
-msgid "The password reset link was invalid, possibly because it has already been used.  Please request a new password reset."
-msgstr "การตั้งรหัสผ่านใหม่ไม่สำเร็จ เป็นเพราะว่าหน้านี้ได้ถูกใช้งานไปแล้ว กรุณาทำการตั้งรหัสผ่านใหม่อีกครั้ง"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "การตั้งค่ารหัสผ่านใหม่เรียบร้อย"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid "We've e-mailed you instructions for setting your password to the e-mail address you submitted. You should be receiving it shortly."
-msgstr "เราได้ส่งอีเมลวิธีการตั้งรหัสผ่าน ไปที่อีเมลที่คุณให้ไว้เรียบร้อยแล้ว และคุณจะได้รับเร็วๆ นี้"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "คุณได้รับอีเมลนี้เพราะว่าคุณได้ทำการขอรหัสผ่านใหม่"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "สำหรับบัญชีการใช้งานของคุณที่ %(site_name)s "
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-msgid "Please go to the following page and choose a new password:"
-msgstr "กรุณาไปที่หน้านี้และเลือกรหัสผ่านใหม่:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:9
-msgid "Your username, in case you've forgotten:"
-msgstr "ชื่อผู้ใช้ของคุณ ในกรณีที่คุณถูกลืม:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Thanks for using our site!"
-msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "%(site_name)s ทีม"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid "Forgotten your password? Enter your e-mail address below, and we'll e-mail instructions for setting a new one."
-msgstr "ลืมรหัสผ่าน? กรุณาใส่อีเมลด้านล่าง ทางเราจะทำการส่งวิธีการในการตั้งรหัสผ่านใหม่ไปให้"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "อีเมลของคุณ"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "ตั้งรหัสผ่านของฉันใหม่"
-
-#: contrib/admin/templatetags/admin_list.py:288
-msgid "All dates"
-msgstr "ทุกวัน"
-
-#: contrib/admin/views/main.py:69
-#, python-format
-msgid "Select %s"
-msgstr "เลือก %s"
-
-#: contrib/admin/views/main.py:69
-#, python-format
-msgid "Select %s to change"
-msgstr "เลือก %s เพื่อเปลี่ยนแปลง"
-
-#: contrib/admin/views/template.py:36
-#: contrib/sites/models.py:38
-msgid "site"
-msgstr "ไซต์"
-
-#: contrib/admin/views/template.py:38
-msgid "template"
-msgstr "เทมเพลต"
-
-#: contrib/admindocs/views.py:57
-#: contrib/admindocs/views.py:59
-#: contrib/admindocs/views.py:61
-msgid "tag:"
-msgstr "ป้ายกำกับ:"
-
-#: contrib/admindocs/views.py:90
-#: contrib/admindocs/views.py:92
-#: contrib/admindocs/views.py:94
-msgid "filter:"
-msgstr "ตัวกรอง:"
-
-#: contrib/admindocs/views.py:154
-#: contrib/admindocs/views.py:156
-#: contrib/admindocs/views.py:158
-msgid "view:"
-msgstr "ดู:"
-
-#: contrib/admindocs/views.py:186
-#, python-format
-msgid "App %r not found"
-msgstr "ไม่พบแอป %r "
-
-#: contrib/admindocs/views.py:193
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "ไม่พบโมเดล %(model_name)r ในแอป %(app_label)r"
-
-#: contrib/admindocs/views.py:205
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "ความสัมพันธ์`%(app_label)s.%(data_type)s` อ็อบเจ็กต์"
-
-#: contrib/admindocs/views.py:205
-#: contrib/admindocs/views.py:227
-#: contrib/admindocs/views.py:241
-#: contrib/admindocs/views.py:246
-msgid "model:"
-msgstr "โมเดล:"
-
-#: contrib/admindocs/views.py:236
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "ความสัมพันธ์`%(app_label)s.%(object_name)s` อ็อบเจ็กต์"
-
-#: contrib/admindocs/views.py:241
-#, python-format
-msgid "all %s"
-msgstr "ทั้งหมด %s "
-
-#: contrib/admindocs/views.py:246
-#, python-format
-msgid "number of %s"
-msgstr "จำนวนของ %s"
-
-#: contrib/admindocs/views.py:251
-#, python-format
-msgid "Fields on %s objects"
-msgstr "ฟิลด์บน %s อ็อบเจ็กต์"
-
-#: contrib/admindocs/views.py:314
-#: contrib/admindocs/views.py:325
-#: contrib/admindocs/views.py:327
-#: contrib/admindocs/views.py:333
-#: contrib/admindocs/views.py:334
-#: contrib/admindocs/views.py:336
-msgid "Integer"
-msgstr "จำนวนเต็ม"
-
-#: contrib/admindocs/views.py:315
-msgid "Boolean (Either True or False)"
-msgstr "ตรรกะแบบบูลหมายถึง ค่า\"จริง\" (True) หรือ \"ไม่จริง \" (False)"
-
-#: contrib/admindocs/views.py:316
-#: contrib/admindocs/views.py:335
-#, python-format
-msgid "String (up to %(max_length)s)"
-msgstr "สตริง(ได้ถึง %(max_length)s)"
-
-#: contrib/admindocs/views.py:317
-msgid "Comma-separated integers"
-msgstr "จำนวนเต็มแบบมีจุลภาค"
-
-#: contrib/admindocs/views.py:318
-msgid "Date (without time)"
-msgstr "วันที่ (ไม่มีเวลา)"
-
-#: contrib/admindocs/views.py:319
-msgid "Date (with time)"
-msgstr "วันที่ (พร้อมด้วยเวลา)"
-
-#: contrib/admindocs/views.py:320
-msgid "Decimal number"
-msgstr "เลขฐานสิบหรือเลขทศนิยม"
-
-#: contrib/admindocs/views.py:321
-msgid "E-mail address"
-msgstr "ที่อยู่อีเมล"
-
-#: contrib/admindocs/views.py:322
-#: contrib/admindocs/views.py:323
-#: contrib/admindocs/views.py:326
-msgid "File path"
-msgstr "ตำแหน่งไฟล์"
-
-#: contrib/admindocs/views.py:324
-msgid "Floating point number"
-msgstr "เลขทศนิยม"
-
-#: contrib/admindocs/views.py:328
-#: contrib/comments/models.py:58
-msgid "IP address"
-msgstr "หมายเลขไอพี"
-
-#: contrib/admindocs/views.py:330
-msgid "Boolean (Either True, False or None)"
-msgstr "ตรรกะแบบบูลหมายถึง ค่า\"จริง\" (True) หรือ \"ไม่จริง \" (False) หรือ \"ไม่มี\" (None)"
-
-#: contrib/admindocs/views.py:331
-msgid "Relation to parent model"
-msgstr "Relation to parent model"
-
-#: contrib/admindocs/views.py:332
-msgid "Phone number"
-msgstr "หมายเลขโทรศัพท์"
-
-#: contrib/admindocs/views.py:337
-msgid "Text"
-msgstr "ข้อความ"
-
-#: contrib/admindocs/views.py:338
-msgid "Time"
-msgstr "เวลา"
-
-#: contrib/admindocs/views.py:339
-#: contrib/comments/forms.py:22
-#: contrib/flatpages/admin.py:8
-#: contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admindocs/views.py:340
-msgid "U.S. state (two uppercase letters)"
-msgstr "รัฐในสหรัฐ (ตัวอักษรใหญ่ 2 ตัว)"
-
-#: contrib/admindocs/views.py:341
-msgid "XML text"
-msgstr "ข้อความ XML"
-
-#: contrib/admindocs/views.py:367
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s ดูเหมือนจะไม่ใช่ urlpattern อ็อบเจ็กต์"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "Bookmarklets"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
-msgid "Documentation bookmarklets"
-msgstr "Documentation bookmarklets"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\">เพื่อติดตั้ง bookmarklets, ลากลิ้งก์ไปที่แถบเครื่องมือบุ๊กมาร์ค\n"
-", หรือคลิกขวาที่ลิ้งและเพิ่มเข้าบุ๊กมาร์คของคุณ. ตอนนี้คุณสามารถ\n"
-"เลือก bookmarklet จากหน้าใดๆในเว็บไซต์.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
-msgid "Documentation for this page"
-msgstr "เอกสารสำหรับหน้านี้"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
-msgid "Jumps you from any page to the documentation for the view that generates that page."
-msgstr "ย้ายจากทุกหน้าไปที่วิวที่สร้างหน้านั้นขึ้นมา"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
-msgid "Show object ID"
-msgstr "แสดงอ็อบเจ็กต์ไอดี"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
-msgid "Shows the content-type and unique ID for pages that represent a single object."
-msgstr "แสดง content-type และ unique ID เพื่อแสดงอ็อบเจ็กต์เพียงอย่างเดียว."
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
-msgid "Edit this object (current window)"
-msgstr "แก้ไขออปเจ็กนี้ (ในหน้าต่างปัจจุบัน)"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "ไปที่หน้าแอดมินเพื่อแสดงอ็อบเจ็กต์เพียงอย่างเดียว."
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
-msgid "Edit this object (new window)"
-msgstr "แก้ไขออปเจ็กนี้ (หน้าใหม่)"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
-msgid "As above, but opens the admin page in a new window."
-msgstr "เหมือนด้านบน แต่เปิดหน้าต่างผู้ดูแลระบบในหน้าต่างใหม่"
-
-#: contrib/auth/admin.py:21
-msgid "Personal info"
-msgstr "ข้อมูลส่วนตัว"
-
-#: contrib/auth/admin.py:22
-msgid "Permissions"
-msgstr "สิทธิ์"
-
-#: contrib/auth/admin.py:23
-msgid "Important dates"
-msgstr "วันที่ที่สำคัญ"
-
-#: contrib/auth/admin.py:24
-msgid "Groups"
-msgstr "กลุ่ม"
-
-#: contrib/auth/admin.py:64
-msgid "Add user"
-msgstr "เพิ่มผู้ใช้"
-
-#: contrib/auth/admin.py:90
-msgid "Password changed successfully."
-msgstr "เปลี่ยนรหัสผ่านสำเร็จแล้ว"
-
-#: contrib/auth/admin.py:96
-#, python-format
-msgid "Change password: %s"
-msgstr "เปลี่ยนรหัสผ่าน: %s "
-
-#: contrib/auth/forms.py:15
-#: contrib/auth/forms.py:48
-#: contrib/auth/models.py:136
-msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
-msgstr "ต้องการไม่เกิน 30 ตัวอักษร และเป็นตัวอักษรหรือตัวเลขเท่านั้น (ตัวอักษร ตัวเลข และ เครื่องหมายขีดล่าง)"
-
-#: contrib/auth/forms.py:16
-#: contrib/auth/forms.py:49
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "ต้องประกอบด้วยตัวอักษร ตัวเลข และเครื่องหมายขีดล่างเท่านั้น"
-
-#: contrib/auth/forms.py:18
-msgid "Password confirmation"
-msgstr "ยืนยันรหัสผ่าน"
-
-#: contrib/auth/forms.py:30
-msgid "A user with that username already exists."
-msgstr "ชื่อผู้ใช้นั้นได้ถูกใช้ไปแล้ว"
-
-#: contrib/auth/forms.py:36
-#: contrib/auth/forms.py:154
-#: contrib/auth/forms.py:196
-msgid "The two password fields didn't match."
-msgstr "รหัสผ่านไม่ตรงกัน"
-
-#: contrib/auth/forms.py:82
-msgid "This account is inactive."
-msgstr "บัญชีนี้ไม่ทำงาน"
-
-#: contrib/auth/forms.py:87
-msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
-msgstr "เว็บเบราเซอร์ของคุณไม่สามารถใช้งานระบบคุกกี้ได้ จำเป็นต้องใช้ระบบคุกกี้ในการเข้าสู่ระบบ"
-
-#: contrib/auth/forms.py:100
-msgid "E-mail"
-msgstr "อีเมล"
-
-#: contrib/auth/forms.py:109
-msgid "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
-msgstr "อีเมลนี้ไม่ตรงกับบัญชีใดๆในระบบ คุณแน่ใจหรือว่าคุณได้ลงทะเบียนแล้ว"
-
-#: contrib/auth/forms.py:134
-#, python-format
-msgid "Password reset on %s"
-msgstr "ตั้งค่ารหัสผ่านใหม่บน %s"
-
-#: contrib/auth/forms.py:142
-msgid "New password"
-msgstr "รหัสผ่านใหม่"
-
-#: contrib/auth/forms.py:143
-msgid "New password confirmation"
-msgstr "ยืนยันการตั้งรหัสผ่านใหม่"
-
-#: contrib/auth/forms.py:168
-msgid "Old password"
-msgstr "รหัสผ่านเก่า"
-
-#: contrib/auth/forms.py:176
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "ใส่รหัสผ่านเก่าผิด กรุณาใส่รหัสผ่านอีกครั้ง"
-
-#: contrib/auth/models.py:72
-#: contrib/auth/models.py:95
-msgid "name"
-msgstr "ชื่อ"
-
-#: contrib/auth/models.py:74
-msgid "codename"
-msgstr "รหัสชื่อ"
-
-#: contrib/auth/models.py:77
-msgid "permission"
-msgstr "สิทธิ์"
-
-#: contrib/auth/models.py:78
-#: contrib/auth/models.py:96
-msgid "permissions"
-msgstr "สิทธิ์"
-
-#: contrib/auth/models.py:99
-msgid "group"
-msgstr "กลุ่ม"
-
-#: contrib/auth/models.py:100
-#: contrib/auth/models.py:146
-msgid "groups"
-msgstr "กลุ่ม"
-
-#: contrib/auth/models.py:136
-msgid "username"
-msgstr "ชื่อผู้ใช้"
-
-#: contrib/auth/models.py:137
-msgid "first name"
-msgstr "ชื่อ"
-
-#: contrib/auth/models.py:138
-msgid "last name"
-msgstr "นามสกุล"
-
-#: contrib/auth/models.py:139
-msgid "e-mail address"
-msgstr "อีเมล"
-
-#: contrib/auth/models.py:140
-msgid "password"
-msgstr "รหัสผ่าน"
-
-#: contrib/auth/models.py:140
-msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
-msgstr "ใช้ '[algo]$[salt]$[hexdigest]'หรือใช้ <a href=\"password/\">แบบฟอร์มเปลี่ยนรหัสผ่าน </a>."
-
-#: contrib/auth/models.py:141
-msgid "staff status"
-msgstr "สถานะของพนักงาน"
-
-#: contrib/auth/models.py:141
-msgid "Designates whether the user can log into this admin site."
-msgstr "กำหนดผู้ที่จะเข้ามาใช้งานในส่วนของผู้ดูแลระบบ"
-
-#: contrib/auth/models.py:142
-msgid "active"
-msgstr "ใช้งานได้"
-
-#: contrib/auth/models.py:142
-msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
-msgstr "กำหนดให้ผู้ใช้มีสถานะที่สามารถเข้ามาใช้งานได้ เลือกออกแทนที่จะลบชื่อผู้ใช้ทิ้งไป "
-
-#: contrib/auth/models.py:143
-msgid "superuser status"
-msgstr "สถานะผู้ใช้พิเศษ"
-
-#: contrib/auth/models.py:143
-msgid "Designates that this user has all permissions without explicitly assigning them."
-msgstr "กำหนดสิทธิ์ทุกอย่างให้ผู้ใช้ โดยไม่ต้องการมอบหมายอย่างเป็นทางการ"
-
-#: contrib/auth/models.py:144
-msgid "last login"
-msgstr "เข้าสู่ระบบครั้งสุดท้าย"
-
-#: contrib/auth/models.py:145
-msgid "date joined"
-msgstr "วันที่เข้าร่วม"
-
-#: contrib/auth/models.py:147
-msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
-msgstr "ด้วยสิทธิ์ที่ได้รับ ผู้ใช้นี้ยังได้รับสิทธิ์ให้ใช้อำนาจได้กับกลุ่มของตนเองอีกด้วย"
-
-#: contrib/auth/models.py:148
-msgid "user permissions"
-msgstr "สิทธิ์ของผู้ใช้"
-
-#: contrib/auth/models.py:152
-msgid "user"
-msgstr "ผู้ใช้"
-
-#: contrib/auth/models.py:153
-msgid "users"
-msgstr "ผู้ใช้"
-
-#: contrib/auth/models.py:308
-msgid "message"
-msgstr "ข้อความ"
-
-#: contrib/auth/views.py:50
-msgid "Logged out"
-msgstr "ออกจากระบบ"
-
-#: contrib/auth/management/commands/createsuperuser.py:23
-#: forms/fields.py:428
-msgid "Enter a valid e-mail address."
-msgstr "กรุณาใส่อีเมลที่ถูกต้อง"
-
-#: contrib/comments/admin.py:11
-msgid "Content"
-msgstr "เนื้อหา"
-
-#: contrib/comments/admin.py:14
-msgid "Metadata"
-msgstr "Metadata"
-
-#: contrib/comments/forms.py:20
-msgid "Name"
-msgstr "ชื่อ"
-
-#: contrib/comments/forms.py:21
-msgid "Email address"
-msgstr "อีเมล"
-
-#: contrib/comments/forms.py:23
-msgid "Comment"
-msgstr "ข้อคิดเห็น"
-
-#: contrib/comments/forms.py:26
-msgid "If you enter anything in this field your comment will be treated as spam"
-msgstr "ถ้าคุณใส่ข้อมูลใดๆ ก็ตามในส่วนนี้ มันจะกลายเป็นสแปม"
-
-#: contrib/comments/forms.py:126
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "ระวังนะ ไม่สามารถใช้คำว่า %s ที่นี่ได้"
-
-#: contrib/comments/models.py:23
-msgid "object ID"
-msgstr "อ็อบเจ็กต์ไอดี"
-
-#: contrib/comments/models.py:50
-msgid "user's name"
-msgstr "ชื่อของผู้ใช้"
-
-#: contrib/comments/models.py:51
-msgid "user's email address"
-msgstr "อีเมลของผู้ใช้"
-
-#: contrib/comments/models.py:52
-msgid "user's URL"
-msgstr "URL ของผู้ใช้"
-
-#: contrib/comments/models.py:54
-msgid "comment"
-msgstr "ข้อคิดเห็น"
-
-#: contrib/comments/models.py:57
-msgid "date/time submitted"
-msgstr "วันและเวลาที่ส่งข้อมูล"
-
-#: contrib/comments/models.py:59
-msgid "is public"
-msgstr "สาธารณะ"
-
-#: contrib/comments/models.py:60
-msgid "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "เลือกออกเพื่อที่จะทำให้ข้อคิดเห็นนั้นหายไปจากเว็บไซต์"
-
-#: contrib/comments/models.py:62
-msgid "is removed"
-msgstr "ถอดออกแล้ว"
-
-#: contrib/comments/models.py:63
-msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
-msgstr "เลือกเมื่อเห็นว่าข้อคิดเห็นไหนไม่เหมาะสม เมื่อข้อคิดเห็นนี้ได้ถูกลบแล้ว ข้อมูลอื่นจะถูกแสดงขึ้นแทน"
-
-#: contrib/comments/models.py:115
-msgid "This comment was posted by an authenticated user and thus the name is read-only."
-msgstr "ข้อคิดเห็นนี้ได้ถูกเขียนไว้โดยผู้ใช้ที่สามารถเชื่อถือได้ จะถูกอ่านได้เพียงอย่างเดียว"
-
-#: contrib/comments/models.py:124
-msgid "This comment was posted by an authenticated user and thus the email is read-only."
-msgstr "ข้อคิดเห็นนี้ถูกเขียนไว้โดยผู้ใช้ที่สามารถเชื่อถือได้ ดังนั้นอีเมลนั้นจะถูกอ่านเท่านั้น"
-
-#: contrib/comments/models.py:149
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"โพสต์โดย %(user)s ที่ %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: contrib/contenttypes/models.py:67
-msgid "python model class name"
-msgstr "python model class name"
-
-#: contrib/contenttypes/models.py:71
-msgid "content type"
-msgstr "content type"
-
-#: contrib/contenttypes/models.py:72
-msgid "content types"
-msgstr "content types"
-
-#: contrib/flatpages/admin.py:9
-msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "ตัวอย่าง: '/about/contact/'. ต้องแน่ใจว่าขึ้นต้นและลงท้ายด้วยเครื่องหมาย /"
-
-#: contrib/flatpages/admin.py:11
-msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
-msgstr "ค่าที่ว่านี้จะต้องประกอบด้วยตัวหน้งสือ ตัวเลข เครื่องหมายขีดล่าง และขีดทับ"
-
-#: contrib/flatpages/admin.py:22
-msgid "Advanced options"
-msgstr "ตัวเลือกเพิ่มเติม"
-
-#: contrib/flatpages/models.py:8
-msgid "title"
-msgstr "หัวข้อ"
-
-#: contrib/flatpages/models.py:9
-msgid "content"
-msgstr "เนื้อหา"
-
-#: contrib/flatpages/models.py:10
-msgid "enable comments"
-msgstr "ใช้งานข้อติชม"
-
-#: contrib/flatpages/models.py:11
-msgid "template name"
-msgstr "ชื่อเทมเพลต"
-
-#: contrib/flatpages/models.py:12
-msgid "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."
-msgstr "ตัวอย่าง: 'flatpages/contact_page.html' ถ้าไม่ได้ถูกใช้ ระบบจะใช้ 'flatpages/default.html' "
-
-#: contrib/flatpages/models.py:13
-msgid "registration required"
-msgstr "ต้องลงทะเบียนก่อน"
-
-#: contrib/flatpages/models.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "ถ้าถูกเลือก ผู้ใช้ที่ลงทะเบียนเข้าสู่ระบบเท่านั้นที่จะสามารถดูหน้านี้"
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "flat page"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "flat page"
-
-#: contrib/formtools/wizard.py:130
-msgid "We apologize, but your form has expired. Please continue filling out the form from this page."
-msgstr "ขออภัย แบบฟอร์มไม่สามารถใช้งานได้ กรุณาใส่ข้อมูลในหน้านี้ใหม่"
-
-#: contrib/gis/forms/fields.py:14
-msgid "No geometry value provided."
-msgstr "ไม่พบข้อมูลพิกัด"
-
-#: contrib/gis/forms/fields.py:15
-msgid "Invalid geometry value."
-msgstr "ค่าพิกัดผิดพลาด "
-
-#: contrib/gis/forms/fields.py:16
-msgid "Invalid geometry type."
-msgstr "ขนิดข้อมูลพิกัดผิดพลาด"
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "th"
-msgstr "th"
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "st"
-msgstr "st"
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "nd"
-msgstr "nd"
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "rd"
-msgstr "rd"
-
-#: contrib/humanize/templatetags/humanize.py:51
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f หนึ่งล้าน"
-
-#: contrib/humanize/templatetags/humanize.py:54
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f สิบล้าน"
-
-#: contrib/humanize/templatetags/humanize.py:57
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f ร้อยล้าน"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "one"
-msgstr "หนึ่ง"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "two"
-msgstr "สอง"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "three"
-msgstr "สาม"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "four"
-msgstr "สี่"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "five"
-msgstr "ห้า"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "six"
-msgstr "หก"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "seven"
-msgstr "เจ็ด"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "eight"
-msgstr "แปด"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "nine"
-msgstr "เก้า"
-
-#: contrib/humanize/templatetags/humanize.py:93
-msgid "today"
-msgstr "วันนี้"
-
-#: contrib/humanize/templatetags/humanize.py:95
-msgid "tomorrow"
-msgstr "พรุ่งนี้"
-
-#: contrib/humanize/templatetags/humanize.py:97
-msgid "yesterday"
-msgstr "เมื่อวานนี้"
-
-#: contrib/localflavor/ar/forms.py:27
-msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "กรุณาใส่รหัสไปรษณีย์ ในรูปแบบของ NNNN หรือ ANNNNAAA  "
-
-#: contrib/localflavor/ar/forms.py:49
-#: contrib/localflavor/br/forms.py:96
-#: contrib/localflavor/br/forms.py:135
-#: contrib/localflavor/pe/forms.py:23
-#: contrib/localflavor/pe/forms.py:51
-msgid "This field requires only numbers."
-msgstr "ฟิลด์นี้ต้องการเฉพาะตัวเลขเท่านั้น"
-
-#: contrib/localflavor/ar/forms.py:50
-msgid "This field requires 7 or 8 digits."
-msgstr "ฟิลด์นี้ต้องการตัวเลขจำนวน 7 หรือ 8 หลัก"
-
-#: contrib/localflavor/ar/forms.py:79
-msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "ใส่ CUIT ในรูปของ XX-XXXXXXXX-X หรือ XXXXXXXXXXXX"
-
-#: contrib/localflavor/ar/forms.py:80
-msgid "Invalid CUIT."
-msgstr "CUIT ไม่สมบูรณ์"
-
-#: contrib/localflavor/at/at_states.py:5
-msgid "Burgenland"
-msgstr "เบอร์เกินแลนด์"
-
-#: contrib/localflavor/at/at_states.py:6
-msgid "Carinthia"
-msgstr "คารินเธีย"
-
-#: contrib/localflavor/at/at_states.py:7
-msgid "Lower Austria"
-msgstr "ออสเตรียใต้"
-
-#: contrib/localflavor/at/at_states.py:8
-msgid "Upper Austria"
-msgstr "ออสเตรียเหนือ"
-
-#: contrib/localflavor/at/at_states.py:9
-msgid "Salzburg"
-msgstr "แซลซ์เบิร์ก"
-
-#: contrib/localflavor/at/at_states.py:10
-msgid "Styria"
-msgstr "สไตเรีย"
-
-#: contrib/localflavor/at/at_states.py:11
-msgid "Tyrol"
-msgstr "ไทรอล"
-
-#: contrib/localflavor/at/at_states.py:12
-msgid "Vorarlberg"
-msgstr "โวราร์ลเบิร์ก"
-
-#: contrib/localflavor/at/at_states.py:13
-msgid "Vienna"
-msgstr "เวียนนา"
-
-#: contrib/localflavor/at/forms.py:20
-#: contrib/localflavor/ch/forms.py:16
-#: contrib/localflavor/no/forms.py:12
-msgid "Enter a zip code in the format XXXX."
-msgstr "ใส่รหัสไปรษณีย์ในรูปแบบของ XXXX"
-
-#: contrib/localflavor/at/forms.py:48
-msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr "ใส่หมายเลขประกันสังคมออสเตรีย ในรูปแบบ XXXX XXXXXX "
-
-#: contrib/localflavor/au/forms.py:16
-msgid "Enter a 4 digit post code."
-msgstr "ใส่รหัสไปรษณีย์ 4 หลัก"
-
-#: contrib/localflavor/br/forms.py:21
-msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "ใส่รหัสไปรษณีย์ในรูปแบบ XXXXX-XXX "
-
-#: contrib/localflavor/br/forms.py:30
-msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "ใส่หมายเลขโทรศัพท์ในรูปแบบ XX-XXXX-XXXX "
-
-#: contrib/localflavor/br/forms.py:58
-msgid "Select a valid brazilian state. That state is not one of the available states."
-msgstr "เลือกชื่อเมืองของบราซิล"
-
-#: contrib/localflavor/br/forms.py:94
-msgid "Invalid CPF number."
-msgstr "ตัวเลข CPF ไม่สมบูรณ์"
-
-#: contrib/localflavor/br/forms.py:95
-msgid "This field requires at most 11 digits or 14 characters."
-msgstr "ฟิลด์นี้ต้องการตัวเลขมากที่สุด 11 หรือ 14 ตัว"
-
-#: contrib/localflavor/br/forms.py:134
-msgid "Invalid CNPJ number."
-msgstr "ตัวเลข CNPJ ไม่สมบูรณ์"
-
-#: contrib/localflavor/br/forms.py:136
-msgid "This field requires at least 14 digits"
-msgstr "ฟิลด์นี้ต้องการตัวเลขอย่างน้อย 14 หลัก"
-
-#: contrib/localflavor/ca/forms.py:17
-msgid "Enter a postal code in the format XXX XXX."
-msgstr "ใส่รหัสไปรษณีย์ในรูปแบบ XXX XXX "
-
-#: contrib/localflavor/ca/forms.py:88
-msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "ใส่หมายเลขของบัตรประกันสังคมแคนาดา ในรูปแบบ XXX-XXX-XXX "
-
-#: contrib/localflavor/ch/ch_states.py:5
-msgid "Aargau"
-msgstr "อาร์เกา"
-
-#: contrib/localflavor/ch/ch_states.py:6
-msgid "Appenzell Innerrhoden"
-msgstr "แอพเพ็นเซล อินเนอร์ฮอเดน"
-
-#: contrib/localflavor/ch/ch_states.py:7
-msgid "Appenzell Ausserrhoden"
-msgstr "แอพเพ็นเซล ออสเซอร์ฮอเดน"
-
-#: contrib/localflavor/ch/ch_states.py:8
-msgid "Basel-Stadt"
-msgstr "บาเซิล-ชตัดท์"
-
-#: contrib/localflavor/ch/ch_states.py:9
-msgid "Basel-Land"
-msgstr "บาเซิล-ชตัดท์"
-
-#: contrib/localflavor/ch/ch_states.py:10
-msgid "Berne"
-msgstr "เบอร์เน"
-
-#: contrib/localflavor/ch/ch_states.py:11
-msgid "Fribourg"
-msgstr "ฟรายบวก"
-
-#: contrib/localflavor/ch/ch_states.py:12
-msgid "Geneva"
-msgstr "เจนีวา"
-
-#: contrib/localflavor/ch/ch_states.py:13
-msgid "Glarus"
-msgstr "กลารัส"
-
-#: contrib/localflavor/ch/ch_states.py:14
-msgid "Graubuenden"
-msgstr "เกาบึนเดน"
-
-#: contrib/localflavor/ch/ch_states.py:15
-msgid "Jura"
-msgstr "จูรา"
-
-#: contrib/localflavor/ch/ch_states.py:16
-msgid "Lucerne"
-msgstr "ลูเซิร์น"
-
-#: contrib/localflavor/ch/ch_states.py:17
-msgid "Neuchatel"
-msgstr "นูชาเทล"
-
-#: contrib/localflavor/ch/ch_states.py:18
-msgid "Nidwalden"
-msgstr "นิดวาลเดน"
-
-#: contrib/localflavor/ch/ch_states.py:19
-msgid "Obwalden"
-msgstr "ออบวาลเดน"
-
-#: contrib/localflavor/ch/ch_states.py:20
-msgid "Schaffhausen"
-msgstr "ชัฟเฮาซัน"
-
-#: contrib/localflavor/ch/ch_states.py:21
-msgid "Schwyz"
-msgstr "ชวิซ"
-
-#: contrib/localflavor/ch/ch_states.py:22
-msgid "Solothurn"
-msgstr "โซโลเธิร์น"
-
-#: contrib/localflavor/ch/ch_states.py:23
-msgid "St. Gallen"
-msgstr "เซนท์ กัลเลน"
-
-#: contrib/localflavor/ch/ch_states.py:24
-msgid "Thurgau"
-msgstr "เธอร์เกอ"
-
-#: contrib/localflavor/ch/ch_states.py:25
-msgid "Ticino"
-msgstr "ทีชิโน"
-
-#: contrib/localflavor/ch/ch_states.py:26
-msgid "Uri"
-msgstr "ยูริ"
-
-#: contrib/localflavor/ch/ch_states.py:27
-msgid "Valais"
-msgstr "วาเล"
-
-#: contrib/localflavor/ch/ch_states.py:28
-msgid "Vaud"
-msgstr "วอด"
-
-#: contrib/localflavor/ch/ch_states.py:29
-msgid "Zug"
-msgstr "ซูก"
-
-#: contrib/localflavor/ch/ch_states.py:30
-msgid "Zurich"
-msgstr "ซูริค"
-
-#: contrib/localflavor/ch/forms.py:64
-msgid "Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format."
-msgstr "ใส่หมายเลขประจำตัวประชาชนหรือหมายเลขพาสปอร์ต ในรูปแบบ X1234567<0 หรือ 1234567890"
-
-#: contrib/localflavor/cl/forms.py:29
-msgid "Enter a valid Chilean RUT."
-msgstr "ใส่ RUT ของชิลีที่ถูกต้อง"
-
-#: contrib/localflavor/cl/forms.py:30
-msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "ใส่หมายเลข RUT ของชิลีที่ถูกต้องในรูปแบบ XX.XXX.XXX-X."
-
-#: contrib/localflavor/cl/forms.py:31
-msgid "The Chilean RUT is not valid."
-msgstr "RUT ของชิลีไม่ถูกต้อง"
-
-#: contrib/localflavor/de/de_states.py:5
-msgid "Baden-Wuerttemberg"
-msgstr "บาเดิน-เวือร์ทเทมแบร์ก"
-
-#: contrib/localflavor/de/de_states.py:6
-msgid "Bavaria"
-msgstr "บาวาเรีย"
-
-#: contrib/localflavor/de/de_states.py:7
-msgid "Berlin"
-msgstr "เบอร์ลิน"
-
-#: contrib/localflavor/de/de_states.py:8
-msgid "Brandenburg"
-msgstr "บรานเดนเบิร์ก"
-
-#: contrib/localflavor/de/de_states.py:9
-msgid "Bremen"
-msgstr "เบรเมน"
-
-#: contrib/localflavor/de/de_states.py:10
-msgid "Hamburg"
-msgstr "ฮัมบูร์ก"
-
-#: contrib/localflavor/de/de_states.py:11
-msgid "Hessen"
-msgstr "เฮสส์"
-
-#: contrib/localflavor/de/de_states.py:12
-msgid "Mecklenburg-Western Pomerania"
-msgstr "เม็กเลนเบิร์กตะวันตก-โพเมราเนีย"
-
-#: contrib/localflavor/de/de_states.py:13
-msgid "Lower Saxony"
-msgstr "แซกโซนีล่าง"
-
-#: contrib/localflavor/de/de_states.py:14
-msgid "North Rhine-Westphalia"
-msgstr "ไรน์ เวสท์ฟาเลีย เหนือ"
-
-#: contrib/localflavor/de/de_states.py:15
-msgid "Rhineland-Palatinate"
-msgstr "ไรน์แลนด์-พาลาทิเนต"
-
-#: contrib/localflavor/de/de_states.py:16
-msgid "Saarland"
-msgstr "ซาร์แลนด์"
-
-#: contrib/localflavor/de/de_states.py:17
-msgid "Saxony"
-msgstr "แซกโซนี"
-
-#: contrib/localflavor/de/de_states.py:18
-msgid "Saxony-Anhalt"
-msgstr "แซกโซนี-แอเฮาท์"
-
-#: contrib/localflavor/de/de_states.py:19
-msgid "Schleswig-Holstein"
-msgstr "ชเลสวิก-โฮลชไตน์"
-
-#: contrib/localflavor/de/de_states.py:20
-msgid "Thuringia"
-msgstr "เธอร์ริงเกีย"
-
-#: contrib/localflavor/de/forms.py:14
-#: contrib/localflavor/fi/forms.py:12
-#: contrib/localflavor/fr/forms.py:15
-msgid "Enter a zip code in the format XXXXX."
-msgstr "ใส่รหัสไปรษณ๊ย์ ในรูปแบบ XXXXX"
-
-#: contrib/localflavor/de/forms.py:41
-msgid "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format."
-msgstr "ใส่หมายเลขประจำตัวประชาชนเยอรมันในรูปแบบ XXXXXXXXXXX-XXXXXXX-XXXXXXX-X"
-
-#: contrib/localflavor/es/es_provinces.py:5
-msgid "Arava"
-msgstr "อราวา"
-
-#: contrib/localflavor/es/es_provinces.py:6
-msgid "Albacete"
-msgstr "อัลบาเซเต"
-
-#: contrib/localflavor/es/es_provinces.py:7
-msgid "Alacant"
-msgstr "อลาแคนท์"
-
-#: contrib/localflavor/es/es_provinces.py:8
-msgid "Almeria"
-msgstr "อัลมีเรีย"
-
-#: contrib/localflavor/es/es_provinces.py:9
-msgid "Avila"
-msgstr "อบียา"
-
-#: contrib/localflavor/es/es_provinces.py:10
-msgid "Badajoz"
-msgstr "บาดาจอซ"
-
-#: contrib/localflavor/es/es_provinces.py:11
-msgid "Illes Balears"
-msgstr "หมู่เกาะแบลีแอริก"
-
-#: contrib/localflavor/es/es_provinces.py:12
-msgid "Barcelona"
-msgstr "บาเซโลนา"
-
-#: contrib/localflavor/es/es_provinces.py:13
-msgid "Burgos"
-msgstr "เบอร์โกซ"
-
-#: contrib/localflavor/es/es_provinces.py:14
-msgid "Caceres"
-msgstr "กาเซเรส"
-
-#: contrib/localflavor/es/es_provinces.py:15
-msgid "Cadiz"
-msgstr "คาดิซ"
-
-#: contrib/localflavor/es/es_provinces.py:16
-msgid "Castello"
-msgstr "คาสเทลโล"
-
-#: contrib/localflavor/es/es_provinces.py:17
-msgid "Ciudad Real"
-msgstr "ซิวดัด เรอัล"
-
-#: contrib/localflavor/es/es_provinces.py:18
-msgid "Cordoba"
-msgstr "คอร์โดบา"
-
-#: contrib/localflavor/es/es_provinces.py:19
-msgid "A Coruna"
-msgstr "ลา คอรุนญ่า"
-
-#: contrib/localflavor/es/es_provinces.py:20
-msgid "Cuenca"
-msgstr "เกวงกา"
-
-#: contrib/localflavor/es/es_provinces.py:21
-msgid "Girona"
-msgstr "จีโรนา"
-
-#: contrib/localflavor/es/es_provinces.py:22
-msgid "Granada"
-msgstr "กรานาดา"
-
-#: contrib/localflavor/es/es_provinces.py:23
-msgid "Guadalajara"
-msgstr "กวาดาลาฮารา"
-
-#: contrib/localflavor/es/es_provinces.py:24
-msgid "Guipuzkoa"
-msgstr "กีปุซโกอา"
-
-#: contrib/localflavor/es/es_provinces.py:25
-msgid "Huelva"
-msgstr "อูเอลบา"
-
-#: contrib/localflavor/es/es_provinces.py:26
-msgid "Huesca"
-msgstr "อวยสกา"
-
-#: contrib/localflavor/es/es_provinces.py:27
-msgid "Jaen"
-msgstr "คาเอน "
-
-#: contrib/localflavor/es/es_provinces.py:28
-msgid "Leon"
-msgstr "ลีออน"
-
-#: contrib/localflavor/es/es_provinces.py:29
-msgid "Lleida"
-msgstr "เยย์ดา"
-
-#: contrib/localflavor/es/es_provinces.py:30
-#: contrib/localflavor/es/es_regions.py:17
-msgid "La Rioja"
-msgstr "ลา ริโอฮา"
-
-#: contrib/localflavor/es/es_provinces.py:31
-msgid "Lugo"
-msgstr "ลูโก"
-
-#: contrib/localflavor/es/es_provinces.py:32
-#: contrib/localflavor/es/es_regions.py:18
-msgid "Madrid"
-msgstr "มาดริด"
-
-#: contrib/localflavor/es/es_provinces.py:33
-msgid "Malaga"
-msgstr "มายอกา"
-
-#: contrib/localflavor/es/es_provinces.py:34
-msgid "Murcia"
-msgstr "มูร์เซีย"
-
-#: contrib/localflavor/es/es_provinces.py:35
-msgid "Navarre"
-msgstr "นาวาร์"
-
-#: contrib/localflavor/es/es_provinces.py:36
-msgid "Ourense"
-msgstr "โอเรนเซ"
-
-#: contrib/localflavor/es/es_provinces.py:37
-msgid "Asturias"
-msgstr "อัสตูเรียส"
-
-#: contrib/localflavor/es/es_provinces.py:38
-msgid "Palencia"
-msgstr "ปาเลนเซีย"
-
-#: contrib/localflavor/es/es_provinces.py:39
-msgid "Las Palmas"
-msgstr "ลาส พัลมาส"
-
-#: contrib/localflavor/es/es_provinces.py:40
-msgid "Pontevedra"
-msgstr "ปอนเตเบดรา"
-
-#: contrib/localflavor/es/es_provinces.py:41
-msgid "Salamanca"
-msgstr "ซาลามังกา"
-
-#: contrib/localflavor/es/es_provinces.py:42
-msgid "Santa Cruz de Tenerife"
-msgstr "ซานตาครูซ ดา เตริเนเฟ"
-
-#: contrib/localflavor/es/es_provinces.py:43
-#: contrib/localflavor/es/es_regions.py:11
-msgid "Cantabria"
-msgstr "กันตาเบรีย"
-
-#: contrib/localflavor/es/es_provinces.py:44
-msgid "Segovia"
-msgstr "เซโกเบีย"
-
-#: contrib/localflavor/es/es_provinces.py:45
-msgid "Seville"
-msgstr "เซบียา"
-
-#: contrib/localflavor/es/es_provinces.py:46
-msgid "Soria"
-msgstr "โซเรีย"
-
-#: contrib/localflavor/es/es_provinces.py:47
-msgid "Tarragona"
-msgstr "ตาร์ราโกนา"
-
-#: contrib/localflavor/es/es_provinces.py:48
-msgid "Teruel"
-msgstr "เตรวยล์"
-
-#: contrib/localflavor/es/es_provinces.py:49
-msgid "Toledo"
-msgstr "โตเลโด"
-
-#: contrib/localflavor/es/es_provinces.py:50
-msgid "Valencia"
-msgstr "บาเลนเซีย"
-
-#: contrib/localflavor/es/es_provinces.py:51
-msgid "Valladolid"
-msgstr "บายาโดลิด"
-
-#: contrib/localflavor/es/es_provinces.py:52
-msgid "Bizkaia"
-msgstr "บิสกาเอีย"
-
-#: contrib/localflavor/es/es_provinces.py:53
-msgid "Zamora"
-msgstr "ซาโมรา"
-
-#: contrib/localflavor/es/es_provinces.py:54
-msgid "Zaragoza"
-msgstr "ซาราโกซา"
-
-#: contrib/localflavor/es/es_provinces.py:55
-msgid "Ceuta"
-msgstr "เซวตา"
-
-#: contrib/localflavor/es/es_provinces.py:56
-msgid "Melilla"
-msgstr "เมลียา"
-
-#: contrib/localflavor/es/es_regions.py:5
-msgid "Andalusia"
-msgstr "อันดาลูเซีย"
-
-#: contrib/localflavor/es/es_regions.py:6
-msgid "Aragon"
-msgstr "อะรากอน"
-
-#: contrib/localflavor/es/es_regions.py:7
-msgid "Principality of Asturias"
-msgstr "ราชรัฐอัสตูเรียส"
-
-#: contrib/localflavor/es/es_regions.py:8
-msgid "Balearic Islands"
-msgstr "หมู่เกาะแบลีแอริก"
-
-#: contrib/localflavor/es/es_regions.py:9
-msgid "Basque Country"
-msgstr "แคว้นบาสค์"
-
-#: contrib/localflavor/es/es_regions.py:10
-msgid "Canary Islands"
-msgstr "หมู่เกาะคะเนรี"
-
-#: contrib/localflavor/es/es_regions.py:12
-msgid "Castile-La Mancha"
-msgstr "กัสตียา-ลามันชา"
-
-#: contrib/localflavor/es/es_regions.py:13
-msgid "Castile and Leon"
-msgstr "คาสตีลและเลออน"
-
-#: contrib/localflavor/es/es_regions.py:14
-msgid "Catalonia"
-msgstr "คาเทโลเนีย"
-
-#: contrib/localflavor/es/es_regions.py:15
-msgid "Extremadura"
-msgstr "เอกเตรมาดูรา"
-
-#: contrib/localflavor/es/es_regions.py:16
-msgid "Galicia"
-msgstr "กาลิเซีย"
-
-#: contrib/localflavor/es/es_regions.py:19
-msgid "Region of Murcia"
-msgstr "แคว้น มูเซียร์"
-
-#: contrib/localflavor/es/es_regions.py:20
-msgid "Foral Community of Navarre"
-msgstr "แคว้นกฎบัตรนาวาร์ "
-
-#: contrib/localflavor/es/es_regions.py:21
-msgid "Valencian Community"
-msgstr "แคว้นบาเลนเซีย"
-
-#: contrib/localflavor/es/forms.py:19
-msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "ใส่รหัสไปรษณีย์ในรูปของ 01XXX - 52XXX "
-
-#: contrib/localflavor/es/forms.py:39
-msgid "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or 9XXXXXXXX."
-msgstr "ใส่เบอร์โทรศัพท์ในรูปของ 6XXXXXXXX, 8XXXXXXXX หรือ 9XXXXXXXX "
-
-#: contrib/localflavor/es/forms.py:66
-msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "กรุณาใส่ NIF, NIE, หรือ CIF "
-
-#: contrib/localflavor/es/forms.py:67
-msgid "Please enter a valid NIF or NIE."
-msgstr "กรุณาใส่ NIF หรือ NIE"
-
-#: contrib/localflavor/es/forms.py:68
-msgid "Invalid checksum for NIF."
-msgstr "ผลรวมตรวจสอบ สำหรับ NIF ผิดพลาด"
-
-#: contrib/localflavor/es/forms.py:69
-msgid "Invalid checksum for NIE."
-msgstr "ผลรวมตรวจสอบ สำหรับ NIE ผิดพลาด"
-
-#: contrib/localflavor/es/forms.py:70
-msgid "Invalid checksum for CIF."
-msgstr "ผลรวมตรวจสอบ สำหรับ CIF ผิดพลาด"
-
-#: contrib/localflavor/es/forms.py:142
-msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr "กรุณาใส่หมายเลขบัญชีในรูปแบบ XXXX-XXXX-XX-XXXXXXXXXX"
-
-#: contrib/localflavor/es/forms.py:143
-msgid "Invalid checksum for bank account number."
-msgstr "ผลรวมตรวจสอบ สำหรับบัญชีธนาคารผิดพลาด"
-
-#: contrib/localflavor/fi/forms.py:28
-msgid "Enter a valid Finnish social security number."
-msgstr "ใส่หมายเลขประกันสังคมฟินแลนด์"
-
-#: contrib/localflavor/in_/forms.py:14
-msgid "Enter a zip code in the format XXXXXXX."
-msgstr "กรุณาใส่รหัสไปรษณีย์ในรูปของ XXXXXXX"
-
-#: contrib/localflavor/is_/forms.py:17
-msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr "ใส่หมายเลขประจำตัวประชาชนไอซ์แลนด์ในรูปของ XXXXXX-XXXX"
-
-#: contrib/localflavor/is_/forms.py:18
-msgid "The Icelandic identification number is not valid."
-msgstr "หมายเลขประจำตัวประชาชนไอซ์แลนด์ไม่ถูกต้อง"
-
-#: contrib/localflavor/it/forms.py:14
-msgid "Enter a valid zip code."
-msgstr "ใส่รหัสไปรษณีย์"
-
-#: contrib/localflavor/it/forms.py:43
-msgid "Enter a valid Social Security number."
-msgstr "ใส่หมายเลขประกันสังคม"
-
-#: contrib/localflavor/it/forms.py:68
-msgid "Enter a valid VAT number."
-msgstr "กรอกหมายเลขภาษีมูลค่าเพิ่มที่ถูต้อง"
-
-#: contrib/localflavor/jp/forms.py:16
-msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "ใส่รหัสไปรษณีย์ในรูปของ XXXXXXX หรือ XXX-XXXX"
-
-#: contrib/localflavor/jp/jp_prefectures.py:4
-msgid "Hokkaido"
-msgstr "ฮอกไกโด"
-
-#: contrib/localflavor/jp/jp_prefectures.py:5
-msgid "Aomori"
-msgstr "อาโอโมริ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:6
-msgid "Iwate"
-msgstr "อิวาเตะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:7
-msgid "Miyagi"
-msgstr "มิยากิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:8
-msgid "Akita"
-msgstr "อากิตะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:9
-msgid "Yamagata"
-msgstr "ยามากาตา"
-
-#: contrib/localflavor/jp/jp_prefectures.py:10
-msgid "Fukushima"
-msgstr "ฟุกุชิมา"
-
-#: contrib/localflavor/jp/jp_prefectures.py:11
-msgid "Ibaraki"
-msgstr "อิบารากิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:12
-msgid "Tochigi"
-msgstr "โตชิกิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:13
-msgid "Gunma"
-msgstr "กันมา"
-
-#: contrib/localflavor/jp/jp_prefectures.py:14
-msgid "Saitama"
-msgstr "ไซตามะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:15
-msgid "Chiba"
-msgstr "ชิบะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:16
-msgid "Tokyo"
-msgstr "โตเกียว"
-
-#: contrib/localflavor/jp/jp_prefectures.py:17
-msgid "Kanagawa"
-msgstr "คะนะงะวะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:18
-msgid "Yamanashi"
-msgstr "ยามานาชิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:19
-msgid "Nagano"
-msgstr "นากาโนะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:20
-msgid "Niigata"
-msgstr "นีงะตะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:21
-msgid "Toyama"
-msgstr "โทยามะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:22
-msgid "Ishikawa"
-msgstr "อิชิคาวะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:23
-msgid "Fukui"
-msgstr "ฟูกุอิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:24
-msgid "Gifu"
-msgstr "กิฟู"
-
-#: contrib/localflavor/jp/jp_prefectures.py:25
-msgid "Shizuoka"
-msgstr "ชิซูโอกะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:26
-msgid "Aichi"
-msgstr "อะอิชิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:27
-msgid "Mie"
-msgstr "มิเอะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:28
-msgid "Shiga"
-msgstr "ชิกะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:29
-msgid "Kyoto"
-msgstr "เกียวโต"
-
-#: contrib/localflavor/jp/jp_prefectures.py:30
-msgid "Osaka"
-msgstr "โอซากา"
-
-#: contrib/localflavor/jp/jp_prefectures.py:31
-msgid "Hyogo"
-msgstr "เฮียวโงะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:32
-msgid "Nara"
-msgstr "นาระ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:33
-msgid "Wakayama"
-msgstr "วากะยามะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:34
-msgid "Tottori"
-msgstr "ทตโตะริ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:35
-msgid "Shimane"
-msgstr "ชิมาเนะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:36
-msgid "Okayama"
-msgstr "โอกะยามะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:37
-msgid "Hiroshima"
-msgstr "ฮิโรชิมา"
-
-#: contrib/localflavor/jp/jp_prefectures.py:38
-msgid "Yamaguchi"
-msgstr "ยามากุชิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:39
-msgid "Tokushima"
-msgstr "โตกุชิมะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:40
-msgid "Kagawa"
-msgstr "คากะวะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:41
-msgid "Ehime"
-msgstr "อิฮิเมะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:42
-msgid "Kochi"
-msgstr "โคจิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:43
-msgid "Fukuoka"
-msgstr "ฟุกุโอกะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:44
-msgid "Saga"
-msgstr "ซากะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:45
-msgid "Nagasaki"
-msgstr "นากะซากิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:46
-msgid "Kumamoto"
-msgstr "คุมะโมโตะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:47
-msgid "Oita"
-msgstr "โออิตะ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:48
-msgid "Miyazaki"
-msgstr "มิยาซากิ"
-
-#: contrib/localflavor/jp/jp_prefectures.py:49
-msgid "Kagoshima"
-msgstr "คาโกชิมา"
-
-#: contrib/localflavor/jp/jp_prefectures.py:50
-msgid "Okinawa"
-msgstr "โอคินาวะ"
-
-#: contrib/localflavor/mx/mx_states.py:12
-msgid "Aguascalientes"
-msgstr "อากวัสกาเลียนเตส"
-
-#: contrib/localflavor/mx/mx_states.py:13
-msgid "Baja California"
-msgstr "บาจา แคลิฟอร์เนีย"
-
-#: contrib/localflavor/mx/mx_states.py:14
-msgid "Baja California Sur"
-msgstr "บาฮากาลิฟอร์เนียซูร์"
-
-#: contrib/localflavor/mx/mx_states.py:15
-msgid "Campeche"
-msgstr "กัมเปเช"
-
-#: contrib/localflavor/mx/mx_states.py:16
-msgid "Chihuahua"
-msgstr "ชีวาวา"
-
-#: contrib/localflavor/mx/mx_states.py:17
-msgid "Chiapas"
-msgstr "เชียปัส"
-
-#: contrib/localflavor/mx/mx_states.py:18
-msgid "Coahuila"
-msgstr "โกอาวีลา"
-
-#: contrib/localflavor/mx/mx_states.py:19
-msgid "Colima"
-msgstr "โคลิมา"
-
-#: contrib/localflavor/mx/mx_states.py:20
-msgid "Distrito Federal"
-msgstr "เม็กซิโก ซิตี้"
-
-#: contrib/localflavor/mx/mx_states.py:21
-msgid "Durango"
-msgstr "ดูรังโก"
-
-#: contrib/localflavor/mx/mx_states.py:22
-msgid "Guerrero"
-msgstr "เกร์เรโร"
-
-#: contrib/localflavor/mx/mx_states.py:23
-msgid "Guanajuato"
-msgstr "กวานาวาโต"
-
-#: contrib/localflavor/mx/mx_states.py:24
-msgid "Hidalgo"
-msgstr "ฮิดาลโก"
-
-#: contrib/localflavor/mx/mx_states.py:25
-msgid "Jalisco"
-msgstr "จาลิสโค"
-
-#: contrib/localflavor/mx/mx_states.py:26
-msgid "Estado de México"
-msgstr "เม็กซิโก"
-
-#: contrib/localflavor/mx/mx_states.py:27
-msgid "Michoacán"
-msgstr "มิโชอากัง"
-
-#: contrib/localflavor/mx/mx_states.py:28
-msgid "Morelos"
-msgstr "มอเรโลส"
-
-#: contrib/localflavor/mx/mx_states.py:29
-msgid "Nayarit"
-msgstr "นายาริต"
-
-#: contrib/localflavor/mx/mx_states.py:30
-msgid "Nuevo León"
-msgstr "นวยโวเลออง"
-
-#: contrib/localflavor/mx/mx_states.py:31
-msgid "Oaxaca"
-msgstr "โออาซากา"
-
-#: contrib/localflavor/mx/mx_states.py:32
-msgid "Puebla"
-msgstr "ปวยบลา"
-
-#: contrib/localflavor/mx/mx_states.py:33
-msgid "Querétaro"
-msgstr "กิเรตาโร"
-
-#: contrib/localflavor/mx/mx_states.py:34
-msgid "Quintana Roo"
-msgstr "กินตานาโร"
-
-#: contrib/localflavor/mx/mx_states.py:35
-msgid "Sinaloa"
-msgstr "ซีนาโลอา"
-
-#: contrib/localflavor/mx/mx_states.py:36
-msgid "San Luis Potosí"
-msgstr "ซันลุยส์โปโตซี"
-
-#: contrib/localflavor/mx/mx_states.py:37
-msgid "Sonora"
-msgstr "โซโนร่า"
-
-#: contrib/localflavor/mx/mx_states.py:38
-msgid "Tabasco"
-msgstr "ทาบาสโค"
-
-#: contrib/localflavor/mx/mx_states.py:39
-msgid "Tamaulipas"
-msgstr "ตาเมาลีปัส"
-
-#: contrib/localflavor/mx/mx_states.py:40
-msgid "Tlaxcala"
-msgstr "ตลัซกาลา"
-
-#: contrib/localflavor/mx/mx_states.py:41
-msgid "Veracruz"
-msgstr "เวรากรูซ"
-
-#: contrib/localflavor/mx/mx_states.py:42
-msgid "Yucatán"
-msgstr "ยูกาตัง"
-
-#: contrib/localflavor/mx/mx_states.py:43
-msgid "Zacatecas"
-msgstr "ซากาเตกัส"
-
-#: contrib/localflavor/nl/forms.py:21
-msgid "Enter a valid postal code"
-msgstr "ใส่รหัสไปรษณีย์"
-
-#: contrib/localflavor/nl/forms.py:52
-msgid "Enter a valid phone number"
-msgstr "ใส่หมายเลขโทรศัพท์"
-
-#: contrib/localflavor/nl/forms.py:78
-msgid "Enter a valid SoFi number"
-msgstr "กรอกหมายเลขประจำตัวประชาชน"
-
-#: contrib/localflavor/nl/nl_provinces.py:4
-msgid "Drenthe"
-msgstr "แดรนด์"
-
-#: contrib/localflavor/nl/nl_provinces.py:5
-msgid "Flevoland"
-msgstr "เฟลโวแลนด์"
-
-#: contrib/localflavor/nl/nl_provinces.py:6
-msgid "Friesland"
-msgstr "ฟรายส์แลนด์"
-
-#: contrib/localflavor/nl/nl_provinces.py:7
-msgid "Gelderland"
-msgstr "เกลเดอร์แลนด์"
-
-#: contrib/localflavor/nl/nl_provinces.py:8
-msgid "Groningen"
-msgstr "เกรอนิงเกน"
-
-#: contrib/localflavor/nl/nl_provinces.py:9
-msgid "Limburg"
-msgstr "ลิมเบอร์ก"
-
-#: contrib/localflavor/nl/nl_provinces.py:10
-msgid "Noord-Brabant"
-msgstr "นอร์ด บราเบนต์"
-
-#: contrib/localflavor/nl/nl_provinces.py:11
-msgid "Noord-Holland"
-msgstr "นอร์ด ฮอลแลนด์"
-
-#: contrib/localflavor/nl/nl_provinces.py:12
-msgid "Overijssel"
-msgstr "โอเวอรีเซล"
-
-#: contrib/localflavor/nl/nl_provinces.py:13
-msgid "Utrecht"
-msgstr "อูเทรซ์ค"
-
-#: contrib/localflavor/nl/nl_provinces.py:14
-msgid "Zeeland"
-msgstr "ซีแลนด์"
-
-#: contrib/localflavor/nl/nl_provinces.py:15
-msgid "Zuid-Holland"
-msgstr "ซูด ฮอลแลนด์"
-
-#: contrib/localflavor/no/forms.py:33
-msgid "Enter a valid Norwegian social security number."
-msgstr "ใส่หมายเลขประกันสังคมนอร์เวย์"
-
-#: contrib/localflavor/pe/forms.py:24
-msgid "This field requires 8 digits."
-msgstr "ข่องนี้ต้องการตัวเลข 8 ตัว"
-
-#: contrib/localflavor/pe/forms.py:52
-msgid "This field requires 11 digits."
-msgstr "ช่องนี้ต้องการตัวเลข 11 ตัว"
-
-#: contrib/localflavor/pl/forms.py:38
-msgid "National Identification Number consists of 11 digits."
-msgstr "บัตรประจำตัวประชาประกอบด้วยตัวเลข 11 ตัว"
-
-#: contrib/localflavor/pl/forms.py:39
-msgid "Wrong checksum for the National Identification Number."
-msgstr "ผลรวมตรวจสอบของหมายเลขประจำตัวประชาชนผิดพลาด"
-
-#: contrib/localflavor/pl/forms.py:71
-msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr "ใส่หมายเลขประจำตัวผู้เสียภาษี (NIP) ในรูปของ XXX-XXX-XX-XX หรือ XX-XX-XXX-XXX "
-
-#: contrib/localflavor/pl/forms.py:72
-msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr "ผลรวมตรวจสอบสำหรับหมายเลขผู้เสียภาษี (NIP) ผิดพลาด."
-
-#: contrib/localflavor/pl/forms.py:111
-msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr "National Business Register Number (REGON) ประกอบด้วยตัวเลข 7 หรือ 9 หลัก."
-
-#: contrib/localflavor/pl/forms.py:112
-msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr "ผลรวมตรวจสอบ National Business Register Number (REGON) ผิดพลาด."
-
-#: contrib/localflavor/pl/forms.py:155
-msgid "Enter a postal code in the format XX-XXX."
-msgstr "ใส่รหัสไปรษณีย์ในรูปของ XX-XXX"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:8
-msgid "Lower Silesia"
-msgstr "ซิลเลสเซียใต้"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:9
-msgid "Kuyavia-Pomerania"
-msgstr "คูยาเวีย-โพเมราเนีย"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:10
-msgid "Lublin"
-msgstr "ลูบลิน"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:11
-msgid "Lubusz"
-msgstr "ลูเบิส์ช"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:12
-msgid "Lodz"
-msgstr "ลอดซ์"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:13
-msgid "Lesser Poland"
-msgstr "เลสเซอร์โปแลนด์"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:14
-msgid "Masovia"
-msgstr "มาโซเวีย"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:15
-msgid "Opole"
-msgstr "โอโปล์"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:16
-msgid "Subcarpatia"
-msgstr "ซับคาเพเทีย"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:17
-msgid "Podlasie"
-msgstr "พอดลาซีย์"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:18
-msgid "Pomerania"
-msgstr "โพเมราเนีย"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:19
-msgid "Silesia"
-msgstr "ซิลเลสเซีย"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:20
-msgid "Swietokrzyskie"
-msgstr "สเวียตโตเชียตสกี"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:21
-msgid "Warmia-Masuria"
-msgstr "วอร์เมีย มาซูเรีย"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:22
-msgid "Greater Poland"
-msgstr "เกรทเธอร์โปแลนด์"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:23
-msgid "West Pomerania"
-msgstr "โพเมราเนียตะวันตก"
-
-#: contrib/localflavor/ro/forms.py:19
-msgid "Enter a valid CIF."
-msgstr "กรุณาใส่ CIF"
-
-#: contrib/localflavor/ro/forms.py:56
-msgid "Enter a valid CNP."
-msgstr "กรุณาใส่ CNP"
-
-#: contrib/localflavor/ro/forms.py:141
-msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "ใส่หมายเลข IBAN ในรูปแบบ ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
-
-#: contrib/localflavor/ro/forms.py:171
-msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "หมายเลขโทรศัพท์ต้องอยู่ในรูปแบบ XXXX-XXXXXX"
-
-#: contrib/localflavor/ro/forms.py:194
-msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "กรุณาใส่รหัสไปรษณีย์ในรูปของ XXXXXX"
-
-#: contrib/localflavor/sk/forms.py:30
-msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "กรุณาใส่รหัสไปรษณีย์ในรูปของ XXXXX หรือ XXX XX "
-
-#: contrib/localflavor/sk/sk_districts.py:8
-msgid "Banska Bystrica"
-msgstr "แคว้น บันสคา บิสทิคา"
-
-#: contrib/localflavor/sk/sk_districts.py:9
-msgid "Banska Stiavnica"
-msgstr "แคว้น บันสคา สเตรียนิคา"
-
-#: contrib/localflavor/sk/sk_districts.py:10
-msgid "Bardejov"
-msgstr "บาเดโยฟ"
-
-#: contrib/localflavor/sk/sk_districts.py:11
-msgid "Banovce nad Bebravou"
-msgstr "บานอฟเซ นาด เบบราวู"
-
-#: contrib/localflavor/sk/sk_districts.py:12
-msgid "Brezno"
-msgstr "เบรซโน"
-
-#: contrib/localflavor/sk/sk_districts.py:13
-msgid "Bratislava I"
-msgstr "บราทิสลาวา หนึ่ง"
-
-#: contrib/localflavor/sk/sk_districts.py:14
-msgid "Bratislava II"
-msgstr "บราทิสลาวา สอง"
-
-#: contrib/localflavor/sk/sk_districts.py:15
-msgid "Bratislava III"
-msgstr "บราทิสลาวา สาม"
-
-#: contrib/localflavor/sk/sk_districts.py:16
-msgid "Bratislava IV"
-msgstr "บราทิสลาวา สี่"
-
-#: contrib/localflavor/sk/sk_districts.py:17
-msgid "Bratislava V"
-msgstr "บราทิสลาวา ห้า"
-
-#: contrib/localflavor/sk/sk_districts.py:18
-msgid "Bytca"
-msgstr "ไบต์กา"
-
-#: contrib/localflavor/sk/sk_districts.py:19
-msgid "Cadca"
-msgstr "คัดคา"
-
-#: contrib/localflavor/sk/sk_districts.py:20
-msgid "Detva"
-msgstr "เดทวา"
-
-#: contrib/localflavor/sk/sk_districts.py:21
-msgid "Dolny Kubin"
-msgstr "ดอลนี่ คูบิน"
-
-#: contrib/localflavor/sk/sk_districts.py:22
-msgid "Dunajska Streda"
-msgstr "ดูนูซกา สเตรดา"
-
-#: contrib/localflavor/sk/sk_districts.py:23
-msgid "Galanta"
-msgstr "กาลันตา"
-
-#: contrib/localflavor/sk/sk_districts.py:24
-msgid "Gelnica"
-msgstr "เกลนิคา"
-
-#: contrib/localflavor/sk/sk_districts.py:25
-msgid "Hlohovec"
-msgstr "ลอเวคช์"
-
-#: contrib/localflavor/sk/sk_districts.py:26
-msgid "Humenne"
-msgstr "ฮูเมนเน"
-
-#: contrib/localflavor/sk/sk_districts.py:27
-msgid "Ilava"
-msgstr "อิลลาวา"
-
-#: contrib/localflavor/sk/sk_districts.py:28
-msgid "Kezmarok"
-msgstr "เคซมารอก"
-
-#: contrib/localflavor/sk/sk_districts.py:29
-msgid "Komarno"
-msgstr "โคมาร์โน"
-
-#: contrib/localflavor/sk/sk_districts.py:30
-msgid "Kosice I"
-msgstr "แคว้น โคซิเซ หนึ่ง"
-
-#: contrib/localflavor/sk/sk_districts.py:31
-msgid "Kosice II"
-msgstr "แคว้น โคซิเซ สอง"
-
-#: contrib/localflavor/sk/sk_districts.py:32
-msgid "Kosice III"
-msgstr "แคว้น โคซิเซ สาม"
-
-#: contrib/localflavor/sk/sk_districts.py:33
-msgid "Kosice IV"
-msgstr "แคว้น โคซิเซ สี่"
-
-#: contrib/localflavor/sk/sk_districts.py:34
-msgid "Kosice - okolie"
-msgstr "แคว้น โคซิเซ โอโคไล"
-
-#: contrib/localflavor/sk/sk_districts.py:35
-msgid "Krupina"
-msgstr "ครูพินา"
-
-#: contrib/localflavor/sk/sk_districts.py:36
-msgid "Kysucke Nove Mesto"
-msgstr "เคียสเซียก โนฟ เมสโต"
-
-#: contrib/localflavor/sk/sk_districts.py:37
-msgid "Levice"
-msgstr "เลวิซ"
-
-#: contrib/localflavor/sk/sk_districts.py:38
-msgid "Levoca"
-msgstr "เลโวคา"
-
-#: contrib/localflavor/sk/sk_districts.py:39
-msgid "Liptovsky Mikulas"
-msgstr "ลิบโตสกี มิคูลาส"
-
-#: contrib/localflavor/sk/sk_districts.py:40
-msgid "Lucenec"
-msgstr "ลูเซินเนค"
-
-#: contrib/localflavor/sk/sk_districts.py:41
-msgid "Malacky"
-msgstr "มาเลคสกี"
-
-#: contrib/localflavor/sk/sk_districts.py:42
-msgid "Martin"
-msgstr "มาร์ติน"
-
-#: contrib/localflavor/sk/sk_districts.py:43
-msgid "Medzilaborce"
-msgstr "เม็ดซิลลาบอร์ซ"
-
-#: contrib/localflavor/sk/sk_districts.py:44
-msgid "Michalovce"
-msgstr "มิคัลโลฟเซอ"
-
-#: contrib/localflavor/sk/sk_districts.py:45
-msgid "Myjava"
-msgstr "มียาวา"
-
-#: contrib/localflavor/sk/sk_districts.py:46
-msgid "Namestovo"
-msgstr "เนเมสโตโว"
-
-#: contrib/localflavor/sk/sk_districts.py:47
-msgid "Nitra"
-msgstr "นิทรา"
-
-#: contrib/localflavor/sk/sk_districts.py:48
-msgid "Nove Mesto nad Vahom"
-msgstr "โนเฟ เมสโต นาด วาห์อม"
-
-#: contrib/localflavor/sk/sk_districts.py:49
-msgid "Nove Zamky"
-msgstr "โนเฟ ซามกี"
-
-#: contrib/localflavor/sk/sk_districts.py:50
-msgid "Partizanske"
-msgstr "ปาร์ติซานเก"
-
-#: contrib/localflavor/sk/sk_districts.py:51
-msgid "Pezinok"
-msgstr "เปซินอก"
-
-#: contrib/localflavor/sk/sk_districts.py:52
-msgid "Piestany"
-msgstr "เปียสตานี"
-
-#: contrib/localflavor/sk/sk_districts.py:53
-msgid "Poltar"
-msgstr "พอลต้าร์"
-
-#: contrib/localflavor/sk/sk_districts.py:54
-msgid "Poprad"
-msgstr "ป็อบปราด"
-
-#: contrib/localflavor/sk/sk_districts.py:55
-msgid "Povazska Bystrica"
-msgstr "โปวาสคา บิสทิคา"
-
-#: contrib/localflavor/sk/sk_districts.py:56
-msgid "Presov"
-msgstr "แคว้น พรีซอฟ"
-
-#: contrib/localflavor/sk/sk_districts.py:57
-msgid "Prievidza"
-msgstr "เปรียวิซา"
-
-#: contrib/localflavor/sk/sk_districts.py:58
-msgid "Puchov"
-msgstr "ปูชอพ"
-
-#: contrib/localflavor/sk/sk_districts.py:59
-msgid "Revuca"
-msgstr "เรวูก้า"
-
-#: contrib/localflavor/sk/sk_districts.py:60
-msgid "Rimavska Sobota"
-msgstr "ริมาฟสกา โซโบตา"
-
-#: contrib/localflavor/sk/sk_districts.py:61
-msgid "Roznava"
-msgstr "รอซนาวา"
-
-#: contrib/localflavor/sk/sk_districts.py:62
-msgid "Ruzomberok"
-msgstr "บูซอมเบรอก"
-
-#: contrib/localflavor/sk/sk_districts.py:63
-msgid "Sabinov"
-msgstr "ซาบินอฟ"
-
-#: contrib/localflavor/sk/sk_districts.py:64
-msgid "Senec"
-msgstr "เซเนค"
-
-#: contrib/localflavor/sk/sk_districts.py:65
-msgid "Senica"
-msgstr "เซนิก้า"
-
-#: contrib/localflavor/sk/sk_districts.py:66
-msgid "Skalica"
-msgstr "สคาลิก้า"
-
-#: contrib/localflavor/sk/sk_districts.py:67
-msgid "Snina"
-msgstr "สนินา"
-
-#: contrib/localflavor/sk/sk_districts.py:68
-msgid "Sobrance"
-msgstr "โซบรานเซ"
-
-#: contrib/localflavor/sk/sk_districts.py:69
-msgid "Spisska Nova Ves"
-msgstr "สปิสสกา โนวา เวส"
-
-#: contrib/localflavor/sk/sk_districts.py:70
-msgid "Stara Lubovna"
-msgstr "สตรารา ลูโบฟนา"
-
-#: contrib/localflavor/sk/sk_districts.py:71
-msgid "Stropkov"
-msgstr "สตรอปคอฟ"
-
-#: contrib/localflavor/sk/sk_districts.py:72
-msgid "Svidnik"
-msgstr "สวิดนิก"
-
-#: contrib/localflavor/sk/sk_districts.py:73
-msgid "Sala"
-msgstr "ซาลา"
-
-#: contrib/localflavor/sk/sk_districts.py:74
-msgid "Topolcany"
-msgstr "โทพอลคานี่"
-
-#: contrib/localflavor/sk/sk_districts.py:75
-msgid "Trebisov"
-msgstr "เทรบิซอฟ"
-
-#: contrib/localflavor/sk/sk_districts.py:76
-msgid "Trencin"
-msgstr "เทรนซิน"
-
-#: contrib/localflavor/sk/sk_districts.py:77
-msgid "Trnava"
-msgstr "แคว้น ทนาวา"
-
-#: contrib/localflavor/sk/sk_districts.py:78
-msgid "Turcianske Teplice"
-msgstr "เทอเซียนสเค เตปลิเซ"
-
-#: contrib/localflavor/sk/sk_districts.py:79
-msgid "Tvrdosin"
-msgstr "ทวาโดซิน"
-
-#: contrib/localflavor/sk/sk_districts.py:80
-msgid "Velky Krtis"
-msgstr "เวลเค เคอติส"
-
-#: contrib/localflavor/sk/sk_districts.py:81
-msgid "Vranov nad Toplou"
-msgstr "วรานอฟ นาด ท็อปพลู"
-
-#: contrib/localflavor/sk/sk_districts.py:82
-msgid "Zlate Moravce"
-msgstr "สตาเต โทราฟเซ"
-
-#: contrib/localflavor/sk/sk_districts.py:83
-msgid "Zvolen"
-msgstr "ซโวเลน"
-
-#: contrib/localflavor/sk/sk_districts.py:84
-msgid "Zarnovica"
-msgstr "ซาร์โนวีก้า"
-
-#: contrib/localflavor/sk/sk_districts.py:85
-msgid "Ziar nad Hronom"
-msgstr "ไซอาร์ นาด โฮนอม"
-
-#: contrib/localflavor/sk/sk_districts.py:86
-msgid "Zilina"
-msgstr "ซิลินา"
-
-#: contrib/localflavor/sk/sk_regions.py:8
-msgid "Banska Bystrica region"
-msgstr "แคว้น บันสคา บิสทิคา"
-
-#: contrib/localflavor/sk/sk_regions.py:9
-msgid "Bratislava region"
-msgstr "แคว้น บราทิสลาวา"
-
-#: contrib/localflavor/sk/sk_regions.py:10
-msgid "Kosice region"
-msgstr "แคว้น โคซิเซ"
-
-#: contrib/localflavor/sk/sk_regions.py:11
-msgid "Nitra region"
-msgstr "แคว้น นิทรา"
-
-#: contrib/localflavor/sk/sk_regions.py:12
-msgid "Presov region"
-msgstr "แคว้น พรีซอฟ"
-
-#: contrib/localflavor/sk/sk_regions.py:13
-msgid "Trencin region"
-msgstr "แคว้น เทรนซิน"
-
-#: contrib/localflavor/sk/sk_regions.py:14
-msgid "Trnava region"
-msgstr "แคว้น ทนาวา"
-
-#: contrib/localflavor/sk/sk_regions.py:15
-msgid "Zilina region"
-msgstr "แคว้น ซิลินา"
-
-#: contrib/localflavor/uk/forms.py:21
-msgid "Enter a valid postcode."
-msgstr "ใส่รหัสไปรษณีย์"
-
-#: contrib/localflavor/uk/uk_regions.py:11
-msgid "Bedfordshire"
-msgstr "เบดฟอร์ดเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:12
-msgid "Buckinghamshire"
-msgstr "บัคกิ้งแฮมเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:14
-msgid "Cheshire"
-msgstr "ชีเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:15
-msgid "Cornwall and Isles of Scilly"
-msgstr "คอนวอลล์ และไฮเซลส์แห่งซิลลี"
-
-#: contrib/localflavor/uk/uk_regions.py:16
-msgid "Cumbria"
-msgstr "คัมเบรีย"
-
-#: contrib/localflavor/uk/uk_regions.py:17
-msgid "Derbyshire"
-msgstr "เดอร์บีเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:18
-msgid "Devon"
-msgstr "เดวอน"
-
-#: contrib/localflavor/uk/uk_regions.py:19
-msgid "Dorset"
-msgstr "ดอร์เซท"
-
-#: contrib/localflavor/uk/uk_regions.py:20
-msgid "Durham"
-msgstr "เดอร์แรม"
-
-#: contrib/localflavor/uk/uk_regions.py:21
-msgid "East Sussex"
-msgstr "ซัสเซ็กซ์ ตะวันออก"
-
-#: contrib/localflavor/uk/uk_regions.py:22
-msgid "Essex"
-msgstr "เอสเซ็กซ์"
-
-#: contrib/localflavor/uk/uk_regions.py:23
-msgid "Gloucestershire"
-msgstr "กลอสเตอร์เชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:24
-msgid "Greater London"
-msgstr "เกรตเตอร์ ลอนดอน"
-
-#: contrib/localflavor/uk/uk_regions.py:25
-msgid "Greater Manchester"
-msgstr "เกรตเตอร์ แมนเชสเตอร์"
-
-#: contrib/localflavor/uk/uk_regions.py:26
-msgid "Hampshire"
-msgstr "แฮมเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:27
-msgid "Hertfordshire"
-msgstr "เฮิร์ทฟอร์ดเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:28
-msgid "Kent"
-msgstr "เคนท์"
-
-#: contrib/localflavor/uk/uk_regions.py:29
-msgid "Lancashire"
-msgstr "แลงคาเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:30
-msgid "Leicestershire"
-msgstr "เลสเตอร์เชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:31
-msgid "Lincolnshire"
-msgstr "ลินคอล์นเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:32
-msgid "Merseyside"
-msgstr "เมอร์ซี่ไซด์"
-
-#: contrib/localflavor/uk/uk_regions.py:33
-msgid "Norfolk"
-msgstr "นอร์ฟอล์ก"
-
-#: contrib/localflavor/uk/uk_regions.py:34
-msgid "North Yorkshire"
-msgstr "ยอร์กเชียร์เหนือ"
-
-#: contrib/localflavor/uk/uk_regions.py:35
-msgid "Northamptonshire"
-msgstr "นอร์ทแฮมตันเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:36
-msgid "Northumberland"
-msgstr "นอร์ทฮัมเบอร์แลนด์"
-
-#: contrib/localflavor/uk/uk_regions.py:37
-msgid "Nottinghamshire"
-msgstr "นอตติ้งแฮมเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:38
-msgid "Oxfordshire"
-msgstr "ออกซ์ฟอร์ดเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:39
-msgid "Shropshire"
-msgstr "ชรอพเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:40
-msgid "Somerset"
-msgstr "ซอมเมอร์เซท"
-
-#: contrib/localflavor/uk/uk_regions.py:41
-msgid "South Yorkshire"
-msgstr "ยอร์กเชียร์ ใต้"
-
-#: contrib/localflavor/uk/uk_regions.py:42
-msgid "Staffordshire"
-msgstr "สตาฟฟอร์ดเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:43
-msgid "Suffolk"
-msgstr "ซัฟฟอล์ก"
-
-#: contrib/localflavor/uk/uk_regions.py:44
-msgid "Surrey"
-msgstr "เซอร์รี่"
-
-#: contrib/localflavor/uk/uk_regions.py:45
-msgid "Tyne and Wear"
-msgstr "ไทน์ และ เวียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:46
-msgid "Warwickshire"
-msgstr "วอร์วิกเชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:47
-msgid "West Midlands"
-msgstr "มิดแลนด์ ตะวันตก"
-
-#: contrib/localflavor/uk/uk_regions.py:48
-msgid "West Sussex"
-msgstr "ซัสเซ็กซ์ ตะวันตก"
-
-#: contrib/localflavor/uk/uk_regions.py:49
-msgid "West Yorkshire"
-msgstr "ยอร์กเชียร์ ตะวันตก"
-
-#: contrib/localflavor/uk/uk_regions.py:50
-msgid "Wiltshire"
-msgstr "วิลท์เชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:51
-msgid "Worcestershire"
-msgstr "วอร์เซสเตอร์เชียร์"
-
-#: contrib/localflavor/uk/uk_regions.py:55
-msgid "County Antrim"
-msgstr "แอนทริม"
-
-#: contrib/localflavor/uk/uk_regions.py:56
-msgid "County Armagh"
-msgstr "อามาห์"
-
-#: contrib/localflavor/uk/uk_regions.py:57
-msgid "County Down"
-msgstr "ดาวน์"
-
-#: contrib/localflavor/uk/uk_regions.py:58
-msgid "County Fermanagh"
-msgstr "เฟอร์มานาห์"
-
-#: contrib/localflavor/uk/uk_regions.py:59
-msgid "County Londonderry"
-msgstr "ลอนดอนเดอร์รี่"
-
-#: contrib/localflavor/uk/uk_regions.py:60
-msgid "County Tyrone"
-msgstr "ไทโรน"
-
-#: contrib/localflavor/uk/uk_regions.py:64
-msgid "Clwyd"
-msgstr "คลูวิด"
-
-#: contrib/localflavor/uk/uk_regions.py:65
-msgid "Dyfed"
-msgstr "ดิฟฟิด"
-
-#: contrib/localflavor/uk/uk_regions.py:66
-msgid "Gwent"
-msgstr "เกวนท์"
-
-#: contrib/localflavor/uk/uk_regions.py:67
-msgid "Gwynedd"
-msgstr "กวินนืดด์"
-
-#: contrib/localflavor/uk/uk_regions.py:68
-msgid "Mid Glamorgan"
-msgstr "กลามอร์แกนกลาง"
-
-#: contrib/localflavor/uk/uk_regions.py:69
-msgid "Powys"
-msgstr "โพวิส"
-
-#: contrib/localflavor/uk/uk_regions.py:70
-msgid "South Glamorgan"
-msgstr "กลามอร์แกน ใต้"
-
-#: contrib/localflavor/uk/uk_regions.py:71
-msgid "West Glamorgan"
-msgstr "กลามอร์แกน ตะวันตก"
-
-#: contrib/localflavor/uk/uk_regions.py:75
-msgid "Borders"
-msgstr "บอร์เดอส์"
-
-#: contrib/localflavor/uk/uk_regions.py:76
-msgid "Central Scotland"
-msgstr "สกอตแลนด์กลาง"
-
-#: contrib/localflavor/uk/uk_regions.py:77
-msgid "Dumfries and Galloway"
-msgstr "ดัมฟรายส์และแกลโลเวย์"
-
-#: contrib/localflavor/uk/uk_regions.py:78
-msgid "Fife"
-msgstr "ไฟฟ์"
-
-#: contrib/localflavor/uk/uk_regions.py:79
-msgid "Grampian"
-msgstr "แกรมเพียน"
-
-#: contrib/localflavor/uk/uk_regions.py:80
-msgid "Highland"
-msgstr "ไฮแลนด์"
-
-#: contrib/localflavor/uk/uk_regions.py:81
-msgid "Lothian"
-msgstr "ลอเธียน"
-
-#: contrib/localflavor/uk/uk_regions.py:82
-msgid "Orkney Islands"
-msgstr "เกาะออร์กนี่"
-
-#: contrib/localflavor/uk/uk_regions.py:83
-msgid "Shetland Islands"
-msgstr "เกาะเชตแลนด์"
-
-#: contrib/localflavor/uk/uk_regions.py:84
-msgid "Strathclyde"
-msgstr "สเตรทไคลด์"
-
-#: contrib/localflavor/uk/uk_regions.py:85
-msgid "Tayside"
-msgstr "เทย์ไซด์"
-
-#: contrib/localflavor/uk/uk_regions.py:86
-msgid "Western Isles"
-msgstr "ไอเซลส์ตะวันออก"
-
-#: contrib/localflavor/uk/uk_regions.py:90
-msgid "England"
-msgstr "อังกฤษ"
-
-#: contrib/localflavor/uk/uk_regions.py:91
-msgid "Northern Ireland"
-msgstr "ไอร์แลนด์เหนือ"
-
-#: contrib/localflavor/uk/uk_regions.py:92
-msgid "Scotland"
-msgstr "สกอตต์แลนด์"
-
-#: contrib/localflavor/uk/uk_regions.py:93
-msgid "Wales"
-msgstr "เวลส์"
-
-#: contrib/localflavor/us/forms.py:16
-msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "ใส่รหัสไปรษณีย์ในรูปของ XXXXX หรือ XXXXX-XXXX"
-
-#: contrib/localflavor/us/forms.py:54
-msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr "ใส่หมายเลขประกันสังคมอเมริกา"
-
-#: contrib/localflavor/za/forms.py:20
-msgid "Enter a valid South African ID number"
-msgstr "ใส่หมายเลขประจำตัวประชาชนแอฟริกาใต้"
-
-#: contrib/localflavor/za/forms.py:54
-msgid "Enter a valid South African postal code"
-msgstr "ใส่รหัสไปรษณีย์แอฟริกาใต้"
-
-#: contrib/localflavor/za/za_provinces.py:4
-msgid "Eastern Cape"
-msgstr "อิสเทิร์นแคป"
-
-#: contrib/localflavor/za/za_provinces.py:5
-msgid "Free State"
-msgstr "ฟรีเสตต์"
-
-#: contrib/localflavor/za/za_provinces.py:6
-msgid "Gauteng"
-msgstr "กัวเตง"
-
-#: contrib/localflavor/za/za_provinces.py:7
-msgid "KwaZulu-Natal"
-msgstr "ควาซูลา-เนทาล"
-
-#: contrib/localflavor/za/za_provinces.py:8
-msgid "Limpopo"
-msgstr "ลิมโพโพ"
-
-#: contrib/localflavor/za/za_provinces.py:9
-msgid "Mpumalanga"
-msgstr "มูมาลากา"
-
-#: contrib/localflavor/za/za_provinces.py:10
-msgid "Northern Cape"
-msgstr "นอร์ทเทิร์นแคป"
-
-#: contrib/localflavor/za/za_provinces.py:11
-msgid "North West"
-msgstr "นอร์ทเวสต์"
-
-#: contrib/localflavor/za/za_provinces.py:12
-msgid "Western Cape"
-msgstr "เวสต์เทิร์นแคป"
-
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "เปลี่ยนทิศทางจาก"
-
-#: contrib/redirects/models.py:8
-msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
-msgstr "พาธไม่รวมโดเมน ตัวอย่าง : '/events/search/'"
-
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "เปลี่ยนทิศทางไปที่"
-
-#: contrib/redirects/models.py:10
-msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
-msgstr "มันอาจจะเป็นพาธหรือ URL แบบเต็มที่ขึ้นต้นด้วย 'http://'."
-
-#: contrib/redirects/models.py:13
-msgid "redirect"
-msgstr "เปลี่ยนทิศทาง"
-
-#: contrib/redirects/models.py:14
-msgid "redirects"
-msgstr "เปลี่ยนทิศทาง"
-
-#: contrib/sessions/models.py:45
-msgid "session key"
-msgstr "เซสชันคีย์"
-
-#: contrib/sessions/models.py:47
-msgid "session data"
-msgstr "ข้อมูลเซสชัน"
-
-#: contrib/sessions/models.py:48
-msgid "expire date"
-msgstr "วันหมดอายุ"
-
-#: contrib/sessions/models.py:53
-msgid "session"
-msgstr "เซสชัน"
-
-#: contrib/sessions/models.py:54
-msgid "sessions"
-msgstr "เซสชัน"
-
-#: contrib/sites/models.py:32
-msgid "domain name"
-msgstr "ชื่อโดเมน"
-
-#: contrib/sites/models.py:33
-msgid "display name"
-msgstr "ชื่อที่แสดง"
-
-#: contrib/sites/models.py:39
-msgid "sites"
-msgstr "ไซต์"
-
-#: db/models/fields/__init__.py:348
-#: db/models/fields/__init__.py:683
-msgid "This value must be an integer."
-msgstr "ค่านี้ต้องเป็นจำนวนเต็ม"
-
-#: db/models/fields/__init__.py:379
-msgid "This value must be either True or False."
-msgstr "ค่านี้ต้องเป็นถูกหรือผิด"
-
-#: db/models/fields/__init__.py:412
-msgid "This field cannot be null."
-msgstr "ฟิลด์นี้ไม่สารถปล่อยว่างได้"
-
-#: db/models/fields/__init__.py:428
-msgid "Enter only digits separated by commas."
-msgstr "ใส่ตัวเลขที่คั่นด้วยจุลภาคเท่านั้น"
-
-#: db/models/fields/__init__.py:459
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "ใส่วันที่ในรูปแบบ YYYY-MM-DD"
-
-#: db/models/fields/__init__.py:468
-#, python-format
-msgid "Invalid date: %s"
-msgstr "วันที่ไม่ถูกต้อง: %s"
-
-#: db/models/fields/__init__.py:532
-#: db/models/fields/__init__.py:550
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "ใส่วันเวลาที่ถูกต้องในรูปแบบ YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-
-#: db/models/fields/__init__.py:586
-msgid "This value must be a decimal number."
-msgstr "ค่านี้ต้องเป็นเลขฐานสิบหรือเลขทศนิยม"
-
-#: db/models/fields/__init__.py:719
-msgid "This value must be either None, True or False."
-msgstr "ค่านี้ต้องเป็นอย่างใดอย่างหนึ่ง None, True หรือ False"
-
-#: db/models/fields/__init__.py:817
-#: db/models/fields/__init__.py:831
-msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "ใส่เวลาในรูปแบบ HH:MM[:ss[.uuuuuu]]"
-
-#: db/models/fields/related.py:761
-msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "กดปุ่ม \"Control\", หรือ \"Command\" บน Mac ค้างไว้, เพื่อเลือกหลายๆตัวเลือก"
-
-#: db/models/fields/related.py:838
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "โปรดใส่ %(self)s ไอดี. ค่า %(value)r ไม่ถูกต้อง"
-
-#: forms/fields.py:54
-msgid "This field is required."
-msgstr "ฟิลด์นี้จำเป็น"
-
-#: forms/fields.py:55
+#: core/validators.py:20 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "กรุณาใส่ค่าที่ถูกต้อง"
 
-#: forms/fields.py:138
-#, python-format
-msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr "ค่านี้มีได้มากที่สุด %(max)d ตัวอักษร (ค่านี้คือ %(length)d)."
-
-#: forms/fields.py:139
-#, python-format
-msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr "ค่านี้มีได้น้อยที่สุด %(min)d ตัวอักษร (ค่านี้คือ %(length)d)."
-
-#: forms/fields.py:166
-msgid "Enter a whole number."
-msgstr "กรอกหมายเลข"
-
-#: forms/fields.py:167
-#: forms/fields.py:196
-#: forms/fields.py:225
-#, python-format
-msgid "Ensure this value is less than or equal to %s."
-msgstr "ค่านี้ต้องน้อยกว่าหรือเท่ากับ %s."
-
-#: forms/fields.py:168
-#: forms/fields.py:197
-#: forms/fields.py:226
-#, python-format
-msgid "Ensure this value is greater than or equal to %s."
-msgstr "ค่านี้ต้องมากกว่าหรือเท่ากับ %s."
-
-#: forms/fields.py:195
-#: forms/fields.py:224
-msgid "Enter a number."
-msgstr "กรอกหมายเลข"
-
-#: forms/fields.py:227
-#, python-format
-msgid "Ensure that there are no more than %s digits in total."
-msgstr "แน่ใจว่ารวมแล้วไม่เกิน %s หลัก."
-
-#: forms/fields.py:228
-#, python-format
-msgid "Ensure that there are no more than %s decimal places."
-msgstr "แน่ใจว่ารวมแล้วเป็นทศนิยมไม่เกิน %s หลัก."
-
-#: forms/fields.py:229
-#, python-format
-msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr "แน่ใจว่ารวมแล้วไม่เกิน %s หลัก ก่อนจุดทศนิยม."
-
-#: forms/fields.py:287
-#: forms/fields.py:848
-msgid "Enter a valid date."
-msgstr "กรุณาใส่วัน"
-
-#: forms/fields.py:321
-#: forms/fields.py:849
-msgid "Enter a valid time."
-msgstr "กรุณาใส่เวลา"
-
-#: forms/fields.py:360
-msgid "Enter a valid date/time."
-msgstr "กรุณาใส่วันเวลา"
-
-#: forms/fields.py:446
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "ไม่มีไฟล์ใดถูกส่ง. ตรวจสอบ encoding type ในฟอร์ม."
-
-#: forms/fields.py:447
-msgid "No file was submitted."
-msgstr "ไม่มีไฟล์ใดถูกส่ง"
-
-#: forms/fields.py:448
-msgid "The submitted file is empty."
-msgstr "ไฟล์ที่ส่งว่างเปล่า"
-
-#: forms/fields.py:477
-msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
-msgstr "อัพโหลดรูปที่ถูกต้อง. ไฟล์ที่อัพโหลดไปไม่ใช่รูป หรือรูปเสียหาย."
-
-#: forms/fields.py:538
+#: core/validators.py:87 forms/fields.py:572
 msgid "Enter a valid URL."
 msgstr "ใส่ URL ที่ถูกต้อง"
 
-#: forms/fields.py:539
+#: core/validators.py:89 forms/fields.py:573
 msgid "This URL appears to be a broken link."
 msgstr "URL อาจจะเป็นลิ้งค์ที่เสียหาย."
 
-#: forms/fields.py:618
-#: forms/fields.py:696
-#, python-format
-msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "เลือกตัวเลือกที่ถูกต้อง. %(value)s ไม่ใช่ตัวเลือกที่ใช้ได้."
+#: core/validators.py:120 forms/fields.py:447
+msgid "Enter a valid e-mail address."
+msgstr "กรุณาใส่อีเมลที่ถูกต้อง"
 
-#: forms/fields.py:697
-#: forms/fields.py:758
-#: forms/models.py:654
-msgid "Enter a list of values."
-msgstr "ใส่รายการ"
+#: core/validators.py:123 forms/fields.py:956
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr "ใส่ 'slug' ประกอปด้วย ตัวหนังสือ ตัวเลข เครื่องหมายขีดล่าง หรือ  เครื่องหมายขีด"
 
-#: forms/fields.py:877
+#: core/validators.py:126 forms/fields.py:949
 msgid "Enter a valid IPv4 address."
 msgstr "กรุณาใส่หมายเลขไอพีที่ถูกต้อง"
 
-#: forms/fields.py:887
-msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "ใส่ 'slug' ประกอปด้วย ตัวหนังสือ ตัวเลข เครื่องหมายขีดล่าง หรือ  เครื่องหมายขีด"
+#: core/validators.py:129 db/models/fields/__init__.py:575
+msgid "Enter only digits separated by commas."
+msgstr "ใส่ตัวเลขที่คั่นด้วยจุลภาคเท่านั้น"
 
-#: forms/formsets.py:242
-#: forms/formsets.py:244
-msgid "Order"
-msgstr "เรียงลำดับ"
+#: core/validators.py:135
+#, fuzzy, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "ค่านี้มีได้น้อยที่สุด %(min)d ตัวอักษร (ค่านี้คือ %(length)d)."
 
-#: forms/models.py:268
-#: forms/models.py:277
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#, fuzzy, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "ค่านี้ต้องน้อยกว่าหรือเท่ากับ %s."
+
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#, fuzzy, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "ค่านี้ต้องมากกว่าหรือเท่ากับ %s."
+
+#: core/validators.py:164
+#, fuzzy, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr "ค่านี้มีได้น้อยที่สุด %(min)d ตัวอักษร (ค่านี้คือ %(length)d)."
+
+#: core/validators.py:170
+#, fuzzy, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr "ค่านี้มีได้มากที่สุด %(max)d ตัวอักษร (ค่านี้คือ %(length)d)."
+
+#: db/models/base.py:765
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr ""
+
+#: db/models/base.py:780 db/models/base.py:788
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s และ %(field_label)s มีอยู่แล้ว"
 
-#: forms/models.py:584
+#: db/models/base.py:787 forms/models.py:581
+msgid "and"
+msgstr "และ"
+
+#: db/models/fields/__init__.py:63
+#, python-format
+msgid "Value %r is not a valid choice."
+msgstr ""
+
+#: db/models/fields/__init__.py:64
+msgid "This field cannot be null."
+msgstr "ฟิลด์นี้ไม่สารถปล่อยว่างได้"
+
+#: db/models/fields/__init__.py:65
+#, fuzzy
+msgid "This field cannot be blank."
+msgstr "ฟิลด์นี้ไม่สารถปล่อยว่างได้"
+
+#: db/models/fields/__init__.py:70
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
+msgid "Integer"
+msgstr "จำนวนเต็ม"
+
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
+msgid "This value must be an integer."
+msgstr "ค่านี้ต้องเป็นจำนวนเต็ม"
+
+#: db/models/fields/__init__.py:493
+msgid "This value must be either True or False."
+msgstr "ค่านี้ต้องเป็นถูกหรือผิด"
+
+#: db/models/fields/__init__.py:495
+msgid "Boolean (Either True or False)"
+msgstr "ตรรกะแบบบูลหมายถึง ค่า\"จริง\" (True) หรือ \"ไม่จริง \" (False)"
+
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "สตริง(ได้ถึง %(max_length)s)"
+
+#: db/models/fields/__init__.py:570
+msgid "Comma-separated integers"
+msgstr "จำนวนเต็มแบบมีจุลภาค"
+
+#: db/models/fields/__init__.py:584
+msgid "Date (without time)"
+msgstr "วันที่ (ไม่มีเวลา)"
+
+#: db/models/fields/__init__.py:588
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "ใส่วันที่ในรูปแบบ YYYY-MM-DD"
+
+#: db/models/fields/__init__.py:589
+#, python-format
+msgid "Invalid date: %s"
+msgstr "วันที่ไม่ถูกต้อง: %s"
+
+#: db/models/fields/__init__.py:670
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "ใส่วันเวลาที่ถูกต้องในรูปแบบ YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+
+#: db/models/fields/__init__.py:672
+msgid "Date (with time)"
+msgstr "วันที่ (พร้อมด้วยเวลา)"
+
+#: db/models/fields/__init__.py:746
+msgid "This value must be a decimal number."
+msgstr "ค่านี้ต้องเป็นเลขฐานสิบหรือเลขทศนิยม"
+
+#: db/models/fields/__init__.py:748
+msgid "Decimal number"
+msgstr "เลขฐานสิบหรือเลขทศนิยม"
+
+#: db/models/fields/__init__.py:803
+msgid "E-mail address"
+msgstr "ที่อยู่อีเมล"
+
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
+msgid "File path"
+msgstr "ตำแหน่งไฟล์"
+
+#: db/models/fields/__init__.py:841
+#, fuzzy
+msgid "This value must be a float."
+msgstr "ค่านี้ต้องเป็นจำนวนเต็ม"
+
+#: db/models/fields/__init__.py:843
+msgid "Floating point number"
+msgstr "เลขทศนิยม"
+
+#: db/models/fields/__init__.py:902
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "หมายเลขไอพี"
+
+#: db/models/fields/__init__.py:931
+msgid "This value must be either None, True or False."
+msgstr "ค่านี้ต้องเป็นอย่างใดอย่างหนึ่ง None, True หรือ False"
+
+#: db/models/fields/__init__.py:933
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+"ตรรกะแบบบูลหมายถึง ค่า\"จริง\" (True) หรือ \"ไม่จริง \" (False) หรือ \"ไม่มี\" (None)"
+
+#: db/models/fields/__init__.py:1024
+msgid "Text"
+msgstr "ข้อความ"
+
+#: db/models/fields/__init__.py:1040
+msgid "Time"
+msgstr "เวลา"
+
+#: db/models/fields/__init__.py:1044
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "ใส่เวลาในรูปแบบ HH:MM[:ss[.uuuuuu]]"
+
+#: db/models/fields/__init__.py:1120
+msgid "URL"
+msgstr "URL"
+
+#: db/models/fields/__init__.py:1136
+msgid "XML text"
+msgstr "ข้อความ XML"
+
+#: db/models/fields/related.py:804
+#, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr ""
+
+#: db/models/fields/related.py:806
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+
+#: db/models/fields/related.py:928
+msgid "One-to-one relationship"
+msgstr ""
+
+#: db/models/fields/related.py:990
+msgid "Many-to-many relationship"
+msgstr ""
+
+#: db/models/fields/related.py:1010
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "กดปุ่ม \"Control\", หรือ \"Command\" บน Mac ค้างไว้, เพื่อเลือกหลายๆตัวเลือก"
+
+#: forms/fields.py:66
+msgid "This field is required."
+msgstr "ฟิลด์นี้จำเป็น"
+
+#: forms/fields.py:221
+msgid "Enter a whole number."
+msgstr "กรอกหมายเลข"
+
+#: forms/fields.py:252 forms/fields.py:273
+msgid "Enter a number."
+msgstr "กรอกหมายเลข"
+
+#: forms/fields.py:276
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "แน่ใจว่ารวมแล้วไม่เกิน %s หลัก."
+
+#: forms/fields.py:277
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "แน่ใจว่ารวมแล้วเป็นทศนิยมไม่เกิน %s หลัก."
+
+#: forms/fields.py:278
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr "แน่ใจว่ารวมแล้วไม่เกิน %s หลัก ก่อนจุดทศนิยม."
+
+#: forms/fields.py:340 forms/fields.py:916
+msgid "Enter a valid date."
+msgstr "กรุณาใส่วัน"
+
+#: forms/fields.py:368 forms/fields.py:917
+msgid "Enter a valid time."
+msgstr "กรุณาใส่เวลา"
+
+#: forms/fields.py:394
+msgid "Enter a valid date/time."
+msgstr "กรุณาใส่วันเวลา"
+
+#: forms/fields.py:458
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "ไม่มีไฟล์ใดถูกส่ง. ตรวจสอบ encoding type ในฟอร์ม."
+
+#: forms/fields.py:459
+msgid "No file was submitted."
+msgstr "ไม่มีไฟล์ใดถูกส่ง"
+
+#: forms/fields.py:460
+msgid "The submitted file is empty."
+msgstr "ไฟล์ที่ส่งว่างเปล่า"
+
+#: forms/fields.py:461
+#, fuzzy, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr "ค่านี้มีได้มากที่สุด %(max)d ตัวอักษร (ค่านี้คือ %(length)d)."
+
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: forms/fields.py:516
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr "อัพโหลดรูปที่ถูกต้อง. ไฟล์ที่อัพโหลดไปไม่ใช่รูป หรือรูปเสียหาย."
+
+#: forms/fields.py:648 forms/fields.py:723
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "เลือกตัวเลือกที่ถูกต้อง. %(value)s ไม่ใช่ตัวเลือกที่ใช้ได้."
+
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+msgid "Enter a list of values."
+msgstr "ใส่รายการ"
+
+#: forms/formsets.py:308 forms/formsets.py:310
+msgid "Order"
+msgstr "เรียงลำดับ"
+
+#: forms/formsets.py:312
+msgid "Delete"
+msgstr "ลบ"
+
+#: forms/models.py:575
+#, fuzzy, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "โปรดแก้ไขข้อผิดพลาดด้านล่าง"
+
+#: forms/models.py:579
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: forms/models.py:585
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: forms/models.py:593
+#, fuzzy
+msgid "Please correct the duplicate values below."
+msgstr "โปรดแก้ไขข้อผิดพลาดด้านล่าง"
+
+#: forms/models.py:868
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
+
+#: forms/models.py:929
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "เลือกตัวเลือกที่ถูกต้อง. ตัวเลือกนั้นไม่สามารถเลือกได้."
 
-#: forms/models.py:655
+#: forms/models.py:1019
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "เลือกตัวเลือกที่ถูกต้อง. %s ไม่สามารถเลือกได้"
 
-#: template/defaultfilters.py:706
+#: forms/models.py:1021
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr ""
+
+#: forms/widgets.py:299
+#, fuzzy
+msgid "Currently"
+msgstr "ปัจจุบัน:"
+
+#: forms/widgets.py:300
+msgid "Change"
+msgstr "เปลี่ยนแปลง"
+
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "ปี"
+
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr "ไม่รู้"
+
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "ใช่"
+
+#: forms/widgets.py:547
+msgid "No"
+msgstr "ไม่ใช่"
+
+#: template/defaultfilters.py:794
 msgid "yes,no,maybe"
 msgstr "ใช่,ไม่ใช่,อาจจะ"
 
-#: template/defaultfilters.py:737
+#: template/defaultfilters.py:825
+#, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d ไบต์"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:827
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f กิโลไบต์"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:829
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f เมกะไบต์"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:831
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f กิกะไบต์"
 
-#: utils/dateformat.py:41
+#: template/defaultfilters.py:833
+#, fuzzy, python-format
+msgid "%.1f TB"
+msgstr "%.1f กิโลไบต์"
+
+#: template/defaultfilters.py:834
+#, fuzzy, python-format
+msgid "%.1f PB"
+msgstr "%.1f กิโลไบต์"
+
+#: utils/dateformat.py:42
 msgid "p.m."
 msgstr "p.m."
 
-#: utils/dateformat.py:42
+#: utils/dateformat.py:43
 msgid "a.m."
 msgstr "a.m."
 
-#: utils/dateformat.py:47
+#: utils/dateformat.py:48
 msgid "PM"
 msgstr "PM"
 
-#: utils/dateformat.py:48
+#: utils/dateformat.py:49
 msgid "AM"
 msgstr "AM"
 
-#: utils/dateformat.py:97
+#: utils/dateformat.py:98
 msgid "midnight"
 msgstr "เที่ยงคืน"
 
-#: utils/dateformat.py:99
+#: utils/dateformat.py:100
 msgid "noon"
 msgstr "เที่ยงวัน"
 
@@ -3732,28 +781,23 @@ msgstr "มกราคม"
 msgid "February"
 msgstr "กุมภาพันธ์"
 
-#: utils/dates.py:18
-#: utils/dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "มีนาคม"
 
-#: utils/dates.py:18
-#: utils/dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "เมษายน"
 
-#: utils/dates.py:18
-#: utils/dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "พฤษภาคม"
 
-#: utils/dates.py:18
-#: utils/dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "มิถุนายน"
 
-#: utils/dates.py:19
-#: utils/dates.py:31
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "กรกฎาคม"
 
@@ -3853,9 +897,86 @@ msgstr "พ.ย."
 msgid "Dec."
 msgstr "ธ.ค."
 
-#: utils/text.py:128
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "alt. month"
+msgid "January"
+msgstr "มกราคม"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "alt. month"
+msgid "February"
+msgstr "กุมภาพันธ์"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "alt. month"
+msgid "March"
+msgstr "มีนาคม"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "alt. month"
+msgid "April"
+msgstr "เมษายน"
+
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "alt. month"
+msgid "May"
+msgstr "พฤษภาคม"
+
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "alt. month"
+msgid "June"
+msgstr "มิถุนายน"
+
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "alt. month"
+msgid "July"
+msgstr "กรกฎาคม"
+
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "alt. month"
+msgid "August"
+msgstr "สิงหาคม"
+
+#: utils/dates.py:43
+#, fuzzy
+msgctxt "alt. month"
+msgid "September"
+msgstr "กันยายน"
+
+#: utils/dates.py:44
+#, fuzzy
+msgctxt "alt. month"
+msgid "October"
+msgstr "ตุลาคม"
+
+#: utils/dates.py:45
+#, fuzzy
+msgctxt "alt. month"
+msgid "November"
+msgstr "พฤศจิกายน"
+
+#: utils/dates.py:46
+#, fuzzy
+msgctxt "alt. month"
+msgid "December"
+msgstr "ธันวาคม"
+
+#: utils/text.py:136
 msgid "or"
 msgstr "หรือ"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
 
 #: utils/timesince.py:21
 msgid "year"
@@ -3887,46 +1008,51 @@ msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "นาที"
 
-#: utils/timesince.py:43
+#: utils/timesince.py:45
 msgid "minutes"
 msgstr "นาที"
 
-#: utils/timesince.py:48
+#: utils/timesince.py:50
+#, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:54
+#: utils/timesince.py:56
+#, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:403
+#: utils/translation/trans_real.py:560
 msgid "DATE_FORMAT"
 msgstr "j N Y"
 
-#: utils/translation/trans_real.py:405
+#: utils/translation/trans_real.py:561
+msgid "DATETIME_FORMAT"
+msgstr "N j, Y, P"
+
+#: utils/translation/trans_real.py:562
 msgid "TIME_FORMAT"
 msgstr "G:i"
 
-#: utils/translation/trans_real.py:421
+#: utils/translation/trans_real.py:583
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:422
+#: utils/translation/trans_real.py:584
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 
-#: views/generic/create_update.py:114
+#: views/generic/create_update.py:121
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s ได้ถูกสร้างเรียบร้อยแล้ว"
 
-#: views/generic/create_update.py:156
+#: views/generic/create_update.py:164
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s ได้ถูกปรับปรุงเรียบร้อยแล้ว"
 
-#: views/generic/create_update.py:198
+#: views/generic/create_update.py:207
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s ได้ถูกลบเรียบร้อยแล้ว"
-

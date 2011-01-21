@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-04-25 14:44+0300\n"
+"POT-Creation-Date: 2010-12-29 21:04+0100\n"
 "PO-Revision-Date: 2008-04-25 21:44+0200\n"
 "Last-Translator: \n"
 "Language-Team: Romanian <ro@li.org>\n"
@@ -15,4254 +15,1073 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: .\conf\global_settings.py:39
+#: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "Arabă"
 
-#: .\conf\global_settings.py:40
-msgid "Bengali"
-msgstr "Bengaleză"
-
-#: .\conf\global_settings.py:41
+#: conf/global_settings.py:45
 msgid "Bulgarian"
 msgstr "Bulgară"
 
-#: .\conf\global_settings.py:42
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "Bengaleză"
+
+#: conf/global_settings.py:47
+#, fuzzy
+msgid "Bosnian"
+msgstr "Română"
+
+#: conf/global_settings.py:48
 msgid "Catalan"
 msgstr "Catalană"
 
-#: .\conf\global_settings.py:43
+#: conf/global_settings.py:49
 msgid "Czech"
 msgstr "Cehă"
 
-#: .\conf\global_settings.py:44
+#: conf/global_settings.py:50
 msgid "Welsh"
 msgstr "Galeză"
 
-#: .\conf\global_settings.py:45
+#: conf/global_settings.py:51
 msgid "Danish"
 msgstr "Daneză"
 
-#: .\conf\global_settings.py:46
+#: conf/global_settings.py:52
 msgid "German"
 msgstr "Germană"
 
-#: .\conf\global_settings.py:47
+#: conf/global_settings.py:53
 msgid "Greek"
 msgstr "Greacă"
 
-#: .\conf\global_settings.py:48
+#: conf/global_settings.py:54
 msgid "English"
 msgstr "Engleză"
 
-#: .\conf\global_settings.py:49
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "British English"
+msgstr "Engleză"
+
+#: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "Spaniolă"
 
-#: .\conf\global_settings.py:50
-msgid "Argentinean Spanish"
+#: conf/global_settings.py:57
+#, fuzzy
+msgid "Argentinian Spanish"
 msgstr "Spaniolă argentiniană"
 
-#: .\conf\global_settings.py:51
+#: conf/global_settings.py:58
+#, fuzzy
+msgid "Estonian"
+msgstr "Română"
+
+#: conf/global_settings.py:59
 msgid "Basque"
 msgstr "Bască"
 
-#: .\conf\global_settings.py:52
+#: conf/global_settings.py:60
 msgid "Persian"
 msgstr "Persană"
 
-#: .\conf\global_settings.py:53
+#: conf/global_settings.py:61
 msgid "Finnish"
 msgstr "Finlandeză"
 
-#: .\conf\global_settings.py:54
+#: conf/global_settings.py:62
 msgid "French"
 msgstr "Franceză"
 
-#: .\conf\global_settings.py:55
+#: conf/global_settings.py:63
+#, fuzzy
+msgid "Frisian"
+msgstr "Frizia"
+
+#: conf/global_settings.py:64
 msgid "Irish"
 msgstr "Irlandeză"
 
-#: .\conf\global_settings.py:56
+#: conf/global_settings.py:65
 msgid "Galician"
 msgstr "Galiciană"
 
-#: .\conf\global_settings.py:57
-msgid "Hungarian"
-msgstr "Ungară"
-
-#: .\conf\global_settings.py:58
+#: conf/global_settings.py:66
 msgid "Hebrew"
 msgstr "Ebraică"
 
-#: .\conf\global_settings.py:59
+#: conf/global_settings.py:67
+#, fuzzy
+msgid "Hindi"
+msgstr "Highland"
+
+#: conf/global_settings.py:68
 msgid "Croatian"
 msgstr "Croată"
 
-#: .\conf\global_settings.py:60
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr "Ungară"
+
+#: conf/global_settings.py:70
+#, fuzzy
+msgid "Indonesian"
+msgstr "Macedoneană"
+
+#: conf/global_settings.py:71
 msgid "Icelandic"
 msgstr "Islandeză"
 
-#: .\conf\global_settings.py:61
+#: conf/global_settings.py:72
 msgid "Italian"
 msgstr "Italiană"
 
-#: .\conf\global_settings.py:62
+#: conf/global_settings.py:73
 msgid "Japanese"
 msgstr "Japoneză"
 
-#: .\conf\global_settings.py:63
+#: conf/global_settings.py:74
 msgid "Georgian"
 msgstr "Georgiană"
 
-#: .\conf\global_settings.py:64
-msgid "Korean"
-msgstr "Koreană"
-
-#: .\conf\global_settings.py:65
+#: conf/global_settings.py:75
 msgid "Khmer"
 msgstr "Khmeră"
 
-#: .\conf\global_settings.py:66
+#: conf/global_settings.py:76
 msgid "Kannada"
 msgstr "Limba kannada"
 
-#: .\conf\global_settings.py:67
+#: conf/global_settings.py:77
+msgid "Korean"
+msgstr "Koreană"
+
+#: conf/global_settings.py:78
+#, fuzzy
+msgid "Lithuanian"
+msgstr "Lothian"
+
+#: conf/global_settings.py:79
 msgid "Latvian"
 msgstr "Letonă"
 
-#: .\conf\global_settings.py:68
+#: conf/global_settings.py:80
 msgid "Macedonian"
 msgstr "Macedoneană"
 
-#: .\conf\global_settings.py:69
+#: conf/global_settings.py:81
+#, fuzzy
+msgid "Malayalam"
+msgstr "Malaga"
+
+#: conf/global_settings.py:82
+#, fuzzy
+msgid "Mongolian"
+msgstr "Macedoneană"
+
+#: conf/global_settings.py:83
 msgid "Dutch"
 msgstr "Olandeză"
 
-#: .\conf\global_settings.py:70
+#: conf/global_settings.py:84
 msgid "Norwegian"
 msgstr "Norvegiană"
 
-#: .\conf\global_settings.py:71
+#: conf/global_settings.py:85
+#, fuzzy
+msgid "Norwegian Bokmal"
+msgstr "Norvegiană"
+
+#: conf/global_settings.py:86
+#, fuzzy
+msgid "Norwegian Nynorsk"
+msgstr "Norvegiană"
+
+#: conf/global_settings.py:87
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Polish"
 msgstr "Poloneză"
 
-#: .\conf\global_settings.py:72
-msgid "Portugese"
+#: conf/global_settings.py:89
+#, fuzzy
+msgid "Portuguese"
 msgstr "Portugheză"
 
-#: .\conf\global_settings.py:73
+#: conf/global_settings.py:90
 msgid "Brazilian Portuguese"
 msgstr "Portugheză braziliană"
 
-#: .\conf\global_settings.py:74
+#: conf/global_settings.py:91
 msgid "Romanian"
 msgstr "Română"
 
-#: .\conf\global_settings.py:75
+#: conf/global_settings.py:92
 msgid "Russian"
 msgstr "Rusă"
 
-#: .\conf\global_settings.py:76
+#: conf/global_settings.py:93
 msgid "Slovak"
 msgstr "Slovacă"
 
-#: .\conf\global_settings.py:77
+#: conf/global_settings.py:94
 msgid "Slovenian"
 msgstr "Slovenă"
 
-#: .\conf\global_settings.py:78
+#: conf/global_settings.py:95
+#, fuzzy
+msgid "Albanian"
+msgstr "Alacant"
+
+#: conf/global_settings.py:96
 msgid "Serbian"
 msgstr "Sârbă"
 
-#: .\conf\global_settings.py:79
+#: conf/global_settings.py:97
+#, fuzzy
+msgid "Serbian Latin"
+msgstr "Sârbă"
+
+#: conf/global_settings.py:98
 msgid "Swedish"
 msgstr "Suedeză"
 
-#: .\conf\global_settings.py:80
+#: conf/global_settings.py:99
 msgid "Tamil"
 msgstr "Limba tamila"
 
-#: .\conf\global_settings.py:81
+#: conf/global_settings.py:100
 msgid "Telugu"
 msgstr "Limba telugu"
 
-#: .\conf\global_settings.py:82
+#: conf/global_settings.py:101
+#, fuzzy
+msgid "Thai"
+msgstr "Limba tamila"
+
+#: conf/global_settings.py:102
 msgid "Turkish"
 msgstr "Turcă"
 
-#: .\conf\global_settings.py:83
+#: conf/global_settings.py:103
 msgid "Ukrainian"
 msgstr "Ucraineană"
 
-#: .\conf\global_settings.py:84
+#: conf/global_settings.py:104
+#, fuzzy
+msgid "Vietnamese"
+msgstr "Prenume"
+
+#: conf/global_settings.py:105
 msgid "Simplified Chinese"
 msgstr "Chineză simplificată"
 
-#: .\conf\global_settings.py:85
+#: conf/global_settings.py:106
 msgid "Traditional Chinese"
 msgstr "Chineză tradițională"
 
-#: .\contrib\admin\filterspecs.py:44
-#, python-format
+#: core/validators.py:20 forms/fields.py:67
+msgid "Enter a valid value."
+msgstr "Introduceți o valoare validă."
+
+#: core/validators.py:87 forms/fields.py:572
+msgid "Enter a valid URL."
+msgstr "Introduceți un URL valid."
+
+#: core/validators.py:89 forms/fields.py:573
+msgid "This URL appears to be a broken link."
+msgstr "URL-ul e invalid."
+
+#: core/validators.py:120 forms/fields.py:447
+msgid "Enter a valid e-mail address."
+msgstr "Introduceţi o adresă de email validă."
+
+#: core/validators.py:123 forms/fields.py:956
+#, fuzzy
 msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"<h3>După %s:</h3>\n"
-"<ul>\n"
-
-#: .\contrib\admin\filterspecs.py:74
-#: .\contrib\admin\filterspecs.py:92
-#: .\contrib\admin\filterspecs.py:147
-#: .\contrib\admin\filterspecs.py:173
-msgid "All"
-msgstr "tot"
-
-#: .\contrib\admin\filterspecs.py:113
-msgid "Any date"
-msgstr "orice data"
-
-#: .\contrib\admin\filterspecs.py:114
-msgid "Today"
-msgstr "Astăzi"
-
-#: .\contrib\admin\filterspecs.py:117
-msgid "Past 7 days"
-msgstr "Ultimele 7 zile"
-
-#: .\contrib\admin\filterspecs.py:119
-msgid "This month"
-msgstr "Luna aceasta"
-
-#: .\contrib\admin\filterspecs.py:121
-msgid "This year"
-msgstr "Anul acesta"
-
-#: .\contrib\admin\filterspecs.py:147
-#: .\newforms\widgets.py:231
-#: .\oldforms\__init__.py:592
-msgid "Yes"
-msgstr "Da"
-
-#: .\contrib\admin\filterspecs.py:147
-#: .\newforms\widgets.py:231
-#: .\oldforms\__init__.py:592
-msgid "No"
-msgstr "Nu"
-
-#: .\contrib\admin\filterspecs.py:154
-#: .\newforms\widgets.py:231
-#: .\oldforms\__init__.py:592
-msgid "Unknown"
-msgstr "Necunoscut"
-
-#: .\contrib\admin\models.py:18
-msgid "action time"
-msgstr "timp acţiune"
-
-#: .\contrib\admin\models.py:21
-msgid "object id"
-msgstr "id obiect"
-
-#: .\contrib\admin\models.py:22
-msgid "object repr"
-msgstr "repr obiect"
-
-#: .\contrib\admin\models.py:23
-msgid "action flag"
-msgstr "steguleţ acţiune"
-
-#: .\contrib\admin\models.py:24
-msgid "change message"
-msgstr "schimbă mesaj"
-
-#: .\contrib\admin\models.py:27
-msgid "log entry"
-msgstr "intrare log"
-
-#: .\contrib\admin\models.py:28
-msgid "log entries"
-msgstr "intrări log"
-
-#: .\contrib\admin\templates\admin\404.html.py:4
-#: .\contrib\admin\templates\admin\404.html.py:8
-msgid "Page not found"
-msgstr "Pagină inexistentă"
-
-#: .\contrib\admin\templates\admin\404.html.py:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Ne pare rău, dar pagina cerută nu există."
-
-#: .\contrib\admin\templates\admin\500.html.py:4
-#: .\contrib\admin\templates\admin\base.html.py:37
-#: .\contrib\admin\templates\admin\change_form.html.py:12
-#: .\contrib\admin\templates\admin\change_list.html.py:5
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:5
-#: .\contrib\admin\templates\admin\invalid_setup.html.py:4
-#: .\contrib\admin\templates\admin\object_history.html.py:4
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:11
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
-#: .\contrib\admin\templates\registration\logged_out.html.py:4
-#: .\contrib\admin\templates\registration\password_change_done.html.py:3
-#: .\contrib\admin\templates\registration\password_change_form.html.py:3
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:4
-msgid "Home"
-msgstr "Acasă"
-
-#: .\contrib\admin\templates\admin\500.html.py:4
-msgid "Server error"
-msgstr "Eroare de server"
-
-#: .\contrib\admin\templates\admin\500.html.py:6
-msgid "Server error (500)"
-msgstr "Eroare de server (500)"
-
-#: .\contrib\admin\templates\admin\500.html.py:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Eroare server <em>(500)</em>"
-
-#: .\contrib\admin\templates\admin\500.html.py:10
-msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
-msgstr "A apărut o eroare. Este raportată către administrator via email şi va fi reparată în scurt timp. Mulţumim pentru înţelegere."
-
-#: .\contrib\admin\templates\admin\base.html.py:26
-msgid "Welcome,"
-msgstr "Bine ai venit,"
-
-#: .\contrib\admin\templates\admin\base.html.py:28
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
-msgid "Documentation"
-msgstr "Documentație"
-
-#: .\contrib\admin\templates\admin\base.html.py:29
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:14
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:45
-msgid "Change password"
-msgstr "Schimbă parola"
-
-#: .\contrib\admin\templates\admin\base.html.py:30
-#: .\contrib\comments\templates\comments\form.html.py:6
-msgid "Log out"
-msgstr "Deautentificare"
-
-#: .\contrib\admin\templates\admin\base_site.html.py:4
-msgid "Django site admin"
-msgstr "Administrare sit Django"
-
-#: .\contrib\admin\templates\admin\base_site.html.py:7
-msgid "Django administration"
-msgstr "Administrare Django"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:14
-#: .\contrib\admin\templates\admin\index.html.py:28
-msgid "Add"
-msgstr "Adaugă"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:20
-#: .\contrib\admin\templates\admin\object_history.html.py:4
-msgid "History"
-msgstr "Istoric"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:21
-msgid "View on site"
-msgstr "Vizualizează pe site"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:31
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:23
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Vă rugăm să corectați eroarea de mai jos"
-msgstr[1] "Vă rugăm să corectați erorile de mai jos"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:49
-msgid "Ordering"
-msgstr "Ordonate după"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:52
-msgid "Order:"
-msgstr "Ordonare:"
-
-#: .\contrib\admin\templates\admin\change_list.html.py:11
-#, python-format
-msgid "Add %(name)s"
-msgstr "Adaugă %(name)s"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:8
-#: .\contrib\admin\templates\admin\submit_line.html.py:3
-msgid "Delete"
-msgstr "Șterge"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:13
-#, python-format
-msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
-msgstr "Ştergerea %(object_name)s '%(escaped_object)s' ar cauza și ştergerea obiectelor asociate, dar contul tău nu are permisiunea de a şterge următoarele tipuri de obiecte:"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:20
-#, python-format
-msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
-msgstr "Eşti sigur că vrei să ştergi %(object_name)s \"%(escaped_object)s\"? Următoarele componente asociate vor fi şterse:"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:25
-msgid "Yes, I'm sure"
-msgstr "Da, sunt sigur"
-
-#: .\contrib\admin\templates\admin\filter.html.py:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr "După %(filter_title)s "
-
-#: .\contrib\admin\templates\admin\filters.html.py:4
-msgid "Filter"
-msgstr "Filtru"
-
-#: .\contrib\admin\templates\admin\index.html.py:17
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Modele disponibile în aplicația %(name)s"
-
-#: .\contrib\admin\templates\admin\index.html.py:18
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: .\contrib\admin\templates\admin\index.html.py:34
-msgid "Change"
-msgstr "Schimbă"
-
-#: .\contrib\admin\templates\admin\index.html.py:44
-msgid "You don't have permission to edit anything."
-msgstr "Nu ai drepturi de editare."
-
-#: .\contrib\admin\templates\admin\index.html.py:52
-msgid "Recent Actions"
-msgstr "Acţiuni recente"
-
-#: .\contrib\admin\templates\admin\index.html.py:53
-msgid "My Actions"
-msgstr "Acţiunile mele"
-
-#: .\contrib\admin\templates\admin\index.html.py:57
-msgid "None available"
-msgstr "Indisponibil"
-
-#: .\contrib\admin\templates\admin\invalid_setup.html.py:8
-msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
-msgstr "Există o problema cu baza de date. Verificați dacă tabelele necesare din baza de date au fost create și verificați dacă baza de date poate fi citită de utilizatorul potrivit."
-
-#: .\contrib\admin\templates\admin\login.html.py:17
-#: .\contrib\comments\templates\comments\form.html.py:6
-#: .\contrib\comments\templates\comments\form.html.py:8
-msgid "Username:"
-msgstr "Utilizator:"
-
-#: .\contrib\admin\templates\admin\login.html.py:20
-#: .\contrib\comments\templates\comments\form.html.py:8
-msgid "Password:"
-msgstr "Parolă:"
-
-#: .\contrib\admin\templates\admin\login.html.py:25
-#: .\contrib\admin\views\decorators.py:31
-msgid "Log in"
-msgstr "Login"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:17
-msgid "Date/time"
-msgstr "Dată/oră"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:18
-msgid "User"
-msgstr "Utilizator"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:19
-msgid "Action"
-msgstr "Acţiune"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:25
-msgid "DATE_WITH_TIME_FULL"
-msgstr "N j, Y, P"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:35
-msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
-msgstr "Acest obiect nu are un istoric al schimbărilor. Probabil nu a fost adăugat prin intermediul acestui sit de administrare."
-
-#: .\contrib\admin\templates\admin\pagination.html.py:10
-msgid "Show all"
-msgstr "Arată tot/toate"
-
-#: .\contrib\admin\templates\admin\search_form.html.py:8
-msgid "Go"
-msgstr "Start"
-
-#: .\contrib\admin\templates\admin\search_form.html.py:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "Un rezultat"
-msgstr[1] "%(counter)s rezultate"
-
-#: .\contrib\admin\templates\admin\search_form.html.py:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s total"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:4
-msgid "Save as new"
-msgstr "Salvați ca nou"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:5
-msgid "Save and add another"
-msgstr "Salvați și adăugați altul"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:6
-msgid "Save and continue editing"
-msgstr "Salvați și continuați"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:7
-msgid "Save"
-msgstr "Salvează"
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:6
-msgid "First, enter a username and password. Then, you'll be able to edit more user options."
-msgstr "Introduceți mai întâi un nume de utilizator și o parolă. Apoi veți putea modifica mai multe opțiuni de utilizator."
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:12
-msgid "Username"
-msgstr "Utilizator"
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:18
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:33
-msgid "Password"
-msgstr "Parolă"
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:23
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:38
-msgid "Password (again)"
-msgstr "Parolă (din nou)"
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:24
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:39
-msgid "Enter the same password as above, for verification."
-msgstr "Introduceți parola din nou pentru verificare."
-
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:27
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Introduceți o parolă nouă pentru utilizatorul <strong>%(username)s</strong>."
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
-msgid "Bookmarklets"
-msgstr "Bookmarklet-uri"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:4
-msgid "Documentation bookmarklets"
-msgstr "Bookmarklet-uri documentație"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:8
+"Această valoare trebuie să conţină numai litere, numere, liniuţe de "
+"subliniere şi liniute."
+
+#: core/validators.py:126 forms/fields.py:949
+msgid "Enter a valid IPv4 address."
+msgstr "Introduceţi o adresă IPv4 validă."
+
+#: core/validators.py:129 db/models/fields/__init__.py:575
+msgid "Enter only digits separated by commas."
+msgstr "Introduceţi numai numere separate de virgule."
+
+#: core/validators.py:135
+#, fuzzy, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"Asigurați-vă că această valoare are cel puțin %(min)d caractere (are %"
+"(length)d)."
+
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#, fuzzy, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Asigurați-vă că această valoare este mai mică sau egală cu %s."
+
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#, fuzzy, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Asigurați-vă că aceasta valoare este mai mare sau egală cu %s."
+
+#: core/validators.py:164
+#, fuzzy, python-format
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
 msgstr ""
-"\n"
-"<p class=\"help\">Pentru a instala bookmarklet-uri, trage link-ul în bara de\n"
-"bookmark-uri, sau click dreapta pe link și adaugă la bookmark-uri. Acum poți\n"
-"selecta bookmarklet-ul din orice pagina a sitului. Este posibil ca unele din\n"
-"aceste bookmarklet-uri sunt accesibile doar de pe un computer desemnat ca\n"
-"\"intern\" (vorbește cu administratorul tău de sistem dacă nu ești sigur că\n"
-"al tău este \"intern\").</p>\n"
+"Asigurați-vă că această valoare are cel puțin %(min)d caractere (are %"
+"(length)d)."
 
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:18
-msgid "Documentation for this page"
-msgstr "Documentație pentru această pagină"
+#: core/validators.py:170
+#, fuzzy, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+"Asigurați-vă că această valoare are cel mult %(max)d caractere (are %(length)"
+"d)."
 
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:19
-msgid "Jumps you from any page to the documentation for the view that generates that page."
-msgstr "Te trimite de la orice pagină la documentația pentru view-ul care generează acea pagină."
+#: db/models/base.py:765
+#, fuzzy, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "Acest câmp e necesar dacă %(field)s este %(value)s"
 
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:21
-msgid "Show object ID"
-msgstr "Arată ID-ul obiectului"
+#: db/models/base.py:780 db/models/base.py:788
+#, fuzzy, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(optname)s cu acest %(fieldname)s există deja."
 
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:22
-msgid "Shows the content-type and unique ID for pages that represent a single object."
-msgstr "Arată tipul de conținut și ID-ul unic pentru paginile ce reprezintă un singur obiect."
+#: db/models/base.py:787 forms/models.py:581
+msgid "and"
+msgstr "și"
 
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:24
-msgid "Edit this object (current window)"
-msgstr "Modifică acest obiect (în fereastra curentă)"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:25
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Sare la pagina de administrare pentru pagini ce reprezintă un singur obiect."
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:27
-msgid "Edit this object (new window)"
-msgstr "Modifică acest obiect (într-o fereastra nouă)"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:28
-msgid "As above, but opens the admin page in a new window."
-msgstr "La fel ca mai sus, dar deschide pagina de administrare într-o fereastră nouă"
-
-#: .\contrib\admin\templates\registration\logged_out.html.py:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Mulţumesc pentru petrecerea folositoare a timpului cu situl astăzi."
-
-#: .\contrib\admin\templates\registration\logged_out.html.py:10
-msgid "Log in again"
-msgstr "Relogare"
-
-#: .\contrib\admin\templates\registration\password_change_done.html.py:3
-#: .\contrib\admin\templates\registration\password_change_form.html.py:3
-#: .\contrib\admin\templates\registration\password_change_form.html.py:5
-#: .\contrib\admin\templates\registration\password_change_form.html.py:9
-msgid "Password change"
-msgstr "Schimbă parola"
-
-#: .\contrib\admin\templates\registration\password_change_done.html.py:5
-#: .\contrib\admin\templates\registration\password_change_done.html.py:9
-msgid "Password change successful"
-msgstr "Schimbare reuşită a parolei"
-
-#: .\contrib\admin\templates\registration\password_change_done.html.py:11
-msgid "Your password was changed."
-msgstr "Parola a fost schimbată."
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:11
-msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
-msgstr "Introdu te rog vechea parolă, pentru motive de siguranţă, şi apoi tastează noua parolă de două ori pentru a verifica dacă ai tastat corect."
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:16
-msgid "Old password:"
-msgstr "Vechea parolă:"
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:18
-msgid "New password:"
-msgstr "Noua parolă:"
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:20
-msgid "Confirm password:"
-msgstr "Confirmă parola:"
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:22
-msgid "Change my password"
-msgstr "Schimbă-mi parola"
-
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:10
-msgid "Password reset"
-msgstr "Resetează parola"
-
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:10
-msgid "Password reset successful"
-msgstr "Parola resetată cu succes"
-
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:12
-msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
-msgstr "Am trimis o nouă parolă prin email la adresa furnizată. Ar trebui să o primeşti în scurt timp."
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Ai primit acest email pentru că ai cerut o resetare a parolei"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:3
+#: db/models/fields/__init__.py:63
 #, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "pentru contul tău la %(site_name)s"
+msgid "Value %r is not a valid choice."
+msgstr ""
 
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:5
+#: db/models/fields/__init__.py:64
+msgid "This field cannot be null."
+msgstr "Câmpul nu poate fi gol"
+
+#: db/models/fields/__init__.py:65
+#, fuzzy
+msgid "This field cannot be blank."
+msgstr "Câmpul nu poate fi gol"
+
+#: db/models/fields/__init__.py:70
 #, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "Noua ta parolă este: %(new_password)s"
+msgid "Field of type: %(field_type)s"
+msgstr ""
 
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "Poţi schmiba această parolă vizitând această pagină:"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:11
-msgid "Your username, in case you've forgotten:"
-msgstr "Numele tău de utilizator, în caz că ai uitat:"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:13
-msgid "Thanks for using our site!"
-msgstr "Mulţumesc pentru folosirea sitului nostru!"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "Echipa %(site_name)s"
-
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:12
-msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
-msgstr "Ai uitat parola? Introdu adresa de email mai jos, iar noi vom reseta parola şi-ţi vom trimite una nouă prin email."
-
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:16
-msgid "E-mail address:"
-msgstr "Adresa email:"
-
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:16
-msgid "Reset my password"
-msgstr "Resetează-mi parola"
-
-#: .\contrib\admin\templates\widget\date_time.html.py:3
-msgid "Date:"
-msgstr "Data:"
-
-#: .\contrib\admin\templates\widget\date_time.html.py:4
-msgid "Time:"
-msgstr "Ora:"
-
-#: .\contrib\admin\templates\widget\file.html.py:2
-msgid "Currently:"
-msgstr "Current:"
-
-#: .\contrib\admin\templates\widget\file.html.py:3
-msgid "Change:"
-msgstr "Schimbă:"
-
-#: .\contrib\admin\templatetags\admin_list.py:257
-msgid "All dates"
-msgstr "Toate datele"
-
-#: .\contrib\admin\views\auth.py:20
-#: .\contrib\admin\views\main.py:267
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" a fost inserat cu succes."
-
-#: .\contrib\admin\views\auth.py:25
-#: .\contrib\admin\views\main.py:271
-#: .\contrib\admin\views\main.py:356
-msgid "You may edit it again below."
-msgstr "Vă puteți edita datele din nou mai jos."
-
-#: .\contrib\admin\views\auth.py:31
-msgid "Add user"
-msgstr "Adaugă utilizator"
-
-#: .\contrib\admin\views\auth.py:58
-msgid "Password changed successfully."
-msgstr "Schimbare reuşită a parolei"
-
-#: .\contrib\admin\views\auth.py:65
-#, python-format
-msgid "Change password: %s"
-msgstr "Schimbă parola: %s"
-
-#: .\contrib\admin\views\decorators.py:17
-#: .\contrib\auth\forms.py:60
-msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
-msgstr "Va rugăm să introduceți numele de utilizator și parola corecte. Aveți grijă deoarece căsuțele sunt case sensitive."
-
-#: .\contrib\admin\views\decorators.py:69
-msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
-msgstr "Vă rugăm să vă înregistrați din nou, deoarece sesiunea a expirat. Nu vă faceti griji: datele au fost salvate."
-
-#: .\contrib\admin\views\decorators.py:76
-msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
-msgstr "Se pare că browserul dumneavostră nu este configurat să accepte cookies. Vă rugăm să vă setați browserul să accepte cookies, dați un reload la pagină și încercați din nou."
-
-#: .\contrib\admin\views\decorators.py:90
-msgid "Usernames cannot contain the '@' character."
-msgstr "Username-ul nu are voie să conțină caracterul '@'."
-
-#: .\contrib\admin\views\decorators.py:92
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Adresa ta de e-mail nu este numele tău de utilizator. Incearcă '%s' în schimb."
-
-#: .\contrib\admin\views\doc.py:48
-#: .\contrib\admin\views\doc.py:50
-#: .\contrib\admin\views\doc.py:52
-msgid "tag:"
-msgstr "tag:"
-
-#: .\contrib\admin\views\doc.py:79
-#: .\contrib\admin\views\doc.py:81
-#: .\contrib\admin\views\doc.py:83
-msgid "filter:"
-msgstr "filtru:"
-
-#: .\contrib\admin\views\doc.py:137
-#: .\contrib\admin\views\doc.py:139
-#: .\contrib\admin\views\doc.py:141
-msgid "view:"
-msgstr "view:"
-
-#: .\contrib\admin\views\doc.py:166
-#, python-format
-msgid "App %r not found"
-msgstr "Applicatia %r inexistenta"
-
-#: .\contrib\admin\views\doc.py:173
-#, python-format
-msgid "Model %(name)r not found in app %(label)r"
-msgstr "Modelul %(name)r nu a fost gasit în aplicatia %(label)r"
-
-#: .\contrib\admin\views\doc.py:185
-#, python-format
-msgid "the related `%(label)s.%(type)s` object"
-msgstr "obiectul `%(label)s.%(type)s` asociat"
-
-#: .\contrib\admin\views\doc.py:185
-#: .\contrib\admin\views\doc.py:207
-#: .\contrib\admin\views\doc.py:221
-#: .\contrib\admin\views\doc.py:226
-msgid "model:"
-msgstr "model:"
-
-#: .\contrib\admin\views\doc.py:216
-#, python-format
-msgid "related `%(label)s.%(name)s` objects"
-msgstr "obiectele `%(label)s.%(name)s` asociate"
-
-#: .\contrib\admin\views\doc.py:221
-#, python-format
-msgid "all %s"
-msgstr "toate %s"
-
-#: .\contrib\admin\views\doc.py:226
-#, python-format
-msgid "number of %s"
-msgstr "numărul de %s"
-
-#: .\contrib\admin\views\doc.py:231
-#, python-format
-msgid "Fields on %s objects"
-msgstr "Campuri în %s obiecte"
-
-#: .\contrib\admin\views\doc.py:293
-#: .\contrib\admin\views\doc.py:304
-#: .\contrib\admin\views\doc.py:306
-#: .\contrib\admin\views\doc.py:312
-#: .\contrib\admin\views\doc.py:313
-#: .\contrib\admin\views\doc.py:315
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
 msgid "Integer"
 msgstr "Intreg"
 
-#: .\contrib\admin\views\doc.py:294
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
+msgid "This value must be an integer."
+msgstr "Această valoare trebuie să fie un număr intreg."
+
+#: db/models/fields/__init__.py:493
+msgid "This value must be either True or False."
+msgstr "Această valoare trebuie să fie ori falsă ori adevarată."
+
+#: db/models/fields/__init__.py:495
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (ori adevarat ori fals)"
 
-#: .\contrib\admin\views\doc.py:295
-#: .\contrib\admin\views\doc.py:314
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Sir de caractere (pana la %(max_length)s caractere)"
 
-#: .\contrib\admin\views\doc.py:296
+#: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
 msgstr "Numere întregi separate de virgule"
 
-#: .\contrib\admin\views\doc.py:297
+#: db/models/fields/__init__.py:584
 msgid "Date (without time)"
 msgstr "Data (fara ora)"
 
-#: .\contrib\admin\views\doc.py:298
-msgid "Date (with time)"
-msgstr "Data (cu ora)"
-
-#: .\contrib\admin\views\doc.py:299
-msgid "Decimal number"
-msgstr "Număr zecimal"
-
-#: .\contrib\admin\views\doc.py:300
-msgid "E-mail address"
-msgstr "Adresa email"
-
-#: .\contrib\admin\views\doc.py:301
-#: .\contrib\admin\views\doc.py:302
-#: .\contrib\admin\views\doc.py:305
-msgid "File path"
-msgstr "Calea fisierului"
-
-#: .\contrib\admin\views\doc.py:303
-msgid "Floating point number"
-msgstr "Număr cu virgula"
-
-#: .\contrib\admin\views\doc.py:307
-#: .\contrib\comments\models.py:89
-msgid "IP address"
-msgstr "adresa ip"
-
-#: .\contrib\admin\views\doc.py:309
-msgid "Boolean (Either True, False or None)"
-msgstr "Boolean (adevarat, fals sau nici una)"
-
-#: .\contrib\admin\views\doc.py:310
-msgid "Relation to parent model"
-msgstr "Relatia cu un model parinte"
-
-#: .\contrib\admin\views\doc.py:311
-msgid "Phone number"
-msgstr "Număr de telefon"
-
-#: .\contrib\admin\views\doc.py:316
-msgid "Text"
-msgstr "Text"
-
-#: .\contrib\admin\views\doc.py:317
-msgid "Time"
-msgstr "Timp"
-
-#: .\contrib\admin\views\doc.py:318
-#: .\contrib\flatpages\models.py:8
-msgid "URL"
-msgstr "URL"
-
-#: .\contrib\admin\views\doc.py:319
-msgid "U.S. state (two uppercase letters)"
-msgstr "Stat SUA (doua litere mari)"
-
-#: .\contrib\admin\views\doc.py:320
-msgid "XML text"
-msgstr "Text XML"
-
-#: .\contrib\admin\views\doc.py:346
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s nu pare a fi un obiect urlpattern"
-
-#: .\contrib\admin\views\main.py:233
-msgid "Site administration"
-msgstr "Administrare site"
-
-#: .\contrib\admin\views\main.py:280
-#: .\contrib\admin\views\main.py:365
-#, python-format
-msgid "You may add another %s below."
-msgstr "Mai puteți adauga un alt %s mai jos."
-
-#: .\contrib\admin\views\main.py:298
-#, python-format
-msgid "Add %s"
-msgstr "Adaugă %s"
-
-#: .\contrib\admin\views\main.py:344
-#, python-format
-msgid "Added %s."
-msgstr "Am adăugat %s."
-
-#: .\contrib\admin\views\main.py:344
-#: .\contrib\admin\views\main.py:346
-#: .\contrib\admin\views\main.py:348
-#: .\core\validators.py:283
-#: .\db\models\manipulators.py:309
-msgid "and"
-msgstr "și"
-
-#: .\contrib\admin\views\main.py:346
-#, python-format
-msgid "Changed %s."
-msgstr "Am schimbat %s."
-
-#: .\contrib\admin\views\main.py:348
-#, python-format
-msgid "Deleted %s."
-msgstr "Am șters %s."
-
-#: .\contrib\admin\views\main.py:351
-msgid "No fields changed."
-msgstr "Nici-un câmp nu a fost schimbat."
-
-#: .\contrib\admin\views\main.py:354
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" au fost modificate cu succes."
-
-#: .\contrib\admin\views\main.py:362
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" au fost adăugate cu succes. Le puteți edita mai jos."
-
-#: .\contrib\admin\views\main.py:400
-#, python-format
-msgid "Change %s"
-msgstr "Schimbă %s"
-
-#: .\contrib\admin\views\main.py:487
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Unul sau mai multe %(fieldname)s în %(name)s: %(obj)s"
-
-#: .\contrib\admin\views\main.py:492
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Unul sau mai multe %(fieldname)s în %(name)s:"
-
-#: .\contrib\admin\views\main.py:524
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" au fost șterse cu succes."
-
-#: .\contrib\admin\views\main.py:527
-msgid "Are you sure?"
-msgstr "Sunteți sigur?"
-
-#: .\contrib\admin\views\main.py:549
-#, python-format
-msgid "Change history: %s"
-msgstr "Schimbări făcute: %s"
-
-#: .\contrib\admin\views\main.py:583
-#, python-format
-msgid "Select %s"
-msgstr "Selectează %s"
-
-#: .\contrib\admin\views\main.py:583
-#, python-format
-msgid "Select %s to change"
-msgstr "Selectează %s pentru schimbare"
-
-#: .\contrib\admin\views\main.py:784
-msgid "Database error"
-msgstr "Eroare de bază de date"
-
-#: .\contrib\auth\forms.py:17
-#: .\contrib\auth\forms.py:138
-msgid "The two password fields didn't match."
-msgstr "Cele doua câmpuri pentru parole nu au coincis."
-
-#: .\contrib\auth\forms.py:25
-msgid "A user with that username already exists."
-msgstr "Un utilizator cu acest nume de utilizator exista deja,"
-
-#: .\contrib\auth\forms.py:53
-msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
-msgstr "Se pare că browserul dumneavoastra nu suporta cookies. Aveti nevoie de un browser care suporta cookies ca să vă logati."
-
-#: .\contrib\auth\forms.py:62
-msgid "This account is inactive."
-msgstr "Acest cont este inactiv."
-
-#: .\contrib\auth\forms.py:84
-msgid "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
-msgstr "Acea adresa de e-mail nu are un nume de utilizator asociat. Sunteți sigur că v-ați înregistrat?"
-
-#: .\contrib\auth\forms.py:107
-#, python-format
-msgid "Password reset on %s"
-msgstr "Parola resetată pe %s"
-
-#: .\contrib\auth\forms.py:117
-msgid "The two 'new password' fields didn't match."
-msgstr "Cele două câmpuri 'parola noua' nu au coincis."
-
-#: .\contrib\auth\forms.py:124
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Parola dumneavoastră veche a fost introdusă incorect. Vă rugăm să o introduceți din nou."
-
-#: .\contrib\auth\models.py:73
-#: .\contrib\auth\models.py:93
-msgid "name"
-msgstr "nume"
-
-#: .\contrib\auth\models.py:75
-msgid "codename"
-msgstr "nume cod"
-
-#: .\contrib\auth\models.py:78
-msgid "permission"
-msgstr "permisiune"
-
-#: .\contrib\auth\models.py:79
-#: .\contrib\auth\models.py:94
-msgid "permissions"
-msgstr "permisiuni"
-
-#: .\contrib\auth\models.py:97
-msgid "group"
-msgstr "grup"
-
-#: .\contrib\auth\models.py:98
-#: .\contrib\auth\models.py:141
-msgid "groups"
-msgstr "grupuri"
-
-#: .\contrib\auth\models.py:131
-msgid "username"
-msgstr "nume utilizator"
-
-#: .\contrib\auth\models.py:131
-msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
-msgstr "Necesar. 30 de caractere sau mai puțin. Doar caractere alfanumerice (litere, cifre, liniuțe de subliniere)."
-
-#: .\contrib\auth\models.py:132
-msgid "first name"
-msgstr "Prenume"
-
-#: .\contrib\auth\models.py:133
-msgid "last name"
-msgstr "Nume"
-
-#: .\contrib\auth\models.py:134
-msgid "e-mail address"
-msgstr "adresă email"
-
-#: .\contrib\auth\models.py:135
-msgid "password"
-msgstr "parolă"
-
-#: .\contrib\auth\models.py:135
-msgid "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
-msgstr "Folosiți '[algo]$[salt]$[hexdigest]' sau folosiți <a href=\"password/\">formularul de schimbare a parolei</a>."
-
-#: .\contrib\auth\models.py:136
-msgid "staff status"
-msgstr "stare staff"
-
-#: .\contrib\auth\models.py:136
-msgid "Designates whether the user can log into this admin site."
-msgstr "Decide când utilizatorul se poate loga în acest sit de adminstrare."
-
-#: .\contrib\auth\models.py:137
-msgid "active"
-msgstr "activ"
-
-#: .\contrib\auth\models.py:137
-msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
-msgstr "Indică dacă acest utilizator va fi tratat ca activ sau nu. Deselectează-l în loc de a șterge conturi."
-
-#: .\contrib\auth\models.py:138
-msgid "superuser status"
-msgstr "stare superutilizator"
-
-#: .\contrib\auth\models.py:138
-msgid "Designates that this user has all permissions without explicitly assigning them."
-msgstr "Indică daca acest user are toate permisiunile fără a le selecta explicit."
-
-#: .\contrib\auth\models.py:139
-msgid "last login"
-msgstr "ultima logare"
-
-#: .\contrib\auth\models.py:140
-msgid "date joined"
-msgstr "data aderării"
-
-#: .\contrib\auth\models.py:142
-msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
-msgstr "Suplimentar permisiunilor manual alocate, acest utilizator va primi toate permisiunile alocate fiecărui grup din care el/ea face parte."
-
-#: .\contrib\auth\models.py:143
-msgid "user permissions"
-msgstr "permisiuni utilizator"
-
-#: .\contrib\auth\models.py:147
-msgid "user"
-msgstr "utilizator"
-
-#: .\contrib\auth\models.py:148
-msgid "users"
-msgstr "utilizatori"
-
-#: .\contrib\auth\models.py:154
-msgid "Personal info"
-msgstr "Informaţii personale"
-
-#: .\contrib\auth\models.py:155
-msgid "Permissions"
-msgstr "Permisiuni"
-
-#: .\contrib\auth\models.py:156
-msgid "Important dates"
-msgstr "Date importante"
-
-#: .\contrib\auth\models.py:157
-msgid "Groups"
-msgstr "Grupuri"
-
-#: .\contrib\auth\models.py:316
-msgid "message"
-msgstr "mesaj"
-
-#: .\contrib\auth\views.py:47
-msgid "Logged out"
-msgstr "Deautentificat"
-
-#: .\contrib\comments\models.py:71
-#: .\contrib\comments\models.py:176
-msgid "object ID"
-msgstr "ID obiect"
-
-#: .\contrib\comments\models.py:72
-msgid "headline"
-msgstr "titlu"
-
-#: .\contrib\comments\models.py:73
-#: .\contrib\comments\models.py:95
-#: .\contrib\comments\models.py:177
-msgid "comment"
-msgstr "comentariu"
-
-#: .\contrib\comments\models.py:74
-msgid "rating #1"
-msgstr "rating #1"
-
-#: .\contrib\comments\models.py:75
-msgid "rating #2"
-msgstr "rating #2"
-
-#: .\contrib\comments\models.py:76
-msgid "rating #3"
-msgstr "rating #3"
-
-#: .\contrib\comments\models.py:77
-msgid "rating #4"
-msgstr "rating #4"
-
-#: .\contrib\comments\models.py:78
-msgid "rating #5"
-msgstr "rating #5"
-
-#: .\contrib\comments\models.py:79
-msgid "rating #6"
-msgstr "rating #6"
-
-#: .\contrib\comments\models.py:80
-msgid "rating #7"
-msgstr "rating #7"
-
-#: .\contrib\comments\models.py:81
-msgid "rating #8"
-msgstr "rating #8"
-
-#: .\contrib\comments\models.py:86
-msgid "is valid rating"
-msgstr "este rating valid"
-
-#: .\contrib\comments\models.py:87
-#: .\contrib\comments\models.py:179
-msgid "date/time submitted"
-msgstr "data/ora creării"
-
-#: .\contrib\comments\models.py:88
-#: .\contrib\comments\models.py:180
-msgid "is public"
-msgstr "public"
-
-#: .\contrib\comments\models.py:90
-msgid "is removed"
-msgstr "șters"
-
-#: .\contrib\comments\models.py:90
-msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
-msgstr "Bifează această casuța dacă comentariul nu este adecvat. Un mesaj de tipul \"Acest comentariu a fost șters\" va fi afișat în schimb."
-
-#: .\contrib\comments\models.py:96
-msgid "comments"
-msgstr "comentarii"
-
-#: .\contrib\comments\models.py:140
-#: .\contrib\comments\models.py:222
-msgid "Content object"
-msgstr "Obiect comentariu"
-
-#: .\contrib\comments\models.py:168
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"Postat de %(user)s la %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: .\contrib\comments\models.py:178
-msgid "person's name"
-msgstr "numele persoanei"
-
-#: .\contrib\comments\models.py:181
-msgid "ip address"
-msgstr "adresa ip"
-
-#: .\contrib\comments\models.py:183
-msgid "approved by staff"
-msgstr "aprobat de echipă"
-
-#: .\contrib\comments\models.py:187
-msgid "free comment"
-msgstr "permite comentariu fara înregistrare"
-
-#: .\contrib\comments\models.py:188
-msgid "free comments"
-msgstr "permite comentarii fara înregistrare"
-
-#: .\contrib\comments\models.py:250
-msgid "score"
-msgstr "punctaj"
-
-#: .\contrib\comments\models.py:251
-msgid "score date"
-msgstr "data punctajului"
-
-#: .\contrib\comments\models.py:255
-#, fuzzy
-msgid "karma score"
-msgstr "punctaj karmic"
-
-#: .\contrib\comments\models.py:256
-#, fuzzy
-msgid "karma scores"
-msgstr "punctaje karmice"
-
-#: .\contrib\comments\models.py:260
-#, fuzzy, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "Punctaj %(score)d atribuit de către %(user)s"
-
-#: .\contrib\comments\models.py:277
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Acest comentariu a fost marcat de %(user)s:\n"
-"\n"
-"%(text)s"
-
-#: .\contrib\comments\models.py:285
-msgid "flag date"
-msgstr "data marcării"
-
-#: .\contrib\comments\models.py:289
-#, fuzzy
-msgid "user flag"
-msgstr "steguleț de utilizator"
-
-#: .\contrib\comments\models.py:290
-#, fuzzy
-msgid "user flags"
-msgstr "stegulețe de utilizatori"
-
-#: .\contrib\comments\models.py:294
-#, python-format
-msgid "Flag by %r"
-msgstr "Marcajul lui %r"
-
-#: .\contrib\comments\models.py:300
-msgid "deletion date"
-msgstr "data ștergerii"
-
-#: .\contrib\comments\models.py:303
-msgid "moderator deletion"
-msgstr "șters de moderator"
-
-#: .\contrib\comments\models.py:304
-msgid "moderator deletions"
-msgstr "șterse de moderator"
-
-#: .\contrib\comments\models.py:308
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "Șters de moderatorul %r"
-
-#: .\contrib\comments\templates\comments\form.html.py:8
-msgid "Forgotten your password?"
-msgstr "Ai uitat parola?"
-
-#: .\contrib\comments\templates\comments\form.html.py:12
-msgid "Ratings"
-msgstr "Ratinguri"
-
-#: .\contrib\comments\templates\comments\form.html.py:12
-#: .\contrib\comments\templates\comments\form.html.py:23
-msgid "Required"
-msgstr "Necesar"
-
-#: .\contrib\comments\templates\comments\form.html.py:12
-#: .\contrib\comments\templates\comments\form.html.py:23
-msgid "Optional"
-msgstr "Opțional"
-
-#: .\contrib\comments\templates\comments\form.html.py:23
-msgid "Post a photo"
-msgstr "Adaugă o poză"
-
-#: .\contrib\comments\templates\comments\form.html.py:28
-#: .\contrib\comments\templates\comments\freeform.html.py:5
-msgid "Comment:"
-msgstr "Comentariu:"
-
-#: .\contrib\comments\templates\comments\form.html.py:35
-#: .\contrib\comments\templates\comments\freeform.html.py:10
-msgid "Preview comment"
-msgstr "Previzualizare comentariu"
-
-#: .\contrib\comments\templates\comments\freeform.html.py:4
-msgid "Your name:"
-msgstr "numele dumneavoastră"
-
-#: .\contrib\comments\views\comments.py:28
-msgid "This rating is required because you've entered at least one other rating."
-msgstr "Acest rating este necesar deoarece ai introdus cel puțin un alt rating."
-
-#: .\contrib\comments\views\comments.py:112
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"Acest comentariu a fost postat de un utilizator care a postat mai puțin de %(count)s comentariu:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"Acest comentariu a fost postat de un utilizator care a postat mai puțin de %(count)s comentarii:\n"
-"\n"
-"%(text)s"
-
-#: .\contrib\comments\views\comments.py:117
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Acest comentariu a fost postat de un utilizator neordonat:\n"
-"\n"
-"%(text)s"
-
-#: .\contrib\comments\views\comments.py:190
-#: .\contrib\comments\views\comments.py:283
-msgid "Only POSTs are allowed"
-msgstr "Doar postările sunt permise"
-
-#: .\contrib\comments\views\comments.py:194
-#: .\contrib\comments\views\comments.py:287
-msgid "One or more of the required fields wasn't submitted"
-msgstr "Unul sau mai multe câmpuri necesare nu au fost completate"
-
-#: .\contrib\comments\views\comments.py:198
-#: .\contrib\comments\views\comments.py:289
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Cineva a modificat formularul de comentarii (încălcare a securității)"
-
-#: .\contrib\comments\views\comments.py:208
-#: .\contrib\comments\views\comments.py:295
-msgid "The comment form had an invalid 'target' parameter -- the object ID was invalid"
-msgstr "Formularul de comentariu a avut un parametru 'țintă' invalid -- ID-ul obiectului a fost invalid"
-
-#: .\contrib\comments\views\comments.py:259
-#: .\contrib\comments\views\comments.py:324
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "Formularul de comentariu nu specifică nici 'previzualizare' nici 'postare'"
-
-#: .\contrib\comments\views\karma.py:21
-msgid "Anonymous users cannot vote"
-msgstr "Utilizatorii anonimi nu pot vota"
-
-#: .\contrib\comments\views\karma.py:25
-msgid "Invalid comment ID"
-msgstr "Comentariu cu ID invalid"
-
-#: .\contrib\comments\views\karma.py:27
-msgid "No voting for yourself"
-msgstr "Nu poți vota pentru tine"
-
-#: .\contrib\contenttypes\models.py:67
-#, fuzzy
-msgid "python model class name"
-msgstr "nume clasă model python"
-
-#: .\contrib\contenttypes\models.py:71
-msgid "content type"
-msgstr "tip conţinut"
-
-#: .\contrib\contenttypes\models.py:72
-msgid "content types"
-msgstr "tipuri conţinut"
-
-#: .\contrib\flatpages\models.py:9
-msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Exemplu: '/despre/contact'. Asiguraţi-vă că aveţi slash-uri la început şi la sfârşit."
-
-#: .\contrib\flatpages\models.py:10
-msgid "title"
-msgstr "titlu"
-
-#: .\contrib\flatpages\models.py:11
-msgid "content"
-msgstr "conţinut"
-
-#: .\contrib\flatpages\models.py:12
-msgid "enable comments"
-msgstr "permite comentarii"
-
-#: .\contrib\flatpages\models.py:13
-msgid "template name"
-msgstr "nume şablon"
-
-#: .\contrib\flatpages\models.py:14
-msgid "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."
-msgstr "Exemplu: 'flatpages/contact_page.html'. Dacă aceasta nu există, sistemul va folosi 'flatpages/default.html'."
-
-#: .\contrib\flatpages\models.py:15
-msgid "registration required"
-msgstr "necesită înregistrare"
-
-#: .\contrib\flatpages\models.py:15
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Dacă aceasta este bifată, numai utilizatorii logaţi vor putea vedea pagina."
-
-#: .\contrib\flatpages\models.py:20
-msgid "flat page"
-msgstr "pagina plată"
-
-#: .\contrib\flatpages\models.py:21
-msgid "flat pages"
-msgstr "pagini plate"
-
-#: .\contrib\flatpages\models.py:27
-msgid "Advanced options"
-msgstr "Opțiuni avansate"
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "th"
-msgstr "ul"
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "st"
-msgstr "ul"
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "nd"
-msgstr "lea"
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "rd"
-msgstr "lea"
-
-#: .\contrib\humanize\templatetags\humanize.py:51
-#, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f milion"
-msgstr[1] "%(value).1f milioane"
-
-#: .\contrib\humanize\templatetags\humanize.py:54
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f miliard"
-msgstr[1] "%(value).1f miliarde"
-
-#: .\contrib\humanize\templatetags\humanize.py:57
-#, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f mie de miliarde"
-msgstr[1] "%(value).1f mii de miliarde"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "one"
-msgstr "unu"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "two"
-msgstr "doi"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "three"
-msgstr "trei"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "four"
-msgstr "patru"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "five"
-msgstr "cinci"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "six"
-msgstr "șase"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "seven"
-msgstr "șapte"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "eight"
-msgstr "opt"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "nine"
-msgstr "nouă"
-
-#: .\contrib\humanize\templatetags\humanize.py:93
-msgid "today"
-msgstr "astăzi"
-
-#: .\contrib\humanize\templatetags\humanize.py:95
-msgid "tomorrow"
-msgstr "mâine"
-
-#: .\contrib\humanize\templatetags\humanize.py:97
-msgid "yesterday"
-msgstr "ieri"
-
-#: .\contrib\localflavor\ar\forms.py:27
-msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "Introduceți un cod poștal valid de forma NNNN sau ANNNNAAA."
-
-#: .\contrib\localflavor\ar\forms.py:49
-#: .\contrib\localflavor\br\forms.py:96
-#: .\contrib\localflavor\br\forms.py:135
-#: .\contrib\localflavor\pe\forms.py:23
-#: .\contrib\localflavor\pe\forms.py:51
-msgid "This field requires only numbers."
-msgstr "Acest câmp acceptă doar numere."
-
-#: .\contrib\localflavor\ar\forms.py:50
-msgid "This field requires 7 or 8 digits."
-msgstr "Acest câmp are nevoie de 7 sau 8 cifre."
-
-#: .\contrib\localflavor\ar\forms.py:79
-msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Introduceți un CUIT valid de forma XX-XXXXXXXX-X sau XXXXXXXXXXXX."
-
-#: .\contrib\localflavor\ar\forms.py:80
-msgid "Invalid CUIT."
-msgstr "CUIT invalid."
-
-#: .\contrib\localflavor\au\forms.py:16
-msgid "Enter a 4 digit post code."
-msgstr "Introduceți un cod poștal de 4 cifre."
-
-#: .\contrib\localflavor\br\forms.py:21
-msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Adăugați un cod poștal de forma XXXXX-XXX."
-
-#: .\contrib\localflavor\br\forms.py:30
-msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "Numerele de telefon trebuie să fie în format XXX-XXX-XXXX."
-
-#: .\contrib\localflavor\br\forms.py:58
-msgid "Select a valid brazilian state. That state is not one of the available states."
-msgstr "Selectați un stat brazilian valid. Acest stat nu se află printre statele disponibile."
-
-#: .\contrib\localflavor\br\forms.py:94
-msgid "Invalid CPF number."
-msgstr "Număr CPF invalid."
-
-#: .\contrib\localflavor\br\forms.py:95
-msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Acest câmp are nevoie de cel mult 11 cifre sau 14 caractere."
-
-#: .\contrib\localflavor\br\forms.py:134
-msgid "Invalid CNPJ number."
-msgstr "Număr CNPJ invalid."
-
-#: .\contrib\localflavor\br\forms.py:136
-msgid "This field requires at least 14 digits"
-msgstr "Acest câmp are nevoie de cel puțin 14 cifre."
-
-#: .\contrib\localflavor\ca\forms.py:17
-msgid "Enter a postal code in the format XXX XXX."
-msgstr "Introduceți un cod poștal de forma XXX XXX."
-
-#: .\contrib\localflavor\ca\forms.py:88
-msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "Introduceți un număr canadian de asigurare socială valid de forma XXX-XXX-XXX."
-
-#: .\contrib\localflavor\ch\ch_states.py:5
-msgid "Aargau"
-msgstr "Aargau"
-
-#: .\contrib\localflavor\ch\ch_states.py:6
-msgid "Appenzell Innerrhoden"
-msgstr "Appenzell Innerrhoden"
-
-#: .\contrib\localflavor\ch\ch_states.py:7
-msgid "Appenzell Ausserrhoden"
-msgstr "Appenzell Ausserrhoden"
-
-#: .\contrib\localflavor\ch\ch_states.py:8
-msgid "Basel-Stadt"
-msgstr "Basel-Stadt"
-
-#: .\contrib\localflavor\ch\ch_states.py:9
-msgid "Basel-Land"
-msgstr "Basel-Land"
-
-#: .\contrib\localflavor\ch\ch_states.py:10
-msgid "Berne"
-msgstr "Berna"
-
-#: .\contrib\localflavor\ch\ch_states.py:11
-msgid "Fribourg"
-msgstr "Fribourg"
-
-#: .\contrib\localflavor\ch\ch_states.py:12
-msgid "Geneva"
-msgstr "Geneva"
-
-#: .\contrib\localflavor\ch\ch_states.py:13
-msgid "Glarus"
-msgstr "Glarus"
-
-#: .\contrib\localflavor\ch\ch_states.py:14
-msgid "Graubuenden"
-msgstr "Graubuenden"
-
-#: .\contrib\localflavor\ch\ch_states.py:15
-msgid "Jura"
-msgstr "Jura"
-
-#: .\contrib\localflavor\ch\ch_states.py:16
-msgid "Lucerne"
-msgstr "Lucerna"
-
-#: .\contrib\localflavor\ch\ch_states.py:17
-msgid "Neuchatel"
-msgstr "Neuchatel"
-
-#: .\contrib\localflavor\ch\ch_states.py:18
-msgid "Nidwalden"
-msgstr "Nidwalden"
-
-#: .\contrib\localflavor\ch\ch_states.py:19
-msgid "Obwalden"
-msgstr "Obwalden"
-
-#: .\contrib\localflavor\ch\ch_states.py:20
-msgid "Schaffhausen"
-msgstr "Schaffhausen"
-
-#: .\contrib\localflavor\ch\ch_states.py:21
-msgid "Schwyz"
-msgstr "Schwyz"
-
-#: .\contrib\localflavor\ch\ch_states.py:22
-msgid "Solothurn"
-msgstr "Solothurn"
-
-#: .\contrib\localflavor\ch\ch_states.py:23
-msgid "St. Gallen"
-msgstr "St. Gallen"
-
-#: .\contrib\localflavor\ch\ch_states.py:24
-msgid "Thurgau"
-msgstr "JoiTurgovia"
-
-#: .\contrib\localflavor\ch\ch_states.py:25
-msgid "Ticino"
-msgstr "Ticino"
-
-#: .\contrib\localflavor\ch\ch_states.py:26
-msgid "Uri"
-msgstr "Uri"
-
-#: .\contrib\localflavor\ch\ch_states.py:27
-msgid "Valais"
-msgstr "Valais"
-
-#: .\contrib\localflavor\ch\ch_states.py:28
-msgid "Vaud"
-msgstr "Vaud"
-
-#: .\contrib\localflavor\ch\ch_states.py:29
-msgid "Zug"
-msgstr "Zug"
-
-#: .\contrib\localflavor\ch\ch_states.py:30
-msgid "Zurich"
-msgstr "Zurich"
-
-#: .\contrib\localflavor\ch\forms.py:16
-#: .\contrib\localflavor\no\forms.py:12
-msgid "Enter a zip code in the format XXXX."
-msgstr "Introduceți un cod poștal de forma XXXX."
-
-#: .\contrib\localflavor\ch\forms.py:64
-msgid "Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format."
-msgstr "Introduceți un număr elvetian de identitate sau pașaport, valid, de forma X1234567<0 sau 1234567890."
-
-#: .\contrib\localflavor\cl\forms.py:29
-msgid "Enter a valid Chilean RUT."
-msgstr "Introduceți RUT chilian valid."
-
-#: .\contrib\localflavor\cl\forms.py:30
-msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Introduceți un RUT chilian valid. Formatul este XX.XXX.XXX-X."
-
-#: .\contrib\localflavor\cl\forms.py:31
-msgid "The Chilean RUT is not valid."
-msgstr "RUT-ul chilean nu este valid."
-
-#: .\contrib\localflavor\de\de_states.py:5
-msgid "Baden-Wuerttemberg"
-msgstr "Baden-Wuerttemberg"
-
-#: .\contrib\localflavor\de\de_states.py:6
-msgid "Bavaria"
-msgstr "Bavaria"
-
-#: .\contrib\localflavor\de\de_states.py:7
-msgid "Berlin"
-msgstr "Berlin"
-
-#: .\contrib\localflavor\de\de_states.py:8
-msgid "Brandenburg"
-msgstr "Brandenburg"
-
-#: .\contrib\localflavor\de\de_states.py:9
-msgid "Bremen"
-msgstr "Bremen"
-
-#: .\contrib\localflavor\de\de_states.py:10
-msgid "Hamburg"
-msgstr "Hamburg"
-
-#: .\contrib\localflavor\de\de_states.py:11
-msgid "Hessen"
-msgstr "Hessa"
-
-#: .\contrib\localflavor\de\de_states.py:12
-msgid "Mecklenburg-Western Pomerania"
-msgstr "Mecklenburg-Pomerania Inferioara"
-
-#: .\contrib\localflavor\de\de_states.py:13
-msgid "Lower Saxony"
-msgstr "Saxonia Inferioara"
-
-#: .\contrib\localflavor\de\de_states.py:14
-msgid "North Rhine-Westphalia"
-msgstr "Renania de Nord-Westfalia"
-
-#: .\contrib\localflavor\de\de_states.py:15
-msgid "Rhineland-Palatinate"
-msgstr "Renanina-Palatinat"
-
-#: .\contrib\localflavor\de\de_states.py:16
-msgid "Saarland"
-msgstr "Saarland"
-
-#: .\contrib\localflavor\de\de_states.py:17
-msgid "Saxony"
-msgstr "Saxonia"
-
-#: .\contrib\localflavor\de\de_states.py:18
-msgid "Saxony-Anhalt"
-msgstr "Saxonia-Anhalt"
-
-#: .\contrib\localflavor\de\de_states.py:19
-msgid "Schleswig-Holstein"
-msgstr "Schleswig-Holstein"
-
-#: .\contrib\localflavor\de\de_states.py:20
-msgid "Thuringia"
-msgstr "Turingia"
-
-#: .\contrib\localflavor\de\forms.py:14
-#: .\contrib\localflavor\fi\forms.py:12
-#: .\contrib\localflavor\fr\forms.py:15
-msgid "Enter a zip code in the format XXXXX."
-msgstr "Introduceți un cod poștal de forma XXXXX."
-
-#: .\contrib\localflavor\de\forms.py:41
-msgid "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format."
-msgstr "Introduceți un număr german de identitate valid, de forma XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
-
-#: .\contrib\localflavor\es\es_provinces.py:5
-msgid "Arava"
-msgstr "Arava"
-
-#: .\contrib\localflavor\es\es_provinces.py:6
-msgid "Albacete"
-msgstr "Albacete"
-
-#: .\contrib\localflavor\es\es_provinces.py:7
-msgid "Alacant"
-msgstr "Alacant"
-
-#: .\contrib\localflavor\es\es_provinces.py:8
-msgid "Almeria"
-msgstr "Almeria"
-
-#: .\contrib\localflavor\es\es_provinces.py:9
-msgid "Avila"
-msgstr "Avila"
-
-#: .\contrib\localflavor\es\es_provinces.py:10
-msgid "Badajoz"
-msgstr "Badajoz"
-
-#: .\contrib\localflavor\es\es_provinces.py:11
-msgid "Illes Balears"
-msgstr "Insulele Baleare"
-
-#: .\contrib\localflavor\es\es_provinces.py:12
-msgid "Barcelona"
-msgstr "Barcelona"
-
-#: .\contrib\localflavor\es\es_provinces.py:13
-msgid "Burgos"
-msgstr "Burgos"
-
-#: .\contrib\localflavor\es\es_provinces.py:14
-msgid "Caceres"
-msgstr "Caceres"
-
-#: .\contrib\localflavor\es\es_provinces.py:15
-msgid "Cadiz"
-msgstr "Cadiz"
-
-#: .\contrib\localflavor\es\es_provinces.py:16
-msgid "Castello"
-msgstr "Castello"
-
-#: .\contrib\localflavor\es\es_provinces.py:17
-msgid "Ciudad Real"
-msgstr "Ciudad Real"
-
-#: .\contrib\localflavor\es\es_provinces.py:18
-msgid "Cordoba"
-msgstr "Cordoba"
-
-#: .\contrib\localflavor\es\es_provinces.py:19
-msgid "A Coruna"
-msgstr "A Coruna"
-
-#: .\contrib\localflavor\es\es_provinces.py:20
-msgid "Cuenca"
-msgstr "Cuenca"
-
-#: .\contrib\localflavor\es\es_provinces.py:21
-msgid "Girona"
-msgstr "Girona"
-
-#: .\contrib\localflavor\es\es_provinces.py:22
-msgid "Granada"
-msgstr "Granada"
-
-#: .\contrib\localflavor\es\es_provinces.py:23
-msgid "Guadalajara"
-msgstr "Guadalajara"
-
-#: .\contrib\localflavor\es\es_provinces.py:24
-msgid "Guipuzkoa"
-msgstr "Guipuzkoa"
-
-#: .\contrib\localflavor\es\es_provinces.py:25
-msgid "Huelva"
-msgstr "Huelva"
-
-#: .\contrib\localflavor\es\es_provinces.py:26
-msgid "Huesca"
-msgstr "Huesca"
-
-#: .\contrib\localflavor\es\es_provinces.py:27
-msgid "Jaen"
-msgstr "Jaen"
-
-#: .\contrib\localflavor\es\es_provinces.py:28
-msgid "Leon"
-msgstr "Leon"
-
-#: .\contrib\localflavor\es\es_provinces.py:29
-msgid "Lleida"
-msgstr "Lleida"
-
-#: .\contrib\localflavor\es\es_provinces.py:30
-#: .\contrib\localflavor\es\es_regions.py:17
-msgid "La Rioja"
-msgstr "La Rioja"
-
-#: .\contrib\localflavor\es\es_provinces.py:31
-msgid "Lugo"
-msgstr "Lugo"
-
-#: .\contrib\localflavor\es\es_provinces.py:32
-#: .\contrib\localflavor\es\es_regions.py:18
-msgid "Madrid"
-msgstr "Madrid"
-
-#: .\contrib\localflavor\es\es_provinces.py:33
-msgid "Malaga"
-msgstr "Malaga"
-
-#: .\contrib\localflavor\es\es_provinces.py:34
-msgid "Murcia"
-msgstr "Murcia"
-
-#: .\contrib\localflavor\es\es_provinces.py:35
-msgid "Navarre"
-msgstr "Navarra"
-
-#: .\contrib\localflavor\es\es_provinces.py:36
-msgid "Ourense"
-msgstr "Ourense"
-
-#: .\contrib\localflavor\es\es_provinces.py:37
-msgid "Asturias"
-msgstr "Asturias"
-
-#: .\contrib\localflavor\es\es_provinces.py:38
-msgid "Palencia"
-msgstr "Palencia"
-
-#: .\contrib\localflavor\es\es_provinces.py:39
-msgid "Las Palmas"
-msgstr "Las Palmas"
-
-#: .\contrib\localflavor\es\es_provinces.py:40
-msgid "Pontevedra"
-msgstr "Pontevedra"
-
-#: .\contrib\localflavor\es\es_provinces.py:41
-msgid "Salamanca"
-msgstr "Salamanca"
-
-#: .\contrib\localflavor\es\es_provinces.py:42
-msgid "Santa Cruz de Tenerife"
-msgstr "Santa Cruz de Tenerife"
-
-#: .\contrib\localflavor\es\es_provinces.py:43
-#: .\contrib\localflavor\es\es_regions.py:11
-msgid "Cantabria"
-msgstr "Cantabria"
-
-#: .\contrib\localflavor\es\es_provinces.py:44
-msgid "Segovia"
-msgstr "Segovia"
-
-#: .\contrib\localflavor\es\es_provinces.py:45
-msgid "Seville"
-msgstr "Sevilia"
-
-#: .\contrib\localflavor\es\es_provinces.py:46
-msgid "Soria"
-msgstr "Soria"
-
-#: .\contrib\localflavor\es\es_provinces.py:47
-msgid "Tarragona"
-msgstr "Tarragona"
-
-#: .\contrib\localflavor\es\es_provinces.py:48
-msgid "Teruel"
-msgstr "Teruel"
-
-#: .\contrib\localflavor\es\es_provinces.py:49
-msgid "Toledo"
-msgstr "Toledo"
-
-#: .\contrib\localflavor\es\es_provinces.py:50
-msgid "Valencia"
-msgstr "Valencia"
-
-#: .\contrib\localflavor\es\es_provinces.py:51
-msgid "Valladolid"
-msgstr "Valladolid"
-
-#: .\contrib\localflavor\es\es_provinces.py:52
-msgid "Bizkaia"
-msgstr "Bizkaia"
-
-#: .\contrib\localflavor\es\es_provinces.py:53
-msgid "Zamora"
-msgstr "Zamora"
-
-#: .\contrib\localflavor\es\es_provinces.py:54
-msgid "Zaragoza"
-msgstr "Zaragoza"
-
-#: .\contrib\localflavor\es\es_provinces.py:55
-msgid "Ceuta"
-msgstr "Ceuta"
-
-#: .\contrib\localflavor\es\es_provinces.py:56
-msgid "Melilla"
-msgstr "Melilla"
-
-#: .\contrib\localflavor\es\es_regions.py:5
-msgid "Andalusia"
-msgstr "Andalusia"
-
-#: .\contrib\localflavor\es\es_regions.py:6
-msgid "Aragon"
-msgstr "Aragon"
-
-#: .\contrib\localflavor\es\es_regions.py:7
-msgid "Principality of Asturias"
-msgstr "Principatul Asturiei"
-
-#: .\contrib\localflavor\es\es_regions.py:8
-msgid "Balearic Islands"
-msgstr "Insulele Baleare"
-
-#: .\contrib\localflavor\es\es_regions.py:9
-msgid "Basque Country"
-msgstr "Tara Bascilor"
-
-#: .\contrib\localflavor\es\es_regions.py:10
-msgid "Canary Islands"
-msgstr "Insulele Canare"
-
-#: .\contrib\localflavor\es\es_regions.py:12
-msgid "Castile-La Mancha"
-msgstr "Castile-La Mancha"
-
-#: .\contrib\localflavor\es\es_regions.py:13
-msgid "Castile and Leon"
-msgstr "Castilia și Leon"
-
-#: .\contrib\localflavor\es\es_regions.py:14
-msgid "Catalonia"
-msgstr "Catalonia"
-
-#: .\contrib\localflavor\es\es_regions.py:15
-msgid "Extremadura"
-msgstr "Extremadura"
-
-#: .\contrib\localflavor\es\es_regions.py:16
-msgid "Galicia"
-msgstr "Galicia"
-
-#: .\contrib\localflavor\es\es_regions.py:19
-msgid "Region of Murcia"
-msgstr "Regiunea Murcia"
-
-#: .\contrib\localflavor\es\es_regions.py:20
-msgid "Foral Community of Navarre"
-msgstr "Comunitatea Forală Navara"
-
-#: .\contrib\localflavor\es\es_regions.py:21
-msgid "Valencian Community"
-msgstr "Comunitatea Valencia"
-
-#: .\contrib\localflavor\es\forms.py:19
-msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Introduceți un cod poștal valid în intervalul și de forma 01XXX - 52XXX."
-
-#: .\contrib\localflavor\es\forms.py:39
-msgid "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or 9XXXXXXXX."
-msgstr "Introduceți un număr de telefon valid într-unul dintre formatele 6XXXXXXXX, 8XXXXXXXX sau 9XXXXXXXX."
-
-#: .\contrib\localflavor\es\forms.py:66
-msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Introduceţi vă rog un NIF, NIE sau CIF valid."
-
-#: .\contrib\localflavor\es\forms.py:67
-msgid "Please enter a valid NIF or NIE."
-msgstr "Introduceți vă rog un NIF sau NIE valid."
-
-#: .\contrib\localflavor\es\forms.py:68
-msgid "Invalid checksum for NIF."
-msgstr "Sumă de control invalidă pentru NIF."
-
-#: .\contrib\localflavor\es\forms.py:69
-msgid "Invalid checksum for NIE."
-msgstr "Sumă de control invalidă pentru NIE."
-
-#: .\contrib\localflavor\es\forms.py:70
-msgid "Invalid checksum for CIF."
-msgstr "Sumă de control invalidă pentru CIF."
-
-#: .\contrib\localflavor\es\forms.py:142
-msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr "Introduceți un număr de cont bancar valid de forma XXXX-XXXX-XX-XXXXXXXXXX."
-
-#: .\contrib\localflavor\es\forms.py:143
-msgid "Invalid checksum for bank account number."
-msgstr "Sumă de control invalidă pentru numărul de cont bancar."
-
-#: .\contrib\localflavor\fi\forms.py:28
-msgid "Enter a valid Finnish social security number."
-msgstr "Introduceți un număr finlandez de securitate socială valid."
-
-#: .\contrib\localflavor\in_\forms.py:14
-msgid "Enter a zip code in the format XXXXXXX."
-msgstr "Introduceți un cod poștal de forma XXXXXXX."
-
-#: .\contrib\localflavor\is_\forms.py:17
-msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr "Introduceți un număr islandez de autentificare valid. Formatul este XXXXXX-XXXX."
-
-#: .\contrib\localflavor\is_\forms.py:18
-msgid "The Icelandic identification number is not valid."
-msgstr "Numărul islandez de identificare nu este valid."
-
-#: .\contrib\localflavor\it\forms.py:14
-msgid "Enter a valid zip code."
-msgstr "Introduceți un cod poștal valid."
-
-#: .\contrib\localflavor\it\forms.py:43
-msgid "Enter a valid Social Security number."
-msgstr "Introduceți un număr de securitate socială valid."
-
-#: .\contrib\localflavor\it\forms.py:68
-msgid "Enter a valid VAT number."
-msgstr "Introduceți un număr TVA valid."
-
-#: .\contrib\localflavor\jp\forms.py:17
-msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "Introduceți un cod poștal de forma XXXXXXX sau XXX-XXXX."
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:4
-msgid "Hokkaido"
-msgstr "Hokkaido"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:5
-msgid "Aomori"
-msgstr "Aomori"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:6
-msgid "Iwate"
-msgstr "Iwate"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:7
-msgid "Miyagi"
-msgstr "Miyagi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:8
-msgid "Akita"
-msgstr "Akita"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:9
-msgid "Yamagata"
-msgstr "Yamagata"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:10
-msgid "Fukushima"
-msgstr "Fukushima"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:11
-msgid "Ibaraki"
-msgstr "Ibaraki"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:12
-msgid "Tochigi"
-msgstr "Tochigi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:13
-msgid "Gunma"
-msgstr "Gunma"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:14
-msgid "Saitama"
-msgstr "Saitama"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:15
-msgid "Chiba"
-msgstr "Chiba"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:16
-msgid "Tokyo"
-msgstr "Tokyo"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:17
-msgid "Kanagawa"
-msgstr "Kanagawa"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:18
-msgid "Yamanashi"
-msgstr "Yamanashi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:19
-msgid "Nagano"
-msgstr "Nagano"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:20
-msgid "Niigata"
-msgstr "Niigata"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:21
-msgid "Toyama"
-msgstr "Toyama"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:22
-msgid "Ishikawa"
-msgstr "Ishikawa"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:23
-msgid "Fukui"
-msgstr "Fukui"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:24
-msgid "Gifu"
-msgstr "Gifu"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:25
-msgid "Shizuoka"
-msgstr "Shizuoka"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:26
-msgid "Aichi"
-msgstr "Aichi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:27
-msgid "Mie"
-msgstr "Mie"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:28
-msgid "Shiga"
-msgstr "Shiga"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:29
-msgid "Kyoto"
-msgstr "Kyoto"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:30
-msgid "Osaka"
-msgstr "Osaka"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:31
-msgid "Hyogo"
-msgstr "Hyogo"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:32
-msgid "Nara"
-msgstr "Nara"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:33
-msgid "Wakayama"
-msgstr "Wakayama"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:34
-msgid "Tottori"
-msgstr "Tottori"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:35
-msgid "Shimane"
-msgstr "Shimane"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:36
-msgid "Okayama"
-msgstr "Okayama"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:37
-msgid "Hiroshima"
-msgstr "Hiroshima"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:38
-msgid "Yamaguchi"
-msgstr "Yamaguchi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:39
-msgid "Tokushima"
-msgstr "Tokushima"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:40
-msgid "Kagawa"
-msgstr "Kagawa"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:41
-msgid "Ehime"
-msgstr "Ehime"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:42
-msgid "Kochi"
-msgstr "Kochi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:43
-msgid "Fukuoka"
-msgstr "Fukuoka"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:44
-msgid "Saga"
-msgstr "Saga"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:45
-msgid "Nagasaki"
-msgstr "Nagasaki"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:46
-msgid "Kumamoto"
-msgstr "Kumamoto"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:47
-msgid "Oita"
-msgstr "Oita"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:48
-msgid "Miyazaki"
-msgstr "Miyazaki"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:49
-msgid "Kagoshima"
-msgstr "Kagoshima"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:50
-msgid "Okinawa"
-msgstr "Okinawa"
-
-#: .\contrib\localflavor\mx\mx_states.py:12
-msgid "Aguascalientes"
-msgstr "Aguascalientes"
-
-#: .\contrib\localflavor\mx\mx_states.py:13
-msgid "Baja California"
-msgstr "Baja California"
-
-#: .\contrib\localflavor\mx\mx_states.py:14
-msgid "Baja California Sur"
-msgstr "Baja California Sur"
-
-#: .\contrib\localflavor\mx\mx_states.py:15
-msgid "Campeche"
-msgstr "Campeche"
-
-#: .\contrib\localflavor\mx\mx_states.py:16
-msgid "Chihuahua"
-msgstr "Chihuahua"
-
-#: .\contrib\localflavor\mx\mx_states.py:17
-msgid "Chiapas"
-msgstr "Chiapas"
-
-#: .\contrib\localflavor\mx\mx_states.py:18
-msgid "Coahuila"
-msgstr "Coahuila"
-
-#: .\contrib\localflavor\mx\mx_states.py:19
-msgid "Colima"
-msgstr "Colima"
-
-#: .\contrib\localflavor\mx\mx_states.py:20
-msgid "Distrito Federal"
-msgstr "Districtul Federal"
-
-#: .\contrib\localflavor\mx\mx_states.py:21
-msgid "Durango"
-msgstr "Durango"
-
-#: .\contrib\localflavor\mx\mx_states.py:22
-msgid "Guerrero"
-msgstr "Guerrero"
-
-#: .\contrib\localflavor\mx\mx_states.py:23
-msgid "Guanajuato"
-msgstr "Guanajuato"
-
-#: .\contrib\localflavor\mx\mx_states.py:24
-msgid "Hidalgo"
-msgstr "Hidalgo"
-
-#: .\contrib\localflavor\mx\mx_states.py:25
-msgid "Jalisco"
-msgstr "Jalisco"
-
-#: .\contrib\localflavor\mx\mx_states.py:26
-msgid "Estado de MÃ©xico"
-msgstr "Statul Mexico"
-
-#: .\contrib\localflavor\mx\mx_states.py:27
-msgid "MichoacÃ¡n"
-msgstr "MichoacÃ¡n"
-
-#: .\contrib\localflavor\mx\mx_states.py:28
-msgid "Morelos"
-msgstr "Morelos"
-
-#: .\contrib\localflavor\mx\mx_states.py:29
-msgid "Nayarit"
-msgstr "Nayarit"
-
-#: .\contrib\localflavor\mx\mx_states.py:30
-msgid "Nuevo LeÃ³n"
-msgstr "Nuevo LeÃ³n"
-
-#: .\contrib\localflavor\mx\mx_states.py:31
-msgid "Oaxaca"
-msgstr "Oaxaca"
-
-#: .\contrib\localflavor\mx\mx_states.py:32
-msgid "Puebla"
-msgstr "Puebla"
-
-#: .\contrib\localflavor\mx\mx_states.py:33
-msgid "QuerÃ©taro"
-msgstr "QuerÃ©taro"
-
-#: .\contrib\localflavor\mx\mx_states.py:34
-msgid "Quintana Roo"
-msgstr "Quintana Roo"
-
-#: .\contrib\localflavor\mx\mx_states.py:35
-msgid "Sinaloa"
-msgstr "Sinaloa"
-
-#: .\contrib\localflavor\mx\mx_states.py:36
-msgid "San Luis PotosÃ­"
-msgstr "San Luis PotosÃ­"
-
-#: .\contrib\localflavor\mx\mx_states.py:37
-msgid "Sonora"
-msgstr "Sonora"
-
-#: .\contrib\localflavor\mx\mx_states.py:38
-msgid "Tabasco"
-msgstr "Tabasco"
-
-#: .\contrib\localflavor\mx\mx_states.py:39
-msgid "Tamaulipas"
-msgstr "Tamaulipas"
-
-#: .\contrib\localflavor\mx\mx_states.py:40
-msgid "Tlaxcala"
-msgstr "Tlaxcala"
-
-#: .\contrib\localflavor\mx\mx_states.py:41
-msgid "Veracruz"
-msgstr "Veracruz"
-
-#: .\contrib\localflavor\mx\mx_states.py:42
-msgid "YucatÃ¡n"
-msgstr "Yucatan"
-
-#: .\contrib\localflavor\mx\mx_states.py:43
-msgid "Zacatecas"
-msgstr "Zacatecas"
-
-#: .\contrib\localflavor\nl\forms.py:21
-msgid "Enter a valid postal code"
-msgstr "Introduceți un cod poștal valid"
-
-#: .\contrib\localflavor\nl\forms.py:52
-msgid "Enter a valid phone number"
-msgstr "Introduceţi un număr de telefon valid"
-
-#: .\contrib\localflavor\nl\forms.py:78
-msgid "Enter a valid SoFi number"
-msgstr "Introduceți un număr SoFi valid"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:4
-msgid "Drente"
-msgstr "Drente"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:5
-msgid "Flevoland"
-msgstr "Flevoland"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:6
-msgid "Friesland"
-msgstr "Frizia"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:7
-msgid "Gelderland"
-msgstr "Gelderland"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:8
-msgid "Groningen"
-msgstr "Groningen"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:9
-msgid "Limburg"
-msgstr "Limburg"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:10
-msgid "Noord-Brabant"
-msgstr "Brabantul de Nord"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:11
-msgid "Noord-Holland"
-msgstr "Olanda de Nord"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:12
-msgid "Overijssel"
-msgstr "Overijssel"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:13
-msgid "Utrecht"
-msgstr "Utrecht"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:14
-msgid "Zeeland"
-msgstr "Zeelanda"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:15
-msgid "Zuid-Holland"
-msgstr "Olanda de Sud"
-
-#: .\contrib\localflavor\no\forms.py:33
-msgid "Enter a valid Norwegian social security number."
-msgstr "Introduceți un număr norvegian de securitate socială valid."
-
-#: .\contrib\localflavor\pe\forms.py:24
-msgid "This field requires 8 digits."
-msgstr "Acest câmp are nevoie de 8 cifre."
-
-#: .\contrib\localflavor\pe\forms.py:52
-msgid "This field requires 11 digits."
-msgstr "Acest câmp are nevoie de 11 cifre."
-
-#: .\contrib\localflavor\pl\forms.py:39
-msgid "National Identification Number consists of 11 digits."
-msgstr "Numărul Național de Identificare conține 11 cifre."
-
-#: .\contrib\localflavor\pl\forms.py:40
-msgid "Wrong checksum for the National Identification Number."
-msgstr "Sumă de control greșită pentru Numărul Național de Identificare."
-
-#: .\contrib\localflavor\pl\forms.py:72
-msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr "Introduceți un număr de taxă(NIP) de forma XXX-XXX-XX-XX sau XX-XX-XXX-XXX."
-
-#: .\contrib\localflavor\pl\forms.py:73
-msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr "Sumă de control greșită pentru Numărul de Taxa (NIP)."
-
-#: .\contrib\localflavor\pl\forms.py:112
-msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr "Numărul National din Registrul pentru Afaceri (REGON) contine 7 sau 9 cifre."
-
-#: .\contrib\localflavor\pl\forms.py:113
-msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr "Suma de control gresita pentru Numărul National din Registrul pentru Afaceri (REGON)."
-
-#: .\contrib\localflavor\pl\forms.py:156
-msgid "Enter a postal code in the format XX-XXX."
-msgstr "Introduceți un cod poștal de forma XX-XXX."
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:8
-msgid "Lower Silesia"
-msgstr "Silezia Inferioară"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:9
-msgid "Kuyavia-Pomerania"
-msgstr "Kuyavia-Pomerania"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:10
-msgid "Lublin"
-msgstr "Lublin"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:11
-msgid "Lubusz"
-msgstr "Lubusz"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:12
-msgid "Lodz"
-msgstr "Lodz"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:13
-msgid "Lesser Poland"
-msgstr "Polonia Mică"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:14
-msgid "Masovia"
-msgstr "Masovia"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:15
-msgid "Opole"
-msgstr "Opole"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:16
-msgid "Subcarpatia"
-msgstr "Podcarpatia"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:17
-msgid "Podlasie"
-msgstr "Podlasie"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:18
-msgid "Pomerania"
-msgstr "Pomerania"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:19
-msgid "Silesia"
-msgstr "Silezia"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:20
-msgid "Swietokrzyskie"
-msgstr "Swietokrzyskie"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:21
-msgid "Warmia-Masuria"
-msgstr "Warmia-Masuria"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:22
-msgid "Greater Poland"
-msgstr "Polonia Mare"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:23
-msgid "West Pomerania"
-msgstr "Pomerania Occidentală"
-
-#: .\contrib\localflavor\sk\forms.py:30
-msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Introduceți un cod poștal de forma XXXXX or XXX XX."
-
-#: .\contrib\localflavor\sk\sk_districts.py:8
-msgid "Banska Bystrica"
-msgstr "Banska Bystrica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:9
-msgid "Banska Stiavnica"
-msgstr "Banska Stiavnica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:10
-msgid "Bardejov"
-msgstr "Bardejov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:11
-msgid "Banovce nad Bebravou"
-msgstr "Banovce nad Bebravou"
-
-#: .\contrib\localflavor\sk\sk_districts.py:12
-msgid "Brezno"
-msgstr "Brezno"
-
-#: .\contrib\localflavor\sk\sk_districts.py:13
-msgid "Bratislava I"
-msgstr "Bratislava I"
-
-#: .\contrib\localflavor\sk\sk_districts.py:14
-msgid "Bratislava II"
-msgstr "Bratislava II"
-
-#: .\contrib\localflavor\sk\sk_districts.py:15
-msgid "Bratislava III"
-msgstr "Bratislava III"
-
-#: .\contrib\localflavor\sk\sk_districts.py:16
-msgid "Bratislava IV"
-msgstr "Bratislava IV"
-
-#: .\contrib\localflavor\sk\sk_districts.py:17
-msgid "Bratislava V"
-msgstr "Bratislava V"
-
-#: .\contrib\localflavor\sk\sk_districts.py:18
-msgid "Bytca"
-msgstr "Bytca"
-
-#: .\contrib\localflavor\sk\sk_districts.py:19
-msgid "Cadca"
-msgstr "Cadca"
-
-#: .\contrib\localflavor\sk\sk_districts.py:20
-msgid "Detva"
-msgstr "Detva"
-
-#: .\contrib\localflavor\sk\sk_districts.py:21
-msgid "Dolny Kubin"
-msgstr "Dolny Kubin"
-
-#: .\contrib\localflavor\sk\sk_districts.py:22
-msgid "Dunajska Streda"
-msgstr "Dunajska Streda"
-
-#: .\contrib\localflavor\sk\sk_districts.py:23
-msgid "Galanta"
-msgstr "Galanta"
-
-#: .\contrib\localflavor\sk\sk_districts.py:24
-msgid "Gelnica"
-msgstr "Gelnica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:25
-msgid "Hlohovec"
-msgstr "Hlohovec"
-
-#: .\contrib\localflavor\sk\sk_districts.py:26
-msgid "Humenne"
-msgstr "Humenne"
-
-#: .\contrib\localflavor\sk\sk_districts.py:27
-msgid "Ilava"
-msgstr "Ilava"
-
-#: .\contrib\localflavor\sk\sk_districts.py:28
-msgid "Kezmarok"
-msgstr "Kezmarok"
-
-#: .\contrib\localflavor\sk\sk_districts.py:29
-msgid "Komarno"
-msgstr "Komarno"
-
-#: .\contrib\localflavor\sk\sk_districts.py:30
-msgid "Kosice I"
-msgstr "Kosice I"
-
-#: .\contrib\localflavor\sk\sk_districts.py:31
-msgid "Kosice II"
-msgstr "Kosice II"
-
-#: .\contrib\localflavor\sk\sk_districts.py:32
-msgid "Kosice III"
-msgstr "Kosice III"
-
-#: .\contrib\localflavor\sk\sk_districts.py:33
-msgid "Kosice IV"
-msgstr "Kosice IV"
-
-#: .\contrib\localflavor\sk\sk_districts.py:34
-msgid "Kosice - okolie"
-msgstr "Kosice - okolie"
-
-#: .\contrib\localflavor\sk\sk_districts.py:35
-msgid "Krupina"
-msgstr "Krupina"
-
-#: .\contrib\localflavor\sk\sk_districts.py:36
-msgid "Kysucke Nove Mesto"
-msgstr "Kysucke Nove Mesto"
-
-#: .\contrib\localflavor\sk\sk_districts.py:37
-msgid "Levice"
-msgstr "Levice"
-
-#: .\contrib\localflavor\sk\sk_districts.py:38
-msgid "Levoca"
-msgstr "Levoca"
-
-#: .\contrib\localflavor\sk\sk_districts.py:39
-msgid "Liptovsky Mikulas"
-msgstr "Liptovsky Mikulas"
-
-#: .\contrib\localflavor\sk\sk_districts.py:40
-msgid "Lucenec"
-msgstr "Lucenec"
-
-#: .\contrib\localflavor\sk\sk_districts.py:41
-msgid "Malacky"
-msgstr "Malacky"
-
-#: .\contrib\localflavor\sk\sk_districts.py:42
-msgid "Martin"
-msgstr "Martin"
-
-#: .\contrib\localflavor\sk\sk_districts.py:43
-msgid "Medzilaborce"
-msgstr "Medzilaborce"
-
-#: .\contrib\localflavor\sk\sk_districts.py:44
-msgid "Michalovce"
-msgstr "Michalovce"
-
-#: .\contrib\localflavor\sk\sk_districts.py:45
-msgid "Myjava"
-msgstr "Myjava"
-
-#: .\contrib\localflavor\sk\sk_districts.py:46
-msgid "Namestovo"
-msgstr "Namestovo"
-
-#: .\contrib\localflavor\sk\sk_districts.py:47
-msgid "Nitra"
-msgstr "Nitra"
-
-#: .\contrib\localflavor\sk\sk_districts.py:48
-msgid "Nove Mesto nad Vahom"
-msgstr "Nove Mesto nad Vahom"
-
-#: .\contrib\localflavor\sk\sk_districts.py:49
-msgid "Nove Zamky"
-msgstr "Nove Zamky"
-
-#: .\contrib\localflavor\sk\sk_districts.py:50
-msgid "Partizanske"
-msgstr "Partizanske"
-
-#: .\contrib\localflavor\sk\sk_districts.py:51
-msgid "Pezinok"
-msgstr "Pezinok"
-
-#: .\contrib\localflavor\sk\sk_districts.py:52
-msgid "Piestany"
-msgstr "Piestany"
-
-#: .\contrib\localflavor\sk\sk_districts.py:53
-msgid "Poltar"
-msgstr "Poltar"
-
-#: .\contrib\localflavor\sk\sk_districts.py:54
-msgid "Poprad"
-msgstr "Poprad"
-
-#: .\contrib\localflavor\sk\sk_districts.py:55
-msgid "Povazska Bystrica"
-msgstr "Povazska Bystrica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:56
-msgid "Presov"
-msgstr "Presov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:57
-msgid "Prievidza"
-msgstr "Prievidza"
-
-#: .\contrib\localflavor\sk\sk_districts.py:58
-msgid "Puchov"
-msgstr "Puchov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:59
-msgid "Revuca"
-msgstr "Revuca"
-
-#: .\contrib\localflavor\sk\sk_districts.py:60
-msgid "Rimavska Sobota"
-msgstr "Rimavska Sobota"
-
-#: .\contrib\localflavor\sk\sk_districts.py:61
-msgid "Roznava"
-msgstr "Roznava"
-
-#: .\contrib\localflavor\sk\sk_districts.py:62
-msgid "Ruzomberok"
-msgstr "Ruzomberok"
-
-#: .\contrib\localflavor\sk\sk_districts.py:63
-msgid "Sabinov"
-msgstr "Sabinov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:64
-msgid "Senec"
-msgstr "Senec"
-
-#: .\contrib\localflavor\sk\sk_districts.py:65
-msgid "Senica"
-msgstr "Senica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:66
-msgid "Skalica"
-msgstr "Skalica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:67
-msgid "Snina"
-msgstr "Snina"
-
-#: .\contrib\localflavor\sk\sk_districts.py:68
-msgid "Sobrance"
-msgstr "Sobrance"
-
-#: .\contrib\localflavor\sk\sk_districts.py:69
-msgid "Spisska Nova Ves"
-msgstr "Spisska Nova Ves"
-
-#: .\contrib\localflavor\sk\sk_districts.py:70
-msgid "Stara Lubovna"
-msgstr "Stara Lubovna"
-
-#: .\contrib\localflavor\sk\sk_districts.py:71
-msgid "Stropkov"
-msgstr "Stropkov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:72
-msgid "Svidnik"
-msgstr "Svidnik"
-
-#: .\contrib\localflavor\sk\sk_districts.py:73
-msgid "Sala"
-msgstr "Sala"
-
-#: .\contrib\localflavor\sk\sk_districts.py:74
-msgid "Topolcany"
-msgstr "Topolcany"
-
-#: .\contrib\localflavor\sk\sk_districts.py:75
-msgid "Trebisov"
-msgstr "Trebisov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:76
-msgid "Trencin"
-msgstr "Trencin"
-
-#: .\contrib\localflavor\sk\sk_districts.py:77
-msgid "Trnava"
-msgstr "Trnava"
-
-#: .\contrib\localflavor\sk\sk_districts.py:78
-msgid "Turcianske Teplice"
-msgstr "Turcianske Teplice"
-
-#: .\contrib\localflavor\sk\sk_districts.py:79
-msgid "Tvrdosin"
-msgstr "Tvrdosin"
-
-#: .\contrib\localflavor\sk\sk_districts.py:80
-msgid "Velky Krtis"
-msgstr "Velky Krtis"
-
-#: .\contrib\localflavor\sk\sk_districts.py:81
-msgid "Vranov nad Toplou"
-msgstr "Vranov nad Toplou"
-
-#: .\contrib\localflavor\sk\sk_districts.py:82
-msgid "Zlate Moravce"
-msgstr "Zlate Moravce"
-
-#: .\contrib\localflavor\sk\sk_districts.py:83
-msgid "Zvolen"
-msgstr "Zvolen"
-
-#: .\contrib\localflavor\sk\sk_districts.py:84
-msgid "Zarnovica"
-msgstr "Zarnovica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:85
-msgid "Ziar nad Hronom"
-msgstr "Ziar nad Hronom"
-
-#: .\contrib\localflavor\sk\sk_districts.py:86
-msgid "Zilina"
-msgstr "Zilina"
-
-#: .\contrib\localflavor\sk\sk_regions.py:8
-msgid "Banska Bystrica region"
-msgstr "Banska Bystrica region"
-
-#: .\contrib\localflavor\sk\sk_regions.py:9
-msgid "Bratislava region"
-msgstr "Regiunea Bratislava"
-
-#: .\contrib\localflavor\sk\sk_regions.py:10
-msgid "Kosice region"
-msgstr "Regiunea Kosice"
-
-#: .\contrib\localflavor\sk\sk_regions.py:11
-msgid "Nitra region"
-msgstr "Regiunea Nitra"
-
-#: .\contrib\localflavor\sk\sk_regions.py:12
-msgid "Presov region"
-msgstr "Regiunea Presov"
-
-#: .\contrib\localflavor\sk\sk_regions.py:13
-msgid "Trencin region"
-msgstr "Regiunea Trencin"
-
-#: .\contrib\localflavor\sk\sk_regions.py:14
-msgid "Trnava region"
-msgstr "Regiunea Trnava"
-
-#: .\contrib\localflavor\sk\sk_regions.py:15
-msgid "Zilina region"
-msgstr "Regiunea Zilina"
-
-#: .\contrib\localflavor\uk\forms.py:21
-msgid "Enter a valid postcode."
-msgstr "Introduceți un cod poștal valid."
-
-#: .\contrib\localflavor\uk\uk_regions.py:11
-msgid "Bedfordshire"
-msgstr "Bedfordshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:12
-msgid "Buckinghamshire"
-msgstr "Buckinghamshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:14
-msgid "Cheshire"
-msgstr "Cheshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:15
-msgid "Cornwall and Isles of Scilly"
-msgstr "Cornwall și Insulele Scilly"
-
-#: .\contrib\localflavor\uk\uk_regions.py:16
-msgid "Cumbria"
-msgstr "Cumbria"
-
-#: .\contrib\localflavor\uk\uk_regions.py:17
-msgid "Derbyshire"
-msgstr "Derbyshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:18
-msgid "Devon"
-msgstr "Devon"
-
-#: .\contrib\localflavor\uk\uk_regions.py:19
-msgid "Dorset"
-msgstr "Dorset"
-
-#: .\contrib\localflavor\uk\uk_regions.py:20
-msgid "Durham"
-msgstr "Durham"
-
-#: .\contrib\localflavor\uk\uk_regions.py:21
-msgid "East Sussex"
-msgstr "East Sussex"
-
-#: .\contrib\localflavor\uk\uk_regions.py:22
-msgid "Essex"
-msgstr "Essex"
-
-#: .\contrib\localflavor\uk\uk_regions.py:23
-msgid "Gloucestershire"
-msgstr "Gloucestershire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:24
-msgid "Greater London"
-msgstr "Londra Mare"
-
-#: .\contrib\localflavor\uk\uk_regions.py:25
-msgid "Greater Manchester"
-msgstr "Greater Manchester"
-
-#: .\contrib\localflavor\uk\uk_regions.py:26
-msgid "Hampshire"
-msgstr "Hampshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:27
-msgid "Hertfordshire"
-msgstr "Hertfordshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:28
-msgid "Kent"
-msgstr "Kent"
-
-#: .\contrib\localflavor\uk\uk_regions.py:29
-msgid "Lancashire"
-msgstr "Lancashire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:30
-msgid "Leicestershire"
-msgstr "Leicestershire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:31
-msgid "Lincolnshire"
-msgstr "Lincolnshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:32
-msgid "Merseyside"
-msgstr "Merseyside"
-
-#: .\contrib\localflavor\uk\uk_regions.py:33
-msgid "Norfolk"
-msgstr "Norfolk"
-
-#: .\contrib\localflavor\uk\uk_regions.py:34
-msgid "North Yorkshire"
-msgstr "North Yorkshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:35
-msgid "Northamptonshire"
-msgstr "Northamptonshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:36
-msgid "Northumberland"
-msgstr "Northumberland"
-
-#: .\contrib\localflavor\uk\uk_regions.py:37
-msgid "Nottinghamshire"
-msgstr "Nottinghamshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:38
-msgid "Oxfordshire"
-msgstr "Oxfordshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:39
-msgid "Shropshire"
-msgstr "Shropshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:40
-msgid "Somerset"
-msgstr "Somerset"
-
-#: .\contrib\localflavor\uk\uk_regions.py:41
-msgid "South Yorkshire"
-msgstr "South Yorkshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:42
-msgid "Staffordshire"
-msgstr "Staffordshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:43
-msgid "Suffolk"
-msgstr "Suffolk"
-
-#: .\contrib\localflavor\uk\uk_regions.py:44
-msgid "Surrey"
-msgstr "Surrey"
-
-#: .\contrib\localflavor\uk\uk_regions.py:45
-msgid "Tyne and Wear"
-msgstr "Tyne și Wear"
-
-#: .\contrib\localflavor\uk\uk_regions.py:46
-msgid "Warwickshire"
-msgstr "Warwickshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:47
-msgid "West Midlands"
-msgstr "West Midlands"
-
-#: .\contrib\localflavor\uk\uk_regions.py:48
-msgid "West Sussex"
-msgstr "West Sussex"
-
-#: .\contrib\localflavor\uk\uk_regions.py:49
-msgid "West Yorkshire"
-msgstr "West Yorkshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:50
-msgid "Wiltshire"
-msgstr "Wiltshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:51
-msgid "Worcestershire"
-msgstr "Worcestershire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:55
-msgid "County Antrim"
-msgstr "Comitatul Antrim"
-
-#: .\contrib\localflavor\uk\uk_regions.py:56
-msgid "County Armagh"
-msgstr "Comitatul Armagh"
-
-#: .\contrib\localflavor\uk\uk_regions.py:57
-msgid "County Down"
-msgstr "Comitatul Down"
-
-#: .\contrib\localflavor\uk\uk_regions.py:58
-msgid "County Fermanagh"
-msgstr "Comitatul Fermanagh"
-
-#: .\contrib\localflavor\uk\uk_regions.py:59
-msgid "County Londonderry"
-msgstr "Comitatul Londonderry"
-
-#: .\contrib\localflavor\uk\uk_regions.py:60
-msgid "County Tyrone"
-msgstr "Comitatul Tyrone"
-
-#: .\contrib\localflavor\uk\uk_regions.py:64
-msgid "Clwyd"
-msgstr "Clwyd"
-
-#: .\contrib\localflavor\uk\uk_regions.py:65
-msgid "Dyfed"
-msgstr "Dyfed"
-
-#: .\contrib\localflavor\uk\uk_regions.py:66
-msgid "Gwent"
-msgstr "Gwent"
-
-#: .\contrib\localflavor\uk\uk_regions.py:67
-msgid "Gwynedd"
-msgstr "Gwynedd"
-
-#: .\contrib\localflavor\uk\uk_regions.py:68
-msgid "Mid Glamorgan"
-msgstr "Mid Glamorgan"
-
-#: .\contrib\localflavor\uk\uk_regions.py:69
-msgid "Powys"
-msgstr "Powys"
-
-#: .\contrib\localflavor\uk\uk_regions.py:70
-msgid "South Glamorgan"
-msgstr "South Glamorgan"
-
-#: .\contrib\localflavor\uk\uk_regions.py:71
-msgid "West Glamorgan"
-msgstr "West Glamorgan"
-
-#: .\contrib\localflavor\uk\uk_regions.py:75
-msgid "Borders"
-msgstr "Borders"
-
-#: .\contrib\localflavor\uk\uk_regions.py:76
-msgid "Central Scotland"
-msgstr "Central Scotland"
-
-#: .\contrib\localflavor\uk\uk_regions.py:77
-msgid "Dumfries and Galloway"
-msgstr "Dumfries și Galloway"
-
-#: .\contrib\localflavor\uk\uk_regions.py:78
-msgid "Fife"
-msgstr "Fife"
-
-#: .\contrib\localflavor\uk\uk_regions.py:79
-msgid "Grampian"
-msgstr "Grampian"
-
-#: .\contrib\localflavor\uk\uk_regions.py:80
-msgid "Highland"
-msgstr "Highland"
-
-#: .\contrib\localflavor\uk\uk_regions.py:81
-msgid "Lothian"
-msgstr "Lothian"
-
-#: .\contrib\localflavor\uk\uk_regions.py:82
-msgid "Orkney Islands"
-msgstr "Orkney Islands"
-
-#: .\contrib\localflavor\uk\uk_regions.py:83
-msgid "Shetland Islands"
-msgstr "Shetland Islands"
-
-#: .\contrib\localflavor\uk\uk_regions.py:84
-msgid "Strathclyde"
-msgstr "Strathclyde"
-
-#: .\contrib\localflavor\uk\uk_regions.py:85
-msgid "Tayside"
-msgstr "Tayside"
-
-#: .\contrib\localflavor\uk\uk_regions.py:86
-msgid "Western Isles"
-msgstr "Western Isles"
-
-#: .\contrib\localflavor\uk\uk_regions.py:90
-msgid "England"
-msgstr "Anglia"
-
-#: .\contrib\localflavor\uk\uk_regions.py:91
-msgid "Northern Ireland"
-msgstr "Irlanda de Nord"
-
-#: .\contrib\localflavor\uk\uk_regions.py:92
-msgid "Scotland"
-msgstr "Scotia"
-
-#: .\contrib\localflavor\uk\uk_regions.py:93
-msgid "Wales"
-msgstr "Țara Galilor"
-
-#: .\contrib\localflavor\us\forms.py:16
-msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "Introduceți un cod poștal de forma XXXXX or XXXXX-XXXX."
-
-#: .\contrib\localflavor\us\forms.py:54
-msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr "Introduceți un număr SUA de Securitate Sociala de forma XXX-XX-XXXX format."
-
-#: .\contrib\localflavor\za\forms.py:20
-msgid "Enter a valid South African ID number"
-msgstr "Introduceți un ID sud african valid"
-
-#: .\contrib\localflavor\za\forms.py:54
-msgid "Enter a valid South African postal code"
-msgstr "Introduceți un cod poștal sud african valid"
-
-#: .\contrib\localflavor\za\za_provinces.py:4
-msgid "Eastern Cape"
-msgstr "Eastern Cape"
-
-#: .\contrib\localflavor\za\za_provinces.py:5
-msgid "Free State"
-msgstr "Free State"
-
-#: .\contrib\localflavor\za\za_provinces.py:6
-msgid "Gauteng"
-msgstr "Gauteng"
-
-#: .\contrib\localflavor\za\za_provinces.py:7
-msgid "KwaZulu-Natal"
-msgstr "KwaZulu-Natal"
-
-#: .\contrib\localflavor\za\za_provinces.py:8
-msgid "Limpopo"
-msgstr "Limpopo"
-
-#: .\contrib\localflavor\za\za_provinces.py:9
-msgid "Mpumalanga"
-msgstr "Mpumalanga"
-
-#: .\contrib\localflavor\za\za_provinces.py:10
-msgid "Northern Cape"
-msgstr "Northern Cape"
-
-#: .\contrib\localflavor\za\za_provinces.py:11
-msgid "North West"
-msgstr "North West"
-
-#: .\contrib\localflavor\za\za_provinces.py:12
-msgid "Western Cape"
-msgstr "Western Cape"
-
-#: .\contrib\redirects\models.py:7
-msgid "redirect from"
-msgstr "redirectat de la "
-
-#: .\contrib\redirects\models.py:8
-msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
-msgstr "Aceasta ar trebui să fie o cale absolută, excluzând numele de domeniu. Exemplu: '/evenimente/cautare/'."
-
-#: .\contrib\redirects\models.py:9
-msgid "redirect to"
-msgstr "redirectat la"
-
-#: .\contrib\redirects\models.py:10
-msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
-msgstr "Aceasta poate fi o cale absolută (ca mai sus) sau un URL începând cu 'http://'."
-
-#: .\contrib\redirects\models.py:13
-msgid "redirect"
-msgstr "redirectare"
-
-#: .\contrib\redirects\models.py:14
-msgid "redirects"
-msgstr "redictări"
-
-#: .\contrib\sessions\models.py:41
-msgid "session key"
-msgstr "cheie sesiune"
-
-#: .\contrib\sessions\models.py:42
-msgid "session data"
-msgstr "date sesiune"
-
-#: .\contrib\sessions\models.py:43
-msgid "expire date"
-msgstr "data expirare"
-
-#: .\contrib\sessions\models.py:48
-msgid "session"
-msgstr "sesiune"
-
-#: .\contrib\sessions\models.py:49
-msgid "sessions"
-msgstr "sesiuni"
-
-#: .\contrib\sites\models.py:32
-msgid "domain name"
-msgstr "nume domeniu"
-
-#: .\contrib\sites\models.py:33
-msgid "display name"
-msgstr "nume afişat"
-
-#: .\contrib\sites\models.py:37
-msgid "site"
-msgstr "sit"
-
-#: .\contrib\sites\models.py:38
-msgid "sites"
-msgstr "sit"
-
-#: .\core\validators.py:72
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Această valoare trebuie să conţină numai litere, numere şi liniuţe de subliniere."
-
-#: .\core\validators.py:76
-msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
-msgstr "Această valoare trebuie să conţină numai litere, numere, liniuţe de subliniere, slash-uri și dash-uri."
-
-#: .\core\validators.py:80
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "Această valoare trebuie să conţină numai litere, numere, liniuţe de subliniere şi liniute."
-
-#: .\core\validators.py:84
-msgid "Uppercase letters are not allowed here."
-msgstr "Literele mari nu sunt permise aici."
-
-#: .\core\validators.py:88
-msgid "Lowercase letters are not allowed here."
-msgstr "Literele mici nu sunt permise aici."
-
-#: .\core\validators.py:95
-msgid "Enter only digits separated by commas."
-msgstr "Introduceţi numai numere separate de virgule."
-
-#: .\core\validators.py:107
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Introduceţi adrese de email valide separate de virgule."
-
-#: .\core\validators.py:111
-msgid "Please enter a valid IP address."
-msgstr "Introduceţi vă rog o adresă IP validă."
-
-#: .\core\validators.py:115
-msgid "Empty values are not allowed here."
-msgstr "Valorile vide nu sunt permise aici."
-
-#: .\core\validators.py:119
-msgid "Non-numeric characters aren't allowed here."
-msgstr "Caracterele ne-numerice nu sunt permise aici."
-
-#: .\core\validators.py:123
-msgid "This value can't be comprised solely of digits."
-msgstr "Această valoare nu poate conţîne numai cifre."
-
-#: .\core\validators.py:128
-#: .\newforms\fields.py:152
-msgid "Enter a whole number."
-msgstr "Introduceţi un număr întreg."
-
-#: .\core\validators.py:132
-msgid "Only alphabetical characters are allowed here."
-msgstr "Numai caractere alfabetice sunt permise aici."
-
-#: .\core\validators.py:147
-msgid "Year must be 1900 or later."
-msgstr "Anul trebuie să fie 1900 sau posterior."
-
-#: .\core\validators.py:151
+#: db/models/fields/__init__.py:588
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Introduceţi o dată validă în format: AAAA-LL-ZZ."
+
+#: db/models/fields/__init__.py:589
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Data invalida: %s"
 
-#: .\core\validators.py:156
-#: .\db\models\fields\__init__.py:527
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Introduceţi o dată validă în format: AAAA-LL-ZZ."
-
-#: .\core\validators.py:161
-msgid "Enter a valid time in HH:MM format."
-msgstr "Introduceţi o oră în format OO:MM."
-
-#: .\core\validators.py:165
-#: .\db\models\fields\__init__.py:604
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+#: db/models/fields/__init__.py:670
+#, fuzzy
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Introduceţi o dată/oră validă în format AAAA-LL-ZZ OO:MM."
 
-#: .\core\validators.py:170
-#: .\newforms\fields.py:403
-msgid "Enter a valid e-mail address."
-msgstr "Introduceţi o adresă de email validă."
+#: db/models/fields/__init__.py:672
+msgid "Date (with time)"
+msgstr "Data (cu ora)"
 
-#: .\core\validators.py:182
-#: .\core\validators.py:474
-#: .\newforms\fields.py:433
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Nici un fisier nu a fost trimis. Verifica tipul fisierului."
-
-#: .\core\validators.py:193
-#: .\newforms\fields.py:459
-msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
-msgstr "Încărcaţi o imagine validă. Fişierul încărcat nu era o imagine sau era o imagine coruptă."
-
-#: .\core\validators.py:200
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "URL-ul %s nu pointează către o imagine validă."
-
-#: .\core\validators.py:204
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "Numerele de telefon trebuie să fie în format XXX-XXX-XXXX. \"%s\" e invalid."
-
-#: .\core\validators.py:212
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "URL-ul %s nu pointează către o imagine video QuickTime validă."
-
-#: .\core\validators.py:216
-msgid "A valid URL is required."
-msgstr "E necesar un URL valid."
-
-#: .\core\validators.py:230
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"E necesar cod HTML valid. Erorile specifice sunt:\n"
-"%s"
-
-#: .\core\validators.py:237
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "Format XML invalid: %s"
-
-#: .\core\validators.py:254
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "URL invalid: %s"
-
-#: .\core\validators.py:259
-#: .\core\validators.py:261
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "URL-ul %s e invalid."
-
-#: .\core\validators.py:267
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "Introduceţi o abreviere validă în U.S."
-
-#: .\core\validators.py:281
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Îngrijiţi-vă limbajul! Cuvântul %s nu este permis aici."
-msgstr[1] "Îngrijiţi-vă limbajul! Cuvintele %s nu sunt permise aici."
-
-#: .\core\validators.py:288
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Acest câmp trebuie să fie identic cu '%s'."
-
-#: .\core\validators.py:307
-msgid "Please enter something for at least one field."
-msgstr "Vă rog completați cel puțin un câmp."
-
-#: .\core\validators.py:316
-#: .\core\validators.py:327
-msgid "Please enter both fields or leave them both empty."
-msgstr "Vă rog completaţi ambele câmpuri sau lăsaţi-le goale pe ambele."
-
-#: .\core\validators.py:335
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Acest câmp e necesar dacă %(field)s este %(value)s"
-
-#: .\core\validators.py:348
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Acest câmp e necesar dacă %(field)s nu este %(value)s"
-
-#: .\core\validators.py:367
-msgid "Duplicate values are not allowed."
-msgstr "Valorile duplicate nu sunt permise."
-
-#: .\core\validators.py:382
-#, python-format
-msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Această valoare trebuie să fie cuprinsa între %(lower)s și %(upper)s."
-
-#: .\core\validators.py:384
-#, python-format
-msgid "This value must be at least %s."
-msgstr "Această valoare trebuie să fie cel puțin %s."
-
-#: .\core\validators.py:386
-#, python-format
-msgid "This value must be no more than %s."
-msgstr "Această valoare trebuie să nu fie mai mult de %s."
-
-#: .\core\validators.py:427
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "Această valoare trebuie să fie o putere a lui %s."
-
-#: .\core\validators.py:437
-msgid "Please enter a valid decimal number."
-msgstr "Vă rog introduceţi un număr zecimal valid."
-
-#: .\core\validators.py:444
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Vă rog introduceţi un număr zecimal valid cu cel mult %s cifră."
-msgstr[1] "Vă rog introduceţi un număr zecimal valid cu cel mult %s cifre."
-
-#: .\core\validators.py:447
-#, python-format
-msgid "Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "Vă rog introduceţi un număr zecimal valid cu partea întreagă de cel mult %s cifră."
-msgstr[1] "Vă rog introduceţi un număr zecimal valid cu partea întreagă de cel mult %s cifre."
-
-#: .\core\validators.py:450
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Vă rog introduceţi un număr zecimal valid cu cel mult %s zecimală."
-msgstr[1] "Vă rog introduceţi un număr zecimal valid cu cel mult %s zecimale."
-
-#: .\core\validators.py:458
-msgid "Please enter a valid floating point number."
-msgstr "Vă rog introduceţi un număr cu virgulă valid."
-
-#: .\core\validators.py:467
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Asigură-te că fişierul încărcat are cel puţin %s octeţi."
-
-#: .\core\validators.py:468
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Asigură-te că fişierul încărcact are cel mult %s octeţi."
-
-#: .\core\validators.py:485
-msgid "The format for this field is wrong."
-msgstr "Formatul acestui câmp este invalid."
-
-#: .\core\validators.py:500
-msgid "This field is invalid."
-msgstr "Câmpul este invalid."
-
-#: .\core\validators.py:536
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "Nu pot prelua nimic de la %s."
-
-#: .\core\validators.py:539
-#, python-format
-msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr "URL-ul %(url)s a returnat un header Content-Type invalid '%(contenttype)s'."
-
-#: .\core\validators.py:572
-#, python-format
-msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
-msgstr "Te rog închide tagurile %(tag)s din linia %(line)s. ( Linia începe cu \"%(start)s\".)"
-
-#: .\core\validators.py:576
-#, python-format
-msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
-msgstr "Textul începând cu linia %(line)s nu e permis în acest context. (Linia începând cu \"%(start)s\".)"
-
-#: .\core\validators.py:581
-#, python-format
-msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
-msgstr "\"%(attr)s\" în linia %(line)s e un atribut invalid. (Linia începând cu \"%(start)s\".)"
-
-#: .\core\validators.py:586
-#, python-format
-msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
-msgstr "\"<%(tag)s>\" în linia %(line)s este un tag invalid. (Linia începe cu \"%(start)s\"."
-
-#: .\core\validators.py:590
-#, python-format
-msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
-msgstr "Unui tag din linia %(line)s îi lipseşte unul sau mai multe atribute. (Linia începe cu \"%(start)s\".)"
-
-#: .\core\validators.py:595
-#, python-format
-msgid "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line starts with \"%(start)s\".)"
-msgstr "Atributul \"%(attr)s\" din linia %(line)s are o valoare invalidă. ( Linia începe cu \"%(start)s\".)"
-
-#: .\db\models\manipulators.py:308
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s de acest tip %(type)s există deja pentru %(field)s dat."
-
-#: .\db\models\fields\__init__.py:52
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s cu acest %(fieldname)s există deja."
-
-#: .\db\models\fields\__init__.py:161
-#: .\db\models\fields\__init__.py:327
-#: .\db\models\fields\__init__.py:759
-#: .\db\models\fields\__init__.py:770
-#: .\newforms\fields.py:46
-#: .\oldforms\__init__.py:374
-msgid "This field is required."
-msgstr "Acest câmp este obligatoriu."
-
-#: .\db\models\fields\__init__.py:427
-msgid "This value must be an integer."
-msgstr "Această valoare trebuie să fie un număr intreg."
-
-#: .\db\models\fields\__init__.py:466
-msgid "This value must be either True or False."
-msgstr "Această valoare trebuie să fie ori falsă ori adevarată."
-
-#: .\db\models\fields\__init__.py:490
-msgid "This field cannot be null."
-msgstr "Câmpul nu poate fi gol"
-
-#: .\db\models\fields\__init__.py:668
+#: db/models/fields/__init__.py:746
 msgid "This value must be a decimal number."
 msgstr "Această valoare trebuie să fie un număr zecimal."
 
-#: .\db\models\fields\__init__.py:779
-msgid "Enter a valid filename."
-msgstr "Introduceți un nume de fișier valid."
+#: db/models/fields/__init__.py:748
+msgid "Decimal number"
+msgstr "Număr zecimal"
 
-#: .\db\models\fields\__init__.py:960
+#: db/models/fields/__init__.py:803
+msgid "E-mail address"
+msgstr "Adresa email"
+
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
+msgid "File path"
+msgstr "Calea fisierului"
+
+#: db/models/fields/__init__.py:841
+#, fuzzy
+msgid "This value must be a float."
+msgstr "Această valoare trebuie să fie cel puțin %s."
+
+#: db/models/fields/__init__.py:843
+msgid "Floating point number"
+msgstr "Număr cu virgula"
+
+#: db/models/fields/__init__.py:902
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "adresa ip"
+
+#: db/models/fields/__init__.py:931
 msgid "This value must be either None, True or False."
 msgstr "Această valoare trebuie să fie falsă, adevarată sau nici una."
 
-#: .\db\models\fields\related.py:93
+#: db/models/fields/__init__.py:933
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolean (adevarat, fals sau nici una)"
+
+#: db/models/fields/__init__.py:1024
+msgid "Text"
+msgstr "Text"
+
+#: db/models/fields/__init__.py:1040
+msgid "Time"
+msgstr "Timp"
+
+#: db/models/fields/__init__.py:1044
+#, fuzzy
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "Introduceţi o oră în format OO:MM."
+
+#: db/models/fields/__init__.py:1120
+msgid "URL"
+msgstr "URL"
+
+#: db/models/fields/__init__.py:1136
+msgid "XML text"
+msgstr "Text XML"
+
+#: db/models/fields/related.py:804
 #, python-format
-msgid "Please enter a valid %s."
-msgstr "Introduceți vă rog un %s valid."
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr ""
 
-#: .\db\models\fields\related.py:701
-msgid "Separate multiple IDs with commas."
-msgstr "Separă ID-urile multiple cu virgulă."
+#: db/models/fields/related.py:806
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
 
-#: .\db\models\fields\related.py:703
-msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr " Ţine apăsat \"Control\", sau \"Command\" pe un Mac, pentru selecție multiplă."
+#: db/models/fields/related.py:928
+msgid "One-to-one relationship"
+msgstr ""
 
-#: .\db\models\fields\related.py:750
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "Introduceți un ID valid pentru %(self)s. Valoarea %(value)r nu este validă."
-msgstr[1] "Introduceți ID-uri valide pentru %(self)s. Valorile %(value)r nu sunt valide."
+#: db/models/fields/related.py:990
+msgid "Many-to-many relationship"
+msgstr ""
 
-#: .\newforms\fields.py:47
-msgid "Enter a valid value."
-msgstr "Introduceți o valoare validă."
+#: db/models/fields/related.py:1010
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+" Ţine apăsat \"Control\", sau \"Command\" pe un Mac, pentru selecție "
+"multiplă."
 
-#: .\newforms\fields.py:124
-#, python-format
-msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr "Asigurați-vă că această valoare are cel mult %(max)d caractere (are %(length)d)."
+#: forms/fields.py:66
+msgid "This field is required."
+msgstr "Acest câmp este obligatoriu."
 
-#: .\newforms\fields.py:125
-#, python-format
-msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr "Asigurați-vă că această valoare are cel puțin %(min)d caractere (are %(length)d)."
+#: forms/fields.py:221
+msgid "Enter a whole number."
+msgstr "Introduceţi un număr întreg."
 
-#: .\newforms\fields.py:153
-#: .\newforms\fields.py:182
-#: .\newforms\fields.py:211
-#, python-format
-msgid "Ensure this value is less than or equal to %s."
-msgstr "Asigurați-vă că această valoare este mai mică sau egală cu %s."
-
-#: .\newforms\fields.py:154
-#: .\newforms\fields.py:183
-#: .\newforms\fields.py:212
-#, python-format
-msgid "Ensure this value is greater than or equal to %s."
-msgstr "Asigurați-vă că aceasta valoare este mai mare sau egală cu %s."
-
-#: .\newforms\fields.py:181
-#: .\newforms\fields.py:210
+#: forms/fields.py:252 forms/fields.py:273
 msgid "Enter a number."
 msgstr "Introduceţi un număr."
 
-#: .\newforms\fields.py:213
+#: forms/fields.py:276
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Asigurați-vă că nu exista mai mult de %s cifre în total."
 
-#: .\newforms\fields.py:214
+#: forms/fields.py:277
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Asigurați-vă că nu exista mai mult de %s spații zecimale."
 
-#: .\newforms\fields.py:215
+#: forms/fields.py:278
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Asigurați-vă că nu exista mai mult de %s cifre înainte de virgulă."
 
-#: .\newforms\fields.py:263
-#: .\newforms\fields.py:751
+#: forms/fields.py:340 forms/fields.py:916
 msgid "Enter a valid date."
 msgstr "Introduceți o dată validă."
 
-#: .\newforms\fields.py:296
-#: .\newforms\fields.py:752
+#: forms/fields.py:368 forms/fields.py:917
 msgid "Enter a valid time."
 msgstr "Introduceți o oră validă."
 
-#: .\newforms\fields.py:335
+#: forms/fields.py:394
 msgid "Enter a valid date/time."
 msgstr "Introduceți o dată/oră validă."
 
-#: .\newforms\fields.py:434
+#: forms/fields.py:458
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Nici un fisier nu a fost trimis. Verifica tipul fisierului."
+
+#: forms/fields.py:459
 msgid "No file was submitted."
 msgstr "Nici un fișier nu a fost trimis."
 
-#: .\newforms\fields.py:435
-#: .\oldforms\__init__.py:689
+#: forms/fields.py:460
 msgid "The submitted file is empty."
 msgstr "Fișierul uploadat este gol"
 
-#: .\newforms\fields.py:497
-msgid "Enter a valid URL."
-msgstr "Introduceți un URL valid."
+#: forms/fields.py:461
+#, fuzzy, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+"Asigurați-vă că această valoare are cel mult %(max)d caractere (are %(length)"
+"d)."
 
-#: .\newforms\fields.py:498
-msgid "This URL appears to be a broken link."
-msgstr "URL-ul e invalid."
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
 
-#: .\newforms\fields.py:560
-#: .\newforms\models.py:299
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Selectați o opțiune validă. Această opțiune nu face parte din opțiunile disponibile."
+#: forms/fields.py:516
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Încărcaţi o imagine validă. Fişierul încărcat nu era o imagine sau era o "
+"imagine coruptă."
 
-#: .\newforms\fields.py:599
+#: forms/fields.py:648 forms/fields.py:723
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Selectați o opțiune validă. %(value)s nu face parte din opțiunile disponibile."
+msgstr ""
+"Selectați o opțiune validă. %(value)s nu face parte din opțiunile "
+"disponibile."
 
-#: .\newforms\fields.py:600
-#: .\newforms\fields.py:662
-#: .\newforms\models.py:371
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
 msgid "Enter a list of values."
 msgstr "Introduceți o listă de valori."
 
-#: .\newforms\fields.py:780
-msgid "Enter a valid IPv4 address."
-msgstr "Introduceţi o adresă IPv4 validă."
+#: forms/formsets.py:308 forms/formsets.py:310
+#, fuzzy
+msgid "Order"
+msgstr "Ordonare:"
 
-#: .\newforms\models.py:372
+#: forms/formsets.py:312
+msgid "Delete"
+msgstr "Șterge"
+
+#: forms/models.py:575
+#, fuzzy, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Vă rugăm să corectați eroarea de mai jos"
+
+#: forms/models.py:579
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: forms/models.py:585
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: forms/models.py:593
+#, fuzzy
+msgid "Please correct the duplicate values below."
+msgstr "Vă rugăm să corectați eroarea de mai jos"
+
+#: forms/models.py:868
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
+
+#: forms/models.py:929
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Selectați o opțiune validă. Această opțiune nu face parte din opțiunile "
+"disponibile."
+
+#: forms/models.py:1019
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Selectați o opțiune validă. %s nu face parte din opțiunile disponibile."
+msgstr ""
+"Selectați o opțiune validă. %s nu face parte din opțiunile disponibile."
 
-#: .\oldforms\__init__.py:409
+#: forms/models.py:1021
 #, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Asigurați-va că textul dumneavoastră are mai puțin de %s caracter."
-msgstr[1] "Asigurați-va că textul dumneavoastră are mai puțin de %s caractere."
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr ""
 
-#: .\oldforms\__init__.py:414
-msgid "Line breaks are not allowed here."
-msgstr "Randurile noi nu sunt permise aici."
+#: forms/widgets.py:299
+#, fuzzy
+msgid "Currently"
+msgstr "Current:"
 
-#: .\oldforms\__init__.py:512
-#: .\oldforms\__init__.py:586
-#: .\oldforms\__init__.py:625
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Selectați o opțiune validă. '%(data)s' nu face parte din %(choices)s."
+#: forms/widgets.py:300
+msgid "Change"
+msgstr "Schimbă"
 
-#: .\oldforms\__init__.py:745
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Introduceţi un număr întreg cu valoare intre -32,768 și 32,767."
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "an"
 
-#: .\oldforms\__init__.py:755
-msgid "Enter a positive number."
-msgstr "Introduceţi un număr pozitiv."
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr "Necunoscut"
 
-#: .\oldforms\__init__.py:765
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Introduceţi un număr întreg cu valoare intre 0 și 32,767."
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "Da"
 
-#: .\template\defaultfilters.py:698
+#: forms/widgets.py:547
+msgid "No"
+msgstr "Nu"
+
+#: template/defaultfilters.py:794
 msgid "yes,no,maybe"
 msgstr "da,nu,poate"
 
-#: .\template\defaultfilters.py:729
+#: template/defaultfilters.py:825
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: .\template\defaultfilters.py:731
+#: template/defaultfilters.py:827
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: .\template\defaultfilters.py:733
+#: template/defaultfilters.py:829
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: .\template\defaultfilters.py:734
+#: template/defaultfilters.py:831
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: .\utils\dateformat.py:41
+#: template/defaultfilters.py:833
+#, fuzzy, python-format
+msgid "%.1f TB"
+msgstr "%.1f KB"
+
+#: template/defaultfilters.py:834
+#, fuzzy, python-format
+msgid "%.1f PB"
+msgstr "%.1f KB"
+
+#: utils/dateformat.py:42
 msgid "p.m."
 msgstr "p.m."
 
-#: .\utils\dateformat.py:42
+#: utils/dateformat.py:43
 msgid "a.m."
 msgstr "a.m."
 
-#: .\utils\dateformat.py:47
+#: utils/dateformat.py:48
 msgid "PM"
 msgstr "PM"
 
-#: .\utils\dateformat.py:48
+#: utils/dateformat.py:49
 msgid "AM"
 msgstr "AM"
 
-#: .\utils\dateformat.py:97
+#: utils/dateformat.py:98
 msgid "midnight"
 msgstr "miezul nopții"
 
-#: .\utils\dateformat.py:99
+#: utils/dateformat.py:100
 msgid "noon"
 msgstr "amiază"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Monday"
 msgstr "Luni"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Tuesday"
 msgstr "Marţi"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Wednesday"
 msgstr "Miercuri"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Thursday"
 msgstr "Joi"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Friday"
 msgstr "Vineri"
 
-#: .\utils\dates.py:7
+#: utils/dates.py:7
 msgid "Saturday"
 msgstr "Sâmbătă"
 
-#: .\utils\dates.py:7
+#: utils/dates.py:7
 msgid "Sunday"
 msgstr "Duminică"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Mon"
 msgstr "Lun"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Tue"
 msgstr "Mar"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Wed"
 msgstr "Mie"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Thu"
 msgstr "Joi"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Fri"
 msgstr "Vin"
 
-#: .\utils\dates.py:11
+#: utils/dates.py:11
 msgid "Sat"
 msgstr "Sâm"
 
-#: .\utils\dates.py:11
+#: utils/dates.py:11
 msgid "Sun"
 msgstr "Dum"
 
-#: .\utils\dates.py:18
+#: utils/dates.py:18
 msgid "January"
 msgstr "Ianuarie"
 
-#: .\utils\dates.py:18
+#: utils/dates.py:18
 msgid "February"
 msgstr "Februarie"
 
-#: .\utils\dates.py:18
-#: .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "Martie"
 
-#: .\utils\dates.py:18
-#: .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "Aprilie"
 
-#: .\utils\dates.py:18
-#: .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "Mai"
 
-#: .\utils\dates.py:18
-#: .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "Iunie"
 
-#: .\utils\dates.py:19
-#: .\utils\dates.py:31
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "Iulie"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "August"
 msgstr "August"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "September"
 msgstr "Septembrie"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "October"
 msgstr "Octombrie"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "November"
 msgstr "Noiembrie"
 
-#: .\utils\dates.py:20
+#: utils/dates.py:20
 msgid "December"
 msgstr "Decembrie"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "jan"
 msgstr "ian"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "feb"
 msgstr "feb"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "mar"
 msgstr "mar"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "apr"
 msgstr "apr"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "may"
 msgstr "mai"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "jun"
 msgstr "iun"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "jul"
 msgstr "iul"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "aug"
 msgstr "aug"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "sep"
 msgstr "sep"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "oct"
 msgstr "oct"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "nov"
 msgstr "noi"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "dec"
 msgstr "dec"
 
-#: .\utils\dates.py:31
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "Ian."
 
-#: .\utils\dates.py:31
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "Feb."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "Aug."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "Sept."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "Oct"
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "Noi."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "Dec."
 
-#: .\utils\text.py:127
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "alt. month"
+msgid "January"
+msgstr "Ianuarie"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "alt. month"
+msgid "February"
+msgstr "Februarie"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "alt. month"
+msgid "March"
+msgstr "Martie"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "alt. month"
+msgid "April"
+msgstr "Aprilie"
+
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "alt. month"
+msgid "May"
+msgstr "Mai"
+
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "alt. month"
+msgid "June"
+msgstr "Iunie"
+
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "alt. month"
+msgid "July"
+msgstr "Iulie"
+
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "alt. month"
+msgid "August"
+msgstr "August"
+
+#: utils/dates.py:43
+#, fuzzy
+msgctxt "alt. month"
+msgid "September"
+msgstr "Septembrie"
+
+#: utils/dates.py:44
+#, fuzzy
+msgctxt "alt. month"
+msgid "October"
+msgstr "Octombrie"
+
+#: utils/dates.py:45
+#, fuzzy
+msgctxt "alt. month"
+msgid "November"
+msgstr "Noiembrie"
+
+#: utils/dates.py:46
+#, fuzzy
+msgctxt "alt. month"
+msgid "December"
+msgstr "Decembrie"
+
+#: utils/text.py:136
 msgid "or"
 msgstr "sau"
 
-#: .\utils\timesince.py:21
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
+
+#: utils/timesince.py:21
 msgid "year"
 msgid_plural "years"
 msgstr[0] "an"
 msgstr[1] "ani"
 
-#: .\utils\timesince.py:22
+#: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "lună"
 msgstr[1] "luni"
 
-#: .\utils\timesince.py:23
+#: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "săptămână"
 msgstr[1] "săptămâni"
 
-#: .\utils\timesince.py:24
+#: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "zi"
 msgstr[1] "zile"
 
-#: .\utils\timesince.py:25
+#: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "oră"
 msgstr[1] "ore"
 
-#: .\utils\timesince.py:26
+#: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minut"
 msgstr[1] "minute"
 
-#: .\utils\timesince.py:46
+#: utils/timesince.py:45
 msgid "minutes"
 msgstr "minute"
 
-#: .\utils\timesince.py:51
+#: utils/timesince.py:50
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: .\utils\timesince.py:57
+#: utils/timesince.py:56
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: .\utils\translation\trans_real.py:403
+#: utils/translation/trans_real.py:560
 msgid "DATE_FORMAT"
 msgstr "j N Y"
 
-#: .\utils\translation\trans_real.py:404
+#: utils/translation/trans_real.py:561
 msgid "DATETIME_FORMAT"
 msgstr "j N Y, H:i:s"
 
-#: .\utils\translation\trans_real.py:405
+#: utils/translation/trans_real.py:562
 msgid "TIME_FORMAT"
 msgstr "H:i:s"
 
-#: .\utils\translation\trans_real.py:421
+#: utils/translation/trans_real.py:583
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: .\utils\translation\trans_real.py:422
+#: utils/translation/trans_real.py:584
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 
-#: .\views\generic\create_update.py:43
+#: views/generic/create_update.py:121
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s a fost creat cu succes."
 
-#: .\views\generic\create_update.py:117
+#: views/generic/create_update.py:164
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s a fost actualizat cu succes."
 
-#: .\views\generic\create_update.py:184
+#: views/generic/create_update.py:207
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s a fost șters."
-
-#~ msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-#~ msgstr "Ai <a href=\"/password_reset/\">uitat parola</a>?"
-#~ msgid "Use '[algo]$[salt]$[hexdigest]'"
-#~ msgstr "Foloseste '[algo]$[salt]$[hexdigest]'"
-
-#, fuzzy
-#~ msgid "Comments"
-#~ msgstr "permite comentarii"
-#~ msgid "label"
-#~ msgstr "etichetă"
-#~ msgid "package"
-#~ msgstr "pachet"
-#~ msgid "packages"
-#~ msgstr "pachete"
-
-#, fuzzy
-#~ msgid "count"
-#~ msgstr "conţinut"
-

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-03 20:18+0200\n"
+"POT-Creation-Date: 2010-12-29 20:59+0100\n"
 "PO-Revision-Date: 2009-03-24 13:28+0100\n"
 "Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
 "Language-Team: Catalan <ca@li.org>\n"
@@ -14,4771 +14,545 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: .\conf\global_settings.py:44
+#: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "àrab"
 
-#: .\conf\global_settings.py:45
+#: conf/global_settings.py:45
 msgid "Bulgarian"
 msgstr "búlgar"
 
-#: .\conf\global_settings.py:46
+#: conf/global_settings.py:46
 msgid "Bengali"
 msgstr "bengalí"
 
-#: .\conf\global_settings.py:47
+#: conf/global_settings.py:47
 msgid "Bosnian"
 msgstr "bosnià"
 
-#: .\conf\global_settings.py:48
+#: conf/global_settings.py:48
 msgid "Catalan"
 msgstr "català"
 
-#: .\conf\global_settings.py:49
+#: conf/global_settings.py:49
 msgid "Czech"
 msgstr "txec"
 
-#: .\conf\global_settings.py:50
+#: conf/global_settings.py:50
 msgid "Welsh"
 msgstr "gal·lès"
 
-#: .\conf\global_settings.py:51
+#: conf/global_settings.py:51
 msgid "Danish"
 msgstr "danès"
 
-#: .\conf\global_settings.py:52
+#: conf/global_settings.py:52
 msgid "German"
 msgstr "alemany"
 
-#: .\conf\global_settings.py:53
+#: conf/global_settings.py:53
 msgid "Greek"
 msgstr "grec"
 
-#: .\conf\global_settings.py:54
+#: conf/global_settings.py:54
 msgid "English"
 msgstr "anglès"
 
-#: .\conf\global_settings.py:55
+#: conf/global_settings.py:55
 msgid "British English"
 msgstr "anglès britànic"
 
-#: .\conf\global_settings.py:56
+#: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "espanyol"
 
-#: .\conf\global_settings.py:57
-msgid "Argentinean Spanish"
+#: conf/global_settings.py:57
+#, fuzzy
+msgid "Argentinian Spanish"
 msgstr "castellà argentí"
 
-#: .\conf\global_settings.py:58
+#: conf/global_settings.py:58
 msgid "Estonian"
 msgstr "estonià"
 
-#: .\conf\global_settings.py:59
+#: conf/global_settings.py:59
 msgid "Basque"
 msgstr "euskera"
 
-#: .\conf\global_settings.py:60
+#: conf/global_settings.py:60
 msgid "Persian"
 msgstr "persa"
 
-#: .\conf\global_settings.py:61
+#: conf/global_settings.py:61
 msgid "Finnish"
 msgstr "finlandès"
 
-#: .\conf\global_settings.py:62
+#: conf/global_settings.py:62
 msgid "French"
 msgstr "francès"
 
-#: .\conf\global_settings.py:63
+#: conf/global_settings.py:63
 msgid "Frisian"
 msgstr "frisi"
 
-#: .\conf\global_settings.py:64
+#: conf/global_settings.py:64
 msgid "Irish"
 msgstr "irlandès"
 
-#: .\conf\global_settings.py:65
+#: conf/global_settings.py:65
 msgid "Galician"
 msgstr "gallec"
 
-#: .\conf\global_settings.py:66
+#: conf/global_settings.py:66
 msgid "Hebrew"
 msgstr "hebreu"
 
-#: .\conf\global_settings.py:67
+#: conf/global_settings.py:67
 msgid "Hindi"
 msgstr "hindi"
 
-#: .\conf\global_settings.py:68
+#: conf/global_settings.py:68
 msgid "Croatian"
 msgstr "croat"
 
-#: .\conf\global_settings.py:69
+#: conf/global_settings.py:69
 msgid "Hungarian"
 msgstr "hongarès"
 
-#: .\conf\global_settings.py:70
+#: conf/global_settings.py:70
 msgid "Indonesian"
 msgstr "indonesi"
 
-#: .\conf\global_settings.py:71
+#: conf/global_settings.py:71
 msgid "Icelandic"
 msgstr "islandès"
 
-#: .\conf\global_settings.py:72
+#: conf/global_settings.py:72
 msgid "Italian"
 msgstr "italià"
 
-#: .\conf\global_settings.py:73
+#: conf/global_settings.py:73
 msgid "Japanese"
 msgstr "japonès"
 
-#: .\conf\global_settings.py:74
+#: conf/global_settings.py:74
 msgid "Georgian"
 msgstr "georgià"
 
-#: .\conf\global_settings.py:75
+#: conf/global_settings.py:75
 msgid "Khmer"
 msgstr "khmer"
 
-#: .\conf\global_settings.py:76
+#: conf/global_settings.py:76
 msgid "Kannada"
 msgstr "kannarès"
 
-#: .\conf\global_settings.py:77
+#: conf/global_settings.py:77
 msgid "Korean"
 msgstr "coreà"
 
-#: .\conf\global_settings.py:78
+#: conf/global_settings.py:78
 msgid "Lithuanian"
 msgstr "lituà"
 
-#: .\conf\global_settings.py:79
+#: conf/global_settings.py:79
 msgid "Latvian"
 msgstr "letó"
 
-#: .\conf\global_settings.py:80
+#: conf/global_settings.py:80
 msgid "Macedonian"
 msgstr "macedoni"
 
-#: .\conf\global_settings.py:81
+#: conf/global_settings.py:81
+#, fuzzy
+msgid "Malayalam"
+msgstr "Màlaga"
+
+#: conf/global_settings.py:82
 msgid "Mongolian"
 msgstr "mongol"
 
-#: .\conf\global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Dutch"
 msgstr "holandès"
 
-#: .\conf\global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Norwegian"
 msgstr "noruec"
 
-#: .\conf\global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian Bokmal"
 msgstr "noruec bokmal"
 
-#: .\conf\global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Norwegian Nynorsk"
 msgstr "noruec nynorsk"
 
-#: .\conf\global_settings.py:86
+#: conf/global_settings.py:87
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Polish"
 msgstr "polonès"
 
-#: .\conf\global_settings.py:87
+#: conf/global_settings.py:89
 msgid "Portuguese"
 msgstr "portuguès"
 
-#: .\conf\global_settings.py:88
+#: conf/global_settings.py:90
 msgid "Brazilian Portuguese"
 msgstr "portuguès de brasil"
 
-#: .\conf\global_settings.py:89
+#: conf/global_settings.py:91
 msgid "Romanian"
 msgstr "romanès"
 
-#: .\conf\global_settings.py:90
+#: conf/global_settings.py:92
 msgid "Russian"
 msgstr "rus"
 
-#: .\conf\global_settings.py:91
+#: conf/global_settings.py:93
 msgid "Slovak"
 msgstr "eslovac"
 
-#: .\conf\global_settings.py:92
+#: conf/global_settings.py:94
 msgid "Slovenian"
 msgstr "eslovè"
 
-#: .\conf\global_settings.py:93
+#: conf/global_settings.py:95
 msgid "Albanian"
 msgstr "albanès"
 
-#: .\conf\global_settings.py:94
+#: conf/global_settings.py:96
 msgid "Serbian"
 msgstr "serbi"
 
-#: .\conf\global_settings.py:95
+#: conf/global_settings.py:97
 msgid "Serbian Latin"
 msgstr "serbi llatí"
 
-#: .\conf\global_settings.py:96
+#: conf/global_settings.py:98
 msgid "Swedish"
 msgstr "suec"
 
-#: .\conf\global_settings.py:97
+#: conf/global_settings.py:99
 msgid "Tamil"
 msgstr "tàmil"
 
-#: .\conf\global_settings.py:98
+#: conf/global_settings.py:100
 msgid "Telugu"
 msgstr "telugu"
 
-#: .\conf\global_settings.py:99
+#: conf/global_settings.py:101
 msgid "Thai"
 msgstr "tailandès"
 
-#: .\conf\global_settings.py:100
+#: conf/global_settings.py:102
 msgid "Turkish"
 msgstr "turc"
 
-#: .\conf\global_settings.py:101
+#: conf/global_settings.py:103
 msgid "Ukrainian"
 msgstr "ucraïnès"
 
-#: .\conf\global_settings.py:102
+#: conf/global_settings.py:104
 msgid "Vietnamese"
 msgstr "vietnamita"
 
-#: .\conf\global_settings.py:103
+#: conf/global_settings.py:105
 msgid "Simplified Chinese"
 msgstr "xinès simplificat"
 
-#: .\conf\global_settings.py:104
+#: conf/global_settings.py:106
 msgid "Traditional Chinese"
 msgstr "xinès tradicional"
 
-#: .\contrib\admin\actions.py:48
-#, python-format
-msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Eliminat/s %(count)d %(items)s satisfactòriament."
-
-#: .\contrib\admin\actions.py:55 .\contrib\admin\options.py:1125
-msgid "Are you sure?"
-msgstr "N'esteu segur?"
-
-#: .\contrib\admin\actions.py:73
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Eliminar els %(verbose_name_plural)s seleccionats"
-
-#: .\contrib\admin\filterspecs.py:44
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>Per %s:</h3>\n"
-"<ul>\n"
-
-#: .\contrib\admin\filterspecs.py:75 .\contrib\admin\filterspecs.py:92
-#: .\contrib\admin\filterspecs.py:147 .\contrib\admin\filterspecs.py:173
-msgid "All"
-msgstr "Tots"
-
-#: .\contrib\admin\filterspecs.py:113
-msgid "Any date"
-msgstr "Qualsevol data"
-
-#: .\contrib\admin\filterspecs.py:114
-msgid "Today"
-msgstr "Avui"
-
-#: .\contrib\admin\filterspecs.py:117
-msgid "Past 7 days"
-msgstr "Últims 7 dies"
-
-#: .\contrib\admin\filterspecs.py:119
-msgid "This month"
-msgstr "Aquest mes"
-
-#: .\contrib\admin\filterspecs.py:121
-msgid "This year"
-msgstr "Aquest any"
-
-#: .\contrib\admin\filterspecs.py:147 .\forms\widgets.py:466
-msgid "Yes"
-msgstr "Sí"
-
-#: .\contrib\admin\filterspecs.py:147 .\forms\widgets.py:466
-msgid "No"
-msgstr "No"
-
-#: .\contrib\admin\filterspecs.py:154 .\forms\widgets.py:466
-msgid "Unknown"
-msgstr "Desconegut"
-
-#: .\contrib\admin\helpers.py:20
-msgid "Action:"
-msgstr "Acció:"
-
-#: .\contrib\admin\models.py:19
-msgid "action time"
-msgstr "moment de l'acció"
-
-#: .\contrib\admin\models.py:22
-msgid "object id"
-msgstr "id de l'objecte"
-
-#: .\contrib\admin\models.py:23
-msgid "object repr"
-msgstr "'repr' de l'objecte"
-
-#: .\contrib\admin\models.py:24
-msgid "action flag"
-msgstr "indicador de l'acció"
-
-#: .\contrib\admin\models.py:25
-msgid "change message"
-msgstr "missatge del canvi"
-
-#: .\contrib\admin\models.py:28
-msgid "log entry"
-msgstr "entrada del registre"
-
-#: .\contrib\admin\models.py:29
-msgid "log entries"
-msgstr "entrades del registre"
-
-#: .\contrib\admin\options.py:138 .\contrib\admin\options.py:153
-msgid "None"
-msgstr "cap"
-
-#: .\contrib\admin\options.py:559
-#, python-format
-msgid "Changed %s."
-msgstr "Modificat %s."
-
-#: .\contrib\admin\options.py:559 .\contrib\admin\options.py:569
-#: .\contrib\comments\templates\comments\preview.html.py:16
-#: .\db\models\base.py:845 .\forms\models.py:568
-msgid "and"
-msgstr "i"
-
-#: .\contrib\admin\options.py:564
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Afegit %(name)s \"%(object)s\""
-
-#: .\contrib\admin\options.py:568
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Modificat %(list)s per a %(name)s \"%(object)s\"."
-
-#: .\contrib\admin\options.py:573
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Eliminat %(name)s \"%(object)s\"."
-
-#: .\contrib\admin\options.py:577
-msgid "No fields changed."
-msgstr "Cap camp modificat."
-
-#: .\contrib\admin\options.py:643
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "El/la %(name)s \"%(obj)s\" ha estat afegit/da amb èxit."
-
-#: .\contrib\admin\options.py:647 .\contrib\admin\options.py:680
-msgid "You may edit it again below."
-msgstr "Podeu editar-lo de nou a sota."
-
-#: .\contrib\admin\options.py:657 .\contrib\admin\options.py:690
-#, python-format
-msgid "You may add another %s below."
-msgstr "Podeu afegir un altre %s a sota."
-
-#: .\contrib\admin\options.py:678
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "S'ha modificat amb èxit el/la %(name)s \"%(obj)s."
-
-#: .\contrib\admin\options.py:686
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"S'ha afegit amb èxit el/la %(name)s \"%(obj)s\". Pot editar-lo de nou a sota."
-
-#: .\contrib\admin\options.py:740 .\contrib\admin\options.py:997
-msgid ""
-"Items must be selected in order to perform actions on them. No items have "
-"been changed."
-msgstr ""
-"Heu de seleccionar els elements per poder realitzar-hi accions. "
-"No heu seleccionat cap element."
-
-#: .\contrib\admin\options.py:759
-msgid "No action selected."
-msgstr "no heu seleccionat cap acció"
-
-#: .\contrib\admin\options.py:840
-#, python-format
-msgid "Add %s"
-msgstr "Afegir %s"
-
-#: .\contrib\admin\options.py:866 .\contrib\admin\options.py:1105
-#, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "No existeix cap objecte %(name)s amb la clau primària %(key)r."
-
-#: .\contrib\admin\options.py:931
-#, python-format
-msgid "Change %s"
-msgstr "Modificar %s"
-
-#: .\contrib\admin\options.py:977
-msgid "Database error"
-msgstr "Error de base de dades"
-
-#: .\contrib\admin\options.py:1039
-#, python-format
-msgid "%(count)s %(name)s was changed successfully."
-msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(count)s %(name)s s'ha modificat amb èxit."
-msgstr[1] "%(count)s %(name)s s'han modificat amb èxit."
-
-#: .\contrib\admin\options.py:1066
-#, python-format
-msgid "%(total_count)s selected"
-msgid_plural "All %(total_count)s selected"
-msgstr[0] "%(total_count)s seleccionat(s)"
-msgstr[1] "Tots %(total_count)s seleccionat(s)"
-
-#: .\contrib\admin\options.py:1071
-#, python-format
-msgid "0 of %(cnt)s selected"
-msgstr "0 de %(cnt)s seleccionats"
-
-#: .\contrib\admin\options.py:1118
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "El/la %(name)s \"%(obj)s\" s'ha eliminat amb èxit."
-
-#: .\contrib\admin\options.py:1155
-#, python-format
-msgid "Change history: %s"
-msgstr "Modificar històric: %s"
-
-#: .\contrib\admin\sites.py:18 .\contrib\admin\views\decorators.py:14
-#: .\contrib\auth\forms.py:81
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-"Si us plau, introduïu un nom d'usuari i contrasenya vàlids. Tingueu en "
-"compte que tots dos camps son sensibles a majúscules i minúscules."
-
-#: .\contrib\admin\sites.py:307 .\contrib\admin\views\decorators.py:40
-msgid "Please log in again, because your session has expired."
-msgstr "Si us plau, entreu de nou perquè la vostra sessió ha caducat."
-
-#: .\contrib\admin\sites.py:314 .\contrib\admin\views\decorators.py:47
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Sembla ser que el vostre navegador no està configurat per acceptar galetes "
-"('cookies'). Si us plau, habiliteu les galetes, recarregueu aquesta pàgina i "
-"proveu-ho de nou. "
-
-#: .\contrib\admin\sites.py:330 .\contrib\admin\sites.py:336
-#: .\contrib\admin\views\decorators.py:66
-msgid "Usernames cannot contain the '@' character."
-msgstr "Els noms d'usuari no poden contenir el caràcter '@'."
-
-#: .\contrib\admin\sites.py:333 .\contrib\admin\views\decorators.py:62
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"La vostra adreça de correu no és el vostre nom d'usuari. Provi '%s' en el "
-"seu lloc."
-
-#: .\contrib\admin\sites.py:389
-msgid "Site administration"
-msgstr "Administració del lloc"
-
-#: .\contrib\admin\sites.py:403
-#: .\contrib\admin\templates\admin\login.html.py:26
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:14
-#: .\contrib\admin\views\decorators.py:20
-msgid "Log in"
-msgstr "Iniciar sessió"
-
-#: .\contrib\admin\sites.py:448
-#, python-format
-msgid "%s administration"
-msgstr "Administració de %s"
-
-#: .\contrib\admin\widgets.py:75
-msgid "Date:"
-msgstr "Data:"
-
-#: .\contrib\admin\widgets.py:75
-msgid "Time:"
-msgstr "Hora:"
-
-#: .\contrib\admin\widgets.py:99
-msgid "Currently:"
-msgstr "Actualment:"
-
-#: .\contrib\admin\widgets.py:99
-msgid "Change:"
-msgstr "Modificar:"
-
-#: .\contrib\admin\widgets.py:129
-msgid "Lookup"
-msgstr "Cercar"
-
-#: .\contrib\admin\widgets.py:244
-msgid "Add Another"
-msgstr "Afegir-ne un altre"
-
-#: .\contrib\admin\templates\admin\404.html.py:4
-#: .\contrib\admin\templates\admin\404.html.py:8
-msgid "Page not found"
-msgstr "No s'ha pogut trobar la pàgina"
-
-#: .\contrib\admin\templates\admin\404.html.py:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Ho sentim, però no s'ha pogut trobar la pàgina sol·licitada"
-
-#: .\contrib\admin\templates\admin\500.html.py:4
-#: .\contrib\admin\templates\admin\app_index.html.py:8
-#: .\contrib\admin\templates\admin\base.html.py:55
-#: .\contrib\admin\templates\admin\change_form.html.py:18
-#: .\contrib\admin\templates\admin\change_list.html.py:42
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:6
-#: .\contrib\admin\templates\admin\delete_selected_confirmation.html.py:6
-#: .\contrib\admin\templates\admin\invalid_setup.html.py:4
-#: .\contrib\admin\templates\admin\object_history.html.py:6
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:11
-#: .\contrib\admin\templates\registration\logged_out.html.py:4
-#: .\contrib\admin\templates\registration\password_change_done.html.py:4
-#: .\contrib\admin\templates\registration\password_change_form.html.py:5
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:4
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:3
-msgid "Home"
-msgstr "Inici"
-
-#: .\contrib\admin\templates\admin\500.html.py:4
-msgid "Server error"
-msgstr "Error del servidor"
-
-#: .\contrib\admin\templates\admin\500.html.py:6
-msgid "Server error (500)"
-msgstr "Error del servidor (500)"
-
-#: .\contrib\admin\templates\admin\500.html.py:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Error del servidor <em>(500)</em>"
-
-#: .\contrib\admin\templates\admin\500.html.py:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"S'ha produït un error. Se n'ha informat els administradors del lloc per "
-"correu electrònic, i hauria d'arreglar-se en breu. Gràcies per la vostra "
-"paciència."
-
-#: .\contrib\admin\templates\admin\actions.html.py:4
-msgid "Run the selected action"
-msgstr "Executar l'acció seleccionada"
-
-#: .\contrib\admin\templates\admin\actions.html.py:4
-msgid "Go"
-msgstr "Anar"
-
-#: .\contrib\admin\templates\admin\actions.html.py:11
-msgid "Click here to select the objects across all pages"
-msgstr "Feu clic aquí per seleccionar els objectes a totes les pàgines"
-
-#: .\contrib\admin\templates\admin\actions.html.py:11
-#, python-format
-msgid "Select all %(total_count)s %(module_name)s"
-msgstr "Seleccioneu tots %(total_count)s %(module_name)s"
-
-#: .\contrib\admin\templates\admin\actions.html.py:13
-msgid "Clear selection"
-msgstr "Netejar la selecció"
-
-#: .\contrib\admin\templates\admin\app_index.html.py:10
-#: .\contrib\admin\templates\admin\index.html.py:19
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: .\contrib\admin\templates\admin\base.html.py:28
-msgid "Welcome,"
-msgstr "Benvingut/da,"
-
-#: .\contrib\admin\templates\admin\base.html.py:33
-#: .\contrib\admin\templates\registration\password_change_done.html.py:3
-#: .\contrib\admin\templates\registration\password_change_form.html.py:4
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:3
-msgid "Documentation"
-msgstr "Documentació"
-
-#: .\contrib\admin\templates\admin\base.html.py:41
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:15
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:48
-#: .\contrib\admin\templates\registration\password_change_done.html.py:3
-#: .\contrib\admin\templates\registration\password_change_form.html.py:4
-msgid "Change password"
-msgstr "Canviar contrasenya"
-
-#: .\contrib\admin\templates\admin\base.html.py:48
-#: .\contrib\admin\templates\registration\password_change_done.html.py:3
-#: .\contrib\admin\templates\registration\password_change_form.html.py:4
-msgid "Log out"
-msgstr "Finalitzar sessió"
-
-#: .\contrib\admin\templates\admin\base_site.html.py:4
-msgid "Django site admin"
-msgstr "Lloc administratiu de Django"
-
-#: .\contrib\admin\templates\admin\base_site.html.py:7
-msgid "Django administration"
-msgstr "Administració de Django"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:21
-#: .\contrib\admin\templates\admin\index.html.py:29
-msgid "Add"
-msgstr "Afegir"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:28
-#: .\contrib\admin\templates\admin\object_history.html.py:10
-msgid "History"
-msgstr "Històric"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:29
-#: .\contrib\admin\templates\admin\edit_inline\stacked.html.py:9
-#: .\contrib\admin\templates\admin\edit_inline\tabular.html.py:28
-msgid "View on site"
-msgstr "Veure al lloc"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:39
-#: .\contrib\admin\templates\admin\change_list.html.py:71
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:24
-#: .\contrib\admin\templates\registration\password_change_form.html.py:15
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Si us plau, corregiu l'error mostrat a sota."
-msgstr[1] "Si us plau, corregiu els errors mostrats a sota."
-
-#: .\contrib\admin\templates\admin\change_list.html.py:63
-#, python-format
-msgid "Add %(name)s"
-msgstr "Afegir %(name)s"
-
-#: .\contrib\admin\templates\admin\change_list.html.py:82
-msgid "Filter"
-msgstr "Filtre"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:10
-#: .\contrib\admin\templates\admin\submit_line.html.py:4
-#: .\forms\formsets.py:302
-msgid "Delete"
-msgstr "Eliminar"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:16
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr ""
-"Eliminar el/la %(object_name)s '%(escaped_object)s' provocaria l'eliminació "
-"d'objectes relacionats, però el vostre compte no te permisos per esborrar "
-"els tipus d'objecte següents:"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:23
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr ""
-"Esteu segurs de voler esborrar els/les %(object_name)s \"%(escaped_object)s"
-"\"? S'esborraran els següents elements relacionats:"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:28
-#: .\contrib\admin\templates\admin\delete_selected_confirmation.html.py:33
-msgid "Yes, I'm sure"
-msgstr "Sí, n'estic segur"
-
-#: .\contrib\admin\templates\admin\delete_selected_confirmation.html.py:9
-msgid "Delete multiple objects"
-msgstr "Eliminar múltiples objectes"
-
-#: .\contrib\admin\templates\admin\delete_selected_confirmation.html.py:15
-#, python-format
-msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
-msgstr ""
-"Eliminar el/la %(object_name)s provocaria l'eliminació d'objectes "
-"relacionats, però el vostre compte no te permisos per esborrar els tipus "
-"d'objecte següents:"
-
-#: .\contrib\admin\templates\admin\delete_selected_confirmation.html.py:22
-#, python-format
-msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
-msgstr ""
-"Esteu segur de voler esborrar els/les %(object_name)s seleccionats? Tots "
-"aquests objectes i els seus elements relacionats s'esborraran:"
-
-#: .\contrib\admin\templates\admin\filter.html.py:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr "Per %(filter_title)s "
-
-#: .\contrib\admin\templates\admin\index.html.py:18
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Models disponibles a l'aplicació %(name)s."
-
-#: .\contrib\admin\templates\admin\index.html.py:35
-msgid "Change"
-msgstr "Modificar"
-
-#: .\contrib\admin\templates\admin\index.html.py:45
-msgid "You don't have permission to edit anything."
-msgstr "No teniu permís per editar res."
-
-#: .\contrib\admin\templates\admin\index.html.py:53
-msgid "Recent Actions"
-msgstr "Accions recents"
-
-#: .\contrib\admin\templates\admin\index.html.py:54
-msgid "My Actions"
-msgstr "Les meves accions"
-
-#: .\contrib\admin\templates\admin\index.html.py:58
-msgid "None available"
-msgstr "Cap disponible"
-
-#: .\contrib\admin\templates\admin\index.html.py:72
-msgid "Unknown content"
-msgstr "Contingut desconegut"
-
-#: .\contrib\admin\templates\admin\invalid_setup.html.py:7
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-"Hi ha algun problema a la instal·lació de la vostra base de dades. Assegureu-"
-"vos que s'han creat les taules adients, i que la base de dades és llegible "
-"per l'usuari apropiat."
-
-#: .\contrib\admin\templates\admin\login.html.py:19
-msgid "Username:"
-msgstr "Nom d'usuari:"
-
-#: .\contrib\admin\templates\admin\login.html.py:22
-msgid "Password:"
-msgstr "Contrasenya:"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:22
-msgid "Date/time"
-msgstr "Data/hora"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:23
-msgid "User"
-msgstr "Usuari"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:24
-msgid "Action"
-msgstr "Acció"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:38
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Aquest objecte no té historial de canvis. Probablement no es va afegir "
-"utilitzant aquest lloc administratiu."
-
-#: .\contrib\admin\templates\admin\pagination.html.py:10
-msgid "Show all"
-msgstr "Mostrar tots"
-
-#: .\contrib\admin\templates\admin\pagination.html.py:11
-#: .\contrib\admin\templates\admin\submit_line.html.py:3
-msgid "Save"
-msgstr "Desar"
-
-#: .\contrib\admin\templates\admin\search_form.html.py:8
-msgid "Search"
-msgstr "Cerca"
-
-#: .\contrib\admin\templates\admin\search_form.html.py:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "1 resultat"
-msgstr[1] "%(counter)s resultats"
-
-#: .\contrib\admin\templates\admin\search_form.html.py:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s en total"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:5
-msgid "Save as new"
-msgstr "Desar com a nou"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:6
-msgid "Save and add another"
-msgstr "Desar i afegir-ne un de nou"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:7
-msgid "Save and continue editing"
-msgstr "Desar i continuar editant"
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:5
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr ""
-"Primer, entreu un nom d'usuari i una contrasenya. Després podreu editar més "
-"opcions de l'usuari."
-
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:28
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Introduïu una contrasenya per l'usuari <strong>%(username)s</strong>"
-
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:35
-#: .\contrib\auth\forms.py:17 .\contrib\auth\forms.py:61
-#: .\contrib\auth\forms.py:186
-msgid "Password"
-msgstr "Contrasenya"
-
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:41
-#: .\contrib\admin\templates\registration\password_change_form.html.py:37
-#: .\contrib\auth\forms.py:187
-msgid "Password (again)"
-msgstr "Contrasenya (de nou)"
-
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:42
-#: .\contrib\auth\forms.py:19
-msgid "Enter the same password as above, for verification."
-msgstr "Introduïu la mateixa contrasenya de dalt, per fer-ne la verificació."
-
-#: .\contrib\admin\templates\admin\edit_inline\stacked.html.py:64
-#: .\contrib\admin\templates\admin\edit_inline\tabular.html.py:110
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Afegir un/a altre/a %(verbose_name)s."
-
-#: .\contrib\admin\templates\admin\edit_inline\stacked.html.py:67
-#: .\contrib\admin\templates\admin\edit_inline\tabular.html.py:113
-#: .\contrib\comments\templates\comments\delete.html.py:12
-msgid "Remove"
-msgstr "Eliminar"
-
-#: .\contrib\admin\templates\admin\edit_inline\tabular.html.py:15
-msgid "Delete?"
-msgstr "Eliminar?"
-
-#: .\contrib\admin\templates\registration\logged_out.html.py:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Gràcies per passar una estona de qualitat al web durant el dia d'avui."
-
-#: .\contrib\admin\templates\registration\logged_out.html.py:10
-msgid "Log in again"
-msgstr "Iniciar sessió de nou"
-
-#: .\contrib\admin\templates\registration\password_change_done.html.py:4
-#: .\contrib\admin\templates\registration\password_change_form.html.py:5
-#: .\contrib\admin\templates\registration\password_change_form.html.py:7
-#: .\contrib\admin\templates\registration\password_change_form.html.py:19
-msgid "Password change"
-msgstr "Canvi de contrasenya"
-
-#: .\contrib\admin\templates\registration\password_change_done.html.py:6
-#: .\contrib\admin\templates\registration\password_change_done.html.py:10
-msgid "Password change successful"
-msgstr "Contrasenya canviada amb èxit"
-
-#: .\contrib\admin\templates\registration\password_change_done.html.py:12
-msgid "Your password was changed."
-msgstr "La seva contrasenya ha estat canviada."
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:21
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Si us plau, introduïu la vostra contrasenya antiga, per seguretat, i tot "
-"seguit introduïu la vostra contrasenya nova dues vegades per verificar que "
-"l'heu escrita correctament."
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:27
-#: .\contrib\auth\forms.py:170
-msgid "Old password"
-msgstr "Contrasenya antiga"
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:32
-#: .\contrib\auth\forms.py:144
-msgid "New password"
-msgstr "Contrasenya nova"
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:43
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:21
-msgid "Change my password"
-msgstr "Canviar la meva contrasenya:"
-
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:10
-msgid "Password reset"
-msgstr "Restablir contrasenya"
-
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:10
-msgid "Password reset complete"
-msgstr "Contrasenya restablerta"
-
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:12
-msgid "Your password has been set.  You may go ahead and log in now."
-msgstr ""
-"S'ha canviat la vostra contrasenya. Ara podeu continuar i iniciar sessió."
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:4
-msgid "Password reset confirmation"
-msgstr "Confirmació de restabliment de contrasenya"
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:12
-msgid "Enter new password"
-msgstr "Introduïu la nova contrasenya"
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:14
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
-msgstr ""
-"Si us plau, introduïu la vostra nova contrasenya dues vegades, per verificar "
-"que l'heu escrita correctament."
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:18
-msgid "New password:"
-msgstr "Contrasenya nova:"
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:20
-msgid "Confirm password:"
-msgstr "Confirmar contrasenya:"
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:26
-msgid "Password reset unsuccessful"
-msgstr "Restabliment de contrasenya fallat"
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:28
-msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a new password reset."
-msgstr ""
-"L'enllaç de restabliment de contrasenya era invàlid, potser perquè ja s'ha "
-"utilitzat. Si us plau, sol·liciteu un nou reestabliment de contrasenya."
-
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:10
-msgid "Password reset successful"
-msgstr "Restabliment de contrasenya amb èxit"
-
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:12
-msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
-"address you submitted. You should be receiving it shortly."
-msgstr ""
-"Us hem enviat les instruccions per canviar la vostra contrasenya a l'adreça "
-"de correu electrònic que ens heu indicat. L'hauríeu de rebre en breu."
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
-"Esteu rebent aquest missatge perquè vau sol·licitar un restabliment de "
-"contrasenya."
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "del vostre compte d'usuari a %(site_name)s."
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:5
-msgid "Please go to the following page and choose a new password:"
-msgstr ""
-"Si us plau, aneu a la pàgina següent i escolliu una nova contrasenya:"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:9
-msgid "Your username, in case you've forgotten:"
-msgstr "El vostre nom d'usuari, en cas que l'hagueu oblidat:"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:11
-msgid "Thanks for using our site!"
-msgstr "Gràcies per fer ús del nostre lloc!"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:13
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "L'equip de %(site_name)s"
-
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
-"instructions for setting a new one."
-msgstr ""
-"Heu oblidat la vostra contrasenya? Introduïu la vostra adreça de correu "
-"electrònic a sota, i us enviarem instruccions per canviar-la."
-
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:16
-msgid "E-mail address:"
-msgstr "Adreça de correu electrònic:"
-
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:16
-msgid "Reset my password"
-msgstr "Restablir la meva contrasenya"
-
-#: .\contrib\admin\templatetags\admin_list.py:257
-msgid "All dates"
-msgstr "Totes les dates"
-
-#: .\contrib\admin\views\main.py:65
-#, python-format
-msgid "Select %s"
-msgstr "Seleccioneu %s"
-
-#: .\contrib\admin\views\main.py:65
-#, python-format
-msgid "Select %s to change"
-msgstr "Seleccioneu %s per modificar"
-
-#: .\contrib\admin\views\template.py:38 .\contrib\sites\models.py:38
-msgid "site"
-msgstr "lloc"
-
-#: .\contrib\admin\views\template.py:40
-msgid "template"
-msgstr "plantilla"
-
-#: .\contrib\admindocs\views.py:61 .\contrib\admindocs\views.py:63
-#: .\contrib\admindocs\views.py:65
-msgid "tag:"
-msgstr "etiqueta:"
-
-#: .\contrib\admindocs\views.py:94 .\contrib\admindocs\views.py:96
-#: .\contrib\admindocs\views.py:98
-msgid "filter:"
-msgstr "filtre:"
-
-#: .\contrib\admindocs\views.py:158 .\contrib\admindocs\views.py:160
-#: .\contrib\admindocs\views.py:162
-msgid "view:"
-msgstr "vista:"
-
-#: .\contrib\admindocs\views.py:190
-#, python-format
-msgid "App %r not found"
-msgstr "No s'ha pogut trobar l'aplicació %r"
-
-#: .\contrib\admindocs\views.py:197
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "El model %(model_name)r no s'ha trobat a l'aplicació %(app_label)r"
-
-#: .\contrib\admindocs\views.py:209
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "l'objecte relacionat `%(app_label)s.%(data_type)s`"
-
-#: .\contrib\admindocs\views.py:209 .\contrib\admindocs\views.py:228
-#: .\contrib\admindocs\views.py:233 .\contrib\admindocs\views.py:247
-#: .\contrib\admindocs\views.py:261 .\contrib\admindocs\views.py:266
-msgid "model:"
-msgstr "model:"
-
-#: .\contrib\admindocs\views.py:224 .\contrib\admindocs\views.py:256
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "objectes relacionats `%(app_label)s.%(object_name)s`"
-
-#: .\contrib\admindocs\views.py:228 .\contrib\admindocs\views.py:261
-#, python-format
-msgid "all %s"
-msgstr "tots %s"
-
-#: .\contrib\admindocs\views.py:233 .\contrib\admindocs\views.py:266
-#, python-format
-msgid "number of %s"
-msgstr "nombre de %s"
-
-#: .\contrib\admindocs\views.py:271
-#, python-format
-msgid "Fields on %s objects"
-msgstr "Camps en objectes %s"
-
-#: .\contrib\admindocs\views.py:361
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s no sembla ser un objecte 'urlpattern'"
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:3
-msgid "Bookmarklets"
-msgstr "'Bookmarklets'"
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:4
-msgid "Documentation bookmarklets"
-msgstr "'Bookmarklets' de documentació"
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:8
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\">Per tal d'instal·lar 'bookmarklets', arrosegueu l'enllaç\n"
-"a la vostra barra de marcadors, o feu click amb el botó dret a l'enllaç i\n"
-"afegiu-lo als marcadors.\n"
-"Ara podeu escollir el 'bookmarklet' des de qualsevol pàgina del lloc.\n"
-"Observeu que per a alguns d'aquests 'bookmarklets' cal que estigueu veient\n"
-"el lloc des d'un ordinador designat com a \"intern\" (parleu\n"
-"amb el vostre administrador de sistemes si no esteu segurs si el vostre "
-"ordinador és \"intern\").</p>\n"
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:18
-msgid "Documentation for this page"
-msgstr "Documentació d'aquesta pàgina"
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:19
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr ""
-"Us porta des de qualsevol pàgina a la documentació de la vista que la genera."
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:21
-msgid "Show object ID"
-msgstr "Mostra l'ID de l'objecte"
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:22
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Mostra el 'content-type' (tipus de contingut) i l'ID inequívoc de les "
-"pàgines que representen un únic objecte."
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:24
-msgid "Edit this object (current window)"
-msgstr "Editar aquest objecte (finestra actual)"
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:25
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"El porta a la pàgina d'administració de pàgines que representen un únic "
-"objecte."
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:27
-msgid "Edit this object (new window)"
-msgstr "Editar aquest objecte (nova finestra)"
-
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:28
-msgid "As above, but opens the admin page in a new window."
-msgstr "Com abans, però obre la pàgina d'administració en una nova finestra."
-
-#: .\contrib\auth\admin.py:29
-msgid "Personal info"
-msgstr "Informació personal"
-
-#: .\contrib\auth\admin.py:30
-msgid "Permissions"
-msgstr "Permisos"
-
-#: .\contrib\auth\admin.py:31
-msgid "Important dates"
-msgstr "Dates importants"
-
-#: .\contrib\auth\admin.py:32
-msgid "Groups"
-msgstr "Grups"
-
-#: .\contrib\auth\admin.py:114
-msgid "Password changed successfully."
-msgstr "Contrasenya canviada amb èxit"
-
-#: .\contrib\auth\admin.py:124
-#, python-format
-msgid "Change password: %s"
-msgstr "Canviar contrasenya: %s"
-
-#: .\contrib\auth\forms.py:14 .\contrib\auth\forms.py:48
-#: .\contrib\auth\forms.py:60
-msgid "Username"
-msgstr "Nom d'usuari"
-
-#: .\contrib\auth\forms.py:15 .\contrib\auth\forms.py:49
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Obligatori. 30 o menys caràcters. Només lletres, dígits i @/./+/-/_."
-
-#: .\contrib\auth\forms.py:16 .\contrib\auth\forms.py:50
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Aquest valor ha de contenir només lletres, números i @/./+/-/_."
-
-#: .\contrib\auth\forms.py:18
-msgid "Password confirmation"
-msgstr "Confirmació de contrasenya"
-
-#: .\contrib\auth\forms.py:31
-msgid "A user with that username already exists."
-msgstr "Ja existeix un usuari amb aquest nom."
-
-#: .\contrib\auth\forms.py:37 .\contrib\auth\forms.py:156
-#: .\contrib\auth\forms.py:198
-msgid "The two password fields didn't match."
-msgstr "Els dos camps de contrasenya no coincideixen."
-
-#: .\contrib\auth\forms.py:83
-msgid "This account is inactive."
-msgstr "Aquest compte està inactiu"
-
-#: .\contrib\auth\forms.py:88
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"El vostre navegador no sembla tenir les galetes ('cookies') activades. "
-"Aquestes són necessàries per iniciar la sessió."
-
-#: .\contrib\auth\forms.py:101
-msgid "E-mail"
-msgstr "Correu electrònic"
-
-#: .\contrib\auth\forms.py:110
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Aquesta adreça de correu no té associat cap compte d'usuari. Esteu segurs "
-"que s'ha registrat?"
-
-#: .\contrib\auth\forms.py:136
-#, python-format
-msgid "Password reset on %s"
-msgstr "Restablir contrasenya en %s"
-
-#: .\contrib\auth\forms.py:145
-msgid "New password confirmation"
-msgstr "Contrasenya nova confirmada"
-
-#: .\contrib\auth\forms.py:178
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr ""
-"La vostra antiga contrasenya no és correcta. Si us plau, introduïu-la de nou."
-
-#: .\contrib\auth\models.py:66 .\contrib\auth\models.py:94
-msgid "name"
-msgstr "nom"
-
-#: .\contrib\auth\models.py:68
-msgid "codename"
-msgstr "nom en clau"
-
-#: .\contrib\auth\models.py:72
-msgid "permission"
-msgstr "permís"
-
-#: .\contrib\auth\models.py:73 .\contrib\auth\models.py:95
-msgid "permissions"
-msgstr "permisos"
-
-#: .\contrib\auth\models.py:98
-msgid "group"
-msgstr "grup"
-
-#: .\contrib\auth\models.py:99 .\contrib\auth\models.py:206
-msgid "groups"
-msgstr "grups"
-
-#: .\contrib\auth\models.py:196
-msgid "username"
-msgstr "nom d'usuari"
-
-#: .\contrib\auth\models.py:196
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
-"Obligatori. 30 o menys caràcters. Només lletres, números i @/./+/-/_"
-
-#: .\contrib\auth\models.py:197
-msgid "first name"
-msgstr "nom propi"
-
-#: .\contrib\auth\models.py:198
-msgid "last name"
-msgstr "cognoms"
-
-#: .\contrib\auth\models.py:199
-msgid "e-mail address"
-msgstr "adreça de correu electrònic"
-
-#: .\contrib\auth\models.py:200
-msgid "password"
-msgstr "contrasenya"
-
-#: .\contrib\auth\models.py:200
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Utilitzeu '[algo]$[salt]$[hexdigest]' o el <a href=\"password/\">formulari "
-"de canvi de contrasenya</a>."
-
-#: .\contrib\auth\models.py:201
-msgid "staff status"
-msgstr "membre del personal"
-
-#: .\contrib\auth\models.py:201
-msgid "Designates whether the user can log into this admin site."
-msgstr "Designa si l'usuari pot entrar al lloc administratiu."
-
-#: .\contrib\auth\models.py:202
-msgid "active"
-msgstr "actiu"
-
-#: .\contrib\auth\models.py:202
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
-msgstr ""
-"Designa si aquest usuari ha de ser tractat com a actiu. Deseleccioneu-ho "
-"enlloc d'esborrar comptes d'usuari."
-
-#: .\contrib\auth\models.py:203
-msgid "superuser status"
-msgstr "estat de superusuari"
-
-#: .\contrib\auth\models.py:203
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr ""
-"Designa que aquest usuari té tots els permisos sense assignar-los "
-"explícitament."
-
-#: .\contrib\auth\models.py:204
-msgid "last login"
-msgstr "últim inici de sessió"
-
-#: .\contrib\auth\models.py:205
-msgid "date joined"
-msgstr "data d'incorporació"
-
-#: .\contrib\auth\models.py:207
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"A més dels permisos assignats manualment, aquest usuari tindrà també els "
-"permisos dels grups dels que sigui membre."
-
-#: .\contrib\auth\models.py:208
-msgid "user permissions"
-msgstr "permisos de l'usuari"
-
-#: .\contrib\auth\models.py:212 .\contrib\comments\models.py:50
-#: .\contrib\comments\models.py:168
-msgid "user"
-msgstr "usuari"
-
-#: .\contrib\auth\models.py:213
-msgid "users"
-msgstr "usuaris"
-
-#: .\contrib\auth\models.py:394
-msgid "message"
-msgstr "missatge"
-
-#: .\contrib\auth\views.py:79
-msgid "Logged out"
-msgstr "Sessió finalitzada"
-
-#: .\contrib\auth\management\commands\createsuperuser.py:24
-#: .\core\validators.py:120 .\forms\fields.py:427
-msgid "Enter a valid e-mail address."
-msgstr "Introduïu una adreça de correu vàlida."
-
-#: .\contrib\comments\admin.py:12
-msgid "Content"
-msgstr "Contingut"
-
-#: .\contrib\comments\admin.py:15
-msgid "Metadata"
-msgstr "Metadades"
-
-# Context problem... waitting for comments from django-i18n
-#: .\contrib\comments\admin.py:40
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "marcat"
-msgstr[1] "marcats"
-
-#: .\contrib\comments\admin.py:41
-msgid "Flag selected comments"
-msgstr "Marcar els comentaris seleccionats"
-
-#: .\contrib\comments\admin.py:45
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "aprovat"
-msgstr[1] "aprovats"
-
-#: .\contrib\comments\admin.py:46
-msgid "Approve selected comments"
-msgstr "Aprovar els comentaris seleccionats"
-
-#: .\contrib\comments\admin.py:50
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "eliminat"
-msgstr[1] "eliminats"
-
-#: .\contrib\comments\admin.py:51
-msgid "Remove selected comments"
-msgstr "Eliminar els comentaris seleccionats"
-
-#: .\contrib\comments\admin.py:63
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "1 comentari ha estat %(action)s satisfactòriament."
-msgstr[1] "%(count)s comentaris han estat %(action)s satisfactòriament."
-
-#: .\contrib\comments\feeds.py:13
-#, python-format
-msgid "%(site_name)s comments"
-msgstr "comentaris de %(site_name)s"
-
-#: .\contrib\comments\feeds.py:23
-#, python-format
-msgid "Latest comments on %(site_name)s"
-msgstr "Últims comentaris a %(site_name)s."
-
-#: .\contrib\comments\forms.py:93
-msgid "Name"
-msgstr "Nom"
-
-#: .\contrib\comments\forms.py:94
-msgid "Email address"
-msgstr "Adreça de correu electrònic"
-
-#: .\contrib\comments\forms.py:95 .\contrib\flatpages\admin.py:8
-#: .\contrib\flatpages\models.py:7 .\db\models\fields\__init__.py:1101
-msgid "URL"
-msgstr "URL"
-
-#: .\contrib\comments\forms.py:96
-msgid "Comment"
-msgstr "Comentari"
-
-#: .\contrib\comments\forms.py:175
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Vigileu amb el vostre llenguatge! Aquí no s'admet la paraula: %s."
-msgstr[1] ""
-"Vigileu amb el vostre llenguatge! Aquí no s'admeten les paraules: %s."
-
-#: .\contrib\comments\forms.py:182
-msgid ""
-"If you enter anything in this field your comment will be treated as spam"
-msgstr ""
-"Si entreu qualsevol cosa en aquest camp el vostre comentari es tractarà com "
-"a spam"
-
-#: .\contrib\comments\models.py:22 .\contrib\contenttypes\models.py:81
-msgid "content type"
-msgstr "tipus de contingut"
-
-#: .\contrib\comments\models.py:24
-msgid "object ID"
-msgstr "ID de l'objecte"
-
-#: .\contrib\comments\models.py:52
-msgid "user's name"
-msgstr "nom de l'usuari"
-
-#: .\contrib\comments\models.py:53
-msgid "user's email address"
-msgstr "adreça de correu electrònic de l'usuari"
-
-#: .\contrib\comments\models.py:54
-msgid "user's URL"
-msgstr "URL de l'usuari"
-
-#: .\contrib\comments\models.py:56 .\contrib\comments\models.py:76
-#: .\contrib\comments\models.py:169
-msgid "comment"
-msgstr "comentari"
-
-#: .\contrib\comments\models.py:59
-msgid "date/time submitted"
-msgstr "data/hora d'enviament"
-
-#: .\contrib\comments\models.py:60 .\db\models\fields\__init__.py:896
-msgid "IP address"
-msgstr "Adreça IP"
-
-#: .\contrib\comments\models.py:61
-msgid "is public"
-msgstr "és públic"
-
-#: .\contrib\comments\models.py:62
-msgid ""
-"Uncheck this box to make the comment effectively disappear from the site."
-msgstr ""
-"Desmarqueu aquesta casella per fer desaparèixer aquest comentari del lloc "
-"web de forma efectiva."
-
-#: .\contrib\comments\models.py:64
-msgid "is removed"
-msgstr "està eliminat"
-
-#: .\contrib\comments\models.py:65
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr ""
-"Marqueu aquesta casella si el comentari no és apropiat. En lloc seu es "
-"mostrarà \"Aquest comentari ha estat eliminat\" "
-
-#: .\contrib\comments\models.py:77
-msgid "comments"
-msgstr "comentaris"
-
-#: .\contrib\comments\models.py:119
-msgid ""
-"This comment was posted by an authenticated user and thus the name is read-"
-"only."
-msgstr ""
-"Aquest comentari va ser publicat per un usuari autentificat, per això el seu "
-"nom no es pot modificar."
-
-#: .\contrib\comments\models.py:128
-msgid ""
-"This comment was posted by an authenticated user and thus the email is read-"
-"only."
-msgstr ""
-"Aquest comentari va ser publicat per un usuari autentificat, per això la "
-"seva adreça de correu electrònic no es pot modificar."
-
-#: .\contrib\comments\models.py:153
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"Enviat per %(user)s el %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-# Context problem... waitting for comments from django-i18n
-#: .\contrib\comments\models.py:170
-msgid "flag"
-msgstr "marcar"
-
-#: .\contrib\comments\models.py:171
-msgid "date"
-msgstr "data"
-
-#: .\contrib\comments\models.py:181
-msgid "comment flag"
-msgstr "marca del comentari"
-
-#: .\contrib\comments\models.py:182
-msgid "comment flags"
-msgstr "marques del comentari"
-
-#: .\contrib\comments\templates\comments\approve.html.py:4
-msgid "Approve a comment"
-msgstr "Aprovar un comentari"
-
-#: .\contrib\comments\templates\comments\approve.html.py:7
-msgid "Really make this comment public?"
-msgstr "Voleu realment fer públic aquest comentari?"
-
-#: .\contrib\comments\templates\comments\approve.html.py:12
-msgid "Approve"
-msgstr "Aprovar"
-
-#: .\contrib\comments\templates\comments\approved.html.py:4
-msgid "Thanks for approving"
-msgstr "Gràcies per aprovar"
-
-#: .\contrib\comments\templates\comments\approved.html.py:7
-#: .\contrib\comments\templates\comments\deleted.html.py:7
-#: .\contrib\comments\templates\comments\flagged.html.py:7
-msgid ""
-"Thanks for taking the time to improve the quality of discussion on our site"
-msgstr ""
-"Gràcies per dedicar el temps a millorar la qualitat del debat al nostre lloc"
-
-#: .\contrib\comments\templates\comments\delete.html.py:4
-msgid "Remove a comment"
-msgstr "Eliminar un comentari"
-
-#: .\contrib\comments\templates\comments\delete.html.py:7
-msgid "Really remove this comment?"
-msgstr "Realment voleu eliminar aquest comentari?"
-
-#: .\contrib\comments\templates\comments\deleted.html.py:4
-msgid "Thanks for removing"
-msgstr "Gràcies per eliminar"
-
-#: .\contrib\comments\templates\comments\flag.html.py:4
-msgid "Flag this comment"
-msgstr "Marcar aquest comentari"
-
-#: .\contrib\comments\templates\comments\flag.html.py:7
-msgid "Really flag this comment?"
-msgstr "Realment voleu marcar aquest comentari?"
-
-# Context problem... waitting for comments from django-i18n
-#: .\contrib\comments\templates\comments\flag.html.py:12
-msgid "Flag"
-msgstr "Marcar"
-
-#: .\contrib\comments\templates\comments\flagged.html.py:4
-msgid "Thanks for flagging"
-msgstr "Gràcies per marcar"
-
-#: .\contrib\comments\templates\comments\form.html.py:17
-#: .\contrib\comments\templates\comments\preview.html.py:32
-msgid "Post"
-msgstr "Publicar"
-
-#: .\contrib\comments\templates\comments\form.html.py:18
-#: .\contrib\comments\templates\comments\preview.html.py:33
-msgid "Preview"
-msgstr "Vista prèvia"
-
-#: .\contrib\comments\templates\comments\posted.html.py:4
-msgid "Thanks for commenting"
-msgstr "Gràcies per comentar"
-
-#: .\contrib\comments\templates\comments\posted.html.py:7
-msgid "Thank you for your comment"
-msgstr "Gràcies pel vostre comentari"
-
-#: .\contrib\comments\templates\comments\preview.html.py:4
-#: .\contrib\comments\templates\comments\preview.html.py:13
-msgid "Preview your comment"
-msgstr "Previsualitzar el vostre comentari"
-
-#: .\contrib\comments\templates\comments\preview.html.py:11
-msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Si us plau, corregiu l'error mostrat a sota."
-msgstr[1] "Si us plau, corregiu els errors mostrats a sota."
-
-#: .\contrib\comments\templates\comments\preview.html.py:16
-msgid "Post your comment"
-msgstr "Enviar el seu comentari"
-
-#: .\contrib\comments\templates\comments\preview.html.py:16
-msgid "or make changes"
-msgstr "o feu canvis."
-
-#: .\contrib\contenttypes\models.py:77
-msgid "python model class name"
-msgstr "nom de la classe del model en python"
-
-#: .\contrib\contenttypes\models.py:82
-msgid "content types"
-msgstr "tipus de continguts"
-
-#: .\contrib\flatpages\admin.py:9
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Exemple: '/about/contact/'. Assegureu-vos de posar les barres al principi i "
-"al final."
-
-#: .\contrib\flatpages\admin.py:11
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-"Aquest valor ha de contenir només lletres, números, guions baixos, guions o "
-"barres (/)."
-
-#: .\contrib\flatpages\admin.py:22
-msgid "Advanced options"
-msgstr "Opcions avançades"
-
-#: .\contrib\flatpages\models.py:8
-msgid "title"
-msgstr "títol"
-
-#: .\contrib\flatpages\models.py:9
-msgid "content"
-msgstr "contingut"
-
-#: .\contrib\flatpages\models.py:10
-msgid "enable comments"
-msgstr "habilitar comentaris"
-
-#: .\contrib\flatpages\models.py:11
-msgid "template name"
-msgstr "nom de la plantilla"
-
-#: .\contrib\flatpages\models.py:12
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr ""
-"Exemple: 'flatpages/contact_page.html'. Si no es proporciona, el sistema "
-"utilitzarà 'flatpages/default.html'."
-
-#: .\contrib\flatpages\models.py:13
-msgid "registration required"
-msgstr "cal estar registrat"
-
-#: .\contrib\flatpages\models.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Si està marcat, només els usuaris registrats podran veure la pàgina."
-
-#: .\contrib\flatpages\models.py:18
-msgid "flat page"
-msgstr "pàgina estàtica"
-
-#: .\contrib\flatpages\models.py:19
-msgid "flat pages"
-msgstr "pàgines estàtiques"
-
-#: .\contrib\formtools\wizard.py:140
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Ho sentim, pero el vostre formulari ha caducat. Si us plau, continueu "
-"omplint el formulari en aquesta pàgina."
-
-#: .\contrib\gis\db\models\fields.py:50
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "El camp GIS base -- correspon al tipus 'Geometry' de l'especificació "
-"OpenGIS."
-
-#: .\contrib\gis\db\models\fields.py:270
-msgid "Point"
-msgstr "Punt"
-
-#: .\contrib\gis\db\models\fields.py:274
-msgid "Line string"
-msgstr "Cadena de línies"
-
-#: .\contrib\gis\db\models\fields.py:278
-msgid "Polygon"
-msgstr "Polígon"
-
-#: .\contrib\gis\db\models\fields.py:282
-msgid "Multi-point"
-msgstr "Multi-punt"
-
-#: .\contrib\gis\db\models\fields.py:286
-msgid "Multi-line string"
-msgstr "Cadena de multi-línies"
-
-#: .\contrib\gis\db\models\fields.py:290
-msgid "Multi polygon"
-msgstr "Multi polígon"
-
-#: .\contrib\gis\db\models\fields.py:294
-msgid "Geometry collection"
-msgstr "Col·leció de geometria"
-
-#: .\contrib\gis\forms\fields.py:17
-msgid "No geometry value provided."
-msgstr "No s'ha indicat cap valor de geometria."
-
-#: .\contrib\gis\forms\fields.py:18
-msgid "Invalid geometry value."
-msgstr "Valor de geometria invàlid."
-
-#: .\contrib\gis\forms\fields.py:19
-msgid "Invalid geometry type."
-msgstr "Tipus de geometria invàlid."
-
-#: .\contrib\gis\forms\fields.py:20
-msgid ""
-"An error occurred when transforming the geometry to the SRID of the geometry "
-"form field."
-msgstr ""
-"S'ha produït un error en transformar la geometria al SRID del camp de "
-"geometria del formulari."
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "th"
-msgstr "è"
-
-# problema: 4t, 5è, 6è...
-# o posem t o posem è, i t només aplica a 4t.
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "st"
-msgstr "r"
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "nd"
-msgstr "n"
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "rd"
-msgstr "r"
-
-#: .\contrib\humanize\templatetags\humanize.py:51
-#, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f milió"
-msgstr[1] "%(value).1f  milions"
-
-#: .\contrib\humanize\templatetags\humanize.py:54
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f bilió"
-msgstr[1] "%(value).1f bilions"
-
-#: .\contrib\humanize\templatetags\humanize.py:57
-#, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f trilió"
-msgstr[1] "%(value).1f trilions"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "one"
-msgstr "un"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "two"
-msgstr "dos"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "three"
-msgstr "tres"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "four"
-msgstr "quatre"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "five"
-msgstr "cinc"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "six"
-msgstr "sis"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "seven"
-msgstr "set"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "eight"
-msgstr "vuit"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "nine"
-msgstr "nou"
-
-#: .\contrib\humanize\templatetags\humanize.py:93
-msgid "today"
-msgstr "avui"
-
-#: .\contrib\humanize\templatetags\humanize.py:95
-msgid "tomorrow"
-msgstr "demà"
-
-#: .\contrib\humanize\templatetags\humanize.py:97
-msgid "yesterday"
-msgstr "ahir"
-
-#: .\contrib\localflavor\ar\forms.py:28
-msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "Introduïu un codi postal en el format NNNN o ANNNNAAA."
-
-#: .\contrib\localflavor\ar\forms.py:50 .\contrib\localflavor\br\forms.py:92
-#: .\contrib\localflavor\br\forms.py:131 .\contrib\localflavor\pe\forms.py:24
-#: .\contrib\localflavor\pe\forms.py:52
-msgid "This field requires only numbers."
-msgstr "Aquest camp precisa només números."
-
-#: .\contrib\localflavor\ar\forms.py:51
-msgid "This field requires 7 or 8 digits."
-msgstr "Aquest camp precisa 7 o 8 dígits."
-
-#: .\contrib\localflavor\ar\forms.py:80
-msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr ""
-"Introduïu un número CUIT vàlid en el format XX-XXXXXXXX-X o XXXXXXXXXXXX."
-
-#: .\contrib\localflavor\ar\forms.py:81
-msgid "Invalid CUIT."
-msgstr "CUIT invàlid."
-
-#: .\contrib\localflavor\at\at_states.py:5
-msgid "Burgenland"
-msgstr "Burgenland"
-
-#: .\contrib\localflavor\at\at_states.py:6
-msgid "Carinthia"
-msgstr "Carinthia"
-
-#: .\contrib\localflavor\at\at_states.py:7
-msgid "Lower Austria"
-msgstr "Àustria Inferior"
-
-#: .\contrib\localflavor\at\at_states.py:8
-msgid "Upper Austria"
-msgstr "Àustria Superior"
-
-#: .\contrib\localflavor\at\at_states.py:9
-msgid "Salzburg"
-msgstr "Salzburg"
-
-#: .\contrib\localflavor\at\at_states.py:10
-msgid "Styria"
-msgstr "Styria"
-
-#: .\contrib\localflavor\at\at_states.py:11
-msgid "Tyrol"
-msgstr "Tirol"
-
-#: .\contrib\localflavor\at\at_states.py:12
-msgid "Vorarlberg"
-msgstr "Vorarlberg"
-
-#: .\contrib\localflavor\at\at_states.py:13
-msgid "Vienna"
-msgstr "Viena"
-
-#: .\contrib\localflavor\at\forms.py:20 .\contrib\localflavor\ch\forms.py:17
-#: .\contrib\localflavor\no\forms.py:13
-msgid "Enter a zip code in the format XXXX."
-msgstr "Introduïu un codi zip en el format XXXX."
-
-#: .\contrib\localflavor\at\forms.py:48
-msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr ""
-"Introduïu un número vàlid de la Seguretat Social Austríaca en el format XXXX "
-"XXXXXX."
-
-#: .\contrib\localflavor\au\forms.py:17
-msgid "Enter a 4 digit post code."
-msgstr "Introduïu un codi postal de 4 dígits."
-
-#: .\contrib\localflavor\br\forms.py:17
-msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Introduïu un codi zip en el format XXXXX-XXX."
-
-#: .\contrib\localflavor\br\forms.py:26
-msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "El número de telèfon ha d'estar en el format XX-XXXX-XXXX."
-
-#: .\contrib\localflavor\br\forms.py:54
-msgid ""
-"Select a valid brazilian state. That state is not one of the available "
-"states."
-msgstr ""
-"Seleccioneu un estat brasiler vàlid. Aquest estat no és un dels estats "
-"disponibles."
-
-#: .\contrib\localflavor\br\forms.py:90
-msgid "Invalid CPF number."
-msgstr "Número CPF invàlid."
-
-#: .\contrib\localflavor\br\forms.py:91
-msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Aquest camp precisa com a màxim 11 dígits o 14 caràcters."
-
-#: .\contrib\localflavor\br\forms.py:130
-msgid "Invalid CNPJ number."
-msgstr "Número CNPJ invàlid."
-
-#: .\contrib\localflavor\br\forms.py:132
-msgid "This field requires at least 14 digits"
-msgstr "Aquest camp precisa almenys 14 dígits."
-
-#: .\contrib\localflavor\ca\forms.py:25
-msgid "Enter a postal code in the format XXX XXX."
-msgstr "Introduïu un codi postal en el format XXX XXX."
-
-#: .\contrib\localflavor\ca\forms.py:96
-msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr ""
-"Introduïu un número vàlid de la Seguretat Social de Canadà en el format XXX-"
-"XXX-XXX."
-
-#: .\contrib\localflavor\ch\ch_states.py:5
-msgid "Aargau"
-msgstr "Argau"
-
-#: .\contrib\localflavor\ch\ch_states.py:6
-msgid "Appenzell Innerrhoden"
-msgstr "Appenzell Inner-Rhoden"
-
-#: .\contrib\localflavor\ch\ch_states.py:7
-msgid "Appenzell Ausserrhoden"
-msgstr "Appenzell Ausser-Rhoden"
-
-#: .\contrib\localflavor\ch\ch_states.py:8
-msgid "Basel-Stadt"
-msgstr "Basilea-Ciutat"
-
-#: .\contrib\localflavor\ch\ch_states.py:9
-msgid "Basel-Land"
-msgstr "Basilea-Land"
-
-#: .\contrib\localflavor\ch\ch_states.py:10
-msgid "Berne"
-msgstr "Berna"
-
-#: .\contrib\localflavor\ch\ch_states.py:11
-msgid "Fribourg"
-msgstr "Friburg"
-
-#: .\contrib\localflavor\ch\ch_states.py:12
-msgid "Geneva"
-msgstr "Ginebra"
-
-#: .\contrib\localflavor\ch\ch_states.py:13
-msgid "Glarus"
-msgstr "Glarus"
-
-#: .\contrib\localflavor\ch\ch_states.py:14
-msgid "Graubuenden"
-msgstr "Graubuenden"
-
-#: .\contrib\localflavor\ch\ch_states.py:15
-msgid "Jura"
-msgstr "Jura"
-
-#: .\contrib\localflavor\ch\ch_states.py:16
-msgid "Lucerne"
-msgstr "Lucerna"
-
-#: .\contrib\localflavor\ch\ch_states.py:17
-msgid "Neuchatel"
-msgstr "Neuchatel"
-
-#: .\contrib\localflavor\ch\ch_states.py:18
-msgid "Nidwalden"
-msgstr "Nidwalden"
-
-#: .\contrib\localflavor\ch\ch_states.py:19
-msgid "Obwalden"
-msgstr "Obwalden"
-
-#: .\contrib\localflavor\ch\ch_states.py:20
-msgid "Schaffhausen"
-msgstr "Schaffhausen"
-
-#: .\contrib\localflavor\ch\ch_states.py:21
-msgid "Schwyz"
-msgstr "Schwyz"
-
-#: .\contrib\localflavor\ch\ch_states.py:22
-msgid "Solothurn"
-msgstr "Solothurn"
-
-#: .\contrib\localflavor\ch\ch_states.py:23
-msgid "St. Gallen"
-msgstr "St. Gallen"
-
-#: .\contrib\localflavor\ch\ch_states.py:24
-msgid "Thurgau"
-msgstr "Thurgau"
-
-#: .\contrib\localflavor\ch\ch_states.py:25
-msgid "Ticino"
-msgstr "Ticino"
-
-#: .\contrib\localflavor\ch\ch_states.py:26
-msgid "Uri"
-msgstr "Uri"
-
-#: .\contrib\localflavor\ch\ch_states.py:27
-msgid "Valais"
-msgstr "Valais"
-
-#: .\contrib\localflavor\ch\ch_states.py:28
-msgid "Vaud"
-msgstr "Vaud"
-
-#: .\contrib\localflavor\ch\ch_states.py:29
-msgid "Zug"
-msgstr "Zug"
-
-#: .\contrib\localflavor\ch\ch_states.py:30
-msgid "Zurich"
-msgstr "Zuric"
-
-#: .\contrib\localflavor\ch\forms.py:65
-msgid ""
-"Enter a valid Swiss identity or passport card number in X1234567<0 or "
-"1234567890 format."
-msgstr ""
-"Introduïu un número d'identificació o de passaport Suïssos en els formats "
-"1234567890 o X1234567<0."
-
-#: .\contrib\localflavor\cl\forms.py:30
-msgid "Enter a valid Chilean RUT."
-msgstr "Introduïu un RUT Xilè vàlid."
-
-#: .\contrib\localflavor\cl\forms.py:31
-msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Introduïu un RUT Xilè vàlid. El format és XX.XXX.XXX-X"
-
-#: .\contrib\localflavor\cl\forms.py:32
-msgid "The Chilean RUT is not valid."
-msgstr "El RUT Xilè no és vàlid."
-
-#: .\contrib\localflavor\cz\cz_regions.py:8
-msgid "Prague"
-msgstr "Praga"
-
-#: .\contrib\localflavor\cz\cz_regions.py:9
-msgid "Central Bohemian Region"
-msgstr "Regió Bohèmia Central"
-
-#: .\contrib\localflavor\cz\cz_regions.py:10
-msgid "South Bohemian Region"
-msgstr "Regió Bohèmia Sur"
-
-#: .\contrib\localflavor\cz\cz_regions.py:11
-msgid "Pilsen Region"
-msgstr "Regió Pilsen"
-
-#: .\contrib\localflavor\cz\cz_regions.py:12
-msgid "Carlsbad Region"
-msgstr "Regió Carlsbad"
-
-#: .\contrib\localflavor\cz\cz_regions.py:13
-msgid "Usti Region"
-msgstr "Regió Usti"
-
-#: .\contrib\localflavor\cz\cz_regions.py:14
-msgid "Liberec Region"
-msgstr "Regió Liberec"
-
-#: .\contrib\localflavor\cz\cz_regions.py:15
-msgid "Hradec Region"
-msgstr "Regió Hradec"
-
-#: .\contrib\localflavor\cz\cz_regions.py:16
-msgid "Pardubice Region"
-msgstr "Regió Pardubice"
-
-#: .\contrib\localflavor\cz\cz_regions.py:17
-msgid "Vysocina Region"
-msgstr "Regió Vysocina"
-
-#: .\contrib\localflavor\cz\cz_regions.py:18
-msgid "South Moravian Region"
-msgstr "Regió Moràvia Sur"
-
-#: .\contrib\localflavor\cz\cz_regions.py:19
-msgid "Olomouc Region"
-msgstr "Regió Olomouc"
-
-#: .\contrib\localflavor\cz\cz_regions.py:20
-msgid "Zlin Region"
-msgstr "Regió Zlin"
-
-#: .\contrib\localflavor\cz\cz_regions.py:21
-msgid "Moravian-Silesian Region"
-msgstr "Regió Moràvia-Silesiana"
-
-#: .\contrib\localflavor\cz\forms.py:28 .\contrib\localflavor\sk\forms.py:30
-msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Introduïu un codi postal en el format XXXXX o XXX XX."
-
-#: .\contrib\localflavor\cz\forms.py:48
-msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
-msgstr ""
-"Introduïu un número de naixement en el format XXXXXX/XXXX o XXXXXXXXXX."
-
-#: .\contrib\localflavor\cz\forms.py:49
-msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr ""
-"El paràmetre opcional 'Gènere' és invàlid, els valors vàlids son 'f' i 'm'."
-
-#: .\contrib\localflavor\cz\forms.py:50
-msgid "Enter a valid birth number."
-msgstr "Introduïu un número de naixement vàlid."
-
-#: .\contrib\localflavor\cz\forms.py:107
-msgid "Enter a valid IC number."
-msgstr "Introduïu un número de IC vàlid."
-
-#: .\contrib\localflavor\de\de_states.py:5
-msgid "Baden-Wuerttemberg"
-msgstr "Baden-Württemberg"
-
-#: .\contrib\localflavor\de\de_states.py:6
-msgid "Bavaria"
-msgstr "Baviera"
-
-#: .\contrib\localflavor\de\de_states.py:7
-msgid "Berlin"
-msgstr "Berlín"
-
-#: .\contrib\localflavor\de\de_states.py:8
-msgid "Brandenburg"
-msgstr "Brandenburg"
-
-#: .\contrib\localflavor\de\de_states.py:9
-msgid "Bremen"
-msgstr "Bremen"
-
-#: .\contrib\localflavor\de\de_states.py:10
-msgid "Hamburg"
-msgstr "Hamburg"
-
-#: .\contrib\localflavor\de\de_states.py:11
-msgid "Hessen"
-msgstr "Hessen"
-
-#: .\contrib\localflavor\de\de_states.py:12
-msgid "Mecklenburg-Western Pomerania"
-msgstr "Mecklenburg-Pomerània Occidental"
-
-#: .\contrib\localflavor\de\de_states.py:13
-msgid "Lower Saxony"
-msgstr "Baixa Saxònia"
-
-#: .\contrib\localflavor\de\de_states.py:14
-msgid "North Rhine-Westphalia"
-msgstr "Renània del Nord-Westfàlia"
-
-#: .\contrib\localflavor\de\de_states.py:15
-msgid "Rhineland-Palatinate"
-msgstr "Renània-Palatinat"
-
-#: .\contrib\localflavor\de\de_states.py:16
-msgid "Saarland"
-msgstr "Saarland"
-
-#: .\contrib\localflavor\de\de_states.py:17
-msgid "Saxony"
-msgstr "Saxònia"
-
-#: .\contrib\localflavor\de\de_states.py:18
-msgid "Saxony-Anhalt"
-msgstr "Saxònia-Anhalt"
-
-#: .\contrib\localflavor\de\de_states.py:19
-msgid "Schleswig-Holstein"
-msgstr "Slesvig-Holstein"
-
-#: .\contrib\localflavor\de\de_states.py:20
-msgid "Thuringia"
-msgstr "Turíngia"
-
-#: .\contrib\localflavor\de\forms.py:15 .\contrib\localflavor\fi\forms.py:13
-#: .\contrib\localflavor\fr\forms.py:16
-msgid "Enter a zip code in the format XXXXX."
-msgstr "Introduïu un codi zip en el format XXXXX."
-
-#: .\contrib\localflavor\de\forms.py:42
-msgid ""
-"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"format."
-msgstr ""
-"Introduïu un número vàlid de tarjeta d'identificació alemanya en el format "
-"XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
-
-#: .\contrib\localflavor\es\es_provinces.py:5
-msgid "Arava"
-msgstr "Àlaba"
-
-#: .\contrib\localflavor\es\es_provinces.py:6
-msgid "Albacete"
-msgstr "Albacete"
-
-#: .\contrib\localflavor\es\es_provinces.py:7
-msgid "Alacant"
-msgstr "Alacant"
-
-#: .\contrib\localflavor\es\es_provinces.py:8
-msgid "Almeria"
-msgstr "Almeria"
-
-#: .\contrib\localflavor\es\es_provinces.py:9
-msgid "Avila"
-msgstr "Àvila"
-
-#: .\contrib\localflavor\es\es_provinces.py:10
-msgid "Badajoz"
-msgstr "Badajoz"
-
-#: .\contrib\localflavor\es\es_provinces.py:11
-msgid "Illes Balears"
-msgstr "Illes Balears"
-
-#: .\contrib\localflavor\es\es_provinces.py:12
-msgid "Barcelona"
-msgstr "Barcelona"
-
-#: .\contrib\localflavor\es\es_provinces.py:13
-msgid "Burgos"
-msgstr "Burgos"
-
-#: .\contrib\localflavor\es\es_provinces.py:14
-msgid "Caceres"
-msgstr "Càceres"
-
-#: .\contrib\localflavor\es\es_provinces.py:15
-msgid "Cadiz"
-msgstr "Cadis"
-
-#: .\contrib\localflavor\es\es_provinces.py:16
-msgid "Castello"
-msgstr "Castelló"
-
-#: .\contrib\localflavor\es\es_provinces.py:17
-msgid "Ciudad Real"
-msgstr "Ciudad Real"
-
-#: .\contrib\localflavor\es\es_provinces.py:18
-msgid "Cordoba"
-msgstr "Còrdova"
-
-#: .\contrib\localflavor\es\es_provinces.py:19
-msgid "A Coruna"
-msgstr "La Corunya"
-
-#: .\contrib\localflavor\es\es_provinces.py:20
-msgid "Cuenca"
-msgstr "Conca"
-
-#: .\contrib\localflavor\es\es_provinces.py:21
-msgid "Girona"
-msgstr "Girona"
-
-#: .\contrib\localflavor\es\es_provinces.py:22
-msgid "Granada"
-msgstr "Granada"
-
-#: .\contrib\localflavor\es\es_provinces.py:23
-msgid "Guadalajara"
-msgstr "Guadalajara"
-
-#: .\contrib\localflavor\es\es_provinces.py:24
-msgid "Guipuzkoa"
-msgstr "Guipúscoa"
-
-#: .\contrib\localflavor\es\es_provinces.py:25
-msgid "Huelva"
-msgstr "Huelva"
-
-#: .\contrib\localflavor\es\es_provinces.py:26
-msgid "Huesca"
-msgstr "Osca"
-
-#: .\contrib\localflavor\es\es_provinces.py:27
-msgid "Jaen"
-msgstr "Jaén"
-
-#: .\contrib\localflavor\es\es_provinces.py:28
-msgid "Leon"
-msgstr "Lleó"
-
-#: .\contrib\localflavor\es\es_provinces.py:29
-msgid "Lleida"
-msgstr "Lleida"
-
-#: .\contrib\localflavor\es\es_provinces.py:30
-#: .\contrib\localflavor\es\es_regions.py:17
-msgid "La Rioja"
-msgstr "La Rioja"
-
-#: .\contrib\localflavor\es\es_provinces.py:31
-msgid "Lugo"
-msgstr "Lugo"
-
-#: .\contrib\localflavor\es\es_provinces.py:32
-#: .\contrib\localflavor\es\es_regions.py:18
-msgid "Madrid"
-msgstr "Madrid"
-
-#: .\contrib\localflavor\es\es_provinces.py:33
-msgid "Malaga"
-msgstr "Màlaga"
-
-#: .\contrib\localflavor\es\es_provinces.py:34
-msgid "Murcia"
-msgstr "Múrcia"
-
-#: .\contrib\localflavor\es\es_provinces.py:35
-msgid "Navarre"
-msgstr "Navarra"
-
-#: .\contrib\localflavor\es\es_provinces.py:36
-msgid "Ourense"
-msgstr "Ourense"
-
-#: .\contrib\localflavor\es\es_provinces.py:37
-msgid "Asturias"
-msgstr "Astúries"
-
-#: .\contrib\localflavor\es\es_provinces.py:38
-msgid "Palencia"
-msgstr "Palència"
-
-#: .\contrib\localflavor\es\es_provinces.py:39
-msgid "Las Palmas"
-msgstr "Las Palmas"
-
-#: .\contrib\localflavor\es\es_provinces.py:40
-msgid "Pontevedra"
-msgstr "Pontevedra"
-
-#: .\contrib\localflavor\es\es_provinces.py:41
-msgid "Salamanca"
-msgstr "Salamanca"
-
-#: .\contrib\localflavor\es\es_provinces.py:42
-msgid "Santa Cruz de Tenerife"
-msgstr "Santa Cruz de Tenerife"
-
-#: .\contrib\localflavor\es\es_provinces.py:43
-#: .\contrib\localflavor\es\es_regions.py:11
-msgid "Cantabria"
-msgstr "Cantàbria"
-
-#: .\contrib\localflavor\es\es_provinces.py:44
-msgid "Segovia"
-msgstr "Segòvia"
-
-#: .\contrib\localflavor\es\es_provinces.py:45
-msgid "Seville"
-msgstr "Sevilla"
-
-#: .\contrib\localflavor\es\es_provinces.py:46
-msgid "Soria"
-msgstr "Sòria"
-
-#: .\contrib\localflavor\es\es_provinces.py:47
-msgid "Tarragona"
-msgstr "Tarragona"
-
-#: .\contrib\localflavor\es\es_provinces.py:48
-msgid "Teruel"
-msgstr "Terol"
-
-#: .\contrib\localflavor\es\es_provinces.py:49
-msgid "Toledo"
-msgstr "Toledo"
-
-#: .\contrib\localflavor\es\es_provinces.py:50
-msgid "Valencia"
-msgstr "València"
-
-#: .\contrib\localflavor\es\es_provinces.py:51
-msgid "Valladolid"
-msgstr "Valladolid"
-
-#: .\contrib\localflavor\es\es_provinces.py:52
-msgid "Bizkaia"
-msgstr "Biscaia"
-
-#: .\contrib\localflavor\es\es_provinces.py:53
-msgid "Zamora"
-msgstr "Zamora"
-
-#: .\contrib\localflavor\es\es_provinces.py:54
-msgid "Zaragoza"
-msgstr "Saragossa"
-
-#: .\contrib\localflavor\es\es_provinces.py:55
-msgid "Ceuta"
-msgstr "Ceuta"
-
-#: .\contrib\localflavor\es\es_provinces.py:56
-msgid "Melilla"
-msgstr "Melilla"
-
-#: .\contrib\localflavor\es\es_regions.py:5
-msgid "Andalusia"
-msgstr "Andalusia"
-
-#: .\contrib\localflavor\es\es_regions.py:6
-msgid "Aragon"
-msgstr "Aragó"
-
-#: .\contrib\localflavor\es\es_regions.py:7
-msgid "Principality of Asturias"
-msgstr "Principat d'Astúries"
-
-#: .\contrib\localflavor\es\es_regions.py:8
-msgid "Balearic Islands"
-msgstr "Illes Balears"
-
-#: .\contrib\localflavor\es\es_regions.py:9
-msgid "Basque Country"
-msgstr "Euskadi"
-
-#: .\contrib\localflavor\es\es_regions.py:10
-msgid "Canary Islands"
-msgstr "Canàries"
-
-#: .\contrib\localflavor\es\es_regions.py:12
-msgid "Castile-La Mancha"
-msgstr "Castella-La Mancha"
-
-#: .\contrib\localflavor\es\es_regions.py:13
-msgid "Castile and Leon"
-msgstr "Castella i Lleó"
-
-#: .\contrib\localflavor\es\es_regions.py:14
-msgid "Catalonia"
-msgstr "Catalunya"
-
-#: .\contrib\localflavor\es\es_regions.py:15
-msgid "Extremadura"
-msgstr "Extremadura"
-
-#: .\contrib\localflavor\es\es_regions.py:16
-msgid "Galicia"
-msgstr "Galícia"
-
-#: .\contrib\localflavor\es\es_regions.py:19
-msgid "Region of Murcia"
-msgstr "Regió de Múrcia"
-
-#: .\contrib\localflavor\es\es_regions.py:20
-msgid "Foral Community of Navarre"
-msgstr "Comunitat Foral de Navarra"
-
-#: .\contrib\localflavor\es\es_regions.py:21
-msgid "Valencian Community"
-msgstr "Comunitat Valenciana"
-
-#: .\contrib\localflavor\es\forms.py:20
-msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Introduïu un codi postal en rang i format 01XXX - 52XXX."
-
-#: .\contrib\localflavor\es\forms.py:40
-msgid ""
-"Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
-"9XXXXXXXX."
-msgstr ""
-"Introduïu un número de telèfon vàlid en un dels formats 6XXXXXXXX, 8XXXXXXXX "
-"o 9XXXXXXXX."
-
-#: .\contrib\localflavor\es\forms.py:67
-msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Si us plau, introduïu un NIF, NIE o CIF vàlid."
-
-#: .\contrib\localflavor\es\forms.py:68
-msgid "Please enter a valid NIF or NIE."
-msgstr "Si us plau, introduïu un NIF o NIE vàlid."
-
-#: .\contrib\localflavor\es\forms.py:69
-msgid "Invalid checksum for NIF."
-msgstr "Verificació del NIF invàlida."
-
-#: .\contrib\localflavor\es\forms.py:70
-msgid "Invalid checksum for NIE."
-msgstr "Verificació del NIE invàlida."
-
-#: .\contrib\localflavor\es\forms.py:71
-msgid "Invalid checksum for CIF."
-msgstr "Verificació del CIF invàlida."
-
-#: .\contrib\localflavor\es\forms.py:143
-msgid ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr ""
-"Introduïu un número de compte bancari vàlid en el format XXXX-XXXX-XX-"
-"XXXXXXXXXX."
-
-#: .\contrib\localflavor\es\forms.py:144
-msgid "Invalid checksum for bank account number."
-msgstr "Verificació del número de compte bancari invàlida."
-
-#: .\contrib\localflavor\fi\forms.py:29
-msgid "Enter a valid Finnish social security number."
-msgstr "Introduïu un número vàlid de la seguretat social finlandesa."
-
-#: .\contrib\localflavor\fr\forms.py:31
-msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "Els números de telèfon han de estar en el format 0X XX XX XX XX."
-
-#: .\contrib\localflavor\id\forms.py:28
-msgid "Enter a valid post code"
-msgstr "Introduïu un codi postal vàlid."
-
-#: .\contrib\localflavor\id\forms.py:68 .\contrib\localflavor\nl\forms.py:53
-msgid "Enter a valid phone number"
-msgstr "Introduïu un número de telèfon vàlid."
-
-#: .\contrib\localflavor\id\forms.py:107
-msgid "Enter a valid vehicle license plate number"
-msgstr "Introduïu un número de matrícula vàlid."
-
-#: .\contrib\localflavor\id\forms.py:170
-msgid "Enter a valid NIK/KTP number"
-msgstr "Introduïu un número NIK/KTP vàlid."
-
-#: .\contrib\localflavor\id\id_choices.py:9
-#: .\contrib\localflavor\id\id_choices.py:73
-msgid "Bali"
-msgstr "Bali"
-
-#: .\contrib\localflavor\id\id_choices.py:10
-#: .\contrib\localflavor\id\id_choices.py:45
-msgid "Banten"
-msgstr "Banten"
-
-#: .\contrib\localflavor\id\id_choices.py:11
-#: .\contrib\localflavor\id\id_choices.py:54
-msgid "Bengkulu"
-msgstr "Bengkulu"
-
-#: .\contrib\localflavor\id\id_choices.py:12
-#: .\contrib\localflavor\id\id_choices.py:47
-msgid "Yogyakarta"
-msgstr "Yogyakarta"
-
-#: .\contrib\localflavor\id\id_choices.py:13
-#: .\contrib\localflavor\id\id_choices.py:51
-msgid "Jakarta"
-msgstr "Jakarta"
-
-#: .\contrib\localflavor\id\id_choices.py:14
-#: .\contrib\localflavor\id\id_choices.py:75
-msgid "Gorontalo"
-msgstr "Gorontalo"
-
-#: .\contrib\localflavor\id\id_choices.py:15
-#: .\contrib\localflavor\id\id_choices.py:57
-msgid "Jambi"
-msgstr "Jambi"
-
-#: .\contrib\localflavor\id\id_choices.py:16
-msgid "Jawa Barat"
-msgstr "Jawa Barat"
-
-#: .\contrib\localflavor\id\id_choices.py:17
-msgid "Jawa Tengah"
-msgstr "Jawa Tengah"
-
-#: .\contrib\localflavor\id\id_choices.py:18
-msgid "Jawa Timur"
-msgstr "Jawa Timur"
-
-#: .\contrib\localflavor\id\id_choices.py:19
-#: .\contrib\localflavor\id\id_choices.py:88
-msgid "Kalimantan Barat"
-msgstr "Kalimantan Barat"
-
-#: .\contrib\localflavor\id\id_choices.py:20
-#: .\contrib\localflavor\id\id_choices.py:66
-msgid "Kalimantan Selatan"
-msgstr "Kalimantan Selatan"
-
-#: .\contrib\localflavor\id\id_choices.py:21
-#: .\contrib\localflavor\id\id_choices.py:89
-msgid "Kalimantan Tengah"
-msgstr "Kalimantan Tengah"
-
-#: .\contrib\localflavor\id\id_choices.py:22
-#: .\contrib\localflavor\id\id_choices.py:90
-msgid "Kalimantan Timur"
-msgstr "Kalimantan Timur"
-
-#: .\contrib\localflavor\id\id_choices.py:23
-msgid "Kepulauan Bangka-Belitung"
-msgstr "Kepulauan Bangka-Belitung"
-
-#: .\contrib\localflavor\id\id_choices.py:24
-#: .\contrib\localflavor\id\id_choices.py:62
-msgid "Kepulauan Riau"
-msgstr "Kepulauan Riau"
-
-#: .\contrib\localflavor\id\id_choices.py:25
-#: .\contrib\localflavor\id\id_choices.py:55
-msgid "Lampung"
-msgstr "Lampung"
-
-#: .\contrib\localflavor\id\id_choices.py:26
-#: .\contrib\localflavor\id\id_choices.py:70
-msgid "Maluku"
-msgstr "Maluku"
-
-#: .\contrib\localflavor\id\id_choices.py:27
-#: .\contrib\localflavor\id\id_choices.py:71
-msgid "Maluku Utara"
-msgstr "Maluku Utara"
-
-#: .\contrib\localflavor\id\id_choices.py:28
-#: .\contrib\localflavor\id\id_choices.py:59
-msgid "Nanggroe Aceh Darussalam"
-msgstr "Nanggroe Aceh Darussalam"
-
-#: .\contrib\localflavor\id\id_choices.py:29
-msgid "Nusa Tenggara Barat"
-msgstr "Nusa Tenggara Barat"
-
-#: .\contrib\localflavor\id\id_choices.py:30
-msgid "Nusa Tenggara Timur"
-msgstr "Nusa Tenggara Timur"
-
-#: .\contrib\localflavor\id\id_choices.py:31
-msgid "Papua"
-msgstr "Papua"
-
-#: .\contrib\localflavor\id\id_choices.py:32
-msgid "Papua Barat"
-msgstr "Papua Barat"
-
-#: .\contrib\localflavor\id\id_choices.py:33
-#: .\contrib\localflavor\id\id_choices.py:60
-msgid "Riau"
-msgstr "Riau"
-
-#: .\contrib\localflavor\id\id_choices.py:34
-#: .\contrib\localflavor\id\id_choices.py:68
-msgid "Sulawesi Barat"
-msgstr "Sulawesi Barat"
-
-#: .\contrib\localflavor\id\id_choices.py:35
-#: .\contrib\localflavor\id\id_choices.py:69
-msgid "Sulawesi Selatan"
-msgstr "Sulawesi Selatan"
-
-#: .\contrib\localflavor\id\id_choices.py:36
-#: .\contrib\localflavor\id\id_choices.py:76
-msgid "Sulawesi Tengah"
-msgstr "Sulawesi Tengah"
-
-#: .\contrib\localflavor\id\id_choices.py:37
-#: .\contrib\localflavor\id\id_choices.py:79
-msgid "Sulawesi Tenggara"
-msgstr "Sulawesi Tenggara"
-
-#: .\contrib\localflavor\id\id_choices.py:38
-msgid "Sulawesi Utara"
-msgstr "Sulawesi Utara"
-
-#: .\contrib\localflavor\id\id_choices.py:39
-#: .\contrib\localflavor\id\id_choices.py:52
-msgid "Sumatera Barat"
-msgstr "Sumatera Barat"
-
-#: .\contrib\localflavor\id\id_choices.py:40
-#: .\contrib\localflavor\id\id_choices.py:56
-msgid "Sumatera Selatan"
-msgstr "Sumatera Selatan"
-
-#: .\contrib\localflavor\id\id_choices.py:41
-#: .\contrib\localflavor\id\id_choices.py:58
-msgid "Sumatera Utara"
-msgstr "Sumatera Utara"
-
-#: .\contrib\localflavor\id\id_choices.py:46
-msgid "Magelang"
-msgstr "Magelang"
-
-#: .\contrib\localflavor\id\id_choices.py:48
-msgid "Surakarta - Solo"
-msgstr "Surakarta - Solo"
-
-#: .\contrib\localflavor\id\id_choices.py:49
-msgid "Madiun"
-msgstr "Madiun"
-
-#: .\contrib\localflavor\id\id_choices.py:50
-msgid "Kediri"
-msgstr "Kediri"
-
-#: .\contrib\localflavor\id\id_choices.py:53
-msgid "Tapanuli"
-msgstr "Tapanuli"
-
-#: .\contrib\localflavor\id\id_choices.py:61
-msgid "Kepulauan Bangka Belitung"
-msgstr "Kepulauan Bangka Belitung"
-
-#: .\contrib\localflavor\id\id_choices.py:63
-msgid "Corps Consulate"
-msgstr "Corps Consulate"
-
-#: .\contrib\localflavor\id\id_choices.py:64
-msgid "Corps Diplomatic"
-msgstr "Corps Diplomatic"
-
-#: .\contrib\localflavor\id\id_choices.py:65
-msgid "Bandung"
-msgstr "Bandung"
-
-#: .\contrib\localflavor\id\id_choices.py:67
-msgid "Sulawesi Utara Daratan"
-msgstr "Sulawesi Utara Daratan"
-
-#: .\contrib\localflavor\id\id_choices.py:72
-msgid "NTT - Timor"
-msgstr "NTT - Timor"
-
-#: .\contrib\localflavor\id\id_choices.py:74
-msgid "Sulawesi Utara Kepulauan"
-msgstr "Sulawesi Utara Kepulauan"
-
-#: .\contrib\localflavor\id\id_choices.py:77
-msgid "NTB - Lombok"
-msgstr "NTB - Lombok"
-
-#: .\contrib\localflavor\id\id_choices.py:78
-msgid "Papua dan Papua Barat"
-msgstr "Papua dan Papua Barat"
-
-#: .\contrib\localflavor\id\id_choices.py:80
-msgid "Cirebon"
-msgstr "Cirebon"
-
-#: .\contrib\localflavor\id\id_choices.py:81
-msgid "NTB - Sumbawa"
-msgstr "NTB - Sumbawa"
-
-#: .\contrib\localflavor\id\id_choices.py:82
-msgid "NTT - Flores"
-msgstr "NTT - Flores"
-
-#: .\contrib\localflavor\id\id_choices.py:83
-msgid "NTT - Sumba"
-msgstr "NTT - Sumba"
-
-#: .\contrib\localflavor\id\id_choices.py:84
-msgid "Bogor"
-msgstr "Bogor"
-
-#: .\contrib\localflavor\id\id_choices.py:85
-msgid "Pekalongan"
-msgstr "Pekalongan"
-
-#: .\contrib\localflavor\id\id_choices.py:86
-msgid "Semarang"
-msgstr "Semarang"
-
-#: .\contrib\localflavor\id\id_choices.py:87
-msgid "Pati"
-msgstr "Pati"
-
-#: .\contrib\localflavor\id\id_choices.py:91
-msgid "Surabaya"
-msgstr "Surabaya"
-
-#: .\contrib\localflavor\id\id_choices.py:92
-msgid "Madura"
-msgstr "Madura"
-
-#: .\contrib\localflavor\id\id_choices.py:93
-msgid "Malang"
-msgstr "Malang"
-
-#: .\contrib\localflavor\id\id_choices.py:94
-msgid "Jember"
-msgstr "Jember"
-
-#: .\contrib\localflavor\id\id_choices.py:95
-msgid "Banyumas"
-msgstr "Banyumas"
-
-#: .\contrib\localflavor\id\id_choices.py:96
-msgid "Federal Government"
-msgstr "Govern Federal"
-
-#: .\contrib\localflavor\id\id_choices.py:97
-msgid "Bojonegoro"
-msgstr "Bojonegoro"
-
-#: .\contrib\localflavor\id\id_choices.py:98
-msgid "Purwakarta"
-msgstr "Purwakarta"
-
-#: .\contrib\localflavor\id\id_choices.py:99
-msgid "Sidoarjo"
-msgstr "Sidoarjo"
-
-#: .\contrib\localflavor\id\id_choices.py:100
-msgid "Garut"
-msgstr "Garut"
-
-#: .\contrib\localflavor\ie\ie_counties.py:8
-msgid "Antrim"
-msgstr "Antrim"
-
-#: .\contrib\localflavor\ie\ie_counties.py:9
-msgid "Armagh"
-msgstr "Armagh"
-
-#: .\contrib\localflavor\ie\ie_counties.py:10
-msgid "Carlow"
-msgstr "Carlow"
-
-#: .\contrib\localflavor\ie\ie_counties.py:11
-msgid "Cavan"
-msgstr "Cavan"
-
-#: .\contrib\localflavor\ie\ie_counties.py:12
-msgid "Clare"
-msgstr "Clare"
-
-#: .\contrib\localflavor\ie\ie_counties.py:13
-msgid "Cork"
-msgstr "Cork"
-
-#: .\contrib\localflavor\ie\ie_counties.py:14
-msgid "Derry"
-msgstr "Derry"
-
-#: .\contrib\localflavor\ie\ie_counties.py:15
-msgid "Donegal"
-msgstr "Donegal"
-
-#: .\contrib\localflavor\ie\ie_counties.py:16
-msgid "Down"
-msgstr "Down"
-
-#: .\contrib\localflavor\ie\ie_counties.py:17
-msgid "Dublin"
-msgstr "Dublin"
-
-#: .\contrib\localflavor\ie\ie_counties.py:18
-msgid "Fermanagh"
-msgstr "Fermanagh"
-
-#: .\contrib\localflavor\ie\ie_counties.py:19
-msgid "Galway"
-msgstr "Galway"
-
-#: .\contrib\localflavor\ie\ie_counties.py:20
-msgid "Kerry"
-msgstr "Kerry"
-
-#: .\contrib\localflavor\ie\ie_counties.py:21
-msgid "Kildare"
-msgstr "Kildare"
-
-#: .\contrib\localflavor\ie\ie_counties.py:22
-msgid "Kilkenny"
-msgstr "Kilkenny"
-
-#: .\contrib\localflavor\ie\ie_counties.py:23
-msgid "Laois"
-msgstr "Laois"
-
-#: .\contrib\localflavor\ie\ie_counties.py:24
-msgid "Leitrim"
-msgstr "Leitrim"
-
-#: .\contrib\localflavor\ie\ie_counties.py:25
-msgid "Limerick"
-msgstr "Limerick"
-
-#: .\contrib\localflavor\ie\ie_counties.py:26
-msgid "Longford"
-msgstr "Longford"
-
-#: .\contrib\localflavor\ie\ie_counties.py:27
-msgid "Louth"
-msgstr "Louth"
-
-#: .\contrib\localflavor\ie\ie_counties.py:28
-msgid "Mayo"
-msgstr "Mayo"
-
-#: .\contrib\localflavor\ie\ie_counties.py:29
-msgid "Meath"
-msgstr "Meath"
-
-#: .\contrib\localflavor\ie\ie_counties.py:30
-msgid "Monaghan"
-msgstr "Monaghan"
-
-#: .\contrib\localflavor\ie\ie_counties.py:31
-msgid "Offaly"
-msgstr "Offaly"
-
-#: .\contrib\localflavor\ie\ie_counties.py:32
-msgid "Roscommon"
-msgstr "Roscommon"
-
-#: .\contrib\localflavor\ie\ie_counties.py:33
-msgid "Sligo"
-msgstr "Sligo"
-
-#: .\contrib\localflavor\ie\ie_counties.py:34
-msgid "Tipperary"
-msgstr "Tipperary"
-
-#: .\contrib\localflavor\ie\ie_counties.py:35
-msgid "Tyrone"
-msgstr "Tyrone"
-
-#: .\contrib\localflavor\ie\ie_counties.py:36
-msgid "Waterford"
-msgstr "Waterford"
-
-#: .\contrib\localflavor\ie\ie_counties.py:37
-msgid "Westmeath"
-msgstr "Westmeath"
-
-#: .\contrib\localflavor\ie\ie_counties.py:38
-msgid "Wexford"
-msgstr "Wexford"
-
-#: .\contrib\localflavor\ie\ie_counties.py:39
-msgid "Wicklow"
-msgstr "Wicklow"
-
-#: .\contrib\localflavor\in_\forms.py:15
-msgid "Enter a zip code in the format XXXXXXX."
-msgstr "Introduïu un codi postal en el format XXXXXXX."
-
-#: .\contrib\localflavor\is_\forms.py:18
-msgid ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr ""
-"Introduïu un número vàlid d'identificació d'Islàndia. El format és XXXXXX-"
-"XXXX."
-
-#: .\contrib\localflavor\is_\forms.py:19
-msgid "The Icelandic identification number is not valid."
-msgstr "El número d'identificació d'Islàndia no és vàlid."
-
-#: .\contrib\localflavor\it\forms.py:15
-msgid "Enter a valid zip code."
-msgstr "Introduïu un codi zip vàlid."
-
-#: .\contrib\localflavor\it\forms.py:44
-msgid "Enter a valid Social Security number."
-msgstr "Introduïu un número valid de la Seguretat Social."
-
-#: .\contrib\localflavor\it\forms.py:69
-msgid "Enter a valid VAT number."
-msgstr "Introduïu un número d'IVA (VAT) vàlid."
-
-#: .\contrib\localflavor\jp\forms.py:16
-msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "Introduïu un codi postal en el format XXXXXXX o XX-XXXX."
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:4
-msgid "Hokkaido"
-msgstr "Hokkaido"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:5
-msgid "Aomori"
-msgstr "Aomori"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:6
-msgid "Iwate"
-msgstr "Iwate"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:7
-msgid "Miyagi"
-msgstr "Miyagi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:8
-msgid "Akita"
-msgstr "Akita"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:9
-msgid "Yamagata"
-msgstr "Yamagata"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:10
-msgid "Fukushima"
-msgstr "Fukushima"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:11
-msgid "Ibaraki"
-msgstr "Ibaraki"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:12
-msgid "Tochigi"
-msgstr "Tochigi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:13
-msgid "Gunma"
-msgstr "Gunma"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:14
-msgid "Saitama"
-msgstr "Saitama"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:15
-msgid "Chiba"
-msgstr "Chiba"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:16
-msgid "Tokyo"
-msgstr "Tokyo"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:17
-msgid "Kanagawa"
-msgstr "Kanagawa"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:18
-msgid "Yamanashi"
-msgstr "Yamanashi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:19
-msgid "Nagano"
-msgstr "Nagano"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:20
-msgid "Niigata"
-msgstr "Niigata"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:21
-msgid "Toyama"
-msgstr "Toyama"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:22
-msgid "Ishikawa"
-msgstr "Ishikawa"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:23
-msgid "Fukui"
-msgstr "Fukui"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:24
-msgid "Gifu"
-msgstr "Gifu"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:25
-msgid "Shizuoka"
-msgstr "Shizuoka"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:26
-msgid "Aichi"
-msgstr "Aichi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:27
-msgid "Mie"
-msgstr "Mie"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:28
-msgid "Shiga"
-msgstr "Shiga"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:29
-msgid "Kyoto"
-msgstr "Kyoto"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:30
-msgid "Osaka"
-msgstr "Osaka"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:31
-msgid "Hyogo"
-msgstr "Hyogo"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:32
-msgid "Nara"
-msgstr "Nara"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:33
-msgid "Wakayama"
-msgstr "Wakayama"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:34
-msgid "Tottori"
-msgstr "Tottori"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:35
-msgid "Shimane"
-msgstr "Shimane"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:36
-msgid "Okayama"
-msgstr "Okayama"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:37
-msgid "Hiroshima"
-msgstr "Hiroshima"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:38
-msgid "Yamaguchi"
-msgstr "Yamaguchi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:39
-msgid "Tokushima"
-msgstr "Tokushima"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:40
-msgid "Kagawa"
-msgstr "Kagawa"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:41
-msgid "Ehime"
-msgstr "Ehime"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:42
-msgid "Kochi"
-msgstr "Kochi"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:43
-msgid "Fukuoka"
-msgstr "Fukuoka"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:44
-msgid "Saga"
-msgstr "Saga"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:45
-msgid "Nagasaki"
-msgstr "Nagasaki"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:46
-msgid "Kumamoto"
-msgstr "Kumamoto"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:47
-msgid "Oita"
-msgstr "Oita"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:48
-msgid "Miyazaki"
-msgstr "Miyazaki"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:49
-msgid "Kagoshima"
-msgstr "Kagoshima"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:50
-msgid "Okinawa"
-msgstr "Okinawa"
-
-#: .\contrib\localflavor\kw\forms.py:25
-msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "Introduïu un número d'Identitat Kuwaitià vàlid"
-
-#: .\contrib\localflavor\mx\mx_states.py:12
-msgid "Aguascalientes"
-msgstr "Aguascalientes"
-
-#: .\contrib\localflavor\mx\mx_states.py:13
-msgid "Baja California"
-msgstr "Baixa Califòrnia"
-
-#: .\contrib\localflavor\mx\mx_states.py:14
-msgid "Baja California Sur"
-msgstr "Baixa Califòrnia Sud"
-
-#: .\contrib\localflavor\mx\mx_states.py:15
-msgid "Campeche"
-msgstr "Campeche"
-
-#: .\contrib\localflavor\mx\mx_states.py:16
-msgid "Chihuahua"
-msgstr "Chihuahua"
-
-#: .\contrib\localflavor\mx\mx_states.py:17
-msgid "Chiapas"
-msgstr "Chiapas"
-
-#: .\contrib\localflavor\mx\mx_states.py:18
-msgid "Coahuila"
-msgstr "Coahuila"
-
-#: .\contrib\localflavor\mx\mx_states.py:19
-msgid "Colima"
-msgstr "Colima"
-
-#: .\contrib\localflavor\mx\mx_states.py:20
-msgid "Distrito Federal"
-msgstr "Districte Federal"
-
-#: .\contrib\localflavor\mx\mx_states.py:21
-msgid "Durango"
-msgstr "Durango"
-
-#: .\contrib\localflavor\mx\mx_states.py:22
-msgid "Guerrero"
-msgstr "Guerrero"
-
-#: .\contrib\localflavor\mx\mx_states.py:23
-msgid "Guanajuato"
-msgstr "Guanajuato"
-
-#: .\contrib\localflavor\mx\mx_states.py:24
-msgid "Hidalgo"
-msgstr "Hidalgo"
-
-#: .\contrib\localflavor\mx\mx_states.py:25
-msgid "Jalisco"
-msgstr "Jalisco"
-
-#: .\contrib\localflavor\mx\mx_states.py:26
-msgid "Estado de México"
-msgstr "Estat de Mèxic"
-
-#: .\contrib\localflavor\mx\mx_states.py:27
-msgid "Michoacán"
-msgstr "Michoacán"
-
-#: .\contrib\localflavor\mx\mx_states.py:28
-msgid "Morelos"
-msgstr "Morelos"
-
-#: .\contrib\localflavor\mx\mx_states.py:29
-msgid "Nayarit"
-msgstr "Nayarit"
-
-#: .\contrib\localflavor\mx\mx_states.py:30
-msgid "Nuevo León"
-msgstr "Nuevo León"
-
-#: .\contrib\localflavor\mx\mx_states.py:31
-msgid "Oaxaca"
-msgstr "Oaxaca"
-
-#: .\contrib\localflavor\mx\mx_states.py:32
-msgid "Puebla"
-msgstr "Puebla"
-
-#: .\contrib\localflavor\mx\mx_states.py:33
-msgid "Querétaro"
-msgstr "Querétaro"
-
-#: .\contrib\localflavor\mx\mx_states.py:34
-msgid "Quintana Roo"
-msgstr "Quintana Roo"
-
-#: .\contrib\localflavor\mx\mx_states.py:35
-msgid "Sinaloa"
-msgstr "Sinaloa"
-
-#: .\contrib\localflavor\mx\mx_states.py:36
-msgid "San Luis Potosí"
-msgstr "San Luis Potosí"
-
-#: .\contrib\localflavor\mx\mx_states.py:37
-msgid "Sonora"
-msgstr "Sonora"
-
-#: .\contrib\localflavor\mx\mx_states.py:38
-msgid "Tabasco"
-msgstr "Tabasco"
-
-#: .\contrib\localflavor\mx\mx_states.py:39
-msgid "Tamaulipas"
-msgstr "Tamaulipas"
-
-#: .\contrib\localflavor\mx\mx_states.py:40
-msgid "Tlaxcala"
-msgstr "Tlaxcala"
-
-#: .\contrib\localflavor\mx\mx_states.py:41
-msgid "Veracruz"
-msgstr "Veracruz"
-
-#: .\contrib\localflavor\mx\mx_states.py:42
-msgid "Yucatán"
-msgstr "Yucatán"
-
-#: .\contrib\localflavor\mx\mx_states.py:43
-msgid "Zacatecas"
-msgstr "Zacatecas"
-
-#: .\contrib\localflavor\nl\forms.py:22
-msgid "Enter a valid postal code"
-msgstr "Introduïu un codi postal vàlid."
-
-#: .\contrib\localflavor\nl\forms.py:79
-msgid "Enter a valid SoFi number"
-msgstr "Introduïu un número SoFi vàlid."
-
-#: .\contrib\localflavor\nl\nl_provinces.py:4
-msgid "Drenthe"
-msgstr "Drenthe"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:5
-msgid "Flevoland"
-msgstr "Flevoland"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:6
-msgid "Friesland"
-msgstr "Friesland"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:7
-msgid "Gelderland"
-msgstr "Gelderland"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:8
-msgid "Groningen"
-msgstr "Groningen"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:9
-msgid "Limburg"
-msgstr "Limburg"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:10
-msgid "Noord-Brabant"
-msgstr "Noord-Brabant"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:11
-msgid "Noord-Holland"
-msgstr "Noord-Holland"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:12
-msgid "Overijssel"
-msgstr "Overijssel"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:13
-msgid "Utrecht"
-msgstr "Utrecht"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:14
-msgid "Zeeland"
-msgstr "Zeeland"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:15
-msgid "Zuid-Holland"
-msgstr "Zuid-Holland"
-
-#: .\contrib\localflavor\no\forms.py:34
-msgid "Enter a valid Norwegian social security number."
-msgstr "Introduïu un número de la seguretat social Noruega vàlid."
-
-#: .\contrib\localflavor\pe\forms.py:25
-msgid "This field requires 8 digits."
-msgstr "Aquest camp precisa 8 dígits."
-
-#: .\contrib\localflavor\pe\forms.py:53
-msgid "This field requires 11 digits."
-msgstr "Aquest camp precisa 11 dígits."
-
-#: .\contrib\localflavor\pl\forms.py:38
-msgid "National Identification Number consists of 11 digits."
-msgstr "El número d'identidicació nacional està compost de 11 digits."
-
-#: .\contrib\localflavor\pl\forms.py:39
-msgid "Wrong checksum for the National Identification Number."
-msgstr "Verificació del número d'identificació nacional invàlida."
-
-#: .\contrib\localflavor\pl\forms.py:71
-msgid ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr "Introduïu un número NIP en el format XXX-XXX-XX-XX o XX-XX-XXX-XXX."
-
-#: .\contrib\localflavor\pl\forms.py:72
-msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr "Verificació del número tributari (NIP) invàlida."
-
-#: .\contrib\localflavor\pl\forms.py:109
-msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
-msgstr ""
-"El número nacional de registre de negocis (REGON) està compost de 9 o 14 "
-"dígits."
-
-#: .\contrib\localflavor\pl\forms.py:110
-msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr "Verificació del número nacional de registre de negocis invàlida."
-
-#: .\contrib\localflavor\pl\forms.py:148
-msgid "Enter a postal code in the format XX-XXX."
-msgstr "Introduïu un codi postal en el format XX-XXX."
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:8
-msgid "Lower Silesia"
-msgstr "Baixa Silèsia"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:9
-msgid "Kuyavia-Pomerania"
-msgstr "Kuyavia-Pomerania"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:10
-msgid "Lublin"
-msgstr "Lublin"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:11
-msgid "Lubusz"
-msgstr "Lubusz"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:12
-msgid "Lodz"
-msgstr "Lodz"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:13
-msgid "Lesser Poland"
-msgstr "Polònia Menor"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:14
-msgid "Masovia"
-msgstr "Masovia"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:15
-msgid "Opole"
-msgstr "Opole"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:16
-msgid "Subcarpatia"
-msgstr "Subcarpatia"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:17
-msgid "Podlasie"
-msgstr "Podlasie"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:18
-msgid "Pomerania"
-msgstr "Pomerània"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:19
-msgid "Silesia"
-msgstr "Silèsia"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:20
-msgid "Swietokrzyskie"
-msgstr "Swietokrzyskie"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:21
-msgid "Warmia-Masuria"
-msgstr "Warmia-Masuria"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:22
-msgid "Greater Poland"
-msgstr "Polònia Major"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:23
-msgid "West Pomerania"
-msgstr "Pomerània Oest"
-
-#: .\contrib\localflavor\pt\forms.py:17
-msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "Introduïu un codi postal en el format XXXX-XXX."
-
-#: .\contrib\localflavor\pt\forms.py:37
-msgid "Phone numbers must have 9 digits, or start by + or 00."
-msgstr "Els números de telèfon han de tenir 9 dígits, o començar per "
-"+ o 00."
-
-#: .\contrib\localflavor\ro\forms.py:19
-msgid "Enter a valid CIF."
-msgstr "Introduïu un CIF vàlid."
-
-#: .\contrib\localflavor\ro\forms.py:56
-msgid "Enter a valid CNP."
-msgstr "Introduïu un CNP vàlid."
-
-#: .\contrib\localflavor\ro\forms.py:141
-msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "Introduïu un IBAN vàlid en el format ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
-
-#: .\contrib\localflavor\ro\forms.py:171
-msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "El número de telèfon ha d'estar en el format XXXX-XXXXXX."
-
-#: .\contrib\localflavor\ro\forms.py:194
-msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Introduïu un codi postal vàlid en el format XXXXXX."
-
-#: .\contrib\localflavor\se\forms.py:50
-msgid "Enter a valid Swedish organisation number."
-msgstr "Introduïu un número d'organització Sueca vàlid."
-
-#: .\contrib\localflavor\se\forms.py:107
-msgid "Enter a valid Swedish personal identity number."
-msgstr "Introduïu un número d'identitat personal suec vàlid."
-
-#: .\contrib\localflavor\se\forms.py:108
-msgid "Co-ordination numbers are not allowed."
-msgstr "No es permeten números de coordinació."
-
-#: .\contrib\localflavor\se\forms.py:150
-msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "Introduïu un codi postal suec en el format XXXXX."
-
-#: .\contrib\localflavor\se\se_counties.py:15
-msgid "Stockholm"
-msgstr "Estocolm"
-
-#: .\contrib\localflavor\se\se_counties.py:16
-msgid "Västerbotten"
-msgstr "Västerbotten"
-
-#: .\contrib\localflavor\se\se_counties.py:17
-msgid "Norrbotten"
-msgstr "Norrbotten"
-
-#: .\contrib\localflavor\se\se_counties.py:18
-msgid "Uppsala"
-msgstr "Uppsala"
-
-#: .\contrib\localflavor\se\se_counties.py:19
-msgid "Södermanland"
-msgstr "Södermanland"
-
-#: .\contrib\localflavor\se\se_counties.py:20
-msgid "Östergötland"
-msgstr "Östergötland"
-
-#: .\contrib\localflavor\se\se_counties.py:21
-msgid "Jönköping"
-msgstr "Jönköping"
-
-#: .\contrib\localflavor\se\se_counties.py:22
-msgid "Kronoberg"
-msgstr "Kronoberg"
-
-#: .\contrib\localflavor\se\se_counties.py:23
-msgid "Kalmar"
-msgstr "Kalmar"
-
-#: .\contrib\localflavor\se\se_counties.py:24
-msgid "Gotland"
-msgstr "Gotland"
-
-#: .\contrib\localflavor\se\se_counties.py:25
-msgid "Blekinge"
-msgstr "Blekinge"
-
-#: .\contrib\localflavor\se\se_counties.py:26
-msgid "Skåne"
-msgstr "Skåne"
-
-#: .\contrib\localflavor\se\se_counties.py:27
-msgid "Halland"
-msgstr "Halland"
-
-#: .\contrib\localflavor\se\se_counties.py:28
-msgid "Västra Götaland"
-msgstr "Västra Götaland"
-
-#: .\contrib\localflavor\se\se_counties.py:29
-msgid "Värmland"
-msgstr "Värmland"
-
-#: .\contrib\localflavor\se\se_counties.py:30
-msgid "Örebro"
-msgstr "Örebro"
-
-#: .\contrib\localflavor\se\se_counties.py:31
-msgid "Västmanland"
-msgstr "Västmanland"
-
-#: .\contrib\localflavor\se\se_counties.py:32
-msgid "Dalarna"
-msgstr "Dalarna"
-
-#: .\contrib\localflavor\se\se_counties.py:33
-msgid "Gävleborg"
-msgstr "Gävleborg"
-
-#: .\contrib\localflavor\se\se_counties.py:34
-msgid "Västernorrland"
-msgstr "Västernorrland"
-
-#: .\contrib\localflavor\se\se_counties.py:35
-msgid "Jämtland"
-msgstr "Jämtland"
-
-#: .\contrib\localflavor\sk\sk_districts.py:8
-msgid "Banska Bystrica"
-msgstr "Banska Bystrica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:9
-msgid "Banska Stiavnica"
-msgstr "Banska Stiavnica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:10
-msgid "Bardejov"
-msgstr "Bardejov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:11
-msgid "Banovce nad Bebravou"
-msgstr "Banovce nad Bebravou"
-
-#: .\contrib\localflavor\sk\sk_districts.py:12
-msgid "Brezno"
-msgstr "Brezno"
-
-#: .\contrib\localflavor\sk\sk_districts.py:13
-msgid "Bratislava I"
-msgstr "Bratislava I"
-
-#: .\contrib\localflavor\sk\sk_districts.py:14
-msgid "Bratislava II"
-msgstr "Bratislava II"
-
-#: .\contrib\localflavor\sk\sk_districts.py:15
-msgid "Bratislava III"
-msgstr "Bratislava III"
-
-#: .\contrib\localflavor\sk\sk_districts.py:16
-msgid "Bratislava IV"
-msgstr "Bratislava IV"
-
-#: .\contrib\localflavor\sk\sk_districts.py:17
-msgid "Bratislava V"
-msgstr "Bratislava V"
-
-#: .\contrib\localflavor\sk\sk_districts.py:18
-msgid "Bytca"
-msgstr "Bytca"
-
-#: .\contrib\localflavor\sk\sk_districts.py:19
-msgid "Cadca"
-msgstr "Cadca"
-
-#: .\contrib\localflavor\sk\sk_districts.py:20
-msgid "Detva"
-msgstr "Detva"
-
-#: .\contrib\localflavor\sk\sk_districts.py:21
-msgid "Dolny Kubin"
-msgstr "Dolny Kubin"
-
-#: .\contrib\localflavor\sk\sk_districts.py:22
-msgid "Dunajska Streda"
-msgstr "Dunajska Streda"
-
-#: .\contrib\localflavor\sk\sk_districts.py:23
-msgid "Galanta"
-msgstr "Galanta"
-
-#: .\contrib\localflavor\sk\sk_districts.py:24
-msgid "Gelnica"
-msgstr "Gelnica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:25
-msgid "Hlohovec"
-msgstr "Hlohovec"
-
-#: .\contrib\localflavor\sk\sk_districts.py:26
-msgid "Humenne"
-msgstr "Humenne"
-
-#: .\contrib\localflavor\sk\sk_districts.py:27
-msgid "Ilava"
-msgstr "Ilava"
-
-#: .\contrib\localflavor\sk\sk_districts.py:28
-msgid "Kezmarok"
-msgstr "Kezmarok"
-
-#: .\contrib\localflavor\sk\sk_districts.py:29
-msgid "Komarno"
-msgstr "Komarno"
-
-#: .\contrib\localflavor\sk\sk_districts.py:30
-msgid "Kosice I"
-msgstr "Kosice I"
-
-#: .\contrib\localflavor\sk\sk_districts.py:31
-msgid "Kosice II"
-msgstr "Kosice II"
-
-#: .\contrib\localflavor\sk\sk_districts.py:32
-msgid "Kosice III"
-msgstr "Kosice III"
-
-#: .\contrib\localflavor\sk\sk_districts.py:33
-msgid "Kosice IV"
-msgstr "Kosice IV"
-
-#: .\contrib\localflavor\sk\sk_districts.py:34
-msgid "Kosice - okolie"
-msgstr "Kosice - okolie"
-
-#: .\contrib\localflavor\sk\sk_districts.py:35
-msgid "Krupina"
-msgstr "Krupina"
-
-#: .\contrib\localflavor\sk\sk_districts.py:36
-msgid "Kysucke Nove Mesto"
-msgstr "Kysucke Nove Mesto"
-
-#: .\contrib\localflavor\sk\sk_districts.py:37
-msgid "Levice"
-msgstr "Levice"
-
-#: .\contrib\localflavor\sk\sk_districts.py:38
-msgid "Levoca"
-msgstr "Levoca"
-
-#: .\contrib\localflavor\sk\sk_districts.py:39
-msgid "Liptovsky Mikulas"
-msgstr "Liptovsky Mikulas"
-
-#: .\contrib\localflavor\sk\sk_districts.py:40
-msgid "Lucenec"
-msgstr "Lucenec"
-
-#: .\contrib\localflavor\sk\sk_districts.py:41
-msgid "Malacky"
-msgstr "Malacky"
-
-#: .\contrib\localflavor\sk\sk_districts.py:42
-msgid "Martin"
-msgstr "Martin"
-
-#: .\contrib\localflavor\sk\sk_districts.py:43
-msgid "Medzilaborce"
-msgstr "Medzilaborce"
-
-#: .\contrib\localflavor\sk\sk_districts.py:44
-msgid "Michalovce"
-msgstr "Michalovce"
-
-#: .\contrib\localflavor\sk\sk_districts.py:45
-msgid "Myjava"
-msgstr "Myjava"
-
-#: .\contrib\localflavor\sk\sk_districts.py:46
-msgid "Namestovo"
-msgstr "Namestovo"
-
-#: .\contrib\localflavor\sk\sk_districts.py:47
-msgid "Nitra"
-msgstr "Nitra"
-
-#: .\contrib\localflavor\sk\sk_districts.py:48
-msgid "Nove Mesto nad Vahom"
-msgstr "Nove Mesto nad Vahom"
-
-#: .\contrib\localflavor\sk\sk_districts.py:49
-msgid "Nove Zamky"
-msgstr "Nove Zamky"
-
-#: .\contrib\localflavor\sk\sk_districts.py:50
-msgid "Partizanske"
-msgstr "Partizanske"
-
-#: .\contrib\localflavor\sk\sk_districts.py:51
-msgid "Pezinok"
-msgstr "Pezinok"
-
-#: .\contrib\localflavor\sk\sk_districts.py:52
-msgid "Piestany"
-msgstr "Piestany"
-
-#: .\contrib\localflavor\sk\sk_districts.py:53
-msgid "Poltar"
-msgstr "Poltar"
-
-#: .\contrib\localflavor\sk\sk_districts.py:54
-msgid "Poprad"
-msgstr "Poprad"
-
-#: .\contrib\localflavor\sk\sk_districts.py:55
-msgid "Povazska Bystrica"
-msgstr "Povazska Bystrica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:56
-msgid "Presov"
-msgstr "Presov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:57
-msgid "Prievidza"
-msgstr "Prievidza"
-
-#: .\contrib\localflavor\sk\sk_districts.py:58
-msgid "Puchov"
-msgstr "Puchov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:59
-msgid "Revuca"
-msgstr "Revuca"
-
-#: .\contrib\localflavor\sk\sk_districts.py:60
-msgid "Rimavska Sobota"
-msgstr "Rimavska Sobota"
-
-#: .\contrib\localflavor\sk\sk_districts.py:61
-msgid "Roznava"
-msgstr "Roznava"
-
-#: .\contrib\localflavor\sk\sk_districts.py:62
-msgid "Ruzomberok"
-msgstr "Ruzomberok"
-
-#: .\contrib\localflavor\sk\sk_districts.py:63
-msgid "Sabinov"
-msgstr "Sabinov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:64
-msgid "Senec"
-msgstr "Senec"
-
-#: .\contrib\localflavor\sk\sk_districts.py:65
-msgid "Senica"
-msgstr "Senica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:66
-msgid "Skalica"
-msgstr "Skalica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:67
-msgid "Snina"
-msgstr "Snina"
-
-#: .\contrib\localflavor\sk\sk_districts.py:68
-msgid "Sobrance"
-msgstr "Sobrance"
-
-#: .\contrib\localflavor\sk\sk_districts.py:69
-msgid "Spisska Nova Ves"
-msgstr "Spisska Nova Ves"
-
-#: .\contrib\localflavor\sk\sk_districts.py:70
-msgid "Stara Lubovna"
-msgstr "Stara Lubovna"
-
-#: .\contrib\localflavor\sk\sk_districts.py:71
-msgid "Stropkov"
-msgstr "Stropkov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:72
-msgid "Svidnik"
-msgstr "Svidnik"
-
-#: .\contrib\localflavor\sk\sk_districts.py:73
-msgid "Sala"
-msgstr "Sala"
-
-#: .\contrib\localflavor\sk\sk_districts.py:74
-msgid "Topolcany"
-msgstr "Topolcany"
-
-#: .\contrib\localflavor\sk\sk_districts.py:75
-msgid "Trebisov"
-msgstr "Trebisov"
-
-#: .\contrib\localflavor\sk\sk_districts.py:76
-msgid "Trencin"
-msgstr "Trencin"
-
-#: .\contrib\localflavor\sk\sk_districts.py:77
-msgid "Trnava"
-msgstr "Trnava"
-
-#: .\contrib\localflavor\sk\sk_districts.py:78
-msgid "Turcianske Teplice"
-msgstr "Turcianske Teplice"
-
-#: .\contrib\localflavor\sk\sk_districts.py:79
-msgid "Tvrdosin"
-msgstr "Tvrdosin"
-
-#: .\contrib\localflavor\sk\sk_districts.py:80
-msgid "Velky Krtis"
-msgstr "Velky Krtis"
-
-#: .\contrib\localflavor\sk\sk_districts.py:81
-msgid "Vranov nad Toplou"
-msgstr "Vranov nad Toplou"
-
-#: .\contrib\localflavor\sk\sk_districts.py:82
-msgid "Zlate Moravce"
-msgstr "Zlate Moravce"
-
-#: .\contrib\localflavor\sk\sk_districts.py:83
-msgid "Zvolen"
-msgstr "Zvolen"
-
-#: .\contrib\localflavor\sk\sk_districts.py:84
-msgid "Zarnovica"
-msgstr "Zarnovica"
-
-#: .\contrib\localflavor\sk\sk_districts.py:85
-msgid "Ziar nad Hronom"
-msgstr "Ziar nad Hronom"
-
-#: .\contrib\localflavor\sk\sk_districts.py:86
-msgid "Zilina"
-msgstr "Zilina"
-
-#: .\contrib\localflavor\sk\sk_regions.py:8
-msgid "Banska Bystrica region"
-msgstr "Regió de Banska Bystrica"
-
-#: .\contrib\localflavor\sk\sk_regions.py:9
-msgid "Bratislava region"
-msgstr "Regió de Bratislava"
-
-#: .\contrib\localflavor\sk\sk_regions.py:10
-msgid "Kosice region"
-msgstr "Regió de Kosice"
-
-#: .\contrib\localflavor\sk\sk_regions.py:11
-msgid "Nitra region"
-msgstr "Regió de Nitra"
-
-#: .\contrib\localflavor\sk\sk_regions.py:12
-msgid "Presov region"
-msgstr "Regió de Presov"
-
-#: .\contrib\localflavor\sk\sk_regions.py:13
-msgid "Trencin region"
-msgstr "Regió de Trencin"
-
-#: .\contrib\localflavor\sk\sk_regions.py:14
-msgid "Trnava region"
-msgstr "Regió de Trnava"
-
-#: .\contrib\localflavor\sk\sk_regions.py:15
-msgid "Zilina region"
-msgstr "Regió de Zilina"
-
-#: .\contrib\localflavor\uk\forms.py:21
-msgid "Enter a valid postcode."
-msgstr "Introduïu un codi postal vàlid."
-
-#: .\contrib\localflavor\uk\uk_regions.py:11
-msgid "Bedfordshire"
-msgstr "Bedfordshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:12
-msgid "Buckinghamshire"
-msgstr "Buckinghamshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:14
-msgid "Cheshire"
-msgstr "Cheshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:15
-msgid "Cornwall and Isles of Scilly"
-msgstr "Cornwall and Isles of Scilly"
-
-#: .\contrib\localflavor\uk\uk_regions.py:16
-msgid "Cumbria"
-msgstr "Cumbria"
-
-#: .\contrib\localflavor\uk\uk_regions.py:17
-msgid "Derbyshire"
-msgstr "Derbyshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:18
-msgid "Devon"
-msgstr "Devon"
-
-#: .\contrib\localflavor\uk\uk_regions.py:19
-msgid "Dorset"
-msgstr "Dorset"
-
-#: .\contrib\localflavor\uk\uk_regions.py:20
-msgid "Durham"
-msgstr "Durham"
-
-#: .\contrib\localflavor\uk\uk_regions.py:21
-msgid "East Sussex"
-msgstr "East Sussex"
-
-#: .\contrib\localflavor\uk\uk_regions.py:22
-msgid "Essex"
-msgstr "Essex"
-
-#: .\contrib\localflavor\uk\uk_regions.py:23
-msgid "Gloucestershire"
-msgstr "Gloucestershire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:24
-msgid "Greater London"
-msgstr "Greater London"
-
-#: .\contrib\localflavor\uk\uk_regions.py:25
-msgid "Greater Manchester"
-msgstr "Greater Manchester"
-
-#: .\contrib\localflavor\uk\uk_regions.py:26
-msgid "Hampshire"
-msgstr "Hampshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:27
-msgid "Hertfordshire"
-msgstr "Hertfordshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:28
-msgid "Kent"
-msgstr "Kent"
-
-#: .\contrib\localflavor\uk\uk_regions.py:29
-msgid "Lancashire"
-msgstr "Lancashire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:30
-msgid "Leicestershire"
-msgstr "Leicestershire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:31
-msgid "Lincolnshire"
-msgstr "Lincolnshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:32
-msgid "Merseyside"
-msgstr "Merseyside"
-
-#: .\contrib\localflavor\uk\uk_regions.py:33
-msgid "Norfolk"
-msgstr "Norfolk"
-
-#: .\contrib\localflavor\uk\uk_regions.py:34
-msgid "North Yorkshire"
-msgstr "North Yorkshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:35
-msgid "Northamptonshire"
-msgstr "Northamptonshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:36
-msgid "Northumberland"
-msgstr "Northumberland"
-
-#: .\contrib\localflavor\uk\uk_regions.py:37
-msgid "Nottinghamshire"
-msgstr "Nottinghamshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:38
-msgid "Oxfordshire"
-msgstr "Oxfordshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:39
-msgid "Shropshire"
-msgstr "Shropshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:40
-msgid "Somerset"
-msgstr "Somerset"
-
-#: .\contrib\localflavor\uk\uk_regions.py:41
-msgid "South Yorkshire"
-msgstr "South Yorkshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:42
-msgid "Staffordshire"
-msgstr "Staffordshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:43
-msgid "Suffolk"
-msgstr "Suffolk"
-
-#: .\contrib\localflavor\uk\uk_regions.py:44
-msgid "Surrey"
-msgstr "Surrey"
-
-#: .\contrib\localflavor\uk\uk_regions.py:45
-msgid "Tyne and Wear"
-msgstr "Tyne and Wear"
-
-#: .\contrib\localflavor\uk\uk_regions.py:46
-msgid "Warwickshire"
-msgstr "Warwickshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:47
-msgid "West Midlands"
-msgstr "West Midlands"
-
-#: .\contrib\localflavor\uk\uk_regions.py:48
-msgid "West Sussex"
-msgstr "West Sussex"
-
-#: .\contrib\localflavor\uk\uk_regions.py:49
-msgid "West Yorkshire"
-msgstr "West Yorkshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:50
-msgid "Wiltshire"
-msgstr "Wiltshire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:51
-msgid "Worcestershire"
-msgstr "Worcestershire"
-
-#: .\contrib\localflavor\uk\uk_regions.py:55
-msgid "County Antrim"
-msgstr "County Antrim"
-
-#: .\contrib\localflavor\uk\uk_regions.py:56
-msgid "County Armagh"
-msgstr "County Armagh"
-
-#: .\contrib\localflavor\uk\uk_regions.py:57
-msgid "County Down"
-msgstr "County Down"
-
-#: .\contrib\localflavor\uk\uk_regions.py:58
-msgid "County Fermanagh"
-msgstr "County Fermanagh"
-
-#: .\contrib\localflavor\uk\uk_regions.py:59
-msgid "County Londonderry"
-msgstr "County Londonderry"
-
-#: .\contrib\localflavor\uk\uk_regions.py:60
-msgid "County Tyrone"
-msgstr "County Tyrone"
-
-#: .\contrib\localflavor\uk\uk_regions.py:64
-msgid "Clwyd"
-msgstr "Clwyd"
-
-#: .\contrib\localflavor\uk\uk_regions.py:65
-msgid "Dyfed"
-msgstr "Dyfed"
-
-#: .\contrib\localflavor\uk\uk_regions.py:66
-msgid "Gwent"
-msgstr "Gwent"
-
-#: .\contrib\localflavor\uk\uk_regions.py:67
-msgid "Gwynedd"
-msgstr "Gwynedd"
-
-#: .\contrib\localflavor\uk\uk_regions.py:68
-msgid "Mid Glamorgan"
-msgstr "Mid Glamorgan"
-
-#: .\contrib\localflavor\uk\uk_regions.py:69
-msgid "Powys"
-msgstr "Powys"
-
-#: .\contrib\localflavor\uk\uk_regions.py:70
-msgid "South Glamorgan"
-msgstr "Glamorgan Sud"
-
-#: .\contrib\localflavor\uk\uk_regions.py:71
-msgid "West Glamorgan"
-msgstr "Glamorgan Oest"
-
-#: .\contrib\localflavor\uk\uk_regions.py:75
-msgid "Borders"
-msgstr "Borders"
-
-#: .\contrib\localflavor\uk\uk_regions.py:76
-msgid "Central Scotland"
-msgstr "Escòcia central"
-
-#: .\contrib\localflavor\uk\uk_regions.py:77
-msgid "Dumfries and Galloway"
-msgstr "Dumfries and Galloway"
-
-#: .\contrib\localflavor\uk\uk_regions.py:78
-msgid "Fife"
-msgstr "Fife"
-
-#: .\contrib\localflavor\uk\uk_regions.py:79
-msgid "Grampian"
-msgstr "Grampian"
-
-#: .\contrib\localflavor\uk\uk_regions.py:80
-msgid "Highland"
-msgstr "Highland"
-
-#: .\contrib\localflavor\uk\uk_regions.py:81
-msgid "Lothian"
-msgstr "Lothian"
-
-#: .\contrib\localflavor\uk\uk_regions.py:82
-msgid "Orkney Islands"
-msgstr "Illes Orkney"
-
-#: .\contrib\localflavor\uk\uk_regions.py:83
-msgid "Shetland Islands"
-msgstr "Illes Shetland"
-
-#: .\contrib\localflavor\uk\uk_regions.py:84
-msgid "Strathclyde"
-msgstr "Strathclyde"
-
-#: .\contrib\localflavor\uk\uk_regions.py:85
-msgid "Tayside"
-msgstr "Tayside"
-
-#: .\contrib\localflavor\uk\uk_regions.py:86
-msgid "Western Isles"
-msgstr "Illes Occidentals"
-
-#: .\contrib\localflavor\uk\uk_regions.py:90
-msgid "England"
-msgstr "Anglaterra"
-
-#: .\contrib\localflavor\uk\uk_regions.py:91
-msgid "Northern Ireland"
-msgstr "Irlanda del Nord"
-
-#: .\contrib\localflavor\uk\uk_regions.py:92
-msgid "Scotland"
-msgstr "Escòcia"
-
-#: .\contrib\localflavor\uk\uk_regions.py:93
-msgid "Wales"
-msgstr "Gal·les"
-
-#: .\contrib\localflavor\us\forms.py:17
-msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "Introduïu un codi postal en el format XXXXX o XXXXX-XXXX."
-
-#: .\contrib\localflavor\us\forms.py:26
-msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "Els números de telèfon han d'estar en el format XXX-XXX-XXXX."
-
-#: .\contrib\localflavor\us\forms.py:55
-msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr ""
-"Introduïu un número vàlid de la Seguretat Social dels E.U.A. en el format "
-"XXX-XX-XXXX."
-
-#: .\contrib\localflavor\us\forms.py:88
-msgid "Enter a U.S. state or territory."
-msgstr "Introduïu un estat o territori dels E.U.A."
-
-#: .\contrib\localflavor\us\models.py:8
-msgid "U.S. state (two uppercase letters)"
-msgstr "Estat dels E.U.A. (dues lletres majúscules)"
-
-#: .\contrib\localflavor\us\models.py:17
-msgid "Phone number"
-msgstr "Número de telèfon"
-
-#: .\contrib\localflavor\uy\forms.py:28
-msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
-msgstr ""
-"Introduïu un número CI vàlid en el format X.XXX.XXX-X,XXXXXXX-X o XXXXXXXX."
-
-#: .\contrib\localflavor\uy\forms.py:30
-msgid "Enter a valid CI number."
-msgstr "Introduïu un número CI vàlid."
-
-#: .\contrib\localflavor\za\forms.py:21
-msgid "Enter a valid South African ID number"
-msgstr "Introduïu un número d'Identitat Sud Africà vàlid"
-
-#: .\contrib\localflavor\za\forms.py:55
-msgid "Enter a valid South African postal code"
-msgstr "Introduïu un codi postal Sud Africà vàlid."
-
-#: .\contrib\localflavor\za\za_provinces.py:4
-msgid "Eastern Cape"
-msgstr "Cap Oriental"
-
-#: .\contrib\localflavor\za\za_provinces.py:5
-msgid "Free State"
-msgstr "Estat lliure"
-
-#: .\contrib\localflavor\za\za_provinces.py:6
-msgid "Gauteng"
-msgstr "Gauteng"
-
-#: .\contrib\localflavor\za\za_provinces.py:7
-msgid "KwaZulu-Natal"
-msgstr "KwaZulu-Natal"
-
-#: .\contrib\localflavor\za\za_provinces.py:8
-msgid "Limpopo"
-msgstr "Limpopo"
-
-#: .\contrib\localflavor\za\za_provinces.py:9
-msgid "Mpumalanga"
-msgstr "Mpumalanga"
-
-#: .\contrib\localflavor\za\za_provinces.py:10
-msgid "Northern Cape"
-msgstr "Cap Nord"
-
-#: .\contrib\localflavor\za\za_provinces.py:11
-msgid "North West"
-msgstr "Cap Oest"
-
-#: .\contrib\localflavor\za\za_provinces.py:12
-msgid "Western Cape"
-msgstr "Cap Occidental"
-
-#: .\contrib\messages\tests\base.py:101
-msgid "lazy message"
-msgstr "missatge gandul"
-
-#: .\contrib\redirects\models.py:7
-msgid "redirect from"
-msgstr "redirecció des de"
-
-#: .\contrib\redirects\models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Aquesta ruta hauria de ser un camí absolut, excloent-ne el nom del domini. "
-"Exemple '/events/search/'."
-
-#: .\contrib\redirects\models.py:9
-msgid "redirect to"
-msgstr "redirigir a"
-
-#: .\contrib\redirects\models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Això pot ser bé una ruta absoluta (com a sobre) o una URL completa que "
-"comenci per 'http://'."
-
-#: .\contrib\redirects\models.py:13
-msgid "redirect"
-msgstr "redirecció"
-
-#: .\contrib\redirects\models.py:14
-msgid "redirects"
-msgstr "redireccions"
-
-#: .\contrib\sessions\models.py:45
-msgid "session key"
-msgstr "clau de la sessió"
-
-#: .\contrib\sessions\models.py:47
-msgid "session data"
-msgstr "dades de la sessió"
-
-#: .\contrib\sessions\models.py:48
-msgid "expire date"
-msgstr "data de caducitat"
-
-#: .\contrib\sessions\models.py:53
-msgid "session"
-msgstr "sessió"
-
-#: .\contrib\sessions\models.py:54
-msgid "sessions"
-msgstr "sessions"
-
-#: .\contrib\sites\models.py:32
-msgid "domain name"
-msgstr "nom del domini"
-
-#: .\contrib\sites\models.py:33
-msgid "display name"
-msgstr "nom per mostrar"
-
-#: .\contrib\sites\models.py:39
-msgid "sites"
-msgstr "llocs"
-
-#: .\core\validators.py:20 .\forms\fields.py:66
+#: core/validators.py:20 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "Introduïu un valor vàlid."
 
-#: .\core\validators.py:87 .\forms\fields.py:528
+#: core/validators.py:87 forms/fields.py:572
 msgid "Enter a valid URL."
 msgstr "Introduïu una URL vàlida."
 
-#: .\core\validators.py:89 .\forms\fields.py:529
+#: core/validators.py:89 forms/fields.py:573
 msgid "This URL appears to be a broken link."
 msgstr "Aquesta URL sembla ser un enllaç trencat."
 
-#: .\core\validators.py:123 .\forms\fields.py:877
+#: core/validators.py:120 forms/fields.py:447
+msgid "Enter a valid e-mail address."
+msgstr "Introduïu una adreça de correu vàlida."
+
+#: core/validators.py:123 forms/fields.py:956
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Introduïu un 'slug' vàlid, consistent en lletres, números, guions o guions "
 "baixos."
 
-#: .\core\validators.py:126 .\forms\fields.py:870
+#: core/validators.py:126 forms/fields.py:949
 msgid "Enter a valid IPv4 address."
 msgstr "Introduïu una adreça IPv4 vàlida."
 
-#: .\core\validators.py:129 .\db\models\fields\__init__.py:572
+#: core/validators.py:129 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "Introduïu només dígits separats per comes."
 
-#: .\core\validators.py:135
+#: core/validators.py:135
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr ""
-"Assegureu-vos que el valor sigui %(limit_value)s (és %(show_value)s)."
+msgstr "Assegureu-vos que el valor sigui %(limit_value)s (és %(show_value)s)."
 
-#: .\core\validators.py:153 .\forms\fields.py:204 .\forms\fields.py:256
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr "Assegureu-vos que aquest valor sigui menor o igual que %(limit_value)s."
+msgstr ""
+"Assegureu-vos que aquest valor sigui menor o igual que %(limit_value)s."
 
-#: .\core\validators.py:158 .\forms\fields.py:205 .\forms\fields.py:257
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr "Assegureu-vos que aquest valor sigui més gran o igual que "
-"%(limit_value)s."
+msgstr ""
+"Assegureu-vos que aquest valor sigui més gran o igual que %(limit_value)s."
 
-#: .\core\validators.py:164
+#: core/validators.py:164
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
-"Assegureu-vos que el valor tingui com a mínim %(limit_value)d caràcters "
-"(en té %(show_value)d)."
+"Assegureu-vos que el valor tingui com a mínim %(limit_value)d caràcters (en "
+"té %(show_value)d)."
 
-#: .\core\validators.py:170
+#: core/validators.py:170
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
-"Assegureu-vos que el valor tingui com a màxim %(limit_value)d caràcters "
-"(en té %(show_value)d)."
+"Assegureu-vos que el valor tingui com a màxim %(limit_value)d caràcters (en "
+"té %(show_value)d)."
 
-#: .\db\models\base.py:823
+#: db/models/base.py:765
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "El camp %(field_name)s ha de ser únic per a %(lookup)s %(date_field)s."
 
-#: .\db\models\base.py:838 .\db\models\base.py:846
+#: db/models/base.py:780 db/models/base.py:788
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ja existeix %(model_name)s amb aquest %(field_label)s."
 
-#: .\db\models\fields\__init__.py:63
+#: db/models/base.py:787 forms/models.py:581
+msgid "and"
+msgstr "i"
+
+#: db/models/fields/__init__.py:63
 #, python-format
 msgid "Value %r is not a valid choice."
 msgstr "El valor %r no és una opció vàlida."
 
-#: .\db\models\fields\__init__.py:64
+#: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
 msgstr "Aquest camp no pot ser nul."
 
-#: .\db\models\fields\__init__.py:65
+#: db/models/fields/__init__.py:65
 msgid "This field cannot be blank."
 msgstr "Aquest camp no pot estar en blanc."
 
-#: .\db\models\fields\__init__.py:70
+#: db/models/fields/__init__.py:70
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Camp del tipus: %(field_type)s"
 
-#: .\db\models\fields\__init__.py:451 .\db\models\fields\__init__.py:852
-#: .\db\models\fields\__init__.py:961 .\db\models\fields\__init__.py:972
-#: .\db\models\fields\__init__.py:999
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
 msgid "Integer"
 msgstr "Enter"
 
-#: .\db\models\fields\__init__.py:455 .\db\models\fields\__init__.py:850
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
 msgid "This value must be an integer."
 msgstr "Aquest valor ha de ser un enter."
 
-#: .\db\models\fields\__init__.py:490
+#: db/models/fields/__init__.py:493
 msgid "This value must be either True or False."
 msgstr "Aquest valor ha de ser True (Cert) o False (Fals)"
 
-#: .\db\models\fields\__init__.py:492
+#: db/models/fields/__init__.py:495
 msgid "Boolean (Either True or False)"
 msgstr "Booleà (Cert o Fals)"
 
-#: .\db\models\fields\__init__.py:539 .\db\models\fields\__init__.py:982
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Cadena (de fins a %(max_length)s)"
 
-#: .\db\models\fields\__init__.py:567
+#: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
 msgstr "Enters separats per comes"
 
-#: .\db\models\fields\__init__.py:581
+#: db/models/fields/__init__.py:584
 msgid "Date (without time)"
 msgstr "Data (sense hora)"
 
-#: .\db\models\fields\__init__.py:585
+#: db/models/fields/__init__.py:588
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Introduïu una data vàlida en el forma AAAA-MM-DD."
 
-#: .\db\models\fields\__init__.py:586
+#: db/models/fields/__init__.py:589
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Data invàlida: %s"
 
-#: .\db\models\fields\__init__.py:667
+#: db/models/fields/__init__.py:670
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
 "Introduïu un data/hora vàlida en format YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
 
-#: .\db\models\fields\__init__.py:669
+#: db/models/fields/__init__.py:672
 msgid "Date (with time)"
 msgstr "Data (amb hora)"
 
-#: .\db\models\fields\__init__.py:735
+#: db/models/fields/__init__.py:746
 msgid "This value must be a decimal number."
 msgstr "Aquest valor ha de ser un número decimal."
 
-#: .\db\models\fields\__init__.py:737
+#: db/models/fields/__init__.py:748
 msgid "Decimal number"
 msgstr "Número decimal"
 
-#: .\db\models\fields\__init__.py:792
+#: db/models/fields/__init__.py:803
 msgid "E-mail address"
 msgstr "Adreça de correu electrònic"
 
-#: .\db\models\fields\__init__.py:799 .\db\models\fields\files.py:220
-#: .\db\models\fields\files.py:331
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
 msgid "File path"
 msgstr "Ruta del fitxer"
 
-#: .\db\models\fields\__init__.py:822
+#: db/models/fields/__init__.py:841
 msgid "This value must be a float."
 msgstr "Aquest valor ha de ser un número amb punt de coma flotant."
 
-#: .\db\models\fields\__init__.py:824
+#: db/models/fields/__init__.py:843
 msgid "Floating point number"
 msgstr "Número de coma flotant"
 
-#: .\db\models\fields\__init__.py:883
+#: db/models/fields/__init__.py:902
 msgid "Big (8 byte) integer"
 msgstr "Enter gran (8 bytes)"
 
-#: .\db\models\fields\__init__.py:912
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "Adreça IP"
+
+#: db/models/fields/__init__.py:931
 msgid "This value must be either None, True or False."
 msgstr "Aquest valor ha de ser None (Cap), True (Cert) o False (Fals)"
 
-#: .\db\models\fields\__init__.py:914
+#: db/models/fields/__init__.py:933
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleà (Cert, Fals o Cap ('None'))"
 
-#: .\db\models\fields\__init__.py:1005
+#: db/models/fields/__init__.py:1024
 msgid "Text"
 msgstr "Text"
 
-#: .\db\models\fields\__init__.py:1021
+#: db/models/fields/__init__.py:1040
 msgid "Time"
 msgstr "Hora"
 
-#: .\db\models\fields\__init__.py:1025
+#: db/models/fields/__init__.py:1044
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Introduïu una hora vàlida en el format HH:MM[:ss[.uuuuuu]]."
 
-#: .\db\models\fields\__init__.py:1109
+#: db/models/fields/__init__.py:1120
+msgid "URL"
+msgstr "URL"
+
+#: db/models/fields/__init__.py:1136
 msgid "XML text"
 msgstr "Text XML"
 
-#: .\db\models\fields\related.py:799
+#: db/models/fields/related.py:804
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "No existeix el model %(model)s amb la clau primària %(pk)r."
 
-#: .\db\models\fields\related.py:801
+#: db/models/fields/related.py:806
 msgid "Foreign Key (type determined by related field)"
 msgstr "Clau forana (tipus determinat pel camp relacionat)"
 
-#: .\db\models\fields\related.py:918
+#: db/models/fields/related.py:928
 msgid "One-to-one relationship"
 msgstr "Inter-relació un-a-un"
 
-#: .\db\models\fields\related.py:980
+#: db/models/fields/related.py:990
 msgid "Many-to-many relationship"
 msgstr "Inter-relació molts-a-molts"
 
-#: .\db\models\fields\related.py:1000
+#: db/models/fields/related.py:1010
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Premeu la tecla \"Control\", o \"Command\" en un Mac, per seleccionar més "
 "d'un valor."
 
-#: .\db\models\fields\related.py:1061
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"Si us plau, introduïu els IDs de %(self)s vàlids. El valor %(value)r és "
-"invàlid."
-msgstr[1] ""
-"Si us plau, introduïu IDs de %(self)s vàlids. Els valors %(value)r són "
-"invàlids."
-
-#: .\forms\fields.py:65
+#: forms/fields.py:66
 msgid "This field is required."
 msgstr "Aquest camp és obligatori."
 
-#: .\forms\fields.py:203
+#: forms/fields.py:221
 msgid "Enter a whole number."
 msgstr "Introduïu un número sencer."
 
-#: .\forms\fields.py:234 .\forms\fields.py:255
+#: forms/fields.py:252 forms/fields.py:273
 msgid "Enter a number."
 msgstr "Introduïu un número."
 
-#: .\forms\fields.py:258
+#: forms/fields.py:276
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Assegureu-vos que no hi ha més de %s dígits en total."
 
-#: .\forms\fields.py:259
+#: forms/fields.py:277
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Assegureu-vos que no hi ha més de %s decimals."
 
-#: .\forms\fields.py:260
+#: forms/fields.py:278
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Assegureu-vos que no hi ha més de %s dígits decimals."
 
-#: .\forms\fields.py:322 .\forms\fields.py:837
+#: forms/fields.py:340 forms/fields.py:916
 msgid "Enter a valid date."
 msgstr "Introduïu una data vàlida."
 
-#: .\forms\fields.py:350 .\forms\fields.py:838
+#: forms/fields.py:368 forms/fields.py:917
 msgid "Enter a valid time."
 msgstr "Introduïu una hora vàlida."
 
-#: .\forms\fields.py:376
+#: forms/fields.py:394
 msgid "Enter a valid date/time."
 msgstr "Introduïu una data/hora vàlides."
 
-#: .\forms\fields.py:434
+#: forms/fields.py:458
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "No s'ha enviat cap fitxer. Comproveu el tipus de codificació del formulari."
 
-#: .\forms\fields.py:435
+#: forms/fields.py:459
 msgid "No file was submitted."
 msgstr "No s'ha enviat cap fitxer."
 
-#: .\forms\fields.py:436
+#: forms/fields.py:460
 msgid "The submitted file is empty."
 msgstr "El fitxer enviat està buit."
 
-#: .\forms\fields.py:437
+#: forms/fields.py:461
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -4786,7 +560,11 @@ msgstr ""
 "Assegureu-vos que el valor té com a màxim %(max)d caràcters (en té %(length)"
 "d)."
 
-#: .\forms\fields.py:472
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: forms/fields.py:516
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -4794,32 +572,36 @@ msgstr ""
 "Carregueu una imatge vàlida. El fitxer que heu carregat no era una imatge o "
 "estava corrupte."
 
-#: .\forms\fields.py:595 .\forms\fields.py:670
+#: forms/fields.py:648 forms/fields.py:723
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Esculliu una opció vàlida. %(value)s no és una de les opcions vàlides."
 
-#: .\forms\fields.py:671 .\forms\fields.py:733 .\forms\models.py:1002
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
 msgid "Enter a list of values."
 msgstr "Introduïu una llista de valors."
 
-#: .\forms\formsets.py:298 .\forms\formsets.py:300
+#: forms/formsets.py:308 forms/formsets.py:310
 msgid "Order"
 msgstr "Ordre"
 
-#: .\forms\models.py:562
+#: forms/formsets.py:312
+msgid "Delete"
+msgstr "Eliminar"
+
+#: forms/models.py:575
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Si us plau, corregiu la dada duplicada per a %(field)s."
 
-#: .\forms\models.py:566
+#: forms/models.py:579
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "Si us plau, corregiu la dada duplicada per a %(field)s, la qual ha de ser "
 "única."
 
-#: .\forms\models.py:572
+#: forms/models.py:585
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -4828,390 +610,459 @@ msgstr ""
 "Si us plau, corregiu la dada duplicada per a %(field_name)s, la qual ha de "
 "ser única per a %(lookup)s en %(date_field)s."
 
-#: .\forms\models.py:580
+#: forms/models.py:593
 msgid "Please correct the duplicate values below."
 msgstr "Si us plau, corregiu els valors duplicats a sota."
 
-#: .\forms\models.py:855
+#: forms/models.py:868
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 "La clau forana en línia no coincideix amb la clau primària de la instància "
 "mare."
 
-#: .\forms\models.py:921
+#: forms/models.py:929
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Esculli una opció vàlida. Aquesta opció no és una de les opcions disponibles."
 
-#: .\forms\models.py:1003
+#: forms/models.py:1019
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Escolliu una opció vàlida; %s no és una de les opcions vàlides."
 
-#: .\forms\models.py:1005
+#: forms/models.py:1021
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" no és un valor vàlid per a una clau primària."
 
-#: .\template\defaultfilters.py:776
+#: forms/widgets.py:299
+#, fuzzy
+msgid "Currently"
+msgstr "Actualment:"
+
+#: forms/widgets.py:300
+msgid "Change"
+msgstr "Modificar"
+
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "Clare"
+
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr "Desconegut"
+
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "Sí"
+
+#: forms/widgets.py:547
+msgid "No"
+msgstr "No"
+
+#: template/defaultfilters.py:794
 msgid "yes,no,maybe"
 msgstr "sí,no,potser"
 
-#: .\template\defaultfilters.py:807
+#: template/defaultfilters.py:825
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: .\template\defaultfilters.py:809
+#: template/defaultfilters.py:827
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: .\template\defaultfilters.py:811
+#: template/defaultfilters.py:829
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: .\template\defaultfilters.py:812
+#: template/defaultfilters.py:831
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: .\utils\dateformat.py:42
+#: template/defaultfilters.py:833
+#, fuzzy, python-format
+msgid "%.1f TB"
+msgstr "%.1f KB"
+
+#: template/defaultfilters.py:834
+#, fuzzy, python-format
+msgid "%.1f PB"
+msgstr "%.1f KB"
+
+#: utils/dateformat.py:42
 msgid "p.m."
 msgstr "p.m."
 
-#: .\utils\dateformat.py:43
+#: utils/dateformat.py:43
 msgid "a.m."
 msgstr "a.m."
 
-#: .\utils\dateformat.py:48
+#: utils/dateformat.py:48
 msgid "PM"
 msgstr "PM"
 
-#: .\utils\dateformat.py:49
+#: utils/dateformat.py:49
 msgid "AM"
 msgstr "AM"
 
-#: .\utils\dateformat.py:98
+#: utils/dateformat.py:98
 msgid "midnight"
 msgstr "mitjanit"
 
-#: .\utils\dateformat.py:100
+#: utils/dateformat.py:100
 msgid "noon"
 msgstr "migdia"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Monday"
 msgstr "Dilluns"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Tuesday"
 msgstr "Dimarts"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Wednesday"
 msgstr "Dimecres"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Thursday"
 msgstr "Dijous"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Friday"
 msgstr "Divendres"
 
-#: .\utils\dates.py:7
+#: utils/dates.py:7
 msgid "Saturday"
 msgstr "Dissabte"
 
-#: .\utils\dates.py:7
+#: utils/dates.py:7
 msgid "Sunday"
 msgstr "Diumenge"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Mon"
 msgstr "dl."
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Tue"
 msgstr "dt."
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Wed"
 msgstr "dc."
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Thu"
 msgstr "dj."
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Fri"
 msgstr "dv."
 
-#: .\utils\dates.py:11
+#: utils/dates.py:11
 msgid "Sat"
 msgstr "ds."
 
-#: .\utils\dates.py:11
+#: utils/dates.py:11
 msgid "Sun"
 msgstr "dg."
 
-#: .\utils\dates.py:18
+#: utils/dates.py:18
 msgid "January"
 msgstr "gener"
 
-#: .\utils\dates.py:18
+#: utils/dates.py:18
 msgid "February"
 msgstr "febrer"
 
-#: .\utils\dates.py:18 .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "març"
 
-#: .\utils\dates.py:18 .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "abril"
 
-#: .\utils\dates.py:18 .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "maig"
 
-#: .\utils\dates.py:18 .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "juny"
 
-#: .\utils\dates.py:19 .\utils\dates.py:31
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "juliol"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "August"
 msgstr "agost"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "September"
 msgstr "setembre"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "October"
 msgstr "octubre"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "November"
 msgstr "novembre"
 
-#: .\utils\dates.py:20
+#: utils/dates.py:20
 msgid "December"
 msgstr "desembre"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "jan"
 msgstr "gen."
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "feb"
 msgstr "feb."
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "mar"
 msgstr "març"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "apr"
 msgstr "abr."
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "may"
 msgstr "maig"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "jun"
 msgstr "juny"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "jul"
 msgstr "jul."
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "aug"
 msgstr "ago."
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "sep"
 msgstr "set."
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "oct"
 msgstr "oct."
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "nov"
 msgstr "nov."
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "dec"
 msgstr "des."
 
-#: .\utils\dates.py:31
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "gen."
 
-#: .\utils\dates.py:31
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "feb."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "ago."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "set."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "oct."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "nov."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "des."
 
-#: .\utils\text.py:130
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "alt. month"
+msgid "January"
+msgstr "gener"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "alt. month"
+msgid "February"
+msgstr "febrer"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "alt. month"
+msgid "March"
+msgstr "març"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "alt. month"
+msgid "April"
+msgstr "abril"
+
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "alt. month"
+msgid "May"
+msgstr "maig"
+
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "alt. month"
+msgid "June"
+msgstr "juny"
+
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "alt. month"
+msgid "July"
+msgstr "juliol"
+
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "alt. month"
+msgid "August"
+msgstr "agost"
+
+#: utils/dates.py:43
+#, fuzzy
+msgctxt "alt. month"
+msgid "September"
+msgstr "setembre"
+
+#: utils/dates.py:44
+#, fuzzy
+msgctxt "alt. month"
+msgid "October"
+msgstr "octubre"
+
+#: utils/dates.py:45
+#, fuzzy
+msgctxt "alt. month"
+msgid "November"
+msgstr "novembre"
+
+#: utils/dates.py:46
+#, fuzzy
+msgctxt "alt. month"
+msgid "December"
+msgstr "desembre"
+
+#: utils/text.py:136
 msgid "or"
 msgstr "o"
 
-#: .\utils\timesince.py:21
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
+
+#: utils/timesince.py:21
 msgid "year"
 msgid_plural "years"
 msgstr[0] "any"
 msgstr[1] "anys"
 
-#: .\utils\timesince.py:22
+#: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "mes"
 msgstr[1] "mesos"
 
-#: .\utils\timesince.py:23
+#: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "setmana"
 msgstr[1] "setmanes"
 
-#: .\utils\timesince.py:24
+#: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "dia"
 msgstr[1] "dies"
 
-#: .\utils\timesince.py:25
+#: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "hora"
 msgstr[1] "hores"
 
-#: .\utils\timesince.py:26
+#: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minut"
 msgstr[1] "minuts"
 
-#: .\utils\timesince.py:45
+#: utils/timesince.py:45
 msgid "minutes"
 msgstr "minuts"
 
-#: .\utils\timesince.py:50
+#: utils/timesince.py:50
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: .\utils\timesince.py:56
+#: utils/timesince.py:56
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: .\utils\translation\trans_real.py:519
+#: utils/translation/trans_real.py:560
 msgid "DATE_FORMAT"
 msgstr "j \\de F \\de Y"
 
-#: .\utils\translation\trans_real.py:520
+#: utils/translation/trans_real.py:561
 msgid "DATETIME_FORMAT"
 msgstr "j \\de F \\de Y, H:i"
 
-#: .\utils\translation\trans_real.py:521
+#: utils/translation/trans_real.py:562
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: .\utils\translation\trans_real.py:542
+#: utils/translation/trans_real.py:583
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F \\de Y"
 
-#: .\utils\translation\trans_real.py:543
+#: utils/translation/trans_real.py:584
 msgid "MONTH_DAY_FORMAT"
 msgstr "j \\de F"
 
-#: .\views\generic\create_update.py:115
+#: views/generic/create_update.py:121
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "El/la %(verbose_name)s s'ha creat amb èxit."
 
-#: .\views\generic\create_update.py:158
+#: views/generic/create_update.py:164
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "El/la %(verbose_name)s s'ha actualtzat amb èxit."
 
-#: .\views\generic\create_update.py:201
+#: views/generic/create_update.py:207
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "El/la %(verbose_name)s s'ha eliminat."
-
-#~ msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-#~ msgstr "Un o més %(fieldname)s en %(name)s: %(obj)s"
-
-#~ msgid "One or more %(fieldname)s in %(name)s:"
-#~ msgstr "Un o més %(fieldname)s en %(name)s:"
-
-#~ msgid "Old password:"
-#~ msgstr "Contrasenya antiga:"
-
-#~ msgid "Relation to parent model"
-#~ msgstr "Relació amb el model pare"
-
-#~ msgid "Add user"
-#~ msgstr "Afegir usuari"
-
-#~ msgid "Comment moderation queue"
-#~ msgstr "Cua de moderació de comentaris"
-
-#~ msgid "No comments to moderate"
-#~ msgstr "No hi ha comentaris per moderar"
-
-#~ msgid "Email"
-#~ msgstr "Correu electrònic"
-
-#~ msgid "Authenticated?"
-#~ msgstr "Autenticat?"
-
-#~ msgid "IP Address"
-#~ msgstr "Adreça IP"
-
-#~ msgid "Date posted"
-#~ msgstr "Data d'enviament"
-
-#~ msgid "yes"
-#~ msgstr "sí"
-
-#~ msgid "no"
-#~ msgstr "no"
-
-#~ msgid "verbose_name"
-#~ msgid_plural "verbose_name_plural"
-#~ msgstr[0] "verbose_name"
-#~ msgstr[1] "verbose_name_plural"

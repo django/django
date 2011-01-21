@@ -553,12 +553,12 @@ msgid "Search"
 msgstr "Найти"
 
 #: templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] "Все объекты общим количеством %(total_count)s были выбраны"
-msgstr[1] "Выбраны все %(total_count)s объекта"
-msgstr[2] "Выбраны все %(total_count)s объектов"
+msgstr[0] "%(counter)s результат"
+msgstr[1] "%(counter)s результата"
+msgstr[2] "%(counter)s результатов"
 
 #: templates/admin/search_form.html:10
 #, python-format

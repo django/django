@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-30 01:08+0200\n"
+"POT-Creation-Date: 2010-12-29 21:02+0100\n"
 "PO-Revision-Date: 2008-08-30 01:11+0200\n"
 "Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
@@ -19,3677 +19,571 @@ msgid "Arabic"
 msgstr "Arab"
 
 #: conf/global_settings.py:45
-msgid "Bengali"
-msgstr "Bengáli"
-
-#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "Bolgár"
 
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "Bengáli"
+
 #: conf/global_settings.py:47
+#, fuzzy
+msgid "Bosnian"
+msgstr "Észt"
+
+#: conf/global_settings.py:48
 msgid "Catalan"
 msgstr "Katalán"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Czech"
 msgstr "Cseh"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Welsh"
 msgstr "Walesi"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Danish"
 msgstr "Dán"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "German"
 msgstr "Német"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Greek"
 msgstr "Görög"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "English"
 msgstr "Angol"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "British English"
+msgstr "Angol"
+
+#: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "Spanyol"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:57
+#, fuzzy
+msgid "Argentinian Spanish"
+msgstr "Argentín spanyol"
+
+#: conf/global_settings.py:58
 msgid "Estonian"
 msgstr "Észt"
 
-#: conf/global_settings.py:56
-msgid "Argentinean Spanish"
-msgstr "Argentín spanyol"
-
-#: conf/global_settings.py:57
+#: conf/global_settings.py:59
 msgid "Basque"
 msgstr "Baszk "
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:60
 msgid "Persian"
 msgstr "Perzsa"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:61
 msgid "Finnish"
 msgstr "Finn"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:62
 msgid "French"
 msgstr "Francia"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:63
+#, fuzzy
+msgid "Frisian"
+msgstr "Friesland"
+
+#: conf/global_settings.py:64
 msgid "Irish"
 msgstr "Ír"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:65
 msgid "Galician"
 msgstr "Gall"
 
-#: conf/global_settings.py:63
-msgid "Hungarian"
-msgstr "Magyar"
-
-#: conf/global_settings.py:64
+#: conf/global_settings.py:66
 msgid "Hebrew"
 msgstr "Héber"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:67
+#, fuzzy
+msgid "Hindi"
+msgstr "Highland"
+
+#: conf/global_settings.py:68
 msgid "Croatian"
 msgstr "Horvát"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr "Magyar"
+
+#: conf/global_settings.py:70
+#, fuzzy
+msgid "Indonesian"
+msgstr "Macedón"
+
+#: conf/global_settings.py:71
 msgid "Icelandic"
 msgstr "Izlandi"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:72
 msgid "Italian"
 msgstr "Olasz"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:73
 msgid "Japanese"
 msgstr "Japán"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:74
 msgid "Georgian"
 msgstr "Grúz"
 
-#: conf/global_settings.py:70
-msgid "Korean"
-msgstr "Koreai"
-
-#: conf/global_settings.py:71
+#: conf/global_settings.py:75
 msgid "Khmer"
 msgstr "Khmer"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:76
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:73
-msgid "Latvian"
-msgstr "Lett"
+#: conf/global_settings.py:77
+msgid "Korean"
+msgstr "Koreai"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:78
 msgid "Lithuanian"
 msgstr "Litván"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:79
+msgid "Latvian"
+msgstr "Lett"
+
+#: conf/global_settings.py:80
 msgid "Macedonian"
 msgstr "Macedón"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:81
+#, fuzzy
+msgid "Malayalam"
+msgstr "Malaga"
+
+#: conf/global_settings.py:82
+#, fuzzy
+msgid "Mongolian"
+msgstr "Macedón"
+
+#: conf/global_settings.py:83
 msgid "Dutch"
 msgstr "Holland"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:84
 msgid "Norwegian"
 msgstr "Norvég"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:85
+#, fuzzy
+msgid "Norwegian Bokmal"
+msgstr "Norvég"
+
+#: conf/global_settings.py:86
+#, fuzzy
+msgid "Norwegian Nynorsk"
+msgstr "Norvég"
+
+#: conf/global_settings.py:87
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Polish"
 msgstr "Lengyel"
 
-#: conf/global_settings.py:79
-msgid "Portugese"
+#: conf/global_settings.py:89
+#, fuzzy
+msgid "Portuguese"
 msgstr "Portugál"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:90
 msgid "Brazilian Portuguese"
 msgstr "Brazíliai portugál"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:91
 msgid "Romanian"
 msgstr "Román"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:92
 msgid "Russian"
 msgstr "Orosz"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:93
 msgid "Slovak"
 msgstr "Szlovák"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:94
 msgid "Slovenian"
 msgstr "Szlovén"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:95
+#, fuzzy
+msgid "Albanian"
+msgstr "Alacant"
+
+#: conf/global_settings.py:96
 msgid "Serbian"
 msgstr "Szerb"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:97
+#, fuzzy
+msgid "Serbian Latin"
+msgstr "Szerb"
+
+#: conf/global_settings.py:98
 msgid "Swedish"
 msgstr "Svéd"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:99
 msgid "Tamil"
 msgstr "Tamil"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:100
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:101
+#, fuzzy
+msgid "Thai"
+msgstr "Tamil"
+
+#: conf/global_settings.py:102
 msgid "Turkish"
 msgstr "Török"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:103
 msgid "Ukrainian"
 msgstr "Ukrán"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:104
+#, fuzzy
+msgid "Vietnamese"
+msgstr "Bécs"
+
+#: conf/global_settings.py:105
 msgid "Simplified Chinese"
 msgstr "Egyszerű kínai"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:106
 msgid "Traditional Chinese"
 msgstr "Hagyományos kínai"
 
-#: contrib/admin/filterspecs.py:44
-#, python-format
+#: core/validators.py:20 forms/fields.py:67
+msgid "Enter a valid value."
+msgstr "Adjon meg egy érvényes értéket."
+
+#: core/validators.py:87 forms/fields.py:572
+msgid "Enter a valid URL."
+msgstr "Adjon meg egy érvényes URL-t."
+
+#: core/validators.py:89 forms/fields.py:573
+msgid "This URL appears to be a broken link."
+msgstr "Ez a hivatkozás törött linknek tűnik."
+
+#: core/validators.py:120 forms/fields.py:447
+msgid "Enter a valid e-mail address."
+msgstr "Írjon be egy érvényes e-mail címet."
+
+#: core/validators.py:123 forms/fields.py:956
 msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"<h3>Szerző: %s:</h3>\n"
-"<ul>\n"
+"Az URL barát cím csak betűket, számokat, aláhúzásokat és kötőjeleket "
+"tartalmazhat."
 
-#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:92
-#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
-msgid "All"
-msgstr "Mind"
+#: core/validators.py:126 forms/fields.py:949
+msgid "Enter a valid IPv4 address."
+msgstr "Írjon be egy érvényes IPv4 címet."
 
-#: contrib/admin/filterspecs.py:113
-msgid "Any date"
-msgstr "Bármely dátum"
+#: core/validators.py:129 db/models/fields/__init__.py:575
+msgid "Enter only digits separated by commas."
+msgstr "Csak számokat adjon meg, vesszővel elválasztva."
 
-#: contrib/admin/filterspecs.py:114
-msgid "Today"
-msgstr "Ma"
+#: core/validators.py:135
+#, fuzzy, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"Bizonyosodjon meg arról, hogy ez az érték legalább %(min)d karaktert "
+"tartalmaz (jelenlegi hossza: %(length)d)."
 
-#: contrib/admin/filterspecs.py:117
-msgid "Past 7 days"
-msgstr "Utolsó 7 nap"
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#, fuzzy, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Bizonyosodjon meg arról, hogy az érték %s vagy kisebb."
 
-#: contrib/admin/filterspecs.py:119
-msgid "This month"
-msgstr "Ez a hónap"
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#, fuzzy, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Bizonyosodjon meg arról, hogy az érték %s vagy nagyobb."
 
-#: contrib/admin/filterspecs.py:121
-msgid "This year"
-msgstr "Ez az év"
+#: core/validators.py:164
+#, fuzzy, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+"Bizonyosodjon meg arról, hogy ez az érték legalább %(min)d karaktert "
+"tartalmaz (jelenlegi hossza: %(length)d)."
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
-#: newforms/widgets.py:231 oldforms/__init__.py:592
-msgid "Yes"
-msgstr "Igen"
+#: core/validators.py:170
+#, fuzzy, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+"Bizonyosodjon meg arról, hogy ez az érték legfeljebb %(max)d karaktert "
+"tartalmaz (jelenlegi hossza: %(length)d)."
 
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:390
-#: newforms/widgets.py:231 oldforms/__init__.py:592
-msgid "No"
-msgstr "Nem"
+#: db/models/base.py:765
+#, fuzzy, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "Ezt a mezőt meg kell adni, ha %(field)s értéke %(value)s"
 
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:390
-#: newforms/widgets.py:231 oldforms/__init__.py:592
-msgid "Unknown"
-msgstr "Ismeretlen"
+#: db/models/base.py:780 db/models/base.py:788
+#, fuzzy, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr ""
+"A megadott %(field)s mezőhöz már létezik %(type)s típusú %(object)s elem."
 
-#: contrib/admin/models.py:19
-msgid "action time"
-msgstr "művelet időpontja"
-
-#: contrib/admin/models.py:22
-msgid "object id"
-msgstr "objektum id"
-
-#: contrib/admin/models.py:23
-msgid "object repr"
-msgstr "objektum repr"
-
-#: contrib/admin/models.py:24
-msgid "action flag"
-msgstr "művelet jelölés"
-
-#: contrib/admin/models.py:25
-msgid "change message"
-msgstr "üzenet módosítása"
-
-#: contrib/admin/models.py:28
-msgid "log entry"
-msgstr "naplóbejegyzés"
-
-#: contrib/admin/models.py:29
-msgid "log entries"
-msgstr "naplóbejegyzések"
-
-#: contrib/admin/options.py:56 contrib/admin/options.py:120
-msgid "None"
-msgstr "Egyik sem"
-
-#: contrib/admin/options.py:334
-#, python-format
-msgid "Changed %s."
-msgstr "%s módosítva."
-
-#: contrib/admin/options.py:334 contrib/admin/options.py:344
-#: core/validators.py:283 db/models/manipulators.py:309
+#: db/models/base.py:787 forms/models.py:581
 msgid "and"
 msgstr "és"
 
-#: contrib/admin/options.py:339
+#: db/models/fields/__init__.py:63
 #, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s létrehozva."
-
-#: contrib/admin/options.py:343
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s tulajdonságai (%(list)s) megváltoztak."
-
-#: contrib/admin/options.py:348
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s törlésre került."
-
-#: contrib/admin/options.py:352
-msgid "No fields changed."
-msgstr "Egy mező sem változott."
-
-# TODO
-#: contrib/admin/options.py:413 contrib/admin/views/auth.py:20
-#: contrib/auth/admin.py:51
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva."
-
-#: contrib/admin/options.py:417 contrib/admin/options.py:450
-#: contrib/admin/views/auth.py:25 contrib/auth/admin.py:57
-msgid "You may edit it again below."
-msgstr "Alább ismét szerkesztheti."
-
-#: contrib/admin/options.py:427 contrib/admin/options.py:460
-#, python-format
-msgid "You may add another %s below."
-msgstr "Alább hozzáadhat egy másikat ebből: %s."
-
-#: contrib/admin/options.py:448
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "\"%(obj)s\" %(name)s sikeresen módosítva."
-
-#: contrib/admin/options.py:456
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva. Alább ismét szerkesztheted."
-
-#: contrib/admin/options.py:532
-#, python-format
-msgid "Add %s"
-msgstr "Új %s"
-
-#: contrib/admin/options.py:610
-#, python-format
-msgid "Change %s"
-msgstr "%s módosítása"
-
-#: contrib/admin/options.py:642
-msgid "Database error"
-msgstr "Adatbázis hiba"
-
-#: contrib/admin/options.py:692
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "\"%(obj)s\" %(name)s sikeresen törölve."
-
-#: contrib/admin/options.py:699
-msgid "Are you sure?"
-msgstr "Biztos benne?"
-
-#: contrib/admin/options.py:728
-#, python-format
-msgid "Change history: %s"
-msgstr "Változások története: %s"
-
-#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:16
-#: contrib/auth/forms.py:80
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
+msgid "Value %r is not a valid choice."
 msgstr ""
-"Írjon be egy helyes felhasználónevet és jelszót. Mindkét mező kisbetű-"
-"nagybetű érzékeny."
 
-#: contrib/admin/sites.py:242 contrib/admin/views/decorators.py:68
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
+#: db/models/fields/__init__.py:64
+msgid "This field cannot be null."
+msgstr "Ez a mező nem lehet nulla."
+
+#: db/models/fields/__init__.py:65
+#, fuzzy
+msgid "This field cannot be blank."
+msgstr "Ez a mező nem lehet nulla."
+
+#: db/models/fields/__init__.py:70
+#, python-format
+msgid "Field of type: %(field_type)s"
 msgstr ""
-"Jelentkezzen be újra, mert a munkamenete végetért. Ne aggódjon, minden "
-"beküldött adata el van mentve."
 
-#: contrib/admin/sites.py:249 contrib/admin/views/decorators.py:75
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Úgy tűnik a böngészőjében nincs engedélyezve a cookie-k fogadása. Kérem "
-"engedélyezze és töltse újra az oldalt!"
-
-#: contrib/admin/sites.py:265 contrib/admin/sites.py:271
-#: contrib/admin/views/decorators.py:94
-msgid "Usernames cannot contain the '@' character."
-msgstr "A felhasználónév nem tartalmazhat '@' karaktert."
-
-#: contrib/admin/sites.py:268 contrib/admin/views/decorators.py:90
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Az email címe nem a felhasználóneve. Próbálja inkább ezt: %s."
-
-#: contrib/admin/sites.py:336
-msgid "Site administration"
-msgstr "Honlap karbantartás"
-
-#: contrib/admin/sites.py:358 contrib/admin/templates/admin/login.html:27
-#: contrib/admin/templates/registration/password_reset_complete.html:14
-#: contrib/admin/views/decorators.py:30
-msgid "Log in"
-msgstr "Bejelentkezés"
-
-#: contrib/admin/sites.py:406
-#, python-format
-msgid "%s administration"
-msgstr "%s adminisztráció"
-
-# TODO
-#: contrib/admin/util.py:138
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Egy vagy több %(fieldname)s a(z) %(name)s -ban: %(obj)s"
-
-# TODO
-#: contrib/admin/util.py:143
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Egy vagy több %(fieldname)s a(z) %(name)s:"
-
-#: contrib/admin/widgets.py:65 contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Dátum:"
-
-#: contrib/admin/widgets.py:65 contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Idő:"
-
-#: contrib/admin/widgets.py:89 contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "Éppen:"
-
-#: contrib/admin/widgets.py:89 contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "Változás:"
-
-#: contrib/admin/widgets.py:115
-msgid "Lookup"
-msgstr "Keresés"
-
-#: contrib/admin/widgets.py:195
-msgid "Add Another"
-msgstr "Újabb hozzáadása"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Nincs ilyen oldal"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Sajnáljuk, de a kért oldal nem található."
-
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/change_form.html:17
-#: contrib/admin/templates/admin/change_list.html:8
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/admin/auth/user/change_password.html:10
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_reset_complete.html:4
-#: contrib/admin/templates/registration/password_reset_confirm.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
-msgid "Home"
-msgstr "Kezdőlap"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Szerverhiba"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Szerverhiba (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Szerverhiba <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Hiba történt, melyet e-mailben jelentettünk az oldal karbantartójának. A "
-"rendszer remélhetően hamar megjavul. Köszönjük a türelmét."
-
-#: contrib/admin/templates/admin/app_index.html:10
-#: contrib/admin/templates/admin/index.html:19
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: contrib/admin/templates/admin/base.html:25
-msgid "Welcome,"
-msgstr "Üdvözlöm,"
-
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Dokumentáció"
-
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/auth/user/change_password.html:46
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-msgid "Change password"
-msgstr "Jelszó megváltoztatása"
-
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-msgid "Log out"
-msgstr "Kijelentkezés"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django honlap adminisztráció"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django adminisztráció"
-
-#: contrib/admin/templates/admin/change_form.html:20
-#: contrib/admin/templates/admin/index.html:29
-msgid "Add"
-msgstr "Új"
-
-#: contrib/admin/templates/admin/change_form.html:27
-#: contrib/admin/templates/admin/object_history.html:10
-msgid "History"
-msgstr "Történet"
-
-#: contrib/admin/templates/admin/change_form.html:28
-#: contrib/admin/templates/admin/edit_inline/stacked.html:13
-#: contrib/admin/templates/admin/edit_inline/tabular.html:25
-msgid "View on site"
-msgstr "Megtekintés a honlapon"
-
-#: contrib/admin/templates/admin/change_form.html:38
-#: contrib/admin/templates/admin/auth/user/change_password.html:22
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Kérem javítsa az alábbi hibát."
-msgstr[1] "Kérlem javítsa az alábbi hibákat."
-
-#: contrib/admin/templates/admin/change_list.html:16
-#, python-format
-msgid "Add %(name)s"
-msgstr "Új %(name)s"
-
-#: contrib/admin/templates/admin/change_list.html:26
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr "Szűrő"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:246
-msgid "Delete"
-msgstr "Törlés"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:16
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr ""
-"'%(escaped_object)s' %(object_name)s törlése a kapcsolódó objektumok "
-"törlését is eredményezi, de a hozzáférése nem engedi a következő típusú "
-"objektumok törlését:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:23
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr ""
-"Biztos hogy törli a következőt: \"%(escaped_object)s\" (típus: %(object_name)"
-"s)? A összes további kapcsolódó elem is törlődik:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:28
-msgid "Yes, I'm sure"
-msgstr "Igen, biztos vagyok benne"
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr " %(filter_title)s szerint "
-
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "%(name)s alkalmazásban elérhető modellek."
-
-#: contrib/admin/templates/admin/index.html:35
-msgid "Change"
-msgstr "Módosítás"
-
-#: contrib/admin/templates/admin/index.html:45
-msgid "You don't have permission to edit anything."
-msgstr "Nincs joga szerkeszteni."
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "Recent Actions"
-msgstr "Utolsó műveletek"
-
-#: contrib/admin/templates/admin/index.html:54
-msgid "My Actions"
-msgstr "Az én műveleteim"
-
-#: contrib/admin/templates/admin/index.html:58
-msgid "None available"
-msgstr "Nincs elérhető"
-
-#: contrib/admin/templates/admin/invalid_setup.html:7
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-"Valami nem stimmel a telepített adatbázissal. Bizonyosodjon meg arról, hogy "
-"a megfelelő táblák létre lettek-e hozva, és hogy a megfelelő felhasználó "
-"tudja-e őket olvasni."
-
-#: contrib/admin/templates/admin/login.html:19
-msgid "Username:"
-msgstr "Felhasználó:"
-
-#: contrib/admin/templates/admin/login.html:22
-msgid "Password:"
-msgstr "Jelszó:"
-
-#: contrib/admin/templates/admin/object_history.html:22
-msgid "Date/time"
-msgstr "Dátum/idő"
-
-#: contrib/admin/templates/admin/object_history.html:23
-msgid "User"
-msgstr "Felhasználó"
-
-#: contrib/admin/templates/admin/object_history.html:24
-msgid "Action"
-msgstr "Művelet"
-
-#: contrib/admin/templates/admin/object_history.html:30
-#: utils/translation/trans_real.py:404
-msgid "DATETIME_FORMAT"
-msgstr "Y. F j., H:i"
-
-#: contrib/admin/templates/admin/object_history.html:38
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Az objektumnak nincs változási története. Valószínűleg nem ezen a "
-"karbantartó oldalon lett rögzítve."
-
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "Mutassa mindet"
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "Mehet"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "Egy találat."
-msgstr[1] "%(counter)s találat."
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s összesen"
-
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Save"
-msgstr "Mentés"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save as new"
-msgstr "Mentés újként"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and add another"
-msgstr "Mentés és másik hozzáadása"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save and continue editing"
-msgstr "Mentés és a szerkesztés folytatása"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr ""
-"Először adjon meg egy felhasználói nevet és egy jelszót. Ezek után további "
-"módosításokat is végezhet a felhasználó adatain."
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:13
-#: contrib/auth/forms.py:14 contrib/auth/forms.py:47 contrib/auth/forms.py:59
-msgid "Username"
-msgstr "Felhasználó"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:20
-#: contrib/admin/templates/admin/auth/user/change_password.html:33
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:60 contrib/auth/forms.py:184
-msgid "Password"
-msgstr "Jelszó"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:26
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
-#: contrib/auth/forms.py:185
-msgid "Password (again)"
-msgstr "Jelszó újra"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:27
-#: contrib/admin/templates/admin/auth/user/change_password.html:40
-msgid "Enter the same password as above, for verification."
-msgstr "Írja be a fenti jelszót ellenőrzés céljából."
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:26
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Adjon meg egy új jelszót a <strong>%(username)s</strong> nevű felhasználónak."
-
-#: contrib/admin/templates/admin/edit_inline/tabular.html:15
-msgid "Delete?"
-msgstr "Törli?"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "Könyvjelzők"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
-msgid "Documentation bookmarklets"
-msgstr "Dokumentum könyvjelzők"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:8
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\">A könyvjelzők felvételéhez húzza a könyvjelzők linkjét az "
-"eszköztárra, vagy kattintson rájuk jobb egérgombbal és úgy adja hozzá. "
-"Ezután \n"
-"már ki tudja választani a könyvjelzőt a honlap bármely oldaláról. A "
-"könyvjelzők között néhány oldal csak \"belső\" gépekről nézhető meg.\n"
-"(Kérdezze meg rendszergazdáját, hogy az Ön gépe \"belső\" gép-e.).</p>\n"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:18
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
-msgid "Documentation for this page"
-msgstr "Az oldal dokumentációja"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr ""
-"Bármely oldalról annak a nézetnek a dokumentációjára ugrik, amely a kérdéses "
-"oldalt generálta."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:21
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
-msgid "Show object ID"
-msgstr "Az objektum ID mutatása"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Az objektum által reprezentált oldalak 'content-type' és 'unique ID' "
-"értékeit mutatja."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:24
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
-msgid "Edit this object (current window)"
-msgstr "Objektum szerkesztése (aktuális ablakban)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Az objektumhoz tartozó oldalak adminisztrációjához ugrik."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:27
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
-msgid "Edit this object (new window)"
-msgstr "Objektum szerkesztése (új ablakban)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
-msgid "As above, but opens the admin page in a new window."
-msgstr "Mint fentebb, de az adminisztrációs oldalt új ablakban nyitja meg."
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Köszönjük hogy egy kis időt eltöltött ma a honlapunkon."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Jelentkezzen be újra"
-
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-msgid "Password change"
-msgstr "Jelszó megváltoztatása"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "Sikeres jelszóváltoztatás"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "Megváltozott a jelszava."
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Írja be a régi jelszavát biztonsági okokból, majd az újat kétszer, hogy "
-"biztosan ne gépelje el."
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "Régi jelszó:"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-#: contrib/admin/templates/registration/password_reset_confirm.html:18
-msgid "New password:"
-msgstr "Új jelszó:"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-#: contrib/admin/templates/registration/password_reset_confirm.html:20
-msgid "Confirm password:"
-msgstr "Jelszó megerősítése:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
-msgid "Change my password"
-msgstr "Jelszavam megváltoztatása"
-
-#: contrib/admin/templates/registration/password_reset_complete.html:4
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-msgid "Password reset"
-msgstr "Jelszó beállítása"
-
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_complete.html:10
-msgid "Password reset complete"
-msgstr "Jelszó beállítása kész"
-
-#: contrib/admin/templates/registration/password_reset_complete.html:12
-msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Jelszava beállításra került.  Most már bejelentkezhet."
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:4
-msgid "Password reset confirmation"
-msgstr "Jelszó beállítás megerősítése"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:12
-msgid "Enter new password"
-msgstr "Írja be az új jelszavát"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:14
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
-msgstr ""
-"Írja be az új jelszavát kétszer, hogy megbizonyosodhassunk annak "
-"helyességéről."
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:26
-msgid "Password reset unsuccessful"
-msgstr "Sikeres jelszó beállítás"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:28
-msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a new password reset."
-msgstr ""
-"A jelszó beállító link érvénytelen. Ennek egyik oka az lehet, hogy már "
-"felhasználták.  Kérem igényeljen új jelszó beállítást."
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Sikeres jelszótörlés"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
-"address you submitted. You should be receiving it shortly."
-msgstr ""
-"Az információkat elküldtük e-mailben a megadott címre. Hamarosan meg kell "
-"érkeznie."
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Ezt az e-mail-t azért kapta, mert jelszó beállítást kért"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "hozzáféréséhez a következő honlapon: %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-msgid "Please go to the following page and choose a new password:"
-msgstr "Kérjük látogassa meg a következő oldalt, és válasszon egy új jelszót:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:9
-msgid "Your username, in case you've forgotten:"
-msgstr "Felhasználóneve, ha elfelejtette volna:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Thanks for using our site!"
-msgstr "Köszönjük, hogy használta honlapunkat!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "%(site_name)s csapat"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
-"instructions for setting a new one."
-msgstr ""
-"Elfelejtette a jelszavát? Írja be az e-mail címét, és küldünk egy levelet a "
-"teendőkről."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "E-mail cím:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Jelszavam törlése"
-
-#: contrib/admin/templatetags/admin_list.py:284
-msgid "All dates"
-msgstr "Minden dátum"
-
-#: contrib/admin/views/auth.py:31 contrib/auth/admin.py:62
-msgid "Add user"
-msgstr "Felhasználó hozzáadása"
-
-#: contrib/admin/views/auth.py:58 contrib/auth/admin.py:88
-msgid "Password changed successfully."
-msgstr "Sikeres jelszóváltoztatás."
-
-#: contrib/admin/views/auth.py:65 contrib/auth/admin.py:94
-#, python-format
-msgid "Change password: %s"
-msgstr "Jelszó megváltoztatása: %s"
-
-#: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
-#: contrib/admin/views/doc.py:52 contrib/admindocs/views.py:57
-#: contrib/admindocs/views.py:59 contrib/admindocs/views.py:61
-msgid "tag:"
-msgstr "címke:"
-
-#: contrib/admin/views/doc.py:79 contrib/admin/views/doc.py:81
-#: contrib/admin/views/doc.py:83 contrib/admindocs/views.py:90
-#: contrib/admindocs/views.py:92 contrib/admindocs/views.py:94
-msgid "filter:"
-msgstr "szűrő:"
-
-#: contrib/admin/views/doc.py:137 contrib/admin/views/doc.py:139
-#: contrib/admin/views/doc.py:141 contrib/admindocs/views.py:154
-#: contrib/admindocs/views.py:156 contrib/admindocs/views.py:158
-msgid "view:"
-msgstr "nézet:"
-
-#: contrib/admin/views/doc.py:166 contrib/admindocs/views.py:186
-#, python-format
-msgid "App %r not found"
-msgstr "%r alkalmazás nem található"
-
-#: contrib/admin/views/doc.py:173
-#, python-format
-msgid "Model %(name)r not found in app %(label)r"
-msgstr "%(name)r modell nem található a következő alkalmazásban: %(label)r"
-
-#: contrib/admin/views/doc.py:185
-#, python-format
-msgid "the related `%(label)s.%(type)s` object"
-msgstr "a kapcsolódó '%(label)s.%(type)s' objektum"
-
-#: contrib/admin/views/doc.py:185 contrib/admin/views/doc.py:207
-#: contrib/admin/views/doc.py:221 contrib/admin/views/doc.py:226
-#: contrib/admindocs/views.py:205 contrib/admindocs/views.py:227
-#: contrib/admindocs/views.py:241 contrib/admindocs/views.py:246
-msgid "model:"
-msgstr "modell:"
-
-#: contrib/admin/views/doc.py:216
-#, python-format
-msgid "related `%(label)s.%(name)s` objects"
-msgstr "kapcsolódó '%(label)s.%(name)sí' objektumok"
-
-#: contrib/admin/views/doc.py:221 contrib/admindocs/views.py:241
-#, python-format
-msgid "all %s"
-msgstr "minden %s"
-
-#: contrib/admin/views/doc.py:226 contrib/admindocs/views.py:246
-#, python-format
-msgid "number of %s"
-msgstr "%s mennyisége"
-
-#: contrib/admin/views/doc.py:231 contrib/admindocs/views.py:251
-#, python-format
-msgid "Fields on %s objects"
-msgstr "Mezők %s objektumokban"
-
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:304
-#: contrib/admin/views/doc.py:306 contrib/admin/views/doc.py:312
-#: contrib/admin/views/doc.py:313 contrib/admin/views/doc.py:315
-#: contrib/admindocs/views.py:314 contrib/admindocs/views.py:325
-#: contrib/admindocs/views.py:327 contrib/admindocs/views.py:333
-#: contrib/admindocs/views.py:334 contrib/admindocs/views.py:336
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
 msgid "Integer"
 msgstr "Egész"
 
-#: contrib/admin/views/doc.py:294 contrib/admindocs/views.py:315
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
+msgid "This value must be an integer."
+msgstr "Az értéknek egész számnak kell lennie."
+
+#: db/models/fields/__init__.py:493
+msgid "This value must be either True or False."
+msgstr "Az értéknek igaznak (True) vagy hamisnak (False) kell lennie."
+
+#: db/models/fields/__init__.py:495
 msgid "Boolean (Either True or False)"
 msgstr "Logikai (True vagy False)"
 
-#: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:314
-#: contrib/admindocs/views.py:316 contrib/admindocs/views.py:335
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Karakterlánc (%(max_length)s hosszig)"
 
-#: contrib/admin/views/doc.py:296 contrib/admindocs/views.py:317
+#: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
 msgstr "Vesszővel elválasztott egészek"
 
-#: contrib/admin/views/doc.py:297 contrib/admindocs/views.py:318
+#: db/models/fields/__init__.py:584
 msgid "Date (without time)"
 msgstr "Dátum (idő nélkül)"
 
-#: contrib/admin/views/doc.py:298 contrib/admindocs/views.py:319
-msgid "Date (with time)"
-msgstr "Dátum (idővel)"
-
-#: contrib/admin/views/doc.py:299 contrib/admindocs/views.py:320
-msgid "Decimal number"
-msgstr "Tizes számrendszerű (decimális) szám"
-
-#: contrib/admin/views/doc.py:300 contrib/admindocs/views.py:321
-msgid "E-mail address"
-msgstr "E-mail cím"
-
-#: contrib/admin/views/doc.py:301 contrib/admin/views/doc.py:302
-#: contrib/admin/views/doc.py:305 contrib/admindocs/views.py:322
-#: contrib/admindocs/views.py:323 contrib/admindocs/views.py:326
-msgid "File path"
-msgstr "Elérési út"
-
-#: contrib/admin/views/doc.py:303 contrib/admindocs/views.py:324
-msgid "Floating point number"
-msgstr "Lebegőpontos szám"
-
-#: contrib/admin/views/doc.py:307 contrib/admindocs/views.py:328
-#: contrib/comments/models.py:57
-msgid "IP address"
-msgstr "IP cím"
-
-#: contrib/admin/views/doc.py:309 contrib/admindocs/views.py:330
-msgid "Boolean (Either True, False or None)"
-msgstr "Logikai (True, False vagy None)"
-
-#: contrib/admin/views/doc.py:310 contrib/admindocs/views.py:331
-msgid "Relation to parent model"
-msgstr "Szülőkapcsolat"
-
-#: contrib/admin/views/doc.py:311 contrib/admindocs/views.py:332
-msgid "Phone number"
-msgstr "Telefonszám"
-
-#: contrib/admin/views/doc.py:316 contrib/admindocs/views.py:337
-msgid "Text"
-msgstr "Szöveg"
-
-#: contrib/admin/views/doc.py:317 contrib/admindocs/views.py:338
-msgid "Time"
-msgstr "Idő"
-
-#: contrib/admin/views/doc.py:318 contrib/admindocs/views.py:339
-#: contrib/comments/forms.py:20 contrib/flatpages/admin.py:8
-#: contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admin/views/doc.py:319 contrib/admindocs/views.py:340
-msgid "U.S. state (two uppercase letters)"
-msgstr "USA állam (két nagybetű)"
-
-#: contrib/admin/views/doc.py:320 contrib/admindocs/views.py:341
-msgid "XML text"
-msgstr "XML szöveg"
-
-#: contrib/admin/views/doc.py:346 contrib/admindocs/views.py:367
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s nem tűnik egy urlpattern objektumnak."
-
-#: contrib/admin/views/main.py:65
-#, python-format
-msgid "Select %s"
-msgstr "Kiválasztás %s"
-
-#: contrib/admin/views/main.py:65
-#, python-format
-msgid "Select %s to change"
-msgstr "Válasszon ki egyet a módosításhoz (%s)"
-
-#: contrib/admin/views/template.py:36 contrib/sites/models.py:38
-msgid "site"
-msgstr "honlap"
-
-#: contrib/admin/views/template.py:38
-msgid "template"
-msgstr "sablon"
-
-#: contrib/admindocs/views.py:193
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "%(model_name)r modell nem található a következő alkalmazásban: %(app_label)r"
-
-#: contrib/admindocs/views.py:205
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "a kapcsolódó '%(app_label)s.%(data_type)s' objektum"
-
-#: contrib/admindocs/views.py:236
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "kapcsolódó '%(app_label)s.%(object_name)s' objektumok"
-
-#: contrib/auth/admin.py:21
-msgid "Personal info"
-msgstr "személyes információ"
-
-#: contrib/auth/admin.py:22
-msgid "Permissions"
-msgstr "jogosultságok"
-
-#: contrib/auth/admin.py:23
-msgid "Important dates"
-msgstr "Fontos dátumok"
-
-#: contrib/auth/admin.py:24
-msgid "Groups"
-msgstr "Csoportok"
-
-#: contrib/auth/forms.py:15 contrib/auth/forms.py:48
-#: contrib/auth/models.py:136
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr ""
-"Kötelező. Legfeljebb 30 karakter. Csak alfanumerikus karaktereket "
-"tartalmazhat (betűk, számok és aláhúzás)."
-
-#: contrib/auth/forms.py:16 contrib/auth/forms.py:49 core/validators.py:72
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Az érték csak betűket, számokat és aláhúzást tartalmazhat."
-
-#: contrib/auth/forms.py:18
-msgid "Password confirmation"
-msgstr "Jelszó megerősítése"
-
-#: contrib/auth/forms.py:30
-msgid "A user with that username already exists."
-msgstr "Létezik már egy felhasználó ezzel a névvel."
-
-#: contrib/auth/forms.py:36 contrib/auth/forms.py:154
-#: contrib/auth/forms.py:196
-msgid "The two password fields didn't match."
-msgstr "A két jelszó mező tartalma nem egyezik meg."
-
-#: contrib/auth/forms.py:82
-msgid "This account is inactive."
-msgstr "Ez a fiók inaktív."
-
-#: contrib/auth/forms.py:87
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"A böngészője úgy tűnik nem támogatja a cookie-kat. A cookie-k engedélyezése "
-"szükséges a bejelentkezéshez."
-
-#: contrib/auth/forms.py:100
-msgid "E-mail"
-msgstr "E-mail cím"
-
-#: contrib/auth/forms.py:109
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Ehhez az e-mail címhez nem tartozik felhasználói fiók. Biztos benne, hogy "
-"regisztrált?"
-
-#: contrib/auth/forms.py:134
-#, python-format
-msgid "Password reset on %s"
-msgstr "Jelszó beállítása: %s"
-
-#: contrib/auth/forms.py:142
-msgid "New password"
-msgstr "Új jelszó"
-
-#: contrib/auth/forms.py:143
-msgid "New password confirmation"
-msgstr "Új jelszó megerősítése"
-
-#: contrib/auth/forms.py:168
-msgid "Old password"
-msgstr "Régi jelszó"
-
-#: contrib/auth/forms.py:176
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "A régi jelszó hibásan lett megadva. Írja be újra."
-
-#: contrib/auth/models.py:72 contrib/auth/models.py:95
-msgid "name"
-msgstr "név"
-
-#: contrib/auth/models.py:74
-msgid "codename"
-msgstr "kódnév"
-
-#: contrib/auth/models.py:77
-msgid "permission"
-msgstr "jogosultság"
-
-#: contrib/auth/models.py:78 contrib/auth/models.py:96
-msgid "permissions"
-msgstr "jogosultságok"
-
-#: contrib/auth/models.py:99
-msgid "group"
-msgstr "csoport"
-
-#: contrib/auth/models.py:100 contrib/auth/models.py:146
-msgid "groups"
-msgstr "csoportok"
-
-#: contrib/auth/models.py:136
-msgid "username"
-msgstr "felhasználónév"
-
-#: contrib/auth/models.py:137
-msgid "first name"
-msgstr "keresztnév"
-
-#: contrib/auth/models.py:138
-msgid "last name"
-msgstr "vezetéknév"
-
-#: contrib/auth/models.py:139
-msgid "e-mail address"
-msgstr "e-mail cím"
-
-#: contrib/auth/models.py:140
-msgid "password"
-msgstr "jelszó"
-
-#: contrib/auth/models.py:140
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Használja az \"[algo]$[salt]$[hexdigest]\" formátumot, vagy a <a href="
-"\"password/\">jelszó megváltoztatása űrlapot</a>."
-
-#: contrib/auth/models.py:141
-msgid "staff status"
-msgstr "személyzet státusz"
-
-#: contrib/auth/models.py:141
-msgid "Designates whether the user can log into this admin site."
-msgstr "Megadja, hogy a felhasználó bejelentkezhet-e erre az adminisztrációs oldalra."
-
-#: contrib/auth/models.py:142
-msgid "active"
-msgstr "aktív"
-
-#: contrib/auth/models.py:142
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
-msgstr ""
-"Megadja, hogy a felhasználó aktív-e. Állítsa át ezt az értéket a fiók "
-"törlése helyett."
-
-#: contrib/auth/models.py:143
-msgid "superuser status"
-msgstr "rendszergazda státusz"
-
-#: contrib/auth/models.py:143
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr ""
-"Megadja, hogy ez a felhasználó rendelkezik-e minden jogosultsággal anélkül, "
-"hogy azt külön meg kellene adni."
-
-#: contrib/auth/models.py:144
-msgid "last login"
-msgstr "utolsó bejelentkezés"
-
-#: contrib/auth/models.py:145
-msgid "date joined"
-msgstr "csatlakozás dátuma"
-
-#: contrib/auth/models.py:147
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"A kézzel beállított jogosultságok mellett a felhasználó a csoportjának "
-"jogait is megkapja."
-
-#: contrib/auth/models.py:148
-msgid "user permissions"
-msgstr "felhasználói jogosultságok"
-
-#: contrib/auth/models.py:152
-msgid "user"
-msgstr "felhasználó"
-
-#: contrib/auth/models.py:153
-msgid "users"
-msgstr "felhasználók"
-
-#: contrib/auth/models.py:308
-msgid "message"
-msgstr "üzenet"
-
-#: contrib/auth/views.py:50
-msgid "Logged out"
-msgstr "Kijelentkezve"
-
-#: contrib/auth/management/commands/createsuperuser.py:23
-#: core/validators.py:170 forms/fields.py:423 newforms/fields.py:403
-msgid "Enter a valid e-mail address."
-msgstr "Írjon be egy érvényes e-mail címet."
-
-#: contrib/comments/admin.py:11
-msgid "Content"
-msgstr "Tartalom"
-
-#: contrib/comments/admin.py:14
-msgid "Metadata"
-msgstr "Metaadat"
-
-#: contrib/comments/forms.py:18
-msgid "Name"
-msgstr "Név"
-
-#: contrib/comments/forms.py:19
-msgid "Email address"
-msgstr "E-mail cím"
-
-#: contrib/comments/forms.py:21
-msgid "Comment"
-msgstr "Hozzászólás"
-
-#: contrib/comments/forms.py:24
-msgid "If you enter anything in this field your comment will be treated as spam"
-msgstr ""
-"Ha bármit begépel ebbe a mezőbe, akkor azt szemétként fogja kezelni a "
-"rendszer"
-
-#: contrib/comments/forms.py:124 core/validators.py:281
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Vigyázzon a szájára! Az ilyen szó (%s) itt nem megengedett."
-msgstr[1] "Vigyázzon a szájára! Az ilyen szavak (%s) itt nem megengedettek."
-
-#: contrib/comments/models.py:22
-msgid "object ID"
-msgstr "objektum ID"
-
-#: contrib/comments/models.py:49
-msgid "user's name"
-msgstr "felhasználó neve"
-
-#: contrib/comments/models.py:50
-msgid "user's email address"
-msgstr "felhasználó e-mail címe"
-
-#: contrib/comments/models.py:51
-msgid "user's URL"
-msgstr "felhasználó URL-je"
-
-#: contrib/comments/models.py:53
-msgid "comment"
-msgstr "megjegyzés"
-
-#: contrib/comments/models.py:56
-msgid "date/time submitted"
-msgstr "dátum/idő beállítva"
-
-#: contrib/comments/models.py:58
-msgid "is public"
-msgstr "publikus"
-
-#: contrib/comments/models.py:59
-msgid "Uncheck this box to make the comment effectively disappear from the site."
-msgstr ""
-"Vegye ki a pipát a jelölőnégyzetből, hogy eltűntesse a hozzászólást az "
-"oldalról."
-
-#: contrib/comments/models.py:61
-msgid "is removed"
-msgstr "eltávolítva"
-
-#: contrib/comments/models.py:62
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr ""
-"Jelöld be a négyzetet, ha a megjegyzés nem megfelelő. Az \"Ezt a megjegyzést "
-"törölték\" üzenet fog megjelenni helyette."
-
-#: contrib/comments/models.py:114
-msgid ""
-"This comment was posted by an authenticated user and thus the name is read-"
-"only."
-msgstr ""
-"Ezt a hozzászólást egy hitelesített felhasználó küldte be, ezért a név csak "
-"olvasható."
-
-#: contrib/comments/models.py:123
-msgid ""
-"This comment was posted by an authenticated user and thus the email is read-"
-"only."
-msgstr ""
-"Ezt a hozzászólást egy hitelesített felhasználó küldte be, ezért az e-mail "
-"csak olvasható."
-
-#: contrib/comments/models.py:148
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"Beküldte %(user)s ekkor: %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "Név:"
-
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "Megjegyzés:"
-
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "Megjegyzés előnézete"
-
-#: contrib/comments/views/karma.py:21
-msgid "Anonymous users cannot vote"
-msgstr "Névtelen felhasználó nem szavazhat"
-
-#: contrib/comments/views/karma.py:25
-msgid "Invalid comment ID"
-msgstr "Érvénytelen megjegyzés ID"
-
-#: contrib/comments/views/karma.py:27
-msgid "No voting for yourself"
-msgstr "Nem szavazhat önmagára"
-
-#: contrib/contenttypes/models.py:67
-msgid "python model class name"
-msgstr "python modell osztály neve"
-
-#: contrib/contenttypes/models.py:71
-msgid "content type"
-msgstr "tartalom típusa"
-
-#: contrib/contenttypes/models.py:72
-msgid "content types"
-msgstr "tartalom típusok"
-
-#: contrib/flatpages/admin.py:9
-msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Például: '/about/contact/'. Figyeljen a nyitó és záró perjelre!"
-
-#: contrib/flatpages/admin.py:11 core/validators.py:76
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr "Az érték csak betűket, számokat, aláhúzást és perjelet tartalmazhat."
-
-#: contrib/flatpages/admin.py:22
-msgid "Advanced options"
-msgstr "További beállítások"
-
-#: contrib/flatpages/models.py:8
-msgid "title"
-msgstr "cím"
-
-#: contrib/flatpages/models.py:9
-msgid "content"
-msgstr "tartalom"
-
-#: contrib/flatpages/models.py:10
-msgid "enable comments"
-msgstr "megjegyzések engedélyezése"
-
-#: contrib/flatpages/models.py:11
-msgid "template name"
-msgstr "sablon neve"
-
-#: contrib/flatpages/models.py:12
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr ""
-"Példa: 'flatpages/contact_page'. Ha ez nem létezik, a rendszer a 'flatpages/"
-"default.html' sablont fogja használni."
-
-#: contrib/flatpages/models.py:13
-msgid "registration required"
-msgstr "regisztráció szükséges"
-
-#: contrib/flatpages/models.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Ha ez be van jelölve, csak bejelentkezett felhasználó tudja az oldalt "
-"megnézni."
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "egyszerű oldal"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "egyszerű oldalak"
-
-#: contrib/formtools/wizard.py:130
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr "Elnézést kérünk, de az űrlap érvényessége lejárt. Kérjük folytassa a kitöltést ettől az oldaltól."
-
-#: contrib/gis/forms/fields.py:14
-msgid "No geometry value provided."
-msgstr "Geometriai adat nem került megadásra."
-
-#: contrib/gis/forms/fields.py:15
-msgid "Invalid geometry value."
-msgstr "Érvénytelen geometriai érték."
-
-#: contrib/gis/forms/fields.py:16
-msgid "Invalid geometry type."
-msgstr "Érvénytelen geometriai típus."
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "th"
-msgstr "."
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "st"
-msgstr "."
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "nd"
-msgstr "."
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "rd"
-msgstr "."
-
-#: contrib/humanize/templatetags/humanize.py:51
-#, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value)1f millió"
-msgstr[1] "%(value)1f millió"
-
-#: contrib/humanize/templatetags/humanize.py:54
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value)1f milliárd"
-msgstr[1] "%(value)1f milliárd"
-
-#: contrib/humanize/templatetags/humanize.py:57
-#, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value)1f trilliárd"
-msgstr[1] "%(value)1f trilliárd"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "one"
-msgstr "egy"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "two"
-msgstr "kettő"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "three"
-msgstr "három"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "four"
-msgstr "négy"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "five"
-msgstr "öt"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "six"
-msgstr "hat"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "seven"
-msgstr "hét"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "eight"
-msgstr "nyolc"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "nine"
-msgstr "kilenc"
-
-#: contrib/humanize/templatetags/humanize.py:93
-msgid "today"
-msgstr "ma"
-
-#: contrib/humanize/templatetags/humanize.py:95
-msgid "tomorrow"
-msgstr "holnap"
-
-#: contrib/humanize/templatetags/humanize.py:97
-msgid "yesterday"
-msgstr "tegnap"
-
-#: contrib/localflavor/ar/forms.py:27
-msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "Írjon be egy irányítószámot 'NNNN' vagy 'ANNNNAA' alakban."
-
-#: contrib/localflavor/ar/forms.py:49 contrib/localflavor/br/forms.py:96
-#: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
-#: contrib/localflavor/pe/forms.py:51
-msgid "This field requires only numbers."
-msgstr "Ez a mező csak számokat tartalmazhat."
-
-#: contrib/localflavor/ar/forms.py:50
-msgid "This field requires 7 or 8 digits."
-msgstr "Ennek a mezőnek 7 vagy 8 számjegyet kell tartalmaznia."
-
-#: contrib/localflavor/ar/forms.py:79
-msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Írjon be egy érvényes CUIT-t 'XX-XXXXXXXX', vagy 'XXXXXXXXXXXX' alakban."
-
-#: contrib/localflavor/ar/forms.py:80
-msgid "Invalid CUIT."
-msgstr "Érvénytelen CUIT."
-
-#: contrib/localflavor/at/at_states.py:5
-msgid "Burgenland"
-msgstr "Burgenland"
-
-#: contrib/localflavor/at/at_states.py:6
-msgid "Carinthia"
-msgstr "Karintia"
-
-#: contrib/localflavor/at/at_states.py:7
-msgid "Lower Austria"
-msgstr "Alsó-Ausztria"
-
-#: contrib/localflavor/at/at_states.py:8
-msgid "Upper Austria"
-msgstr "Felső-Ausztria"
-
-#: contrib/localflavor/at/at_states.py:9
-msgid "Salzburg"
-msgstr "Salzburg"
-
-#: contrib/localflavor/at/at_states.py:10
-msgid "Styria"
-msgstr "Stájerország"
-
-#: contrib/localflavor/at/at_states.py:11
-msgid "Tyrol"
-msgstr "Tirol"
-
-#: contrib/localflavor/at/at_states.py:12
-msgid "Vorarlberg"
-msgstr "Vorarlberg"
-
-#: contrib/localflavor/at/at_states.py:13
-msgid "Vienna"
-msgstr "Bécs"
-
-#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:16
-#: contrib/localflavor/no/forms.py:12
-msgid "Enter a zip code in the format XXXX."
-msgstr "Írjon be egy irányítószámot 'XXXX' alakban."
-
-#: contrib/localflavor/at/forms.py:48
-msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr ""
-"Írjon be egy érvényes ausztriai társadalombiztosítási azonosítót 'XXXX "
-"XXXXXX' alakban."
-
-#: contrib/localflavor/au/forms.py:16
-msgid "Enter a 4 digit post code."
-msgstr "Írjon be egy négyjegyű irányítószámot."
-
-#: contrib/localflavor/br/forms.py:21
-msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Írjon be egy irányítószámot 'XXXXX-XXX' alakban."
-
-#: contrib/localflavor/br/forms.py:30
-msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "A telefonszámoknak 'XXX-XXX-XXXX' formátumúnak kell lenniük."
-
-#: contrib/localflavor/br/forms.py:58
-msgid ""
-"Select a valid brazilian state. That state is not one of the available "
-"states."
-msgstr ""
-"Válasszon ki egy érvényes brazil államot. Az Ön választása nincs az elérhető "
-"lehetőségek között."
-
-#: contrib/localflavor/br/forms.py:94
-msgid "Invalid CPF number."
-msgstr "Érvénytelen CPF szám."
-
-#: contrib/localflavor/br/forms.py:95
-msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Ez a mező legfeljebb 11 számjegyet vagy 14 karaktert tartalmazhat."
-
-#: contrib/localflavor/br/forms.py:134
-msgid "Invalid CNPJ number."
-msgstr "Érvénytelen CNPJ szám."
-
-#: contrib/localflavor/br/forms.py:136
-msgid "This field requires at least 14 digits"
-msgstr "Ennek a mezőnek legalább 14 számjegyet kell tartalmaznia."
-
-#: contrib/localflavor/ca/forms.py:17
-msgid "Enter a postal code in the format XXX XXX."
-msgstr "Írjon be egy irányítószámot 'XXX XXX' alakban."
-
-#: contrib/localflavor/ca/forms.py:88
-msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr ""
-"Írjon be egy érvényes kanadai egészségbiztosítási számot 'XXX-XXX-XXX' "
-"alakban."
-
-#: contrib/localflavor/ch/ch_states.py:5
-msgid "Aargau"
-msgstr "Aargau"
-
-#: contrib/localflavor/ch/ch_states.py:6
-msgid "Appenzell Innerrhoden"
-msgstr "Appenzell Innerrhoden"
-
-#: contrib/localflavor/ch/ch_states.py:7
-msgid "Appenzell Ausserrhoden"
-msgstr "Appenzell Ausserrhoden"
-
-#: contrib/localflavor/ch/ch_states.py:8
-msgid "Basel-Stadt"
-msgstr "Bázel-város"
-
-#: contrib/localflavor/ch/ch_states.py:9
-msgid "Basel-Land"
-msgstr "Bázel-vidék"
-
-#: contrib/localflavor/ch/ch_states.py:10
-msgid "Berne"
-msgstr "Berne"
-
-#: contrib/localflavor/ch/ch_states.py:11
-msgid "Fribourg"
-msgstr "Fribourg"
-
-#: contrib/localflavor/ch/ch_states.py:12
-msgid "Geneva"
-msgstr "Genf"
-
-#: contrib/localflavor/ch/ch_states.py:13
-msgid "Glarus"
-msgstr "Glarus"
-
-#: contrib/localflavor/ch/ch_states.py:14
-msgid "Graubuenden"
-msgstr "Graubuenden"
-
-#: contrib/localflavor/ch/ch_states.py:15
-msgid "Jura"
-msgstr "Jura"
-
-#: contrib/localflavor/ch/ch_states.py:16
-msgid "Lucerne"
-msgstr "Lucerne"
-
-#: contrib/localflavor/ch/ch_states.py:17
-msgid "Neuchatel"
-msgstr "Neuchatel"
-
-#: contrib/localflavor/ch/ch_states.py:18
-msgid "Nidwalden"
-msgstr "Nidwalden"
-
-#: contrib/localflavor/ch/ch_states.py:19
-msgid "Obwalden"
-msgstr "Obwalden"
-
-#: contrib/localflavor/ch/ch_states.py:20
-msgid "Schaffhausen"
-msgstr "Schaffhausen"
-
-#: contrib/localflavor/ch/ch_states.py:21
-msgid "Schwyz"
-msgstr "Schwyz"
-
-#: contrib/localflavor/ch/ch_states.py:22
-msgid "Solothurn"
-msgstr "Solothurn"
-
-#: contrib/localflavor/ch/ch_states.py:23
-msgid "St. Gallen"
-msgstr "St. Gallen"
-
-#: contrib/localflavor/ch/ch_states.py:24
-msgid "Thurgau"
-msgstr "Thurgau"
-
-#: contrib/localflavor/ch/ch_states.py:25
-msgid "Ticino"
-msgstr "Ticino"
-
-#: contrib/localflavor/ch/ch_states.py:26
-msgid "Uri"
-msgstr "Uri"
-
-#: contrib/localflavor/ch/ch_states.py:27
-msgid "Valais"
-msgstr "Valais"
-
-#: contrib/localflavor/ch/ch_states.py:28
-msgid "Vaud"
-msgstr "Vaud"
-
-#: contrib/localflavor/ch/ch_states.py:29
-msgid "Zug"
-msgstr "Zug"
-
-#: contrib/localflavor/ch/ch_states.py:30
-msgid "Zurich"
-msgstr "Zürich"
-
-#: contrib/localflavor/ch/forms.py:64
-msgid ""
-"Enter a valid Swiss identity or passport card number in X1234567<0 or "
-"1234567890 format."
-msgstr ""
-"Írjon be egy érvényes svájci személyazonosító vagy útlevél számot "
-"\"X1234567<0\" vagy \"1234567890\" alakban."
-
-#: contrib/localflavor/cl/forms.py:29
-msgid "Enter a valid Chilean RUT."
-msgstr "Írjon be egy érvényes chilei RUT-ot."
-
-#: contrib/localflavor/cl/forms.py:30
-msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Írjon be egy érvényes chilei RUT-ot 'XX.XXX.XXX-X' alakban."
-
-#: contrib/localflavor/cl/forms.py:31
-msgid "The Chilean RUT is not valid."
-msgstr "A chilei RUT érvénytelen."
-
-#: contrib/localflavor/de/de_states.py:5
-msgid "Baden-Wuerttemberg"
-msgstr "Baden-Württemberg"
-
-#: contrib/localflavor/de/de_states.py:6
-msgid "Bavaria"
-msgstr "Bajorország"
-
-#: contrib/localflavor/de/de_states.py:7
-msgid "Berlin"
-msgstr "Berlin"
-
-#: contrib/localflavor/de/de_states.py:8
-msgid "Brandenburg"
-msgstr "Brandenburg"
-
-#: contrib/localflavor/de/de_states.py:9
-msgid "Bremen"
-msgstr "Bréma"
-
-#: contrib/localflavor/de/de_states.py:10
-msgid "Hamburg"
-msgstr "Hamburg"
-
-#: contrib/localflavor/de/de_states.py:11
-msgid "Hessen"
-msgstr "Hessen"
-
-#: contrib/localflavor/de/de_states.py:12
-msgid "Mecklenburg-Western Pomerania"
-msgstr "Mecklenburg-Nyugat-Pomeránia"
-
-#: contrib/localflavor/de/de_states.py:13
-msgid "Lower Saxony"
-msgstr "Alsó-Szászország"
-
-#: contrib/localflavor/de/de_states.py:14
-msgid "North Rhine-Westphalia"
-msgstr "Észak-Rajna-Vesztfália"
-
-#: contrib/localflavor/de/de_states.py:15
-msgid "Rhineland-Palatinate"
-msgstr "Rhineland-Palatinate"
-
-#: contrib/localflavor/de/de_states.py:16
-msgid "Saarland"
-msgstr "Szárföld"
-
-#: contrib/localflavor/de/de_states.py:17
-msgid "Saxony"
-msgstr "Szászország"
-
-#: contrib/localflavor/de/de_states.py:18
-msgid "Saxony-Anhalt"
-msgstr "Szász-Anhalt"
-
-#: contrib/localflavor/de/de_states.py:19
-msgid "Schleswig-Holstein"
-msgstr "Schleswig-Holstein"
-
-#: contrib/localflavor/de/de_states.py:20
-msgid "Thuringia"
-msgstr "Türingia"
-
-#: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
-#: contrib/localflavor/fr/forms.py:15
-msgid "Enter a zip code in the format XXXXX."
-msgstr "Írjon be egy irányítószámot 'XXXXX' alakban."
-
-#: contrib/localflavor/de/forms.py:41
-msgid ""
-"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"format."
-msgstr ""
-"Írjon be egy érvényes német személyazonosító számot \"XXXXXXXXXXX-XXXXXXX-"
-"XXXXXXX-X\" alakban."
-
-#: contrib/localflavor/es/es_provinces.py:5
-msgid "Arava"
-msgstr "Arava"
-
-#: contrib/localflavor/es/es_provinces.py:6
-msgid "Albacete"
-msgstr "Albacete"
-
-#: contrib/localflavor/es/es_provinces.py:7
-msgid "Alacant"
-msgstr "Alacant"
-
-#: contrib/localflavor/es/es_provinces.py:8
-msgid "Almeria"
-msgstr "Almeria"
-
-#: contrib/localflavor/es/es_provinces.py:9
-msgid "Avila"
-msgstr "Avila"
-
-#: contrib/localflavor/es/es_provinces.py:10
-msgid "Badajoz"
-msgstr "Badajoz"
-
-#: contrib/localflavor/es/es_provinces.py:11
-msgid "Illes Balears"
-msgstr "Baleár szigetek"
-
-#: contrib/localflavor/es/es_provinces.py:12
-msgid "Barcelona"
-msgstr "Barcelona"
-
-#: contrib/localflavor/es/es_provinces.py:13
-msgid "Burgos"
-msgstr "Burgosz"
-
-#: contrib/localflavor/es/es_provinces.py:14
-msgid "Caceres"
-msgstr "Caceres"
-
-#: contrib/localflavor/es/es_provinces.py:15
-msgid "Cadiz"
-msgstr "Cadiz"
-
-#: contrib/localflavor/es/es_provinces.py:16
-msgid "Castello"
-msgstr "Castello"
-
-#: contrib/localflavor/es/es_provinces.py:17
-msgid "Ciudad Real"
-msgstr "Ciudad Real"
-
-#: contrib/localflavor/es/es_provinces.py:18
-msgid "Cordoba"
-msgstr "Cordoba"
-
-#: contrib/localflavor/es/es_provinces.py:19
-msgid "A Coruna"
-msgstr "A Coruna"
-
-#: contrib/localflavor/es/es_provinces.py:20
-msgid "Cuenca"
-msgstr "Cuenca"
-
-#: contrib/localflavor/es/es_provinces.py:21
-msgid "Girona"
-msgstr "Girona"
-
-#: contrib/localflavor/es/es_provinces.py:22
-msgid "Granada"
-msgstr "Granada"
-
-#: contrib/localflavor/es/es_provinces.py:23
-msgid "Guadalajara"
-msgstr "Guadalajara"
-
-#: contrib/localflavor/es/es_provinces.py:24
-msgid "Guipuzkoa"
-msgstr "Guipuzkoa"
-
-#: contrib/localflavor/es/es_provinces.py:25
-msgid "Huelva"
-msgstr "Huelva"
-
-#: contrib/localflavor/es/es_provinces.py:26
-msgid "Huesca"
-msgstr "Huesca"
-
-#: contrib/localflavor/es/es_provinces.py:27
-msgid "Jaen"
-msgstr "Jaen"
-
-#: contrib/localflavor/es/es_provinces.py:28
-msgid "Leon"
-msgstr "Leon"
-
-#: contrib/localflavor/es/es_provinces.py:29
-msgid "Lleida"
-msgstr "Lleida"
-
-#: contrib/localflavor/es/es_provinces.py:30
-#: contrib/localflavor/es/es_regions.py:17
-msgid "La Rioja"
-msgstr "La Rioja"
-
-#: contrib/localflavor/es/es_provinces.py:31
-msgid "Lugo"
-msgstr "Lugo"
-
-#: contrib/localflavor/es/es_provinces.py:32
-#: contrib/localflavor/es/es_regions.py:18
-msgid "Madrid"
-msgstr "Madrid"
-
-#: contrib/localflavor/es/es_provinces.py:33
-msgid "Malaga"
-msgstr "Malaga"
-
-#: contrib/localflavor/es/es_provinces.py:34
-msgid "Murcia"
-msgstr "Murcia"
-
-#: contrib/localflavor/es/es_provinces.py:35
-msgid "Navarre"
-msgstr "Navarra"
-
-#: contrib/localflavor/es/es_provinces.py:36
-msgid "Ourense"
-msgstr "Ourense"
-
-#: contrib/localflavor/es/es_provinces.py:37
-msgid "Asturias"
-msgstr "Asturias"
-
-#: contrib/localflavor/es/es_provinces.py:38
-msgid "Palencia"
-msgstr "Palenica"
-
-#: contrib/localflavor/es/es_provinces.py:39
-msgid "Las Palmas"
-msgstr "Las Palmas"
-
-#: contrib/localflavor/es/es_provinces.py:40
-msgid "Pontevedra"
-msgstr "Pontevedra"
-
-#: contrib/localflavor/es/es_provinces.py:41
-msgid "Salamanca"
-msgstr "Salamanca"
-
-#: contrib/localflavor/es/es_provinces.py:42
-msgid "Santa Cruz de Tenerife"
-msgstr "Santa Cruz de Tenerife"
-
-#: contrib/localflavor/es/es_provinces.py:43
-#: contrib/localflavor/es/es_regions.py:11
-msgid "Cantabria"
-msgstr "Cantabria"
-
-#: contrib/localflavor/es/es_provinces.py:44
-msgid "Segovia"
-msgstr "Segovia"
-
-#: contrib/localflavor/es/es_provinces.py:45
-msgid "Seville"
-msgstr "Sevilla"
-
-#: contrib/localflavor/es/es_provinces.py:46
-msgid "Soria"
-msgstr "Soria"
-
-#: contrib/localflavor/es/es_provinces.py:47
-msgid "Tarragona"
-msgstr "Tarragona"
-
-#: contrib/localflavor/es/es_provinces.py:48
-msgid "Teruel"
-msgstr "Teruel"
-
-#: contrib/localflavor/es/es_provinces.py:49
-msgid "Toledo"
-msgstr "Toledo"
-
-#: contrib/localflavor/es/es_provinces.py:50
-msgid "Valencia"
-msgstr "Valencia"
-
-#: contrib/localflavor/es/es_provinces.py:51
-msgid "Valladolid"
-msgstr "Valladolid"
-
-#: contrib/localflavor/es/es_provinces.py:52
-msgid "Bizkaia"
-msgstr "Bizkaia"
-
-#: contrib/localflavor/es/es_provinces.py:53
-msgid "Zamora"
-msgstr "Zamora"
-
-#: contrib/localflavor/es/es_provinces.py:54
-msgid "Zaragoza"
-msgstr "Zaragoza"
-
-#: contrib/localflavor/es/es_provinces.py:55
-msgid "Ceuta"
-msgstr "Ceuta"
-
-#: contrib/localflavor/es/es_provinces.py:56
-msgid "Melilla"
-msgstr "Melilla"
-
-#: contrib/localflavor/es/es_regions.py:5
-msgid "Andalusia"
-msgstr "Andalúzia"
-
-#: contrib/localflavor/es/es_regions.py:6
-msgid "Aragon"
-msgstr "Aragon"
-
-#: contrib/localflavor/es/es_regions.py:7
-msgid "Principality of Asturias"
-msgstr "Asztúriák tartománya"
-
-#: contrib/localflavor/es/es_regions.py:8
-msgid "Balearic Islands"
-msgstr "Baleár-szigetek"
-
-#: contrib/localflavor/es/es_regions.py:9
-msgid "Basque Country"
-msgstr "Baszkföld"
-
-#: contrib/localflavor/es/es_regions.py:10
-msgid "Canary Islands"
-msgstr "Kanári-szigetek"
-
-#: contrib/localflavor/es/es_regions.py:12
-msgid "Castile-La Mancha"
-msgstr "Kasztília-La Mancha"
-
-#: contrib/localflavor/es/es_regions.py:13
-msgid "Castile and Leon"
-msgstr "Kasztília és Leon"
-
-#: contrib/localflavor/es/es_regions.py:14
-msgid "Catalonia"
-msgstr "Katalónia"
-
-#: contrib/localflavor/es/es_regions.py:15
-msgid "Extremadura"
-msgstr "Extremadura"
-
-#: contrib/localflavor/es/es_regions.py:16
-msgid "Galicia"
-msgstr "Galícia"
-
-#: contrib/localflavor/es/es_regions.py:19
-msgid "Region of Murcia"
-msgstr "Murciai régió"
-
-#: contrib/localflavor/es/es_regions.py:20
-msgid "Foral Community of Navarre"
-msgstr "Navarrai autonóm közösség"
-
-#: contrib/localflavor/es/es_regions.py:21
-msgid "Valencian Community"
-msgstr "Valenciai közösség"
-
-#: contrib/localflavor/es/forms.py:19
-msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Írjon be egy irányítószámot '01XXX-52XXX' alakban és tartományban."
-
-#: contrib/localflavor/es/forms.py:39
-msgid ""
-"Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
-"9XXXXXXXX."
-msgstr "Írjon be egy telefonszámot '6XXXXXXXX', '8XXXXXXXX' vagy '9XXXXXXXX' alakban."
-
-#: contrib/localflavor/es/forms.py:66
-msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Írjon be egy érvényes NIF-et, NIE-t, vagy CIF-et."
-
-#: contrib/localflavor/es/forms.py:67
-msgid "Please enter a valid NIF or NIE."
-msgstr "Adjon meg egy érvényes NIF-et vagy NIE-t."
-
-#: contrib/localflavor/es/forms.py:68
-msgid "Invalid checksum for NIF."
-msgstr "Érvénytelen NIF ellenőrzőösszeg."
-
-#: contrib/localflavor/es/forms.py:69
-msgid "Invalid checksum for NIE."
-msgstr "Érvénytelen NIE ellenőrzőösszeg."
-
-#: contrib/localflavor/es/forms.py:70
-msgid "Invalid checksum for CIF."
-msgstr "Érvénytelen CIF ellenőrzőösszeg."
-
-#: contrib/localflavor/es/forms.py:142
-msgid "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr "Írjon be egy érvényes bankszámlaszámot 'XXXX.XXXX-XX-XXXXXXXXXX' alakban."
-
-#: contrib/localflavor/es/forms.py:143
-msgid "Invalid checksum for bank account number."
-msgstr "Érvénytelen bankszámlaszám ellenőrzőösszeg."
-
-#: contrib/localflavor/fi/forms.py:28
-msgid "Enter a valid Finnish social security number."
-msgstr "Adjon meg egy érvényes finn társadalombiztosítási számot."
-
-#: contrib/localflavor/in_/forms.py:14
-msgid "Enter a zip code in the format XXXXXXX."
-msgstr "Írjon be egy irányítószámot \"XXXXXXX\" alakban."
-
-#: contrib/localflavor/is_/forms.py:17
-msgid "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr ""
-"Írjon be egy érvényes izlandi személyazonosító számot \"XXXXXX-XXXX\" "
-"alakban."
-
-#: contrib/localflavor/is_/forms.py:18
-msgid "The Icelandic identification number is not valid."
-msgstr "Az izlandi személyazonosító szám érvénytelen."
-
-#: contrib/localflavor/it/forms.py:14
-msgid "Enter a valid zip code."
-msgstr "Adjon meg egy érvényes irányítószámot."
-
-#: contrib/localflavor/it/forms.py:43
-msgid "Enter a valid Social Security number."
-msgstr "Adjon meg egy érvényes társadalombiztosítási számot."
-
-#: contrib/localflavor/it/forms.py:68
-msgid "Enter a valid VAT number."
-msgstr "Adjon meg egy érvényes ÁFA számot."
-
-#: contrib/localflavor/jp/forms.py:16
-msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "Írjon be egy irányítószámot \"XXXXXXX\" vagy \"XXX-XXXX\" alakban."
-
-#: contrib/localflavor/jp/jp_prefectures.py:4
-msgid "Hokkaido"
-msgstr "Hokkaido"
-
-#: contrib/localflavor/jp/jp_prefectures.py:5
-msgid "Aomori"
-msgstr "Aomori"
-
-#: contrib/localflavor/jp/jp_prefectures.py:6
-msgid "Iwate"
-msgstr "Iwate"
-
-#: contrib/localflavor/jp/jp_prefectures.py:7
-msgid "Miyagi"
-msgstr "Miyagi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:8
-msgid "Akita"
-msgstr "Akita"
-
-#: contrib/localflavor/jp/jp_prefectures.py:9
-msgid "Yamagata"
-msgstr "Yamagata"
-
-#: contrib/localflavor/jp/jp_prefectures.py:10
-msgid "Fukushima"
-msgstr "Fukushima"
-
-#: contrib/localflavor/jp/jp_prefectures.py:11
-msgid "Ibaraki"
-msgstr "Ibaraki"
-
-#: contrib/localflavor/jp/jp_prefectures.py:12
-msgid "Tochigi"
-msgstr "Tochigi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:13
-msgid "Gunma"
-msgstr "Gunma"
-
-#: contrib/localflavor/jp/jp_prefectures.py:14
-msgid "Saitama"
-msgstr "Saitama"
-
-#: contrib/localflavor/jp/jp_prefectures.py:15
-msgid "Chiba"
-msgstr "Chiba"
-
-#: contrib/localflavor/jp/jp_prefectures.py:16
-msgid "Tokyo"
-msgstr "Tókió"
-
-#: contrib/localflavor/jp/jp_prefectures.py:17
-msgid "Kanagawa"
-msgstr "Kanagawa"
-
-#: contrib/localflavor/jp/jp_prefectures.py:18
-msgid "Yamanashi"
-msgstr "Yamanashi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:19
-msgid "Nagano"
-msgstr "Nagano"
-
-#: contrib/localflavor/jp/jp_prefectures.py:20
-msgid "Niigata"
-msgstr "Niigata"
-
-#: contrib/localflavor/jp/jp_prefectures.py:21
-msgid "Toyama"
-msgstr "Toyama"
-
-#: contrib/localflavor/jp/jp_prefectures.py:22
-msgid "Ishikawa"
-msgstr "Ishikawa"
-
-#: contrib/localflavor/jp/jp_prefectures.py:23
-msgid "Fukui"
-msgstr "Fukui"
-
-#: contrib/localflavor/jp/jp_prefectures.py:24
-msgid "Gifu"
-msgstr "Gifu"
-
-#: contrib/localflavor/jp/jp_prefectures.py:25
-msgid "Shizuoka"
-msgstr "Shizuoka"
-
-#: contrib/localflavor/jp/jp_prefectures.py:26
-msgid "Aichi"
-msgstr "Aichi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:27
-msgid "Mie"
-msgstr "Mie"
-
-#: contrib/localflavor/jp/jp_prefectures.py:28
-msgid "Shiga"
-msgstr "Shiga"
-
-#: contrib/localflavor/jp/jp_prefectures.py:29
-msgid "Kyoto"
-msgstr "Kiotó"
-
-#: contrib/localflavor/jp/jp_prefectures.py:30
-msgid "Osaka"
-msgstr "Oszaka"
-
-#: contrib/localflavor/jp/jp_prefectures.py:31
-msgid "Hyogo"
-msgstr "Hyogo"
-
-#: contrib/localflavor/jp/jp_prefectures.py:32
-msgid "Nara"
-msgstr "Nara"
-
-#: contrib/localflavor/jp/jp_prefectures.py:33
-msgid "Wakayama"
-msgstr "Wakayama"
-
-#: contrib/localflavor/jp/jp_prefectures.py:34
-msgid "Tottori"
-msgstr "Tottori"
-
-#: contrib/localflavor/jp/jp_prefectures.py:35
-msgid "Shimane"
-msgstr "Shimane"
-
-#: contrib/localflavor/jp/jp_prefectures.py:36
-msgid "Okayama"
-msgstr "Okayama"
-
-#: contrib/localflavor/jp/jp_prefectures.py:37
-msgid "Hiroshima"
-msgstr "Hiroshima"
-
-#: contrib/localflavor/jp/jp_prefectures.py:38
-msgid "Yamaguchi"
-msgstr "Yamaguchi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:39
-msgid "Tokushima"
-msgstr "Tokushima"
-
-#: contrib/localflavor/jp/jp_prefectures.py:40
-msgid "Kagawa"
-msgstr "Kagawa"
-
-#: contrib/localflavor/jp/jp_prefectures.py:41
-msgid "Ehime"
-msgstr "Ehime"
-
-#: contrib/localflavor/jp/jp_prefectures.py:42
-msgid "Kochi"
-msgstr "Kochi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:43
-msgid "Fukuoka"
-msgstr "Fukuoka"
-
-#: contrib/localflavor/jp/jp_prefectures.py:44
-msgid "Saga"
-msgstr "Saga"
-
-#: contrib/localflavor/jp/jp_prefectures.py:45
-msgid "Nagasaki"
-msgstr "Nagaszaki"
-
-#: contrib/localflavor/jp/jp_prefectures.py:46
-msgid "Kumamoto"
-msgstr "Kumamoto"
-
-#: contrib/localflavor/jp/jp_prefectures.py:47
-msgid "Oita"
-msgstr "Oita"
-
-#: contrib/localflavor/jp/jp_prefectures.py:48
-msgid "Miyazaki"
-msgstr "Miyazaki"
-
-#: contrib/localflavor/jp/jp_prefectures.py:49
-msgid "Kagoshima"
-msgstr "Kagoshima"
-
-#: contrib/localflavor/jp/jp_prefectures.py:50
-msgid "Okinawa"
-msgstr "Okinawa"
-
-#: contrib/localflavor/mx/mx_states.py:12
-msgid "Aguascalientes"
-msgstr "Aguascalientes"
-
-#: contrib/localflavor/mx/mx_states.py:13
-msgid "Baja California"
-msgstr "Baja California"
-
-#: contrib/localflavor/mx/mx_states.py:14
-msgid "Baja California Sur"
-msgstr "Baja California Sur"
-
-#: contrib/localflavor/mx/mx_states.py:15
-msgid "Campeche"
-msgstr "Campeche"
-
-#: contrib/localflavor/mx/mx_states.py:16
-msgid "Chihuahua"
-msgstr "Chihuahua"
-
-#: contrib/localflavor/mx/mx_states.py:17
-msgid "Chiapas"
-msgstr "Chiapas"
-
-#: contrib/localflavor/mx/mx_states.py:18
-msgid "Coahuila"
-msgstr "Coahuila"
-
-#: contrib/localflavor/mx/mx_states.py:19
-msgid "Colima"
-msgstr "Colima"
-
-#: contrib/localflavor/mx/mx_states.py:20
-msgid "Distrito Federal"
-msgstr "Distritio Federal"
-
-#: contrib/localflavor/mx/mx_states.py:21
-msgid "Durango"
-msgstr "Durango"
-
-#: contrib/localflavor/mx/mx_states.py:22
-msgid "Guerrero"
-msgstr "Guerrero"
-
-#: contrib/localflavor/mx/mx_states.py:23
-msgid "Guanajuato"
-msgstr "Guanajuato"
-
-#: contrib/localflavor/mx/mx_states.py:24
-msgid "Hidalgo"
-msgstr "Hidalgo"
-
-#: contrib/localflavor/mx/mx_states.py:25
-msgid "Jalisco"
-msgstr "Jalisco"
-
-#: contrib/localflavor/mx/mx_states.py:26
-msgid "Estado de México"
-msgstr "Mexikóváros"
-
-#: contrib/localflavor/mx/mx_states.py:27
-msgid "Michoacán"
-msgstr "Michoacán"
-
-#: contrib/localflavor/mx/mx_states.py:28
-msgid "Morelos"
-msgstr "Morelos"
-
-#: contrib/localflavor/mx/mx_states.py:29
-msgid "Nayarit"
-msgstr "Nayarit"
-
-#: contrib/localflavor/mx/mx_states.py:30
-msgid "Nuevo León"
-msgstr "Nuevo León"
-
-#: contrib/localflavor/mx/mx_states.py:31
-msgid "Oaxaca"
-msgstr "Oaxaca"
-
-#: contrib/localflavor/mx/mx_states.py:32
-msgid "Puebla"
-msgstr "Puebla"
-
-#: contrib/localflavor/mx/mx_states.py:33
-msgid "Querétaro"
-msgstr "Querétaro"
-
-#: contrib/localflavor/mx/mx_states.py:34
-msgid "Quintana Roo"
-msgstr "Quintana Roo"
-
-#: contrib/localflavor/mx/mx_states.py:35
-msgid "Sinaloa"
-msgstr "Sinaloa"
-
-#: contrib/localflavor/mx/mx_states.py:36
-msgid "San Luis Potosí"
-msgstr "San Luis Potosí"
-
-#: contrib/localflavor/mx/mx_states.py:37
-msgid "Sonora"
-msgstr "SOnora"
-
-#: contrib/localflavor/mx/mx_states.py:38
-msgid "Tabasco"
-msgstr "Tabasco"
-
-#: contrib/localflavor/mx/mx_states.py:39
-msgid "Tamaulipas"
-msgstr "Tamaulipas"
-
-#: contrib/localflavor/mx/mx_states.py:40
-msgid "Tlaxcala"
-msgstr "Tlaxcala"
-
-#: contrib/localflavor/mx/mx_states.py:41
-msgid "Veracruz"
-msgstr "Veracruz"
-
-#: contrib/localflavor/mx/mx_states.py:42
-msgid "Yucatán"
-msgstr "Yucatán"
-
-#: contrib/localflavor/mx/mx_states.py:43
-msgid "Zacatecas"
-msgstr "Zacatecas"
-
-#: contrib/localflavor/nl/forms.py:21
-msgid "Enter a valid postal code"
-msgstr "Adjon meg egy érvényes irányítószámot. "
-
-#: contrib/localflavor/nl/forms.py:52
-msgid "Enter a valid phone number"
-msgstr "Adjon meg egy érvényes telefonszámot."
-
-#: contrib/localflavor/nl/forms.py:78
-msgid "Enter a valid SoFi number"
-msgstr "Adjon meg egy érvényes SoFi számot."
-
-#: contrib/localflavor/nl/nl_provinces.py:4
-msgid "Drenthe"
-msgstr "Drenthe"
-
-#: contrib/localflavor/nl/nl_provinces.py:5
-msgid "Flevoland"
-msgstr "Flevoland"
-
-#: contrib/localflavor/nl/nl_provinces.py:6
-msgid "Friesland"
-msgstr "Friesland"
-
-#: contrib/localflavor/nl/nl_provinces.py:7
-msgid "Gelderland"
-msgstr "Gelderland"
-
-#: contrib/localflavor/nl/nl_provinces.py:8
-msgid "Groningen"
-msgstr "Groningen"
-
-#: contrib/localflavor/nl/nl_provinces.py:9
-msgid "Limburg"
-msgstr "Limburg"
-
-#: contrib/localflavor/nl/nl_provinces.py:10
-msgid "Noord-Brabant"
-msgstr "Noord-Brabant"
-
-#: contrib/localflavor/nl/nl_provinces.py:11
-msgid "Noord-Holland"
-msgstr "Noord-Holland"
-
-#: contrib/localflavor/nl/nl_provinces.py:12
-msgid "Overijssel"
-msgstr "Overijssel"
-
-#: contrib/localflavor/nl/nl_provinces.py:13
-msgid "Utrecht"
-msgstr "Utrecht"
-
-#: contrib/localflavor/nl/nl_provinces.py:14
-msgid "Zeeland"
-msgstr "Zeeland"
-
-#: contrib/localflavor/nl/nl_provinces.py:15
-msgid "Zuid-Holland"
-msgstr "Zuid-Holland"
-
-#: contrib/localflavor/no/forms.py:33
-msgid "Enter a valid Norwegian social security number."
-msgstr "Írjon be egy érvényes norvég társadalombiztosítási számot."
-
-#: contrib/localflavor/pe/forms.py:24
-msgid "This field requires 8 digits."
-msgstr "Ennek a mezőnek 8 számjegyet kell tartalmaznia."
-
-#: contrib/localflavor/pe/forms.py:52
-msgid "This field requires 11 digits."
-msgstr "Ennek a mezőnek 11 számjegyet kell tartalmaznia."
-
-#: contrib/localflavor/pl/forms.py:38
-msgid "National Identification Number consists of 11 digits."
-msgstr "A nemzeti azonosítószám 11 számjegyből áll."
-
-#: contrib/localflavor/pl/forms.py:39
-msgid "Wrong checksum for the National Identification Number."
-msgstr "Hibás a nemzeti azonosítószám ellenőrző kódja."
-
-#: contrib/localflavor/pl/forms.py:71
-msgid "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr "Írjon be egy adószámot \"XXX-XXX-XX-XX\" vagy \"XX-XX-XXX-XXX\" alakban."
-
-#: contrib/localflavor/pl/forms.py:72
-msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr "Hibás az adószám (NIP) ellenőrzőösszege."
-
-#: contrib/localflavor/pl/forms.py:111
-msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr "A nemzeti üzleti azonosítószám (REGON) 7 vagy 9 számjegyből áll."
-
-#: contrib/localflavor/pl/forms.py:112
-msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr "Hibás a nemzeti üzleti azonosítószám (REGON) ellenőrzőösszege."
-
-#: contrib/localflavor/pl/forms.py:155
-msgid "Enter a postal code in the format XX-XXX."
-msgstr "Írjon be egy irányítószámot 'XX-XXX' alakban."
-
-#: contrib/localflavor/pl/pl_voivodeships.py:8
-msgid "Lower Silesia"
-msgstr "Alsó-Szilézia"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:9
-msgid "Kuyavia-Pomerania"
-msgstr "Kuyavia-Pomerania"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:10
-msgid "Lublin"
-msgstr "Lublin"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:11
-msgid "Lubusz"
-msgstr "Lubusz"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:12
-msgid "Lodz"
-msgstr "Lodz"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:13
-msgid "Lesser Poland"
-msgstr "Kis-Lengyelország"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:14
-msgid "Masovia"
-msgstr "Masovia"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:15
-msgid "Opole"
-msgstr "Opole"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:16
-msgid "Subcarpatia"
-msgstr "Szubkárpátok"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:17
-msgid "Podlasie"
-msgstr "Podlasie"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:18
-msgid "Pomerania"
-msgstr "Pomeránia"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:19
-msgid "Silesia"
-msgstr "Szilézia"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:20
-msgid "Swietokrzyskie"
-msgstr "Swietokrzyskie"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:21
-msgid "Warmia-Masuria"
-msgstr "Warmia-Masuria"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:22
-msgid "Greater Poland"
-msgstr "Nagy-Lengyelország"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:23
-msgid "West Pomerania"
-msgstr "Nyugat-Pomeránia"
-
-#: contrib/localflavor/ro/forms.py:19
-msgid "Enter a valid CIF."
-msgstr "Adjon meg egy érvényes CIF-t."
-
-#: contrib/localflavor/ro/forms.py:56
-msgid "Enter a valid CNP."
-msgstr "Adjon meg egy érvényes CNP-t."
-
-#: contrib/localflavor/ro/forms.py:141
-msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr ""
-"Írjon be egy érvényes nemzetközi bankszámlaszámot 'ROXX-XXXX-XXXX-XXXX-XXXX-"
-"XXXX-XXXX' alakban."
-
-#: contrib/localflavor/ro/forms.py:171
-msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "A telefonszámoknak 'XXXX-XXXXXX' formátumúnak kell lenniük."
-
-#: contrib/localflavor/ro/forms.py:194
-msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Írjon be egy érvényes irányítószámot 'XXXXXX' alakban."
-
-#: contrib/localflavor/sk/forms.py:30
-msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Írjon be egy irányítószámot 'XXXXX' vagy 'XXX XX' alakban."
-
-#: contrib/localflavor/sk/sk_districts.py:8
-msgid "Banska Bystrica"
-msgstr "Besztercebánya"
-
-#: contrib/localflavor/sk/sk_districts.py:9
-msgid "Banska Stiavnica"
-msgstr "Banska Stiavnica"
-
-#: contrib/localflavor/sk/sk_districts.py:10
-msgid "Bardejov"
-msgstr "Bardejov"
-
-#: contrib/localflavor/sk/sk_districts.py:11
-msgid "Banovce nad Bebravou"
-msgstr "Banovce nad Bebravou"
-
-#: contrib/localflavor/sk/sk_districts.py:12
-msgid "Brezno"
-msgstr "Brezno"
-
-#: contrib/localflavor/sk/sk_districts.py:13
-msgid "Bratislava I"
-msgstr "Pozsony I"
-
-#: contrib/localflavor/sk/sk_districts.py:14
-msgid "Bratislava II"
-msgstr "Pozsony II"
-
-#: contrib/localflavor/sk/sk_districts.py:15
-msgid "Bratislava III"
-msgstr "Pozsony III"
-
-#: contrib/localflavor/sk/sk_districts.py:16
-msgid "Bratislava IV"
-msgstr "Pozsony IV"
-
-#: contrib/localflavor/sk/sk_districts.py:17
-msgid "Bratislava V"
-msgstr "Pozsony V"
-
-#: contrib/localflavor/sk/sk_districts.py:18
-msgid "Bytca"
-msgstr "Bytca"
-
-#: contrib/localflavor/sk/sk_districts.py:19
-msgid "Cadca"
-msgstr "Cadca"
-
-#: contrib/localflavor/sk/sk_districts.py:20
-msgid "Detva"
-msgstr "Detva"
-
-#: contrib/localflavor/sk/sk_districts.py:21
-msgid "Dolny Kubin"
-msgstr "Dolny Kubin"
-
-#: contrib/localflavor/sk/sk_districts.py:22
-msgid "Dunajska Streda"
-msgstr "Dunaszerdahely"
-
-#: contrib/localflavor/sk/sk_districts.py:23
-msgid "Galanta"
-msgstr "Galánta"
-
-#: contrib/localflavor/sk/sk_districts.py:24
-msgid "Gelnica"
-msgstr "Gelnica"
-
-#: contrib/localflavor/sk/sk_districts.py:25
-msgid "Hlohovec"
-msgstr "Hlohovec"
-
-#: contrib/localflavor/sk/sk_districts.py:26
-msgid "Humenne"
-msgstr "Humenne"
-
-#: contrib/localflavor/sk/sk_districts.py:27
-msgid "Ilava"
-msgstr "Ilava"
-
-#: contrib/localflavor/sk/sk_districts.py:28
-msgid "Kezmarok"
-msgstr "Késmárk"
-
-#: contrib/localflavor/sk/sk_districts.py:29
-msgid "Komarno"
-msgstr "Komárom"
-
-#: contrib/localflavor/sk/sk_districts.py:30
-msgid "Kosice I"
-msgstr "Kassa I"
-
-#: contrib/localflavor/sk/sk_districts.py:31
-msgid "Kosice II"
-msgstr "Kassa II"
-
-#: contrib/localflavor/sk/sk_districts.py:32
-msgid "Kosice III"
-msgstr "Kassa III"
-
-#: contrib/localflavor/sk/sk_districts.py:33
-msgid "Kosice IV"
-msgstr "Kassa IV"
-
-#: contrib/localflavor/sk/sk_districts.py:34
-msgid "Kosice - okolie"
-msgstr "Kosice - okolie"
-
-#: contrib/localflavor/sk/sk_districts.py:35
-msgid "Krupina"
-msgstr "Krupina"
-
-#: contrib/localflavor/sk/sk_districts.py:36
-msgid "Kysucke Nove Mesto"
-msgstr "Kysucke Nove Mesto"
-
-#: contrib/localflavor/sk/sk_districts.py:37
-msgid "Levice"
-msgstr "Levice"
-
-#: contrib/localflavor/sk/sk_districts.py:38
-msgid "Levoca"
-msgstr "Levoca"
-
-#: contrib/localflavor/sk/sk_districts.py:39
-msgid "Liptovsky Mikulas"
-msgstr "Liptovsky Mikulas"
-
-#: contrib/localflavor/sk/sk_districts.py:40
-msgid "Lucenec"
-msgstr "Lucenec"
-
-#: contrib/localflavor/sk/sk_districts.py:41
-msgid "Malacky"
-msgstr "Malacky"
-
-#: contrib/localflavor/sk/sk_districts.py:42
-msgid "Martin"
-msgstr "Martin"
-
-#: contrib/localflavor/sk/sk_districts.py:43
-msgid "Medzilaborce"
-msgstr "Medzilaborce"
-
-#: contrib/localflavor/sk/sk_districts.py:44
-msgid "Michalovce"
-msgstr "Michalovce"
-
-#: contrib/localflavor/sk/sk_districts.py:45
-msgid "Myjava"
-msgstr "Myjava"
-
-#: contrib/localflavor/sk/sk_districts.py:46
-msgid "Namestovo"
-msgstr "Namestovo"
-
-#: contrib/localflavor/sk/sk_districts.py:47
-msgid "Nitra"
-msgstr "Nyitra"
-
-#: contrib/localflavor/sk/sk_districts.py:48
-msgid "Nove Mesto nad Vahom"
-msgstr "Nove Mesto nad Vahom"
-
-#: contrib/localflavor/sk/sk_districts.py:49
-msgid "Nove Zamky"
-msgstr "Nove Zamky"
-
-#: contrib/localflavor/sk/sk_districts.py:50
-msgid "Partizanske"
-msgstr "Partizanske"
-
-#: contrib/localflavor/sk/sk_districts.py:51
-msgid "Pezinok"
-msgstr "Pezinok"
-
-#: contrib/localflavor/sk/sk_districts.py:52
-msgid "Piestany"
-msgstr "Piestany"
-
-#: contrib/localflavor/sk/sk_districts.py:53
-msgid "Poltar"
-msgstr "Poltar"
-
-#: contrib/localflavor/sk/sk_districts.py:54
-msgid "Poprad"
-msgstr "Poprád"
-
-#: contrib/localflavor/sk/sk_districts.py:55
-msgid "Povazska Bystrica"
-msgstr "Povazska Bystrica"
-
-#: contrib/localflavor/sk/sk_districts.py:56
-msgid "Presov"
-msgstr "Presov"
-
-#: contrib/localflavor/sk/sk_districts.py:57
-msgid "Prievidza"
-msgstr "Prievidza"
-
-#: contrib/localflavor/sk/sk_districts.py:58
-msgid "Puchov"
-msgstr "Puchov"
-
-#: contrib/localflavor/sk/sk_districts.py:59
-msgid "Revuca"
-msgstr "Revuca"
-
-#: contrib/localflavor/sk/sk_districts.py:60
-msgid "Rimavska Sobota"
-msgstr "Rimaszombat"
-
-#: contrib/localflavor/sk/sk_districts.py:61
-msgid "Roznava"
-msgstr "Rozsnyó"
-
-#: contrib/localflavor/sk/sk_districts.py:62
-msgid "Ruzomberok"
-msgstr "Rózsahegy"
-
-#: contrib/localflavor/sk/sk_districts.py:63
-msgid "Sabinov"
-msgstr "Sabinov"
-
-#: contrib/localflavor/sk/sk_districts.py:64
-msgid "Senec"
-msgstr "Senec"
-
-#: contrib/localflavor/sk/sk_districts.py:65
-msgid "Senica"
-msgstr "Senica"
-
-#: contrib/localflavor/sk/sk_districts.py:66
-msgid "Skalica"
-msgstr "Skalica"
-
-#: contrib/localflavor/sk/sk_districts.py:67
-msgid "Snina"
-msgstr "Snina"
-
-#: contrib/localflavor/sk/sk_districts.py:68
-msgid "Sobrance"
-msgstr "Sobrance"
-
-#: contrib/localflavor/sk/sk_districts.py:69
-msgid "Spisska Nova Ves"
-msgstr "Igló"
-
-#: contrib/localflavor/sk/sk_districts.py:70
-msgid "Stara Lubovna"
-msgstr "Stara Lubovna"
-
-#: contrib/localflavor/sk/sk_districts.py:71
-msgid "Stropkov"
-msgstr "Stropkov"
-
-#: contrib/localflavor/sk/sk_districts.py:72
-msgid "Svidnik"
-msgstr "Svidnik"
-
-#: contrib/localflavor/sk/sk_districts.py:73
-msgid "Sala"
-msgstr "Sellye"
-
-#: contrib/localflavor/sk/sk_districts.py:74
-msgid "Topolcany"
-msgstr "Topolcany"
-
-#: contrib/localflavor/sk/sk_districts.py:75
-msgid "Trebisov"
-msgstr "Trebisov"
-
-#: contrib/localflavor/sk/sk_districts.py:76
-msgid "Trencin"
-msgstr "Trencsén"
-
-#: contrib/localflavor/sk/sk_districts.py:77
-msgid "Trnava"
-msgstr "Trnava"
-
-#: contrib/localflavor/sk/sk_districts.py:78
-msgid "Turcianske Teplice"
-msgstr "Turcianske Teplice"
-
-#: contrib/localflavor/sk/sk_districts.py:79
-msgid "Tvrdosin"
-msgstr "Tvrdosin"
-
-#: contrib/localflavor/sk/sk_districts.py:80
-msgid "Velky Krtis"
-msgstr "Velky Krtis"
-
-#: contrib/localflavor/sk/sk_districts.py:81
-msgid "Vranov nad Toplou"
-msgstr "Vranov nad Toplou"
-
-#: contrib/localflavor/sk/sk_districts.py:82
-msgid "Zlate Moravce"
-msgstr "Zlate Moravce"
-
-#: contrib/localflavor/sk/sk_districts.py:83
-msgid "Zvolen"
-msgstr "Zvolen"
-
-#: contrib/localflavor/sk/sk_districts.py:84
-msgid "Zarnovica"
-msgstr "Zarnovica"
-
-#: contrib/localflavor/sk/sk_districts.py:85
-msgid "Ziar nad Hronom"
-msgstr "Ziar nad Hronom"
-
-#: contrib/localflavor/sk/sk_districts.py:86
-msgid "Zilina"
-msgstr "Zsolna"
-
-#: contrib/localflavor/sk/sk_regions.py:8
-msgid "Banska Bystrica region"
-msgstr "Besztercebánya régió"
-
-#: contrib/localflavor/sk/sk_regions.py:9
-msgid "Bratislava region"
-msgstr "Pozsony régió"
-
-#: contrib/localflavor/sk/sk_regions.py:10
-msgid "Kosice region"
-msgstr "Kassa régió"
-
-#: contrib/localflavor/sk/sk_regions.py:11
-msgid "Nitra region"
-msgstr "Nyitra régió"
-
-#: contrib/localflavor/sk/sk_regions.py:12
-msgid "Presov region"
-msgstr "Presov régió"
-
-#: contrib/localflavor/sk/sk_regions.py:13
-msgid "Trencin region"
-msgstr "Trencsén régió"
-
-#: contrib/localflavor/sk/sk_regions.py:14
-msgid "Trnava region"
-msgstr "Trnava régió"
-
-#: contrib/localflavor/sk/sk_regions.py:15
-msgid "Zilina region"
-msgstr "Zsolna régió"
-
-#: contrib/localflavor/uk/forms.py:21
-msgid "Enter a valid postcode."
-msgstr "Adjon meg egy érvényes irányítószámot."
-
-#: contrib/localflavor/uk/uk_regions.py:11
-msgid "Bedfordshire"
-msgstr "Bedfordshire"
-
-#: contrib/localflavor/uk/uk_regions.py:12
-msgid "Buckinghamshire"
-msgstr "Buckinghamshire"
-
-#: contrib/localflavor/uk/uk_regions.py:14
-msgid "Cheshire"
-msgstr "Cheshire"
-
-#: contrib/localflavor/uk/uk_regions.py:15
-msgid "Cornwall and Isles of Scilly"
-msgstr "Cornwall and Isles of Scilly"
-
-#: contrib/localflavor/uk/uk_regions.py:16
-msgid "Cumbria"
-msgstr "Cumbria"
-
-#: contrib/localflavor/uk/uk_regions.py:17
-msgid "Derbyshire"
-msgstr "Derbyshire"
-
-#: contrib/localflavor/uk/uk_regions.py:18
-msgid "Devon"
-msgstr "Devon"
-
-#: contrib/localflavor/uk/uk_regions.py:19
-msgid "Dorset"
-msgstr "Dorset"
-
-#: contrib/localflavor/uk/uk_regions.py:20
-msgid "Durham"
-msgstr "Durham"
-
-#: contrib/localflavor/uk/uk_regions.py:21
-msgid "East Sussex"
-msgstr "East Sussex"
-
-#: contrib/localflavor/uk/uk_regions.py:22
-msgid "Essex"
-msgstr "Essex"
-
-#: contrib/localflavor/uk/uk_regions.py:23
-msgid "Gloucestershire"
-msgstr "Gloucestershire"
-
-#: contrib/localflavor/uk/uk_regions.py:24
-msgid "Greater London"
-msgstr "Greater London"
-
-#: contrib/localflavor/uk/uk_regions.py:25
-msgid "Greater Manchester"
-msgstr "Greater Manchester"
-
-#: contrib/localflavor/uk/uk_regions.py:26
-msgid "Hampshire"
-msgstr "Hampshire"
-
-#: contrib/localflavor/uk/uk_regions.py:27
-msgid "Hertfordshire"
-msgstr "Hertofrdshire"
-
-#: contrib/localflavor/uk/uk_regions.py:28
-msgid "Kent"
-msgstr "Kent"
-
-#: contrib/localflavor/uk/uk_regions.py:29
-msgid "Lancashire"
-msgstr "Lancashire"
-
-#: contrib/localflavor/uk/uk_regions.py:30
-msgid "Leicestershire"
-msgstr "Leicestershire"
-
-#: contrib/localflavor/uk/uk_regions.py:31
-msgid "Lincolnshire"
-msgstr "Linclonshire"
-
-#: contrib/localflavor/uk/uk_regions.py:32
-msgid "Merseyside"
-msgstr "Merseyside"
-
-#: contrib/localflavor/uk/uk_regions.py:33
-msgid "Norfolk"
-msgstr "Norfolk"
-
-#: contrib/localflavor/uk/uk_regions.py:34
-msgid "North Yorkshire"
-msgstr "North Yorkshire"
-
-#: contrib/localflavor/uk/uk_regions.py:35
-msgid "Northamptonshire"
-msgstr "Northamptonshire"
-
-#: contrib/localflavor/uk/uk_regions.py:36
-msgid "Northumberland"
-msgstr "Northumberland"
-
-#: contrib/localflavor/uk/uk_regions.py:37
-msgid "Nottinghamshire"
-msgstr "Nottinghamshire"
-
-#: contrib/localflavor/uk/uk_regions.py:38
-msgid "Oxfordshire"
-msgstr "Oxfordshire"
-
-#: contrib/localflavor/uk/uk_regions.py:39
-msgid "Shropshire"
-msgstr "Shropshire"
-
-#: contrib/localflavor/uk/uk_regions.py:40
-msgid "Somerset"
-msgstr "Somerset"
-
-#: contrib/localflavor/uk/uk_regions.py:41
-msgid "South Yorkshire"
-msgstr "South Yorkshire"
-
-#: contrib/localflavor/uk/uk_regions.py:42
-msgid "Staffordshire"
-msgstr "Staffordshire"
-
-#: contrib/localflavor/uk/uk_regions.py:43
-msgid "Suffolk"
-msgstr "Suffolk"
-
-#: contrib/localflavor/uk/uk_regions.py:44
-msgid "Surrey"
-msgstr "Surrey"
-
-#: contrib/localflavor/uk/uk_regions.py:45
-msgid "Tyne and Wear"
-msgstr "Tyne and Wear"
-
-#: contrib/localflavor/uk/uk_regions.py:46
-msgid "Warwickshire"
-msgstr "Warwickshire"
-
-#: contrib/localflavor/uk/uk_regions.py:47
-msgid "West Midlands"
-msgstr "West Midlands"
-
-#: contrib/localflavor/uk/uk_regions.py:48
-msgid "West Sussex"
-msgstr "West Sussex"
-
-#: contrib/localflavor/uk/uk_regions.py:49
-msgid "West Yorkshire"
-msgstr "West Yorkshire"
-
-#: contrib/localflavor/uk/uk_regions.py:50
-msgid "Wiltshire"
-msgstr "Wiltshire"
-
-#: contrib/localflavor/uk/uk_regions.py:51
-msgid "Worcestershire"
-msgstr "Worcestershire"
-
-#: contrib/localflavor/uk/uk_regions.py:55
-msgid "County Antrim"
-msgstr "County Antrim"
-
-#: contrib/localflavor/uk/uk_regions.py:56
-msgid "County Armagh"
-msgstr "Aounty Armagh"
-
-#: contrib/localflavor/uk/uk_regions.py:57
-msgid "County Down"
-msgstr "County Down"
-
-#: contrib/localflavor/uk/uk_regions.py:58
-msgid "County Fermanagh"
-msgstr "County Fermanagh"
-
-#: contrib/localflavor/uk/uk_regions.py:59
-msgid "County Londonderry"
-msgstr "County Londonderry"
-
-#: contrib/localflavor/uk/uk_regions.py:60
-msgid "County Tyrone"
-msgstr "County Tyrone"
-
-#: contrib/localflavor/uk/uk_regions.py:64
-msgid "Clwyd"
-msgstr "Clwyd"
-
-#: contrib/localflavor/uk/uk_regions.py:65
-msgid "Dyfed"
-msgstr "Dyfed"
-
-#: contrib/localflavor/uk/uk_regions.py:66
-msgid "Gwent"
-msgstr "Gwent"
-
-#: contrib/localflavor/uk/uk_regions.py:67
-msgid "Gwynedd"
-msgstr "Gwynedd"
-
-#: contrib/localflavor/uk/uk_regions.py:68
-msgid "Mid Glamorgan"
-msgstr "Mid Glamorgan"
-
-#: contrib/localflavor/uk/uk_regions.py:69
-msgid "Powys"
-msgstr "Powys"
-
-#: contrib/localflavor/uk/uk_regions.py:70
-msgid "South Glamorgan"
-msgstr "South Glamoran"
-
-#: contrib/localflavor/uk/uk_regions.py:71
-msgid "West Glamorgan"
-msgstr "West Glamorgan"
-
-#: contrib/localflavor/uk/uk_regions.py:75
-msgid "Borders"
-msgstr "Borders"
-
-#: contrib/localflavor/uk/uk_regions.py:76
-msgid "Central Scotland"
-msgstr "Közép-Skócia"
-
-#: contrib/localflavor/uk/uk_regions.py:77
-msgid "Dumfries and Galloway"
-msgstr "Dumfries and Galloway"
-
-#: contrib/localflavor/uk/uk_regions.py:78
-msgid "Fife"
-msgstr "Fife"
-
-#: contrib/localflavor/uk/uk_regions.py:79
-msgid "Grampian"
-msgstr "Grampian"
-
-#: contrib/localflavor/uk/uk_regions.py:80
-msgid "Highland"
-msgstr "Highland"
-
-#: contrib/localflavor/uk/uk_regions.py:81
-msgid "Lothian"
-msgstr "Lothian"
-
-#: contrib/localflavor/uk/uk_regions.py:82
-msgid "Orkney Islands"
-msgstr "Orkey-szigetek"
-
-#: contrib/localflavor/uk/uk_regions.py:83
-msgid "Shetland Islands"
-msgstr "Shetland-szigetek"
-
-#: contrib/localflavor/uk/uk_regions.py:84
-msgid "Strathclyde"
-msgstr "Strathclyde"
-
-#: contrib/localflavor/uk/uk_regions.py:85
-msgid "Tayside"
-msgstr "Tayside"
-
-#: contrib/localflavor/uk/uk_regions.py:86
-msgid "Western Isles"
-msgstr "Western Isles"
-
-#: contrib/localflavor/uk/uk_regions.py:90
-msgid "England"
-msgstr "Anglia"
-
-#: contrib/localflavor/uk/uk_regions.py:91
-msgid "Northern Ireland"
-msgstr "Észak-Írország"
-
-#: contrib/localflavor/uk/uk_regions.py:92
-msgid "Scotland"
-msgstr "Skócia"
-
-#: contrib/localflavor/uk/uk_regions.py:93
-msgid "Wales"
-msgstr "Wales"
-
-#: contrib/localflavor/us/forms.py:16
-msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "Írjon be egy irányítószámot 'XXXXX', vagy 'XXXXX-XXXX' alakban."
-
-#: contrib/localflavor/us/forms.py:54
-msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr "Írjon be egy érvényes USA SSN-t 'XXX-XX-XXXX' formátumban."
-
-#: contrib/localflavor/za/forms.py:20
-msgid "Enter a valid South African ID number"
-msgstr "Adjon meg egy érvényes dél-afrikai azonosító számot."
-
-#: contrib/localflavor/za/forms.py:54
-msgid "Enter a valid South African postal code"
-msgstr "Adjon meg egy érvényes dél-afrikai irányítószámot."
-
-#: contrib/localflavor/za/za_provinces.py:4
-msgid "Eastern Cape"
-msgstr "Eastern Cape"
-
-#: contrib/localflavor/za/za_provinces.py:5
-msgid "Free State"
-msgstr "Free State"
-
-#: contrib/localflavor/za/za_provinces.py:6
-msgid "Gauteng"
-msgstr "Gauteng"
-
-#: contrib/localflavor/za/za_provinces.py:7
-msgid "KwaZulu-Natal"
-msgstr "KwaZulu -Natal"
-
-#: contrib/localflavor/za/za_provinces.py:8
-msgid "Limpopo"
-msgstr "Limpopo"
-
-#: contrib/localflavor/za/za_provinces.py:9
-msgid "Mpumalanga"
-msgstr "Mpumalanga"
-
-#: contrib/localflavor/za/za_provinces.py:10
-msgid "Northern Cape"
-msgstr "Northern Cape"
-
-#: contrib/localflavor/za/za_provinces.py:11
-msgid "North West"
-msgstr "North West"
-
-#: contrib/localflavor/za/za_provinces.py:12
-msgid "Western Cape"
-msgstr "Western Cape"
-
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "átirányítva innen"
-
-#: contrib/redirects/models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Ennek abszolút elérési útnak kell lennie, a tartománynév nélkül. Példa: '/"
-"events/search/'"
-
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "átirányítva ide"
-
-#: contrib/redirects/models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Ennek vagy abszolút elérési útnak kell lennie (mint fentebb), vagy teljes "
-"URL-nek 'http://'-vel kezdve."
-
-#: contrib/redirects/models.py:13
-msgid "redirect"
-msgstr "átirányítás"
-
-#: contrib/redirects/models.py:14
-msgid "redirects"
-msgstr "átirányít"
-
-#: contrib/sessions/models.py:45
-msgid "session key"
-msgstr "munkamenet kulcs"
-
-#: contrib/sessions/models.py:47
-msgid "session data"
-msgstr "munkamenet adat"
-
-#: contrib/sessions/models.py:48
-msgid "expire date"
-msgstr "lejárat dátuma"
-
-#: contrib/sessions/models.py:53
-msgid "session"
-msgstr "munkamenet"
-
-#: contrib/sessions/models.py:54
-msgid "sessions"
-msgstr "munkamenetek"
-
-#: contrib/sites/models.py:32
-msgid "domain name"
-msgstr "tartománynév"
-
-#: contrib/sites/models.py:33
-msgid "display name"
-msgstr "megjelenítendő név"
-
-#: contrib/sites/models.py:39
-msgid "sites"
-msgstr "honlapok"
-
-#: core/validators.py:80
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "Az érték csak betűket, számokat, aláhúzást és kötőjelet tartalmazhat."
-
-#: core/validators.py:84
-msgid "Uppercase letters are not allowed here."
-msgstr "Nagybetűk itt nem megengedettek."
-
-#: core/validators.py:88
-msgid "Lowercase letters are not allowed here."
-msgstr "Kisbetűk itt nem megengedettek."
-
-#: core/validators.py:95 db/models/fields/__init__.py:412
-msgid "Enter only digits separated by commas."
-msgstr "Csak számokat adjon meg, vesszővel elválasztva."
-
-#: core/validators.py:107
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Érvényes e-mail címeket adjon meg, vesszővel elválasztva."
-
-#: core/validators.py:111
-msgid "Please enter a valid IP address."
-msgstr "Írjon be egy érvényes IP címet."
-
-#: core/validators.py:115
-msgid "Empty values are not allowed here."
-msgstr "Üres érték itt nem megengedett."
-
-#: core/validators.py:119
-msgid "Non-numeric characters aren't allowed here."
-msgstr "Nem szám karakterek itt nem megengedettek."
-
-#: core/validators.py:123
-msgid "This value can't be comprised solely of digits."
-msgstr "Ez az érték nem tartalmazhat kizárólag számokat."
-
-#: core/validators.py:128 forms/fields.py:161 newforms/fields.py:152
-msgid "Enter a whole number."
-msgstr "Adjon meg egy egész számot."
-
-#: core/validators.py:132
-msgid "Only alphabetical characters are allowed here."
-msgstr "Itt csak betűk megengedettek."
-
-#: core/validators.py:147
-msgid "Year must be 1900 or later."
-msgstr "Az évnek 1900-nak vagy későbbinek kell lennie."
-
-#: core/validators.py:151 db/models/fields/__init__.py:452
+#: db/models/fields/__init__.py:588
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Írjon be egy érvényes dátumot 'ÉÉÉÉ-HH-NN' alakban."
+
+#: db/models/fields/__init__.py:589
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Érvénytelen dátum: %s"
 
-#: core/validators.py:156 db/models/fields/__init__.py:443
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Írjon be egy érvényes dátumot 'ÉÉÉÉ-HH-NN' alakban."
+#: db/models/fields/__init__.py:670
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr ""
+"Írjon be egy érvényes dátumot/időt 'ÉÉÉÉ-HH-NN ÓÓ-PP[:MP[.MILLIS]] alakban."
 
-#: core/validators.py:161
-msgid "Enter a valid time in HH:MM format."
-msgstr "Írjon be egy érvényes időt 'ÓÓ:PP' alakban."
+#: db/models/fields/__init__.py:672
+msgid "Date (with time)"
+msgstr "Dátum (idővel)"
 
-#: core/validators.py:165
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Írjon be egy érvényes dátumot/időt 'ÉÉÉÉ-HH-NN ÓÓ-PP' alakban."
+#: db/models/fields/__init__.py:746
+msgid "This value must be a decimal number."
+msgstr "Az értéknek decimálisnak kell lennie."
 
-#: core/validators.py:182 core/validators.py:474 forms/fields.py:441
-#: newforms/fields.py:433 oldforms/__init__.py:687
+#: db/models/fields/__init__.py:748
+msgid "Decimal number"
+msgstr "Tizes számrendszerű (decimális) szám"
+
+#: db/models/fields/__init__.py:803
+msgid "E-mail address"
+msgstr "E-mail cím"
+
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
+msgid "File path"
+msgstr "Elérési út"
+
+#: db/models/fields/__init__.py:841
+#, fuzzy
+msgid "This value must be a float."
+msgstr "Az értéknek legalább ennyinek kell lennie: %s."
+
+#: db/models/fields/__init__.py:843
+msgid "Floating point number"
+msgstr "Lebegőpontos szám"
+
+#: db/models/fields/__init__.py:902
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "IP cím"
+
+#: db/models/fields/__init__.py:931
+msgid "This value must be either None, True or False."
+msgstr ""
+"Az értéknek semminek (None), igaznak (True), vagy hamisnak (False) kell "
+"lennie."
+
+#: db/models/fields/__init__.py:933
+msgid "Boolean (Either True, False or None)"
+msgstr "Logikai (True, False vagy None)"
+
+#: db/models/fields/__init__.py:1024
+msgid "Text"
+msgstr "Szöveg"
+
+#: db/models/fields/__init__.py:1040
+msgid "Time"
+msgstr "Idő"
+
+#: db/models/fields/__init__.py:1044
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "Írjon be egy érvényes időt 'ÓÓ:PP[:MP[:MILLIS]]' alakban."
+
+#: db/models/fields/__init__.py:1120
+msgid "URL"
+msgstr "URL"
+
+#: db/models/fields/__init__.py:1136
+msgid "XML text"
+msgstr "XML szöveg"
+
+#: db/models/fields/related.py:804
+#, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr ""
+
+#: db/models/fields/related.py:806
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+
+#: db/models/fields/related.py:928
+msgid "One-to-one relationship"
+msgstr ""
+
+#: db/models/fields/related.py:990
+msgid "Many-to-many relationship"
+msgstr ""
+
+#: db/models/fields/related.py:1010
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Tartsa lenyomva a \"Control\"-t (vagy Mac-en a \"Command\"-ot) több elem "
+"kiválasztásához."
+
+#: forms/fields.py:66
+msgid "This field is required."
+msgstr "Ennek a mezőnek a megadása kötelező."
+
+#: forms/fields.py:221
+msgid "Enter a whole number."
+msgstr "Adjon meg egy egész számot."
+
+#: forms/fields.py:252 forms/fields.py:273
+msgid "Enter a number."
+msgstr "Adj meg egy számot."
+
+#: forms/fields.py:276
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Bizonyosodjon meg arról, hogy nincs ennél több számjegy: %s."
+
+#: forms/fields.py:277
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Bizonyosodjon meg arról, hogy nincs ennél több tizedesjegy: %s."
+
+#: forms/fields.py:278
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr ""
+"Bizonyosodjon meg arról, hogy nincs ennél több számjegy a tizedesvessző "
+"előtt: %s."
+
+#: forms/fields.py:340 forms/fields.py:916
+msgid "Enter a valid date."
+msgstr "Adjon meg egy érvényes dátumot."
+
+#: forms/fields.py:368 forms/fields.py:917
+msgid "Enter a valid time."
+msgstr "Adjon meg egy érvényes időt."
+
+#: forms/fields.py:394
+msgid "Enter a valid date/time."
+msgstr "Adjon meg egy érvényes dátumot/időt."
+
+#: forms/fields.py:458
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nem küldött el fájlt. Ellenőrizze a kódolás típusát az űrlapon."
 
-#: core/validators.py:193 forms/fields.py:472 newforms/fields.py:459
+#: forms/fields.py:459
+msgid "No file was submitted."
+msgstr "Semmilyen fájl sem került feltöltésre."
+
+#: forms/fields.py:460
+msgid "The submitted file is empty."
+msgstr "A küldött fájl üres."
+
+#: forms/fields.py:461
+#, fuzzy, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+"Bizonyosodjon meg arról, hogy ez az érték legfeljebb %(max)d karaktert "
+"tartalmaz (jelenlegi hossza: %(length)d)."
+
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: forms/fields.py:516
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3697,462 +591,149 @@ msgstr ""
 "Töltsön fel egy érvényes képfájlt. A feltöltött fájl nem kép volt, vagy "
 "megsérült."
 
-#: core/validators.py:200
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "A hivatkozás (%s) érvénytelen képfájlra mutat."
-
-#: core/validators.py:204
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr ""
-"A telefonszámoknak 'XXX-XXX-XXXX' formátumúnak kell lenniük. \"%s\" "
-"érvénytelen."
-
-#: core/validators.py:212
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "A hivatkozás (%s) érvénytelen QuickTime videóra mutat."
-
-#: core/validators.py:216
-msgid "A valid URL is required."
-msgstr "Érvényes URL szükséges."
-
-#: core/validators.py:230
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"Érvényes HTML kell. A hiba:\n"
-"%s"
-
-#: core/validators.py:237
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "Rosszul formázott XML: %s"
-
-#: core/validators.py:254
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "Érvénytelen URL: %s"
-
-#: core/validators.py:259 core/validators.py:261
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "A hivatkozás (%s) egy törött link."
-
-#: core/validators.py:267
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "Írja be egy érvényes USA állam rövidítését."
-
-# TODO
-#: core/validators.py:288
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Ennek a mezőnek egyeznie kell a(z) %s mezővel."
-
-#: core/validators.py:307
-msgid "Please enter something for at least one field."
-msgstr "Írjon be valamit legalább egy mezőbe."
-
-#: core/validators.py:316 core/validators.py:327
-msgid "Please enter both fields or leave them both empty."
-msgstr "Töltse ki mindkét mezőt, vagy hagyja üresen mindkettőt."
-
-#: core/validators.py:335
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Ezt a mezőt meg kell adni, ha %(field)s értéke %(value)s"
-
-#: core/validators.py:348
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Ezt a mezőt meg kell adni, ha %(field)s értéke nem %(value)s"
-
-#: core/validators.py:367
-msgid "Duplicate values are not allowed."
-msgstr "Ugyanazok az értékek nem megengedettek."
-
-#: core/validators.py:382
-#, python-format
-msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Az értéknek %(lower)s és %(upper)s között kell lennie."
-
-#: core/validators.py:384
-#, python-format
-msgid "This value must be at least %s."
-msgstr "Az értéknek legalább ennyinek kell lennie: %s."
-
-#: core/validators.py:386
-#, python-format
-msgid "This value must be no more than %s."
-msgstr "Az érték nem lehet több ennyinél: %s."
-
-#: core/validators.py:427
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "Az értéknek %s hatványának kell lennie."
-
-#: core/validators.py:437
-msgid "Please enter a valid decimal number."
-msgstr "Írjon be egy érvényes decimális számot."
-
-#: core/validators.py:444
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Írjon be egy legalább %s jegyű érvényes decimális számot."
-msgstr[1] "Írjon be egy legalább %s jegyű érvényes decimális számot."
-
-#: core/validators.py:447
-#, python-format
-msgid "Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "Írjon be egy érvényes decimális számot, legfeljebb %s egész számjeggyel."
-msgstr[1] "Írjon be egy érvényes decimális számot, legfeljebb %s egész számjeggyel."
-
-#: core/validators.py:450
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Írjon be egy érvényes decimális számot, legfeljebb %s tizedessel."
-msgstr[1] "Írj be egy érvényes decimális számot, legfeljebb %s tizedessel."
-
-#: core/validators.py:458
-msgid "Please enter a valid floating point number."
-msgstr "Írj be egy érvényes lebegőpontos számot."
-
-#: core/validators.py:467
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "A feltöltött fájl legalább %s bájt méretű legyen."
-
-#: core/validators.py:468
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "A feltöltött fájl legfeljebb %s bájt méretű lehet."
-
-#: core/validators.py:485
-msgid "The format for this field is wrong."
-msgstr "Ennek a mezőnek rossz a formátuma."
-
-#: core/validators.py:500
-msgid "This field is invalid."
-msgstr "A mező érvénytelen."
-
-#: core/validators.py:536
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "Nem lehet semmit kinyerni innen: %s."
-
-#: core/validators.py:539
-#, python-format
-msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-"A hivatkozás (%(url)s) érvénytelen '%(contenttype)s' Content-Type fejlécet "
-"adott vissza."
-
-#: core/validators.py:572
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"Zárja le a nyitott %(tag)s címkét a következő sorban: %(line)s. (A sor "
-"kezdete: \"%(start)s\".)"
-
-#: core/validators.py:576
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Valamely szöveg nem megengedett ebben a környezetben a következő sorban: %"
-"(line)s. (A sor kezdete: \"%(start)s\".)"
-
-#: core/validators.py:581
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"%(attr)s\" érvénytelen tulajdonság a következő sorban: %(line)s. (A sor "
-"kezdete: \"%(start)s\".)"
-
-#: core/validators.py:586
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"<%(tag)s>\" érvénytelen címke a következő sorban: %(line)s. (A sor "
-"kezdete: \"%(start)s\".)"
-
-#: core/validators.py:590
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"A következő sorban lévő címkéről hiányzik egy vagy több kötelező "
-"tulajdonság: %(line)s. (A sor kezdete: \"%(start)s\".)"
-
-#: core/validators.py:595
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"A tulajdonság (\"%(attr)s\") érvénytelen a következő sorban: %(line)s. (A "
-"sor kezdete: \"%(start)s\".)"
-
-#: db/models/manipulators.py:308
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "A megadott %(field)s mezőhöz már létezik %(type)s típusú %(object)s elem."
-
-#: db/models/fields/__init__.py:332 db/models/fields/__init__.py:667
-msgid "This value must be an integer."
-msgstr "Az értéknek egész számnak kell lennie."
-
-#: db/models/fields/__init__.py:363
-msgid "This value must be either True or False."
-msgstr "Az értéknek igaznak (True) vagy hamisnak (False) kell lennie."
-
-#: db/models/fields/__init__.py:396
-msgid "This field cannot be null."
-msgstr "Ez a mező nem lehet nulla."
-
-#: db/models/fields/__init__.py:516 db/models/fields/__init__.py:534
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "Írjon be egy érvényes dátumot/időt 'ÉÉÉÉ-HH-NN ÓÓ-PP[:MP[.MILLIS]] alakban."
-
-#: db/models/fields/__init__.py:570
-msgid "This value must be a decimal number."
-msgstr "Az értéknek decimálisnak kell lennie."
-
-#: db/models/fields/__init__.py:703
-msgid "This value must be either None, True or False."
-msgstr ""
-"Az értéknek semminek (None), igaznak (True), vagy hamisnak (False) kell "
-"lennie."
-
-#: db/models/fields/__init__.py:811 db/models/fields/__init__.py:825
-msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "Írjon be egy érvényes időt 'ÓÓ:PP[:MP[:MILLIS]]' alakban."
-
-#: db/models/fields/related.py:748
-msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Tartsa lenyomva a \"Control\"-t (vagy Mac-en a \"Command\"-ot) több elem "
-"kiválasztásához."
-
-#: db/models/fields/related.py:825
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "Írjon be érvényes %(self)s ID-t. A mostani érték érvénytelen: %(value)r."
-msgstr[1] ""
-"Írjon be érvényes %(self)s ID-ket. A mostani értékek érvénytelenek: %(value)"
-"r."
-
-#: forms/fields.py:52 newforms/fields.py:46 oldforms/__init__.py:374
-msgid "This field is required."
-msgstr "Ennek a mezőnek a megadása kötelező."
-
-#: forms/fields.py:53 newforms/fields.py:47
-msgid "Enter a valid value."
-msgstr "Adjon meg egy érvényes értéket."
-
-#: forms/fields.py:133 newforms/fields.py:124
-#, python-format
-msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr ""
-"Bizonyosodjon meg arról, hogy ez az érték legfeljebb %(max)d karaktert "
-"tartalmaz (jelenlegi hossza: %(length)d)."
-
-#: forms/fields.py:134 newforms/fields.py:125
-#, python-format
-msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr ""
-"Bizonyosodjon meg arról, hogy ez az érték legalább %(min)d karaktert "
-"tartalmaz (jelenlegi hossza: %(length)d)."
-
-#: forms/fields.py:162 forms/fields.py:191 forms/fields.py:220
-#: newforms/fields.py:153 newforms/fields.py:182 newforms/fields.py:211
-#, python-format
-msgid "Ensure this value is less than or equal to %s."
-msgstr "Bizonyosodjon meg arról, hogy az érték %s vagy kisebb."
-
-#: forms/fields.py:163 forms/fields.py:192 forms/fields.py:221
-#: newforms/fields.py:154 newforms/fields.py:183 newforms/fields.py:212
-#, python-format
-msgid "Ensure this value is greater than or equal to %s."
-msgstr "Bizonyosodjon meg arról, hogy az érték %s vagy nagyobb."
-
-#: forms/fields.py:190 forms/fields.py:219 newforms/fields.py:181
-#: newforms/fields.py:210
-msgid "Enter a number."
-msgstr "Adj meg egy számot."
-
-#: forms/fields.py:222 newforms/fields.py:213
-#, python-format
-msgid "Ensure that there are no more than %s digits in total."
-msgstr "Bizonyosodjon meg arról, hogy nincs ennél több számjegy: %s."
-
-#: forms/fields.py:223 newforms/fields.py:214
-#, python-format
-msgid "Ensure that there are no more than %s decimal places."
-msgstr "Bizonyosodjon meg arról, hogy nincs ennél több tizedesjegy: %s."
-
-#: forms/fields.py:224 newforms/fields.py:215
-#, python-format
-msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr ""
-"Bizonyosodjon meg arról, hogy nincs ennél több számjegy a tizedesvessző "
-"előtt: %s."
-
-#: forms/fields.py:282 forms/fields.py:815 newforms/fields.py:263
-#: newforms/fields.py:750
-msgid "Enter a valid date."
-msgstr "Adjon meg egy érvényes dátumot."
-
-#: forms/fields.py:316 forms/fields.py:816 newforms/fields.py:296
-#: newforms/fields.py:751
-msgid "Enter a valid time."
-msgstr "Adjon meg egy érvényes időt."
-
-#: forms/fields.py:355 newforms/fields.py:335
-msgid "Enter a valid date/time."
-msgstr "Adjon meg egy érvényes dátumot/időt."
-
-#: forms/fields.py:442 newforms/fields.py:434
-msgid "No file was submitted."
-msgstr "Semmilyen fájl sem került feltöltésre."
-
-#: forms/fields.py:443 newforms/fields.py:435 oldforms/__init__.py:689
-msgid "The submitted file is empty."
-msgstr "A küldött fájl üres."
-
-#: forms/fields.py:533 newforms/fields.py:497
-msgid "Enter a valid URL."
-msgstr "Adjon meg egy érvényes URL-t."
-
-#: forms/fields.py:534 newforms/fields.py:498
-msgid "This URL appears to be a broken link."
-msgstr "Ez a hivatkozás törött linknek tűnik."
-
-#: forms/fields.py:613 forms/fields.py:664 newforms/fields.py:598
+#: forms/fields.py:648 forms/fields.py:723
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Válasszon érvényes elemet. '%(value)s' nincs az elérhető lehetőségek között."
+msgstr ""
+"Válasszon érvényes elemet. '%(value)s' nincs az elérhető lehetőségek között."
 
-#: forms/fields.py:665 forms/fields.py:726 forms/models.py:531
-#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:372
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
 msgid "Enter a list of values."
 msgstr "Adja meg értékek egy listáját."
 
-#: forms/fields.py:844 newforms/fields.py:779
-msgid "Enter a valid IPv4 address."
-msgstr "Írjon be egy érvényes IPv4 címet."
-
-#: forms/fields.py:854
-msgid "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr ""
-"Az URL barát cím csak betűket, számokat, aláhúzásokat és kötőjeleket "
-"tartalmazhat."
-
-#: forms/formsets.py:242 forms/formsets.py:244
+#: forms/formsets.py:308 forms/formsets.py:310
 msgid "Order"
 msgstr "Sorrend"
 
-#: forms/models.py:463 newforms/fields.py:559 newforms/models.py:305
+#: forms/formsets.py:312
+msgid "Delete"
+msgstr "Törlés"
+
+#: forms/models.py:575
+#, fuzzy, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Kérem javítsa az alábbi hibát."
+
+#: forms/models.py:579
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: forms/models.py:585
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: forms/models.py:593
+#, fuzzy
+msgid "Please correct the duplicate values below."
+msgstr "Kérem javítsa az alábbi hibát."
+
+#: forms/models.py:868
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
+
+#: forms/models.py:929
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Válasszon érvényes elemet. Az Ön választása nincs az elérhető lehetőségek "
 "között."
 
-#: forms/models.py:532 newforms/models.py:373
+#: forms/models.py:1019
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Válasszon érvényes elemet. %s nincs az elérhető lehetőségek között."
 
-#: oldforms/__init__.py:409
+#: forms/models.py:1021
 #, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "A szövegnek rövidebbnek kell lennie %s karakternél."
-msgstr[1] "A szövegnek rövidebbnek kell lennie %s karakternél."
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr ""
 
-#: oldforms/__init__.py:414
-msgid "Line breaks are not allowed here."
-msgstr "Sortörések itt nem megengedettek."
+#: forms/widgets.py:299
+#, fuzzy
+msgid "Currently"
+msgstr "Éppen:"
 
-#: oldforms/__init__.py:512 oldforms/__init__.py:586 oldforms/__init__.py:625
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Válasszon egy érvényes elemet, '%(data)s' nincs ezek között: %(choices)s."
+#: forms/widgets.py:300
+msgid "Change"
+msgstr "Módosítás"
 
-#: oldforms/__init__.py:745
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Írjon be egy egész számot -32 768 és 32 767 között."
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "év"
 
-#: oldforms/__init__.py:755
-msgid "Enter a positive number."
-msgstr "Írjon be egy pozitív számot."
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr "Ismeretlen"
 
-#: oldforms/__init__.py:765
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Írjon be egy egész számot 0 és 32 767 között."
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "Igen"
 
-#: template/defaultfilters.py:706
+#: forms/widgets.py:547
+msgid "No"
+msgstr "Nem"
+
+#: template/defaultfilters.py:794
 msgid "yes,no,maybe"
 msgstr "igen,nem,talán"
 
-#: template/defaultfilters.py:737
+#: template/defaultfilters.py:825
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d bájt"
 msgstr[1] "%(size)d bájt"
 
-#: template/defaultfilters.py:739
+#: template/defaultfilters.py:827
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:741
+#: template/defaultfilters.py:829
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:742
+#: template/defaultfilters.py:831
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: utils/dateformat.py:41
+#: template/defaultfilters.py:833
+#, fuzzy, python-format
+msgid "%.1f TB"
+msgstr "%.1f KB"
+
+#: template/defaultfilters.py:834
+#, fuzzy, python-format
+msgid "%.1f PB"
+msgstr "%.1f KB"
+
+#: utils/dateformat.py:42
 msgid "p.m."
 msgstr "du"
 
-#: utils/dateformat.py:42
+#: utils/dateformat.py:43
 msgid "a.m."
 msgstr "de"
 
-#: utils/dateformat.py:47
+#: utils/dateformat.py:48
 msgid "PM"
 msgstr "DU"
 
-#: utils/dateformat.py:48
+#: utils/dateformat.py:49
 msgid "AM"
 msgstr "DE"
 
-#: utils/dateformat.py:97
+#: utils/dateformat.py:98
 msgid "midnight"
 msgstr "éjfél"
 
-#: utils/dateformat.py:99
+#: utils/dateformat.py:100
 msgid "noon"
 msgstr "dél"
 
@@ -4336,9 +917,86 @@ msgstr "nov."
 msgid "Dec."
 msgstr "dec."
 
-#: utils/text.py:128
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "alt. month"
+msgid "January"
+msgstr "január"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "alt. month"
+msgid "February"
+msgstr "február"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "alt. month"
+msgid "March"
+msgstr "március"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "alt. month"
+msgid "April"
+msgstr "április"
+
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "alt. month"
+msgid "May"
+msgstr "május"
+
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "alt. month"
+msgid "June"
+msgstr "június"
+
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "alt. month"
+msgid "July"
+msgstr "július"
+
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "alt. month"
+msgid "August"
+msgstr "augusztus"
+
+#: utils/dates.py:43
+#, fuzzy
+msgctxt "alt. month"
+msgid "September"
+msgstr "szeptember"
+
+#: utils/dates.py:44
+#, fuzzy
+msgctxt "alt. month"
+msgid "October"
+msgstr "október"
+
+#: utils/dates.py:45
+#, fuzzy
+msgctxt "alt. month"
+msgid "November"
+msgstr "november"
+
+#: utils/dates.py:46
+#, fuzzy
+msgctxt "alt. month"
+msgid "December"
+msgstr "december"
+
+#: utils/text.py:136
 msgid "or"
 msgstr "vagy"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
 
 #: utils/timesince.py:21
 msgid "year"
@@ -4376,48 +1034,51 @@ msgid_plural "minutes"
 msgstr[0] "perc"
 msgstr[1] "perc"
 
-#: utils/timesince.py:43
+#: utils/timesince.py:45
 msgid "minutes"
 msgstr "perc"
 
-#: utils/timesince.py:48
+#: utils/timesince.py:50
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:54
+#: utils/timesince.py:56
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:403
+#: utils/translation/trans_real.py:560
 msgid "DATE_FORMAT"
 msgstr "Y. F j."
 
-#: utils/translation/trans_real.py:405
+#: utils/translation/trans_real.py:561
+msgid "DATETIME_FORMAT"
+msgstr "Y. F j., H:i"
+
+#: utils/translation/trans_real.py:562
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:421
+#: utils/translation/trans_real.py:583
 msgid "YEAR_MONTH_FORMAT"
 msgstr "Y. F j."
 
-#: utils/translation/trans_real.py:422
+#: utils/translation/trans_real.py:584
 msgid "MONTH_DAY_FORMAT"
 msgstr "Y. F j."
 
-#: views/generic/create_update.py:114
+#: views/generic/create_update.py:121
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s sikeresen létrehozva."
 
-#: views/generic/create_update.py:156
+#: views/generic/create_update.py:164
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s sikeresen frissítve."
 
-#: views/generic/create_update.py:198
+#: views/generic/create_update.py:207
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s törölve."
-

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-09 20:22+0200\n"
+"POT-Creation-Date: 2010-12-29 21:02+0100\n"
 "PO-Revision-Date: 2010-05-08 18:39+0700\n"
 "Last-Translator: Selwin Ong <selwin@ui.co.id>\n"
 "Language-Team: Indonesian <id@li.org>\n"
@@ -67,7 +67,8 @@ msgid "Spanish"
 msgstr "Bahasa Spanyol"
 
 #: conf/global_settings.py:57
-msgid "Argentinean Spanish"
+#, fuzzy
+msgid "Argentinian Spanish"
 msgstr "Bahasa Spanyol"
 
 #: conf/global_settings.py:58
@@ -163,4316 +164,138 @@ msgid "Macedonian"
 msgstr "Bahasa Macedonia"
 
 #: conf/global_settings.py:81
+#, fuzzy
+msgid "Malayalam"
+msgstr "Malaga"
+
+#: conf/global_settings.py:82
 msgid "Mongolian"
 msgstr "Bahasa Mongolia"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Dutch"
 msgstr "Bahasa Belanda"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Norwegian"
 msgstr "Bahasa Norwegia"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian Bokmal"
 msgstr "Bahasa Norwegia Bokmal"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Norwegian Nynorsk"
 msgstr "Bahasa Norwegia Nynorsk"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Polish"
 msgstr "Bahasa Polandia"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:89
 msgid "Portuguese"
 msgstr "Bahasa Portugal"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:90
 msgid "Brazilian Portuguese"
 msgstr "Bahasa Portugal Brazil"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:91
 msgid "Romanian"
 msgstr "Bahasa Romania"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:92
 msgid "Russian"
 msgstr "Bahasa Russia"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:93
 msgid "Slovak"
 msgstr "Bahasa Slovakia"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:94
 msgid "Slovenian"
 msgstr "Bahasa Slovenia"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:95
 msgid "Albanian"
 msgstr "Bahasa Albania"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:96
 msgid "Serbian"
 msgstr "Bahasa Serbia"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:97
 msgid "Serbian Latin"
 msgstr "Bahasa Serbia Latin"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:98
 msgid "Swedish"
 msgstr "Bahasa Swedia"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:99
 msgid "Tamil"
 msgstr "Bahasa Tamil"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:100
 msgid "Telugu"
 msgstr "Bahasa Telugu"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:101
 msgid "Thai"
 msgstr "Bahasa Thailand"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:102
 msgid "Turkish"
 msgstr "Bahasa Turki"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:103
 msgid "Ukrainian"
 msgstr "Bahasa Ukrainia"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:104
 msgid "Vietnamese"
 msgstr "Bahasa Vietnam"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:105
 msgid "Simplified Chinese"
 msgstr "Bahasa Cina Sederhana"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:106
 msgid "Traditional Chinese"
 msgstr "Bahasa Cina Tradisional"
 
-#: contrib/admin/actions.py:48
-#, python-format
-msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Berhasil menghapus %(count)d %(items)s."
-
-#: contrib/admin/actions.py:55 contrib/admin/options.py:1125
-msgid "Are you sure?"
-msgstr "Apakah Anda yakin?"
-
-#: contrib/admin/actions.py:73
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Hapus %(verbose_name_plural)s yang terpilih"
-
-#: contrib/admin/filterspecs.py:44
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>Oleh %s:</h3>\n"
-"<ul>\n"
-
-#: contrib/admin/filterspecs.py:75 contrib/admin/filterspecs.py:92
-#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
-msgid "All"
-msgstr "Semua"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Any date"
-msgstr "Kapanpun"
-
-#: contrib/admin/filterspecs.py:114
-msgid "Today"
-msgstr "Hari ini"
-
-#: contrib/admin/filterspecs.py:117
-msgid "Past 7 days"
-msgstr "Tujuh hari terakhir"
-
-#: contrib/admin/filterspecs.py:119
-msgid "This month"
-msgstr "Bulan ini"
-
-#: contrib/admin/filterspecs.py:121
-msgid "This year"
-msgstr "Tahun ini"
-
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
-msgid "Yes"
-msgstr "Ya"
-
-#: contrib/admin/filterspecs.py:147 forms/widgets.py:469
-msgid "No"
-msgstr "Tidak"
-
-#: contrib/admin/filterspecs.py:154 forms/widgets.py:469
-msgid "Unknown"
-msgstr "Tidak diketahui"
-
-#: contrib/admin/helpers.py:20
-msgid "Action:"
-msgstr "Aksi:"
-
-#: contrib/admin/models.py:19
-msgid "action time"
-msgstr "waktu aksi"
-
-#: contrib/admin/models.py:22
-msgid "object id"
-msgstr "id obyek"
-
-#: contrib/admin/models.py:23
-msgid "object repr"
-msgstr "representasi obyek"
-
-#: contrib/admin/models.py:24
-msgid "action flag"
-msgstr "jenis aksi"
-
-#: contrib/admin/models.py:25
-msgid "change message"
-msgstr "ganti pesan"
-
-#: contrib/admin/models.py:28
-msgid "log entry"
-msgstr "pencatatan log"
-
-#: contrib/admin/models.py:29
-msgid "log entries"
-msgstr "pencatatan log"
-
-#: contrib/admin/options.py:138 contrib/admin/options.py:153
-msgid "None"
-msgstr "None"
-
-#: contrib/admin/options.py:559
-#, python-format
-msgid "Changed %s."
-msgstr "%s telah diubah"
-
-#: contrib/admin/options.py:559 contrib/admin/options.py:569
-#: contrib/comments/templates/comments/preview.html:16 db/models/base.py:844
-#: forms/models.py:568
-msgid "and"
-msgstr "dan"
-
-#: contrib/admin/options.py:564
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" telah ditambahkan."
-
-#: contrib/admin/options.py:568
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(list)s untuk %(name)s \"%(object)s\" telah diubah."
-
-#: contrib/admin/options.py:573
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" telah dihapus."
-
-#: contrib/admin/options.py:577
-msgid "No fields changed."
-msgstr "Tidak ada field yang berubah."
-
-#: contrib/admin/options.py:643
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" berhasil ditambahkan."
-
-#: contrib/admin/options.py:647 contrib/admin/options.py:680
-msgid "You may edit it again below."
-msgstr "Anda boleh mengubahnya kembali di bawah."
-
-#: contrib/admin/options.py:657 contrib/admin/options.py:690
-#, python-format
-msgid "You may add another %s below."
-msgstr "Anda boleh menambahkan %s lagi di bawah."
-
-#: contrib/admin/options.py:678
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" berhasil diubah."
-
-#: contrib/admin/options.py:686
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"%(name)s \"%(obj)s\" berhasil ditambahkan. Anda boleh mengubahnya di bawah."
-
-#: contrib/admin/options.py:740 contrib/admin/options.py:997
-msgid ""
-"Items must be selected in order to perform actions on them. No items have "
-"been changed."
-msgstr "Obyek harus dipilih sebelum dimanipulasi. Tidak ada obyek yang diubah."
-
-#: contrib/admin/options.py:759
-msgid "No action selected."
-msgstr "Tidak ada aksi yang terpilih."
-
-#: contrib/admin/options.py:840
-#, python-format
-msgid "Add %s"
-msgstr "Tambahkan %s"
-
-#: contrib/admin/options.py:866 contrib/admin/options.py:1105
-#, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Obyek %(name)s dengan primary key %(key)r tidak ada."
-
-#: contrib/admin/options.py:931
-#, python-format
-msgid "Change %s"
-msgstr "Ubah %s"
-
-#: contrib/admin/options.py:977
-msgid "Database error"
-msgstr "Database error"
-
-#: contrib/admin/options.py:1039
-#, python-format
-msgid "%(count)s %(name)s was changed successfully."
-msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(count)s %(name)s berhasil diubah."
-
-#: contrib/admin/options.py:1066
-#, python-format
-msgid "%(total_count)s selected"
-msgid_plural "All %(total_count)s selected"
-msgstr[0] "%(total_count)s terpilih"
-
-#: contrib/admin/options.py:1071
-#, python-format
-msgid "0 of %(cnt)s selected"
-msgstr "0 dari %(cnt)s terpilih"
-
-#: contrib/admin/options.py:1118
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" berhasil dihapus."
-
-#: contrib/admin/options.py:1155
-#, python-format
-msgid "Change history: %s"
-msgstr "Ubah riwayat: %s"
-
-#: contrib/admin/sites.py:18 contrib/admin/views/decorators.py:14
-#: contrib/auth/forms.py:81
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-"Mohon masukkan nama dan sandi yang benar. Kedua field ini case-sensitive."
-
-#: contrib/admin/sites.py:307 contrib/admin/views/decorators.py:40
-msgid "Please log in again, because your session has expired."
-msgstr "Mohon log in kembali karena sesi Anda telah habis."
-
-#: contrib/admin/sites.py:314 contrib/admin/views/decorators.py:47
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Tampaknya peramban Anda tidak menerima cookies. Mohon ubah konfigurasi Anda, "
-"reload halaman ini dan coba lagi."
-
-#: contrib/admin/sites.py:330 contrib/admin/sites.py:336
-#: contrib/admin/views/decorators.py:66
-msgid "Usernames cannot contain the '@' character."
-msgstr "Nama tidak boleh memiliki karakter '@'."
-
-#: contrib/admin/sites.py:333 contrib/admin/views/decorators.py:62
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Nama akun Anda bukan alamat email. Cobalah dengan '%s'."
-
-#: contrib/admin/sites.py:389
-msgid "Site administration"
-msgstr "Administrasi situs"
-
-#: contrib/admin/sites.py:403 contrib/admin/templates/admin/login.html:26
-#: contrib/admin/templates/registration/password_reset_complete.html:14
-#: contrib/admin/views/decorators.py:20
-msgid "Log in"
-msgstr "Log in"
-
-#: contrib/admin/sites.py:448
-#, python-format
-msgid "%s administration"
-msgstr "administrasi %s"
-
-#: contrib/admin/widgets.py:75
-msgid "Date:"
-msgstr "Tanggal:"
-
-#: contrib/admin/widgets.py:75
-msgid "Time:"
-msgstr "Waktu:"
-
-#: contrib/admin/widgets.py:99
-msgid "Currently:"
-msgstr "Saat ini:"
-
-#: contrib/admin/widgets.py:99
-msgid "Change:"
-msgstr "Ubah:"
-
-#: contrib/admin/widgets.py:129
-msgid "Lookup"
-msgstr "Cari"
-
-#: contrib/admin/widgets.py:244
-msgid "Add Another"
-msgstr "Tambah Satu Lagi"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Halaman tidak ditemukan"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Maaf, halaman yang Anda cari tidak ditemukan."
-
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/app_index.html:8
-#: contrib/admin/templates/admin/base.html:55
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:42
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:6
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/admin/auth/user/change_password.html:11
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:5
-#: contrib/admin/templates/registration/password_reset_complete.html:4
-#: contrib/admin/templates/registration/password_reset_confirm.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
-msgid "Home"
-msgstr "Halaman Utama"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Server error"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Server error (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Server Error <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Error telah ditemukan dan dilaporkan kepada administrator situs melalui e-"
-"mail dan akan diperbaiki secepatnya. Terima kasih atas pengertian Anda."
-
-#: contrib/admin/templates/admin/actions.html:4
-msgid "Run the selected action"
-msgstr "Jalankan aksi terpilih"
-
-#: contrib/admin/templates/admin/actions.html:4
-msgid "Go"
-msgstr "Go"
-
-#: contrib/admin/templates/admin/actions.html:11
-msgid "Click here to select the objects across all pages"
-msgstr "Klik di sini untuk memilih semua obyek di semua halaman"
-
-#: contrib/admin/templates/admin/actions.html:11
-#, python-format
-msgid "Select all %(total_count)s %(module_name)s"
-msgstr "Pilih seluruh %(total_count)s %(module_name)s"
-
-#: contrib/admin/templates/admin/actions.html:13
-msgid "Clear selection"
-msgstr "Hilangkan pilihan"
-
-#: contrib/admin/templates/admin/app_index.html:10
-#: contrib/admin/templates/admin/index.html:19
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: contrib/admin/templates/admin/base.html:28
-msgid "Welcome,"
-msgstr "Selamat datang,"
-
-#: contrib/admin/templates/admin/base.html:33
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Dokumentasi"
-
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/admin/auth/user/change_password.html:15
-#: contrib/admin/templates/admin/auth/user/change_password.html:48
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
-msgid "Change password"
-msgstr "Ganti sandi"
-
-#: contrib/admin/templates/admin/base.html:48
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
-msgid "Log out"
-msgstr "Log out"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Admin situs Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Administrasi Django"
-
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:29
-msgid "Add"
-msgstr "Tambah"
-
-#: contrib/admin/templates/admin/change_form.html:28
-#: contrib/admin/templates/admin/object_history.html:10
-msgid "History"
-msgstr "Riwayat"
-
-#: contrib/admin/templates/admin/change_form.html:29
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:28
-msgid "View on site"
-msgstr "Lihat di situs"
-
-#: contrib/admin/templates/admin/change_form.html:39
-#: contrib/admin/templates/admin/change_list.html:71
-#: contrib/admin/templates/admin/auth/user/change_password.html:24
-#: contrib/admin/templates/registration/password_change_form.html:15
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Mohon perbaiki error di bawah ini."
-
-#: contrib/admin/templates/admin/change_list.html:63
-#, python-format
-msgid "Add %(name)s"
-msgstr "Tambahkan %(name)s"
-
-#: contrib/admin/templates/admin/change_list.html:82
-msgid "Filter"
-msgstr "Filter"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:10
-#: contrib/admin/templates/admin/submit_line.html:4 forms/formsets.py:302
-msgid "Delete"
-msgstr "Hapus"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:16
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr ""
-"Menghapus %(object_name)s '%(escaped_object)s' akan menghapus obyek-obyek "
-"lain yang terhubung, akan tetapi akun Anda tidak memiliki ijin untuk "
-"menghapus obyek-obyek dengan tipe:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:23
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr ""
-"Apakah Anda yakin ingin menghapus %(object_name)s \"%(escaped_object)s\"? "
-"Semua obyek-obyek lain yang berhubungan juga akan dihapus:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:28
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:33
-msgid "Yes, I'm sure"
-msgstr "Ya, saya yakin"
-
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:9
-msgid "Delete multiple objects"
-msgstr "Hapus beberapa obyek"
-
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:15
-#, python-format
-msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
-msgstr ""
-"Menghapus %(object_name)s akan menghapus obyek-obyek lain yang berhubungan, "
-"tetapi akun Anda tidak memiliki ijin untuk menghapus tipe-tipe obyek:"
-
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:22
-#, python-format
-msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
-msgstr ""
-"Apakah Anda yakin ingin menghapus obyek %(object_name)s yang terpilih? Semua "
-"obyek di bawah ini dan obyek-obyek lain yang berhubungan akan dihapus:"
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr " Berdasarkan %(filter_title)s "
-
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Model-model yang tersedia di aplikasi %(name)s."
-
-#: contrib/admin/templates/admin/index.html:35
-msgid "Change"
-msgstr "Ubah"
-
-#: contrib/admin/templates/admin/index.html:45
-msgid "You don't have permission to edit anything."
-msgstr "Anda tidak memiliki ijin untuk mengubah apapun."
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "Recent Actions"
-msgstr "Aktivitas Sebelumnya"
-
-#: contrib/admin/templates/admin/index.html:54
-msgid "My Actions"
-msgstr "Aktivitas Saya"
-
-#: contrib/admin/templates/admin/index.html:58
-msgid "None available"
-msgstr "Tidak ada yang tersedia"
-
-#: contrib/admin/templates/admin/index.html:72
-msgid "Unknown content"
-msgstr "Konten tidak diketahui"
-
-#: contrib/admin/templates/admin/invalid_setup.html:7
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-"Ada yang salah dengan instalasi database Anda. Pastikan tabel-tabel database "
-"yang benar telah dibuat dan database dapat dibaca oleh user yang benar."
-
-#: contrib/admin/templates/admin/login.html:19
-msgid "Username:"
-msgstr "Username:"
-
-#: contrib/admin/templates/admin/login.html:22
-msgid "Password:"
-msgstr "Sandi:"
-
-#: contrib/admin/templates/admin/object_history.html:22
-msgid "Date/time"
-msgstr "Tanggal/waktu"
-
-#: contrib/admin/templates/admin/object_history.html:23
-msgid "User"
-msgstr "Pengguna"
-
-#: contrib/admin/templates/admin/object_history.html:24
-msgid "Action"
-msgstr "Aksi"
-
-#: contrib/admin/templates/admin/object_history.html:38
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Obyek ini tidak memiliki riwayat perubahan. Kemungkinan obyek ini tidak "
-"ditambahkan melalui situs administrasi ini."
-
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "Perlihatkan semua"
-
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Save"
-msgstr "Simpan"
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Search"
-msgstr "Cari"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "%(counter)s hasil"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s total"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save as new"
-msgstr "Simpan sebagai baru"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and add another"
-msgstr "Simpan dan tambahkan satu lagi"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save and continue editing"
-msgstr "Simpan dan terus mengubah"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:5
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr ""
-"Pertama, masukkan username dan sandi. Kemudian Anda akan dapat mengubah opsi-"
-"opsi lain."
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:28
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Masukkan sandi baru untuk <strong>%(username)s</strong>."
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:35
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:61 contrib/auth/forms.py:186
-msgid "Password"
-msgstr "Sandi"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:41
-#: contrib/admin/templates/registration/password_change_form.html:37
-#: contrib/auth/forms.py:187
-msgid "Password (again)"
-msgstr "Sandi (ulangi)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:42
-#: contrib/auth/forms.py:19
-msgid "Enter the same password as above, for verification."
-msgstr "Masukkan sandi yang sama dengan di atas, untuk verifikasi."
-
-#: contrib/admin/templates/admin/edit_inline/stacked.html:64
-#: contrib/admin/templates/admin/edit_inline/tabular.html:110
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Tambahkan satu %(verbose_name)s lagi"
-
-#: contrib/admin/templates/admin/edit_inline/stacked.html:67
-#: contrib/admin/templates/admin/edit_inline/tabular.html:113
-#: contrib/comments/templates/comments/delete.html:12
-msgid "Remove"
-msgstr "Hapus"
-
-#: contrib/admin/templates/admin/edit_inline/tabular.html:15
-msgid "Delete?"
-msgstr "Hapus?"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Terima kasih telah menggunakan situs ini hari ini."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Log in kembali"
-
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:5
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "Password change"
-msgstr "Ubah sandi"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "Sandi telah berhasil diubah"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "Sandi Anda telah diubah."
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Mohon masukkan sandi lama Anda untuk keperluan sekuriti dan masukkan sandi "
-"baru dua kali untuk memastikan Anda tidak melakukan kesalahan ketik."
-
-#: contrib/admin/templates/registration/password_change_form.html:27
-#: contrib/auth/forms.py:170
-msgid "Old password"
-msgstr "Sandi lama"
-
-#: contrib/admin/templates/registration/password_change_form.html:32
-#: contrib/auth/forms.py:144
-msgid "New password"
-msgstr "Sandi baru"
-
-#: contrib/admin/templates/registration/password_change_form.html:43
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
-msgid "Change my password"
-msgstr "Ubah sandi saya"
-
-#: contrib/admin/templates/registration/password_reset_complete.html:4
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-msgid "Password reset"
-msgstr "Reset sandi"
-
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_complete.html:10
-msgid "Password reset complete"
-msgstr "Sandi telah di-reset"
-
-#: contrib/admin/templates/registration/password_reset_complete.html:12
-msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Sandi Anda telah diperbaharui. Anda boleh log in kembali sekarang."
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:4
-msgid "Password reset confirmation"
-msgstr "Konfirmasi reset sandi"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:12
-msgid "Enter new password"
-msgstr "Masukkan sandi baru"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:14
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
-msgstr ""
-"Masukkan sandi baru Anda dua kali untuk memastikan tidak terjadinya "
-"kesalahanketik."
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:18
-msgid "New password:"
-msgstr "Sandi baru:"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:20
-msgid "Confirm password:"
-msgstr "Konfirmasi sandi:"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:26
-msgid "Password reset unsuccessful"
-msgstr "Reset sandi tidak berhasil"
-
-#: contrib/admin/templates/registration/password_reset_confirm.html:28
-msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a new password reset."
-msgstr ""
-"Link reset sandi tidak benar, kemungkinan karena link itu sudah dipakai "
-"sebelumnya. Mohon ajukan sebuah permintaan reset sandi lagi."
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Reset sandi berhasil"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
-"address you submitted. You should be receiving it shortly."
-msgstr ""
-"Kami telah mengirimkan instruksi untuk me-reset sandi Anda melalui alamat e-"
-"mail yang Anda masukkan. Anda akan menerima e-mail tersebut sebentar lagi."
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Anda menerima e-mail ini karena Anda mengajukan permintaan reset sandi"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "untuk akun Anda di %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-msgid "Please go to the following page and choose a new password:"
-msgstr "Mohon kunjungi halaman di bawah ini dan pilih sandi baru:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:9
-msgid "Your username, in case you've forgotten:"
-msgstr "Username Anda, apabila Anda lupa:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Thanks for using our site!"
-msgstr "Terima kasih telah menggunakan situs kami!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "Tim %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
-"instructions for setting a new one."
-msgstr ""
-"Lupa sandi Anda? Masukkan alamat e-mail Anda di bawah dan kami akan "
-"mengirimkan instruksi untuk mendapatkan sandi baru."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "Alamat e-mail:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Reset sandi saya"
-
-#: contrib/admin/templatetags/admin_list.py:257
-msgid "All dates"
-msgstr "Semua tanggal"
-
-#: contrib/admin/views/main.py:65
-#, python-format
-msgid "Select %s"
-msgstr "Pilih %s"
-
-#: contrib/admin/views/main.py:65
-#, python-format
-msgid "Select %s to change"
-msgstr "Pilih %s untuk diubah"
-
-#: contrib/admin/views/template.py:38 contrib/sites/models.py:38
-msgid "site"
-msgstr "situs"
-
-#: contrib/admin/views/template.py:40
-msgid "template"
-msgstr "template"
-
-#: contrib/admindocs/views.py:61 contrib/admindocs/views.py:63
-#: contrib/admindocs/views.py:65
-msgid "tag:"
-msgstr "tag:"
-
-#: contrib/admindocs/views.py:94 contrib/admindocs/views.py:96
-#: contrib/admindocs/views.py:98
-msgid "filter:"
-msgstr "filter:"
-
-#: contrib/admindocs/views.py:158 contrib/admindocs/views.py:160
-#: contrib/admindocs/views.py:162
-msgid "view:"
-msgstr "view:"
-
-#: contrib/admindocs/views.py:190
-#, python-format
-msgid "App %r not found"
-msgstr "Aplikasi %r tidak ditemukan"
-
-#: contrib/admindocs/views.py:197
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "Model %(model_name)r tidak ada di aplikasi %(app_label)r"
-
-#: contrib/admindocs/views.py:209
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "obyek `%(app_label)s.%(data_type)s` yang berhubungan"
-
-#: contrib/admindocs/views.py:209 contrib/admindocs/views.py:228
-#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:247
-#: contrib/admindocs/views.py:261 contrib/admindocs/views.py:266
-msgid "model:"
-msgstr "model:"
-
-#: contrib/admindocs/views.py:224 contrib/admindocs/views.py:256
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "obyek-obyek `%(app_label)s.%(object_name)s` yang berhubungan"
-
-#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:261
-#, python-format
-msgid "all %s"
-msgstr "semua %s"
-
-#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:266
-#, python-format
-msgid "number of %s"
-msgstr "jumlah %s"
-
-#: contrib/admindocs/views.py:271
-#, python-format
-msgid "Fields on %s objects"
-msgstr "Field-field dalam %s obyek"
-
-#: contrib/admindocs/views.py:361
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s bukan berupa obyek urlpattern"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "Bookmarklets"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:4
-msgid "Documentation bookmarklets"
-msgstr "Bookmarklet dokumentasi"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\">Untuk menginstal bookmarklet, drag tautan ini ke toolbar\n"
-"bookmark Anda atau klik kanan di pautan tersebut dan tambahkan ke bookmark "
-"Anda. Kini Anda dapat\n"
-"memilih bookmarklet dari halaman apapun di situs. Jangan lupa beberapa\n"
-"bookmarklet ini hanya bisa digunakan dari komputer yang terdaftar \n"
-"sebagai \"internal\" (hubungi administrator sistem Anda apabila tidak yakin "
-"apakah\n"
-"komputer Anda termasuk \"internal\").</p>\n"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:18
-msgid "Documentation for this page"
-msgstr "Dokumentasi untuk halaman ini"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:19
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr ""
-"Membawa Anda ke halaman dokumentasi untuk view yang menghasilkan halaman "
-"tersebut."
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:21
-msgid "Show object ID"
-msgstr "Perlihatkan ID obyek"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:22
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Perlihatkan content-type dan ID unik untuk halaman-halaman yang mewakili "
-"sebuah obyek tunggal."
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:24
-msgid "Edit this object (current window)"
-msgstr "Ubah obyek ini (di jendela ini)"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Loncat ke halaman admin untuk halaman-halaman yang mewakili sebuah obyek "
-"tunggal."
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:27
-msgid "Edit this object (new window)"
-msgstr "Ubah obyek ini (di jendela baru)"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
-msgid "As above, but opens the admin page in a new window."
-msgstr "Seperti di atas, tetapi membuka halaman admin di jendela baru."
-
-#: contrib/auth/admin.py:29
-msgid "Personal info"
-msgstr "Informasi pribadi"
-
-#: contrib/auth/admin.py:30
-msgid "Permissions"
-msgstr "Ijin akses"
-
-#: contrib/auth/admin.py:31
-msgid "Important dates"
-msgstr "Tanggal-tanggal penting"
-
-#: contrib/auth/admin.py:32
-msgid "Groups"
-msgstr "Grup"
-
-#: contrib/auth/admin.py:114
-msgid "Password changed successfully."
-msgstr "Sandi berhasil diubah."
-
-#: contrib/auth/admin.py:124
-#, python-format
-msgid "Change password: %s"
-msgstr "Ganti sandi: %s"
-
-#: contrib/auth/forms.py:14 contrib/auth/forms.py:48 contrib/auth/forms.py:60
-msgid "Username"
-msgstr "Username"
-
-#: contrib/auth/forms.py:15 contrib/auth/forms.py:49
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Wajib. 30 karakter atau kurang dalam kombinasi huruf, angka dan @/./+/-/_ ."
-
-#: contrib/auth/forms.py:16 contrib/auth/forms.py:50
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"Nilai ini hanya boleh berisi huruf, angka dan karakter-karakter @/./+/-/_ ."
-
-#: contrib/auth/forms.py:18
-msgid "Password confirmation"
-msgstr "Konfirmasi sandi"
-
-#: contrib/auth/forms.py:31
-msgid "A user with that username already exists."
-msgstr "Pengguna dengan username tersebut sudah ada."
-
-#: contrib/auth/forms.py:37 contrib/auth/forms.py:156
-#: contrib/auth/forms.py:198
-msgid "The two password fields didn't match."
-msgstr "Dua field sandi tidak sama."
-
-#: contrib/auth/forms.py:83
-msgid "This account is inactive."
-msgstr "Akun ini tidak aktif."
-
-#: contrib/auth/forms.py:88
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Tampaknya peramban Anda tidak menerima cookies. Cookies diperlukan untuk log "
-"in."
-
-#: contrib/auth/forms.py:101
-msgid "E-mail"
-msgstr "E-mail"
-
-#: contrib/auth/forms.py:110
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Alamat e-mail tersebut tidak terhubung dengan akun apapun. Apakah Anda yakin "
-"telah terdaftar?"
-
-#: contrib/auth/forms.py:136
-#, python-format
-msgid "Password reset on %s"
-msgstr "Reset sandi di %s"
-
-#: contrib/auth/forms.py:145
-msgid "New password confirmation"
-msgstr "Konfirmasi sandi baru"
-
-#: contrib/auth/forms.py:178
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Sandi lama Anda tidak benar. Mohon masukkan sekali lagi."
-
-#: contrib/auth/models.py:66 contrib/auth/models.py:94
-msgid "name"
-msgstr "nama"
-
-#: contrib/auth/models.py:68
-msgid "codename"
-msgstr "namasandi"
-
-#: contrib/auth/models.py:72
-msgid "permission"
-msgstr "ijin"
-
-#: contrib/auth/models.py:73 contrib/auth/models.py:95
-msgid "permissions"
-msgstr "ijin"
-
-#: contrib/auth/models.py:98
-msgid "group"
-msgstr "grup"
-
-#: contrib/auth/models.py:99 contrib/auth/models.py:206
-msgid "groups"
-msgstr "grup"
-
-#: contrib/auth/models.py:196
-msgid "username"
-msgstr "username"
-
-#: contrib/auth/models.py:196
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
-"Wajib. 30 karakter atau kurang dalam kombinasi huruf, angka dan karakter @/./"
-"+/-/_ "
-
-#: contrib/auth/models.py:197
-msgid "first name"
-msgstr "nama depan"
-
-#: contrib/auth/models.py:198
-msgid "last name"
-msgstr "nama belakang"
-
-#: contrib/auth/models.py:199
-msgid "e-mail address"
-msgstr "alamat e-mail"
-
-#: contrib/auth/models.py:200
-msgid "password"
-msgstr "sandi"
-
-#: contrib/auth/models.py:200
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Gunakan '[algo]$[salt]$[hexdigest]' atau <a href=\"password/\">formulir "
-"ganti sandi</a>."
-
-#: contrib/auth/models.py:201
-msgid "staff status"
-msgstr "status staff"
-
-#: contrib/auth/models.py:201
-msgid "Designates whether the user can log into this admin site."
-msgstr "Menentukan apakah pengguna berhak masuk ke situs administrasi ini."
-
-#: contrib/auth/models.py:202
-msgid "active"
-msgstr "aktif"
-
-#: contrib/auth/models.py:202
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
-msgstr ""
-"Menentukan apakah pengguna dianggap aktif. Hapus pilihan ini tanpa perlu "
-"menghapus akun apapun."
-
-#: contrib/auth/models.py:203
-msgid "superuser status"
-msgstr "status superuser"
-
-#: contrib/auth/models.py:203
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr ""
-"Menentukan apakah pengguna memiliki semua ijin tanpa perlu diberikan secara "
-"manual."
-
-#: contrib/auth/models.py:204
-msgid "last login"
-msgstr "login terakhir"
-
-#: contrib/auth/models.py:205
-msgid "date joined"
-msgstr "tanggal daftar"
-
-#: contrib/auth/models.py:207
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"Selain ijin-ijin yang diberikan secara manual, pengguna ini juga akan "
-"mendapatkan ijin yang diberikan kepada semua grup di mana ia berada."
-
-#: contrib/auth/models.py:208
-msgid "user permissions"
-msgstr "ijin pengguna"
-
-#: contrib/auth/models.py:212 contrib/comments/models.py:50
-#: contrib/comments/models.py:168
-msgid "user"
-msgstr "pengguna"
-
-#: contrib/auth/models.py:213
-msgid "users"
-msgstr "pengguna-pengguna"
-
-#: contrib/auth/models.py:394
-msgid "message"
-msgstr "pesan"
-
-#: contrib/auth/views.py:79
-msgid "Logged out"
-msgstr "Logged out"
-
-#: contrib/auth/management/commands/createsuperuser.py:23
-#: core/validators.py:120 forms/fields.py:428
-msgid "Enter a valid e-mail address."
-msgstr "Masukkan alamat e-mail yang benar."
-
-#: contrib/comments/admin.py:12
-msgid "Content"
-msgstr "Konten"
-
-#: contrib/comments/admin.py:15
-msgid "Metadata"
-msgstr "Metadata"
-
-#: contrib/comments/admin.py:40
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "ditandai"
-
-#: contrib/comments/admin.py:41
-msgid "Flag selected comments"
-msgstr "Tandai komentar-komentar terpilih"
-
-#: contrib/comments/admin.py:45
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "disetujui"
-
-#: contrib/comments/admin.py:46
-msgid "Approve selected comments"
-msgstr "Setujui komentar-komentar terpilih"
-
-#: contrib/comments/admin.py:50
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "dihapus"
-
-#: contrib/comments/admin.py:51
-msgid "Remove selected comments"
-msgstr "Hapus komentar-komentar terpilih"
-
-#: contrib/comments/admin.py:63
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s komentar berhasil di-%(action)s."
-
-#: contrib/comments/feeds.py:13
-#, python-format
-msgid "%(site_name)s comments"
-msgstr "komentar-komentar di %(site_name)s"
-
-#: contrib/comments/feeds.py:23
-#, python-format
-msgid "Latest comments on %(site_name)s"
-msgstr "Komentar-komentar terakhir di %(site_name)s"
-
-#: contrib/comments/forms.py:93
-msgid "Name"
-msgstr "Nama"
-
-#: contrib/comments/forms.py:94
-msgid "Email address"
-msgstr "Alamat email"
-
-#: contrib/comments/forms.py:95 contrib/flatpages/admin.py:8
-#: contrib/flatpages/models.py:7 db/models/fields/__init__.py:1101
-msgid "URL"
-msgstr "URL"
-
-#: contrib/comments/forms.py:96
-msgid "Comment"
-msgstr "Komentar"
-
-#: contrib/comments/forms.py:175
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Awas! Kata %s tidak di-ijinkan di sini."
-
-#: contrib/comments/forms.py:182
-msgid ""
-"If you enter anything in this field your comment will be treated as spam"
-msgstr ""
-"Apabila Anda mengisi field ini komentar Anda akan dianggap sebagai spam"
-
-#: contrib/comments/models.py:22 contrib/contenttypes/models.py:81
-msgid "content type"
-msgstr "tipe konten"
-
-#: contrib/comments/models.py:24
-msgid "object ID"
-msgstr "ID obyek"
-
-#: contrib/comments/models.py:52
-msgid "user's name"
-msgstr "nama pengguna"
-
-#: contrib/comments/models.py:53
-msgid "user's email address"
-msgstr "alamat email pengguna"
-
-#: contrib/comments/models.py:54
-msgid "user's URL"
-msgstr "URL pengguna"
-
-#: contrib/comments/models.py:56 contrib/comments/models.py:76
-#: contrib/comments/models.py:169
-msgid "comment"
-msgstr "komentar"
-
-#: contrib/comments/models.py:59
-msgid "date/time submitted"
-msgstr "tanggal/waktu disimpan"
-
-#: contrib/comments/models.py:60 db/models/fields/__init__.py:896
-msgid "IP address"
-msgstr "alamat IP"
-
-#: contrib/comments/models.py:61
-msgid "is public"
-msgstr "untuk umum"
-
-#: contrib/comments/models.py:62
-msgid ""
-"Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Jangan centang box ini untuk membuat komentar hilang dari situs."
-
-#: contrib/comments/models.py:64
-msgid "is removed"
-msgstr "telah dihapus"
-
-#: contrib/comments/models.py:65
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr ""
-"Centang box ini apabila komentar tidak pantas. Sebuah pesan \"Komentar ini "
-"telah dihapus\" akan ditampilkan sebagai penggantinya."
-
-#: contrib/comments/models.py:77
-msgid "comments"
-msgstr "komentar-komentar"
-
-#: contrib/comments/models.py:119
-msgid ""
-"This comment was posted by an authenticated user and thus the name is read-"
-"only."
-msgstr ""
-"Komentar ini dikirim oleh seorang pengguna yang ter-otentikasi sehingga nama "
-"pengguna tidak dapat diubah."
-
-#: contrib/comments/models.py:128
-msgid ""
-"This comment was posted by an authenticated user and thus the email is read-"
-"only."
-msgstr ""
-"Komentar ini dikirim oleh seorang pengguna yang ter-otentikasi sehingga "
-"alamat email tidak dapat diubah."
-
-#: contrib/comments/models.py:153
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"Dikirim oleh %(user)s pada tanggal %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: contrib/comments/models.py:170
-msgid "flag"
-msgstr "tanda"
-
-#: contrib/comments/models.py:171
-msgid "date"
-msgstr "tanggal"
-
-#: contrib/comments/models.py:181
-msgid "comment flag"
-msgstr "tanda komentar"
-
-#: contrib/comments/models.py:182
-msgid "comment flags"
-msgstr "tanda-tanda komentar"
-
-#: contrib/comments/templates/comments/approve.html:4
-msgid "Approve a comment"
-msgstr "Perbolehkan sebuah komentar"
-
-#: contrib/comments/templates/comments/approve.html:7
-msgid "Really make this comment public?"
-msgstr "Yakin ingin membuka komentar ini untuk umum?"
-
-#: contrib/comments/templates/comments/approve.html:12
-msgid "Approve"
-msgstr "Perbolehkan"
-
-#: contrib/comments/templates/comments/approved.html:4
-msgid "Thanks for approving"
-msgstr "Terima kasih telah memperbolehkan"
-
-#: contrib/comments/templates/comments/approved.html:7
-#: contrib/comments/templates/comments/deleted.html:7
-#: contrib/comments/templates/comments/flagged.html:7
-msgid ""
-"Thanks for taking the time to improve the quality of discussion on our site"
-msgstr ""
-"Terima kasih telah membantu meningkatkan kualitas diskusi di situs kami"
-
-#: contrib/comments/templates/comments/delete.html:4
-msgid "Remove a comment"
-msgstr "Hapus sebuah komentar"
-
-#: contrib/comments/templates/comments/delete.html:7
-msgid "Really remove this comment?"
-msgstr "Yakin ingin menghapus komentar ini?"
-
-#: contrib/comments/templates/comments/deleted.html:4
-msgid "Thanks for removing"
-msgstr "Terima kasih telah menghapus"
-
-#: contrib/comments/templates/comments/flag.html:4
-msgid "Flag this comment"
-msgstr "Tandai komentar ini"
-
-#: contrib/comments/templates/comments/flag.html:7
-msgid "Really flag this comment?"
-msgstr "Yakin ingin menandai komentar ini?"
-
-#: contrib/comments/templates/comments/flag.html:12
-msgid "Flag"
-msgstr "Tandai"
-
-#: contrib/comments/templates/comments/flagged.html:4
-msgid "Thanks for flagging"
-msgstr "Terima kasih telah menandai"
-
-#: contrib/comments/templates/comments/form.html:17
-#: contrib/comments/templates/comments/preview.html:32
-msgid "Post"
-msgstr "Kirim"
-
-#: contrib/comments/templates/comments/form.html:18
-#: contrib/comments/templates/comments/preview.html:33
-msgid "Preview"
-msgstr "Preview"
-
-#: contrib/comments/templates/comments/posted.html:4
-msgid "Thanks for commenting"
-msgstr "Terima kasih telah meninggalkan komentar"
-
-#: contrib/comments/templates/comments/posted.html:7
-msgid "Thank you for your comment"
-msgstr "Terima kasih atas komentar Anda"
-
-#: contrib/comments/templates/comments/preview.html:4
-#: contrib/comments/templates/comments/preview.html:13
-msgid "Preview your comment"
-msgstr "Preview komentar Anda"
-
-#: contrib/comments/templates/comments/preview.html:11
-msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Mohon perbaiki kesalahan di bawah ini"
-
-#: contrib/comments/templates/comments/preview.html:16
-msgid "Post your comment"
-msgstr "Kirim komentar Anda"
-
-#: contrib/comments/templates/comments/preview.html:16
-msgid "or make changes"
-msgstr "atau lakukan perubahan"
-
-#: contrib/contenttypes/models.py:77
-msgid "python model class name"
-msgstr "nama class model python"
-
-#: contrib/contenttypes/models.py:82
-msgid "content types"
-msgstr "tipe-tipe konten"
-
-#: contrib/flatpages/admin.py:9
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Contoh: '/about/contact/'. Pastikan dimulai dan diakhiri dengan garis miring "
-"(/)."
-
-#: contrib/flatpages/admin.py:11
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-"Nilai ini hanya boleh terdiri dari huruf, angka, garis bawah, garis tengah "
-"atau garis miring (/)."
-
-#: contrib/flatpages/admin.py:22
-msgid "Advanced options"
-msgstr "Opsi advanced"
-
-#: contrib/flatpages/models.py:8
-msgid "title"
-msgstr "judul"
-
-#: contrib/flatpages/models.py:9
-msgid "content"
-msgstr "konten"
-
-#: contrib/flatpages/models.py:10
-msgid "enable comments"
-msgstr "perbolehkan komentar"
-
-#: contrib/flatpages/models.py:11
-msgid "template name"
-msgstr "nama template"
-
-#: contrib/flatpages/models.py:12
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr ""
-"Contoh: 'flatpages/contact_page.html'. Apabila tidak tersedia, sistem akan "
-"menggunakan 'flatpages/default.html'."
-
-#: contrib/flatpages/models.py:13
-msgid "registration required"
-msgstr "pendaftaran dibutuhkan"
-
-#: contrib/flatpages/models.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Apabila dipilih, hanya pengguna ter-otentikasi yang bisa mengunjungi halaman "
-"ini."
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "flat page"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "flat pages"
-
-#: contrib/formtools/wizard.py:140
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Maaf, formulir Anda sudah tidak berlaku lagi. Mohon lanjutkan mengisi "
-"formulir dari halaman ini."
-
-#: contrib/gis/db/models/fields.py:50
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "Field GIS dasar dibuat berdasarkan OpenGIS Specification Geometry."
-
-#: contrib/gis/db/models/fields.py:270
-msgid "Point"
-msgstr "Point"
-
-#: contrib/gis/db/models/fields.py:274
-msgid "Line string"
-msgstr "Line string"
-
-#: contrib/gis/db/models/fields.py:278
-msgid "Polygon"
-msgstr "Polygon"
-
-#: contrib/gis/db/models/fields.py:282
-msgid "Multi-point"
-msgstr "Multi-point"
-
-#: contrib/gis/db/models/fields.py:286
-msgid "Multi-line string"
-msgstr "Multi-line string"
-
-#: contrib/gis/db/models/fields.py:290
-msgid "Multi polygon"
-msgstr "Multi polygon"
-
-#: contrib/gis/db/models/fields.py:294
-msgid "Geometry collection"
-msgstr "Geometry collection"
-
-#: contrib/gis/forms/fields.py:17
-msgid "No geometry value provided."
-msgstr "Nilai geometri tidak tersedia."
-
-#: contrib/gis/forms/fields.py:18
-msgid "Invalid geometry value."
-msgstr "Nilai geometri salah"
-
-#: contrib/gis/forms/fields.py:19
-msgid "Invalid geometry type."
-msgstr "Tipe geometri salah"
-
-#: contrib/gis/forms/fields.py:20
-msgid ""
-"An error occurred when transforming the geometry to the SRID of the geometry "
-"form field."
-msgstr ""
-"Telah terjadi kesalahan ketika merubah geometri ke SRID dari field formulir"
-"geometri."
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "th"
-msgstr "th"
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "st"
-msgstr "st"
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "nd"
-msgstr "nd"
-
-#: contrib/humanize/templatetags/humanize.py:19
-msgid "rd"
-msgstr "rd"
-
-#: contrib/humanize/templatetags/humanize.py:51
-#, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f juta"
-
-#: contrib/humanize/templatetags/humanize.py:54
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f milyar"
-
-#: contrib/humanize/templatetags/humanize.py:57
-#, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f trilyun"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "one"
-msgstr "satu"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "two"
-msgstr "dua"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "three"
-msgstr "tiga"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "four"
-msgstr "empat"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "five"
-msgstr "lima"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "six"
-msgstr "enam"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "seven"
-msgstr "tujuh"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "eight"
-msgstr "delapan"
-
-#: contrib/humanize/templatetags/humanize.py:73
-msgid "nine"
-msgstr "sembilan"
-
-#: contrib/humanize/templatetags/humanize.py:93
-msgid "today"
-msgstr "hari ini"
-
-#: contrib/humanize/templatetags/humanize.py:95
-msgid "tomorrow"
-msgstr "besok"
-
-#: contrib/humanize/templatetags/humanize.py:97
-msgid "yesterday"
-msgstr "kemarin"
-
-#: contrib/localflavor/ar/forms.py:28
-msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "Masukkan kode pos dalam format NNNN atau ANNNNAAA."
-
-#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:92
-#: contrib/localflavor/br/forms.py:131 contrib/localflavor/pe/forms.py:24
-#: contrib/localflavor/pe/forms.py:52
-msgid "This field requires only numbers."
-msgstr "Field ini hanya terdiri dari angka."
-
-#: contrib/localflavor/ar/forms.py:51
-msgid "This field requires 7 or 8 digits."
-msgstr "Field ini membutuhkan 7 atau 8 angka."
-
-#: contrib/localflavor/ar/forms.py:80
-msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Masukkan CUIT yang benar dalam format XX-XXXXXXXX-X atau XXXXXXXXXXXX."
-
-#: contrib/localflavor/ar/forms.py:81
-msgid "Invalid CUIT."
-msgstr "CUIT salah."
-
-#: contrib/localflavor/at/at_states.py:5
-msgid "Burgenland"
-msgstr "Burgenland"
-
-#: contrib/localflavor/at/at_states.py:6
-msgid "Carinthia"
-msgstr "Carinthia"
-
-#: contrib/localflavor/at/at_states.py:7
-msgid "Lower Austria"
-msgstr "Lower Austria"
-
-#: contrib/localflavor/at/at_states.py:8
-msgid "Upper Austria"
-msgstr "Upper Austria"
-
-#: contrib/localflavor/at/at_states.py:9
-msgid "Salzburg"
-msgstr "Salzburg"
-
-#: contrib/localflavor/at/at_states.py:10
-msgid "Styria"
-msgstr "Styria"
-
-#: contrib/localflavor/at/at_states.py:11
-msgid "Tyrol"
-msgstr "Tyrol"
-
-#: contrib/localflavor/at/at_states.py:12
-msgid "Vorarlberg"
-msgstr "Vorarlberg"
-
-#: contrib/localflavor/at/at_states.py:13
-msgid "Vienna"
-msgstr "Vienna"
-
-#: contrib/localflavor/at/forms.py:20 contrib/localflavor/ch/forms.py:17
-#: contrib/localflavor/no/forms.py:13
-msgid "Enter a zip code in the format XXXX."
-msgstr "Masukkan kode pos dalam format XXXX."
-
-#: contrib/localflavor/at/forms.py:48
-msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr ""
-"Masukkan nomor identifikasi Austria yang benar dalam format XXXX XXXXXX."
-
-#: contrib/localflavor/au/forms.py:17
-msgid "Enter a 4 digit post code."
-msgstr "Masukkan kode pos 4 angka."
-
-#: contrib/localflavor/br/forms.py:17
-msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Masukkan kode pos dalam format XXXXX-XXX."
-
-#: contrib/localflavor/br/forms.py:26
-msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "Nomor telepon harus dalam format XX-XXXX-XXXX."
-
-#: contrib/localflavor/br/forms.py:54
-msgid ""
-"Select a valid brazilian state. That state is not one of the available "
-"states."
-msgstr ""
-"Pilih propinsi Brazil yang benar. Propinsi ini tidak termasuk dalam daftar "
-"propinsi."
-
-#: contrib/localflavor/br/forms.py:90
-msgid "Invalid CPF number."
-msgstr "Nomor CPF salah."
-
-#: contrib/localflavor/br/forms.py:91
-msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Field ini membutuhkan paling banyak 11 angka atau 14 huruf."
-
-#: contrib/localflavor/br/forms.py:130
-msgid "Invalid CNPJ number."
-msgstr "Nomor CNPJ salah."
-
-#: contrib/localflavor/br/forms.py:132
-msgid "This field requires at least 14 digits"
-msgstr "Field ini membutuhkan sedikitnya 14 angka"
-
-#: contrib/localflavor/ca/forms.py:25
-msgid "Enter a postal code in the format XXX XXX."
-msgstr "Masukkan kode pos dalam format XXX XXX."
-
-#: contrib/localflavor/ca/forms.py:96
-msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "Masukkan nomor asuransi Kanada yang benar dalam format XXX-XXX-XXX."
-
-#: contrib/localflavor/ch/ch_states.py:5
-msgid "Aargau"
-msgstr "Aargau"
-
-#: contrib/localflavor/ch/ch_states.py:6
-msgid "Appenzell Innerrhoden"
-msgstr "Appenzell Innerrhoden"
-
-#: contrib/localflavor/ch/ch_states.py:7
-msgid "Appenzell Ausserrhoden"
-msgstr "Appenzell Ausserrhoden"
-
-#: contrib/localflavor/ch/ch_states.py:8
-msgid "Basel-Stadt"
-msgstr "Basel-Stadt"
-
-#: contrib/localflavor/ch/ch_states.py:9
-msgid "Basel-Land"
-msgstr "Basel-Land"
-
-#: contrib/localflavor/ch/ch_states.py:10
-msgid "Berne"
-msgstr "Berne"
-
-#: contrib/localflavor/ch/ch_states.py:11
-msgid "Fribourg"
-msgstr "Fribourg"
-
-#: contrib/localflavor/ch/ch_states.py:12
-msgid "Geneva"
-msgstr "Geneva"
-
-#: contrib/localflavor/ch/ch_states.py:13
-msgid "Glarus"
-msgstr "Glarus"
-
-#: contrib/localflavor/ch/ch_states.py:14
-msgid "Graubuenden"
-msgstr "Graubuenden"
-
-#: contrib/localflavor/ch/ch_states.py:15
-msgid "Jura"
-msgstr "Jura"
-
-#: contrib/localflavor/ch/ch_states.py:16
-msgid "Lucerne"
-msgstr "Lucerne"
-
-#: contrib/localflavor/ch/ch_states.py:17
-msgid "Neuchatel"
-msgstr "Neuchatel"
-
-#: contrib/localflavor/ch/ch_states.py:18
-msgid "Nidwalden"
-msgstr "Nidwalden"
-
-#: contrib/localflavor/ch/ch_states.py:19
-msgid "Obwalden"
-msgstr "Obwalden"
-
-#: contrib/localflavor/ch/ch_states.py:20
-msgid "Schaffhausen"
-msgstr "Schaffhausen"
-
-#: contrib/localflavor/ch/ch_states.py:21
-msgid "Schwyz"
-msgstr "Schwyz"
-
-#: contrib/localflavor/ch/ch_states.py:22
-msgid "Solothurn"
-msgstr "Solothurn"
-
-#: contrib/localflavor/ch/ch_states.py:23
-msgid "St. Gallen"
-msgstr "St. Gallen"
-
-#: contrib/localflavor/ch/ch_states.py:24
-msgid "Thurgau"
-msgstr "Thurgau"
-
-#: contrib/localflavor/ch/ch_states.py:25
-msgid "Ticino"
-msgstr "Ticino"
-
-#: contrib/localflavor/ch/ch_states.py:26
-msgid "Uri"
-msgstr "Uri"
-
-#: contrib/localflavor/ch/ch_states.py:27
-msgid "Valais"
-msgstr "Valais"
-
-#: contrib/localflavor/ch/ch_states.py:28
-msgid "Vaud"
-msgstr "Vaud"
-
-#: contrib/localflavor/ch/ch_states.py:29
-msgid "Zug"
-msgstr "Zug"
-
-#: contrib/localflavor/ch/ch_states.py:30
-msgid "Zurich"
-msgstr "Zurich"
-
-#: contrib/localflavor/ch/forms.py:65
-msgid ""
-"Enter a valid Swiss identity or passport card number in X1234567<0 or "
-"1234567890 format."
-msgstr ""
-"Masukkan identitas atau nomor paspor Swiss yang benar dalam bentuk "
-"X1234567<0 atau 1234567890."
-
-#: contrib/localflavor/cl/forms.py:30
-msgid "Enter a valid Chilean RUT."
-msgstr "Masukkan RUT Chile yang benar."
-
-#: contrib/localflavor/cl/forms.py:31
-msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Masukkan RUT Chile yang benar. Formatnya adalah XX.XXX.XXX-X."
-
-#: contrib/localflavor/cl/forms.py:32
-msgid "The Chilean RUT is not valid."
-msgstr "RUT Chile tidak valid."
-
-#: contrib/localflavor/cz/cz_regions.py:8
-msgid "Prague"
-msgstr "Praha"
-
-#: contrib/localflavor/cz/cz_regions.py:9
-msgid "Central Bohemian Region"
-msgstr "Daerah Bohemia Tengah"
-
-#: contrib/localflavor/cz/cz_regions.py:10
-msgid "South Bohemian Region"
-msgstr "Daerah Bohemia Selatan"
-
-#: contrib/localflavor/cz/cz_regions.py:11
-msgid "Pilsen Region"
-msgstr "Daerah Pilsen"
-
-#: contrib/localflavor/cz/cz_regions.py:12
-msgid "Carlsbad Region"
-msgstr "Daerah Carlsbad"
-
-#: contrib/localflavor/cz/cz_regions.py:13
-msgid "Usti Region"
-msgstr "Daerah Usti"
-
-#: contrib/localflavor/cz/cz_regions.py:14
-msgid "Liberec Region"
-msgstr "Daerah Liberec"
-
-#: contrib/localflavor/cz/cz_regions.py:15
-msgid "Hradec Region"
-msgstr "Daerah Hradec"
-
-#: contrib/localflavor/cz/cz_regions.py:16
-msgid "Pardubice Region"
-msgstr "Daerah Pardubice"
-
-#: contrib/localflavor/cz/cz_regions.py:17
-msgid "Vysocina Region"
-msgstr "Daerah Vysocina"
-
-#: contrib/localflavor/cz/cz_regions.py:18
-msgid "South Moravian Region"
-msgstr "Daerah Moravia Selatan"
-
-#: contrib/localflavor/cz/cz_regions.py:19
-msgid "Olomouc Region"
-msgstr "Daerah Olomouc"
-
-#: contrib/localflavor/cz/cz_regions.py:20
-msgid "Zlin Region"
-msgstr "Daerah Zlin"
-
-#: contrib/localflavor/cz/cz_regions.py:21
-msgid "Moravian-Silesian Region"
-msgstr "Daerah Moravia-Silesian"
-
-#: contrib/localflavor/cz/forms.py:28 contrib/localflavor/sk/forms.py:30
-msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Masukkan kode pos dalam format XXXXX atau XXX XX."
-
-#: contrib/localflavor/cz/forms.py:48
-msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
-msgstr "Masukkan tanggal lahir dalam format XXXXXX/XXXX atau XXXXXXXXXX."
-
-#: contrib/localflavor/cz/forms.py:49
-msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr "Parameter opsional jenis kelamin tidak benar, pilih 'f' atau 'm'"
-
-#: contrib/localflavor/cz/forms.py:50
-msgid "Enter a valid birth number."
-msgstr "Masukkan tanggal lahir yang benar."
-
-#: contrib/localflavor/cz/forms.py:107
-msgid "Enter a valid IC number."
-msgstr "Masukkan nomor pengenal yang benar."
-
-#: contrib/localflavor/de/de_states.py:5
-msgid "Baden-Wuerttemberg"
-msgstr "Baden-Wuerttemberg"
-
-#: contrib/localflavor/de/de_states.py:6
-msgid "Bavaria"
-msgstr "Bavaria"
-
-#: contrib/localflavor/de/de_states.py:7
-msgid "Berlin"
-msgstr "Berlin"
-
-#: contrib/localflavor/de/de_states.py:8
-msgid "Brandenburg"
-msgstr "Brandenburg"
-
-#: contrib/localflavor/de/de_states.py:9
-msgid "Bremen"
-msgstr "Bremen"
-
-#: contrib/localflavor/de/de_states.py:10
-msgid "Hamburg"
-msgstr "Hamburg"
-
-#: contrib/localflavor/de/de_states.py:11
-msgid "Hessen"
-msgstr "Hessen"
-
-#: contrib/localflavor/de/de_states.py:12
-msgid "Mecklenburg-Western Pomerania"
-msgstr "Mecklenburg-Western Pomerania"
-
-#: contrib/localflavor/de/de_states.py:13
-msgid "Lower Saxony"
-msgstr "Lower Saxony"
-
-#: contrib/localflavor/de/de_states.py:14
-msgid "North Rhine-Westphalia"
-msgstr "Rhine-Westphalia Utara"
-
-#: contrib/localflavor/de/de_states.py:15
-msgid "Rhineland-Palatinate"
-msgstr "Rhineland-Palatinate"
-
-#: contrib/localflavor/de/de_states.py:16
-msgid "Saarland"
-msgstr "Saarland"
-
-#: contrib/localflavor/de/de_states.py:17
-msgid "Saxony"
-msgstr "Saxony"
-
-#: contrib/localflavor/de/de_states.py:18
-msgid "Saxony-Anhalt"
-msgstr "Saxony-Anhalt"
-
-#: contrib/localflavor/de/de_states.py:19
-msgid "Schleswig-Holstein"
-msgstr "Schleswig-Holstein"
-
-#: contrib/localflavor/de/de_states.py:20
-msgid "Thuringia"
-msgstr "Thuringia"
-
-#: contrib/localflavor/de/forms.py:15 contrib/localflavor/fi/forms.py:13
-#: contrib/localflavor/fr/forms.py:16
-msgid "Enter a zip code in the format XXXXX."
-msgstr "Masukkan kode pos dalam format XXXXX."
-
-#: contrib/localflavor/de/forms.py:42
-msgid ""
-"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"format."
-msgstr ""
-"Masukkan nomor kartu identitas Jerman yang benar dalam format XXXXXXXXXXX-"
-"XXXXXXX-XXXXXXX-X."
-
-#: contrib/localflavor/es/es_provinces.py:5
-msgid "Arava"
-msgstr "Arava"
-
-#: contrib/localflavor/es/es_provinces.py:6
-msgid "Albacete"
-msgstr "Albacete"
-
-#: contrib/localflavor/es/es_provinces.py:7
-msgid "Alacant"
-msgstr "Alacant"
-
-#: contrib/localflavor/es/es_provinces.py:8
-msgid "Almeria"
-msgstr "Almeria"
-
-#: contrib/localflavor/es/es_provinces.py:9
-msgid "Avila"
-msgstr "Avila"
-
-#: contrib/localflavor/es/es_provinces.py:10
-msgid "Badajoz"
-msgstr "Badajoz"
-
-#: contrib/localflavor/es/es_provinces.py:11
-msgid "Illes Balears"
-msgstr "Illes Balears"
-
-#: contrib/localflavor/es/es_provinces.py:12
-msgid "Barcelona"
-msgstr "Barcelona"
-
-#: contrib/localflavor/es/es_provinces.py:13
-msgid "Burgos"
-msgstr "Burgos"
-
-#: contrib/localflavor/es/es_provinces.py:14
-msgid "Caceres"
-msgstr "Caceres"
-
-#: contrib/localflavor/es/es_provinces.py:15
-msgid "Cadiz"
-msgstr "Cadiz"
-
-#: contrib/localflavor/es/es_provinces.py:16
-msgid "Castello"
-msgstr "Castello"
-
-#: contrib/localflavor/es/es_provinces.py:17
-msgid "Ciudad Real"
-msgstr "Ciudad Real"
-
-#: contrib/localflavor/es/es_provinces.py:18
-msgid "Cordoba"
-msgstr "Cordoba"
-
-#: contrib/localflavor/es/es_provinces.py:19
-msgid "A Coruna"
-msgstr "A Coruna"
-
-#: contrib/localflavor/es/es_provinces.py:20
-msgid "Cuenca"
-msgstr "Cuenca"
-
-#: contrib/localflavor/es/es_provinces.py:21
-msgid "Girona"
-msgstr "Girona"
-
-#: contrib/localflavor/es/es_provinces.py:22
-msgid "Granada"
-msgstr "Granada"
-
-#: contrib/localflavor/es/es_provinces.py:23
-msgid "Guadalajara"
-msgstr "Guadalajara"
-
-#: contrib/localflavor/es/es_provinces.py:24
-msgid "Guipuzkoa"
-msgstr "Guipuzkoa"
-
-#: contrib/localflavor/es/es_provinces.py:25
-msgid "Huelva"
-msgstr "Huelva"
-
-#: contrib/localflavor/es/es_provinces.py:26
-msgid "Huesca"
-msgstr "Huesca"
-
-#: contrib/localflavor/es/es_provinces.py:27
-msgid "Jaen"
-msgstr "Jaen"
-
-#: contrib/localflavor/es/es_provinces.py:28
-msgid "Leon"
-msgstr "Leon"
-
-#: contrib/localflavor/es/es_provinces.py:29
-msgid "Lleida"
-msgstr "Lleida"
-
-#: contrib/localflavor/es/es_provinces.py:30
-#: contrib/localflavor/es/es_regions.py:17
-msgid "La Rioja"
-msgstr "La Rioja"
-
-#: contrib/localflavor/es/es_provinces.py:31
-msgid "Lugo"
-msgstr "Lugo"
-
-#: contrib/localflavor/es/es_provinces.py:32
-#: contrib/localflavor/es/es_regions.py:18
-msgid "Madrid"
-msgstr "Madrid"
-
-#: contrib/localflavor/es/es_provinces.py:33
-msgid "Malaga"
-msgstr "Malaga"
-
-#: contrib/localflavor/es/es_provinces.py:34
-msgid "Murcia"
-msgstr "Murcia"
-
-#: contrib/localflavor/es/es_provinces.py:35
-msgid "Navarre"
-msgstr "Navarre"
-
-#: contrib/localflavor/es/es_provinces.py:36
-msgid "Ourense"
-msgstr "Ourense"
-
-#: contrib/localflavor/es/es_provinces.py:37
-msgid "Asturias"
-msgstr "Asturias"
-
-#: contrib/localflavor/es/es_provinces.py:38
-msgid "Palencia"
-msgstr "Palencia"
-
-#: contrib/localflavor/es/es_provinces.py:39
-msgid "Las Palmas"
-msgstr "Las Palmas"
-
-#: contrib/localflavor/es/es_provinces.py:40
-msgid "Pontevedra"
-msgstr "Pontevedra"
-
-#: contrib/localflavor/es/es_provinces.py:41
-msgid "Salamanca"
-msgstr "Salamanca"
-
-#: contrib/localflavor/es/es_provinces.py:42
-msgid "Santa Cruz de Tenerife"
-msgstr "Santa Cruz de Tenerife"
-
-#: contrib/localflavor/es/es_provinces.py:43
-#: contrib/localflavor/es/es_regions.py:11
-msgid "Cantabria"
-msgstr "Cantabria"
-
-#: contrib/localflavor/es/es_provinces.py:44
-msgid "Segovia"
-msgstr "Segovia"
-
-#: contrib/localflavor/es/es_provinces.py:45
-msgid "Seville"
-msgstr "Seville"
-
-#: contrib/localflavor/es/es_provinces.py:46
-msgid "Soria"
-msgstr "Soria"
-
-#: contrib/localflavor/es/es_provinces.py:47
-msgid "Tarragona"
-msgstr "Tarragona"
-
-#: contrib/localflavor/es/es_provinces.py:48
-msgid "Teruel"
-msgstr "Teruel"
-
-#: contrib/localflavor/es/es_provinces.py:49
-msgid "Toledo"
-msgstr "Toledo"
-
-#: contrib/localflavor/es/es_provinces.py:50
-msgid "Valencia"
-msgstr "Valencia"
-
-#: contrib/localflavor/es/es_provinces.py:51
-msgid "Valladolid"
-msgstr "Valladolid"
-
-#: contrib/localflavor/es/es_provinces.py:52
-msgid "Bizkaia"
-msgstr "Bizkaia"
-
-#: contrib/localflavor/es/es_provinces.py:53
-msgid "Zamora"
-msgstr "Zamora"
-
-#: contrib/localflavor/es/es_provinces.py:54
-msgid "Zaragoza"
-msgstr "Zaragoza"
-
-#: contrib/localflavor/es/es_provinces.py:55
-msgid "Ceuta"
-msgstr "Ceuta"
-
-#: contrib/localflavor/es/es_provinces.py:56
-msgid "Melilla"
-msgstr "Melilla"
-
-#: contrib/localflavor/es/es_regions.py:5
-msgid "Andalusia"
-msgstr "Andalusia"
-
-#: contrib/localflavor/es/es_regions.py:6
-msgid "Aragon"
-msgstr "Aragon"
-
-#: contrib/localflavor/es/es_regions.py:7
-msgid "Principality of Asturias"
-msgstr "Principality of Asturias"
-
-#: contrib/localflavor/es/es_regions.py:8
-msgid "Balearic Islands"
-msgstr "Balearic Islands"
-
-#: contrib/localflavor/es/es_regions.py:9
-msgid "Basque Country"
-msgstr "Basque Country"
-
-#: contrib/localflavor/es/es_regions.py:10
-msgid "Canary Islands"
-msgstr "Canary Islands"
-
-#: contrib/localflavor/es/es_regions.py:12
-msgid "Castile-La Mancha"
-msgstr "Castile-La Mancha"
-
-#: contrib/localflavor/es/es_regions.py:13
-msgid "Castile and Leon"
-msgstr "Castile and Leon"
-
-#: contrib/localflavor/es/es_regions.py:14
-msgid "Catalonia"
-msgstr "Catalonia"
-
-#: contrib/localflavor/es/es_regions.py:15
-msgid "Extremadura"
-msgstr "Extremadura"
-
-#: contrib/localflavor/es/es_regions.py:16
-msgid "Galicia"
-msgstr "Galicia"
-
-#: contrib/localflavor/es/es_regions.py:19
-msgid "Region of Murcia"
-msgstr "Region of Murcia"
-
-#: contrib/localflavor/es/es_regions.py:20
-msgid "Foral Community of Navarre"
-msgstr "Foral Community of Navarre"
-
-#: contrib/localflavor/es/es_regions.py:21
-msgid "Valencian Community"
-msgstr "Valencian Community"
-
-#: contrib/localflavor/es/forms.py:20
-msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Masukkan kode pos yang benar dalam format 01XXX - 52XXX"
-
-#: contrib/localflavor/es/forms.py:40
-msgid ""
-"Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
-"9XXXXXXXX."
-msgstr ""
-"Masukkan nomor telepon yang benar dalam format 6XXXXXXXX, 8XXXXXXXX atau "
-"9XXXXXXXX."
-
-#: contrib/localflavor/es/forms.py:67
-msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Mohon masukkan NIF, NIE atau CIF yang benar."
-
-#: contrib/localflavor/es/forms.py:68
-msgid "Please enter a valid NIF or NIE."
-msgstr "Mohon masukkan NIF atau NIE yang benar."
-
-#: contrib/localflavor/es/forms.py:69
-msgid "Invalid checksum for NIF."
-msgstr "Checksum untuk NIF salah."
-
-#: contrib/localflavor/es/forms.py:70
-msgid "Invalid checksum for NIE."
-msgstr "Checksum untuk NIE salah."
-
-#: contrib/localflavor/es/forms.py:71
-msgid "Invalid checksum for CIF."
-msgstr "Checksum untuk CIF salah."
-
-#: contrib/localflavor/es/forms.py:143
-msgid ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr ""
-"Masukkan nomor akun bank yang benar dalam format XXXX-XXXX-XX-XXXXXXXXXX."
-
-#: contrib/localflavor/es/forms.py:144
-msgid "Invalid checksum for bank account number."
-msgstr "Checksum untuk nomor akun bank salah."
-
-#: contrib/localflavor/fi/forms.py:29
-msgid "Enter a valid Finnish social security number."
-msgstr "Masukkan nomor identitas Finlandia yang benar."
-
-#: contrib/localflavor/fr/forms.py:31
-msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "Nomor telepon harus dalam format 0X XX XX XX XX."
-
-#: contrib/localflavor/id/forms.py:28
-msgid "Enter a valid post code"
-msgstr "Masukkan kode pos yang benar"
-
-#: contrib/localflavor/id/forms.py:68 contrib/localflavor/nl/forms.py:53
-msgid "Enter a valid phone number"
-msgstr "Masukkan nomor telepon yang benar"
-
-#: contrib/localflavor/id/forms.py:107
-msgid "Enter a valid vehicle license plate number"
-msgstr "Masukkan nomor polisi kendaraan yang benar"
-
-#: contrib/localflavor/id/forms.py:170
-msgid "Enter a valid NIK/KTP number"
-msgstr "Masukkan nomor NIK/KTP yang benar"
-
-#: contrib/localflavor/id/id_choices.py:9
-#: contrib/localflavor/id/id_choices.py:73
-msgid "Bali"
-msgstr "Bali"
-
-#: contrib/localflavor/id/id_choices.py:10
-#: contrib/localflavor/id/id_choices.py:45
-msgid "Banten"
-msgstr "Banten"
-
-#: contrib/localflavor/id/id_choices.py:11
-#: contrib/localflavor/id/id_choices.py:54
-msgid "Bengkulu"
-msgstr "Bengkulu"
-
-#: contrib/localflavor/id/id_choices.py:12
-#: contrib/localflavor/id/id_choices.py:47
-msgid "Yogyakarta"
-msgstr "Yogyakarta"
-
-#: contrib/localflavor/id/id_choices.py:13
-#: contrib/localflavor/id/id_choices.py:51
-msgid "Jakarta"
-msgstr "Jakarta"
-
-#: contrib/localflavor/id/id_choices.py:14
-#: contrib/localflavor/id/id_choices.py:75
-msgid "Gorontalo"
-msgstr "Gorontalo"
-
-#: contrib/localflavor/id/id_choices.py:15
-#: contrib/localflavor/id/id_choices.py:57
-msgid "Jambi"
-msgstr "Jambi"
-
-#: contrib/localflavor/id/id_choices.py:16
-msgid "Jawa Barat"
-msgstr "Jawa Barat"
-
-#: contrib/localflavor/id/id_choices.py:17
-msgid "Jawa Tengah"
-msgstr "Jawa Tengah"
-
-#: contrib/localflavor/id/id_choices.py:18
-msgid "Jawa Timur"
-msgstr "Jawa Timur"
-
-#: contrib/localflavor/id/id_choices.py:19
-#: contrib/localflavor/id/id_choices.py:88
-msgid "Kalimantan Barat"
-msgstr "Kalimantan Barat"
-
-#: contrib/localflavor/id/id_choices.py:20
-#: contrib/localflavor/id/id_choices.py:66
-msgid "Kalimantan Selatan"
-msgstr "Kalimantan Selatan"
-
-#: contrib/localflavor/id/id_choices.py:21
-#: contrib/localflavor/id/id_choices.py:89
-msgid "Kalimantan Tengah"
-msgstr "Kalimantan Tengah"
-
-#: contrib/localflavor/id/id_choices.py:22
-#: contrib/localflavor/id/id_choices.py:90
-msgid "Kalimantan Timur"
-msgstr "Kalimantan Timur"
-
-#: contrib/localflavor/id/id_choices.py:23
-msgid "Kepulauan Bangka-Belitung"
-msgstr "Kepulauan Bangka-Belitung"
-
-#: contrib/localflavor/id/id_choices.py:24
-#: contrib/localflavor/id/id_choices.py:62
-msgid "Kepulauan Riau"
-msgstr "Kepulauan Riau"
-
-#: contrib/localflavor/id/id_choices.py:25
-#: contrib/localflavor/id/id_choices.py:55
-msgid "Lampung"
-msgstr "Lampung"
-
-#: contrib/localflavor/id/id_choices.py:26
-#: contrib/localflavor/id/id_choices.py:70
-msgid "Maluku"
-msgstr "Maluku"
-
-#: contrib/localflavor/id/id_choices.py:27
-#: contrib/localflavor/id/id_choices.py:71
-msgid "Maluku Utara"
-msgstr "Maluku Utara"
-
-#: contrib/localflavor/id/id_choices.py:28
-#: contrib/localflavor/id/id_choices.py:59
-msgid "Nanggroe Aceh Darussalam"
-msgstr "Nanggroe Aceh Darussalam"
-
-#: contrib/localflavor/id/id_choices.py:29
-msgid "Nusa Tenggara Barat"
-msgstr "Nusa Tenggara Barat"
-
-#: contrib/localflavor/id/id_choices.py:30
-msgid "Nusa Tenggara Timur"
-msgstr "Nusa Tenggara Timur"
-
-#: contrib/localflavor/id/id_choices.py:31
-msgid "Papua"
-msgstr "Papua"
-
-#: contrib/localflavor/id/id_choices.py:32
-msgid "Papua Barat"
-msgstr "Papua Barat"
-
-#: contrib/localflavor/id/id_choices.py:33
-#: contrib/localflavor/id/id_choices.py:60
-msgid "Riau"
-msgstr "Riau"
-
-#: contrib/localflavor/id/id_choices.py:34
-#: contrib/localflavor/id/id_choices.py:68
-msgid "Sulawesi Barat"
-msgstr "Sulawesi Barat"
-
-#: contrib/localflavor/id/id_choices.py:35
-#: contrib/localflavor/id/id_choices.py:69
-msgid "Sulawesi Selatan"
-msgstr "Sulawesi Selatan"
-
-#: contrib/localflavor/id/id_choices.py:36
-#: contrib/localflavor/id/id_choices.py:76
-msgid "Sulawesi Tengah"
-msgstr "Sulawesi Tengah"
-
-#: contrib/localflavor/id/id_choices.py:37
-#: contrib/localflavor/id/id_choices.py:79
-msgid "Sulawesi Tenggara"
-msgstr "Sulawesi Tenggara"
-
-#: contrib/localflavor/id/id_choices.py:38
-msgid "Sulawesi Utara"
-msgstr "Sulawesi Utara"
-
-#: contrib/localflavor/id/id_choices.py:39
-#: contrib/localflavor/id/id_choices.py:52
-msgid "Sumatera Barat"
-msgstr "Sumatera Barat"
-
-#: contrib/localflavor/id/id_choices.py:40
-#: contrib/localflavor/id/id_choices.py:56
-msgid "Sumatera Selatan"
-msgstr "Sumatera Selatan"
-
-#: contrib/localflavor/id/id_choices.py:41
-#: contrib/localflavor/id/id_choices.py:58
-msgid "Sumatera Utara"
-msgstr "Sumatera Utara"
-
-#: contrib/localflavor/id/id_choices.py:46
-msgid "Magelang"
-msgstr "Magelang"
-
-#: contrib/localflavor/id/id_choices.py:48
-msgid "Surakarta - Solo"
-msgstr "Surakarta - Solo"
-
-#: contrib/localflavor/id/id_choices.py:49
-msgid "Madiun"
-msgstr "Madiun"
-
-#: contrib/localflavor/id/id_choices.py:50
-msgid "Kediri"
-msgstr "Kediri"
-
-#: contrib/localflavor/id/id_choices.py:53
-msgid "Tapanuli"
-msgstr "Tapanuli"
-
-#: contrib/localflavor/id/id_choices.py:61
-msgid "Kepulauan Bangka Belitung"
-msgstr "Kepulauan Bangka Belitung"
-
-#: contrib/localflavor/id/id_choices.py:63
-msgid "Corps Consulate"
-msgstr "Corps Consulate"
-
-#: contrib/localflavor/id/id_choices.py:64
-msgid "Corps Diplomatic"
-msgstr "Corps Diplomatic"
-
-#: contrib/localflavor/id/id_choices.py:65
-msgid "Bandung"
-msgstr "Bandung"
-
-#: contrib/localflavor/id/id_choices.py:67
-msgid "Sulawesi Utara Daratan"
-msgstr "Sulawesi Utara Daratan"
-
-#: contrib/localflavor/id/id_choices.py:72
-msgid "NTT - Timor"
-msgstr "NTT - Timor"
-
-#: contrib/localflavor/id/id_choices.py:74
-msgid "Sulawesi Utara Kepulauan"
-msgstr "Sulawesi Utara Kepulauan"
-
-#: contrib/localflavor/id/id_choices.py:77
-msgid "NTB - Lombok"
-msgstr "NTB - Lombok"
-
-#: contrib/localflavor/id/id_choices.py:78
-msgid "Papua dan Papua Barat"
-msgstr "Papua dan Papua Barat"
-
-#: contrib/localflavor/id/id_choices.py:80
-msgid "Cirebon"
-msgstr "Cirebon"
-
-#: contrib/localflavor/id/id_choices.py:81
-msgid "NTB - Sumbawa"
-msgstr "NTB - Sumbawa"
-
-#: contrib/localflavor/id/id_choices.py:82
-msgid "NTT - Flores"
-msgstr "NTT - Flores"
-
-#: contrib/localflavor/id/id_choices.py:83
-msgid "NTT - Sumba"
-msgstr "NTT - Sumba"
-
-#: contrib/localflavor/id/id_choices.py:84
-msgid "Bogor"
-msgstr "Bogor"
-
-#: contrib/localflavor/id/id_choices.py:85
-msgid "Pekalongan"
-msgstr "Pekalongan"
-
-#: contrib/localflavor/id/id_choices.py:86
-msgid "Semarang"
-msgstr "Semarang"
-
-#: contrib/localflavor/id/id_choices.py:87
-msgid "Pati"
-msgstr "Pati"
-
-#: contrib/localflavor/id/id_choices.py:91
-msgid "Surabaya"
-msgstr "Surabaya"
-
-#: contrib/localflavor/id/id_choices.py:92
-msgid "Madura"
-msgstr "Madura"
-
-#: contrib/localflavor/id/id_choices.py:93
-msgid "Malang"
-msgstr "Malang"
-
-#: contrib/localflavor/id/id_choices.py:94
-msgid "Jember"
-msgstr "Jember"
-
-#: contrib/localflavor/id/id_choices.py:95
-msgid "Banyumas"
-msgstr "Banyumas"
-
-#: contrib/localflavor/id/id_choices.py:96
-msgid "Federal Government"
-msgstr "Federal Government"
-
-#: contrib/localflavor/id/id_choices.py:97
-msgid "Bojonegoro"
-msgstr "Bojonegoro"
-
-#: contrib/localflavor/id/id_choices.py:98
-msgid "Purwakarta"
-msgstr "Purwakarta"
-
-#: contrib/localflavor/id/id_choices.py:99
-msgid "Sidoarjo"
-msgstr "Sidoarjo"
-
-#: contrib/localflavor/id/id_choices.py:100
-msgid "Garut"
-msgstr "Garut"
-
-#: contrib/localflavor/ie/ie_counties.py:8
-msgid "Antrim"
-msgstr "Antrim"
-
-#: contrib/localflavor/ie/ie_counties.py:9
-msgid "Armagh"
-msgstr "Armagh"
-
-#: contrib/localflavor/ie/ie_counties.py:10
-msgid "Carlow"
-msgstr "Carlow"
-
-#: contrib/localflavor/ie/ie_counties.py:11
-msgid "Cavan"
-msgstr "Cavan"
-
-#: contrib/localflavor/ie/ie_counties.py:12
-msgid "Clare"
-msgstr "Clare"
-
-#: contrib/localflavor/ie/ie_counties.py:13
-msgid "Cork"
-msgstr "Cork"
-
-#: contrib/localflavor/ie/ie_counties.py:14
-msgid "Derry"
-msgstr "Derry"
-
-#: contrib/localflavor/ie/ie_counties.py:15
-msgid "Donegal"
-msgstr "Donegal"
-
-#: contrib/localflavor/ie/ie_counties.py:16
-msgid "Down"
-msgstr "Down"
-
-#: contrib/localflavor/ie/ie_counties.py:17
-msgid "Dublin"
-msgstr "Dublin"
-
-#: contrib/localflavor/ie/ie_counties.py:18
-msgid "Fermanagh"
-msgstr "Fermanagh"
-
-#: contrib/localflavor/ie/ie_counties.py:19
-msgid "Galway"
-msgstr "Galway"
-
-#: contrib/localflavor/ie/ie_counties.py:20
-msgid "Kerry"
-msgstr "Kerry"
-
-#: contrib/localflavor/ie/ie_counties.py:21
-msgid "Kildare"
-msgstr "Kildare"
-
-#: contrib/localflavor/ie/ie_counties.py:22
-msgid "Kilkenny"
-msgstr "Kilkenny"
-
-#: contrib/localflavor/ie/ie_counties.py:23
-msgid "Laois"
-msgstr "Laois"
-
-#: contrib/localflavor/ie/ie_counties.py:24
-msgid "Leitrim"
-msgstr "Leitrim"
-
-#: contrib/localflavor/ie/ie_counties.py:25
-msgid "Limerick"
-msgstr "Limerick"
-
-#: contrib/localflavor/ie/ie_counties.py:26
-msgid "Longford"
-msgstr "Longford"
-
-#: contrib/localflavor/ie/ie_counties.py:27
-msgid "Louth"
-msgstr "Louth"
-
-#: contrib/localflavor/ie/ie_counties.py:28
-msgid "Mayo"
-msgstr "Mayo"
-
-#: contrib/localflavor/ie/ie_counties.py:29
-msgid "Meath"
-msgstr "Meath"
-
-#: contrib/localflavor/ie/ie_counties.py:30
-msgid "Monaghan"
-msgstr "Monaghan"
-
-#: contrib/localflavor/ie/ie_counties.py:31
-msgid "Offaly"
-msgstr "Offaly"
-
-#: contrib/localflavor/ie/ie_counties.py:32
-msgid "Roscommon"
-msgstr "Roscommon"
-
-#: contrib/localflavor/ie/ie_counties.py:33
-msgid "Sligo"
-msgstr "Sligo"
-
-#: contrib/localflavor/ie/ie_counties.py:34
-msgid "Tipperary"
-msgstr "Tipperary"
-
-#: contrib/localflavor/ie/ie_counties.py:35
-msgid "Tyrone"
-msgstr "Tyrone"
-
-#: contrib/localflavor/ie/ie_counties.py:36
-msgid "Waterford"
-msgstr "Waterford"
-
-#: contrib/localflavor/ie/ie_counties.py:37
-msgid "Westmeath"
-msgstr "Westmeath"
-
-#: contrib/localflavor/ie/ie_counties.py:38
-msgid "Wexford"
-msgstr "Wexford"
-
-#: contrib/localflavor/ie/ie_counties.py:39
-msgid "Wicklow"
-msgstr "Wicklow"
-
-#: contrib/localflavor/in_/forms.py:15
-msgid "Enter a zip code in the format XXXXXXX."
-msgstr "Masukkan kode pos dalam format XXXXXXX."
-
-#: contrib/localflavor/is_/forms.py:18
-msgid ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr ""
-"Masukkan nomor identifikasi Iceland yang benar. Formatnya adalah XXXXXX-XXXX."
-
-#: contrib/localflavor/is_/forms.py:19
-msgid "The Icelandic identification number is not valid."
-msgstr "Nomor identifikasi Iceland tidak benar."
-
-#: contrib/localflavor/it/forms.py:15
-msgid "Enter a valid zip code."
-msgstr "Masukkan kode pos yang benar."
-
-#: contrib/localflavor/it/forms.py:44
-msgid "Enter a valid Social Security number."
-msgstr "Masukkan nomor identifikasi yang benar."
-
-#: contrib/localflavor/it/forms.py:69
-msgid "Enter a valid VAT number."
-msgstr "Masukkan nomor VAT yang benar."
-
-#: contrib/localflavor/jp/forms.py:16
-msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "Masukkan kode pos dalam format XXXXXXX atau XXX-XXXX."
-
-#: contrib/localflavor/jp/jp_prefectures.py:4
-msgid "Hokkaido"
-msgstr "Hokkaido"
-
-#: contrib/localflavor/jp/jp_prefectures.py:5
-msgid "Aomori"
-msgstr "Aomori"
-
-#: contrib/localflavor/jp/jp_prefectures.py:6
-msgid "Iwate"
-msgstr "Iwate"
-
-#: contrib/localflavor/jp/jp_prefectures.py:7
-msgid "Miyagi"
-msgstr "Miyagi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:8
-msgid "Akita"
-msgstr "Akita"
-
-#: contrib/localflavor/jp/jp_prefectures.py:9
-msgid "Yamagata"
-msgstr "Yamagata"
-
-#: contrib/localflavor/jp/jp_prefectures.py:10
-msgid "Fukushima"
-msgstr "Fukushima"
-
-#: contrib/localflavor/jp/jp_prefectures.py:11
-msgid "Ibaraki"
-msgstr "Ibaraki"
-
-#: contrib/localflavor/jp/jp_prefectures.py:12
-msgid "Tochigi"
-msgstr "Tochigi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:13
-msgid "Gunma"
-msgstr "Gunma"
-
-#: contrib/localflavor/jp/jp_prefectures.py:14
-msgid "Saitama"
-msgstr "Saitama"
-
-#: contrib/localflavor/jp/jp_prefectures.py:15
-msgid "Chiba"
-msgstr "Chiba"
-
-#: contrib/localflavor/jp/jp_prefectures.py:16
-msgid "Tokyo"
-msgstr "Tokyo"
-
-#: contrib/localflavor/jp/jp_prefectures.py:17
-msgid "Kanagawa"
-msgstr "Kanagawa"
-
-#: contrib/localflavor/jp/jp_prefectures.py:18
-msgid "Yamanashi"
-msgstr "Yamanashi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:19
-msgid "Nagano"
-msgstr "Nagano"
-
-#: contrib/localflavor/jp/jp_prefectures.py:20
-msgid "Niigata"
-msgstr "Niigata"
-
-#: contrib/localflavor/jp/jp_prefectures.py:21
-msgid "Toyama"
-msgstr "Toyama"
-
-#: contrib/localflavor/jp/jp_prefectures.py:22
-msgid "Ishikawa"
-msgstr "Ishikawa"
-
-#: contrib/localflavor/jp/jp_prefectures.py:23
-msgid "Fukui"
-msgstr "Fukui"
-
-#: contrib/localflavor/jp/jp_prefectures.py:24
-msgid "Gifu"
-msgstr "Gifu"
-
-#: contrib/localflavor/jp/jp_prefectures.py:25
-msgid "Shizuoka"
-msgstr "Shizuoka"
-
-#: contrib/localflavor/jp/jp_prefectures.py:26
-msgid "Aichi"
-msgstr "Aichi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:27
-msgid "Mie"
-msgstr "Mie"
-
-#: contrib/localflavor/jp/jp_prefectures.py:28
-msgid "Shiga"
-msgstr "Shiga"
-
-#: contrib/localflavor/jp/jp_prefectures.py:29
-msgid "Kyoto"
-msgstr "Kyoto"
-
-#: contrib/localflavor/jp/jp_prefectures.py:30
-msgid "Osaka"
-msgstr "Osaka"
-
-#: contrib/localflavor/jp/jp_prefectures.py:31
-msgid "Hyogo"
-msgstr "Hyogo"
-
-#: contrib/localflavor/jp/jp_prefectures.py:32
-msgid "Nara"
-msgstr "Nara"
-
-#: contrib/localflavor/jp/jp_prefectures.py:33
-msgid "Wakayama"
-msgstr "Wakayama"
-
-#: contrib/localflavor/jp/jp_prefectures.py:34
-msgid "Tottori"
-msgstr "Tottori"
-
-#: contrib/localflavor/jp/jp_prefectures.py:35
-msgid "Shimane"
-msgstr "Shimane"
-
-#: contrib/localflavor/jp/jp_prefectures.py:36
-msgid "Okayama"
-msgstr "Okayama"
-
-#: contrib/localflavor/jp/jp_prefectures.py:37
-msgid "Hiroshima"
-msgstr "Hiroshima"
-
-#: contrib/localflavor/jp/jp_prefectures.py:38
-msgid "Yamaguchi"
-msgstr "Yamaguchi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:39
-msgid "Tokushima"
-msgstr "Tokushima"
-
-#: contrib/localflavor/jp/jp_prefectures.py:40
-msgid "Kagawa"
-msgstr "Kagawa"
-
-#: contrib/localflavor/jp/jp_prefectures.py:41
-msgid "Ehime"
-msgstr "Ehime"
-
-#: contrib/localflavor/jp/jp_prefectures.py:42
-msgid "Kochi"
-msgstr "Kochi"
-
-#: contrib/localflavor/jp/jp_prefectures.py:43
-msgid "Fukuoka"
-msgstr "Fukuoka"
-
-#: contrib/localflavor/jp/jp_prefectures.py:44
-msgid "Saga"
-msgstr "Saga"
-
-#: contrib/localflavor/jp/jp_prefectures.py:45
-msgid "Nagasaki"
-msgstr "Nagasaki"
-
-#: contrib/localflavor/jp/jp_prefectures.py:46
-msgid "Kumamoto"
-msgstr "Kumamoto"
-
-#: contrib/localflavor/jp/jp_prefectures.py:47
-msgid "Oita"
-msgstr "Oita"
-
-#: contrib/localflavor/jp/jp_prefectures.py:48
-msgid "Miyazaki"
-msgstr "Miyazaki"
-
-#: contrib/localflavor/jp/jp_prefectures.py:49
-msgid "Kagoshima"
-msgstr "Kagoshima"
-
-#: contrib/localflavor/jp/jp_prefectures.py:50
-msgid "Okinawa"
-msgstr "Okinawa"
-
-#: contrib/localflavor/kw/forms.py:25
-msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "Masukkan nomor ID Kuwait yang benar"
-
-#: contrib/localflavor/mx/mx_states.py:12
-msgid "Aguascalientes"
-msgstr "Aguascalientes"
-
-#: contrib/localflavor/mx/mx_states.py:13
-msgid "Baja California"
-msgstr "Baja California"
-
-#: contrib/localflavor/mx/mx_states.py:14
-msgid "Baja California Sur"
-msgstr "Baja California Sur"
-
-#: contrib/localflavor/mx/mx_states.py:15
-msgid "Campeche"
-msgstr "Campeche"
-
-#: contrib/localflavor/mx/mx_states.py:16
-msgid "Chihuahua"
-msgstr "Chihuahua"
-
-#: contrib/localflavor/mx/mx_states.py:17
-msgid "Chiapas"
-msgstr "Chiapas"
-
-#: contrib/localflavor/mx/mx_states.py:18
-msgid "Coahuila"
-msgstr "Coahuila"
-
-#: contrib/localflavor/mx/mx_states.py:19
-msgid "Colima"
-msgstr "Colima"
-
-#: contrib/localflavor/mx/mx_states.py:20
-msgid "Distrito Federal"
-msgstr "Distrito Federal"
-
-#: contrib/localflavor/mx/mx_states.py:21
-msgid "Durango"
-msgstr "Durango"
-
-#: contrib/localflavor/mx/mx_states.py:22
-msgid "Guerrero"
-msgstr "Guerrero"
-
-#: contrib/localflavor/mx/mx_states.py:23
-msgid "Guanajuato"
-msgstr "Guanajuato"
-
-#: contrib/localflavor/mx/mx_states.py:24
-msgid "Hidalgo"
-msgstr "Hidalgo"
-
-#: contrib/localflavor/mx/mx_states.py:25
-msgid "Jalisco"
-msgstr "Jalisco"
-
-#: contrib/localflavor/mx/mx_states.py:26
-msgid "Estado de México"
-msgstr "Estado de México"
-
-#: contrib/localflavor/mx/mx_states.py:27
-msgid "Michoacán"
-msgstr "Michoacán"
-
-#: contrib/localflavor/mx/mx_states.py:28
-msgid "Morelos"
-msgstr "Morelos"
-
-#: contrib/localflavor/mx/mx_states.py:29
-msgid "Nayarit"
-msgstr "Nayarit"
-
-#: contrib/localflavor/mx/mx_states.py:30
-msgid "Nuevo León"
-msgstr "Nuevo León"
-
-#: contrib/localflavor/mx/mx_states.py:31
-msgid "Oaxaca"
-msgstr "Oaxaca"
-
-#: contrib/localflavor/mx/mx_states.py:32
-msgid "Puebla"
-msgstr "Puebla"
-
-#: contrib/localflavor/mx/mx_states.py:33
-msgid "Querétaro"
-msgstr "Querétaro"
-
-#: contrib/localflavor/mx/mx_states.py:34
-msgid "Quintana Roo"
-msgstr "Quintana Roo"
-
-#: contrib/localflavor/mx/mx_states.py:35
-msgid "Sinaloa"
-msgstr "Sinaloa"
-
-#: contrib/localflavor/mx/mx_states.py:36
-msgid "San Luis Potosí"
-msgstr "San Luis Potosí"
-
-#: contrib/localflavor/mx/mx_states.py:37
-msgid "Sonora"
-msgstr "Sonora"
-
-#: contrib/localflavor/mx/mx_states.py:38
-msgid "Tabasco"
-msgstr "Tabasco"
-
-#: contrib/localflavor/mx/mx_states.py:39
-msgid "Tamaulipas"
-msgstr "Tamaulipas"
-
-#: contrib/localflavor/mx/mx_states.py:40
-msgid "Tlaxcala"
-msgstr "Tlaxcala"
-
-#: contrib/localflavor/mx/mx_states.py:41
-msgid "Veracruz"
-msgstr "Veracruz"
-
-#: contrib/localflavor/mx/mx_states.py:42
-msgid "Yucatán"
-msgstr "Yucatán"
-
-#: contrib/localflavor/mx/mx_states.py:43
-msgid "Zacatecas"
-msgstr "Zacatecas"
-
-#: contrib/localflavor/nl/forms.py:22
-msgid "Enter a valid postal code"
-msgstr "Masukkan kode pos yang benar"
-
-#: contrib/localflavor/nl/forms.py:79
-msgid "Enter a valid SoFi number"
-msgstr "Masukkan nomor SoFi yang benar"
-
-#: contrib/localflavor/nl/nl_provinces.py:4
-msgid "Drenthe"
-msgstr "Drenthe"
-
-#: contrib/localflavor/nl/nl_provinces.py:5
-msgid "Flevoland"
-msgstr "Flevoland"
-
-#: contrib/localflavor/nl/nl_provinces.py:6
-msgid "Friesland"
-msgstr "Friesland"
-
-#: contrib/localflavor/nl/nl_provinces.py:7
-msgid "Gelderland"
-msgstr "Gelderland"
-
-#: contrib/localflavor/nl/nl_provinces.py:8
-msgid "Groningen"
-msgstr "Groningen"
-
-#: contrib/localflavor/nl/nl_provinces.py:9
-msgid "Limburg"
-msgstr "Limburg"
-
-#: contrib/localflavor/nl/nl_provinces.py:10
-msgid "Noord-Brabant"
-msgstr "Noord-Brabant"
-
-#: contrib/localflavor/nl/nl_provinces.py:11
-msgid "Noord-Holland"
-msgstr "Noord-Holland"
-
-#: contrib/localflavor/nl/nl_provinces.py:12
-msgid "Overijssel"
-msgstr "Overijssel"
-
-#: contrib/localflavor/nl/nl_provinces.py:13
-msgid "Utrecht"
-msgstr "Utrecht"
-
-#: contrib/localflavor/nl/nl_provinces.py:14
-msgid "Zeeland"
-msgstr "Zeeland"
-
-#: contrib/localflavor/nl/nl_provinces.py:15
-msgid "Zuid-Holland"
-msgstr "Zuid-Holland"
-
-#: contrib/localflavor/no/forms.py:34
-msgid "Enter a valid Norwegian social security number."
-msgstr "Masukkan nomor identifikasi Norwegia yang benar."
-
-#: contrib/localflavor/pe/forms.py:25
-msgid "This field requires 8 digits."
-msgstr "Field ini membutuhkan 8 angka."
-
-#: contrib/localflavor/pe/forms.py:53
-msgid "This field requires 11 digits."
-msgstr "Field ini membutuhkan 11 angka."
-
-#: contrib/localflavor/pl/forms.py:38
-msgid "National Identification Number consists of 11 digits."
-msgstr "Nomor identifikasi nasional terdiri dari 11 angka."
-
-#: contrib/localflavor/pl/forms.py:39
-msgid "Wrong checksum for the National Identification Number."
-msgstr "Checksum untuk nomor identifikasi nasional salah."
-
-#: contrib/localflavor/pl/forms.py:71
-msgid ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr ""
-"Masukkan nomor pajak (NIP) dalam format XXX-XXX-XX-XX atau XX-XX-XXX-XXX."
-
-#: contrib/localflavor/pl/forms.py:72
-msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr "Checksum untuk nomor pajak (NIP) salah."
-
-#: contrib/localflavor/pl/forms.py:109
-msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
-msgstr "Nomor Registrasi Bisnis Nasional (REGON) terdiri dari 9 atau 14 angka."
-
-#: contrib/localflavor/pl/forms.py:110
-msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr "Checksum untuk Nomor Registrasi Bisnis Nasional (REGON) salah."
-
-#: contrib/localflavor/pl/forms.py:148
-msgid "Enter a postal code in the format XX-XXX."
-msgstr "Masukkan kode pos dalam format XX-XXX."
-
-#: contrib/localflavor/pl/pl_voivodeships.py:8
-msgid "Lower Silesia"
-msgstr "Lower Silesia"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:9
-msgid "Kuyavia-Pomerania"
-msgstr "Kuyavia-Pomerania"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:10
-msgid "Lublin"
-msgstr "Lublin"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:11
-msgid "Lubusz"
-msgstr "Lubusz"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:12
-msgid "Lodz"
-msgstr "Lodz"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:13
-msgid "Lesser Poland"
-msgstr "Lesser Poland"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:14
-msgid "Masovia"
-msgstr "Masovia"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:15
-msgid "Opole"
-msgstr "Opole"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:16
-msgid "Subcarpatia"
-msgstr "Subcarpatia"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:17
-msgid "Podlasie"
-msgstr "Podlasie"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:18
-msgid "Pomerania"
-msgstr "Pomerania"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:19
-msgid "Silesia"
-msgstr "Silesia"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:20
-msgid "Swietokrzyskie"
-msgstr "Swietokrzyskie"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:21
-msgid "Warmia-Masuria"
-msgstr "Warmia-Masuria"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:22
-msgid "Greater Poland"
-msgstr "Greater Poland"
-
-#: contrib/localflavor/pl/pl_voivodeships.py:23
-msgid "West Pomerania"
-msgstr "West Pomerania"
-
-#: contrib/localflavor/pt/forms.py:17
-msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "Masukkan kode pos dalam format XXXX-XXX."
-
-#: contrib/localflavor/pt/forms.py:37
-msgid "Phone numbers must have 9 digits, or start by + or 00."
-msgstr "Nomor telepon harus memiliki 9 angka, atau dimulai dari + atau 00."
-
-#: contrib/localflavor/ro/forms.py:19
-msgid "Enter a valid CIF."
-msgstr "Masukkan CIF yang benar."
-
-#: contrib/localflavor/ro/forms.py:56
-msgid "Enter a valid CNP."
-msgstr "Masukkan CNP yang benar."
-
-#: contrib/localflavor/ro/forms.py:141
-msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "Masukkan IBAN yang benar dalam format ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
-
-#: contrib/localflavor/ro/forms.py:171
-msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "Nomor telepon harus dalam format XXXX-XXXXXX."
-
-#: contrib/localflavor/ro/forms.py:194
-msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Masukkan kode pos yang benar dalam format XXXXXX"
-
-#: contrib/localflavor/se/forms.py:50
-msgid "Enter a valid Swedish organisation number."
-msgstr "Masukkan nomor organisasi Swedia yang benar."
-
-#: contrib/localflavor/se/forms.py:107
-msgid "Enter a valid Swedish personal identity number."
-msgstr "Masukkan nomor identifikasi pribadi Swedia yang benar."
-
-#: contrib/localflavor/se/forms.py:108
-msgid "Co-ordination numbers are not allowed."
-msgstr "Nomor koordinasi tidak diperbolehkan."
-
-#: contrib/localflavor/se/forms.py:150
-msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "Masukkan kode pos Swedia dalam format XXXXX."
-
-#: contrib/localflavor/se/se_counties.py:15
-msgid "Stockholm"
-msgstr "Stockholm"
-
-#: contrib/localflavor/se/se_counties.py:16
-msgid "Västerbotten"
-msgstr "Västerbotten"
-
-#: contrib/localflavor/se/se_counties.py:17
-msgid "Norrbotten"
-msgstr "Norrbotten"
-
-#: contrib/localflavor/se/se_counties.py:18
-msgid "Uppsala"
-msgstr "Uppsala"
-
-#: contrib/localflavor/se/se_counties.py:19
-msgid "Södermanland"
-msgstr "Södermanland"
-
-#: contrib/localflavor/se/se_counties.py:20
-msgid "Östergötland"
-msgstr "Östergötland"
-
-#: contrib/localflavor/se/se_counties.py:21
-msgid "Jönköping"
-msgstr "Jönköping"
-
-#: contrib/localflavor/se/se_counties.py:22
-msgid "Kronoberg"
-msgstr "Kronoberg"
-
-#: contrib/localflavor/se/se_counties.py:23
-msgid "Kalmar"
-msgstr "Kalmar"
-
-#: contrib/localflavor/se/se_counties.py:24
-msgid "Gotland"
-msgstr "Gotland"
-
-#: contrib/localflavor/se/se_counties.py:25
-msgid "Blekinge"
-msgstr "Blekinge"
-
-#: contrib/localflavor/se/se_counties.py:26
-msgid "Skåne"
-msgstr "Skåne"
-
-#: contrib/localflavor/se/se_counties.py:27
-msgid "Halland"
-msgstr "Halland"
-
-#: contrib/localflavor/se/se_counties.py:28
-msgid "Västra Götaland"
-msgstr "Västra Götaland"
-
-#: contrib/localflavor/se/se_counties.py:29
-msgid "Värmland"
-msgstr "Värmland"
-
-#: contrib/localflavor/se/se_counties.py:30
-msgid "Örebro"
-msgstr "Örebro"
-
-#: contrib/localflavor/se/se_counties.py:31
-msgid "Västmanland"
-msgstr "Västmanland"
-
-#: contrib/localflavor/se/se_counties.py:32
-msgid "Dalarna"
-msgstr "Dalarna"
-
-#: contrib/localflavor/se/se_counties.py:33
-msgid "Gävleborg"
-msgstr "Gävleborg"
-
-#: contrib/localflavor/se/se_counties.py:34
-msgid "Västernorrland"
-msgstr "Västernorrland"
-
-#: contrib/localflavor/se/se_counties.py:35
-msgid "Jämtland"
-msgstr "Jämtland"
-
-#: contrib/localflavor/sk/sk_districts.py:8
-msgid "Banska Bystrica"
-msgstr "Banska Bystrica"
-
-#: contrib/localflavor/sk/sk_districts.py:9
-msgid "Banska Stiavnica"
-msgstr "Banska Stiavnica"
-
-#: contrib/localflavor/sk/sk_districts.py:10
-msgid "Bardejov"
-msgstr "Bardejov"
-
-#: contrib/localflavor/sk/sk_districts.py:11
-msgid "Banovce nad Bebravou"
-msgstr "Banovce nad Bebravou"
-
-#: contrib/localflavor/sk/sk_districts.py:12
-msgid "Brezno"
-msgstr "Brezno"
-
-#: contrib/localflavor/sk/sk_districts.py:13
-msgid "Bratislava I"
-msgstr "Bratislava I"
-
-#: contrib/localflavor/sk/sk_districts.py:14
-msgid "Bratislava II"
-msgstr "Bratislava II"
-
-#: contrib/localflavor/sk/sk_districts.py:15
-msgid "Bratislava III"
-msgstr "Bratislava III"
-
-#: contrib/localflavor/sk/sk_districts.py:16
-msgid "Bratislava IV"
-msgstr "Bratislava IV"
-
-#: contrib/localflavor/sk/sk_districts.py:17
-msgid "Bratislava V"
-msgstr "Bratislava V"
-
-#: contrib/localflavor/sk/sk_districts.py:18
-msgid "Bytca"
-msgstr "Bytca"
-
-#: contrib/localflavor/sk/sk_districts.py:19
-msgid "Cadca"
-msgstr "Cadca"
-
-#: contrib/localflavor/sk/sk_districts.py:20
-msgid "Detva"
-msgstr "Detva"
-
-#: contrib/localflavor/sk/sk_districts.py:21
-msgid "Dolny Kubin"
-msgstr "Dolny Kubin"
-
-#: contrib/localflavor/sk/sk_districts.py:22
-msgid "Dunajska Streda"
-msgstr "Dunajska Streda"
-
-#: contrib/localflavor/sk/sk_districts.py:23
-msgid "Galanta"
-msgstr "Galanta"
-
-#: contrib/localflavor/sk/sk_districts.py:24
-msgid "Gelnica"
-msgstr "Gelnica"
-
-#: contrib/localflavor/sk/sk_districts.py:25
-msgid "Hlohovec"
-msgstr "Hlohovec"
-
-#: contrib/localflavor/sk/sk_districts.py:26
-msgid "Humenne"
-msgstr "Humenne"
-
-#: contrib/localflavor/sk/sk_districts.py:27
-msgid "Ilava"
-msgstr "Ilava"
-
-#: contrib/localflavor/sk/sk_districts.py:28
-msgid "Kezmarok"
-msgstr "Kezmarok"
-
-#: contrib/localflavor/sk/sk_districts.py:29
-msgid "Komarno"
-msgstr "Komarno"
-
-#: contrib/localflavor/sk/sk_districts.py:30
-msgid "Kosice I"
-msgstr "Kosice I"
-
-#: contrib/localflavor/sk/sk_districts.py:31
-msgid "Kosice II"
-msgstr "Kosice II"
-
-#: contrib/localflavor/sk/sk_districts.py:32
-msgid "Kosice III"
-msgstr "Kosice III"
-
-#: contrib/localflavor/sk/sk_districts.py:33
-msgid "Kosice IV"
-msgstr "Kosice IV"
-
-#: contrib/localflavor/sk/sk_districts.py:34
-msgid "Kosice - okolie"
-msgstr "Kosice - okolie"
-
-#: contrib/localflavor/sk/sk_districts.py:35
-msgid "Krupina"
-msgstr "Krupina"
-
-#: contrib/localflavor/sk/sk_districts.py:36
-msgid "Kysucke Nove Mesto"
-msgstr "Kysucke Nove Mesto"
-
-#: contrib/localflavor/sk/sk_districts.py:37
-msgid "Levice"
-msgstr "Levice"
-
-#: contrib/localflavor/sk/sk_districts.py:38
-msgid "Levoca"
-msgstr "Levoca"
-
-#: contrib/localflavor/sk/sk_districts.py:39
-msgid "Liptovsky Mikulas"
-msgstr "Liptovsky Mikulas"
-
-#: contrib/localflavor/sk/sk_districts.py:40
-msgid "Lucenec"
-msgstr "Lucenec"
-
-#: contrib/localflavor/sk/sk_districts.py:41
-msgid "Malacky"
-msgstr "Malacky"
-
-#: contrib/localflavor/sk/sk_districts.py:42
-msgid "Martin"
-msgstr "Martin"
-
-#: contrib/localflavor/sk/sk_districts.py:43
-msgid "Medzilaborce"
-msgstr "Medzilaborce"
-
-#: contrib/localflavor/sk/sk_districts.py:44
-msgid "Michalovce"
-msgstr "Michalovce"
-
-#: contrib/localflavor/sk/sk_districts.py:45
-msgid "Myjava"
-msgstr "Myjava"
-
-#: contrib/localflavor/sk/sk_districts.py:46
-msgid "Namestovo"
-msgstr "Namestovo"
-
-#: contrib/localflavor/sk/sk_districts.py:47
-msgid "Nitra"
-msgstr "Nitra"
-
-#: contrib/localflavor/sk/sk_districts.py:48
-msgid "Nove Mesto nad Vahom"
-msgstr "Nove Mesto nad Vahom"
-
-#: contrib/localflavor/sk/sk_districts.py:49
-msgid "Nove Zamky"
-msgstr "Nove Zamky"
-
-#: contrib/localflavor/sk/sk_districts.py:50
-msgid "Partizanske"
-msgstr "Partizanske"
-
-#: contrib/localflavor/sk/sk_districts.py:51
-msgid "Pezinok"
-msgstr "Pezinok"
-
-#: contrib/localflavor/sk/sk_districts.py:52
-msgid "Piestany"
-msgstr "Piestany"
-
-#: contrib/localflavor/sk/sk_districts.py:53
-msgid "Poltar"
-msgstr "Poltar"
-
-#: contrib/localflavor/sk/sk_districts.py:54
-msgid "Poprad"
-msgstr "Poprad"
-
-#: contrib/localflavor/sk/sk_districts.py:55
-msgid "Povazska Bystrica"
-msgstr "Povazska Bystrica"
-
-#: contrib/localflavor/sk/sk_districts.py:56
-msgid "Presov"
-msgstr "Presov"
-
-#: contrib/localflavor/sk/sk_districts.py:57
-msgid "Prievidza"
-msgstr "Prievidza"
-
-#: contrib/localflavor/sk/sk_districts.py:58
-msgid "Puchov"
-msgstr "Puchov"
-
-#: contrib/localflavor/sk/sk_districts.py:59
-msgid "Revuca"
-msgstr "Revuca"
-
-#: contrib/localflavor/sk/sk_districts.py:60
-msgid "Rimavska Sobota"
-msgstr "Rimavska Sobota"
-
-#: contrib/localflavor/sk/sk_districts.py:61
-msgid "Roznava"
-msgstr "Roznava"
-
-#: contrib/localflavor/sk/sk_districts.py:62
-msgid "Ruzomberok"
-msgstr "Ruzomberok"
-
-#: contrib/localflavor/sk/sk_districts.py:63
-msgid "Sabinov"
-msgstr "Sabinov"
-
-#: contrib/localflavor/sk/sk_districts.py:64
-msgid "Senec"
-msgstr "Senec"
-
-#: contrib/localflavor/sk/sk_districts.py:65
-msgid "Senica"
-msgstr "Senica"
-
-#: contrib/localflavor/sk/sk_districts.py:66
-msgid "Skalica"
-msgstr "Skalica"
-
-#: contrib/localflavor/sk/sk_districts.py:67
-msgid "Snina"
-msgstr "Snina"
-
-#: contrib/localflavor/sk/sk_districts.py:68
-msgid "Sobrance"
-msgstr "Sobrance"
-
-#: contrib/localflavor/sk/sk_districts.py:69
-msgid "Spisska Nova Ves"
-msgstr "Spisska Nova Ves"
-
-#: contrib/localflavor/sk/sk_districts.py:70
-msgid "Stara Lubovna"
-msgstr "Stara Lubovna"
-
-#: contrib/localflavor/sk/sk_districts.py:71
-msgid "Stropkov"
-msgstr "Stropkov"
-
-#: contrib/localflavor/sk/sk_districts.py:72
-msgid "Svidnik"
-msgstr "Svidnik"
-
-#: contrib/localflavor/sk/sk_districts.py:73
-msgid "Sala"
-msgstr "Sala"
-
-#: contrib/localflavor/sk/sk_districts.py:74
-msgid "Topolcany"
-msgstr "Topolcany"
-
-#: contrib/localflavor/sk/sk_districts.py:75
-msgid "Trebisov"
-msgstr "Trebisov"
-
-#: contrib/localflavor/sk/sk_districts.py:76
-msgid "Trencin"
-msgstr "Trencin"
-
-#: contrib/localflavor/sk/sk_districts.py:77
-msgid "Trnava"
-msgstr "Trnava"
-
-#: contrib/localflavor/sk/sk_districts.py:78
-msgid "Turcianske Teplice"
-msgstr "Turcianske Teplice"
-
-#: contrib/localflavor/sk/sk_districts.py:79
-msgid "Tvrdosin"
-msgstr "Tvrdosin"
-
-#: contrib/localflavor/sk/sk_districts.py:80
-msgid "Velky Krtis"
-msgstr "Velky Krtis"
-
-#: contrib/localflavor/sk/sk_districts.py:81
-msgid "Vranov nad Toplou"
-msgstr "Vranov nad Toplou"
-
-#: contrib/localflavor/sk/sk_districts.py:82
-msgid "Zlate Moravce"
-msgstr "Zlate Moravce"
-
-#: contrib/localflavor/sk/sk_districts.py:83
-msgid "Zvolen"
-msgstr "Zvolen"
-
-#: contrib/localflavor/sk/sk_districts.py:84
-msgid "Zarnovica"
-msgstr "Zarnovica"
-
-#: contrib/localflavor/sk/sk_districts.py:85
-msgid "Ziar nad Hronom"
-msgstr "Ziar nad Hronom"
-
-#: contrib/localflavor/sk/sk_districts.py:86
-msgid "Zilina"
-msgstr "Zilina"
-
-#: contrib/localflavor/sk/sk_regions.py:8
-msgid "Banska Bystrica region"
-msgstr "Daerah Banska Bystrica"
-
-#: contrib/localflavor/sk/sk_regions.py:9
-msgid "Bratislava region"
-msgstr "Daerah Brastilava"
-
-#: contrib/localflavor/sk/sk_regions.py:10
-msgid "Kosice region"
-msgstr "Daerah Kosice"
-
-#: contrib/localflavor/sk/sk_regions.py:11
-msgid "Nitra region"
-msgstr "Daerah Nitra"
-
-#: contrib/localflavor/sk/sk_regions.py:12
-msgid "Presov region"
-msgstr "Daerah Presov"
-
-#: contrib/localflavor/sk/sk_regions.py:13
-msgid "Trencin region"
-msgstr "Daerah Trencin"
-
-#: contrib/localflavor/sk/sk_regions.py:14
-msgid "Trnava region"
-msgstr "Daerah Trnava"
-
-#: contrib/localflavor/sk/sk_regions.py:15
-msgid "Zilina region"
-msgstr "Daerah Zilina"
-
-#: contrib/localflavor/uk/forms.py:21
-msgid "Enter a valid postcode."
-msgstr "Masukkan kode pos yang benar."
-
-#: contrib/localflavor/uk/uk_regions.py:11
-msgid "Bedfordshire"
-msgstr "Bedfordshire"
-
-#: contrib/localflavor/uk/uk_regions.py:12
-msgid "Buckinghamshire"
-msgstr "Buckinghamshire"
-
-#: contrib/localflavor/uk/uk_regions.py:14
-msgid "Cheshire"
-msgstr "Cheshire"
-
-#: contrib/localflavor/uk/uk_regions.py:15
-msgid "Cornwall and Isles of Scilly"
-msgstr "Cornwall dan Kepulauan Scilly"
-
-#: contrib/localflavor/uk/uk_regions.py:16
-msgid "Cumbria"
-msgstr "Cumbria"
-
-#: contrib/localflavor/uk/uk_regions.py:17
-msgid "Derbyshire"
-msgstr "Derbyshire"
-
-#: contrib/localflavor/uk/uk_regions.py:18
-msgid "Devon"
-msgstr "Devon"
-
-#: contrib/localflavor/uk/uk_regions.py:19
-msgid "Dorset"
-msgstr "Dorset"
-
-#: contrib/localflavor/uk/uk_regions.py:20
-msgid "Durham"
-msgstr "Durham"
-
-#: contrib/localflavor/uk/uk_regions.py:21
-msgid "East Sussex"
-msgstr "East Sussex"
-
-#: contrib/localflavor/uk/uk_regions.py:22
-msgid "Essex"
-msgstr "Essex"
-
-#: contrib/localflavor/uk/uk_regions.py:23
-msgid "Gloucestershire"
-msgstr "Gloucestershire"
-
-#: contrib/localflavor/uk/uk_regions.py:24
-msgid "Greater London"
-msgstr "Greater London"
-
-#: contrib/localflavor/uk/uk_regions.py:25
-msgid "Greater Manchester"
-msgstr "Greater Manchester"
-
-#: contrib/localflavor/uk/uk_regions.py:26
-msgid "Hampshire"
-msgstr "Hampshire"
-
-#: contrib/localflavor/uk/uk_regions.py:27
-msgid "Hertfordshire"
-msgstr "Hertfordshire"
-
-#: contrib/localflavor/uk/uk_regions.py:28
-msgid "Kent"
-msgstr "Kent"
-
-#: contrib/localflavor/uk/uk_regions.py:29
-msgid "Lancashire"
-msgstr "Lancashire"
-
-#: contrib/localflavor/uk/uk_regions.py:30
-msgid "Leicestershire"
-msgstr "Leicestershire"
-
-#: contrib/localflavor/uk/uk_regions.py:31
-msgid "Lincolnshire"
-msgstr "Lincolnshire"
-
-#: contrib/localflavor/uk/uk_regions.py:32
-msgid "Merseyside"
-msgstr "Merseyside"
-
-#: contrib/localflavor/uk/uk_regions.py:33
-msgid "Norfolk"
-msgstr "Norfolk"
-
-#: contrib/localflavor/uk/uk_regions.py:34
-msgid "North Yorkshire"
-msgstr "North Yorkshire"
-
-#: contrib/localflavor/uk/uk_regions.py:35
-msgid "Northamptonshire"
-msgstr "Northamptonshire"
-
-#: contrib/localflavor/uk/uk_regions.py:36
-msgid "Northumberland"
-msgstr "Northumberland"
-
-#: contrib/localflavor/uk/uk_regions.py:37
-msgid "Nottinghamshire"
-msgstr "Nottinghamshire"
-
-#: contrib/localflavor/uk/uk_regions.py:38
-msgid "Oxfordshire"
-msgstr "Oxfordshire"
-
-#: contrib/localflavor/uk/uk_regions.py:39
-msgid "Shropshire"
-msgstr "Shropshire"
-
-#: contrib/localflavor/uk/uk_regions.py:40
-msgid "Somerset"
-msgstr "Somerset"
-
-#: contrib/localflavor/uk/uk_regions.py:41
-msgid "South Yorkshire"
-msgstr "South Yorkshire"
-
-#: contrib/localflavor/uk/uk_regions.py:42
-msgid "Staffordshire"
-msgstr "Staffordshire"
-
-#: contrib/localflavor/uk/uk_regions.py:43
-msgid "Suffolk"
-msgstr "Suffolk"
-
-#: contrib/localflavor/uk/uk_regions.py:44
-msgid "Surrey"
-msgstr "Surrey"
-
-#: contrib/localflavor/uk/uk_regions.py:45
-msgid "Tyne and Wear"
-msgstr "Tyne and Wear"
-
-#: contrib/localflavor/uk/uk_regions.py:46
-msgid "Warwickshire"
-msgstr "Warwickshire"
-
-#: contrib/localflavor/uk/uk_regions.py:47
-msgid "West Midlands"
-msgstr "West Midlands"
-
-#: contrib/localflavor/uk/uk_regions.py:48
-msgid "West Sussex"
-msgstr "West Sussex"
-
-#: contrib/localflavor/uk/uk_regions.py:49
-msgid "West Yorkshire"
-msgstr "West Yorkshire"
-
-#: contrib/localflavor/uk/uk_regions.py:50
-msgid "Wiltshire"
-msgstr "Wiltshire"
-
-#: contrib/localflavor/uk/uk_regions.py:51
-msgid "Worcestershire"
-msgstr "Worcestershire"
-
-#: contrib/localflavor/uk/uk_regions.py:55
-msgid "County Antrim"
-msgstr "County Antrim"
-
-#: contrib/localflavor/uk/uk_regions.py:56
-msgid "County Armagh"
-msgstr "County Armagh"
-
-#: contrib/localflavor/uk/uk_regions.py:57
-msgid "County Down"
-msgstr "County Down"
-
-#: contrib/localflavor/uk/uk_regions.py:58
-msgid "County Fermanagh"
-msgstr "County Fermanagh"
-
-#: contrib/localflavor/uk/uk_regions.py:59
-msgid "County Londonderry"
-msgstr "County Londonderry"
-
-#: contrib/localflavor/uk/uk_regions.py:60
-msgid "County Tyrone"
-msgstr "County Tyrone"
-
-#: contrib/localflavor/uk/uk_regions.py:64
-msgid "Clwyd"
-msgstr "Clwyd"
-
-#: contrib/localflavor/uk/uk_regions.py:65
-msgid "Dyfed"
-msgstr "Dyfed"
-
-#: contrib/localflavor/uk/uk_regions.py:66
-msgid "Gwent"
-msgstr "Gwent"
-
-#: contrib/localflavor/uk/uk_regions.py:67
-msgid "Gwynedd"
-msgstr "Gwynedd"
-
-#: contrib/localflavor/uk/uk_regions.py:68
-msgid "Mid Glamorgan"
-msgstr "Mid Glamorgan"
-
-#: contrib/localflavor/uk/uk_regions.py:69
-msgid "Powys"
-msgstr "Powys"
-
-#: contrib/localflavor/uk/uk_regions.py:70
-msgid "South Glamorgan"
-msgstr "South Glamorgan"
-
-#: contrib/localflavor/uk/uk_regions.py:71
-msgid "West Glamorgan"
-msgstr "West Glamorgan"
-
-#: contrib/localflavor/uk/uk_regions.py:75
-msgid "Borders"
-msgstr "Borders"
-
-#: contrib/localflavor/uk/uk_regions.py:76
-msgid "Central Scotland"
-msgstr "Central Scotland"
-
-#: contrib/localflavor/uk/uk_regions.py:77
-msgid "Dumfries and Galloway"
-msgstr "Dumfries dan Galloway"
-
-#: contrib/localflavor/uk/uk_regions.py:78
-msgid "Fife"
-msgstr "Fife"
-
-#: contrib/localflavor/uk/uk_regions.py:79
-msgid "Grampian"
-msgstr "Grampian"
-
-#: contrib/localflavor/uk/uk_regions.py:80
-msgid "Highland"
-msgstr "Highland"
-
-#: contrib/localflavor/uk/uk_regions.py:81
-msgid "Lothian"
-msgstr "Lothian"
-
-#: contrib/localflavor/uk/uk_regions.py:82
-msgid "Orkney Islands"
-msgstr "Kepulauan Orkney"
-
-#: contrib/localflavor/uk/uk_regions.py:83
-msgid "Shetland Islands"
-msgstr "Kepulauan Shetland"
-
-#: contrib/localflavor/uk/uk_regions.py:84
-msgid "Strathclyde"
-msgstr "Strathclyde"
-
-#: contrib/localflavor/uk/uk_regions.py:85
-msgid "Tayside"
-msgstr "Tayside"
-
-#: contrib/localflavor/uk/uk_regions.py:86
-msgid "Western Isles"
-msgstr "Western Isles"
-
-#: contrib/localflavor/uk/uk_regions.py:90
-msgid "England"
-msgstr "Inggris"
-
-#: contrib/localflavor/uk/uk_regions.py:91
-msgid "Northern Ireland"
-msgstr "Irlandia Utara"
-
-#: contrib/localflavor/uk/uk_regions.py:92
-msgid "Scotland"
-msgstr "Scotlandia"
-
-#: contrib/localflavor/uk/uk_regions.py:93
-msgid "Wales"
-msgstr "Wales"
-
-#: contrib/localflavor/us/forms.py:17
-msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "Masukkan kode pos dalam format XXXXX atau XXXXX-XXXX."
-
-#: contrib/localflavor/us/forms.py:26
-msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "Nomor telepon harus dalam format XXX-XXX-XXXX."
-
-#: contrib/localflavor/us/forms.py:55
-msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr "Masukkan nomor identifikasi A.S. yang benar dalam format XXX-XX-XXXX."
-
-#: contrib/localflavor/us/forms.py:88
-msgid "Enter a U.S. state or territory."
-msgstr "Masukkan sebuah propinsi atau teritori A.S."
-
-#: contrib/localflavor/us/models.py:8
-msgid "U.S. state (two uppercase letters)"
-msgstr "Propinsi A.S (dua huruf besar)"
-
-#: contrib/localflavor/us/models.py:17
-msgid "Phone number"
-msgstr "Nomor telepon"
-
-#: contrib/localflavor/uy/forms.py:28
-msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
-msgstr ""
-"Masukkan nomor CI yang benar dalam format X.XXX.XXX-X,XXXXXXX-X atau "
-"XXXXXXXX."
-
-#: contrib/localflavor/uy/forms.py:30
-msgid "Enter a valid CI number."
-msgstr "Masukkan nomor CI yang benar."
-
-#: contrib/localflavor/za/forms.py:21
-msgid "Enter a valid South African ID number"
-msgstr "Masukkan nomor ID Afrika Selatan yang benar"
-
-#: contrib/localflavor/za/forms.py:55
-msgid "Enter a valid South African postal code"
-msgstr "Masukkan kode pos Afrika Selatan yang benar"
-
-#: contrib/localflavor/za/za_provinces.py:4
-msgid "Eastern Cape"
-msgstr "Eastern Cape"
-
-#: contrib/localflavor/za/za_provinces.py:5
-msgid "Free State"
-msgstr "Free State"
-
-#: contrib/localflavor/za/za_provinces.py:6
-msgid "Gauteng"
-msgstr "Gauteng"
-
-#: contrib/localflavor/za/za_provinces.py:7
-msgid "KwaZulu-Natal"
-msgstr "KwaZulu-Natal"
-
-#: contrib/localflavor/za/za_provinces.py:8
-msgid "Limpopo"
-msgstr "Limpopo"
-
-#: contrib/localflavor/za/za_provinces.py:9
-msgid "Mpumalanga"
-msgstr "Mpumalanga"
-
-#: contrib/localflavor/za/za_provinces.py:10
-msgid "Northern Cape"
-msgstr "Northern Cape"
-
-#: contrib/localflavor/za/za_provinces.py:11
-msgid "North West"
-msgstr "North West"
-
-#: contrib/localflavor/za/za_provinces.py:12
-msgid "Western Cape"
-msgstr "Western Cape"
-
-#: contrib/messages/tests/base.py:101
-msgid "lazy message"
-msgstr "pesan malas"
-
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "alihkan dari"
-
-#: contrib/redirects/models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Harus berupa path absolut, tanpa nama domain. Contoh: '/kejadian/cari/'."
-
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "alihkan ke"
-
-#: contrib/redirects/models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Dapat berupa path absolut (seperti di atas) atau URL penuh dimulai dengan "
-"'http://'."
-
-#: contrib/redirects/models.py:13
-msgid "redirect"
-msgstr "alihkan"
-
-#: contrib/redirects/models.py:14
-msgid "redirects"
-msgstr "dialihkan"
-
-#: contrib/sessions/models.py:45
-msgid "session key"
-msgstr "kunci sesi"
-
-#: contrib/sessions/models.py:47
-msgid "session data"
-msgstr "data sesi"
-
-#: contrib/sessions/models.py:48
-msgid "expire date"
-msgstr "tanggal kadaluarsa"
-
-#: contrib/sessions/models.py:53
-msgid "session"
-msgstr "sesi"
-
-#: contrib/sessions/models.py:54
-msgid "sessions"
-msgstr "sesi"
-
-#: contrib/sites/models.py:32
-msgid "domain name"
-msgstr "nama domain"
-
-#: contrib/sites/models.py:33
-msgid "display name"
-msgstr "nama yang ditampilkan"
-
-#: contrib/sites/models.py:39
-msgid "sites"
-msgstr "situs"
-
-#: core/validators.py:20 forms/fields.py:66
+#: core/validators.py:20 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "Masukkan nilai yang benar."
 
-#: core/validators.py:87 forms/fields.py:529
+#: core/validators.py:87 forms/fields.py:572
 msgid "Enter a valid URL."
 msgstr "Masukkan URL yang benar."
 
-#: core/validators.py:89 forms/fields.py:530
+#: core/validators.py:89 forms/fields.py:573
 msgid "This URL appears to be a broken link."
 msgstr "URL ini tampaknya tidak ada."
 
-#: core/validators.py:123 forms/fields.py:873
+#: core/validators.py:120 forms/fields.py:447
+msgid "Enter a valid e-mail address."
+msgstr "Masukkan alamat e-mail yang benar."
+
+#: core/validators.py:123 forms/fields.py:956
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Masukkan 'slug' yang terdiri dari huruf, bilangan, garis bawah atau garis "
 "tengah."
 
-#: core/validators.py:126 forms/fields.py:866
+#: core/validators.py:126 forms/fields.py:949
 msgid "Enter a valid IPv4 address."
 msgstr "Masukkan alamat IPv4 yang benar."
 
-#: core/validators.py:129 db/models/fields/__init__.py:572
+#: core/validators.py:129 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "Masukkan bilangan yang dipisahkan dengan koma."
 
@@ -4481,12 +304,12 @@ msgstr "Masukkan bilangan yang dipisahkan dengan koma."
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "Pastikan nilai ini %(limit_value)s (saat ini %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:205 forms/fields.py:257
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Pastikan nilai ini lebih kecil dari atau sama dengan %(limit_value)s."
 
-#: core/validators.py:158 forms/fields.py:206 forms/fields.py:258
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Pastikan nilai ini lebih besar dari atau sama dengan %(limit_value)s."
@@ -4509,15 +332,19 @@ msgstr ""
 "Pastikan nilai ini tidak memiliki lebih dari %(limit_value)d karakter (saat "
 "ini %(show_value)d)."
 
-#: db/models/base.py:822
+#: db/models/base.py:765
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "%(field_name)s harus unik untuk %(date_field)s %(lookup)s."
 
-#: db/models/base.py:837 db/models/base.py:845
+#: db/models/base.py:780 db/models/base.py:788
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s dengan %(field_label)s telah ada."
+
+#: db/models/base.py:787 forms/models.py:581
+msgid "and"
+msgstr "dan"
 
 #: db/models/fields/__init__.py:63
 #, python-format
@@ -4537,197 +364,202 @@ msgstr "Field ini tidak boleh kosong."
 msgid "Field of type: %(field_type)s"
 msgstr "Field dengan tipe: %(field_type)s"
 
-#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:852
-#: db/models/fields/__init__.py:961 db/models/fields/__init__.py:972
-#: db/models/fields/__init__.py:999
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
 msgid "Integer"
 msgstr "Integer"
 
-#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:850
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
 msgid "This value must be an integer."
 msgstr "Nilai ini harus berupa integer."
 
-#: db/models/fields/__init__.py:490
+#: db/models/fields/__init__.py:493
 msgid "This value must be either True or False."
 msgstr "Nilai ini harus berupa True atau False"
 
-#: db/models/fields/__init__.py:492
+#: db/models/fields/__init__.py:495
 msgid "Boolean (Either True or False)"
 msgstr "Nilai Boolean (True atau False)"
 
-#: db/models/fields/__init__.py:539 db/models/fields/__init__.py:982
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "String (maximum %(max_length)s)"
 
-#: db/models/fields/__init__.py:567
+#: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
 msgstr "Integer yang dipisahkan dengan koma"
 
-#: db/models/fields/__init__.py:581
+#: db/models/fields/__init__.py:584
 msgid "Date (without time)"
 msgstr "Tanggal (tanpa waktu)"
 
-#: db/models/fields/__init__.py:585
+#: db/models/fields/__init__.py:588
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Masukkan tanggal valid dalam format YYYY-MM-DD"
 
-#: db/models/fields/__init__.py:586
+#: db/models/fields/__init__.py:589
 #, python-format
 msgid "Invalid date: %s"
 msgstr "Tanggal salah: %s"
 
-#: db/models/fields/__init__.py:667
+#: db/models/fields/__init__.py:670
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
 "Masukkan tanggal/waktu yang benar dalam format YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 
-#: db/models/fields/__init__.py:669
+#: db/models/fields/__init__.py:672
 msgid "Date (with time)"
 msgstr "Tanggal (dengan waktu)"
 
-#: db/models/fields/__init__.py:735
+#: db/models/fields/__init__.py:746
 msgid "This value must be a decimal number."
 msgstr "Nilai ini harus berupa bilangan desimal."
 
-#: db/models/fields/__init__.py:737
+#: db/models/fields/__init__.py:748
 msgid "Decimal number"
 msgstr "Bilangan decimal"
 
-#: db/models/fields/__init__.py:792
+#: db/models/fields/__init__.py:803
 msgid "E-mail address"
 msgstr "Alamat e-mail"
 
-#: db/models/fields/__init__.py:799 db/models/fields/files.py:220
-#: db/models/fields/files.py:331
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
 msgid "File path"
 msgstr "Path berkas"
 
-#: db/models/fields/__init__.py:822
+#: db/models/fields/__init__.py:841
 msgid "This value must be a float."
 msgstr "Nilai ini harus berupa float."
 
-#: db/models/fields/__init__.py:824
+#: db/models/fields/__init__.py:843
 msgid "Floating point number"
 msgstr "Bilangan floating point"
 
-#: db/models/fields/__init__.py:883
+#: db/models/fields/__init__.py:902
 msgid "Big (8 byte) integer"
 msgstr "Integer besar (8 byte)"
 
-#: db/models/fields/__init__.py:912
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "alamat IP"
+
+#: db/models/fields/__init__.py:931
 msgid "This value must be either None, True or False."
 msgstr "Nilai harus berupa None, True atau False."
 
-#: db/models/fields/__init__.py:914
+#: db/models/fields/__init__.py:933
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (True, False atau None)"
 
-#: db/models/fields/__init__.py:1005
+#: db/models/fields/__init__.py:1024
 msgid "Text"
 msgstr "Teks"
 
-#: db/models/fields/__init__.py:1021
+#: db/models/fields/__init__.py:1040
 msgid "Time"
 msgstr "Waktu"
 
-#: db/models/fields/__init__.py:1025
+#: db/models/fields/__init__.py:1044
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
 msgstr "Masukkan waktu yang benar dalam bentuk HH:MM[:ss[.uuuuuu]]"
 
-#: db/models/fields/__init__.py:1109
+#: db/models/fields/__init__.py:1120
+msgid "URL"
+msgstr "URL"
+
+#: db/models/fields/__init__.py:1136
 msgid "XML text"
 msgstr "Teks XML"
 
-#: db/models/fields/related.py:799
+#: db/models/fields/related.py:804
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "Model %(model)s dengan pk %(pk)r tidak ada."
 
-#: db/models/fields/related.py:801
+#: db/models/fields/related.py:806
 msgid "Foreign Key (type determined by related field)"
 msgstr "Foreign Key (tipe tergantung dari field yang berhubungan)"
 
-#: db/models/fields/related.py:918
+#: db/models/fields/related.py:928
 msgid "One-to-one relationship"
 msgstr "Hubungan one-to-one"
 
-#: db/models/fields/related.py:980
+#: db/models/fields/related.py:990
 msgid "Many-to-many relationship"
 msgstr "Hubungan many-to-many"
 
-#: db/models/fields/related.py:1000
+#: db/models/fields/related.py:1010
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Tekan \"Control\", ata \"Command\" di Mac untuk memilih lebih dari satu."
 
-#: db/models/fields/related.py:1061
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "Mohon masukkan ID %(self)s yang benar. Nilai %(value)r salah."
-
-#: forms/fields.py:65
+#: forms/fields.py:66
 msgid "This field is required."
 msgstr "Field ini tidak boleh kosong."
 
-#: forms/fields.py:204
+#: forms/fields.py:221
 msgid "Enter a whole number."
 msgstr "Masukkan bilangan penuh."
 
-#: forms/fields.py:235 forms/fields.py:256
+#: forms/fields.py:252 forms/fields.py:273
 msgid "Enter a number."
 msgstr "Masukkan sebuah bilangan."
 
-#: forms/fields.py:259
+#: forms/fields.py:276
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Pastikan total bilangan tidak melebihi %s angka."
 
-#: forms/fields.py:260
+#: forms/fields.py:277
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Pastikan bilangan tidak memiliki lebih dari %s angka desimal."
 
-#: forms/fields.py:261
+#: forms/fields.py:278
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Pastikan bilangan tidak memiliki lebih dari %s angka sebelum desimal."
 
-#: forms/fields.py:323 forms/fields.py:838
+#: forms/fields.py:340 forms/fields.py:916
 msgid "Enter a valid date."
 msgstr "Masukkan tanggal yang benar."
 
-#: forms/fields.py:351 forms/fields.py:839
+#: forms/fields.py:368 forms/fields.py:917
 msgid "Enter a valid time."
 msgstr "Masukkan waktu yang benar."
 
-#: forms/fields.py:377
+#: forms/fields.py:394
 msgid "Enter a valid date/time."
 msgstr "Masukkan tanggal/waktu yang benar."
 
-#: forms/fields.py:435
+#: forms/fields.py:458
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tidak ada berkas yang dikirimkan. Periksa tipe encoding form."
 
-#: forms/fields.py:436
+#: forms/fields.py:459
 msgid "No file was submitted."
 msgstr "Tidak ada berkas yang dikirimkan."
 
-#: forms/fields.py:437
+#: forms/fields.py:460
 msgid "The submitted file is empty."
 msgstr "Berkas yang dikirimkan kosong."
 
-#: forms/fields.py:438
+#: forms/fields.py:461
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Pastikan nama berkas tidak melebihi %(max)d angka (saat ini %(length)d)."
 
-#: forms/fields.py:473
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: forms/fields.py:516
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -4735,31 +567,35 @@ msgstr ""
 "Unggah gambar yang benar. Berkas yang anda unggah bukan gambar atau gambar "
 "itu rusak."
 
-#: forms/fields.py:596 forms/fields.py:671
+#: forms/fields.py:648 forms/fields.py:723
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Masukkan pilihan yang benar. %(value)s bukan pilihan yang valid."
 
-#: forms/fields.py:672 forms/fields.py:734 forms/models.py:1002
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
 msgid "Enter a list of values."
 msgstr "Masukkan daftar nilai."
 
-#: forms/formsets.py:298 forms/formsets.py:300
+#: forms/formsets.py:308 forms/formsets.py:310
 msgid "Order"
 msgstr "Urutan"
 
-#: forms/models.py:562
+#: forms/formsets.py:312
+msgid "Delete"
+msgstr "Hapus"
+
+#: forms/models.py:575
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Mohon perbaiki data duplikat untuk %(field)s."
 
-#: forms/models.py:566
+#: forms/models.py:579
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "Mohon perbaiki data duplikat untuk %(field)s yang harus memiliki nilai unik."
 
-#: forms/models.py:572
+#: forms/models.py:585
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -4768,54 +604,90 @@ msgstr ""
 "Mohon perbaiki data duplikat untuk %(field_name)s yang harus memiliki nilai "
 "unik untuk pencarian %(lookup)s di %(date_field)s."
 
-#: forms/models.py:580
+#: forms/models.py:593
 msgid "Please correct the duplicate values below."
 msgstr "Mohon perbaiki nilai duplikat di bawah ini."
 
-#: forms/models.py:855
+#: forms/models.py:868
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Foreign key inline tidak cocok dengan primary key milik parent."
 
-#: forms/models.py:921
+#: forms/models.py:929
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Masukkan pilihan yang benar. Pilihan anda bukan salah satu dari pilihan yang "
 "ada."
 
-#: forms/models.py:1003
+#: forms/models.py:1019
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Masukkan pilihan yang benar. %s bukan salah satu pilihan yang ada."
 
-#: forms/models.py:1005
+#: forms/models.py:1021
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" bukan pilihan yang benar untuk sebuah primary key."
 
-#: template/defaultfilters.py:776
+#: forms/widgets.py:299
+#, fuzzy
+msgid "Currently"
+msgstr "Saat ini:"
+
+#: forms/widgets.py:300
+msgid "Change"
+msgstr "Ubah"
+
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "Clare"
+
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr "Tidak diketahui"
+
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "Ya"
+
+#: forms/widgets.py:547
+msgid "No"
+msgstr "Tidak"
+
+#: template/defaultfilters.py:794
 msgid "yes,no,maybe"
 msgstr "ya,tidak,mungkin"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:825
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d bytes"
 
-#: template/defaultfilters.py:809
+#: template/defaultfilters.py:827
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:811
+#: template/defaultfilters.py:829
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:812
+#: template/defaultfilters.py:831
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
+
+#: template/defaultfilters.py:833
+#, fuzzy, python-format
+msgid "%.1f TB"
+msgstr "%.1f KB"
+
+#: template/defaultfilters.py:834
+#, fuzzy, python-format
+msgid "%.1f PB"
+msgstr "%.1f KB"
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -5021,9 +893,86 @@ msgstr "Nov."
 msgid "Dec."
 msgstr "Dec."
 
-#: utils/text.py:130
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "alt. month"
+msgid "January"
+msgstr "Januari"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "alt. month"
+msgid "February"
+msgstr "Februari"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "alt. month"
+msgid "March"
+msgstr "Maret"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "alt. month"
+msgid "April"
+msgstr "April"
+
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "alt. month"
+msgid "May"
+msgstr "Mei"
+
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "alt. month"
+msgid "June"
+msgstr "Juni"
+
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "alt. month"
+msgid "July"
+msgstr "Juli"
+
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "alt. month"
+msgid "August"
+msgstr "Agustus"
+
+#: utils/dates.py:43
+#, fuzzy
+msgctxt "alt. month"
+msgid "September"
+msgstr "September"
+
+#: utils/dates.py:44
+#, fuzzy
+msgctxt "alt. month"
+msgid "October"
+msgstr "Oktober"
+
+#: utils/dates.py:45
+#, fuzzy
+msgctxt "alt. month"
+msgid "November"
+msgstr "November"
+
+#: utils/dates.py:46
+#, fuzzy
+msgctxt "alt. month"
+msgid "December"
+msgstr "Desember"
+
+#: utils/text.py:136
 msgid "or"
 msgstr "atau"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
 
 #: utils/timesince.py:21
 msgid "year"
@@ -5069,37 +1018,37 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:519
+#: utils/translation/trans_real.py:560
 msgid "DATE_FORMAT"
 msgstr "j N Y"
 
-#: utils/translation/trans_real.py:520
+#: utils/translation/trans_real.py:561
 msgid "DATETIME_FORMAT"
 msgstr "j N Y, G:i:s"
 
-#: utils/translation/trans_real.py:521
+#: utils/translation/trans_real.py:562
 msgid "TIME_FORMAT"
 msgstr "G:i:s"
 
-#: utils/translation/trans_real.py:542
+#: utils/translation/trans_real.py:583
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:543
+#: utils/translation/trans_real.py:584
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 
-#: views/generic/create_update.py:115
+#: views/generic/create_update.py:121
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "%(verbose_name)s telah berhasil dibuat."
 
-#: views/generic/create_update.py:158
+#: views/generic/create_update.py:164
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "%(verbose_name)s telah berhasil diubah."
 
-#: views/generic/create_update.py:201
+#: views/generic/create_update.py:207
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s telah dihapus."

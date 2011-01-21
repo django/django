@@ -5,1663 +5,739 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
-"Report-Msgid-Bugs-To: sengtha@e-khmer.com\n"
-"POT-Creation-Date: 2007-01-15 15:43+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 21:03+0100\n"
 "PO-Revision-Date: 2007-08-10 00:21+0900\n"
 "Last-Translator: Chay Sengtha <sengtha@e-khmer.com>\n"
 "Language-Team: Chay Sengtha <sengtha@e-khmer.com>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: Information
-msgid "Administration Page"
-msgstr "ទំព័រគ្រប់គ្រង"
+#: conf/global_settings.py:44
+msgid "Arabic"
+msgstr "ភាសាអារ៉ាប់"
 
-msgid "Tag"
-msgstr "ប្រភេទ"
+#: conf/global_settings.py:45
+#, fuzzy
+msgid "Bulgarian"
+msgstr "ភាសាហុងគ្រី"
 
-msgid "Headline"
-msgstr "ចំណងជើង"
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "ភាសាបេឡារុស្ស"
 
-msgid "Article"
-msgstr "អត្ថបទ"
+#: conf/global_settings.py:47
+#, fuzzy
+msgid "Bosnian"
+msgstr "ភាសារូម៉ានី"
 
-msgid "Review"
-msgstr "ព្រឹត្តិការណ៍ និង ផលិតផលថ្មីៗ"
+#: conf/global_settings.py:48
+#, fuzzy
+msgid "Catalan"
+msgstr "ភាសាអ៊ីតាលី"
 
-msgid "Keyword"
-msgstr "ពាក្យសំខាន់ៗ"
+#: conf/global_settings.py:49
+msgid "Czech"
+msgstr "ភាសាឆេក"
 
-msgid "Advertisement"
-msgstr "ការផ្សាយពាណិជ្ជកម្ម"
+#: conf/global_settings.py:50
+msgid "Welsh"
+msgstr "ភាសាអ៊ុយក្រែន"
 
-msgid "Link"
-msgstr "អត្ថបទភ្ជាប់"
+#: conf/global_settings.py:51
+msgid "Danish"
+msgstr "ភាសាដាណឺម៉ាក"
 
-msgid "Accounting"
-msgstr "គណនី"
+#: conf/global_settings.py:52
+msgid "German"
+msgstr "ភាសាអាល្លឺម៉ង់"
 
-msgid "Name"
-msgstr "ឈ្មោះ"
+#: conf/global_settings.py:53
+msgid "Greek"
+msgstr "ភាសាហ្កែលិគ"
 
-msgid "Slug"
-msgstr "ឈ្មោះជាអក្សរឡាតាំង"
+#: conf/global_settings.py:54
+msgid "English"
+msgstr "ភាសាអង់គ្លេស"
 
-msgid "Created"
-msgstr "កាលបរិច្ឆេទនៃការសរសេរ"
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "British English"
+msgstr "ភាសាអង់គ្លេស"
 
-msgid "Modified"
-msgstr "កាលបរិច្ឆេទ​នៃការ​ផ្លាស់ប្តូរ"
+#: conf/global_settings.py:56
+msgid "Spanish"
+msgstr "ភាសាអេស្ប៉ាញ"
 
-msgid "Summary"
-msgstr "អត្ថបទសង្ខេប"
+#: conf/global_settings.py:57
+#, fuzzy
+msgid "Argentinian Spanish"
+msgstr "ភាសាអេស្ប៉ាញ"
 
-msgid "Viewed number"
-msgstr "ចំនួនអាន"
+#: conf/global_settings.py:58
+#, fuzzy
+msgid "Estonian"
+msgstr "ភាសារូម៉ានី"
 
-msgid "Site"
-msgstr "គេហទំព័រ"
+#: conf/global_settings.py:59
+msgid "Basque"
+msgstr ""
 
-msgid "Rate"
-msgstr "ការវាយតំលៃ"
-
-msgid "Private"
-msgstr "សំរាប់សមាជិកបង់លុយ"
-
-msgid "Public"
-msgstr "ផ្សព្វផ្សាយ"
-
-msgid "Content"
-msgstr "អត្ថបទ"
-
-msgid "Page"
-msgstr "ទំព័រទី"
-
-msgid "Attach Image"
-msgstr "រូបភាព"
-
-msgid "Ads type"
-msgstr "ប្រភេទពាណិជ្ជកម្ម"
-
-msgid "Link type"
-msgstr "ប្រភេទអត្ថបទភ្ជាប់"
-
-msgid "Account type"
-msgstr "ប្រភេទគណនី"
-
-msgid "Amount"
-msgstr "ចំនួន"
-
-msgid "Person"
+#: conf/global_settings.py:60
+#, fuzzy
+msgid "Persian"
 msgstr "អ្នកទទួលខុសត្រូវ"
 
-msgid "Date"
-msgstr "កាលបរិច្ឆេទ"
+#: conf/global_settings.py:61
+msgid "Finnish"
+msgstr "ភាសាហ្វាំងឡង់"
 
-msgid "Information"
-msgstr "ការគ្រប់គ្រងព័ត៌មាន"
+#: conf/global_settings.py:62
+msgid "French"
+msgstr "ភាសាបារាំង"
 
-msgid "Auth"
-msgstr "ការគ្រប់គ្រងសមាជិក"
+#: conf/global_settings.py:63
+#, fuzzy
+msgid "Frisian"
+msgstr "ភាសាប្រេស៊ីល"
 
-msgid "Comments"
-msgstr "ការគ្រប់គ្រងមតិ​យោបល់"
+#: conf/global_settings.py:64
+#, fuzzy
+msgid "Irish"
+msgstr "ភាសាទួរគី"
 
-msgid "Sites"
-msgstr "ការគ្រប់គ្រងដមែន"
+#: conf/global_settings.py:65
+msgid "Galician"
+msgstr "ភាសាហ្កែលិគ"
 
-msgid "Flatpages"
-msgstr "ការគ្រប់គ្រងទំព័រថ្មី"
+#: conf/global_settings.py:66
+msgid "Hebrew"
+msgstr "ភាសាហេប្រិ"
 
-msgid "File-Browser"
-msgstr "ការគ្រប់គ្រងឯកសារ"
+#: conf/global_settings.py:67
+msgid "Hindi"
+msgstr ""
 
-msgid "Make Directory"
-msgstr "បង្កើតថតថ្មី"
+#: conf/global_settings.py:68
+#, fuzzy
+msgid "Croatian"
+msgstr "ភាសារូម៉ានី"
 
-msgid "Multiple Upload"
-msgstr "ទាញយកឯកសារ"
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr "ភាសាហុងគ្រី"
 
-msgid "results"
-msgstr "លទ្ធផល"
+#: conf/global_settings.py:70
+msgid "Indonesian"
+msgstr ""
 
-msgid "total"
-msgstr "​សរុប"
+#: conf/global_settings.py:71
+msgid "Icelandic"
+msgstr "ភាសាអ៉ីស្លង់"
 
-msgid "Total"
-msgstr "​សរុប"
+#: conf/global_settings.py:72
+msgid "Italian"
+msgstr "ភាសាអ៊ីតាលី"
 
-msgid "type"
-msgstr "ប្រភេទ"
+#: conf/global_settings.py:73
+msgid "Japanese"
+msgstr "ភាសាជប៉ុន"
 
-msgid "filename"
+#: conf/global_settings.py:74
+#, fuzzy
+msgid "Georgian"
+msgstr "ភាសាអាល្លឺម៉ង់"
+
+#: conf/global_settings.py:75
+msgid "Khmer"
+msgstr ""
+
+#: conf/global_settings.py:76
+#, fuzzy
+msgid "Kannada"
+msgstr "និង"
+
+#: conf/global_settings.py:77
+#, fuzzy
+msgid "Korean"
+msgstr "ភាសាន័រវែស"
+
+#: conf/global_settings.py:78
+msgid "Lithuanian"
+msgstr ""
+
+#: conf/global_settings.py:79
+msgid "Latvian"
+msgstr ""
+
+#: conf/global_settings.py:80
+msgid "Macedonian"
+msgstr ""
+
+#: conf/global_settings.py:81
+msgid "Malayalam"
+msgstr ""
+
+#: conf/global_settings.py:82
+msgid "Mongolian"
+msgstr ""
+
+#: conf/global_settings.py:83
+msgid "Dutch"
+msgstr "ភាសាហ្វាំងឡង់"
+
+#: conf/global_settings.py:84
+msgid "Norwegian"
+msgstr "ភាសាន័រវែស"
+
+#: conf/global_settings.py:85
+#, fuzzy
+msgid "Norwegian Bokmal"
+msgstr "ភាសាន័រវែស"
+
+#: conf/global_settings.py:86
+#, fuzzy
+msgid "Norwegian Nynorsk"
+msgstr "ភាសាន័រវែស"
+
+#: conf/global_settings.py:87
+#, fuzzy
+msgid "Punjabi"
+msgstr "ផ្សព្វផ្សាយ"
+
+#: conf/global_settings.py:88
+#, fuzzy
+msgid "Polish"
+msgstr "ភាសាអង់គ្លេស"
+
+#: conf/global_settings.py:89
+msgid "Portuguese"
+msgstr ""
+
+#: conf/global_settings.py:90
+#, fuzzy
+msgid "Brazilian Portuguese"
+msgstr "ភាសាប្រេស៊ីល"
+
+#: conf/global_settings.py:91
+msgid "Romanian"
+msgstr "ភាសារូម៉ានី"
+
+#: conf/global_settings.py:92
+msgid "Russian"
+msgstr "ភាសាรัរូស្ស៉ី"
+
+#: conf/global_settings.py:93
+msgid "Slovak"
+msgstr "ភាសាស្លូវ៉ាគី"
+
+#: conf/global_settings.py:94
+msgid "Slovenian"
+msgstr "ភាសាស្លូវ៉ានី"
+
+#: conf/global_settings.py:95
+#, fuzzy
+msgid "Albanian"
+msgstr "ភាសារូម៉ានី"
+
+#: conf/global_settings.py:96
+msgid "Serbian"
+msgstr ""
+
+#: conf/global_settings.py:97
+msgid "Serbian Latin"
+msgstr ""
+
+#: conf/global_settings.py:98
+msgid "Swedish"
+msgstr "ភាសាស៊ុយអែដ"
+
+#: conf/global_settings.py:99
+msgid "Tamil"
+msgstr "ភាសាតាមីល"
+
+#: conf/global_settings.py:100
+#, fuzzy
+msgid "Telugu"
+msgstr "ឈ្មោះជាអក្សរឡាតាំង"
+
+#: conf/global_settings.py:101
+#, fuzzy
+msgid "Thai"
+msgstr "ភាសាតាមីល"
+
+#: conf/global_settings.py:102
+msgid "Turkish"
+msgstr "ភាសាទួរគី"
+
+#: conf/global_settings.py:103
+msgid "Ukrainian"
+msgstr "ភាសាអ៊ុយក្រែន"
+
+#: conf/global_settings.py:104
+#, fuzzy
+msgid "Vietnamese"
 msgstr "ឈ្មោះឯកសារ"
 
-msgid "size"
-msgstr "ទំហំ"
-
-msgid "Past 30 days"
-msgstr "៣០ថ្ងៃកន្លងមក"
-
-msgid "By Date"
-msgstr "តាម​កាលបរិច្ឆេទ"
-
-msgid "By Type"
-msgstr "តាម​ប្រភេទ"
-
-msgid "no entries found"
-msgstr "រកមិនឃើញ"
-
-msgid "Select files to upload"
-msgstr "សូមជ្រើសរើសឯកសារ​។"
-
-msgid "At least one file must be chosen."
-msgstr "សូមជ្រើសរើសឯកសារ​យ៉ាង​តិច១។"
-
-msgid "Wrong filetype for"
-msgstr "ប្រភេទឯកសារដែលមិនអាចទាញយកបាន។"
-
-msgid "File already exists"
-msgstr "ឯកសារនេះមានរួចហើយ។"
-
-msgid "File"
-msgstr "ឯកសារ"
-
-msgid " is existed."
-msgstr "ត្រូវបានគេយករួចហើយ។"
-
-msgid "Account registration is not complete yet.<br/>You need to activate your account first.<br/>We have already sent you the activate URL. Please check you mail box."
-msgstr "ការចុះឈ្មោះមិនទាន់ចប់នៅឡើយទេ។ <br/>យើងខ្ញុំបានបញ្ជូនអ៊ីមែល​ទៅកាន់អាស័យដ្ឋានអ៊ីមែល​របស់​លោកអ្នក​ហើយ​ សូមចុច​អត្ថបទភ្ជាប់​នៅក្នុង​អ៊ីមែល ដើម្បី​បញ្ជប់ការចុះឈ្មោះ។"
-
-msgid "Help"
-msgstr "ជំនួយ"
-
-msgid "Max. Filesize"
-msgstr "ទំហំឯកសារអតិបរិមា"
-
-msgid "Upload"
-msgstr "ទាញយក"
-
-msgid "Folder"
-msgstr "ថត"
-
-msgid "Video"
-msgstr "វីដេអូ"
-
-msgid "Document"
-msgstr "ឯកសារ"
-
-msgid "Sound"
-msgstr "សំលេង"
-
-msgid "Code"
-msgstr "កូត"
-
-msgid "Allowed"
-msgstr "ប្រភេទឯកសារដែលអាចទាញ​យកបាន"
-
-msgid "Directory already exists."
-msgstr "ថតនេះមាន​រួចហើយ។"
-
-msgid "Permission denied."
-msgstr "ពុំមានសិទ្ធិអាចបង្កើតបាន។"
-
-msgid "Please correct the errors below."
-msgstr "សូមកែកំហុសដូចខាងក្រោម។"
-
-msgid "Only letters, numbers and underscores are allowed."
-msgstr "ត្រូវបំពេញតែអក្សរឡាតាំង ចំនួនលេខ និង សញ្ញា _ ។"
-
-msgid "The directory will automatically be converted to lowercase"
-msgstr "ឈ្មោះថតនឹងត្រូវផ្លាស់ប្តូរទៅជាអក្សរតូចដោយស្វ័យប្រវត្ត។"
-
-msgid "Create"
-msgstr "បង្កើត"
-
-msgid "date"
-msgstr "​កាលបរិច្ឆេទ"
-
-msgid "Dbtemplate"
-msgstr "ការគ្រប់គ្រងឯកសារគំរូ"
-
-msgid "template"
-msgstr "ឯកសារគំរូ"
-
-msgid "templates"
-msgstr "ឯកសារគំរូ"
-
-msgid "Comment"
-msgstr "ផ្សេងៗ"
-
-msgid "Income"
-msgstr "ចំណូល"
-
-msgid "Expense"
-msgstr "ចំណាយ"
-
-msgid "Image"
-msgstr "រូបភាព"
-
-msgid "Text and Image"
-msgstr "អក្សរ និង​ រូបភាព"
-
-msgid "New Headlines"
-msgstr "អត្ថបទថ្មីៗ"
-
-msgid "New Reviews"
-msgstr "ព្រឹត្តិការណ៍ និង ផលិតផលថ្មីៗ"
-
-msgid "Login"
-msgstr "ពិនិត្យចូល"
-
-msgid "Logout"
-msgstr "ចាកចេញ"
-
-msgid "Register"
-msgstr "ចូលជាសមាជិក"
-
-msgid "Free"
-msgstr "ឥតគិតថ្លៃ"
-
-msgid "Welcome"
-msgstr "សូមស្វាគមន័ "
-
-msgid "IT Resources"
-msgstr "ប្រភពព័ត៌មានអំពី បច្ចេកទេសព័ត៌មានវិទ្យា"
-
-msgid "Copyrights"
-msgstr "រក្សាសិទ្ធិដោយ "
-
-msgid "Next page"
-msgstr "ទំព័របន្ទាប់"
-
-msgid "Previous page"
-msgstr "ទំព័រមុន "
-
-msgid "Wrong number or password. Please try it again."
-msgstr "ឈ្មោះជាសមាជិក​ ឬ ពាក្យសំងាត់ មិនត្រឹមត្រូវ។ សូមសាកល្បងម្តងទៀត។ "
-
-msgid "This username has not activated yet."
-msgstr "ឈ្មោះសាមាជិកនេះមិនទាន់ត្រូវបានគេអនុញ្ញាតនៅឡើយទេ។"
-
-msgid "Please write"
-msgstr "សូមបំពេញ"
-
-msgid "More"
-msgstr "អត្ថបទផ្សេងទៀត"
-
-msgid "Please correct below errors."
-msgstr "សូកកែកូមហុសខាងក្រោម។"
-
-msgid "Thank for your comment."
-msgstr "សូមអរគុណដែលបានបញ្ជេញមតិយោបល់ទាក់ទងនឹងអត្ថបទនេះ"
-
-#: Django standard
-#: contrib/comments/models.py:67
-#: contrib/comments/models.py:166
-msgid "object ID"
-msgstr "លេខ​សំគាល់​កម្មវិធី"
-
-#: contrib/comments/models.py:68
-msgid "headline"
-msgstr "ចំណងជើង"
-
-#: contrib/comments/models.py:69
-#: contrib/comments/models.py:90
-#: contrib/comments/models.py:167
-msgid "comment"
-msgstr "មតិ​យោបល់"
-
-#: contrib/comments/models.py:70
-msgid "rating #1"
-msgstr "វាយ​តំលៃ #1"
-
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr "វាយ​តំលៃ #2"
-
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr "វាយ​តំលៃ #3"
-
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr "វាយ​តំលៃ #4"
-
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr "វាយ​តំលៃ #5"
-
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr "វាយ​តំលៃ #6"
-
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr "វាយ​តំលៃ #7"
-
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr "វាយ​តំលៃ #8"
-
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr "កំពុង​ត្រួត​ពិនិត្យចំពោះ​​ការ​វាយ​តំលៃ"
-
-#: contrib/comments/models.py:83
-#: contrib/comments/models.py:169
-msgid "date/time submitted"
-msgstr "កាល​បរិច្ឆេទនៃ​ការ​សរសេរ​​"
-
-#: contrib/comments/models.py:84
-#: contrib/comments/models.py:170
-msgid "is public"
-msgstr "ផ្សព្វផ្សាយ​ជាសធារណៈ"
-
-#: contrib/comments/models.py:85
-#: contrib/admin/views/doc.py:304
-msgid "IP address"
-msgstr "លេខ IP"
-
-#: contrib/comments/models.py:86
-msgid "is removed"
-msgstr "ត្រូវ​បាន​លប់​ចេញ"
-
-#: contrib/comments/models.py:86
-msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
-msgstr "សូម​ចុច​ជ្រើសរើស​យក​ប្រអប់​នេះ​ ប្រសិន​បើ​មតិ​យោបល់​មិនសមរម្យ។ ឃ្លា \" មតិ​យោបល់​នេះ​ត្រូវបាន​គេលប់​\" នឹងត្រូវ​បង្ហាញ​ជំនួស​វិញ។"
-
-#: contrib/comments/models.py:91
-msgid "comments"
-msgstr "មតិ​យោបល់"
-
-#: contrib/comments/models.py:131
-#: contrib/comments/models.py:207
-msgid "Content object"
-msgstr "អត្ថន័យ​របស់​កម្មវិធី"
-
-#: contrib/comments/models.py:159
-#: python-format
+#: conf/global_settings.py:105
+msgid "Simplified Chinese"
+msgstr "ភាសាចិនសាមញ្ញ"
+
+#: conf/global_settings.py:106
+msgid "Traditional Chinese"
+msgstr "ភាសាចិនបុរាណ"
+
+#: core/validators.py:20 forms/fields.py:67
+#, fuzzy
+msgid "Enter a valid value."
+msgstr "សូមបំពេញឈ្មោះឯកសារអោយបានត្រឹមត្រូវ។"
+
+#: core/validators.py:87 forms/fields.py:572
+#, fuzzy
+msgid "Enter a valid URL."
+msgstr "សូមបំពេញឈ្មោះឯកសារអោយបានត្រឹមត្រូវ។"
+
+#: core/validators.py:89 forms/fields.py:573
+#, fuzzy
+msgid "This URL appears to be a broken link."
+msgstr "URL​ខូច: %s"
+
+#: core/validators.py:120 forms/fields.py:447
+msgid "Enter a valid e-mail address."
+msgstr "សូមបំពេញអ៊ីមែល"
+
+#: core/validators.py:123 forms/fields.py:956
+#, fuzzy
 msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"សរសេរ​ដោយ %(user)s នៅថ្ងៃ​ %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr "ត្រូវបំពេញតែអក្សរឡាតាំង ចំនួនលេខ និង សញ្ញា _ សញ្ញា - ។"
 
-#: contrib/comments/models.py:168
-msgid "person's name"
-msgstr "ឈ្មោះ"
+#: core/validators.py:126 forms/fields.py:949
+#, fuzzy
+msgid "Enter a valid IPv4 address."
+msgstr "សូមបំពេញអ៊ីមែល"
 
-#: contrib/comments/models.py:171
-msgid "ip address"
-msgstr "លេខ ip"
+#: core/validators.py:129 db/models/fields/__init__.py:575
+msgid "Enter only digits separated by commas."
+msgstr "បំពេញតែលេខហើយផ្តាច់ចេញពីគ្នាដោយសញ្ញាក្បៀស។"
 
-#: contrib/comments/models.py:173
-msgid "approved by staff"
-msgstr "យល់ព្រម​ដោយ​បុគ្គលិក"
+#: core/validators.py:135
+#, fuzzy, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "អត្ថបទរបស់អ្នកត្រូវច្រើនជាង  %d អក្សរ។"
 
-#: contrib/comments/models.py:176
-msgid "free comment"
-msgstr "មតិ​យោបល់(មិនចាំបាច់សមាជិក)"
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#, fuzzy, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "អត្ថបទរបស់អ្នកត្រូវច្រើនជាង  %d អក្សរ។"
 
-#: contrib/comments/models.py:177
-msgid "free comments"
-msgstr "មតិ​យោបល់(មិនចាំបាច់សមាជិក)"
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#, fuzzy, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "អត្ថបទរបស់អ្នកត្រូវតិចជាង %d អក្សរ។"
 
-#: contrib/comments/models.py:233
-msgid "score"
-msgstr "ពិន្ទុ"
-
-#: contrib/comments/models.py:234
-msgid "score date"
-msgstr "កាលបរិច្ឆេទ​ដាក់ពិន្ទុ"
-
-#: contrib/comments/models.py:237
-msgid "karma score"
-msgstr "ពិន្ទុ​កម្មា(karma)"
-
-#: contrib/comments/models.py:238
-msgid "karma scores"
-msgstr "ពិន្ទុ​កម្មា(karma)"
-
-#: contrib/comments/models.py:242
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "%(score)d វាយ​តំលៃ​ដោយ %(user)s"
-
-#: contrib/comments/models.py:258
-#, python-format
+#: core/validators.py:164
+#, fuzzy, python-format
 msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"មតិ​យោបល់នេះ​ត្រូវបាន​កត់សំគាល់ទុក​ដោយ %(user)s:\n"
-"\n"
-"%(text)s"
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr "អត្ថបទរបស់អ្នកត្រូវច្រើនជាង  %d អក្សរ។"
 
-#: contrib/comments/models.py:265
-msgid "flag date"
-msgstr "កាល​បរិច្ឆេទ​កត់​សំគាល់​ទុក"
-
-#: contrib/comments/models.py:268
-msgid "user flag"
-msgstr "ការ​កត់​សំគាល់​ទុក​"
-
-#: contrib/comments/models.py:269
-msgid "user flags"
-msgstr "ការ​កត់​សំគាល់​ទុក"
-
-#: contrib/comments/models.py:273
-#, python-format
-msgid "Flag by %r"
-msgstr "កត់​សំគាល់​ទុកដោយ %r"
-
-#: contrib/comments/models.py:278
-msgid "deletion date"
-msgstr "កាល​បរិច្ឆេទនៃ​ការ​លប់​"
-
-#: contrib/comments/models.py:280
-msgid "moderator deletion"
-msgstr "ការ​លប់​ដោយអ្នក​គ្រប់គ្រង"
-
-#: contrib/comments/models.py:281
-msgid "moderator deletions"
-msgstr "ការ​លប់​ដោយអ្នក​គ្រប់គ្រង"
-
-#: contrib/comments/models.py:285
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "ការ​លប់​ដោយអ្នក​គ្រប់គ្រង នៅ %r"
-
-#: contrib/comments/views/karma.py:19
-msgid "Anonymous users cannot vote"
-msgstr "ជនអនាមិក​មិន​អាច​បោះ​ឆ្នោត​បាន​ទេ"
-
-#: contrib/comments/views/karma.py:23
-msgid "Invalid comment ID"
-msgstr "លេខ​សំគាល់​មតិ​យោបល់​មិន​ត្រឹម​ត្រូវ"
-
-#: contrib/comments/views/karma.py:25
-msgid "No voting for yourself"
-msgstr "មិន​អាច​បោះ​ឆ្នោត​អោយ​ខ្លួន​ឯង​បាន​ទេ"
-
-#: contrib/comments/views/comments.py:27
-msgid "This rating is required because you've entered at least one other rating."
-msgstr "ចាំបាច់ត្រូវការ វាយតំលៃ ពីព្រោះលោកអ្នកបានជ្រើសរើសធ្វើការវាយតំលៃផ្សេងពីនេះ។"
-
-#: contrib/comments/views/comments.py:111
-#, python-format
+#: core/validators.py:170
+#, fuzzy, python-format
 msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"មតិយោបល់នេះត្រូវបានបញ្ជូនដោយសមាជិកម្នាក់ដែលបាន​ផ្តល់មតិយោបល់​តិចជាង %(count)s។\n"
-"%(text)s"
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr "អត្ថបទរបស់អ្នកត្រូវតិចជាង %d អក្សរ។"
 
-#: contrib/comments/views/comments.py:116
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"មតិយោបល់បានសរសេរដោយសមាជិកមិនសូវប្រាកដប្រជា:\n"
-"\n"
-"%(text)s"
+#: db/models/base.py:765
+#, fuzzy, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "ទិន្នន័យកន្លែងនេះត្រូវបំពេញ​ប្រសិន​បើ %(field)s មានតំលៃ %(value)s"
 
-#: contrib/comments/views/comments.py:188
-#: contrib/comments/views/comments.py:280
-msgid "Only POSTs are allowed"
-msgstr "អនុញ្ញាតតែទិន្នន័យតាមរយះ​ POST ​។"
+#: db/models/base.py:780 db/models/base.py:788
+#, fuzzy, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(optname)s ជាមួយឈ្មោះ %(fieldname)s នេះមានរួចរាល់ហើយ។"
 
-#: contrib/comments/views/comments.py:192
-#: contrib/comments/views/comments.py:284
-msgid "One or more of the required fields wasn't submitted"
-msgstr "ទិន្នន័យរបស់ចំនុចមួយចំនួនដែលចាំបាច់ មិនទាន់បានបំពេញ។"
-
-#: contrib/comments/views/comments.py:196
-#: contrib/comments/views/comments.py:286
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "មានគេព្យាយាមសរសេរ មតិយោបល់ មិនត្រឹមត្រូវ (ប៉ះពាល់ដល់សុវត្ថិភាព)"
-
-#: contrib/comments/views/comments.py:206
-#: contrib/comments/views/comments.py:292
-msgid "The comment form had an invalid 'target' parameter -- the object ID was invalid"
-msgstr "បែបបទបំពេញមតិយោបល់មិនមាន 'target' ​និង​ លេខសំគាល់កម្មវិធី (object ID)​ ត្រឹមត្រូវ"
-
-#: contrib/comments/views/comments.py:257
-#: contrib/comments/views/comments.py:321
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "បែបបទបំពេញមតិយោបល់មិនមាន 'preview' or 'post' ។"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:17
-msgid "Username:"
-msgstr "ឈ្មោះសមាជិក"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Log out"
-msgstr "ចាកចេញ"
-
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:20
-msgid "Password:"
-msgstr "ពាក្យ​សំងាត់"
-
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "តើលោកអ្នក​ភ្លេច​ពាក្យសំងាត់រឺ?​​"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "វាយតំលៃ"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "ចាំ​បាច់"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "មិនចាំ​បាច់​ជ្រើសរើស​យក​ក៏បាន​"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "បញ្ជូន​រូបភាព"
-
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "មតិ​យោបល់"
-
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "មើល​ មតិយោបល់"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "ឈ្មោះ"
-
-#: contrib/admin/filterspecs.py:40
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>ដោយ %s:</h3>\n"
-"<ul>\n"
-
-#: contrib/admin/filterspecs.py:70
-#: contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143
-#: contrib/admin/filterspecs.py:169
-msgid "All"
-msgstr "ទាំងអស់"
-
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "កាល​បរិច្ឆេទណាមួយ"
-
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "ថ្ងៃនេះ"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "៧​ថ្ងៃ​កន្លង​មក"
-
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "ខែ​នេះ"
-
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "ឆ្នាំ​នេះ"
-
-#: contrib/admin/filterspecs.py:143
-msgid "Yes"
-msgstr "យល់ព្រម"
-
-#: contrib/admin/filterspecs.py:143
-msgid "No"
-msgstr "មិនយល់ព្រម"
-
-#: contrib/admin/filterspecs.py:150
-msgid "Unknown"
-msgstr "មិន​ដឹង"
-
-#: contrib/admin/models.py:16
-msgid "action time"
-msgstr "ពេលវេលាប្រតិបត្តិការ"
-
-#: contrib/admin/models.py:19
-msgid "object id"
-msgstr "លេខ​សំគាល់​កម្មវិធី (object id)"
-
-#: contrib/admin/models.py:20
-msgid "object repr"
-msgstr "object repr"
-
-#: contrib/admin/models.py:21
-msgid "action flag"
-msgstr "សកម្មភាព"
-
-#: contrib/admin/models.py:22
-msgid "change message"
-msgstr "ផ្លាស់ប្តូរ"
-
-#: contrib/admin/models.py:25
-msgid "log entry"
-msgstr "កំណត់ហេតុ"
-
-#: contrib/admin/models.py:26
-msgid "log entries"
-msgstr "កំណត់ហេតុ"
-
-#: contrib/admin/templatetags/admin_list.py:230
-msgid "All dates"
-msgstr "កាលបរិច្ឆេទទាំងអស់"
-
-#: contrib/admin/views/decorators.py:10
-#: contrib/auth/forms.py:59
-msgid "Please enter a correct username and password. Note that both fields are case-sensitive."
-msgstr "សូមបំពេញ ឈ្មោះសមាជិក និង ពាក្យសំងាត់ ។ "
-
-#: contrib/admin/views/decorators.py:24
-#: contrib/admin/templates/admin/login.html:25
-msgid "Log in"
-msgstr "ពិនិត្យចូល"
-
-#: contrib/admin/views/decorators.py:62
-msgid "Please log in again, because your session has expired. Don't worry: Your submission has been saved."
-msgstr "សូមពិនិត្យចូលម្តងទៀត ។"
-
-#: contrib/admin/views/decorators.py:69
-msgid "Looks like your browser isn't configured to accept cookies. Please enable cookies, reload this page, and try again."
-msgstr "ប្រហែលជាកម្មវិធីមើលគេះទំព័រដែលលោកអ្នកកំពុងប្រើ មិនទទួល​ គូគី (cookies) ។ សូមកំណត់កម្មវិធីដែលលោកអ្នកកំពុងប្រើនេះអោយទទួលយក គូគី ហើយចូលមកមើលទំព័រនេះម្តងទៀត ។"
-
-#: contrib/admin/views/decorators.py:83
-msgid "Usernames cannot contain the '@' character."
-msgstr "ឈ្មោះសមាជិកមិនអាចមាន សញ្ញា '@' ។"
-
-#: contrib/admin/views/decorators.py:85
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "អ៊ីមែលរបស់លោកអ្នក មិនអាចធ្វើជា ឈ្មោះសមាជិកបានទេ ។ សូមសាកល្បងជាមួយ '%s'។"
-
-#: contrib/admin/views/main.py:223
-msgid "Site administration"
-msgstr "ទំព័រគ្រប់គ្រង"
-
-#: contrib/admin/views/main.py:257
-#: contrib/admin/views/auth.py:17
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "ឈ្មោះកម្មវិធី %(name)s \"%(obj)s\" បានបញ្ជូលដោយជោគជ័យ​។"
-
-#: contrib/admin/views/main.py:261
-#: contrib/admin/views/main.py:347
-#: contrib/admin/views/auth.py:22
-msgid "You may edit it again below."
-msgstr "សូមសាកល្បងកែប្រែម្តងទៀត។"
-
-#: contrib/admin/views/main.py:271
-#: contrib/admin/views/main.py:356
-#, python-format
-msgid "You may add another %s below."
-msgstr "លោកអ្នកអាចបន្ថែម  %s ផ្សេងទៀតដូចខាងក្រោម។"
-
-#: contrib/admin/views/main.py:289
-#, python-format
-msgid "Add %s"
-msgstr "បន្ថែម %s"
-
-#: contrib/admin/views/main.py:335
-#, python-format
-msgid "Added %s."
-msgstr "បានបន្ថែម %s"
-
-#: contrib/admin/views/main.py:335
-#: contrib/admin/views/main.py:337
-#: contrib/admin/views/main.py:339
+#: db/models/base.py:787 forms/models.py:581
 msgid "and"
 msgstr "និង"
 
-#: contrib/admin/views/main.py:337
+#: db/models/fields/__init__.py:63
 #, python-format
-msgid "Changed %s."
-msgstr "បានផ្លាស់ប្តូរ %s"
+msgid "Value %r is not a valid choice."
+msgstr ""
 
-#: contrib/admin/views/main.py:339
+#: db/models/fields/__init__.py:64
+msgid "This field cannot be null."
+msgstr "ចាំបាច់បំពេញទិន្នន័យកន្លែងនេះ។"
+
+#: db/models/fields/__init__.py:65
+#, fuzzy
+msgid "This field cannot be blank."
+msgstr "ចាំបាច់បំពេញទិន្នន័យកន្លែងនេះ។"
+
+#: db/models/fields/__init__.py:70
 #, python-format
-msgid "Deleted %s."
-msgstr "បានលប់ %s"
+msgid "Field of type: %(field_type)s"
+msgstr ""
 
-#: contrib/admin/views/main.py:342
-msgid "No fields changed."
-msgstr "ពុំមានទិន្នន័យត្រូវបានផ្លាស់ប្តូរ។"
-
-#: contrib/admin/views/main.py:345
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "កម្មវិធីឈ្មោះ %(name)s \"%(obj)s\" ត្រូវបានផ្លាស់ប្តូរដោយជោគជ័យ។"
-
-#: contrib/admin/views/main.py:353
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "ឈ្មោះកម្មវីធី %(name)s \"%(obj)s\" ត្រូវបានបន្ថែមដោយជោគជ័យ។ លោកអ្នកអាចផ្លាស់ប្តូរម្តងទៀតនៅខាងក្រោម។"
-
-#: contrib/admin/views/main.py:391
-#, python-format
-msgid "Change %s"
-msgstr "ផ្លាស់ប្តូរ %s"
-
-#: contrib/admin/views/main.py:473
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "មានទិន្នន័យ %(fieldname)s មួយចំនួននៅក្នុង %(name)s: %(obj)s"
-
-#: contrib/admin/views/main.py:478
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "មានទិន្នន័យ %(fieldname)s មួយចំនួននៅក្នុង %(name)s:"
-
-#: contrib/admin/views/main.py:511
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "ឈ្មោះកម្មវិធី %(name)s \"%(obj)s\" ត្រូវបានលប់ដោយជោគជ័យ។"
-
-#: contrib/admin/views/main.py:514
-msgid "Are you sure?"
-msgstr "តើលោកអ្នកប្រាកដទេ?"
-
-#: contrib/admin/views/main.py:536
-#, python-format
-msgid "Change history: %s"
-msgstr "សកម្មភាពផ្លាស់ប្តូរកន្លងមក : %s"
-
-#: contrib/admin/views/main.py:570
-#, python-format
-msgid "Select %s"
-msgstr "ជ្រើសរើស %s"
-
-#: contrib/admin/views/main.py:570
-#, python-format
-msgid "Select %s to change"
-msgstr "ជ្រើសរើស %s ដើម្បីផ្លាស់ប្តូរ"
-
-#: contrib/admin/views/main.py:758
-msgid "Database error"
-msgstr "ទិន្នន័យមូលដ្ឋានមានបញ្ហា"
-
-#: contrib/admin/views/doc.py:46
-#: contrib/admin/views/doc.py:48
-#: contrib/admin/views/doc.py:50
-msgid "tag:"
-msgstr "ប្រភេទ:"
-
-#: contrib/admin/views/doc.py:77
-#: contrib/admin/views/doc.py:79
-#: contrib/admin/views/doc.py:81
-msgid "filter:"
-msgstr "ពាក្យស្វែងរក"
-
-#: contrib/admin/views/doc.py:135
-#: contrib/admin/views/doc.py:137
-#: contrib/admin/views/doc.py:139
-msgid "view:"
-msgstr "មើល"
-
-#: contrib/admin/views/doc.py:164
-#, python-format
-msgid "App %r not found"
-msgstr "ស្វែងរក App %r មិនឃើញ ។"
-
-#: contrib/admin/views/doc.py:171
-#, python-format
-msgid "Model %r not found in app %r"
-msgstr "Model %r រកមិនឃើញនៅក្នុង app %r"
-
-#: contrib/admin/views/doc.py:183
-#, python-format
-msgid "the related `%s.%s` object"
-msgstr " `%s.%s` object ដែលពាក់ព័ន្ធ"
-
-#: contrib/admin/views/doc.py:183
-#: contrib/admin/views/doc.py:205
-#: contrib/admin/views/doc.py:219
-#: contrib/admin/views/doc.py:224
-msgid "model:"
-msgstr "model:"
-
-#: contrib/admin/views/doc.py:214
-#, python-format
-msgid "related `%s.%s` objects"
-msgstr "ជាប់​ទាក់ទង​ជាមួយ​នឹងកម្មវិធី​  `%s.%s` "
-
-#: contrib/admin/views/doc.py:219
-#, python-format
-msgid "all %s"
-msgstr "ទាំងអស់ %s"
-
-#: contrib/admin/views/doc.py:224
-#, python-format
-msgid "number of %s"
-msgstr "ចំនួន​នៃ​%s"
-
-#: contrib/admin/views/doc.py:229
-#, python-format
-msgid "Fields on %s objects"
-msgstr "ទិន្នន័យអំពី %s កម្មវិធី"
-
-#: contrib/admin/views/doc.py:291
-#: contrib/admin/views/doc.py:301
-#: contrib/admin/views/doc.py:303
-#: contrib/admin/views/doc.py:309
-#: contrib/admin/views/doc.py:310
-#: contrib/admin/views/doc.py:312
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
 msgid "Integer"
 msgstr "ចំនួនពិត(Integer)"
 
-#: contrib/admin/views/doc.py:292
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
+msgid "This value must be an integer."
+msgstr "តំលៃនេះត្រូវតែជាចំនួនលេខ។"
+
+#: db/models/fields/__init__.py:493
+msgid "This value must be either True or False."
+msgstr "តំលៃអាចជា True ឬ False។"
+
+#: db/models/fields/__init__.py:495
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (អាច​ជា True រឺ False)"
 
-#: contrib/admin/views/doc.py:293
-#: contrib/admin/views/doc.py:311
-#, python-format
-msgid "String (up to %(maxlength)s)"
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
+#, fuzzy, python-format
+msgid "String (up to %(max_length)s)"
 msgstr "String (អាចសរសេរបានរហូតដល់ %(maxlength)s)"
 
-#: contrib/admin/views/doc.py:294
+#: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
 msgstr "ចំនួនពិត(Integer) ដែលផ្តាច់ចេញពីគ្នាដោយ​ក្បៀស"
 
-#: contrib/admin/views/doc.py:295
+#: db/models/fields/__init__.py:584
 msgid "Date (without time)"
 msgstr "កាល​បរិច្ឆេទ (Date) (មិនមានសរសេរម៉ោង)"
 
-#: contrib/admin/views/doc.py:296
+#: db/models/fields/__init__.py:588
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "សូមបំពេញកាលបរិច្ឆេទក្នុងទំរង់ជា YYYY-MM-DD ។"
+
+#: db/models/fields/__init__.py:589
+#, fuzzy, python-format
+msgid "Invalid date: %s"
+msgstr "កាលបរិច្ឆេទមិនត្រឹមត្រូវ : %s។"
+
+#: db/models/fields/__init__.py:670
+#, fuzzy
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "សូមបំពេញកាលបរិច្ឆេទក្នុងទំរង់ជា YYYY-MM-DD HH:MM ។"
+
+#: db/models/fields/__init__.py:672
 msgid "Date (with time)"
 msgstr "កាល​បរិច្ឆេទ (Date) (មានសរសេរម៉ោង)"
 
-#: contrib/admin/views/doc.py:297
-msgid "E-mail address"
-msgstr "អ៊ីម៉ែល"
+#: db/models/fields/__init__.py:746
+#, fuzzy
+msgid "This value must be a decimal number."
+msgstr "តំលៃនេះត្រូវតែជាចំនួនលេខ។"
 
-#: contrib/admin/views/doc.py:298
-#: contrib/admin/views/doc.py:299
-#: contrib/admin/views/doc.py:302
-msgid "File path"
-msgstr "ផ្លូវទៅកាន់ឯកសារ"
-
-#: contrib/admin/views/doc.py:300
+#: db/models/fields/__init__.py:748
 msgid "Decimal number"
 msgstr "ចំនួនទសភាគ (Decimal)"
 
-#: contrib/admin/views/doc.py:306
+#: db/models/fields/__init__.py:803
+msgid "E-mail address"
+msgstr "អ៊ីម៉ែល"
+
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
+msgid "File path"
+msgstr "ផ្លូវទៅកាន់ឯកសារ"
+
+#: db/models/fields/__init__.py:841
+#, fuzzy
+msgid "This value must be a float."
+msgstr "តំលៃនេះត្រូវតែជាចំនួនលេខ។"
+
+#: db/models/fields/__init__.py:843
+msgid "Floating point number"
+msgstr ""
+
+#: db/models/fields/__init__.py:902
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "លេខ IP"
+
+#: db/models/fields/__init__.py:931
+#, fuzzy
+msgid "This value must be either None, True or False."
+msgstr "តំលៃអាចជា True ឬ False។"
+
+#: db/models/fields/__init__.py:933
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (អាចជា True​ រឺ False រឺ None)"
 
-#: contrib/admin/views/doc.py:307
-msgid "Relation to parent model"
-msgstr "ទាក់ទងទៅនឹងម៉ូដែល (model)មេ"
-
-#: contrib/admin/views/doc.py:308
-msgid "Phone number"
-msgstr "លេខទូរស័ព្ទ"
-
-#: contrib/admin/views/doc.py:313
+#: db/models/fields/__init__.py:1024
 msgid "Text"
 msgstr "អត្ថបទ"
 
-#: contrib/admin/views/doc.py:314
+#: db/models/fields/__init__.py:1040
 msgid "Time"
 msgstr "ពេលវេលា"
 
-#: contrib/admin/views/doc.py:315
-#: contrib/flatpages/models.py:7
+#: db/models/fields/__init__.py:1044
+#, fuzzy
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "សូមបំពេញពេលវេលាក្នុងទំរង់ជា HH:MM ។"
+
+#: db/models/fields/__init__.py:1120
 msgid "URL"
 msgstr "អាស័យដ្ឋានគេហទំព័រ(URL)"
 
-#: contrib/admin/views/doc.py:316
-msgid "U.S. state (two uppercase letters)"
-msgstr "សហរដ្ឋអាមេរិក U.S. (ជាមួយនឹងអក្សរធំពីរ)"
-
-#: contrib/admin/views/doc.py:317
+#: db/models/fields/__init__.py:1136
 msgid "XML text"
 msgstr "អត្ថបទ XML"
 
-#: contrib/admin/views/doc.py:343
+#: db/models/fields/related.py:804
 #, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s ហាក់បីដូចជា URL ដែល​ត្រឹមត្រូវទេ"
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr ""
 
-#: contrib/admin/views/auth.py:28
-msgid "Add user"
-msgstr "បន្ថែមសមាជិក"
+#: db/models/fields/related.py:806
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
 
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "ឯកសារ"
+#: db/models/fields/related.py:928
+msgid "One-to-one relationship"
+msgstr ""
 
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Change password"
-msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
+#: db/models/fields/related.py:990
+#, fuzzy
+msgid "Many-to-many relationship"
+msgstr "គ្រួសារ និង សេចក្តីស្នេហា"
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Home"
-msgstr "គេហទំព័រ"
+#: db/models/fields/related.py:1010
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"សូមចុចប៉ូតុន \"Control\", ឬ \"Command\" ចំពោះកុំព្យូទ័រ Mac, ដើម្បីជ្រើសរើសច្រើនជាងមួយ។"
 
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "History"
-msgstr "សកម្មភាព​កន្លង​មក"
+#: forms/fields.py:66
+msgid "This field is required."
+msgstr "ចាំបាច់បំពេញទិន្នន័យកន្លែងនេះ។"
 
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "Date/time"
+#: forms/fields.py:221
+msgid "Enter a whole number."
+msgstr "បំពេញចំនួនទាំងអស់។"
 
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "សមាជិក"
+#: forms/fields.py:252 forms/fields.py:273
+#, fuzzy
+msgid "Enter a number."
+msgstr "បំពេញចំនួនទាំងអស់។"
 
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "សកម្មភាព"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "N j, Y, P"
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
-msgstr "កម្មវិធីនេះមិនមានសកម្មភាព​កន្លងមកទេ។ ប្រហែលជាសកម្មភាពទាំងនេះមិនបានធ្វើនៅទំព័រគ្រប់គ្រងនេះ។"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "ទំព័រគ្រប់គ្រងរបស់ Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "ការ​គ្រប់គ្រង​របស់ ​Django"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "ម៉ាស៊ីនផ្តល់សេវាកម្ម​ មានបញ្ហា"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "ម៉ាស៊ីនផ្តល់សេវាកម្ម​ មានបញ្ហា (៥០០)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "ម៉ាស៊ីនផ្តល់សេវាកម្ម​ មានបញ្ហា  <em>(៥០០)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
-msgstr "មានកំហុស។ កំហុសនេះត្រូវបានបញ្ជូនទៅកាន់អ្នកគ្រប់គ្រងគេហទំព័រនេះរួចហើយ។ សូមអភ័យទោសចំពោះបញ្ហានេះ។"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "ទំព័រ​ដែល​លោកអ្នកចង់​រក​នេះពុំមាន​នៅក្នុងម៉ាស៊ីនរបស់យើងខ្ញុំទេ"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "សួមអភ័យទោស ទំព័រ​ដែល​លោកអ្នកចង់​រក​នេះពុំមាន​នឹងក្នុងម៉ាស៊ីនរបស់យើងខ្ញុំទេ"
-
-#: contrib/admin/templates/admin/index.html:17
+#: forms/fields.py:276
 #, python-format
-msgid "Models available in the %(name)s application."
-msgstr "ម៉ូដែល (Models) មាននៅក្នុងកម្មវិធី %(name)s ។"
+msgid "Ensure that there are no more than %s digits in total."
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:18
+#: forms/fields.py:277
 #, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
+msgid "Ensure that there are no more than %s decimal places."
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:28
-#: contrib/admin/templates/admin/change_form.html:15
-msgid "Add"
-msgstr "បន្ថែម"
-
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "ផ្លាស់ប្តូរ"
-
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "លោកអ្នកពុំមានសិទ្ធិ ផ្លាស់​ប្តូរ ទេ។"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "សកម្មភាពបច្ចុប្បន្ន"
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "សកម្មភាពរបស់ខ្ញុំ"
-
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "គ្មាន"
-
-#: contrib/admin/templates/admin/change_list.html:11
+#: forms/fields.py:278
 #, python-format
-msgid "Add %(name)s"
-msgstr "បន្ថែម %(name)s"
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr ""
 
-#: contrib/admin/templates/admin/login.html:22
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "តើលោកអ្នក <a href=\"/password_reset/\">ភ្លេចពាក្យសំងាត់</a>?"
+#: forms/fields.py:340 forms/fields.py:916
+#, fuzzy
+msgid "Enter a valid date."
+msgstr "សូមបំពេញឈ្មោះឯកសារអោយបានត្រឹមត្រូវ។"
 
-#: contrib/admin/templates/admin/base.html:25
-msgid "Welcome,"
-msgstr "សូមស្វាគមន៏"
+#: forms/fields.py:368 forms/fields.py:917
+#, fuzzy
+msgid "Enter a valid time."
+msgstr "សូមបំពេញឈ្មោះឯកសារអោយបានត្រឹមត្រូវ។"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-#: contrib/admin/templates/admin/submit_line.html:3
+#: forms/fields.py:394
+#, fuzzy
+msgid "Enter a valid date/time."
+msgstr "សូមបំពេញឈ្មោះឯកសារអោយបានត្រឹមត្រូវ។"
+
+#: forms/fields.py:458
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "មិនមានឯកសារត្រូវបានជ្រើសរើស។ សូមពិនិត្យប្រភេទឯកសារម្តងទៀត។"
+
+#: forms/fields.py:459
+msgid "No file was submitted."
+msgstr ""
+
+#: forms/fields.py:460
+msgid "The submitted file is empty."
+msgstr "ពុំមានឯកសារ។​"
+
+#: forms/fields.py:461
+#, fuzzy, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr "អត្ថបទរបស់អ្នកត្រូវតិចជាង %d អក្សរ។"
+
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: forms/fields.py:516
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr "រូបភាពដែលទាញយកមិនត្រឹមត្រូវ ប្រហែលជាមិនមែនជារូបភាព ឬក៏ជា រូបភាពខូច។"
+
+#: forms/fields.py:648 forms/fields.py:723
+#, fuzzy, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "សូមជ្រើសរើស ; '%(data)s' មិនមាននៅក្នុង %(choices)s"
+
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+#, fuzzy
+msgid "Enter a list of values."
+msgstr "សូមបំពេញឈ្មោះឯកសារអោយបានត្រឹមត្រូវ។"
+
+#: forms/formsets.py:308 forms/formsets.py:310
+#, fuzzy
+msgid "Order"
+msgstr "តំរៀប"
+
+#: forms/formsets.py:312
 msgid "Delete"
 msgstr "លប់"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
-msgstr "ការលប់ %(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​ព័ន្ធបាត់បង់ ។ ក៏ប៉ន្តែលោកអ្នក​ពុំមាន​សិទ្ធិលប់​កម្មវិធី​ប្រភេទនេះទេ។"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:21
-#, python-format
-msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
-msgstr "តើលោកអ្នកប្រាកដជាចង់លប់ %(object_name)s \"%(escaped_object)s\"? ការលប់ %(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​ព័ន្ធបាត់បង់។"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "ខ្ញុំច្បាស់​ជាចង់លប់"
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr "ដោយ​  %(filter_title)s "
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "ស្វែងរក"
-
-#: contrib/admin/templates/admin/search_form.html:10
+#: forms/models.py:575
 #, fuzzy, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "លទ្ធផល %(counter)s "
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "សូមកែប្រែកំហុសខាងក្រោម ។"
 
-#: contrib/admin/templates/admin/search_form.html:10
+#: forms/models.py:579
 #, python-format
-msgid "%(full_result_count)s total"
-msgstr "សរុបទាំងអស់ %(full_result_count)s"
-
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "បង្ហាញទាំងអស់"
-
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr "ស្វែងរកជាមួយ"
-
-#: contrib/admin/templates/admin/change_form.html:21
-msgid "View on site"
-msgstr "មើលនៅលើគេហទំព័រដោយផ្ទាល់"
-
-#: contrib/admin/templates/admin/change_form.html:30
-#, fuzzy
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "សូមកែប្រែកំហុសខាងក្រោម ។"
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Ordering"
-msgstr "កំពុងតំរៀប"
-
-#: contrib/admin/templates/admin/change_form.html:51
-msgid "Order:"
-msgstr "តំរៀប"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "រក្សាទុក"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "រក្សាទុក ហើយ បន្ថែម​ថ្មី"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "រក្សាទុក ហើយ កែឯកសារដដែល"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "រក្សាទុក"
-
-#: contrib/admin/templates/admin/invalid_setup.html:8
-msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
-msgstr "មូលដ្ឋាន​ទិន្នន័យ​​​ របស់លោកអ្នក មានបញ្ហា។ តើ លោកអ្នកបាន បង្កើត តារាង​ របស់មូលដ្ឋានទិន្នន័យ​ ហើយឬនៅ? តើ​ លោកអ្នកប្រាកដថាសមាជិកអាចអានមូលដ្ឋានទិន្នន័យនេះ​​បានឬទេ? "
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid "First, enter a username and password. Then, you'll be able to edit more user options."
-msgstr "តំបូងសូមបំពេញ ឈ្មោះជាសមាជិក និង ពាក្យសំងាត់​។ បន្ទាប់មកលោកអ្នកអាចបំពេញបន្ថែមជំរើសផ្សេងៗទៀតបាន។ "
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
-msgid "Username"
-msgstr "ឈ្មោះជាសមាជិក"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
-msgid "Password"
-msgstr "ពាក្យសំងាត់"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-msgid "Password (again)"
-msgstr "ពាក្យសំងាត់ (ម្តងទៀត)"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-msgid "Enter the same password as above, for verification."
-msgstr "សូមបំពេញពាក្យសំងាត់ដូចខាងលើ ដើម្បីត្រួតពិនិត្យ។ "
-
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-msgid "Password change"
-msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "ពាក្យសំងាត់បានផ្លាស់ប្តូរដោយជោគជ័យ"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "ពាក្យសំងាត់របស់លោកអ្នកបានផ្លាស់ប្តូរហើយ"
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "ពាក្យសំងាត់បានកំណត់សារជាថ្មី"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid "Forgotten your password? Enter your e-mail address below, and we'll reset your password and e-mail the new one to you."
-msgstr "តើលោកអ្នកភ្លេចពាក្យសំងាត់រឺ? សូមបំពេញអ៊ីម៉ែលខាងក្រោម យើងខ្ញុំនឹងកំណត់ពាក្យសំងាត់របស់លោកអ្នកសារឡើងវិញ ហើយបញ្ជូនទៅកាន់អ៊ីម៉ែលរបស់លោកអ្នក។"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "អ៊ីមែល"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "កំណត់ពាក្យសំងាត់សារជាថ្មី"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "សូមថ្លែងអំណរគុណ ដែលបានចំណាយ ពេលវេលាដ៏មានតំលៃ របស់លោកអ្នកមកទស្សនាគេហទំព័ររបស់យើងខ្ញុំ"
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "ពិនិត្យចូលម្តងទៀត"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "ពាក្យសំងាត់បានផ្លាស់ប្តូរដោយជោគជ័យ"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid "We've e-mailed a new password to the e-mail address you submitted. You should be receiving it shortly."
-msgstr "យើងខ្ញុំបានបញ្ជូន​ពាក្យសំងាត់ទៅកាន់​អ៊ីម៉ែលរបស់លោកអ្នករួចហើយ។ លោកអ្នកនឹងបានទទួលនៅពេលបន្តិចទៀតនេះ។"
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid "Please enter your old password, for security's sake, and then enter your new password twice so we can verify you typed it in correctly."
-msgstr "សូមបំពេញពាក្យសំងាត់ចាស់របស់លោកអ្នក។ ដើម្បីសុវត្ថភាព សូមបំពេញពាក្យសំងាត់ថ្មីខាងក្រោមពីរដង។"
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "ពាក្សំងាត់ចាស់"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "New password:"
-msgstr "ពាក្យសំងាត់ថ្មី"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid "Confirm password:"
-msgstr "បំពេញពាក្យសំងាត់ថ្មីម្តងទៀត"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-msgid "Change my password"
-msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "លោកអ្នកទទួលអ៊ីម៉ែលនេះដោយសារលោកអ្នកកំណត់ពាក្យសំងាត់នេះសារជាថ្មី"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "សំរាប់សមាជិកនៅឯគេហទំព័រ %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "ពាក្យសំងាត់ថ្មីគឺ: %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "សូមផ្លាស់ប្តូរពាក្យសំងាត់នៅឯទំព័រនេះ:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "ឈ្មោះជាសមាជិកក្នុងករណីភ្លេច:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "សូមអរគុណដែលបានប្រើប្រាស់សេវាកម្មរបស់យើងខ្ញុំ"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "ក្រុមរបស់គេហទំព័រ %(site_name)s"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "កំរងចំណាំ"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
-msgid "Documentation bookmarklets"
-msgstr "កំរងចំណាំអំពីឯកសារ"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
-"\n"
-"<p class=\"help\">ដើម្បីតំលើងកំរងចំណាំ សូមទាញយកអត្ថបទភ្ជាប់ទៅ​កាន់​របាឧបករណ៍ ឬក៏ចុចខាងស្តាំលើអត្ថបទភ្ជាប់ហើយ​បញ្ជូលទៅក្នុងកំរងចំណាំរបស់លោកអ្នក។</p>\n"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-msgid "Documentation for this page"
-msgstr "ឯកសារសំរាប់ទំព័រនេះ"
+#: forms/models.py:585
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid "Jumps you from any page to the documentation for the view that generates that page."
-msgstr "Jumps you from any page to the documentation for the view that generates that page."
+#: forms/models.py:593
+#, fuzzy
+msgid "Please correct the duplicate values below."
+msgstr "សូមកែកំហុសដូចខាងក្រោម។"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-msgid "Show object ID"
-msgstr "បង្ហាញលេខសំគាល់កម្មវិធី"
+#: forms/models.py:868
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid "Shows the content-type and unique ID for pages that represent a single object."
-msgstr "Shows the content-type and unique ID for pages that represent a single object."
+#: forms/models.py:929
+#, fuzzy
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "សូមជ្រើសរើស ; '%(data)s' មិនមាននៅក្នុង %(choices)s"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-msgid "Edit this object (current window)"
-msgstr "កែប្រែកម្មវិធីនេះ(វីនដូវកំពុងប្រើ)"
+#: forms/models.py:1019
+#, fuzzy, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "សូមជ្រើសរើស ; '%(data)s' មិនមាននៅក្នុង %(choices)s"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "បង្វែរទៅកាន់​ ទំព័រគ្រប់គ្រង សំរាប់ទំព័រណាដែលតំណាងអោយកម្មវិធីតែមួយ។"
+#: forms/models.py:1021
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-msgid "Edit this object (new window)"
-msgstr "កែប្រែកម្មវិធីនេះ(វីនដូវថ្មី)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
-msgid "As above, but opens the admin page in a new window."
-msgstr "ដូចខាងលើ តែបើកនៅទំព័រវីនដូវថ្មី"
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "កាលបរិច្ឆេទ"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "ម៉ោង"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
+#: forms/widgets.py:299
+#, fuzzy
+msgid "Currently"
 msgstr "បច្ចុប្បន្ន"
 
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
+#: forms/widgets.py:300
+msgid "Change"
 msgstr "ផ្លាស់ប្តូរ"
 
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "នាំចេញពី"
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "ឆ្នាំ"
 
-#: contrib/redirects/models.py:8
-msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
-msgstr "គួរតែជាផ្លូវពេញ (absolute path) ហើយមិនបញ្ជូលឈ្មោះ ដមែន (domain name​)។​ឧទាហរណ៍ '/events/search/'។"
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr "មិន​ដឹង"
 
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "នាំចេញទៅ"
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "យល់ព្រម"
 
-#: contrib/redirects/models.py:10
-msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
-msgstr "អាចជាផ្លូវពេញ (absolute path) ឬក៏ URL ទាំងមូលដែលចាប់ផ្តើមជាមួយ 'http://'។"
+#: forms/widgets.py:547
+msgid "No"
+msgstr "មិនយល់ព្រម"
 
-#: contrib/redirects/models.py:13
-msgid "redirect"
-msgstr "នាំចេញ"
+#: template/defaultfilters.py:794
+msgid "yes,no,maybe"
+msgstr "យល់ព្រម មិនយល់ព្រម​ ប្រហែល"
 
-#: contrib/redirects/models.py:14
-msgid "redirects"
-msgstr "នាំចេញ"
+#: template/defaultfilters.py:825
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
 
-#: contrib/flatpages/models.py:8
-msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "ឧទាហរណ៍  '/about/contact/' ។ ត្រូវប្រាកដថាមានសញ្ញា / ទាំងនៅផ្នែកខាងមុខ និង ខាងក្រោយ។"
+#: template/defaultfilters.py:827
+#, python-format
+msgid "%.1f KB"
+msgstr ""
 
-#: contrib/flatpages/models.py:9
-msgid "title"
-msgstr "ចំណងជើង"
+#: template/defaultfilters.py:829
+#, python-format
+msgid "%.1f MB"
+msgstr ""
 
-msgid "Title"
-msgstr "ចំណងជើង"
+#: template/defaultfilters.py:831
+#, python-format
+msgid "%.1f GB"
+msgstr ""
 
-#: contrib/flatpages/models.py:10
-msgid "content"
-msgstr "អត្ថន័យ"
+#: template/defaultfilters.py:833
+#, python-format
+msgid "%.1f TB"
+msgstr ""
 
-#: contrib/flatpages/models.py:11
-msgid "enable comments"
-msgstr "អនុញ្ញាត"
+#: template/defaultfilters.py:834
+#, python-format
+msgid "%.1f PB"
+msgstr ""
 
-#: contrib/flatpages/models.py:12
-msgid "template name"
-msgstr "ឈ្មោះឯកសារគំរូ"
+#: utils/dateformat.py:42
+msgid "p.m."
+msgstr ""
 
-#: contrib/flatpages/models.py:13
-msgid "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."
-msgstr "ឧទាហរណ៍ 'flatpages/contact_page.html'។ ប្រសិនឯកសារនេះមិនមានទេ​ នោះឯកសារ 'flatpages/default.html'នឹងត្រូវប្រើ។"
+#: utils/dateformat.py:43
+msgid "a.m."
+msgstr ""
 
-#: contrib/flatpages/models.py:14
-msgid "registration required"
-msgstr "ត្រូវការសមាជិកភាព"
+#: utils/dateformat.py:48
+msgid "PM"
+msgstr ""
 
-#: contrib/flatpages/models.py:14
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "ប្រសិនជាចុចជ្រើសរើសយកជំរើសនេះ នោះ មានតែសមាជិកទេដែលអាចមើលទំព័រនេះបាន​។"
+#: utils/dateformat.py:49
+msgid "AM"
+msgstr ""
 
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "ទំព័ថ្មី"
+#: utils/dateformat.py:98
+msgid "midnight"
+msgstr ""
 
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "ទំព័ថ្មី"
-
-#: contrib/auth/views.py:39
-msgid "Logged out"
-msgstr "ចាកចេញ"
-
-#: contrib/auth/models.py:38
-#: contrib/auth/models.py:57
-msgid "name"
-msgstr "ឈ្មោះ"
-
-#: contrib/auth/models.py:40
-msgid "codename"
-msgstr "ឈ្មោះលេខកូត"
-
-#: contrib/auth/models.py:42
-msgid "permission"
-msgstr "អនុញ្ញាត"
-
-#: contrib/auth/models.py:43
-#: contrib/auth/models.py:58
-msgid "permissions"
-msgstr "អនុញ្ញាត"
-
-#: contrib/auth/models.py:60
-msgid "group"
-msgstr "ក្រុម"
-
-#: contrib/auth/models.py:61
-#: contrib/auth/models.py:100
-msgid "groups"
-msgstr "ក្រុម"
-
-#: contrib/auth/models.py:90
-msgid "username"
-msgstr "ឈ្មោះជាសមាជិក"
-
-#: contrib/auth/models.py:90
-msgid "Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."
-msgstr "ត្រូចវបំពេញអក្សរឡាតាំងចំនួន៣០ ឬ តិចជាងនេះ (អក្សរ លេខ ឬ សញ្ញា _)។"
-
-#: contrib/auth/models.py:91
-msgid "First name"
-msgstr "នាម"
-
-#: contrib/auth/models.py:92
-msgid "Last name"
-msgstr "គោត្តនាម"
-
-msgid "first name"
-msgstr "នាម"
-
-#: contrib/auth/models.py:92
-msgid "last name"
-msgstr "គោត្តនាម"
-
-#: contrib/auth/models.py:93
-msgid "e-mail address"
-msgstr "អ៊ីមែល"
-
-#: contrib/auth/models.py:94
-msgid "password"
-msgstr "ពាក្យសំងាត់"
-
-#: contrib/auth/models.py:94
-msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr "ប្រើ '[algo]$[salt]$[hexdigest]'"
-
-#: contrib/auth/models.py:95
-msgid "staff status"
-msgstr "ស្ថានភាពបុគ្គលិក"
-
-#: contrib/auth/models.py:95
-msgid "Designates whether the user can log into this admin site."
-msgstr "កំណត់អោយសមាជិកអាចចូលមកប្រើប្រាស់ទំព័រគ្រប់គ្រងនេះ។"
-
-#: contrib/auth/models.py:96
-msgid "active"
-msgstr "សកម្ម"
-
-#: contrib/auth/models.py:96
-msgid "Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."
-msgstr "កំណត់ថាតើសមាជិកអាច​ពិនិត្យចូលមកប្រើទំព័រគ្រប់គ្រង។ មិនជ្រើសរើស ជាជាងលប់ចោល។"
-
-#: contrib/auth/models.py:97
-msgid "superuser status"
-msgstr "ស្ថានភាពអ្នកគ្រងគ្រង"
-
-#: contrib/auth/models.py:97
-msgid "Designates that this user has all permissions without explicitly assigning them."
-msgstr "កំណត់អោយសមាជិកនេះមានសិទ្ធិទាំងអស់។"
-
-#: contrib/auth/models.py:98
-msgid "last login"
-msgstr "ការពិនិត្យចូលកន្លងមក"
-
-#: contrib/auth/models.py:99
-msgid "date joined"
-msgstr "កាលបរិច្ឆេទចូលរួម"
-
-#: contrib/auth/models.py:101
-msgid "In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."
-msgstr "បន្ថែមចំពោះសិទ្ធិដែលគេបាន​ផ្តល់​អោយ សមាជិកនេះអាចទទួលបានសិទ្ធិទាំងអស់​ដែលកំណត់​សំរាប់​ក្រុម​ ដែលសមាជិកនេះស្ថិតនៅ។"
-
-#: contrib/auth/models.py:102
-msgid "user permissions"
-msgstr "ការអនុញ្ញាតអោយសមាជិក"
-
-#: contrib/auth/models.py:105
-msgid "user"
-msgstr "សមាជិក"
-
-#: contrib/auth/models.py:106
-msgid "users"
-msgstr "សមាជិក"
-
-#: contrib/auth/models.py:111
-msgid "Personal info"
-msgstr "ព័ត៌មានផ្ទាល់ខ្លួន"
-
-#: contrib/auth/models.py:112
-msgid "Permissions"
-msgstr "ការអនុញ្ញាត"
-
-#: contrib/auth/models.py:113
-msgid "Important dates"
-msgstr "កាលបរិច្ឆេទសំខាន់"
-
-#: contrib/auth/models.py:114
-msgid "Groups"
-msgstr "ក្រុម"
-
-#: contrib/auth/models.py:256
-msgid "message"
-msgstr "អត្ថបទ"
-
-#: contrib/auth/forms.py:52
-msgid "Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in."
-msgstr "កម្មវិធីសំរាប់មើលគេហទំព័រនេះហាក់បីដូចជាមិនទាន់បានទទួលយកគុគី ។ ចាំបាច់ត្រូវកំណត់អោយ​កម្មវិធីសំរាប់មើលគេហទំព័រទទួល​យក គុគី ដើម្បីពិនិត្យចូល ។"
-
-#: contrib/auth/forms.py:61
-msgid "This account is inactive."
-msgstr "ឈ្មោះសមាជិកនេះ​លែងដំណើរការ"
-
-#: contrib/contenttypes/models.py:20
-msgid "python model class name"
-msgstr "ឈ្មោះ python model class"
-
-#: contrib/contenttypes/models.py:23
-msgid "content type"
-msgstr "ប្រភេទអត្ថន័យ"
-
-#: contrib/contenttypes/models.py:24
-msgid "content types"
-msgstr "ប្រភេទអត្ថន័យ"
-
-#: contrib/sessions/models.py:51
-msgid "session key"
-msgstr "លេខសំគាល់​រយះពេល​ពិនិត្យ​ចូល"
-
-#: contrib/sessions/models.py:52
-msgid "session data"
-msgstr "ទិន្នន័យរយះពេល​ពិនិត្យ​ចូល"
-
-#: contrib/sessions/models.py:53
-msgid "expire date"
-msgstr "ហួសពេលកំណត់"
-
-#: contrib/sessions/models.py:57
-msgid "session"
-msgstr "រយះពេល​ពិនិត្យ​ចូល"
-
-#: contrib/sessions/models.py:58
-msgid "sessions"
-msgstr "រយះពេល​ពិនិត្យ​ចូល"
-
-#: contrib/sites/models.py:10
-msgid "domain name"
-msgstr "ឈ្មោះដមែន"
-
-#: contrib/sites/models.py:11
-msgid "display name"
-msgstr "ឈ្មោះសំរាប់បង្ហាញ"
-
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr "គេហទំព័រ"
-
-#: contrib/sites/models.py:16
-msgid "sites"
-msgstr "គេហទំព័រ"
+#: utils/dateformat.py:100
+msgid "noon"
+msgstr ""
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -1691,802 +767,320 @@ msgstr "សៅរ៍"
 msgid "Sunday"
 msgstr "អាទិត្យ"
 
-#: utils/dates.py:14
+#: utils/dates.py:10
+#, fuzzy
+msgid "Mon"
+msgstr "ច័ន្ទ"
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Tue"
+msgstr "អង្គារ"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr ""
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr ""
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Fri"
+msgstr "សុក្រ"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr ""
+
+#: utils/dates.py:11
+#, fuzzy
+msgid "Sun"
+msgstr "សំលេង"
+
+#: utils/dates.py:18
 msgid "January"
 msgstr "មករា"
 
-#: utils/dates.py:14
+#: utils/dates.py:18
 msgid "February"
 msgstr "កុម្ភៈ"
 
-#: utils/dates.py:14
-#: utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "មិនា"
 
-#: utils/dates.py:14
-#: utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "មេសា"
 
-#: utils/dates.py:14
-#: utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "ឧសភា"
 
-#: utils/dates.py:14
-#: utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "មិថុនា"
 
-#: utils/dates.py:15
-#: utils/dates.py:27
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "កក្កដា"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "August"
 msgstr "សីហា"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "September"
 msgstr "កញ្ញា"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "October"
 msgstr "តុលា"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "November"
 msgstr "វិច្ឆិកា"
 
-#: utils/dates.py:16
+#: utils/dates.py:20
 msgid "December"
 msgstr "ធ្នូ"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jan"
 msgstr "មករា"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "feb"
 msgstr "កុម្ភះ"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "mar"
 msgstr "មិនា"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "apr"
 msgstr "មេសា"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "may"
 msgstr "ឧសភា"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jun"
 msgstr "មិថុនា"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "jul"
 msgstr "កក្កដា"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "aug"
 msgstr "សីហា"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "sep"
 msgstr "កញ្ញា"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "oct"
 msgstr "តុលា"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "nov"
 msgstr "វិច្ឆិកា"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "dec"
 msgstr "ធ្នូ"
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "មករា"
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "កុម្ភះ"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "សីហា"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "កញ្ញា"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "តុលា"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "វិច្ឆិកា"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "ធ្នូ"
 
-#: utils/timesince.py:12
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "alt. month"
+msgid "January"
+msgstr "មករា"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "alt. month"
+msgid "February"
+msgstr "កុម្ភៈ"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "alt. month"
+msgid "March"
+msgstr "មិនា"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "alt. month"
+msgid "April"
+msgstr "មេសា"
+
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "alt. month"
+msgid "May"
+msgstr "ឧសភា"
+
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "alt. month"
+msgid "June"
+msgstr "មិថុនា"
+
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "alt. month"
+msgid "July"
+msgstr "កក្កដា"
+
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "alt. month"
+msgid "August"
+msgstr "សីហា"
+
+#: utils/dates.py:43
+#, fuzzy
+msgctxt "alt. month"
+msgid "September"
+msgstr "កញ្ញា"
+
+#: utils/dates.py:44
+#, fuzzy
+msgctxt "alt. month"
+msgid "October"
+msgstr "តុលា"
+
+#: utils/dates.py:45
+#, fuzzy
+msgctxt "alt. month"
+msgid "November"
+msgstr "វិច្ឆិកា"
+
+#: utils/dates.py:46
+#, fuzzy
+msgctxt "alt. month"
+msgid "December"
+msgstr "ធ្នូ"
+
+#: utils/text.py:136
+#, fuzzy
+msgid "or"
+msgstr "អត្ថបទផ្សេងទៀត"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
+
+#: utils/timesince.py:21
 msgid "year"
 msgid_plural "years"
 msgstr[0] "ឆ្នាំ"
 
-#: utils/timesince.py:13
+#: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "ខែ"
 
-#: utils/timesince.py:14
+#: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "សប្តាហ៍"
 
-#: utils/timesince.py:15
+#: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "ថ្ងៃ"
 
-#: utils/timesince.py:16
+#: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "ម៉ោង"
 
-#: utils/timesince.py:17
+#: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "នាទី"
 
-#: utils/translation/trans_real.py:362
+#: utils/timesince.py:45
+#, fuzzy
+msgid "minutes"
+msgstr "នាទី"
+
+#: utils/timesince.py:50
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr ""
+
+#: utils/timesince.py:56
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ""
+
+#: utils/translation/trans_real.py:560
 msgid "DATE_FORMAT"
 msgstr "ថ្ងៃទី j ​ខែ N ឆ្នាំ Y"
 
-#: utils/translation/trans_real.py:363
+#: utils/translation/trans_real.py:561
 msgid "DATETIME_FORMAT"
 msgstr "ថ្ងៃទី j ​ខែ N ឆ្នាំ Y ម៉ោង P"
 
-#: utils/translation/trans_real.py:364
+#: utils/translation/trans_real.py:562
 msgid "TIME_FORMAT"
 msgstr "ម៉ោង P"
 
-#: utils/translation/trans_real.py:380
+#: utils/translation/trans_real.py:583
 msgid "YEAR_MONTH_FORMAT"
 msgstr "ខែ F ឆ្នាំ Y"
 
-#: utils/translation/trans_real.py:381
+#: utils/translation/trans_real.py:584
 msgid "MONTH_DAY_FORMAT"
 msgstr "ថ្ងៃទី​​ j ខែ F"
 
-#: conf/global_settings.py:39
-msgid "Arabic"
-msgstr "ភាសាអារ៉ាប់"
-
-#: conf/global_settings.py:40
-msgid "Bengali"
-msgstr "ភាសាបេឡារុស្ស"
-
-#: conf/global_settings.py:41
-msgid "Czech"
-msgstr "ភាសាឆេក"
-
-#: conf/global_settings.py:42
-msgid "Welsh"
-msgstr "ភាសាអ៊ុយក្រែន"
-
-#: conf/global_settings.py:43
-msgid "Danish"
-msgstr "ភាសាដាណឺម៉ាក"
-
-#: conf/global_settings.py:44
-msgid "German"
-msgstr "ភាសាអាល្លឺម៉ង់"
-
-#: conf/global_settings.py:45
-msgid "Greek"
-msgstr "ភាសាហ្កែលិគ"
-
-#: conf/global_settings.py:46
-msgid "English"
-msgstr "ភាសាអង់គ្លេស"
-
-#: conf/global_settings.py:47
-msgid "Spanish"
-msgstr "ភាសាអេស្ប៉ាញ"
-
-#: conf/global_settings.py:48
-msgid "Argentinean Spanish"
-msgstr "ភាសាអេស្ប៉ាញ"
-
-#: conf/global_settings.py:49
-msgid "Finnish"
-msgstr "ភាសាហ្វាំងឡង់"
-
-#: conf/global_settings.py:50
-msgid "French"
-msgstr "ភាសាបារាំង"
-
-#: conf/global_settings.py:51
-msgid "Galician"
-msgstr "ភាសាហ្កែលិគ"
-
-#: conf/global_settings.py:52
-msgid "Hungarian"
-msgstr "ភាសាហុងគ្រី"
-
-#: conf/global_settings.py:53
-msgid "Hebrew"
-msgstr "ភាសាហេប្រិ"
-
-#: conf/global_settings.py:54
-msgid "Icelandic"
-msgstr "ភាសាអ៉ីស្លង់"
-
-#: conf/global_settings.py:55
-msgid "Italian"
-msgstr "ភាសាអ៊ីតាលី"
-
-#: conf/global_settings.py:56
-msgid "Japanese"
-msgstr "ភាសាជប៉ុន"
-
-#: conf/global_settings.py:57
-msgid "Dutch"
-msgstr "ភាសាហ្វាំងឡង់"
-
-#: conf/global_settings.py:58
-msgid "Norwegian"
-msgstr "ភាសាន័រវែស"
-
-#: conf/global_settings.py:59
-msgid "Brazilian"
-msgstr "ភាសាប្រេស៊ីល"
-
-#: conf/global_settings.py:60
-msgid "Romanian"
-msgstr "ភាសារូម៉ានី"
-
-#: conf/global_settings.py:61
-msgid "Russian"
-msgstr "ភាសាรัរូស្ស៉ី"
-
-#: conf/global_settings.py:62
-msgid "Slovak"
-msgstr "ភាសាស្លូវ៉ាគី"
-
-#: conf/global_settings.py:63
-msgid "Slovenian"
-msgstr "ភាសាស្លូវ៉ានី"
-
-#: conf/global_settings.py:64
-msgid "Serbian"
-msgstr ""
-
-#: conf/global_settings.py:65
-msgid "Swedish"
-msgstr "ភាសាស៊ុយអែដ"
-
-#: conf/global_settings.py:66
-msgid "Tamil"
-msgstr "ភាសាតាមីល"
-
-#: conf/global_settings.py:67
-msgid "Turkish"
-msgstr "ភាសាទួរគី"
-
-#: conf/global_settings.py:68
-msgid "Ukrainian"
-msgstr "ភាសាអ៊ុយក្រែន"
-
-#: conf/global_settings.py:69
-msgid "Simplified Chinese"
-msgstr "ភាសាចិនសាមញ្ញ"
-
-#: conf/global_settings.py:70
-msgid "Traditional Chinese"
-msgstr "ភាសាចិនបុរាណ"
-
-#: core/validators.py:63
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "ត្រូវបំពេញតែអក្សរឡាតាំង ចំនួនលេខ និង សញ្ញា _"
-
-#: core/validators.py:67
-msgid "This value must contain only letters, numbers, underscores, dashes or slashes."
-msgstr "ត្រូវបំពេញតែអក្សរឡាតាំង ចំនួនលេខ និង សញ្ញា _ សញ្ញា - ឬ សញ្ញា / ។"
-
-#: core/validators.py:71
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "ត្រូវបំពេញតែអក្សរឡាតាំង ចំនួនលេខ និង សញ្ញា _ សញ្ញា - ។"
-
-#: core/validators.py:75
-msgid "Uppercase letters are not allowed here."
-msgstr "មិនអនុញ្ញាតអោយសរសេរអក្សរធំ។"
-
-#: core/validators.py:79
-msgid "Lowercase letters are not allowed here."
-msgstr "មិនអនុញ្ញាតអោយសរសេរអក្សរតូច។"
-
-#: core/validators.py:86
-msgid "Enter only digits separated by commas."
-msgstr "បំពេញតែលេខហើយផ្តាច់ចេញពីគ្នាដោយសញ្ញាក្បៀស។"
-
-#: core/validators.py:98
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "បំពេញអ៊ីម៉ែលហើយផ្តាច់ចេញពីគ្នាដោយសញ្ញាក្បៀស។"
-
-#: core/validators.py:102
-msgid "Please enter a valid IP address."
-msgstr "សូមបំពេញអាស័យដ្ឋាន IP។"
-
-#: core/validators.py:106
-msgid "Empty values are not allowed here."
-msgstr "មិនអនុញ្ញាតអោយមានចំនួនទទេ។"
-
-#: core/validators.py:110
-msgid "Non-numeric characters aren't allowed here."
-msgstr "មិនអនុញ្ញាតអោយសរសេរអក្សរដែលមិនមែនជាលេខ។"
-
-#: core/validators.py:114
-msgid "This value can't be comprised solely of digits."
-msgstr "មិនអាចអនុញ្ញាតអោយមានតែចំនួនលេខ។"
-
-#: core/validators.py:119
-msgid "Enter a whole number."
-msgstr "បំពេញចំនួនទាំងអស់។"
-
-#: core/validators.py:123
-msgid "Only alphabetical characters are allowed here."
-msgstr "អនុញ្ញាតអោយសរសេរតែអក្សរឡាតាំង។"
-
-#: core/validators.py:138
-msgid "Year must be 1900 or later."
-msgstr "ត្រូវបំពេញឆ្នាំចាប់ពី ១៩០០។"
-
-#: core/validators.py:142
-#, python-format
-msgid "Invalid date: %s."
-msgstr "កាលបរិច្ឆេទមិនត្រឹមត្រូវ : %s។"
-
-#: core/validators.py:146
-#: db/models/fields/__init__.py:415
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "សូមបំពេញកាលបរិច្ឆេទក្នុងទំរង់ជា YYYY-MM-DD ។"
-
-#: core/validators.py:151
-msgid "Enter a valid time in HH:MM format."
-msgstr "សូមបំពេញពេលវេលាក្នុងទំរង់ជា HH:MM ។"
-
-#: core/validators.py:155
-#: db/models/fields/__init__.py:477
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "សូមបំពេញកាលបរិច្ឆេទក្នុងទំរង់ជា YYYY-MM-DD HH:MM ។"
-
-#: core/validators.py:160
-msgid "Enter a valid e-mail address."
-msgstr "សូមបំពេញអ៊ីមែល"
-
-#: core/validators.py:172
-#: core/validators.py:401
-#: forms/__init__.py:661
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "មិនមានឯកសារត្រូវបានជ្រើសរើស។ សូមពិនិត្យប្រភេទឯកសារម្តងទៀត។"
-
-#: core/validators.py:176
-msgid "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
-msgstr "រូបភាពដែលទាញយកមិនត្រឹមត្រូវ ប្រហែលជាមិនមែនជារូបភាព ឬក៏ជា រូបភាពខូច។"
-
-#: core/validators.py:183
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "URL រូបភាព %s មិនត្រឹមត្រូវ ។"
-
-#: core/validators.py:187
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "លេខទូរស័ព្ទត្រូវតែក្នុងទំរង់ជា XXX-XXX-XXXX ។ \"%s\" គឺមិនត្រឹមត្រូវទេ។"
-
-#: core/validators.py:195
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "URL ទៅកាន់វីដេអូ QuickTime %s មិនត្រឹមត្រូវ ។"
-
-#: core/validators.py:199
-msgid "A valid URL is required."
-msgstr "URL មិនត្រឹមត្រូវ។"
-
-#: core/validators.py:213
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"ចាំបាច់ HTML ដែលត្រឹមត្រូវ។ ខាងក្រោម​គឺ​ជាកំហុស​:\n"
-"%s"
-
-#: core/validators.py:220
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "XML មិនត្រឹមត្រូវ​: %s"
-
-#: core/validators.py:230
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "URL ដែលមិនត្រឹមត្រូវ: %s"
-
-#: core/validators.py:234
-#: core/validators.py:236
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "URL​ខូច: %s"
-
-#: core/validators.py:242
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "សូមបំពេញអក្សរកាត់រដ្ឋរបស់សហរដ្ឋអាមេរិកអោយបានត្រឹមត្រូវ។"
-
-#: core/validators.py:256
+#: views/generic/create_update.py:121
 #, fuzzy, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "ពាក្យ %s មិនអនុញ្ញាតអោយប្រើនៅទីនេះទេ។"
+msgid "The %(verbose_name)s was created successfully."
+msgstr "The %(verbose_name)s បានផ្លាស់ប្តូរដោយជោគជ័យ។"
 
-#: core/validators.py:263
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "ទិន្នន័យនៅកន្លែងនេះត្រូវតែដូច '%s'  ។"
-
-#: core/validators.py:282
-msgid "Please enter something for at least one field."
-msgstr "សូមបំពេញទិន្នន័យយ៉ាងតិចនៅមួយ​កន្លែង។"
-
-#: core/validators.py:291
-#: core/validators.py:302
-msgid "Please enter both fields or leave them both empty."
-msgstr "អាចបំពេញ ឬ មិនបំពេញ ទិន្នន័យនៅកន្លែងទាំងពីរនេះ។"
-
-#: core/validators.py:309
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "ទិន្នន័យកន្លែងនេះត្រូវបំពេញ​ប្រសិន​បើ %(field)s មានតំលៃ %(value)s"
-
-#: core/validators.py:321
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "ទិន្នន័យកន្លែងនេះត្រូវបំពេញ​ប្រសិន​បើ %(field)s មិនមានតំលៃ %(value)s"
-
-#: core/validators.py:340
-msgid "Duplicate values are not allowed."
-msgstr "មិនអនុញ្ញាតអោយមានតំលៃដូចគ្នា។"
-
-#: core/validators.py:363
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "ចំនួនត្រូវតែជាស្វ័យគុណរបស់ %s។"
-
-#: core/validators.py:374
-msgid "Please enter a valid decimal number."
-msgstr "សូមបំពេញចំនួនទសភាគអោយបានត្រឹមត្រូវ។"
-
-#: core/validators.py:378
-#, fuzzy, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "សូមបំពេញចំនួនទសភាគយ៉ាងតិច  %sខ្ទង់។"
-
-#: core/validators.py:381
-#, fuzzy, python-format
-msgid "Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "សូមបំពេញចំនួនទសភាគទាំងអស់  %sខ្ទង់។"
-
-#: core/validators.py:384
-#, fuzzy, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "សូមបំពេញចំនួនទសភាគយ៉ាងច្រើន  %sខ្ទង់។"
-
-#: core/validators.py:394
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "ឯកសារដែលទាញយកត្រូវមានទំហំយ៉ាងតិច %s បៃ។"
-
-#: core/validators.py:395
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "ឯកសារដែលទាញយកត្រូវមានទំហំអតិបរិមា %s បៃ។"
-
-#: core/validators.py:412
-msgid "The format for this field is wrong."
-msgstr "ទំរង់ទិន្នន័យនៅកន្លែងនេះមិនត្រឹមត្រូវ។"
-
-#: core/validators.py:427
-msgid "This field is invalid."
-msgstr "ទិន្នន័យកន្លែងនេះមិនត្រឹមត្រូវ។"
-
-#: core/validators.py:463
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "មិនអាចទាញយកពី  %s។"
-
-#: core/validators.py:466
-#, python-format
-msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr "ទទួលចំលើយ ​Content-Type header '%(contenttype)s' មិនត្រឹមត្រូវពី URL %(url)s ។"
-
-#: core/validators.py:499
-#, python-format
-msgid "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with \"%(start)s\".)"
-msgstr "សូមបិទ ថាក់(tag) ដែលមិនទាន់បិទ %(tag)s នៅបន្ទាត់ %(line)s ។ (បន្ទាត់ដែលចាប់ផ្តើមជាមួយ \"%(start)s\".)"
-
-#: core/validators.py:503
-#, python-format
-msgid "Some text starting on line %(line)s is not allowed in that context. (Line starts with \"%(start)s\".)"
-msgstr "ពាក្យមួយចំនួននៅបន្ទាត់ %(line)s មិនអនុញ្ញាតអោយប្រើទេ។ (បន្ទាត់ចាប់ផ្តើមជាមួយ \"%(start)s\"។)"
-
-#: core/validators.py:508
-#, python-format
-msgid "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%(start)s\".)"
-msgstr "\"%(attr)s\" on line %(line)s គឺជាគុណលក្ខណៈ(attribute) មិនត្រឹមត្រូវ។ (បន្ទាត់ចាប់ផ្តើមជាមួយ \"%(start)s\".)"
-
-#: core/validators.py:513
-#, python-format
-msgid "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%(start)s\".)"
-msgstr "\"<%(tag)s>\" ថាក់(tag)នៅបន្ទាត់ %(line)s គឺមិនត្រឹមត្រូវ។ (បន្ទាត់ចាប់ផ្តើមជាមួយ \"%(start)s\".)"
-
-#: core/validators.py:517
-#, python-format
-msgid "A tag on line %(line)s is missing one or more required attributes. (Line starts with \"%(start)s\".)"
-msgstr "ថាក់ (tag)​នៅបន្ទាត់ %(line)s បាត់គុណលក្ខណៈ មួយ ឬ ច្រើន។(បន្ទាត់ចាប់ផ្តើមជាមួយ \"%(start)s\".)"
-
-#: core/validators.py:522
-#, python-format
-msgid "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line starts with \"%(start)s\".)"
-msgstr "គុណលក្ខណៈ \"%(attr)s\" នៅបន្ទាត់ %(line)s ពុំមានតំលៃត្រឹមត្រូវទេ។ (បន្ទាត់ចាប់ផ្តើមជាមួយ \"%(start)s\".)"
-
-#: views/generic/create_update.py:43
-#: views/generic/create_update.py:117
+#: views/generic/create_update.py:164
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "The %(verbose_name)s បានផ្លាស់ប្តូរដោយជោគជ័យ។"
 
-#: views/generic/create_update.py:184
+#: views/generic/create_update.py:207
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "The %(verbose_name)s​ បានលប់។ "
-
-#: db/models/manipulators.py:302
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s ជាមួយនឹងប្រភេទ %(type)s នេះមានម្តងរួចហើយនៅជាមួយ %(field)s"
-
-#: db/models/fields/__init__.py:40
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s ជាមួយឈ្មោះ %(fieldname)s នេះមានរួចរាល់ហើយ។"
-
-#: db/models/fields/__init__.py:114
-#: db/models/fields/__init__.py:265
-#: db/models/fields/__init__.py:551
-#: db/models/fields/__init__.py:562
-#: forms/__init__.py:346
-msgid "This field is required."
-msgstr "ចាំបាច់បំពេញទិន្នន័យកន្លែងនេះ។"
-
-#: db/models/fields/__init__.py:340
-msgid "This value must be an integer."
-msgstr "តំលៃនេះត្រូវតែជាចំនួនលេខ។"
-
-#: db/models/fields/__init__.py:372
-msgid "This value must be either True or False."
-msgstr "តំលៃអាចជា True ឬ False។"
-
-#: db/models/fields/__init__.py:388
-msgid "This field cannot be null."
-msgstr "ចាំបាច់បំពេញទិន្នន័យកន្លែងនេះ។"
-
-#: db/models/fields/__init__.py:571
-msgid "Enter a valid filename."
-msgstr "សូមបំពេញឈ្មោះឯកសារអោយបានត្រឹមត្រូវ។"
-
-#: db/models/fields/related.py:51
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "សូមបំពេញ  %s អោយបានត្រឹមត្រូវ។"
-
-#: db/models/fields/related.py:618
-msgid "Separate multiple IDs with commas."
-msgstr "ផ្តាច់លេច ID ចេញពីគ្នាដោយក្បៀស។"
-
-#: db/models/fields/related.py:620
-msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "សូមចុចប៉ូតុន \"Control\", ឬ \"Command\" ចំពោះកុំព្យូទ័រ Mac, ដើម្បីជ្រើសរើសច្រើនជាងមួយ។"
-
-#: db/models/fields/related.py:664
-#, fuzzy, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "សូមបំពេញលេខ %(self)s អោយបានត្រឹមត្រូវ។ តំលៃ %(value)r នេះមិនត្រឹមត្រូវទេ។"
-
-#: forms/__init__.py:381
-#, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "អត្ថបទរបស់អ្នកតិចជាង %s អក្សរ។"
-
-msgid "Ensure this value has at most %d characters."
-msgstr "អត្ថបទរបស់អ្នកត្រូវតិចជាង %d អក្សរ។"
-
-#: newforms/fields.py:105
-#: newforms/fields.py:258
-#, python-format
-msgid "Ensure this value has at least %d characters."
-msgstr "អត្ថបទរបស់អ្នកត្រូវច្រើនជាង  %d អក្សរ។"
-
-#: forms/__init__.py:386
-msgid "Line breaks are not allowed here."
-msgstr "បន្ទាត់មិនអនុញ្ញាតនៅទីនេះទេ។"
-
-#: forms/__init__.py:487
-#: forms/__init__.py:560
-#: forms/__init__.py:599
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "សូមជ្រើសរើស ; '%(data)s' មិនមាននៅក្នុង %(choices)s"
-
-#: forms/__init__.py:663
-msgid "The submitted file is empty."
-msgstr "ពុំមានឯកសារ។​"
-
-#: forms/__init__.py:719
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "សូម​បំពេញ​លេខចន្លោះ​ពី​ -៣២.៧៦៧ និង ៣២.៧៦៧"
-
-#: forms/__init__.py:729
-msgid "Enter a positive number."
-msgstr "សូមបំពេញចំនួន​វិជ្ជមាន"
-
-#: forms/__init__.py:739
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "សូម​បំពេញ​លេខចន្លោះ​ពី​ ០ និង ៣២.៧៦៧"
-
-#: template/defaultfilters.py:401
-msgid "yes,no,maybe"
-msgstr "យល់ព្រម មិនយល់ព្រម​ ប្រហែល"
-
-msgid "Your username and password didn't match. Please try again."
-msgstr "ឈ្មោះជាសមាជិក និង ពាក្យ​សំងាត់​មិន​ត្រឹមត្រូវ។"
-
-msgid "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
-msgstr "អ៊ីមែល នេះ មិនមាន​នៅក្នុង​ទិន្នន័យ​របស់​យើង​ខ្ញុំ​ទេ។"
-
-msgid "5-30 alphanumeric characters or underscores."
-msgstr "ត្រូវបំពេញអក្សរឡាតាំង (អក្សរ លេខ ឬ សញ្ញា _) ចំនួនពី​៥​ ទៅ ៣០។"
-
-msgid "Must be 5-30 alphanumeric characters or underscores."
-msgstr "ត្រូចវបំពេញអក្សរឡាតាំង (អក្សរ លេខ ឬ សញ្ញា _) ចំនួនពី​៥​ ទៅ ៣០។"
-
-msgid "Confirm password"
-msgstr "បំពេញពាក្យសំងាត់ម្តងទៀត"
-
-msgid "Please make sure your passwords match."
-msgstr "ពាក្យសំងាត់មិនដូចគ្នា។"
-
-msgid "The username \"%s\" is already taken."
-msgstr "ឈ្មោះជាសមាជិក  \"%s\" ត្រូវបានគេយករួចហើយ។ សូមជ្រើសរើសឈ្មោះជាសមាជិកផ្សេងទៀត។"
-
-msgid "The email \"%s\" existed."
-msgstr "អ៊ីមែល  \"%s\" មានរួចហើយ។ សូមជ្រើសរើសអ៊ីមែលផ្សេងទៀត។"
-
-msgid "Audio"
-msgstr "ចំរៀង"
-
-msgid "Video id"
-msgstr "លេខ វីដេអូ"
-
-msgid "Video title"
-msgstr "ចំណងជើើង  វីដេអូ"
-
-msgid "Video length"
-msgstr "ទំហំ  វីដេអូ"
-
-msgid "Outside url"
-msgstr "គេហទំព័រ​ពីក្រៅ"
-
-msgid "Receive name"
-msgstr "ឈ្មោះ​អ្នក​ទទួល"
-
-msgid "Receive email"
-msgstr "អ៊ីមែល​របស់​​អ្នក​ទទួល"
-
-msgid "Message"
-msgstr "អត្ថបទ"
-
-msgid "Sending date"
-msgstr "បញ្ជូន​នៅ​ថ្ងៃ"
-
-msgid "Received date"
-msgstr "​ថ្ងៃ​ទទួល"
-
-msgid "Send as private message"
-msgstr "ជាអត្ថបទ​ផ្ទាល់​ខ្លួន​"
-
-msgid "Sent"
-msgstr "បានបញ្ជូន​"
-
-msgid "Question"
-msgstr "សំណួរ"
-
-msgid "Answer"
-msgstr "ចំលើយ​"
-
-msgid "Tags"
-msgstr "ប្រភេទ​"
-
-msgid "Business"
-msgstr "ពាណិជ្ជកម្ម"
-
-msgid "Beauty & Style"
-msgstr "សោភ័ណភាព និង ម៉ូត​"
-
-msgid "Education"
-msgstr "ការអប់រំ​"
-
-msgid "Environment"
-msgstr "បរិដ្ឋាន"
-
-msgid "Family & Relationships"
-msgstr "គ្រួសារ និង សេចក្តីស្នេហា"
-
-msgid "Food & Drink"
-msgstr "ម្ហូប និង ភេសជ្ជៈ"
-
-msgid "General"
-msgstr "ផ្សេងៗ"
-
-msgid "Games & Recreation"
-msgstr "កំសាន្ត និង ហ្គេម"
-
-msgid "Health"
-msgstr "សុខភាព"
-
-msgid "Pets"
-msgstr "សត្វ ចិញ្ជឹម"
-
-msgid "Politics & Government"
-msgstr "រដ្ឋាភិបាល និង នយោបាយ"
-
-msgid "Sports"
-msgstr "កីឡា"
-
-msgid "Technology"
-msgstr "បច្ចេកវិទ្សា"
-
-msgid "Travel"
-msgstr "ដំណើរកំសាន្ត"
-
-msgid "Source"
-msgstr "ដកស្រង់ចេញ"
-
-msgid "Left column"
-msgstr "ជួរទីមួយ"
-
-msgid "Right column"
-msgstr "ជួរទីពីរ"
-
-msgid "Start date"
-msgstr "ចាប់ផ្តើមនៅ"
-
-msgid "End date"
-msgstr "បញ្ជប់នៅ"
-

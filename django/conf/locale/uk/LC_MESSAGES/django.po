@@ -6,3900 +6,577 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-19 19:42+0200\n"
+"POT-Creation-Date: 2010-12-29 21:05+0100\n"
 "PO-Revision-Date: 2010-04-06 00:02+0300\n"
 "Last-Translator: Mykola Zamkovoy <nickzam@gmail.com>\n"
 "Language-Team: UK <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: .\conf\global_settings.py:44
+#: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "Арабська"
 
-#: .\conf\global_settings.py:45
-msgid "Bengali"
-msgstr "Бенгальська"
-
-#: .\conf\global_settings.py:46
+#: conf/global_settings.py:45
 msgid "Bulgarian"
 msgstr "Болгарська"
 
-#: .\conf\global_settings.py:47
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "Бенгальська"
+
+#: conf/global_settings.py:47
+#, fuzzy
+msgid "Bosnian"
+msgstr "Румунська"
+
+#: conf/global_settings.py:48
 msgid "Catalan"
 msgstr "Каталонська"
 
-#: .\conf\global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Czech"
 msgstr "Чеська"
 
-#: .\conf\global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Welsh"
 msgstr "Валлійська"
 
-#: .\conf\global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Danish"
 msgstr "Датська"
 
-#: .\conf\global_settings.py:51
+#: conf/global_settings.py:52
 msgid "German"
 msgstr "Німецька"
 
-#: .\conf\global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Greek"
 msgstr "Грецька"
 
-#: .\conf\global_settings.py:53
+#: conf/global_settings.py:54
 msgid "English"
 msgstr "Англійська"
 
-#: .\conf\global_settings.py:54
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "British English"
+msgstr "Англійська"
+
+#: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "Іспанська"
 
-#: .\conf\global_settings.py:55
+#: conf/global_settings.py:57
+#, fuzzy
+msgid "Argentinian Spanish"
+msgstr "Аргентинська іспанська"
 
+#: conf/global_settings.py:58
 msgid "Estonian"
 msgstr "Румунська"
 
-#: .\conf\global_settings.py:56
-msgid "Argentinean Spanish"
-msgstr "Аргентинська іспанська"
-
-#: .\conf\global_settings.py:57
+#: conf/global_settings.py:59
 msgid "Basque"
 msgstr "Баскський"
 
-#: .\conf\global_settings.py:58
+#: conf/global_settings.py:60
 msgid "Persian"
 msgstr "Перська"
 
-#: .\conf\global_settings.py:59
+#: conf/global_settings.py:61
 msgid "Finnish"
 msgstr "Фінська"
 
-#: .\conf\global_settings.py:60
+#: conf/global_settings.py:62
 msgid "French"
 msgstr "Французька"
 
-#: .\conf\global_settings.py:61
+#: conf/global_settings.py:63
+#, fuzzy
+msgid "Frisian"
+msgstr "Фризляндія"
+
+#: conf/global_settings.py:64
 msgid "Irish"
 msgstr "Ірландська"
 
-#: .\conf\global_settings.py:62
+#: conf/global_settings.py:65
 msgid "Galician"
 msgstr "Галіційська"
 
-#: .\conf\global_settings.py:63
-msgid "Hungarian"
-msgstr "Угорська"
-
-#: .\conf\global_settings.py:64
+#: conf/global_settings.py:66
 msgid "Hebrew"
 msgstr "Іврит"
 
-#: .\conf\global_settings.py:65
+#: conf/global_settings.py:67
 msgid "Hindi"
 msgstr "Хінді"
 
-#: .\conf\global_settings.py:66
+#: conf/global_settings.py:68
 msgid "Croatian"
 msgstr "Хорватська"
 
-#: .\conf\global_settings.py:67
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr "Угорська"
+
+#: conf/global_settings.py:70
+#, fuzzy
+msgid "Indonesian"
+msgstr "Македонська"
+
+#: conf/global_settings.py:71
 msgid "Icelandic"
 msgstr "Ісландська"
 
-#: .\conf\global_settings.py:68
+#: conf/global_settings.py:72
 msgid "Italian"
 msgstr "Італійська"
 
-#: .\conf\global_settings.py:69
+#: conf/global_settings.py:73
 msgid "Japanese"
 msgstr "Японська"
 
-#: .\conf\global_settings.py:70
+#: conf/global_settings.py:74
 msgid "Georgian"
 msgstr "Грузинська"
 
-#: .\conf\global_settings.py:71
-msgid "Korean"
-msgstr "Корейська"
-
-#: .\conf\global_settings.py:72
+#: conf/global_settings.py:75
 msgid "Khmer"
 msgstr "Кхмерська"
 
-#: .\conf\global_settings.py:73
+#: conf/global_settings.py:76
 msgid "Kannada"
 msgstr "Канадська"
 
-#: .\conf\global_settings.py:74
-msgid "Latvian"
-msgstr "Латвійська"
+#: conf/global_settings.py:77
+msgid "Korean"
+msgstr "Корейська"
 
-#: .\conf\global_settings.py:75
+#: conf/global_settings.py:78
 msgid "Lithuanian"
 msgstr "Литовська"
 
-#: .\conf\global_settings.py:76
+#: conf/global_settings.py:79
+msgid "Latvian"
+msgstr "Латвійська"
+
+#: conf/global_settings.py:80
 msgid "Macedonian"
 msgstr "Македонська"
 
-#: .\conf\global_settings.py:77
+#: conf/global_settings.py:81
+#, fuzzy
+msgid "Malayalam"
+msgstr "Малага"
+
+#: conf/global_settings.py:82
+#, fuzzy
+msgid "Mongolian"
+msgstr "Македонська"
+
+#: conf/global_settings.py:83
 msgid "Dutch"
 msgstr "Голландська"
 
-#: .\conf\global_settings.py:78
+#: conf/global_settings.py:84
 msgid "Norwegian"
 msgstr "Норвезька"
 
-#: .\conf\global_settings.py:79
+#: conf/global_settings.py:85
+#, fuzzy
+msgid "Norwegian Bokmal"
+msgstr "Норвезька"
+
+#: conf/global_settings.py:86
+#, fuzzy
+msgid "Norwegian Nynorsk"
+msgstr "Норвезька"
+
+#: conf/global_settings.py:87
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Polish"
 msgstr "Польська"
 
-#: .\conf\global_settings.py:80
+#: conf/global_settings.py:89
 msgid "Portuguese"
 msgstr "Португальська"
 
-#: .\conf\global_settings.py:81
+#: conf/global_settings.py:90
 msgid "Brazilian Portuguese"
 msgstr "Бразильска"
 
-#: .\conf\global_settings.py:82
+#: conf/global_settings.py:91
 msgid "Romanian"
 msgstr "Румунська"
 
-#: .\conf\global_settings.py:83
+#: conf/global_settings.py:92
 msgid "Russian"
 msgstr "Російська"
 
-#: .\conf\global_settings.py:84
+#: conf/global_settings.py:93
 msgid "Slovak"
 msgstr "Словацька"
 
-#: .\conf\global_settings.py:85
+#: conf/global_settings.py:94
 msgid "Slovenian"
 msgstr "Словенська"
 
-#: .\conf\global_settings.py:86
+#: conf/global_settings.py:95
+#, fuzzy
+msgid "Albanian"
+msgstr "Аліканте"
+
+#: conf/global_settings.py:96
 msgid "Serbian"
 msgstr "Сербська"
 
-#: .\conf\global_settings.py:87
+#: conf/global_settings.py:97
+#, fuzzy
+msgid "Serbian Latin"
+msgstr "Сербська"
+
+#: conf/global_settings.py:98
 msgid "Swedish"
 msgstr "Шведська"
 
-#: .\conf\global_settings.py:88
+#: conf/global_settings.py:99
 msgid "Tamil"
 msgstr "Тамільська"
 
-#: .\conf\global_settings.py:89
+#: conf/global_settings.py:100
 msgid "Telugu"
 msgstr "Телугу"
 
-#: .\conf\global_settings.py:90
+#: conf/global_settings.py:101
 msgid "Thai"
 msgstr "Тайська"
 
-#: .\conf\global_settings.py:91
+#: conf/global_settings.py:102
 msgid "Turkish"
 msgstr "Турецька"
 
-#: .\conf\global_settings.py:92
-
+#: conf/global_settings.py:103
 msgid "Ukrainian"
 msgstr "Українська"
 
-#: .\conf\global_settings.py:93
+#: conf/global_settings.py:104
+#, fuzzy
+msgid "Vietnamese"
+msgstr "Відень"
+
+#: conf/global_settings.py:105
 msgid "Simplified Chinese"
 msgstr "Китайська спрощена"
 
-#: .\conf\global_settings.py:94
+#: conf/global_settings.py:106
 msgid "Traditional Chinese"
 msgstr "Китайська традиційна"
 
-#: .\contrib\admin\filterspecs.py:44
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>За %s:</h3>\n"
-"<ul>\n"
-
-#: .\contrib\admin\filterspecs.py:74 .\contrib\admin\filterspecs.py:91
-#: .\contrib\admin\filterspecs.py:146 .\contrib\admin\filterspecs.py:172
-msgid "All"
-msgstr "Всі"
-
-#: .\contrib\admin\filterspecs.py:112
-msgid "Any date"
-msgstr "Будь-яка дата"
-
-#: .\contrib\admin\filterspecs.py:113
-msgid "Today"
-msgstr "Сьогодні"
-
-#: .\contrib\admin\filterspecs.py:116
-msgid "Past 7 days"
-msgstr "Останні 7 днів"
-
-#: .\contrib\admin\filterspecs.py:118
-msgid "This month"
-msgstr "Цього місяця"
-
-#: .\contrib\admin\filterspecs.py:120
-msgid "This year"
-msgstr "Цього року"
-
-#: .\contrib\admin\filterspecs.py:146 .\forms\widgets.py:390
-#: .\newforms\widgets.py:361 .\oldforms\__init__.py:588
-msgid "Yes"
-msgstr "Так"
-
-#: .\contrib\admin\filterspecs.py:146 .\forms\widgets.py:390
-#: .\newforms\widgets.py:361 .\oldforms\__init__.py:588
-msgid "No"
-msgstr "Ні"
-
-#: .\contrib\admin\filterspecs.py:153 .\forms\widgets.py:390
-#: .\newforms\widgets.py:361 .\oldforms\__init__.py:588
-msgid "Unknown"
-msgstr "Невідомо"
-
-#: .\contrib\admin\models.py:19
-msgid "action time"
-msgstr "час дії"
-
-#: .\contrib\admin\models.py:22
-msgid "object id"
-msgstr "id об'єкту"
-
-#: .\contrib\admin\models.py:23
-msgid "object repr"
-msgstr "представлення об'єкту(repr)"
-
-#: .\contrib\admin\models.py:24
-msgid "action flag"
-msgstr "прапор дії"
-
-#: .\contrib\admin\models.py:25
-msgid "change message"
-msgstr "змінити повідомлення"
-
-#: .\contrib\admin\models.py:28
-msgid "log entry"
-msgstr "реєстрування записів"
-
-#: .\contrib\admin\models.py:29
-msgid "log entries"
-msgstr "реєстрування записів"
-
-#: .\contrib\admin\options.py:60 .\contrib\admin\options.py:121
-
-msgid "None"
-msgstr "Ніщо"
-
-#: .\contrib\admin\options.py:338
-#, python-format
-msgid "Changed %s."
-msgstr "Змінено %s."
-
-#: .\contrib\admin\options.py:338 .\contrib\admin\options.py:348
-#: .\contrib\comments\templates\comments\preview.html.py:15
-#: .\core\validators.py:279 .\db\models\manipulators.py:305
-#: .\forms\models.py:288
-msgid "and"
-msgstr "та"
-
-#: .\contrib\admin\options.py:343
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Додано %(name)s \"%(object)s\"."
-
-#: .\contrib\admin\options.py:347
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Змінено %(list)s для %(name)s \"%(object)s\"."
-
-#: .\contrib\admin\options.py:352
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Видалено %(name)s \"%(object)s\"."
-
-#: .\contrib\admin\options.py:356
-msgid "No fields changed."
-msgstr "Поля не змінені."
-
-#: .\contrib\admin\options.py:417 .\contrib\admin\views\auth.py:20
-#: .\contrib\auth\admin.py:51
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" було додано успішно."
-
-#: .\contrib\admin\options.py:421 .\contrib\admin\options.py:454
-#: .\contrib\admin\views\auth.py:25 .\contrib\auth\admin.py:59
-msgid "You may edit it again below."
-msgstr "Ви можете редагувати це знову внизу."
-
-#: .\contrib\admin\options.py:431 .\contrib\admin\options.py:464
-#, python-format
-msgid "You may add another %s below."
-msgstr "Ви можете додати інший %s внизу."
-
-#: .\contrib\admin\options.py:452
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" був успішно змінений."
-
-#: .\contrib\admin\options.py:460
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"%(name)s \"%(obj)s\"  був успішно доданий. Ви модете редагувати його знову "
-"внизу."
-
-#: .\contrib\admin\options.py:528
-#, python-format
-msgid "Add %s"
-msgstr "Додати %s"
-
-#: .\contrib\admin\options.py:559 .\contrib\admin\options.py:673
-#, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s об'єкт з первинним ключем %(key)r не існує."
-
-#: .\contrib\admin\options.py:606
-#, python-format
-msgid "Change %s"
-msgstr "Змінити %s"
-
-#: .\contrib\admin\options.py:638
-msgid "Database error"
-msgstr "Помилка бази даних"
-
-#: .\contrib\admin\options.py:688
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" був видалений успішно."
-
-#: .\contrib\admin\options.py:695
-msgid "Are you sure?"
-msgstr "Ви впевнені?"
-
-#: .\contrib\admin\options.py:724
-#, python-format
-msgid "Change history: %s"
-msgstr "Історія змін: %s"
-
-#: .\contrib\admin\sites.py:16 .\contrib\admin\views\decorators.py:14
-#: .\contrib\auth\forms.py:80
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-"Будь-ласка введіть правильне ім'я та пароль. Зауважте, що обидва поля "
-"розрізняють великі і маленькі літери."
-
-#: .\contrib\admin\sites.py:226 .\contrib\admin\views\decorators.py:40
-
-msgid "Please log in again, because your session has expired."
-msgstr ""
-"Будь ласка, увійдіть знову, ваша сесія закінчилася. Не хвилюйтесь: все, що "
-"ви додавали збережено."
-
-#: .\contrib\admin\sites.py:233 .\contrib\admin\views\decorators.py:47
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Здається ваш броузер не сконфігурований приймати cookies. Будь ласка, "
-"увімкніть cookies, перезавантажте цю сторінку і спробуйте знову"
-
-#: .\contrib\admin\sites.py:249 .\contrib\admin\sites.py:255
-#: .\contrib\admin\views\decorators.py:66
-msgid "Usernames cannot contain the '@' character."
-msgstr "Ім'я користувача не може містити символ '@'."
-
-#: .\contrib\admin\sites.py:252 .\contrib\admin\views\decorators.py:62
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"Ваша e-mail адреса не є вашим ім'ям користувача. Замість спробуйте '%s'"
-
-#: .\contrib\admin\sites.py:312
-msgid "Site administration"
-msgstr "Адміністрування сайта"
-
-#: .\contrib\admin\sites.py:325
-#: .\contrib\admin\templates\admin\login.html.py:26
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:14
-#: .\contrib\admin\views\decorators.py:20
-msgid "Log in"
-msgstr "Увійти"
-
-#: .\contrib\admin\sites.py:372
-#, python-format
-msgid "%s administration"
-msgstr "Адміністрування %s"
-
-#: .\contrib\admin\util.py:138
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Одне або більше %(fieldname)s у %(name)s: %(obj)s"
-
-#: .\contrib\admin\util.py:143
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Одне або більше %(fieldname)s у %(name)s:"
-
-#: .\contrib\admin\widgets.py:70
-#: .\contrib\admin\templates\widget\date_time.html.py:3
-msgid "Date:"
-msgstr "Дата:"
-
-#: .\contrib\admin\widgets.py:70
-#: .\contrib\admin\templates\widget\date_time.html.py:4
-msgid "Time:"
-msgstr "Час:"
-
-#: .\contrib\admin\widgets.py:94
-#: .\contrib\admin\templates\widget\file.html.py:2
-msgid "Currently:"
-msgstr "Зараз:"
-
-#: .\contrib\admin\widgets.py:94
-#: .\contrib\admin\templates\widget\file.html.py:3
-msgid "Change:"
-msgstr "Змінити:"
-
-#: .\contrib\admin\widgets.py:123
-
-msgid "Lookup"
-msgstr "Вийти"
-
-#: .\contrib\admin\widgets.py:230
-msgid "Add Another"
-msgstr "Додати інше"
-
-#: .\contrib\admin\templates\admin\404.html.py:4
-#: .\contrib\admin\templates\admin\404.html.py:8
-msgid "Page not found"
-msgstr "Сторінка не знайдена"
-
-#: .\contrib\admin\templates\admin\404.html.py:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Ми шкодуємо, але сторінка яку ви запросили, не знайдена."
-
-#: .\contrib\admin\templates\admin\500.html.py:4
-#: .\contrib\admin\templates\admin\app_index.html.py:8
-#: .\contrib\admin\templates\admin\base.html.py:33
-#: .\contrib\admin\templates\admin\change_form.html.py:17
-#: .\contrib\admin\templates\admin\change_list.html.py:8
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:6
-#: .\contrib\admin\templates\admin\invalid_setup.html.py:4
-#: .\contrib\admin\templates\admin\object_history.html.py:6
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:10
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
-#: .\contrib\admin\templates\registration\logged_out.html.py:4
-#: .\contrib\admin\templates\registration\password_change_done.html.py:4
-#: .\contrib\admin\templates\registration\password_change_form.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:4
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:3
-msgid "Home"
-msgstr "Домівка"
-
-#: .\contrib\admin\templates\admin\500.html.py:4
-msgid "Server error"
-msgstr "Помилка сервера"
-
-#: .\contrib\admin\templates\admin\500.html.py:6
-msgid "Server error (500)"
-msgstr "Помилка сервера (500)"
-
-#: .\contrib\admin\templates\admin\500.html.py:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Помилка сервера <em>(500)</em>"
-
-#: .\contrib\admin\templates\admin\500.html.py:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Виникла помилка. Про неї було повідомлено адміністраторам сайту e-mail'ом і "
-"вона повинна бути незабаром виправлена. Дякуємо за ваше терпіння."
-
-#: .\contrib\admin\templates\admin\app_index.html.py:10
-#: .\contrib\admin\templates\admin\index.html.py:19
-msgid "%(name)s"
-msgstr "Додати %(name)s"
-
-#: .\contrib\admin\templates\admin\base.html.py:28
-msgid "Welcome,"
-msgstr "Вітаємо,"
-
-#: .\contrib\admin\templates\admin\base.html.py:28
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
-#: .\contrib\admin\templates\registration\password_change_done.html.py:3
-#: .\contrib\admin\templates\registration\password_change_form.html.py:3
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:3
-msgid "Documentation"
-msgstr "Документація"
-
-#: .\contrib\admin\templates\admin\base.html.py:28
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:13
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:46
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:4
-#: .\contrib\admin\templates\admin_doc\missing_docutils.html.py:4
-#: .\contrib\admin\templates\admin_doc\model_index.html.py:5
-#: .\contrib\admin\templates\admin_doc\template_detail.html.py:4
-#: .\contrib\admin\templates\admin_doc\template_filter_index.html.py:5
-#: .\contrib\admin\templates\admin_doc\template_tag_index.html.py:5
-#: .\contrib\admin\templates\admin_doc\view_detail.html.py:4
-#: .\contrib\admin\templates\registration\password_change_done.html.py:3
-#: .\contrib\admin\templates\registration\password_change_form.html.py:3
-msgid "Change password"
-msgstr "Змінити пароль"
-
-#: .\contrib\admin\templates\admin\base.html.py:28
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:4
-#: .\contrib\admin\templates\admin_doc\missing_docutils.html.py:4
-#: .\contrib\admin\templates\admin_doc\model_index.html.py:5
-#: .\contrib\admin\templates\admin_doc\template_detail.html.py:4
-#: .\contrib\admin\templates\admin_doc\template_filter_index.html.py:5
-#: .\contrib\admin\templates\admin_doc\template_tag_index.html.py:5
-#: .\contrib\admin\templates\admin_doc\view_detail.html.py:4
-#: .\contrib\admin\templates\registration\password_change_done.html.py:3
-#: .\contrib\admin\templates\registration\password_change_form.html.py:3
-msgid "Log out"
-msgstr "Вийти"
-
-#: .\contrib\admin\templates\admin\base_site.html.py:4
-msgid "Django site admin"
-msgstr "Django сайт адміністрування"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:20
-#: .\contrib\admin\templates\admin\index.html.py:29
-msgid "Add"
-msgstr "Додати"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:27
-#: .\contrib\admin\templates\admin\object_history.html.py:10
-msgid "History"
-msgstr "Історія"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:28
-#: .\contrib\admin\templates\admin\edit_inline\stacked.html.py:13
-#: .\contrib\admin\templates\admin\edit_inline\tabular.html.py:27
-msgid "View on site"
-msgstr "Дивитися на сайті"
-
-#: .\contrib\admin\templates\admin\change_form.html.py:38
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:22
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Будь ласка, виправте помилку, що зазначена нижче"
-msgstr[1] "Будь ласка, виправте помилки, що зазначені нижче"
-msgstr[2] "Будь ласка, виправте помилки, що зазначені нижче"
-
-#: .\contrib\admin\templates\admin\change_list.html.py:16
-#, python-format
-msgid "Add %(name)s"
-msgstr "Додати %(name)s"
-
-#: .\contrib\admin\templates\admin\change_list.html.py:26
-#: .\contrib\admin\templates\admin\filters.html.py:4
-msgid "Filter"
-msgstr "Відфільтрувати"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:10
-#: .\contrib\admin\templates\admin\submit_line.html.py:4
-#: .\forms\formsets.py:246
-msgid "Delete"
-msgstr "Видалити"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:16
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr ""
-"Видалення %(object_name)s '%(escaped_object)s' призведе до видалення пов'язаних "
-"об'єктів, але ваш реєстраційний запис не має дозволу видаляти наступні типи "
-"об'єктів:"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:23
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr ""
-"Ви впевнені що хочете видалити %(object_name)s \"%(escaped_object)s\"? Всі пов'язані "
-"записи, що перелічені, будуть видалені:"
-
-#: .\contrib\admin\templates\admin\delete_confirmation.html.py:28
-msgid "Yes, I'm sure"
-msgstr "Так, я впевнений"
-
-#: .\contrib\admin\templates\admin\filter.html.py:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr "За %(filter_title)s"
-
-#: .\contrib\admin\templates\admin\index.html.py:18
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Моделі, що є в наявності у прикладній системі %(name)s."
-
-#: .\contrib\admin\templates\admin\index.html.py:35
-msgid "Change"
-msgstr "Змінити"
-
-#: .\contrib\admin\templates\admin\index.html.py:45
-msgid "You don't have permission to edit anything."
-msgstr "У вас немає дозволу редагувати будь-що."
-
-#: .\contrib\admin\templates\admin\index.html.py:53
-msgid "Recent Actions"
-msgstr "Недавні дії"
-
-#: .\contrib\admin\templates\admin\index.html.py:54
-msgid "My Actions"
-msgstr "Мої дії"
-
-#: .\contrib\admin\templates\admin\index.html.py:58
-msgid "None available"
-msgstr "Немає"
-
-#: .\contrib\admin\templates\admin\invalid_setup.html.py:7
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-"Щось не так з інсталяцією бази даних. Перевірте, що таблиці бази даних "
-"створено і база даних може бути прочитана відповідним користувачем."
-
-#: .\contrib\admin\templates\admin\login.html.py:19
-msgid "Username:"
-msgstr "Користувач:"
-
-#: .\contrib\admin\templates\admin\login.html.py:22
-msgid "Password:"
-msgstr "Пароль:"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:22
-msgid "Date/time"
-msgstr "Дата/час"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:23
-msgid "User"
-msgstr "Користувач"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:24
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:33
-msgid "Action"
-msgstr "Дія"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:30
-#: .\utils\translation\trans_real.py:404
-msgid "DATETIME_FORMAT"
-msgstr "d.m.Y H:i"
-
-#: .\contrib\admin\templates\admin\object_history.html.py:38
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Цей об'єкт не має історії змін. Напевно, він був доданий не через цей сайт "
-"адміністрування."
-
-#: .\contrib\admin\templates\admin\pagination.html.py:10
-msgid "Show all"
-msgstr "Показати всі"
-
-#: .\contrib\admin\templates\admin\search_form.html.py:8
-msgid "Go"
-msgstr "Уперед"
-
-#: .\contrib\admin\templates\admin\search_form.html.py:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "%(counter)s результат"
-msgstr[1] "%(counter)s результати"
-msgstr[2] "%(counter)s результатів"
-
-#: .\contrib\admin\templates\admin\search_form.html.py:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s всього"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:3
-msgid "Save"
-msgstr "Зберегти"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:5
-msgid "Save as new"
-msgstr "Зберегти як нове"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:6
-msgid "Save and add another"
-msgstr "Зберегти і додати інше"
-
-#: .\contrib\admin\templates\admin\submit_line.html.py:7
-msgid "Save and continue editing"
-msgstr "Зберегти і продовжити редагування"
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr ""
-"Спочатку, введіть ім'я користувача і пароль. Потім ви зможете редагувати "
-"більше опцій користувача."
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:13
-#: .\contrib\auth\forms.py:14 .\contrib\auth\forms.py:47
-#: .\contrib\auth\forms.py:59
-msgid "Username"
-msgstr "Користувач:"
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:20
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:33
-#: .\contrib\auth\forms.py:17 .\contrib\auth\forms.py:60
-#: .\contrib\auth\forms.py:184
-msgid "Password"
-msgstr "Пароль:"
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:26
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:39
-#: .\contrib\auth\forms.py:185
-msgid "Password (again)"
-msgstr "Зміна пароля"
-
-#: .\contrib\admin\templates\admin\auth\user\add_form.html.py:27
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:40
-msgid "Enter the same password as above, for verification."
-msgstr "Повторіть пароль для перевірки."
-
-#: .\contrib\admin\templates\admin\auth\user\change_password.html.py:26
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Введіть новий пароль для користувача <strong>%(username)s</strong>."
-
-#: .\contrib\admin\templates\admin\edit_inline\tabular.html.py:15
-msgid "Delete?"
-msgstr "Видалити"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:3
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:3
-msgid "Bookmarklets"
-msgstr "Інтерактивні закладки"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:5
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:4
-msgid "Documentation bookmarklets"
-msgstr "Інтерактивні закладки документації"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:9
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:8
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\">Щоб встановити інтерактивні закладки, перетягніть лінк до\n"
-"тулбару закладок, або клікніть правою кнопкою миші та додайте у\n"
-"свої закладки. Тепер ви можете обрати інтерактивні закладки з будь-якої\n"
-"сторінки сайту. Зауважте, що деякі з цих інтерактивних закладок на сайті\n"
-"можуть переглядатися тільки з комп'ютера, що є в одній внутрішній мережі з \n"
-"даним сайтом (запитайте у вашого системного адміністратора, якщо ви не "
-"впевнені,\n"
-"що сайт і ваш комп'ютер є в одній внутрішній мережі).</p>\n"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:19
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:18
-msgid "Documentation for this page"
-msgstr "Документація для цієї сторінки"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:20
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:19
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr ""
-"Перекидає вас з будь-якої сторінки в документацію для функції, що "
-"сгенерувала цю сторінку."
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:22
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:21
-msgid "Show object ID"
-msgstr "Показати ID об'єкту"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:23
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:22
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Показує content-type та унікальний ID для сторінок, які являють собою єдиний "
-"об'єкт."
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:25
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:24
-msgid "Edit this object (current window)"
-msgstr "Редагувати цей об'єкт (поточне вікно)"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:26
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:25
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Перекидає до адміністраторської сторінки для сторінок, що "
-"відображають окремий об'єкт."
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:28
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:27
-msgid "Edit this object (new window)"
-msgstr "Редагувати цей об'єкт (нове вікно)"
-
-#: .\contrib\admin\templates\admin_doc\bookmarklets.html.py:29
-#: .\contrib\admindocs\templates\admin_doc\bookmarklets.html.py:28
-msgid "As above, but opens the admin page in a new window."
-msgstr "Як і вище, але відкриває сторінку адміністрування у новому вікні."
-
-#: .\contrib\admin\templates\registration\logged_out.html.py:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Дякуємо за час, проведений сьогодні на сайті."
-
-#: .\contrib\admin\templates\registration\logged_out.html.py:10
-msgid "Log in again"
-msgstr "Увійти знову"
-
-#: .\contrib\admin\templates\registration\password_change_done.html.py:4
-#: .\contrib\admin\templates\registration\password_change_form.html.py:4
-#: .\contrib\admin\templates\registration\password_change_form.html.py:6
-#: .\contrib\admin\templates\registration\password_change_form.html.py:10
-msgid "Password change"
-msgstr "Зміна паролю"
-
-#: .\contrib\admin\templates\registration\password_change_done.html.py:6
-#: .\contrib\admin\templates\registration\password_change_done.html.py:10
-msgid "Password change successful"
-msgstr "Зміна паролю успішна"
-
-#: .\contrib\admin\templates\registration\password_change_done.html.py:12
-msgid "Your password was changed."
-msgstr "Ваш пароль було змінено."
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Будь ласка введіть ваш старий пароль, задля безпеки, потім введіть ваш новий "
-"пароль двічі, щоб ми могли перевірити, що ви ввели його правильно"
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:17
-msgid "Old password:"
-msgstr "Старий пароль:"
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:19
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:18
-msgid "New password:"
-msgstr "Новий пароль:"
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:21
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:20
-msgid "Confirm password:"
-msgstr "Підтвердіть пароль:"
-
-#: .\contrib\admin\templates\registration\password_change_form.html.py:23
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:21
-msgid "Change my password"
-msgstr "Змінити мій пароль"
-
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:4
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:10
-msgid "Password reset"
-msgstr "Перевстановлення паролю"
-
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:10
-msgid "Password reset complete"
-msgstr "Пароль перевстановлено"
-
-#: .\contrib\admin\templates\registration\password_reset_complete.html.py:12
-msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Пароль встановлено. Ви можете увійти зараз."
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:4
-
-msgid "Password reset confirmation"
-msgstr "Підтвердження перевстановлення паролю"
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:12
-
-msgid "Enter new password"
-msgstr "Новий пароль:"
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:14
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
-msgstr ""
-"Будь ласка, введіть ваш старий пароль, задля безпеки, потім введіть ваш "
-"новий пароль двічі, щоб ми могли перевірити, що ви ввели його правильно"
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:26
-msgid "Password reset unsuccessful"
-msgstr "Пароль не перевстановлено"
-
-#: .\contrib\admin\templates\registration\password_reset_confirm.html.py:28
-msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a new password reset."
-msgstr ""
-"Посилання на перевстановлення паролю було помилковим. Можливо тому, що воно "
-"було вже використано. Будь ласка, замовте нове перевстановлення паролю."
-
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:6
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:10
-msgid "Password reset successful"
-msgstr "Пароль перевстановлено успішно"
-
-#: .\contrib\admin\templates\registration\password_reset_done.html.py:12
-msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
-"address you submitted. You should be receiving it shortly."
-msgstr ""
-"Ми надіслали інструкції по встановленню нового паролю поштою на адресу, яку "
-"ви вказали. Незабаром ви повинні його отримати."
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Ви отримали цього листа, тому що замовили перевстановлення паролю"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "для вашого рахунку користувача на сайті %(site_name)s"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:5
-msgid "Please go to the following page and choose a new password:"
-msgstr "Будь ласка, перейдіть на цю сторінку, та оберіть новий пароль:"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:9
-msgid "Your username, in case you've forgotten:"
-msgstr "У разі, якщо ви забули, ваше ім'я користувача:"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:11
-msgid "Thanks for using our site!"
-msgstr "Дякуємо за користування нашим сайтом!"
-
-#: .\contrib\admin\templates\registration\password_reset_email.html.py:13
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "Команда сайту %(site_name)s "
-
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
-"instructions for setting a new one."
-msgstr ""
-"Забули свій пароль? Введіть свою e-mail адресу і ми надішлемо інструкції для "
-"встановлення нового паролю по e-mail."
-
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:16
-msgid "E-mail address:"
-msgstr "E-mail адреса:"
-
-#: .\contrib\admin\templates\registration\password_reset_form.html.py:16
-msgid "Reset my password"
-msgstr "Перевстановіть мій пароль"
-
-#: .\contrib\admin\templatetags\admin_list.py:284
-msgid "All dates"
-msgstr "Всі дати"
-
-#: .\contrib\admin\views\auth.py:31 .\contrib\auth\admin.py:64
-
-msgid "Add user"
-msgstr "Додати користувача"
-
-#: .\contrib\admin\views\auth.py:58 .\contrib\auth\admin.py:90
-
-msgid "Password changed successfully."
-msgstr "Зміна паролю успішна"
-
-#: .\contrib\admin\views\auth.py:65 .\contrib\auth\admin.py:96
-
-msgid "Change password: %s"
-msgstr "Змінити пароль: %s"
-
-#: .\contrib\admin\views\doc.py:48 .\contrib\admin\views\doc.py:50
-#: .\contrib\admin\views\doc.py:52 .\contrib\admindocs\views.py:57
-#: .\contrib\admindocs\views.py:59 .\contrib\admindocs\views.py:61
-msgid "tag:"
-msgstr "тег:"
-
-#: .\contrib\admin\views\doc.py:79 .\contrib\admin\views\doc.py:81
-#: .\contrib\admin\views\doc.py:83 .\contrib\admindocs\views.py:90
-#: .\contrib\admindocs\views.py:92 .\contrib\admindocs\views.py:94
-msgid "filter:"
-msgstr "відфільтрувати:"
-
-#: .\contrib\admin\views\doc.py:137 .\contrib\admin\views\doc.py:139
-#: .\contrib\admin\views\doc.py:141 .\contrib\admindocs\views.py:154
-#: .\contrib\admindocs\views.py:156 .\contrib\admindocs\views.py:158
-msgid "view:"
-msgstr "переглянути:"
-
-#: .\contrib\admin\views\doc.py:166 .\contrib\admindocs\views.py:186
-
-msgid "App %r not found"
-msgstr "Прикладна система(app) %r не знайдена"
-
-#: .\contrib\admin\views\doc.py:173
-#, python-format
-msgid "Model %(name)r not found in app %(label)r"
-msgstr "Модель %(name)r не знайдено у прикладній системі %(label)r"
-
-#: .\contrib\admin\views\doc.py:185
-#, python-format
-msgid "the related `%(label)s.%(type)s` object"
-msgstr "пов'язаний `%(label)s.%(type)s` об'єкт"
-
-#: .\contrib\admin\views\doc.py:185 .\contrib\admin\views\doc.py:207
-#: .\contrib\admin\views\doc.py:221 .\contrib\admin\views\doc.py:226
-#: .\contrib\admindocs\views.py:205 .\contrib\admindocs\views.py:227
-#: .\contrib\admindocs\views.py:241 .\contrib\admindocs\views.py:246
-msgid "model:"
-msgstr "модель:"
-
-#: .\contrib\admin\views\doc.py:216
-#, python-format
-msgid "related `%(label)s.%(name)s` objects"
-msgstr "зв'язані `%(label)s.%(name)s` об'єкти"
-
-#: .\contrib\admin\views\doc.py:221 .\contrib\admindocs\views.py:241
-msgid "all %s"
-msgstr "всі %s"
-
-#: .\contrib\admin\views\doc.py:226 .\contrib\admindocs\views.py:246
-msgid "number of %s"
-msgstr "кількість з %s"
-
-#: .\contrib\admin\views\doc.py:231 .\contrib\admindocs\views.py:251
-msgid "Fields on %s objects"
-msgstr "Поля об'єктів %s"
-
-#: .\contrib\admin\views\doc.py:293 .\contrib\admin\views\doc.py:304
-#: .\contrib\admin\views\doc.py:306 .\contrib\admin\views\doc.py:312
-#: .\contrib\admin\views\doc.py:313 .\contrib\admin\views\doc.py:315
-#: .\contrib\admindocs\views.py:314 .\contrib\admindocs\views.py:325
-#: .\contrib\admindocs\views.py:327 .\contrib\admindocs\views.py:333
-#: .\contrib\admindocs\views.py:334 .\contrib\admindocs\views.py:336
-msgid "Integer"
-msgstr "Ціле"
-
-#: .\contrib\admin\views\doc.py:294 .\contrib\admindocs\views.py:315
-msgid "Boolean (Either True or False)"
-msgstr "Булеве значення (True або False)"
-
-#: .\contrib\admin\views\doc.py:295 .\contrib\admin\views\doc.py:314
-#: .\contrib\admindocs\views.py:316 .\contrib\admindocs\views.py:335
-
-msgid "String (up to %(max_length)s)"
-msgstr "Рядок (до %(maxlength)s символів)"
-
-#: .\contrib\admin\views\doc.py:296 .\contrib\admindocs\views.py:317
-msgid "Comma-separated integers"
-msgstr "Цілі, розділені комою"
-
-#: .\contrib\admin\views\doc.py:297 .\contrib\admindocs\views.py:318
-msgid "Date (without time)"
-msgstr "Дата (без часу)"
-
-#: .\contrib\admin\views\doc.py:298 .\contrib\admindocs\views.py:319
-msgid "Date (with time)"
-msgstr "Дата (з часом)"
-
-#: .\contrib\admin\views\doc.py:299 .\contrib\admindocs\views.py:320
-msgid "Decimal number"
-msgstr "Десяткове число"
-
-#: .\contrib\admin\views\doc.py:300 .\contrib\admindocs\views.py:321
-msgid "E-mail address"
-msgstr "E-mail адреса"
-
-#: .\contrib\admin\views\doc.py:301 .\contrib\admin\views\doc.py:302
-#: .\contrib\admin\views\doc.py:305 .\contrib\admindocs\views.py:322
-#: .\contrib\admindocs\views.py:323 .\contrib\admindocs\views.py:326
-msgid "File path"
-msgstr "Шлях до файла"
-
-#: .\contrib\admin\views\doc.py:303 .\contrib\admindocs\views.py:324
-msgid "Floating point number"
-msgstr "Число з плаваючою комою"
-
-#: .\contrib\admin\views\doc.py:307 .\contrib\admindocs\views.py:328
-#: .\contrib\comments\models.py:58
-msgid "IP address"
-msgstr "IP адреса"
-
-#: .\contrib\admin\views\doc.py:309 .\contrib\admindocs\views.py:330
-msgid "Boolean (Either True, False or None)"
-msgstr "Булеве значення (включаючи True, False або None)"
-
-#: .\contrib\admin\views\doc.py:310 .\contrib\admindocs\views.py:331
-msgid "Relation to parent model"
-msgstr "Відношення до батьківської моделі"
-
-#: .\contrib\admin\views\doc.py:311 .\contrib\admindocs\views.py:332
-msgid "Phone number"
-msgstr "Телефонний номер"
-
-#: .\contrib\admin\views\doc.py:316 .\contrib\admindocs\views.py:337
-msgid "Text"
-msgstr "Текст"
-
-#: .\contrib\admin\views\doc.py:317 .\contrib\admindocs\views.py:338
-msgid "Time"
-msgstr "Час"
-
-#: .\contrib\admin\views\doc.py:318 .\contrib\admindocs\views.py:339
-#: .\contrib\comments\forms.py:21
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:37
-#: .\contrib\flatpages\admin.py:8 .\contrib\flatpages\models.py:7
-msgid "URL"
-msgstr "URL"
-
-#: .\contrib\admin\views\doc.py:319 .\contrib\admindocs\views.py:340
-msgid "U.S. state (two uppercase letters)"
-msgstr "Штат Сполучених Штатів Америки (дві великіх букви)"
-
-#: .\contrib\admin\views\doc.py:320 .\contrib\admindocs\views.py:341
-msgid "XML text"
-msgstr "текст XML"
-
-#: .\contrib\admin\views\doc.py:346 .\contrib\admindocs\views.py:367
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s не є об'єктом urlpattern"
-
-#: .\contrib\admin\views\main.py:69
-#, python-format
-msgid "Select %s"
-msgstr "Вибрати %s"
-
-#: .\contrib\admin\views\main.py:69
-#, python-format
-msgid "Select %s to change"
-msgstr "Виберіть %s щоб змінити"
-
-#: .\contrib\admin\views\template.py:36 .\contrib\sites\models.py:38
-msgid "site"
-msgstr "сайт"
-
-#: .\contrib\admin\views\template.py:38
-msgid "template"
-msgstr "ім'я шаблона"
-
-#: .\contrib\admindocs\views.py:193
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "Модель %(model_name)r не знайдено в прикладній системі %(app_label)r"
-
-#: .\contrib\admindocs\views.py:205
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "пов'язаний `%(app_label)s.%(data_type)s` об'єкт"
-
-#: .\contrib\admindocs\views.py:236
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "пов'язані з `%(app_label)s.%(object_name)s` об'єкти"
-
-#: .\contrib\auth\admin.py:21
-msgid "Personal info"
-msgstr "Персональна інформація"
-
-#: .\contrib\auth\admin.py:22
-msgid "Permissions"
-msgstr "Дозволи"
-
-#: .\contrib\auth\admin.py:23
-msgid "Important dates"
-msgstr "Важливі дати"
-
-#: .\contrib\auth\admin.py:24
-msgid "Groups"
-msgstr "Групи"
-
-#: .\contrib\auth\forms.py:15 .\contrib\auth\forms.py:48
-#: .\contrib\auth\models.py:127
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr ""
-"Необхідне поле. 30 символів або менше. Тільки букви, цифри та символ "
-"підкреслювання."
-
-#: .\contrib\auth\forms.py:16 .\contrib\auth\forms.py:49
-#: .\core\validators.py:72
-msgid "This value must contain only letters, numbers and underscores."
-msgstr ""
-"Це значення може містити тільки літери, числа та символи підкреслювання"
-
-#: .\contrib\auth\forms.py:18
-msgid "Password confirmation"
-msgstr "Підтвердження паролю"
-
-#: .\contrib\auth\forms.py:30
-msgid "A user with that username already exists."
-msgstr "Користувач з таким ім'ям вже існує."
-
-#: .\contrib\auth\forms.py:36 .\contrib\auth\forms.py:154
-#: .\contrib\auth\forms.py:196
-msgid "The two password fields didn't match."
-msgstr "Паролі у двох полях не співпадають."
-
-#: .\contrib\auth\forms.py:82
-msgid "This account is inactive."
-msgstr "Цей запис користувача не активний."
-
-#: .\contrib\auth\forms.py:87
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Схоже, що у вашому браузері на увімкнені cookies. Cookies необхідні для "
-"входу."
-
-#: .\contrib\auth\forms.py:100
-msgid "E-mail"
-msgstr "E-mail"
-
-#: .\contrib\auth\forms.py:109
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Ця e-mail адреса не пов'язана з користувацьким запитом. Ви впевнені, що ви "
-"реєструвалися?"
-
-#: .\contrib\auth\forms.py:134
-#, python-format
-msgid "Password reset on %s"
-msgstr "Пароль перевстановлено %s"
-
-#: .\contrib\auth\forms.py:142
-msgid "New password"
-msgstr "Новий пароль:"
-
-#: .\contrib\auth\forms.py:143
-msgid "New password confirmation"
-msgstr "Новий пароль (підтвердження):"
-
-#: .\contrib\auth\forms.py:168
-
-msgid "Old password"
-msgstr "Старий пароль:"
-
-#: .\contrib\auth\forms.py:176
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr ""
-"Старий пароль було введено неправильно. Будь ласка, введіть його знову."
-
-#: .\contrib\auth\models.py:63 .\contrib\auth\models.py:86
-msgid "name"
-msgstr "ім'я"
-
-#: .\contrib\auth\models.py:65
-msgid "codename"
-msgstr "код"
-
-#: .\contrib\auth\models.py:68
-
-msgid "permission"
-msgstr "дозвіл"
-
-#: .\contrib\auth\models.py:69 .\contrib\auth\models.py:87
-
-msgid "permissions"
-msgstr "дозволи"
-
-#: .\contrib\auth\models.py:90
-
-msgid "group"
-msgstr "група"
-
-#: .\contrib\auth\models.py:91 .\contrib\auth\models.py:137
-
-msgid "groups"
-msgstr "групи"
-
-#: .\contrib\auth\models.py:127
-msgid "username"
-msgstr "ім'я користувача"
-
-#: .\contrib\auth\models.py:128
-msgid "first name"
-msgstr "ім'я"
-
-#: .\contrib\auth\models.py:129
-msgid "last name"
-msgstr "прізвище"
-
-#: .\contrib\auth\models.py:130
-msgid "e-mail address"
-msgstr "e-mail адреса"
-
-#: .\contrib\auth\models.py:131
-msgid "password"
-msgstr "пароль"
-
-#: .\contrib\auth\models.py:131
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Використайте '[algo]$[salt]$[hexdigest]' або використайте <a href=\"password/"
-"\">форму зміни паролю</a>."
-
-#: .\contrib\auth\models.py:132
-msgid "staff status"
-msgstr "Статус персоналу"
-
-#: .\contrib\auth\models.py:132
-msgid "Designates whether the user can log into this admin site."
-msgstr "Визначає, чи може користувач увійти до цього сайту адміністрування."
-
-#: .\contrib\auth\models.py:133
-msgid "active"
-msgstr "Активний"
-
-#: .\contrib\auth\models.py:133
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
-msgstr ""
-"Визначає, чи можна цього користувача вважати діючим. Заберіть галочку, "
-"замість відалення запису користувача."
-
-#: .\contrib\auth\models.py:134
-msgid "superuser status"
-msgstr "Статус суперкористувача"
-
-#: .\contrib\auth\models.py:134
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr "Визначає, що цей користувач має всі дозволи без їх точного зазначення."
-
-#: .\contrib\auth\models.py:135
-msgid "last login"
-msgstr "Останній вхід"
-
-#: .\contrib\auth\models.py:136
-msgid "date joined"
-msgstr "Дата приєднання"
-
-#: .\contrib\auth\models.py:138
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"На додаток до прав, які призначені вручну, цей користувач також отримує усі "
-"права, що має група, в якій він знаходиться."
-
-#: .\contrib\auth\models.py:139
-
-msgid "user permissions"
-msgstr "дозволи користувача"
-
-#: .\contrib\auth\models.py:143
-
-msgid "user"
-msgstr "користувач"
-
-#: .\contrib\auth\models.py:144
-
-msgid "users"
-msgstr "користувачі"
-
-#: .\contrib\auth\models.py:300
-
-msgid "message"
-msgstr "повідомлення"
-
-#: .\contrib\auth\views.py:50
-msgid "Logged out"
-msgstr "Вихід"
-
-#: .\contrib\auth\management\commands\createsuperuser.py:23
-#: .\core\validators.py:166 .\forms\fields.py:428 .\newforms\fields.py:403
+#: core/validators.py:20 forms/fields.py:67
+msgid "Enter a valid value."
+msgstr "Уведіть коректне значення."
+
+#: core/validators.py:87 forms/fields.py:572
+msgid "Enter a valid URL."
+msgstr "Уведіть коректний URL."
+
+#: core/validators.py:89 forms/fields.py:573
+msgid "This URL appears to be a broken link."
+msgstr "URL %s є пошкодженим посиланням."
+
+#: core/validators.py:120 forms/fields.py:447
 msgid "Enter a valid e-mail address."
 msgstr "Уведіть коректну e-mail адресу."
 
-#: .\contrib\comments\admin.py:11
-msgid "Content"
-msgstr "Зміст"
-
-#: .\contrib\comments\admin.py:14
-msgid "Metadata"
-msgstr "Мета-дані"
-
-#: .\contrib\comments\forms.py:19
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:34
-msgid "Name"
-msgstr "Ім'я"
-
-#: .\contrib\comments\forms.py:20
-msgid "Email address"
-msgstr "E-mail адреса"
-
-#: .\contrib\comments\forms.py:22
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:35
-msgid "Comment"
-msgstr "Коментар"
-
-#: .\contrib\comments\forms.py:25
+#: core/validators.py:123 forms/fields.py:956
 msgid ""
-"If you enter anything in this field your comment will be treated as spam"
-msgstr "Якщо ви введете щось в це поле, ваш коментар буде вважатися спамом"
-
-#: .\contrib\comments\forms.py:125 .\core\validators.py:277
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Слідкуйте за виразами! Слово %s тут заборонено."
-msgstr[1] "Слідкуйте за виразами! Слова %s тут заборонені."
-msgstr[2] "Слідкуйте за виразами! Слова %s тут заборонені."
-
-#: .\contrib\comments\models.py:23
-msgid "object ID"
-msgstr "ID об'єкту"
-
-#: .\contrib\comments\models.py:50
-
-msgid "user's name"
-msgstr "ім'я користувача"
-
-#: .\contrib\comments\models.py:51
-
-msgid "user's email address"
-msgstr "e-mail адреса користувача"
-
-#: .\contrib\comments\models.py:52
-
-msgid "user's URL"
-msgstr "URL користувачів"
-
-#: .\contrib\comments\models.py:54
-msgid "comment"
-msgstr "коментар"
-
-#: .\contrib\comments\models.py:57
-msgid "date/time submitted"
-msgstr "дата/час додавання"
-
-#: .\contrib\comments\models.py:59
-msgid "is public"
-msgstr "публічний"
-
-#: .\contrib\comments\models.py:60
-msgid ""
-"Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Заберіть галочку звідси, щоб коментар зник з сайту."
-
-#: .\contrib\comments\models.py:62
-msgid "is removed"
-msgstr "видалений"
-
-#: .\contrib\comments\models.py:63
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Поставте тут галочку, якщо коментар неприйнятний. Повідомлення \"Цей "
-"коментар було видалено\" буде відображено замість цього коментаря."
+"Введіть коректне значення 'slug' (короткого заголовку), що може містити "
+"тільки літери, числа, символи підкреслювання та дефіси."
 
-#: .\contrib\comments\models.py:115
-msgid ""
-"This comment was posted by an authenticated user and thus the name is read-"
-"only."
-msgstr ""
-"Цей коментар був розміщений зареєстрованим користувачем і тому ім'я не "
-"може бути відредаговано."
+#: core/validators.py:126 forms/fields.py:949
+msgid "Enter a valid IPv4 address."
+msgstr "Введіть коректну IPv4 адресу."
 
-#: .\contrib\comments\models.py:124
-msgid ""
-"This comment was posted by an authenticated user and thus the email is read-"
-"only."
-msgstr ""
-"Цей коментар був розміщений зареєстрованим користувачем і тому email не "
-"може бути відредагований."
-
-#: .\contrib\comments\models.py:149
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"Додав %(user)s %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: .\contrib\comments\templates\comments\approve.html.py:4
-msgid "Approve a comment"
-msgstr "Затвердіть коментар"
-
-#: .\contrib\comments\templates\comments\approve.html.py:7
-msgid "Really make this comment public?"
-msgstr "Дійсно, зробити цей коментар публічним?"
-
-#: .\contrib\comments\templates\comments\approve.html.py:12
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:49
-msgid "Approve"
-msgstr "Затвердити"
-
-#: .\contrib\comments\templates\comments\approved.html.py:4
-msgid "Thanks for approving"
-msgstr "Дякуємо за затвердження."
-
-#: .\contrib\comments\templates\comments\approved.html.py:7
-#: .\contrib\comments\templates\comments\deleted.html.py:7
-#: .\contrib\comments\templates\comments\flagged.html.py:7
-msgid ""
-"Thanks for taking the time to improve the quality of discussion on our site"
-msgstr ""
-"Дякуємо за те, що ви приділили увагу покращенню якості дискусії на нашому "
-"сайті"
-
-#: .\contrib\comments\templates\comments\delete.html.py:4
-msgid "Remove a comment"
-msgstr "Видалити коментар"
-
-#: .\contrib\comments\templates\comments\delete.html.py:7
-msgid "Really remove this comment?"
-msgstr "Дійсно, видалити цей коментар?"
-
-#: .\contrib\comments\templates\comments\delete.html.py:12
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:53
-msgid "Remove"
-msgstr "Видалити"
-
-#: .\contrib\comments\templates\comments\deleted.html.py:4
-msgid "Thanks for removing"
-msgstr "Дякуємо за видалення."
-
-#: .\contrib\comments\templates\comments\flag.html.py:4
-msgid "Flag this comment"
-msgstr "Відмітити цей коментар?"
-
-#: .\contrib\comments\templates\comments\flag.html.py:7
-msgid "Really flag this comment?"
-msgstr "Дійсно відмітити цей коментар?"
-
-#: .\contrib\comments\templates\comments\flag.html.py:12
-msgid "Flag"
-msgstr "Відмітити"
-
-#: .\contrib\comments\templates\comments\flagged.html.py:4
-
-msgid "Thanks for flagging"
-msgstr "Дякуємо за користування нашим сайтом."
-
-#: .\contrib\comments\templates\comments\form.html.py:16
-#: .\contrib\comments\templates\comments\preview.html.py:31
-msgid "Post"
-msgstr "Надіслати"
-
-#: .\contrib\comments\templates\comments\form.html.py:17
-#: .\contrib\comments\templates\comments\preview.html.py:32
-msgid "Preview"
-msgstr "Попередній перегляд"
-
-#: .\contrib\comments\templates\comments\freeform.html.py:4
-msgid "Your name:"
-msgstr "Ваше ім'я:"
-
-#: .\contrib\comments\templates\comments\freeform.html.py:5
-msgid "Comment:"
-msgstr "Коментар:"
-
-#: .\contrib\comments\templates\comments\freeform.html.py:10
-msgid "Preview comment"
-msgstr "Попередній перегляд коментаря"
-
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:4
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:19
-msgid "Comment moderation queue"
-msgstr "Черга коментарів на модерацію"
-
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:26
-msgid "No comments to moderate"
-msgstr "Немає коментарів для модерації"
-
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:36
-msgid "Email"
-msgstr "Email"
-
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:38
-msgid "Authenticated?"
-msgstr "Зроблено вхід?"
-
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:39
-msgid "IP Address"
-msgstr "IP адреса"
-
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:40
-msgid "Date posted"
-msgstr "Дата відсилки"
-
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:63
-msgid "yes"
-msgstr "так"
-
-#: .\contrib\comments\templates\comments\moderation_queue.html.py:63
-msgid "no"
-msgstr "ні"
-
-#: .\contrib\comments\templates\comments\posted.html.py:4
-msgid "Thanks for commenting"
-msgstr "Дякуємо за коментування"
-
-#: .\contrib\comments\templates\comments\posted.html.py:7
-msgid "Thank you for your comment"
-msgstr "Дякуємо за ваш коментар"
-
-#: .\contrib\comments\templates\comments\preview.html.py:4
-#: .\contrib\comments\templates\comments\preview.html.py:12
-msgid "Preview your comment"
-msgstr "Попередній перегляд коментаря"
-
-#: .\contrib\comments\templates\comments\preview.html.py:10
-msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Будь ласка, виправте помилку, що зазначена нижче"
-msgstr[1] "Будь ласка, виправте помилки, що зазначені нижче"
-msgstr[2] "Будь ласка, виправте помилки, що зазначені нижче"
-
-#: .\contrib\comments\templates\comments\preview.html.py:15
-msgid "Post your comment"
-msgstr "Опублікуйте коментар"
-
-#: .\contrib\comments\templates\comments\preview.html.py:15
-msgid "or make changes"
-msgstr "або зробіть зміни."
-
-#: .\contrib\comments\views\karma.py:21
-msgid "Anonymous users cannot vote"
-msgstr "Анонімний користувач не може голосувати"
-
-#: .\contrib\comments\views\karma.py:25
-msgid "Invalid comment ID"
-msgstr "Невірний ID коментаря"
-
-#: .\contrib\comments\views\karma.py:27
-msgid "No voting for yourself"
-msgstr "Не можна голосувати за себе"
-
-#: .\contrib\contenttypes\models.py:67
-msgid "python model class name"
-msgstr "python model class name"
-
-#: .\contrib\contenttypes\models.py:71
-msgid "content type"
-msgstr "content type"
-
-#: .\contrib\contenttypes\models.py:72
-msgid "content types"
-msgstr "content types"
-
-#: .\contrib\flatpages\admin.py:9
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Приклад: '/about/contact/'. Переконайтеся у наявності слешу на початку та у "
-"кінці."
-
-#: .\contrib\flatpages\admin.py:11 .\core\validators.py:76
-
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-"Це значення може містити тільки літери, числа, символи підкреслювання та "
-"слеші."
-
-#: .\contrib\flatpages\admin.py:22
-msgid "Advanced options"
-msgstr "Додаткові опції"
-
-#: .\contrib\flatpages\models.py:8
-msgid "title"
-msgstr "заголовок"
-
-#: .\contrib\flatpages\models.py:9
-msgid "content"
-msgstr "зміст"
-
-#: .\contrib\flatpages\models.py:10
-msgid "enable comments"
-msgstr "увімкнути коментарі"
-
-#: .\contrib\flatpages\models.py:11
-msgid "template name"
-msgstr "ім'я шаблона"
-
-#: .\contrib\flatpages\models.py:12
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr ""
-"Приклад: 'flatpages/contact_page'. Якщо це не надано, система буда "
-"використовувати 'flatpages/default'."
-
-#: .\contrib\flatpages\models.py:13
-msgid "registration required"
-msgstr "потрібна реєстрація"
-
-#: .\contrib\flatpages\models.py:13
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Якщо тут є галочка, тільки користувачи, що увійшли, зможуть переглядати цю "
-"сторінку."
-
-#: .\contrib\flatpages\models.py:18
-msgid "flat page"
-msgstr "проста сторінка"
-
-#: .\contrib\flatpages\models.py:19
-msgid "flat pages"
-msgstr "прості сторінки"
-
-#: .\contrib\formtools\wizard.py:130
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Пробачте, але закінчився строк заповнення форми. Будь ласка, продовжіть "
-"заповнення форми з цієї сторінки."
-
-#: .\contrib\gis\forms\fields.py:14
-msgid "No geometry value provided."
-msgstr "Не задано геометрічне значення."
-
-#: .\contrib\gis\forms\fields.py:15
-msgid "Invalid geometry value."
-msgstr "Невірне геометричне значення."
-
-#: .\contrib\gis\forms\fields.py:16
-msgid "Invalid geometry type."
-msgstr "Невірний геометричний тип."
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "th"
-msgstr ""
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "st"
-msgstr ""
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "nd"
-msgstr ""
-
-#: .\contrib\humanize\templatetags\humanize.py:19
-msgid "rd"
-msgstr ""
-
-#: .\contrib\humanize\templatetags\humanize.py:51
-#, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f мільйон"
-msgstr[1] "%(value).1f мільйони"
-msgstr[2] "%(value).1f мільйонів"
-
-#: .\contrib\humanize\templatetags\humanize.py:54
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f мільярд"
-msgstr[1] "%(value).1f мільярди"
-msgstr[2] "%(value).1f мільярдів"
-
-#: .\contrib\humanize\templatetags\humanize.py:57
-#, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f трильйон"
-msgstr[1] "%(value).1f трильйони"
-msgstr[2] "%(value).1f трильйонів"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "one"
-msgstr "один"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "two"
-msgstr "два"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "three"
-msgstr "три"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-
-msgid "four"
-msgstr "чотири"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "five"
-msgstr "п'ять"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "six"
-msgstr "шість"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "seven"
-msgstr "сім"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "eight"
-msgstr "вісім"
-
-#: .\contrib\humanize\templatetags\humanize.py:73
-msgid "nine"
-msgstr "дев'ять"
-
-#: .\contrib\humanize\templatetags\humanize.py:93
-
-msgid "today"
-msgstr "сьогодні"
-
-#: .\contrib\humanize\templatetags\humanize.py:95
-msgid "tomorrow"
-msgstr "завтра"
-
-#: .\contrib\humanize\templatetags\humanize.py:97
-msgid "yesterday"
-msgstr "вчора"
-
-#: .\contrib\localflavor\ar\forms.py:27
-msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "Введіть поштовий індекс у форматі NNNN або ANNNNAAA."
-
-#: .\contrib\localflavor\ar\forms.py:49 .\contrib\localflavor\br\forms.py:96
-#: .\contrib\localflavor\br\forms.py:135 .\contrib\localflavor\pe\forms.py:23
-#: .\contrib\localflavor\pe\forms.py:51
-msgid "This field requires only numbers."
-msgstr "В це поле можна вводити тільки числа."
-
-#: .\contrib\localflavor\ar\forms.py:50
-msgid "This field requires 7 or 8 digits."
-msgstr "В це поле можна вводити тільки 7 або 8 цифр."
-
-#: .\contrib\localflavor\ar\forms.py:79
-msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Введіть правильний CUIT у форматі XX-XXXXXXXX-X або XXXXXXXXXXXX."
-
-#: .\contrib\localflavor\ar\forms.py:80
-msgid "Invalid CUIT."
-msgstr "Невірний CUIT."
-
-#: .\contrib\localflavor\at\at_states.py:5
-msgid "Burgenland"
-msgstr "Бургенленд"
-
-#: .\contrib\localflavor\at\at_states.py:6
-msgid "Carinthia"
-msgstr "Каринтія"
-
-#: .\contrib\localflavor\at\at_states.py:7
-msgid "Lower Austria"
-msgstr "Нижня Австрія"
-
-#: .\contrib\localflavor\at\at_states.py:8
-msgid "Upper Austria"
-msgstr "Верхня Австрія"
-
-#: .\contrib\localflavor\at\at_states.py:9
-msgid "Salzburg"
-msgstr "Зальцбург"
-
-#: .\contrib\localflavor\at\at_states.py:10
-msgid "Styria"
-msgstr "Штирія"
-
-#: .\contrib\localflavor\at\at_states.py:11
-msgid "Tyrol"
-msgstr "Тіроль"
-
-#: .\contrib\localflavor\at\at_states.py:12
-msgid "Vorarlberg"
-msgstr "Форарльберг"
-
-#: .\contrib\localflavor\at\at_states.py:13
-msgid "Vienna"
-msgstr "Відень"
-
-#: .\contrib\localflavor\at\forms.py:20 .\contrib\localflavor\ch\forms.py:16
-#: .\contrib\localflavor\no\forms.py:12
-msgid "Enter a zip code in the format XXXX."
-msgstr "Введіть поштовий індекс у форматі ХХХХ."
-
-#: .\contrib\localflavor\at\forms.py:48
-msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr ""
-"Введіть правильний австрійський номер соціального страхування в форматі XXXX "
-"XXXXXX."
-
-#: .\contrib\localflavor\au\forms.py:16
-msgid "Enter a 4 digit post code."
-msgstr "Введіть поштовий індекс з 4 цифр."
-
-#: .\contrib\localflavor\br\forms.py:21
-msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Введіть поштовий індекс у форматі XXXXX-XXX."
-
-#: .\contrib\localflavor\br\forms.py:30
-msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "Телефонні номери мають бути у форматі XX-XXXX-XXXX."
-
-#: .\contrib\localflavor\br\forms.py:58
-msgid ""
-"Select a valid brazilian state. That state is not one of the available "
-"states."
-msgstr ""
-"Оберіть правильний бразильський штат. Штата, який ви обрали, не має серед "
-"представлених тут."
-
-#: .\contrib\localflavor\br\forms.py:94
-msgid "Invalid CPF number."
-msgstr "Помилковий номер CPF."
-
-#: .\contrib\localflavor\br\forms.py:95
-msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Це поле вимагає максимум 11 цифр або 14 символів."
-
-#: .\contrib\localflavor\br\forms.py:134
-msgid "Invalid CNPJ number."
-msgstr "Помилковий номер CNPJ."
-
-#: .\contrib\localflavor\br\forms.py:136
-msgid "This field requires at least 14 digits"
-msgstr "Це поле вимагає як мінімум 14 цифр"
-
-#: .\contrib\localflavor\ca\forms.py:17
-msgid "Enter a postal code in the format XXX XXX."
-msgstr "Введіть поштовий індекс у форматі XXX XXX."
-
-#: .\contrib\localflavor\ca\forms.py:88
-msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr ""
-"Введіть правильний канадський номер соціального страхування у форматі XXX-"
-"XXX-XXX."
-
-#: .\contrib\localflavor\ch\ch_states.py:5
-msgid "Aargau"
-msgstr "Ааргау"
-
-#: .\contrib\localflavor\ch\ch_states.py:6
-msgid "Appenzell Innerrhoden"
-msgstr "Аппенцелль Іннерходен"
-
-#: .\contrib\localflavor\ch\ch_states.py:7
-msgid "Appenzell Ausserrhoden"
-msgstr "Аппенцелль Ауссеррходен"
-
-#: .\contrib\localflavor\ch\ch_states.py:8
-msgid "Basel-Stadt"
-msgstr "Базель"
-
-#: .\contrib\localflavor\ch\ch_states.py:9
-msgid "Basel-Land"
-msgstr "Базель-Ленд"
-
-#: .\contrib\localflavor\ch\ch_states.py:10
-msgid "Berne"
-msgstr "Берн"
-
-#: .\contrib\localflavor\ch\ch_states.py:11
-msgid "Fribourg"
-msgstr "Фрібург"
-
-#: .\contrib\localflavor\ch\ch_states.py:12
-msgid "Geneva"
-msgstr "Женева"
-
-#: .\contrib\localflavor\ch\ch_states.py:13
-msgid "Glarus"
-msgstr "Гларус"
-
-#: .\contrib\localflavor\ch\ch_states.py:14
-msgid "Graubuenden"
-msgstr "Граубюнден"
-
-#: .\contrib\localflavor\ch\ch_states.py:15
-msgid "Jura"
-msgstr "Юра"
-
-#: .\contrib\localflavor\ch\ch_states.py:16
-msgid "Lucerne"
-msgstr "Люцерн"
-
-#: .\contrib\localflavor\ch\ch_states.py:17
-msgid "Neuchatel"
-msgstr "Невшатель"
-
-#: .\contrib\localflavor\ch\ch_states.py:18
-msgid "Nidwalden"
-msgstr "Нідвальден"
-
-#: .\contrib\localflavor\ch\ch_states.py:19
-msgid "Obwalden"
-msgstr "Обвальден"
-
-#: .\contrib\localflavor\ch\ch_states.py:20
-msgid "Schaffhausen"
-msgstr "Шафхаузен"
-
-#: .\contrib\localflavor\ch\ch_states.py:21
-msgid "Schwyz"
-msgstr "Швіц"
-
-#: .\contrib\localflavor\ch\ch_states.py:22
-msgid "Solothurn"
-msgstr "Золотурн"
-
-#: .\contrib\localflavor\ch\ch_states.py:23
-msgid "St. Gallen"
-msgstr "Санкт-Галлен"
-
-#: .\contrib\localflavor\ch\ch_states.py:24
-msgid "Thurgau"
-msgstr "Тургау"
-
-#: .\contrib\localflavor\ch\ch_states.py:25
-msgid "Ticino"
-msgstr "Тичино"
-
-#: .\contrib\localflavor\ch\ch_states.py:26
-msgid "Uri"
-msgstr "Урі"
-
-#: .\contrib\localflavor\ch\ch_states.py:27
-msgid "Valais"
-msgstr "Вале"
-
-#: .\contrib\localflavor\ch\ch_states.py:28
-msgid "Vaud"
-msgstr "Во"
-
-#: .\contrib\localflavor\ch\ch_states.py:29
-msgid "Zug"
-msgstr "Цуг"
-
-#: .\contrib\localflavor\ch\ch_states.py:30
-msgid "Zurich"
-msgstr "Цюріх"
-
-#: .\contrib\localflavor\ch\forms.py:64
-msgid ""
-"Enter a valid Swiss identity or passport card number in X1234567<0 or "
-"1234567890 format."
-msgstr ""
-"Введіть вірний номер посвідчення особи або паспорту у форматі X1234567<0 або "
-"1234567890."
-
-#: .\contrib\localflavor\cl\forms.py:29
-msgid "Enter a valid Chilean RUT."
-msgstr "Введіть вірний чилійський RUT."
-
-#: .\contrib\localflavor\cl\forms.py:30
-msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Введіть вірний чилійський RUT. Формат: XX.XXX.XXX-X."
-
-#: .\contrib\localflavor\cl\forms.py:31
-msgid "The Chilean RUT is not valid."
-msgstr "Чилійський RUT не правильний."
-
-#: .\contrib\localflavor\de\de_states.py:5
-msgid "Baden-Wuerttemberg"
-msgstr "Баден-Вюртемберг"
-
-#: .\contrib\localflavor\de\de_states.py:6
-msgid "Bavaria"
-msgstr "Баварія"
-
-#: .\contrib\localflavor\de\de_states.py:7
-msgid "Berlin"
-msgstr "Берлін"
-
-#: .\contrib\localflavor\de\de_states.py:8
-msgid "Brandenburg"
-msgstr "Бранденбург"
-
-#: .\contrib\localflavor\de\de_states.py:9
-msgid "Bremen"
-msgstr "Бремен"
-
-#: .\contrib\localflavor\de\de_states.py:10
-msgid "Hamburg"
-msgstr "Гамбург"
-
-#: .\contrib\localflavor\de\de_states.py:11
-msgid "Hessen"
-msgstr "Гессен"
-
-#: .\contrib\localflavor\de\de_states.py:12
-msgid "Mecklenburg-Western Pomerania"
-msgstr "Мекленбург — Передня Померанія"
-
-#: .\contrib\localflavor\de\de_states.py:13
-msgid "Lower Saxony"
-msgstr "Нижня Саксонія"
-
-#: .\contrib\localflavor\de\de_states.py:14
-msgid "North Rhine-Westphalia"
-msgstr "Північний Рейн – Вестфалія"
-
-#: .\contrib\localflavor\de\de_states.py:15
-msgid "Rhineland-Palatinate"
-msgstr "Райнланд-Пфальц"
-
-#: .\contrib\localflavor\de\de_states.py:16
-msgid "Saarland"
-msgstr "Саарланд"
-
-#: .\contrib\localflavor\de\de_states.py:17
-msgid "Saxony"
-msgstr "Саксонія"
-
-#: .\contrib\localflavor\de\de_states.py:18
-msgid "Saxony-Anhalt"
-msgstr "Саксонія-Ангальт"
-
-#: .\contrib\localflavor\de\de_states.py:19
-msgid "Schleswig-Holstein"
-msgstr "Шлезвіг-Гольштайн"
-
-#: .\contrib\localflavor\de\de_states.py:20
-msgid "Thuringia"
-msgstr "Тюрінгія"
-
-#: .\contrib\localflavor\de\forms.py:14 .\contrib\localflavor\fi\forms.py:12
-#: .\contrib\localflavor\fr\forms.py:15
-msgid "Enter a zip code in the format XXXXX."
-msgstr "Введіть поштовий індекс у форматі XXXXX."
-
-#: .\contrib\localflavor\de\forms.py:41
-msgid ""
-"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"format."
-msgstr ""
-"Введіть правильний номер німецького посвідчення особи в форматі XXXXXXXXXXX-"
-"XXXXXXX-XXXXXXX-X "
-
-#: .\contrib\localflavor\es\es_provinces.py:5
-msgid "Arava"
-msgstr "Алава"
-
-#: .\contrib\localflavor\es\es_provinces.py:6
-msgid "Albacete"
-msgstr "Альбасете"
-
-#: .\contrib\localflavor\es\es_provinces.py:7
-msgid "Alacant"
-msgstr "Аліканте"
-
-#: .\contrib\localflavor\es\es_provinces.py:8
-msgid "Almeria"
-msgstr "Альмерія"
-
-#: .\contrib\localflavor\es\es_provinces.py:9
-msgid "Avila"
-msgstr "Авіла"
-
-#: .\contrib\localflavor\es\es_provinces.py:10
-msgid "Badajoz"
-msgstr "Бадахос"
-
-#: .\contrib\localflavor\es\es_provinces.py:11
-msgid "Illes Balears"
-msgstr "Балеарські острови"
-
-#: .\contrib\localflavor\es\es_provinces.py:12
-msgid "Barcelona"
-msgstr "Барселона"
-
-#: .\contrib\localflavor\es\es_provinces.py:13
-msgid "Burgos"
-msgstr "Бургос"
-
-#: .\contrib\localflavor\es\es_provinces.py:14
-msgid "Caceres"
-msgstr "Касерес"
-
-#: .\contrib\localflavor\es\es_provinces.py:15
-msgid "Cadiz"
-msgstr "Кадіс"
-
-#: .\contrib\localflavor\es\es_provinces.py:16
-msgid "Castello"
-msgstr "Кастельйон"
-
-#: .\contrib\localflavor\es\es_provinces.py:17
-msgid "Ciudad Real"
-msgstr "Сьюдад-Реаль"
-
-#: .\contrib\localflavor\es\es_provinces.py:18
-msgid "Cordoba"
-msgstr "Кордова"
-
-#: .\contrib\localflavor\es\es_provinces.py:19
-msgid "A Coruna"
-msgstr "Ла-Корунья"
-
-#: .\contrib\localflavor\es\es_provinces.py:20
-msgid "Cuenca"
-msgstr "Куенка"
-
-#: .\contrib\localflavor\es\es_provinces.py:21
-msgid "Girona"
-msgstr "Жірона"
-
-#: .\contrib\localflavor\es\es_provinces.py:22
-
-msgid "Granada"
-msgstr "Гранада"
-
-#: .\contrib\localflavor\es\es_provinces.py:23
-msgid "Guadalajara"
-msgstr "Гвадалахара"
-
-#: .\contrib\localflavor\es\es_provinces.py:24
-msgid "Guipuzkoa"
-msgstr "Гіпускоа"
-
-#: .\contrib\localflavor\es\es_provinces.py:25
-msgid "Huelva"
-msgstr "Уельва"
-
-#: .\contrib\localflavor\es\es_provinces.py:26
-msgid "Huesca"
-msgstr "Уеска"
-
-#: .\contrib\localflavor\es\es_provinces.py:27
-msgid "Jaen"
-msgstr "Хаен"
-
-#: .\contrib\localflavor\es\es_provinces.py:28
-msgid "Leon"
-msgstr "Леон"
-
-#: .\contrib\localflavor\es\es_provinces.py:29
-msgid "Lleida"
-msgstr "Льєйда"
-
-#: .\contrib\localflavor\es\es_provinces.py:30
-#: .\contrib\localflavor\es\es_regions.py:17
-msgid "La Rioja"
-msgstr "Ла-Ріоха"
-
-#: .\contrib\localflavor\es\es_provinces.py:31
-msgid "Lugo"
-msgstr "Луго"
-
-#: .\contrib\localflavor\es\es_provinces.py:32
-#: .\contrib\localflavor\es\es_regions.py:18
-msgid "Madrid"
-msgstr "Мадрід"
-
-#: .\contrib\localflavor\es\es_provinces.py:33
-msgid "Malaga"
-msgstr "Малага"
-
-#: .\contrib\localflavor\es\es_provinces.py:34
-msgid "Murcia"
-msgstr "Мурсія"
-
-#: .\contrib\localflavor\es\es_provinces.py:35
-msgid "Navarre"
-msgstr "Наварра"
-
-#: .\contrib\localflavor\es\es_provinces.py:36
-msgid "Ourense"
-msgstr "Оренсе"
-
-#: .\contrib\localflavor\es\es_provinces.py:37
-msgid "Asturias"
-msgstr "Астурія"
-
-#: .\contrib\localflavor\es\es_provinces.py:38
-msgid "Palencia"
-msgstr "Паленсія"
-
-#: .\contrib\localflavor\es\es_provinces.py:39
-msgid "Las Palmas"
-msgstr "Лас-Пальмас"
-
-#: .\contrib\localflavor\es\es_provinces.py:40
-msgid "Pontevedra"
-msgstr "Понтеведра"
-
-#: .\contrib\localflavor\es\es_provinces.py:41
-msgid "Salamanca"
-msgstr "Саламанка"
-
-#: .\contrib\localflavor\es\es_provinces.py:42
-msgid "Santa Cruz de Tenerife"
-msgstr "Санта-Крус-де-Тенерифе"
-
-#: .\contrib\localflavor\es\es_provinces.py:43
-#: .\contrib\localflavor\es\es_regions.py:11
-msgid "Cantabria"
-msgstr "Кантабрія"
-
-#: .\contrib\localflavor\es\es_provinces.py:44
-msgid "Segovia"
-msgstr "Сеговія"
-
-#: .\contrib\localflavor\es\es_provinces.py:45
-msgid "Seville"
-msgstr "Севілья"
-
-#: .\contrib\localflavor\es\es_provinces.py:46
-msgid "Soria"
-msgstr "Сорія"
-
-#: .\contrib\localflavor\es\es_provinces.py:47
-msgid "Tarragona"
-msgstr "Таррагона"
-
-#: .\contrib\localflavor\es\es_provinces.py:48
-msgid "Teruel"
-msgstr "Теруель"
-
-#: .\contrib\localflavor\es\es_provinces.py:49
-msgid "Toledo"
-msgstr "Толедо"
-
-#: .\contrib\localflavor\es\es_provinces.py:50
-msgid "Valencia"
-msgstr "Валенсія"
-
-#: .\contrib\localflavor\es\es_provinces.py:51
-msgid "Valladolid"
-msgstr "Вальядолід"
-
-#: .\contrib\localflavor\es\es_provinces.py:52
-msgid "Bizkaia"
-msgstr "Біскайя"
-
-#: .\contrib\localflavor\es\es_provinces.py:53
-msgid "Zamora"
-msgstr "Самора"
-
-#: .\contrib\localflavor\es\es_provinces.py:54
-msgid "Zaragoza"
-msgstr "Сарагоса"
-
-#: .\contrib\localflavor\es\es_provinces.py:55
-msgid "Ceuta"
-msgstr "Сеута"
-
-#: .\contrib\localflavor\es\es_provinces.py:56
-msgid "Melilla"
-msgstr "Мелілья"
-
-#: .\contrib\localflavor\es\es_regions.py:5
-msgid "Andalusia"
-msgstr "Андалусія"
-
-#: .\contrib\localflavor\es\es_regions.py:6
-msgid "Aragon"
-msgstr "Арагон"
-
-#: .\contrib\localflavor\es\es_regions.py:7
-msgid "Principality of Asturias"
-msgstr "Астурія"
-
-#: .\contrib\localflavor\es\es_regions.py:8
-msgid "Balearic Islands"
-msgstr "Балеарські острови"
-
-#: .\contrib\localflavor\es\es_regions.py:9
-msgid "Basque Country"
-msgstr "Країна Басків (Еускаді)"
-
-#: .\contrib\localflavor\es\es_regions.py:10
-msgid "Canary Islands"
-msgstr "Канарські острови"
-
-#: .\contrib\localflavor\es\es_regions.py:12
-msgid "Castile-La Mancha"
-msgstr "Кастилія — Ла-Манча"
-
-#: .\contrib\localflavor\es\es_regions.py:13
-msgid "Castile and Leon"
-msgstr "Кастилія і Леон"
-
-#: .\contrib\localflavor\es\es_regions.py:14
-msgid "Catalonia"
-msgstr "Каталонія"
-
-#: .\contrib\localflavor\es\es_regions.py:15
-msgid "Extremadura"
-msgstr "Естремадура"
-
-#: .\contrib\localflavor\es\es_regions.py:16
-msgid "Galicia"
-msgstr "Галісія"
-
-#: .\contrib\localflavor\es\es_regions.py:19
-msgid "Region of Murcia"
-msgstr "Мурсія"
-
-#: .\contrib\localflavor\es\es_regions.py:20
-msgid "Foral Community of Navarre"
-msgstr "Наварра"
-
-#: .\contrib\localflavor\es\es_regions.py:21
-msgid "Valencian Community"
-msgstr "Валенсія"
-
-#: .\contrib\localflavor\es\forms.py:19
-msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Введіть правильний поштовий індекс в диапазоні формату 01XXX - 52XXX."
-
-#: .\contrib\localflavor\es\forms.py:39
-msgid ""
-"Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
-"9XXXXXXXX."
-msgstr ""
-"Введіть правильний номер телефону в одному з форматів 6XXXXXXXX,8XXXXXXXX or "
-"9XXXXXXXX."
-
-#: .\contrib\localflavor\es\forms.py:66
-msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Будь ласка введіть правильний NIF, NIE, або CIF."
-
-#: .\contrib\localflavor\es\forms.py:67
-msgid "Please enter a valid NIF or NIE."
-msgstr "Будь ласка введіть правильний NIF або NIE"
-
-#: .\contrib\localflavor\es\forms.py:68
-msgid "Invalid checksum for NIF."
-msgstr "Помилкова контрольна сума для NIF."
-
-#: .\contrib\localflavor\es\forms.py:69
-msgid "Invalid checksum for NIE."
-msgstr "Помилкова контрольна сума для NIE."
-
-#: .\contrib\localflavor\es\forms.py:70
-msgid "Invalid checksum for CIF."
-msgstr "Помилкова контрольна сума для CIF."
-
-#: .\contrib\localflavor\es\forms.py:142
-msgid ""
-"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr ""
-"Будь ласка, введіть правильний номер банківського рахунку у форматі XXXX-"
-"XXXX-XX-XXXXXXXXXX."
-
-#: .\contrib\localflavor\es\forms.py:143
-msgid "Invalid checksum for bank account number."
-msgstr "Помилкова контрольна сума для номеру банківського рахунку."
-
-#: .\contrib\localflavor\fi\forms.py:28
-msgid "Enter a valid Finnish social security number."
-msgstr "Введіть правильний номер фінського соціального страхування."
-
-#: .\contrib\localflavor\in_\forms.py:14
-msgid "Enter a zip code in the format XXXXXXX."
-msgstr "Введіть поштовий індекс у форматі XXXXXXX."
-
-#: .\contrib\localflavor\is_\forms.py:17
-msgid ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr ""
-"Введіть правильний номер ісландського посвідчення особи. Формат: XXXXXX-XXXX."
-
-#: .\contrib\localflavor\is_\forms.py:18
-msgid "The Icelandic identification number is not valid."
-msgstr "Номер ісландського посвідчення особи не вірний."
-
-#: .\contrib\localflavor\it\forms.py:14
-msgid "Enter a valid zip code."
-msgstr "Введіть правильну поштову адресу."
-
-#: .\contrib\localflavor\it\forms.py:43
-msgid "Enter a valid Social Security number."
-msgstr "Введіть правильний номер соціального страхування"
-
-#: .\contrib\localflavor\it\forms.py:68
-msgid "Enter a valid VAT number."
-msgstr "Введіть правильний номер VAT."
-
-#: .\contrib\localflavor\jp\forms.py:16
-msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "Введіть поштовий індекс у форматі XXXXXXX or XXX-XXXX."
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:4
-msgid "Hokkaido"
-msgstr "Хоккайдо"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:5
-msgid "Aomori"
-msgstr "Аоморі"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:6
-msgid "Iwate"
-msgstr "Івате"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:7
-msgid "Miyagi"
-msgstr "Міяґі"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:8
-msgid "Akita"
-msgstr "Акіта"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:9
-msgid "Yamagata"
-msgstr "Ямаґата"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:10
-msgid "Fukushima"
-msgstr "Фукусіма"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:11
-msgid "Ibaraki"
-msgstr "Ібаракі"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:12
-msgid "Tochigi"
-msgstr "Тотіґі"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:13
-msgid "Gunma"
-msgstr "Ґумма"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:14
-msgid "Saitama"
-msgstr "Сайтама"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:15
-msgid "Chiba"
-msgstr "Тіба"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:16
-msgid "Tokyo"
-msgstr "Токіо"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:17
-msgid "Kanagawa"
-msgstr "Канаґава"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:18
-msgid "Yamanashi"
-msgstr "Яманасі"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:19
-msgid "Nagano"
-msgstr "Наґано"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:20
-msgid "Niigata"
-msgstr "Ніїґата"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:21
-msgid "Toyama"
-msgstr "Тояма"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:22
-msgid "Ishikawa"
-msgstr "Ісікава"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:23
-msgid "Fukui"
-msgstr "Фукуї"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:24
-msgid "Gifu"
-msgstr "Ґіфу"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:25
-msgid "Shizuoka"
-msgstr "Сідзуока"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:26
-msgid "Aichi"
-msgstr "Аїті"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:27
-msgid "Mie"
-msgstr "Міє"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:28
-msgid "Shiga"
-msgstr "Сіґа"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:29
-msgid "Kyoto"
-msgstr "Кіото"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:30
-msgid "Osaka"
-msgstr "Осака"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:31
-msgid "Hyogo"
-msgstr "Хьоґо"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:32
-msgid "Nara"
-msgstr "Нара"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:33
-msgid "Wakayama"
-msgstr "Вакаяма"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:34
-msgid "Tottori"
-msgstr "Тотторі"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:35
-msgid "Shimane"
-msgstr "Сімане"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:36
-msgid "Okayama"
-msgstr "Окаяма"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:37
-msgid "Hiroshima"
-msgstr "Хіросіма"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:38
-msgid "Yamaguchi"
-msgstr "Ямаґуті"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:39
-msgid "Tokushima"
-msgstr "Токусіма"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:40
-msgid "Kagawa"
-msgstr "Каґава"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:41
-msgid "Ehime"
-msgstr "Ехіме"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:42
-msgid "Kochi"
-msgstr "Коті"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:43
-msgid "Fukuoka"
-msgstr "Фукуока"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:44
-msgid "Saga"
-msgstr "Саґа"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:45
-msgid "Nagasaki"
-msgstr "Наґасакі"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:46
-msgid "Kumamoto"
-msgstr "Кумамото"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:47
-msgid "Oita"
-msgstr "Оїта"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:48
-msgid "Miyazaki"
-msgstr "Міядзакі"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:49
-msgid "Kagoshima"
-msgstr "Каґосіма"
-
-#: .\contrib\localflavor\jp\jp_prefectures.py:50
-msgid "Okinawa"
-msgstr "Окінава"
-
-#: .\contrib\localflavor\mx\mx_states.py:12
-msgid "Aguascalientes"
-msgstr "Аґуаскальєнтес"
-
-#: .\contrib\localflavor\mx\mx_states.py:13
-msgid "Baja California"
-msgstr "Нижня Каліфорнія Північна"
-
-#: .\contrib\localflavor\mx\mx_states.py:14
-msgid "Baja California Sur"
-msgstr "Нижня Каліфорнія Південна"
-
-#: .\contrib\localflavor\mx\mx_states.py:15
-msgid "Campeche"
-msgstr "Кампече"
-
-#: .\contrib\localflavor\mx\mx_states.py:16
-msgid "Chihuahua"
-msgstr "Чіуауа"
-
-#: .\contrib\localflavor\mx\mx_states.py:17
-msgid "Chiapas"
-msgstr "Чіапас"
-
-#: .\contrib\localflavor\mx\mx_states.py:18
-msgid "Coahuila"
-msgstr "Коауїла"
-
-#: .\contrib\localflavor\mx\mx_states.py:19
-msgid "Colima"
-msgstr "Коліма"
-
-#: .\contrib\localflavor\mx\mx_states.py:20
-msgid "Distrito Federal"
-msgstr "Федеральний округ"
-
-#: .\contrib\localflavor\mx\mx_states.py:21
-msgid "Durango"
-msgstr "Дуранго"
-
-#: .\contrib\localflavor\mx\mx_states.py:22
-msgid "Guerrero"
-msgstr "Ґерреро"
-
-#: .\contrib\localflavor\mx\mx_states.py:23
-msgid "Guanajuato"
-msgstr "Ґуанахуато"
-
-#: .\contrib\localflavor\mx\mx_states.py:24
-msgid "Hidalgo"
-msgstr "Ідальґо"
-
-#: .\contrib\localflavor\mx\mx_states.py:25
-msgid "Jalisco"
-msgstr "Халіско"
-
-#: .\contrib\localflavor\mx\mx_states.py:26
-msgid "Estado de México"
-msgstr "Мехіко"
-
-#: .\contrib\localflavor\mx\mx_states.py:27
-msgid "Michoacán"
-msgstr "Мічоакан"
-
-#: .\contrib\localflavor\mx\mx_states.py:28
-msgid "Morelos"
-msgstr "Морелос"
-
-#: .\contrib\localflavor\mx\mx_states.py:29
-msgid "Nayarit"
-msgstr "Наяріт"
-
-#: .\contrib\localflavor\mx\mx_states.py:30
-msgid "Nuevo León"
-msgstr "Нуево-Леон"
-
-#: .\contrib\localflavor\mx\mx_states.py:31
-msgid "Oaxaca"
-msgstr "Оахака"
-
-#: .\contrib\localflavor\mx\mx_states.py:32
-msgid "Puebla"
-msgstr "Пуебла"
-
-#: .\contrib\localflavor\mx\mx_states.py:33
-msgid "Querétaro"
-msgstr "Керетаро"
-
-#: .\contrib\localflavor\mx\mx_states.py:34
-msgid "Quintana Roo"
-msgstr "Кінтана-Роо"
-
-#: .\contrib\localflavor\mx\mx_states.py:35
-msgid "Sinaloa"
-msgstr "Сіналоа"
-
-#: .\contrib\localflavor\mx\mx_states.py:36
-msgid "San Luis Potosí"
-msgstr "Сан-Луїс-Потосі"
-
-#: .\contrib\localflavor\mx\mx_states.py:37
-msgid "Sonora"
-msgstr "Сонора"
-
-#: .\contrib\localflavor\mx\mx_states.py:38
-msgid "Tabasco"
-msgstr "Табаско"
-
-#: .\contrib\localflavor\mx\mx_states.py:39
-msgid "Tamaulipas"
-msgstr "Тамауліпас"
-
-#: .\contrib\localflavor\mx\mx_states.py:40
-msgid "Tlaxcala"
-msgstr "Тлашкала"
-
-#: .\contrib\localflavor\mx\mx_states.py:41
-msgid "Veracruz"
-msgstr "Веракрус"
-
-#: .\contrib\localflavor\mx\mx_states.py:42
-msgid "Yucatán"
-msgstr "Юкатан"
-
-#: .\contrib\localflavor\mx\mx_states.py:43
-msgid "Zacatecas"
-msgstr "Сакатекас"
-
-#: .\contrib\localflavor\nl\forms.py:21
-msgid "Enter a valid postal code"
-msgstr "Уведіть правильний поштовий індекс."
-
-#: .\contrib\localflavor\nl\forms.py:52
-msgid "Enter a valid phone number"
-msgstr "Введіть правильний номер телефону."
-
-#: .\contrib\localflavor\nl\forms.py:78
-msgid "Enter a valid SoFi number"
-msgstr "Введіть правильний номер SoFi."
-
-#: .\contrib\localflavor\nl\nl_provinces.py:4
-msgid "Drenthe"
-msgstr "Дренте"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:5
-msgid "Flevoland"
-msgstr "Флеволанд"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:6
-msgid "Friesland"
-msgstr "Фризляндія"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:7
-msgid "Gelderland"
-msgstr "Ґельдерланд"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:8
-msgid "Groningen"
-msgstr "Ґронінґен"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:9
-msgid "Limburg"
-msgstr "Лімбурґ"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:10
-msgid "Noord-Brabant"
-msgstr "Північний Брабант"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:11
-msgid "Noord-Holland"
-msgstr "Північна Голландія"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:12
-msgid "Overijssel"
-msgstr "Оверейсел"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:13
-msgid "Utrecht"
-msgstr "Утрехт"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:14
-msgid "Zeeland"
-msgstr "Зеландія"
-
-#: .\contrib\localflavor\nl\nl_provinces.py:15
-msgid "Zuid-Holland"
-msgstr "Південна Голландія"
-
-#: .\contrib\localflavor\no\forms.py:33
-msgid "Enter a valid Norwegian social security number."
-msgstr "Введіть правильний номер норвезького соціального страхування."
-
-#: .\contrib\localflavor\pe\forms.py:24
-msgid "This field requires 8 digits."
-msgstr "В це поле можна ввести тільки 8 цифр."
-
-#: .\contrib\localflavor\pe\forms.py:52
-msgid "This field requires 11 digits."
-msgstr "В це поле можна ввести тільки 11 цифр."
-
-#: .\contrib\localflavor\pl\forms.py:38
-msgid "National Identification Number consists of 11 digits."
-msgstr "Національний ідентифікаційний номер складається з 11 цифр."
-
-#: .\contrib\localflavor\pl\forms.py:39
-msgid "Wrong checksum for the National Identification Number."
-msgstr "Помилкова контрольна сума для Національного ідентифікаційного номера"
-
-#: .\contrib\localflavor\pl\forms.py:71
-msgid ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr ""
-"Заповніть поле податковий номер (NIP) у форматі XXX-XXX-XX-XX або XX-XX-XXX-"
-"XXX."
-
-#: .\contrib\localflavor\pl\forms.py:72
-msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr "Помилкова контрольна сума для податкового номеру (NIP)."
-
-#: .\contrib\localflavor\pl\forms.py:111
-msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
-msgstr ""
-"Національний діловий реєстраційний номер (REGON) складається з 7 або 9 цифр."
-
-#: .\contrib\localflavor\pl\forms.py:112
-msgid "Wrong checksum for the National Business Register Number (REGON)."
-msgstr ""
-"Помилкова контрольна сума для Національного ділового реєстраційного номеру "
-"(REGON)."
-
-#: .\contrib\localflavor\pl\forms.py:155
-msgid "Enter a postal code in the format XX-XXX."
-msgstr "Введіть поштовий індекс у форматі XX-XXX."
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:8
-msgid "Lower Silesia"
-msgstr "Нижньосілезьке"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:9
-msgid "Kuyavia-Pomerania"
-msgstr "Куявсько-Поморське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:10
-msgid "Lublin"
-msgstr "Люблінське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:11
-msgid "Lubusz"
-msgstr "Любуське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:12
-msgid "Lodz"
-msgstr "Лодзинське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:13
-msgid "Lesser Poland"
-msgstr "Малопольське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:14
-msgid "Masovia"
-msgstr "Мазовецьке"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:15
-msgid "Opole"
-msgstr "Опольське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:16
-msgid "Subcarpatia"
-msgstr "Підкарпатське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:17
-msgid "Podlasie"
-msgstr "Підляське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:18
-msgid "Pomerania"
-msgstr "Поморське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:19
-msgid "Silesia"
-msgstr "Сілезьке"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:20
-msgid "Swietokrzyskie"
-msgstr "Свентокшиське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:21
-msgid "Warmia-Masuria"
-msgstr "Вармінсько-Мазурське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:22
-msgid "Greater Poland"
-msgstr "Великопольське"
-
-#: .\contrib\localflavor\pl\pl_voivodeships.py:23
-msgid "West Pomerania"
-msgstr "Західнопоморське"
-
-#: .\contrib\localflavor\ro\forms.py:19
-msgid "Enter a valid CIF."
-msgstr "Введіть правильний CIF."
-
-#: .\contrib\localflavor\ro\forms.py:56
-msgid "Enter a valid CNP."
-msgstr "Введіть правильний CNP."
-
-#: .\contrib\localflavor\ro\forms.py:141
-msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "Введіть правильний IBAN в форматі ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
-
-#: .\contrib\localflavor\ro\forms.py:171
-msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "Телефонні номери мають бути у форматі XXX-XXX-XXXX."
-
-#: .\contrib\localflavor\ro\forms.py:194
-
-msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Введіть правильний поштовий індекс у форматі XXXXXX"
-
-#: .\contrib\localflavor\sk\forms.py:30
-msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Введіть поштовий індекс у форматі XXXXX або XXX XX."
-
-#: .\contrib\localflavor\sk\sk_districts.py:8
-msgid "Banska Bystrica"
-msgstr "Банська Бистриця"
-
-#: .\contrib\localflavor\sk\sk_districts.py:9
-msgid "Banska Stiavnica"
-msgstr "Банська Шт'явниця"
-
-#: .\contrib\localflavor\sk\sk_districts.py:10
-msgid "Bardejov"
-msgstr "Бардейов"
-
-#: .\contrib\localflavor\sk\sk_districts.py:11
-msgid "Banovce nad Bebravou"
-msgstr "Бановце-над-Бебравоу"
-
-#: .\contrib\localflavor\sk\sk_districts.py:12
-msgid "Brezno"
-msgstr "Брезно"
-
-#: .\contrib\localflavor\sk\sk_districts.py:13
-msgid "Bratislava I"
-msgstr "Братіслава I"
-
-#: .\contrib\localflavor\sk\sk_districts.py:14
-msgid "Bratislava II"
-msgstr "Братіслава II"
-
-#: .\contrib\localflavor\sk\sk_districts.py:15
-msgid "Bratislava III"
-msgstr "Братіслава III"
-
-#: .\contrib\localflavor\sk\sk_districts.py:16
-msgid "Bratislava IV"
-msgstr "Братіслава IV"
-
-#: .\contrib\localflavor\sk\sk_districts.py:17
-msgid "Bratislava V"
-msgstr "Братіслава V"
-
-#: .\contrib\localflavor\sk\sk_districts.py:18
-msgid "Bytca"
-msgstr "Бітча"
-
-#: .\contrib\localflavor\sk\sk_districts.py:19
-msgid "Cadca"
-msgstr "Чадца"
-
-#: .\contrib\localflavor\sk\sk_districts.py:20
-msgid "Detva"
-msgstr "Детва"
-
-#: .\contrib\localflavor\sk\sk_districts.py:21
-msgid "Dolny Kubin"
-msgstr "Долни Кубін"
-
-#: .\contrib\localflavor\sk\sk_districts.py:22
-msgid "Dunajska Streda"
-msgstr "Дунайська Стреда"
-
-#: .\contrib\localflavor\sk\sk_districts.py:23
-msgid "Galanta"
-msgstr "Галанта"
-
-#: .\contrib\localflavor\sk\sk_districts.py:24
-msgid "Gelnica"
-msgstr "Гелница"
-
-#: .\contrib\localflavor\sk\sk_districts.py:25
-msgid "Hlohovec"
-msgstr "Глоговець"
-
-#: .\contrib\localflavor\sk\sk_districts.py:26
-msgid "Humenne"
-msgstr "Гуменне"
-
-#: .\contrib\localflavor\sk\sk_districts.py:27
-msgid "Ilava"
-msgstr "Ілава"
-
-#: .\contrib\localflavor\sk\sk_districts.py:28
-msgid "Kezmarok"
-msgstr "Кежмарок"
-
-#: .\contrib\localflavor\sk\sk_districts.py:29
-msgid "Komarno"
-msgstr "Комарно"
-
-#: .\contrib\localflavor\sk\sk_districts.py:30
-msgid "Kosice I"
-msgstr "Кошице I"
-
-#: .\contrib\localflavor\sk\sk_districts.py:31
-msgid "Kosice II"
-msgstr "Кошице II"
-
-#: .\contrib\localflavor\sk\sk_districts.py:32
-msgid "Kosice III"
-msgstr "Кошице III"
-
-#: .\contrib\localflavor\sk\sk_districts.py:33
-msgid "Kosice IV"
-msgstr "Кошице IV"
-
-#: .\contrib\localflavor\sk\sk_districts.py:34
-msgid "Kosice - okolie"
-msgstr "Кошице - периферія"
-
-#: .\contrib\localflavor\sk\sk_districts.py:35
-msgid "Krupina"
-msgstr "Крупіна"
-
-#: .\contrib\localflavor\sk\sk_districts.py:36
-msgid "Kysucke Nove Mesto"
-msgstr "Кошицький край"
-
-#: .\contrib\localflavor\sk\sk_districts.py:37
-msgid "Levice"
-msgstr "Левіце"
-
-#: .\contrib\localflavor\sk\sk_districts.py:38
-msgid "Levoca"
-msgstr "Левоча"
-
-#: .\contrib\localflavor\sk\sk_districts.py:39
-msgid "Liptovsky Mikulas"
-msgstr "Ліптовскі Мікулаш"
-
-#: .\contrib\localflavor\sk\sk_districts.py:40
-msgid "Lucenec"
-msgstr "Лученєць"
-
-#: .\contrib\localflavor\sk\sk_districts.py:41
-msgid "Malacky"
-msgstr "Малацькі"
-
-#: .\contrib\localflavor\sk\sk_districts.py:42
-msgid "Martin"
-msgstr "Мартін"
-
-#: .\contrib\localflavor\sk\sk_districts.py:43
-msgid "Medzilaborce"
-msgstr "Мєдзілаборце"
-
-#: .\contrib\localflavor\sk\sk_districts.py:44
-msgid "Michalovce"
-msgstr "Міхаловце"
-
-#: .\contrib\localflavor\sk\sk_districts.py:45
-msgid "Myjava"
-msgstr "Міява"
-
-#: .\contrib\localflavor\sk\sk_districts.py:46
-msgid "Namestovo"
-msgstr "Намєстово"
-
-#: .\contrib\localflavor\sk\sk_districts.py:47
-msgid "Nitra"
-msgstr "Нітра"
-
-#: .\contrib\localflavor\sk\sk_districts.py:48
-msgid "Nove Mesto nad Vahom"
-msgstr "Нове Мєсто-над-Вагом"
-
-#: .\contrib\localflavor\sk\sk_districts.py:49
-msgid "Nove Zamky"
-msgstr "Нове Замкі"
-
-#: .\contrib\localflavor\sk\sk_districts.py:50
-msgid "Partizanske"
-msgstr "Партизанське"
-
-#: .\contrib\localflavor\sk\sk_districts.py:51
-msgid "Pezinok"
-msgstr "Пєзінок"
-
-#: .\contrib\localflavor\sk\sk_districts.py:52
-msgid "Piestany"
-msgstr "П'єштяни"
-
-#: .\contrib\localflavor\sk\sk_districts.py:53
-msgid "Poltar"
-msgstr "Полтар"
-
-#: .\contrib\localflavor\sk\sk_districts.py:54
-msgid "Poprad"
-msgstr "Попрад"
-
-#: .\contrib\localflavor\sk\sk_districts.py:55
-msgid "Povazska Bystrica"
-msgstr "Поважська Бистриця"
-
-#: .\contrib\localflavor\sk\sk_districts.py:56
-msgid "Presov"
-msgstr "Прєшов"
-
-#: .\contrib\localflavor\sk\sk_districts.py:57
-msgid "Prievidza"
-msgstr "Пр'євідза"
-
-#: .\contrib\localflavor\sk\sk_districts.py:58
-msgid "Puchov"
-msgstr "Пухов"
-
-#: .\contrib\localflavor\sk\sk_districts.py:59
-msgid "Revuca"
-msgstr "Рєвуца"
-
-#: .\contrib\localflavor\sk\sk_districts.py:60
-msgid "Rimavska Sobota"
-msgstr "Рімавська Собота"
-
-#: .\contrib\localflavor\sk\sk_districts.py:61
-msgid "Roznava"
-msgstr "Рожнява"
-
-#: .\contrib\localflavor\sk\sk_districts.py:62
-msgid "Ruzomberok"
-msgstr "Ружомберок"
-
-#: .\contrib\localflavor\sk\sk_districts.py:63
-msgid "Sabinov"
-msgstr "Сабінов"
-
-#: .\contrib\localflavor\sk\sk_districts.py:64
-msgid "Senec"
-msgstr "Сєнєц"
-
-#: .\contrib\localflavor\sk\sk_districts.py:65
-
-msgid "Senica"
-msgstr "Сєніца"
-
-#: .\contrib\localflavor\sk\sk_districts.py:66
-msgid "Skalica"
-msgstr "Скаліца"
-
-#: .\contrib\localflavor\sk\sk_districts.py:67
-msgid "Snina"
-msgstr "Сніна"
-
-#: .\contrib\localflavor\sk\sk_districts.py:68
-msgid "Sobrance"
-msgstr "Собранце"
-
-#: .\contrib\localflavor\sk\sk_districts.py:69
-msgid "Spisska Nova Ves"
-msgstr "Спішська Нова Вєс"
-
-#: .\contrib\localflavor\sk\sk_districts.py:70
-msgid "Stara Lubovna"
-msgstr "Стара Любовня"
-
-#: .\contrib\localflavor\sk\sk_districts.py:71
-msgid "Stropkov"
-msgstr "Стропков"
-
-#: .\contrib\localflavor\sk\sk_districts.py:72
-msgid "Svidnik"
-msgstr "Свіднік"
-
-#: .\contrib\localflavor\sk\sk_districts.py:73
-msgid "Sala"
-msgstr "Шаля"
-
-#: .\contrib\localflavor\sk\sk_districts.py:74
-msgid "Topolcany"
-msgstr "Топольчани"
-
-#: .\contrib\localflavor\sk\sk_districts.py:75
-msgid "Trebisov"
-msgstr "Требішов"
-
-#: .\contrib\localflavor\sk\sk_districts.py:76
-
-msgid "Trencin"
-msgstr "Трєнчін"
-
-#: .\contrib\localflavor\sk\sk_districts.py:77
-msgid "Trnava"
-msgstr "Трнава"
-
-#: .\contrib\localflavor\sk\sk_districts.py:78
-msgid "Turcianske Teplice"
-msgstr "Турч'янське Тепліце"
-
-#: .\contrib\localflavor\sk\sk_districts.py:79
-msgid "Tvrdosin"
-msgstr "Тврдошін"
-
-#: .\contrib\localflavor\sk\sk_districts.py:80
-msgid "Velky Krtis"
-msgstr "Вельки Кртіш"
-
-#: .\contrib\localflavor\sk\sk_districts.py:81
-msgid "Vranov nad Toplou"
-msgstr "Вранов-над-Топльеу"
-
-#: .\contrib\localflavor\sk\sk_districts.py:82
-msgid "Zlate Moravce"
-msgstr "Злате Моравце"
-
-#: .\contrib\localflavor\sk\sk_districts.py:83
-msgid "Zvolen"
-msgstr "Зволен"
-
-#: .\contrib\localflavor\sk\sk_districts.py:84
-msgid "Zarnovica"
-msgstr "Жарновиця"
-
-#: .\contrib\localflavor\sk\sk_districts.py:85
-msgid "Ziar nad Hronom"
-msgstr "Ж'яр-над-Гроном"
-
-#: .\contrib\localflavor\sk\sk_districts.py:86
-msgid "Zilina"
-msgstr "Жиліна"
-
-#: .\contrib\localflavor\sk\sk_regions.py:8
-msgid "Banska Bystrica region"
-msgstr "Банкобистрицький край"
-
-#: .\contrib\localflavor\sk\sk_regions.py:9
-msgid "Bratislava region"
-msgstr "Братиславський край"
-
-#: .\contrib\localflavor\sk\sk_regions.py:10
-msgid "Kosice region"
-msgstr "Кошицький край"
-
-#: .\contrib\localflavor\sk\sk_regions.py:11
-msgid "Nitra region"
-msgstr "Нітранський край"
-
-#: .\contrib\localflavor\sk\sk_regions.py:12
-msgid "Presov region"
-msgstr "Прєшовський край"
-
-#: .\contrib\localflavor\sk\sk_regions.py:13
-msgid "Trencin region"
-msgstr "Тренчин"
-
-#: .\contrib\localflavor\sk\sk_regions.py:14
-msgid "Trnava region"
-msgstr "Трнава"
-
-#: .\contrib\localflavor\sk\sk_regions.py:15
-msgid "Zilina region"
-msgstr "Жилінський край"
-
-#: .\contrib\localflavor\uk\forms.py:21
-msgid "Enter a valid postcode."
-msgstr "Уведіть правильний поштовий індекс."
-
-#: .\contrib\localflavor\uk\uk_regions.py:11
-msgid "Bedfordshire"
-msgstr "Бедфордшір"
-
-#: .\contrib\localflavor\uk\uk_regions.py:12
-msgid "Buckinghamshire"
-msgstr "Бакінгемшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:14
-msgid "Cheshire"
-msgstr "Чешир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:15
-msgid "Cornwall and Isles of Scilly"
-msgstr "Корнуолл"
-
-#: .\contrib\localflavor\uk\uk_regions.py:16
-msgid "Cumbria"
-msgstr "Камбрія"
-
-#: .\contrib\localflavor\uk\uk_regions.py:17
-msgid "Derbyshire"
-msgstr "Дербішир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:18
-msgid "Devon"
-msgstr "Девон"
-
-#: .\contrib\localflavor\uk\uk_regions.py:19
-msgid "Dorset"
-msgstr "Дорсет"
-
-#: .\contrib\localflavor\uk\uk_regions.py:20
-msgid "Durham"
-msgstr "Дарем"
-
-#: .\contrib\localflavor\uk\uk_regions.py:21
-msgid "East Sussex"
-msgstr "Східний Сассекс"
-
-#: .\contrib\localflavor\uk\uk_regions.py:22
-msgid "Essex"
-msgstr "Ессекс"
-
-#: .\contrib\localflavor\uk\uk_regions.py:23
-msgid "Gloucestershire"
-msgstr "Глостершир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:24
-msgid "Greater London"
-msgstr "Великий Лондон"
-
-#: .\contrib\localflavor\uk\uk_regions.py:25
-msgid "Greater Manchester"
-msgstr "Великий Манчестер"
-
-#: .\contrib\localflavor\uk\uk_regions.py:26
-msgid "Hampshire"
-msgstr "Хемпшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:27
-msgid "Hertfordshire"
-msgstr "Хартфордшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:28
-msgid "Kent"
-msgstr "Кент"
-
-#: .\contrib\localflavor\uk\uk_regions.py:29
-msgid "Lancashire"
-msgstr "Ланкашир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:30
-msgid "Leicestershire"
-msgstr "Лестершир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:31
-msgid "Lincolnshire"
-msgstr "Лінкольншир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:32
-msgid "Merseyside"
-msgstr "Мерсісайд"
-
-#: .\contrib\localflavor\uk\uk_regions.py:33
-msgid "Norfolk"
-msgstr "Норфолк"
-
-#: .\contrib\localflavor\uk\uk_regions.py:34
-msgid "North Yorkshire"
-msgstr "Північний Йоркшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:35
-msgid "Northamptonshire"
-msgstr "Нортгемптоншир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:36
-msgid "Northumberland"
-msgstr "Нортумберленд"
-
-#: .\contrib\localflavor\uk\uk_regions.py:37
-msgid "Nottinghamshire"
-msgstr "Ноттінгемшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:38
-msgid "Oxfordshire"
-msgstr "Оксфордшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:39
-msgid "Shropshire"
-msgstr "Шропшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:40
-msgid "Somerset"
-msgstr "Сомерсет"
-
-#: .\contrib\localflavor\uk\uk_regions.py:41
-msgid "South Yorkshire"
-msgstr "Південний Йоркшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:42
-msgid "Staffordshire"
-msgstr "Стаффордшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:43
-msgid "Suffolk"
-msgstr "Саффолк"
-
-#: .\contrib\localflavor\uk\uk_regions.py:44
-msgid "Surrey"
-msgstr "Суррей"
-
-#: .\contrib\localflavor\uk\uk_regions.py:45
-msgid "Tyne and Wear"
-msgstr "Тайн-енд-Уїр"
-
-#: .\contrib\localflavor\uk\uk_regions.py:46
-msgid "Warwickshire"
-msgstr "Варвікшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:47
-msgid "West Midlands"
-msgstr "Уест Мідлендс"
-
-#: .\contrib\localflavor\uk\uk_regions.py:48
-msgid "West Sussex"
-msgstr "Західний Сассекс"
-
-#: .\contrib\localflavor\uk\uk_regions.py:49
-msgid "West Yorkshire"
-msgstr "Західний Йоркшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:50
-msgid "Wiltshire"
-msgstr "Уілтшир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:51
-msgid "Worcestershire"
-msgstr "Вустершир"
-
-#: .\contrib\localflavor\uk\uk_regions.py:55
-msgid "County Antrim"
-msgstr "Графство Антрім"
-
-#: .\contrib\localflavor\uk\uk_regions.py:56
-msgid "County Armagh"
-msgstr "Графство Арма"
-
-#: .\contrib\localflavor\uk\uk_regions.py:57
-msgid "County Down"
-msgstr "Графство Даун"
-
-#: .\contrib\localflavor\uk\uk_regions.py:58
-msgid "County Fermanagh"
-msgstr "Графство Фєрмана"
-
-#: .\contrib\localflavor\uk\uk_regions.py:59
-msgid "County Londonderry"
-msgstr "Графство Лондондеррі"
-
-#: .\contrib\localflavor\uk\uk_regions.py:60
-msgid "County Tyrone"
-msgstr "Графство Тірон"
-
-#: .\contrib\localflavor\uk\uk_regions.py:64
-msgid "Clwyd"
-msgstr "Клуід"
-
-#: .\contrib\localflavor\uk\uk_regions.py:65
-msgid "Dyfed"
-msgstr "Давєд"
-
-#: .\contrib\localflavor\uk\uk_regions.py:66
-msgid "Gwent"
-msgstr "Гвєнт"
-
-#: .\contrib\localflavor\uk\uk_regions.py:67
-msgid "Gwynedd"
-msgstr "Гвінед"
-
-#: .\contrib\localflavor\uk\uk_regions.py:68
-msgid "Mid Glamorgan"
-msgstr "Мід Гламорган"
-
-#: .\contrib\localflavor\uk\uk_regions.py:69
-msgid "Powys"
-msgstr "Поуіс"
-
-#: .\contrib\localflavor\uk\uk_regions.py:70
-msgid "South Glamorgan"
-msgstr "Південний Гламорган"
-
-#: .\contrib\localflavor\uk\uk_regions.py:71
-msgid "West Glamorgan"
-msgstr "Західний Гламорган"
-
-#: .\contrib\localflavor\uk\uk_regions.py:75
-msgid "Borders"
-msgstr "Бордерс"
-
-#: .\contrib\localflavor\uk\uk_regions.py:76
-msgid "Central Scotland"
-msgstr "Центральна Шотландія"
-
-#: .\contrib\localflavor\uk\uk_regions.py:77
-msgid "Dumfries and Galloway"
-msgstr "Дамфріс і Галлоуей"
-
-#: .\contrib\localflavor\uk\uk_regions.py:78
-msgid "Fife"
-msgstr "Файф"
-
-#: .\contrib\localflavor\uk\uk_regions.py:79
-msgid "Grampian"
-msgstr "Гремпіан"
-
-#: .\contrib\localflavor\uk\uk_regions.py:80
-msgid "Highland"
-msgstr "Хайленд"
-
-#: .\contrib\localflavor\uk\uk_regions.py:81
-msgid "Lothian"
-msgstr "Лотіан"
-
-#: .\contrib\localflavor\uk\uk_regions.py:82
-msgid "Orkney Islands"
-msgstr "Оркнейські острови"
-
-#: .\contrib\localflavor\uk\uk_regions.py:83
-msgid "Shetland Islands"
-msgstr "Шетлендські острови"
-
-#: .\contrib\localflavor\uk\uk_regions.py:84
-msgid "Strathclyde"
-msgstr "Стресклайд"
-
-#: .\contrib\localflavor\uk\uk_regions.py:85
-msgid "Tayside"
-msgstr "Тейсайд"
-
-#: .\contrib\localflavor\uk\uk_regions.py:86
-msgid "Western Isles"
-msgstr "Західні острови"
-
-#: .\contrib\localflavor\uk\uk_regions.py:90
-msgid "England"
-msgstr "Англія"
-
-#: .\contrib\localflavor\uk\uk_regions.py:91
-msgid "Northern Ireland"
-msgstr "Північна Ірландія"
-
-#: .\contrib\localflavor\uk\uk_regions.py:92
-msgid "Scotland"
-msgstr "Шотландія"
-
-#: .\contrib\localflavor\uk\uk_regions.py:93
-msgid "Wales"
-msgstr "Уельс"
-
-#: .\contrib\localflavor\us\forms.py:16
-msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "Введіть поштовий індекс у форматі XXXXX або XXXXX-XXXX."
-
-#: .\contrib\localflavor\us\forms.py:54
-msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr ""
-"Введіть правильний номер соціального забезпення США в форматі XXX-XX-XXXX."
-
-#: .\contrib\localflavor\za\forms.py:20
-msgid "Enter a valid South African ID number"
-msgstr "Введіть правильний Південно-Африканський ідентифікаційний номер"
-
-#: .\contrib\localflavor\za\forms.py:54
-msgid "Enter a valid South African postal code"
-msgstr "Введіть правильний поштовий індекс Південної Африки"
-
-#: .\contrib\localflavor\za\za_provinces.py:4
-msgid "Eastern Cape"
-msgstr "Східна Капська"
-
-#: .\contrib\localflavor\za\za_provinces.py:5
-msgid "Free State"
-msgstr "Вільна країна"
-
-#: .\contrib\localflavor\za\za_provinces.py:6
-msgid "Gauteng"
-msgstr "Гаутенг"
-
-#: .\contrib\localflavor\za\za_provinces.py:7
-msgid "KwaZulu-Natal"
-msgstr "КваЗулу-Наталь"
-
-#: .\contrib\localflavor\za\za_provinces.py:8
-msgid "Limpopo"
-msgstr "Лімпопо"
-
-#: .\contrib\localflavor\za\za_provinces.py:9
-msgid "Mpumalanga"
-msgstr "Мпумаланга"
-
-#: .\contrib\localflavor\za\za_provinces.py:10
-msgid "Northern Cape"
-msgstr "Північна Капська"
-
-#: .\contrib\localflavor\za\za_provinces.py:11
-msgid "North West"
-msgstr "Північно-Західна"
-
-#: .\contrib\localflavor\za\za_provinces.py:12
-msgid "Western Cape"
-msgstr "Західна Капська"
-
-#: .\contrib\redirects\models.py:7
-msgid "redirect from"
-msgstr "перенаправлення з"
-
-#: .\contrib\redirects\models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Це повинен бути абсолютний шлях, виключаючи ім'я домену. Приклад: '/events/"
-"search/'."
-
-#: .\contrib\redirects\models.py:9
-msgid "redirect to"
-msgstr "перенаправлення до"
-
-#: .\contrib\redirects\models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Це може бути або абсолютний шлях (як вище), або повний URL, який починається "
-"з 'http://'."
-
-#: .\contrib\redirects\models.py:13
-msgid "redirect"
-msgstr "перенаправлення"
-
-#: .\contrib\redirects\models.py:14
-msgid "redirects"
-msgstr "перенаправлення"
-
-#: .\contrib\sessions\models.py:45
-msgid "session key"
-msgstr "ключ сесії"
-
-#: .\contrib\sessions\models.py:47
-msgid "session data"
-msgstr "дані сесії"
-
-#: .\contrib\sessions\models.py:48
-msgid "expire date"
-msgstr "термін придатності"
-
-#: .\contrib\sessions\models.py:53
-msgid "session"
-msgstr "сесія"
-
-#: .\contrib\sessions\models.py:54
-msgid "sessions"
-msgstr "сесії"
-
-#: .\contrib\sites\models.py:32
-msgid "domain name"
-msgstr "доменне ім'я"
-
-#: .\contrib\sites\models.py:33
-msgid "display name"
-msgstr "відображуване ім'я"
-
-#: .\contrib\sites\models.py:39
-msgid "sites"
-msgstr "сайти"
-
-#: .\core\validators.py:80
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr ""
-"Це значення повинно містити тільки літери, числа, символи підкреслювання або "
-"дефіси."
-
-#: .\core\validators.py:84
-msgid "Uppercase letters are not allowed here."
-msgstr "Літери у верхньому регістрі тут недозволені."
-
-#: .\core\validators.py:88
-msgid "Lowercase letters are not allowed here."
-msgstr "Літери у нижньому регістрі тут недозволені."
-
-#: .\core\validators.py:95 .\db\models\fields\__init__.py:428
+#: core/validators.py:129 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "Введіть тільки цифри, що розділені комами."
 
-#: .\core\validators.py:107
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Введіть правильні e-mail адреси, що розділені комами."
+#: core/validators.py:135
+#, fuzzy, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"Переконайтеся, що це значення має не менще %(min)d символів (зараз %(length)"
+"d)."
 
-#: .\core\validators.py:111
-msgid "Please enter a valid IP address."
-msgstr "Будь ласка, введіть правильну IP-адресу."
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#, fuzzy, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Переконайтеся, що це значення менше або дорівнює %s."
 
-#: .\core\validators.py:115
-msgid "Empty values are not allowed here."
-msgstr "Порожні значення тут не дозволені."
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#, fuzzy, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Переконайтеся, що це значення більше або дорівнює %s."
 
-#: .\core\validators.py:119
-msgid "Non-numeric characters aren't allowed here."
-msgstr "Не-цифрові символи тут не дозволені"
+#: core/validators.py:164
+#, fuzzy, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+"Переконайтеся, що це значення має не менще %(min)d символів (зараз %(length)"
+"d)."
 
-#: .\core\validators.py:123
-msgid "This value can't be comprised solely of digits."
-msgstr "Це значення не може складатися з одних цифр."
+#: core/validators.py:170
+#, fuzzy, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr ""
+"Переконайтеся, що це значення має не більше %(max)d символів (зараз %(length)"
+"d)."
 
-#: .\core\validators.py:128 .\forms\fields.py:166 .\newforms\fields.py:152
-msgid "Enter a whole number."
-msgstr "Введіть ціле число."
+#: db/models/base.py:765
+#, fuzzy, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "Це поле повинно бути заданим, у разі якщо %(field)s є %(value)s"
 
-#: .\core\validators.py:132
-msgid "Only alphabetical characters are allowed here."
-msgstr "Тільки алфавітні символи дозволені тут."
+#: db/models/base.py:780 db/models/base.py:788
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s з таким %(field_label)s вже існує."
 
-#: .\core\validators.py:147 .\db\models\fields\__init__.py:468
-msgid "Invalid date: %s"
-msgstr "Неправильна дата: %s"
+#: db/models/base.py:787 forms/models.py:581
+msgid "and"
+msgstr "та"
 
-#: .\core\validators.py:152 .\db\models\fields\__init__.py:459
+#: db/models/fields/__init__.py:63
+#, python-format
+msgid "Value %r is not a valid choice."
+msgstr ""
+
+#: db/models/fields/__init__.py:64
+msgid "This field cannot be null."
+msgstr "Це поле не може бути пустим."
+
+#: db/models/fields/__init__.py:65
+#, fuzzy
+msgid "This field cannot be blank."
+msgstr "Це поле не може бути пустим."
+
+#: db/models/fields/__init__.py:70
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
+msgid "Integer"
+msgstr "Ціле"
+
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
+msgid "This value must be an integer."
+msgstr "Це значення має бути цілим."
+
+#: db/models/fields/__init__.py:493
+msgid "This value must be either True or False."
+msgstr "Це значення повинно бути True або False."
+
+#: db/models/fields/__init__.py:495
+msgid "Boolean (Either True or False)"
+msgstr "Булеве значення (True або False)"
+
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
+#, fuzzy, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Рядок (до %(maxlength)s символів)"
+
+#: db/models/fields/__init__.py:570
+msgid "Comma-separated integers"
+msgstr "Цілі, розділені комою"
+
+#: db/models/fields/__init__.py:584
+msgid "Date (without time)"
+msgstr "Дата (без часу)"
+
+#: db/models/fields/__init__.py:588
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Уведіть правильну дату у форматі РРРР-ММ-ДД."
 
-#: .\core\validators.py:157
-msgid "Enter a valid time in HH:MM format."
-msgstr "Введіть коректний час у форматі ГГ:ХХ."
+#: db/models/fields/__init__.py:589
+#, python-format
+msgid "Invalid date: %s"
+msgstr "Неправильна дата: %s"
 
-#: .\core\validators.py:161
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Введіть коректні дату/час у форматі ГГГГ-ММ-ДД ГГ:ХХ"
+#: db/models/fields/__init__.py:670
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "Введіть коректну дату у форматі РРРР-ММ-ДД[:сс[.мммммм]]."
 
-#: .\core\validators.py:178 .\core\validators.py:470 .\forms\fields.py:446
-#: .\newforms\fields.py:433
+#: db/models/fields/__init__.py:672
+msgid "Date (with time)"
+msgstr "Дата (з часом)"
+
+#: db/models/fields/__init__.py:746
+msgid "This value must be a decimal number."
+msgstr "Це значення повинно бути цілим числом."
+
+#: db/models/fields/__init__.py:748
+msgid "Decimal number"
+msgstr "Десяткове число"
+
+#: db/models/fields/__init__.py:803
+msgid "E-mail address"
+msgstr "E-mail адреса"
+
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
+msgid "File path"
+msgstr "Шлях до файла"
+
+#: db/models/fields/__init__.py:841
+#, fuzzy
+msgid "This value must be a float."
+msgstr "Це значення повинно бути, принаймні %s."
+
+#: db/models/fields/__init__.py:843
+msgid "Floating point number"
+msgstr "Число з плаваючою комою"
+
+#: db/models/fields/__init__.py:902
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "IP адреса"
+
+#: db/models/fields/__init__.py:931
+msgid "This value must be either None, True or False."
+msgstr "Це значення повинно бути None, True або False."
+
+#: db/models/fields/__init__.py:933
+msgid "Boolean (Either True, False or None)"
+msgstr "Булеве значення (включаючи True, False або None)"
+
+#: db/models/fields/__init__.py:1024
+msgid "Text"
+msgstr "Текст"
+
+#: db/models/fields/__init__.py:1040
+msgid "Time"
+msgstr "Час"
+
+#: db/models/fields/__init__.py:1044
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "Уведіть коректний час у форматі ГГ:ХХ[:сс[.мммммм]]."
+
+#: db/models/fields/__init__.py:1120
+msgid "URL"
+msgstr "URL"
+
+#: db/models/fields/__init__.py:1136
+msgid "XML text"
+msgstr "текст XML"
+
+#: db/models/fields/related.py:804
+#, fuzzy, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr "%(name)s об'єкт з первинним ключем %(key)r не існує."
+
+#: db/models/fields/related.py:806
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+
+#: db/models/fields/related.py:928
+msgid "One-to-one relationship"
+msgstr ""
+
+#: db/models/fields/related.py:990
+msgid "Many-to-many relationship"
+msgstr ""
+
+#: db/models/fields/related.py:1010
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Затисніть клавішу \"Control\", або \"Command\" на Маку, щоб обрати більше "
+"однієї опції."
+
+#: forms/fields.py:66
+msgid "This field is required."
+msgstr "Це поле обов'язкове."
+
+#: forms/fields.py:221
+msgid "Enter a whole number."
+msgstr "Введіть ціле число."
+
+#: forms/fields.py:252 forms/fields.py:273
+msgid "Enter a number."
+msgstr "Введіть число."
+
+#: forms/fields.py:276
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Переконайтеся, що тут не більше ніж %s цифр загалом."
+
+#: forms/fields.py:277
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Переконайтеся, що тут не більше ніж %s цифр після десяткової коми."
+
+#: forms/fields.py:278
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr "Переконайтеся, що тут не більше ніж %s цифр до десяткової коми."
+
+#: forms/fields.py:340 forms/fields.py:916
+msgid "Enter a valid date."
+msgstr "Введіть коректну дату."
+
+#: forms/fields.py:368 forms/fields.py:917
+msgid "Enter a valid time."
+msgstr "Введіть коректний час."
+
+#: forms/fields.py:394
+msgid "Enter a valid date/time."
+msgstr "Уведіть коректну дату/час адресу."
+
+#: forms/fields.py:458
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Файл не надіслано. Перевірте тип кодування форми."
 
-#: .\core\validators.py:189 .\forms\fields.py:477 .\newforms\fields.py:459
+#: forms/fields.py:459
+msgid "No file was submitted."
+msgstr "Файл не було надіслано."
+
+#: forms/fields.py:460
+msgid "The submitted file is empty."
+msgstr "Переданий файл порожній."
+
+#: forms/fields.py:461
+#, fuzzy, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+"Переконайтеся, що це значення має не більше %(max)d символів (зараз %(length)"
+"d)."
+
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: forms/fields.py:516
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3907,438 +584,96 @@ msgstr ""
 "Завантажте правильний малюнок. Файл, який ви завантажили, не є малюнком, або "
 "є зіпсованим малюнком."
 
-#: .\core\validators.py:196
+#: forms/fields.py:648 forms/fields.py:723
 #, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "URL %s не вказує на правильний малюнок."
-
-#: .\core\validators.py:200
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr ""
-"Телефонні номери мають бути у форматі XXX-XXX-XXXX. \"%s\" є неправильним."
-
-#: .\core\validators.py:208
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "URL %s не вказує на коректне відео у форматі QuickTime."
-
-#: .\core\validators.py:212
-msgid "A valid URL is required."
-msgstr "Необхадно ввести правильний URL."
-
-#: .\core\validators.py:226
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"Необхідно ввести валідний HTML. Помилки:\n"
-"%s"
-
-#: .\core\validators.py:233
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "Погано сформований XML: %s"
-
-#: .\core\validators.py:250
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "Невірний URL: %s"
-
-#: .\core\validators.py:255 .\core\validators.py:257
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "URL %s є пошкодженим посиланням."
-
-#: .\core\validators.py:263
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "Введіть правильну аббревіатуру штата США"
-
-#: .\core\validators.py:284
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Це поле повинно співпадати з полем '%s'"
-
-#: .\core\validators.py:303
-msgid "Please enter something for at least one field."
-msgstr "Будь ласка, введіть щось в хоча б одне поле."
-
-#: .\core\validators.py:312 .\core\validators.py:323
-msgid "Please enter both fields or leave them both empty."
-msgstr "Будь ласка, заповніть обидва поля або залишіть їх обох пустими."
-
-#: .\core\validators.py:331
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Це поле повинно бути заданим, у разі якщо %(field)s є %(value)s"
-
-#: .\core\validators.py:344
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Це поле повинно бути заданим, у разі якщо %(field)s не є %(value)s"
-
-#: .\core\validators.py:363
-msgid "Duplicate values are not allowed."
-msgstr "Продубльовані значення недозволені."
-
-#: .\core\validators.py:378
-#, python-format
-msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Це значення повинно бути між %(lower)s та %(upper)s."
-
-#: .\core\validators.py:380
-#, python-format
-msgid "This value must be at least %s."
-msgstr "Це значення повинно бути, принаймні %s."
-
-#: .\core\validators.py:382
-#, python-format
-msgid "This value must be no more than %s."
-msgstr "Це значення повинно бути не більше %s."
-
-#: .\core\validators.py:423
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "Це значення повинно бути ступенем %s."
-
-#: .\core\validators.py:433
-msgid "Please enter a valid decimal number."
-msgstr "Будь ласка, введіть правильне десяткове число."
-
-#: .\core\validators.py:440
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
-msgstr[0] ""
-"Будь ласка, введіть правильне десяткове число з загальною кількістю цифр не "
-"більшою ніж %s."
-msgstr[1] ""
-"Будь ласка, введіть правильне десяткове число з загальною кількістю цифр не "
-"більшою ніж %s."
-msgstr[2] ""
-"Будь ласка, введіть правильне десяткове число з загальною кількістю цифр не "
-"більшою ніж %s."
-
-#: .\core\validators.py:443
-#, python-format
-msgid ""
-"Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural ""
-"Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] ""
-"Будь ласка, введіть правильне десяткове число з цілою частиною, що налічує  "
-"максимум %s цифру."
-msgstr[1] ""
-"Будь ласка, введіть правильне десяткове число з цілою частиною, що налічує  "
-"максимум %s цифри."
-msgstr[2] ""
-"Будь ласка, введіть правильне десяткове число з цілою частиною, що налічує  "
-"максимум %s цифр."
-
-#: .\core\validators.py:446
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Будь ласка, введіть правильне десяткове число з %s цифр після коми."
-msgstr[1] "Будь ласка, введіть правильне десяткове число з %s цифр після коми."
-msgstr[2] "Будь ласка, введіть правильне десяткове число з %s цифр після коми."
-
-#: .\core\validators.py:454
-msgid "Please enter a valid floating point number."
-msgstr "Будь ласка, введіть правильне число з плаваючою точкою."
-
-#: .\core\validators.py:463
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Перевірте, щоб розмір закачаного файлу був як мінімум %s байтів."
-
-#: .\core\validators.py:464
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Перевірте, щоб розмір закачаного файлу був максимум %s байтів."
-
-#: .\core\validators.py:481
-msgid "The format for this field is wrong."
-msgstr "Невірний формат для цього поля."
-
-#: .\core\validators.py:496
-msgid "This field is invalid."
-msgstr "Це поле містить помилки."
-
-#: .\core\validators.py:532
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "Не можу нічого отримати з %s."
-
-#: .\core\validators.py:535
-#, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-"URL %(url)s повернув помилковий заголовок Content-Type '%(contenttype)s'."
-
-#: .\core\validators.py:568
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"Будь ласка, закрийте незакритий %(tag)s тег у рядку %(line)s. (Початок "
-"рядка: \"%(start)s\".)"
-
-#: .\core\validators.py:572
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Частина тексту, що починається у рядку %(line)s неприпустима у цьому "
-"контексті. (Початок рядка: \"%(start)s\".)"
-
-#: .\core\validators.py:577
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"\"%(attr)s\" у рядку %(line)s має помилковий атрибут. (Початок рядка: \"%"
-"(start)s\".)"
-
-#: .\core\validators.py:582
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"Тег \"<%(tag)s>\" у рядку %(line)s є помилковим. (Початок рядка: \"%(start)s"
-"\".)"
-
-#: .\core\validators.py:586
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"У тега в рядку %(line)s відсутній один або декілька необхідних атрибутів. "
-"(Початок рядка: \"%(start)s\".)"
-
-#: .\core\validators.py:591
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Атрибут \"%(attr)s\" у рядку %(line)s має помилкове значення. (Початок "
-"рядка: \"%(start)s\".)"
-
-#: .\db\models\manipulators.py:304
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s з таким %(type)s вже існує для даних %(field)s."
-
-#: .\db\models\fields\__init__.py:348 .\db\models\fields\__init__.py:683
-msgid "This value must be an integer."
-msgstr "Це значення має бути цілим."
-
-#: .\db\models\fields\__init__.py:379
-msgid "This value must be either True or False."
-msgstr "Це значення повинно бути True або False."
-
-#: .\db\models\fields\__init__.py:412
-msgid "This field cannot be null."
-msgstr "Це поле не може бути пустим."
-
-#: .\db\models\fields\__init__.py:532 .\db\models\fields\__init__.py:550
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "Введіть коректну дату у форматі РРРР-ММ-ДД[:сс[.мммммм]]."
-
-#: .\db\models\fields\__init__.py:586
-msgid "This value must be a decimal number."
-msgstr "Це значення повинно бути цілим числом."
-
-#: .\db\models\fields\__init__.py:719
-msgid "This value must be either None, True or False."
-msgstr "Це значення повинно бути None, True або False."
-
-#: .\db\models\fields\__init__.py:817 .\db\models\fields\__init__.py:831
-msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "Уведіть коректний час у форматі ГГ:ХХ[:сс[.мммммм]]."
-
-#: .\db\models\fields\related.py:761
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Затисніть клавішу \"Control\", або \"Command\" на Маку, щоб обрати більше "
-"однієї опції."
-
-#: .\db\models\fields\related.py:838
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"Будь ласка, введіть правильні %(self)s ID. Значення %(value)r помилкове."
-msgstr[1] "Будь ласка, введіть правильні %(self)s ID. Значення %(value)r помилкові."
-msgstr[2] "Будь ласка, введіть правильні %(self)s ID. Значення %(value)r помилкові."
-
-#: .\forms\fields.py:54 .\newforms\fields.py:46 .\oldforms\__init__.py:370
-msgid "This field is required."
-msgstr "Це поле обов'язкове."
-
-#: .\forms\fields.py:55 .\newforms\fields.py:47
-msgid "Enter a valid value."
-msgstr "Уведіть коректне значення."
-
-#: .\forms\fields.py:138 .\newforms\fields.py:124
-msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr ""
-"Переконайтеся, що це значення має не більше %(max)d символів (зараз %(length)"
-"d)."
-
-#: .\forms\fields.py:139 .\newforms\fields.py:125
-msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr ""
-"Переконайтеся, що це значення має не менще %(min)d символів (зараз %(length)"
-"d)."
-
-#: .\forms\fields.py:167 .\forms\fields.py:196 .\forms\fields.py:225
-#: .\newforms\fields.py:153 .\newforms\fields.py:182 .\newforms\fields.py:211
-msgid "Ensure this value is less than or equal to %s."
-msgstr "Переконайтеся, що це значення менше або дорівнює %s."
-
-#: .\forms\fields.py:168 .\forms\fields.py:197 .\forms\fields.py:226
-#: .\newforms\fields.py:154 .\newforms\fields.py:183 .\newforms\fields.py:212
-msgid "Ensure this value is greater than or equal to %s."
-msgstr "Переконайтеся, що це значення більше або дорівнює %s."
-
-#: .\forms\fields.py:195 .\forms\fields.py:224 .\newforms\fields.py:181
-#: .\newforms\fields.py:210
-msgid "Enter a number."
-msgstr "Введіть число."
-
-#: .\forms\fields.py:227 .\newforms\fields.py:213
-msgid "Ensure that there are no more than %s digits in total."
-msgstr "Переконайтеся, що тут не більше ніж %s цифр загалом."
-
-#: .\forms\fields.py:228 .\newforms\fields.py:214
-msgid "Ensure that there are no more than %s decimal places."
-msgstr "Переконайтеся, що тут не більше ніж %s цифр після десяткової коми."
-
-#: .\forms\fields.py:229 .\newforms\fields.py:215
-msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr "Переконайтеся, що тут не більше ніж %s цифр до десяткової коми."
-
-#: .\forms\fields.py:287 .\forms\fields.py:849 .\newforms\fields.py:263
-#: .\newforms\fields.py:750
-msgid "Enter a valid date."
-msgstr "Введіть коректну дату."
-
-#: .\forms\fields.py:321 .\forms\fields.py:850 .\newforms\fields.py:296
-#: .\newforms\fields.py:751
-msgid "Enter a valid time."
-msgstr "Введіть коректний час."
-
-#: .\forms\fields.py:360 .\newforms\fields.py:335
-msgid "Enter a valid date/time."
-msgstr "Уведіть коректну дату/час адресу."
-
-#: .\forms\fields.py:447 .\newforms\fields.py:434
-msgid "No file was submitted."
-msgstr "Файл не було надіслано."
-
-#: .\forms\fields.py:448 .\newforms\fields.py:435 .\oldforms\__init__.py:689
-msgid "The submitted file is empty."
-msgstr "Переданий файл порожній."
-
-#: .\forms\fields.py:538 .\newforms\fields.py:497
-msgid "Enter a valid URL."
-msgstr "Уведіть коректний URL."
-
-#: .\forms\fields.py:539 .\newforms\fields.py:498
-msgid "This URL appears to be a broken link."
-msgstr "URL %s є пошкодженим посиланням."
-
-#: .\forms\fields.py:618 .\forms\fields.py:696 .\newforms\fields.py:598
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Зробить коректний вибір, %(value)s немає серед варіантів вибору."
 
-#: .\forms\fields.py:697 .\forms\fields.py:758 .\forms\models.py:714
-#: .\newforms\fields.py:599 .\newforms\fields.py:661 .\newforms\models.py:563
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
 msgid "Enter a list of values."
 msgstr "Введіть список значень."
 
-#: .\forms\fields.py:878 .\newforms\fields.py:779
-msgid "Enter a valid IPv4 address."
-msgstr "Введіть коректну IPv4 адресу."
-
-#: .\forms\fields.py:888
-msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr ""
-"Введіть коректне значення 'slug' (короткого заголовку), що може містити "
-"тільки літери, числа, символи підкреслювання та дефіси."
-
-#: .\forms\formsets.py:242 .\forms\formsets.py:244
+#: forms/formsets.py:308 forms/formsets.py:310
 msgid "Order"
 msgstr "Послідовність"
 
-#: .\forms\models.py:281 .\forms\models.py:290
-#, python-format
-msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "%(model_name)s з таким %(field_label)s вже існує."
+#: forms/formsets.py:312
+msgid "Delete"
+msgstr "Видалити"
 
-#: .\forms\models.py:581
+#: forms/models.py:575
+#, fuzzy, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Будь ласка, виправте помилку, що зазначена нижче"
+
+#: forms/models.py:579
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: forms/models.py:585
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: forms/models.py:593
+#, fuzzy
+msgid "Please correct the duplicate values below."
+msgstr "Будь ласка, виправте помилку, що зазначена нижче"
+
+#: forms/models.py:868
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 "Зв'язаний зовнішній ключ не відповідає первісному ключу батьківського "
 "екземпляру."
 
-#: .\forms\models.py:644 .\newforms\fields.py:559 .\newforms\models.py:497
+#: forms/models.py:929
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Зробить коректний вибір. Такого варіанту нема серед доступних."
 
-#: .\forms\models.py:715 .\newforms\models.py:564
+#: forms/models.py:1019
+#, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Зробить коректний вибір. Такого варіанту %s нема серед доступних."
 
-#: .\oldforms\__init__.py:405
+#: forms/models.py:1021
 #, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Переконайтеся, що ваш текст менше, ніж %s символ."
-msgstr[1] "Переконайтеся, що ваш текст менше, ніж %s символи."
-msgstr[2] "Переконайтеся, що ваш текст менше, ніж %s символів."
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr ""
 
-#: .\oldforms\__init__.py:410
-msgid "Line breaks are not allowed here."
-msgstr "Символи нового рядку тут не дозволені."
+#: forms/widgets.py:299
+#, fuzzy
+msgid "Currently"
+msgstr "Зараз:"
 
-#: .\oldforms\__init__.py:508 .\oldforms\__init__.py:582
-#: .\oldforms\__init__.py:621
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Зробить коректний вибір; '%(data)s' немає у %(choices)s."
+#: forms/widgets.py:300
+msgid "Change"
+msgstr "Змінити"
 
-#: .\oldforms\__init__.py:750
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Введіть ціле число між -32,768 та 32,767."
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "рік"
 
-#: .\oldforms\__init__.py:760
-msgid "Enter a positive number."
-msgstr "Введіть додатне число."
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr "Невідомо"
 
-#: .\oldforms\__init__.py:770
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Введіть ціле число між 0 та 32,767."
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "Так"
 
-#: .\template\defaultfilters.py:743
+#: forms/widgets.py:547
+msgid "No"
+msgstr "Ні"
+
+#: template/defaultfilters.py:794
 msgid "yes,no,maybe"
 msgstr "так,ні,можливо"
 
-#: .\template\defaultfilters.py:774
+#: template/defaultfilters.py:825
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
@@ -4346,513 +681,391 @@ msgstr[0] "%(size)d байт"
 msgstr[1] "%(size)d байти"
 msgstr[2] "%(size)d байтів"
 
-#: .\template\defaultfilters.py:776
+#: template/defaultfilters.py:827
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f КБ"
 
-#: .\template\defaultfilters.py:778
+#: template/defaultfilters.py:829
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f МБ"
 
-#: .\template\defaultfilters.py:779
+#: template/defaultfilters.py:831
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f ГБ"
 
-#: .\utils\dateformat.py:41
+#: template/defaultfilters.py:833
+#, fuzzy, python-format
+msgid "%.1f TB"
+msgstr "%.1f КБ"
+
+#: template/defaultfilters.py:834
+#, fuzzy, python-format
+msgid "%.1f PB"
+msgstr "%.1f КБ"
+
+#: utils/dateformat.py:42
 msgid "p.m."
 msgstr "після полудня"
 
-#: .\utils\dateformat.py:42
+#: utils/dateformat.py:43
 msgid "a.m."
 msgstr "до полудня"
 
-#: .\utils\dateformat.py:47
+#: utils/dateformat.py:48
 msgid "PM"
 msgstr "після полудня"
 
-#: .\utils\dateformat.py:48
+#: utils/dateformat.py:49
 msgid "AM"
 msgstr "до полудня"
 
-#: .\utils\dateformat.py:97
+#: utils/dateformat.py:98
 msgid "midnight"
 msgstr "північ"
 
-#: .\utils\dateformat.py:99
+#: utils/dateformat.py:100
 msgid "noon"
 msgstr "полудень"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Monday"
 msgstr "Понеділок"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Tuesday"
 msgstr "Вівторок"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Wednesday"
 msgstr "Середа"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Thursday"
 msgstr "Четвер"
 
-#: .\utils\dates.py:6
+#: utils/dates.py:6
 msgid "Friday"
 msgstr "П'ятниця"
 
-#: .\utils\dates.py:7
+#: utils/dates.py:7
 msgid "Saturday"
 msgstr "Субота"
 
-#: .\utils\dates.py:7
+#: utils/dates.py:7
 msgid "Sunday"
 msgstr "Неділя"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Mon"
 msgstr "Пн"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Tue"
 msgstr "Вт"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Wed"
 msgstr "Сер"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Thu"
 msgstr "Чт"
 
-#: .\utils\dates.py:10
+#: utils/dates.py:10
 msgid "Fri"
 msgstr "Пт"
 
-#: .\utils\dates.py:11
+#: utils/dates.py:11
 msgid "Sat"
 msgstr "Сб"
 
-#: .\utils\dates.py:11
+#: utils/dates.py:11
 msgid "Sun"
 msgstr "Нед"
 
-#: .\utils\dates.py:18
+#: utils/dates.py:18
 msgid "January"
 msgstr "Січень"
 
-#: .\utils\dates.py:18
+#: utils/dates.py:18
 msgid "February"
 msgstr "Лютий"
 
-#: .\utils\dates.py:18 .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "Березень"
 
-#: .\utils\dates.py:18 .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "Квітень"
 
-#: .\utils\dates.py:18 .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "Травень"
 
-#: .\utils\dates.py:18 .\utils\dates.py:31
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "Червень"
 
-#: .\utils\dates.py:19 .\utils\dates.py:31
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "Липень"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "August"
 msgstr "Серпень"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "September"
 msgstr "Вересень"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "October"
 msgstr "Жовтень"
 
-#: .\utils\dates.py:19
+#: utils/dates.py:19
 msgid "November"
 msgstr "Листопад"
 
-#: .\utils\dates.py:20
+#: utils/dates.py:20
 msgid "December"
 msgstr "Грудень"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "jan"
 msgstr "січ"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "feb"
 msgstr "лют"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "mar"
 msgstr "бер"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "apr"
 msgstr "кві"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "may"
 msgstr "тра"
 
-#: .\utils\dates.py:23
+#: utils/dates.py:23
 msgid "jun"
 msgstr "чер"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "jul"
 msgstr "лип"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "aug"
 msgstr "сер"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "sep"
 msgstr "вер"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "oct"
 msgstr "жов"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "nov"
 msgstr "лис"
 
-#: .\utils\dates.py:24
+#: utils/dates.py:24
 msgid "dec"
 msgstr "гру"
 
-#: .\utils\dates.py:31
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "Січ."
 
-#: .\utils\dates.py:31
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "Лют."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "Сер."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "Вер."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "Жов."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "Лис."
 
-#: .\utils\dates.py:32
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "Груд."
 
-#: utils/dates.py:45
+#: utils/dates.py:35
 msgctxt "alt. month"
 msgid "January"
 msgstr "січня"
 
-#: utils/dates.py:46
+#: utils/dates.py:36
 msgctxt "alt. month"
 msgid "February"
 msgstr "лютого"
 
-#: utils/dates.py:47
+#: utils/dates.py:37
 msgctxt "alt. month"
 msgid "March"
 msgstr "березня"
 
-#: utils/dates.py:48
+#: utils/dates.py:38
 msgctxt "alt. month"
 msgid "April"
 msgstr "квітня"
 
-#: utils/dates.py:49
+#: utils/dates.py:39
 msgctxt "alt. month"
 msgid "May"
 msgstr "травня"
 
-#: utils/dates.py:50
+#: utils/dates.py:40
 msgctxt "alt. month"
 msgid "June"
 msgstr "червня"
 
-#: utils/dates.py:51
+#: utils/dates.py:41
 msgctxt "alt. month"
 msgid "July"
 msgstr "липня"
 
-#: utils/dates.py:52
+#: utils/dates.py:42
 msgctxt "alt. month"
 msgid "August"
 msgstr "серпня"
 
-#: utils/dates.py:53
+#: utils/dates.py:43
 msgctxt "alt. month"
 msgid "September"
 msgstr "вересня"
 
-#: utils/dates.py:54
+#: utils/dates.py:44
 msgctxt "alt. month"
 msgid "October"
 msgstr "жовтня"
 
-#: utils/dates.py:55
+#: utils/dates.py:45
 msgctxt "alt. month"
 msgid "November"
 msgstr "листопада"
 
-#: utils/dates.py:56
+#: utils/dates.py:46
 msgctxt "alt. month"
 msgid "December"
 msgstr "грудня"
 
-#: .\utils\text.py:128
+#: utils/text.py:136
 msgid "or"
 msgstr "або"
 
-#: .\utils\timesince.py:21
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
+
+#: utils/timesince.py:21
 msgid "year"
 msgid_plural "years"
 msgstr[0] "рік"
 msgstr[1] "роки"
 msgstr[2] "років"
 
-#: .\utils\timesince.py:22
+#: utils/timesince.py:22
 msgid "month"
 msgid_plural "months"
 msgstr[0] "місяць"
 msgstr[1] "місяці"
 msgstr[2] "місяців"
 
-#: .\utils\timesince.py:23
+#: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "тиждень"
 msgstr[1] "тижні"
 msgstr[2] "тижнів"
 
-#: .\utils\timesince.py:24
+#: utils/timesince.py:24
 msgid "day"
 msgid_plural "days"
 msgstr[0] "день"
 msgstr[1] "дні"
 msgstr[2] "днів"
 
-#: .\utils\timesince.py:25
+#: utils/timesince.py:25
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "година"
 msgstr[1] "години"
 msgstr[2] "годин"
 
-#: .\utils\timesince.py:26
+#: utils/timesince.py:26
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "хвилина"
 msgstr[1] "хвилини"
 msgstr[2] "хвилин"
 
-#: .\utils\timesince.py:43
+#: utils/timesince.py:45
 msgid "minutes"
 msgstr "хвилин(а)"
 
-#: .\utils\timesince.py:48
+#: utils/timesince.py:50
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: .\utils\timesince.py:54
+#: utils/timesince.py:56
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: .\utils\translation\trans_real.py:403
+#: utils/translation/trans_real.py:560
 msgid "DATE_FORMAT"
 msgstr "d.m.Y"
 
-#: .\utils\translation\trans_real.py:405
+#: utils/translation/trans_real.py:561
+msgid "DATETIME_FORMAT"
+msgstr "d.m.Y H:i"
+
+#: utils/translation/trans_real.py:562
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: .\utils\translation\trans_real.py:421
+#: utils/translation/trans_real.py:583
 msgid "YEAR_MONTH_FORMAT"
 msgstr "d.m.Y"
 
-#: .\utils\translation\trans_real.py:422
+#: utils/translation/trans_real.py:584
 msgid "MONTH_DAY_FORMAT"
 msgstr "d.m.Y"
 
-#: .\views\generic\create_update.py:114
+#: views/generic/create_update.py:121
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "Об'єкт %(verbose_name)s був успішно створений."
 
-#: .\views\generic\create_update.py:156
+#: views/generic/create_update.py:164
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "Об'єкт %(verbose_name)s був успішно змінений."
 
-#: .\views\generic\create_update.py:198
+#: views/generic/create_update.py:207
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "Об'єкт %(verbose_name)s був успішно видалений."
-
-#~ msgid "rating #1"
-#~ msgstr "рейтинг #1"
-
-#~ msgid "rating #2"
-#~ msgstr "рейтинг #2"
-
-#~ msgid "rating #3"
-#~ msgstr "рейтинг #3"
-
-#~ msgid "rating #4"
-#~ msgstr "рейтинг #4"
-
-#~ msgid "rating #5"
-#~ msgstr "рейтинг #5"
-
-#~ msgid "rating #6"
-#~ msgstr "рейтинг #6"
-
-#~ msgid "rating #7"
-#~ msgstr "рейтинг #7"
-
-#~ msgid "rating #8"
-#~ msgstr "рейтинг #8"
-
-
-#~ msgid "comments"
-#~ msgstr "коментарі"
-
-#~ msgid "person's name"
-#~ msgstr "Ім'я людини"
-
-#~ msgid "ip address"
-#~ msgstr "ip адреса"
-
-#~ msgid "approved by staff"
-#~ msgstr "схвалено адміністрацією"
-
-
-#~ msgid "free comments"
-#~ msgstr "вільні коментарі"
-
-#~ msgid "score"
-#~ msgstr "рахунок"
-
-
-#~ msgid "karma score"
-#~ msgstr "рахунок карми"
-
-
-#~ msgid "user flag"
-#~ msgstr "ознака користувача"
-
-
-#~ msgid "user flags"
-#~ msgstr "ознаки користувача"
-
-#~ msgid "deletion date"
-#~ msgstr "дата видалення"
-
-
-#~ msgid "moderator deletion"
-#~ msgstr "видалено модератором"
-
-
-#~ msgid "moderator deletions"
-#~ msgstr "видалено модератором"
-
-#~ msgid ""
-#~ "This comment was posted by a user who has posted fewer than %(count)s "
-#~ "comment:\n"
-#~ "\n"
-#~ "%(text)s"
-#~ msgid_plural ""
-#~ "This comment was posted by a user who has posted fewer than %(count)s "
-#~ "comments:\n"
-#~ "\n"
-#~ "%(text)s"
-#~ msgstr[0] ""
-#~ "Цей коментар доданий користувачем, який додав меньше ніж %(count)s "
-#~ "коментаря"
-#~ msgstr[1] ""
-#~ "Цей коментар доданий користувачем, який додав меньше ніж %(count)s "
-#~ "коментарів"
-
-#~ msgid "Only POSTs are allowed"
-#~ msgstr "Тільки POST'и дозволені"
-
-#~ msgid "One or more of the required fields wasn't submitted"
-#~ msgstr "Одне або декілька обов'язкових полів не було заповнено"
-
-#~ msgid ""
-#~ "The comment form had an invalid 'target' parameter -- the object ID was "
-#~ "invalid"
-#~ msgstr ""
-#~ "Форма для коментарів мала невірний параметр 'target' -- ID об'єкту був "
-#~ "невірний"
-
-#~ msgid "The comment form didn't provide either 'preview' or 'post'"
-#~ msgstr ""
-#~ "Форма для коментарів не забезпечувала функції 'переглянути' або 'додати'"
-
-
-#~ msgid "Forgotten your password?"
-#~ msgstr "Забули пароль?"
-
-#~ msgid "Added %s."
-#~ msgstr "Додано %s."
-
-#~ msgid "Deleted %s."
-#~ msgstr "Видалено %s."
-
-#~ msgid "DATE_WITH_TIME_FULL"
-#~ msgstr "j N Y H:i"
-
-#~ msgid "Django administration"
-#~ msgstr "Django адміністрування"
-
-#~ msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-#~ msgstr "<a href=\"/password_reset/\">Забули пароль</a>?"
-
-#~ msgid "Your new password is: %(new_password)s"
-#~ msgstr "Ваш новий пароль: %(new_password)s"
-
-#~ msgid "Feel free to change this password by going to this page:"
-#~ msgstr "Ви можете змінити цей пароль, перейшовши до цієї сторінки:"
-
-#~ msgid "Comments"
-#~ msgstr "Коментарі"
-
-#~ msgid "String (up to 50)"
-#~ msgstr "Рядок (до 50 символів)"
-
-#~ msgid "label"
-#~ msgstr "мітка"
-
-#~ msgid "package"
-#~ msgstr "пакунок"
-
-#~ msgid "packages"
-#~ msgstr "пакунки"

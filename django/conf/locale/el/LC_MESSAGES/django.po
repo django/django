@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-05 01:32+1000\n"
+"POT-Creation-Date: 2010-12-29 21:00+0100\n"
 "PO-Revision-Date: 2007-09-03 04:19+0100\n"
 "Last-Translator: Dimitris Glezos <dimitris@glezos.com>\n"
 "Language-Team: el <fedora-trans-el@redhat.com>\n"
@@ -16,273 +16,726 @@ msgstr ""
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: db/models/manipulators.py:307
-#, fuzzy, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "αντικείμενο με τύπος για πεδίο."
+#: conf/global_settings.py:44
+msgid "Arabic"
+msgstr "Αραβικά"
 
-#: db/models/manipulators.py:308 contrib/admin/views/main.py:335
-#: contrib/admin/views/main.py:337 contrib/admin/views/main.py:339
+#: conf/global_settings.py:45
+#, fuzzy
+msgid "Bulgarian"
+msgstr "Ουγγρικά"
+
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "Μπενγκάλι"
+
+#: conf/global_settings.py:47
+#, fuzzy
+msgid "Bosnian"
+msgstr "Ρουμανικά"
+
+#: conf/global_settings.py:48
+msgid "Catalan"
+msgstr "Καταλανικά"
+
+#: conf/global_settings.py:49
+msgid "Czech"
+msgstr "Τσέχικα"
+
+#: conf/global_settings.py:50
+msgid "Welsh"
+msgstr "Ουαλικά"
+
+#: conf/global_settings.py:51
+msgid "Danish"
+msgstr "Δανέζικα"
+
+#: conf/global_settings.py:52
+msgid "German"
+msgstr "Γερμανικά"
+
+#: conf/global_settings.py:53
+msgid "Greek"
+msgstr "Ελληνικά"
+
+#: conf/global_settings.py:54
+msgid "English"
+msgstr "Αγγλικά"
+
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "British English"
+msgstr "Αγγλικά"
+
+#: conf/global_settings.py:56
+msgid "Spanish"
+msgstr "Ισπανικά"
+
+#: conf/global_settings.py:57
+#, fuzzy
+msgid "Argentinian Spanish"
+msgstr "Ισπανικά Αργεντινής"
+
+#: conf/global_settings.py:58
+#, fuzzy
+msgid "Estonian"
+msgstr "Ρουμανικά"
+
+#: conf/global_settings.py:59
+msgid "Basque"
+msgstr ""
+
+#: conf/global_settings.py:60
+#, fuzzy
+msgid "Persian"
+msgstr "Σερβικά"
+
+#: conf/global_settings.py:61
+msgid "Finnish"
+msgstr "Φινλανδικά"
+
+#: conf/global_settings.py:62
+msgid "French"
+msgstr "Γαλλικά"
+
+#: conf/global_settings.py:63
+#, fuzzy
+msgid "Frisian"
+msgstr "Βραζιλιάνικα"
+
+#: conf/global_settings.py:64
+#, fuzzy
+msgid "Irish"
+msgstr "Τουρκικά"
+
+#: conf/global_settings.py:65
+msgid "Galician"
+msgstr ""
+
+#: conf/global_settings.py:66
+msgid "Hebrew"
+msgstr "Εβραϊκά"
+
+#: conf/global_settings.py:67
+msgid "Hindi"
+msgstr ""
+
+#: conf/global_settings.py:68
+#, fuzzy
+msgid "Croatian"
+msgstr "Καταλανικά"
+
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr "Ουγγρικά"
+
+#: conf/global_settings.py:70
+#, fuzzy
+msgid "Indonesian"
+msgstr "Μακεδονικά"
+
+#: conf/global_settings.py:71
+msgid "Icelandic"
+msgstr "Ισλανδικά"
+
+#: conf/global_settings.py:72
+msgid "Italian"
+msgstr "Ιταλικά"
+
+#: conf/global_settings.py:73
+msgid "Japanese"
+msgstr "Γιαπωνέζικα"
+
+#: conf/global_settings.py:74
+#, fuzzy
+msgid "Georgian"
+msgstr "Γερμανικά"
+
+#: conf/global_settings.py:75
+msgid "Khmer"
+msgstr ""
+
+#: conf/global_settings.py:76
+msgid "Kannada"
+msgstr ""
+
+#: conf/global_settings.py:77
+#, fuzzy
+msgid "Korean"
+msgstr "Νορβηγικά"
+
+#: conf/global_settings.py:78
+msgid "Lithuanian"
+msgstr ""
+
+#: conf/global_settings.py:79
+msgid "Latvian"
+msgstr ""
+
+#: conf/global_settings.py:80
+msgid "Macedonian"
+msgstr "Μακεδονικά"
+
+#: conf/global_settings.py:81
+msgid "Malayalam"
+msgstr ""
+
+#: conf/global_settings.py:82
+#, fuzzy
+msgid "Mongolian"
+msgstr "Μακεδονικά"
+
+#: conf/global_settings.py:83
+msgid "Dutch"
+msgstr "Ολλανδικά"
+
+#: conf/global_settings.py:84
+msgid "Norwegian"
+msgstr "Νορβηγικά"
+
+#: conf/global_settings.py:85
+#, fuzzy
+msgid "Norwegian Bokmal"
+msgstr "Νορβηγικά"
+
+#: conf/global_settings.py:86
+#, fuzzy
+msgid "Norwegian Nynorsk"
+msgstr "Νορβηγικά"
+
+#: conf/global_settings.py:87
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:88
+msgid "Polish"
+msgstr "Πολωνικά"
+
+#: conf/global_settings.py:89
+#, fuzzy
+msgid "Portuguese"
+msgstr "Πορτογαλικά"
+
+#: conf/global_settings.py:90
+#, fuzzy
+msgid "Brazilian Portuguese"
+msgstr "Πορτογαλικά"
+
+#: conf/global_settings.py:91
+msgid "Romanian"
+msgstr "Ρουμανικά"
+
+#: conf/global_settings.py:92
+msgid "Russian"
+msgstr "Ρωσικά"
+
+#: conf/global_settings.py:93
+msgid "Slovak"
+msgstr "Σλοβακικά"
+
+#: conf/global_settings.py:94
+msgid "Slovenian"
+msgstr "Σλοβενικά"
+
+#: conf/global_settings.py:95
+#, fuzzy
+msgid "Albanian"
+msgstr "Ρουμανικά"
+
+#: conf/global_settings.py:96
+msgid "Serbian"
+msgstr "Σερβικά"
+
+#: conf/global_settings.py:97
+#, fuzzy
+msgid "Serbian Latin"
+msgstr "Σερβικά"
+
+#: conf/global_settings.py:98
+msgid "Swedish"
+msgstr "Σουηδικά"
+
+#: conf/global_settings.py:99
+msgid "Tamil"
+msgstr "Ταμιλικά"
+
+#: conf/global_settings.py:100
+msgid "Telugu"
+msgstr ""
+
+#: conf/global_settings.py:101
+#, fuzzy
+msgid "Thai"
+msgstr "Ταμιλικά"
+
+#: conf/global_settings.py:102
+msgid "Turkish"
+msgstr "Τουρκικά"
+
+#: conf/global_settings.py:103
+msgid "Ukrainian"
+msgstr "Ουκρανικά"
+
+#: conf/global_settings.py:104
+#, fuzzy
+msgid "Vietnamese"
+msgstr "όνομα"
+
+#: conf/global_settings.py:105
+msgid "Simplified Chinese"
+msgstr "Απλοποιημένα Κινέζικα"
+
+#: conf/global_settings.py:106
+msgid "Traditional Chinese"
+msgstr "Παραδοσιακά Κινέζικα"
+
+#: core/validators.py:20 forms/fields.py:67
+msgid "Enter a valid value."
+msgstr "Εισάγετε μια έγκυρη τιμή."
+
+#: core/validators.py:87 forms/fields.py:572
+msgid "Enter a valid URL."
+msgstr "Εισάγετε ένα έγκυρο URL."
+
+#: core/validators.py:89 forms/fields.py:573
+#, fuzzy
+msgid "This URL appears to be a broken link."
+msgstr "Το URL %s είναι χαλασμένος σύνδεσμος."
+
+#: core/validators.py:120 forms/fields.py:447
+msgid "Enter a valid e-mail address."
+msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
+
+#: core/validators.py:123 forms/fields.py:956
+#, fuzzy
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Αυτή η τιμή πρέπει να περιέχει μόνο γράμματα, αριθμούς, υπογεγραμμένες, "
+"παύλες ή καθέτους."
+
+#: core/validators.py:126 forms/fields.py:949
+#, fuzzy
+msgid "Enter a valid IPv4 address."
+msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
+
+#: core/validators.py:129 db/models/fields/__init__.py:575
+msgid "Enter only digits separated by commas."
+msgstr "Εισάγετε μόνο ψηφία χωρισμένα με κόμματα."
+
+#: core/validators.py:135
+#, fuzzy, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος τουλάχιστον %d χαρακτήρες."
+
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#, fuzzy, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "τιμή a από."
+
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#, fuzzy, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "τιμή a από."
+
+#: core/validators.py:164
+#, fuzzy, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος τουλάχιστον %d χαρακτήρες."
+
+#: core/validators.py:170
+#, fuzzy, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
+msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος το πολύ %d χαρακτήρες."
+
+#: db/models/base.py:765
+#, fuzzy, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "πεδίο πεδίο είναι τιμή"
+
+#: db/models/base.py:780 db/models/base.py:788
+#, fuzzy, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "με."
+
+#: db/models/base.py:787 forms/models.py:581
 msgid "and"
 msgstr "και"
 
-#: db/models/fields/related.py:53
+#: db/models/fields/__init__.py:63
 #, python-format
-msgid "Please enter a valid %s."
-msgstr "Παρακαλούμε εισάγετε ένα έγκυρο %s."
+msgid "Value %r is not a valid choice."
+msgstr ""
 
-#: db/models/fields/related.py:642
-msgid "Separate multiple IDs with commas."
-msgstr "Ξεχωρίστε πολλαπλά ΙD με κόμματα."
-
-#: db/models/fields/related.py:644
-#, fuzzy
-msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "Αναμονή Έλεγχος ή Εντολή ενεργό a επιλογή περισσότερα ένα."
-
-#: db/models/fields/related.py:691
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"Παρακαλούμε εισάγετε ένα έγκυρο %(self)s IDs. Η τιμή %(value)r δεν είναι "
-"έγκυρη."
-msgstr[1] ""
-"Παρακαλούμε εισάγετε ένα έγκυρο %(self)s IDs. Οι τιμές %(value)r δεν είναι "
-"έγκυρες."
-
-#: db/models/fields/__init__.py:42
-#, fuzzy, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "με."
-
-#: db/models/fields/__init__.py:117 db/models/fields/__init__.py:274
-#: db/models/fields/__init__.py:610 db/models/fields/__init__.py:621
-#: oldforms/__init__.py:357 newforms/fields.py:80 newforms/fields.py:376
-#: newforms/fields.py:452 newforms/fields.py:463 newforms/models.py:178
-msgid "This field is required."
-msgstr "Αυτό το πεδίο είναι απαραίτητο."
-
-#: db/models/fields/__init__.py:367
-msgid "This value must be an integer."
-msgstr "Αυτή η τιμή πρέπει να είναι ένας ακέραιος."
-
-#: db/models/fields/__init__.py:402
-msgid "This value must be either True or False."
-msgstr "Αυτή η τιμή πρέπει να είναι Αληθές ή Ψευδές."
-
-#: db/models/fields/__init__.py:423
+#: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
 msgstr "Αυτό το πεδίο δεν μπορεί να είναι κενό (null)."
 
-#: db/models/fields/__init__.py:457 core/validators.py:148
+#: db/models/fields/__init__.py:65
+#, fuzzy
+msgid "This field cannot be blank."
+msgstr "Αυτό το πεδίο δεν μπορεί να είναι κενό (null)."
+
+#: db/models/fields/__init__.py:70
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
+msgid "Integer"
+msgstr "Ακέραιος"
+
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
+msgid "This value must be an integer."
+msgstr "Αυτή η τιμή πρέπει να είναι ένας ακέραιος."
+
+#: db/models/fields/__init__.py:493
+msgid "This value must be either True or False."
+msgstr "Αυτή η τιμή πρέπει να είναι Αληθές ή Ψευδές."
+
+#: db/models/fields/__init__.py:495
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (Είτε Αληθές ή Ψευδές)"
+
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
+#, fuzzy, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Συμβολοσειρά (μέχρι %(maxlength)s χαρακτήρες)"
+
+#: db/models/fields/__init__.py:570
+msgid "Comma-separated integers"
+msgstr "Ακέραιοι χωρισμένοι με κόμματα"
+
+#: db/models/fields/__init__.py:584
+msgid "Date (without time)"
+msgstr "Ημερομηνία (χωρίς την ώρα)"
+
+#: db/models/fields/__init__.py:588
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Εισάγετε μία έγκυρη ημερομηνία στη μορφή ΧΧΧΧ-MM-ΗΗ."
 
-#: db/models/fields/__init__.py:526 core/validators.py:157
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+#: db/models/fields/__init__.py:589
+#, fuzzy, python-format
+msgid "Invalid date: %s"
+msgstr "Μη έγκυρο URL: %s"
+
+#: db/models/fields/__init__.py:670
+#, fuzzy
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "Εισάγετε μία έγκυρη ημερομηνία/ώρα στη μορφή ΧΧΧΧ-MM-ΗΗ ΩΩ:ΛΛ."
 
-#: db/models/fields/__init__.py:630
-msgid "Enter a valid filename."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+#: db/models/fields/__init__.py:672
+msgid "Date (with time)"
+msgstr "Ημερομηνία (με την ώρα)"
 
-#: db/models/fields/__init__.py:751
+#: db/models/fields/__init__.py:746
+#, fuzzy
+msgid "This value must be a decimal number."
+msgstr "Αυτή η τιμή πρέπει να είναι ένας ακέραιος."
+
+#: db/models/fields/__init__.py:748
+msgid "Decimal number"
+msgstr "Δεκαδικός αριθμός"
+
+#: db/models/fields/__init__.py:803
+msgid "E-mail address"
+msgstr "Ηλεκτρονική διεύθυνση"
+
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
+msgid "File path"
+msgstr "Τοποθεσία αρχείου"
+
+#: db/models/fields/__init__.py:841
+#, fuzzy
+msgid "This value must be a float."
+msgstr "Αυτή η τιμή πρέπει να είναι τουλάχιστον %s."
+
+#: db/models/fields/__init__.py:843
+msgid "Floating point number"
+msgstr ""
+
+#: db/models/fields/__init__.py:902
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "διεύθυνση IP"
+
+#: db/models/fields/__init__.py:931
 #, fuzzy
 msgid "This value must be either None, True or False."
 msgstr "Αυτή η τιμή πρέπει να είναι Αληθές ή Ψευδές."
 
-#: conf/global_settings.py:39
-msgid "Arabic"
-msgstr "Αραβικά"
+#: db/models/fields/__init__.py:933
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolean (Αληθές, Ψευδές, ή τίποτα)"
 
-#: conf/global_settings.py:40
-msgid "Bengali"
-msgstr "Μπενγκάλι"
+#: db/models/fields/__init__.py:1024
+msgid "Text"
+msgstr "Κείμενο"
 
-#: conf/global_settings.py:41
-msgid "Catalan"
-msgstr "Καταλανικά"
+#: db/models/fields/__init__.py:1040
+msgid "Time"
+msgstr "Ώρα"
 
-#: conf/global_settings.py:42
-msgid "Czech"
-msgstr "Τσέχικα"
+#: db/models/fields/__init__.py:1044
+#, fuzzy
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
 
-#: conf/global_settings.py:43
-msgid "Welsh"
-msgstr "Ουαλικά"
+#: db/models/fields/__init__.py:1120
+msgid "URL"
+msgstr "URL"
 
-#: conf/global_settings.py:44
-msgid "Danish"
-msgstr "Δανέζικα"
+#: db/models/fields/__init__.py:1136
+msgid "XML text"
+msgstr "Κείμενο XML"
 
-#: conf/global_settings.py:45
-msgid "German"
-msgstr "Γερμανικά"
-
-#: conf/global_settings.py:46
-msgid "Greek"
-msgstr "Ελληνικά"
-
-#: conf/global_settings.py:47
-msgid "English"
-msgstr "Αγγλικά"
-
-#: conf/global_settings.py:48
-msgid "Spanish"
-msgstr "Ισπανικά"
-
-#: conf/global_settings.py:49
-msgid "Argentinean Spanish"
-msgstr "Ισπανικά Αργεντινής"
-
-#: conf/global_settings.py:50
-msgid "Finnish"
-msgstr "Φινλανδικά"
-
-#: conf/global_settings.py:51
-msgid "French"
-msgstr "Γαλλικά"
-
-#: conf/global_settings.py:52
-msgid "Galician"
+#: db/models/fields/related.py:804
+#, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr ""
 
-#: conf/global_settings.py:53
-msgid "Hungarian"
-msgstr "Ουγγρικά"
-
-#: conf/global_settings.py:54
-msgid "Hebrew"
-msgstr "Εβραϊκά"
-
-#: conf/global_settings.py:55
-msgid "Icelandic"
-msgstr "Ισλανδικά"
-
-#: conf/global_settings.py:56
-msgid "Italian"
-msgstr "Ιταλικά"
-
-#: conf/global_settings.py:57
-msgid "Japanese"
-msgstr "Γιαπωνέζικα"
-
-#: conf/global_settings.py:58
-msgid "Kannada"
+#: db/models/fields/related.py:806
+msgid "Foreign Key (type determined by related field)"
 msgstr ""
 
-#: conf/global_settings.py:59
-msgid "Latvian"
+#: db/models/fields/related.py:928
+msgid "One-to-one relationship"
 msgstr ""
 
-#: conf/global_settings.py:60
-msgid "Macedonian"
-msgstr "Μακεδονικά"
-
-#: conf/global_settings.py:61
-msgid "Dutch"
-msgstr "Ολλανδικά"
-
-#: conf/global_settings.py:62
-msgid "Norwegian"
-msgstr "Νορβηγικά"
-
-#: conf/global_settings.py:63
-msgid "Polish"
-msgstr "Πολωνικά"
-
-#: conf/global_settings.py:64
-msgid "Portugese"
-msgstr "Πορτογαλικά"
-
-#: conf/global_settings.py:65
-msgid "Brazilian"
-msgstr "Βραζιλιάνικα"
-
-#: conf/global_settings.py:66
-msgid "Romanian"
-msgstr "Ρουμανικά"
-
-#: conf/global_settings.py:67
-msgid "Russian"
-msgstr "Ρωσικά"
-
-#: conf/global_settings.py:68
-msgid "Slovak"
-msgstr "Σλοβακικά"
-
-#: conf/global_settings.py:69
-msgid "Slovenian"
-msgstr "Σλοβενικά"
-
-#: conf/global_settings.py:70
-msgid "Serbian"
-msgstr "Σερβικά"
-
-#: conf/global_settings.py:71
-msgid "Swedish"
-msgstr "Σουηδικά"
-
-#: conf/global_settings.py:72
-msgid "Tamil"
-msgstr "Ταμιλικά"
-
-#: conf/global_settings.py:73
-msgid "Telugu"
+#: db/models/fields/related.py:990
+msgid "Many-to-many relationship"
 msgstr ""
 
-#: conf/global_settings.py:74
-msgid "Turkish"
-msgstr "Τουρκικά"
+#: db/models/fields/related.py:1010
+#, fuzzy
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "Αναμονή Έλεγχος ή Εντολή ενεργό a επιλογή περισσότερα ένα."
 
-#: conf/global_settings.py:75
-msgid "Ukrainian"
-msgstr "Ουκρανικά"
+#: forms/fields.py:66
+msgid "This field is required."
+msgstr "Αυτό το πεδίο είναι απαραίτητο."
 
-#: conf/global_settings.py:76
-msgid "Simplified Chinese"
-msgstr "Απλοποιημένα Κινέζικα"
+#: forms/fields.py:221
+msgid "Enter a whole number."
+msgstr "Εισάγετε έναν ακέραιο αριθμό."
 
-#: conf/global_settings.py:77
-msgid "Traditional Chinese"
-msgstr "Παραδοσιακά Κινέζικα"
+#: forms/fields.py:252 forms/fields.py:273
+#, fuzzy
+msgid "Enter a number."
+msgstr "Εισάγετε έναν ακέραιο αριθμό."
 
-#: utils/timesince.py:12
-msgid "year"
-msgid_plural "years"
-msgstr[0] "χρόνος"
-msgstr[1] "χρόνια"
+#: forms/fields.py:276
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr ""
 
-#: utils/timesince.py:13
-msgid "month"
-msgid_plural "months"
-msgstr[0] "μήνας"
-msgstr[1] "μήνες"
+#: forms/fields.py:277
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr ""
 
-#: utils/timesince.py:14
-msgid "week"
-msgid_plural "weeks"
-msgstr[0] "εβδομάδα"
-msgstr[1] "εβδομάδες"
+#: forms/fields.py:278
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr ""
 
-#: utils/timesince.py:15
-msgid "day"
-msgid_plural "days"
-msgstr[0] "ημέρα"
-msgstr[1] "ημέρες"
+#: forms/fields.py:340 forms/fields.py:916
+msgid "Enter a valid date."
+msgstr "Εισάγετε μια έγκυρη ημερομηνία."
 
-#: utils/timesince.py:16
-msgid "hour"
-msgid_plural "hours"
-msgstr[0] "ώρα"
-msgstr[1] "ώρες"
+#: forms/fields.py:368 forms/fields.py:917
+msgid "Enter a valid time."
+msgstr "Εισάγετε μια έγκυρη ώρα."
 
-#: utils/timesince.py:17
-msgid "minute"
-msgid_plural "minutes"
-msgstr[0] "λεπτό"
-msgstr[1] "λεπτά"
+#: forms/fields.py:394
+msgid "Enter a valid date/time."
+msgstr "Εισάγετε μια έγκυρη ημερομηνία/ώρα."
+
+#: forms/fields.py:458
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+
+#: forms/fields.py:459
+msgid "No file was submitted."
+msgstr ""
+
+#: forms/fields.py:460
+msgid "The submitted file is empty."
+msgstr "Το αρχείο που υποβλήθηκε είναι κενό."
+
+#: forms/fields.py:461
+#, fuzzy, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος το πολύ %d χαρακτήρες."
+
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: forms/fields.py:516
+#, fuzzy
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr "a εικόνα αρχείο υποφαινόμενο όχι εικόνα ή a εικόνα."
+
+#: forms/fields.py:648 forms/fields.py:723
+#, fuzzy, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
+
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+#, fuzzy
+msgid "Enter a list of values."
+msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+
+#: forms/formsets.py:308 forms/formsets.py:310
+#, fuzzy
+msgid "Order"
+msgstr "Ταξινόμηση:"
+
+#: forms/formsets.py:312
+msgid "Delete"
+msgstr "Διαγραφή"
+
+#: forms/models.py:575
+#, fuzzy, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Παρακαλούμε διορθώστε το παρακάτω λάθος."
+
+#: forms/models.py:579
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: forms/models.py:585
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: forms/models.py:593
+#, fuzzy
+msgid "Please correct the duplicate values below."
+msgstr "Παρακαλούμε διορθώστε το παρακάτω λάθος."
+
+#: forms/models.py:868
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
+
+#: forms/models.py:929
+#, fuzzy
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
+
+#: forms/models.py:1019
+#, fuzzy, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
+
+#: forms/models.py:1021
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr ""
+
+#: forms/widgets.py:299
+#, fuzzy
+msgid "Currently"
+msgstr "Τρέχουσα:"
+
+#: forms/widgets.py:300
+msgid "Change"
+msgstr "Επεξεργασία"
+
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "χρόνος"
+
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr "Άγνωστο"
+
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "Ναι"
+
+#: forms/widgets.py:547
+msgid "No"
+msgstr "Όχι"
+
+#: template/defaultfilters.py:794
+msgid "yes,no,maybe"
+msgstr "ναι,όχι,ίσως"
+
+#: template/defaultfilters.py:825
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/defaultfilters.py:827
+#, python-format
+msgid "%.1f KB"
+msgstr ""
+
+#: template/defaultfilters.py:829
+#, python-format
+msgid "%.1f MB"
+msgstr ""
+
+#: template/defaultfilters.py:831
+#, python-format
+msgid "%.1f GB"
+msgstr ""
+
+#: template/defaultfilters.py:833
+#, python-format
+msgid "%.1f TB"
+msgstr ""
+
+#: template/defaultfilters.py:834
+#, python-format
+msgid "%.1f PB"
+msgstr ""
+
+#: utils/dateformat.py:42
+msgid "p.m."
+msgstr "μμ."
+
+#: utils/dateformat.py:43
+msgid "a.m."
+msgstr "πμ."
+
+#: utils/dateformat.py:48
+msgid "PM"
+msgstr "ΜΜ"
+
+#: utils/dateformat.py:49
+msgid "AM"
+msgstr "ΠΜ"
+
+#: utils/dateformat.py:98
+msgid "midnight"
+msgstr "μεσάνυχτα"
+
+#: utils/dateformat.py:100
+msgid "noon"
+msgstr "μεσημέρι"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -312,2515 +765,314 @@ msgstr "Σάββατο"
 msgid "Sunday"
 msgstr "Κυριακή"
 
-#: utils/dates.py:14
+#: utils/dates.py:10
+#, fuzzy
+msgid "Mon"
+msgstr "Δευτέρα"
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Tue"
+msgstr "Τρίτη"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr ""
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr ""
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Fri"
+msgstr "Παρασκευή"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr ""
+
+#: utils/dates.py:11
+#, fuzzy
+msgid "Sun"
+msgstr "Κυριακή"
+
+#: utils/dates.py:18
 msgid "January"
 msgstr "Ιανουάριος"
 
-#: utils/dates.py:14
+#: utils/dates.py:18
 msgid "February"
 msgstr "Φεβρουάριος"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "Μάρτιος"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "Απρίλιος"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "Μάιος"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "Ιούνιος"
 
-#: utils/dates.py:15 utils/dates.py:27
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "Ιούλιος"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "August"
 msgstr "Αύγουστος"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "September"
 msgstr "Σεπτέμβριος"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "October"
 msgstr "Οκτώβριος"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "November"
 msgstr "Νοέμβριος"
 
-#: utils/dates.py:16
+#: utils/dates.py:20
 msgid "December"
 msgstr "Δεκέμβριος"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jan"
 msgstr "Ιαν"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "feb"
 msgstr "Φεβ"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "mar"
 msgstr "Μάρ"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "apr"
 msgstr "Απρ"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "may"
 msgstr "Μάι"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jun"
 msgstr "Ιούν"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "jul"
 msgstr "Ιούλ"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "aug"
 msgstr "Αύγ"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "sep"
 msgstr "Σεπ"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "oct"
 msgstr "Οκτ"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "nov"
 msgstr "Νοέ"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "dec"
 msgstr "Δεκ"
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "Ιάν."
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "Φεβ."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "Αύγ."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "Σεπτ."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "Οκτ."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "Νοέ."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "Δεκ."
 
-#: utils/dates.py:45
+#: utils/dates.py:35
 msgctxt "alt. month"
 msgid "January"
 msgstr "Ιανουαρίου"
 
-#: utils/dates.py:46
+#: utils/dates.py:36
 msgctxt "alt. month"
 msgid "February"
 msgstr "Φεβρουαρίου"
 
-#: utils/dates.py:47
+#: utils/dates.py:37
 msgctxt "alt. month"
 msgid "March"
 msgstr "Μαρτίου"
 
-#: utils/dates.py:48
+#: utils/dates.py:38
 msgctxt "alt. month"
 msgid "April"
 msgstr "Απριλίου"
 
-#: utils/dates.py:49
+#: utils/dates.py:39
 msgctxt "alt. month"
 msgid "May"
 msgstr "Μαΐου"
 
-#: utils/dates.py:50
+#: utils/dates.py:40
 msgctxt "alt. month"
 msgid "June"
 msgstr "Ιουνίου"
 
-#: utils/dates.py:51
+#: utils/dates.py:41
 msgctxt "alt. month"
 msgid "July"
 msgstr "Ιουλίου"
 
-#: utils/dates.py:52
+#: utils/dates.py:42
 msgctxt "alt. month"
 msgid "August"
 msgstr "Αυγούστου"
 
-#: utils/dates.py:53
+#: utils/dates.py:43
 msgctxt "alt. month"
 msgid "September"
 msgstr "Σεπτεμβρίου"
 
-#: utils/dates.py:54
+#: utils/dates.py:44
 msgctxt "alt. month"
 msgid "October"
 msgstr "Οκτωβρίου"
 
-#: utils/dates.py:55
+#: utils/dates.py:45
 msgctxt "alt. month"
 msgid "November"
 msgstr "Νοεμβρίου"
 
-#: utils/dates.py:56
+#: utils/dates.py:46
 msgctxt "alt. month"
 msgid "December"
 msgstr "Δεκεμβρίου"
 
-#: utils/dateformat.py:40
-msgid "p.m."
-msgstr "μμ."
+#: utils/text.py:136
+#, fuzzy
+msgid "or"
+msgstr "ώρα"
 
-#: utils/dateformat.py:41
-msgid "a.m."
-msgstr "πμ."
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
 
-#: utils/dateformat.py:46
-msgid "PM"
-msgstr "ΜΜ"
+#: utils/timesince.py:21
+msgid "year"
+msgid_plural "years"
+msgstr[0] "χρόνος"
+msgstr[1] "χρόνια"
 
-#: utils/dateformat.py:47
-msgid "AM"
-msgstr "ΠΜ"
+#: utils/timesince.py:22
+msgid "month"
+msgid_plural "months"
+msgstr[0] "μήνας"
+msgstr[1] "μήνες"
 
-#: utils/dateformat.py:95
-msgid "midnight"
-msgstr "μεσάνυχτα"
+#: utils/timesince.py:23
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] "εβδομάδα"
+msgstr[1] "εβδομάδες"
 
-#: utils/dateformat.py:97
-msgid "noon"
-msgstr "μεσημέρι"
+#: utils/timesince.py:24
+msgid "day"
+msgid_plural "days"
+msgstr[0] "ημέρα"
+msgstr[1] "ημέρες"
 
-#: utils/translation/trans_real.py:358
+#: utils/timesince.py:25
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "ώρα"
+msgstr[1] "ώρες"
+
+#: utils/timesince.py:26
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "λεπτό"
+msgstr[1] "λεπτά"
+
+#: utils/timesince.py:45
+#, fuzzy
+msgid "minutes"
+msgstr "λεπτό"
+
+#: utils/timesince.py:50
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr ""
+
+#: utils/timesince.py:56
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ""
+
+#: utils/translation/trans_real.py:560
 msgid "DATE_FORMAT"
 msgstr "j N Y"
 
-#: utils/translation/trans_real.py:359
+#: utils/translation/trans_real.py:561
 msgid "DATETIME_FORMAT"
 msgstr "j N Y, P"
 
-#: utils/translation/trans_real.py:360
+#: utils/translation/trans_real.py:562
 msgid "TIME_FORMAT"
 msgstr "P"
 
-#: utils/translation/trans_real.py:376
+#: utils/translation/trans_real.py:583
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:377
+#: utils/translation/trans_real.py:584
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 
-#: oldforms/__init__.py:392
-#, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος μικρότερο από %s χαρακτήρα."
-msgstr[1] "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος μικρότερο από %s χαρακτήρες."
-
-#: oldforms/__init__.py:397
-msgid "Line breaks are not allowed here."
-msgstr "Δεν επιτρέπονται αλλαγές γραμμών εδώ."
-
-#: oldforms/__init__.py:498 oldforms/__init__.py:571 oldforms/__init__.py:610
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
-
-#: oldforms/__init__.py:577 contrib/admin/filterspecs.py:150
-#: newforms/widgets.py:174
-msgid "Unknown"
-msgstr "Άγνωστο"
-
-#: oldforms/__init__.py:577 contrib/admin/filterspecs.py:143
-#: newforms/widgets.py:174
-msgid "Yes"
-msgstr "Ναι"
-
-#: oldforms/__init__.py:577 contrib/admin/filterspecs.py:143
-#: newforms/widgets.py:174
-msgid "No"
-msgstr "Όχι"
-
-#: oldforms/__init__.py:672 core/validators.py:174 core/validators.py:445
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
-
-#: oldforms/__init__.py:674
-msgid "The submitted file is empty."
-msgstr "Το αρχείο που υποβλήθηκε είναι κενό."
-
-#: oldforms/__init__.py:730
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Εισάγετε έναν ακέραιο αριθμό μεταξύ -32,768 και 32,767."
-
-#: oldforms/__init__.py:740
-msgid "Enter a positive number."
-msgstr "Εισάγετε ένα θετικό αριθμό."
-
-#: oldforms/__init__.py:750
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Εισάγετε έναν ακέραιο αριθμό μεταξύ 0 και 32,767."
-
-#: contrib/localflavor/no/forms.py:15
-#, fuzzy
-msgid "Enter a zip code in the format XXXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
-
-#: contrib/localflavor/no/forms.py:36
-#, fuzzy
-msgid "Enter a valid Norwegian social security number."
-msgstr "Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό."
-
-#: contrib/localflavor/it/forms.py:14 contrib/localflavor/fr/forms.py:17
-#: contrib/localflavor/fi/forms.py:14 contrib/localflavor/de/forms.py:16
-#, fuzzy
-msgid "Enter a zip code in the format XXXXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
-
-#: contrib/localflavor/jp/forms.py:21
-msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:4
-msgid "Hokkaido"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:5
-msgid "Aomori"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:6
-#, fuzzy
-msgid "Iwate"
-msgstr "Ημ/νία:"
-
-#: contrib/localflavor/jp/jp_prefectures.py:7
-msgid "Miyagi"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:8
-msgid "Akita"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:9
-msgid "Yamagata"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:10
-msgid "Fukushima"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:11
-msgid "Ibaraki"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:12
-msgid "Tochigi"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:13
-msgid "Gunma"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:14
-msgid "Saitama"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:15
-msgid "Chiba"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:16
-#, fuzzy
-msgid "Tokyo"
-msgstr "Σήμερα"
-
-#: contrib/localflavor/jp/jp_prefectures.py:17
-msgid "Kanagawa"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:18
-msgid "Yamanashi"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:19
-msgid "Nagano"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:20
-msgid "Niigata"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:21
-msgid "Toyama"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:22
-msgid "Ishikawa"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:23
-msgid "Fukui"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:24
-msgid "Gifu"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:25
-msgid "Shizuoka"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:26
-msgid "Aichi"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:27
-msgid "Mie"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:28
-msgid "Shiga"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:29
-msgid "Kyoto"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:30
-msgid "Osaka"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:31
-msgid "Hyogo"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:32
-msgid "Nara"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:33
-msgid "Wakayama"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:34
-msgid "Tottori"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:35
-msgid "Shimane"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:36
-msgid "Okayama"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:37
-msgid "Hiroshima"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:38
-msgid "Yamaguchi"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:39
-msgid "Tokushima"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:40
-msgid "Kagawa"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:41
-msgid "Ehime"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:42
-msgid "Kochi"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:43
-msgid "Fukuoka"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:44
-msgid "Saga"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:45
-msgid "Nagasaki"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:46
-msgid "Kumamoto"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:47
-msgid "Oita"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:48
-msgid "Miyazaki"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:49
-msgid "Kagoshima"
-msgstr ""
-
-#: contrib/localflavor/jp/jp_prefectures.py:50
-msgid "Okinawa"
-msgstr ""
-
-#: contrib/localflavor/br/forms.py:18
-#, fuzzy
-msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
-
-#: contrib/localflavor/br/forms.py:30
-#, fuzzy
-msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "Τηλέφωνο μέσα είναι."
-
-#: contrib/localflavor/fi/forms.py:40 contrib/localflavor/fi/forms.py:46
-#, fuzzy
-msgid "Enter a valid Finnish social security number."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
-
-#: contrib/localflavor/uk/forms.py:18
-msgid "Enter a postcode. A space is required between the two postcode parts."
-msgstr ""
-
-#: contrib/localflavor/de/forms.py:63
-#, fuzzy
-msgid ""
-"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"format"
-msgstr "Γερμανικά"
-
-#: contrib/localflavor/de/de_states.py:5
-msgid "Baden-Wuerttemberg"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:6
-msgid "Bavaria"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:7
-#, fuzzy
-msgid "Berlin"
-msgstr "Βραζιλιάνικα"
-
-#: contrib/localflavor/de/de_states.py:8
-msgid "Brandenburg"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:9
-msgid "Bremen"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:10
-#, fuzzy
-msgid "Hamburg"
-msgstr "Αύγ"
-
-#: contrib/localflavor/de/de_states.py:11
-#, fuzzy
-msgid "Hessen"
-msgstr "μήνυμα"
-
-#: contrib/localflavor/de/de_states.py:12
-msgid "Mecklenburg-Western Pomerania"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:13
-msgid "Lower Saxony"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:14
-msgid "North Rhine-Westphalia"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:15
-msgid "Rhineland-Palatinate"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:16
-msgid "Saarland"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:17
-msgid "Saxony"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:18
-msgid "Saxony-Anhalt"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:19
-msgid "Schleswig-Holstein"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:20
-msgid "Thuringia"
-msgstr ""
-
-#: contrib/localflavor/usa/forms.py:18
-msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr ""
-
-#: contrib/localflavor/usa/forms.py:51
-msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr ""
-
-#: contrib/sessions/models.py:68
-msgid "session key"
-msgstr "κλειδί συνεδρίας"
-
-#: contrib/sessions/models.py:69
-msgid "session data"
-msgstr "δεδομένα συνεδρίας"
-
-#: contrib/sessions/models.py:70
-msgid "expire date"
-msgstr "ημερομηνία λήξης"
-
-#: contrib/sessions/models.py:74
-msgid "session"
-msgstr "συνεδρία"
-
-#: contrib/sessions/models.py:75
-msgid "sessions"
-msgstr "συνεδρίες"
-
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
-msgid "The two password fields didn't match."
-msgstr "Τα δύο πεδία συνθηματικών δεν ταιριάζουν."
-
-#: contrib/auth/forms.py:25
-msgid "A user with that username already exists."
-msgstr "Ένας χρήστης με αυτό το όνομα χρήστη υπάρχει ήδη."
-
-#: contrib/auth/forms.py:53
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Ο πλοηγητής σας δεν φαίνεται να έχει ενεργοποιημένα τα αρχεία cookie. Τα "
-"αρχεία cookie απαιτούνται για να συνδεθείτε."
-
-#: contrib/auth/forms.py:60 contrib/admin/views/decorators.py:10
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-"Παρακαλούμε εισάγετε ένα σωστό όνομα χρήστη και συνθηματικό. Να σημειωθεί "
-"ότι και τα δύο πεδία κάνουν διάκριση μεταξύ πεζών και κεφαλαίων."
-
-#: contrib/auth/forms.py:62
-msgid "This account is inactive."
-msgstr "Αυτός ο λογαριασμός είναι ανενεργός."
-
-#: contrib/auth/forms.py:85
-#, fuzzy
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr "χρήστης?"
-
-#: contrib/auth/forms.py:117
-#, fuzzy
-msgid "The two 'new password' fields didn't match."
-msgstr "συνθηματικό."
-
-#: contrib/auth/forms.py:124
-#, fuzzy
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "συνθηματικό."
-
-#: contrib/auth/views.py:39
-msgid "Logged out"
-msgstr "Έγινε αποσύνδεση"
-
-#: contrib/auth/models.py:38 contrib/auth/models.py:57
-msgid "name"
-msgstr "όνομα"
-
-#: contrib/auth/models.py:40
-msgid "codename"
-msgstr "κωδικό όνομα"
-
-#: contrib/auth/models.py:42
-msgid "permission"
-msgstr "δικαίωμα"
-
-#: contrib/auth/models.py:43 contrib/auth/models.py:58
-msgid "permissions"
-msgstr "διακαιώματα"
-
-#: contrib/auth/models.py:60
-msgid "group"
-msgstr "ομάδα"
-
-#: contrib/auth/models.py:61 contrib/auth/models.py:100
-msgid "groups"
-msgstr "ομάδες"
-
-#: contrib/auth/models.py:90
-msgid "username"
-msgstr "όνομα χρήστη"
-
-#: contrib/auth/models.py:90
-#, fuzzy
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr "Απαραίτητο."
-
-#: contrib/auth/models.py:91
-msgid "first name"
-msgstr "όνομα"
-
-#: contrib/auth/models.py:92
-msgid "last name"
-msgstr "επώνυμο"
-
-#: contrib/auth/models.py:93
-msgid "e-mail address"
-msgstr "ηλεκτρονική διεύθυνση"
-
-#: contrib/auth/models.py:94
-msgid "password"
-msgstr "συνθηματικό"
-
-#: contrib/auth/models.py:94
-#, fuzzy
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr "<a href=\"password/\"> συνθηματικό</a>."
-
-#: contrib/auth/models.py:95
-msgid "staff status"
-msgstr "Κατάσταση προσωπικού"
-
-#: contrib/auth/models.py:95
-msgid "Designates whether the user can log into this admin site."
-msgstr "Ορίζει αν ο χρήστης μπορεί να συνδεθεί στο χώρο διαχείρισης."
-
-#: contrib/auth/models.py:96
-msgid "active"
-msgstr "ενεργό"
-
-#: contrib/auth/models.py:96
-#, fuzzy
-msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
-"instead of deleting accounts."
-msgstr "Ορίζει αν ο χρήστης μπορεί να συνδεθεί στο χώρο διαχείρισης."
-
-#: contrib/auth/models.py:97
-msgid "superuser status"
-msgstr "κατάσταση υπερχρήστη"
-
-#: contrib/auth/models.py:97
-#, fuzzy
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr "χρήστης διακαιώματα."
-
-#: contrib/auth/models.py:98
-msgid "last login"
-msgstr "τελευταία σύνδεση"
-
-#: contrib/auth/models.py:99
-msgid "date joined"
-msgstr "ημερομηνία σύνδεσης"
-
-#: contrib/auth/models.py:101
-#, fuzzy
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr "Μέσα διακαιώματα χειρωνακτικά χρήστης get όλα διακαιώματα ομάδα είναι μέσα."
-
-#: contrib/auth/models.py:102
-msgid "user permissions"
-msgstr "δικαιώματα χρήστη"
-
-#: contrib/auth/models.py:105
-msgid "user"
-msgstr "χρήστης"
-
-#: contrib/auth/models.py:106
-msgid "users"
-msgstr "χρήστες"
-
-#: contrib/auth/models.py:111
-msgid "Personal info"
-msgstr "Προσωπικές πληροφορίες"
-
-#: contrib/auth/models.py:112
-msgid "Permissions"
-msgstr "Δικαιώματα"
-
-#: contrib/auth/models.py:113
-msgid "Important dates"
-msgstr "Σημαντικές ημερομηνίες"
-
-#: contrib/auth/models.py:114
-msgid "Groups"
-msgstr "Ομάδες"
-
-#: contrib/auth/models.py:258
-msgid "message"
-msgstr "μήνυμα"
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "th"
-msgstr "η"
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "st"
-msgstr "η"
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "nd"
-msgstr "η"
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "rd"
-msgstr "η"
-
-#: contrib/humanize/templatetags/humanize.py:47
-#, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f εκατομμύριο"
-msgstr[1] "%(value).1f εκατομμύρια"
-
-#: contrib/humanize/templatetags/humanize.py:50
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f δισεκατομμύριο"
-msgstr[1] "%(value).1f δισεκατομμύρια"
-
-#: contrib/humanize/templatetags/humanize.py:53
-#, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f τρισεκατομμύριο"
-msgstr[1] "%(value).1f τρισεκατομμύρια"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "one"
-msgstr "ένα"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "two"
-msgstr "δύο"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "three"
-msgstr "τρία"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "four"
-msgstr "τέσσερα"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "five"
-msgstr "πέντε"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "six"
-msgstr "έξι"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "seven"
-msgstr "εφτά"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "eight"
-msgstr "οκτώ"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "nine"
-msgstr "εννιά"
-
-#: contrib/contenttypes/models.py:36
-msgid "python model class name"
-msgstr "όνομα python model class"
-
-#: contrib/contenttypes/models.py:39
-msgid "content type"
-msgstr "τύπος περιεχομένου"
-
-#: contrib/contenttypes/models.py:40
-msgid "content types"
-msgstr "τύποι περιεχομένου"
-
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "ανακατεύθυνση από"
-
-#: contrib/redirects/models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Αυτό πρέπει να είναι ένα απόλυτο μονοπάτι, με εξαίρεση το όνομα χώρου. "
-"Παράδειγμα: '/events/search/'."
-
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "ανακατεύθυνση προς"
-
-#: contrib/redirects/models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Αυτό πρέπει να είναι ένα απόλυτο μονοπάτι (όπως παραπάνω), ή ένα πλήρες URL "
-"που αρχίζει με 'http://'."
-
-#: contrib/redirects/models.py:13
-msgid "redirect"
-msgstr "ανακατεύθυνση"
-
-#: contrib/redirects/models.py:14
-msgid "redirects"
-msgstr "ανακατευθύνσεις"
-
-#: contrib/flatpages/models.py:7 contrib/admin/views/doc.py:315
-msgid "URL"
-msgstr "URL"
-
-#: contrib/flatpages/models.py:8
-msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Παράδειγμα: '/about/contact/'. Βεβαιωθείτε ότι περιέχει καθέτους στην αρχή "
-"και το τέλος."
-
-#: contrib/flatpages/models.py:9
-msgid "title"
-msgstr "τίτλος"
-
-#: contrib/flatpages/models.py:10
-msgid "content"
-msgstr "περιεχόμενο"
-
-#: contrib/flatpages/models.py:11
-msgid "enable comments"
-msgstr "ενεργοποίηση σχολίων"
-
-#: contrib/flatpages/models.py:12
-msgid "template name"
-msgstr "όνομα προτύπου"
-
-#: contrib/flatpages/models.py:13
-msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
-msgstr ""
-"Παράδειγμα: 'flatpages/contact_page.html'. Αν δεν εισαχθεί, το σύστημα θα "
-"χρησιμοποιήσει το 'flatpages/default.html'."
-
-#: contrib/flatpages/models.py:14
-msgid "registration required"
-msgstr "απαιτείται εγγραφή"
-
-#: contrib/flatpages/models.py:14
-#, fuzzy
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "είναι μέσα χρήστες σελίδα."
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "απλή σελίδα"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "απλές σελίδες"
-
-#: contrib/comments/models.py:67 contrib/comments/models.py:166
-msgid "object ID"
-msgstr "ID αντικειμένου"
-
-#: contrib/comments/models.py:68
-msgid "headline"
-msgstr "Επικεφαλίδα"
-
-#: contrib/comments/models.py:69 contrib/comments/models.py:90
-#: contrib/comments/models.py:167
-msgid "comment"
-msgstr "σχόλιο"
-
-#: contrib/comments/models.py:70
-msgid "rating #1"
-msgstr "βαθμολογία #1"
-
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr "βαθμολογία #2"
-
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr "βαθμολογία #3"
-
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr "βαθμολογία #4"
-
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr "βαθμολογία #5"
-
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr "βαθμολογία #6"
-
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr "βαθμολογία #7"
-
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr "βαθμολογία #8"
-
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr "είναι έγκυρη βαθμολογία"
-
-#: contrib/comments/models.py:83 contrib/comments/models.py:169
-msgid "date/time submitted"
-msgstr "ημερομηνία/ώρα υποβολής"
-
-#: contrib/comments/models.py:84 contrib/comments/models.py:170
-msgid "is public"
-msgstr "είναι δημόσιο"
-
-#: contrib/comments/models.py:85 contrib/admin/views/doc.py:304
-msgid "IP address"
-msgstr "διεύθυνση IP"
-
-#: contrib/comments/models.py:86
-msgid "is removed"
-msgstr "είναι διαγραμμένο"
-
-#: contrib/comments/models.py:86
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr ""
-"Επιλέξτε αυτό το κουτί ελέγχου εάν το σχόλιο είναι ανάρμοστο. Ένα μήνυμα "
-"\"Αυτό το σχόλιο διαγράφηκε\" θα εμφανιστεί στη θέση του."
-
-#: contrib/comments/models.py:91
-msgid "comments"
-msgstr "σχόλια"
-
-#: contrib/comments/models.py:131 contrib/comments/models.py:207
-msgid "Content object"
-msgstr "Αντικείμενο περιεχομένου"
-
-#: contrib/comments/models.py:159
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"Σχόλιο από %(user)s στις %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: contrib/comments/models.py:168
-msgid "person's name"
-msgstr "όνομα ατόμου"
-
-#: contrib/comments/models.py:171
-msgid "ip address"
-msgstr "διεύθυνση ip"
-
-#: contrib/comments/models.py:173
-msgid "approved by staff"
-msgstr "εγκεκριμένο από το προσωπικό"
-
-#: contrib/comments/models.py:176
-msgid "free comment"
-msgstr "ελεύθερο σχόλιο"
-
-#: contrib/comments/models.py:177
-msgid "free comments"
-msgstr "ελεύθερα σχόλια"
-
-#: contrib/comments/models.py:233
-msgid "score"
-msgstr "βαθμολογία"
-
-#: contrib/comments/models.py:234
-msgid "score date"
-msgstr "ημερομηνία βαθμολόγησης"
-
-#: contrib/comments/models.py:237
-msgid "karma score"
-msgstr "σκορ κάρμα"
-
-#: contrib/comments/models.py:238
-msgid "karma scores"
-msgstr "σκορ κάρμα"
-
-#: contrib/comments/models.py:242
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "%(score)d βαθμολογία από %(user)s"
-
-#: contrib/comments/models.py:258
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Αυτό το σχόλιο σημειώθηκε από %(user)s\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/models.py:265
-msgid "flag date"
-msgstr "ημερομηνία σημείωσης"
-
-#: contrib/comments/models.py:268
-msgid "user flag"
-msgstr "σημείωση χρήστη"
-
-#: contrib/comments/models.py:269
-msgid "user flags"
-msgstr "σημειώσεις χρήστη"
-
-#: contrib/comments/models.py:273
-#, python-format
-msgid "Flag by %r"
-msgstr "Σημείωση από %r"
-
-#: contrib/comments/models.py:278
-msgid "deletion date"
-msgstr "ημερομηνία διαγραφής"
-
-#: contrib/comments/models.py:280
-msgid "moderator deletion"
-msgstr "διαγραφή συντονιστή"
-
-#: contrib/comments/models.py:281
-msgid "moderator deletions"
-msgstr "διαγραφές συντονιστή"
-
-#: contrib/comments/models.py:285
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "Διαγραφή συντονιστή από %r"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:17
-msgid "Username:"
-msgstr "Όνομα χρήστη:"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Log out"
-msgstr "Αποσύνδεση"
-
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:20
-msgid "Password:"
-msgstr "Συνθηματικό:"
-
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "Ξεχάσατε το συνθηματικό σας;"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "Βαθμολογίες"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "Απαραίτητο"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "Προαιρετικό"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "Στείλτε μια φωτογραφία"
-
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "Σχόλιο:"
-
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "Προεπισκόπηση σχολίου"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "Το όνομα σας:"
-
-#: contrib/comments/views/karma.py:19
-msgid "Anonymous users cannot vote"
-msgstr "Ανώνυμοι χρήστες δεν μπορούν να ψηφίσουν"
-
-#: contrib/comments/views/karma.py:23
-msgid "Invalid comment ID"
-msgstr "Μη έγκυρο ID σχολίου"
-
-#: contrib/comments/views/karma.py:25
-msgid "No voting for yourself"
-msgstr "Δεν επιτρέπεται ψήφος για τον εαυτό σας"
-
-#: contrib/comments/views/comments.py:27
-msgid "This rating is required because you've entered at least one other rating."
-msgstr ""
-"Αυτή η βαθμολογία απαιτείται επειδή έχετε εισάγει τουλάχιστον μία ακόμη "
-"βαθμολογία."
-
-#: contrib/comments/views/comments.py:111
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"Αυτό το σχόλιο έχει αναρτηθεί από ένα χρήστη με λιγότερα από %(count)s "
-"σχόλιο:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"Αυτό το σχόλιο έχει αναρτηθεί από ένα χρήστη με λιγότερα από %(count)s "
-"σχόλια:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:116
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Αυτό το σχόλιο αναρτήθηκε από έναν sketchy χρήστη:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:188
-#: contrib/comments/views/comments.py:280
-msgid "Only POSTs are allowed"
-msgstr "Επιτρέπονται μόνο POST υποβολές"
-
-#: contrib/comments/views/comments.py:192
-#: contrib/comments/views/comments.py:284
-msgid "One or more of the required fields wasn't submitted"
-msgstr "Ένα ή περισσότερα από τα απαιτούμενα πεδία δεν έχουν υποβληθεί"
-
-#: contrib/comments/views/comments.py:196
-#: contrib/comments/views/comments.py:286
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Κάποιος έχει πειράξει τη φόρμα σχολιασμού (παραβίαση ασφάλειας)"
-
-#: contrib/comments/views/comments.py:206
-#: contrib/comments/views/comments.py:292
-#, fuzzy
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr "σχόλιο αντικείμενο ID"
-
-#: contrib/comments/views/comments.py:257
-#: contrib/comments/views/comments.py:321
-#, fuzzy
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "σχόλιο t προεπισκόπηση ή"
-
-#: contrib/sites/models.py:10
-msgid "domain name"
-msgstr "όνομα χώρου"
-
-#: contrib/sites/models.py:11
-msgid "display name"
-msgstr "εμφανιζόμενο όνομα"
-
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr "ιστότοπος"
-
-#: contrib/sites/models.py:16
-msgid "sites"
-msgstr "ιστότοποι"
-
-#: contrib/admin/filterspecs.py:40
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>Από %s:</h3>\n"
-"<ul>\n"
-
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
-msgid "All"
-msgstr "Όλα"
-
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "Οποιαδήποτε ημερομηνία"
-
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "Σήμερα"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "Τελευταίες 7 ημέρες"
-
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "Αυτόν το μήνα"
-
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "Αυτόν το χρόνο"
-
-#: contrib/admin/models.py:16
-msgid "action time"
-msgstr "ώρα ενέργειας"
-
-#: contrib/admin/models.py:19
-msgid "object id"
-msgstr "id αντικειμένου"
-
-#: contrib/admin/models.py:20
-msgid "object repr"
-msgstr "repr αντικειμένου"
-
-#: contrib/admin/models.py:21
-msgid "action flag"
-msgstr "σημαία ενέργειας"
-
-#: contrib/admin/models.py:22
-msgid "change message"
-msgstr "αλλαγή μηνύματος"
-
-#: contrib/admin/models.py:25
-msgid "log entry"
-msgstr "εγγραφή καταγραφής"
-
-#: contrib/admin/models.py:26
-msgid "log entries"
-msgstr "εγγραφές καταγραφής"
-
-#: contrib/admin/templatetags/admin_list.py:247
-msgid "All dates"
-msgstr "Όλες οι ημερομηνίες"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/auth/user/change_password.html:12
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-msgid "Home"
-msgstr "Αρχική"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Documentation"
-msgstr "Τεκμηρίωση"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "Σελιδοδείκτες"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:15
-#: contrib/admin/templates/admin/auth/user/change_password.html:46
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Change password"
-msgstr "Αλλαγή συνθηματικού"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
-msgid "Documentation bookmarklets"
-msgstr "Σελιδοδείκτες τεκμηρίωσης"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
-#, fuzzy
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\"> δεσμός ή δεξιά δεσμός και αύξηση Τώρα υποφαινόμενο από "
-"κάθε σελίδα μέσα site Σημείωση από υποφαινόμενο site από a σύστημα "
-"υποφαινόμενο t είναι</p> n"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-msgid "Documentation for this page"
-msgstr "Τεκμηρίωση για αυτήν τη σελίδα"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
-#, fuzzy
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr "Άλματα υποφαινόμενο από κάθε σελίδα τεκμηρίωση για σελίδα."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-msgid "Show object ID"
-msgstr "Εμφάνιση ID αντικειμένου"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
-#, fuzzy
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr "Περιεχόμενο τύπος και μοναδικό ID για σελίδες a single αντικείμενο."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-msgid "Edit this object (current window)"
-msgstr "Επεξεργασία αυτού του αντικειμένου (τρέχον παράθυρο)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
-#, fuzzy
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Άλματα σελίδα για σελίδες a single αντικείμενο."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-msgid "Edit this object (new window)"
-msgstr "Επεξεργασία αυτού του αντικειμένου (νέο παράθυρο)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
-#, fuzzy
-msgid "As above, but opens the admin page in a new window."
-msgstr "σελίδα μέσα a νέο παράθυρο."
-
-#: contrib/admin/templates/admin/submit_line.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-msgid "Delete"
-msgstr "Διαγραφή"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "Αποθήκευση ως νέο"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "Αποθήκευση και προσθήκη καινούριου"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "Αποθήκευση και συνέχεια επεξεργασίας"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "Αποθήκευση"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Σφάλμα εξυπηρετητή"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Σφάλμα εξυπηρετητή (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Σφάλμα εξυπηρετητή <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Υπήρξε ένα σφάλμα. Έχει αναφερθεί στους διαχειριστές του ιστότοπου μέσω ηλ. "
-"ταχυδρομείου και θα πρέπει να επιδιορθωθεί σύντομα. Ευχαριστούμε για την "
-"υπομονή σας."
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr " Ανά %(filter_title)s "
-
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr "Φίλτρο"
-
-#: contrib/admin/templates/admin/invalid_setup.html:8
-#, fuzzy
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr "χρήστης."
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "Μετάβαση"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "1 αποτέλεσμα"
-msgstr[1] "%(counter)s αποτελέσματα"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s συνολικά"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:21
-msgid "History"
-msgstr "Ιστορικό"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "Ημερομηνία/ώρα"
-
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "Χρήστης"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "Ενέργεια"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "N j, Y, P"
-
-#: contrib/admin/templates/admin/object_history.html:36
-#, fuzzy
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr "αντικείμενο t a t site."
-
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, fuzzy, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr "Διαγραφή αντικείμενο μέσα λογαριασμός t δικαίωμα διαγραφή από:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:21
-#, fuzzy, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr "υποφαινόμενο υποφαινόμενο διαγραφή αντικείμενο Όλα από διαγράφηκε:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "Ναι, είμαι βέβαιος"
-
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "Εμφάνιση όλων"
-
-#: contrib/admin/templates/admin/change_list.html:12
-#, python-format
-msgid "Add %(name)s"
-msgstr "Προσθήκη %(name)s"
-
-#: contrib/admin/templates/admin/change_form.html:15
-#: contrib/admin/templates/admin/index.html:28
-msgid "Add"
-msgstr "Προσθήκη"
-
-#: contrib/admin/templates/admin/change_form.html:22
-msgid "View on site"
-msgstr "Προβολή στην ιστοσελίδα"
-
-#: contrib/admin/templates/admin/change_form.html:32
-#: contrib/admin/templates/admin/auth/user/change_password.html:24
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Παρακαλούμε διορθώστε το παρακάτω λάθος."
-msgstr[1] "Παρακαλούμε διορθώστε τα παρακάτω λάθη."
-
-#: contrib/admin/templates/admin/change_form.html:50
-msgid "Ordering"
-msgstr "Ταξινόμηση"
-
-#: contrib/admin/templates/admin/change_form.html:53
-msgid "Order:"
-msgstr "Ταξινόμηση:"
-
-#: contrib/admin/templates/admin/base.html:25
-msgid "Welcome,"
-msgstr "Καλωσήρθατε,"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Η σελίδα δε βρέθηκε"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Λυπόμαστε, αλλά η σελίδα που ζητήθηκε δε μπόρεσε να βρεθεί."
-
-#: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:24
-msgid "Log in"
-msgstr "Σύνδεση"
-
-#: contrib/admin/templates/admin/index.html:17
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Διαθέσιμα μοντέλα στην εφαρμογή %(name)s."
-
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "Επεξεργασία"
-
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "Δεν έχετε δικαίωμα να επεξεργαστείτε τίποτα."
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "Πρόσφατες ενέργειες"
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "Οι ενέργειες μου"
-
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "Κανένα διαθέσιμο"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Διαχειριστής ιστότοπου Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Διαχείριση Django"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
-#, fuzzy
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr "όνομα χρήστη συνθηματικό χρήστης."
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
-msgid "Username"
-msgstr "Όνομα χρήστη"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
-#: contrib/admin/templates/admin/auth/user/change_password.html:34
-msgid "Password"
-msgstr "Συνθηματικό"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
-msgid "Password (again)"
-msgstr "Συνθηματικό (ξανά)"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-#: contrib/admin/templates/admin/auth/user/change_password.html:40
-msgid "Enter the same password as above, for verification."
-msgstr "Εισάγετε το ίδιο συνθηματικό όπως παραπάνω, για λόγους επιβεβαίωσης."
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:28
-#, python-format
-#, fuzzy
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "συνθηματικό χρήστης<strong> όνομα χρήστη</strong>."
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "Τρέχουσα:"
-
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "Αλλαγή:"
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Ημ/νία:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Ώρα:"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Ευχαριστούμε που διαθέσατε κάποιο ποιοτικό χρόνο στον ιστότοπο σήμερα."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Σύνδεση ξανά"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-#, fuzzy
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "συνθηματικό"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, fuzzy, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "για χρήστης λογαριασμός σε"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, fuzzy, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "νέο συνθηματικό είναι"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-#, fuzzy
-msgid "Feel free to change this password by going to this page:"
-msgstr "συνθηματικό από σελίδα:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-#, fuzzy
-msgid "Your username, in case you've forgotten:"
-msgstr "όνομα χρήστη μέσα υποφαινόμενο:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-#, fuzzy
-msgid "Thanks for using our site!"
-msgstr "Ευχαριστώ για site!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-#, fuzzy
-msgid "The %(site_name)s team"
-msgstr "ιστότοπος όνομα"
-
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-msgid "Password reset"
-msgstr "Επαναφορά συνθηματικού"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Επιτυχής επαναφορά συνθηματικού"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Ένα νέο συνθηματικό έχει αποσταλεί στην ηλεκτρονική διεύθυνση που έχετε "
-"επιλέξει. Θα πρέπει να το παραλάβετε πολύ σύντομα."
-
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:4
-msgid "Password change"
-msgstr "Αλλαγή συνθηματικού"
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Παρακαλούμε εισάγετε το παλιό σας συνθηματικό, για λόγους ασφάλειας, και "
-"κατόπιν εισάγετε το νέο σας συνθηματικό δύο φορές ούτως ώστε να "
-"πιστοποιήσουμε ότι το πληκτρολογήσατε σωστά."
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "Παλιό συνθηματικό:"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "New password:"
-msgstr "Νέο συνθηματικό:"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid "Confirm password:"
-msgstr "Επιβεβαίωση συνθηματικού:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-msgid "Change my password"
-msgstr "Αλλαγή του συνθηματικού μου"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "Επιτυχής αλλαγή συνθηματικού"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "Το συνθηματικό σας έχει αλλαχτεί."
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Έχετε ξεχάσει το συνθηματικό σας; Εισάγετε παρακάτω την ηλεκτρονική σας "
-"διεύθυνση, και θα επαναφέρουμε το συνθηματικό σας, αποστέλλοντας το "
-"καινούριο στην ηλ. σας διεύθυνση."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "Ηλεκτρονική διεύθυνση:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Επαναφορά του συνθηματικού μου"
-
-#: contrib/admin/views/main.py:223
-msgid "Site administration"
-msgstr "Διαχείριση του ιστότοπου"
-
-#: contrib/admin/views/main.py:257 contrib/admin/views/auth.py:19
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "Το %(name)s \"%(obj)s\" αποθηκεύτηκε με επιτυχία."
-
-#: contrib/admin/views/main.py:261 contrib/admin/views/main.py:347
-#: contrib/admin/views/auth.py:24
-msgid "You may edit it again below."
-msgstr "Μπορείτε να το επεξεργαστείτε ξανά παρακάτω."
-
-#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
-#, python-format
-msgid "You may add another %s below."
-msgstr "Μπορείτε να προσθέσετε ακόμα ένα %s παρακάτω."
-
-#: contrib/admin/views/main.py:289
-#, python-format
-msgid "Add %s"
-msgstr "Προσθήκη %s"
-
-#: contrib/admin/views/main.py:335
-#, python-format
-msgid "Added %s."
-msgstr "Το %s προστέθηκε."
-
-#: contrib/admin/views/main.py:337
-#, python-format
-msgid "Changed %s."
-msgstr "Έγινε επεξεργασία του %s."
-
-#: contrib/admin/views/main.py:339
-#, python-format
-msgid "Deleted %s."
-msgstr "Το %s διεγράφη."
-
-#: contrib/admin/views/main.py:342
-msgid "No fields changed."
-msgstr "Κανένα πεδίο δεν άλλαξε."
-
-#: contrib/admin/views/main.py:345
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Το %(name)s \"%(obj)s\" αλλάχτηκε με επιτυχία."
-
-#: contrib/admin/views/main.py:353
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"Το %(name)s \"%(obj)s\" αποθηκεύτηκε με επιτυχία. Μπορείτε να το "
-"επεξεργαστείτε πάλι παρακάτω."
-
-#: contrib/admin/views/main.py:391
-#, python-format
-msgid "Change %s"
-msgstr "Αλλαγή του %s"
-
-#: contrib/admin/views/main.py:476
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Ένα ή περισσότερα %(fieldname)s στο %(name)s: %(obj)s"
-
-#: contrib/admin/views/main.py:481
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Ένα ή περισσότερα %(fieldname)s στο %(name)s:"
-
-#: contrib/admin/views/main.py:514
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Το %(name)s \"%(obj)s\" διαγράφηκε με επιτυχία."
-
-#: contrib/admin/views/main.py:517
-msgid "Are you sure?"
-msgstr "Είστε σίγουροι;"
-
-#: contrib/admin/views/main.py:539
-#, python-format
-msgid "Change history: %s"
-msgstr "Ιστορικό αλλαγών: %s"
-
-#: contrib/admin/views/main.py:573
-#, python-format
-msgid "Select %s"
-msgstr "Επιλέξτε %s"
-
-#: contrib/admin/views/main.py:573
-#, python-format
-msgid "Select %s to change"
-msgstr "Επιλέξτε %s προς αλλαγή"
-
-#: contrib/admin/views/main.py:768
-msgid "Database error"
-msgstr "Σφάλμα βάσης δεδομένων"
-
-#: contrib/admin/views/decorators.py:62
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-"Παρακαλούμε συνδεθείτε εκ νέου, γιατί η συνεδρία σας έχει λήξει. Μην "
-"ανησυχείτε: Η υποβολή σας έχει αποθηκευτεί."
-
-#: contrib/admin/views/decorators.py:69
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Από ότι φαίνεται, ο πλοηγητής σας δεν έχει ρυθμιστεί να δέχεται cookies. "
-"Παρακαλούμε ενεργοποιείστε τα cookies, φορτώστε ξανά αυτήν τη σελίδα και "
-"δοκιμάστε ξανά."
-
-#: contrib/admin/views/decorators.py:83
-msgid "Usernames cannot contain the '@' character."
-msgstr "Τα ονόματα χρηστών δεν επιτρέπεται να περιέχουν το χαρακτήρα '@'."
-
-#: contrib/admin/views/decorators.py:85
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"Η ηλεκτρονική σας διεύθυνση δεν είναι το όνομα χρήστη σας. Δοκιμάστε '%s' "
-"στη θέση αυτού."
-
-#: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
-#: contrib/admin/views/doc.py:50
-msgid "tag:"
-msgstr "ετικέτα:"
-
-#: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
-#: contrib/admin/views/doc.py:81
-msgid "filter:"
-msgstr "φίλτρο:"
-
-#: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
-#: contrib/admin/views/doc.py:139
-msgid "view:"
-msgstr "προβολή:"
-
-#: contrib/admin/views/doc.py:164
-#, fuzzy, python-format
-msgid "App %r not found"
-msgstr "Η σελίδα δε βρέθηκε"
-
-#: contrib/admin/views/doc.py:171
-#, python-format
-#, fuzzy
-msgid "Model %(name)r not found in app %(label)r"
-msgstr "όνομα"
-
-#: contrib/admin/views/doc.py:183
-#, python-format
-msgid "the related `%(label)s.%(type)s` object"
-msgstr ""
-
-#: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
-#: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
-msgid "model:"
-msgstr "μοντέλο:"
-
-#: contrib/admin/views/doc.py:214
-#, python-format
-#, fuzzy
-msgid "related `%(label)s.%(name)s` objects"
-msgstr "όνομα"
-
-#: contrib/admin/views/doc.py:219
-#, python-format
-msgid "all %s"
-msgstr "όλα %s"
-
-#: contrib/admin/views/doc.py:224
-#, python-format
-msgid "number of %s"
-msgstr ""
-
-#: contrib/admin/views/doc.py:229
-#, python-format
-msgid "Fields on %s objects"
-msgstr ""
-
-#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
-#: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
-#: contrib/admin/views/doc.py:310 contrib/admin/views/doc.py:312
-msgid "Integer"
-msgstr "Ακέραιος"
-
-#: contrib/admin/views/doc.py:292
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (Είτε Αληθές ή Ψευδές)"
-
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:311
-#, python-format
-msgid "String (up to %(maxlength)s)"
-msgstr "Συμβολοσειρά (μέχρι %(maxlength)s χαρακτήρες)"
-
-#: contrib/admin/views/doc.py:294
-msgid "Comma-separated integers"
-msgstr "Ακέραιοι χωρισμένοι με κόμματα"
-
-#: contrib/admin/views/doc.py:295
-msgid "Date (without time)"
-msgstr "Ημερομηνία (χωρίς την ώρα)"
-
-#: contrib/admin/views/doc.py:296
-msgid "Date (with time)"
-msgstr "Ημερομηνία (με την ώρα)"
-
-#: contrib/admin/views/doc.py:297
-msgid "E-mail address"
-msgstr "Ηλεκτρονική διεύθυνση"
-
-#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:299
-#: contrib/admin/views/doc.py:302
-msgid "File path"
-msgstr "Τοποθεσία αρχείου"
-
-#: contrib/admin/views/doc.py:300
-msgid "Decimal number"
-msgstr "Δεκαδικός αριθμός"
-
-#: contrib/admin/views/doc.py:306
-msgid "Boolean (Either True, False or None)"
-msgstr "Boolean (Αληθές, Ψευδές, ή τίποτα)"
-
-#: contrib/admin/views/doc.py:307
-msgid "Relation to parent model"
-msgstr "Σχέση με το γονικό μοντέλο"
-
-#: contrib/admin/views/doc.py:308
-msgid "Phone number"
-msgstr "Αριθμός τηλεφώνου"
-
-#: contrib/admin/views/doc.py:313
-msgid "Text"
-msgstr "Κείμενο"
-
-#: contrib/admin/views/doc.py:314
-msgid "Time"
-msgstr "Ώρα"
-
-#: contrib/admin/views/doc.py:316
-msgid "U.S. state (two uppercase letters)"
-msgstr "Πολιτεία ΗΠΑ. (δύο κεφαλαία γράμματα)"
-
-#: contrib/admin/views/doc.py:317
-msgid "XML text"
-msgstr "Κείμενο XML"
-
-#: contrib/admin/views/doc.py:343
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "Το %s δε φαίνεται να είναι ένα αντικείμενο urlpattern"
-
-#: contrib/admin/views/auth.py:30
-msgid "Add user"
-msgstr "Προσθήκη χρήστη"
-
-#: contrib/admin/views/auth.py:57
-msgid "Password changed successfully."
-msgstr "Το συνθηματικό αλλάχτηκε με επιτυχία."
-
-#: contrib/admin/views/auth.py:64
-#, python-format
-msgid "Change password: %s"
-msgstr "Αλλαγή συνθηματικού: %s"
-
-#: newforms/fields.py:103 newforms/fields.py:256
-#, python-format
-msgid "Ensure this value has at most %d characters."
-msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος το πολύ %d χαρακτήρες."
-
-#: newforms/fields.py:105 newforms/fields.py:258
-#, python-format
-msgid "Ensure this value has at least %d characters."
-msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος τουλάχιστον %d χαρακτήρες."
-
-#: newforms/fields.py:128 core/validators.py:120
-msgid "Enter a whole number."
-msgstr "Εισάγετε έναν ακέραιο αριθμό."
-
-#: newforms/fields.py:130
-#, fuzzy, python-format
-msgid "Ensure this value is less than or equal to %s."
-msgstr "τιμή a από."
-
-#: newforms/fields.py:132
-#, python-format
-msgid "Ensure this value is greater than or equal to %s."
-msgstr ""
-
-#: newforms/fields.py:165
-msgid "Enter a valid date."
-msgstr "Εισάγετε μια έγκυρη ημερομηνία."
-
-#: newforms/fields.py:192
-msgid "Enter a valid time."
-msgstr "Εισάγετε μια έγκυρη ώρα."
-
-#: newforms/fields.py:228
-msgid "Enter a valid date/time."
-msgstr "Εισάγετε μια έγκυρη ημερομηνία/ώρα."
-
-#: newforms/fields.py:242
-msgid "Enter a valid value."
-msgstr "Εισάγετε μια έγκυρη τιμή."
-
-#: newforms/fields.py:271 core/validators.py:162
-msgid "Enter a valid e-mail address."
-msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
-
-#: newforms/fields.py:289 newforms/fields.py:311
-msgid "Enter a valid URL."
-msgstr "Εισάγετε ένα έγκυρο URL."
-
-#: newforms/fields.py:313
-#, fuzzy
-msgid "This URL appears to be a broken link."
-msgstr "Το URL %s είναι χαλασμένος σύνδεσμος."
-
-#: newforms/fields.py:362 newforms/models.py:165
-#, fuzzy
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
-
-#: newforms/fields.py:380 newforms/fields.py:456 newforms/models.py:182
-#, fuzzy
-msgid "Enter a list of values."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
-
-#: newforms/fields.py:389 newforms/models.py:188
-#, fuzzy, python-format
-msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
-
-#: template/defaultfilters.py:491
-msgid "yes,no,maybe"
-msgstr "ναι,όχι,ίσως"
-
-#: views/generic/create_update.py:43
+#: views/generic/create_update.py:121
 #, fuzzy, python-format
 msgid "The %(verbose_name)s was created successfully."
 msgstr "Το %(name)s \"%(obj)s\" αλλάχτηκε με επιτυχία."
 
-#: views/generic/create_update.py:117
+#: views/generic/create_update.py:164
 #, fuzzy, python-format
 msgid "The %(verbose_name)s was updated successfully."
 msgstr "Το %(name)s \"%(obj)s\" διαγράφηκε με επιτυχία."
 
-#: views/generic/create_update.py:184
+#: views/generic/create_update.py:207
 #, fuzzy, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "Το %(name)s \"%(obj)s\" διαγράφηκε με επιτυχία."
-
-#: core/validators.py:64
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Αυτή η τιμή πρέπει να περιέχει μόνο γράμματα, αριθμούς και υπογεγραμμένες."
-
-#: core/validators.py:68
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-"Αυτή η τιμή πρέπει να περιέχει μόνο γράμματα, αριθμούς, υπογεγραμμένες, "
-"παύλες ή καθέτους."
-
-#: core/validators.py:72
-#, fuzzy
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr ""
-"Αυτή η τιμή πρέπει να περιέχει μόνο γράμματα, αριθμούς, υπογεγραμμένες, "
-"παύλες ή καθέτους."
-
-#: core/validators.py:76
-msgid "Uppercase letters are not allowed here."
-msgstr "Τα κεφαλαία γράμματα δεν επιτρέπονται εδώ."
-
-#: core/validators.py:80
-msgid "Lowercase letters are not allowed here."
-msgstr "Τα πεζά γράμματα δεν επιτρέπονται εδώ."
-
-#: core/validators.py:87
-msgid "Enter only digits separated by commas."
-msgstr "Εισάγετε μόνο ψηφία χωρισμένα με κόμματα."
-
-#: core/validators.py:99
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Εισάγετε έγκυρες ηλ. διευθύνσεις χωρισμένες με κόμματα."
-
-#: core/validators.py:103
-msgid "Please enter a valid IP address."
-msgstr "Παρακαλούμε εισάγετε μια έγκυρη διεύθυνση IP."
-
-#: core/validators.py:107
-msgid "Empty values are not allowed here."
-msgstr "Δεν επιτρέπονται κενές τιμές εδώ."
-
-#: core/validators.py:111
-msgid "Non-numeric characters aren't allowed here."
-msgstr "Δεν επιτρέπονται μη-αριθμητικοί χαρακτήρες εδώ."
-
-#: core/validators.py:115
-msgid "This value can't be comprised solely of digits."
-msgstr "Αυτή η τιμή δεν μπορεί να αποτελείται μόνο από ψηφία."
-
-#: core/validators.py:124
-msgid "Only alphabetical characters are allowed here."
-msgstr "Μόνο αλφαβητικοί χαρακτήρες επιτρέπονται εδώ."
-
-#: core/validators.py:139
-msgid "Year must be 1900 or later."
-msgstr ""
-
-#: core/validators.py:143
-#, fuzzy, python-format
-msgid "Invalid date: %s"
-msgstr "Μη έγκυρο URL: %s"
-
-#: core/validators.py:153
-msgid "Enter a valid time in HH:MM format."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
-
-#: core/validators.py:178
-#, fuzzy
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr "a εικόνα αρχείο υποφαινόμενο όχι εικόνα ή a εικόνα."
-
-#: core/validators.py:185
-#, fuzzy, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "URL όχι σημείο a εικόνα."
-
-#: core/validators.py:189
-#, fuzzy, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "Τηλέφωνο μέσα είναι."
-
-#: core/validators.py:197
-#, fuzzy, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "URL όχι σημείο a."
-
-#: core/validators.py:201
-msgid "A valid URL is required."
-msgstr "Απαιτείται ένα έγκυρο URL."
-
-#: core/validators.py:215
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-"Απαιτείται έγκυρη HTML. Συγκεκριμένα σφάλματα είναι τα εξής:\n"
-"%s"
-
-#: core/validators.py:222
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr "Κακώς δομημένη XML: %s"
-
-#: core/validators.py:239
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "Μη έγκυρο URL: %s"
-
-#: core/validators.py:244 core/validators.py:246
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "Το URL %s είναι χαλασμένος σύνδεσμος."
-
-#: core/validators.py:252
-#, fuzzy
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "a U συντομογραφία."
-
-#: core/validators.py:266
-#, fuzzy, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Παρακολούθηση είναι όχι."
-msgstr[1] "Παρακολούθηση είναι όχι."
-
-#: core/validators.py:273
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Αυτό το πεδίο πρέπει να ταιριάζει με το πεδίο '%s'."
-
-#: core/validators.py:292
-#, fuzzy
-msgid "Please enter something for at least one field."
-msgstr "για σε ένα πεδίο."
-
-#: core/validators.py:301 core/validators.py:312
-msgid "Please enter both fields or leave them both empty."
-msgstr "Παρακαλούμε συμπληρώστε και τα δύο πεδία ή αφήστε τα και τα δύο άδεια."
-
-#: core/validators.py:320
-#, fuzzy, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "πεδίο πεδίο είναι τιμή"
-
-#: core/validators.py:333
-#, fuzzy, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "πεδίο πεδίο είναι όχι τιμή"
-
-#: core/validators.py:352
-msgid "Duplicate values are not allowed."
-msgstr "Δεν επιτρέπονται διπλές τιμές."
-
-#: core/validators.py:367
-#, python-format
-msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Αυτή η τιμή πρέπει να είναι μεταξύ %(lower)s και %(upper)s."
-
-#: core/validators.py:369
-#, python-format
-msgid "This value must be at least %s."
-msgstr "Αυτή η τιμή πρέπει να είναι τουλάχιστον %s."
-
-#: core/validators.py:371
-#, python-format
-msgid "This value must be no more than %s."
-msgstr "Αυτή η τιμή πρέπει να είναι το πολύ %s."
-
-#: core/validators.py:407
-#, fuzzy, python-format
-msgid "This value must be a power of %s."
-msgstr "τιμή a από."
-
-#: core/validators.py:418
-msgid "Please enter a valid decimal number."
-msgstr "Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό."
-
-#: core/validators.py:422
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] ""
-"Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό με το πολύ %s ψηφίο "
-"συνολικά."
-msgstr[1] ""
-"Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό με το πολύ %s ψηφία "
-"συνολικά."
-
-#: core/validators.py:425
-#, python-format
-msgid "Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] ""
-"Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό με ακέραιο μέρος το πολύ %s ψηφίο "
-"συνολικά."
-msgstr[1] ""
-"Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό με ακέραιο μέρος το πολύ %s ψηφία "
-"συνολικά."
-
-#: core/validators.py:428
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό με το πολύ %s δεκαδική θέση."
-msgstr[1] ""
-"Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό με το πολύ %s δεκαδικές "
-"θέσεις."
-
-#: core/validators.py:438
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Βεβαιωθείτε ότι το αρχείο που στέλνετε έχει μέγεθος τουλάχιστον %s ψηφία."
-
-#: core/validators.py:439
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Βεβαιωθείτε ότι το αρχείο που στέλνετε έχει μέγεθος το πολύ μέχρι %s ψηφία."
-
-#: core/validators.py:456
-msgid "The format for this field is wrong."
-msgstr "Η μορφή αυτού του πεδίου είναι λανθασμένη."
-
-#: core/validators.py:471
-msgid "This field is invalid."
-msgstr "Αυτό το πεδίο είναι μη έγκυρο."
-
-#: core/validators.py:507
-#, fuzzy, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "όχι Οτιδήποτε από."
-
-#: core/validators.py:510
-#, fuzzy, python-format
-msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr "URL url Περιεχόμενο Τύπος."
-
-#: core/validators.py:543
-#, fuzzy, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr "close από Γραμμή με έναρξη"
-
-#: core/validators.py:547
-#, fuzzy, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr "κείμενο ενεργό είναι όχι μέσα Γραμμή με έναρξη"
-
-#: core/validators.py:552
-#, fuzzy, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr "ενεργό είναι χαρακτηριστικό Γραμμή με έναρξη"
-
-#: core/validators.py:557
-#, fuzzy, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr "ενεργό είναι Γραμμή με έναρξη"
-
-#: core/validators.py:561
-#, fuzzy, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr "ενεργό είναι αγνοείται ένα ή περισσότερα Γραμμή με έναρξη"
-
-#: core/validators.py:566
-#, fuzzy, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr "χαρακτηριστικό ενεργό τιμή Γραμμή με έναρξη"
-

@@ -6,1306 +6,744 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-16 10:12+0200\n"
+"POT-Creation-Date: 2010-12-29 21:00+0100\n"
 "PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
 "Last-Translator: Jason Davies <jason@jasondavies.com>\n"
 "Language-Team: Cymraeg <cy@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural= (n==1) ? 0 : (n==2) ? 1 : (n != 8 && "
-"n != 11) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural= (n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
+"11) ? 2 : 3;\n"
 
-#: contrib/comments/models.py:67 contrib/comments/models.py:166
-msgid "object ID"
-msgstr "ID gwrthrych"
+#: conf/global_settings.py:44
+msgid "Arabic"
+msgstr ""
 
-#: contrib/comments/models.py:68
-msgid "headline"
-msgstr "pennawd"
+#: conf/global_settings.py:45
+msgid "Bulgarian"
+msgstr ""
 
-#: contrib/comments/models.py:69 contrib/comments/models.py:90
-#: contrib/comments/models.py:167
-msgid "comment"
-msgstr "sylw"
+#: conf/global_settings.py:46
+msgid "Bengali"
+msgstr "Bengaleg"
 
-#: contrib/comments/models.py:70
-msgid "rating #1"
-msgstr "cyfraddiad #1"
+#: conf/global_settings.py:47
+#, fuzzy
+msgid "Bosnian"
+msgstr "Romaneg"
 
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr "cyfraddiad #2"
+#: conf/global_settings.py:48
+#, fuzzy
+msgid "Catalan"
+msgstr "Eidaleg"
 
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr "cyfraddiad #3"
+#: conf/global_settings.py:49
+msgid "Czech"
+msgstr "Tsieceg"
 
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr "cyfraddiad #4"
+#: conf/global_settings.py:50
+msgid "Welsh"
+msgstr "Cymraeg"
 
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr "cyfraddiad #5"
+#: conf/global_settings.py:51
+msgid "Danish"
+msgstr "Daneg"
 
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr "cyfraddiad #6"
+#: conf/global_settings.py:52
+msgid "German"
+msgstr "Almaeneg"
 
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr "cyfraddiad #7"
+#: conf/global_settings.py:53
+msgid "Greek"
+msgstr ""
 
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr "cyfraddiad #8"
+#: conf/global_settings.py:54
+msgid "English"
+msgstr "Saesneg"
 
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr "yn gyfraddiad dilys"
+#: conf/global_settings.py:55
+#, fuzzy
+msgid "British English"
+msgstr "Saesneg"
 
-#: contrib/comments/models.py:83 contrib/comments/models.py:169
-msgid "date/time submitted"
-msgstr "dyddiad/amser wedi ymostwng"
+#: conf/global_settings.py:56
+msgid "Spanish"
+msgstr "Spaeneg"
 
-#: contrib/comments/models.py:84 contrib/comments/models.py:170
-msgid "is public"
-msgstr "yn gyhoeddus"
+#: conf/global_settings.py:57
+msgid "Argentinian Spanish"
+msgstr ""
 
-#: contrib/comments/models.py:85 contrib/admin/views/doc.py:289
-msgid "IP address"
-msgstr "cyfeiriad IP"
+#: conf/global_settings.py:58
+#, fuzzy
+msgid "Estonian"
+msgstr "Romaneg"
 
-#: contrib/comments/models.py:86
-msgid "is removed"
-msgstr "wedi diddymu"
+#: conf/global_settings.py:59
+msgid "Basque"
+msgstr ""
 
-#: contrib/comments/models.py:86
+#: conf/global_settings.py:60
+#, fuzzy
+msgid "Persian"
+msgstr "Serbeg"
+
+#: conf/global_settings.py:61
+#, fuzzy
+msgid "Finnish"
+msgstr "Daneg"
+
+#: conf/global_settings.py:62
+msgid "French"
+msgstr "Ffrangeg"
+
+#: conf/global_settings.py:63
+#, fuzzy
+msgid "Frisian"
+msgstr "Brasileg"
+
+#: conf/global_settings.py:64
+msgid "Irish"
+msgstr ""
+
+#: conf/global_settings.py:65
+msgid "Galician"
+msgstr "Galisieg"
+
+#: conf/global_settings.py:66
+msgid "Hebrew"
+msgstr ""
+
+#: conf/global_settings.py:67
+msgid "Hindi"
+msgstr ""
+
+#: conf/global_settings.py:68
+#, fuzzy
+msgid "Croatian"
+msgstr "Romaneg"
+
+#: conf/global_settings.py:69
+msgid "Hungarian"
+msgstr ""
+
+#: conf/global_settings.py:70
+msgid "Indonesian"
+msgstr ""
+
+#: conf/global_settings.py:71
+msgid "Icelandic"
+msgstr "Islandeg"
+
+#: conf/global_settings.py:72
+msgid "Italian"
+msgstr "Eidaleg"
+
+#: conf/global_settings.py:73
+msgid "Japanese"
+msgstr ""
+
+#: conf/global_settings.py:74
+#, fuzzy
+msgid "Georgian"
+msgstr "Almaeneg"
+
+#: conf/global_settings.py:75
+msgid "Khmer"
+msgstr ""
+
+#: conf/global_settings.py:76
+#, fuzzy
+msgid "Kannada"
+msgstr "ac"
+
+#: conf/global_settings.py:77
+#, fuzzy
+msgid "Korean"
+msgstr "Norwyeg"
+
+#: conf/global_settings.py:78
+msgid "Lithuanian"
+msgstr ""
+
+#: conf/global_settings.py:79
+msgid "Latvian"
+msgstr ""
+
+#: conf/global_settings.py:80
+msgid "Macedonian"
+msgstr ""
+
+#: conf/global_settings.py:81
+msgid "Malayalam"
+msgstr ""
+
+#: conf/global_settings.py:82
+msgid "Mongolian"
+msgstr ""
+
+#: conf/global_settings.py:83
+msgid "Dutch"
+msgstr ""
+
+#: conf/global_settings.py:84
+msgid "Norwegian"
+msgstr "Norwyeg"
+
+#: conf/global_settings.py:85
+#, fuzzy
+msgid "Norwegian Bokmal"
+msgstr "Norwyeg"
+
+#: conf/global_settings.py:86
+#, fuzzy
+msgid "Norwegian Nynorsk"
+msgstr "Norwyeg"
+
+#: conf/global_settings.py:87
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:88
+#, fuzzy
+msgid "Polish"
+msgstr "Saesneg"
+
+#: conf/global_settings.py:89
+msgid "Portuguese"
+msgstr ""
+
+#: conf/global_settings.py:90
+#, fuzzy
+msgid "Brazilian Portuguese"
+msgstr "Brasileg"
+
+#: conf/global_settings.py:91
+msgid "Romanian"
+msgstr "Romaneg"
+
+#: conf/global_settings.py:92
+msgid "Russian"
+msgstr "Rwsieg"
+
+#: conf/global_settings.py:93
+msgid "Slovak"
+msgstr "Slofaceg"
+
+#: conf/global_settings.py:94
+#, fuzzy
+msgid "Slovenian"
+msgstr "Slofaceg"
+
+#: conf/global_settings.py:95
+#, fuzzy
+msgid "Albanian"
+msgstr "Romaneg"
+
+#: conf/global_settings.py:96
+msgid "Serbian"
+msgstr "Serbeg"
+
+#: conf/global_settings.py:97
+#, fuzzy
+msgid "Serbian Latin"
+msgstr "Serbeg"
+
+#: conf/global_settings.py:98
+msgid "Swedish"
+msgstr "Swedeg"
+
+#: conf/global_settings.py:99
+msgid "Tamil"
+msgstr ""
+
+#: conf/global_settings.py:100
+msgid "Telugu"
+msgstr ""
+
+#: conf/global_settings.py:101
+msgid "Thai"
+msgstr ""
+
+#: conf/global_settings.py:102
+msgid "Turkish"
+msgstr ""
+
+#: conf/global_settings.py:103
+#, fuzzy
+msgid "Ukrainian"
+msgstr "Brasileg"
+
+#: conf/global_settings.py:104
+#, fuzzy
+msgid "Vietnamese"
+msgstr "enw cyntaf"
+
+#: conf/global_settings.py:105
+msgid "Simplified Chinese"
+msgstr "Tsieinëeg Symledig"
+
+#: conf/global_settings.py:106
+msgid "Traditional Chinese"
+msgstr ""
+
+#: core/validators.py:20 forms/fields.py:67
+#, fuzzy
+msgid "Enter a valid value."
+msgstr "Rhowch enw ffeil dilys."
+
+#: core/validators.py:87 forms/fields.py:572
+#, fuzzy
+msgid "Enter a valid URL."
+msgstr "Rhowch enw ffeil dilys."
+
+#: core/validators.py:89 forms/fields.py:573
+#, fuzzy
+msgid "This URL appears to be a broken link."
+msgstr "Mae'r URL %s yn gyswllt toredig."
+
+#: core/validators.py:120 forms/fields.py:447
+msgid "Enter a valid e-mail address."
+msgstr "Rhowch cyfeiriad e-bost ddilys."
+
+#: core/validators.py:123 forms/fields.py:956
+#, fuzzy
 msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Rhaid i'r werth yma cynnwys lythrennau, rhifau, tanlinellau ac slaesau yn "
+"unig."
+
+#: core/validators.py:126 forms/fields.py:949
+#, fuzzy
+msgid "Enter a valid IPv4 address."
+msgstr "Rhowch cyfeiriad e-bost ddilys."
+
+#: core/validators.py:129 db/models/fields/__init__.py:575
+msgid "Enter only digits separated by commas."
+msgstr "Rhowch digidau gwahanu gyda atalnodau yn unig."
+
+#: core/validators.py:135
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 
-#: contrib/comments/models.py:91
-#, fuzzy
-msgid "comments"
-msgstr "sylw"
+#: core/validators.py:153 forms/fields.py:222 forms/fields.py:274
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
 
-#: contrib/comments/models.py:131 contrib/comments/models.py:207
-msgid "Content object"
-msgstr "Gwrthrych cynnwys"
+#: core/validators.py:158 forms/fields.py:223 forms/fields.py:275
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
 
-#: contrib/comments/models.py:159
+#: core/validators.py:164
 #, python-format
 msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"Postiwyd gan %(user)s ar %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: contrib/comments/models.py:168
-msgid "person's name"
-msgstr "enw'r person"
-
-#: contrib/comments/models.py:171
-msgid "ip address"
-msgstr "cyfeiriad ip"
-
-#: contrib/comments/models.py:173
-msgid "approved by staff"
+"Ensure this value has at least %(limit_value)d characters (it has %"
+"(show_value)d)."
 msgstr ""
 
-#: contrib/comments/models.py:176
-#, fuzzy
-msgid "free comment"
-msgstr "Sylw rhydd"
-
-#: contrib/comments/models.py:177
-#, fuzzy
-msgid "free comments"
-msgstr "Sylwadau rhydd"
-
-#: contrib/comments/models.py:233
-msgid "score"
-msgstr "sgôr"
-
-#: contrib/comments/models.py:234
-msgid "score date"
-msgstr "dyddiad sgôr"
-
-#: contrib/comments/models.py:237
-#, fuzzy
-msgid "karma score"
-msgstr "Sgôr Carma"
-
-#: contrib/comments/models.py:238
-#, fuzzy
-msgid "karma scores"
-msgstr "Sgorau Carma"
-
-#: contrib/comments/models.py:242
-#, python-format
-#, fuzzy
-msgid "%(score)d rating by %(user)s"
-msgstr "%(score)d"
-
-#: contrib/comments/models.py:258
+#: core/validators.py:170
 #, python-format
 msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
+"Ensure this value has at most %(limit_value)d characters (it has %"
+"(show_value)d)."
 msgstr ""
 
-#: contrib/comments/models.py:265
-msgid "flag date"
-msgstr "fflagio dyddiad"
-
-#: contrib/comments/models.py:268
-#, fuzzy
-msgid "user flag"
-msgstr "Fflag defnyddiwr"
-
-#: contrib/comments/models.py:269
-#, fuzzy
-msgid "user flags"
-msgstr "Fflagiau defnyddwyr"
-
-#: contrib/comments/models.py:273
-#, python-format
-msgid "Flag by %r"
-msgstr "Fflagio hefo %r"
-
-#: contrib/comments/models.py:278
-msgid "deletion date"
-msgstr "dyddiad dilead"
-
-#: contrib/comments/models.py:280
-#, fuzzy
-msgid "moderator deletion"
-msgstr "Dilead cymedrolwr"
-
-#: contrib/comments/models.py:281
-#, fuzzy
-msgid "moderator deletions"
-msgstr "Dileadau cymedrolwr"
-
-#: contrib/comments/models.py:285
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "Dilead cymedrolwr gan %r"
-
-#: contrib/comments/views/karma.py:19
-msgid "Anonymous users cannot vote"
-msgstr "Ni gellir defnyddwyr dienw pleidleisio"
-
-#: contrib/comments/views/karma.py:23
-msgid "Invalid comment ID"
-msgstr "ID sylw annilys"
-
-#: contrib/comments/views/karma.py:25
-msgid "No voting for yourself"
-msgstr "Dim pleidleisio ar gyfer eich hun"
-
-#: contrib/comments/views/comments.py:28
-msgid ""
-"This rating is required because you've entered at least one other rating."
-msgstr ""
-
-#: contrib/comments/views/comments.py:112
+#: db/models/base.py:765
 #, fuzzy, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr "Rhaid roi'r faes yma os mae %(field)s yn %(value)s"
 
-#: contrib/comments/views/comments.py:117
+#: db/models/base.py:780 db/models/base.py:788
 #, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
+msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
 
-#: contrib/comments/views/comments.py:189
-#: contrib/comments/views/comments.py:280
-msgid "Only POSTs are allowed"
-msgstr "Caniateir POSTiau yn unig"
-
-#: contrib/comments/views/comments.py:193
-#: contrib/comments/views/comments.py:284
-msgid "One or more of the required fields wasn't submitted"
-msgstr ""
-
-#: contrib/comments/views/comments.py:197
-#: contrib/comments/views/comments.py:286
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr ""
-
-#: contrib/comments/views/comments.py:207
-#: contrib/comments/views/comments.py:292
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr ""
-
-#: contrib/comments/views/comments.py:257
-#: contrib/comments/views/comments.py:321
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr ""
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:17
-msgid "Username:"
-msgstr "Enw defnyddiwr:"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/admin/templates/admin/login.html:20
-msgid "Password:"
-msgstr "Cyfrinair:"
-
-#: contrib/comments/templates/comments/form.html:6
-#, fuzzy
-msgid "Forgotten your password?"
-msgstr "Newidio fy nghyfrinair"
-
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Log out"
-msgstr "Allgofnodi"
-
-#: contrib/comments/templates/comments/form.html:12
-#, fuzzy
-msgid "Ratings"
-msgstr "cyfraddiad #1"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr ""
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr ""
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr ""
-
-#: contrib/comments/templates/comments/form.html:27
-#: contrib/comments/templates/comments/freeform.html:5
-#, fuzzy
-msgid "Comment:"
-msgstr "Sylw"
-
-#: contrib/comments/templates/comments/form.html:32
-#: contrib/comments/templates/comments/freeform.html:9
-#, fuzzy
-msgid "Preview comment"
-msgstr "Sylw rhydd"
-
-#: contrib/comments/templates/comments/freeform.html:4
-#, fuzzy
-msgid "Your name:"
-msgstr "enw defnyddiwr"
-
-#: contrib/admin/filterspecs.py:40
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143
-msgid "All"
-msgstr ""
-
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "Unrhyw dyddiad"
-
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "Heddiw"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "7 diwrnod gorffennol"
-
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "Mis yma"
-
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "Blwyddyn yma"
-
-#: contrib/admin/filterspecs.py:143
-msgid "Yes"
-msgstr "Ie"
-
-#: contrib/admin/filterspecs.py:143
-msgid "No"
-msgstr "Na"
-
-#: contrib/admin/filterspecs.py:150
-msgid "Unknown"
-msgstr ""
-
-#: contrib/admin/models.py:16
-msgid "action time"
-msgstr "amser gweithred"
-
-#: contrib/admin/models.py:19
-msgid "object id"
-msgstr "id gwrthrych"
-
-#: contrib/admin/models.py:20
-msgid "object repr"
-msgstr "repr gwrthrych"
-
-#: contrib/admin/models.py:21
-msgid "action flag"
-msgstr "fflag gweithred"
-
-#: contrib/admin/models.py:22
-msgid "change message"
-msgstr "neges newid"
-
-#: contrib/admin/models.py:25
-msgid "log entry"
-msgstr "cofnod"
-
-#: contrib/admin/models.py:26
-msgid "log entries"
-msgstr "cofnodion"
-
-#: contrib/admin/templatetags/admin_list.py:228
-msgid "All dates"
-msgstr "Dyddiadau i gyd"
-
-#: contrib/admin/views/decorators.py:9 contrib/auth/forms.py:36
-#: contrib/auth/forms.py:41
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-
-#: contrib/admin/views/decorators.py:23
-#: contrib/admin/templates/admin/login.html:25
-msgid "Log in"
-msgstr "Mewngofnodi"
-
-#: contrib/admin/views/decorators.py:61
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-
-#: contrib/admin/views/decorators.py:68
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-
-#: contrib/admin/views/decorators.py:82
-msgid "Usernames cannot contain the '@' character."
-msgstr ""
-
-#: contrib/admin/views/decorators.py:84
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-
-#: contrib/admin/views/main.py:226
-msgid "Site administration"
-msgstr "Gweinyddiad safle"
-
-#: contrib/admin/views/main.py:260
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr ""
-
-#: contrib/admin/views/main.py:264 contrib/admin/views/main.py:348
-msgid "You may edit it again below."
-msgstr ""
-
-#: contrib/admin/views/main.py:272 contrib/admin/views/main.py:357
-#, python-format
-msgid "You may add another %s below."
-msgstr ""
-
-#: contrib/admin/views/main.py:290
-#, python-format
-msgid "Add %s"
-msgstr "Ychwanegu %s"
-
-#: contrib/admin/views/main.py:336
-#, python-format
-msgid "Added %s."
-msgstr "Ychwanegwyd %s."
-
-#: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
-#: contrib/admin/views/main.py:340
+#: db/models/base.py:787 forms/models.py:581
 msgid "and"
 msgstr "ac"
 
-#: contrib/admin/views/main.py:338
+#: db/models/fields/__init__.py:63
 #, python-format
-msgid "Changed %s."
-msgstr "Newidiwyd %s."
-
-#: contrib/admin/views/main.py:340
-#, python-format
-msgid "Deleted %s."
-msgstr "Dileuwyd %s."
-
-#: contrib/admin/views/main.py:343
-msgid "No fields changed."
+msgid "Value %r is not a valid choice."
 msgstr ""
 
-#: contrib/admin/views/main.py:346
+#: db/models/fields/__init__.py:64
+#, fuzzy
+msgid "This field cannot be null."
+msgstr "Mae'r faes yma yn annilydd."
+
+#: db/models/fields/__init__.py:65
+#, fuzzy
+msgid "This field cannot be blank."
+msgstr "Mae'r faes yma yn annilydd."
+
+#: db/models/fields/__init__.py:70
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgid "Field of type: %(field_type)s"
 msgstr ""
 
-#: contrib/admin/views/main.py:354
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-
-#: contrib/admin/views/main.py:392
-#, python-format
-msgid "Change %s"
-msgstr "Newidio %s"
-
-#: contrib/admin/views/main.py:470
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr ""
-
-#: contrib/admin/views/main.py:475
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr ""
-
-#: contrib/admin/views/main.py:508
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
-
-#: contrib/admin/views/main.py:511
-msgid "Are you sure?"
-msgstr "Ydych yn sicr?"
-
-#: contrib/admin/views/main.py:533
-#, python-format
-msgid "Change history: %s"
-msgstr "Hanes newid: %s"
-
-#: contrib/admin/views/main.py:565
-#, python-format
-msgid "Select %s"
-msgstr "Dewis %s"
-
-#: contrib/admin/views/main.py:565
-#, python-format
-msgid "Select %s to change"
-msgstr "Dewis %s i newid"
-
-#: contrib/admin/views/doc.py:277 contrib/admin/views/doc.py:286
-#: contrib/admin/views/doc.py:288 contrib/admin/views/doc.py:294
-#: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:297
+#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
+#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
+#: db/models/fields/__init__.py:1018
 msgid "Integer"
 msgstr ""
 
-#: contrib/admin/views/doc.py:278
+#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
+#, fuzzy
+msgid "This value must be an integer."
+msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
+
+#: db/models/fields/__init__.py:493
+#, fuzzy
+msgid "This value must be either True or False."
+msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
+
+#: db/models/fields/__init__.py:495
 msgid "Boolean (Either True or False)"
 msgstr ""
 
-#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:296
-#, python-format
-msgid "String (up to %(maxlength)s)"
-msgstr ""
+#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
+#, fuzzy, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Llinyn (i fyny at 50)"
 
-#: contrib/admin/views/doc.py:280
+#: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
 msgstr ""
 
-#: contrib/admin/views/doc.py:281
+#: db/models/fields/__init__.py:584
 msgid "Date (without time)"
 msgstr "Dyddiad (heb amser)"
 
-#: contrib/admin/views/doc.py:282
+#: db/models/fields/__init__.py:588
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Rhowch dyddiad dilys mewn fformat YYYY-MM-DD."
+
+#: db/models/fields/__init__.py:589
+#, fuzzy, python-format
+msgid "Invalid date: %s"
+msgstr "URL annilys: %s"
+
+#: db/models/fields/__init__.py:670
+#, fuzzy
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgstr "Rhowch dyddiad/amser ddilys mewn fformat YYYY-MM-DD HH:MM."
+
+#: db/models/fields/__init__.py:672
 msgid "Date (with time)"
 msgstr "Dyddiad (gyda amser)"
 
-#: contrib/admin/views/doc.py:283
-msgid "E-mail address"
-msgstr "Cyfeiriad e-bost"
+#: db/models/fields/__init__.py:746
+#, fuzzy
+msgid "This value must be a decimal number."
+msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
 
-#: contrib/admin/views/doc.py:284 contrib/admin/views/doc.py:287
-msgid "File path"
-msgstr "Llwybr ffeil"
-
-#: contrib/admin/views/doc.py:285
+#: db/models/fields/__init__.py:748
 msgid "Decimal number"
 msgstr "Rhif degol"
 
-#: contrib/admin/views/doc.py:291
+#: db/models/fields/__init__.py:803
+msgid "E-mail address"
+msgstr "Cyfeiriad e-bost"
+
+#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
+#: db/models/fields/files.py:339
+msgid "File path"
+msgstr "Llwybr ffeil"
+
+#: db/models/fields/__init__.py:841
+#, fuzzy
+msgid "This value must be a float."
+msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
+
+#: db/models/fields/__init__.py:843
+msgid "Floating point number"
+msgstr ""
+
+#: db/models/fields/__init__.py:902
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:915
+msgid "IP address"
+msgstr "cyfeiriad IP"
+
+#: db/models/fields/__init__.py:931
+#, fuzzy
+msgid "This value must be either None, True or False."
+msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
+
+#: db/models/fields/__init__.py:933
 msgid "Boolean (Either True, False or None)"
 msgstr "Boole (Naill ai True, False neu None)"
 
-#: contrib/admin/views/doc.py:292
-msgid "Relation to parent model"
-msgstr "Perthynas i model rhiant"
-
-#: contrib/admin/views/doc.py:293
-msgid "Phone number"
-msgstr "Rhif ffôn"
-
-#: contrib/admin/views/doc.py:298
+#: db/models/fields/__init__.py:1024
 msgid "Text"
 msgstr "Testun"
 
-#: contrib/admin/views/doc.py:299
+#: db/models/fields/__init__.py:1040
 msgid "Time"
 msgstr "Amser"
 
-#: contrib/admin/views/doc.py:300 contrib/flatpages/models.py:7
+#: db/models/fields/__init__.py:1044
+#, fuzzy
+msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+msgstr "Rhowch amser ddilys mewn fformat HH:MM."
+
+#: db/models/fields/__init__.py:1120
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admin/views/doc.py:301
-msgid "U.S. state (two uppercase letters)"
-msgstr "Talaith U.D. (dwy briflythyren)"
-
-#: contrib/admin/views/doc.py:302
+#: db/models/fields/__init__.py:1136
 msgid "XML text"
 msgstr "Testun XML"
 
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Dogfennaeth"
-
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Change password"
-msgstr "Newid cyfrinair"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/base.html:28
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Home"
-msgstr "Adref"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "History"
-msgstr "Hanes"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "Dyddiad/amser"
-
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "Defnyddiwr"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "Gweithred"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "N j, Y, P"
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
-"Does dim hanes newid gan y gwrthrych yma. Mae'n debyg ni ychwanegwyd drwy'r "
-"safle gweinydd yma."
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Gweinyddiad safle Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Gweinyddiad Django"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Gwall gweinyddwr"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Gwall gweinyddwr (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Gwall Gweinyddwr <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Mae gwall wedi digwydd. Adroddwyd i weinyddwyr y safle drwy e-bost ac ddylai "
-"cael ei drwsio cyn bo hir."
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Tudalen heb ei ddarganfod"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Mae'n ddrwg gennym, ond nid darganfwyd y dudalen a dymunwyd"
-
-#: contrib/admin/templates/admin/index.html:17
+#: db/models/fields/related.py:804
 #, python-format
-msgid "Models available in the %(name)s application."
+msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr ""
 
-#: contrib/admin/templates/admin/index.html:28
-#: contrib/admin/templates/admin/change_form.html:15
-msgid "Add"
-msgstr "Ychwanegu"
+#: db/models/fields/related.py:806
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "Newidio"
+#: db/models/fields/related.py:928
+msgid "One-to-one relationship"
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "Does genych ddim hawl i olygu unrhywbeth."
+#: db/models/fields/related.py:990
+msgid "Many-to-many relationship"
+msgstr ""
 
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "Gweithredau Diweddar"
+#: db/models/fields/related.py:1010
+#, fuzzy
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Gafaelwch lawr \"Control\", neu \"Command\" ar Fac, i ddewis mwy nag un."
 
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "Fy Ngweithredau"
+#: forms/fields.py:66
+msgid "This field is required."
+msgstr "Mae angen y faes yma."
 
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "Dim ar gael"
+#: forms/fields.py:221
+msgid "Enter a whole number."
+msgstr "Rhowch rhif cyfan."
 
-#: contrib/admin/templates/admin/change_list.html:11
+#: forms/fields.py:252 forms/fields.py:273
+#, fuzzy
+msgid "Enter a number."
+msgstr "Rhowch rhif cyfan."
+
+#: forms/fields.py:276
 #, python-format
-msgid "Add %(name)s"
-msgstr "Ychwanegu %(name)s"
+msgid "Ensure that there are no more than %s digits in total."
+msgstr ""
 
-#: contrib/admin/templates/admin/login.html:22
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Ydych wedi <a href=\"/password_reset/\">anghofio eich cyfrinair</a>?"
+#: forms/fields.py:277
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr ""
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Croeso,"
+#: forms/fields.py:278
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-#: contrib/admin/templates/admin/submit_line.html:3
+#: forms/fields.py:340 forms/fields.py:916
+#, fuzzy
+msgid "Enter a valid date."
+msgstr "Rhowch enw ffeil dilys."
+
+#: forms/fields.py:368 forms/fields.py:917
+#, fuzzy
+msgid "Enter a valid time."
+msgstr "Rhowch enw ffeil dilys."
+
+#: forms/fields.py:394
+#, fuzzy
+msgid "Enter a valid date/time."
+msgstr "Rhowch enw ffeil dilys."
+
+#: forms/fields.py:458
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+
+#: forms/fields.py:459
+msgid "No file was submitted."
+msgstr ""
+
+#: forms/fields.py:460
+msgid "The submitted file is empty."
+msgstr "Mae'r ffeil yn wag."
+
+#: forms/fields.py:461
+#, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+
+#: forms/fields.py:462
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: forms/fields.py:516
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Llwythwch delwedd dilys. Doedd y delwedd a llwythwyd dim yn ddelwedd dilys, "
+"neu roedd o'n ddelwedd llwgr."
+
+#: forms/fields.py:648 forms/fields.py:723
+#, fuzzy, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Dewisiwch dewis dilys; dydy '%(data)s' dim mewn %(choices)s."
+
+#: forms/fields.py:724 forms/fields.py:812 forms/models.py:1018
+#, fuzzy
+msgid "Enter a list of values."
+msgstr "Rhowch enw ffeil dilys."
+
+#: forms/formsets.py:308 forms/formsets.py:310
+#, fuzzy
+msgid "Order"
+msgstr "Trefn:"
+
+#: forms/formsets.py:312
 msgid "Delete"
 msgstr "Dileu"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
+#: forms/models.py:575
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr ""
+
+#: forms/models.py:579
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: forms/models.py:585
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Bydda dileu'r %(object_name)s '%(object)s' yn ddilyn i dileu'r wrthrychau "
-"perthynol, ond ni chaniateir eich cyfrif ddileu'r mathau o wrthrych canlynol:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:21
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
+#: forms/models.py:593
+msgid "Please correct the duplicate values below."
 msgstr ""
-"Ydych yn sicr chi eiso ddileu'r %(object_name)s \"%(object)s\"? Bydd y cwbl "
-"o'r eitemau perthynol canlynol yn cae eu ddileu:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "Yndw, rwy'n sicr"
+#: forms/models.py:868
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
 
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(title)s "
-msgstr " Gan %(title)s"
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "Ewch"
-
-#: contrib/admin/templates/admin/change_form.html:21
-msgid "View on site"
-msgstr "Gweld ar safle"
-
-#: contrib/admin/templates/admin/change_form.html:30
+#: forms/models.py:929
 #, fuzzy
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Dewisiwch dewis dilys; dydy '%(data)s' dim mewn %(choices)s."
+
+#: forms/models.py:1019
+#, fuzzy, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "Dewisiwch dewis dilys; dydy '%(data)s' dim mewn %(choices)s."
+
+#: forms/models.py:1021
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr ""
+
+#: forms/widgets.py:299
+msgid "Currently"
+msgstr ""
+
+#: forms/widgets.py:300
+msgid "Change"
+msgstr "Newidio"
+
+#: forms/widgets.py:301
+#, fuzzy
+msgid "Clear"
+msgstr "blwyddyn"
+
+#: forms/widgets.py:547
+msgid "Unknown"
+msgstr ""
+
+#: forms/widgets.py:547
+msgid "Yes"
+msgstr "Ie"
+
+#: forms/widgets.py:547
+msgid "No"
+msgstr "Na"
+
+#: template/defaultfilters.py:794
+msgid "yes,no,maybe"
+msgstr "ie,na,efallai"
+
+#: template/defaultfilters.py:825
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Ordering"
-msgstr "Trefnu"
-
-#: contrib/admin/templates/admin/change_form.html:51
-msgid "Order:"
-msgstr "Trefn:"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "Cadw fel newydd"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "Cadw ac ychwanegu un arall"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "Cadw ac parhau i olygu"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "Cadw"
-
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-msgid "Password change"
-msgstr "Newid cyfrinair"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "Newid cyfrinair yn lwyddianus"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "Newidwyd eich cyfrinair."
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "Ailosod cyfrinair"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Wedi anghofio eich cyfrinair? Rhowch eich cyfeiriad e-bost isod, ac "
-"ailosodan eich cyfrinair ac e-bostio'r un newydd i chi."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "Cyfeiriad e-bost:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Ailosodi fy nghyfrinair"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Diolch am dreulio amser ansawdd gyda'r safle we heddiw 'ma."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Ailmewngofnodi"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Ailosod cyfrinair yn lwyddianus"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr "Wedi e-bostio cyfrinair newydd i'r gyfeiriad e-bost "
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Rhowch eich cyfrinair hen, er mwyn gwarchodaeth, yna rhowch eich cyfrinair "
-"newydd dwywaith er mwyn i ni wirio y teipiwyd yn gywir."
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "Cyfrinair hen:"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "New password:"
-msgstr "Cyfrinair newydd:"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid "Confirm password:"
-msgstr "Cadarnhewch cyfrinair:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-msgid "Change my password"
-msgstr "Newidio fy nghyfrinair"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Chi'n derbyn yr e-bost yma achos ddymunwyd ailosod cyfrinair"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
+#: template/defaultfilters.py:827
 #, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "er mwyn eich cyfrif defnyddiwr ar %(site_name)s"
+msgid "%.1f KB"
+msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_email.html:5
+#: template/defaultfilters.py:829
 #, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "Eich cyfrinair newydd yw: %(new_password)s"
+msgid "%.1f MB"
+msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "Mae croeso i chi newid y gyfrinair hon wrth fynd i'r dudalen yma:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "Eich enw defnyddiwr, rhag ofn chi wedi anghofio:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "Diolch am ddefnyddio ein safle!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
+#: template/defaultfilters.py:831
 #, python-format
-msgid "The %(site_name)s team"
-msgstr "Y tîm %(site_name)s"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "Dalennau gofnod"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
-msgid "Documentation bookmarklets"
-msgstr "Dogfennaeth dalennau gofnod"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+msgid "%.1f GB"
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-msgid "Documentation for this page"
-msgstr "Dogfennaeth er mwyn y dudalen yma"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
+#: template/defaultfilters.py:833
+#, python-format
+msgid "%.1f TB"
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-msgid "Show object ID"
-msgstr "Dangos ID gwrthrych"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Yn dangos y fath-cynnwys a'r ID unigryw ar gyfer tudalennau sy'n "
-"cynrychioligwrthrych sengl."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-msgid "Edit this object (current window)"
-msgstr "Golygu'r gwrthrych yma (ffenestr cyfoes)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Yn neidio i'r dudalen weinyddiad ar gyfer tudalennau sy'n cynrychioli "
-"gwrthrych sengl."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-msgid "Edit this object (new window)"
-msgstr "Golygu'r gwrthrych yma (ffenestr newydd)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
-msgid "As above, but opens the admin page in a new window."
-msgstr "Fel uwchben, ond yn agor y dudalen weinyddiad mewn ffenestr newydd."
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Dyddiad:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Amser:"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
+#: template/defaultfilters.py:834
+#, python-format
+msgid "%.1f PB"
 msgstr ""
 
-#: contrib/admin/templates/widget/file.html:3
-#, fuzzy
-msgid "Change:"
-msgstr "Newidio"
-
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "ailgyfeirio o"
-
-#: contrib/redirects/models.py:8
-msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Ddylai hon bod yn lwybr hollol, heb y parth-enw. Er enghraifft: '/"
-"digwyddiadau/chwilio/'."
-
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "ailgyfeirio i"
-
-#: contrib/redirects/models.py:10
-msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr ""
-"Gellir fod naill ai llwybr hollol (fel uwch) neu URL hollol yn ddechrau â "
-"'http://'."
-
-#: contrib/redirects/models.py:12
-msgid "redirect"
-msgstr "ailgyfeiriad"
-
-#: contrib/redirects/models.py:13
-msgid "redirects"
-msgstr "ailgyfeiriadau"
-
-#: contrib/flatpages/models.py:8
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Er enghraifft: '/amdan/cyswllt/'. Sicrhewch gennych slaesau arweiniol ac "
-"trywyddiol."
-
-#: contrib/flatpages/models.py:9
-msgid "title"
-msgstr "teitl"
-
-#: contrib/flatpages/models.py:10
-msgid "content"
-msgstr "cynnwys"
-
-#: contrib/flatpages/models.py:11
-msgid "enable comments"
-msgstr "galluogi sylwadau"
-
-#: contrib/flatpages/models.py:12
-msgid "template name"
-msgstr "enw'r templed"
-
-#: contrib/flatpages/models.py:13
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"Er enghraifft: 'flatpages/tudalen_cyswllt'. Os nid darparwyd, ddefnyddia'r "
-"system 'flatpages/default'."
-
-#: contrib/flatpages/models.py:14
-msgid "registration required"
-msgstr "cofrestriad gofynnol"
-
-#: contrib/flatpages/models.py:14
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Os wedi dewis, dim ond defnyddwyr a mewngofnodwyd bydd yn gallu gweld y "
-"tudalen."
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "tudalen fflat"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "tudalennau fflat"
-
-#: contrib/auth/models.py:13 contrib/auth/models.py:26
-msgid "name"
-msgstr "enw"
-
-#: contrib/auth/models.py:15
-msgid "codename"
-msgstr "enw arwyddol"
-
-#: contrib/auth/models.py:17
-#, fuzzy
-msgid "permission"
-msgstr "Hawl"
-
-#: contrib/auth/models.py:18 contrib/auth/models.py:27
-#, fuzzy
-msgid "permissions"
-msgstr "Hawliau"
-
-#: contrib/auth/models.py:29
-#, fuzzy
-msgid "group"
-msgstr "Grŵp"
-
-#: contrib/auth/models.py:30 contrib/auth/models.py:65
-#, fuzzy
-msgid "groups"
-msgstr "Grwpiau"
-
-#: contrib/auth/models.py:55
-msgid "username"
-msgstr "enw defnyddiwr"
-
-#: contrib/auth/models.py:56
-msgid "first name"
-msgstr "enw cyntaf"
-
-#: contrib/auth/models.py:57
-msgid "last name"
-msgstr "enw olaf"
-
-#: contrib/auth/models.py:58
-msgid "e-mail address"
-msgstr "cyfeiriad e-bost"
-
-#: contrib/auth/models.py:59
-msgid "password"
-msgstr "cyfrinair"
-
-#: contrib/auth/models.py:59
-msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr "Defnyddiwch '[algo]$[salt]$[hexdigest]'"
-
-#: contrib/auth/models.py:60
-msgid "staff status"
-msgstr "statws staff"
-
-#: contrib/auth/models.py:60
-msgid "Designates whether the user can log into this admin site."
-msgstr "Dylunio ai'r defnyddiwr yn gally mewngofnodi i'r safle weinyddiad yma."
-
-#: contrib/auth/models.py:61
-msgid "active"
-msgstr "gweithredol"
-
-#: contrib/auth/models.py:62
-msgid "superuser status"
-msgstr "statws defnyddiwr swper"
-
-#: contrib/auth/models.py:63
-msgid "last login"
-msgstr "mewngofnod olaf"
-
-#: contrib/auth/models.py:64
-msgid "date joined"
-msgstr "Dyddiad"
-
-#: contrib/auth/models.py:66
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"Yn ogystal â'r hawliau trosglwyddwyd dros law, byddai'r defnyddiwr yma hefyd "
-"yn cael y cwbl hawliau a addefwyd i pob grŵp mae o/hi mewn."
-
-#: contrib/auth/models.py:67
-#, fuzzy
-msgid "user permissions"
-msgstr "Hawliau"
-
-#: contrib/auth/models.py:70
-#, fuzzy
-msgid "user"
-msgstr "Defnyddiwr"
-
-#: contrib/auth/models.py:71
-#, fuzzy
-msgid "users"
-msgstr "Defnyddwyr"
-
-#: contrib/auth/models.py:76
-msgid "Personal info"
-msgstr "Gwybodaeth personol"
-
-#: contrib/auth/models.py:77
-msgid "Permissions"
-msgstr "Hawliau"
-
-#: contrib/auth/models.py:78
-msgid "Important dates"
-msgstr "Dyddiadau pwysig"
-
-#: contrib/auth/models.py:79
-msgid "Groups"
-msgstr "Grwpiau"
-
-#: contrib/auth/models.py:219
-#, fuzzy
-msgid "message"
-msgstr "Neges"
-
-#: contrib/auth/forms.py:30
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
+#: utils/dateformat.py:42
+msgid "p.m."
 msgstr ""
 
-#: contrib/contenttypes/models.py:25
-#, fuzzy
-msgid "python model class name"
-msgstr "enw modwl python"
-
-#: contrib/contenttypes/models.py:28
-msgid "content type"
-msgstr "math cynnwys"
-
-#: contrib/contenttypes/models.py:29
-msgid "content types"
-msgstr "mathau cynnwys"
-
-#: contrib/sessions/models.py:35
-msgid "session key"
-msgstr "goriad sesiwn"
-
-#: contrib/sessions/models.py:36
-msgid "session data"
-msgstr "data sesiwn"
-
-#: contrib/sessions/models.py:37
-msgid "expire date"
-msgstr "dyddiad darfod"
-
-#: contrib/sessions/models.py:41
-msgid "session"
-msgstr "sesiwn"
-
-#: contrib/sessions/models.py:42
-msgid "sessions"
-msgstr "sesiynau"
-
-#: contrib/sites/models.py:10
-msgid "domain name"
-msgstr "parth-enw"
-
-#: contrib/sites/models.py:11
-msgid "display name"
-msgstr "enw arddangos"
-
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr "safle"
-
-#: contrib/sites/models.py:16
-msgid "sites"
-msgstr "safleoedd"
-
-#: utils/translation.py:360
-msgid "DATE_FORMAT"
+#: utils/dateformat.py:43
+msgid "a.m."
 msgstr ""
 
-#: utils/translation.py:361
-msgid "DATETIME_FORMAT"
+#: utils/dateformat.py:48
+msgid "PM"
 msgstr ""
 
-#: utils/translation.py:362
-msgid "TIME_FORMAT"
+#: utils/dateformat.py:49
+msgid "AM"
+msgstr ""
+
+#: utils/dateformat.py:98
+msgid "midnight"
+msgstr ""
+
+#: utils/dateformat.py:100
+msgid "noon"
 msgstr ""
 
 #: utils/dates.py:6
@@ -1336,133 +774,247 @@ msgstr "Dydd Sadwrn"
 msgid "Sunday"
 msgstr "Dydd Sul"
 
-#: utils/dates.py:14
+#: utils/dates.py:10
+#, fuzzy
+msgid "Mon"
+msgstr "Dydd Llun"
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Tue"
+msgstr "Dydd Mawrth"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr ""
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr ""
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Fri"
+msgstr "Dydd Gwener"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr ""
+
+#: utils/dates.py:11
+#, fuzzy
+msgid "Sun"
+msgstr "Dydd Sul"
+
+#: utils/dates.py:18
 msgid "January"
 msgstr "Ionawr"
 
-#: utils/dates.py:14
+#: utils/dates.py:18
 msgid "February"
 msgstr "Chwefror"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "Mawrth"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "Ebrill"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "Mai"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "Mehefin"
 
-#: utils/dates.py:15 utils/dates.py:27
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "Gorffenaf"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "August"
 msgstr "Awst"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "September"
 msgstr "Medi"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "October"
 msgstr "Hydref"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "November"
 msgstr "Tachwedd"
 
-#: utils/dates.py:16
+#: utils/dates.py:20
 msgid "December"
 msgstr "Rhagfyr"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 #, fuzzy
 msgid "jan"
 msgstr "ac"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "feb"
 msgstr ""
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "mar"
 msgstr ""
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "apr"
 msgstr ""
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 #, fuzzy
 msgid "may"
 msgstr "diwrnod"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jun"
 msgstr ""
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "jul"
 msgstr ""
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "aug"
 msgstr ""
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "sep"
 msgstr ""
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "oct"
 msgstr ""
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "nov"
 msgstr ""
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "dec"
 msgstr ""
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "Ion."
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "Chwe."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "Awst"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "Medi"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "Hyd."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "Tach."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "Rhag."
 
-#: utils/timesince.py:12
+#: utils/dates.py:35
+#, fuzzy
+msgctxt "alt. month"
+msgid "January"
+msgstr "Ionawr"
+
+#: utils/dates.py:36
+#, fuzzy
+msgctxt "alt. month"
+msgid "February"
+msgstr "Chwefror"
+
+#: utils/dates.py:37
+#, fuzzy
+msgctxt "alt. month"
+msgid "March"
+msgstr "Mawrth"
+
+#: utils/dates.py:38
+#, fuzzy
+msgctxt "alt. month"
+msgid "April"
+msgstr "Ebrill"
+
+#: utils/dates.py:39
+#, fuzzy
+msgctxt "alt. month"
+msgid "May"
+msgstr "Mai"
+
+#: utils/dates.py:40
+#, fuzzy
+msgctxt "alt. month"
+msgid "June"
+msgstr "Mehefin"
+
+#: utils/dates.py:41
+#, fuzzy
+msgctxt "alt. month"
+msgid "July"
+msgstr "Gorffenaf"
+
+#: utils/dates.py:42
+#, fuzzy
+msgctxt "alt. month"
+msgid "August"
+msgstr "Awst"
+
+#: utils/dates.py:43
+#, fuzzy
+msgctxt "alt. month"
+msgid "September"
+msgstr "Medi"
+
+#: utils/dates.py:44
+#, fuzzy
+msgctxt "alt. month"
+msgid "October"
+msgstr "Hydref"
+
+#: utils/dates.py:45
+#, fuzzy
+msgctxt "alt. month"
+msgid "November"
+msgstr "Tachwedd"
+
+#: utils/dates.py:46
+#, fuzzy
+msgctxt "alt. month"
+msgid "December"
+msgstr "Rhagfyr"
+
+#: utils/text.py:136
+#, fuzzy
+msgid "or"
+msgstr "awr"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:153
+msgid ", "
+msgstr ""
+
+#: utils/timesince.py:21
 #, fuzzy
 msgid "year"
 msgid_plural "years"
@@ -1471,7 +1023,7 @@ msgstr[1] "blynyddoedd"
 msgstr[2] ""
 msgstr[3] ""
 
-#: utils/timesince.py:13
+#: utils/timesince.py:22
 #, fuzzy
 msgid "month"
 msgid_plural "months"
@@ -1480,8 +1032,7 @@ msgstr[1] "misoedd"
 msgstr[2] ""
 msgstr[3] ""
 
-#: utils/timesince.py:14
-#, fuzzy
+#: utils/timesince.py:23
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] ""
@@ -1489,7 +1040,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: utils/timesince.py:15
+#: utils/timesince.py:24
 #, fuzzy
 msgid "day"
 msgid_plural "days"
@@ -1498,7 +1049,7 @@ msgstr[1] "diwrnodau"
 msgstr[2] ""
 msgstr[3] ""
 
-#: utils/timesince.py:16
+#: utils/timesince.py:25
 #, fuzzy
 msgid "hour"
 msgid_plural "hours"
@@ -1507,7 +1058,7 @@ msgstr[1] "oriau"
 msgstr[2] ""
 msgstr[3] ""
 
-#: utils/timesince.py:17
+#: utils/timesince.py:26
 #, fuzzy
 msgid "minute"
 msgid_plural "minutes"
@@ -1516,509 +1067,52 @@ msgstr[1] "munudau"
 msgstr[2] ""
 msgstr[3] ""
 
-#: conf/global_settings.py:37
-msgid "Bengali"
-msgstr "Bengaleg"
-
-#: conf/global_settings.py:38
-msgid "Czech"
-msgstr "Tsieceg"
-
-#: conf/global_settings.py:39
-msgid "Welsh"
-msgstr "Cymraeg"
-
-#: conf/global_settings.py:40
-msgid "Danish"
-msgstr "Daneg"
-
-#: conf/global_settings.py:41
-msgid "German"
-msgstr "Almaeneg"
-
-#: conf/global_settings.py:42
-msgid "Greek"
-msgstr ""
-
-#: conf/global_settings.py:43
-msgid "English"
-msgstr "Saesneg"
-
-#: conf/global_settings.py:44
-msgid "Spanish"
-msgstr "Spaeneg"
-
-#: conf/global_settings.py:45
-msgid "French"
-msgstr "Ffrangeg"
-
-#: conf/global_settings.py:46
-msgid "Galician"
-msgstr "Galisieg"
-
-#: conf/global_settings.py:47
-msgid "Hungarian"
-msgstr ""
-
-#: conf/global_settings.py:48
-msgid "Hebrew"
-msgstr ""
-
-#: conf/global_settings.py:49
-msgid "Icelandic"
-msgstr "Islandeg"
-
-#: conf/global_settings.py:50
-msgid "Italian"
-msgstr "Eidaleg"
-
-#: conf/global_settings.py:51
-msgid "Japanese"
-msgstr ""
-
-#: conf/global_settings.py:52
-msgid "Dutch"
-msgstr ""
-
-#: conf/global_settings.py:53
-msgid "Norwegian"
-msgstr "Norwyeg"
-
-#: conf/global_settings.py:54
-msgid "Brazilian"
-msgstr "Brasileg"
-
-#: conf/global_settings.py:55
-msgid "Romanian"
-msgstr "Romaneg"
-
-#: conf/global_settings.py:56
-msgid "Russian"
-msgstr "Rwsieg"
-
-#: conf/global_settings.py:57
-msgid "Slovak"
-msgstr "Slofaceg"
-
-#: conf/global_settings.py:58
+#: utils/timesince.py:45
 #, fuzzy
-msgid "Slovenian"
-msgstr "Slofaceg"
+msgid "minutes"
+msgstr "munud"
 
-#: conf/global_settings.py:59
-msgid "Serbian"
-msgstr "Serbeg"
-
-#: conf/global_settings.py:60
-msgid "Swedish"
-msgstr "Swedeg"
-
-#: conf/global_settings.py:61
-#, fuzzy
-msgid "Ukrainian"
-msgstr "Brasileg"
-
-#: conf/global_settings.py:62
-msgid "Simplified Chinese"
-msgstr "Tsieinëeg Symledig"
-
-#: conf/global_settings.py:63
-msgid "Traditional Chinese"
+#: utils/timesince.py:50
+#, python-format
+msgid "%(number)d %(type)s"
 msgstr ""
 
-#: core/validators.py:60
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Rhaid i'r werth yma cynnwys lythrennau, rhifau ac tanlinellau yn unig."
-
-#: core/validators.py:64
-#, fuzzy
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
+#: utils/timesince.py:56
+#, python-format
+msgid ", %(number)d %(type)s"
 msgstr ""
-"Rhaid i'r werth yma cynnwys lythrennau, rhifau, tanlinellau ac slaesau yn "
-"unig."
 
-#: core/validators.py:72
-msgid "Uppercase letters are not allowed here."
-msgstr "Ni chaniateir priflythrennau yma."
-
-#: core/validators.py:76
-msgid "Lowercase letters are not allowed here."
-msgstr "Ni chaniateir lythrennau bach yma."
-
-#: core/validators.py:83
-msgid "Enter only digits separated by commas."
-msgstr "Rhowch digidau gwahanu gyda atalnodau yn unig."
-
-#: core/validators.py:95
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Rhowch cyfeiriad e-bost dilys gwahanu gyda atalnodau."
-
-#: core/validators.py:99
-msgid "Please enter a valid IP address."
-msgstr "Rhowch cyfeiriad IP dilys, os gwelwch yn dda."
-
-#: core/validators.py:103
-msgid "Empty values are not allowed here."
-msgstr "Ni chaniateir gwerthau gwag yma."
-
-#: core/validators.py:107
-msgid "Non-numeric characters aren't allowed here."
-msgstr "Ni chaniateir nodau anrhifol yma."
-
-#: core/validators.py:111
-msgid "This value can't be comprised solely of digits."
-msgstr "Ni gellir y werth yma"
-
-#: core/validators.py:116
-msgid "Enter a whole number."
-msgstr "Rhowch rhif cyfan."
-
-#: core/validators.py:120
-msgid "Only alphabetical characters are allowed here."
-msgstr "Caniateir nodau gwyddorol un unig yma."
-
-#: core/validators.py:124
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Rhowch dyddiad dilys mewn fformat YYYY-MM-DD."
-
-#: core/validators.py:128
-msgid "Enter a valid time in HH:MM format."
-msgstr "Rhowch amser ddilys mewn fformat HH:MM."
-
-#: core/validators.py:132 db/models/fields/__init__.py:468
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Rhowch dyddiad/amser ddilys mewn fformat YYYY-MM-DD HH:MM."
-
-#: core/validators.py:136
-msgid "Enter a valid e-mail address."
-msgstr "Rhowch cyfeiriad e-bost ddilys."
-
-#: core/validators.py:148
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
+#: utils/translation/trans_real.py:560
+msgid "DATE_FORMAT"
 msgstr ""
-"Llwythwch delwedd dilys. Doedd y delwedd a llwythwyd dim yn ddelwedd dilys, "
-"neu roedd o'n ddelwedd llwgr."
 
-#: core/validators.py:155
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "Dydy'r URL %s dim yn pwyntio at delwedd dilys."
-
-#: core/validators.py:159
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "Rhaid rifau ffon bod mewn fformat XXX-XXX-XXXX. Mae \"%s\" yn annilys."
-
-#: core/validators.py:167
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "Dydy'r URL %s dim yn pwyntio at fideo Quicktime dilys."
-
-#: core/validators.py:171
-msgid "A valid URL is required."
-msgstr "Mae URL dilys yn ofynnol."
-
-#: core/validators.py:185
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
+#: utils/translation/trans_real.py:561
+msgid "DATETIME_FORMAT"
 msgstr ""
-"Mae HTML dilys yn ofynnol. Gwallau penodol yw:\n"
-"%s"
 
-#: core/validators.py:192
+#: utils/translation/trans_real.py:562
+msgid "TIME_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:583
+msgid "YEAR_MONTH_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:584
+msgid "MONTH_DAY_FORMAT"
+msgstr ""
+
+#: views/generic/create_update.py:121
 #, python-format
-msgid "Badly formed XML: %s"
-msgstr "XML wedi ffurfio'n wael: %s"
+msgid "The %(verbose_name)s was created successfully."
+msgstr ""
 
-#: core/validators.py:202
+#: views/generic/create_update.py:164
 #, python-format
-msgid "Invalid URL: %s"
-msgstr "URL annilys: %s"
+msgid "The %(verbose_name)s was updated successfully."
+msgstr ""
 
-#: core/validators.py:206 core/validators.py:208
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "Mae'r URL %s yn gyswllt toredig."
-
-#: core/validators.py:214
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "Rhowch talfyriad dalaith U.S. dilys."
-
-#: core/validators.py:229
+#: views/generic/create_update.py:207
 #, fuzzy, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Gwyliwch eich ceg! Ni chaniateir y gair %s yma."
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-
-#: core/validators.py:236
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Rhaid i'r faes yma cydweddu'r faes '%s'."
-
-#: core/validators.py:255
-msgid "Please enter something for at least one field."
-msgstr "Rhowch rhywbeth am un maes o leiaf, os gwelwch yn dda."
-
-#: core/validators.py:264 core/validators.py:275
-msgid "Please enter both fields or leave them both empty."
-msgstr "Llenwch y ddwy faes, neu gadewch nhw'n wag, os gwelwch yn dda."
-
-#: core/validators.py:282
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Rhaid roi'r faes yma os mae %(field)s yn %(value)s"
-
-#: core/validators.py:294
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Rhaid roi'r faes yma os mae %(field)s dim yn %(value)s"
-
-#: core/validators.py:313
-msgid "Duplicate values are not allowed."
-msgstr "Ni chaniateir gwerthau ddyblyg."
-
-#: core/validators.py:336
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
-
-#: core/validators.py:347
-msgid "Please enter a valid decimal number."
-msgstr "Rhowch rhif degol dilys, os gwelwch yn dda."
-
-#: core/validators.py:349
-#, fuzzy, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Rhowch rhif degol dilys gyda cyfanswm %s digidau o fwyaf."
-msgstr[1] "Rhowch rhif degol dilys gyda cyfanswm %s digid o fwyaf."
-msgstr[2] ""
-msgstr[3] ""
-
-#: core/validators.py:352
-#, fuzzy, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
-"Rhowch rif degol dilydd gyda o fwyaf %s lle degol, os gwelwch yn dda."
-msgstr[1] ""
-"Rhowch rif degol dilydd gyda o fwyaf %s lleoedd degol, os gwelwch yn dda."
-msgstr[2] ""
-msgstr[3] ""
-
-#: core/validators.py:362
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Sicrhewch bod yr ffeil a llwythwyd yn o leiaf %s beit."
-
-#: core/validators.py:363
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Sicrhewch bod yr ffeil a llwythwyd yn %s beit o fwyaf."
-
-#: core/validators.py:376
-msgid "The format for this field is wrong."
-msgstr "Mae'r fformat i'r faes yma yn anghywir."
-
-#: core/validators.py:391
-msgid "This field is invalid."
-msgstr "Mae'r faes yma yn annilydd."
-
-#: core/validators.py:426
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "Ni gellir adalw unrhywbeth o %s."
-
-#: core/validators.py:429
-#, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-"Dychwelodd yr URL %(url)s y pennawd Content-Type annilys '%(contenttype)s'."
-
-#: core/validators.py:462
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-"Caewch y tag anghaedig %(tag)s o linell %(line)s. (Linell yn ddechrau â \"%"
-"(start)s\".)"
-
-#: core/validators.py:466
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Ni chaniateir rhai o'r destun ar linell %(line)s yn y gyd-destun yna. "
-"(Linell yn ddechrau â \"%(start)s\".)"
-
-#: core/validators.py:471
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"Mae \"%(attr)s\" ar lein %(line)s yn priodoledd annilydd. (Linell yn "
-"ddechrau â \"%(start)s\".)"
-
-#: core/validators.py:476
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-"Mae \"<%(tag)s>\" ar lein %(line)s yn tag annilydd. (Linell yn ddechrau â \"%"
-"(start)s\".)"
-
-#: core/validators.py:480
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Mae tag ar lein %(line)s yn eisiau un new fwy priodoleddau gofynnol. (Linell "
-"yn ddechrau â \"%(start)s\".)"
-
-#: core/validators.py:485
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Mae gan y priodoledd \"%(attr)s\" ar lein %(line)s gwerth annilydd. (Linell "
-"yn ddechrau â \"%(start)s\".)"
-
-#: db/models/manipulators.py:302
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr ""
-
-#: db/models/fields/__init__.py:40
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr ""
-
-#: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
-#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:553
-#: forms/__init__.py:346
-msgid "This field is required."
-msgstr "Mae angen y faes yma."
-
-#: db/models/fields/__init__.py:337
-#, fuzzy
-msgid "This value must be an integer."
-msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
-
-#: db/models/fields/__init__.py:369
-#, fuzzy
-msgid "This value must be either True or False."
-msgstr "Rhaid i'r gwerth yma fod yn bŵer o %s."
-
-#: db/models/fields/__init__.py:385
-#, fuzzy
-msgid "This field cannot be null."
-msgstr "Mae'r faes yma yn annilydd."
-
-#: db/models/fields/__init__.py:562
-msgid "Enter a valid filename."
-msgstr "Rhowch enw ffeil dilys."
-
-#: db/models/fields/related.py:43
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "Rhowch %s dilys, os gwelwch yn dda."
-
-#: db/models/fields/related.py:579
-#, fuzzy
-msgid "Separate multiple IDs with commas."
-msgstr " Gwahanwch mwy nag un ID gyda atalnodau."
-
-#: db/models/fields/related.py:581
-#, fuzzy
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Gafaelwch lawr \"Control\", neu \"Command\" ar Fac, i ddewis mwy nag un."
-
-#: db/models/fields/related.py:625
-#, fuzzy, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-
-#: forms/__init__.py:380
-#, fuzzy, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-
-#: forms/__init__.py:385
-msgid "Line breaks are not allowed here."
-msgstr "Ni chaniateir toriadau llinell yma."
-
-#: forms/__init__.py:480 forms/__init__.py:551 forms/__init__.py:589
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Dewisiwch dewis dilys; dydy '%(data)s' dim mewn %(choices)s."
-
-#: forms/__init__.py:645
-msgid "The submitted file is empty."
-msgstr "Mae'r ffeil yn wag."
-
-#: forms/__init__.py:699
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Rhowch rhif cyfan rhwng -32,768 a 32,767."
-
-#: forms/__init__.py:708
-msgid "Enter a positive number."
-msgstr "Rhowch rhif positif."
-
-#: forms/__init__.py:717
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Rhowch rhif cyfan rhwng 0 a 32,767."
-
-#: template/defaultfilters.py:379
-msgid "yes,no,maybe"
-msgstr "ie,na,efallai"
-
-#~ msgid "Comment"
-#~ msgstr "Sylw"
-
-#~ msgid "Comments"
-#~ msgstr "Sylwadau"
-
-#~ msgid "String (up to 50)"
-#~ msgstr "Llinyn (i fyny at 50)"
-
-#~ msgid "label"
-#~ msgstr "label"
-
-#~ msgid "package"
-#~ msgstr "pecyn"
-
-#~ msgid "packages"
-#~ msgstr "pecynau"
-
-#, fuzzy
-#~ msgid "count"
-#~ msgstr "cynnwys"
+msgid "The %(verbose_name)s was deleted."
+msgstr "Y tîm %(site_name)s"
