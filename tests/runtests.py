@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, subprocess, sys, traceback
+import os, subprocess, sys
 
 import django.contrib as contrib
 from django.utils import unittest
@@ -36,31 +36,31 @@ def geodjango(settings):
                    if db_dict['ENGINE'].startswith('django.contrib.gis')]
     return len(spatial_dbs) == len(settings.DATABASES)
 
-def get_test_models():
-    models = []
+def get_test_modules():
+    modules = []
     for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR), (CONTRIB_DIR_NAME, CONTRIB_DIR):
         for f in os.listdir(dirpath):
             if f.startswith('__init__') or f.startswith('.') or \
                f.startswith('sql') or f.startswith('invalid') or \
                os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP:
                 continue
-            models.append((loc, f))
-    return models
+            modules.append((loc, f))
+    return modules
 
-def get_invalid_models():
-    models = []
+def get_invalid_modules():
+    modules = []
     for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR), (CONTRIB_DIR_NAME, CONTRIB_DIR):
         for f in os.listdir(dirpath):
             if f.startswith('__init__') or f.startswith('.') or f.startswith('sql'):
                 continue
             if f.startswith('invalid'):
-                models.append((loc, f))
-    return models
+                modules.append((loc, f))
+    return modules
 
 class InvalidModelTestCase(unittest.TestCase):
-    def __init__(self, model_label):
+    def __init__(self, module_label):
         unittest.TestCase.__init__(self)
-        self.model_label = model_label
+        self.module_label = module_label
 
     def runTest(self):
         from django.core.management.validation import get_validation_errors
@@ -68,7 +68,7 @@ class InvalidModelTestCase(unittest.TestCase):
         from cStringIO import StringIO
 
         try:
-            module = load_app(self.model_label)
+            module = load_app(self.module_label)
         except Exception, e:
             self.fail('Unable to load invalid model module')
 
@@ -130,26 +130,26 @@ def setup(verbosity, test_labels):
 
     # Load all the test model apps.
     test_labels_set = set([label.split('.')[0] for label in test_labels])
-    test_models = get_test_models()
+    test_modules = get_test_modules()
 
     # If GeoDjango, then we'll want to add in the test applications
     # that are a part of its test suite.
     if geodjango(settings):
         from django.contrib.gis.tests import geo_apps
-        test_models.extend(geo_apps(runtests=True))
+        test_modules.extend(geo_apps(runtests=True))
 
-    for model_dir, model_name in test_models:
-        model_label = '.'.join([model_dir, model_name])
-        # if the model was named on the command line, or
-        # no models were named (i.e., run all), import
-        # this model and add it to the list to test.
-        if not test_labels or model_name in test_labels_set:
+    for module_dir, module_name in test_modules:
+        module_label = '.'.join([module_dir, module_name])
+        # if the module was named on the command line, or
+        # no modules were named (i.e., run all), import
+        # this module and add it to the list to test.
+        if not test_labels or module_name in test_labels_set:
             if verbosity >= 2:
-                print "Importing model %s" % model_name
-            mod = load_app(model_label)
+                print "Importing application %s" % module_name
+            mod = load_app(module_label)
             if mod:
-                if model_label not in settings.INSTALLED_APPS:
-                    settings.INSTALLED_APPS.append(model_label)
+                if module_label not in settings.INSTALLED_APPS:
+                    settings.INSTALLED_APPS.append(module_label)
 
     return state
 
@@ -163,16 +163,16 @@ def django_tests(verbosity, interactive, failfast, test_labels):
     from django.conf import settings
     state = setup(verbosity, test_labels)
 
-    # Add tests for invalid models.
+    # Add tests for invalid models apps.
     extra_tests = []
-    for model_dir, model_name in get_invalid_models():
-        model_label = '.'.join([model_dir, model_name])
-        if not test_labels or model_name in test_labels:
-            extra_tests.append(InvalidModelTestCase(model_label))
+    for module_dir, module_name in get_invalid_modules():
+        module_label = '.'.join([module_dir, module_name])
+        if not test_labels or module_name in test_labels:
+            extra_tests.append(InvalidModelTestCase(module_label))
             try:
                 # Invalid models are not working apps, so we cannot pass them into
                 # the test runner with the other test_labels
-                test_labels.remove(model_name)
+                test_labels.remove(module_name)
             except ValueError:
                 pass
 
@@ -304,7 +304,7 @@ def paired_tests(paired_test, options, test_labels):
 
 if __name__ == "__main__":
     from optparse import OptionParser
-    usage = "%prog [options] [model model model ...]"
+    usage = "%prog [options] [module module module ...]"
     parser = OptionParser(usage=usage)
     parser.add_option('-v','--verbosity', action='store', dest='verbosity', default='1',
         type='choice', choices=['0', '1', '2', '3'],
