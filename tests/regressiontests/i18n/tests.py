@@ -689,7 +689,7 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
         super(LocalePathsResolutionOrderI18NTests, self).tearDown()
 
     def test_locale_paths_translation(self):
-        self.assertUgettext('Date/time', 'LOCALE_PATHS')
+        self.assertUgettext('Time', 'LOCALE_PATHS')
 
 class ProjectResolutionOrderI18NTests(ResolutionOrderI18NTests):
 

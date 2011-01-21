@@ -284,7 +284,7 @@ class AdminSite(object):
             from django.views.i18n import javascript_catalog
         else:
             from django.views.i18n import null_javascript_catalog as javascript_catalog
-        return javascript_catalog(request, packages='django.conf')
+        return javascript_catalog(request, packages=['django.conf', 'django.contrib.admin'])
 
     @never_cache
     def logout(self, request, extra_context=None):
