@@ -1,0 +1,32 @@
+# Norwegian (Bokmål) translation of Django
+# Copyright (C) 2005-2010
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:30+0100\n"
+"PO-Revision-Date: 2010-05-14 21:43+0200\n"
+"Last-Translator: Christian Mikalsen and Jon Lønne\n"
+"Language-Team: Norsk <no@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:37
+msgid "domain name"
+msgstr "domenenavn"
+
+#: models.py:38
+msgid "display name"
+msgstr "visningsnavn"
+
+#: models.py:43
+msgid "site"
+msgstr "nettsted"
+
+#: models.py:44
+msgid "sites"
+msgstr "nettsteder"

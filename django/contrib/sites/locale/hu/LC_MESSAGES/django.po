@@ -1,0 +1,31 @@
+# translation of django.po to Hungarian
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:30+0100\n"
+"PO-Revision-Date: 2008-08-30 01:11+0200\n"
+"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: models.py:37
+msgid "domain name"
+msgstr "tartománynév"
+
+#: models.py:38
+msgid "display name"
+msgstr "megjelenítendő név"
+
+#: models.py:43
+msgid "site"
+msgstr "honlap"
+
+#: models.py:44
+msgid "sites"
+msgstr "honlapok"

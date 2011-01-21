@@ -1,0 +1,31 @@
+# Spanish translation for the django project
+# Copyright (C) 2008, The Django Project
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:30+0100\n"
+"PO-Revision-Date: 2009-11-30 11:31+0100\n"
+"Last-Translator: Django Spanish Team, <django-cat@googlegroups.com>\n"
+"Language-Team: Django Spanish Team, <django-cat@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:37
+msgid "domain name"
+msgstr "nombre de dominio"
+
+#: models.py:38
+msgid "display name"
+msgstr "nombre para mostrar"
+
+#: models.py:43
+msgid "site"
+msgstr "sitio"
+
+#: models.py:44
+msgid "sites"
+msgstr "sitios"

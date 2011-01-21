@@ -1,0 +1,34 @@
+# Translation of django.po to Czech
+# This file is distributed under the same license as the DJANGO package.
+# Radek Svarz <translate@svarz.cz>, 2005,
+# Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2009,
+# Vlada Macek <macek@sandbox.cz>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:30+0100\n"
+"PO-Revision-Date: 2010-08-06 18:33+0100\n"
+"Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
+"Language-Team: Czech\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>1 && n<5 ? 1 : 2;\n"
+
+#: models.py:37
+msgid "domain name"
+msgstr "název domény"
+
+#: models.py:38
+msgid "display name"
+msgstr "zobrazený název"
+
+#: models.py:43
+msgid "site"
+msgstr "web"
+
+#: models.py:44
+msgid "sites"
+msgstr "weby"
