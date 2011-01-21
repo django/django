@@ -1,0 +1,20 @@
+# translation of django.po to Bulgarian
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-03-12 13:01+0200\n"
+"Last-Translator: Vladislav <vladislav.mitov@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: wizard.py:172
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""

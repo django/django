@@ -1,0 +1,78 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django-1.1-rc-1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2009-07-28 22:31+0700\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
+"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin "
+"Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Thai\n"
+"X-Poedit-Country: THAILAND\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:8 models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: admin.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "ตัวอย่าง: '/about/contact/'. ต้องแน่ใจว่าขึ้นต้นและลงท้ายด้วยเครื่องหมาย /"
+
+#: admin.py:11
+#, fuzzy
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr "ค่าที่ว่านี้จะต้องประกอบด้วยตัวหน้งสือ ตัวเลข เครื่องหมายขีดล่าง และขีดทับ"
+
+#: admin.py:22
+msgid "Advanced options"
+msgstr "ตัวเลือกเพิ่มเติม"
+
+#: models.py:8
+msgid "title"
+msgstr "หัวข้อ"
+
+#: models.py:9
+msgid "content"
+msgstr "เนื้อหา"
+
+#: models.py:10
+msgid "enable comments"
+msgstr "ใช้งานข้อติชม"
+
+#: models.py:11
+msgid "template name"
+msgstr "ชื่อเทมเพลต"
+
+#: models.py:12
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"ตัวอย่าง: 'flatpages/contact_page.html' ถ้าไม่ได้ถูกใช้ ระบบจะใช้ 'flatpages/default."
+"html' "
+
+#: models.py:13
+msgid "registration required"
+msgstr "ต้องลงทะเบียนก่อน"
+
+#: models.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "ถ้าถูกเลือก ผู้ใช้ที่ลงทะเบียนเข้าสู่ระบบเท่านั้นที่จะสามารถดูหน้านี้"
+
+#: models.py:18
+msgid "flat page"
+msgstr "flat page"
+
+#: models.py:19
+msgid "flat pages"
+msgstr "flat page"

@@ -1,0 +1,24 @@
+# translation of django.po to Georgian
+# Django translation to Georgian language.
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-10-05 14:34+0400\n"
+"Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
+"Language-Team: Georgian <ka@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: wizard.py:172
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""
+"ბოდიშს გიხდით, მაგრამ თქვენს ფორმას ვადა გაუვიდა. გთხოვთ, გააგრძელოთ ფორმის "
+"შევსება ამ გვერდზე."

@@ -1,0 +1,74 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2009-07-19 22:49+0000\n"
+"Last-Translator: Nasimul Haque <nasim.haque@gmail.com>\n"
+"Language-Team: Nasimul Haque <nasim.haque@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:8 models.py:7
+msgid "URL"
+msgstr "ইউআরএল (URL)"
+
+#: admin.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "উদাহরণঃ '/about/contact/'। শুরু এবং শেষের স্ল্যাশগুলো আবশ্যক।"
+
+#: admin.py:11
+#, fuzzy
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr "এটি শুধুমাত্র ইংরেজী বর্ণ, সংখ্যা, আন্ডারস্কোর, ড্যাশ অথবা স্ল্যাশ ব্যবহার সম্ভব।"
+
+#: admin.py:22
+msgid "Advanced options"
+msgstr "এডভান্সড অপশন"
+
+#: models.py:8
+msgid "title"
+msgstr "শিরোনাম"
+
+#: models.py:9
+msgid "content"
+msgstr "কনটেন্ট"
+
+#: models.py:10
+msgid "enable comments"
+msgstr "মন্তব্য প্রদান সচল করুন"
+
+#: models.py:11
+msgid "template name"
+msgstr "টেমপ্লেট নাম"
+
+#: models.py:12
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"উদাহরণঃ ’flatpage/contact_page.html'। এটি যদি খালি থাকে, তবে সিস্টেম "
+"’flatpage/default.html' ব্যবহার করবে।"
+
+#: models.py:13
+msgid "registration required"
+msgstr "নিবন্ধন আবশ্যক"
+
+#: models.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "এটি চেক করা হলে, শুধুমাত্র লগইন করা সদস্যরা পাতাটি দেখতে সমর্থ হবেন।"
+
+#: models.py:18
+msgid "flat page"
+msgstr "ফ্লাট পাতা"
+
+#: models.py:19
+msgid "flat pages"
+msgstr "ফ্লাট পাতা সমূহ"

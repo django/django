@@ -1,0 +1,75 @@
+# Translation of django.po to japanese.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-05-09 12:41+0900\n"
+"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
+"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: admin.py:8 models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: admin.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"例: '/about/contact/'. 先頭と最後にスラッシュがあるか確認してください。"
+
+#: admin.py:11
+#, fuzzy
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+"半角の英数字、アンダースコア、ダッシュ、スラッシュ以外は使用できません。"
+
+#: admin.py:22
+msgid "Advanced options"
+msgstr "詳細設定"
+
+#: models.py:8
+msgid "title"
+msgstr "タイトル"
+
+#: models.py:9
+msgid "content"
+msgstr "内容"
+
+#: models.py:10
+msgid "enable comments"
+msgstr "コメントを有効にする"
+
+#: models.py:11
+msgid "template name"
+msgstr "テンプレート名"
+
+#: models.py:12
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"例: 'flatpages/contact_page.html'. 指定しなければ、デフォルト設定"
+"の'flatpages/default.html' を使います。"
+
+#: models.py:13
+msgid "registration required"
+msgstr "登録が必要です"
+
+#: models.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "チェックした場合、ログインしたユーザだけがページを参照できます。"
+
+#: models.py:18
+msgid "flat page"
+msgstr "フラットページ"
+
+#: models.py:19
+msgid "flat pages"
+msgstr "フラットページ"

@@ -1,0 +1,76 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-11-12 08:14+0530\n"
+"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
+"Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Hindi\n"
+"X-Poedit-Country: INDIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:8 models.py:7
+msgid "URL"
+msgstr "यू.आर.एल"
+
+#: admin.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+
+#: admin.py:11
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+
+#: admin.py:22
+msgid "Advanced options"
+msgstr ""
+
+#: models.py:8
+msgid "title"
+msgstr "शीर्षक"
+
+#: models.py:9
+msgid "content"
+msgstr "विषय सूची"
+
+#: models.py:10
+msgid "enable comments"
+msgstr "टिप्पणी सक्षम करें"
+
+#: models.py:11
+msgid "template name"
+msgstr "टेम्प्लेट नाम"
+
+#: models.py:12
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+
+#: models.py:13
+msgid "registration required"
+msgstr ""
+
+#: models.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+
+#: models.py:18
+msgid "flat page"
+msgstr "चपटा पृष्ट"
+
+#: models.py:19
+msgid "flat pages"
+msgstr "चपटे पृष्ट"

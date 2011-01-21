@@ -1,0 +1,79 @@
+# Translation of Django to Malayalam.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# RAJEESH R NAIR <rajeeshrnair@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django SVN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2010-05-28 15:09+0530\n"
+"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"Language-Team: MALAYALAM <ML@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Malayalam\n"
+"X-Poedit-Country: INDIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:8 models.py:7
+msgid "URL"
+msgstr "URL(വെബ്-വിലാസം)"
+
+#: admin.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "ഉദാ: '/about/contact/'. ആദ്യവും അവസാനവും സ്ളാഷുകള്‍ നിര്‍ബന്ധം."
+
+#: admin.py:11
+#, fuzzy
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr "ഇതില്‍ അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, അണ്ടര്‍സ്കോര്‍, വരകള്‍, സ്ളാഷുകള്‍ എന്നിവ മാത്രമേ പാടുള്ളൂ. "
+
+#: admin.py:22
+msgid "Advanced options"
+msgstr "ഉയര്‍ന്ന സൗകര്യങ്ങള്‍"
+
+#: models.py:8
+msgid "title"
+msgstr "ശീര്‍ഷകം"
+
+#: models.py:9
+msgid "content"
+msgstr "ഉള്ളടക്കം"
+
+#: models.py:10
+msgid "enable comments"
+msgstr "അഭിപ്രായങ്ങള്‍ അനുവദിക്കുക"
+
+#: models.py:11
+msgid "template name"
+msgstr "ടെമ്പ്ലേറ്റിന്റെ പേര്"
+
+#: models.py:12
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"ഉദാ: 'flatpages/contact_page.html'. ഇതു നല്കിയില്ലെങ്കില്‍, 'flatpages/default."
+"html' എന്ന വിലാസം ഉപയോഗിക്കപ്പെടും."
+
+#: models.py:13
+msgid "registration required"
+msgstr "രജിസ്ട്രേഷന്‍ ആവശ്യമാണ്"
+
+#: models.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "ഇതു ടിക് ചെയ്താല്‍ പിന്നെ ലോഗ്-ഇന്‍ ചെയ്ത യൂസര്‍ക്കു മാത്രമേ ഈ പേജ് കാണാന്‍ കഴിയൂ."
+
+#: models.py:18
+msgid "flat page"
+msgstr "ഫ്ളാറ്റ് പേജ്"
+
+#: models.py:19
+msgid "flat pages"
+msgstr "ഫ്ളാറ്റ് പേജുകള്‍"

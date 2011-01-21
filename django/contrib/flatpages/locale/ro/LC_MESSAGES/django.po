@@ -1,0 +1,81 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-04-25 21:44+0200\n"
+"Last-Translator: \n"
+"Language-Team: Romanian <ro@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:8 models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: admin.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Exemplu: '/despre/contact'. Asiguraţi-vă că aveţi slash-uri la început şi la "
+"sfârşit."
+
+#: admin.py:11
+#, fuzzy
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+"Această valoare trebuie să conţină numai litere, numere, liniuţe de "
+"subliniere, slash-uri și dash-uri."
+
+#: admin.py:22
+msgid "Advanced options"
+msgstr "Opțiuni avansate"
+
+#: models.py:8
+msgid "title"
+msgstr "titlu"
+
+#: models.py:9
+msgid "content"
+msgstr "conţinut"
+
+#: models.py:10
+msgid "enable comments"
+msgstr "permite comentarii"
+
+#: models.py:11
+msgid "template name"
+msgstr "nume şablon"
+
+#: models.py:12
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"Exemplu: 'flatpages/contact_page.html'. Dacă aceasta nu există, sistemul va "
+"folosi 'flatpages/default.html'."
+
+#: models.py:13
+msgid "registration required"
+msgstr "necesită înregistrare"
+
+#: models.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Dacă aceasta este bifată, numai utilizatorii logaţi vor putea vedea pagina."
+
+#: models.py:18
+msgid "flat page"
+msgstr "pagina plată"
+
+#: models.py:19
+msgid "flat pages"
+msgstr "pagini plate"

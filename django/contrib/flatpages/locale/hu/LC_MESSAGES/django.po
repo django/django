@@ -1,0 +1,77 @@
+# translation of django.po to Hungarian
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:24+0100\n"
+"PO-Revision-Date: 2008-08-30 01:11+0200\n"
+"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:8 models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: admin.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "Például: '/about/contact/'. Figyeljen a nyitó és záró perjelre!"
+
+#: admin.py:11
+#, fuzzy
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr "Az érték csak betűket, számokat, aláhúzást és perjelet tartalmazhat."
+
+#: admin.py:22
+msgid "Advanced options"
+msgstr "További beállítások"
+
+#: models.py:8
+msgid "title"
+msgstr "cím"
+
+#: models.py:9
+msgid "content"
+msgstr "tartalom"
+
+#: models.py:10
+msgid "enable comments"
+msgstr "megjegyzések engedélyezése"
+
+#: models.py:11
+msgid "template name"
+msgstr "sablon neve"
+
+#: models.py:12
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"Példa: 'flatpages/contact_page'. Ha ez nem létezik, a rendszer a 'flatpages/"
+"default.html' sablont fogja használni."
+
+#: models.py:13
+msgid "registration required"
+msgstr "regisztráció szükséges"
+
+#: models.py:13
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Ha ez be van jelölve, csak bejelentkezett felhasználó tudja az oldalt "
+"megnézni."
+
+#: models.py:18
+msgid "flat page"
+msgstr "egyszerű oldal"
+
+#: models.py:19
+msgid "flat pages"
+msgstr "egyszerű oldalak"
