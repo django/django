@@ -844,10 +844,11 @@ class UploadedFileEncodingTest(TestCase):
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.bin"))[2])
         self.assertEqual('Content-Type: text/plain',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.txt"))[2])
-        self.assertIn(encode_file('IGNORE', 'IGNORE', DummyFile("file.zip"))[2], (
+        self.assertTrue(encode_file('IGNORE', 'IGNORE', DummyFile("file.zip"))[2] in (
                         'Content-Type: application/x-compress',
                         'Content-Type: application/x-zip',
-                        'Content-Type: application/x-zip-compressed'))
+                        'Content-Type: application/x-zip-compressed',
+                        'Content-Type: application/zip'))
         self.assertEqual('Content-Type: application/octet-stream',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.unknown"))[2])
 
