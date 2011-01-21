@@ -1,0 +1,768 @@
+# This file is distributed under the same license as the django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2009-07-23 11:47+0800\n"
+"Last-Translator: Qing Feng <paradise.qingfeng@gmail.com>\n"
+"Language-Team: Simplified Chinese <paradise.qingfeng@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Chinese\n"
+"X-Poedit-Country: CHINA\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: actions.py:49
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "删除了%(count)d的%(items)s"
+
+#: actions.py:56 options.py:1185
+msgid "Are you sure?"
+msgstr "你确认吗？"
+
+#: actions.py:74
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "删除了选择的%(verbose_name_plural)s"
+
+#: filterspecs.py:54
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>以 %s:</h3>\n"
+"<ul>\n"
+
+#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+msgid "All"
+msgstr "全部"
+
+#: filterspecs.py:137
+msgid "Any date"
+msgstr "任意日期"
+
+#: filterspecs.py:138
+msgid "Today"
+msgstr "今天"
+
+#: filterspecs.py:141
+msgid "Past 7 days"
+msgstr "前7天"
+
+#: filterspecs.py:144
+msgid "This month"
+msgstr "本月"
+
+#: filterspecs.py:146
+msgid "This year"
+msgstr "今年"
+
+#: filterspecs.py:175
+msgid "Yes"
+msgstr "是"
+
+#: filterspecs.py:175
+msgid "No"
+msgstr "否"
+
+#: filterspecs.py:182
+msgid "Unknown"
+msgstr "未知"
+
+#: forms.py:9
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr "请输入正确的用户名和密码。请注意两者都是大小写敏感的。"
+
+#: forms.py:18
+msgid "Please log in again, because your session has expired."
+msgstr "请重新登录，因为你的会话已经过期。"
+
+#: forms.py:37
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "你的 e-mail 地址不是你的用户名。换 '%s' 试试。"
+
+#: helpers.py:19
+#, fuzzy
+msgid "Action:"
+msgstr "动作"
+
+#: models.py:19
+msgid "action time"
+msgstr "动作时间"
+
+#: models.py:22
+msgid "object id"
+msgstr "对象id"
+
+#: models.py:23
+msgid "object repr"
+msgstr "对象表示"
+
+#: models.py:24
+msgid "action flag"
+msgstr "动作标志"
+
+#: models.py:25
+msgid "change message"
+msgstr "修改消息"
+
+#: models.py:28
+msgid "log entry"
+msgstr "日志记录"
+
+#: models.py:29
+msgid "log entries"
+msgstr "日志记录"
+
+#: options.py:148 options.py:163
+msgid "None"
+msgstr "无"
+
+#: options.py:608
+#, python-format
+msgid "Changed %s."
+msgstr "已修改 %s 。"
+
+#: options.py:608 options.py:618
+msgid "and"
+msgstr "和"
+
+#: options.py:613
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "已添加 %(name)s \"%(object)s\"."
+
+#: options.py:617
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "已变更 %(list)s for %(name)s \"%(object)s\"."
+
+#: options.py:622
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "已删除 %(name)s \"%(object)s\"."
+
+#: options.py:626
+msgid "No fields changed."
+msgstr "没有字段被修改。"
+
+#: options.py:698
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" 添加成功。"
+
+#: options.py:702 options.py:735
+msgid "You may edit it again below."
+msgstr "你可以在下面再次编辑它。"
+
+#: options.py:712 options.py:745
+#, python-format
+msgid "You may add another %s below."
+msgstr "你可以在下面增加另一个 %s 。"
+
+#: options.py:733
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" 修改成功。"
+
+#: options.py:741
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "%(name)s \"%(obj)s\" 添加成功。你可以在下面再次编辑它。"
+
+#: options.py:795 options.py:1053
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+#: options.py:814
+#, fuzzy
+msgid "No action selected."
+msgstr "动作时间"
+
+#: options.py:895
+#, python-format
+msgid "Add %s"
+msgstr "增加 %s"
+
+#: options.py:921 options.py:1162
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "具有主键 %(key)r 的对象 %(name)s 不存在。"
+
+#: options.py:986
+#, python-format
+msgid "Change %s"
+msgstr "修改 %s"
+
+#: options.py:1033
+msgid "Database error"
+msgstr "数据库错误"
+
+#: options.py:1095
+#, fuzzy, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(name)s \"%(obj)s\" 修改成功。"
+
+#: options.py:1122
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+
+#: options.py:1127
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#: options.py:1178
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" 删除成功。"
+
+#: options.py:1215
+#, python-format
+msgid "Change history: %s"
+msgstr "变更历史： %s"
+
+#: sites.py:312 templates/admin/login.html:42
+#: templates/registration/password_reset_complete.html:14
+#: views/decorators.py:29
+msgid "Log in"
+msgstr "登录"
+
+#: sites.py:368
+msgid "Site administration"
+msgstr "站点管理"
+
+#: sites.py:412
+#, python-format
+msgid "%s administration"
+msgstr "%s 管理"
+
+#: widgets.py:75
+msgid "Date:"
+msgstr "日期："
+
+#: widgets.py:75
+msgid "Time:"
+msgstr "时间："
+
+#: widgets.py:121
+msgid "Lookup"
+msgstr "查询"
+
+#: widgets.py:237
+msgid "Add Another"
+msgstr "添加另一个"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "页面没有找到"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "很报歉，请求页面无法找到。"
+
+#: templates/admin/500.html:4 templates/admin/app_index.html:8
+#: templates/admin/base.html:55 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:42
+#: templates/admin/delete_confirmation.html:6
+#: templates/admin/delete_selected_confirmation.html:6
+#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
+#: templates/admin/auth/user/change_password.html:12
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "首页"
+
+#: templates/admin/500.html:4
+msgid "Server error"
+msgstr "服务器错误"
+
+#: templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "服务器错误(500)"
+
+#: templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "服务器错误 <em>(500)</em>"
+
+#: templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"发生了一个错误。系统已将错误通过电子邮件报告给了站点管理员，相信问题应该会很"
+"快得到解决。感谢您的耐心。"
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr ""
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "执行"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr ""
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "欢迎，"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Documentation"
+msgstr "文档"
+
+#: templates/admin/base.html:41
+#: templates/admin/auth/user/change_password.html:16
+#: templates/admin/auth/user/change_password.html:49
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Change password"
+msgstr "修改密码"
+
+#: templates/admin/base.html:48
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Log out"
+msgstr "注销"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django 站点管理员"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django 管理"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:29
+msgid "Add"
+msgstr "增加"
+
+#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+msgid "History"
+msgstr "历史"
+
+#: templates/admin/change_form.html:32
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:28
+msgid "View on site"
+msgstr "在站点上查看"
+
+#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:25
+#: templates/registration/password_change_form.html:16
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "请修正下面的错误。"
+
+#: templates/admin/change_list.html:64
+#, python-format
+msgid "Add %(name)s"
+msgstr "增加 %(name)s"
+
+#: templates/admin/change_list.html:84
+msgid "Filter"
+msgstr "过滤器"
+
+#: templates/admin/delete_confirmation.html:10
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "删除"
+
+#: templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"删除 %(object_name)s  '%(escaped_object)s' 会导致删除相关的对象，但你的帐号无"
+"权删除下列类型的对象："
+
+#: templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"你确认想要删除 %(object_name)s \"%(escaped_object)s\"？ 下列所有相关的项目都"
+"将被删除："
+
+#: templates/admin/delete_confirmation.html:28
+#: templates/admin/delete_selected_confirmation.html:33
+msgid "Yes, I'm sure"
+msgstr "是的，我确定"
+
+#: templates/admin/delete_selected_confirmation.html:9
+#, fuzzy
+msgid "Delete multiple objects"
+msgstr "已删除 %(name)s \"%(object)s\"."
+
+#: templates/admin/delete_selected_confirmation.html:15
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+"删除 %(object_name)s  '%(escaped_object)s' 会导致删除相关的对象，但你的帐号无"
+"权删除下列类型的对象："
+
+#: templates/admin/delete_selected_confirmation.html:22
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+"你确认想要删除 %(object_name)s \"%(escaped_object)s\"？ 下列所有相关的项目都"
+"将被删除："
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " 以 %(filter_title)s"
+
+#: templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "模型在 %(name)s 应用中可用。"
+
+#: templates/admin/index.html:35
+msgid "Change"
+msgstr "修改"
+
+#: templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr "你无权修改任何东西。"
+
+#: templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr "最近动作"
+
+#: templates/admin/index.html:54
+msgid "My Actions"
+msgstr "我的动作"
+
+#: templates/admin/index.html:58
+msgid "None available"
+msgstr "无可用的"
+
+#: templates/admin/index.html:72
+msgid "Unknown content"
+msgstr "未知内容"
+
+#: templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"你的数据库安装有误。确保已经创建了相应的数据库表，并确保数据库可被相关的用户"
+"读取。"
+
+#: templates/admin/login.html:33
+msgid "Username:"
+msgstr "用户名："
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "密码："
+
+#: templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "日期/时间"
+
+#: templates/admin/object_history.html:23
+msgid "User"
+msgstr "用户"
+
+#: templates/admin/object_history.html:24
+msgid "Action"
+msgstr "动作"
+
+#: templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr "该对象没有变更历史记录。可能从未通过这个管理站点添加。"
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "显示全部"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "保存"
+
+#: templates/admin/search_form.html:8
+msgid "Search"
+msgstr "搜索"
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "总共 %(full_result_count)s"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "保存为新的"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "保存并增加另一个"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "保存并继续编辑"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr "首先，输入一个用户名和密码。然后，你就可以编辑更多的用户选项。"
+
+#: templates/admin/auth/user/add_form.html:8
+#, fuzzy
+msgid "Enter a username and password."
+msgstr "输入新密码"
+
+#: templates/admin/auth/user/change_password.html:29
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "为用户 <strong>%(username)s</strong> 输入一个新的密码。"
+
+#: templates/admin/auth/user/change_password.html:36
+msgid "Password"
+msgstr "密码"
+
+#: templates/admin/auth/user/change_password.html:42
+#: templates/registration/password_change_form.html:38
+msgid "Password (again)"
+msgstr "密码(重复)"
+
+#: templates/admin/auth/user/change_password.html:43
+msgid "Enter the same password as above, for verification."
+msgstr "为了校验，输入与上面相同的密码。"
+
+#: templates/admin/edit_inline/stacked.html:67
+#: templates/admin/edit_inline/tabular.html:113
+#, fuzzy, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "%(verbose_name)s 已被删除。"
+
+#: templates/admin/edit_inline/stacked.html:70
+#: templates/admin/edit_inline/tabular.html:116
+msgid "Remove"
+msgstr "删除"
+
+#: templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr "删除？"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "感谢您今天在本站花费了一些宝贵时间。"
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "重新登录"
+
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:20
+msgid "Password change"
+msgstr "密码修改"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_done.html:11
+msgid "Password change successful"
+msgstr "密码修改成功"
+
+#: templates/registration/password_change_done.html:13
+msgid "Your password was changed."
+msgstr "你的密码已修改。"
+
+#: templates/registration/password_change_form.html:22
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"请输入你的旧密码，为了安全起见，接着要输入两遍新密码，以便我们校验你输入的是"
+"否正确。"
+
+#: templates/registration/password_change_form.html:28
+msgid "Old password"
+msgstr "旧密码"
+
+#: templates/registration/password_change_form.html:33
+msgid "New password"
+msgstr "新密码"
+
+#: templates/registration/password_change_form.html:44
+#: templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "修改我的密码"
+
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
+#: templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "密码重设"
+
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr "完成密码重设"
+
+#: templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "你的口令己经设置。现在你可以继续进行登录。"
+
+#: templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr "密码重设确认"
+
+#: templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr "输入新密码"
+
+#: templates/registration/password_reset_confirm.html:14
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr "请输入两遍新密码，以便我们校验你输入的是否正确。"
+
+#: templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "新密码："
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "确认密码："
+
+#: templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr "密码重设失败"
+
+#: templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr "密码重置链接无效，可能是因为它已使用。可以请求一次新的密码重置。"
+
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "密码重设成功"
+
+#: templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"我们已经按你所提交的电子邮箱地址发送了密码设置说明。你应该很快就能收到这封邮"
+"件。"
+
+#: templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "之所以收到这封邮件，是因为你请求了密码重设"
+
+#: templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "在 %(site_name)s 你的用户帐号"
+
+#: templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "请访问该页面并选择一个新密码："
+
+#: templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "你的用户名，如果已忘记的话："
+
+#: templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "感谢使用我们的站点！"
+
+#: templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s 团队"
+
+#: templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+"忘记了你的密码？请在下面输入你的 e-mail 地址，我们将把新密码设置说明通过邮件"
+"发送给你。"
+
+#: templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "E-mail 地址："
+
+#: templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "重设我的密码"
+
+#: templatetags/admin_list.py:273
+msgid "All dates"
+msgstr "所有日期"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "选择 %s"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s to change"
+msgstr "选择 %s 来修改"

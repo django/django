@@ -1,0 +1,785 @@
+# translation of django.po to Macedonian
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2010-04-05 15:53+0100\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"Language-Team: Macedonian <ossm-members@hedona.on.net.mk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: actions.py:49
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Успешно беа избришани %(count)d %(items)s."
+
+#: actions.py:56 options.py:1185
+msgid "Are you sure?"
+msgstr "Сигурни сте?"
+
+#: actions.py:74
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Избриши ги избраните %(verbose_name_plural)s"
+
+#: filterspecs.py:54
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>Според %s:</h3>\n"
+"<ul>\n"
+
+#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+msgid "All"
+msgstr "Сите"
+
+#: filterspecs.py:137
+msgid "Any date"
+msgstr "Било кој датум"
+
+#: filterspecs.py:138
+msgid "Today"
+msgstr "Денеска"
+
+#: filterspecs.py:141
+msgid "Past 7 days"
+msgstr "Последните 7 дена"
+
+#: filterspecs.py:144
+msgid "This month"
+msgstr "Овој месец"
+
+#: filterspecs.py:146
+msgid "This year"
+msgstr "Оваа година"
+
+#: filterspecs.py:175
+msgid "Yes"
+msgstr "Да"
+
+#: filterspecs.py:175
+msgid "No"
+msgstr "Не"
+
+#: filterspecs.py:182
+msgid "Unknown"
+msgstr "Непознато"
+
+#: forms.py:9
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Ве молам внесете точно корисничко име и лозинка. Имајте на ум дека и во "
+"двете полиња се битни големите и малите букви."
+
+#: forms.py:18
+msgid "Please log in again, because your session has expired."
+msgstr "Ве молам најавете се повторно бидејќи вашата сесија е истечена."
+
+#: forms.py:37
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "Вашата е-пошта не е вашето корисничко име. Пробајте со „%s“."
+
+#: helpers.py:19
+msgid "Action:"
+msgstr "Акција:"
+
+#: models.py:19
+msgid "action time"
+msgstr "време на акција"
+
+#: models.py:22
+msgid "object id"
+msgstr "идентификационен број на објект"
+
+#: models.py:23
+msgid "object repr"
+msgstr "репрезентација на објект"
+
+#: models.py:24
+msgid "action flag"
+msgstr "знакче за акција"
+
+#: models.py:25
+msgid "change message"
+msgstr "измени ја пораката"
+
+#: models.py:28
+msgid "log entry"
+msgstr "ставка во записникот"
+
+#: models.py:29
+msgid "log entries"
+msgstr "ставки во записникот"
+
+#: options.py:148 options.py:163
+msgid "None"
+msgstr "Ништо"
+
+#: options.py:608
+#, python-format
+msgid "Changed %s."
+msgstr "Изменета %s."
+
+#: options.py:608 options.py:618
+msgid "and"
+msgstr "и"
+
+#: options.py:613
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "Додадено %(name)s „%(object)s“."
+
+#: options.py:617
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "Изменето %(list)s за %(name)s „%(object)s“."
+
+#: options.py:622
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "Избришан  %(name)s „%(object)s“."
+
+#: options.py:626
+msgid "No fields changed."
+msgstr "Не беше изменето ниедно поле."
+
+#: options.py:698
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "Ставката %(name)s \"%(obj)s\" беше успешно додадена."
+
+#: options.py:702 options.py:735
+msgid "You may edit it again below."
+msgstr "Подолу можете повторно да го уредите."
+
+#: options.py:712 options.py:745
+#, python-format
+msgid "You may add another %s below."
+msgstr "Подолу можете да додате уште еден %s."
+
+#: options.py:733
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" беше успешно изменета."
+
+#: options.py:741
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"Ставката %(name)s \"%(obj)s\" беше успешно додадена. Подолу можете повторно "
+"да ја уредите."
+
+#: options.py:795 options.py:1053
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Мора да се одберат предмети за да се изврши акција врз нив. Ниеден предмет "
+"не беше променет."
+
+#: options.py:814
+msgid "No action selected."
+msgstr "Ниедна акција не е одбрана."
+
+#: options.py:895
+#, python-format
+msgid "Add %s"
+msgstr "Додади %s"
+
+#: options.py:921 options.py:1162
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "објект %(name)s со примарен клуч %(key)r не постои."
+
+#: options.py:986
+#, python-format
+msgid "Change %s"
+msgstr "Измени %s"
+
+#: options.py:1033
+msgid "Database error"
+msgstr "Грешка во базата на податоци"
+
+#: options.py:1095
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s ставка %(name)s беше успешно изменета."
+msgstr[1] "%(count)s ставки %(name)s беа успешно изменети."
+
+#: options.py:1122
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s одбран"
+msgstr[1] "Сите %(total_count)s одбрани"
+
+#: options.py:1127
+#, fuzzy, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "од одбраниот %(count)d"
+
+#: options.py:1178
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "Ставаката %(name)s \"%(obj)s\" беше избришана успешно."
+
+#: options.py:1215
+#, python-format
+msgid "Change history: %s"
+msgstr "Историја на измени: %s"
+
+#: sites.py:312 templates/admin/login.html:42
+#: templates/registration/password_reset_complete.html:14
+#: views/decorators.py:29
+msgid "Log in"
+msgstr "Најава"
+
+#: sites.py:368
+msgid "Site administration"
+msgstr "Администрација на сајт"
+
+#: sites.py:412
+#, python-format
+msgid "%s administration"
+msgstr "%s администрација"
+
+#: widgets.py:75
+msgid "Date:"
+msgstr "Датум:"
+
+#: widgets.py:75
+msgid "Time:"
+msgstr "Време:"
+
+#: widgets.py:121
+msgid "Lookup"
+msgstr "Побарај"
+
+#: widgets.py:237
+msgid "Add Another"
+msgstr "Додади друго"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "Страницата не е најдена"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Се извинуваме, но неможе да ја најдеме страницата која ја баравте."
+
+#: templates/admin/500.html:4 templates/admin/app_index.html:8
+#: templates/admin/base.html:55 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:42
+#: templates/admin/delete_confirmation.html:6
+#: templates/admin/delete_selected_confirmation.html:6
+#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
+#: templates/admin/auth/user/change_password.html:12
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "Дома"
+
+#: templates/admin/500.html:4
+msgid "Server error"
+msgstr "Грешка со серверот"
+
+#: templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Грешка со серверот (500)"
+
+#: templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Грешка со серверот <em>(500)</em>"
+
+#: templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Имаше грешка. Истата беше пријавена на администраторите и ќе биде поправена "
+"во брзо време. Ви благодариме за вашето трпение."
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Изврши ја избраната акција"
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "Оди"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Кликнете тука за да изберете објекти низ повеќе страници"
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Избери ги сите %(total_count)s %(module_name)s"
+
+#: templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "Откажи го изборот"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "Добредојдовте,"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Documentation"
+msgstr "Документација"
+
+#: templates/admin/base.html:41
+#: templates/admin/auth/user/change_password.html:16
+#: templates/admin/auth/user/change_password.html:49
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Change password"
+msgstr "Промени лозинка"
+
+#: templates/admin/base.html:48
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Log out"
+msgstr "Одјава"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Џанго администрација на сајт"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Џанго администрација"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:29
+msgid "Add"
+msgstr "Додади"
+
+#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+msgid "History"
+msgstr "Историја"
+
+#: templates/admin/change_form.html:32
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:28
+msgid "View on site"
+msgstr "Погледни на сајтот"
+
+#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:25
+#: templates/registration/password_change_form.html:16
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Ве молам поправете ја грешката подолу."
+msgstr[1] "Ве молам поправете ги грешките подолу."
+
+#: templates/admin/change_list.html:64
+#, python-format
+msgid "Add %(name)s"
+msgstr "Додади %(name)s"
+
+#: templates/admin/change_list.html:84
+msgid "Filter"
+msgstr "Филтер"
+
+#: templates/admin/delete_confirmation.html:10
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "Избриши"
+
+#: templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Бришење на %(object_name)s '%(escaped_object)s' ќе резултира со бришење на "
+"поврзаните објекти, но со вашата сметка немате доволно привилегии да ги "
+"бришете следните типови на објекти:"
+
+#: templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Сигурне сте дека сакате да ги бришете %(object_name)s „%(escaped_object)s“? "
+"Сите овие ставки ќе бидат избришани:"
+
+#: templates/admin/delete_confirmation.html:28
+#: templates/admin/delete_selected_confirmation.html:33
+msgid "Yes, I'm sure"
+msgstr "Да, сигурен сум"
+
+#: templates/admin/delete_selected_confirmation.html:9
+msgid "Delete multiple objects"
+msgstr "Избриши повеќе ставки"
+
+#: templates/admin/delete_selected_confirmation.html:15
+#, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+"Бришење на %(object_name)s би резултирало со бришење на поврзаните објекти, "
+"но вие како корисник немате доволно привилегии да ги бришете следните типови "
+"на објекти:"
+
+#: templates/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+"Сигурне сте дека сакате да ги избришете избраните %(object_name)s? Сите овие "
+"објекти и објектите поврзани со нив ќе бидат избришани:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Според %(filter_title)s "
+
+#: templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "Достапни модели во апликацијата %(name)s."
+
+#: templates/admin/index.html:35
+msgid "Change"
+msgstr "Измени"
+
+#: templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr "Немате дозвола ништо да уредува."
+
+#: templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr "Последни акции"
+
+#: templates/admin/index.html:54
+msgid "My Actions"
+msgstr "Мои акции"
+
+#: templates/admin/index.html:58
+msgid "None available"
+msgstr "Ништо не е достапно"
+
+#: templates/admin/index.html:72
+msgid "Unknown content"
+msgstr "Непозната содржина"
+
+#: templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Нешто не е во ред со инсталацијата на базата на податоци. Потврдете дека "
+"соодветни табели во базата се направени и потврдете дека базата може да биде "
+"прочитана од соодветниот корисник."
+
+#: templates/admin/login.html:33
+msgid "Username:"
+msgstr "Корисник:"
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "Лозинка:"
+
+#: templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "Датум/час"
+
+#: templates/admin/object_history.html:23
+msgid "User"
+msgstr "Корисник"
+
+#: templates/admin/object_history.html:24
+msgid "Action"
+msgstr "Акција"
+
+#: templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Овој објект нема историја на измени. Најверојатно не бил додаден со админ "
+"сајтот."
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Прикажи ги сите"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Сними"
+
+#: templates/admin/search_form.html:8
+msgid "Search"
+msgstr "Барај"
+
+#: templates/admin/search_form.html:10
+#, fuzzy, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(total_count)s одбран"
+msgstr[1] "Сите %(total_count)s одбрани"
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "вкупно %(full_result_count)s"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "Сними како нова"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "Сними и додади уште"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "Сними и продолжи со уредување"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Прво, внесете корисничко име и лозинка. Потоа ќе можете да уредувате повеќе "
+"кориснички опции."
+
+#: templates/admin/auth/user/add_form.html:8
+#, fuzzy
+msgid "Enter a username and password."
+msgstr "Внесете нова лозинка"
+
+#: templates/admin/auth/user/change_password.html:29
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Внесете нова лозинка за корисникот <strong>%(username)s</strong>."
+
+#: templates/admin/auth/user/change_password.html:36
+msgid "Password"
+msgstr "Лозинка"
+
+#: templates/admin/auth/user/change_password.html:42
+#: templates/registration/password_change_form.html:38
+msgid "Password (again)"
+msgstr "Лозинка (повторно)"
+
+#: templates/admin/auth/user/change_password.html:43
+msgid "Enter the same password as above, for verification."
+msgstr "Заради верификација внесете ја истата лозинка како и горе."
+
+#: templates/admin/edit_inline/stacked.html:67
+#: templates/admin/edit_inline/tabular.html:113
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Додадете уште %(verbose_name)s"
+
+#: templates/admin/edit_inline/stacked.html:70
+#: templates/admin/edit_inline/tabular.html:116
+msgid "Remove"
+msgstr "Отстрани"
+
+#: templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr "Избриши?"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr ""
+"Ви благодариме што денеска поминавте квалитетно време со интернет страницава."
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Најавете се повторно"
+
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:20
+msgid "Password change"
+msgstr "Измена на лозинка"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_done.html:11
+msgid "Password change successful"
+msgstr "Успешна промена на лозинката"
+
+#: templates/registration/password_change_done.html:13
+msgid "Your password was changed."
+msgstr "Вашата лозинка беше сменета."
+
+#: templates/registration/password_change_form.html:22
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Заради сигурност ве молам внесете ја вашата стара лозинка и потоа внесете ја "
+"новата двапати за да може да се потврди дека правилно сте ја искуцале."
+
+#: templates/registration/password_change_form.html:28
+msgid "Old password"
+msgstr "Стара лозинка"
+
+#: templates/registration/password_change_form.html:33
+msgid "New password"
+msgstr "Нова лозинка"
+
+#: templates/registration/password_change_form.html:44
+#: templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "Промени ја мојата лозинка"
+
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
+#: templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "Ресетирање на лозинка"
+
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr "Ресетирањето на лозинката заврши"
+
+#: templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Вашата лозинка беше поставена. Сега можете да се најавите."
+
+#: templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr "Одобрување за ресетирање на лозинка"
+
+#: templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr "Внесете нова лозинка"
+
+#: templates/registration/password_reset_confirm.html:14
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Ве молам внесете ја вашата нова лозинка двапати за да може да бидете сигурни "
+"дека правилно сте ја внеле."
+
+#: templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "Нова лозинка:"
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "Потврди лозинка:"
+
+#: templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr "Неуспеа ресетирањето на лозинката"
+
+#: templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Врската за ресетирање на лозинката беше невалидна, најверојатно бидејќи веќе "
+"била искористена. Ве молам повторно побарајте ресетирање на вашата лозинката."
+
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Успешно е ресетирањето на лозинката"
+
+#: templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"Ви пративме инструкции за поставување на вашата лозинка на е-пошта која ја "
+"напишавте. Би требало да ја примите за кратко време."
+
+#: templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr ""
+"Ја добивата оваа порака бидејќи побаравте да се ресетира вашата лозинка"
+
+#: templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "за корисничката сметка на %(site_name)s"
+
+#: templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "Ве молам одите на следната страница и внесете нова лозинка:"
+
+#: templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "Вашето корисничко име, во случај да сте го заборавиле:"
+
+#: templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "Ви благодариме што го користите овој сајт!"
+
+#: templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Тимот на %(site_name)s"
+
+#: templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+"Сте ја заборавиле вашата лозинка? Внесете ја вашата е-пошта подолу и ќе ви "
+"пратиме инструкции за поставување на нова."
+
+#: templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Е-пошта:"
+
+#: templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Ресетирај ја мојата лозинка"
+
+#: templatetags/admin_list.py:273
+msgid "All dates"
+msgstr "Сите датуми"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "Изберете %s"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s to change"
+msgstr "Изберете %s за измена"

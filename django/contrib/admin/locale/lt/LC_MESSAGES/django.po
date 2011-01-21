@@ -1,0 +1,800 @@
+# Lithuanian translation of Django.
+# Copyright (C) 2008 The Django Software Foundation
+# This file is distributed under the same license as the Django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2008-06-18 22:37+0200\n"
+"Last-Translator: Rapolas Kaselis <rapolas@gmail.com>\n"
+"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%"
+"100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: actions.py:49
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr ""
+
+#: actions.py:56 options.py:1185
+msgid "Are you sure?"
+msgstr "Ar tu tikras?"
+
+#: actions.py:74
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
+
+#: filterspecs.py:54
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+
+#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+msgid "All"
+msgstr "Visi"
+
+#: filterspecs.py:137
+msgid "Any date"
+msgstr "Betkokia data"
+
+#: filterspecs.py:138
+msgid "Today"
+msgstr "Šiandien"
+
+#: filterspecs.py:141
+msgid "Past 7 days"
+msgstr "Paskutinės 7 dienos"
+
+#: filterspecs.py:144
+msgid "This month"
+msgstr "Šį mėnesį"
+
+#: filterspecs.py:146
+msgid "This year"
+msgstr "Šiais metais"
+
+#: filterspecs.py:175
+msgid "Yes"
+msgstr "Taip"
+
+#: filterspecs.py:175
+msgid "No"
+msgstr "Ne"
+
+#: filterspecs.py:182
+msgid "Unknown"
+msgstr "Nežinomas"
+
+#: forms.py:9
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Įveskite teisingą vartotojo vardą ir slaptažodį. Abiejuose laukuose "
+"didžiosios mažosios raidės skiriasi"
+
+#: forms.py:18
+#, fuzzy
+msgid "Please log in again, because your session has expired."
+msgstr ""
+"Prisijunkite dar kartą, nes sesijos laikas baigėsi. Nesirūpinkite, įrašai "
+"buvo išsaugoti."
+
+#: forms.py:37
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "E-mailas nėra vartotojo vardas. Pabandyk '%s' vietoj to."
+
+#: helpers.py:19
+#, fuzzy
+msgid "Action:"
+msgstr "Veiksmas"
+
+#: models.py:19
+msgid "action time"
+msgstr "veiksmo laikas"
+
+#: models.py:22
+msgid "object id"
+msgstr "objekto id"
+
+#: models.py:23
+msgid "object repr"
+msgstr "objekto repr"
+
+#: models.py:24
+msgid "action flag"
+msgstr "veiksmo žymė"
+
+#: models.py:25
+msgid "change message"
+msgstr "pakeisti žinutę"
+
+#: models.py:28
+msgid "log entry"
+msgstr "log įrašas"
+
+#: models.py:29
+msgid "log entries"
+msgstr "log įrašai"
+
+#: options.py:148 options.py:163
+#, fuzzy
+msgid "None"
+msgstr "vienas"
+
+#: options.py:608
+#, python-format
+msgid "Changed %s."
+msgstr "Pakeistas %s."
+
+#: options.py:608 options.py:618
+msgid "and"
+msgstr "ir"
+
+#: options.py:613
+#, fuzzy, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "Pridėti %(name)s"
+
+#: options.py:617
+#, fuzzy, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "susiję `%(label)s.%(name)s` objektai"
+
+#: options.py:622
+#, fuzzy, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "susiję `%(label)s.%(name)s` objektai"
+
+#: options.py:626
+msgid "No fields changed."
+msgstr "Nei vienas laukas nepakeistas"
+
+#: options.py:698
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" pridėtas sėkmingai."
+
+#: options.py:702 options.py:735
+msgid "You may edit it again below."
+msgstr "Gali taisyti dar kartą žemiau."
+
+#: options.py:712 options.py:745
+#, python-format
+msgid "You may add another %s below."
+msgstr "Gali pridėti dar vieną %s žemiau."
+
+#: options.py:733
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas."
+
+#: options.py:741
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\" pridėtas sėkmingai. Gali taisytį jį dar kartą žemiau."
+
+#: options.py:795 options.py:1053
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+#: options.py:814
+#, fuzzy
+msgid "No action selected."
+msgstr "veiksmo laikas"
+
+#: options.py:895
+#, python-format
+msgid "Add %s"
+msgstr "Pridėti %s"
+
+#: options.py:921 options.py:1162
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+#: options.py:986
+#, python-format
+msgid "Change %s"
+msgstr "Pakeisti %s"
+
+#: options.py:1033
+msgid "Database error"
+msgstr "Duomenų bazės klaida"
+
+#: options.py:1095
+#, fuzzy, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas."
+msgstr[1] "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas."
+msgstr[2] "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas."
+
+#: options.py:1122
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: options.py:1127
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#: options.py:1178
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" sėkmingai ištrintas."
+
+#: options.py:1215
+#, python-format
+msgid "Change history: %s"
+msgstr "Pakeisti istoriją: %s"
+
+#: sites.py:312 templates/admin/login.html:42
+#: templates/registration/password_reset_complete.html:14
+#: views/decorators.py:29
+msgid "Log in"
+msgstr "Prisijungti"
+
+#: sites.py:368
+msgid "Site administration"
+msgstr "Saito administracija"
+
+#: sites.py:412
+#, fuzzy, python-format
+msgid "%s administration"
+msgstr "Saito administracija"
+
+#: widgets.py:75
+msgid "Date:"
+msgstr "Data:"
+
+#: widgets.py:75
+msgid "Time:"
+msgstr "Laikas:"
+
+#: widgets.py:121
+#, fuzzy
+msgid "Lookup"
+msgstr "Atsijungti"
+
+#: widgets.py:237
+#, fuzzy
+msgid "Add Another"
+msgstr "Pridėti vartotoją"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "Puslapis nerastas"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Atsiprašome, bet prašytas puslapis nerastas."
+
+#: templates/admin/500.html:4 templates/admin/app_index.html:8
+#: templates/admin/base.html:55 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:42
+#: templates/admin/delete_confirmation.html:6
+#: templates/admin/delete_selected_confirmation.html:6
+#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
+#: templates/admin/auth/user/change_password.html:12
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "Pradinis"
+
+#: templates/admin/500.html:4
+msgid "Server error"
+msgstr "Serverio klaida"
+
+#: templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Serverio klaida (500)"
+
+#: templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Serverio klaida <em>(500)</em>"
+
+#: templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Įvyko klaida. Apie ją buvo pranešta administratoriams ir turėtų būti greitai "
+"ištaisyta. Dėkojame už kantrybę."
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr ""
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "Eiti!"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: templates/admin/actions.html:13
+#, fuzzy
+msgid "Clear selection"
+msgstr "moderatoriaus ištrynimas"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "Sveiki,"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+#: templates/admin/base.html:41
+#: templates/admin/auth/user/change_password.html:16
+#: templates/admin/auth/user/change_password.html:49
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Change password"
+msgstr "Pakeisti slaptažodį"
+
+#: templates/admin/base.html:48
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Log out"
+msgstr "Atsijungti"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django saito administravimas"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django administravimas"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:29
+msgid "Add"
+msgstr "Pridėti"
+
+#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+msgid "History"
+msgstr "Istorija"
+
+#: templates/admin/change_form.html:32
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:28
+msgid "View on site"
+msgstr "Matyti saite"
+
+#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:25
+#: templates/registration/password_change_form.html:16
+#, fuzzy
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Ištaisykite klaidą žemiau"
+msgstr[1] "Ištaisykite klaidas žemiau"
+msgstr[2] ""
+
+#: templates/admin/change_list.html:64
+#, python-format
+msgid "Add %(name)s"
+msgstr "Pridėti %(name)s"
+
+#: templates/admin/change_list.html:84
+msgid "Filter"
+msgstr "Filtras"
+
+#: templates/admin/delete_confirmation.html:10
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "Ištrinti"
+
+#: templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Trinant %(object_name)s '%(escaped_object)s' turi būti ištrinti ir susiję "
+"objektai, bet tavo vartotojas neturi teisių ištrinti šių objektų:"
+
+#: templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Ar tu esi tikras, kad nori ištrinti %(object_name)s \"%(escaped_object)s\"? "
+"Visi susiję objektai bus ištrinti:"
+
+#: templates/admin/delete_confirmation.html:28
+#: templates/admin/delete_selected_confirmation.html:33
+msgid "Yes, I'm sure"
+msgstr "Taip, aš esu tikras"
+
+#: templates/admin/delete_selected_confirmation.html:9
+msgid "Delete multiple objects"
+msgstr ""
+
+#: templates/admin/delete_selected_confirmation.html:15
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+"Trinant %(object_name)s '%(escaped_object)s' turi būti ištrinti ir susiję "
+"objektai, bet tavo vartotojas neturi teisių ištrinti šių objektų:"
+
+#: templates/admin/delete_selected_confirmation.html:22
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+"Ar tu esi tikras, kad nori ištrinti %(object_name)s \"%(escaped_object)s\"? "
+"Visi susiję objektai bus ištrinti:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Pagal %(filter_title)s "
+
+#: templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "Modelis prieinamas %(name)s programoje."
+
+#: templates/admin/index.html:35
+msgid "Change"
+msgstr "Pakeisti"
+
+#: templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr "Neturi teisių ką nors keistis."
+
+#: templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr "Neseni veiksmai"
+
+#: templates/admin/index.html:54
+msgid "My Actions"
+msgstr "Mano Veiksmai"
+
+#: templates/admin/index.html:58
+msgid "None available"
+msgstr "Nėra prieinamų"
+
+#: templates/admin/index.html:72
+#, fuzzy
+msgid "Unknown content"
+msgstr "Nežinomas"
+
+#: templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Kažkas yra negerai su jūsų duomenų bazės instaliacija. Įsitikink, kad visos "
+"reikalingos lentelės sukurtos ir vartotojas turi teises skaityti duomenų "
+"bazę."
+
+#: templates/admin/login.html:33
+msgid "Username:"
+msgstr "Vartotojo vardas:"
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "Slaptažodis:"
+
+#: templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "Data/laikas"
+
+#: templates/admin/object_history.html:23
+msgid "User"
+msgstr "Vartotojas"
+
+#: templates/admin/object_history.html:24
+msgid "Action"
+msgstr "Veiksmas"
+
+#: templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Šis objektas neturi pakeitimų istorijos. Tikriausiai jis buvo pridėtas ne "
+"per admin puslapį."
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Rodyti visus"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Išsaugoti"
+
+#: templates/admin/search_form.html:8
+#, fuzzy
+msgid "Search"
+msgstr "Kovas"
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s iš viso"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "Išsaugoti kaip naują"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "Išsaugoti ir pridėti naują"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "Išsaugoti ir tęsti redagavimą"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Pirmiausi įvesk vartotojo vardą ir slaptažodį. Tada turėsi galimybę "
+"redaguoti daugiau nustatymų."
+
+#: templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr ""
+
+#: templates/admin/auth/user/change_password.html:29
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Įvesk naują slaptažodį vartotojui <strong>%(username)s</strong>."
+
+#: templates/admin/auth/user/change_password.html:36
+msgid "Password"
+msgstr "Slaptažodis"
+
+#: templates/admin/auth/user/change_password.html:42
+#: templates/registration/password_change_form.html:38
+msgid "Password (again)"
+msgstr "Slaptažodis (dar kartą)"
+
+#: templates/admin/auth/user/change_password.html:43
+msgid "Enter the same password as above, for verification."
+msgstr "Patikrinimui įvesk tokį patį slaptažodį, kaip viršuje."
+
+#: templates/admin/edit_inline/stacked.html:67
+#: templates/admin/edit_inline/tabular.html:113
+#, fuzzy, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "%(verbose_name)s buvo ištrintas."
+
+#: templates/admin/edit_inline/stacked.html:70
+#: templates/admin/edit_inline/tabular.html:116
+#, fuzzy
+msgid "Remove"
+msgstr "pašalintas"
+
+#: templates/admin/edit_inline/tabular.html:15
+#, fuzzy
+msgid "Delete?"
+msgstr "Ištrinti"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Dėkui už praleistą laiką šiandien."
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Prisijungti dar kartą"
+
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:20
+msgid "Password change"
+msgstr "Slaptažodžio keitimas"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_done.html:11
+msgid "Password change successful"
+msgstr "Slaptažodis sėkmingai pakeistas"
+
+#: templates/registration/password_change_done.html:13
+msgid "Your password was changed."
+msgstr "Jūsų slaptažodis buvo pakeistas."
+
+#: templates/registration/password_change_form.html:22
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Saugumo sumetimais įvesk seną slaptažodį ir tada du kartus naują, kad "
+"įsitikinti, jog nesuklydai rašydamas"
+
+#: templates/registration/password_change_form.html:28
+#, fuzzy
+msgid "Old password"
+msgstr "Senas slaptažodis:"
+
+#: templates/registration/password_change_form.html:33
+#, fuzzy
+msgid "New password"
+msgstr "Naujas slaptažodis:"
+
+#: templates/registration/password_change_form.html:44
+#: templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "Pakeisti slaptažodį"
+
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
+#: templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "Slaptažodžiu atstatymas(reset)"
+
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_complete.html:10
+#, fuzzy
+msgid "Password reset complete"
+msgstr "Slaptažodžiu atstatymas(reset)"
+
+#: templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:4
+#, fuzzy
+msgid "Password reset confirmation"
+msgstr "Slaptažodžiu atstatymas(reset)"
+
+#: templates/registration/password_reset_confirm.html:12
+#, fuzzy
+msgid "Enter new password"
+msgstr "Naujas slaptažodis:"
+
+#: templates/registration/password_reset_confirm.html:14
+#, fuzzy
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Saugumo sumetimais įvesk seną slaptažodį ir tada du kartus naują, kad "
+"įsitikinti, jog nesuklydai rašydamas"
+
+#: templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "Naujas slaptažodis:"
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "Slaptažodžio patvirtinimas:"
+
+#: templates/registration/password_reset_confirm.html:26
+#, fuzzy
+msgid "Password reset unsuccessful"
+msgstr "Slaptažodis sėkmingai atsatytas"
+
+#: templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Slaptažodis sėkmingai atsatytas"
+
+#: templates/registration/password_reset_done.html:12
+#, fuzzy
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr "Išsiuntėm naują slaptažodį e-mailu. Turėtumėte greitai gauti."
+
+#: templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Gavote šį laišką, nes paprašėte atstatyti slaptažodį"
+
+#: templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "Jūsų vartotojui %(site_name)s saite"
+
+#: templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "Jūsų vartotojo vardas, jei netyčia užmiršote:"
+
+#: templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "Dėkui, kad naudojatės mūsų saitu!"
+
+#: templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s komanda"
+
+#: templates/registration/password_reset_form.html:12
+#, fuzzy
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+"Pamiršai slaptažodį? Įvesk savo emailą žemiau ir mes atsiųsime naują "
+"slaptažodį emailu."
+
+#: templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "E-mailo adresas:"
+
+#: templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Atstatyti slaptažodį"
+
+#: templatetags/admin_list.py:273
+msgid "All dates"
+msgstr "Visos datos"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "Pasirinkti %s"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s to change"
+msgstr "Pasirinkti %s pakeitimui"

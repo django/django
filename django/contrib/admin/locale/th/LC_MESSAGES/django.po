@@ -1,0 +1,769 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django-1.1-rc-1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2009-07-28 22:31+0700\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
+"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin "
+"Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Thai\n"
+"X-Poedit-Country: THAILAND\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: actions.py:49
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr ""
+
+#: actions.py:56 options.py:1185
+msgid "Are you sure?"
+msgstr "แน่ใจหรือ"
+
+#: actions.py:74
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
+
+#: filterspecs.py:54
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>โดย %s:</h3>\n"
+"<ul>\n"
+
+#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+msgid "All"
+msgstr "ทั้งหมด"
+
+#: filterspecs.py:137
+msgid "Any date"
+msgstr "วันไหนก็ได้"
+
+#: filterspecs.py:138
+msgid "Today"
+msgstr "วันนี้"
+
+#: filterspecs.py:141
+msgid "Past 7 days"
+msgstr "สัปดาห์ที่แล้ว"
+
+#: filterspecs.py:144
+msgid "This month"
+msgstr "เดือนนี้"
+
+#: filterspecs.py:146
+msgid "This year"
+msgstr "ปีนี้"
+
+#: filterspecs.py:175
+msgid "Yes"
+msgstr "ใช่"
+
+#: filterspecs.py:175
+msgid "No"
+msgstr "ไม่ใช่"
+
+#: filterspecs.py:182
+msgid "Unknown"
+msgstr "ไม่รู้"
+
+#: forms.py:9
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr "กรุณาใส่ชื่อผู้ใช้และรหัสผ่านให้ถูกต้อง มีการแยกแยะตัวพิมพ์ใหญ่-เล็ก"
+
+#: forms.py:18
+msgid "Please log in again, because your session has expired."
+msgstr "กรุณาลงชื่อเข้าใช้อีกครั้ง, เนื่องจากคุณไม่ได้ใช้งานนานเกินไป"
+
+#: forms.py:37
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "ที่อยู่อีเมลไม่ใช่ชื่อผู้ใช้ของคุณ ลองใช้ '%s' แทน"
+
+#: helpers.py:19
+#, fuzzy
+msgid "Action:"
+msgstr "คำสั่ง"
+
+#: models.py:19
+msgid "action time"
+msgstr "เวลาลงมือ"
+
+#: models.py:22
+msgid "object id"
+msgstr "อ็อบเจ็กต์ไอดี"
+
+#: models.py:23
+msgid "object repr"
+msgstr "object repr"
+
+#: models.py:24
+msgid "action flag"
+msgstr "action flag"
+
+#: models.py:25
+msgid "change message"
+msgstr "เปลี่ยนข้อความ"
+
+#: models.py:28
+msgid "log entry"
+msgstr "log entry"
+
+#: models.py:29
+msgid "log entries"
+msgstr "log entries"
+
+#: options.py:148 options.py:163
+msgid "None"
+msgstr "ไม่มี"
+
+#: options.py:608
+#, python-format
+msgid "Changed %s."
+msgstr "%s เปลี่ยนแล้ว"
+
+#: options.py:608 options.py:618
+msgid "and"
+msgstr "และ"
+
+#: options.py:613
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "เพิ่ม %(name)s \"%(object)s\" แล้ว"
+
+#: options.py:617
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "เปลี่ยน %(list)s สำหรับ %(name)s \"%(object)s\" แล้ว"
+
+#: options.py:622
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "ลบ %(name)s \"%(object)s\" แล้ว"
+
+#: options.py:626
+msgid "No fields changed."
+msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
+
+#: options.py:698
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
+
+#: options.py:702 options.py:735
+msgid "You may edit it again below."
+msgstr "สามารถแก้ไขเพิ่มเติมได้ที่ด้านล่าง"
+
+#: options.py:712 options.py:745
+#, python-format
+msgid "You may add another %s below."
+msgstr "คุณสามารถเพิ่ม %s ได้อีกที่ด้านล่าง"
+
+#: options.py:733
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
+
+#: options.py:741
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว แก้ไขได้อีกที่ด้านล่าง"
+
+#: options.py:795 options.py:1053
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+#: options.py:814
+#, fuzzy
+msgid "No action selected."
+msgstr "เวลาลงมือ"
+
+#: options.py:895
+#, python-format
+msgid "Add %s"
+msgstr "เพิ่ม %s"
+
+#: options.py:921 options.py:1162
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+#: options.py:986
+#, python-format
+msgid "Change %s"
+msgstr "เปลี่ยน %s"
+
+#: options.py:1033
+msgid "Database error"
+msgstr "เกิดความผิดพลาดที่ฐานข้อมูล"
+
+#: options.py:1095
+#, fuzzy, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
+
+#: options.py:1122
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+
+#: options.py:1127
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#: options.py:1178
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "ลบ %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
+
+#: options.py:1215
+#, python-format
+msgid "Change history: %s"
+msgstr "เปลี่ยนแปลงประวัติ: %s"
+
+#: sites.py:312 templates/admin/login.html:42
+#: templates/registration/password_reset_complete.html:14
+#: views/decorators.py:29
+msgid "Log in"
+msgstr "เข้าสู่ระบบ"
+
+#: sites.py:368
+msgid "Site administration"
+msgstr "การจัดการไซต์"
+
+#: sites.py:412
+#, python-format
+msgid "%s administration"
+msgstr "%s การจัดการ"
+
+#: widgets.py:75
+msgid "Date:"
+msgstr "วันที่ :"
+
+#: widgets.py:75
+msgid "Time:"
+msgstr "เวลา :"
+
+#: widgets.py:121
+msgid "Lookup"
+msgstr "ดูที่"
+
+#: widgets.py:237
+msgid "Add Another"
+msgstr "เพิ่มอีก"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "ไม่พบหน้านี้"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "เสียใจด้วย ไม่พบหน้าที่ต้องการ"
+
+#: templates/admin/500.html:4 templates/admin/app_index.html:8
+#: templates/admin/base.html:55 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:42
+#: templates/admin/delete_confirmation.html:6
+#: templates/admin/delete_selected_confirmation.html:6
+#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
+#: templates/admin/auth/user/change_password.html:12
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "หน้าหลัก"
+
+#: templates/admin/500.html:4
+msgid "Server error"
+msgstr "เซิร์ฟเวอร์ขัดข้อง"
+
+#: templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "เซิร์ฟเวอร์ขัดข้อง (500)"
+
+#: templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "เซิร์ฟเวอร์ขัดข้อง <em>(500)</em>"
+
+#: templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"เกิดเหตุขัดข้องขี้น ทางเราได้รายงานไปยังผู้ดูแลระบบแล้ว และจะดำเนินการแก้ไขอย่างเร่งด่วน "
+"ขอบคุณที่ราบงานความผิดพลาด"
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr ""
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "ไป"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr ""
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "ยินดีต้อนรับ,"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Documentation"
+msgstr "เอกสารประกอบ"
+
+#: templates/admin/base.html:41
+#: templates/admin/auth/user/change_password.html:16
+#: templates/admin/auth/user/change_password.html:49
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Change password"
+msgstr "เปลี่ยนรหัสผ่าน"
+
+#: templates/admin/base.html:48
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Log out"
+msgstr "ออกจากระบบ"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "ผู้ดูแลระบบ Django"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "การจัดการ Django"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:29
+msgid "Add"
+msgstr "เพิ่ม"
+
+#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+msgid "History"
+msgstr "ประวัติ"
+
+#: templates/admin/change_form.html:32
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:28
+msgid "View on site"
+msgstr "ดูที่หน้าเว็บ"
+
+#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:25
+#: templates/registration/password_change_form.html:16
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "โปรดแก้ไขข้อผิดพลาดด้านล่าง"
+
+#: templates/admin/change_list.html:64
+#, python-format
+msgid "Add %(name)s"
+msgstr "เพิ่ม %(name)s"
+
+#: templates/admin/change_list.html:84
+msgid "Filter"
+msgstr "ตัวกรอง"
+
+#: templates/admin/delete_confirmation.html:10
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "ลบ"
+
+#: templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
+"แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
+
+#: templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"คุณแน่ใจหรือที่จะลบ %(object_name)s \"%(escaped_object)s\"?"
+"ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย:"
+
+#: templates/admin/delete_confirmation.html:28
+#: templates/admin/delete_selected_confirmation.html:33
+msgid "Yes, I'm sure"
+msgstr "ใช่, ฉันแน่ใจ"
+
+#: templates/admin/delete_selected_confirmation.html:9
+#, fuzzy
+msgid "Delete multiple objects"
+msgstr "ลบ %(name)s \"%(object)s\" แล้ว"
+
+#: templates/admin/delete_selected_confirmation.html:15
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+"กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
+"แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
+
+#: templates/admin/delete_selected_confirmation.html:22
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+"คุณแน่ใจหรือที่จะลบ %(object_name)s \"%(escaped_object)s\"?"
+"ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " โดย %(filter_title)s "
+
+#: templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "โมเดลใช้ได้ในแอป %(name)s ."
+
+#: templates/admin/index.html:35
+msgid "Change"
+msgstr "เปลี่ยนแปลง"
+
+#: templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr "คุณไม่สิทธิ์ในการเปลี่ยนแปลงข้อมูลใดๆ ได้"
+
+#: templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr "คำสั่งที่ผ่านมา"
+
+#: templates/admin/index.html:54
+msgid "My Actions"
+msgstr "คำสั่งของฉัน"
+
+#: templates/admin/index.html:58
+msgid "None available"
+msgstr "ไม่ว่าง"
+
+#: templates/admin/index.html:72
+#, fuzzy
+msgid "Unknown content"
+msgstr "ไม่รู้"
+
+#: templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"มีสิ่งผิดปกติเกิดขึ้นกับการติดตั้งฐานข้อมูล กรุณาตรวจสอบอีกครั้งว่าฐานข้อมูลได้ถูกติดตั้งแล้ว "
+"หรือฐานข้อมูลสามารถอ่านและเขียนได้โคยผู้ใช้นี้"
+
+#: templates/admin/login.html:33
+msgid "Username:"
+msgstr "ชื่อผู้ใช้:"
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "รหัสผ่าน:"
+
+#: templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "วันที่/เวลา"
+
+#: templates/admin/object_history.html:23
+msgid "User"
+msgstr "ผู้ใช้"
+
+#: templates/admin/object_history.html:24
+msgid "Action"
+msgstr "คำสั่ง"
+
+#: templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr "อ็อบเจ็กต์นี้ไม่ได้แก้ไขประวัติ เป็นไปได้ว่ามันอาจจะไม่ได้ถูกเพิ่มเข้าไปโดยระบบ"
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "แสดงทั้งหมด"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "บันทึก"
+
+#: templates/admin/search_form.html:8
+#, fuzzy
+msgid "Search"
+msgstr "มีนาคม"
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s ทั้งหมด"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "บันทึกใหม่"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "บันทึกและเพิ่ม"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "บันทึกและกลับมาแก้ไข"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr "ขั้นตอนแรก ใส่ชื่อผู้ใช้และรหัสผ่าน หลังจากนั้นคุณจะสามารถแก้ไขข้อมูลผู้ใช้ได้มากขึ้น"
+
+#: templates/admin/auth/user/add_form.html:8
+#, fuzzy
+msgid "Enter a username and password."
+msgstr "ใส่รหัสผ่านใหม่"
+
+#: templates/admin/auth/user/change_password.html:29
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "ใส่รหัสผ่านใหม่สำหรับผู้ใช้ <strong>%(username)s</strong>."
+
+#: templates/admin/auth/user/change_password.html:36
+msgid "Password"
+msgstr "รหัสผ่าน"
+
+#: templates/admin/auth/user/change_password.html:42
+#: templates/registration/password_change_form.html:38
+msgid "Password (again)"
+msgstr "รหัสผ่าน (อีกครั้ง)"
+
+#: templates/admin/auth/user/change_password.html:43
+msgid "Enter the same password as above, for verification."
+msgstr "ใส่รหัสผ่านเหมือนด้านบน เพื่อตรวจสอบความถูกต้อง"
+
+#: templates/admin/edit_inline/stacked.html:67
+#: templates/admin/edit_inline/tabular.html:113
+#, fuzzy, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "%(verbose_name)s ได้ถูกลบเรียบร้อยแล้ว"
+
+#: templates/admin/edit_inline/stacked.html:70
+#: templates/admin/edit_inline/tabular.html:116
+#, fuzzy
+msgid "Remove"
+msgstr "ถอดออกแล้ว"
+
+#: templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr "ลบ?"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "ขอบคุณที่สละเวลาอันมีค่าให้กับเว็บไซต์ของเราในวันนี้"
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "เข้าสู่ระบบอีกครั้ง"
+
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:20
+msgid "Password change"
+msgstr "เปลี่ยนรหัสผ่าน"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_done.html:11
+msgid "Password change successful"
+msgstr "เปลี่ยนรหัสผ่านสำเร็จ"
+
+#: templates/registration/password_change_done.html:13
+msgid "Your password was changed."
+msgstr "รหัสผ่านของคุณถูกเปลี่ยนไปแล้ว"
+
+#: templates/registration/password_change_form.html:22
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"กรุณาใส่รหัสผ่านเดิม ด้วยเหตุผลทางด้านการรักษาความปลอดภัย "
+"หลังจากนั้นให้ใส่รหัสผ่านใหม่อีกสองครั้ง เพื่อตรวจสอบว่าคุณได้พิมพ์รหัสอย่างถูกต้อง"
+
+#: templates/registration/password_change_form.html:28
+msgid "Old password"
+msgstr "รหัสผ่านเก่า"
+
+#: templates/registration/password_change_form.html:33
+msgid "New password"
+msgstr "รหัสผ่านใหม่"
+
+#: templates/registration/password_change_form.html:44
+#: templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "เปลี่ยนรหัสผ่านของฉัน"
+
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
+#: templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "ตั้งค่ารหัสผ่านใหม่"
+
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr "ตั้งค่ารหัสผ่านใหม่เรียบร้อย"
+
+#: templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "รหัสผ่านของคุณได้รับการตั้งค่าแล้ว คุณสามารถเข้าสู่ระบบได้ทันที"
+
+#: templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr "การยืนยันตั้งค่ารหัสผ่านใหม่"
+
+#: templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr "ใส่รหัสผ่านใหม่"
+
+#: templates/registration/password_reset_confirm.html:14
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr "กรุณาใส่รหัสผ่านใหม่สองครั้ง เพื่อตรวจสอบว่าคุณได้พิมพ์รหัสอย่างถูกต้อง"
+
+#: templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "รหัสผ่านใหม่:"
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "ยืนยันรหัสผ่าน:"
+
+#: templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr "การตั้งค่ารหัสผ่านใหม่ ไม่สำเร็จ"
+
+#: templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"การตั้งรหัสผ่านใหม่ไม่สำเร็จ เป็นเพราะว่าหน้านี้ได้ถูกใช้งานไปแล้ว กรุณาทำการตั้งรหัสผ่านใหม่อีกครั้ง"
+
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "การตั้งค่ารหัสผ่านใหม่เรียบร้อย"
+
+#: templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr "เราได้ส่งอีเมลวิธีการตั้งรหัสผ่าน ไปที่อีเมลที่คุณให้ไว้เรียบร้อยแล้ว และคุณจะได้รับเร็วๆ นี้"
+
+#: templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "คุณได้รับอีเมลนี้เพราะว่าคุณได้ทำการขอรหัสผ่านใหม่"
+
+#: templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "สำหรับบัญชีการใช้งานของคุณที่ %(site_name)s "
+
+#: templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "กรุณาไปที่หน้านี้และเลือกรหัสผ่านใหม่:"
+
+#: templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "ชื่อผู้ใช้ของคุณ ในกรณีที่คุณถูกลืม:"
+
+#: templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
+
+#: templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s ทีม"
+
+#: templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr "ลืมรหัสผ่าน? กรุณาใส่อีเมลด้านล่าง ทางเราจะทำการส่งวิธีการในการตั้งรหัสผ่านใหม่ไปให้"
+
+#: templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "อีเมลของคุณ"
+
+#: templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "ตั้งรหัสผ่านของฉันใหม่"
+
+#: templatetags/admin_list.py:273
+msgid "All dates"
+msgstr "ทุกวัน"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "เลือก %s"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s to change"
+msgstr "เลือก %s เพื่อเปลี่ยนแปลง"

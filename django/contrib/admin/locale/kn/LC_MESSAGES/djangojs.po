@@ -1,0 +1,142 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 20:56+0100\n"
+"PO-Revision-Date: 2007-01-08 20:22+0530\n"
+"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
+"Language-Team: Kannada <translation@sampada.info>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: media/js/SelectFilter2.js:37
+#, perl-format
+msgid "Available %s"
+msgstr "ಲಭ್ಯ %s "
+
+#: media/js/SelectFilter2.js:45
+msgid "Choose all"
+msgstr "ಎಲ್ಲವನ್ನೂ  ಆಯ್ದುಕೊಳ್ಳಿ"
+
+#: media/js/SelectFilter2.js:50
+msgid "Add"
+msgstr "ಸೇರಿಸಿ"
+
+#: media/js/SelectFilter2.js:52
+msgid "Remove"
+msgstr "ತೆಗೆದು ಹಾಕಿ"
+
+#: media/js/SelectFilter2.js:57
+#, perl-format
+msgid "Chosen %s"
+msgstr "%s ಆಯ್ದುಕೊಳ್ಳಲಾಗಿದೆ"
+
+#: media/js/SelectFilter2.js:58
+msgid "Select your choice(s) and click "
+msgstr "ನಿಮ್ಮ ಆಯ್ಕೆ(ಗಳ)ನ್ನು ಆರಿಸಿ ಮತ್ತು ಕ್ಲಿಕ್ಕಿಸಿ"
+
+#: media/js/SelectFilter2.js:63
+msgid "Clear all"
+msgstr "ಎಲ್ಲವನ್ನೂ  ತೆರವುಗೊಳಿಸಿ"
+
+#: media/js/actions.js:18 media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: media/js/actions.js:109 media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+
+#: media/js/actions.js:121 media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+
+#: media/js/actions.js:123 media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+
+#: media/js/calendar.js:24 media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "ಜನವರಿ ಫೆಬ್ರುವರಿ ಮಾರ್ಚ್ ಎಪ್ರಿಲ್ ಮೇ ಜೂನ್ ಜುಲೈ ಆಗಸ್ಟ್ ಸೆಪ್ಟೆಂಬರ್ ನವೆಂಬರ್ ಡಿಸೆಂಬರ್"
+
+#: media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "ರ ಸೋ ಮ ಬು ಗು ಶು ಶ"
+
+#: media/js/collapse.js:9 media/js/collapse.js.py:21
+#: media/js/collapse.min.js:1
+msgid "Show"
+msgstr ""
+
+#: media/js/collapse.js:16 media/js/collapse.min.js:1
+msgid "Hide"
+msgstr ""
+
+#: media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "ರವಿವಾರ ಸೋಮವಾರ ಮಂಗಳವಾರ ಬುಧವಾರ ಗುರುವಾರ ಶುಕ್ರವಾರ ಶನಿವಾರ"
+
+#: media/js/admin/DateTimeShortcuts.js:49
+#: media/js/admin/DateTimeShortcuts.js:84
+msgid "Now"
+msgstr "ಈಗ"
+
+#: media/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "ಗಡಿಯಾರ"
+
+#: media/js/admin/DateTimeShortcuts.js:80
+msgid "Choose a time"
+msgstr "ಸಮಯವೊಂದನ್ನು ಆರಿಸಿ"
+
+#: media/js/admin/DateTimeShortcuts.js:85
+msgid "Midnight"
+msgstr "ಮಧ್ಯರಾತ್ರಿ"
+
+#: media/js/admin/DateTimeShortcuts.js:86
+msgid "6 a.m."
+msgstr "ಬೆಳಗಿನ ೬ ಗಂಟೆ "
+
+#: media/js/admin/DateTimeShortcuts.js:87
+msgid "Noon"
+msgstr "ಮಧ್ಯಾಹ್ನ"
+
+#: media/js/admin/DateTimeShortcuts.js:91
+#: media/js/admin/DateTimeShortcuts.js:188
+msgid "Cancel"
+msgstr "ರದ್ದುಗೊಳಿಸಿ"
+
+#: media/js/admin/DateTimeShortcuts.js:133
+#: media/js/admin/DateTimeShortcuts.js:182
+msgid "Today"
+msgstr "ಈ ದಿನ"
+
+#: media/js/admin/DateTimeShortcuts.js:137
+msgid "Calendar"
+msgstr "ಪಂಚಾಂಗ"
+
+#: media/js/admin/DateTimeShortcuts.js:180
+msgid "Yesterday"
+msgstr "ನಿನ್ನೆ"
+
+#: media/js/admin/DateTimeShortcuts.js:184
+msgid "Tomorrow"
+msgstr "ನಾಳೆ"

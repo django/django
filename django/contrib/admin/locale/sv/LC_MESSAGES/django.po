@@ -1,0 +1,787 @@
+# Swedish translation of Django
+# Copyright (C) 2005-2007
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2008-05-26 11:15+0200\n"
+"Last-Translator: Mikko Hellsing <mikko@aino.se>\n"
+"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Swedish\n"
+"X-Poedit-Country: SWEDEN\n"
+
+#: actions.py:49
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Tog bort %(count)d %(items)s"
+
+#: actions.py:56 options.py:1185
+msgid "Are you sure?"
+msgstr "Är du säker?"
+
+#: actions.py:74
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Tag bort markerade %(verbose_name_plural)s"
+
+#: filterspecs.py:54
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>Av %s:</h3>\n"
+"<ul>\n"
+
+#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+msgid "All"
+msgstr "Alla"
+
+#: filterspecs.py:137
+msgid "Any date"
+msgstr "Alla datum"
+
+#: filterspecs.py:138
+msgid "Today"
+msgstr "Idag"
+
+#: filterspecs.py:141
+msgid "Past 7 days"
+msgstr "Senaste 7 dagarna"
+
+#: filterspecs.py:144
+msgid "This month"
+msgstr "Denna månad"
+
+#: filterspecs.py:146
+msgid "This year"
+msgstr "Detta år"
+
+#: filterspecs.py:175
+msgid "Yes"
+msgstr "Ja"
+
+#: filterspecs.py:175
+msgid "No"
+msgstr "Nej"
+
+#: filterspecs.py:182
+msgid "Unknown"
+msgstr "Okänt"
+
+#: forms.py:9
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Var god ange ett korrekt användarnamn och lösenord. Tänk på att skilja "
+"mellan gemener och versaler."
+
+#: forms.py:18
+msgid "Please log in again, because your session has expired."
+msgstr "Var god logga in igen, eftersom din session har förfallit."
+
+#: forms.py:37
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "Din e-postadress är inte ditt användarnamn. Försök med '%s' istället."
+
+#: helpers.py:19
+msgid "Action:"
+msgstr ""
+
+#: models.py:19
+msgid "action time"
+msgstr "händelsetid"
+
+#: models.py:22
+msgid "object id"
+msgstr "objektets id"
+
+#: models.py:23
+msgid "object repr"
+msgstr "objektets beskrivning"
+
+#: models.py:24
+msgid "action flag"
+msgstr "händelseflagga"
+
+#: models.py:25
+msgid "change message"
+msgstr "ändra meddelande"
+
+#: models.py:28
+msgid "log entry"
+msgstr "loggpost"
+
+#: models.py:29
+msgid "log entries"
+msgstr "loggposter"
+
+#: options.py:148 options.py:163
+msgid "None"
+msgstr "Inget"
+
+#: options.py:608
+#, python-format
+msgid "Changed %s."
+msgstr "Ändrade %s."
+
+#: options.py:608 options.py:618
+msgid "and"
+msgstr "och"
+
+#: options.py:613
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "Lade till %(name)s \"%(object)s\"."
+
+#: options.py:617
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "Ändrade %(list)s på %(name)s \"%(object)s\"."
+
+#: options.py:622
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "Tog bort %(name)s \"%(object)s\"."
+
+#: options.py:626
+msgid "No fields changed."
+msgstr "Inga fält ändrade."
+
+#: options.py:698
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" lades till."
+
+#: options.py:702 options.py:735
+msgid "You may edit it again below."
+msgstr "Du kan ändra det igen nedanför."
+
+#: options.py:712 options.py:745
+#, python-format
+msgid "You may add another %s below."
+msgstr "Du kan lägga till ytterligare %s nedanför."
+
+#: options.py:733
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" ändrades."
+
+#: options.py:741
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\" lades till. Du kan redigera objektet igen nedanför."
+
+#: options.py:795 options.py:1053
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+#: options.py:814
+#, fuzzy
+msgid "No action selected."
+msgstr "händelsetid"
+
+#: options.py:895
+#, python-format
+msgid "Add %s"
+msgstr "Lägg till %s"
+
+#: options.py:921 options.py:1162
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s-objekt med primärnyckel %(key)r finns inte."
+
+#: options.py:986
+#, python-format
+msgid "Change %s"
+msgstr "Ändra %s"
+
+#: options.py:1033
+msgid "Database error"
+msgstr "Databasfel"
+
+#: options.py:1095
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s ändrades."
+msgstr[1] "%(count)s %(name)s ändrades."
+
+#: options.py:1122
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: options.py:1127
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#: options.py:1178
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" togs bort."
+
+#: options.py:1215
+#, python-format
+msgid "Change history: %s"
+msgstr "Ändringshistorik: %s"
+
+#: sites.py:312 templates/admin/login.html:42
+#: templates/registration/password_reset_complete.html:14
+#: views/decorators.py:29
+msgid "Log in"
+msgstr "Logga in"
+
+#: sites.py:368
+msgid "Site administration"
+msgstr "Webbplatsadministration"
+
+#: sites.py:412
+#, python-format
+msgid "%s administration"
+msgstr "Administration av %s"
+
+#: widgets.py:75
+msgid "Date:"
+msgstr "Datum:"
+
+#: widgets.py:75
+msgid "Time:"
+msgstr "Tid:"
+
+#: widgets.py:121
+msgid "Lookup"
+msgstr "Uppslag"
+
+#: widgets.py:237
+msgid "Add Another"
+msgstr "Lägg till ytterligare"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "Sidan kunde inte hittas"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Vi beklagar men den begärda sidan hittades inte."
+
+#: templates/admin/500.html:4 templates/admin/app_index.html:8
+#: templates/admin/base.html:55 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:42
+#: templates/admin/delete_confirmation.html:6
+#: templates/admin/delete_selected_confirmation.html:6
+#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
+#: templates/admin/auth/user/change_password.html:12
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "Hem"
+
+#: templates/admin/500.html:4
+msgid "Server error"
+msgstr "Serverfel"
+
+#: templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Serverfel (500)"
+
+#: templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Serverfel <em>(500)</em>"
+
+#: templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Ett fel har uppstått. Administratören har meddelats via e-post och felet bör "
+"vara åtgärdat inom kort. Tack för visat tålamod."
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Kör markerade operationer"
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "Utför"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: templates/admin/actions.html:13
+#, fuzzy
+msgid "Clear selection"
+msgstr "borttaget av moderator"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "Välkommen,"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Documentation"
+msgstr "Dokumentation"
+
+#: templates/admin/base.html:41
+#: templates/admin/auth/user/change_password.html:16
+#: templates/admin/auth/user/change_password.html:49
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Change password"
+msgstr "Ändra lösenord"
+
+#: templates/admin/base.html:48
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Log out"
+msgstr "Logga ut"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django webbplatsadministration"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django-administration"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:29
+msgid "Add"
+msgstr "Lägg till"
+
+#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+msgid "History"
+msgstr "Historik"
+
+#: templates/admin/change_form.html:32
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:28
+msgid "View on site"
+msgstr "Visa på webbplats"
+
+#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:25
+#: templates/registration/password_change_form.html:16
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Rätta till felet nedan."
+msgstr[1] "Rätta till felen nedan."
+
+#: templates/admin/change_list.html:64
+#, python-format
+msgid "Add %(name)s"
+msgstr "Lägg till %(name)s"
+
+#: templates/admin/change_list.html:84
+msgid "Filter"
+msgstr "Filter"
+
+#: templates/admin/delete_confirmation.html:10
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "Radera"
+
+#: templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Att ta bort %(object_name)s '%(escaped_object)s' skulle innebära att "
+"relaterade objekt togs bort, men ditt konto har inte rättigheter att ta bort "
+"följande objekttyper:"
+
+#: templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Är du säker på att du vill ta bort %(object_name)s \"%(escaped_object)s\"? "
+"Följande relaterade objekt kommer att tas bort:"
+
+#: templates/admin/delete_confirmation.html:28
+#: templates/admin/delete_selected_confirmation.html:33
+msgid "Yes, I'm sure"
+msgstr "Ja, jag är säker"
+
+#: templates/admin/delete_selected_confirmation.html:9
+msgid "Delete multiple objects"
+msgstr "Tog bort %(name)s \"%(object)s\"."
+
+#: templates/admin/delete_selected_confirmation.html:15
+#, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+"Att ta bort %(object_name)s skulle innebära att relaterade objekt togs bort, "
+"men ditt konto har inte rättigheter att ta bort följande objekttyper:"
+
+#: templates/admin/delete_selected_confirmation.html:22
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+"Är du säker på att du vill ta bort %(object_name)s objekten? Följande "
+"relaterade objekt kommer att tas bort:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Av %(filter_title)s "
+
+#: templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "Modeller tillgängliga i applikationen %(name)s."
+
+#: templates/admin/index.html:35
+msgid "Change"
+msgstr "Ändra"
+
+#: templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr "Du har inte rättigheter att redigera något."
+
+#: templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr "Senaste Händelser"
+
+#: templates/admin/index.html:54
+msgid "My Actions"
+msgstr "Mina händelser"
+
+#: templates/admin/index.html:58
+msgid "None available"
+msgstr "Inga tillgängliga"
+
+#: templates/admin/index.html:72
+#, fuzzy
+msgid "Unknown content"
+msgstr "Okänt"
+
+#: templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Någonting är fel med din databasinstallation. Se till att de rätta "
+"databastabellerna har skapats och att databasen är läsbar av rätt användare."
+
+#: templates/admin/login.html:33
+msgid "Username:"
+msgstr "Användarnamn:"
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "Lösenord:"
+
+#: templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "Datum tid"
+
+#: templates/admin/object_history.html:23
+msgid "User"
+msgstr "Användare"
+
+#: templates/admin/object_history.html:24
+msgid "Action"
+msgstr "Händelse"
+
+#: templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Detta objekt har ingen ändringshistorik. Det lades antagligen inte till via "
+"denna administrationssida."
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Visa alla"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Spara"
+
+#: templates/admin/search_form.html:8
+#, fuzzy
+msgid "Search"
+msgstr "mars"
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s totalt"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "Spara som ny"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "Spara och lägg till ny"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "Spara och fortsätt redigera"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Ange först ett användarnamn och ett lösenord. Efter det kommer du att få "
+"fler användaralternativ."
+
+#: templates/admin/auth/user/add_form.html:8
+#, fuzzy
+msgid "Enter a username and password."
+msgstr "Fyll i lösenord"
+
+#: templates/admin/auth/user/change_password.html:29
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Ange nytt lösenord för användare <strong>%(username)s</strong>."
+
+#: templates/admin/auth/user/change_password.html:36
+msgid "Password"
+msgstr "Lösenord"
+
+#: templates/admin/auth/user/change_password.html:42
+#: templates/registration/password_change_form.html:38
+msgid "Password (again)"
+msgstr "Lösenord (igen)"
+
+#: templates/admin/auth/user/change_password.html:43
+msgid "Enter the same password as above, for verification."
+msgstr "Fyll i samma lösenord som ovan för verifiering."
+
+#: templates/admin/edit_inline/stacked.html:67
+#: templates/admin/edit_inline/tabular.html:113
+#, fuzzy, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "%(verbose_name)s togs bort."
+
+#: templates/admin/edit_inline/stacked.html:70
+#: templates/admin/edit_inline/tabular.html:116
+msgid "Remove"
+msgstr "Tag bort"
+
+#: templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr "Radera?"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Tack för att du spenderade lite kvalitetstid med webbplatsen idag."
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Logga in igen"
+
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:20
+msgid "Password change"
+msgstr "Ändra lösenord"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_done.html:11
+msgid "Password change successful"
+msgstr "Lösenordet ändrades"
+
+#: templates/registration/password_change_done.html:13
+msgid "Your password was changed."
+msgstr "Ditt lösenord har ändrats."
+
+#: templates/registration/password_change_form.html:22
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Var god fyll i ditt gamla lösenord för säkerhets skull och skriv sedan in "
+"ditt nya lösenord två gånger så vi kan kontrollera att du skrev det rätt."
+
+#: templates/registration/password_change_form.html:28
+msgid "Old password"
+msgstr "Gammalt lösenord"
+
+#: templates/registration/password_change_form.html:33
+msgid "New password"
+msgstr "Nytt lösenord"
+
+#: templates/registration/password_change_form.html:44
+#: templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "Ändra mitt lösenord"
+
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
+#: templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "Nollställ lösenord"
+
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr "Nollställning av lösenord klar"
+
+#: templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Ditt lösenord har ändrats.  Du kan nu logga in."
+
+#: templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr "Bekräftelse av lösenordsnollställning"
+
+#: templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr "Fyll i lösenord"
+
+#: templates/registration/password_reset_confirm.html:14
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Var god fyll i ditt nya lösenord två gånger så vi kan kontrollera att du "
+"skrev det rätt."
+
+#: templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "Nytt lösenord:"
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "Bekräfta lösenord:"
+
+#: templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr "Lösenordsnollställning misslyckad"
+
+#: templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Länken för lösenordsnollställning var felaktig, möjligen därför att den "
+"redan använts.  Var god skicka en ny nollställningsförfrågan."
+
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Lösenordsnollställning lyckades"
+
+#: templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"Vi har skickat ett e-postmeddelande med instruktioner för att ändra ditt "
+"lösenord till den e-postaddress du angivit. Det bör anlända inom kort."
+
+#: templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr ""
+"Du får detta e-postbrev eftersom du bad om att få lösenordet nollställt"
+
+#: templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "för ditt användarkonto på %(site_name)s"
+
+#: templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "Var god gå till följande sida och välj ett nytt lösenord:"
+
+#: templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "Ditt användarnamn (i fall du skulle ha glömt det):"
+
+#: templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "Tack för att du använder vår webbplats!"
+
+#: templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s-teamet"
+
+#: templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+"Glömt ditt lösenord? Fyll i din e-postadress nedan så skickar vi ett e-"
+"postmeddelande med instruktioner för hur du ställer in ett nytt."
+
+#: templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "E-postadress:"
+
+#: templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Nollställ mitt lösenord"
+
+#: templatetags/admin_list.py:273
+msgid "All dates"
+msgstr "Alla datum"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "Välj %s"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s to change"
+msgstr "Välj %s att ändra"

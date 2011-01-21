@@ -1,0 +1,143 @@
+# translation of djangojs.po to tamil
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 20:56+0100\n"
+"PO-Revision-Date: 2007-03-14 16:40+0530\n"
+"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
+"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: media/js/SelectFilter2.js:37
+#, perl-format
+msgid "Available %s"
+msgstr "%s இருக்கிறதா "
+
+#: media/js/SelectFilter2.js:45
+msgid "Choose all"
+msgstr "எல்லாவற்றையும் தேர்ந்த்தெடுக்க"
+
+#: media/js/SelectFilter2.js:50
+msgid "Add"
+msgstr "சேர்க்க"
+
+#: media/js/SelectFilter2.js:52
+msgid "Remove"
+msgstr "அழிக்க"
+
+#: media/js/SelectFilter2.js:57
+#, perl-format
+msgid "Chosen %s"
+msgstr "%s தேர்ந்த்தெடுக்கப்பட்ட"
+
+#: media/js/SelectFilter2.js:58
+msgid "Select your choice(s) and click "
+msgstr "தேவையானவற்றை தேர்ந்த்தெடுத்து கிளிக் செய்க"
+
+#: media/js/SelectFilter2.js:63
+msgid "Clear all"
+msgstr "எல்லாவற்றையும் அழிக்க "
+
+#: media/js/actions.js:18 media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: media/js/actions.js:109 media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+
+#: media/js/actions.js:121 media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+
+#: media/js/actions.js:123 media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+
+#: media/js/calendar.js:24 media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "ஜனவரி பிப்ரவரி மார்ச் ஏப்ரல் மே ஜூன் ஜூலை ஆகஸ்டு செப்டம்பர் அக்டோபர் நவம்பர் டிசம்பர்"
+
+#: media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "ஞா தி செ பு வி வெ ச"
+
+#: media/js/collapse.js:9 media/js/collapse.js.py:21
+#: media/js/collapse.min.js:1
+msgid "Show"
+msgstr ""
+
+#: media/js/collapse.js:16 media/js/collapse.min.js:1
+msgid "Hide"
+msgstr ""
+
+#: media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "ஞாயிறு திங்கள் செவ்வாய் புதன்  வியாழன் வெள்ளி சனி "
+
+#: media/js/admin/DateTimeShortcuts.js:49
+#: media/js/admin/DateTimeShortcuts.js:84
+msgid "Now"
+msgstr "இப்பொழுது "
+
+#: media/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "கடிகாரம் "
+
+#: media/js/admin/DateTimeShortcuts.js:80
+msgid "Choose a time"
+msgstr "ஒரு நேரத்தை தேர்ந்த்தெடுக்க  "
+
+#: media/js/admin/DateTimeShortcuts.js:85
+msgid "Midnight"
+msgstr "நடு இரவு "
+
+#: media/js/admin/DateTimeShortcuts.js:86
+msgid "6 a.m."
+msgstr "காலை 6 மணி  "
+
+#: media/js/admin/DateTimeShortcuts.js:87
+msgid "Noon"
+msgstr "மதியம் "
+
+#: media/js/admin/DateTimeShortcuts.js:91
+#: media/js/admin/DateTimeShortcuts.js:188
+msgid "Cancel"
+msgstr "வேண்டாம் "
+
+#: media/js/admin/DateTimeShortcuts.js:133
+#: media/js/admin/DateTimeShortcuts.js:182
+msgid "Today"
+msgstr "இன்று "
+
+#: media/js/admin/DateTimeShortcuts.js:137
+msgid "Calendar"
+msgstr "நாள்காட்டி  "
+
+#: media/js/admin/DateTimeShortcuts.js:180
+msgid "Yesterday"
+msgstr "நேற்று "
+
+#: media/js/admin/DateTimeShortcuts.js:184
+msgid "Tomorrow"
+msgstr "நாளை"

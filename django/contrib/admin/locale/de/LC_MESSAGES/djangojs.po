@@ -1,0 +1,154 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 21:33+0100\n"
+"PO-Revision-Date: 2008-06-23 21:02+0100\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: media/js/SelectFilter2.js:37
+#, perl-format
+msgid "Available %s"
+msgstr "Verfügbare %s"
+
+#: media/js/SelectFilter2.js:45
+msgid "Choose all"
+msgstr "Alles auswählen"
+
+#: media/js/SelectFilter2.js:50
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: media/js/SelectFilter2.js:52
+msgid "Remove"
+msgstr "Entfernen"
+
+#: media/js/SelectFilter2.js:57
+#, perl-format
+msgid "Chosen %s"
+msgstr "Ausgewählte %s"
+
+#: media/js/SelectFilter2.js:58
+msgid "Select your choice(s) and click "
+msgstr "Auswahl treffen und Klick auf"
+
+#: media/js/SelectFilter2.js:63
+msgid "Clear all"
+msgstr "Alles abwählen"
+
+#: media/js/actions.js:18 media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s von %(cnt)s ausgewählt"
+msgstr[1] "%(sel)s von %(cnt)s ausgewählt"
+
+#: media/js/actions.js:109 media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Sie haben Änderungen an editierbaren Feldern vorgenommen und nicht "
+"gespeichert. Wollen Sie die Aktion trotzdem ausführen und Ihre Änderungen "
+"verwerfen?"
+
+#: media/js/actions.js:121 media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Sie haben eine Aktion ausgewählt, aber ihre vorgenommenen Änderungen nicht "
+"gespeichert. Klicken Sie OK, um dennoch zu speichern. Danach müssen Sie die "
+"Aktion erneut ausführen."
+
+#: media/js/actions.js:123 media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Sie haben eine Aktion ausgewählt, aber keine Änderungen an editierbaren "
+"Feldern vorgenommen. Sie wollten wahrscheinlich auf 'Ausführen' und nicht "
+"auf 'Speichern' klicken."
+
+#: media/js/calendar.js:24 media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Januar Februar März April Mai Juni Juli August September Oktober November "
+"Dezember"
+
+#: media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "S M D M D F S"
+
+#: media/js/collapse.js:9 media/js/collapse.js.py:21
+#: media/js/collapse.min.js:1
+msgid "Show"
+msgstr "Einblenden"
+
+#: media/js/collapse.js:16 media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Ausblenden"
+
+#: media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag"
+
+#: media/js/admin/DateTimeShortcuts.js:49
+#: media/js/admin/DateTimeShortcuts.js:84
+msgid "Now"
+msgstr "Jetzt"
+
+#: media/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Uhr"
+
+#: media/js/admin/DateTimeShortcuts.js:80
+msgid "Choose a time"
+msgstr "Uhrzeit"
+
+#: media/js/admin/DateTimeShortcuts.js:85
+msgid "Midnight"
+msgstr "Mitternacht"
+
+#: media/js/admin/DateTimeShortcuts.js:86
+msgid "6 a.m."
+msgstr "6 Uhr"
+
+#: media/js/admin/DateTimeShortcuts.js:87
+msgid "Noon"
+msgstr "Mittag"
+
+#: media/js/admin/DateTimeShortcuts.js:91
+#: media/js/admin/DateTimeShortcuts.js:188
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: media/js/admin/DateTimeShortcuts.js:133
+#: media/js/admin/DateTimeShortcuts.js:182
+msgid "Today"
+msgstr "Heute"
+
+#: media/js/admin/DateTimeShortcuts.js:137
+msgid "Calendar"
+msgstr "Kalender"
+
+#: media/js/admin/DateTimeShortcuts.js:180
+msgid "Yesterday"
+msgstr "Gestern"
+
+#: media/js/admin/DateTimeShortcuts.js:184
+msgid "Tomorrow"
+msgstr "Morgen"

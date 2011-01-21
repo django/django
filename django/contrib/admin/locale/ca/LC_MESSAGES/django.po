@@ -1,0 +1,790 @@
+# translation of django.po to Catalan
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:21+0100\n"
+"PO-Revision-Date: 2009-03-24 13:28+0100\n"
+"Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
+"Language-Team: Catalan <ca@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: actions.py:49
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Eliminat/s %(count)d %(items)s satisfactòriament."
+
+#: actions.py:56 options.py:1185
+msgid "Are you sure?"
+msgstr "N'esteu segur?"
+
+#: actions.py:74
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Eliminar els %(verbose_name_plural)s seleccionats"
+
+#: filterspecs.py:54
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>Per %s:</h3>\n"
+"<ul>\n"
+
+#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+msgid "All"
+msgstr "Tots"
+
+#: filterspecs.py:137
+msgid "Any date"
+msgstr "Qualsevol data"
+
+#: filterspecs.py:138
+msgid "Today"
+msgstr "Avui"
+
+#: filterspecs.py:141
+msgid "Past 7 days"
+msgstr "Últims 7 dies"
+
+#: filterspecs.py:144
+msgid "This month"
+msgstr "Aquest mes"
+
+#: filterspecs.py:146
+msgid "This year"
+msgstr "Aquest any"
+
+#: filterspecs.py:175
+msgid "Yes"
+msgstr "Sí"
+
+#: filterspecs.py:175
+msgid "No"
+msgstr "No"
+
+#: filterspecs.py:182
+msgid "Unknown"
+msgstr "Desconegut"
+
+#: forms.py:9
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Si us plau, introduïu un nom d'usuari i contrasenya vàlids. Tingueu en "
+"compte que tots dos camps son sensibles a majúscules i minúscules."
+
+#: forms.py:18
+msgid "Please log in again, because your session has expired."
+msgstr "Si us plau, entreu de nou perquè la vostra sessió ha caducat."
+
+#: forms.py:37
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr ""
+"La vostra adreça de correu no és el vostre nom d'usuari. Provi '%s' en el "
+"seu lloc."
+
+#: helpers.py:19
+msgid "Action:"
+msgstr "Acció:"
+
+#: models.py:19
+msgid "action time"
+msgstr "moment de l'acció"
+
+#: models.py:22
+msgid "object id"
+msgstr "id de l'objecte"
+
+#: models.py:23
+msgid "object repr"
+msgstr "'repr' de l'objecte"
+
+#: models.py:24
+msgid "action flag"
+msgstr "indicador de l'acció"
+
+#: models.py:25
+msgid "change message"
+msgstr "missatge del canvi"
+
+#: models.py:28
+msgid "log entry"
+msgstr "entrada del registre"
+
+#: models.py:29
+msgid "log entries"
+msgstr "entrades del registre"
+
+#: options.py:148 options.py:163
+msgid "None"
+msgstr "cap"
+
+#: options.py:608
+#, python-format
+msgid "Changed %s."
+msgstr "Modificat %s."
+
+#: options.py:608 options.py:618
+msgid "and"
+msgstr "i"
+
+#: options.py:613
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "Afegit %(name)s \"%(object)s\""
+
+#: options.py:617
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "Modificat %(list)s per a %(name)s \"%(object)s\"."
+
+#: options.py:622
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "Eliminat %(name)s \"%(object)s\"."
+
+#: options.py:626
+msgid "No fields changed."
+msgstr "Cap camp modificat."
+
+#: options.py:698
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "El/la %(name)s \"%(obj)s\" ha estat afegit/da amb èxit."
+
+#: options.py:702 options.py:735
+msgid "You may edit it again below."
+msgstr "Podeu editar-lo de nou a sota."
+
+#: options.py:712 options.py:745
+#, python-format
+msgid "You may add another %s below."
+msgstr "Podeu afegir un altre %s a sota."
+
+#: options.py:733
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "S'ha modificat amb èxit el/la %(name)s \"%(obj)s."
+
+#: options.py:741
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"S'ha afegit amb èxit el/la %(name)s \"%(obj)s\". Pot editar-lo de nou a sota."
+
+#: options.py:795 options.py:1053
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Heu de seleccionar els elements per poder realitzar-hi accions. No heu "
+"seleccionat cap element."
+
+#: options.py:814
+msgid "No action selected."
+msgstr "no heu seleccionat cap acció"
+
+#: options.py:895
+#, python-format
+msgid "Add %s"
+msgstr "Afegir %s"
+
+#: options.py:921 options.py:1162
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "No existeix cap objecte %(name)s amb la clau primària %(key)r."
+
+#: options.py:986
+#, python-format
+msgid "Change %s"
+msgstr "Modificar %s"
+
+#: options.py:1033
+msgid "Database error"
+msgstr "Error de base de dades"
+
+#: options.py:1095
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s s'ha modificat amb èxit."
+msgstr[1] "%(count)s %(name)s s'han modificat amb èxit."
+
+#: options.py:1122
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s seleccionat(s)"
+msgstr[1] "Tots %(total_count)s seleccionat(s)"
+
+#: options.py:1127
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 de %(cnt)s seleccionats"
+
+#: options.py:1178
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "El/la %(name)s \"%(obj)s\" s'ha eliminat amb èxit."
+
+#: options.py:1215
+#, python-format
+msgid "Change history: %s"
+msgstr "Modificar històric: %s"
+
+#: sites.py:312 templates/admin/login.html:42
+#: templates/registration/password_reset_complete.html:14
+#: views/decorators.py:29
+msgid "Log in"
+msgstr "Iniciar sessió"
+
+#: sites.py:368
+msgid "Site administration"
+msgstr "Administració del lloc"
+
+#: sites.py:412
+#, python-format
+msgid "%s administration"
+msgstr "Administració de %s"
+
+#: widgets.py:75
+msgid "Date:"
+msgstr "Data:"
+
+#: widgets.py:75
+msgid "Time:"
+msgstr "Hora:"
+
+#: widgets.py:121
+msgid "Lookup"
+msgstr "Cercar"
+
+#: widgets.py:237
+msgid "Add Another"
+msgstr "Afegir-ne un altre"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "No s'ha pogut trobar la pàgina"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Ho sentim, però no s'ha pogut trobar la pàgina sol·licitada"
+
+#: templates/admin/500.html:4 templates/admin/app_index.html:8
+#: templates/admin/base.html:55 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:42
+#: templates/admin/delete_confirmation.html:6
+#: templates/admin/delete_selected_confirmation.html:6
+#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
+#: templates/admin/auth/user/change_password.html:12
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "Inici"
+
+#: templates/admin/500.html:4
+msgid "Server error"
+msgstr "Error del servidor"
+
+#: templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Error del servidor (500)"
+
+#: templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Error del servidor <em>(500)</em>"
+
+#: templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"S'ha produït un error. Se n'ha informat els administradors del lloc per "
+"correu electrònic, i hauria d'arreglar-se en breu. Gràcies per la vostra "
+"paciència."
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Executar l'acció seleccionada"
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "Anar"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Feu clic aquí per seleccionar els objectes a totes les pàgines"
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Seleccioneu tots %(total_count)s %(module_name)s"
+
+#: templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "Netejar la selecció"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "Benvingut/da,"
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Documentation"
+msgstr "Documentació"
+
+#: templates/admin/base.html:41
+#: templates/admin/auth/user/change_password.html:16
+#: templates/admin/auth/user/change_password.html:49
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Change password"
+msgstr "Canviar contrasenya"
+
+#: templates/admin/base.html:48
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Log out"
+msgstr "Finalitzar sessió"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Lloc administratiu de Django"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Administració de Django"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:29
+msgid "Add"
+msgstr "Afegir"
+
+#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+msgid "History"
+msgstr "Històric"
+
+#: templates/admin/change_form.html:32
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:28
+msgid "View on site"
+msgstr "Veure al lloc"
+
+#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:25
+#: templates/registration/password_change_form.html:16
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Si us plau, corregiu l'error mostrat a sota."
+msgstr[1] "Si us plau, corregiu els errors mostrats a sota."
+
+#: templates/admin/change_list.html:64
+#, python-format
+msgid "Add %(name)s"
+msgstr "Afegir %(name)s"
+
+#: templates/admin/change_list.html:84
+msgid "Filter"
+msgstr "Filtre"
+
+#: templates/admin/delete_confirmation.html:10
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "Eliminar"
+
+#: templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Eliminar el/la %(object_name)s '%(escaped_object)s' provocaria l'eliminació "
+"d'objectes relacionats, però el vostre compte no te permisos per esborrar "
+"els tipus d'objecte següents:"
+
+#: templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Esteu segurs de voler esborrar els/les %(object_name)s \"%(escaped_object)s"
+"\"? S'esborraran els següents elements relacionats:"
+
+#: templates/admin/delete_confirmation.html:28
+#: templates/admin/delete_selected_confirmation.html:33
+msgid "Yes, I'm sure"
+msgstr "Sí, n'estic segur"
+
+#: templates/admin/delete_selected_confirmation.html:9
+msgid "Delete multiple objects"
+msgstr "Eliminar múltiples objectes"
+
+#: templates/admin/delete_selected_confirmation.html:15
+#, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+"Eliminar el/la %(object_name)s provocaria l'eliminació d'objectes "
+"relacionats, però el vostre compte no te permisos per esborrar els tipus "
+"d'objecte següents:"
+
+#: templates/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+"Esteu segur de voler esborrar els/les %(object_name)s seleccionats? Tots "
+"aquests objectes i els seus elements relacionats s'esborraran:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Per %(filter_title)s "
+
+#: templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "Models disponibles a l'aplicació %(name)s."
+
+#: templates/admin/index.html:35
+msgid "Change"
+msgstr "Modificar"
+
+#: templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr "No teniu permís per editar res."
+
+#: templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr "Accions recents"
+
+#: templates/admin/index.html:54
+msgid "My Actions"
+msgstr "Les meves accions"
+
+#: templates/admin/index.html:58
+msgid "None available"
+msgstr "Cap disponible"
+
+#: templates/admin/index.html:72
+msgid "Unknown content"
+msgstr "Contingut desconegut"
+
+#: templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Hi ha algun problema a la instal·lació de la vostra base de dades. Assegureu-"
+"vos que s'han creat les taules adients, i que la base de dades és llegible "
+"per l'usuari apropiat."
+
+#: templates/admin/login.html:33
+msgid "Username:"
+msgstr "Nom d'usuari:"
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "Contrasenya:"
+
+#: templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "Data/hora"
+
+#: templates/admin/object_history.html:23
+msgid "User"
+msgstr "Usuari"
+
+#: templates/admin/object_history.html:24
+msgid "Action"
+msgstr "Acció"
+
+#: templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Aquest objecte no té historial de canvis. Probablement no es va afegir "
+"utilitzant aquest lloc administratiu."
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Mostrar tots"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Desar"
+
+#: templates/admin/search_form.html:8
+msgid "Search"
+msgstr "Cerca"
+
+#: templates/admin/search_form.html:10
+#, fuzzy, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(total_count)s seleccionat(s)"
+msgstr[1] "Tots %(total_count)s seleccionat(s)"
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s en total"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "Desar com a nou"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "Desar i afegir-ne un de nou"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "Desar i continuar editant"
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Primer, entreu un nom d'usuari i una contrasenya. Després podreu editar més "
+"opcions de l'usuari."
+
+#: templates/admin/auth/user/add_form.html:8
+#, fuzzy
+msgid "Enter a username and password."
+msgstr "Introduïu la nova contrasenya"
+
+#: templates/admin/auth/user/change_password.html:29
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Introduïu una contrasenya per l'usuari <strong>%(username)s</strong>"
+
+#: templates/admin/auth/user/change_password.html:36
+msgid "Password"
+msgstr "Contrasenya"
+
+#: templates/admin/auth/user/change_password.html:42
+#: templates/registration/password_change_form.html:38
+msgid "Password (again)"
+msgstr "Contrasenya (de nou)"
+
+#: templates/admin/auth/user/change_password.html:43
+msgid "Enter the same password as above, for verification."
+msgstr "Introduïu la mateixa contrasenya de dalt, per fer-ne la verificació."
+
+#: templates/admin/edit_inline/stacked.html:67
+#: templates/admin/edit_inline/tabular.html:113
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Afegir un/a altre/a %(verbose_name)s."
+
+#: templates/admin/edit_inline/stacked.html:70
+#: templates/admin/edit_inline/tabular.html:116
+msgid "Remove"
+msgstr "Eliminar"
+
+#: templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr "Eliminar?"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Gràcies per passar una estona de qualitat al web durant el dia d'avui."
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Iniciar sessió de nou"
+
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:20
+msgid "Password change"
+msgstr "Canvi de contrasenya"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_done.html:11
+msgid "Password change successful"
+msgstr "Contrasenya canviada amb èxit"
+
+#: templates/registration/password_change_done.html:13
+msgid "Your password was changed."
+msgstr "La seva contrasenya ha estat canviada."
+
+#: templates/registration/password_change_form.html:22
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Si us plau, introduïu la vostra contrasenya antiga, per seguretat, i tot "
+"seguit introduïu la vostra contrasenya nova dues vegades per verificar que "
+"l'heu escrita correctament."
+
+#: templates/registration/password_change_form.html:28
+msgid "Old password"
+msgstr "Contrasenya antiga"
+
+#: templates/registration/password_change_form.html:33
+msgid "New password"
+msgstr "Contrasenya nova"
+
+#: templates/registration/password_change_form.html:44
+#: templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "Canviar la meva contrasenya:"
+
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
+#: templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "Restablir contrasenya"
+
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr "Contrasenya restablerta"
+
+#: templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+"S'ha canviat la vostra contrasenya. Ara podeu continuar i iniciar sessió."
+
+#: templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr "Confirmació de restabliment de contrasenya"
+
+#: templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr "Introduïu la nova contrasenya"
+
+#: templates/registration/password_reset_confirm.html:14
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Si us plau, introduïu la vostra nova contrasenya dues vegades, per verificar "
+"que l'heu escrita correctament."
+
+#: templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "Contrasenya nova:"
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "Confirmar contrasenya:"
+
+#: templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr "Restabliment de contrasenya fallat"
+
+#: templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"L'enllaç de restabliment de contrasenya era invàlid, potser perquè ja s'ha "
+"utilitzat. Si us plau, sol·liciteu un nou reestabliment de contrasenya."
+
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Restabliment de contrasenya amb èxit"
+
+#: templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"Us hem enviat les instruccions per canviar la vostra contrasenya a l'adreça "
+"de correu electrònic que ens heu indicat. L'hauríeu de rebre en breu."
+
+#: templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr ""
+"Esteu rebent aquest missatge perquè vau sol·licitar un restabliment de "
+"contrasenya."
+
+#: templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "del vostre compte d'usuari a %(site_name)s."
+
+#: templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "Si us plau, aneu a la pàgina següent i escolliu una nova contrasenya:"
+
+#: templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "El vostre nom d'usuari, en cas que l'hagueu oblidat:"
+
+#: templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "Gràcies per fer ús del nostre lloc!"
+
+#: templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "L'equip de %(site_name)s"
+
+#: templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+"Heu oblidat la vostra contrasenya? Introduïu la vostra adreça de correu "
+"electrònic a sota, i us enviarem instruccions per canviar-la."
+
+#: templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Adreça de correu electrònic:"
+
+#: templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Restablir la meva contrasenya"
+
+#: templatetags/admin_list.py:273
+msgid "All dates"
+msgstr "Totes les dates"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "Seleccioneu %s"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s to change"
+msgstr "Seleccioneu %s per modificar"

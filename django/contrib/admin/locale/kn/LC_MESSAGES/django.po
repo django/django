@@ -1,0 +1,802 @@
+# Kannada translation of Django.
+# Copyright (C) 2007 Translation Team <translation@sampada.info>
+# This file is distributed under the same license as the Django package.
+# Kannada Localization Team <translation@sampada.info>, 2007.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:22+0100\n"
+"PO-Revision-Date: 2007-01-08 20:22+0530\n"
+"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
+"Language-Team: Kannada <translation@sampada.info>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: actions.py:49
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr ""
+
+#: actions.py:56 options.py:1185
+msgid "Are you sure?"
+msgstr "ಖಚಿತಪಡಿಸುವಿರಾ? "
+
+#: actions.py:74
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
+
+#: filterspecs.py:54
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>%s ಇಂದ :</h3>\n"
+"<ul>\n"
+
+#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+msgid "All"
+msgstr "ಎಲ್ಲಾ"
+
+#: filterspecs.py:137
+msgid "Any date"
+msgstr "ಯಾವುದೇ ದಿನಾಂಕ"
+
+#: filterspecs.py:138
+msgid "Today"
+msgstr "ಈದಿನ"
+
+#: filterspecs.py:141
+msgid "Past 7 days"
+msgstr "ಕಳೆದ ೭ ದಿನಗಳು"
+
+#: filterspecs.py:144
+msgid "This month"
+msgstr "ಈ ತಿಂಗಳು"
+
+#: filterspecs.py:146
+msgid "This year"
+msgstr "ಈ ವರ್ಷ"
+
+#: filterspecs.py:175
+msgid "Yes"
+msgstr "ಹೌದು"
+
+#: filterspecs.py:175
+msgid "No"
+msgstr "ಇಲ್ಲ"
+
+#: filterspecs.py:182
+msgid "Unknown"
+msgstr "ಗೊತ್ತಿಲ್ಲ(ದ/ದ್ದು)"
+
+#: forms.py:9
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"ದಯವಿಟ್ಟು ಸರಿಯಾದ ಬಳಕೆದಾರ-ಪದ ಮತ್ತು  ಪ್ರವೇಶಪದ ಬರೆಯಿರಿ .ಎರಡೂ ಇಂಗ್ಲೀಷಿನ  ಸಣ್ಣ ಮತ್ತು "
+"ದೊಡ್ಡ ಅಕ್ಷರ ಸಂವೇದಿ  ಎಂಬುದನ್ನು ಗಮನದಲ್ಲಿಡಿ"
+
+#: forms.py:18
+#, fuzzy
+msgid "Please log in again, because your session has expired."
+msgstr ""
+"ದಯವಿಟ್ಟು ಇನ್ನೊಮ್ಮೆ ಒಳಬನ್ನಿ (ಲಾಗಿನ್ ಮಾಡಿ) . ನಿಮ್ಮ ಅಧಿವೇಶನ ಕೊನೆಗೊಂಡಿದೆ. ಚಿಂತಿಸಬೇಡಿ:"
+"ನಿಮ್ಮ ಸಲ್ಲಿಕೆಯನ್ನು ಉಳಿಸಲಾಗಿದೆ."
+
+#: forms.py:37
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "ನಿಮ್ಮ ವಿ-ಅಂಚೆ ವಿಳಾಸವು ನಿಮ್ಮ ಬಳಕೆದಾರ-ಹೆಸರಲ್ಲ; ಬದಲಾಗಿ '%s'  ಪ್ರಯತ್ನಿಸಿ."
+
+#: helpers.py:19
+#, fuzzy
+msgid "Action:"
+msgstr "ಕ್ರಮ(ಕ್ರಿಯೆ)"
+
+#: models.py:19
+msgid "action time"
+msgstr "ಕ್ರಮದ(ಕ್ರಿಯೆಯ) ಸಮಯ"
+
+#: models.py:22
+msgid "object id"
+msgstr "ವಸ್ತುವಿನ ಐಡಿ"
+
+#: models.py:23
+msgid "object repr"
+msgstr "ವಸ್ತು ಪ್ರಾತಿನಿಧ್ಯ"
+
+#: models.py:24
+msgid "action flag"
+msgstr "ಕ್ರಮದ(ಕ್ರಿಯೆಯ) ಪತಾಕೆ"
+
+#: models.py:25
+msgid "change message"
+msgstr "ಬದಲಾವಣೆಯ ಸಂದೇಶ/ಸಂದೇಶ ಬದಲಿಸಿ"
+
+#: models.py:28
+msgid "log entry"
+msgstr "ಲಾಗ್ ದಾಖಲೆ"
+
+#: models.py:29
+msgid "log entries"
+msgstr "ಲಾಗ್ ದಾಖಲೆಗಳು"
+
+#: options.py:148 options.py:163
+#, fuzzy
+msgid "None"
+msgstr "ಇಲ್ಲ"
+
+#: options.py:608
+#, python-format
+msgid "Changed %s."
+msgstr "%s ಬದಲಾಯಿಸಲಾಯಿತು."
+
+#: options.py:608 options.py:618
+msgid "and"
+msgstr "ಮತ್ತು"
+
+#: options.py:613
+#, fuzzy, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "%(name)s ಸೇರಿಸಿ"
+
+#: options.py:617
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr ""
+
+#: options.py:622
+#, fuzzy, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "ಸಂಬಂಧಿಸಿದ `%s.%s` ವಸ್ತುಗಳು"
+
+#: options.py:626
+msgid "No fields changed."
+msgstr "ಯಾವುದೇ ಅಂಶಗಳು ಬದಲಾಗಲಿಲ್ಲ."
+
+#: options.py:698
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr " %(name)s \"%(obj)s\" ಅನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಯಿತು."
+
+#: options.py:702 options.py:735
+msgid "You may edit it again below."
+msgstr "ನೀವು ಅದನ್ನು ಕೆಳಗೆ ಮತ್ತೆ ಬದಲಾಯಿಸಬಹುದು."
+
+#: options.py:712 options.py:745
+#, python-format
+msgid "You may add another %s below."
+msgstr "ನೀವು ಕೆಳಗೆ ಇನ್ನೊಂದು %s ಸೇರಿಸಬಹುದು."
+
+#: options.py:733
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" ಸಫಲವಾಗಿ ಬದಲಾಯಿಸಲಾಯಿತು."
+
+#: options.py:741
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"%(name)s \"%(obj)s\" ಅನ್ನು  ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಯಿತು. ನೀವು ಕೆಳಗೆ ಅದನ್ನು ಮತ್ತೆ "
+"ಬದಲಾಯಿಸಬಹುದು."
+
+#: options.py:795 options.py:1053
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+#: options.py:814
+#, fuzzy
+msgid "No action selected."
+msgstr "ಕ್ರಮದ(ಕ್ರಿಯೆಯ) ಸಮಯ"
+
+#: options.py:895
+#, python-format
+msgid "Add %s"
+msgstr "%s ಸೇರಿಸಿ"
+
+#: options.py:921 options.py:1162
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+#: options.py:986
+#, python-format
+msgid "Change %s"
+msgstr "%s ಅನ್ನು ಬದಲಿಸು"
+
+#: options.py:1033
+msgid "Database error"
+msgstr "ದತ್ತಸಂಚಯದ ದೋಷ"
+
+#: options.py:1095
+#, fuzzy, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(name)s \"%(obj)s\" ಸಫಲವಾಗಿ ಬದಲಾಯಿಸಲಾಯಿತು."
+msgstr[1] "%(name)s \"%(obj)s\" ಸಫಲವಾಗಿ ಬದಲಾಯಿಸಲಾಯಿತು."
+
+#: options.py:1122
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: options.py:1127
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#: options.py:1178
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" ಯಶಸ್ವಿಯಾಗಿ ಅಳಿಸಲಾಯಿತು."
+
+#: options.py:1215
+#, python-format
+msgid "Change history: %s"
+msgstr "ಬದಲಾವಣೆಗಳ ಇತಿಹಾಸ: %s"
+
+#: sites.py:312 templates/admin/login.html:42
+#: templates/registration/password_reset_complete.html:14
+#: views/decorators.py:29
+msgid "Log in"
+msgstr "ಒಳಗೆ ಬನ್ನಿ"
+
+#: sites.py:368
+msgid "Site administration"
+msgstr "ತಾಣ ನಿರ್ವಹಣೆ"
+
+#: sites.py:412
+#, fuzzy, python-format
+msgid "%s administration"
+msgstr "ತಾಣ ನಿರ್ವಹಣೆ"
+
+#: widgets.py:75
+msgid "Date:"
+msgstr "ದಿನಾಂಕ:"
+
+#: widgets.py:75
+msgid "Time:"
+msgstr "ಸಮಯ:"
+
+#: widgets.py:121
+#, fuzzy
+msgid "Lookup"
+msgstr "ಹೊರಕ್ಕೆ ಹೋಗಿ"
+
+#: widgets.py:237
+#, fuzzy
+msgid "Add Another"
+msgstr "ಬಳಕೆದಾರನನ್ನು ಸೇರಿಸಿ"
+
+#: templates/admin/404.html:4 templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr "ಪುಟ ಸಿಗಲಿಲ್ಲ"
+
+#: templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "ಕ್ಷಮಿಸಿ, ನೀವು ಕೇಳಿದ ಪುಟ ಸಿಗಲಿಲ್ಲ"
+
+#: templates/admin/500.html:4 templates/admin/app_index.html:8
+#: templates/admin/base.html:55 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:42
+#: templates/admin/delete_confirmation.html:6
+#: templates/admin/delete_selected_confirmation.html:6
+#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
+#: templates/admin/auth/user/change_password.html:12
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "ಪ್ರಾರಂಭಸ್ಥಳ(ಮನೆ)"
+
+#: templates/admin/500.html:4
+msgid "Server error"
+msgstr "ಸರ್ವರ್ ದೋಷ"
+
+#: templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "ಸರ್ವರ್ ದೋಷ(೫೦೦)"
+
+#: templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "ಸರ್ವರ್ ದೋಷ<em>(೫೦೦)</em>"
+
+#: templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"ಇಲ್ಲಿ ಒಂದು ತಪ್ಪಾಗಿದೆ. ಅದನ್ನು ತಾಣದ ಆಡಳಿತಗಾರರಿಗೆ ವರದಿ ಮಾಡಲಾಗಿದ್ದು ಶೀಘ್ರದ್ದಲ್ಲಿ "
+"ಸರಿಪಡಿಸಲಾಗುವದು. ನಿಮ್ಮ ತಾಳ್ಮೆಗೆ ಧನ್ಯವಾದಗಳು."
+
+#: templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr ""
+
+#: templates/admin/actions.html:4
+msgid "Go"
+msgstr "ಹೋಗಿ"
+
+#: templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#: templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: templates/admin/actions.html:13
+#, fuzzy
+msgid "Clear selection"
+msgstr "ನಿಯಂತ್ರಕರು ಅಳಿಸಿದ್ದು"
+
+#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: templates/admin/base.html:28
+msgid "Welcome,"
+msgstr "ಸುಸ್ವಾಗತ."
+
+#: templates/admin/base.html:33
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Documentation"
+msgstr "ವಿವರಮಾಹಿತಿ"
+
+#: templates/admin/base.html:41
+#: templates/admin/auth/user/change_password.html:16
+#: templates/admin/auth/user/change_password.html:49
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Change password"
+msgstr "ಪ್ರವೇಶಪದ ಬದಲಿಸಿ"
+
+#: templates/admin/base.html:48
+#: templates/registration/password_change_done.html:4
+#: templates/registration/password_change_form.html:5
+msgid "Log out"
+msgstr "ಹೊರಕ್ಕೆ ಹೋಗಿ"
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "ಜಾಂಗೋ ತಾಣದ ಆಡಳಿತಗಾರರು"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "ಜಾಂಗೋ ಆಡಳಿತ"
+
+#: templates/admin/change_form.html:22 templates/admin/index.html:29
+msgid "Add"
+msgstr "ಸೇರಿಸಿ"
+
+#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+msgid "History"
+msgstr "ಚರಿತ್ರೆ"
+
+#: templates/admin/change_form.html:32
+#: templates/admin/edit_inline/stacked.html:9
+#: templates/admin/edit_inline/tabular.html:28
+msgid "View on site"
+msgstr "ತಾಣದಲ್ಲಿ ನೋಡಿ"
+
+#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:25
+#: templates/registration/password_change_form.html:16
+#, fuzzy
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪನ್ನು ಸರಿಪಡಿಸಿ ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪುಗಳನ್ನು ಸರಿಪಡಿಸಿ. "
+msgstr[1] "ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪನ್ನು ಸರಿಪಡಿಸಿ ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪುಗಳನ್ನು ಸರಿಪಡಿಸಿ. "
+
+#: templates/admin/change_list.html:64
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s ಸೇರಿಸಿ"
+
+#: templates/admin/change_list.html:84
+msgid "Filter"
+msgstr "ಸೋಸಕ"
+
+#: templates/admin/delete_confirmation.html:10
+#: templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr "ಅಳಿಸಿಹಾಕಿ"
+
+#: templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"'%(escaped_object)s'  %(object_name)s ಅನ್ನು ತೆಗೆದುಹಾಕುವುದರಿಂದ ಸಂಬಂಧಿತ ವಸ್ತುಗಳೂ "
+"ಕಳೆದುಹೋಗುತ್ತವೆ. ಆದರೆ ನಿಮ್ಮ ಖಾತೆಗೆ ಕೆಳಕಂಡ ಬಗೆಗಳ ವಸ್ತುಗಳನ್ನು ತೆಗೆದುಹಾಕಲು "
+"ಅನುಮತಿಯಿಲ್ಲ."
+
+#: templates/admin/delete_confirmation.html:23
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"ದಿಟವಾಗಿಯೂ, ನೀವು %(object_name)s  \"%(escaped_object)ಗಳನ್ನು\"? "
+"ತೆಗೆದುಹಾಕಬಯಸಿದ್ದೀರಾ? ಸಂಬಂಧಪಟ್ಟ ಕೆಳಕಂಡ ಎಲ್ಲವನ್ನೂ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ:"
+
+#: templates/admin/delete_confirmation.html:28
+#: templates/admin/delete_selected_confirmation.html:33
+msgid "Yes, I'm sure"
+msgstr "ಹೌದು,ನನಗೆ ಖಚಿತವಿದೆ"
+
+#: templates/admin/delete_selected_confirmation.html:9
+msgid "Delete multiple objects"
+msgstr ""
+
+#: templates/admin/delete_selected_confirmation.html:15
+#, fuzzy, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+"'%(escaped_object)s'  %(object_name)s ಅನ್ನು ತೆಗೆದುಹಾಕುವುದರಿಂದ ಸಂಬಂಧಿತ ವಸ್ತುಗಳೂ "
+"ಕಳೆದುಹೋಗುತ್ತವೆ. ಆದರೆ ನಿಮ್ಮ ಖಾತೆಗೆ ಕೆಳಕಂಡ ಬಗೆಗಳ ವಸ್ತುಗಳನ್ನು ತೆಗೆದುಹಾಕಲು "
+"ಅನುಮತಿಯಿಲ್ಲ."
+
+#: templates/admin/delete_selected_confirmation.html:22
+#, fuzzy, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+"ದಿಟವಾಗಿಯೂ, ನೀವು %(object_name)s  \"%(escaped_object)ಗಳನ್ನು\"? "
+"ತೆಗೆದುಹಾಕಬಯಸಿದ್ದೀರಾ? ಸಂಬಂಧಪಟ್ಟ ಕೆಳಕಂಡ ಎಲ್ಲವನ್ನೂ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ:"
+
+#: templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "%(filter_title)s ಇಂದ"
+
+#: templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "%(name)s ಅನ್ವಯಾಂಶದಲ್ಲಿ ಮಾಡೆಲ್ಲುಗಳು ಲಭ್ಯ."
+
+#: templates/admin/index.html:35
+msgid "Change"
+msgstr "ಬದಲಿಸಿ/ಬದಲಾವಣೆ"
+
+#: templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr "ಯಾವುದನ್ನೂ ತಿದ್ದಲು ನಿಮಗೆ ಅನುಮತಿ ಇಲ್ಲ ."
+
+#: templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr "ಇತ್ತೀಚಿನ ಕ್ರಮಗಳು"
+
+#: templates/admin/index.html:54
+msgid "My Actions"
+msgstr "ನನ್ನ ಕ್ರಮಗಳು"
+
+#: templates/admin/index.html:58
+msgid "None available"
+msgstr "ಯಾವುದೂ ಲಭ್ಯವಿಲ್ಲ"
+
+#: templates/admin/index.html:72
+#, fuzzy
+msgid "Unknown content"
+msgstr "ಗೊತ್ತಿಲ್ಲ(ದ/ದ್ದು)"
+
+#: templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"ಡಾಟಾಬೇಸನ್ನು ಇನ್ಸ್ಟಾಲ್ ಮಾಡುವಾಗ ಏನೋ ತಪ್ಪಾಗಿದೆ. ಸೂಕ್ತ  ಡಾಟಾಬೇಸ್ ಕೋಷ್ಟಕಗಳು ರಚನೆಯಾಗಿ ಅರ್ಹ "
+"ಬಳಕೆದಾರರು ಅವುಗಳನ್ನು ಓದಬಹುದಾಗಿದೆಯೇ ಎಂಬುದನ್ನು ಖಾತರಿ ಪಡಿಸಿಕೊಳ್ಳಿ."
+
+#: templates/admin/login.html:33
+msgid "Username:"
+msgstr "ಬಳಕೆದಾರನ ಹೆಸರು:"
+
+#: templates/admin/login.html:37
+msgid "Password:"
+msgstr "ಪ್ರವೇಶಪದ:"
+
+#: templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "ದಿನಾಂಕ/ಸಮಯ"
+
+#: templates/admin/object_history.html:23
+msgid "User"
+msgstr "ಬಳಕೆದಾರ"
+
+#: templates/admin/object_history.html:24
+msgid "Action"
+msgstr "ಕ್ರಮ(ಕ್ರಿಯೆ)"
+
+#: templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"ಈ ವಸ್ತುವಿಗೆ ಬದಲಾವಣೆಯ ಇತಿಹಾಸವಿಲ್ಲ. ಅದು ಬಹುಶಃ ಈ ಆಡಳಿತತಾಣದ ಮೂಲಕ ಸೇರಿಸಲ್ಪಟ್ಟಿಲ್ಲ."
+
+#: templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "ಎಲ್ಲವನ್ನೂ ತೋರಿಸು"
+
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "ಉಳಿಸಿ"
+
+#: templates/admin/search_form.html:8
+#, fuzzy
+msgid "Search"
+msgstr "ಮಾರ್ಚ್"
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "ಒಟ್ಟು %(full_result_count)s"
+
+#: templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr "ಹೊಸದರಂತೆ ಉಳಿಸಿ"
+
+#: templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr "ಉಳಿಸಿ ಮತ್ತು ಇನ್ನೊಂದನ್ನು ಸೇರಿಸಿ"
+
+#: templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr "ಉಳಿಸಿ ಮತ್ತು ತಿದ್ದುವುದನ್ನು ಮುಂದುವರಿಸಿರಿ."
+
+#: templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"ಮೊದಲು ಬಳಕೆದಾರ-ಹೆಸರು ಮತ್ತು ಪ್ರವೇಶಪದವನ್ನು ಕೊಡಿರಿ. ನಂತರ, ನೀವು ಇನ್ನಷ್ಟು ಆಯ್ಕೆಗಳನ್ನು  "
+"ಬದಲಿಸಬಹುದಾಗಿದೆ."
+
+#: templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr ""
+
+#: templates/admin/auth/user/change_password.html:29
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+#: templates/admin/auth/user/change_password.html:36
+msgid "Password"
+msgstr "ಪ್ರವೇಶಪದ"
+
+#: templates/admin/auth/user/change_password.html:42
+#: templates/registration/password_change_form.html:38
+msgid "Password (again)"
+msgstr "ಪ್ರವೇಶಪದ(ಇನ್ನೊಮ್ಮೆ)"
+
+#: templates/admin/auth/user/change_password.html:43
+msgid "Enter the same password as above, for verification."
+msgstr "ಖಚಿತಗೊಳಿಸಲು ಮೇಲಿನ ಪ್ರವೇಶಪದವನ್ನು ಇನ್ನೊಮ್ಮೆ ಬರೆಯಿರಿ."
+
+#: templates/admin/edit_inline/stacked.html:67
+#: templates/admin/edit_inline/tabular.html:113
+#, fuzzy, python-format
+msgid "Add another %(verbose_name)s"
+msgstr " %(verbose_name)s ಅನ್ನು ತೆಗೆದುಹಾಕಲಾಯಿತು"
+
+#: templates/admin/edit_inline/stacked.html:70
+#: templates/admin/edit_inline/tabular.html:116
+#, fuzzy
+msgid "Remove"
+msgstr "ತೆಗೆದು ಹಾಕಲಾಗಿದೆ"
+
+#: templates/admin/edit_inline/tabular.html:15
+#, fuzzy
+msgid "Delete?"
+msgstr "ಅಳಿಸಿಹಾಕಿ"
+
+#: templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "ಈದಿನ ತಮ್ಮ ಅತ್ಯಮೂಲ್ಯವಾದ ಸಮಯವನ್ನು ನಮ್ಮ ತಾಣದಲ್ಲಿ ಕಳೆದುದಕ್ಕಾಗಿ ಧನ್ಯವಾದಗಳು."
+
+#: templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "ಮತ್ತೆ ಒಳಬನ್ನಿ"
+
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:20
+msgid "Password change"
+msgstr "ಪ್ರವೇಶಪದ ಬದಲಾವಣೆ"
+
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_done.html:11
+msgid "Password change successful"
+msgstr "ಪ್ರವೇಶಪದ ಬದಲಾವಣೆ ಯಶಸ್ವಿ"
+
+#: templates/registration/password_change_done.html:13
+msgid "Your password was changed."
+msgstr "ನಿಮ್ಮ ಪ್ರವೇಶಪದ ಬದಲಾಯಿಸಲಾಗಿದೆ"
+
+#: templates/registration/password_change_form.html:22
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"ಭದ್ರತೆಯ ದೃಷ್ಟಿಯಿಂದ ದಯವಿಟ್ಟು ನಿಮ್ಮ ಹಳೆಯ ಪ್ರವೇಶಪದವನ್ನು ಸೂಚಿಸಿರಿ. ಆನಂತರ ನೀವು ಸರಿಯಾಗಿ "
+"ಬರೆದಿದ್ದೀರೆಂದು ನಾವು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಲು   ಹೊಸ ಪ್ರವೇಶಪದವನ್ನು ಎರಡು ಬಾರಿ ಬರೆಯಿರಿ."
+
+#: templates/registration/password_change_form.html:28
+#, fuzzy
+msgid "Old password"
+msgstr "ಹಳೆಯ ಪ್ರವೇಶಪದ:"
+
+#: templates/registration/password_change_form.html:33
+#, fuzzy
+msgid "New password"
+msgstr "ಹೊಸ ಪ್ರವೇಶಪದ:"
+
+#: templates/registration/password_change_form.html:44
+#: templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr "ನನ್ನ ಪ್ರವೇಶಪದ ಬದಲಿಸಿ"
+
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:6
+#: templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "ಪ್ರವೇಶಪದವನ್ನು ಬದಲಿಸುವಿಕೆ"
+
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_complete.html:10
+#, fuzzy
+msgid "Password reset complete"
+msgstr "ಪ್ರವೇಶಪದವನ್ನು ಬದಲಿಸುವಿಕೆ"
+
+#: templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:4
+#, fuzzy
+msgid "Password reset confirmation"
+msgstr "ಪ್ರವೇಶಪದವನ್ನು ಬದಲಿಸುವಿಕೆ"
+
+#: templates/registration/password_reset_confirm.html:12
+#, fuzzy
+msgid "Enter new password"
+msgstr "ಹೊಸ ಪ್ರವೇಶಪದ:"
+
+#: templates/registration/password_reset_confirm.html:14
+#, fuzzy
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"ಭದ್ರತೆಯ ದೃಷ್ಟಿಯಿಂದ ದಯವಿಟ್ಟು ನಿಮ್ಮ ಹಳೆಯ ಪ್ರವೇಶಪದವನ್ನು ಸೂಚಿಸಿರಿ. ಆನಂತರ ನೀವು ಸರಿಯಾಗಿ "
+"ಬರೆದಿದ್ದೀರೆಂದು ನಾವು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಲು   ಹೊಸ ಪ್ರವೇಶಪದವನ್ನು ಎರಡು ಬಾರಿ ಬರೆಯಿರಿ."
+
+#: templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr "ಹೊಸ ಪ್ರವೇಶಪದ:"
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr "ಪ್ರವೇಶಪದವನ್ನು ಖಚಿತಪಡಿಸಿ:"
+
+#: templates/registration/password_reset_confirm.html:26
+#, fuzzy
+msgid "Password reset unsuccessful"
+msgstr "ಪ್ರವೇಶಪದದ ಮರುನಿರ್ಧಾರ ಸಾಧ್ಯವಾಗಿದೆ"
+
+#: templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "ಪ್ರವೇಶಪದದ ಮರುನಿರ್ಧಾರ ಸಾಧ್ಯವಾಗಿದೆ"
+
+#: templates/registration/password_reset_done.html:12
+#, fuzzy
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+"ನಾವು ಹೊಸ ಪ್ರವೇಶಪದವನ್ನು ನಿಮ್ಮ ವಿ-ಅಂಚೆಗೆ ಕಳಿಸಿದ್ದೇವೆ. ಕೆಲವೇ ಕ್ಷಣಗಳಲ್ಲಿ ನೀವದನ್ನು "
+"ಪಡೆಯಲಿದ್ದೀರಿ."
+
+#: templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "ಪ್ರವೇಶಪದದ ಮರುನಿರ್ಧಾರವನ್ನು ನೀವು ಕೇಳಿದುದರಿಂದ ಈ ವಿ-ಅಂಚೆಯನ್ನು ಪಡೆಯುತ್ತಿದ್ದೀರಿ."
+
+#: templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "%(site_name)s ತಾಣದಲ್ಲಿ ನಿಮ್ಮ ಬಳಕೆದಾರ-ಖಾತೆಗಾಗಿ"
+
+#: templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr "ನೀವು ಮರೆತಿದ್ದಲ್ಲಿ , ನಿಮ್ಮ ಬಳಕೆದಾರ-ಹೆಸರು"
+
+#: templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "ನಮ್ಮ ತಾಣವನ್ನು ಬಳಸಿದ್ದಕ್ದಾಗಿ ಧನ್ಯವಾದಗಳು!"
+
+#: templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s ತಂಡ"
+
+#: templates/registration/password_reset_form.html:12
+#, fuzzy
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+"ಪ್ರವೇಶಪದವನ್ನು ಮರೆತಿದ್ದೀರಾ? ನಿಮ್ಮ ವಿ-ಅಂಚೆಯ ವಿಳಾಸವನ್ನು ಕೆಳಗೆ ಸೂಚಿಸಿರಿ, ನಾವು ನಿಮ್ಮ "
+"ಪ್ರವೇಶಪದವನ್ನು ಬದಲಾಯಿಸಿ ಅದನ್ನು ರವಾನಿಸುತ್ತೇವೆ."
+
+#: templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "ವಿ-ಅಂಚೆ ವಿಳಾಸ:"
+
+#: templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "ನನ್ನ ಪ್ರವೇಶಪದವನ್ನು ಮತ್ತೆ ನಿರ್ಧರಿಸಿ "
+
+#: templatetags/admin_list.py:273
+msgid "All dates"
+msgstr "ಎಲ್ಲಾ ದಿನಾಂಕಗಳು"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s"
+msgstr "%s ಆಯ್ದುಕೊಳ್ಳಿ"
+
+#: views/main.py:65
+#, python-format
+msgid "Select %s to change"
+msgstr "ಬದಲಾಯಿಸಲು %s ಆಯ್ದುಕೊಳ್ಳಿ"
