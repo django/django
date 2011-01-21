@@ -51,7 +51,7 @@ can be replaced with an instance of
 -----------------------------------------------------
 
 The ``template`` argument to the ``direct_to_template`` view has been renamed
-``template_name``. This has ben done to maintain consistency with other views.
+``template_name``. This has been done to maintain consistency with other views.
 
 ``object_id`` argument to detail views
 --------------------------------------
