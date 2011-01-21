@@ -1,0 +1,71 @@
+# translation of django.po to Slovenian
+# Gasper Zejn <zejn@kiberpipa.org>, 2010.
+# Jure Cuhalev <gandalf@owca.info>, 2010.
+# This file is distributed under the same license as the Django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:26+0100\n"
+"PO-Revision-Date: 2010-05-08 13:47+0100\n"
+"Last-Translator: Jure Cuhalev <gandalf@owca.info>\n"
+"Language-Team:  <sl@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+#: db/models/fields.py:50
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Osnovno GIS polje -- se preslika v tip Geometry po OpenGIS specifikaciji."
+
+#: db/models/fields.py:270
+msgid "Point"
+msgstr "Točka"
+
+#: db/models/fields.py:274
+msgid "Line string"
+msgstr "Črtni zapis"
+
+#: db/models/fields.py:278
+msgid "Polygon"
+msgstr "Poligon"
+
+#: db/models/fields.py:282
+msgid "Multi-point"
+msgstr "Večtočkovje"
+
+#: db/models/fields.py:286
+msgid "Multi-line string"
+msgstr "Več črtni zapis"
+
+#: db/models/fields.py:290
+msgid "Multi polygon"
+msgstr "Več poligonov"
+
+#: db/models/fields.py:294
+msgid "Geometry collection"
+msgstr "Niz likov"
+
+#: forms/fields.py:17
+msgid "No geometry value provided."
+msgstr "Niste navedli geometrijske vrednosti."
+
+#: forms/fields.py:18
+msgid "Invalid geometry value."
+msgstr "Neveljavna geometrijska vrednost."
+
+#: forms/fields.py:19
+msgid "Invalid geometry type."
+msgstr "Neveljaven tip geometrije."
+
+#: forms/fields.py:20
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Pri pretvorbi geometrijskega zapisa v SRID geometrijskega polja je prišlo do "
+"napake."

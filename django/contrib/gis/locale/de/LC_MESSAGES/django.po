@@ -1,0 +1,72 @@
+# Translation of django.po to German
+#
+# Copyright (C) 2005-2009,
+# This file is distributed under the same license as the django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 21:23+0100\n"
+"PO-Revision-Date: 2010-10-10 00:58+0200\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: db/models/fields.py:50
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr "Das Basis-GIS-Feld, das dem OpenGIS-Geometrie-Typ entspricht."
+
+#: db/models/fields.py:270
+msgid "Point"
+msgstr "Punkt"
+
+#: db/models/fields.py:274
+msgid "Line string"
+msgstr "Linienzug"
+
+#: db/models/fields.py:278
+msgid "Polygon"
+msgstr "Polygon"
+
+#: db/models/fields.py:282
+msgid "Multi-point"
+msgstr "Mehrere Punkte"
+
+#: db/models/fields.py:286
+msgid "Multi-line string"
+msgstr "Mehrere Linienzüge"
+
+#: db/models/fields.py:290
+msgid "Multi polygon"
+msgstr "Mehrere Polygone"
+
+#: db/models/fields.py:294
+msgid "Geometry collection"
+msgstr "Sammlung geometrischer Objekte"
+
+#: forms/fields.py:17
+msgid "No geometry value provided."
+msgstr "Kein geometrischer Wert gegeben."
+
+#: forms/fields.py:18
+msgid "Invalid geometry value."
+msgstr "Ungültiger geometrischer Wert."
+
+#: forms/fields.py:19
+msgid "Invalid geometry type."
+msgstr "Ungültiger geometrischer Typ."
+
+#: forms/fields.py:20
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Ein Fehler ist beim Umwandeln der Geometrie-Werte in die SRID des Geometrie-"
+"Formularfeldes aufgetreten."

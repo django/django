@@ -1,0 +1,65 @@
+# Translation of django.po to japanese.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:26+0100\n"
+"PO-Revision-Date: 2010-05-09 12:41+0900\n"
+"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
+"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: db/models/fields.py:50
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr "GIS基底フィールドです -- OpenGIS で決められた地形タイプに対応"
+
+#: db/models/fields.py:270
+msgid "Point"
+msgstr "点"
+
+#: db/models/fields.py:274
+msgid "Line string"
+msgstr "線"
+
+#: db/models/fields.py:278
+msgid "Polygon"
+msgstr "ポリゴン"
+
+#: db/models/fields.py:282
+msgid "Multi-point"
+msgstr "複数の点"
+
+#: db/models/fields.py:286
+msgid "Multi-line string"
+msgstr "複数の線"
+
+#: db/models/fields.py:290
+msgid "Multi polygon"
+msgstr "複数のポリゴン"
+
+#: db/models/fields.py:294
+msgid "Geometry collection"
+msgstr "地形の集合"
+
+#: forms/fields.py:17
+msgid "No geometry value provided."
+msgstr "geometry値がありません。"
+
+#: forms/fields.py:18
+msgid "Invalid geometry value."
+msgstr "geometry値が不正です"
+
+#: forms/fields.py:19
+msgid "Invalid geometry type."
+msgstr "geometryタイプが不正です。"
+
+#: forms/fields.py:20
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"geometry を geometry フォームフィールドの SRID に変換しようとしてエラーが起き"
+"ました。"

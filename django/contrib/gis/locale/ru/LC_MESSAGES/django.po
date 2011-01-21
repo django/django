@@ -1,0 +1,70 @@
+# Translation of django.po to russian.
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:26+0100\n"
+"PO-Revision-Date: 2010-05-11 17:36+0300\n"
+"Last-Translator: alexey boriskin <sun.void@gmail.com>\n"
+"Language-Team: Russian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: RUSSIAN FEDERATION\n"
+
+#: db/models/fields.py:50
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Базовое ГИС-поле. Его потомки отражают конкретные геометрические типы по "
+"спецификации OpenGIS."
+
+#: db/models/fields.py:270
+msgid "Point"
+msgstr "Точка"
+
+#: db/models/fields.py:274
+msgid "Line string"
+msgstr "Ломаная"
+
+#: db/models/fields.py:278
+msgid "Polygon"
+msgstr "Многоугольник"
+
+#: db/models/fields.py:282
+msgid "Multi-point"
+msgstr "Набор точек"
+
+#: db/models/fields.py:286
+msgid "Multi-line string"
+msgstr "Набор ломаных"
+
+#: db/models/fields.py:290
+msgid "Multi polygon"
+msgstr "Набор многоугольников"
+
+#: db/models/fields.py:294
+msgid "Geometry collection"
+msgstr "Набор геометрических объектов"
+
+#: forms/fields.py:17
+msgid "No geometry value provided."
+msgstr "Не указано значение геометрии."
+
+#: forms/fields.py:18
+msgid "Invalid geometry value."
+msgstr "Неверное значение геометрии."
+
+#: forms/fields.py:19
+msgid "Invalid geometry type."
+msgstr "Неверный тип геометрии."
+
+#: forms/fields.py:20
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr "Произошла ошибка во время преобразования геометрии в SRID."
