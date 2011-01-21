@@ -115,7 +115,8 @@ def copy_plural_forms(msgs, locale, domain, verbosity):
 
 
 def make_messages(locale=None, domain='django', verbosity='1', all=False,
-        extensions=None, symlinks=False, ignore_patterns=[], no_wrap=False):
+        extensions=None, symlinks=False, ignore_patterns=[], no_wrap=False,
+        no_obsolete=False):
     """
     Uses the locale directory from the Django SVN tree or an application/
     project to process all
@@ -133,6 +134,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
     if os.path.isdir(os.path.join('conf', 'locale')):
         localedir = os.path.abspath(os.path.join('conf', 'locale'))
         invoked_for_django = True
+        # Ignoring all contrib apps
+        ignore_patterns += ['contrib/*']
     elif os.path.isdir('locale'):
         localedir = os.path.abspath('locale')
     else:
@@ -288,6 +291,11 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
             finally:
                 f.close()
             os.unlink(potfile)
+            if no_obsolete:
+                msgs, errors = _popen('msgattrib %s -o "%s" --no-obsolete "%s"' %
+                                      (wrap, pofile, pofile))
+                if errors:
+                    raise CommandError("errors happened while running msgattrib\n%s" % errors)
 
 
 class Command(BaseCommand):
@@ -309,6 +317,8 @@ class Command(BaseCommand):
             default=True, help="Don't ignore the common glob-style patterns 'CVS', '.*' and '*~'."),
         make_option('--no-wrap', action='store_true', dest='no_wrap',
             default=False, help="Don't break long message lines into several lines"),
+        make_option('--no-obsolete', action='store_true', dest='no_obsolete',
+            default=False, help="Remove obsolete message strings"),
     )
     help = "Runs over the entire source tree of the current directory and pulls out all strings marked for translation. It creates (or updates) a message file in the conf/locale (in the django tree) or locale (for project and application) directory."
 
@@ -330,7 +340,7 @@ class Command(BaseCommand):
             ignore_patterns += ['CVS', '.*', '*~']
         ignore_patterns = list(set(ignore_patterns))
         no_wrap = options.get('no_wrap')
-
+        no_obsolete = options.get('no_obsolete')
         if domain == 'djangojs':
             extensions = handle_extensions(extensions or ['js'])
         else:
@@ -340,4 +350,4 @@ class Command(BaseCommand):
             sys.stdout.write('examining files with the extensions: %s\n'
                              % get_text_list(list(extensions), 'and'))
 
-        make_messages(locale, domain, verbosity, process_all, extensions, symlinks, ignore_patterns, no_wrap)
+        make_messages(locale, domain, verbosity, process_all, extensions, symlinks, ignore_patterns, no_wrap, no_obsolete)
