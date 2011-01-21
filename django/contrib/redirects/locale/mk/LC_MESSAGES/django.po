@@ -1,0 +1,46 @@
+# translation of django.po to Macedonian
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2010-04-05 15:53+0100\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"Language-Team: Macedonian <ossm-members@hedona.on.net.mk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: models.py:7
+msgid "redirect from"
+msgstr "пренасочи од"
+
+#: models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Ова треба да биде апсолутна патека без името на домејнот. На пр. „/nastani/"
+"prebaraj/“."
+
+#: models.py:9
+msgid "redirect to"
+msgstr "пренасочи кон"
+
+#: models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Ова може да биде или апсолутна патека (како погоре) или цела адреса "
+"почувајќи со „http://“."
+
+#: models.py:13
+msgid "redirect"
+msgstr "пренасочување"
+
+#: models.py:14
+msgid "redirects"
+msgstr "пренасочувања"

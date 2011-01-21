@@ -1,0 +1,50 @@
+# Django Latvian translation.
+# Copyright (C) 2008 THE Django'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Django package.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2010-05-10 20:18+0200\n"
+"Last-Translator: Reinis Veips <reinis.veips@wot.lv>\n"
+"Language-Team: Latvian translators' team <reinis.veips@wot.lv>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
+
+#: models.py:7
+msgid "redirect from"
+msgstr "pārvirzīt(redirect) no"
+
+#: models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Tam jābūt absolūtajam ceļam, atskaitot domēna vārdu. Piemēram: '/notikumi/"
+"meklet/'."
+
+#: models.py:9
+msgid "redirect to"
+msgstr "pārvirzīt(redirect) uz"
+
+#: models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Šis var būt vai nu absolūtais ceļš (kā augstāk) vai pilnais URL, kas sākas "
+"ar 'http://'."
+
+#: models.py:13
+msgid "redirect"
+msgstr "pārvirzīt"
+
+#: models.py:14
+msgid "redirects"
+msgstr "pārvirzījumi"

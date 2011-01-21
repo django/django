@@ -1,0 +1,47 @@
+# Spanish translation for the django project
+# Copyright (C) 2008, The Django Project
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2009-11-30 11:31+0100\n"
+"Last-Translator: Django Spanish Team, <django-cat@googlegroups.com>\n"
+"Language-Team: Django Spanish Team, <django-cat@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:7
+msgid "redirect from"
+msgstr "redirigir desde"
+
+#: models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Esta ruta debería ser absoluta, excluyendo el nombre de dominio. Ejemplo: '/"
+"events/search/'."
+
+#: models.py:9
+msgid "redirect to"
+msgstr "redirigir a"
+
+#: models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Esto puede ser bien una ruta absoluta (como antes) o una URL completa que "
+"empiece con 'http://'."
+
+#: models.py:13
+msgid "redirect"
+msgstr "redirección"
+
+#: models.py:14
+msgid "redirects"
+msgstr "redirecciones"

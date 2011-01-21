@@ -1,0 +1,47 @@
+# translation of django.po to Catalan
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2009-03-24 13:28+0100\n"
+"Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
+"Language-Team: Catalan <ca@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:7
+msgid "redirect from"
+msgstr "redirecció des de"
+
+#: models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Aquesta ruta hauria de ser un camí absolut, excloent-ne el nom del domini. "
+"Exemple '/events/search/'."
+
+#: models.py:9
+msgid "redirect to"
+msgstr "redirigir a"
+
+#: models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Això pot ser bé una ruta absoluta (com a sobre) o una URL completa que "
+"comenci per 'http://'."
+
+#: models.py:13
+msgid "redirect"
+msgstr "redirecció"
+
+#: models.py:14
+msgid "redirects"
+msgstr "redireccions"

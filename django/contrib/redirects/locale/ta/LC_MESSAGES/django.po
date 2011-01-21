@@ -1,0 +1,50 @@
+# translation of django-new.po to tamil
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2007-03-15 16:48+0530\n"
+"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
+"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: models.py:7
+msgid "redirect from"
+msgstr "லிருந்து திசைமாற்று"
+
+#: models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"இது ஒரு முழுமையான பாதையாக இருக்கவேண்டும். இணையத்தளப்பெயராக இருக்கக்கூடாது. உதாரணம்:'/"
+"events/search/'."
+
+#: models.py:9
+msgid "redirect to"
+msgstr "திரும்ப அனுப்பு"
+
+#: models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"இது முழுமையான பாதையாக (மேலே உள்ளது போல) அல்லது  \"http\"//\" என தொடங்கும் வலை  "
+"முகவரியாக இருக்கலாம்."
+
+#: models.py:13
+msgid "redirect"
+msgstr "திரும்ப அனுப்பு"
+
+#: models.py:14
+msgid "redirects"
+msgstr "திரும்ப அனுப்புகிறது. "

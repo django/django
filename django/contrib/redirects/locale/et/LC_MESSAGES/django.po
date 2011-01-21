@@ -1,0 +1,47 @@
+# Estonian translation for the Django Project.
+# Copyright (C) 2008, Django Project
+# This file is distributed under the same license as the django package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2008-09-03 00:35+0200\n"
+"Last-Translator: Erik Allik <removethis-eallik_at_gmail-com>\n"
+"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:7
+msgid "redirect from"
+msgstr "ümbersuunatav asukoht"
+
+#: models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"See peaks olema absoluutne asukoht, v.a. domeeninimi. Näide: '/events/"
+"search/'."
+
+#: models.py:9
+msgid "redirect to"
+msgstr "suuna aadressile"
+
+#: models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"See võib olla kas absoluutne asukoht (nagu ülemine) või täielik URL algusega "
+"'http://'."
+
+#: models.py:13
+msgid "redirect"
+msgstr "suunamine"
+
+#: models.py:14
+msgid "redirects"
+msgstr "suunamised"

@@ -1,0 +1,52 @@
+# French translation of Django.
+# This file is distributed under the same license as the Django package.
+# Copyright (C) 2008 Django Software Foundation and individual contributors.
+#
+# Stéphane Raimbault <stephane.raimbault@gmail.com>, 2009-2010.
+# Claude Paroz <claude@2xlibre.net>, 2009
+# David Larlet <http://larlet.fr>, 2009-2010
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2010-08-09 14:38+0200\n"
+"Last-Translator: Stéphane Raimbault <stephane.raimbault@gmail.com>\n"
+"Language-Team: French <http://django-fr.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: models.py:7
+msgid "redirect from"
+msgstr "redirigé depuis"
+
+#: models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Ceci doit être un chemin absolu, sans nom de domaine. Par exemple, « /"
+"evenements/rechercher/ »."
+
+#: models.py:9
+msgid "redirect to"
+msgstr "redirigé vers"
+
+#: models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Ceci peut être soit un chemin absolu (voir ci-dessus) soit une URL complète "
+"débutant par « http:// »."
+
+#: models.py:13
+msgid "redirect"
+msgstr "redirige"
+
+#: models.py:14
+msgid "redirects"
+msgstr "redirige"

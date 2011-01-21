@@ -1,0 +1,47 @@
+# Slovak translation of Django
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"PO-Revision-Date: 2010-05-08 16:32+0200\n"
+"Last-Translator: Martin Kosír <martin@martinkosir.net>\n"
+"Language-Team: Slovak <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>1 && n<5 ? 1 : 2;\n"
+
+#: models.py:7
+msgid "redirect from"
+msgstr "presmerovať z"
+
+#: models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Tu by sa mala použiť absolútna cesta bez názvu domény. Napríklad: '/events/"
+"search/'."
+
+#: models.py:9
+msgid "redirect to"
+msgstr "presmerovať na"
+
+#: models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Toto môže byť buď absolútna cesta (ako vyššie) alebo úplné URL začínajúce na "
+"'http://'."
+
+#: models.py:13
+msgid "redirect"
+msgstr "presmerovanie"
+
+#: models.py:14
+msgid "redirects"
+msgstr "presmerovania"
