@@ -26,4 +26,5 @@ urlpatterns = patterns('',
     (r'^parse_unicode_json/$', views.return_json_file),
     (r'^check_headers/$', views.check_headers),
     (r'^check_headers_redirect/$', redirect_to, {'url': '/test_client_regress/check_headers/'}),
+    (r'^raw_post_data/$', views.raw_post_data),
 )

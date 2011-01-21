@@ -91,3 +91,6 @@ def check_headers(request):
     "A view that responds with value of the X-ARG-CHECK header"
     return HttpResponse('HTTP_X_ARG_CHECK: %s' % request.META.get('HTTP_X_ARG_CHECK', 'Undefined'))
 
+def raw_post_data(request):
+    "A view that is requested with GET and accesses request.raw_post_data. Refs #14753."
+    return HttpResponse(request.raw_post_data)

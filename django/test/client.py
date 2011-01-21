@@ -46,7 +46,7 @@ class FakePayload(object):
 
     def read(self, num_bytes=None):
         if num_bytes is None:
-            num_bytes = self.__len or 1
+            num_bytes = self.__len or 0
         assert self.__len >= num_bytes, "Cannot read more than the available bytes from the HTTP incoming data."
         content = self.__content.read(num_bytes)
         self.__len -= num_bytes

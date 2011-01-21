@@ -879,3 +879,12 @@ class ResponseTemplateDeprecationTests(TestCase):
     def test_response_no_template(self):
         response = self.client.get("/test_client_regress/request_methods/")
         self.assertEqual(response.template, None)
+
+class RawPostDataTest(TestCase):
+    "Access to request.raw_post_data from the test client."
+    def test_raw_post_data(self):
+        # Refs #14753
+        try:
+            response = self.client.get("/test_client_regress/raw_post_data/")
+        except AssertionError:
+            self.fail("Accessing request.raw_post_data from a view fetched with GET by the test client shouldn't fail.")
