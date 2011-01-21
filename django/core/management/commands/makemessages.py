@@ -7,7 +7,7 @@ from itertools import dropwhile
 from optparse import make_option
 from subprocess import PIPE, Popen
 
-from django.core.management.base import CommandError, BaseCommand
+from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.text import get_text_list
 
 pythonize_re = re.compile(r'(?:^|\n)\s*//')
@@ -298,8 +298,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                     raise CommandError("errors happened while running msgattrib\n%s" % errors)
 
 
-class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
+class Command(NoArgsCommand):
+    option_list = NoArgsCommand.option_list + (
         make_option('--locale', '-l', default=None, dest='locale',
             help='Creates or updates the message files only for the given locale (e.g. pt_BR).'),
         make_option('--domain', '-d', default='django', dest='domain',
@@ -325,10 +325,7 @@ class Command(BaseCommand):
     requires_model_validation = False
     can_import_settings = False
 
-    def handle(self, *args, **options):
-        if len(args) != 0:
-            raise CommandError("Command doesn't accept any arguments")
-
+    def handle_noargs(self, *args, **options):
         locale = options.get('locale')
         domain = options.get('domain')
         verbosity = int(options.get('verbosity'))
