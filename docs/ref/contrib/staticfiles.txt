@@ -50,7 +50,7 @@ your additional files directory(ies) e.g.::
         "/opt/webfiles/common",
     )
 
-In case you want to refer to files in one of the locations with a additional
+In case you want to refer to files in one of the locations with an additional
 namespace, you can **optionally** provide a prefix as ``(prefix, path)``
 tuples, e.g.::
 
