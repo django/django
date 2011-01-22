@@ -657,10 +657,10 @@ How to log a user out
 Login and logout signals
 ------------------------
 
-The auth framework uses two :ref:`signals <topic-signals>` that can be used for
-notification when a user logs in or out.
+The auth framework uses two :doc:`signals </topics/signals>` that can be used
+for notification when a user logs in or out.
 
-**:data:`django.contrib.auth.signals.user_logged_in`**
+.. data:: django.contrib.auth.signals.user_logged_in
 
 Sent when a user logs in successfully.
 
@@ -675,7 +675,7 @@ Arguments sent with this signal:
     ``user``
         The user instance that just logged in.
 
-**:data:`django.contrib.auth.signals.user_logged_out`**
+.. data:: django.contrib.auth.signals.user_logged_outs
 
 Sent when the logout method is called.
 
@@ -1537,11 +1537,11 @@ object the first time a user authenticates::
         ADMIN_LOGIN = 'admin'
         ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
         """
-        
+
         supports_object_permissions = False
         supports_anonymous_user = False
         supports_inactive_user = False
-        
+
         def authenticate(self, username=None, password=None):
             login_valid = (settings.ADMIN_LOGIN == username)
             pwd_valid = check_password(password, settings.ADMIN_PASSWORD)

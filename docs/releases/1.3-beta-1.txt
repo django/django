@@ -61,7 +61,7 @@ Permissions for inactive users
 If you provide a custom auth backend with ``supports_inactive_user`` set to
 ``True``, an inactive user model will check the backend for permissions.
 This is useful for further centralizing the permission handling. See the
-:ref:`authentication docs <topics-auth>` for more details.
+:doc:`authentication docs </topics/auth>` for more details.
 
 Backwards-incompatible changes in 1.3 alpha 2
 =============================================
