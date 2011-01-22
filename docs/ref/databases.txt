@@ -151,21 +151,12 @@ The default engine is MyISAM_ [#]_. The main drawback of MyISAM is that it
 doesn't currently support transactions or foreign keys. On the plus side, it's
 currently the only engine that supports full-text indexing and searching.
 
-The InnoDB_ engine is fully transactional and supports foreign key references.
+The InnoDB_ engine is fully transactional and supports foreign key references
+and is probably the best choice at this point in time.
 
-The BDB_ engine, like InnoDB, is also fully transactional and supports foreign
-key references. However, its use seems to be deprecated.
-
-`Other storage engines`_, including SolidDB_ and Falcon_, are on the horizon.
-For now, InnoDB is probably your best choice.
-
-.. _storage engines: http://dev.mysql.com/doc/refman/5.0/en/storage-engines.html
-.. _MyISAM: http://dev.mysql.com/doc/refman/5.0/en/myisam-storage-engine.html
-.. _BDB: http://dev.mysql.com/doc/refman/5.0/en/bdb-storage-engine.html
-.. _InnoDB: http://dev.mysql.com/doc/refman/5.0/en/innodb.html
-.. _Other storage engines: http://dev.mysql.com/doc/refman/5.1/en/storage-engines-other.html
-.. _SolidDB: http://forge.mysql.com/projects/project.php?id=139
-.. _Falcon: http://dev.mysql.com/doc/falcon/en/index.html
+.. _storage engines: http://dev.mysql.com/doc/refman/5.5/en/storage-engines.html
+.. _MyISAM: http://dev.mysql.com/doc/refman/5.5/en/myisam-storage-engine.html
+.. _InnoDB: http://dev.mysql.com/doc/refman/5.5/en/innodb.html
 
 .. [#] Unless this was changed by the packager of your MySQL package. We've
    had reports that the Windows Community Server installer sets up InnoDB as
