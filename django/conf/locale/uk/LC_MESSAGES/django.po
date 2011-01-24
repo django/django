@@ -683,28 +683,28 @@ msgstr[2] "%(size)d байтів"
 
 #: template/defaultfilters.py:807
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f КБ"
+msgid "%s KB"
+msgstr "%s КБ"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f МБ"
+msgid "%s MB"
+msgstr "%s МБ"
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f ГБ"
+msgid "%s GB"
+msgstr "%s ГБ"
 
 #: template/defaultfilters.py:813
 #, fuzzy, python-format
-msgid "%.1f TB"
-msgstr "%.1f КБ"
+msgid "%s TB"
+msgstr "%s КБ"
 
 #: template/defaultfilters.py:814
 #, fuzzy, python-format
-msgid "%.1f PB"
-msgstr "%.1f КБ"
+msgid "%s PB"
+msgstr "%s КБ"
 
 #: utils/dateformat.py:42
 msgid "p.m."

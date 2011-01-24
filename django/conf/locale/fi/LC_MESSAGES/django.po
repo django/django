@@ -668,28 +668,28 @@ msgstr[1] "%(size)d tavua"
 
 #: template/defaultfilters.py:807
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f Kt"
+msgid "%s KB"
+msgstr "%s Kt"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f Mt"
+msgid "%s MB"
+msgstr "%s Mt"
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f Gt"
+msgid "%s GB"
+msgstr "%s Gt"
 
 #: template/defaultfilters.py:813
 #, fuzzy, python-format
-msgid "%.1f TB"
-msgstr "%.1f Kt"
+msgid "%s TB"
+msgstr "%s Kt"
 
 #: template/defaultfilters.py:814
 #, fuzzy, python-format
-msgid "%.1f PB"
-msgstr "%.1f Kt"
+msgid "%s PB"
+msgstr "%s Kt"
 
 #: utils/dateformat.py:42
 msgid "p.m."

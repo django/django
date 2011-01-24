@@ -668,28 +668,28 @@ msgstr[1] "%(size)d বাইট"
 
 #: template/defaultfilters.py:807
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f কেবি"
+msgid "%s KB"
+msgstr "%s কেবি"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f এমবি"
+msgid "%s MB"
+msgstr "%s এমবি"
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f জিবি"
+msgid "%s GB"
+msgstr "%s জিবি"
 
 #: template/defaultfilters.py:813
 #, fuzzy, python-format
-msgid "%.1f TB"
-msgstr "%.1f কেবি"
+msgid "%s TB"
+msgstr "%s কেবি"
 
 #: template/defaultfilters.py:814
 #, fuzzy, python-format
-msgid "%.1f PB"
-msgstr "%.1f কেবি"
+msgid "%s PB"
+msgstr "%s কেবি"
 
 #: utils/dateformat.py:42
 msgid "p.m."

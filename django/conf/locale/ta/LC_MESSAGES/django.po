@@ -697,27 +697,27 @@ msgstr[1] ""
 
 #: template/defaultfilters.py:807
 #, python-format
-msgid "%.1f KB"
+msgid "%s KB"
 msgstr ""
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f MB"
+msgid "%s MB"
 msgstr ""
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f GB"
+msgid "%s GB"
 msgstr ""
 
 #: template/defaultfilters.py:813
 #, python-format
-msgid "%.1f TB"
+msgid "%s TB"
 msgstr ""
 
 #: template/defaultfilters.py:814
 #, python-format
-msgid "%.1f PB"
+msgid "%s PB"
 msgstr ""
 
 #: utils/dateformat.py:42

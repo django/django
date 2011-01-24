@@ -683,28 +683,28 @@ msgstr[1] "%(size)d octets"
 
 #: template/defaultfilters.py:807
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f Ko"
+msgid "%s KB"
+msgstr "%s Ko"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f Mo"
+msgid "%s MB"
+msgstr "%s Mo"
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f Go"
+msgid "%s GB"
+msgstr "%s Go"
 
 #: template/defaultfilters.py:813
 #, fuzzy, python-format
-msgid "%.1f TB"
-msgstr "%.1f Ko"
+msgid "%s TB"
+msgstr "%s Ko"
 
 #: template/defaultfilters.py:814
 #, fuzzy, python-format
-msgid "%.1f PB"
-msgstr "%.1f Ko"
+msgid "%s PB"
+msgstr "%s Ko"
 
 #: utils/dateformat.py:42
 msgid "p.m."

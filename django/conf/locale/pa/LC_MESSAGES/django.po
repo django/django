@@ -646,28 +646,28 @@ msgstr[1] "%(size)d ਬਾਈਟ"
 
 #: template/defaultfilters.py:807
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f KB"
+msgid "%s KB"
+msgstr "%s KB"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f MB"
+msgid "%s MB"
+msgstr "%s MB"
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f GB"
+msgid "%s GB"
+msgstr "%s GB"
 
 #: template/defaultfilters.py:813
 #, python-format
-msgid "%.1f TB"
-msgstr "%.1f TB"
+msgid "%s TB"
+msgstr "%s TB"
 
 #: template/defaultfilters.py:814
 #, python-format
-msgid "%.1f PB"
-msgstr "%.1f PB"
+msgid "%s PB"
+msgstr "%s PB"
 
 #: utils/dateformat.py:42
 msgid "p.m."

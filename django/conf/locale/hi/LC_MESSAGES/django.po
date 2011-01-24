@@ -671,28 +671,28 @@ msgstr[1] "%(size)d बाइट"
 
 #: template/defaultfilters.py:807
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f के.बी"
+msgid "%s KB"
+msgstr "%s के.बी"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f एम.बी"
+msgid "%s MB"
+msgstr "%s एम.बी"
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f जी.बी"
+msgid "%s GB"
+msgstr "%s जी.बी"
 
 #: template/defaultfilters.py:813
 #, fuzzy, python-format
-msgid "%.1f TB"
-msgstr "%.1f के.बी"
+msgid "%s TB"
+msgstr "%s के.बी"
 
 #: template/defaultfilters.py:814
 #, fuzzy, python-format
-msgid "%.1f PB"
-msgstr "%.1f के.बी"
+msgid "%s PB"
+msgstr "%s के.बी"
 
 #: utils/dateformat.py:42
 msgid "p.m."
