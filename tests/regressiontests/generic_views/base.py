@@ -1,3 +1,4 @@
+import time
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
@@ -158,7 +159,7 @@ class TemplateViewTest(TestCase):
     def _assert_about(self, response):
         response.render()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '<h1>About</h1>')
+        self.assertContains(response, '<h1>About</h1>')
 
     def test_get(self):
         """
@@ -196,6 +197,28 @@ class TemplateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['params'], {'foo': 'bar'})
         self.assertEqual(response.context['key'], 'value')
+
+    def test_cached_views(self):
+        """
+        A template view can be cached
+        """
+        response = self.client.get('/template/cached/bar/')
+        self.assertEqual(response.status_code, 200)
+
+        time.sleep(1.0)
+
+        response2 = self.client.get('/template/cached/bar/')
+        self.assertEqual(response2.status_code, 200)
+
+        self.assertEqual(response.content, response2.content)
+
+        time.sleep(2.0)
+
+        # Let the cache expire and test again
+        response2 = self.client.get('/template/cached/bar/')
+        self.assertEqual(response2.status_code, 200)
+
+        self.assertNotEqual(response.content, response2.content)
 
 class RedirectViewTest(unittest.TestCase):
     rf = RequestFactory()

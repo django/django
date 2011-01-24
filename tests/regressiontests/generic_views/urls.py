@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from django.views.generic import TemplateView
+from django.views.decorators.cache import cache_page
 
 import views
 
@@ -14,6 +15,9 @@ urlpatterns = patterns('',
         TemplateView.as_view(template_name='generic_views/about.html')),
     (r'^template/custom/(?P<foo>\w+)/$',
         views.CustomTemplateView.as_view(template_name='generic_views/about.html')),
+
+    (r'^template/cached/(?P<foo>\w+)/$',
+        cache_page(2.0)(TemplateView.as_view(template_name='generic_views/about.html'))),
 
     # DetailView
     (r'^detail/obj/$',

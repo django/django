@@ -1,4 +1,7 @@
+from datetime import datetime
 import os
+import pickle
+import time
 from django.utils import unittest
 from django.test import RequestFactory, TestCase
 from django.conf import settings
@@ -147,6 +150,49 @@ class SimpleTemplateResponseTest(BaseTemplateResponseTest):
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
 
+    def test_post_callbacks(self):
+        "Rendering a template response triggers the post-render callbacks"
+        post = []
+
+        def post1(obj):
+            post.append('post1')
+        def post2(obj):
+            post.append('post2')
+
+        response = SimpleTemplateResponse('first/test.html', {})
+        response.add_post_render_callback(post1)
+        response.add_post_render_callback(post2)
+
+        # When the content is rendered, all the callbacks are invoked, too.
+        response.render()
+        self.assertEqual('First template\n', response.content)
+        self.assertEquals(post, ['post1','post2'])
+
+
+    def test_pickling(self):
+        # Create a template response. The context is
+        # known to be unpickleable (e.g., a function).
+        response = SimpleTemplateResponse('first/test.html', {
+                'value': 123,
+                'fn': datetime.now,
+            })
+        self.assertRaises(ContentNotRenderedError,
+                          pickle.dumps, response)
+
+        # But if we render the response, we can pickle it.
+        response.render()
+        pickled_response = pickle.dumps(response)
+        unpickled_response = pickle.loads(pickled_response)
+
+        self.assertEquals(unpickled_response.content, response.content)
+        self.assertEquals(unpickled_response['content-type'], response['content-type'])
+        self.assertEquals(unpickled_response.status_code, response.status_code)
+
+        # ...and the unpickled reponse doesn't have the
+        # template-related attributes, so it can't be re-rendered
+        self.assertFalse(hasattr(unpickled_response, 'template_name'))
+        self.assertFalse(hasattr(unpickled_response, 'context_data'))
+        self.assertFalse(hasattr(unpickled_response, '_post_render_callbacks'))
 
 class TemplateResponseTest(BaseTemplateResponseTest):
 
@@ -187,6 +233,33 @@ class TemplateResponseTest(BaseTemplateResponseTest):
 
         self.assertEqual(rc.current_app, 'foobar')
 
+    def test_pickling(self):
+        # Create a template response. The context is
+        # known to be unpickleable (e.g., a function).
+        response = TemplateResponse(self.factory.get('/'),
+            'first/test.html', {
+                'value': 123,
+                'fn': datetime.now,
+            })
+        self.assertRaises(ContentNotRenderedError,
+                          pickle.dumps, response)
+
+        # But if we render the response, we can pickle it.
+        response.render()
+        pickled_response = pickle.dumps(response)
+        unpickled_response = pickle.loads(pickled_response)
+
+        self.assertEquals(unpickled_response.content, response.content)
+        self.assertEquals(unpickled_response['content-type'], response['content-type'])
+        self.assertEquals(unpickled_response.status_code, response.status_code)
+
+        # ...and the unpickled reponse doesn't have the
+        # template-related attributes, so it can't be re-rendered
+        self.assertFalse(hasattr(unpickled_response, '_request'))
+        self.assertFalse(hasattr(unpickled_response, 'template_name'))
+        self.assertFalse(hasattr(unpickled_response, 'context_data'))
+        self.assertFalse(hasattr(unpickled_response, '_post_render_callbacks'))
+
 
 class CustomURLConfTest(TestCase):
     urls = 'regressiontests.templates.urls'
@@ -203,6 +276,41 @@ class CustomURLConfTest(TestCase):
     def test_custom_urlconf(self):
         response = self.client.get('/template_response_view/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'This is where you can find the snark: /snark/')
+        self.assertContains(response, 'This is where you can find the snark: /snark/')
 
 
+class CacheMiddlewareTest(TestCase):
+    urls = 'regressiontests.templates.alternate_urls'
+
+    def setUp(self):
+        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
+        self.CACHE_MIDDLEWARE_SECONDS = settings.CACHE_MIDDLEWARE_SECONDS
+
+        settings.CACHE_MIDDLEWARE_SECONDS = 2.0
+        settings.MIDDLEWARE_CLASSES = list(settings.MIDDLEWARE_CLASSES) + [
+            'django.middleware.cache.FetchFromCacheMiddleware',
+            'django.middleware.cache.UpdateCacheMiddleware',
+        ]
+
+    def tearDown(self):
+        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
+        settings.CACHE_MIDDLEWARE_SECONDS = self.CACHE_MIDDLEWARE_SECONDS
+
+    def test_middleware_caching(self):
+        response = self.client.get('/template_response_view/')
+        self.assertEqual(response.status_code, 200)
+
+        time.sleep(1.0)
+
+        response2 = self.client.get('/template_response_view/')
+        self.assertEqual(response2.status_code, 200)
+
+        self.assertEqual(response.content, response2.content)
+
+        time.sleep(2.0)
+
+        # Let the cache expire and test again
+        response2 = self.client.get('/template_response_view/')
+        self.assertEqual(response2.status_code, 200)
+
+        self.assertNotEqual(response.content, response2.content)

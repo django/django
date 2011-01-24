@@ -55,7 +55,6 @@ Attributes
 
     A boolean indicating whether the response content has been rendered.
 
-
 Methods
 -------
 
@@ -105,6 +104,20 @@ Methods
     rendered.
 
     Override this method in order to customize template rendering.
+
+.. method:: SimpleTemplateResponse.add_post_rendering_callback
+
+    Add a callback that will be invoked after rendering has taken
+    place. This hook can be used to defer certain processing
+    operations (such as caching) until after rendering has occurred.
+
+    If the :class:`~django.template.response.SimpleTemplateResponse`
+    has already been rendered, the callback will be invoked
+    immediately.
+
+    When called, callbacks will be passed a single argument -- the
+    rendered :class:`~django.template.response.SimpleTemplateResponse`
+    instance.
 
 .. method:: SimpleTemplateResponse.render():
 
@@ -210,6 +223,50 @@ the content of the response manually::
     >>> t.content = t.rendered_content
     >>> print t.content
     New content
+
+Post-render callbacks
+---------------------
+
+Some operations -- such as caching -- cannot be performed on an
+unrendered template. They must be performed on a fully complete and
+rendered response.
+
+If you're using middleware, the solution is easy. Middleware provides
+multiple opportunities to process a response on exit from a view. If
+you put behavior in the Response middleware is guaranteed to execute
+after template rendering has taken place.
+
+However, if you're using a decorator, the same opportunities do not
+exist. Any behavior defined in a decorator is handled immediately.
+
+To compensate for this (and any other analogous use cases),
+:class:`TemplateResponse` allows you to register callbacks that will
+be invoked when rendering has completed. Using this callback, you can
+defer critical processing until a point where you can guarantee that
+rendered content will be available.
+
+To define a post-render callback, just define a function that takes
+a single argument -- response -- and register that function with
+the template response::
+
+    def my_render_callback(response):
+        # Do content-sensitive processing
+        do_post_processing()
+
+    def my_view(request):
+        # Create a response
+        response = TemplateResponse(request, 'mytemplate.html', {})
+        # Register the callback
+        response.add_post_render_callback(my_render_callback)
+        # Return the response
+        return response
+
+``my_render_callback()`` will be invoked after the ``mytemplate.html``
+has been rendered, and will be provided the fully rendered
+:class:`TemplateResponse` instance as an argument.
+
+If the template has already been rendered, the callback will be
+invoked immediately.
 
 Using TemplateResponse and SimpleTemplateResponse
 =================================================

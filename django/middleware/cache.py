@@ -52,6 +52,7 @@ from django.conf import settings
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
 from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age
 
+
 class UpdateCacheMiddleware(object):
     """
     Response-phase cache middleware that updates the cache if the response is
@@ -87,7 +88,12 @@ class UpdateCacheMiddleware(object):
         patch_response_headers(response, timeout)
         if timeout:
             cache_key = learn_cache_key(request, response, timeout, self.key_prefix, cache=self.cache)
-            self.cache.set(cache_key, response, timeout)
+            if hasattr(response, 'render') and callable(response.render):
+                response.add_post_render_callback(
+                    lambda r: self.cache.set(cache_key, r, timeout)
+                )
+            else:
+                self.cache.set(cache_key, response, timeout)
         return response
 
 class FetchFromCacheMiddleware(object):
