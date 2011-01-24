@@ -3818,18 +3818,18 @@ msgstr[1] "%(size)d बाइट"
 
 #: template/defaultfilters.py:774
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f के.बी"
+msgid "%s KB"
+msgstr "%s के.बी"
 
 #: template/defaultfilters.py:776
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f एम.बी"
+msgid "%s MB"
+msgstr "%s एम.बी"
 
 #: template/defaultfilters.py:777
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f जी.बी"
+msgid "%s GB"
+msgstr "%s जी.बी"
 
 #: utils/dateformat.py:41
 msgid "p.m."

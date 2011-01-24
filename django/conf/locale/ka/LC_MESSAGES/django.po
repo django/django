@@ -3872,18 +3872,18 @@ msgstr[1] "%(size)d ბაიტი"
 
 #: template/defaultfilters.py:747
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f კბაიტი"
+msgid "%s KB"
+msgstr "%s კბაიტი"
 
 #: template/defaultfilters.py:749
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f მბაიტი"
+msgid "%s MB"
+msgstr "%s მბაიტი"
 
 #: template/defaultfilters.py:750
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f გბაიტი"
+msgid "%s GB"
+msgstr "%s გბაიტი"
 
 #: utils/dateformat.py:41
 msgid "p.m."

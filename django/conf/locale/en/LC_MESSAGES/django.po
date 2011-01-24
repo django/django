@@ -4695,17 +4695,17 @@ msgstr[1] ""
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f KB"
+msgid "%s KB"
 msgstr ""
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f MB"
+msgid "%s MB"
 msgstr ""
 
 #: template/defaultfilters.py:812
 #, python-format
-msgid "%.1f GB"
+msgid "%s GB"
 msgstr ""
 
 #: utils/dateformat.py:42

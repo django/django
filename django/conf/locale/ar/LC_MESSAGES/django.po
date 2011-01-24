@@ -4801,18 +4801,18 @@ msgstr[3] "%(size)d بايت"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f ك.ب"
+msgid "%s KB"
+msgstr "%s ك.ب"
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f م.ب"
+msgid "%s MB"
+msgstr "%s م.ب"
 
 #: template/defaultfilters.py:812
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f ج.ب"
+msgid "%s GB"
+msgstr "%s ج.ب"
 
 #: utils/dateformat.py:42
 msgid "p.m."

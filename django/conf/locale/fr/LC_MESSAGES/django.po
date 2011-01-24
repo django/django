@@ -4889,18 +4889,18 @@ msgstr[1] "%(size)d octets"
 
 #: template/defaultfilters.py:813
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f Ko"
+msgid "%s KB"
+msgstr "%s Ko"
 
 #: template/defaultfilters.py:815
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f Mo"
+msgid "%s MB"
+msgstr "%s Mo"
 
 #: template/defaultfilters.py:816
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f Go"
+msgid "%s GB"
+msgstr "%s Go"
 
 #: utils/dateformat.py:42
 msgid "p.m."

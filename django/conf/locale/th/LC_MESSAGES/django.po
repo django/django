@@ -3631,18 +3631,18 @@ msgstr[0] "%(size)d ไบต์"
 
 #: template/defaultfilters.py:739
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f กิโลไบต์"
+msgid "%s KB"
+msgstr "%s กิโลไบต์"
 
 #: template/defaultfilters.py:741
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f เมกะไบต์"
+msgid "%s MB"
+msgstr "%s เมกะไบต์"
 
 #: template/defaultfilters.py:742
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f กิกะไบต์"
+msgid "%s GB"
+msgstr "%s กิกะไบต์"
 
 #: utils/dateformat.py:41
 msgid "p.m."

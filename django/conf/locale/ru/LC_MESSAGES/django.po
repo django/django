@@ -4707,18 +4707,18 @@ msgstr[2] "%(size)d байт"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f КБ"
+msgid "%s KB"
+msgstr "%s КБ"
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f МБ"
+msgid "%s MB"
+msgstr "%s МБ"
 
 #: template/defaultfilters.py:812
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f ГБ"
+msgid "%s GB"
+msgstr "%s ГБ"
 
 #: utils/dateformat.py:42
 msgid "p.m."

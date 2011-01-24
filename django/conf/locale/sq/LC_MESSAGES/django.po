@@ -106,17 +106,17 @@ msgstr[1] ""
 
 #: template/defaultfilters.py:811
 #, python-format
-msgid "%.1f GB"
+msgid "%s GB"
 msgstr ""
 
 #: template/defaultfilters.py:808
 #, python-format
-msgid "%.1f KB"
+msgid "%s KB"
 msgstr ""
 
 #: template/defaultfilters.py:810
 #, python-format
-msgid "%.1f MB"
+msgid "%s MB"
 msgstr ""
 
 #: contrib/admin/sites.py:447

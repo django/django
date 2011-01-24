@@ -4935,20 +4935,20 @@ msgstr "%(size)d байт"
 #: django/template/defaultfilters.py:728
 #: template/defaultfilters.py:724
 #, python-format
-msgid "%.1f KB"
-msgstr "%.1f КБ"
+msgid "%s KB"
+msgstr "%s КБ"
 
 #: django/template/defaultfilters.py:730
 #: template/defaultfilters.py:726
 #, python-format
-msgid "%.1f MB"
-msgstr "%.1f МБ"
+msgid "%s MB"
+msgstr "%s МБ"
 
 #: django/template/defaultfilters.py:731
 #: template/defaultfilters.py:727
 #, python-format
-msgid "%.1f GB"
-msgstr "%.1f ГБ"
+msgid "%s GB"
+msgstr "%s ГБ"
 
 #: django/utils/dateformat.py:41
 #: utils/dateformat.py:41
