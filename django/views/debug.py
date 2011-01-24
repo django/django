@@ -329,6 +329,7 @@ TECHNICAL_500_TEMPLATE = """
     h2 span { font-size:80%; color:#666; font-weight:normal; }
     h3 { margin:1em 0 .5em 0; }
     h4 { margin:0 0 .5em 0; font-weight: normal; }
+    code, pre { font-size: 100%; }
     table { border:1px solid #ccc; border-collapse: collapse; width:100%; background:white; }
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
     thead th { padding:1px 6px 1px 3px; background:#fefefe; text-align:left; font-weight:normal; font-size:11px; border:1px solid #ddd; }
@@ -340,12 +341,13 @@ TECHNICAL_500_TEMPLATE = """
     table.source th { color:#666; }
     table.source td { font-family:monospace; white-space:pre; border-bottom:1px solid #eee; }
     ul.traceback { list-style-type:none; }
-    ul.traceback li.frame { margin-bottom:1em; }
-    div.context { margin: 10px 0; }
+    ul.traceback li.frame { padding-bottom:1em; }
+    div.context { padding:10px 0; overflow:hidden; }
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
     div.context ol li { font-family:monospace; white-space:pre; color:#666; cursor:pointer; }
+    div.context ol li pre { display:inline; }
     div.context ol.context-line li { color:black; background-color:#ccc; }
-    div.context ol.context-line li span { float: right; }
+    div.context ol.context-line li span { position:absolute; right:32px; }
     div.commands { margin-left: 40px; }
     div.commands a { color:black; text-decoration:none; }
     #summary { background: #ffc; }
