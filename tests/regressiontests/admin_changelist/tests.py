@@ -20,6 +20,26 @@ class ChangeListTests(TransactionTestCase):
                 m.list_select_related, m.list_per_page, m.list_editable, m)
         self.assertEqual(cl.query_set.query.select_related, {'parent': {'name': {}}})
 
+    def test_result_list_empty_changelist_value(self):
+        """
+        Regression test for #14982: EMPTY_CHANGELIST_VALUE should be honored
+        for relationship fields
+        """
+        new_child = Child.objects.create(name='name', parent=None)
+        request = MockRequest()
+        m = ChildAdmin(Child, admin.site)
+        cl = ChangeList(request, Child, m.list_display, m.list_display_links,
+                m.list_filter, m.date_hierarchy, m.search_fields,
+                m.list_select_related, m.list_per_page, m.list_editable, m)
+        cl.formset = None
+        template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
+        context = Context({'cl': cl})
+        table_output = template.render(context)
+        row_html = '<tbody><tr class="row1"><td><input type="checkbox" class="action-select" value="1" name="_selected_action" /></td><th><a href="1/">name</a></th><td>(None)</td></tr></tbody>'
+        self.assertFalse(table_output.find(row_html) == -1,
+            'Failed to find expected row element: %s' % table_output)
+
+
     def test_result_list_html(self):
         """
         Verifies that inclusion tag result_list generates a table when with

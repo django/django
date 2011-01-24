@@ -5,5 +5,5 @@ class Parent(models.Model):
     name = models.CharField(max_length=128)
 
 class Child(models.Model):
-    parent = models.ForeignKey(Parent, editable=False)
+    parent = models.ForeignKey(Parent, editable=False, null=True)
     name = models.CharField(max_length=30, blank=True)
