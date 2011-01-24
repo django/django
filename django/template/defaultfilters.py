@@ -799,19 +799,21 @@ def filesizeformat(bytes):
     try:
         bytes = float(bytes)
     except (TypeError,ValueError,UnicodeDecodeError):
-        return u"0 bytes"
+        return ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
+
+    filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
 
     if bytes < 1024:
         return ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
     if bytes < 1024 * 1024:
-        return ugettext("%.1f KB") % (bytes / 1024)
+        return ugettext("%s KB") % filesize_number_format(bytes / 1024)
     if bytes < 1024 * 1024 * 1024:
-        return ugettext("%.1f MB") % (bytes / (1024 * 1024))
+        return ugettext("%s MB") % filesize_number_format(bytes / (1024 * 1024))
     if bytes < 1024 * 1024 * 1024 * 1024:
-        return ugettext("%.1f GB") % (bytes / (1024 * 1024 * 1024))
+        return ugettext("%s GB") % filesize_number_format(bytes / (1024 * 1024 * 1024))
     if bytes < 1024 * 1024 * 1024 * 1024 * 1024:
-        return ugettext("%.1f TB") % (bytes / (1024 * 1024 * 1024 * 1024))
-    return ugettext("%.1f PB") % (bytes / (1024 * 1024 * 1024 * 1024 * 1024))
+        return ugettext("%s TB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024))
+    return ugettext("%s PB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024 * 1024))
 filesizeformat.is_safe = True
 
 def pluralize(value, arg=u's'):
