@@ -1133,10 +1133,14 @@ class CacheMiddlewareTest(unittest.TestCase):
     def setUp(self):
         self.orig_cache_middleware_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.orig_cache_middleware_key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.orig_cache_middleware_seconds = settings.CACHE_MIDDLEWARE_SECONDS
+        self.orig_cache_middleware_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
         self.orig_caches = settings.CACHES
 
         settings.CACHE_MIDDLEWARE_ALIAS = 'other'
         settings.CACHE_MIDDLEWARE_KEY_PREFIX = 'middlewareprefix'
+        settings.CACHE_MIDDLEWARE_SECONDS = 30
+        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
         settings.CACHES = {
             'default': {
                 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
@@ -1151,7 +1155,41 @@ class CacheMiddlewareTest(unittest.TestCase):
     def tearDown(self):
         settings.CACHE_MIDDLEWARE_ALIAS = self.orig_cache_middleware_alias
         settings.CACHE_MIDDLEWARE_KEY_PREFIX = self.orig_cache_middleware_key_prefix
+        settings.CACHE_MIDDLEWARE_SECONDS = self.orig_cache_middleware_seconds
+        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = self.orig_cache_middleware_anonymous_only
         settings.CACHES = self.orig_caches
+
+    def test_constructor(self):
+        """
+        Ensure the constructor is correctly distinguishing between usage of CacheMiddleware as
+        Middleware vs. usage of CacheMiddleware as view decorator and setting attributes
+        appropriately.
+        """
+        # If no arguments are passed in construction, it's being used as middleware.
+        middleware = CacheMiddleware()
+
+        # Now test object attributes against values defined in setUp above
+        self.assertEquals(middleware.cache_timeout, 30)
+        self.assertEquals(middleware.key_prefix, 'middlewareprefix')
+        self.assertEquals(middleware.cache_alias, 'other')
+        self.assertEquals(middleware.cache_anonymous_only, False)
+
+        # If arguments are being passed in construction, it's being used as a decorator.
+        # First, test with "defaults":
+        as_view_decorator = CacheMiddleware(cache_alias=None, key_prefix=None)
+
+        self.assertEquals(as_view_decorator.cache_timeout, 300) # Timeout value for 'default' cache, i.e. 300
+        self.assertEquals(as_view_decorator.key_prefix, '')
+        self.assertEquals(as_view_decorator.cache_alias, 'default') # Value of DEFAULT_CACHE_ALIAS from django.core.cache
+        self.assertEquals(as_view_decorator.cache_anonymous_only, False)
+
+        # Next, test with custom values:
+        as_view_decorator_with_custom = CacheMiddleware(cache_anonymous_only=True, cache_timeout=60, cache_alias='other', key_prefix='foo')
+
+        self.assertEquals(as_view_decorator_with_custom.cache_timeout, 60)
+        self.assertEquals(as_view_decorator_with_custom.key_prefix, 'foo')
+        self.assertEquals(as_view_decorator_with_custom.cache_alias, 'other')
+        self.assertEquals(as_view_decorator_with_custom.cache_anonymous_only, True)
 
     def test_middleware(self):
         def view(request, value):
@@ -1201,6 +1239,7 @@ class CacheMiddlewareTest(unittest.TestCase):
 
         other_view = cache_page(cache='other')(view)
         other_with_prefix_view = cache_page(cache='other', key_prefix='prefix2')(view)
+        other_with_timeout_view = cache_page(4, cache='other', key_prefix='prefix3')(view)
 
         factory = RequestFactory()
         request = factory.get('/view/')
@@ -1241,33 +1280,48 @@ class CacheMiddlewareTest(unittest.TestCase):
         response = other_with_prefix_view(request, '9')
         self.assertEquals(response.content, 'Hello World 9')
 
+        # Request from the alternate cache with a new prefix and a custom timeout
+        response = other_with_timeout_view(request, '10')
+        self.assertEquals(response.content, 'Hello World 10')
+
         # But if we wait a couple of seconds...
         time.sleep(2)
 
         # ... the default cache will still hit
         cache = get_cache('default')
-        response = default_view(request, '10')
+        response = default_view(request, '11')
         self.assertEquals(response.content, 'Hello World 1')
 
         # ... the default cache with a prefix will still hit
-        response = default_with_prefix_view(request, '11')
+        response = default_with_prefix_view(request, '12')
         self.assertEquals(response.content, 'Hello World 4')
 
         # ... the explicit default cache will still hit
-        response = explicit_default_view(request, '12')
+        response = explicit_default_view(request, '13')
         self.assertEquals(response.content, 'Hello World 1')
 
         # ... the explicit default cache with a prefix will still hit
-        response = explicit_default_with_prefix_view(request, '13')
+        response = explicit_default_with_prefix_view(request, '14')
         self.assertEquals(response.content, 'Hello World 4')
 
         # .. but a rapidly expiring cache won't hit
-        response = other_view(request, '14')
-        self.assertEquals(response.content, 'Hello World 14')
+        response = other_view(request, '15')
+        self.assertEquals(response.content, 'Hello World 15')
 
         # .. even if it has a prefix
-        response = other_with_prefix_view(request, '15')
-        self.assertEquals(response.content, 'Hello World 15')
+        response = other_with_prefix_view(request, '16')
+        self.assertEquals(response.content, 'Hello World 16')
+
+        # ... but a view with a custom timeout will still hit
+        response = other_with_timeout_view(request, '17')
+        self.assertEquals(response.content, 'Hello World 10')
+
+        # And if we wait a few more seconds
+        time.sleep(2)
+
+        # the custom timeouot cache will miss
+        response = other_with_timeout_view(request, '18')
+        self.assertEquals(response.content, 'Hello World 18')
 
 if __name__ == '__main__':
     unittest.main()

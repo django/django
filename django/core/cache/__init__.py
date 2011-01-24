@@ -110,6 +110,7 @@ def parse_backend_conf(backend, **kwargs):
     conf = settings.CACHES.get(backend, None)
     if conf is not None:
         args = conf.copy()
+        args.update(kwargs)
         backend = args.pop('BACKEND')
         location = args.pop('LOCATION', '')
         return backend, location, args
