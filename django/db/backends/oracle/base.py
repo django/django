@@ -365,9 +365,24 @@ WHEN (new.%(col_name)s IS NULL)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
 
+class _UninitializedOperatorsDescriptor(object):
+
+    def __get__(self, instance, owner):
+        # If connection.operators is looked up before a connection has been
+        # created, transparently initialize connection.operators to avert an
+        # AttributeError.
+        if instance is None:
+            raise AttributeError("operators not available as class attribute")
+        # Creating a cursor will initialize the operators.
+        instance.cursor().close()
+        return instance.__dict__['operators']
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'oracle'
-    operators = {
+    operators = _UninitializedOperatorsDescriptor()
+
+    _standard_operators = {
         'exact': '= %s',
         'iexact': '= UPPER(%s)',
         'contains': "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
@@ -381,6 +396,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'istartswith': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
         'iendswith': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
     }
+
+    _likec_operators = _standard_operators.copy()
+    _likec_operators.update({
+        'contains': "LIKEC %s ESCAPE '\\'",
+        'icontains': "LIKEC UPPER(%s) ESCAPE '\\'",
+        'startswith': "LIKEC %s ESCAPE '\\'",
+        'endswith': "LIKEC %s ESCAPE '\\'",
+        'istartswith': "LIKEC UPPER(%s) ESCAPE '\\'",
+        'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
+    })
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
@@ -426,6 +451,22 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS' "
                            "NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF' "
                            "NLS_TERRITORY = 'AMERICA'")
+
+            if 'operators' not in self.__dict__:
+                # Ticket #14149: Check whether our LIKE implementation will
+                # work for this connection or we need to fall back on LIKEC.
+                # This check is performed only once per DatabaseWrapper
+                # instance per thread, since subsequent connections will use
+                # the same settings.
+                try:
+                    cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
+                                   % self._standard_operators['contains'],
+                                   ['X'])
+                except utils.DatabaseError:
+                    self.operators = self._likec_operators
+                else:
+                    self.operators = self._standard_operators
+
             try:
                 self.oracle_version = int(self.connection.version.split('.')[0])
                 # There's no way for the DatabaseOperations class to know the
