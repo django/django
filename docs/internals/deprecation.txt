@@ -155,6 +155,9 @@ their deprecation, as per the :ref:`Django deprecation policy
           a :class:`~django.contrib.gis.geos.GEOSException` when called 
           on a geometry with no SRID value.
 
+        * :class:`~django.http.CompatCookie` will be removed in favour of
+          :class:`~django.http.SimpleCookie`.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the

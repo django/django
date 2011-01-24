@@ -1,7 +1,7 @@
 import copy
 import pickle
 
-from django.http import QueryDict, HttpResponse, CompatCookie, BadHeaderError
+from django.http import QueryDict, HttpResponse, SimpleCookie, BadHeaderError
 from django.utils import unittest
 
 class QueryDictTests(unittest.TestCase):
@@ -250,7 +250,7 @@ class CookieTests(unittest.TestCase):
         # Python 2.4 compatibility note: Python 2.4's cookie implementation
         # always returns Set-Cookie headers terminating in semi-colons.
         # That's not the bug this test is looking for, so ignore it.
-        c = CompatCookie()
+        c = SimpleCookie()
         c['test'] = "An,awkward;value"
         self.assert_(";" not in c.output().rstrip(';')) # IE compat
         self.assert_("," not in c.output().rstrip(';')) # Safari compat
@@ -259,9 +259,9 @@ class CookieTests(unittest.TestCase):
         """
         Test that we can still preserve semi-colons and commas
         """
-        c = CompatCookie()
+        c = SimpleCookie()
         c['test'] = "An,awkward;value"
-        c2 = CompatCookie()
+        c2 = SimpleCookie()
         c2.load(c.output())
         self.assertEqual(c['test'].value, c2['test'].value)
 
@@ -269,8 +269,8 @@ class CookieTests(unittest.TestCase):
         """
         Test that we haven't broken normal encoding
         """
-        c = CompatCookie()
+        c = SimpleCookie()
         c['test'] = "\xf0"
-        c2 = CompatCookie()
+        c2 = SimpleCookie()
         c2.load(c.output())
         self.assertEqual(c['test'].value, c2['test'].value)

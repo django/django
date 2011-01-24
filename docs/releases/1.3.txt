@@ -609,3 +609,11 @@ Previously this field's ``clean()`` method accepted a second, gender, argument
 which allowed stronger validation checks to be made, however since this
 argument could never actually be passed from the Django form machinery it is
 now pending deprecation.
+
+``CompatCookie``
+~~~~~~~~~~~~~~~~
+
+Previously, ``django.http`` exposed an undocumented ``CompatCookie`` class,
+which was a bug-fix wrapper around the standard library ``SimpleCookie``. As the
+fixes are moving upstream, this is now deprecated - you should use ``from
+django.http import SimpleCookie`` instead.

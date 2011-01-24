@@ -21,38 +21,76 @@ except ImportError:
         # PendingDeprecationWarning
         from cgi import parse_qsl
 
+import Cookie
 # httponly support exists in Python 2.6's Cookie library,
 # but not in Python 2.4 or 2.5.
-import Cookie
-if Cookie.Morsel._reserved.has_key('httponly'):
+_morsel_supports_httponly = Cookie.Morsel._reserved.has_key('httponly')
+# Some versions of Python 2.7 and later won't need this encoding bug fix:
+_cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\\073"')
+
+if _morsel_supports_httponly and _cookie_encodes_correctly:
     SimpleCookie = Cookie.SimpleCookie
 else:
-    class Morsel(Cookie.Morsel):
-        def __setitem__(self, K, V):
-            K = K.lower()
-            if K == "httponly":
-                if V:
-                    # The superclass rejects httponly as a key,
-                    # so we jump to the grandparent.
-                    super(Cookie.Morsel, self).__setitem__(K, V)
-            else:
-                super(Morsel, self).__setitem__(K, V)
+    if not _morsel_supports_httponly:
+        class Morsel(Cookie.Morsel):
+            def __setitem__(self, K, V):
+                K = K.lower()
+                if K == "httponly":
+                    if V:
+                        # The superclass rejects httponly as a key,
+                        # so we jump to the grandparent.
+                        super(Cookie.Morsel, self).__setitem__(K, V)
+                else:
+                    super(Morsel, self).__setitem__(K, V)
 
-        def OutputString(self, attrs=None):
-            output = super(Morsel, self).OutputString(attrs)
-            if "httponly" in self:
-                output += "; httponly"
-            return output
+            def OutputString(self, attrs=None):
+                output = super(Morsel, self).OutputString(attrs)
+                if "httponly" in self:
+                    output += "; httponly"
+                return output
 
     class SimpleCookie(Cookie.SimpleCookie):
-        def __set(self, key, real_value, coded_value):
-            M = self.get(key, Morsel())
-            M.set(key, real_value, coded_value)
-            dict.__setitem__(self, key, M)
+        if not _morsel_supports_httponly:
+            def __set(self, key, real_value, coded_value):
+                M = self.get(key, Morsel())
+                M.set(key, real_value, coded_value)
+                dict.__setitem__(self, key, M)
 
-        def __setitem__(self, key, value):
-            rval, cval = self.value_encode(value)
-            self.__set(key, rval, cval)
+            def __setitem__(self, key, value):
+                rval, cval = self.value_encode(value)
+                self.__set(key, rval, cval)
+
+        if not _cookie_encodes_correctly:
+            def value_encode(self, val):
+                # Some browsers do not support quoted-string from RFC 2109,
+                # including some versions of Safari and Internet Explorer.
+                # These browsers split on ';', and some versions of Safari
+                # are known to split on ', '. Therefore, we encode ';' and ','
+
+                # SimpleCookie already does the hard work of encoding and decoding.
+                # It uses octal sequences like '\\012' for newline etc.
+                # and non-ASCII chars.  We just make use of this mechanism, to
+                # avoid introducing two encoding schemes which would be confusing
+                # and especially awkward for javascript.
+
+                # NB, contrary to Python docs, value_encode returns a tuple containing
+                # (real val, encoded_val)
+                val, encoded = super(SimpleCookie, self).value_encode(val)
+
+                encoded = encoded.replace(";", "\\073").replace(",","\\054")
+                # If encoded now contains any quoted chars, we need double quotes
+                # around the whole string.
+                if "\\" in encoded and not encoded.startswith('"'):
+                    encoded = '"' + encoded + '"'
+
+                return val, encoded
+
+class CompatCookie(SimpleCookie):
+    def __init__(self, *args, **kwargs):
+        super(CompatCookie, self).__init__(*args, **kwargs)
+        import warnings
+        warnings.warn("CompatCookie is deprecated, use django.http.SimpleCookie instead.",
+                      PendingDeprecationWarning)
 
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
@@ -389,40 +427,12 @@ class QueryDict(MultiValueDict):
                            for v in list_])
         return '&'.join(output)
 
-class CompatCookie(SimpleCookie):
-    """
-    Cookie class that handles some issues with browser compatibility.
-    """
-    def value_encode(self, val):
-        # Some browsers do not support quoted-string from RFC 2109,
-        # including some versions of Safari and Internet Explorer.
-        # These browsers split on ';', and some versions of Safari
-        # are known to split on ', '. Therefore, we encode ';' and ','
-
-        # SimpleCookie already does the hard work of encoding and decoding.
-        # It uses octal sequences like '\\012' for newline etc.
-        # and non-ASCII chars.  We just make use of this mechanism, to
-        # avoid introducing two encoding schemes which would be confusing
-        # and especially awkward for javascript.
-
-        # NB, contrary to Python docs, value_encode returns a tuple containing
-        # (real val, encoded_val)
-        val, encoded = super(CompatCookie, self).value_encode(val)
-
-        encoded = encoded.replace(";", "\\073").replace(",","\\054")
-        # If encoded now contains any quoted chars, we need double quotes
-        # around the whole string.
-        if "\\" in encoded and not encoded.startswith('"'):
-            encoded = '"' + encoded + '"'
-
-        return val, encoded
-
 def parse_cookie(cookie):
     if cookie == '':
         return {}
     if not isinstance(cookie, Cookie.BaseCookie):
         try:
-            c = CompatCookie()
+            c = SimpleCookie()
             c.load(cookie)
         except Cookie.CookieError:
             # Invalid cookie
@@ -460,7 +470,7 @@ class HttpResponse(object):
         else:
             self._container = [content]
             self._is_string = True
-        self.cookies = CompatCookie()
+        self.cookies = SimpleCookie()
         if status:
             self.status_code = status
 
