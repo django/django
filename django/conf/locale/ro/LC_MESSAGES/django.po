@@ -893,73 +893,61 @@ msgid "dec"
 msgstr "dec"
 
 #: utils/dates.py:31
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "Ian."
 
 #: utils/dates.py:32
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "Feb."
 
 #: utils/dates.py:33
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "March"
 msgstr "Martie"
 
 #: utils/dates.py:34
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "April"
 msgstr "Aprilie"
 
 #: utils/dates.py:35
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "May"
 msgstr "Mai"
 
 #: utils/dates.py:36
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "June"
 msgstr "Iunie"
 
 #: utils/dates.py:37
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "July"
 msgstr "Iulie"
 
 #: utils/dates.py:38
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "Aug."
 
 #: utils/dates.py:39
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "Sept."
 
 #: utils/dates.py:40
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "Oct"
 
 #: utils/dates.py:41
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "Noi."
 
 #: utils/dates.py:42
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "Dec."

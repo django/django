@@ -846,73 +846,61 @@ msgid "dec"
 msgstr "ਦਸੰ"
 
 #: utils/dates.py:31
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "ਜਨ."
 
 #: utils/dates.py:32
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "ਫਰ."
 
 #: utils/dates.py:33
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "March"
 msgstr "ਮਾਰਚ"
 
 #: utils/dates.py:34
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "April"
 msgstr "ਅਪਰੈਲ"
 
 #: utils/dates.py:35
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "May"
 msgstr "ਮਈ"
 
 #: utils/dates.py:36
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "June"
 msgstr "ਜੂਨ"
 
 #: utils/dates.py:37
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "July"
 msgstr "ਜੁਲਾਈ"
 
 #: utils/dates.py:38
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "ਅਗ."
 
 #: utils/dates.py:39
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "ਸਤੰ."
 
 #: utils/dates.py:40
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "ਅਕ."
 
 #: utils/dates.py:41
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "ਨਵੰ."
 
 #: utils/dates.py:42
-#, fuzzy
 msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "ਦਸੰ."
