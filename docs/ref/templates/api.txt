@@ -630,8 +630,13 @@ sources.
 
 Some of these other loaders are disabled by default, but you can activate them
 by editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
-should be a tuple of strings, where each string represents a template loader.
-Here are the template loaders that come with Django:
+should be a tuple of strings, where each string represents a template loader
+class. Here are the template loaders that come with Django:
+
+.. versionchanged:: 1.2
+    Template loaders were based on callables (usually functions) before Django
+    1.2, starting with the 1.2 release there is a new class-based API, all the
+    loaders described below implement this new API.
 
 ``django.template.loaders.filesystem.Loader``
     Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.

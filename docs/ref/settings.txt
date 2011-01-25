@@ -1743,6 +1743,12 @@ used instead of a string. The first item in the tuple should be the ``Loader``'s
 module, subsequent items are passed to the ``Loader`` during initialization. See
 :doc:`/ref/templates/api`.
 
+.. versionchanged:: 1.2
+    The class-based API for template loaders was introduced in Django 1.2
+    although  the ``TEMPLATE_LOADERS`` setting will accept strings that specify
+    function-based loaders until compatibility with them is completely removed in
+    Django 1.4.
+
 .. setting:: TEMPLATE_STRING_IF_INVALID
 
 TEMPLATE_STRING_IF_INVALID
