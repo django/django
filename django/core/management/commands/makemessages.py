@@ -145,11 +145,7 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
         raise CommandError("currently makemessages only supports domains 'django' and 'djangojs'")
 
     if (locale is None and not all) or domain is None:
-        # backwards compatible error message
-        if not sys.argv[0].endswith("make-messages.py"):
-            message = "Type '%s help %s' for usage.\n" % (os.path.basename(sys.argv[0]), sys.argv[1])
-        else:
-            message = "usage: make-messages.py -l <language>\n   or: make-messages.py -a\n"
+        message = "Type '%s help %s' for usage information." % (os.path.basename(sys.argv[0]), sys.argv[1])
         raise CommandError(message)
 
     # We require gettext version 0.15 or newer.
@@ -301,11 +297,11 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--locale', '-l', default=None, dest='locale',
-            help='Creates or updates the message files only for the given locale (e.g. pt_BR).'),
+            help='Creates or updates the message files for the given locale (e.g. pt_BR).'),
         make_option('--domain', '-d', default='django', dest='domain',
             help='The domain of the message files (default: "django").'),
         make_option('--all', '-a', action='store_true', dest='all',
-            default=False, help='Reexamines all source code and templates for new translation strings and updates all message files for all available languages.'),
+            default=False, help='Updates the message files for all existing locales.'),
         make_option('--extension', '-e', dest='extensions',
             help='The file extension(s) to examine (default: ".html", separate multiple extensions with commas, or use -e multiple times)',
             action='append'),
@@ -320,7 +316,11 @@ class Command(NoArgsCommand):
         make_option('--no-obsolete', action='store_true', dest='no_obsolete',
             default=False, help="Remove obsolete message strings"),
     )
-    help = "Runs over the entire source tree of the current directory and pulls out all strings marked for translation. It creates (or updates) a message file in the conf/locale (in the django tree) or locale (for project and application) directory."
+    help = ( "Runs over the entire source tree of the current directory and "
+"pulls out all strings marked for translation. It creates (or updates) a message "
+"file in the conf/locale (in the django tree) or locale (for projects and "
+"applications) directory.\n\nYou must run this command with one of either the "
+"--locale or --all options.")
 
     requires_model_validation = False
     can_import_settings = False
