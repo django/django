@@ -21,8 +21,7 @@ from formsets import BaseFormSet, formset_factory, DELETION_FIELD_NAME
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
-    'save_instance', 'form_for_fields', 'ModelChoiceField',
-    'ModelMultipleChoiceField',
+    'save_instance', 'ModelChoiceField', 'ModelMultipleChoiceField',
 )
 
 def construct_instance(form, instance, fields=None, exclude=None):
@@ -91,26 +90,6 @@ def save_instance(form, instance, fields=None, fail_message='saved',
         # saving of m2m data.
         form.save_m2m = save_m2m
     return instance
-
-def make_model_save(model, fields, fail_message):
-    """Returns the save() method for a Form."""
-    def save(self, commit=True):
-        return save_instance(self, model(), fields, fail_message, commit)
-    return save
-
-def make_instance_save(instance, fields, fail_message):
-    """Returns the save() method for a Form."""
-    def save(self, commit=True):
-        return save_instance(self, instance, fields, fail_message, commit)
-    return save
-
-def form_for_fields(field_list):
-    """
-    Returns a Form class for the given list of Django database field instances.
-    """
-    fields = SortedDict([(f.name, f.formfield())
-                         for f in field_list if f.editable])
-    return type('FormForFields', (BaseForm,), {'base_fields': fields})
 
 
 # ModelForms #################################################################
