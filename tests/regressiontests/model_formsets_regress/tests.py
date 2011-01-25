@@ -2,7 +2,7 @@ from django import forms
 from django.forms.models import modelform_factory, inlineformset_factory, modelformset_factory
 from django.test import TestCase
 
-from models import User, UserSite, Restaurant, Manager
+from models import User, UserSite, Restaurant, Manager, Network, Host
 
 
 class InlineFormsetTests(TestCase):
@@ -166,6 +166,39 @@ class InlineFormsetTests(TestCase):
         for form in formset.forms:
             self.assertTrue('id' in form.fields)
             self.assertEqual(len(form.fields), 1)
+
+    def test_save_as_new_with_new_inlines(self):
+        """
+        Existing and new inlines are saved with save_as_new.
+
+        Regression for #14938.
+
+        """
+        efnet = Network.objects.create(name="EFNet")
+        host1 = Host.objects.create(hostname="irc.he.net", network=efnet)
+
+        HostFormSet = inlineformset_factory(Network, Host)
+
+        # Add a new host, modify previous host, and save-as-new
+        data = {
+            'host_set-TOTAL_FORMS': u'2',
+            'host_set-INITIAL_FORMS': u'1',
+            'host_set-MAX_NUM_FORMS': u'0',
+            'host_set-0-id': unicode(host1.id),
+            'host_set-0-hostname': u'tranquility.hub.dal.net',
+            'host_set-1-hostname': u'matrix.de.eu.dal.net'
+        }
+
+        # To save a formset as new, it needs a new hub instance
+        dalnet = Network.objects.create(name="DALnet")
+        formset = HostFormSet(data, instance=dalnet, save_as_new=True)
+
+        self.assertTrue(formset.is_valid())
+        formset.save()
+        self.assertQuerysetEqual(
+            dalnet.host_set.order_by("hostname"),
+            ["<Host: matrix.de.eu.dal.net>", "<Host: tranquility.hub.dal.net>"]
+            )
 
 
 class CustomWidget(forms.CharField):

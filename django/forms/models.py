@@ -690,10 +690,6 @@ class BaseInlineFormSet(BaseModelFormSet):
             return 0
         return super(BaseInlineFormSet, self).initial_form_count()
 
-    def total_form_count(self):
-        if self.save_as_new:
-            return super(BaseInlineFormSet, self).initial_form_count()
-        return super(BaseInlineFormSet, self).total_form_count()
 
     def _construct_form(self, i, **kwargs):
         form = super(BaseInlineFormSet, self)._construct_form(i, **kwargs)

@@ -17,3 +17,13 @@ class Restaurant(Place):
 class Manager(models.Model):
     retaurant = models.ForeignKey(Restaurant)
     name = models.CharField(max_length=50)
+
+class Network(models.Model):
+    name = models.CharField(max_length=15)
+
+class Host(models.Model):
+    network = models.ForeignKey(Network)
+    hostname = models.CharField(max_length=25)
+
+    def __unicode__(self):
+        return self.hostname
