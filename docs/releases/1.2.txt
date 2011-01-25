@@ -256,6 +256,29 @@ As a side effect, it is now much easier to support non-Django template
 languages. For more details, see the :ref:`notes on supporting
 non-Django template languages<topic-template-alternate-language>`.
 
+Class-based template loaders
+----------------------------
+
+As part of the changes made to introduce `Template caching`_  and following
+a general trend in Django, the template loaders API has been modified
+to use template loading mechanisms that are encapsulated in Python classes as
+opposed to functions, the only method available until Django 1.1.
+
+All the template loaders :ref:`shipped with Django <template-loaders>` have
+been ported to the new API but they still implement the function-based API and
+the template core machinery still accepts function-based loaders (builtin or
+third party) so there is no immediate need to modify your
+:setting:`TEMPLATE_LOADERS` setting in existing projects, things will keep
+working if you leave it untouched up to and including the Django 1.3 release.
+
+If you have developed your own custom template loaders we suggest to consider
+porting them to a class-based implementation because the code for backwards
+compatibility with function-based loaders starts its deprecation process in
+Django 1.2 and will be removed in Django 1.4.  There is a description of the
+API these loader classes must implement :ref:`here
+<topic-template-alternate-language>` and you can also examine the source code
+of the loaders shipped with Django.
+
 Natural keys in fixtures
 ------------------------
 
@@ -1137,3 +1160,10 @@ Language code ``no``
 The currently used language code for Norwegian Bokmål ``no`` is being
 replaced by the more common language code ``nb``.
 
+Function-based template loaders
+-------------------------------
+
+Django 1.2 changes the template loading mechanism to use a class-based
+approach. Old style function-based template loaders will still work, but should
+be updated to use the new :ref:`class-based template loaders
+<topic-template-alternate-language>`.
