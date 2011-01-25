@@ -274,3 +274,23 @@ class Plaything(models.Model):
 class Article(models.Model):
     name = models.CharField(max_length=20)
     created = models.DateTimeField()
+
+class Food(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+    def __unicode__(self):
+        return self.name
+
+class Eaten(models.Model):
+    food = models.ForeignKey(Food, to_field="name")
+    meal = models.CharField(max_length=20)
+
+    def __unicode__(self):
+        return u"%s at %s" % (self.food, self.meal)
+
+class Node(models.Model):
+    num = models.IntegerField(unique=True)
+    parent = models.ForeignKey("self", to_field="num", null=True)
+
+    def __unicode__(self):
+        return u"%s" % self.num

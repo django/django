@@ -158,11 +158,9 @@ class CustomPKTests(TestCase):
         new_bar = Bar.objects.create()
         new_foo = Foo.objects.create(bar=new_bar)
 
-        # FIXME: This still doesn't work, but will require some changes in
-        # get_db_prep_lookup to fix it.
-        # f = Foo.objects.get(bar=new_bar.pk)
-        # self.assertEqual(f, new_foo)
-        # self.assertEqual(f.bar, new_bar)
+        f = Foo.objects.get(bar=new_bar.pk)
+        self.assertEqual(f, new_foo)
+        self.assertEqual(f.bar, new_bar)
 
         f = Foo.objects.get(bar=new_bar)
         self.assertEqual(f, new_foo),
