@@ -178,9 +178,20 @@ class RelatedField(object):
         # the primary key may itself be an object - so we need to keep drilling
         # down until we hit a value that can be used for a comparison.
         v = value
+
+        # In the case of an FK to 'self', this check allows to_field to be used
+        # for both forwards and reverse lookups across the FK. (For normal FKs,
+        # it's only relevant for forward lookups).
+        if isinstance(v, self.rel.to):
+            field_name = getattr(self.rel, "field_name", None)
+        else:
+            field_name = None
         try:
             while True:
-                v = getattr(v, v._meta.pk.name)
+                if field_name is None:
+                    field_name = v._meta.pk.name
+                v = getattr(v, field_name)
+                field_name = None
         except AttributeError:
             pass
         except exceptions.ObjectDoesNotExist:

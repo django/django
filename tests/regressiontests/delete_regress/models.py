@@ -44,3 +44,10 @@ class Email(Contact):
 
 class Researcher(models.Model):
     contacts = models.ManyToManyField(Contact, related_name="research_contacts")
+
+class Food(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+class Eaten(models.Model):
+    food = models.ForeignKey(Food, to_field="name")
+    meal = models.CharField(max_length=20)
