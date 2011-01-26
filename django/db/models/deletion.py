@@ -10,7 +10,8 @@ from django.utils.functional import wraps
 class ProtectedError(IntegrityError):
     def __init__(self, msg, protected_objects):
         self.protected_objects = protected_objects
-        super(ProtectedError, self).__init__(msg, protected_objects)
+        # TODO change this to use super() when we drop Python 2.4
+        IntegrityError.__init__(self, msg, protected_objects)
 
 
 def CASCADE(collector, field, sub_objs, using):
