@@ -7,7 +7,8 @@ from django.core import management
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from models import Person, Group, Membership, UserMembership
+from models import (Person, Group, Membership, UserMembership,
+                    Car, Driver, CarDriver)
 
 
 class M2MThroughTestCase(TestCase):
@@ -117,6 +118,25 @@ class M2MThroughTestCase(TestCase):
                 "<Group: Roll>",
             ]
         )
+
+
+class ToFieldThroughTests(TestCase):
+    def setUp(self):
+        self.car = Car.objects.create(make="Toyota")
+        self.driver = Driver.objects.create(name="Ryan Briscoe")
+        CarDriver.objects.create(car=self.car, driver=self.driver)
+
+    def test_to_field(self):
+        self.assertQuerysetEqual(
+            self.car.drivers.all(),
+            ["<Driver: Ryan Briscoe>"]
+            )
+
+    def test_to_field_reverse(self):
+        self.assertQuerysetEqual(
+            self.driver.car_set.all(),
+            ["<Car: Toyota>"]
+            )
 
 class ThroughLoadDataTestCase(TestCase):
     fixtures = ["m2m_through"]
