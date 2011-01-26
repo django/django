@@ -611,6 +611,7 @@ class TestTicket11101(TransactionTestCase):
         transaction.rollback()
         self.assertEqual(Thingy.objects.count(), 0)
 
+    @skipUnlessDBFeature('supports_transactions')
     def test_ticket_11101(self):
         """Test that fixtures can be rolled back (ticket #11101)."""
         ticket_11101 = transaction.commit_manually(self.ticket_11101)
