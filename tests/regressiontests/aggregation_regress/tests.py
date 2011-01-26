@@ -768,6 +768,18 @@ class AggregationTests(TestCase):
             attrgetter("name")
         )
 
+    def test_quoting_aggregate_order_by(self):
+        qs = Book.objects.filter(
+            name="Python Web Development with Django"
+        ).annotate(
+            authorCount=Count("authors")
+        ).order_by("authorCount")
+        self.assertQuerysetEqual(
+            qs, [
+                ("Python Web Development with Django", 3),
+            ],
+            lambda b: (b.name, b.authorCount)
+        )
 
     if run_stddev_tests():
         def test_stddev(self):
