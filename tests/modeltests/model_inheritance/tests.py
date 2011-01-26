@@ -4,7 +4,7 @@ from django.core.exceptions import FieldError
 from django.test import TestCase
 
 from models import (Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place,
-    Post, Restaurant, Student, StudentWorker, Supplier, Worker)
+    Post, Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel)
 
 
 class ModelInheritanceTests(TestCase):
@@ -269,3 +269,7 @@ class ModelInheritanceTests(TestCase):
         self.assertNumQueries(1,
             lambda: ItalianRestaurant.objects.select_related("chef")[0].chef
         )
+
+    def test_mixin_init(self):
+        m = MixinModel()
+        self.assertEqual(m.other_attr, 1)
