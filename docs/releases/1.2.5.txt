@@ -1,0 +1,63 @@
+==========================
+Django 1.2.5 release notes
+==========================
+
+Welcome to Django 1.2.5!
+
+This is the fifth "bugfix" release in the Django 1.2 series,
+improving the stability and performance of the Django 1.2 codebase.
+
+With two exceptions, Django 1.2.5 maintains backwards compatibility
+with Django 1.2.4, but contain a number of fixes and other
+improvements. Django 1.2.5 is a recommended upgrade for any
+development or deployment currently using or targeting Django 1.2.
+
+For full details on the new features, backwards incompatibilities, and
+deprecated features in the 1.2 branch, see the :doc:`/releases/1.2`.
+
+Backwards incompatible changes
+==============================
+
+FileField no longer deletes files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In earlier Django versions, when a model instance containing a
+:class:`~django.db.models.FileField` was deleted,
+:class:`~django.db.models.FileField` took it upon itself to also delete the
+file from the backend storage. This opened the door to several potentially
+serious data-loss scenarios, including rolled-back transactions and fields on
+different models referencing the same file. In Django 1.2.5,
+:class:`~django.db.models.FileField` will never delete files from the backend
+storage. If you need cleanup of orphaned files, you'll need to handle it
+yourself (for instance, with a custom management command that can be run
+manually or scheduled to run periodically via e.g. cron).
+
+Use of custom SQL to load initial data in tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django provides a custom SQL hooks as a way to inject hand-crafted SQL
+into the database synchronization process. One of the possible uses
+for this custom SQL is to insert data into your database. If your
+custom SQL contains ``INSERT`` statements, those insertions will be
+performed every time your database is synchronized. This includes the
+synchronization of any test databases that are created when you run a
+test suite.
+
+However, in the process of testing the Django 1.3, it was discovered
+that this feature has never completely worked as advertised. When
+using database backends that don't support transactions, or when using
+a TransactionTestCase, data that has been inserted using custom SQL
+will not be visible during the testing process.
+
+Unfortunately, there was no way to rectify this problem without
+introducing a backwards incompatibility. Rather than leave
+SQL-inserted initial data in an uncertain state, Django now enforces
+the policy that data inserted by custom SQL will *not* be visible
+during testing.
+
+This change only affects the testing process. You can still use custom
+SQL to load data into your production database as part of the syncdb
+process. If you require data to exist during test conditions, you
+should either insert it using :ref:`test fixtures
+<topics-testing-fixtures>`, or using the ``setUp()`` method of your
+test case.
