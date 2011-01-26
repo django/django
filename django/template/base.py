@@ -9,7 +9,7 @@ from django.utils.itercompat import is_iterable
 from django.utils.functional import curry, Promise
 from django.utils.text import smart_split, unescape_string_literal, get_text_list
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from django.utils.safestring import SafeData, EscapeData, mark_safe, mark_for_escaping
 from django.utils.formats import localize
 from django.utils.html import escape
@@ -655,7 +655,7 @@ class Variable(object):
             # We're dealing with a literal, so it's already been "resolved"
             value = self.literal
         if self.translate:
-            return _(value)
+            return ugettext_lazy(value)
         return value
 
     def __repr__(self):

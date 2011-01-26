@@ -15,7 +15,7 @@ from django.utils.numberformat import format as nformat
 from django.utils.safestring import mark_safe, SafeString, SafeUnicode
 from django.utils.translation import (ugettext, ugettext_lazy, activate,
         deactivate, gettext_lazy, pgettext, npgettext, to_locale,
-        get_language_info)
+        get_language_info, get_language)
 from django.utils.unittest import TestCase
 
 
@@ -743,3 +743,134 @@ class TestLanguageInfo(TestCase):
         self.assertEqual(li['name_local'], u'Deutsch')
         self.assertEqual(li['name'], 'German')
         self.assertEqual(li['bidi'], False)
+
+
+class MultipleLocaleActivationTests(TestCase):
+    """
+    Tests for template rendering behavior when multiple locales are activated
+    during the lifetime of the same process.
+    """
+    def setUp(self):
+        self._old_language = get_language()
+
+    def tearDown(self):
+        activate(self._old_language)
+
+    def test_single_locale_activation(self):
+        """
+        Simple baseline behavior with one locale for all the supported i18n constructs.
+        """
+        activate('fr')
+        self.assertEqual(Template("{{ _('Yes') }}").render(Context({})), 'Oui')
+        self.assertEqual(Template("{% load i18n %}{% trans 'Yes' %}").render(Context({})), 'Oui')
+        self.assertEqual(Template("{% load i18n %}{% blocktrans %}Yes{% endblocktrans %}").render(Context({})), 'Oui')
+
+    # Literal marked up with _() in a filter expression
+
+    def test_multiple_locale_filter(self):
+        activate('de')
+        t = Template("{% load i18n %}{{ 0|yesno:_('yes,no,maybe') }}")
+        activate(self._old_language)
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'nee')
+
+    def test_multiple_locale_filter_deactivate(self):
+        activate('de')
+        t = Template("{% load i18n %}{{ 0|yesno:_('yes,no,maybe') }}")
+        deactivate()
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'nee')
+
+    def test_multiple_locale_filter_direct_switch(self):
+        activate('de')
+        t = Template("{% load i18n %}{{ 0|yesno:_('yes,no,maybe') }}")
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'nee')
+
+    # Literal marked up with _()
+
+    def test_multiple_locale(self):
+        activate('de')
+        t = Template("{{ _('No') }}")
+        activate(self._old_language)
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    def test_multiple_locale_deactivate(self):
+        activate('de')
+        t = Template("{{ _('No') }}")
+        deactivate()
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    def test_multiple_locale_direct_switch(self):
+        activate('de')
+        t = Template("{{ _('No') }}")
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    # Literal marked up with _(), loading the i18n template tag library
+
+    def test_multiple_locale_loadi18n(self):
+        activate('de')
+        t = Template("{% load i18n %}{{ _('No') }}")
+        activate(self._old_language)
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    def test_multiple_locale_loadi18n_deactivate(self):
+        activate('de')
+        t = Template("{% load i18n %}{{ _('No') }}")
+        deactivate()
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    def test_multiple_locale_loadi18n_direct_switch(self):
+        activate('de')
+        t = Template("{% load i18n %}{{ _('No') }}")
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    # trans i18n tag
+
+    def test_multiple_locale_trans(self):
+        activate('de')
+        t = Template("{% load i18n %}{% trans 'No' %}")
+        activate(self._old_language)
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    def test_multiple_locale_deactivate_trans(self):
+        activate('de')
+        t = Template("{% load i18n %}{% trans 'No' %}")
+        deactivate()
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    def test_multiple_locale_direct_switch_trans(self):
+        activate('de')
+        t = Template("{% load i18n %}{% trans 'No' %}")
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    # blocktrans i18n tag
+
+    def test_multiple_locale_btrans(self):
+        activate('de')
+        t = Template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
+        activate(self._old_language)
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    def test_multiple_locale_deactivate_btrans(self):
+        activate('de')
+        t = Template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
+        deactivate()
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
+
+    def test_multiple_locale_direct_switch_btrans(self):
+        activate('de')
+        t = Template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
+        activate('nl')
+        self.assertEqual(t.render(Context({})), 'Nee')
