@@ -330,7 +330,7 @@ class SQLCompiler(object):
                 continue
             col, order = get_order_dir(field, asc)
             if col in self.query.aggregate_select:
-                result.append('%s %s' % (col, order))
+                result.append('%s %s' % (qn(col), order))
                 continue
             if '.' in field:
                 # This came in through an extra(order_by=...) addition. Pass it
