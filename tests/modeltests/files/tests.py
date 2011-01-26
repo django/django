@@ -61,11 +61,10 @@ class FileTests(TestCase):
         cache.set("obj2", obj2)
         self.assertEqual(cache.get("obj2").normal.name, "tests/django_test_1.txt")
 
-        # Deleting an object deletes the file it uses, if there are no other
-        # objects still using that file.
+        # Deleting an object does not delete the file it uses.
         obj2.delete()
         obj2.normal.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj2.normal.name, "tests/django_test_1.txt")
+        self.assertEqual(obj2.normal.name, "tests/django_test_2.txt")
 
         # Multiple files with the same name get _N appended to them.
         objs = [Storage() for i in range(3)]
