@@ -611,7 +611,8 @@ class TestTicket11101(TransactionTestCase):
         transaction.rollback()
         self.assertEqual(Thingy.objects.count(), 0)
 
-    def test_ticket_11101(self):
-        """Test that fixtures can be rolled back (ticket #11101)."""
-        ticket_11101 = transaction.commit_manually(self.ticket_11101)
-        ticket_11101()
+    if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'] != 'django.db.backends.mysql':
+        def test_ticket_11101(self):
+            """Test that fixtures can be rolled back (ticket #11101)."""
+            ticket_11101 = transaction.commit_manually(self.ticket_11101)
+            ticket_11101()
