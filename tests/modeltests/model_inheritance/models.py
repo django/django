@@ -143,3 +143,11 @@ class Copy(NamedURL):
 
     def __unicode__(self):
         return self.content
+
+class Mixin(object):
+    def __init__(self):
+        self.other_attr = 1
+        super(Mixin, self).__init__()
+
+class MixinModel(models.Model, Mixin):
+    pass

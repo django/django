@@ -6,7 +6,7 @@ from django.db import connection
 from django.test import TestCase
 
 from models import (Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place,
-    Post, Restaurant, Student, StudentWorker, Supplier, Worker)
+    Post, Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel)
 
 
 class ModelInheritanceTests(TestCase):
@@ -278,4 +278,6 @@ class ModelInheritanceTests(TestCase):
         finally:
             settings.DEBUG = old_DEBUG
 
-
+    def test_mixin_init(self):
+        m = MixinModel()
+        self.assertEqual(m.other_attr, 1)
