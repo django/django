@@ -306,11 +306,6 @@ You can now delete the ``index()``, ``detail()`` and ``results()``
 views from ``polls/views.py``. We don't need them anymore -- they have
 been replaced by generic views.
 
-The ``vote()`` view is still required. However, it must be modified to
-match the new context variables. In the
-:func:`~django.shortcuts.render_to_response` call, rename the ``poll``
-context variable to ``object``.
-
 The last thing to do is fix the URL handling to account for the use of
 generic views. In the vote view above, we used the
 :func:`~django.core.urlresolvers.reverse` function to avoid
