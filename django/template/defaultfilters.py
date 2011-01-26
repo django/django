@@ -460,10 +460,7 @@ def dictsort(value, arg):
     Takes a list of dicts, returns that list sorted by the property given in
     the argument.
     """
-    var_resolve = Variable(arg).resolve
-    decorated = [(var_resolve(item), item) for item in value]
-    decorated.sort()
-    return [item[1] for item in decorated]
+    return sorted(value, key=Variable(arg).resolve)
 dictsort.is_safe = False
 
 def dictsortreversed(value, arg):
@@ -471,11 +468,7 @@ def dictsortreversed(value, arg):
     Takes a list of dicts, returns that list sorted in reverse order by the
     property given in the argument.
     """
-    var_resolve = Variable(arg).resolve
-    decorated = [(var_resolve(item), item) for item in value]
-    decorated.sort()
-    decorated.reverse()
-    return [item[1] for item in decorated]
+    return sorted(value, key=Variable(arg).resolve, reverse=True)
 dictsortreversed.is_safe = False
 
 def first(value):
