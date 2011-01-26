@@ -80,8 +80,8 @@ class DayMixin(object):
 
     def get_day_format(self):
         """
-        Get a month format string in strptime syntax to be used to parse the
-        month from url variables.
+        Get a day format string in strptime syntax to be used to parse the day
+        from url variables.
         """
         return self.day_format
 
