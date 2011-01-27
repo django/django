@@ -889,14 +889,41 @@ for an explanation of how to write new tests.
 Running the unit tests
 ----------------------
 
-To run the tests, ``cd`` to the ``tests/`` directory and type:
+Quickstart
+~~~~~~~~~~
+
+Running the tests requires a Django settings module that defines the
+databases to use. To make it easy to get started. Django provides a
+sample settings module that uses the SQLite database. To run the tests
+with this sample ``settings`` module, ``cd`` into the Django
+``tests/`` directory and run:
+
+.. code-block:: bash
+
+    ./runtests.py --settings=test_sqlite
+
+If you get an ``ImportError: No module named django.contrib`` error,
+you need to add your install of Django to your ``PYTHONPATH``. For
+more details on how to do this, read `Pointing Python at the new
+Django version`_ below.
+
+Using another ``settings`` module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The included settings module allows you to run the test suite using
+SQLite. If you want to test behavior using a different database (and
+if you're proposing patches for Django, it's a good idea to test
+across databases), you may need to define your own settings file.
+
+To run the tests with different settings, ``cd`` to the ``tests/`` directory
+and type:
 
 .. code-block:: bash
 
     ./runtests.py --settings=path.to.django.settings
 
-Yes, the unit tests need a settings module, but only for database connection
-info. Your :setting:`DATABASES` setting needs to define two databases:
+The :setting:`DATABASES` setting in this test settings module needs to define
+two databases:
 
     * A ``default`` database. This database should use the backend that
       you want to use for primary testing
@@ -907,22 +934,8 @@ info. Your :setting:`DATABASES` setting needs to define two databases:
       want. It doesn't need to use the same backend as the ``default``
       database (although it can use the same backend if you want to).
 
-As a convenience, a minimal settings file, using two in memory SQLite
-databases, is included in your Django distribution. It is called
-``test_sqlite``, and is included in the ``tests`` directory. This allows you to
-get started running the tests against the sqlite database without doing
-anything on your filesystem. However it should be noted that running against
-other database backends is recommended for certain types of test cases.
-
-To run the tests with this included settings file, ``cd``
-to the ``tests/`` directory and type:
-
-.. code-block:: bash
-
-    ./runtests.py --settings=test_sqlite
-
-If you're using another backend, you will need to provide other details for
-each database:
+If you're using a backend that isn't SQLite, you will need to provide other
+details for each database:
 
     * The :setting:`USER` option for each of your databases needs to
       specify an existing user account for the database.
@@ -941,6 +954,40 @@ You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
 you will need to include a value for ``TEST_CHARSET`` in the settings
 dictionary for the applicable database.
+
+Running only some of the tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's entire test suite takes a few minutes to run. To run a subset of the
+unit tests, append the names of the test modules to the ``runtests.py``
+command line.
+
+As an example, if you'd like to only run tests for generic relations and
+internationalization, type:
+
+.. code-block:: bash
+
+    ./runtests.py --settings=path.to.settings generic_relations i18n
+
+See the list of directories in ``tests/modeltests`` and
+``tests/regressiontests`` for module names.
+
+If you just want to run a particular class of tests, you can specify a list of
+paths to individual test classes. For example, to run the ``TranslationTests``
+of the ``i18n`` module, type:
+
+.. code-block:: bash
+
+    ./runtests.py --settings=path.to.settings i18n.TranslationTests
+
+You can specify an individual test like this:
+
+.. code-block:: bash
+
+    ./runtests.py --settings=path.to.settings i18n.TranslationTests.test_lazy_objects
+
+Running all the tests
+~~~~~~~~~~~~~~~~~~~~~
 
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
@@ -966,19 +1013,6 @@ associated tests will be skipped.
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
 .. _memcached: http://www.danga.com/memcached/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
-
-To run a subset of the unit tests, append the names of the test modules to the
-``runtests.py`` command line. See the list of directories in
-``tests/modeltests`` and ``tests/regressiontests`` for module names.
-
-As an example, if Django is not in your ``PYTHONPATH``, you placed
-``settings.py`` in the ``tests/`` directory, and you'd like to only run tests
-for generic relations and internationalization, type:
-
-.. code-block:: bash
-
-    PYTHONPATH=`pwd`/..
-    ./runtests.py --settings=settings generic_relations i18n
 
 Contrib apps
 ------------
