@@ -224,7 +224,7 @@ def bisect_tests(bisection_label, options, test_labels):
         except ValueError:
             pass
 
-    subprocess_args = ['python','runtests.py', '--settings=%s' % options.settings]
+    subprocess_args = [sys.executable, __file__, '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:
@@ -284,7 +284,7 @@ def paired_tests(paired_test, options, test_labels):
         except ValueError:
             pass
 
-    subprocess_args = ['python','runtests.py', '--settings=%s' % options.settings]
+    subprocess_args = [sys.executable, __file__, '--settings=%s' % options.settings]
     if options.failfast:
         subprocess_args.append('--failfast')
     if options.verbosity:
@@ -325,6 +325,8 @@ if __name__ == "__main__":
     elif "DJANGO_SETTINGS_MODULE" not in os.environ:
         parser.error("DJANGO_SETTINGS_MODULE is not set in the environment. "
                       "Set it or use --settings.")
+    else:
+        options.settings = os.environ['DJANGO_SETTINGS_MODULE']
 
     if options.bisect:
         bisect_tests(options.bisect, options, args)
