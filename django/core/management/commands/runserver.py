@@ -63,6 +63,7 @@ class BaseRunserverCommand(BaseCommand):
                     raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
         if not self.addr:
             self.addr = self.use_ipv6 and '::1' or '127.0.0.1'
+            self._raw_ipv6 = bool(self.use_ipv6)
         self.run(*args, **options)
 
     def run(self, *args, **options):

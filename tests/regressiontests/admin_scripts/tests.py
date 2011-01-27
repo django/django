@@ -1025,10 +1025,10 @@ class ManageRunserver(AdminScriptTestCase):
 
         # IPv6
         self.cmd.handle(addrport="", use_ipv6=True)
-        self.assertServerSettings('::1', '8000', ipv6=True)
+        self.assertServerSettings('::1', '8000', ipv6=True, raw_ipv6=True)
 
         self.cmd.handle(addrport="7000", use_ipv6=True)
-        self.assertServerSettings('::1', '7000', ipv6=True)
+        self.assertServerSettings('::1', '7000', ipv6=True, raw_ipv6=True)
 
         self.cmd.handle(addrport="[2001:0db8:1234:5678::9]:7000")
         self.assertServerSettings('2001:0db8:1234:5678::9', '7000', ipv6=True, raw_ipv6=True)
@@ -1045,7 +1045,7 @@ class ManageRunserver(AdminScriptTestCase):
 
         # Potentially ambiguous
 
-        # Only 4 characters, all of which coudl be in an ipv6 address
+        # Only 4 characters, all of which could be in an ipv6 address
         self.cmd.handle(addrport="beef:7654")
         self.assertServerSettings('beef', '7654')
 
