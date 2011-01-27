@@ -48,6 +48,8 @@ def register_serializer(format, serializer_module, serializers=None):
     directly into the global register of serializers. Adding serializers
     directly is not a thread-safe operation.
     """
+    if serializers is None and not _serializers:
+        _load_serializers()
     module = importlib.import_module(serializer_module)
     if serializers is None:
         _serializers[format] = module
@@ -56,6 +58,8 @@ def register_serializer(format, serializer_module, serializers=None):
 
 def unregister_serializer(format):
     "Unregister a given serializer. This is not a thread-safe operation."
+    if not _serializers:
+        _load_serializers()
     del _serializers[format]
 
 def get_serializer(format):
