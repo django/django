@@ -85,9 +85,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             table, column = [s.strip('"') for s in m.groups()]
 
             cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s", [table])
-            result = cursor.fetchone()
-            if not result:
-                continue
+            result = cursor.fetchall()[0]
             other_table_results = result[0].strip()
             li, ri = other_table_results.index('('), other_table_results.rindex(')')
             other_table_results = other_table_results[li+1:ri]
