@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from StringIO import StringIO
+import unittest
 from xml.dom import minidom
 
+from django.conf import settings
 from django.core import serializers
 from django.db import transaction
 from django.test import TestCase, TransactionTestCase, Approximate
@@ -10,6 +12,56 @@ from django.utils import simplejson
 
 from models import Category, Author, Article, AuthorProfile, Actor, \
                                     Movie, Score, Player, Team
+
+class SerializerRegistrationTests(unittest.TestCase):
+    def setUp(self):
+        self.old_SERIALIZATION_MODULES = getattr(settings, 'SERIALIZATION_MODULES', None)
+        self.old_serializers = serializers._serializers
+
+        serializers._serializers = {}
+        settings.SERIALIZATION_MODULES = {
+            "json2" : "django.core.serializers.json",
+        }
+
+    def tearDown(self):
+        serializers._serializers = self.old_serializers
+        if self.old_SERIALIZATION_MODULES:
+            settings.SERIALIZATION_MODULES = self.old_SERIALIZATION_MODULES
+        else:
+            delattr(settings, 'SERIALIZATION_MODULES')
+
+    def test_register(self):
+        "Registering a new serializer populates the full registry. Refs #14823"
+        serializers.register_serializer('json3', 'django.core.serializers.json')
+
+        public_formats = serializers.get_public_serializer_formats()
+        self.assertTrue('json3' in public_formats)
+        self.assertTrue('json2' in public_formats)
+        self.assertTrue('xml' in public_formats)
+
+    def test_unregister(self):
+        "Unregistering a serializer doesn't cause the registry to be repopulated. Refs #14823"
+        serializers.unregister_serializer('xml')
+        serializers.register_serializer('json3', 'django.core.serializers.json')
+
+        public_formats = serializers.get_public_serializer_formats()
+
+        self.assertFalse('xml' in public_formats)
+        self.assertTrue('json3' in public_formats)
+
+    def test_builtin_serializers(self):
+        "Requesting a list of serializer formats popuates the registry"
+        all_formats = set(serializers.get_serializer_formats())
+        public_formats = set(serializers.get_public_serializer_formats())
+
+        self.assertTrue('xml' in all_formats),
+        self.assertTrue('xml' in public_formats)
+
+        self.assertTrue('json2' in all_formats)
+        self.assertTrue('json2' in public_formats)
+
+        self.assertTrue('python' in all_formats)
+        self.assertFalse('python' in public_formats)
 
 class SerializersTestBase(object):
     @staticmethod
