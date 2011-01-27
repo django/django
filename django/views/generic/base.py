@@ -8,6 +8,7 @@ from django.utils.decorators import classonlymethod
 
 logger = getLogger('django.request')
 
+
 class View(object):
     """
     Intentionally simple parent class for all views. Only implements

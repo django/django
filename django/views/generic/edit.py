@@ -102,9 +102,6 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         self.object = form.save()
         return super(ModelFormMixin, self).form_valid(form)
 
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
     def get_context_data(self, **kwargs):
         context = kwargs
         if self.object:
@@ -169,6 +166,7 @@ class BaseCreateView(ModelFormMixin, ProcessFormView):
     def put(self, *args, **kwargs):
         return self.post(*args, **kwargs)
 
+
 class CreateView(SingleObjectTemplateResponseMixin, BaseCreateView):
     """
     View for creating an new object instance,
@@ -227,12 +225,14 @@ class DeletionMixin(object):
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")
 
+
 class BaseDeleteView(DeletionMixin, BaseDetailView):
     """
     Base view for deleting an object.
 
     Using this base class requires subclassing to provide a response mixin.
     """
+
 
 class DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView):
     """

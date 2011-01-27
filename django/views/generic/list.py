@@ -119,6 +119,7 @@ class BaseListView(MultipleObjectMixin, View):
         context = self.get_context_data(object_list=self.object_list)
         return self.render_to_response(context)
 
+
 class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
     template_name_suffix = '_list'
 
@@ -138,6 +139,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
             names.append("%s/%s%s.html" % (opts.app_label, opts.object_name.lower(), self.template_name_suffix))
 
         return names
+
 
 class ListView(MultipleObjectTemplateResponseMixin, BaseListView):
     """

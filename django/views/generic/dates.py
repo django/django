@@ -212,8 +212,6 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
 
         return date_list
 
-
-
     def get_context_data(self, **kwargs):
         """
         Get the context. Must return a Context (or subclass) instance.
@@ -240,7 +238,7 @@ class BaseArchiveIndexView(BaseDateListView):
         date_list = self.get_date_list(qs, 'year')
 
         if date_list:
-            object_list = qs.order_by('-'+self.get_date_field())
+            object_list = qs.order_by('-' + self.get_date_field())
         else:
             object_list = qs.none()
 
@@ -325,7 +323,6 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
             'next_month': self.get_next_month(date),
             'previous_month': self.get_previous_month(date),
         })
-
 
 
 class MonthArchiveView(MultipleObjectTemplateResponseMixin, BaseMonthArchiveView):
@@ -416,7 +413,6 @@ class BaseDayArchiveView(YearMixin, MonthMixin, DayMixin, BaseDateListView):
         })
 
 
-
 class DayArchiveView(MultipleObjectTemplateResponseMixin, BaseDayArchiveView):
     """
     List of objects published on a given day.
@@ -477,7 +473,6 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         return super(BaseDetailView, self).get_object(queryset=qs)
 
 
-
 class DateDetailView(SingleObjectTemplateResponseMixin, BaseDateDetailView):
     """
     Detail view of a single object on a single date; this differs from the
@@ -498,6 +493,7 @@ def _date_from_string(year, year_format, month, month_format, day='', day_format
     except ValueError:
         raise Http404(u"Invalid date string '%s' given format '%s'" % (datestr, format))
 
+
 def _month_bounds(date):
     """
     Helper: return the first and last days of the month for the given date.
@@ -509,6 +505,7 @@ def _month_bounds(date):
         last_day = first_day.replace(month=first_day.month + 1)
 
     return first_day, last_day
+
 
 def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day):
     """
@@ -582,6 +579,7 @@ def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day)
     else:
         return None
 
+
 def _date_lookup_for_field(field, date):
     """
     Get the lookup kwargs for looking up a date against a given Field. If the
@@ -597,4 +595,3 @@ def _date_lookup_for_field(field, date):
         return {'%s__range' % field.name: date_range}
     else:
         return {field.name: date}
-
