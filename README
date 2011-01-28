@@ -43,3 +43,4 @@ To run Django's test suite:
     * Follow the instructions in the "Unit tests" section of
       docs/internals/contributing.txt, published online at
       http://docs.djangoproject.com/en/dev/internals/contributing/#running-the-unit-tests
+
