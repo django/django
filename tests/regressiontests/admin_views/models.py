@@ -187,16 +187,26 @@ class Actor(models.Model):
 class Inquisition(models.Model):
     expected = models.BooleanField()
     leader = models.ForeignKey(Actor)
+    country = models.CharField(max_length=20)
+
     def __unicode__(self):
-        return self.expected
+        return u"by %s from %s" % (self.leader, self.country)
+
+class InquisitionAdmin(admin.ModelAdmin):
+    list_display = ('leader', 'country', 'expected')
 
 class Sketch(models.Model):
     title = models.CharField(max_length=100)
     inquisition = models.ForeignKey(Inquisition, limit_choices_to={'leader__name': 'Palin',
                                                                    'leader__age': 27,
+                                                                   'expected': False,
                                                                    })
+
     def __unicode__(self):
         return self.title
+
+class SketchAdmin(admin.ModelAdmin):
+    raw_id_fields = ('inquisition',)
 
 class Fabric(models.Model):
     NG_CHOICES = (
@@ -663,8 +673,8 @@ admin.site.register(ModelWithStringPrimaryKey)
 admin.site.register(Color)
 admin.site.register(Thing, ThingAdmin)
 admin.site.register(Actor)
-admin.site.register(Inquisition)
-admin.site.register(Sketch)
+admin.site.register(Inquisition, InquisitionAdmin)
+admin.site.register(Sketch, SketchAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Persona, PersonaAdmin)
 admin.site.register(Subscriber, SubscriberAdmin)

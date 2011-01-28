@@ -2,6 +2,7 @@
 
 import re
 import datetime
+import urlparse
 
 from django.conf import settings
 from django.core import mail
@@ -34,7 +35,7 @@ from models import (Article, BarAccount, CustomArticle, EmptyModel,
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast,
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit,
     Category, Post, Plot, FunkyTag, Chapter, Book, Promo, WorkHour, Employee,
-    Question, Answer)
+    Question, Answer, Inquisition, Actor)
 
 
 class AdminViewBasicTest(TestCase):
@@ -2349,6 +2350,39 @@ class ReadonlyTest(TestCase):
         "Regression test for #13004"
         response = self.client.get('/test_admin/admin/admin_views/pizza/add/')
         self.assertEqual(response.status_code, 200)
+
+
+class RawIdFieldsTest(TestCase):
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_limit_choices_to(self):
+        """Regression test for 14880"""
+        # This includes tests integers, strings and booleans in the lookup query string
+        actor = Actor.objects.create(name="Palin", age=27)
+        inquisition1 = Inquisition.objects.create(expected=True,
+                                                  leader=actor,
+                                                  country="England")
+        inquisition2 = Inquisition.objects.create(expected=False,
+                                                  leader=actor,
+                                                  country="Spain")
+        response = self.client.get('/test_admin/admin/admin_views/sketch/add/')
+        # Find the link
+        m = re.search(r'<a href="([^"]*)"[^>]* id="lookup_id_inquisition"', response.content)
+        self.assertTrue(m) # Got a match
+        popup_url = m.groups()[0].replace("&amp;", "&")
+
+        # Handle relative links
+        popup_url = urlparse.urljoin(response.request['PATH_INFO'], popup_url)
+        # Get the popup
+        response2 = self.client.get(popup_url)
+        self.assertContains(response2, "Spain")
+        self.assertNotContains(response2, "England")
 
 class UserAdminTest(TestCase):
     """
