@@ -178,6 +178,26 @@ class Thing(models.Model):
 class ThingAdmin(admin.ModelAdmin):
     list_filter = ('color__warm', 'color__value')
 
+class Actor(models.Model):
+    name = models.CharField(max_length=50)
+    age = models.IntegerField()
+    def __unicode__(self):
+        return self.name
+
+class Inquisition(models.Model):
+    expected = models.BooleanField()
+    leader = models.ForeignKey(Actor)
+    def __unicode__(self):
+        return self.expected
+
+class Sketch(models.Model):
+    title = models.CharField(max_length=100)
+    inquisition = models.ForeignKey(Inquisition, limit_choices_to={'leader__name': 'Palin',
+                                                                   'leader__age': 27,
+                                                                   })
+    def __unicode__(self):
+        return self.title
+
 class Fabric(models.Model):
     NG_CHOICES = (
         ('Textured', (
@@ -642,6 +662,9 @@ admin.site.register(Section, save_as=True, inlines=[ArticleInline])
 admin.site.register(ModelWithStringPrimaryKey)
 admin.site.register(Color)
 admin.site.register(Thing, ThingAdmin)
+admin.site.register(Actor)
+admin.site.register(Inquisition)
+admin.site.register(Sketch)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Persona, PersonaAdmin)
 admin.site.register(Subscriber, SubscriberAdmin)

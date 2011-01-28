@@ -55,6 +55,10 @@ class Options(object):
         self.abstract_managers = []
         self.concrete_managers = []
 
+        # List of all lookups defined in ForeignKey 'limit_choices_to' options
+        # from *other* models. Needed for some admin checks. Internal use only.
+        self.related_fkey_lookups = []
+
     def contribute_to_class(self, cls, name):
         from django.db import connection
         from django.db.backends.util import truncate_name

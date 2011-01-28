@@ -91,6 +91,22 @@ class AdminFileWidget(forms.ClearableFileInput):
     template_with_clear = (u'<span class="clearable-file-input">%s</span>'
                            % forms.ClearableFileInput.template_with_clear)
 
+def url_params_from_lookup_dict(lookups):
+    """
+    Converts the type of lookups specified in a ForeignKey limit_choices_to
+    attribute to a dictionary of query parameters
+    """
+    params = {}
+    if lookups and hasattr(lookups, 'items'):
+        items = []
+        for k, v in lookups.items():
+            if isinstance(v, list):
+                v = u','.join([str(x) for x in v])
+            else:
+                v = unicode(v)
+            items.append((k, v))
+        params.update(dict(items))
+    return params
 
 class ForeignKeyRawIdWidget(forms.TextInput):
     """
@@ -108,33 +124,23 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         related_url = '../../../%s/%s/' % (self.rel.to._meta.app_label, self.rel.to._meta.object_name.lower())
         params = self.url_parameters()
         if params:
-            url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
+            url = u'?' + u'&amp;'.join([u'%s=%s' % (k, v) for k, v in params.items()])
         else:
-            url = ''
+            url = u''
         if "class" not in attrs:
             attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)]
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
-        output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
+        output.append(u'<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
             (related_url, url, name))
-        output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Lookup')))
+        output.append(u'<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Lookup')))
         if value:
             output.append(self.label_for_value(value))
         return mark_safe(u''.join(output))
 
     def base_url_parameters(self):
-        params = {}
-        if self.rel.limit_choices_to and hasattr(self.rel.limit_choices_to, 'items'):
-            items = []
-            for k, v in self.rel.limit_choices_to.items():
-                if isinstance(v, list):
-                    v = ','.join([str(x) for x in v])
-                else:
-                    v = str(v)
-                items.append((k, v))
-            params.update(dict(items))
-        return params
+        return url_params_from_lookup_dict(self.rel.limit_choices_to)
 
     def url_parameters(self):
         from django.contrib.admin.views.main import TO_FIELD_VAR

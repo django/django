@@ -901,6 +901,8 @@ class ForeignKey(RelatedField, Field):
         # don't get a related descriptor.
         if not self.rel.is_hidden():
             setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
+            if self.rel.limit_choices_to:
+                cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
         if self.rel.field_name is None:
             self.rel.field_name = cls._meta.pk.name
 

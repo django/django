@@ -393,6 +393,17 @@ class AdminViewBasicTest(TestCase):
         response = self.client.get("/test_admin/admin/admin_views/workhour/?employee__person_ptr__exact=%d" % e1.pk)
         self.assertEqual(response.status_code, 200)
 
+    def test_allowed_filtering_15103(self):
+        """
+        Regressions test for ticket 15103 - filtering on fields defined in a
+        ForeignKey 'limit_choices_to' should be allowed, otherwise raw_id_fields
+        can break.
+        """
+        try:
+            self.client.get("/test_admin/admin/admin_views/inquisition/?leader__name=Palin&leader__age=27")
+        except SuspiciousOperation:
+            self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
+
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
 

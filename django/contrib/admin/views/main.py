@@ -183,16 +183,18 @@ class ChangeList(object):
 
             # if key ends with __in, split parameter into separate values
             if key.endswith('__in'):
-                lookup_params[key] = value.split(',')
+                value = value.split(',')
+                lookup_params[key] = value
 
             # if key ends with __isnull, special case '' and false
             if key.endswith('__isnull'):
                 if value.lower() in ('', 'false'):
-                    lookup_params[key] = False
+                    value = False
                 else:
-                    lookup_params[key] = True
+                    value = True
+                lookup_params[key] = value
 
-            if not self.model_admin.lookup_allowed(key):
+            if not self.model_admin.lookup_allowed(key, value):
                 raise SuspiciousOperation(
                     "Filtering by %s not allowed" % key
                 )
