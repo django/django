@@ -61,3 +61,14 @@ process. If you require data to exist during test conditions, you
 should either insert it using :ref:`test fixtures
 <topics-testing-fixtures>`, or using the ``setUp()`` method of your
 test case.
+
+ModelAdmin.lookup_allowed signature changed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.2.4 introduced a method ``lookup_allowed`` on ``ModelAdmin``, to cope
+with a security issue (changeset `[15033]
+<http://code.djangoproject.com/changeset/15033>`_). Although this method was
+never documented, it seems some people have overridden ``lookup_allowed``,
+especially to cope with regressions introduced by that changeset. While the
+method is still undocumented and not marked as stable, it may be helpful to know
+that the signature of this function has changed.
