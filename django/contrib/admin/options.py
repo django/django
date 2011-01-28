@@ -173,7 +173,16 @@ class BaseModelAdmin(object):
         return None
     declared_fieldsets = property(_declared_fieldsets)
 
-    def lookup_allowed(self, lookup):
+    def lookup_allowed(self, lookup, value):
+        model = self.model
+        # Check FKey lookups that are allowed, so that popups produced by
+        # ForeignKeyRawIdWidget, on the basis of ForeignKey.limit_choices_to,
+        # are allowed to work.
+        for l in model._meta.related_fkey_lookups:
+            for k, v in widgets.url_params_from_lookup_dict(l).items():
+                if k == lookup and v == value:
+                    return True
+
         parts = lookup.split(LOOKUP_SEP)
 
         # Last term in lookup is a query term (__exact, __startswith etc)

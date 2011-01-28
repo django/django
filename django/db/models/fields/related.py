@@ -745,6 +745,8 @@ class ForeignKey(RelatedField, Field):
 
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
+        if self.rel.limit_choices_to:
+            cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
 
     def formfield(self, **kwargs):
         defaults = {

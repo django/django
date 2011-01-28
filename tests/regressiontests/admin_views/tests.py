@@ -300,6 +300,17 @@ class AdminViewBasicTest(TestCase):
         except SuspiciousOperation:
             self.fail("Filters should be allowed if they involve a local field without the need to whitelist them in list_filter or date_hierarchy.")
 
+    def test_allowed_filtering_15103(self):
+        """
+        Regressions test for ticket 15103 - filtering on fields defined in a
+        ForeignKey 'limit_choices_to' should be allowed, otherwise raw_id_fields
+        can break.
+        """
+        try:
+            self.client.get("/test_admin/admin/admin_views/inquisition/?leader__name=Palin&leader__age=27")
+        except SuspiciousOperation:
+            self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
+
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
 
