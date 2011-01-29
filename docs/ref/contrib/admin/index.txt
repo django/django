@@ -263,15 +263,20 @@ subclass::
 
 .. attribute:: ModelAdmin.filter_horizontal
 
-    Use a nifty unobtrusive JavaScript "filter" interface instead of the
-    usability-challenged ``<select multiple>`` in the admin form. The value is
-    a list of fields that should be displayed as a horizontal filter interface.
-    See ``filter_vertical`` to use a vertical interface.
+    By default, a :class:`~django.db.models.ManyToManyField` is displayed in
+    the admin site with a ``<select multiple>``. However, multiple-select boxes
+    can be difficult to use when selecting many items. Adding a
+    :class:`~django.db.models.ManyToManyField` to this list will instead use
+    a nifty unobtrusive JavaScript "filter" interface that allows searching
+    within the options. The unselected and selected options appear in two boxes
+    side by side. See :attr:`~ModelAdmin.filter_vertical` to use a vertical
+    interface.
 
 .. attribute:: ModelAdmin.filter_vertical
 
-    Same as ``filter_horizontal``, but is a vertical display of the filter
-    interface.
+    Same as :attr:`~ModelAdmin.filter_horizontal`, but uses a vertical display
+    of the filter interface with the box of unselected options appearing above
+    the box of selected options.
 
 .. attribute:: ModelAdmin.form
 
