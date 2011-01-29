@@ -630,14 +630,13 @@ in transformation SQL, allowing the developer to work at a higher level
 of abstraction::
 
     >>> qs = WorldBorders.objects.filter(mpoly__intersects=pnt)
-    >>> qs.query.as_sql() # Generating the SQL
-    ('SELECT "world_worldborders"."id", "world_worldborders"."name", "world_worldborders"."area",
+    >>> print qs.query # Generating the SQL
+    SELECT "world_worldborders"."id", "world_worldborders"."name", "world_worldborders"."area",
     "world_worldborders"."pop2005", "world_worldborders"."fips", "world_worldborders"."iso2",
     "world_worldborders"."iso3", "world_worldborders"."un", "world_worldborders"."region",
     "world_worldborders"."subregion", "world_worldborders"."lon", "world_worldborders"."lat",
     "world_worldborders"."mpoly" FROM "world_worldborders"
-    WHERE ST_Intersects("world_worldborders"."mpoly", ST_Transform(%s, 4326))',
-    (<django.contrib.gis.db.backend.postgis.adaptor.PostGISAdaptor object at 0x25641b0>,))
+    WHERE ST_Intersects("world_worldborders"."mpoly", ST_Transform(%s, 4326))
     >>> qs # printing evaluates the queryset
     [<WorldBorders: United States>]
 
