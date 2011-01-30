@@ -2,6 +2,16 @@
 Generic views
 =============
 
+
+.. versionchanged:: 1.3
+
+.. note::
+
+    From Django 1.3, function-based generic views have been deprecated in favor
+    of a class-based approach, described in the class-based views :doc:`topic
+    guide </topics/class-based-views>` and :doc:`detailed reference
+    </ref/class-based-views>`.
+
 Writing Web applications can be monotonous, because we repeat certain patterns
 again and again. In Django, the most common of these patterns have been
 abstracted into "generic views" that let you quickly provide common views of
