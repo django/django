@@ -25,6 +25,10 @@ class DefaultLoader(unittest.TestCase):
         self.assertFalse(module_has_submodule(test_module, 'no_such_module'))
         self.assertRaises(ImportError, import_module, 'regressiontests.utils.test_module.no_such_module')
 
+        # Don't be confused by caching of import misses
+        import types  # causes attempted import of regressiontests.utils.types
+        self.assertFalse(module_has_submodule(sys.modules['regressiontests.utils'], 'types'))
+
 class EggLoader(unittest.TestCase):
     def setUp(self):
         self.old_path = sys.path[:]
