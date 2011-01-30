@@ -11,7 +11,7 @@ from django.utils._os import safe_join
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.storage import AppStaticStorage
 
-_finders = {}
+_finders = SortedDict()
 
 
 class BaseFinder(object):
