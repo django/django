@@ -50,20 +50,29 @@ your additional files directory(ies) e.g.::
         "/opt/webfiles/common",
     )
 
+Prefixes (optional)
+"""""""""""""""""""
+
 In case you want to refer to files in one of the locations with an additional
 namespace, you can **optionally** provide a prefix as ``(prefix, path)``
 tuples, e.g.::
 
     STATICFILES_DIRS = (
-        "/home/polls.com/polls/static",
+        # ...
         ("downloads", "/opt/webfiles/stats"),
     )
 
-With this configuration, the :djadmin:`collectstatic` management command would
-for example collect the stats files in a ``'downloads'`` directory. So
-assuming you have :setting:`STATIC_URL` set ``'/static/'``, this would
-allow you to refer to the file ``'/opt/webfiles/stats/polls_20101022.tar.gz'``
-with ``'/static/downloads/polls_20101022.tar.gz'`` in your templates.
+Example:
+
+Assuming you have :setting:`STATIC_URL` set ``'/static/'``, the
+:djadmin:`collectstatic` management command would collect the "stats" files
+in a ``'downloads'`` subdirectory of :setting:`STATIC_ROOT`.
+
+This would allow you to refer to the local file
+``'/opt/webfiles/stats/polls_20101022.tar.gz'`` with
+``'/static/downloads/polls_20101022.tar.gz'`` in your templates, e.g.::
+
+    <a href="{{ STATIC_URL }}downloads/polls_20101022.tar.gz">
 
 .. setting:: STATICFILES_STORAGE
 
@@ -182,6 +191,8 @@ collected for a given path.
 
 runserver
 ---------
+
+.. django-admin:: staticfiles-runserver
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static

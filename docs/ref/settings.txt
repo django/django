@@ -1628,24 +1628,25 @@ STATIC_ROOT
 
 Default: ``''`` (Empty string)
 
-The absolute path to the directory that contains static content.
+The absolute path to the directory that contains static files.
 
 Example: ``"/home/example.com/static/"``
 
-When using the :djadmin:`collectstatic` management command of the optional,
-:doc:`staticfiles</ref/contrib/staticfiles>` app this will be used to collect
-static files into and served from :setting:`STATIC_URL`.
+If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
+(default) this will be used as the directory which the
+:djadmin:`collectstatic` management command collects static files in. See
+the howto on :doc:`managing static files</howto/static-files>` for more
+details about usage.
 
-In that case this is a **required setting**, unless you've overridden
-:setting:`STATICFILES_STORAGE` and are using a custom storage backend.
+.. warning:: This is not a place to store your static files permanently;
+    you should do that in directories that will be found by
+    :doc:`staticfiles</ref/contrib/staticfiles>`'s
+    :setting:`finders<STATICFILES_FINDERS>`, which by default, are
+    ``'static'`` app sub directories and any directories you include in
+    the :setting:`STATICFILES_DIRS`).
 
-This is not a place to store your static files permanently under version
-control; you should do that in directories that will be found by your
-:setting:`STATICFILES_FINDERS` (by default, per-app ``static/`` subdirectories,
-and any directories you include in :setting:`STATICFILES_DIRS`). Files from
-those locations will be collected into :setting:`STATIC_ROOT`.
-
-See :doc:`/ref/contrib/staticfiles` and :setting:`STATIC_URL`.
+See :doc:`staticfiles reference</ref/contrib/staticfiles>` and
+:setting:`STATIC_URL`.
 
 .. setting:: STATIC_URL
 
@@ -1654,7 +1655,7 @@ STATIC_URL
 
 Default: ``None``
 
-URL that handles the files served from :setting:`STATIC_ROOT`.
+URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 
 Example: ``"/site_media/static/"`` or ``"http://static.example.com/"``
 

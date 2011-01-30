@@ -204,7 +204,7 @@ the appropriate prefix.
 
 As part of the introduction of the
 :doc:`staticfiles app </ref/contrib/staticfiles>` two new settings were added
-to refer to "static content" (images, CSS, Javascript, etc.) that are needed
+to refer to "static files" (images, CSS, Javascript, etc.) that are needed
 to render a complete web page: :setting:`STATIC_URL` and :setting:`STATIC_ROOT`.
 
 To find the appropriate prefix to use, Django will check if the
