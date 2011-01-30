@@ -74,7 +74,7 @@ Here's the basic usage in a nutshell:
        directory given by :setting:`STATIC_ROOT`.
 
        .. note:: This is **not necessary in local development** if you are
-           using :djadmin:`staticfiles-runserver` or adding
+           using :djadmin:`runserver<staticfiles-runserver>` or adding
            ``staticfiles_urlpatterns`` to your URLconf; see below).
 
     4. Deploy those files.
