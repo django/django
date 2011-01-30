@@ -669,6 +669,13 @@ Example usage::
 
     django-admin.py runserver --adminmedia=/tmp/new-admin-style/
 
+.. versionchanged:: 1.3
+
+If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
+(default in new projects) the :djadmin:`runserver` command will be overriden
+with an own :djadmin:`runserver<staticfiles-runserver>` command which doesn't
+have the :djadminopt:`--adminmedia` option due to deprecation.
+
 .. django-admin-option:: --noreload
 
 Use the ``--noreload`` option to disable the use of the auto-reloader. This
