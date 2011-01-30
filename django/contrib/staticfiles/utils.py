@@ -45,3 +45,10 @@ def check_settings():
             (settings.MEDIA_ROOT == settings.STATIC_ROOT)):
         raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
                                    "settings must have different values")
+    for path in settings.STATICFILES_DIRS:
+        # in case the item contains a prefix
+        if isinstance(path, (list, tuple)):
+            path = path[1]
+        if os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(path):
+            raise ImproperlyConfigured("The STATICFILES_DIRS setting should "
+                                       "not contain the STATIC_ROOT setting")
