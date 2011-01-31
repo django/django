@@ -9,7 +9,6 @@ from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
 from django.contrib.sessions.backends.file import SessionStore as FileSession
-from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ImproperlyConfigured
@@ -100,7 +99,7 @@ class SessionTestsMixin(object):
         self.assertFalse(self.session.modified)
         self.assertEqual(list(i), ['x'])
 
-    def test_iterkeys(self):
+    def test_itervalues(self):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
@@ -199,8 +198,8 @@ class SessionTestsMixin(object):
         age = self.session.get_expiry_age()
         self.assertTrue(age in (9, 10))
 
-    def test_custom_expiry_timedelta(self):
-        # Using timedelta
+    def test_custom_expiry_datetime(self):
+        # Using fixed datetime
         self.session.set_expiry(datetime.now() + timedelta(seconds=10))
         delta = self.session.get_expiry_date() - datetime.now()
         self.assertTrue(delta.seconds in (9, 10))
