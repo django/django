@@ -189,10 +189,12 @@ for each relative path, use the ``--first`` option::
 This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
 
+.. _staticfiles-runserver:
+
 runserver
 ---------
 
-.. django-admin:: staticfiles-runserver
+.. django-admin:: runserver
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
@@ -317,3 +319,31 @@ already defined pattern list. Use it like this::
     This helper function will only work if :setting:`DEBUG` is ``True``
     and your :setting:`STATIC_URL` setting is neither empty nor a full
     URL such as ``http://static.example.com/``.
+
+.. _staticfiles-serve-other-directories:
+
+Serving other directories
+"""""""""""""""""""""""""
+
+There may be files other than your project's static assets that, for
+convenience, you'd like to have Django serve for you in local development. The
+:func:`~django.contrib.staticfiles.views.serve` view can be used to serve any
+directory you give it. (Again, this view is **not** hardened for production
+use, and should be used only as a development aid; you should serve these files
+in production using a real front-end webserver).
+
+The most likely example is user-uploaded content in :setting:`MEDIA_ROOT`.
+``staticfiles`` is intended for static assets and has no built-in handling for
+user-uploaded files, but you can have Django serve your :setting:`MEDIA_ROOT`
+by appending something like this to your URLconf::
+
+   from django.conf import settings
+
+   if settings.DEBUG:
+       urlpatterns += patterns('django.contrib.staticfiles.views',
+           url(r'^media/(?P<path>.*)$', 'serve',
+               {'document_root': settings.MEDIA_ROOT}),
+       )
+
+This snippet assumes you've also set your :setting:`MEDIA_URL` (in development)
+to ``/media/``.
