@@ -20,18 +20,6 @@ class GEOSContext(threading.local):
 
 thread_context = GEOSContext()
 
-def call_geos_threaded(cfunc, args):
-    """
-    This module-level routine calls the specified GEOS C thread-safe
-    function with the context for this current thread.
-    """
-    # If a context handle does not exist for this thread, initialize one.
-    if not thread_context.handle:
-        thread_context.handle = GEOSContextHandle()
-    # Call the threaded GEOS routine with pointer of the context handle
-    # as the first argument.
-    return cfunc(thread_context.handle.ptr, *args)
-
 class GEOSFunc(object):
     """
     Class that serves as a wrapper for GEOS C Functions, and will
@@ -43,6 +31,9 @@ class GEOSFunc(object):
             # take an additional context handle parameter.
             self.cfunc = getattr(lgeos, func_name + '_r')
             self.threaded = True
+            # Create a reference here to thread_context so it's not
+            # garbage-collected before an attempt to call this object.
+            self.thread_context = thread_context
         except AttributeError:
             # Otherwise, use usual function.
             self.cfunc = getattr(lgeos, func_name)
@@ -50,7 +41,12 @@ class GEOSFunc(object):
 
     def __call__(self, *args):
         if self.threaded:
-            return call_geos_threaded(self.cfunc, args)
+            # If a context handle does not exist for this thread, initialize one.
+            if not self.thread_context.handle:
+                self.thread_context.handle = GEOSContextHandle()
+            # Call the threaded GEOS routine with pointer of the context handle
+            # as the first argument.
+            return self.cfunc(self.thread_context.handle.ptr, *args)
         else:
             return self.cfunc(*args)
 
