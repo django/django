@@ -2,7 +2,6 @@ import urllib
 from urlparse import urlparse
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 
 from django.contrib.staticfiles import utils

@@ -286,7 +286,7 @@ class TestServeStatic(StaticFilesTestCase):
 
 class TestServeDisabled(TestServeStatic):
     """
-    Test serving media from django.contrib.admin.
+    Test serving static files disabled when DEBUG is False.
     """
     def setUp(self):
         super(TestServeDisabled, self).setUp()
@@ -300,7 +300,7 @@ class TestServeDisabled(TestServeStatic):
 
 class TestServeStaticWithDefaultURL(TestServeStatic, TestDefaults):
     """
-    Test static asset serving view with staticfiles_urlpatterns helper.
+    Test static asset serving view with manually configured URLconf.
     """
     pass
 
