@@ -26,8 +26,6 @@ Settings
 .. note::
 
     The following settings control the behavior of the staticfiles app.
-    Configuring the global settings :setting:`STATIC_ROOT` and
-    :setting:`STATIC_URL` is **required**.
 
 .. setting:: STATICFILES_DIRS
 

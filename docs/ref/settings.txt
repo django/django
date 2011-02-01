@@ -1628,22 +1628,24 @@ STATIC_ROOT
 
 Default: ``''`` (Empty string)
 
-The absolute path to the directory that contains static files.
+The absolute path to the directory where :djadmin:`collectstatic` will collect
+static files for deployment.
 
 Example: ``"/home/example.com/static/"``
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
-(default) this will be used as the directory which the
-:djadmin:`collectstatic` management command collects static files in. See
-the howto on :doc:`managing static files</howto/static-files>` for more
-details about usage.
+(default) the :djadmin:`collectstatic` management command will collect static
+files into this directory. See the howto on :doc:`managing static
+files</howto/static-files>` for more details about usage.
 
-.. warning:: This is not a place to store your static files permanently;
-    you should do that in directories that will be found by
-    :doc:`staticfiles</ref/contrib/staticfiles>`'s
+.. warning:: This should be an (initially empty) destination directory for
+    collecting your static files from their permanent locations into one
+    directory for ease of deployment; it is **not** a place to store your
+    static files permanently. You should do that in directories that will be
+    found by :doc:`staticfiles</ref/contrib/staticfiles>`'s
     :setting:`finders<STATICFILES_FINDERS>`, which by default, are
-    ``'static'`` app sub directories and any directories you include in
-    the :setting:`STATICFILES_DIRS`).
+    ``'static/'`` app sub-directories and any directories you include in
+    :setting:`STATICFILES_DIRS`).
 
 See :doc:`staticfiles reference</ref/contrib/staticfiles>` and
 :setting:`STATIC_URL`.

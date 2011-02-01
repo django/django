@@ -1,6 +1,5 @@
 import os
 from django.conf import settings
-from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage, Storage, FileSystemStorage
 from django.utils.datastructures import SortedDict
