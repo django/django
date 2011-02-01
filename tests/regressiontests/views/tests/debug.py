@@ -64,12 +64,12 @@ class ExceptionReporterTests(TestCase):
         "A simple exception report can be generated"
         try:
             request = self.rf.get('/test_view/')
-            raise KeyError("Can't find my keys")
-        except KeyError:
+            raise ValueError("Can't find my keys")
+        except ValueError:
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>KeyError at /test_view/</h1>', html)
+        self.assertIn('<h1>ValueError at /test_view/</h1>', html)
         self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
         self.assertIn('<th>Request Method:</th>', html)
         self.assertIn('<th>Request URL:</th>', html)
@@ -82,12 +82,12 @@ class ExceptionReporterTests(TestCase):
     def test_no_request(self):
         "An exception report can be generated without request"
         try:
-            raise KeyError("Can't find my keys")
-        except KeyError:
+            raise ValueError("Can't find my keys")
+        except ValueError:
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>KeyError</h1>', html)
+        self.assertIn('<h1>ValueError</h1>', html)
         self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
         self.assertNotIn('<th>Request Method:</th>', html)
         self.assertNotIn('<th>Request URL:</th>', html)
