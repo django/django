@@ -50,7 +50,7 @@ More details about how the caching works:
 
 from django.conf import settings
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
-from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age
+from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age, has_vary_header
 
 
 class UpdateCacheMiddleware(object):
@@ -69,9 +69,19 @@ class UpdateCacheMiddleware(object):
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = get_cache(self.cache_alias)
 
+    def _should_update_cache(self, request, response):
+        if not hasattr(request, '_cache_update_cache') or not request._cache_update_cache:
+            return False
+        if self.cache_anonymous_only and has_vary_header(response, 'Cookie'):
+            assert hasattr(request, 'user'), "The Django cache middleware with CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True requires authentication middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.auth.middleware.AuthenticationMiddleware' before the CacheMiddleware."
+            if request.user.is_authenticated():
+                # Don't cache user-variable requests from authenticated users.
+                return False
+        return True
+
     def process_response(self, request, response):
         """Sets the cache, if needed."""
-        if not hasattr(request, '_cache_update_cache') or not request._cache_update_cache:
+        if not self._should_update_cache(request, response):
             # We don't need to update the cache, just return.
             return response
         if not response.status_code == 200:
@@ -116,16 +126,9 @@ class FetchFromCacheMiddleware(object):
         Checks whether the page is already cached and returns the cached
         version if available.
         """
-        if self.cache_anonymous_only:
-            assert hasattr(request, 'user'), "The Django cache middleware with CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True requires authentication middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.auth.middleware.AuthenticationMiddleware' before the CacheMiddleware."
-
         if not request.method in ('GET', 'HEAD') or request.GET:
             request._cache_update_cache = False
             return None # Don't bother checking the cache.
-
-        if self.cache_anonymous_only and request.user.is_authenticated():
-            request._cache_update_cache = False
-            return None # Don't cache requests from authenticated users.
 
         # try and get the cached GET response
         cache_key = get_cache_key(request, self.key_prefix, 'GET', cache=self.cache)

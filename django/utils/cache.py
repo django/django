@@ -134,6 +134,16 @@ def patch_vary_headers(response, newheaders):
                           if newheader.lower() not in existing_headers]
     response['Vary'] = ', '.join(vary_headers + additional_headers)
 
+def has_vary_header(response, header_query):
+    """
+    Checks to see if the response has a given header name in its Vary header.
+    """
+    if not response.has_header('Vary'):
+        return False
+    vary_headers = cc_delim_re.split(response['Vary'])
+    existing_headers = set([header.lower() for header in vary_headers])
+    return header_query.lower() in existing_headers
+
 def _i18n_cache_key_suffix(request, cache_key):
     """If enabled, returns the cache key ending with a locale."""
     if settings.USE_I18N:
