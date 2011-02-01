@@ -46,11 +46,19 @@ class FileSystemFinder(BaseFinder):
         self.storages = SortedDict()
         # Set of locations with static files
         self.locations = set()
+        if not isinstance(settings.STATICFILES_DIRS, (list, tuple)):
+            raise ImproperlyConfigured(
+                "Your STATICFILES_DIRS setting is not a tuple or list; "
+                "perhaps you forgot a trailing comma?")
         for root in settings.STATICFILES_DIRS:
             if isinstance(root, (list, tuple)):
                 prefix, root = root
             else:
                 prefix = ''
+            if os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(root):
+                raise ImproperlyConfigured(
+                    "The STATICFILES_DIRS setting should "
+                    "not contain the STATIC_ROOT setting")
             self.locations.add((prefix, root))
         # Don't initialize multiple storages for the same location
         for prefix, root in self.locations:

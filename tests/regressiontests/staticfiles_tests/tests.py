@@ -10,8 +10,6 @@ from django.contrib.staticfiles import finders, storage
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage
 from django.core.management import call_command
-from django.db.models.loading import load_app
-from django.template import Template, Context
 from django.test import TestCase
 from django.utils._os import rmtree_errorhandler
 
@@ -383,7 +381,27 @@ class TestMiscFinder(TestCase):
         self.assertTrue(isinstance(finders.get_finder(
             'django.contrib.staticfiles.finders.FileSystemFinder'),
             finders.FileSystemFinder))
+
+    def test_get_finder_bad_classname(self):
         self.assertRaises(ImproperlyConfigured,
             finders.get_finder, 'django.contrib.staticfiles.finders.FooBarFinder')
+
+    def test_get_finder_bad_module(self):
         self.assertRaises(ImproperlyConfigured,
             finders.get_finder, 'foo.bar.FooBarFinder')
+
+
+class TestStaticfilesDirsType(TestCase):
+    """
+    We can't determine if STATICFILES_DIRS is set correctly just by looking at
+    the type, but we can determine if it's definitely wrong.
+    """
+    def setUp(self):
+        self.old_settings_dir = settings.STATICFILES_DIRS
+        settings.STATICFILES_DIRS = 'a string'
+
+    def tearDown(self):
+        settings.STATICFILES_DIRS = self.old_settings_dir
+
+    def test_non_tuple_raises_exception(self):
+        self.assertRaises(ImproperlyConfigured, finders.FileSystemFinder)

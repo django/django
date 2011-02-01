@@ -35,9 +35,13 @@ def get_files(storage, ignore_patterns=[], location=''):
 
 def check_settings():
     """
-    Checks if the MEDIA_(ROOT|URL) and STATIC_(ROOT|URL)
-    settings have the same value.
+    Checks if the staticfiles settings have sane values.
+
     """
+    if not settings.STATIC_URL:
+        raise ImproperlyConfigured(
+            "You're using the staticfiles app "
+            "without having set the required STATIC_URL setting.")
     if settings.MEDIA_URL == settings.STATIC_URL:
         raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
                                    "settings must have different values")
@@ -45,10 +49,3 @@ def check_settings():
             (settings.MEDIA_ROOT == settings.STATIC_ROOT)):
         raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
                                    "settings must have different values")
-    for path in settings.STATICFILES_DIRS:
-        # in case the item contains a prefix
-        if isinstance(path, (list, tuple)):
-            path = path[1]
-        if os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(path):
-            raise ImproperlyConfigured("The STATICFILES_DIRS setting should "
-                                       "not contain the STATIC_ROOT setting")
