@@ -4,7 +4,6 @@
 # Uses whatever cache backend is set in the test settings file.
 
 import os
-import shutil
 import tempfile
 import time
 import unittest
@@ -13,9 +12,10 @@ import warnings
 from django.conf import settings
 from django.core import management
 from django.core.cache import get_cache
-from django.core.cache.backends.base import InvalidCacheBackendError, CacheKeyWarning
+from django.core.cache.backends.base import CacheKeyWarning
 from django.http import HttpResponse, HttpRequest
 from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware
+from django.test import TestCase
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import translation
 from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
@@ -647,6 +647,29 @@ class CacheI18nTest(unittest.TestCase):
         translation.activate('es')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertEqual(get_cache_data.content, es_message)
+
+
+class CacheMiddlewareAnonymousOnlyTests(TestCase):
+    urls = 'regressiontests.cache.urls'
+
+    def setUp(self):
+        self._orig_cache_middleware_anonymous_only = \
+            getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
+        self._orig_middleware_classes = settings.MIDDLEWARE_CLASSES
+
+        settings.MIDDLEWARE_CLASSES = list(settings.MIDDLEWARE_CLASSES)
+        settings.MIDDLEWARE_CLASSES.insert(0, 'django.middleware.cache.UpdateCacheMiddleware')
+        settings.MIDDLEWARE_CLASSES += ['django.middleware.cache.FetchFromCacheMiddleware']
+
+    def tearDown(self):
+        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = self._orig_cache_middleware_anonymous_only
+        settings.MIDDLEWARE_CLASSES = self._orig_middleware_classes
+
+    def test_cache_middleware_anonymous_only_does_not_cause_vary_cookie(self):
+        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
+        response = self.client.get('/')
+        self.failIf('Cookie' in response.get('Vary', ''))
+
 
 if __name__ == '__main__':
     unittest.main()
