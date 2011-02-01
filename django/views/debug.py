@@ -59,7 +59,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
     html = reporter.get_traceback_html()
     return HttpResponseServerError(html, mimetype='text/html')
 
-class ExceptionReporter:
+class ExceptionReporter(object):
     """
     A class to organize and coordinate reporting on exceptions.
     """
@@ -82,7 +82,7 @@ class ExceptionReporter:
     def get_traceback_html(self):
         "Return HTML code for traceback."
 
-        if issubclass(self.exc_type, TemplateDoesNotExist):
+        if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
             from django.template.loader import template_source_loaders
             self.template_does_not_exist = True
             self.loader_debug_info = []
@@ -113,11 +113,12 @@ class ExceptionReporter:
 
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
-            frame['vars'] = [(k, force_escape(pprint(v))) for k, v in frame['vars']]
+            if 'vars' in frame:
+                frame['vars'] = [(k, force_escape(pprint(v))) for k, v in frame['vars']]
             frames[i] = frame
 
         unicode_hint = ''
-        if issubclass(self.exc_type, UnicodeError):
+        if self.exc_type and issubclass(self.exc_type, UnicodeError):
             start = getattr(self.exc_value, 'start', None)
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
@@ -127,11 +128,8 @@ class ExceptionReporter:
         t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
         c = Context({
             'is_email': self.is_email,
-            'exception_type': self.exc_type.__name__,
-            'exception_value': smart_unicode(self.exc_value, errors='replace'),
             'unicode_hint': unicode_hint,
             'frames': frames,
-            'lastframe': frames[-1],
             'request': self.request,
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
@@ -143,6 +141,13 @@ class ExceptionReporter:
             'template_does_not_exist': self.template_does_not_exist,
             'loader_debug_info': self.loader_debug_info,
         })
+        # Check whether exception info is available
+        if self.exc_type:
+            c['exception_type'] = self.exc_type.__name__
+        if self.exc_value:
+            c['exception_value'] = smart_unicode(self.exc_value, errors='replace')
+        if frames:
+            c['lastframe'] = frames[-1]
         return t.render(c)
 
     def get_template_exception_info(self):
@@ -250,14 +255,6 @@ class ExceptionReporter:
                 })
             tb = tb.tb_next
 
-        if not frames:
-            frames = [{
-                'filename': '&lt;unknown&gt;',
-                'function': '?',
-                'lineno': '?',
-                'context_line': '???',
-            }]
-
         return frames
 
     def format_exception(self):
@@ -319,7 +316,7 @@ TECHNICAL_500_TEMPLATE = """
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="robots" content="NONE,NOARCHIVE">
-  <title>{{ exception_type }} at {{ request.path_info|escape }}</title>
+  <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
@@ -429,9 +426,10 @@ TECHNICAL_500_TEMPLATE = """
 </head>
 <body>
 <div id="summary">
-  <h1>{{ exception_type }}{% if request %} at {{ request.path_info|escape }}{% endif %}</h1>
-  <pre class="exception_value">{{ exception_value|force_escape }}</pre>
+  <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}{% if request %} at {{ request.path_info|escape }}{% endif %}</h1>
+  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception supplied{% endif %}</pre>
   <table class="meta">
+{% if request %}
     <tr>
       <th>Request Method:</th>
       <td>{{ request.META.REQUEST_METHOD }}</td>
@@ -440,22 +438,29 @@ TECHNICAL_500_TEMPLATE = """
       <th>Request URL:</th>
       <td>{{ request.build_absolute_uri|escape }}</td>
     </tr>
+{% endif %}
     <tr>
       <th>Django Version:</th>
       <td>{{ django_version_info }}</td>
     </tr>
+{% if exception_type %}
     <tr>
       <th>Exception Type:</th>
       <td>{{ exception_type }}</td>
     </tr>
+{% endif %}
+{% if exception_type and exception_value %}
     <tr>
       <th>Exception Value:</th>
       <td><pre>{{ exception_value|force_escape }}</pre></td>
     </tr>
+{% endif %}
+{% if lastframe %}
     <tr>
       <th>Exception Location:</th>
       <td>{{ lastframe.filename|escape }} in {{ lastframe.function|escape }}, line {{ lastframe.lineno }}</td>
     </tr>
+{% endif %}
     <tr>
       <th>Python Executable:</th>
       <td>{{ sys_executable|escape }}</td>
@@ -515,6 +520,7 @@ TECHNICAL_500_TEMPLATE = """
    </table>
 </div>
 {% endif %}
+{% if frames %}
 <div id="traceback">
   <h2>Traceback <span class="commands">{% if not is_email %}<a href="#" onclick="return switchPastebinFriendly(this);">Switch to copy-and-paste view</a></span>{% endif %}</h2>
   {% autoescape off %}
@@ -614,6 +620,7 @@ Exception Value: {{ exception_value|force_escape }}
   </div>
 </form>
 </div>
+{% endif %}
 {% endif %}
 
 <div id="requestinfo">
@@ -725,6 +732,8 @@ Exception Value: {{ exception_value|force_escape }}
       {% endfor %}
     </tbody>
   </table>
+{% else %}
+  <p>Request data not supplied</p>
 {% endif %}
 
   <h3 id="settings-info">Settings</h3>

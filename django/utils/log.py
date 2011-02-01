@@ -83,7 +83,7 @@ class AdminEmailHandler(logging.Handler):
             exc_info = record.exc_info
             stack_trace = '\n'.join(traceback.format_exception(*record.exc_info))
         else:
-            exc_info = ()
+            exc_info = (None, record.msg, None)
             stack_trace = 'No stack trace available'
 
         message = "%s\n\n%s" % (stack_trace, request_repr)

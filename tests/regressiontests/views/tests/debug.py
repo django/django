@@ -1,12 +1,15 @@
 import inspect
+import sys
 
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
 from django.template import TemplateSyntaxError
+from django.views.debug import ExceptionReporter
 
 from regressiontests.views import BrokenException, except_args
+
 
 class DebugViewTests(TestCase):
     def setUp(self):
@@ -52,3 +55,87 @@ class DebugViewTests(TestCase):
     def test_template_loader_postmortem(self):
         response = self.client.get(reverse('raises_template_does_not_exist'))
         self.assertContains(response, 'templates/i_dont_exist.html</code> (File does not exist)</li>', status_code=500)
+
+
+class ExceptionReporterTests(TestCase):
+    rf = RequestFactory()
+
+    def test_request_and_exception(self):
+        "A simple exception report can be generated"
+        try:
+            request = self.rf.get('/test_view/')
+            raise KeyError("Can't find my keys")
+        except KeyError:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('<h1>KeyError at /test_view/</h1>', html)
+        self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
+        self.assertIn('<th>Request Method:</th>', html)
+        self.assertIn('<th>Request URL:</th>', html)
+        self.assertIn('<th>Exception Type:</th>', html)
+        self.assertIn('<th>Exception Value:</th>', html)
+        self.assertIn('<h2>Traceback ', html)
+        self.assertIn('<h2>Request information</h2>', html)
+        self.assertNotIn('<p>Request data not supplied</p>', html)
+
+    def test_no_request(self):
+        "An exception report can be generated without request"
+        try:
+            raise KeyError("Can't find my keys")
+        except KeyError:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('<h1>KeyError</h1>', html)
+        self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
+        self.assertNotIn('<th>Request Method:</th>', html)
+        self.assertNotIn('<th>Request URL:</th>', html)
+        self.assertIn('<th>Exception Type:</th>', html)
+        self.assertIn('<th>Exception Value:</th>', html)
+        self.assertIn('<h2>Traceback ', html)
+        self.assertIn('<h2>Request information</h2>', html)
+        self.assertIn('<p>Request data not supplied</p>', html)
+
+    def test_no_exception(self):
+        "An exception report can be generated for just a request"
+        request = self.rf.get('/test_view/')
+        reporter = ExceptionReporter(request, None, None, None)
+        html = reporter.get_traceback_html()
+        self.assertIn('<h1>Report at /test_view/</h1>', html)
+        self.assertIn('<pre class="exception_value">No exception supplied</pre>', html)
+        self.assertIn('<th>Request Method:</th>', html)
+        self.assertIn('<th>Request URL:</th>', html)
+        self.assertNotIn('<th>Exception Type:</th>', html)
+        self.assertNotIn('<th>Exception Value:</th>', html)
+        self.assertNotIn('<h2>Traceback ', html)
+        self.assertIn('<h2>Request information</h2>', html)
+        self.assertNotIn('<p>Request data not supplied</p>', html)
+
+    def test_request_and_message(self):
+        "A message can be provided in addition to a request"
+        request = self.rf.get('/test_view/')
+        reporter = ExceptionReporter(request, None, "I'm a little teapot", None)
+        html = reporter.get_traceback_html()
+        self.assertIn('<h1>Report at /test_view/</h1>', html)
+        self.assertIn('<pre class="exception_value">I&#39;m a little teapot</pre>', html)
+        self.assertIn('<th>Request Method:</th>', html)
+        self.assertIn('<th>Request URL:</th>', html)
+        self.assertNotIn('<th>Exception Type:</th>', html)
+        self.assertNotIn('<th>Exception Value:</th>', html)
+        self.assertNotIn('<h2>Traceback ', html)
+        self.assertIn('<h2>Request information</h2>', html)
+        self.assertNotIn('<p>Request data not supplied</p>', html)
+
+    def test_message_only(self):
+        reporter = ExceptionReporter(None, None, "I'm a little teapot", None)
+        html = reporter.get_traceback_html()
+        self.assertIn('<h1>Report</h1>', html)
+        self.assertIn('<pre class="exception_value">I&#39;m a little teapot</pre>', html)
+        self.assertNotIn('<th>Request Method:</th>', html)
+        self.assertNotIn('<th>Request URL:</th>', html)
+        self.assertNotIn('<th>Exception Type:</th>', html)
+        self.assertNotIn('<th>Exception Value:</th>', html)
+        self.assertNotIn('<h2>Traceback ', html)
+        self.assertIn('<h2>Request information</h2>', html)
+        self.assertIn('<p>Request data not supplied</p>', html)
