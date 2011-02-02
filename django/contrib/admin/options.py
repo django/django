@@ -547,7 +547,7 @@ class ModelAdmin(BaseModelAdmin):
         # want *any* actions enabled on this page.
         from django.contrib.admin.views.main import IS_POPUP_VAR
         if self.actions is None or IS_POPUP_VAR in request.GET:
-            return []
+            return SortedDict()
 
         actions = []
 
