@@ -212,17 +212,17 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     ...     cc_myself = forms.BooleanField(required=False)
     >>> f = HelpTextContactForm(auto_id=False)
     >>> print f.as_table()
-    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br />100 characters max.</td></tr>
+    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br /><span class="helptext">100 characters max.</span></td></tr>
     <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
     <tr><th>Sender:</th><td><input type="text" name="sender" /><br />A valid e-mail address, please.</td></tr>
     <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
     >>> print f.as_ul()
-    <li>Subject: <input type="text" name="subject" maxlength="100" /> 100 characters max.</li>
+    <li>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></li>
     <li>Message: <input type="text" name="message" /></li>
     <li>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</li>
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
     >>> print f.as_p()
-    <p>Subject: <input type="text" name="subject" maxlength="100" /> 100 characters max.</p>
+    <p>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></p>
     <p>Message: <input type="text" name="message" /></p>
     <p>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</p>
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
