@@ -114,6 +114,16 @@ class DatabaseCreation(BaseDatabaseCreation):
 
         return self.connection.settings_dict['NAME']
 
+    def test_db_signature(self):
+        settings_dict = self.connection.settings_dict
+        return (
+            settings_dict['HOST'],
+            settings_dict['PORT'],
+            settings_dict['ENGINE'],
+            settings_dict['NAME'],
+            settings_dict['TEST_USER'],
+        )
+
     def _destroy_test_db(self, test_database_name, verbosity=1):
         """
         Destroy a test database, prompting the user for confirmation if the
