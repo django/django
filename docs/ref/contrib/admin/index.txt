@@ -927,6 +927,25 @@ templates used by the :class:`ModelAdmin` views:
                     kwargs["queryset"] = Car.objects.filter(owner=request.user)
                 return super(MyModelAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
+.. method:: ModelAdmin.formfield_for_choice_field(self, db_field, request, **kwargs)
+
+    Like the ``formfield_for_foreignkey`` and ``formfield_for_manytomany``
+    methods, the ``formfield_for_choice_field`` method can be overridden to
+    change the default formfield for a field that has declared choices. For
+    example, if the choices available to a superuser should be different than
+    those available to regular staff, you could proceed as follows::
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def formfield_for_choice_field(self, db_field, request, **kwargs):
+                if db_field.name == "status":
+                    kwargs['choices'] = (
+                        ('accepted', 'Accepted'),
+                        ('denied', 'Denied'),
+                    )
+                    if request.user.is_superuser:
+                        kwargs['choices'] += (('ready', 'Ready for deployment'),)
+                return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+
 .. method:: ModelAdmin.has_add_permission(self, request)
 
     Should return ``True`` if adding an object is permitted, ``False``
