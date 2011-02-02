@@ -536,7 +536,7 @@ class ModelAdmin(BaseModelAdmin):
         # If self.actions is explicitally set to None that means that we don't
         # want *any* actions enabled on this page.
         if self.actions is None:
-            return []
+            return SortedDict()
 
         actions = []
 
