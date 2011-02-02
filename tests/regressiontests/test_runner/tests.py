@@ -33,9 +33,9 @@ class DependencyOrderingTests(unittest.TestCase):
 
     def test_simple_dependencies(self):
         raw = [
-            ('s1', ['alpha']),
-            ('s2', ['bravo']),
-            ('s3', ['charlie']),
+            ('s1', ('s1_db', ['alpha'])),
+            ('s2', ('s2_db', ['bravo'])),
+            ('s3', ('s3_db', ['charlie'])),
         ]
         dependencies = {
             'alpha': ['charlie'],
@@ -43,7 +43,7 @@ class DependencyOrderingTests(unittest.TestCase):
         }
 
         ordered = simple.dependency_ordered(raw, dependencies=dependencies)
-        ordered_sigs = [sig for sig,aliases in ordered]
+        ordered_sigs = [sig for sig,value in ordered]
 
         self.assertIn('s1', ordered_sigs)
         self.assertIn('s2', ordered_sigs)
@@ -53,9 +53,9 @@ class DependencyOrderingTests(unittest.TestCase):
 
     def test_chained_dependencies(self):
         raw = [
-            ('s1', ['alpha']),
-            ('s2', ['bravo']),
-            ('s3', ['charlie']),
+            ('s1', ('s1_db', ['alpha'])),
+            ('s2', ('s2_db', ['bravo'])),
+            ('s3', ('s3_db', ['charlie'])),
         ]
         dependencies = {
             'alpha': ['bravo'],
@@ -63,7 +63,7 @@ class DependencyOrderingTests(unittest.TestCase):
         }
 
         ordered = simple.dependency_ordered(raw, dependencies=dependencies)
-        ordered_sigs = [sig for sig,aliases in ordered]
+        ordered_sigs = [sig for sig,value in ordered]
 
         self.assertIn('s1', ordered_sigs)
         self.assertIn('s2', ordered_sigs)
@@ -78,10 +78,10 @@ class DependencyOrderingTests(unittest.TestCase):
 
     def test_multiple_dependencies(self):
         raw = [
-            ('s1', ['alpha']),
-            ('s2', ['bravo']),
-            ('s3', ['charlie']),
-            ('s4', ['delta']),
+            ('s1', ('s1_db', ['alpha'])),
+            ('s2', ('s2_db', ['bravo'])),
+            ('s3', ('s3_db', ['charlie'])),
+            ('s4', ('s4_db', ['delta'])),
         ]
         dependencies = {
             'alpha': ['bravo','delta'],
@@ -108,8 +108,8 @@ class DependencyOrderingTests(unittest.TestCase):
 
     def test_circular_dependencies(self):
         raw = [
-            ('s1', ['alpha']),
-            ('s2', ['bravo']),
+            ('s1', ('s1_db', ['alpha'])),
+            ('s2', ('s2_db', ['bravo'])),
         ]
         dependencies = {
             'bravo': ['alpha'],

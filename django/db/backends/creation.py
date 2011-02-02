@@ -476,3 +476,17 @@ class BaseDatabaseCreation(object):
     def sql_table_creation_suffix(self):
         "SQL to append to the end of the test table creation statements"
         return ''
+
+    def test_db_signature(self):
+        """
+        Returns a tuple with elements of self.connection.settings_dict (a
+        DATABASES setting value) that uniquely identify a database
+        accordingly to the RDBMS particularities.
+        """
+        settings_dict = self.connection.settings_dict
+        return (
+            settings_dict['HOST'],
+            settings_dict['PORT'],
+            settings_dict['ENGINE'],
+            settings_dict['NAME']
+        )
