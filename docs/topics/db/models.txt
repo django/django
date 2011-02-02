@@ -24,7 +24,7 @@ The basics:
     examples`_. (In the Django source distribution, these examples are in the
     ``tests/modeltests`` directory.)
 
-    .. _official repository of model examples: http://www.djangoproject.com/documentation/models/
+    .. _official repository of model examples: http://code.djangoproject.com/browser/django/trunk/tests/modeltests
 
 Quick example
 =============
@@ -320,7 +320,7 @@ whatever you want. For example::
 
     See the `Many-to-one relationship model example`_ for a full example.
 
-.. _Many-to-one relationship model example: http://www.djangoproject.com/documentation/models/many_to_one/
+.. _Many-to-one relationship model example: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/many_to_one/models.py
 
 :class:`~django.db.models.ForeignKey` fields also accept a number of extra
 arguments which are explained in :ref:`the model field reference
@@ -375,7 +375,7 @@ form would let users select the toppings.
 
     See the `Many-to-many relationship model example`_ for a full example.
 
-.. _Many-to-many relationship model example: http://www.djangoproject.com/documentation/models/many_to_many/
+.. _Many-to-many relationship model example: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/many_to_many/models.py
 
 :class:`~django.db.models.ManyToManyField` fields also accept a number of extra
 arguments which are explained in :ref:`the model field reference
@@ -549,7 +549,7 @@ can be made; see :ref:`the model field reference <ref-onetoone>` for details.
 
     See the `One-to-one relationship model example`_ for a full example.
 
-.. _One-to-one relationship model example: http://www.djangoproject.com/documentation/models/one_to_one/
+.. _One-to-one relationship model example: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/one_to_one/models.py
 
 :class:`~django.db.models.OneToOneField` fields also accept one optional argument
 described in the :ref:`model field reference <ref-onetoone>`.
