@@ -36,12 +36,12 @@ def iter_format_modules(lang):
 
 def get_format_modules(reverse=False):
     """
-    Returns an iterator over the format modules found
+    Returns a list of the format modules found
     """
     lang = get_language()
     modules = _format_modules_cache.setdefault(lang, list(iter_format_modules(lang)))
     if reverse:
-        modules.reverse()
+        return list(reversed(modules))
     return modules
 
 def get_format(format_type, lang=None, use_l10n=None):
