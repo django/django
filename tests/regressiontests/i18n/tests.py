@@ -8,7 +8,8 @@ import pickle
 from django.conf import settings
 from django.template import Template, Context
 from django.test import TestCase
-from django.utils.formats import get_format, date_format, time_format, localize, localize_input, iter_format_modules
+from django.utils.formats import (get_format, date_format, time_format,
+    localize, localize_input, iter_format_modules, get_format_modules)
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import mark_safe, SafeString, SafeUnicode
 from django.utils.translation import (ugettext, ugettext_lazy, activate,
@@ -465,6 +466,19 @@ class FormattingTests(TestCase):
             self.assertEqual(list(iter_format_modules('en-gb')), [en_gb_format_mod, en_format_mod])
         finally:
             settings.USE_L10N = old_l10n
+
+    def test_get_format_modules_stability(self):
+        activate('de')
+        old_format_module_path = settings.FORMAT_MODULE_PATH
+        settings.FORMAT_MODULE_PATH = 'regressiontests.i18n.other.locale'
+        try:
+            settings.USE_L10N = True
+            old = "%r" % get_format_modules(reverse=True)
+            new = "%r" % get_format_modules(reverse=True) # second try
+            self.assertEqual(new, old, 'Value returned by get_formats_modules() must be preserved between calls.')
+        finally:
+            settings.FORMAT_MODULE_PATH = old_format_module_path
+            deactivate()
 
 
 class MiscTests(TestCase):
