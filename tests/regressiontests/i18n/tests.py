@@ -233,10 +233,8 @@ class FormattingTests(TestCase):
             deactivate()
 
     def test_l10n_enabled(self):
-        """
-        Catalan locale
-        """
         settings.USE_L10N = True
+        # Catalan locale
         activate('ca')
         try:
             self.assertEqual('j \de F \de Y', get_format('DATE_FORMAT'))
@@ -324,8 +322,6 @@ class FormattingTests(TestCase):
             deactivate()
 
         # English locale
-
-        settings.USE_L10N = True
         activate('en')
         try:
             self.assertEqual('N j, Y', get_format('DATE_FORMAT'))
@@ -459,13 +455,10 @@ class FormattingTests(TestCase):
         Tests the iter_format_modules function always yields format modules in
         a stable and correct order in presence of both base ll and ll_CC formats.
         """
-        try:
-            old_l10n, settings.USE_L10N = settings.USE_L10N, True
-            en_format_mod = import_module('django.conf.locale.en.formats')
-            en_gb_format_mod = import_module('django.conf.locale.en_GB.formats')
-            self.assertEqual(list(iter_format_modules('en-gb')), [en_gb_format_mod, en_format_mod])
-        finally:
-            settings.USE_L10N = old_l10n
+        settings.USE_L10N = True
+        en_format_mod = import_module('django.conf.locale.en.formats')
+        en_gb_format_mod = import_module('django.conf.locale.en_GB.formats')
+        self.assertEqual(list(iter_format_modules('en-gb')), [en_gb_format_mod, en_format_mod])
 
     def test_get_format_modules_stability(self):
         activate('de')
