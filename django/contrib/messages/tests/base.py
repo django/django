@@ -58,6 +58,8 @@ class BaseTest(TestCase):
         self._message_storage = settings.MESSAGE_STORAGE
         settings.MESSAGE_STORAGE = '%s.%s' % (self.storage_class.__module__,
                                               self.storage_class.__name__)
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = ()
         self.save_warnings_state()
         warnings.filterwarnings('ignore', category=DeprecationWarning,
                                 module='django.contrib.auth.models')
@@ -71,6 +73,7 @@ class BaseTest(TestCase):
            self._template_context_processors
         settings.INSTALLED_APPS = self._installed_apps
         settings.MESSAGE_STORAGE = self._message_storage
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
         self.restore_warnings_state()
 
     def restore_setting(self, setting):
