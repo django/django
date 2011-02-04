@@ -48,12 +48,18 @@ class AdminViewBasicTest(TestCase):
     urlbit = 'admin'
 
     def setUp(self):
-        self.old_language_code = settings.LANGUAGE_CODE
+        self.old_USE_I18N = settings.LANGUAGE_CODE
+        self.old_USE_L10N = settings.USE_L10N
+        self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
         self.client.login(username='super', password='secret')
+        settings.USE_I18N = True
 
     def tearDown(self):
-        settings.LANGUAGE_CODE = self.old_language_code
+        settings.USE_I18N = self.old_USE_I18N
+        settings.USE_L10N = self.old_USE_L10N
+        settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
         self.client.logout()
+        formats.reset_format_cache()
 
     def testTrailingSlashRequired(self):
         """
@@ -351,22 +357,42 @@ class AdminViewBasicTest(TestCase):
         if the default language is non-English but the selected language
         is English. See #13388 and #3594 for more details.
         """
-        settings.LANGUAGE_CODE = 'fr'
-        activate('en-us')
-        response = self.client.get('/test_admin/admin/jsi18n/')
-        self.assertNotContains(response, 'Choisir une heure')
-        deactivate()
+        try:
+            settings.LANGUAGE_CODE = 'fr'
+            activate('en-us')
+            response = self.client.get('/test_admin/admin/jsi18n/')
+            self.assertNotContains(response, 'Choisir une heure')
+        finally:
+            deactivate()
 
     def testI18NLanguageNonEnglishFallback(self):
         """
         Makes sure that the fallback language is still working properly
         in cases where the selected language cannot be found.
         """
-        settings.LANGUAGE_CODE = 'fr'
-        activate('none')
-        response = self.client.get('/test_admin/admin/jsi18n/')
-        self.assertContains(response, 'Choisir une heure')
-        deactivate()
+        try:
+            settings.LANGUAGE_CODE = 'fr'
+            activate('none')
+            response = self.client.get('/test_admin/admin/jsi18n/')
+            self.assertContains(response, 'Choisir une heure')
+        finally:
+            deactivate()
+
+    def testL10NDeactivated(self):
+        """
+        Check if L10N is deactivated, the Javascript i18n view doesn't
+        return localized date/time formats. Refs #14824.
+        """
+        try:
+            settings.LANGUAGE_CODE = 'ru'
+            settings.USE_L10N = False
+            activate('ru')
+            response = self.client.get('/test_admin/admin/jsi18n/')
+            self.assertNotContains(response, '%d.%m.%Y %H:%M:%S')
+            self.assertContains(response, '%Y-%m-%d %H:%M:%S')
+        finally:
+            deactivate()
+
 
     def test_disallowed_filtering(self):
         self.assertRaises(SuspiciousOperation,

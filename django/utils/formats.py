@@ -14,11 +14,21 @@ from django.utils.safestring import mark_safe
 _format_cache = {}
 _format_modules_cache = {}
 
+def reset_format_cache():
+    """Clear any cached formats.
+
+    This method is provided primarily for testing purposes,
+    so that the effects of cached formats can be removed.
+    """
+    global _format_cache, _format_modules_cache
+    _format_cache = {}
+    _format_modules_cache = {}
+
 def iter_format_modules(lang):
     """
     Does the heavy lifting of finding format modules.
     """
-    if check_for_language(lang) or settings.USE_L10N:
+    if check_for_language(lang):
         format_locations = ['django.conf.locale.%s']
         if settings.FORMAT_MODULE_PATH:
             format_locations.append(settings.FORMAT_MODULE_PATH + '.%s')
