@@ -7,7 +7,7 @@ from django.utils import importlib
 from django.utils.translation import check_for_language, activate, to_locale, get_language
 from django.utils.text import javascript_quote
 from django.utils.encoding import smart_unicode
-from django.utils.formats import get_format_modules
+from django.utils.formats import get_format_modules, get_format
 
 def set_language(request):
     """
@@ -49,10 +49,7 @@ def get_formats():
     result = {}
     for module in [settings] + get_format_modules(reverse=True):
         for attr in FORMAT_SETTINGS:
-            try:
-                result[attr] = getattr(module, attr)
-            except AttributeError:
-                pass
+            result[attr] = get_format(attr)
     src = []
     for k, v in result.items():
         if isinstance(v, (basestring, int)):
