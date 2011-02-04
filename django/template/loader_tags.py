@@ -168,12 +168,10 @@ class IncludeNode(BaseIncludeNode):
             template_name = self.template_name.resolve(context)
             template = get_template(template_name)
             return self.render_template(template, context)
-        except TemplateSyntaxError:
+        except:
             if settings.TEMPLATE_DEBUG:
                 raise
             return ''
-        except:
-            return '' # Fail silently for invalid included templates.
 
 def do_block(parser, token):
     """
