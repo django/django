@@ -50,7 +50,7 @@ class SelectDateWidget(Widget):
                         input_format = get_format('DATE_INPUT_FORMATS')[0]
                         # Python 2.4 compatibility:
                         #     v = datetime.datetime.strptime(value, input_format)
-                        # would be clearer, but datetime.strptime was added in 
+                        # would be clearer, but datetime.strptime was added in
                         # Python 2.5
                         v = datetime.datetime(*(time.strptime(value, input_format)[0:6]))
                         year_val, month_val, day_val = v.year, v.month, v.day
@@ -99,7 +99,7 @@ class SelectDateWidget(Widget):
                 try:
                     date_value = datetime.date(int(y), int(m), int(d))
                 except ValueError:
-                    pass
+                    return '%s-%s-%s' % (y, m, d)
                 else:
                     date_value = datetime_safe.new_date(date_value)
                     return date_value.strftime(input_format)

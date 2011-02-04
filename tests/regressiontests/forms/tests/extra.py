@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 import datetime
-from decimal import Decimal
-import re
 import time
 from django.conf import settings
 from django.forms import *
 from django.forms.extras import SelectDateWidget
 from django.forms.util import ErrorList
-from django.test import TestCase
 from django.utils import translation
 from django.utils import unittest
 from django.utils.encoding import force_unicode
 from django.utils.encoding import smart_unicode
 from error_messages import AssertFormErrorsMixin
 
+class GetDate(Form):
+    mydate = DateField(widget=SelectDateWidget)
 
 class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
     ###############
@@ -338,9 +337,6 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <option value="2016">2016</option>
 </select>""")
 
-        class GetDate(Form):
-            mydate = DateField(widget=SelectDateWidget)
-
         a = GetDate({'mydate_month':'4', 'mydate_day':'1', 'mydate_year':'2008'})
         self.assertTrue(a.is_valid())
         self.assertEqual(a.cleaned_data['mydate'], datetime.date(2008, 4, 1))
@@ -354,6 +350,11 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
         b = GetDate({'mydate':'2008-4-1'})
         self.assertTrue(b.is_valid())
         self.assertEqual(b.cleaned_data['mydate'], datetime.date(2008, 4, 1))
+
+        # Invalid dates shouldn't be allowed
+        c = GetDate({'mydate_month':'2', 'mydate_day':'31', 'mydate_year':'2010'})
+        self.assertFalse(c.is_valid())
+        self.assertEqual(c.errors, {'mydate': [u'Enter a valid date.']})
 
     def test_multiwidget(self):
         # MultiWidget and MultiValueField #############################################
@@ -608,3 +609,10 @@ class FormsExtraL10NTestCase(unittest.TestCase):
         # Years before 1900 work
         w = SelectDateWidget(years=('1899',))
         self.assertEqual(w.value_from_datadict({'date_year': '1899', 'date_month': '8', 'date_day': '13'}, {}, 'date'), '13-08-1899')
+
+    def test_l10n_invalid_date_in(self):
+        # Invalid dates shouldn't be allowed
+        a = GetDate({'mydate_month':'2', 'mydate_day':'31', 'mydate_year':'2010'})
+        self.assertFalse(a.is_valid())
+        # 'Geef een geldige datum op.' = 'Enter a valid date.'
+        self.assertEqual(a.errors, {'mydate': [u'Geef een geldige datum op.']})
