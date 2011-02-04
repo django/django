@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, filepath_to_uri
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 from django.utils.text import get_valid_filename
@@ -218,7 +218,7 @@ class FileSystemStorage(Storage):
     def url(self, name):
         if self.base_url is None:
             raise ValueError("This file is not accessible via a URL.")
-        return urlparse.urljoin(self.base_url, name).replace('\\', '/')
+        return urlparse.urljoin(self.base_url, filepath_to_uri(name))
 
 def get_storage_class(import_path=None):
     if import_path is None:
