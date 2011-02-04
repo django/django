@@ -436,7 +436,6 @@ CACHES = {
 }
 # The cache backend to use.  See the docstring in django.core.cache for the
 # possible values.
-CACHE_BACKEND = 'locmem://'
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
 CACHE_MIDDLEWARE_SECONDS = 600
 CACHE_MIDDLEWARE_ALIAS = 'default'
