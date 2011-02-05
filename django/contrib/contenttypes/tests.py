@@ -61,9 +61,11 @@ class ContentTypesTests(TestCase):
         from django.contrib.auth.models import User
         user_ct = ContentType.objects.get_for_model(User)
         obj = User.objects.create(username="john")
-        Site._meta.installed = True
-        response = shortcut(request, user_ct.id, obj.id)
-        self.assertEqual("http://example.com/users/john/", response._headers.get("location")[1])
+
+        if Site._meta.installed:
+            response = shortcut(request, user_ct.id, obj.id)
+            self.assertEqual("http://example.com/users/john/", response._headers.get("location")[1])
+
         Site._meta.installed = False
         response = shortcut(request, user_ct.id, obj.id)
         self.assertEqual("http://Example.com/users/john/", response._headers.get("location")[1])

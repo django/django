@@ -15,9 +15,14 @@ class SitemapTests(TestCase):
     urls = 'django.contrib.sitemaps.tests.urls'
 
     def setUp(self):
+        if Site._meta.installed:
+            self.base_url = 'http://example.com'
+        else:
+            self.base_url = 'http://testserver'
         self.old_USE_L10N = settings.USE_L10N
         self.old_Site_meta_installed = Site._meta.installed
         self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        self.old_Site_meta_installed = Site._meta.installed
         settings.TEMPLATE_DIRS = (
             os.path.join(os.path.dirname(__file__), 'templates'),
         )
@@ -28,6 +33,7 @@ class SitemapTests(TestCase):
         settings.USE_L10N = self.old_USE_L10N
         Site._meta.installed = self.old_Site_meta_installed
         settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+        Site._meta.installed = self.old_Site_meta_installed
 
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
@@ -36,9 +42,9 @@ class SitemapTests(TestCase):
         # Check for all the important bits:
         self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>http://example.com/simple/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
-""")
+""" % self.base_url)
 
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
@@ -48,9 +54,9 @@ class SitemapTests(TestCase):
         self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>http://example.com/simple/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
-""")
+""" % self.base_url)
 
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
@@ -59,9 +65,9 @@ class SitemapTests(TestCase):
         # Check for all the important bits:
         self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>http://example.com/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
+<url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % date.today().strftime('%Y-%m-%d'))
+""" % (self.base_url, date.today().strftime('%Y-%m-%d')))
 
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"
@@ -71,9 +77,9 @@ class SitemapTests(TestCase):
         self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>http://example.com/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
+<url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % date.today().strftime('%Y-%m-%d'))
+""" % (self.base_url, date.today().strftime('%Y-%m-%d')))
 
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     def test_localized_priority(self):
@@ -97,13 +103,13 @@ class SitemapTests(TestCase):
 
         expected = ''
         for username in User.objects.values_list("username", flat=True):
-            expected += "<url><loc>http://example.com/users/%s/</loc></url>" %username
+            expected += "<url><loc>%s/users/%s/</loc></url>" % (self.base_url, username)
         # Check for all the important bits:
         self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 %s
 </urlset>
-""" %expected)
+""" % expected)
 
     @skipUnless("django.contrib.flatpages" in settings.INSTALLED_APPS, "django.contrib.flatpages app not installed.")
     def test_flatpage_sitemap(self):
@@ -131,9 +137,9 @@ class SitemapTests(TestCase):
         private.sites.add(settings.SITE_ID)
         response = self.client.get('/flatpages/sitemap.xml')
         # Public flatpage should be in the sitemap
-        self.assertContains(response, '<loc>http://example.com%s</loc>' % public.url)
+        self.assertContains(response, '<loc>%s%s</loc>' % (self.base_url, public.url))
         # Private flatpage should not be in the sitemap
-        self.assertNotContains(response, '<loc>http://example.com%s</loc>' % private.url)
+        self.assertNotContains(response, '<loc>%s%s</loc>' % (self.base_url, private.url))
 
     def test_requestsite_sitemap(self):
         # Make sure hitting the flatpages sitemap without the sites framework
@@ -148,12 +154,12 @@ class SitemapTests(TestCase):
 </urlset>
 """ % date.today().strftime('%Y-%m-%d'))
 
+    @skipUnless("django.contrib.sites" in settings.INSTALLED_APPS, "django.contrib.sites app not installed.")
     def test_sitemap_get_urls_no_site_1(self):
         """
         Check we get ImproperlyConfigured if we don't pass a site object to
         Sitemap.get_urls and no Site objects exist
         """
-        Site._meta.installed = True
         Site.objects.all().delete()
         self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
 
@@ -163,6 +169,5 @@ class SitemapTests(TestCase):
         Sitemap.get_urls if Site objects exists, but the sites framework is not
         actually installed.
         """
-        Site.objects.get_current()
         Site._meta.installed = False
         self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
