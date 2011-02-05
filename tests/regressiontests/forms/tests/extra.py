@@ -356,6 +356,10 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
         self.assertFalse(c.is_valid())
         self.assertEqual(c.errors, {'mydate': [u'Enter a valid date.']})
 
+        # label tag is correctly associated with month dropdown
+        d = GetDate({'mydate_month':'1', 'mydate_day':'1', 'mydate_year':'2010'})
+        self.assertTrue('<label for="id_mydate_month">' in d.as_p())
+
     def test_multiwidget(self):
         # MultiWidget and MultiValueField #############################################
         # MultiWidgets are widgets composed of other widgets. They are usually
@@ -616,3 +620,8 @@ class FormsExtraL10NTestCase(unittest.TestCase):
         self.assertFalse(a.is_valid())
         # 'Geef een geldige datum op.' = 'Enter a valid date.'
         self.assertEqual(a.errors, {'mydate': [u'Geef een geldige datum op.']})
+
+    def test_form_label_association(self):
+        # label tag is correctly associated with first rendered dropdown
+        a = GetDate({'mydate_month':'1', 'mydate_day':'1', 'mydate_year':'2010'})
+        self.assertTrue('<label for="id_mydate_day">' in a.as_p())
