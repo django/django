@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.util import ErrorDict, ErrorList
 from django.forms.models import modelform_factory, inlineformset_factory, modelformset_factory
 from django.test import TestCase
 
@@ -200,6 +201,31 @@ class InlineFormsetTests(TestCase):
             ["<Host: matrix.de.eu.dal.net>", "<Host: tranquility.hub.dal.net>"]
             )
 
+class FormsetTests(TestCase):
+    def test_error_class(self):
+        '''
+        Test the type of Formset and Form error attributes
+        '''
+        Formset = modelformset_factory(User)
+        data = {
+            'form-TOTAL_FORMS': u'2',
+            'form-INITIAL_FORMS': u'0',
+            'form-MAX_NUM_FORMS': u'0',
+            'form-0-id': '',
+            'form-0-username': u'apollo13',
+            'form-0-serial': u'1',
+            'form-1-id': '',
+            'form-1-username': u'apollo13',
+            'form-1-serial': u'2',
+        }
+        formset = Formset(data)
+        # check if the returned error classes are correct
+        # note: formset.errors returns a list as documented
+        self.assertTrue(isinstance(formset.errors, list))
+        self.assertTrue(isinstance(formset.non_form_errors(), ErrorList))
+        for form in formset.forms:
+            self.assertTrue(isinstance(form.errors, ErrorDict))
+            self.assertTrue(isinstance(form.non_field_errors(), ErrorList))
 
 class CustomWidget(forms.CharField):
     pass

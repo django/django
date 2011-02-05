@@ -511,7 +511,7 @@ class BaseModelFormSet(BaseFormSet):
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_unique_error_message(unique_check))
-                        form._errors[NON_FIELD_ERRORS] = self.get_form_error()
+                        form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
                         del form.cleaned_data
                         break
                     # mark the data as seen
@@ -542,7 +542,7 @@ class BaseModelFormSet(BaseFormSet):
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_date_error_message(date_check))
-                        form._errors[NON_FIELD_ERRORS] = self.get_form_error()
+                        form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
                         del form.cleaned_data
                         break
                     seen_data.add(data)
