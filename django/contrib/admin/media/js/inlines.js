@@ -31,6 +31,7 @@
 			}
 		};
 		var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").attr("autocomplete", "off");
+		var nextIndex = parseInt(totalForms.val());
 		var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").attr("autocomplete", "off");
 		// only show the add button if we are allowed to add more items,
         // note that max_num = None translates to a blank string.
@@ -53,12 +54,12 @@
 			}
 			addButton.click(function() {
 				var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
-				var nextIndex = parseInt(totalForms.val());
 				var template = $("#" + options.prefix + "-empty");
 				var row = template.clone(true);
 				row.removeClass(options.emptyCssClass)
 				    .addClass(options.formCssClass)
 				    .attr("id", options.prefix + "-" + nextIndex);
+				nextIndex += 1;
 				row.find("*")
 				    .filter(function() {
 				        var el = $(this);
@@ -94,7 +95,7 @@
 				// Insert the new form when it has been fully edited
 				row.insertBefore($(template));
 				// Update number of total forms
-				$(totalForms).val(nextIndex + 1);
+				$(totalForms).val(parseInt(totalForms.val()) + 1);
 				// Hide add button in case we've hit the max, except we want to add infinitely
 				if ((maxForms.val() != '') && (maxForms.val()-totalForms.val()) <= 0) {
 					addButton.parent().hide();
