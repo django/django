@@ -93,9 +93,9 @@ class SitemapTests(TestCase):
             private.sites.add(settings.SITE_ID)
             response = self.client.get('/flatpages/sitemap.xml')
             # Public flatpage should be in the sitemap
-            self.assertContains(response, '<loc>http://%s%s</loc>' % (self.base_url, public.url))
+            self.assertContains(response, '<loc>%s%s</loc>' % (self.base_url, public.url))
             # Private flatpage should not be in the sitemap
-            self.assertNotContains(response, '<loc>http://%s%s</loc>' % (self.base_url, private.url))
+            self.assertNotContains(response, '<loc>%s%s</loc>' % (self.base_url, private.url))
 
     def test_requestsite_sitemap(self):
         # Make sure hitting the flatpages sitemap without the sites framework
