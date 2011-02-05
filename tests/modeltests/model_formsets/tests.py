@@ -1096,7 +1096,7 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(formset._non_form_errors,
             [u'Please correct the duplicate data for title.'])
         self.assertEqual(formset.errors,
-            [{}, {'__all__': u'Please correct the duplicate values below.'}])
+            [{}, {'__all__': [u'Please correct the duplicate values below.']}])
 
         FormSet = modelformset_factory(Post, extra=2)
         data = {
@@ -1118,7 +1118,7 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(formset._non_form_errors,
             [u'Please correct the duplicate data for title which must be unique for the date in posted.'])
         self.assertEqual(formset.errors,
-            [{}, {'__all__': u'Please correct the duplicate values below.'}])
+            [{}, {'__all__': [u'Please correct the duplicate values below.']}])
 
         data = {
             'form-TOTAL_FORMS': '2',
