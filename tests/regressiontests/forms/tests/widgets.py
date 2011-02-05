@@ -1084,7 +1084,7 @@ class ClearableFileInputTests(TestCase):
         widget = ClearableFileInput()
         widget.is_required = False
         self.assertEqual(widget.render('myfile', FakeFieldFile()),
-                         u'Currently: <a target="_blank" href="something">something</a> <input type="checkbox" name="myfile-clear" id="myfile-clear_id" /> <label for="myfile-clear_id">Clear</label><br />Change: <input type="file" name="myfile" />')
+                         u'Currently: <a href="something">something</a> <input type="checkbox" name="myfile-clear" id="myfile-clear_id" /> <label for="myfile-clear_id">Clear</label><br />Change: <input type="file" name="myfile" />')
 
     def test_clear_input_renders_only_if_not_required(self):
         """
@@ -1095,7 +1095,7 @@ class ClearableFileInputTests(TestCase):
         widget = ClearableFileInput()
         widget.is_required = True
         self.assertEqual(widget.render('myfile', FakeFieldFile()),
-                         u'Currently: <a target="_blank" href="something">something</a> <br />Change: <input type="file" name="myfile" />')
+                         u'Currently: <a href="something">something</a> <br />Change: <input type="file" name="myfile" />')
 
     def test_clear_input_renders_only_if_initial(self):
         """
