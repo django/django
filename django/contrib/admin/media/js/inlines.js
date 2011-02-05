@@ -58,8 +58,7 @@
 				var row = template.clone(true);
 				row.removeClass(options.emptyCssClass)
 				    .addClass(options.formCssClass)
-				    .attr("id", options.prefix + "-" + nextIndex)
-				    .insertBefore($(template));
+				    .attr("id", options.prefix + "-" + nextIndex);
 				row.find("*")
 				    .filter(function() {
 				        var el = $(this);
@@ -92,6 +91,8 @@
 				row.find("input,select,textarea,label,a").each(function() {
 					updateElementIndex(this, options.prefix, totalForms.val());
 				});
+				// Insert the new form when it has been fully edited
+				row.insertBefore($(template));
 				// Update number of total forms
 				$(totalForms).val(nextIndex + 1);
 				// Hide add button in case we've hit the max, except we want to add infinitely
