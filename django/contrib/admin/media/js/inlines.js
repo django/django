@@ -75,6 +75,14 @@
 				    }).each(function() {
 				        var el = $(this);
 				        el.attr("name", el.attr("name").replace(/__prefix__/g, nextIndex));
+				    })
+				    .end()
+				    .filter(function() {
+				        var el = $(this);
+				        return el.attr("for") && el.attr("for").search(/__prefix__/) >= 0;
+				    }).each(function() {
+				        var el = $(this);
+				        el.attr("for", el.attr("for").replace(/__prefix__/g, nextIndex));
 				    });
 				if (row.is("tr")) {
 					// If the forms are laid out in table rows, insert
