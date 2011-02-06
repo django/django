@@ -401,7 +401,7 @@ of 60 seconds, and a maximum capacity of 1000 items::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileCache',
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
             'LOCATION': '/var/tmp/django_cache',
             'TIMEOUT': 60,
             'OPTIONS': {
@@ -1146,4 +1146,3 @@ where middleware is applied first-to-last, so an item at the top of the list
 runs *first* during the request phase. The ``FetchFromCacheMiddleware`` also
 needs to run after other middleware updates the ``Vary`` header, so
 ``FetchFromCacheMiddleware`` must be *after* any item that does so.
-
