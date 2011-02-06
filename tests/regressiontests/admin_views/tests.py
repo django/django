@@ -1675,6 +1675,29 @@ class AdminActionsTest(TestCase):
         response = self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)
 
+    def test_non_localized_pk(self):
+        """If USE_THOUSAND_SEPARATOR is set, make sure that the ids for
+        the objects selected for deletion are rendered without separators.
+        Refs #14895.
+        """
+        self.old_USE_THOUSAND_SEPARATOR = settings.USE_THOUSAND_SEPARATOR
+        self.old_USE_L10N = settings.USE_L10N
+        settings.USE_THOUSAND_SEPARATOR = True
+        settings.USE_L10N = True
+        subscriber = Subscriber.objects.get(id=1)
+        subscriber.id = 9999
+        subscriber.save()
+        action_data = {
+            ACTION_CHECKBOX_NAME: [9999, 2],
+            'action' : 'delete_selected',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
+        self.assertTemplateUsed(response, 'admin/delete_selected_confirmation.html')
+        self.assertTrue('value="9999"' in response.content and 'value="2"' in response.content) # Instead of 9,999
+        settings.USE_THOUSAND_SEPARATOR = self.old_USE_THOUSAND_SEPARATOR
+        settings.USE_L10N = self.old_USE_L10N
+
     def test_model_admin_default_delete_action_protected(self):
         """
         Tests the default delete action defined as a ModelAdmin method in the
