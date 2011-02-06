@@ -70,7 +70,7 @@ class MonthMixin(object):
         Get the previous valid month.
         """
         first_day, last_day = _month_bounds(date)
-        prev = (first_day - datetime.timedelta(days=1)).replace(day=1)
+        prev = (first_day - datetime.timedelta(days=1))
         return _get_next_prev_month(self, prev, is_previous=True, use_first_day=True)
 
 
@@ -516,7 +516,7 @@ def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day)
     This is a bit complicated since it handles both next and previous months
     and days (for MonthArchiveView and DayArchiveView); hence the coupling to generic_view.
 
-    However in essance the logic comes down to:
+    However in essence the logic comes down to:
 
         * If allow_empty and allow_future are both true, this is easy: just
           return the naive result (just the next/previous day or month,
@@ -546,7 +546,7 @@ def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day)
     # whose date_field is at least (greater than/less than) the given
     # naive result
     else:
-        # Construct a lookup and an ordering depending on weather we're doing
+        # Construct a lookup and an ordering depending on whether we're doing
         # a previous date or a next date lookup.
         if is_previous:
             lookup = {'%s__lte' % date_field: naive_result}
@@ -569,7 +569,7 @@ def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day)
         result = result.date()
 
     # For month views, we always want to have a date that's the first of the
-    # month for consistancy's sake.
+    # month for consistency's sake.
     if result and use_first_day:
         result = result.replace(day=1)
 
