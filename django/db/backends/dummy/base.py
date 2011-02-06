@@ -52,5 +52,9 @@ class DatabaseWrapper(object):
         self.settings_dict = settings_dict
         self.alias = alias
 
+        self.transaction_state = []
+        self.savepoint_state = 0
+        self.dirty = None
+
     def close(self):
         pass
