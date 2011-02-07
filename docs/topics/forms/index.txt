@@ -396,8 +396,8 @@ This covers the basics, but forms can do a whole lot more:
 .. toctree::
    :maxdepth: 2
 
-   modelforms
    formsets
+   modelforms
    media
 
 .. seealso::
