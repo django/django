@@ -3,13 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: django tests\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-14 17:33+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2011-02-07 13:13-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,5 +17,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: models.py:3
+msgid "Time"
+msgstr "Zeit (PROJECT)"
+
+#: models.py:5
 msgid "Date/time"
 msgstr "Datum/Zeit (PROJECT)"

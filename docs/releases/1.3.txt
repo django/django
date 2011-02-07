@@ -454,6 +454,52 @@ should either insert it using :ref:`test fixtures
 <topics-testing-fixtures>`, or using the ``setUp()`` method of your
 test case.
 
+Changed priority of translation loading
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Work has been done to homogeneize, simplify, rationalize and properly document
+the algorithm used by Django at runtime to build translations from the
+differents translations found on disk, namely:
+
+For translatable literals found in Python code and templates (``'django'``
+gettext domain):
+
+ * Priorities of translations included with applications listed in the
+   :setting:`INSTALLED_APPS` setting were changed. To provide a behavior
+   consistent with other parts of Django that also use such setting (templates,
+   etc.) now, when building the translation that will be made available, the
+   apps listed first have higher precedence than the ones listed later.
+
+ * Now it is possible to override the translations shipped with applications by
+   using the :setting:`LOCALE_PATHS` setting whose translations have now higher
+   precedence than the translations of ``INSTALLED_APPS`` applications.
+   The relative priority among the values listed in this setting has also been
+   modified so the paths listed first have higher precedence than the
+   ones listed later.
+
+ * The ``locale`` subdirectory of the directory containing the settings, that
+   usually coincides with and is know as the *project directory* is being
+   deprecated in this release as a source of translations. (the precedence of
+   these translations is intermediate between applications and ``LOCALE_PATHS``
+   translations). See the `corresponding deprecated features section`_
+   of this document.
+
+For translatable literals found in Javascript code (``'djangojs'`` gettext
+domain):
+
+ * Similarly to the ``'django'`` domain translations: Overriding of
+   translations shipped with applications by using the :setting:`LOCALE_PATHS`
+   setting is now possible for this domain too. These translations have higher
+   precedence than the translations of Python packages passed to the
+   :ref:`javascript_catalog view <javascript_catalog-view>`.  Paths listed first
+   have higher precedence than the ones listed later.
+
+ * Translations under the ``locale`` sbdirectory of the *project directory* have
+   never been taken in account for JavaScript translations and remain in the
+   same situation considering the deprecation of such location.
+
+.. _corresponding deprecated features section: loading_of_translations_from_the_project_directory_
+
 .. _deprecated-features-1.3:
 
 Features deprecated in 1.3
@@ -631,3 +677,38 @@ Previously, ``django.http`` exposed an undocumented ``CompatCookie`` class,
 which was a bug-fix wrapper around the standard library ``SimpleCookie``. As the
 fixes are moving upstream, this is now deprecated - you should use ``from
 django.http import SimpleCookie`` instead.
+
+.. _loading_of_translations_from_the_project_directory:
+
+Loading of translations from the project directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This release of Django starts the deprecation process for inclusion of
+translations located under the *project path* in the translation building
+process performed at runtime. The :setting:`LOCALE_PATHS` setting can be used
+for the same task by including in it the filesystem path to the ``locale``
+directory containing project-level translations.
+
+Rationale for this decision:
+
+ * The *project path* has always been a loosely defined concept (actually, the
+   directory used for locating project-level translations is the directory
+   containing the settings module) and there has been a shift in other parts
+   of the framework to stop using it as a reference for location of assets at
+   runtime.
+
+ * Detection of the ``locale`` subdirectory tends to fail when the deployment
+   scenario is more complex than the basic one. e.g. it fails when the settings
+   module is a directory (ticket #10765).
+
+ * Potential for strange development- and deployment-time problems like the
+   fact that the ``project_dir/locale/`` subdir can generate spurious error
+   messages when the project directory is included in the Python path (default
+   behavior of ``manage.py runserver``) and then it clashes with the equally
+   named standard library module, this is a typical warming message::
+
+     /usr/lib/python2.6/gettext.py:49: ImportWarning: Not importing directory '/path/to/project/dir/locale': missing __init__.py.
+     import locale, copy, os, re, struct, sys
+
+ * This location wasn't included in the translation building process for
+   JavaScript literals.

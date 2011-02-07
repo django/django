@@ -1,8 +1,11 @@
 """
 Internationalization support.
 """
+from os import path
+
 from django.utils.encoding import force_unicode
-from django.utils.functional import lazy, curry
+from django.utils.functional import lazy
+from django.utils.importlib import import_module
 
 
 __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
@@ -33,10 +36,22 @@ class Trans(object):
     performance effect, as access to the function goes the normal path,
     instead of using __getattr__.
     """
+
     def __getattr__(self, real_name):
         from django.conf import settings
         if settings.USE_I18N:
             from django.utils.translation import trans_real as trans
+
+            if settings.SETTINGS_MODULE is not None:
+                import warnings
+                parts = settings.SETTINGS_MODULE.split('.')
+                project = import_module(parts[0])
+                if path.isdir(path.join(path.dirname(project.__file__), 'locale')):
+                    warnings.warn(
+                        "Translations in the project directory aren't supported anymore. Use the LOCALE_PATHS setting instead.",
+                        PendingDeprecationWarning
+                    )
+
         else:
             from django.utils.translation import trans_null as trans
         setattr(self, real_name, getattr(trans, real_name))

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django tests\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-14 17:33+0100\n"
-"PO-Revision-Date: 2011-01-16 17:14+0100\n"
+"PO-Revision-Date: 2011-01-21 21:37-0300\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: de <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,22 +18,25 @@ msgstr ""
 
 #: models.py:3
 msgid "Time"
-msgstr "Time (LOCALE_PATHS)"
+msgstr "Zeit (LOCALE_PATHS)"
 
 #: models.py:5
+msgid "Date/time"
+msgstr "Datum/Zeit (LOCALE_PATHS)"
+
+#: models.py:7
 msgctxt "month name"
 msgid "May"
 msgstr "Mai"
 
-#: models.py:7
+#: models.py:9
 msgctxt "verb"
 msgid "May"
 msgstr "Kann"
 
-#: models.py:9
+#: models.py:11
 msgctxt "search"
 msgid "%d result"
 msgid_plural "%d results"
 msgstr[0] "%d Resultat"
 msgstr[1] "%d Resultate"
-

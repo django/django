@@ -125,11 +125,11 @@ def translation(language):
 
         global _translations
 
-        loc = to_locale(lang)
-
         res = _translations.get(lang, None)
         if res is not None:
             return res
+
+        loc = to_locale(lang)
 
         def _translation(path):
             try:
@@ -159,11 +159,7 @@ def translation(language):
                     res.merge(t)
             return res
 
-        for localepath in settings.LOCALE_PATHS:
-            if os.path.isdir(localepath):
-                res = _merge(localepath)
-
-        for appname in settings.INSTALLED_APPS:
+        for appname in reversed(settings.INSTALLED_APPS):
             app = import_module(appname)
             apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
 
@@ -172,6 +168,10 @@ def translation(language):
 
         if projectpath and os.path.isdir(projectpath):
             res = _merge(projectpath)
+
+        for localepath in reversed(settings.LOCALE_PATHS):
+            if os.path.isdir(localepath):
+                res = _merge(localepath)
 
         if res is None:
             if fallback is not None:

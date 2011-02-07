@@ -668,14 +668,14 @@ class ResolutionOrderI18NTests(TestCase):
 
     def assertUgettext(self, msgid, msgstr):
         result = ugettext(msgid)
-        self.assert_(msgstr in result, ("The string '%s' isn't in the "
+        self.assertTrue(msgstr in result, ("The string '%s' isn't in the "
             "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
 
 class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def setUp(self):
         self.old_installed_apps = settings.INSTALLED_APPS
-        settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ['regressiontests.i18n.resolution']
+        settings.INSTALLED_APPS = ['regressiontests.i18n.resolution'] + list(settings.INSTALLED_APPS)
         super(AppResolutionOrderI18NTests, self).setUp()
 
     def tearDown(self):
@@ -699,6 +699,22 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
     def test_locale_paths_translation(self):
         self.assertUgettext('Time', 'LOCALE_PATHS')
 
+    def test_locale_paths_override_app_translation(self):
+        old_installed_apps = settings.INSTALLED_APPS
+        settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ['regressiontests.i18n.resolution']
+        try:
+            self.assertUgettext('Time', 'LOCALE_PATHS')
+        finally:
+            settings.INSTALLED_APPS = old_installed_apps
+
+    def test_locale_paths_override_project_translation(self):
+        old_settings_module = settings.SETTINGS_MODULE
+        settings.SETTINGS_MODULE = 'regressiontests'
+        try:
+            self.assertUgettext('Date/time', 'LOCALE_PATHS')
+        finally:
+            settings.SETTINGS_MODULE = old_settings_module
+
 class ProjectResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def setUp(self):
@@ -716,19 +732,15 @@ class ProjectResolutionOrderI18NTests(ResolutionOrderI18NTests):
     def test_project_override_app_translation(self):
         old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = list(settings.INSTALLED_APPS) + ['regressiontests.i18n.resolution']
-        self.assertUgettext('Date/time', 'PROJECT')
-        settings.INSTALLED_APPS = old_installed_apps
-
-    def test_project_override_locale_paths_translation(self):
-        old_locale_paths = settings.LOCALE_PATHS
-        settings.LOCALE_PATHS += (os.path.join(os.path.dirname(os.path.abspath(__file__)), 'other', 'locale'),)
-        self.assertUgettext('Date/time', 'PROJECT')
-        settings.LOCALE_PATHS = old_locale_paths
+        try:
+            self.assertUgettext('Date/time', 'PROJECT')
+        finally:
+            settings.INSTALLED_APPS = old_installed_apps
 
 class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_django_fallback(self):
-        self.assertUgettext('Date/time', 'Datum/Zeit')
+        self.assertEqual(ugettext('Date/time'), 'Datum/Zeit')
 
 
 class TestModels(TestCase):

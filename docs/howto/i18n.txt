@@ -4,15 +4,36 @@
 Using internationalization in your own projects
 ===============================================
 
-At runtime, Django looks for translations by following this algorithm:
+At runtime, Django builds an in-memory unified catalog of literals-translations.
+To achieve this it looks for translations by following this algorithm regarding
+the order in which it examines the different file paths to load the compiled
+:term:`message files <message file>` (``.mo``) and the precedence of multiple
+translations for the same literal:
 
-    * First, it looks for a ``locale`` directory in the directory containing
-      your settings file.
-    * Second, it looks for a ``locale`` directory in the project directory.
-    * Third, it looks for a ``locale`` directory in each of the installed apps.
-      It does this in the reverse order of INSTALLED_APPS
-    * Finally, it checks the Django-provided base translation in
-      ``django/conf/locale``.
+    1. The directories listed in :setting:`LOCALE_PATHS` have the highest
+       precedence, with the ones appearing first having higher precedence than
+       the ones appearing later.
+    2. Then, it looks for and uses if it exists a ``locale`` directory in each
+       of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
+       appearing first have higher precedence than the ones appearing later.
+    3. Then, it looks for a ``locale`` directory in the project directory, or
+       more accurately, in the directory containing your settings file.
+    4. Finally, the Django-provided base translation in ``django/conf/locale``
+       is used as a fallback.
+
+.. deprecated:: 1.3
+    Lookup in the ``locale`` subdirectory of the directory containing your
+    settings file (item 3 above) is deprecated since the 1.3 release and will be
+    removed in Django 1.5. You can use the :setting:`LOCALE_PATHS` setting
+    instead, by listing the absolute filesystem path of such ``locale``
+    directory in the setting value.
+
+.. seealso::
+
+    The translations for literals included in JavaScript assets are looked up
+    following a similar but not identical algorithm. See the
+    :ref:`javascript_catalog view documentation <javascript_catalog-view>` for
+    more details.
 
 In all cases the name of the directory containing the translation is expected to
 be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
@@ -20,8 +41,8 @@ etc.
 
 This way, you can write applications that include their own translations, and
 you can override base translations in your project path. Or, you can just build
-a big project out of several apps and put all translations into one big project
-message file. The choice is yours.
+a big project out of several apps and put all translations into one big common
+message file specific to the project you are composing. The choice is yours.
 
 .. note::
 
@@ -34,10 +55,11 @@ message file. The choice is yours.
 
 All message file repositories are structured the same way. They are:
 
-    * ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
-    * ``$PROJECTPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
     * All paths listed in ``LOCALE_PATHS`` in your settings file are
-      searched in that order for ``<language>/LC_MESSAGES/django.(po|mo)``
+      searched for ``<language>/LC_MESSAGES/django.(po|mo)``
+    * ``$PROJECTPATH/locale/<language>/LC_MESSAGES/django.(po|mo)`` --
+      deprecated, see above.
+    * ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
     * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
 To create message files, you use the :djadmin:`django-admin.py makemessages <makemessages>`
@@ -50,22 +72,18 @@ You can also run ``django-admin.py compilemessages --settings=path.to.settings``
 to make the compiler process all the directories in your :setting:`LOCALE_PATHS`
 setting.
 
-Application message files are a bit complicated to discover -- they need the
-:class:`~django.middleware.locale.LocaleMiddleware`. If you don't use the
-middleware, only the Django message files and project message files will be
-installed and available at runtime.
-
 Finally, you should give some thought to the structure of your translation
 files. If your applications need to be delivered to other users and will
 be used in other projects, you might want to use app-specific translations.
-But using app-specific translations and project translations could produce
-weird problems with ``makemessages``: It will traverse all directories below
-the current path and so might put message IDs into the project message file
-that are already in application message files.
+But using app-specific translations and project-specific translations could
+produce weird problems with ``makemessages``: It will traverse all directories
+below the current path and so might put message IDs into a unified, common
+message file for the current project that are already in application message
+files.
 
 The easiest way out is to store applications that are not part of the project
 (and so carry their own translations) outside the project tree. That way,
-``django-admin.py makemessages`` on the project level will only translate
+``django-admin.py makemessages``, when ran on a project level will only extract
 strings that are connected to your explicit project and not strings that are
 distributed independently.
 

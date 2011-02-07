@@ -348,8 +348,6 @@ translation method!
 Working with lazy translation objects
 -------------------------------------
 
-.. highlightlang:: python
-
 Using ``ugettext_lazy()`` and ``ungettext_lazy()`` to mark strings in models
 and utility functions is a common operation. When you're working with these
 objects elsewhere in your code, you should ensure that you don't accidentally
@@ -633,6 +631,8 @@ There are also simple filters available for convenience:
 Specifying translation strings: In JavaScript code
 ==================================================
 
+.. highlightlang:: python
+
 Adding translations to JavaScript poses some problems:
 
     * JavaScript code doesn't have access to a ``gettext`` implementation.
@@ -647,6 +647,8 @@ Django provides an integrated solution for these problems: It passes the
 translations into JavaScript, so you can call ``gettext``, etc., from within
 JavaScript.
 
+.. _javascript_catalog-view:
+
 The ``javascript_catalog`` view
 -------------------------------
 
@@ -657,8 +659,9 @@ The ``javascript_catalog`` view
 The main solution to these problems is the :meth:`django.views.i18n.javascript_catalog`
 view, which sends out a JavaScript code library with functions that mimic the
 ``gettext`` interface, plus an array of translation strings. Those translation
-strings are taken from the application, project or Django core, according to what
-you specify in either the info_dict or the URL.
+strings are taken from applications or Django core, according to what you
+specify in either the info_dict or the URL. Paths listed in
+:setting:`LOCALE_PATHS` are also included.
 
 You hook it up like this::
 
@@ -676,6 +679,11 @@ that contains a ``locale`` directory. If you specify multiple packages, all
 those catalogs are merged into one catalog. This is useful if you have
 JavaScript that uses strings from different applications.
 
+The precedence of translations is such that the packages appearing later in the
+``packages`` argument have higher precedence than the ones appearing at the
+beginning, this is important in the case of clashing translations for the same
+literal.
+
 By default, the view uses the ``djangojs`` gettext domain. This can be
 changed by altering the ``domain`` argument.
 
@@ -691,10 +699,25 @@ different apps and this changes often and you don't want to pull in one big
 catalog file. As a security measure, these values can only be either
 ``django.conf`` or any package from the :setting:`INSTALLED_APPS` setting.
 
+The JavaScript translations found in the paths listed in the
+:setting:`LOCALE_PATHS` setting are also always included. To keep consistency
+with the translations lookup order algorithm used for Python and templates, the
+directories listed in :setting:`LOCALE_PATHS` have the highest precedence with
+the ones appearing first having higher precedence than the ones appearing
+later.
+
+.. versionchanged:: 1.3
+    Directories listed in ``LOCALE_PATHS`` weren't included in the lookup
+    algorithm until version 1.3.
+
 Using the JavaScript translation catalog
 ----------------------------------------
 
-To use the catalog, just pull in the dynamically generated script like this::
+.. highlightlang:: javascript
+
+To use the catalog, just pull in the dynamically generated script like this:
+
+.. code-block:: html+django
 
     <script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
 
@@ -750,6 +773,8 @@ to produce proper pluralizations).
 
 The ``set_language`` redirect view
 ==================================
+
+.. highlightlang:: python
 
 .. function:: set_language(request)
 

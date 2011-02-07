@@ -193,11 +193,15 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     paths = []
     en_selected = locale.startswith('en')
     en_catalog_missing = True
-    # first load all english languages files for defaults
+    # paths of requested packages
     for package in packages:
         p = importlib.import_module(package)
         path = os.path.join(os.path.dirname(p.__file__), 'locale')
         paths.append(path)
+    # add the filesystem paths listed in the LOCALE_PATHS setting
+    paths.extend(list(reversed(settings.LOCALE_PATHS)))
+    # first load all english languages files for defaults
+    for path in paths:
         try:
             catalog = gettext_module.translation(domain, path, ['en'])
             t.update(catalog._catalog)
@@ -275,4 +279,3 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     src.append(LibFormatFoot)
     src = ''.join(src)
     return http.HttpResponse(src, 'text/javascript')
-

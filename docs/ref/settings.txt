@@ -1149,6 +1149,17 @@ Default: ``()`` (Empty tuple)
 A tuple of directories where Django looks for translation files.
 See :ref:`using-translations-in-your-own-projects`.
 
+Example::
+
+    LOCALE_PATHS = (
+        '/home/www/project/common_files/locale',
+        '/var/local/translations/locale'
+    )
+
+Note that in the paths you add to the value of this setting, if you have the
+typical ``/path/to/locale/xx/LC_MESSAGES`` hierarchy, you should use the path to
+the ``locale`` directory (i.e. ``'/path/to/locale'``).
+
 .. setting:: LOGGING
 
 LOGGING

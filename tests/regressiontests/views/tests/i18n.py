@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import gettext
+from os import path
 
 from django.conf import settings
 from django.test import TestCase
@@ -150,3 +151,11 @@ class JsI18NTestsMultiPackage(TestCase):
         response = self.client.get('/views/jsi18n_multi_packages2/')
         self.assertContains(response, javascript_quote('este texto de app3 debe ser traducido'))
         deactivate()
+
+    def testI18NWithLocalePaths(self):
+        settings.LANGUAGE_CODE = 'es-ar'
+        self.old_locale_paths = settings.LOCALE_PATHS
+        settings.LOCALE_PATHS += (path.join(path.dirname(path.dirname(path.abspath(__file__))), 'app3', 'locale'),)
+        response = self.client.get('/views/jsi18n/')
+        self.assertContains(response, javascript_quote('este texto de app3 debe ser traducido'))
+        settings.LOCALE_PATHS = self.old_locale_paths
