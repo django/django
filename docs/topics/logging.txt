@@ -349,6 +349,36 @@ This logging configuration does the following things:
           printed to the console; ``ERROR`` and ``CRITICAL``
           messages will also be output via e-mail.
 
+.. admonition:: Custom handlers and circular imports
+
+    If your ``settings.py`` specifies a custom handler class and the file
+    defining that class also imports ``settings.py`` a circular import will
+    occur.
+
+    For example, if ``settings.py`` contains the following config for
+    :setting:`LOGGING`::
+
+        LOGGING = {
+          'version': 1,
+          'handlers': {
+            'custom_handler': {
+              'level': 'INFO',
+              'class': 'myproject.logconfig.MyHandler',
+            }
+          }
+        }
+
+    and ``myproject/logconfig.py`` has the following line before the
+    ``MyHandler`` definition::
+
+        from django.conf import settings
+
+    then the ``dictconfig`` module will raise an exception like the following::
+
+        ValueError: Unable to configure handler 'custom_handler':
+        Unable to configure handler 'custom_handler':
+        'module' object has no attribute 'logconfig'
+
 .. _formatter documentation: http://docs.python.org/library/logging.html#formatter-objects
 
 Custom logging configuration
