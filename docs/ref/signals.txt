@@ -51,16 +51,16 @@ of the model's :meth:`~django.db.models.Model.__init__` method.
 
 Arguments sent with this signal:
 
-    ``sender``
-        The model class that just had an instance created.
+``sender``
+    The model class that just had an instance created.
 
-    ``args``
-        A list of positional arguments passed to
-        :meth:`~django.db.models.Model.__init__`:
+``args``
+    A list of positional arguments passed to
+    :meth:`~django.db.models.Model.__init__`:
 
-    ``kwargs``
-        A dictionary of keyword arguments passed to
-        :meth:`~django.db.models.Model.__init__`:.
+``kwargs``
+    A dictionary of keyword arguments passed to
+    :meth:`~django.db.models.Model.__init__`:.
 
 For example, the :doc:`tutorial </intro/tutorial01>` has this line:
 
@@ -91,11 +91,11 @@ Like pre_init, but this one is sent when the :meth:`~django.db.models.Model.__in
 
 Arguments sent with this signal:
 
-    ``sender``
-        As above: the model class that just had an instance created.
+``sender``
+    As above: the model class that just had an instance created.
 
-    ``instance``
-        The actual instance of the model that's just been created.
+``instance``
+    The actual instance of the model that's just been created.
 
 pre_save
 --------
@@ -108,14 +108,16 @@ method.
 
 Arguments sent with this signal:
 
-    ``sender``
-        The model class.
+``sender``
+    The model class.
 
-    ``instance``
-        The actual instance being saved.
+``instance``
+    The actual instance being saved.
 
-    ``using``
-        The database alias being used.
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
 
 post_save
 ---------
@@ -128,17 +130,19 @@ Like :data:`pre_save`, but sent at the end of the
 
 Arguments sent with this signal:
 
-    ``sender``
-        The model class.
+``sender``
+    The model class.
 
-    ``instance``
-        The actual instance being saved.
+``instance``
+    The actual instance being saved.
 
-    ``created``
-        A boolean; ``True`` if a new record was created.
+``created``
+    A boolean; ``True`` if a new record was created.
 
-    ``using``
-        The database alias being used.
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
 
 pre_delete
 ----------
@@ -151,14 +155,16 @@ method.
 
 Arguments sent with this signal:
 
-    ``sender``
-        The model class.
+``sender``
+    The model class.
 
-    ``instance``
-        The actual instance being deleted.
+``instance``
+    The actual instance being deleted.
 
-    ``using``
-        The database alias being used.
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
 
 post_delete
 -----------
@@ -171,17 +177,19 @@ Like :data:`pre_delete`, but sent at the end of the
 
 Arguments sent with this signal:
 
-    ``sender``
-        The model class.
+``sender``
+    The model class.
 
-    ``instance``
-        The actual instance being deleted.
+``instance``
+    The actual instance being deleted.
 
-        Note that the object will no longer be in the database, so be very
-        careful what you do with this instance.
+    Note that the object will no longer be in the database, so be very
+    careful what you do with this instance.
 
-    ``using``
-        The database alias being used.
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
 
 m2m_changed
 -----------
@@ -199,51 +207,53 @@ when it comes to tracking changes to models, it is included here.
 
 Arguments sent with this signal:
 
-    ``sender``
-        The intermediate model class describing the :class:`ManyToManyField`.
-        This class is automatically created when a many-to-many field is
-        defined; you can access it using the ``through`` attribute on the
-        many-to-many field.
+``sender``
+    The intermediate model class describing the :class:`ManyToManyField`.
+    This class is automatically created when a many-to-many field is
+    defined; you can access it using the ``through`` attribute on the
+    many-to-many field.
 
-    ``instance``
-        The instance whose many-to-many relation is updated. This can be an
-        instance of the ``sender``, or of the class the :class:`ManyToManyField`
-        is related to.
+``instance``
+    The instance whose many-to-many relation is updated. This can be an
+    instance of the ``sender``, or of the class the :class:`ManyToManyField`
+    is related to.
 
-    ``action``
-        A string indicating the type of update that is done on the relation.
-        This can be one of the following:
+``action``
+    A string indicating the type of update that is done on the relation.
+    This can be one of the following:
 
-        ``"pre_add"``
-            Sent *before* one or more objects are added to the relation
-        ``"post_add"``
-            Sent *after* one or more objects are added to the relation
-        ``"pre_remove"``
-            Sent *after* one or more objects are removed from the relation
-        ``"post_remove"``
-            Sent *after* one or more objects are removed from the relation
-        ``"pre_clear"``
-            Sent *before* the relation is cleared
-        ``"post_clear"``
-            Sent *after* the relation is cleared
+    ``"pre_add"``
+        Sent *before* one or more objects are added to the relation
+    ``"post_add"``
+        Sent *after* one or more objects are added to the relation
+    ``"pre_remove"``
+        Sent *after* one or more objects are removed from the relation
+    ``"post_remove"``
+        Sent *after* one or more objects are removed from the relation
+    ``"pre_clear"``
+        Sent *before* the relation is cleared
+    ``"post_clear"``
+        Sent *after* the relation is cleared
 
-    ``reverse``
-        Indicates which side of the relation is updated (i.e., if it is the
-        forward or reverse relation that is being modified).
+``reverse``
+    Indicates which side of the relation is updated (i.e., if it is the
+    forward or reverse relation that is being modified).
 
-    ``model``
-        The class of the objects that are added to, removed from or cleared
-        from the relation.
+``model``
+    The class of the objects that are added to, removed from or cleared
+    from the relation.
 
-    ``pk_set``
-        For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
-        actions, this is a list of primary key values that have been added to
-        or removed from the relation.
+``pk_set``
+    For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
+    actions, this is a list of primary key values that have been added to
+    or removed from the relation.
 
-        For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
+    For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
 
-    ``using``
-        The database alias being used.
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
 
 For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
 like this:
@@ -351,32 +361,32 @@ handlers are registered anywhere else they may not be loaded by
 
 Arguments sent with this signal:
 
-    ``sender``
-        The ``models`` module that was just installed. That is, if
-        :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
-        ``sender`` will be the ``foo.bar.myapp.models`` module.
+``sender``
+    The ``models`` module that was just installed. That is, if
+    :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
+    ``sender`` will be the ``foo.bar.myapp.models`` module.
 
-    ``app``
-        Same as ``sender``.
+``app``
+    Same as ``sender``.
 
-    ``created_models``
-        A list of the model classes from any app which :djadmin:`syncdb` has
-        created so far.
+``created_models``
+    A list of the model classes from any app which :djadmin:`syncdb` has
+    created so far.
 
-    ``verbosity``
-        Indicates how much information manage.py is printing on screen. See
-        the :djadminopt:`--verbosity` flag for details.
+``verbosity``
+    Indicates how much information manage.py is printing on screen. See
+    the :djadminopt:`--verbosity` flag for details.
 
-        Functions which listen for :data:`post_syncdb` should adjust what they
-        output to the screen based on the value of this argument.
+    Functions which listen for :data:`post_syncdb` should adjust what they
+    output to the screen based on the value of this argument.
 
-    ``interactive``
-        If ``interactive`` is ``True``, it's safe to prompt the user to input
-        things on the command line. If ``interactive`` is ``False``, functions
-        which listen for this signal should not try to prompt for anything.
+``interactive``
+    If ``interactive`` is ``True``, it's safe to prompt the user to input
+    things on the command line. If ``interactive`` is ``False``, functions
+    which listen for this signal should not try to prompt for anything.
 
-        For example, the :mod:`django.contrib.auth` app only prompts to create a
-        superuser when ``interactive`` is ``True``.
+    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    superuser when ``interactive`` is ``True``.
 
 For example, yourapp/signals/__init__.py could be written like::
 
@@ -407,10 +417,10 @@ Sent when Django begins processing an HTTP request.
 
 Arguments sent with this signal:
 
-    ``sender``
-        The handler class -- e.g.
-        :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
-        the request.
+``sender``
+    The handler class -- e.g.
+    :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
+    the request.
 
 request_finished
 ----------------
@@ -422,8 +432,8 @@ Sent when Django finishes processing an HTTP request.
 
 Arguments sent with this signal:
 
-    ``sender``
-        The handler class, as above.
+``sender``
+    The handler class, as above.
 
 got_request_exception
 ---------------------
@@ -435,11 +445,11 @@ This signal is sent whenever Django encounters an exception while processing an 
 
 Arguments sent with this signal:
 
-    ``sender``
-        The handler class, as above.
+``sender``
+    The handler class, as above.
 
-    ``request``
-        The :class:`~django.http.HttpRequest` object.
+``request``
+    The :class:`~django.http.HttpRequest` object.
 
 Test signals
 ============
@@ -460,15 +470,15 @@ normal operation of a Django server -- it is only available during testing.
 
 Arguments sent with this signal:
 
-    sender
-        The :class:`~django.template.Template` object which was rendered.
+``sender``
+    The :class:`~django.template.Template` object which was rendered.
 
-    template
-        Same as sender
+``template``
+    Same as sender
 
-    context
-        The :class:`~django.template.Context` with which the template was
-        rendered.
+``context``
+    The :class:`~django.template.Context` with which the template was
+    rendered.
 
 Database Wrappers
 =================
@@ -494,12 +504,12 @@ connection commands to the SQL backend.
 
 Arguments sent with this signal:
 
-    sender
-        The database wrapper class -- i.e.
-        :class:`django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
-        :class:`django.db.backends.mysql.DatabaseWrapper`, etc.
+``sender``
+    The database wrapper class -- i.e.
+    :class:`django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
+    :class:`django.db.backends.mysql.DatabaseWrapper`, etc.
 
-    connection
-        The database connection that was opened. This can be used in a
-        multiple-database configuration to differentiate connection signals
-        from different databases.
+``connection``
+    The database connection that was opened. This can be used in a
+    multiple-database configuration to differentiate connection signals
+    from different databases.
