@@ -291,8 +291,6 @@ translation method!
 Working with lazy translation objects
 -------------------------------------
 
-.. highlightlang:: python
-
 Using ``ugettext_lazy()`` and ``ungettext_lazy()`` to mark strings in models
 and utility functions is a common operation. When you're working with these
 objects elsewhere in your code, you should ensure that you don't accidentally
@@ -507,6 +505,8 @@ string, so they don't need to be aware of translations.
 Specifying translation strings: In JavaScript code
 ==================================================
 
+.. highlightlang:: python
+
 Adding translations to JavaScript poses some problems:
 
     * JavaScript code doesn't have access to a ``gettext`` implementation.
@@ -568,7 +568,11 @@ catalog file. As a security measure, these values can only be either
 Using the JavaScript translation catalog
 ----------------------------------------
 
-To use the catalog, just pull in the dynamically generated script like this::
+.. highlightlang:: javascript
+
+To use the catalog, just pull in the dynamically generated script like this:
+
+.. code-block:: html+django
 
     <script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
 
@@ -622,6 +626,8 @@ to produce proper pluralizations).
 
 The ``set_language`` redirect view
 ==================================
+
+.. highlightlang:: python
 
 .. function:: set_language(request)
 
