@@ -669,7 +669,7 @@ If your template tag needs to access the current context, you can use the
     # The first argument *must* be called "context" here.
     def current_time(context, format_string):
         timezone = context['timezone']
-        return your_get_current_time_method(timezone)
+        return your_get_current_time_method(timezone, format_string)
 
     register.simple_tag(takes_context=True)(current_time)
 
@@ -678,7 +678,7 @@ Or, using decorator syntax::
     @register.simple_tag(takes_context=True)
     def current_time(context, format_string):
         timezone = context['timezone']
-        return your_get_current_time_method(timezone)
+        return your_get_current_time_method(timezone, format_string)
 
 For more information on how the ``takes_context`` option works, see the section
 on `inclusion tags`_.
