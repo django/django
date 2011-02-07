@@ -172,13 +172,22 @@ Forms are designed to work with the Django template language. In the above
 example, we passed our ``ContactForm`` instance to the template using the
 context variable ``form``. Here's a simple example template::
 
-    <form action="/contact/" method="post">
+    <form action="/contact/" method="post">{% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Submit" />
     </form>
 
 The form only outputs its own fields; it is up to you to provide the surrounding
 ``<form>`` tags and the submit button.
+
+.. admonition:: Forms and Cross Site Request Forgery protection
+
+   Django ships with an easy-to-use :doc:`protection against Cross Site Request
+   Forgeries </ref/contrib/csrf>`. When submitting a form via POST with
+   CSRF protection enabled you must use the :ttag:`csrf_token` template tag
+   as in the preceding example. However, since CSRF protection is not
+   directly tied to forms in templates, this tag is omitted from the
+   following examples in this document.
 
 ``form.as_p`` will output the form with each form field and accompanying label
 wrapped in a paragraph. Here's the output for our example template::
