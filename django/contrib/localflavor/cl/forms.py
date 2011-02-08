@@ -74,7 +74,7 @@ class CLRutField(RegexField):
         tuple.
         """
         rut = smart_unicode(rut).replace(' ', '').replace('.', '').replace('-', '')
-        return rut[:-1], rut[-1]
+        return rut[:-1], rut[-1].upper()
 
     def _format(self, code, verifier=None):
         """
