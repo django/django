@@ -36,6 +36,7 @@ class CLLocalFlavorTests(LocalFlavorTestCase):
             '78.412.790-7': '78.412.790-7',
             '8.334.6043': '8.334.604-3',
             '76793310-K': '76.793.310-K',
+            '76793310-k': '76.793.310-K',
         }
         invalid = {
             '11.111.111-0': error_invalid,
