@@ -419,6 +419,7 @@ class QuerySet(object):
             return {}
         qs = self._clone()
         qs.query.add_filter(('pk__in', id_list))
+        qs.query.clear_ordering(force_empty=True)
         return dict([(obj._get_pk_val(), obj) for obj in qs.iterator()])
 
     def delete(self):
