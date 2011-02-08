@@ -522,3 +522,14 @@ class BoundField(StrAndUnicode):
             return self.html_name
         return ''
     auto_id = property(_auto_id)
+
+    def _id_for_label(self):
+        """
+        Wrapper around the field widget's `id_for_label` class method.
+        Useful, for example, for focusing on this field regardless of whether
+        it has a single widget or a MutiWidget.
+        """
+        widget = self.field.widget
+        id_ = widget.attrs.get('id') or self.auto_id
+        return widget.id_for_label(id_)
+    id_for_label = property(_id_for_label)

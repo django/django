@@ -666,6 +666,10 @@ class Answer(models.Model):
     def __unicode__(self):
         return self.answer
 
+class Reservation(models.Model):
+    start_date = models.DateTimeField()
+    price = models.IntegerField()
+    
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -701,6 +705,7 @@ admin.site.register(PlotDetails)
 admin.site.register(CyclicOne)
 admin.site.register(CyclicTwo)
 admin.site.register(WorkHour, WorkHourAdmin)
+admin.site.register(Reservation)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

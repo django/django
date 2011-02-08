@@ -431,6 +431,29 @@ class AdminViewBasicTest(TestCase):
         except SuspiciousOperation:
             self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
 
+class AdminJavaScriptTest(AdminViewBasicTest):
+    def testSingleWidgetFirsFieldFocus(self):
+        """
+        JavaScript-assisted auto-focus on first field.
+        """
+        response = self.client.get('/test_admin/%s/admin_views/picture/add/' % self.urlbit)
+        self.assertContains(
+            response,
+            '<script type="text/javascript">document.getElementById("id_name").focus();</script>'
+        )
+        
+    def testMultiWidgetFirsFieldFocus(self):
+        """
+        JavaScript-assisted auto-focus should work if a model/ModelAdmin setup
+        is such that the first form field has a MultiWidget.
+        """
+        response = self.client.get('/test_admin/%s/admin_views/reservation/add/' % self.urlbit)
+        self.assertContains(
+            response,
+            '<script type="text/javascript">document.getElementById("id_start_date_0").focus();</script>'
+        )
+
+
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
 
