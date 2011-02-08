@@ -67,3 +67,15 @@ class NullQueriesTests(TestCase):
             ['<Inner: Inner object>']
         )
 
+        # Ticket #13815: check if <reverse>_isnull=False does not produce
+        # faulty empty lists
+        objB = OuterB.objects.create(data="reverse")
+        self.assertQuerysetEqual(
+            OuterB.objects.filter(inner__isnull=False),
+            []
+        )
+        Inner.objects.create(first=obj)
+        self.assertQuerysetEqual(
+            OuterB.objects.exclude(inner__isnull=False),
+            ['<OuterB: OuterB object>']
+        )

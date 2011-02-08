@@ -1475,6 +1475,13 @@ class Query(object):
         query.bump_prefix()
         query.clear_ordering(True)
         query.set_start(prefix)
+        # Adding extra check to make sure the selected field will not be null
+        # since we are adding a IN <subquery> clause. This prevents the
+        # database from tripping over IN (...,NULL,...) selects and returning
+        # nothing
+        alias, col = query.select[0]
+        query.where.add((Constraint(alias, col, None), 'isnull', False), AND)
+
         self.add_filter(('%s__in' % prefix, query), negate=True, trim=True,
                 can_reuse=can_reuse)
 
