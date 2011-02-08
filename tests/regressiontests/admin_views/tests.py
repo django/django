@@ -7,6 +7,7 @@ import urlparse
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.core.files import temp as tempfile
+from django.core.urlresolvers import reverse
 # Register auth models with the admin.
 from django.contrib.auth import REDIRECT_FIELD_NAME, admin
 from django.contrib.auth.models import User, Permission, UNUSABLE_PASSWORD
@@ -2374,6 +2375,21 @@ class ValidXHTMLTests(TestCase):
             # Force re-evaluation of the contex processor list
             django.template.context._standard_context_processors = None
         self.client.login(username='super', password='secret')
+        self.old_USE_THOUSAND_SEPARATOR = settings.USE_THOUSAND_SEPARATOR
+        self.old_USE_L10N = settings.USE_L10N
+        settings.USE_THOUSAND_SEPARATOR = True
+        settings.USE_L10N = True
+
+    def tearDown(self):
+        settings.USE_THOUSAND_SEPARATOR = self.old_USE_THOUSAND_SEPARATOR
+        settings.USE_L10N = self.old_USE_L10N
+
+    def assert_non_localized_year(self, url, year):
+        """Ensure that the year is not localized with
+        USE_THOUSAND_SEPARATOR. Refs #15234.
+        """
+        response = self.client.get(url)
+        self.assertNotContains(response, formats.number_format(year))
 
     def tearDown(self):
         self.client.logout()
@@ -2387,3 +2403,116 @@ class ValidXHTMLTests(TestCase):
         response = self.client.get('/test_admin/%s/admin_views/' % self.urlbit)
         self.assertFalse(' lang=""' in response.content)
         self.assertFalse(' xml:lang=""' in response.content)
+
+
+class DateHierarchyTests(TestCase):
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+        self.old_USE_THOUSAND_SEPARATOR = settings.USE_THOUSAND_SEPARATOR
+        self.old_USE_L10N = settings.USE_L10N
+        settings.USE_THOUSAND_SEPARATOR = True
+        settings.USE_L10N = True
+
+    def tearDown(self):
+        settings.USE_THOUSAND_SEPARATOR = self.old_USE_THOUSAND_SEPARATOR
+        settings.USE_L10N = self.old_USE_L10N
+
+    def assert_non_localized_year(self, response, year):
+        """Ensure that the year is not localized with
+        USE_THOUSAND_SEPARATOR. Refs #15234.
+        """
+        self.assertNotContains(response, formats.number_format(year))
+
+    def assert_contains_year_link(self, response, date):
+        self.assertContains(response, '?release_date__year=%d"' % (date.year,))
+
+    def assert_contains_month_link(self, response, date):
+        self.assertContains(
+            response, '?release_date__year=%d&amp;release_date__month=%d"' % (
+                date.year, date.month))
+
+    def assert_contains_day_link(self, response, date):
+        self.assertContains(
+            response, '?release_date__year=%d&amp;'
+            'release_date__month=%d&amp;release_date__day=%d"' % (
+                date.year, date.month, date.day))
+
+    def test_empty(self):
+        """
+        Ensure that no date hierarchy links display with empty changelist.
+        """
+        response = self.client.get(
+            reverse('admin:admin_views_podcast_changelist'))
+        self.assertNotContains(response, 'release_date__year=')
+        self.assertNotContains(response, 'release_date__month=')
+        self.assertNotContains(response, 'release_date__day=')
+
+    def test_single(self):
+        """
+        Ensure that single day-level date hierarchy appears for single object.
+        """
+        DATE = datetime.date(2000, 6, 30)
+        Podcast.objects.create(release_date=DATE)
+        url = reverse('admin:admin_views_podcast_changelist')
+        response = self.client.get(url)
+        self.assert_non_localized_year(response, 2000)
+
+    def test_within_month(self):
+        """
+        Ensure that day-level links appear for changelist within single month.
+        """
+        DATES = (datetime.date(2000, 6, 30),
+                 datetime.date(2000, 6, 15),
+                 datetime.date(2000, 6, 3))
+        for date in DATES:
+            Podcast.objects.create(release_date=date)
+        url = reverse('admin:admin_views_podcast_changelist')
+        response = self.client.get(url)
+        self.assert_non_localized_year(response, 2000)
+
+    def test_within_year(self):
+        """
+        Ensure that month-level links appear for changelist within single year.
+        """
+        DATES = (datetime.date(2000, 1, 30),
+                 datetime.date(2000, 3, 15),
+                 datetime.date(2000, 5, 3))
+        for date in DATES:
+            Podcast.objects.create(release_date=date)
+        url = reverse('admin:admin_views_podcast_changelist')
+        response = self.client.get(url)
+        # no day-level links
+        self.assertNotContains(response, 'release_date__day=')
+        self.assert_non_localized_year(response, 2000)
+
+    def test_multiple_years(self):
+        """
+        Ensure that year-level links appear for year-spanning changelist.
+        """
+        DATES = (datetime.date(2001, 1, 30),
+                 datetime.date(2003, 3, 15),
+                 datetime.date(2005, 5, 3))
+        for date in DATES:
+            Podcast.objects.create(release_date=date)
+        response = self.client.get(
+            reverse('admin:admin_views_podcast_changelist'))
+        # no day/month-level links
+        self.assertNotContains(response, 'release_date__day=')
+        self.assertNotContains(response, 'release_date__month=')
+
+        # and make sure GET parameters still behave correctly
+        for date in DATES:
+            url = '%s?release_date__year=%d' % (
+                  reverse('admin:admin_views_podcast_changelist'),
+                  date.year)
+            response = self.client.get(url)
+            self.assert_non_localized_year(response, 2000)
+            self.assert_non_localized_year(response, 2003)
+            self.assert_non_localized_year(response, 2005)
+
+            response = self.client.get(url)
+            self.assert_non_localized_year(response, 2000)
+            self.assert_non_localized_year(response, 2003)
+            self.assert_non_localized_year(response, 2005)
