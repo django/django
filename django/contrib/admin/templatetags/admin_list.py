@@ -261,7 +261,7 @@ def date_hierarchy(cl):
                 'show': True,
                 'back': {
                     'link': link({year_field: year_lookup}),
-                    'title': year_lookup
+                    'title': str(year_lookup)
                 },
                 'choices': [{
                     'link': link({year_field: year_lookup, month_field: month_lookup, day_field: day.day}),
