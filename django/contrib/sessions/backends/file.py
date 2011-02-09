@@ -26,6 +26,8 @@ class SessionStore(SessionBase):
         self.file_prefix = settings.SESSION_COOKIE_NAME
         super(SessionStore, self).__init__(session_key)
 
+    VALID_KEY_CHARS = set("abcdef0123456789")
+
     def _key_to_file(self, session_key=None):
         """
         Get the file associated with this session key.
@@ -36,9 +38,9 @@ class SessionStore(SessionBase):
         # Make sure we're not vulnerable to directory traversal. Session keys
         # should always be md5s, so they should never contain directory
         # components.
-        if os.path.sep in session_key:
+        if not set(session_key).issubset(self.VALID_KEY_CHARS):
             raise SuspiciousOperation(
-                "Invalid characters (directory components) in session key")
+                "Invalid characters in session key")
 
         return os.path.join(self.storage_path, self.file_prefix + session_key)
 
