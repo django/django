@@ -2618,6 +2618,7 @@ class DateHierarchyTests(TestCase):
     def tearDown(self):
         settings.USE_THOUSAND_SEPARATOR = self.old_USE_THOUSAND_SEPARATOR
         settings.USE_L10N = self.old_USE_L10N
+        formats.reset_format_cache()
 
     def assert_non_localized_year(self, response, year):
         """Ensure that the year is not localized with
