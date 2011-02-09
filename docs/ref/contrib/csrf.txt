@@ -39,6 +39,34 @@ replaced instead of using ``CsrfMiddleware``.
     (previous versions of Django did not provide these two components
     of ``CsrfMiddleware`` as described above)
 
+AJAX
+----
+
+While the above method can be used with AJAX POST requests, it has some
+inconveniences: you have to remember to get the CSRF token from the HTML
+document and pass it in as POST data with every POST request. For this reason,
+there is an alternative method: on each XMLHttpRequest, set a custom
+`X-CSRFToken` header to the value of the CSRF token. This is often easier,
+because many javascript frameworks provide hooks that allow headers to be set on
+every request. In jQuery, you can use the ``beforeSend`` hook as follows:
+
+.. code-block:: javascript
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken",
+                                     $("#csrfmiddlewaretoken").val());
+            }
+        }
+    });
+
+Adding this to a javascript file that is included on your site will ensure that
+AJAX POST requests that are made via jQuery will not be caught by the CSRF
+protection. This will only work if you remember to include a form on the page,
+so that the input with id 'csrfmiddlewaretoken' will be found.
+
 Exceptions
 ----------
 
@@ -60,10 +88,6 @@ of two parts: a ``csrf_view_exempt`` decorator and a
 disable the view protection mechanism (``CsrfViewMiddleware``) and the
 response post-processing (``CsrfResponseMiddleware``) respectively.
 They can be used individually if required.
-
-You don't have to worry about doing this for most AJAX views. Any
-request sent with "X-Requested-With: XMLHttpRequest" is automatically
-exempt. (See the next section.)
 
 How it works
 ============
@@ -97,14 +121,6 @@ risk.
 The Content-Type is checked before modifying the response, and only
 pages that are served as 'text/html' or 'application/xml+xhtml'
 are modified.
-
-The middleware tries to be smart about requests that come in via AJAX. Many
-JavaScript toolkits send an "X-Requested-With: XMLHttpRequest" HTTP header;
-these requests are detected and automatically *not* handled by this middleware.
-We can do this safely because, in the context of a browser, the header can only
-be added by using ``XMLHttpRequest``, and browsers already implement a
-same-domain policy for ``XMLHttpRequest``. (Note that this is not secure if you
-don't trust content within the same domain or subdomains.)
 
 
 .. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html

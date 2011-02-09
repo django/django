@@ -37,9 +37,6 @@ class CsrfViewMiddleware(object):
             if getattr(callback, 'csrf_exempt', False):
                 return None
 
-            if request.is_ajax():
-                return None
-
             try:
                 session_id = request.COOKIES[settings.SESSION_COOKIE_NAME]
             except KeyError:
@@ -48,9 +45,12 @@ class CsrfViewMiddleware(object):
 
             csrf_token = _make_token(session_id)
             # check incoming token
-            try:
-                request_csrf_token = request.POST['csrfmiddlewaretoken']
-            except KeyError:
+            request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+            if request_csrf_token == "":
+                # Fall back to X-CSRFToken, to make things easier for AJAX
+                request_csrf_token = request.META.get('HTTP_X_CSRFTOKEN', '')
+
+            if request_csrf_token == "":
                 return HttpResponseForbidden(_ERROR_MSG)
 
             if request_csrf_token != csrf_token:
