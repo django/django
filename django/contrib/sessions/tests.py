@@ -129,6 +129,17 @@ True
 >>> file_session = FileSession(file_session.session_key)
 >>> file_session.save()
 
+# Ensure we don't allow directory traversal
+>>> FileSession("a/b/c").load()
+Traceback (innermost last):
+    ...
+SuspiciousOperation: Invalid characters in session key
+
+>>> FileSession("a\\b\\c").load()
+Traceback (innermost last):
+    ...
+SuspiciousOperation: Invalid characters in session key
+
 # Make sure the file backend checks for a good storage dir
 >>> settings.SESSION_FILE_PATH = "/if/this/directory/exists/you/have/a/weird/computer"
 >>> FileSession()
