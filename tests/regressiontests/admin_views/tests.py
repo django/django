@@ -386,7 +386,7 @@ class AdminJavaScriptTest(AdminViewBasicTest):
             response,
             '<script type="text/javascript">document.getElementById("id_name").focus();</script>'
         )
-        
+
     def testMultiWidgetFirsFieldFocus(self):
         """
         JavaScript-assisted auto-focus should work if a model/ModelAdmin setup
@@ -2398,21 +2398,6 @@ class ValidXHTMLTests(TestCase):
             # Force re-evaluation of the contex processor list
             django.template.context._standard_context_processors = None
         self.client.login(username='super', password='secret')
-        self.old_USE_THOUSAND_SEPARATOR = settings.USE_THOUSAND_SEPARATOR
-        self.old_USE_L10N = settings.USE_L10N
-        settings.USE_THOUSAND_SEPARATOR = True
-        settings.USE_L10N = True
-
-    def tearDown(self):
-        settings.USE_THOUSAND_SEPARATOR = self.old_USE_THOUSAND_SEPARATOR
-        settings.USE_L10N = self.old_USE_L10N
-
-    def assert_non_localized_year(self, url, year):
-        """Ensure that the year is not localized with
-        USE_THOUSAND_SEPARATOR. Refs #15234.
-        """
-        response = self.client.get(url)
-        self.assertNotContains(response, formats.number_format(year))
 
     def tearDown(self):
         self.client.logout()
