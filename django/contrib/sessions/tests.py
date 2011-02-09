@@ -11,7 +11,7 @@ from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSe
 from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
 from django.utils import unittest
@@ -321,6 +321,16 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         # Make sure the file backend checks for a good storage dir
         settings.SESSION_FILE_PATH = "/if/this/directory/exists/you/have/a/weird/computer"
         self.assertRaises(ImproperlyConfigured, self.backend)
+
+    def test_invalid_key_backslash(self):
+        # Ensure we don't allow directory-traversal
+        self.assertRaises(SuspiciousOperation,
+                          self.backend("a\\b\\c").load)
+
+    def test_invalid_key_forwardslash(self):
+        # Ensure we don't allow directory-traversal
+        self.assertRaises(SuspiciousOperation,
+                          self.backend("a/b/c").load)
 
 
 class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
