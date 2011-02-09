@@ -7,7 +7,7 @@ Welcome to Django 1.2.5!
 This is the fifth "bugfix" release in the Django 1.2 series,
 improving the stability and performance of the Django 1.2 codebase.
 
-With two exceptions, Django 1.2.5 maintains backwards compatibility
+With three exceptions, Django 1.2.5 maintains backwards compatibility
 with Django 1.2.4, but contain a number of fixes and other
 improvements. Django 1.2.5 is a recommended upgrade for any
 development or deployment currently using or targeting Django 1.2.
@@ -17,6 +17,65 @@ deprecated features in the 1.2 branch, see the :doc:`/releases/1.2`.
 
 Backwards incompatible changes
 ==============================
+
+CSRF exception for AJAX requests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django includes a CSRF-protection mechanism, which makes use of a
+token inserted into outgoing forms. Middleware then checks for the
+token's presence on form submission, and validates it.
+
+Prior to Django 1.2.5, our CSRF protection made an exception for AJAX
+requests, on the following basis:
+
+    * Many AJAX toolkits add an X-Requested-With header when using
+      XMLHttpRequest.
+
+    * Browsers have strict same-origin policies regarding
+      XMLHttpRequest.
+
+    * In the context of a browser, the only way that a custom header
+      of this nature can be added is with XMLHttpRequest.
+
+Therefore, for ease of use, we did not apply CSRF checks to requests
+that appeared to be AJAX on the basis of the X-Requested-With header.
+The Ruby on Rails web framework had a similar exemption.
+
+Recently, engineers at Google made members of the Ruby on Rails
+development team aware of a combination of browser plugins and
+redirects which can allow an attacker to provide custom HTTP headers
+on a request to any website. This can allow a forged request to appear
+to be an AJAX request, thereby defeating CSRF protection which trusts
+the same-origin nature of AJAX requests.
+
+Michael Koziarski of the Rails team brought this to our attention, and
+we were able to produce a proof-of-concept demonstrating the same
+vulnerability in Django's CSRF handling.
+
+To remedy this, Django will now apply full CSRF validation to all
+requests, regardless of apparent AJAX origin. This is technically
+backwards-incompatible, but the security risks have been judged to
+outweigh the compatibility concerns in this case.
+
+Additionally, Django will now accept the CSRF token in the custom HTTP
+header X-CSRFTOKEN, as well as in the form submission itself, for ease
+of use with popular JavaScript toolkits which allow insertion of
+custom headers into all AJAX requests.
+
+The following example using the jQuery JavaScript toolkit demonstrates
+this; the call to jQuery's ajaxSetup will cause all AJAX requests to
+send back the CSRF token in the custom X-CSRFTOKEN header::
+
+    $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken",
+                                         $("#csrfmiddlewaretoken").val());
+                }
+            }
+        });
+
 
 FileField no longer deletes files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
