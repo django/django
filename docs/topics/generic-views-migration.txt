@@ -145,9 +145,14 @@ processors when rendering template content.
 
 Class-based views don't provide a ``context_processors`` argument.
 Instead, you subclass the view, overriding
-:meth:`TemplateResponseMixin.render_to_response()`. For example::
+:meth:`TemplateResponseMixin.render_to_response()`, and passing in
+a context instance that has been instantiated with the processors
+you want to use. For example::
 
     class MyListView(ListView):
         def render_to_response(self, context, **kwargs):
             return super(MyListView, self).render_to_response(
-                    RequestContext(self.request, context, processors=[custom_processor]), **kwargs)
+                    RequestContext(self.request,
+                                   context,
+                                   processors=[custom_processor]),
+                    **kwargs)
