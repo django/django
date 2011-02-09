@@ -96,7 +96,7 @@ class AdminFileWidget(forms.FileInput):
         output = []
         if value and hasattr(value, "url"):
             output.append('%s <a target="_blank" href="%s">%s</a> <br />%s ' % \
-                (_('Currently:'), value.url, value, _('Change:')))
+                (_('Currently:'), escape(value.url), escape(value), _('Change:')))
         output.append(super(AdminFileWidget, self).render(name, value, attrs))
         return mark_safe(u''.join(output))
 

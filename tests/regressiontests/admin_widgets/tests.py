@@ -239,6 +239,22 @@ class AdminFileWidgetTest(DjangoTestCase):
             '<input type="file" name="test" />',
         )
 
+    def test_render_escapes_html(self):
+        class StrangeFieldFile(object):
+            url = "something?chapter=1&sect=2&copy=3&lang=en"
+
+            def __unicode__(self):
+                return u'''something<div onclick="alert('oops')">.jpg'''
+
+        widget = AdminFileWidget()
+        field = StrangeFieldFile()
+        output = widget.render('myfile', field)
+        self.assertFalse(field.url in output)
+        self.assertTrue(u'href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"' in output)
+        self.assertFalse(unicode(field) in output)
+        self.assertTrue(u'something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg' in output)
+
+
 
 class ForeignKeyRawIdWidgetTest(DjangoTestCase):
     def test_render(self):
