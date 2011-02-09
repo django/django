@@ -128,12 +128,12 @@ as way to control the mimetype of the response.
 
 Class-based views don't provide a ``mimetype`` argument. Instead, you
 subclass the view, overriding
-:meth:`TemplateResponseMixin.get_response()` and pass in arguments for
-the HttpResponse constructor. For example::
+:meth:`TemplateResponseMixin.render_to_response()` and pass in arguments for
+the TemplateResponse constructor. For example::
 
     class MyListView(ListView):
-        def get_response(self, content, **kwargs):
-            return super(MyListView, self).get_response(content,
+        def render_to_response(self, context, **kwargs):
+            return super(MyListView, self).render_to_response(context,
                             content_type='application/json', **kwargs)
 
 ``context_processors``
@@ -145,10 +145,9 @@ processors when rendering template content.
 
 Class-based views don't provide a ``context_processors`` argument.
 Instead, you subclass the view, overriding
-:meth:`TemplateResponseMixin.get_context_instance()`. For example::
+:meth:`TemplateResponseMixin.render_to_response()`. For example::
 
     class MyListView(ListView):
-        def get_context_instance(self, context):
-            return RequestContext(self.request,
-                                  context,
-                                  processors=[custom_processor])
+        def render_to_response(self, context, **kwargs):
+            return super(MyListView, self).render_to_response(
+                    RequestContext(self.request, context, processors=[custom_processor]), **kwargs)
