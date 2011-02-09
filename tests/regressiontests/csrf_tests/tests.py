@@ -284,12 +284,12 @@ class CsrfMiddlewareTest(TestCase):
         req2 = CsrfMiddleware().process_view(req, csrf_exempt(post_form_view), (), {})
         self.assertEquals(None, req2)
 
-    def test_ajax_exemption(self):
+    def test_csrf_token_in_header(self):
         """
-        Check that AJAX requests are automatically exempted.
+        Check that we can pass in the token in a header instead of in the form
         """
         req = self._get_POST_csrf_cookie_request()
-        req.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
+        req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
         req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
         self.assertEquals(None, req2)
 

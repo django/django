@@ -101,6 +101,7 @@ class CsrfViewMiddleware(object):
         return _get_failure_view()(request, reason=reason)
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
+
         if getattr(request, 'csrf_processing_done', False):
             return None
 
@@ -132,31 +133,6 @@ class CsrfViewMiddleware(object):
                 # the creation of CSRF cookies, so that everything else continues to
                 # work exactly the same (e.g. cookies are sent etc), but before the
                 # any branches that call reject()
-                return self._accept(request)
-
-            if request.is_ajax():
-                # .is_ajax() is based on the presence of X-Requested-With.  In
-                # the context of a browser, this can only be sent if using
-                # XmlHttpRequest.  Browsers implement careful policies for
-                # XmlHttpRequest:
-                #
-                #  * Normally, only same-domain requests are allowed.
-                #
-                #  * Some browsers (e.g. Firefox 3.5 and later) relax this
-                #    carefully:
-                #
-                #    * if it is a 'simple' GET or POST request (which can
-                #      include no custom headers), it is allowed to be cross
-                #      domain.  These requests will not be recognized as AJAX.
-                #
-                #    * if a 'preflight' check with the server confirms that the
-                #      server is expecting and allows the request, cross domain
-                #      requests even with custom headers are allowed. These
-                #      requests will be recognized as AJAX, but can only get
-                #      through when the developer has specifically opted in to
-                #      allowing the cross-domain POST request.
-                #
-                # So in all cases, it is safe to allow these requests through.
                 return self._accept(request)
 
             if request.is_secure():
@@ -222,6 +198,10 @@ class CsrfViewMiddleware(object):
 
             # check incoming token
             request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+            if request_csrf_token == "":
+                # Fall back to X-CSRFToken, to make things easier for AJAX
+                request_csrf_token = request.META.get('HTTP_X_CSRFTOKEN', '')
+
             if not constant_time_compare(request_csrf_token, csrf_token):
                 if cookie_is_new:
                     # probably a problem setting the CSRF cookie

@@ -81,6 +81,47 @@ The utility script ``extras/csrf_migration_helper.py`` can help to automate the
 finding of code and templates that may need to be upgraded.  It contains full
 help on how to use it.
 
+AJAX
+----
+
+While the above method can be used for AJAX POST requests, it has some
+inconveniences: you have to remember to pass the CSRF token in as POST data with
+every POST request. For this reason, there is an alternative method: on each
+XMLHttpRequest, set a custom `X-CSRFToken` header to the value of the CSRF
+token. This is often easier, because many javascript frameworks provide hooks
+that allow headers to be set on every request. In jQuery, you can use the
+``beforeSend`` hook as follows:
+
+.. code-block:: javascript
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        }
+    });
+
+Adding this to a javascript file that is included on your site will ensure that
+AJAX POST requests that are made via jQuery will not be caught by the CSRF
+protection.
+
 The decorator method
 --------------------
 
@@ -261,10 +302,6 @@ in the same module.  These disable the view protection mechanism
 (``CsrfResponseMiddleware``) respectively.  They can be used individually if
 required.
 
-You don't have to worry about doing this for most AJAX views. Any request sent
-with "X-Requested-With: XMLHttpRequest" is automatically exempt. (See the `How
-it works`_ section.)
-
 Subdomains
 ----------
 
@@ -341,24 +378,6 @@ request ought to be harmless.
 ``CsrfResponseMiddleware`` checks the Content-Type before modifying the
 response, and only pages that are served as 'text/html' or
 'application/xml+xhtml' are modified.
-
-AJAX
-----
-
-The middleware tries to be smart about requests that come in via AJAX. Most
-modern JavaScript toolkits send an "X-Requested-With: XMLHttpRequest" HTTP
-header; these requests are detected and automatically *not* handled by this
-middleware.  We can do this safely because, in the context of a browser, the
-header can only be added by using ``XMLHttpRequest``, and browsers already
-implement a same-domain policy for ``XMLHttpRequest``.
-
-For the more recent browsers that relax this same-domain policy, custom headers
-like "X-Requested-With" are only allowed after the browser has done a
-'preflight' check to the server to see if the cross-domain request is allowed,
-using a strictly 'opt in' mechanism, so the exception for AJAX is still safe—if
-the developer has specifically opted in to allowing cross-site AJAX POST
-requests on a specific URL, they obviously don't want the middleware to disallow
-exactly that.
 
 .. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 
