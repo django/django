@@ -8,7 +8,7 @@ This is the fifth "bugfix" release in the Django 1.2 series,
 improving the stability and performance of the Django 1.2 codebase.
 
 With four exceptions, Django 1.2.5 maintains backwards compatibility
-with Django 1.2.4, but contain a number of fixes and other
+with Django 1.2.4. It also contains a number of fixes and other
 improvements. Django 1.2.5 is a recommended upgrade for any
 development or deployment currently using or targeting Django 1.2.
 

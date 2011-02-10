@@ -8,15 +8,15 @@ This is the fourth "bugfix" release in the Django 1.1 series,
 improving the stability and performance of the Django 1.1 codebase.
 
 With one exception, Django 1.1.4 maintains backwards compatibility
-with Django 1.1.3, but contain a number of fixes and other
+with Django 1.1.3. It also contains a number of fixes and other
 improvements. Django 1.1.4 is a recommended upgrade for any
 development or deployment currently using or targeting Django 1.1.
 
 For full details on the new features, backwards incompatibilities, and
 deprecated features in the 1.1 branch, see the :doc:`/releases/1.1`.
 
-Backwards-incompatible changes in 1.1.4
-=======================================
+Backwards incompatible changes
+==============================
 
 CSRF exception for AJAX requests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
