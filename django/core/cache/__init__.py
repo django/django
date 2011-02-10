@@ -101,6 +101,8 @@ if not settings.CACHES:
     engine, host, params = parse_backend_uri(settings.CACHE_BACKEND)
     if engine in backend_classes:
         engine = 'django.core.cache.backends.%s' % backend_classes[engine]
+    else:
+        engine = '%s.CacheClass' % engine
     defaults = {
         'BACKEND': engine,
         'LOCATION': host,
