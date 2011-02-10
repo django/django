@@ -7,7 +7,7 @@ Welcome to Django 1.2.5!
 This is the fifth "bugfix" release in the Django 1.2 series,
 improving the stability and performance of the Django 1.2 codebase.
 
-With three exceptions, Django 1.2.5 maintains backwards compatibility
+With four exceptions, Django 1.2.5 maintains backwards compatibility
 with Django 1.2.4, but contain a number of fixes and other
 improvements. Django 1.2.5 is a recommended upgrade for any
 development or deployment currently using or targeting Django 1.2.
@@ -67,14 +67,28 @@ this; the call to jQuery's ajaxSetup will cause all AJAX requests to
 send back the CSRF token in the custom X-CSRFTOKEN header::
 
     $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                    // Only send the token to relative URLs i.e. locally.
-                    xhr.setRequestHeader("X-CSRFToken",
-                                         $("#csrfmiddlewaretoken").val());
+        beforeSend: function(xhr, settings) {
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
                 }
+                return cookieValue;
             }
-        });
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        }
+    });
 
 
 FileField no longer deletes files
