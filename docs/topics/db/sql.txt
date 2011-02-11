@@ -226,6 +226,8 @@ alias::
 
     from django.db import connections
     cursor = connections['my_db_alias'].cursor()
+    # Your code here...
+    transaction.commit_unless_managed(using='my_db_alias')
 
 .. _transactions-and-raw-sql:
 
