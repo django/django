@@ -561,6 +561,7 @@ class FieldsTests(TestCase):
         self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com')) # This will fail if there's no Internet connection
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example')
         self.assertRaises(ValidationError, f.clean, 'http://www.broken.djangoproject.com') # bad domain
+        self.assertRaises(ValidationError, f.clean, 'http://qa-dev.w3.org/link-testsuite/http.php?code=405') # Method not allowed
         try:
             f.clean('http://www.broken.djangoproject.com') # bad domain
         except ValidationError, e:
