@@ -60,3 +60,12 @@ class FeedgeneratorTest(unittest.TestCase):
             "2008-11-14T13:37:00+02:00"
         )
 
+    def test_atom1_mime_type(self):
+        """
+        Test to make sure Atom MIME type has UTF8 Charset parameter set
+        """
+        atom_feed = feedgenerator.Atom1Feed("title", "link", "description")
+        self.assertEqual(
+            atom_feed.mime_type, "application/atom+xml; charset=utf8"
+        )
+

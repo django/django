@@ -291,7 +291,7 @@ class Rss201rev2Feed(RssFeed):
 
 class Atom1Feed(SyndicationFeed):
     # Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html
-    mime_type = 'application/atom+xml'
+    mime_type = 'application/atom+xml; charset=utf8'
     ns = u"http://www.w3.org/2005/Atom"
 
     def write(self, outfile, encoding):

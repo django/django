@@ -1,9 +1,8 @@
-import datetime
 from django.conf import settings
 from django.contrib.sites.models import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import HttpResponse, Http404
-from django.template import loader, Template, TemplateDoesNotExist, RequestContext
+from django.template import loader, TemplateDoesNotExist, RequestContext
 from django.utils import feedgenerator, tzinfo
 from django.utils.encoding import force_unicode, iri_to_uri, smart_unicode
 from django.utils.html import escape
