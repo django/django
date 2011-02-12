@@ -11,7 +11,7 @@ from models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
     ParkingLot2, ParkingLot3, Supplier, Wholesaler, Child, SelfRefParent,
     SelfRefChild, ArticleWithAuthor, M2MChild, QualityControl, DerivedM,
     Person, BirthdayParty, BachelorParty, MessyBachelorParty,
-    InternalCertificationAudit)
+    InternalCertificationAudit, BusStation, TrainStation)
 
 
 class ModelInheritanceTest(TestCase):
@@ -358,7 +358,7 @@ class ModelInheritanceTest(TestCase):
         parties = list(p4.bachelorparty_set.all())
         self.assertEqual(parties, [bachelor, messy_parent])
 
-    def test_11369(self):
+    def test_abstract_verbose_name_plural_inheritance(self):
         """
         verbose_name_plural correctly inherited from ABC if inheritance chain
         includes an abstract model.
@@ -386,3 +386,23 @@ class ModelInheritanceTest(TestCase):
             ],
             attrgetter("pk")
         )
+
+    def test_concrete_abstract_concrete_pk(self):
+        """
+        Primary key set correctly with concrete->abstract->concrete inheritance.
+        """
+        # Regression test for #13987: Primary key is incorrectly determined
+        # when more than one model has a concrete->abstract->concrete
+        # inheritance hierarchy.
+        self.assertEquals(
+            len([field for field in BusStation._meta.local_fields
+                       if field.primary_key]),
+            1
+        )
+        self.assertEquals(
+            len([field for field in TrainStation._meta.local_fields
+                       if field.primary_key]),
+            1
+        )
+        self.assertIs(BusStation._meta.pk.model, BusStation)
+        self.assertIs(TrainStation._meta.pk.model, TrainStation)
