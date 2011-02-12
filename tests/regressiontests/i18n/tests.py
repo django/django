@@ -24,6 +24,7 @@ from models import Company, TestModel
 
 from commands.tests import *
 
+from test_warnings import DeprecationWarningTests
 
 class TranslationTests(TestCase):
 
