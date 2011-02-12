@@ -81,7 +81,7 @@ class QuerySet(object):
             else:
                 self._result_cache = list(self.iterator())
         elif self._iter:
-            self._result_cache.extend(list(self._iter))
+            self._result_cache.extend(self._iter)
         return len(self._result_cache)
 
     def __iter__(self):
