@@ -48,17 +48,15 @@ document and pass it in as POST data with every POST request. For this reason,
 there is an alternative method: on each XMLHttpRequest, set a custom
 `X-CSRFToken` header to the value of the CSRF token. This is often easier,
 because many javascript frameworks provide hooks that allow headers to be set on
-every request. In jQuery, you can use the ``beforeSend`` hook as follows:
+every request. In jQuery, you can use the ``ajaxSend`` event as follows:
 
 .. code-block:: javascript
 
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                // Only send the token to relative URLs i.e. locally.
-                xhr.setRequestHeader("X-CSRFToken",
-                                     $("#csrfmiddlewaretoken").val());
-            }
+    $('html').ajaxSend(function(event, xhr, settings) {
+        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken",
+                                 $("#csrfmiddlewaretoken").val());
         }
     });
 
