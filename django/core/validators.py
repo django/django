@@ -84,6 +84,7 @@ class URLValidator(RegexValidator):
                 "Connection": "close",
                 "User-Agent": self.user_agent,
             }
+            url = url.encode('utf-8')
             broken_error = ValidationError(
                 _(u'This URL appears to be a broken link.'), code='invalid_link')
             try:

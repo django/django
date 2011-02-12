@@ -571,6 +571,8 @@ class FieldsTests(TestCase):
             f.clean('http://google.com/we-love-microsoft.html') # good domain, bad page
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
+        # UTF-8 char in path
+        self.assertEqual(u'http://de.wikipedia.org/wiki/T\xfcr', f.clean(u'http://de.wikipedia.org/wiki/T\xfcr'))
 
     def test_urlfield_4(self):
         f = URLField(verify_exists=True, required=False)
