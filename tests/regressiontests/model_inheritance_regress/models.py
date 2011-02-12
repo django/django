@@ -146,3 +146,20 @@ class BachelorParty(AbstractEvent):
 
 class MessyBachelorParty(BachelorParty):
     pass
+
+# Check concrete -> abstract -> concrete inheritance
+class SearchableLocation(models.Model):
+    keywords = models.CharField(max_length=256)
+
+class Station(SearchableLocation):
+    name = models.CharField(max_length=128)
+
+    class Meta:
+        abstract = True
+
+class BusStation(Station):
+    bus_routes = models.CommaSeparatedIntegerField(max_length=128)
+    inbound = models.BooleanField()
+
+class TrainStation(Station):
+    zone = models.IntegerField()
