@@ -27,8 +27,11 @@ import datetime
 import urlparse
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_unicode, iri_to_uri
+from django.utils import datetime_safe
 
 def rfc2822_date(date):
+    # Support datetime objects older than 1900
+    date = datetime_safe.new_datetime(date)
     # We do this ourselves to be timezone aware, email.Utils is not tz aware.
     if date.tzinfo:
         time_str = date.strftime('%a, %d %b %Y %H:%M:%S ')
@@ -40,6 +43,8 @@ def rfc2822_date(date):
         return date.strftime('%a, %d %b %Y %H:%M:%S -0000')
 
 def rfc3339_date(date):
+    # Support datetime objects older than 1900
+    date = datetime_safe.new_datetime(date)
     if date.tzinfo:
         time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
         offset = date.tzinfo.utcoffset(date)
@@ -64,7 +69,7 @@ def get_tag_uri(url, date):
 
     d = ''
     if date is not None:
-        d = ',%s' % date.strftime('%Y-%m-%d')
+        d = ',%s' % datetime_safe.new_datetime(date).strftime('%Y-%m-%d')
     return u'tag:%s%s:%s/%s' % (hostname, d, path, fragment)
 
 class SyndicationFeed(object):
