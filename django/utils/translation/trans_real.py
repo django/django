@@ -67,7 +67,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     Python 2.4.
     """
     def __init__(self, *args, **kw):
-        from django.conf import settings
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
         # Starting with Python 2.4, there's a function to define
         # the output charset. Before 2.4, the output charset is
@@ -136,7 +135,7 @@ def translation(language):
                 t = gettext_module.translation('django', path, [loc], DjangoTranslation)
                 t.set_language(lang)
                 return t
-            except IOError, e:
+            except IOError:
                 return None
 
         res = _translation(globalpath)
@@ -166,7 +165,7 @@ def translation(language):
             if os.path.isdir(apppath):
                 res = _merge(apppath)
 
-        if projectpath and os.path.isdir(projectpath):
+        if projectpath and os.path.isdir(projectpath) and projectpath not in settings.LOCALE_PATHS:
             res = _merge(projectpath)
 
         for localepath in reversed(settings.LOCALE_PATHS):
@@ -365,8 +364,6 @@ def get_language_from_request(request):
     """
     global _accepted
     from django.conf import settings
-    globalpath = os.path.join(
-        os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     supported = dict(settings.LANGUAGES)
 
     if hasattr(request, 'session'):
