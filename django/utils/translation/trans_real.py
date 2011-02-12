@@ -335,19 +335,26 @@ def npgettext(context, singular, plural, number):
         result = do_ntranslate(singular, plural, number, 'ungettext')
     return result
 
+def all_locale_paths():
+    """
+    Returns a list of paths to user-provides languages files.
+    """
+    from django.conf import settings
+    globalpath = os.path.join(
+        os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
+    return [globalpath] + list(settings.LOCALE_PATHS)
+
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
     code. This is used to decide whether a user-provided language is
     available. This is only used for language codes from either the cookies or
-    session.
+    session and during format localization.
     """
-    from django.conf import settings
-    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
-    if gettext_module.find('django', globalpath, [to_locale(lang_code)]) is not None:
-        return True
-    else:
-        return False
+    for path in all_locale_paths():
+        if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
+            return True
+    return False
 
 def get_language_from_request(request):
     """
@@ -358,7 +365,8 @@ def get_language_from_request(request):
     """
     global _accepted
     from django.conf import settings
-    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
+    globalpath = os.path.join(
+        os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     supported = dict(settings.LANGUAGES)
 
     if hasattr(request, 'session'):
@@ -401,11 +409,10 @@ def get_language_from_request(request):
                 (accept_lang.split('-')[0], normalized.split('_')[0])):
             if lang.lower() not in supported:
                 continue
-            langfile = os.path.join(globalpath, dirname, 'LC_MESSAGES',
-                    'django.mo')
-            if os.path.exists(langfile):
-                _accepted[normalized] = lang
-                return lang
+            for path in all_locale_paths():
+                if os.path.exists(os.path.join(path, dirname, 'LC_MESSAGES', 'django.mo')):
+                    _accepted[normalized] = lang
+                    return lang
 
     return settings.LANGUAGE_CODE
 
