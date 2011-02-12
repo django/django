@@ -319,11 +319,11 @@ table thead th.sorted a {
 }
 
 table thead th.ascending a {
-    background: url(../img/admin/arrow-down.gif) right .4em no-repeat;
+    background: url(../img/admin/arrow-up.gif) right .4em no-repeat;
 }
 
 table thead th.descending a {
-    background: url(../img/admin/arrow-up.gif) right .4em no-repeat;
+    background: url(../img/admin/arrow-down.gif) right .4em no-repeat;
 }
 
 /* ORDERABLE TABLES */
