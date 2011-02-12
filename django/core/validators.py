@@ -81,7 +81,7 @@ class URLValidator(RegexValidator):
                 "User-Agent": self.user_agent,
             }
             try:
-                req = urllib2.Request(url, None, headers)
+                req = urllib2.Request(url.encode('utf-8'), None, headers)
                 u = urllib2.urlopen(req)
             except ValueError:
                 raise ValidationError(_(u'Enter a valid URL.'), code='invalid')
