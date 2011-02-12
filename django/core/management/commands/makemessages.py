@@ -201,16 +201,21 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                 )
                 msgs, errors = _popen(cmd)
                 if errors:
-                    raise CommandError("errors happened while running xgettext on %s\n%s" % (file, errors))
-                old = '#: '+os.path.join(dirpath, thefile)[2:]
-                new = '#: '+os.path.join(dirpath, file)[2:]
-                msgs = msgs.replace(old, new)
-                if os.path.exists(potfile):
-                    # Strip the header
-                    msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
-                else:
-                    msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
+                    os.unlink(os.path.join(dirpath, thefile))
+                    if os.path.exists(potfile):
+                        os.unlink(potfile)
+                    raise CommandError(
+                        "errors happened while running xgettext on %s\n%s" %
+                        (file, errors))
                 if msgs:
+                    old = '#: ' + os.path.join(dirpath, thefile)[2:]
+                    new = '#: ' + os.path.join(dirpath, file)[2:]
+                    msgs = msgs.replace(old, new)
+                    if os.path.exists(potfile):
+                        # Strip the header
+                        msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
+                    else:
+                        msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
                     f = open(potfile, 'ab')
                     try:
                         f.write(msgs)
@@ -242,18 +247,23 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                 )
                 msgs, errors = _popen(cmd)
                 if errors:
-                    raise CommandError("errors happened while running xgettext on %s\n%s" % (file, errors))
-
-                if thefile != file:
-                    old = '#: '+os.path.join(dirpath, thefile)[2:]
-                    new = '#: '+orig_file[2:]
-                    msgs = msgs.replace(old, new)
-                if os.path.exists(potfile):
-                    # Strip the header
-                    msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
-                else:
-                    msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
+                    if thefile != file:
+                        os.unlink(os.path.join(dirpath, thefile))
+                    if os.path.exists(potfile):
+                        os.unlink(potfile)
+                    raise CommandError(
+                        "errors happened while running xgettext on %s\n%s" %
+                        (file, errors))
                 if msgs:
+                    if thefile != file:
+                        old = '#: ' + os.path.join(dirpath, thefile)[2:]
+                        new = '#: ' + orig_file[2:]
+                        msgs = msgs.replace(old, new)
+                    if os.path.exists(potfile):
+                        # Strip the header
+                        msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
+                    else:
+                        msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
                     f = open(potfile, 'ab')
                     try:
                         f.write(msgs)
@@ -266,17 +276,21 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
             msgs, errors = _popen('msguniq %s --to-code=utf-8 "%s"' %
                                   (wrap, potfile))
             if errors:
-                raise CommandError("errors happened while running msguniq\n%s" % errors)
-            f = open(potfile, 'w')
-            try:
-                f.write(msgs)
-            finally:
-                f.close()
+                os.unlink(potfile)
+                raise CommandError(
+                    "errors happened while running msguniq\n%s" % errors)
             if os.path.exists(pofile):
+                f = open(potfile, 'w')
+                try:
+                    f.write(msgs)
+                finally:
+                    f.close()
                 msgs, errors = _popen('msgmerge %s -q "%s" "%s"' %
                                       (wrap, pofile, potfile))
                 if errors:
-                    raise CommandError("errors happened while running msgmerge\n%s" % errors)
+                    os.unlink(potfile)
+                    raise CommandError(
+                        "errors happened while running msgmerge\n%s" % errors)
             elif not invoked_for_django:
                 msgs = copy_plural_forms(msgs, locale, domain, verbosity)
             msgs = msgs.replace(
@@ -291,7 +305,8 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                 msgs, errors = _popen('msgattrib %s -o "%s" --no-obsolete "%s"' %
                                       (wrap, pofile, pofile))
                 if errors:
-                    raise CommandError("errors happened while running msgattrib\n%s" % errors)
+                    raise CommandError(
+                        "errors happened while running msgattrib\n%s" % errors)
 
 
 class Command(NoArgsCommand):
