@@ -245,10 +245,11 @@ class BaseDatabaseWrapper(local):
             self.connection = None
 
     def cursor(self):
-        cursor = self._cursor()
         if (self.use_debug_cursor or
             (self.use_debug_cursor is None and settings.DEBUG)):
-            return self.make_debug_cursor(cursor)
+            cursor = self.make_debug_cursor(self._cursor())
+        else:
+            cursor = util.CursorWrapper(self._cursor(), self)
         return cursor
 
     def make_debug_cursor(self, cursor):

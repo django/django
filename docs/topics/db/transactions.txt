@@ -70,35 +70,35 @@ per-function or per-code-block basis.
 These functions, described in detail below, can be used in two different ways:
 
     * As a decorator_ on a particular function. For example::
-    
+
             from django.db import transaction
-            
+
             @transaction.commit_on_success()
             def viewfunc(request):
                 # ...
                 # this code executes inside a transaction
                 # ...
-                
+
       This technique works with all supported version of Python (that is, with
       Python 2.4 and greater).
-      
+
     * As a `context manager`_ around a particular block of code::
-    
+
             from django.db import transaction
-            
+
             def viewfunc(request):
                 # ...
                 # this code executes using default transaction management
-                # ... 
-                
+                # ...
+
                 with transaction.commit_on_success():
                     # ...
                     # this code executes inside a transaction
                     # ...
-                    
+
       The ``with`` statement is new in Python 2.5, and so this syntax can only
       be used with Python 2.5 and above.
-      
+
 .. _decorator: http://docs.python.org/glossary.html#term-decorator
 .. _context manager: http://docs.python.org/glossary.html#term-context-manager
 
@@ -106,7 +106,7 @@ For maximum compatibility, all of the examples below show transactions using the
 decorator syntax, but all of the follow functions may be used as context
 managers, too.
 
-.. note:: 
+.. note::
 
     Although the examples below use view functions as examples, these
     decorators and context managers can be used anywhere in your code
@@ -186,6 +186,25 @@ managers, too.
         @transaction.commit_manually(using="my_other_database")
         def viewfunc2(request):
             ....
+
+.. _topics-db-transactions-requirements:
+
+Requirements for transaction handling
+=====================================
+
+.. versionadded:: 1.3
+
+Django requires that every transaction that is opened is closed before
+the completion of a request. If you are using :func:`autocommit` (the
+default commit mode) or :func:`commit_on_success`, this will be done
+for you automatically. However, if you are manually managing
+transactions (using the :func:`commit_manually` decorator), you must
+ensure that the transaction is either committed or rolled back before
+a request is completed.
+
+This applies to all database operations, not just write operations. Even
+if your transaction only reads from the database, the transaction must
+be committed or rolled back before you complete a request.
 
 How to globally deactivate transaction management
 =================================================

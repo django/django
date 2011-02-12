@@ -5,12 +5,28 @@ from time import time
 from django.utils.hashcompat import md5_constructor
 from django.utils.log import getLogger
 
+
 logger = getLogger('django.db.backends')
 
-class CursorDebugWrapper(object):
-    def __init__(self, cursor, db):
+
+class CursorWrapper(object):
+    def __init__(self, cursor, connection):
         self.cursor = cursor
-        self.db = db # Instance of a BaseDatabaseWrapper subclass
+        self.connection = connection
+
+    def __getattr__(self, attr):
+        if self.connection.is_managed():
+            self.connection.set_dirty()
+        if attr in self.__dict__:
+            return self.__dict__[attr]
+        else:
+            return getattr(self.cursor, attr)
+
+    def __iter__(self):
+        return iter(self.cursor)
+
+
+class CursorDebugWrapper(CursorWrapper):
 
     def execute(self, sql, params=()):
         start = time()
@@ -19,8 +35,8 @@ class CursorDebugWrapper(object):
         finally:
             stop = time()
             duration = stop - start
-            sql = self.db.ops.last_executed_query(self.cursor, sql, params)
-            self.db.queries.append({
+            sql = self.connection.ops.last_executed_query(self.cursor, sql, params)
+            self.connection.queries.append({
                 'sql': sql,
                 'time': "%.3f" % duration,
             })
@@ -35,7 +51,7 @@ class CursorDebugWrapper(object):
         finally:
             stop = time()
             duration = stop - start
-            self.db.queries.append({
+            self.connection.queries.append({
                 'sql': '%s times: %s' % (len(param_list), sql),
                 'time': "%.3f" % duration,
             })
@@ -51,6 +67,7 @@ class CursorDebugWrapper(object):
 
     def __iter__(self):
         return iter(self.cursor)
+
 
 ###############################################
 # Converters from database (string) to Python #

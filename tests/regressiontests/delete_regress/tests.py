@@ -62,6 +62,7 @@ class DeleteLockingTest(TransactionTestCase):
         Book.objects.filter(pagecount__lt=250).delete()
         transaction.commit()
         self.assertEqual(1, Book.objects.count())
+        transaction.commit()
 
 
 class DeleteCascadeTests(TestCase):

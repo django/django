@@ -610,6 +610,7 @@ class TestTicket11101(TransactionTestCase):
         self.assertEqual(Thingy.objects.count(), 1)
         transaction.rollback()
         self.assertEqual(Thingy.objects.count(), 0)
+        transaction.commit()
 
     @skipUnlessDBFeature('supports_transactions')
     def test_ticket_11101(self):
