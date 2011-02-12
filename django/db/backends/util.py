@@ -59,9 +59,6 @@ class CursorDebugWrapper(CursorWrapper):
                 extra={'duration':duration, 'sql':sql, 'params':param_list}
             )
 
-    def __iter__(self):
-        return iter(self.cursor)
-
 
 ###############################################
 # Converters from database (string) to Python #
