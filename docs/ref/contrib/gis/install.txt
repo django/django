@@ -89,7 +89,7 @@ Program                   Description                           Required        
 ========================  ====================================  ================================  ==========================
 :ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.2, 3.1, 3.0
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.7, 4.6, 4.5, 4.4
-:ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.7, 1.6, 1.5, 1.4
+:ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.8, 1.7, 1.6, 1.5, 1.4
 :ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             1.5, 1.4, 1.3
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 2.4, 2.3
@@ -176,7 +176,7 @@ When GeoDjango can't find GEOS, this error is raised::
 The most common solution is to properly configure your :ref:`libsettings` *or* set
 :ref:`geoslibrarypath` in your settings.
 
-If using a binary package of GEOS (e.g., on Ubuntu 8.10), you may need to :ref:`binutils`.
+If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binutils`.
 
 .. _geoslibrarypath:
 
@@ -274,9 +274,9 @@ supports :ref:`GDAL's vector data <ref-gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/gdal-1.7.3.tar.gz
-    $ tar xzf gdal-1.7.3.tar.gz
-    $ cd gdal-1.7.3
+    $ wget http://download.osgeo.org/gdal/gdal-1.8.0.tar.gz
+    $ tar xzf gdal-1.8.0.tar.gz
+    $ cd gdal-1.8.0
 
 Configure, make and install::
 
@@ -517,14 +517,15 @@ user.  For example, you can use the following to become the ``postgres`` user::
    whereas version 1.4 uses ``<sharedir>/contrib/postgis.sql`` and
    version 1.5 uses ``<sharedir>/contrib/postgis-1.5/postgis.sql``.
 
+   To complicate matters, :ref:`ubuntudebian` distributions have their
+   own separate directory naming system that changes each release.
+
    The example below assumes PostGIS 1.5, thus you may need to modify
    ``POSTGIS_SQL_PATH`` and the name of the SQL file for the specific
    version of PostGIS you are using.
 
 Once you're a database super user, then you may execute the following commands
-to create a PostGIS spatial database template.  If running Ubuntu :ref:`ibex`
-or Debian :ref:`lenny`, please refer to their specific documentation for
-modifications to these commands::
+to create a PostGIS spatial database template::
 
     $ POSTGIS_SQL_PATH=`pg_config --sharedir`/contrib/postgis-1.5
     # Creating the template spatial database.
@@ -549,6 +550,7 @@ PostGIS Version  Shell Script
 1.3              `create_template_postgis-1.3.sh`_
 1.4              `create_template_postgis-1.4.sh`_
 1.5              `create_template_postgis-1.5.sh`_
+Debian/Ubuntu    `create_template_postgis-debian.sh`_
 ===============  ==========================================
 
 Afterwards, you may create a spatial database by simply specifying
@@ -919,22 +921,30 @@ __ http://www.macports.org/
 Ubuntu & Debian GNU/Linux
 -------------------------
 
+.. note::
+
+    The PostGIS SQL files are not placed the PostgreSQL share directory in the
+    Debian and Ubuntu packages, and are located instead special directory
+    depending on the release.  Thus, when :ref:`spatialdb_template` use the 
+    `create_template_postgis-debian.sh`_ script instead 
+
 .. _ubuntu:
 
 Ubuntu
 ^^^^^^
 
-.. _heron:
+.. _ubuntu10:
 
-8.04 and lower
-~~~~~~~~~~~~~~
+10.04 and 10.10
+~~~~~~~~~~~~~~~
 
-The 8.04 (and lower) versions of Ubuntu use GEOS v2.2.3 in their binary packages,
-which is incompatible with GeoDjango.  Thus, do *not* use the binary packages
-for GEOS or PostGIS and build some prerequisites from source, per the instructions
-in this document; however, it is okay to use the PostgreSQL binary packages.
+In Ubuntu 10 PostgreSQL was upgraded to 8.4 and GDAL was upgraded to 1.6.
+Ubuntu 10.04 uses PostGIS 1.4, while Ubuntu 10.10 uses PostGIS 1.5 (with
+geography support).  The installation commands are::
 
-For more details, please see the Debian instructions for :ref:`etch` below.
+    $ sudo apt-get install binutils gdal-bin postgresql-8.4-postgis \
+         postgresql-server-dev-8.4 python-psycopg2 python-setuptools
+    $ sudo easy_install Django
 
 .. _ibex:
 
@@ -943,7 +953,7 @@ For more details, please see the Debian instructions for :ref:`etch` below.
 
 Use the synaptic package manager to install the following packages::
 
-    $ sudo apt-get install binutils libgdal1-1.5.0 postgresql-8.3-postgis \
+    $ sudo apt-get install binutils gdal-bin postgresql-8.3-postgis \
         postgresql-server-dev-8.3 python-psycopg2 python-setuptools
 
 Afterwards, you may install Django with Python's ``easy_install`` script (the
@@ -970,24 +980,14 @@ Optional packages to consider:
 * ``gdal-bin``: for GDAL command line programs like ``ogr2ogr``
 * ``python-gdal`` for GDAL's own Python bindings -- includes interfaces for raster manipulation
 
-10.04
-~~~~~
-
-In Ubuntu 10.04 LTS PostgreSQL was upgraded to 8.4, as was GDAL, which is now
-at version 1.6.0. Because of that, the package installation mentioned above
-has to be slightly changed::
-
-	$ sudo apt-get install binutils libgdal1-1.6.0 postgresql-8.4-postgis \
-        postgresql-server-dev-8.4 python-psycopg2 python-setuptools
-
-
 .. note::
 
-    The Ubuntu ``proj`` package does not come with the datum shifting files
-    installed, which will cause problems with the geographic admin because
-    the ``null`` datum grid is not available for transforming geometries to the
-    spherical mercator projection. A solution is to download the
-    datum-shifting files, create the grid file, and install it yourself::
+    On this version of Ubuntu the ``proj`` package does not come with the
+    datum shifting files installed, which will cause problems with the
+    geographic admin because the ``null`` datum grid is not available for
+    transforming geometries to the spherical mercator projection. A solution
+    is to download the datum-shifting files, create the grid file, and
+    install it yourself::
 
         $ wget http://download.osgeo.org/proj/proj-datumgrid-1.4.tar.gz
         $ mkdir nad
@@ -1000,11 +1000,17 @@ has to be slightly changed::
     do not plan on doing any database transformation of geometries to the
     Google projection (900913).
 
-.. note::
+.. _heron:
 
-    The PostGIS SQL files are not placed the PostgreSQL share directory in the
-    Ubuntu packages.  Use the `create_template_postgis-debian.sh`_ script
-    instead when :ref:`spatialdb_template`.
+8.04 and lower
+~~~~~~~~~~~~~~
+
+The 8.04 (and lower) versions of Ubuntu use GEOS v2.2.3 in their binary packages,
+which is incompatible with GeoDjango.  Thus, do *not* use the binary packages
+for GEOS or PostGIS and build some prerequisites from source, per the instructions
+in this document; however, it is okay to use the PostgreSQL binary packages.
+
+For more details, please see the Debian instructions for :ref:`etch` below.
 
 .. _debian:
 
@@ -1051,6 +1057,7 @@ directions carefully.
 
 5.0 (Lenny)
 ^^^^^^^^^^^
+
 This version is comparable to Ubuntu :ref:`ibex`, so the command
 is very similar::
 
