@@ -169,6 +169,8 @@ class ChangeList(object):
         return order_field, order_type
 
     def get_query_set(self):
+        use_distinct = False
+
         qs = self.root_query_set
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
@@ -180,6 +182,17 @@ class ChangeList(object):
                 # requires it to be a string.
                 del lookup_params[key]
                 lookup_params[smart_str(key)] = value
+
+            if not use_distinct:
+                # Check if it's a relationship that might return more than one
+                # instance
+                field_name = key.split('__', 1)[0]
+                try:
+                    f = self.lookup_opts.get_field_by_name(field_name)[0]
+                except models.FieldDoesNotExist:
+                    raise IncorrectLookupParameters
+                if hasattr(f, 'rel') and isinstance(f.rel, models.ManyToManyRel):
+                    use_distinct = True
 
             # if key ends with __in, split parameter into separate values
             if key.endswith('__in'):
@@ -246,12 +259,18 @@ class ChangeList(object):
             for bit in self.query.split():
                 or_queries = [models.Q(**{construct_search(str(field_name)): bit}) for field_name in self.search_fields]
                 qs = qs.filter(reduce(operator.or_, or_queries))
-            for field_name in self.search_fields:
-                if '__' in field_name:
-                    qs = qs.distinct()
-                    break
+            if not use_distinct:
+                for search_field in self.search_fields:
+                    field_name = search_field.split('__', 1)[0]
+                    f = self.lookup_opts.get_field_by_name(field_name)[0]
+                    if hasattr(f, 'rel') and isinstance(f.rel, models.ManyToManyRel):
+                        use_distinct = True
+                        break
 
-        return qs
+        if use_distinct:
+            return qs.distinct()
+        else:
+            return qs
 
     def url_for_result(self, result):
         return "%s/" % quote(getattr(result, self.pk_attname))

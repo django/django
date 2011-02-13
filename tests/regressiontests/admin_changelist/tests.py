@@ -5,7 +5,8 @@ from django.core.paginator import Paginator
 from django.template import Context, Template
 from django.test import TransactionTestCase
 
-from regressiontests.admin_changelist.models import Child, Parent
+from models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
+    Membership, ChordsMusician, ChordsBand, Invitation)
 
 
 class ChangeListTests(TransactionTestCase):
@@ -135,18 +136,122 @@ class ChangeListTests(TransactionTestCase):
         cl.get_results(request)
         self.assertIsInstance(cl.paginator, CustomPaginator)
 
+    def test_distinct_for_m2m_in_list_filter(self):
+        """
+        Regression test for #13902: When using a ManyToMany in list_filter,
+        results shouldn't apper more than once. Basic ManyToMany.
+        """
+        blues = Genre.objects.create(name='Blues')
+        band = Band.objects.create(name='B.B. King Review', nr_of_members=11)
+
+        band.genres.add(blues)
+        band.genres.add(blues)
+
+        m = BandAdmin(Band, admin.site)
+        cl = ChangeList(MockFilteredRequestA(), Band, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_editable, m)
+
+        cl.get_results(MockFilteredRequestA())
+
+        # There's only one Group instance
+        self.assertEqual(cl.result_count, 1)
+
+    def test_distinct_for_through_m2m_in_list_filter(self):
+        """
+        Regression test for #13902: When using a ManyToMany in list_filter,
+        results shouldn't apper more than once. With an intermediate model.
+        """
+        lead = Musician.objects.create(name='Vox')
+        band = Group.objects.create(name='The Hype')
+        Membership.objects.create(group=band, music=lead, role='lead voice')
+        Membership.objects.create(group=band, music=lead, role='bass player')
+
+        m = GroupAdmin(Group, admin.site)
+        cl = ChangeList(MockFilteredRequestB(), Group, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_editable, m)
+
+        cl.get_results(MockFilteredRequestB())
+
+        # There's only one Group instance
+        self.assertEqual(cl.result_count, 1)
+
+    def test_distinct_for_inherited_m2m_in_list_filter(self):
+        """
+        Regression test for #13902: When using a ManyToMany in list_filter,
+        results shouldn't apper more than once. Model managed in the
+        admin inherits from the one that defins the relationship.
+        """
+        lead = Musician.objects.create(name='John')
+        four = Quartet.objects.create(name='The Beatles')
+        Membership.objects.create(group=four, music=lead, role='lead voice')
+        Membership.objects.create(group=four, music=lead, role='guitar player')
+
+        m = QuartetAdmin(Quartet, admin.site)
+        cl = ChangeList(MockFilteredRequestB(), Quartet, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_editable, m)
+
+        cl.get_results(MockFilteredRequestB())
+
+        # There's only one Quartet instance
+        self.assertEqual(cl.result_count, 1)
+
+    def test_distinct_for_m2m_to_inherited_in_list_filter(self):
+        """
+        Regression test for #13902: When using a ManyToMany in list_filter,
+        results shouldn't apper more than once. Target of the relationship
+        inherits from another.
+        """
+        lead = ChordsMusician.objects.create(name='Player A')
+        three = ChordsBand.objects.create(name='The Chords Trio')
+        Invitation.objects.create(band=three, player=lead, instrument='guitar')
+        Invitation.objects.create(band=three, player=lead, instrument='bass')
+
+        m = ChordsBandAdmin(ChordsBand, admin.site)
+        cl = ChangeList(MockFilteredRequestB(), ChordsBand, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_editable, m)
+
+        cl.get_results(MockFilteredRequestB())
+
+        # There's only one ChordsBand instance
+        self.assertEqual(cl.result_count, 1)
+
 
 class ChildAdmin(admin.ModelAdmin):
     list_display = ['name', 'parent']
     def queryset(self, request):
         return super(ChildAdmin, self).queryset(request).select_related("parent__name")
 
-
 class MockRequest(object):
     GET = {}
-
 
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
         super(CustomPaginator, self).__init__(queryset, 5, orphans=2,
             allow_empty_first_page=allow_empty_first_page)
+
+
+class BandAdmin(admin.ModelAdmin):
+    list_filter = ['genres']
+
+class GroupAdmin(admin.ModelAdmin):
+    list_filter = ['members']
+
+class QuartetAdmin(admin.ModelAdmin):
+    list_filter = ['members']
+
+class ChordsBandAdmin(admin.ModelAdmin):
+    list_filter = ['members']
+
+class MockFilteredRequestA(object):
+    GET = { 'genres': 1 }
+
+class MockFilteredRequestB(object):
+    GET = { 'members': 1 }
