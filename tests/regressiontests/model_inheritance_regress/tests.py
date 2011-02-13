@@ -394,15 +394,15 @@ class ModelInheritanceTest(TestCase):
         # Regression test for #13987: Primary key is incorrectly determined
         # when more than one model has a concrete->abstract->concrete
         # inheritance hierarchy.
-        self.assertEquals(
+        self.assertEqual(
             len([field for field in BusStation._meta.local_fields
                        if field.primary_key]),
             1
         )
-        self.assertEquals(
+        self.assertEqual(
             len([field for field in TrainStation._meta.local_fields
                        if field.primary_key]),
             1
         )
-        self.assertIs(BusStation._meta.pk.model, BusStation)
-        self.assertIs(TrainStation._meta.pk.model, TrainStation)
+        self.assertTrue(BusStation._meta.pk.model is BusStation)
+        self.assertTrue(TrainStation._meta.pk.model is TrainStation)
