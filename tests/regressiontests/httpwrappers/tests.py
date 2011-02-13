@@ -2,7 +2,8 @@ import copy
 import pickle
 import unittest
 
-from django.http import QueryDict, HttpResponse, CompatCookie, BadHeaderError
+from django.http import (QueryDict, HttpResponse, CompatCookie, BadHeaderError,
+        parse_cookie)
 
 
 class QueryDictTests(unittest.TestCase):
@@ -264,3 +265,9 @@ class CookieTests(unittest.TestCase):
         c2 = CompatCookie()
         c2.load(c.output())
         self.assertEqual(c['test'].value, c2['test'].value)
+
+    def test_nonstandard_keys(self):
+        """
+        Test that a single non-standard cookie name doesn't affect all cookies. Ticket #13007.
+        """
+        self.assertTrue('good_cookie' in parse_cookie('good_cookie=yes;bad:cookie=yes').keys())
