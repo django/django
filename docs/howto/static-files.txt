@@ -2,8 +2,6 @@
 Managing static files
 =====================
 
-.. currentmodule:: django.contrib.staticfiles
-
 .. versionadded:: 1.3
 
 Django developers mostly concern themselves with the dynamic parts of web
@@ -109,10 +107,9 @@ the framework see :doc:`the staticfiles reference </ref/contrib/staticfiles>`.
    :setting:`MEDIA_URL` different from your :setting:`STATIC_ROOT` and
    :setting:`STATIC_URL`. You will need to arrange for serving of files in
    :setting:`MEDIA_ROOT` yourself; ``staticfiles`` does not deal with
-   user-uploaded files at all. You can, however, use ``staticfiles``'
-   :func:`~django.contrib.staticfiles.views.serve` view for serving
-   :setting:`MEDIA_ROOT` in development; see
-   :ref:`staticfiles-serve-other-directories`.
+   user-uploaded files at all. You can, however, use
+   :func:`~django.views.static.serve` view for serving :setting:`MEDIA_ROOT`
+   in development; see :ref:`staticfiles-other-directories`.
 
 .. _staticfiles-in-templates:
 
@@ -241,8 +238,64 @@ files in app directories.
     :setting:`STATIC_URL` setting can't be empty or a full URL, such as
     ``http://static.example.com/``.
 
-For a few more details, including an alternate method of enabling this view,
-see :ref:`staticfiles-development-view`.
+For a few more details on how the ``staticfiles`` can be used during
+development, see :ref:`staticfiles-development-view`.
+
+.. _staticfiles-other-directories:
+
+Serving other directories
+-------------------------
+
+.. currentmodule:: django.views.static
+.. function:: serve(request, path, document_root, show_indexes=False)
+
+There may be files other than your project's static assets that, for
+convenience, you'd like to have Django serve for you in local development.
+The :func:`~django.views.static.serve` view can be used to serve any directory
+you give it. (Again, this view is **not** hardened for production
+use, and should be used only as a development aid; you should serve these files
+in production using a real front-end webserver).
+
+The most likely example is user-uploaded content in :setting:`MEDIA_ROOT`.
+``staticfiles`` is intended for static assets and has no built-in handling
+for user-uploaded files, but you can have Django serve your
+:setting:`MEDIA_ROOT` by appending something like this to your URLconf::
+
+    from django.conf import settings
+
+    # ... the rest of your URLconf goes here ...
+
+    if settings.DEBUG:
+        urlpatterns += patterns('',
+            url(r'^media/(?P<path>.*)$', 'django.views.static', {
+                'document_root': settings.MEDIA_ROOT,
+            }),
+       )
+
+Note, the snippet assumes your :setting:`MEDIA_URL` has a value of
+``'/media/'``. This will call the :func:`~django.views.static.serve` view,
+passing in the path from the URLconf and the (required) ``document_root``
+parameter.
+
+.. currentmodule:: django.conf.urls.static
+.. function:: static(prefix, view='django.views.static.serve', **kwargs)
+
+Since it can become a bit cumbersome to define this URL pattern, Django
+ships with a small URL helper function
+:func:`~django.conf.urls.static.static` that taks as parameters the prefix
+such as :setting:`MEDIA_URL` and a dotted path to a view, such as
+``'django.views.static.serve'``. Any other function parameter will be
+transparently passed to the view.
+
+An example for serving :setting:`MEDIA_URL` (``'/media/'``) during
+development::
+
+    from django.conf import settings
+    from django.conf.urls.static import static
+
+    urlpatterns = patterns('',
+        # ... the rest of your URLconf goes here ...
+    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 .. _staticfiles-production:
 
@@ -395,7 +448,7 @@ Upgrading from ``django-staticfiles``
 =====================================
 
 ``django.contrib.staticfiles`` began its life as `django-staticfiles`_. If
-you're upgrading from `django-staticfiles`_ < ``1.0``` (e.g. ``0.3.4``) to
+you're upgrading from `django-staticfiles`_ older than 1.0 (e.g. 0.3.4) to
 ``django.contrib.staticfiles``, you'll need to make a few changes:
 
     * Application files should now live in a ``static`` directory in each app

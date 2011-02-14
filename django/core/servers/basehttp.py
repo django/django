@@ -18,8 +18,9 @@ import warnings
 from django.core.management.color import color_style
 from django.utils.http import http_date
 from django.utils._os import safe_join
+from django.views import static
 
-from django.contrib.staticfiles import handlers, views as static
+from django.contrib.staticfiles import handlers
 
 __version__ = "0.1"
 __all__ = ['WSGIServer','WSGIRequestHandler']
@@ -677,8 +678,7 @@ class AdminMediaHandler(handlers.StaticFilesHandler):
 
     def serve(self, request):
         document_root, path = os.path.split(self.file_path(request.path))
-        return static.serve(request, path,
-            document_root=document_root, insecure=True)
+        return static.serve(request, path, document_root=document_root)
 
     def _should_handle(self, path):
         """
