@@ -6,6 +6,7 @@ from optparse import make_option
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from django.core.management.base import CommandError, NoArgsCommand
+from django.utils.encoding import smart_str
 
 from django.contrib.staticfiles import finders
 
@@ -64,7 +65,7 @@ class Command(NoArgsCommand):
 
         # Warn before doing anything more.
         if options.get('interactive'):
-            confirm = raw_input("""
+            confirm = raw_input(u"""
 You have requested to collect static files at the destination
 location as specified in your settings file ('%s').
 
@@ -90,17 +91,18 @@ Type 'yes' to continue, or 'no' to cancel: """ % settings.STATIC_ROOT)
         actual_count = len(self.copied_files) + len(self.symlinked_files)
         unmodified_count = len(self.unmodified_files)
         if self.verbosity >= 1:
-            self.stdout.write("\n%s static file%s %s to '%s'%s.\n"
+            self.stdout.write(smart_str(u"\n%s static file%s %s to '%s'%s.\n"
                               % (actual_count, actual_count != 1 and 's' or '',
                                  symlink and 'symlinked' or 'copied',
                                  settings.STATIC_ROOT,
                                  unmodified_count and ' (%s unmodified)'
-                                 % unmodified_count or ''))
+                                 % unmodified_count or '')))
 
     def log(self, msg, level=2):
         """
         Small log helper
         """
+        msg = smart_str(msg)
         if not msg.endswith("\n"):
             msg += "\n"
         if self.verbosity >= level:
@@ -135,13 +137,13 @@ Type 'yes' to continue, or 'no' to cancel: """ % settings.STATIC_ROOT)
                                 (not symlink and full_path and os.path.islink(full_path))):
                             if prefixed_path not in self.unmodified_files:
                                 self.unmodified_files.append(prefixed_path)
-                            self.log("Skipping '%s' (not modified)" % path)
+                            self.log(u"Skipping '%s' (not modified)" % path)
                             return False
             # Then delete the existing file if really needed
             if options['dry_run']:
-                self.log("Pretending to delete '%s'" % path)
+                self.log(u"Pretending to delete '%s'" % path)
             else:
-                self.log("Deleting '%s'" % path)
+                self.log(u"Deleting '%s'" % path)
                 self.storage.delete(prefixed_path)
         return True
 
@@ -151,7 +153,7 @@ Type 'yes' to continue, or 'no' to cancel: """ % settings.STATIC_ROOT)
         """
         # Skip this file if it was already copied earlier
         if prefixed_path in self.symlinked_files:
-            return self.log("Skipping '%s' (already linked earlier)" % path)
+            return self.log(u"Skipping '%s' (already linked earlier)" % path)
         # Delete the target file if needed or break
         if not self.delete_file(path, prefixed_path, source_storage, **options):
             return
@@ -159,9 +161,9 @@ Type 'yes' to continue, or 'no' to cancel: """ % settings.STATIC_ROOT)
         source_path = source_storage.path(path)
         # Finally link the file
         if options['dry_run']:
-            self.log("Pretending to link '%s'" % source_path, level=1)
+            self.log(u"Pretending to link '%s'" % source_path, level=1)
         else:
-            self.log("Linking '%s'" % source_path, level=1)
+            self.log(u"Linking '%s'" % source_path, level=1)
             full_path = self.storage.path(prefixed_path)
             try:
                 os.makedirs(os.path.dirname(full_path))
@@ -177,7 +179,7 @@ Type 'yes' to continue, or 'no' to cancel: """ % settings.STATIC_ROOT)
         """
         # Skip this file if it was already copied earlier
         if prefixed_path in self.copied_files:
-            return self.log("Skipping '%s' (already copied earlier)" % path)
+            return self.log(u"Skipping '%s' (already copied earlier)" % path)
         # Delete the target file if needed or break
         if not self.delete_file(path, prefixed_path, source_storage, **options):
             return
@@ -185,9 +187,9 @@ Type 'yes' to continue, or 'no' to cancel: """ % settings.STATIC_ROOT)
         source_path = source_storage.path(path)
         # Finally start copying
         if options['dry_run']:
-            self.log("Pretending to copy '%s'" % source_path, level=1)
+            self.log(u"Pretending to copy '%s'" % source_path, level=1)
         else:
-            self.log("Copying '%s'" % source_path, level=1)
+            self.log(u"Copying '%s'" % source_path, level=1)
             if self.local:
                 full_path = self.storage.path(prefixed_path)
                 try:

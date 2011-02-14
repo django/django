@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+import codecs
 import os
 import posixpath
 import shutil
@@ -11,6 +13,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.test import TestCase
+from django.utils.encoding import smart_unicode
 from django.utils._os import rmtree_errorhandler
 
 
@@ -72,8 +75,8 @@ class StaticFilesTestCase(TestCase):
         settings.INSTALLED_APPS = self.old_installed_apps
 
     def assertFileContains(self, filepath, text):
-        self.assertTrue(text in self._get_file(filepath),
-                        "'%s' not in '%s'" % (text, filepath))
+        self.assertTrue(text in self._get_file(smart_unicode(filepath)),
+                        u"'%s' not in '%s'" % (text, filepath))
 
     def assertFileNotFound(self, filepath):
         self.assertRaises(IOError, self._get_file, filepath)
@@ -108,7 +111,7 @@ class BuildStaticTestCase(StaticFilesTestCase):
     def _get_file(self, filepath):
         assert filepath, 'filepath is empty.'
         filepath = os.path.join(settings.STATIC_ROOT, filepath)
-        f = open(filepath)
+        f = codecs.open(filepath, "r", "utf-8")
         try:
             return f.read()
         finally:
@@ -140,9 +143,15 @@ class TestDefaults(object):
 
     def test_app_files(self):
         """
-        Can find a file in an app media/ directory.
+        Can find a file in an app static/ directory.
         """
         self.assertFileContains('test/file1.txt', 'file1 in the app dir')
+
+    def test_nonascii_filenames(self):
+        """
+        Can find a file with non-ASCII character in an app static/ directory.
+        """
+        self.assertFileContains(u'test/speçial.txt', u'speçial in the app dir')
 
 
 class TestFindStatic(BuildStaticTestCase, TestDefaults):
@@ -156,7 +165,7 @@ class TestFindStatic(BuildStaticTestCase, TestDefaults):
             call_command('findstatic', filepath, all=False, verbosity='0')
             sys.stdout.seek(0)
             lines = [l.strip() for l in sys.stdout.readlines()]
-            contents = open(lines[1].strip()).read()
+            contents = codecs.open(lines[1].strip(), "r", "utf-8").read()
         finally:
             sys.stdout = _stdout
         return contents
