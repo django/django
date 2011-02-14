@@ -108,7 +108,12 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         Return a list of template names to be used for the request. Must return
         a list. May not be called if get_template is overridden.
         """
-        names = super(SingleObjectTemplateResponseMixin, self).get_template_names()
+        try:
+            names = super(SingleObjectTemplateResponseMixin, self).get_template_names()
+        except ImproperlyConfigured:
+            # If template_name isn't specified, it's not a problem --
+            # we just start with an empty list.
+            names = []
 
         # If self.template_name_field is set, grab the value of the field
         # of that name from the object; this is the most specific template

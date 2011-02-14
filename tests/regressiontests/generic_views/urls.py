@@ -11,6 +11,8 @@ urlpatterns = patterns('',
     #    views.DecoratedAboutView()),
 
     # TemplateView
+    (r'^template/no_template/$',
+        TemplateView.as_view()),
     (r'^template/simple/(?P<foo>\w+)/$',
         TemplateView.as_view(template_name='generic_views/about.html')),
     (r'^template/custom/(?P<foo>\w+)/$',

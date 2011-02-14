@@ -102,7 +102,9 @@ class TemplateResponseMixin(object):
         a list. May not be called if render_to_response is overridden.
         """
         if self.template_name is None:
-            return []
+            raise ImproperlyConfigured(
+                "TemplateResponseMixin requires either a definition of "
+                "'template_name' or an implementation of 'get_template_names()'")
         else:
             return [self.template_name]
 

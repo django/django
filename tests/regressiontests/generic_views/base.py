@@ -181,6 +181,12 @@ class TemplateViewTest(TestCase):
         """
         self._assert_about(TemplateView.as_view(template_name='generic_views/about.html')(self.rf.get('/about/')))
 
+    def test_template_name_required(self):
+        """
+        A template view must provide a template name
+        """
+        self.assertRaises(ImproperlyConfigured, self.client.get, '/template/no_template/')
+
     def test_template_params(self):
         """
         A generic template view passes kwargs as context.
