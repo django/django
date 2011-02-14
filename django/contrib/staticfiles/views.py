@@ -25,7 +25,7 @@ def serve(request, path, document_root=None, insecure=False, **kwargs):
 
     in your URLconf.
 
-    It automatically falls back to django.views.static
+    It uses the django.views.static view to serve the found files.
     """
     if not settings.DEBUG and not insecure:
         raise ImproperlyConfigured("The staticfiles view can only be used in "
@@ -33,6 +33,7 @@ def serve(request, path, document_root=None, insecure=False, **kwargs):
                                    "option of 'runserver' is used")
     normalized_path = posixpath.normpath(urllib.unquote(path)).lstrip('/')
     absolute_path = finders.find(normalized_path)
-    if absolute_path:
-        document_root, path = os.path.split(absolute_path)
+    if not absolute_path:
+        raise Http404("'%s' could not be found" % path)
+    document_root, path = os.path.split(absolute_path)
     return static.serve(request, path, document_root=document_root, **kwargs)
