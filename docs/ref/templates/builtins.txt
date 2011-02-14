@@ -878,7 +878,7 @@ See also: ``{% include %}``.
     .. versionchanged:: 1.3
 
     In Django 1.5, the behavior of the :ttag:`ssi` template tag will
-    change, with the the first argument being made into a context
+    change, with the first argument being made into a context
     variable, rather than being a special case unquoted constant. This
     will allow the :ttag:`ssi` tag to use a context variable as the
     value of the page to be included.
@@ -1017,7 +1017,7 @@ projects?
     .. versionchanged:: 1.3
 
     In Django 1.5, the behavior of the :ttag:`url` template tag will
-    change, with the the first argument being made into a context
+    change, with the first argument being made into a context
     variable, rather than being a special case unquoted constant. This
     will allow the :ttag:`url` tag to use a context variable as the
     value of the URL name to be reversed.

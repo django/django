@@ -81,7 +81,7 @@ SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires
 
 Geospatial Libraries
 --------------------
-GeoDjango uses and/or provides interfaces for the the following open source
+GeoDjango uses and/or provides interfaces for the following open source
 geospatial libraries:
 
 ========================  ====================================  ================================  ==========================
@@ -98,8 +98,8 @@ Program                   Description                           Required        
 .. admonition::  Install GDAL
 
     While :ref:`gdalbuild` is technically not required, it is *recommended*.
-    Important features of GeoDjango (including the :ref:`ref-layermapping`, 
-    geometry reprojection, and the geographic admin) depend on its 
+    Important features of GeoDjango (including the :ref:`ref-layermapping`,
+    geometry reprojection, and the geographic admin) depend on its
     functionality.
 
 .. note::
@@ -480,7 +480,7 @@ to look like the following::
 
 .. note::
 
-    The important thing here is to make sure you comment out the the
+    The important thing here is to make sure you comment out the
     ``define=SQLITE_OMIT_LOAD_EXTENSION`` flag and that the ``include_dirs``
     and ``library_dirs`` settings are uncommented and set to the appropriate
     path if the SQLite header files and libraries are not in ``/usr/include``
@@ -810,7 +810,7 @@ __ http://www.kyngchaos.com/software/postgres
 
     Use of these binaries requires Django 1.0.3 and above.  If you are
     using a previous version of Django (like 1.0.2), then you will have
-    to add the the following in your settings::
+    to add the following in your settings::
 
         GEOS_LIBRARY_PATH='/Library/Frameworks/GEOS.framework/GEOS'
         GDAL_LIBRARY_PATH='/Library/Frameworks/GDAL.framework/GDAL'
@@ -925,8 +925,8 @@ Ubuntu & Debian GNU/Linux
 
     The PostGIS SQL files are not placed the PostgreSQL share directory in the
     Debian and Ubuntu packages, and are located instead special directory
-    depending on the release.  Thus, when :ref:`spatialdb_template` use the 
-    `create_template_postgis-debian.sh`_ script instead 
+    depending on the release.  Thus, when :ref:`spatialdb_template` use the
+    `create_template_postgis-debian.sh`_ script instead
 
 .. _ubuntu:
 

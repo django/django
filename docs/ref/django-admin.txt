@@ -1305,7 +1305,7 @@ display options:
     * ``reverse``
     * ``conceal``
 
-A color specification follows one of the the following patterns:
+A color specification follows one of the following patterns:
 
     * ``role=fg``
     * ``role=fg/bg``

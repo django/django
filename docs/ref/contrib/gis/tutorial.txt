@@ -321,7 +321,7 @@ may also use the following to populate your spatial database:
 GDAL Interface
 --------------
 
-Earlier we used the the ``ogrinfo`` to explore the contents of the world borders
+Earlier we used the ``ogrinfo`` to explore the contents of the world borders
 shapefile.  Included within GeoDjango is an interface to GDAL's powerful OGR
 library -- in other words, you'll be able explore all the vector data sources
 that OGR supports via a Pythonic API.

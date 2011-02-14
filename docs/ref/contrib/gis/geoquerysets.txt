@@ -14,7 +14,7 @@ GeoQuerySet API Reference
 Spatial Lookups
 ===============
 
-Just like when using the the :ref:`queryset-api`, interaction
+Just like when using the :ref:`queryset-api`, interaction
 with ``GeoQuerySet`` by :ref:`chaining filters <chaining-filters>`.
 Instead of the regular Django :ref:`field-lookups`, the
 spatial lookups in this section are available for :class:`GeometryField`.
@@ -271,7 +271,7 @@ relate
 
 *Availability*: PostGIS, Oracle, SpatiaLite
 
-Tests if the geometry field is spatially related to the the lookup geometry by
+Tests if the geometry field is spatially related to the lookup geometry by
 the values given in the given pattern.  This lookup requires a tuple parameter,
 ``(geom, pattern)``; the form of ``pattern`` will depend on the spatial backend:
 
@@ -762,7 +762,7 @@ Geometry Relationships
 
 The following methods take no arguments, and attach geometry objects
 each element of the :class:`GeoQuerySet` that is the result of relationship
-function evaluated on the the geometry field.
+function evaluated on the geometry field.
 
 ``centroid``
 ~~~~~~~~~~~~
@@ -945,7 +945,7 @@ of the geometry field in each model converted to the requested output format.
 
 .. versionadded:: 1.2
 
-Attaches a ``geohash`` attribute to every model the the queryset
+Attaches a ``geohash`` attribute to every model the queryset
 containing the `GeoHash`__ representation of the geometry.
 
 __ http://geohash.org/

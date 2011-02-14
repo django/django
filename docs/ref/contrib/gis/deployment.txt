@@ -22,7 +22,7 @@ matter whether the version of Apache is prefork or worker.
 
 .. note::
 
-    The ``Alias`` and ``Directory`` configurations in the the examples
+    The ``Alias`` and ``Directory`` configurations in the examples
     below use an example path to a system-wide installation folder of Django.
     Substitute in an appropriate location, if necessary, as it may be
     different than the path on your system.

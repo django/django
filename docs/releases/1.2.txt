@@ -352,7 +352,7 @@ are now included:
 
 GeoDjango now supports the rich capabilities added
 in the `PostGIS 1.5 release <http://postgis.refractions.net/documentation/manual-1.5/>`_.
-New features include suppport for the the :ref:`geography type <geography-type>`
+New features include suppport for the :ref:`geography type <geography-type>`
 and enabling of :ref:`distance queries <distance-queries>`
 with non-point geometries on geographic coordinate systems.
 
