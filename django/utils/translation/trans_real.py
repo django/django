@@ -165,7 +165,9 @@ def translation(language):
             if os.path.isdir(apppath):
                 res = _merge(apppath)
 
-        if projectpath and os.path.isdir(projectpath) and projectpath not in settings.LOCALE_PATHS:
+        localepaths = [os.path.normpath(path) for path in settings.LOCALE_PATHS]
+        if (projectpath and os.path.isdir(projectpath) and
+                os.path.normpath(projectpath) not in localepaths):
             res = _merge(projectpath)
 
         for localepath in reversed(settings.LOCALE_PATHS):
