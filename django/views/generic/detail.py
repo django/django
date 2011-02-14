@@ -3,6 +3,7 @@ import re
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import Http404
 from django.utils.encoding import smart_str
+from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateResponseMixin, View
 
 
@@ -47,8 +48,8 @@ class SingleObjectMixin(object):
         try:
             obj = queryset.get()
         except ObjectDoesNotExist:
-            raise Http404(u"No %s found matching the query" %
-                          (queryset.model._meta.verbose_name))
+            raise Http404(_(u"No %(verbose_name)s found matching the query") %
+                          {'verbose_name': queryset.model._meta.verbose_name})
         return obj
 
     def get_queryset(self):
