@@ -32,7 +32,7 @@ class DetailViewTest(TestCase):
         res = self.client.get('/detail/artist/1/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'], Artist.objects.get(pk=1))
-        self.assertEqual(res.context['professional_artist'], Artist.objects.get(pk=1))
+        self.assertEqual(res.context['artist'], Artist.objects.get(pk=1))
         self.assertTemplateUsed(res, 'generic_views/artist_detail.html')
 
     def test_template_name(self):

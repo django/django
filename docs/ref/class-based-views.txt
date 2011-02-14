@@ -162,14 +162,14 @@ SingleObjectMixin
         it constructs a :class:`QuerySet` by calling the `all()` method on the
         :attr:`~SingleObjectMixin.model` attribute's default manager.
 
-    .. method:: get_context_object_name(object_list)
+    .. method:: get_context_object_name(obj)
 
         Return the context variable name that will be used to contain the
-        list of data that this view is manipulating. If ``object_list`` is a
-        :class:`QuerySet` of Django objects and
+        data that this view is manipulating. If
         :attr:`~SingleObjectMixin.context_object_name` is not set, the context
-        name will be constructed from the verbose plural name of the model that
-        the queryset is composed from.
+        name will be constructed from the ``object_name`` of the model that
+        the queryset is composed from. For example, the model ``Article``
+        would have context object named ``'article'``.
 
     .. method:: get_context_data(**kwargs)
 
@@ -333,10 +333,14 @@ MultipleObjectMixin
 
     .. method:: get_context_object_name(object_list)
 
-        Return the context variable name that will be used to contain the list
-        of data that this view is manipulating. If object_list is a queryset of
-        Django objects, the context name will be verbose plural name of the
-        model that the queryset is composed from.
+        Return the context variable name that will be used to contain
+        the list of data that this view is manipulating. If
+        ``object_list`` is a queryset of Django objects and
+        :attr:`~MultipleObjectMixin.context_object_name` is not set,
+        the context name will be the ``object_name`` of the model that
+        the queryset is composed from, with postfix ``'_list'``
+        appended. For example, the model ``Article`` would have a
+        context object named ``article_list``.
 
     .. method:: get_context_data(**kwargs)
 

@@ -76,8 +76,7 @@ class MultipleObjectMixin(object):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(object_list, 'model'):
-            return smart_str(re.sub('[^a-zA-Z0-9]+', '_',
-                    object_list.model._meta.verbose_name_plural.lower()))
+            return smart_str('%s_list' % object_list.model._meta.object_name.lower())
         else:
             return None
 

@@ -80,8 +80,7 @@ class SingleObjectMixin(object):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(obj, '_meta'):
-            return smart_str(re.sub('[^a-zA-Z0-9]+', '_',
-                    obj._meta.verbose_name.lower()))
+            return smart_str(obj._meta.object_name.lower())
         else:
             return None
 

@@ -72,7 +72,8 @@ The ``_list`` suffix on list views
 In a function-based :class:`ListView`, the ``template_object_name``
 was appended with the suffix ``'_list'`` to yield the final context
 variable name. In a class-based ``ListView``, the
-``context_object_name`` is used verbatim.
+``context_object_name`` is used verbatim. The ``'_list'`` suffix
+is only applied when generating a default context object name.
 
 The context data for ``object_list`` views
 ------------------------------------------
