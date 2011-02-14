@@ -102,8 +102,8 @@ default options such as :djadminopt:`--verbosity` and :djadminopt:`--traceback`.
 
     The :meth:`BaseCommand.execute` method sets the hardcoded ``en-us`` locale
     because the commands shipped with Django perform several tasks
-    (for example, user-visible content and database population) that require
-    a system-neutral string language (for which we use ``en-us``).
+    (for example, user-facing content rendering and database population) that
+    require a system-neutral string language (for which we use ``en-us``).
 
     If your custom management command uses another locale, you should manually
     activate and deactivate it in your :meth:`~BaseCommand.handle` or

@@ -1287,7 +1287,7 @@ on whichever model contains the actual reference to the
 :class:`~django.db.models.ManyToManyField`. Depending on your ``ModelAdmin``
 definition, each many-to-many field in your model will be represented by a
 standard HTML ``<select multiple>``, a horizontal or vertical filter, or a
-``raw_id_admin`` widget. However, it is also possible to to replace these
+``raw_id_admin`` widget. However, it is also possible to replace these
 widgets with inlines.
 
 Suppose we have the following models::

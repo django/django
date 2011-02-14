@@ -50,7 +50,7 @@ GeoDjango's admin site
 
    .. attribute:: modifiable
 
-   Defaults to ``False``.  When set to to ``True``, disables editing of
+   Defaults to ``False``.  When set to ``True``, disables editing of
    existing geometry fields in the admin.
 
    .. note::
