@@ -10,13 +10,13 @@ logger = getLogger('django.db.backends')
 
 
 class CursorWrapper(object):
-    def __init__(self, cursor, connection):
+    def __init__(self, cursor, db):
         self.cursor = cursor
-        self.connection = connection
+        self.db = db
 
     def __getattr__(self, attr):
-        if self.connection.is_managed():
-            self.connection.set_dirty()
+        if self.db.is_managed():
+            self.db.set_dirty()
         if attr in self.__dict__:
             return self.__dict__[attr]
         else:
@@ -35,8 +35,8 @@ class CursorDebugWrapper(CursorWrapper):
         finally:
             stop = time()
             duration = stop - start
-            sql = self.connection.ops.last_executed_query(self.cursor, sql, params)
-            self.connection.queries.append({
+            sql = self.db.ops.last_executed_query(self.cursor, sql, params)
+            self.db.queries.append({
                 'sql': sql,
                 'time': "%.3f" % duration,
             })
@@ -51,7 +51,7 @@ class CursorDebugWrapper(CursorWrapper):
         finally:
             stop = time()
             duration = stop - start
-            self.connection.queries.append({
+            self.db.queries.append({
                 'sql': '%s times: %s' % (len(param_list), sql),
                 'time': "%.3f" % duration,
             })
