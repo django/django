@@ -201,6 +201,25 @@ class UpdateViewTests(TestCase):
         except ImproperlyConfigured:
             pass
 
+    def test_update_get_object(self):
+        a = Author.objects.create(
+            name='Randall Munroe',
+            slug='randall-munroe',
+        )
+        res = self.client.get('/edit/author/update/')
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(isinstance(res.context['form'], forms.ModelForm))
+        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
+        self.assertTemplateUsed(res, 'generic_views/author_form.html')
+
+        # Modification with both POST and PUT (browser compatible)
+        res = self.client.post('/edit/author/update/',
+                        {'name': 'Randall Munroe (xkcd)', 'slug': 'randall-munroe'})
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (xkcd)>'])
+
 class DeleteViewTests(TestCase):
     urls = 'regressiontests.generic_views.urls'
 

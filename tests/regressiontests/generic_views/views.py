@@ -114,6 +114,13 @@ class AuthorUpdate(generic.UpdateView):
     success_url = '/list/authors/'
 
 
+class OneAuthorUpdate(generic.UpdateView):
+    success_url = '/list/authors/'
+
+    def get_object(self):
+        return Author.objects.get(pk=1)
+
+
 class SpecializedAuthorUpdate(generic.UpdateView):
     model = Author
     form_class = AuthorForm

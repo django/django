@@ -75,7 +75,17 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         if self.form_class:
             return self.form_class
         else:
-            model = self.get_queryset().model
+            if self.model is not None:
+                # If a model has been explicitly provided, use it
+                model = self.model
+            elif hasattr(self, 'object') and self.object is not None:
+                # If this view is operating on a single object, use
+                # the class of that object
+                model = self.object.__class__
+            else:
+                # Try to get a queryset and extract the model class
+                # from that
+                model = self.get_queryset().model
             return model_forms.modelform_factory(model)
 
     def get_form_kwargs(self):
