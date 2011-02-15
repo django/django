@@ -28,6 +28,7 @@ import datetime
 import time
 import re
 import os
+import urllib2
 from decimal import Decimal
 
 from unittest import TestCase
@@ -567,8 +568,6 @@ class FieldsTests(TestCase):
             f.clean('http://google.com/we-love-microsoft.html') # good domain, bad page
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
-        # UTF-8 char in path
-        self.assertEqual(u'http://de.wikipedia.org/wiki/T\xfcr', f.clean(u'http://de.wikipedia.org/wiki/T\xfcr'))
 
     def test_urlfield_4(self):
         f = URLField(verify_exists=True, required=False)
@@ -621,6 +620,18 @@ class FieldsTests(TestCase):
             f.clean(u'http://broken.עברית.idn.icann.org/')
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
+
+    def test_urlfield_10(self):
+        # UTF-8 char in path, enclosed by a monkey-patch to make sure it
+        # the encoding is passed to urllib2.urlopen
+        f = URLField(verify_exists=True)
+        try:
+            _orig_urlopen = urllib2.urlopen
+            urllib2.urlopen = lambda req: True
+            url = u'http://t\xfcr.djangoproject.com/'
+            self.assertEqual(url, f.clean(url))
+        finally:
+            urllib2.urlopen = _orig_urlopen
 
     # BooleanField ################################################################
 
