@@ -82,7 +82,7 @@ places:
 
 Here is an example ``unittest.TestCase`` subclass::
 
-    from django.utils import unittest
+    import unittest
     from myapp.models import Animal
 
     class AnimalTestCase(unittest.TestCase):
