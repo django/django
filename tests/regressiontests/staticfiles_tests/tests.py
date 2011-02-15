@@ -63,6 +63,16 @@ class StaticFilesTestCase(TestCase):
         # since we're planning on changing that we need to clear out the cache.
         default_storage._wrapped = None
 
+        # To make sure SVN doesn't hangs itself with the non-ASCII characters
+        # during checkout, we actually create one file dynamically.
+        self._nonascii_filepath = os.path.join(
+            TEST_ROOT, 'apps', 'test', 'static', 'test', u'fişier.txt')
+        f = codecs.open(self._nonascii_filepath, 'w', 'utf-8')
+        try:
+            f.write(u"fişier in the app dir")
+        finally:
+            f.close()
+
     def tearDown(self):
         settings.DEBUG = self.old_debug
         settings.MEDIA_ROOT = self.old_media_root
@@ -73,6 +83,8 @@ class StaticFilesTestCase(TestCase):
         settings.STATICFILES_DIRS = self.old_staticfiles_dirs
         settings.STATICFILES_FINDERS = self.old_staticfiles_finders
         settings.INSTALLED_APPS = self.old_installed_apps
+        if os.path.exists(self._nonascii_filepath):
+            os.unlink(self._nonascii_filepath)
 
     def assertFileContains(self, filepath, text):
         self.assertTrue(text in self._get_file(smart_unicode(filepath)),
@@ -151,7 +163,7 @@ class TestDefaults(object):
         """
         Can find a file with non-ASCII character in an app static/ directory.
         """
-        self.assertFileContains(u'test/speçial.txt', u'speçial in the app dir')
+        self.assertFileContains(u'test/fişier.txt', u'fişier in the app dir')
 
 
 class TestFindStatic(BuildStaticTestCase, TestDefaults):
