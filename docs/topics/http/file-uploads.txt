@@ -2,7 +2,7 @@
 File Uploads
 ============
 
-.. currentmodule:: django.core.files
+.. currentmodule:: django.core.files.uploadedfile
 
 When Django handles a file upload, the file data ends up placed in
 :attr:`request.FILES <django.http.HttpRequest.FILES>` (for more on the
@@ -59,33 +59,40 @@ into the form's constructor; this is how file data gets bound into a form.
 Handling uploaded files
 -----------------------
 
-The final piece of the puzzle is handling the actual file data from
-:attr:`request.FILES <django.http.HttpRequest.FILES>`. Each entry in this
-dictionary is an ``UploadedFile`` object -- a simple wrapper around an uploaded
-file. You'll usually use one of these methods to access the uploaded content:
+.. class:: UploadedFile
 
-    ``UploadedFile.read()``
+    The final piece of the puzzle is handling the actual file data from
+    :attr:`request.FILES <django.http.HttpRequest.FILES>`. Each entry in this
+    dictionary is an ``UploadedFile`` object -- a simple wrapper around an uploaded
+    file. You'll usually use one of these methods to access the uploaded content:
+
+    .. method:: read()
+
         Read the entire uploaded data from the file. Be careful with this
         method: if the uploaded file is huge it can overwhelm your system if you
         try to read it into memory. You'll probably want to use ``chunks()``
         instead; see below.
 
-    ``UploadedFile.multiple_chunks()``
+    .. method:: multiple_chunks()
+
         Returns ``True`` if the uploaded file is big enough to require
         reading in multiple chunks. By default this will be any file
         larger than 2.5 megabytes, but that's configurable; see below.
 
-    ``UploadedFile.chunks()``
+    .. method:: chunks()
+
         A generator returning chunks of the file. If ``multiple_chunks()`` is
         ``True``, you should use this method in a loop instead of ``read()``.
 
         In practice, it's often easiest simply to use ``chunks()`` all the time;
         see the example below.
 
-    ``UploadedFile.name``
+    .. attribute:: name
+
         The name of the uploaded file (e.g. ``my_file.txt``).
 
-    ``UploadedFile.size``
+    .. attribute:: size
+
         The size, in bytes, of the uploaded file.
 
 There are a few other methods and attributes available on ``UploadedFile``
@@ -177,25 +184,26 @@ Three settings control Django's file upload behavior:
 ``UploadedFile`` objects
 ========================
 
-.. class:: UploadedFile
-
 In addition to those inherited from :class:`File`, all ``UploadedFile`` objects
 define the following methods/attributes:
 
-    ``UploadedFile.content_type``
-        The content-type header uploaded with the file (e.g. ``text/plain`` or
-        ``application/pdf``). Like any data supplied by the user, you shouldn't
-        trust that the uploaded file is actually this type. You'll still need to
-        validate that the file contains the content that the content-type header
-        claims -- "trust but verify."
+.. attribute:: UploadedFile.content_type
 
-    ``UploadedFile.charset``
-        For ``text/*`` content-types, the character set (i.e. ``utf8``) supplied
-        by the browser. Again, "trust but verify" is the best policy here.
+    The content-type header uploaded with the file (e.g. ``text/plain`` or
+    ``application/pdf``). Like any data supplied by the user, you shouldn't
+    trust that the uploaded file is actually this type. You'll still need to
+    validate that the file contains the content that the content-type header
+    claims -- "trust but verify."
 
-    ``UploadedFile.temporary_file_path()``
-        Only files uploaded onto disk will have this method; it returns the full
-        path to the temporary uploaded file.
+.. attribute:: UploadedFile.charset
+
+    For ``text/*`` content-types, the character set (i.e. ``utf8``) supplied
+    by the browser. Again, "trust but verify" is the best policy here.
+
+.. attribute:: UploadedFile.temporary_file_path()
+
+    Only files uploaded onto disk will have this method; it returns the full
+    path to the temporary uploaded file.
 
 .. note::
 

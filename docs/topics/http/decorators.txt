@@ -45,7 +45,7 @@ These decorators can be used to generate ``ETag`` and ``Last-Modified``
 headers; see
 :doc:`conditional view processing </topics/conditional-view-processing>`.
 
-.. currentmodule:: django.views.decorators.http
+.. currentmodule:: django.views.decorators.gzip
 
 GZip compression
 ================

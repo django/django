@@ -765,6 +765,8 @@ following would happen:
 Utility methods
 ===============
 
+.. module:: django.core.urlresolvers
+
 reverse()
 ---------
 

@@ -1110,6 +1110,8 @@ information.
 ============================
 
 .. class:: InlineModelAdmin
+.. class:: TabularInline
+.. class:: StackedInline
 
     The admin interface has the ability to edit models on the same page as a
     parent model. These are called inlines. Suppose you have these two models::
@@ -1134,8 +1136,8 @@ information.
 
     Django provides two subclasses of ``InlineModelAdmin`` and they are:
 
-        * ``TabularInline``
-        * ``StackedInline``
+        * :class:`~django.contrib.admin.TabularInline`
+        * :class:`~django.contrib.admin.StackedInline`
 
     The difference between these two is merely the template used to render
     them.

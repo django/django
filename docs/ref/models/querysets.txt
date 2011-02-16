@@ -1749,6 +1749,8 @@ SQL equivalents::
 Aggregation functions
 ---------------------
 
+.. currentmodule:: django.db.models
+
 Django provides the following aggregation functions in the
 ``django.db.models`` module. For details on how to use these
 aggregate functions, see
@@ -1759,100 +1761,100 @@ Avg
 
 .. class:: Avg(field)
 
-Returns the mean value of the given field.
+    Returns the mean value of the given field.
 
-    * Default alias: ``<field>__avg``
-    * Return type: float
+        * Default alias: ``<field>__avg``
+        * Return type: float
 
 Count
 ~~~~~
 
 .. class:: Count(field, distinct=False)
 
-Returns the number of objects that are related through the provided field.
+    Returns the number of objects that are related through the provided field.
 
-    * Default alias: ``<field>__count``
-    * Return type: integer
+        * Default alias: ``<field>__count``
+        * Return type: integer
 
-Has one optional argument:
+    Has one optional argument:
 
-.. attribute:: distinct
+    .. attribute:: distinct
 
-    If distinct=True, the count will only include unique instances. This has
-    the SQL equivalent of ``COUNT(DISTINCT field)``. Default value is ``False``.
+        If distinct=True, the count will only include unique instances. This has
+        the SQL equivalent of ``COUNT(DISTINCT field)``. Default value is ``False``.
 
 Max
 ~~~
 
 .. class:: Max(field)
 
-Returns the maximum value of the given field.
+    Returns the maximum value of the given field.
 
-    * Default alias: ``<field>__max``
-    * Return type: same as input field
+        * Default alias: ``<field>__max``
+        * Return type: same as input field
 
 Min
 ~~~
 
 .. class:: Min(field)
 
-Returns the minimum value of the given field.
+    Returns the minimum value of the given field.
 
-    * Default alias: ``<field>__min``
-    * Return type: same as input field
+        * Default alias: ``<field>__min``
+        * Return type: same as input field
 
 StdDev
 ~~~~~~
 
 .. class:: StdDev(field, sample=False)
 
-Returns the standard deviation of the data in the provided field.
+    Returns the standard deviation of the data in the provided field.
 
-    * Default alias: ``<field>__stddev``
-    * Return type: float
+        * Default alias: ``<field>__stddev``
+        * Return type: float
 
-Has one optional argument:
+    Has one optional argument:
 
-.. attribute:: sample
+    .. attribute:: sample
 
-    By default, ``StdDev`` returns the population standard deviation. However,
-    if ``sample=True``, the return value will be the sample standard deviation.
+        By default, ``StdDev`` returns the population standard deviation. However,
+        if ``sample=True``, the return value will be the sample standard deviation.
 
-.. admonition:: SQLite
+    .. admonition:: SQLite
 
-    SQLite doesn't provide ``StdDev`` out of the box. An implementation is
-    available as an extension module for SQLite. Consult the SQlite
-    documentation for instructions on obtaining and installing this extension.
+        SQLite doesn't provide ``StdDev`` out of the box. An implementation is
+        available as an extension module for SQLite. Consult the SQlite
+        documentation for instructions on obtaining and installing this extension.
 
 Sum
 ~~~
 
 .. class:: Sum(field)
 
-Computes the sum of all values of the given field.
+    Computes the sum of all values of the given field.
 
-    * Default alias: ``<field>__sum``
-    * Return type: same as input field
+        * Default alias: ``<field>__sum``
+        * Return type: same as input field
 
 Variance
 ~~~~~~~~
 
 .. class:: Variance(field, sample=False)
 
-Returns the variance of the data in the provided field.
+    Returns the variance of the data in the provided field.
 
-    * Default alias: ``<field>__variance``
-    * Return type: float
+        * Default alias: ``<field>__variance``
+        * Return type: float
 
-Has one optional argument:
+    Has one optional argument:
 
-.. attribute:: sample
+    .. attribute:: sample
 
-    By default, ``Variance`` returns the population variance. However,
-    if ``sample=True``, the return value will be the sample variance.
+        By default, ``Variance`` returns the population variance. However,
+        if ``sample=True``, the return value will be the sample variance.
 
-.. admonition:: SQLite
+    .. admonition:: SQLite
 
-    SQLite doesn't provide ``Variance`` out of the box. An implementation is
-    available as an extension module for SQLite. Consult the SQlite
-    documentation for instructions on obtaining and installing this extension.
+        SQLite doesn't provide ``Variance`` out of the box. An implementation is
+        available as an extension module for SQLite. Consult the SQlite
+        documentation for instructions on obtaining and installing this extension.

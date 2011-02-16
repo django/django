@@ -160,6 +160,8 @@ commonly used groups of widgets:
     Takes two optional arguments, ``date_format`` and ``time_format``, which
     work just like the ``format`` argument for ``DateInput`` and ``TimeInput``.
 
+.. currentmodule:: django.forms.extras.widgets
+
 .. class:: SelectDateWidget
 
     Wrapper around three select widgets: one each for month, day, and year.
@@ -180,6 +182,7 @@ commonly used groups of widgets:
 
 Specifying widgets
 ------------------
+.. currentmodule:: django.forms
 
 .. attribute:: Form.widget
 

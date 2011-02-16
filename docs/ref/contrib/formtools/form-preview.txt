@@ -2,7 +2,7 @@
 Form preview
 ============
 
-.. module:: django.contrib.formtools
+.. module:: django.contrib.formtools.preview
     :synopsis: Displays an HTML form, forces a preview, then does something
                with the submission.
 
@@ -26,7 +26,7 @@ application takes care of the following workflow:
       b. If it's not valid, redisplays the form with error messages.
    3. When the "confirmation" form is submitted from the preview page, calls
       a hook that you define -- a
-      :meth:`~django.contrib.formtools.FormPreview.done()` method that gets
+      :meth:`~django.contrib.formtools.preview.FormPreview.done()` method that gets
       passed the valid data.
 
 The framework enforces the required preview by passing a shared-secret hash to
@@ -50,8 +50,8 @@ How to use ``FormPreview``
               :file:`django/contrib/formtools/templates` directory, and add that
               directory to your :setting:`TEMPLATE_DIRS` setting.
 
-    2. Create a :class:`~django.contrib.formtools.FormPreview` subclass that
-       overrides the :meth:`~django.contrib.formtools.FormPreview.done()`
+    2. Create a :class:`~django.contrib.formtools.preview.FormPreview` subclass that
+       overrides the :meth:`~django.contrib.formtools.preview.FormPreview.done()`
        method::
 
            from django.contrib.formtools.preview import FormPreview
@@ -70,7 +70,7 @@ How to use ``FormPreview``
        is the end result of the form being submitted.
 
     3. Change your URLconf to point to an instance of your
-       :class:`~django.contrib.formtools.FormPreview` subclass::
+       :class:`~django.contrib.formtools.preview.FormPreview` subclass::
 
            from myapp.preview import SomeModelFormPreview
            from myapp.forms import SomeModelForm
@@ -89,11 +89,11 @@ How to use ``FormPreview``
 
 .. class:: FormPreview
 
-A :class:`~django.contrib.formtools.FormPreview` class is a simple Python class
+A :class:`~django.contrib.formtools.preview.FormPreview` class is a simple Python class
 that represents the preview workflow.
-:class:`~django.contrib.formtools.FormPreview` classes must subclass
+:class:`~django.contrib.formtools.preview.FormPreview` classes must subclass
 ``django.contrib.formtools.preview.FormPreview`` and override the
-:meth:`~django.contrib.formtools.FormPreview.done()` method. They can live
+:meth:`~django.contrib.formtools.preview.FormPreview.done()` method. They can live
 anywhere in your codebase.
 
 ``FormPreview`` templates
@@ -102,8 +102,8 @@ anywhere in your codebase.
 By default, the form is rendered via the template :file:`formtools/form.html`,
 and the preview page is rendered via the template :file:`formtools/preview.html`.
 These values can be overridden for a particular form preview by setting
-:attr:`~django.contrib.formtools.FormPreview.preview_template` and
-:attr:`~django.contrib.formtools.FormPreview.form_template` attributes on the
+:attr:`~django.contrib.formtools.preview.FormPreview.preview_template` and
+:attr:`~django.contrib.formtools.preview.FormPreview.form_template` attributes on the
 FormPreview subclass. See :file:`django/contrib/formtools/templates` for the
 default templates.
 
