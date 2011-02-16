@@ -23,7 +23,7 @@ from models import Article, BarAccount, CustomArticle, EmptyModel, \
     FooAccount, Gallery, ModelWithStringPrimaryKey, \
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast, \
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit, \
-    Category, Plot, FunkyTag
+    Category, Plot, FunkyTag, WorkHour, Employee
 
 try:
     set
@@ -310,6 +310,16 @@ class AdminViewBasicTest(TestCase):
             self.client.get("/test_admin/admin/admin_views/inquisition/?leader__name=Palin&leader__age=27")
         except SuspiciousOperation:
             self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
+
+        e1 = Employee.objects.create(name='Anonymous', gender=1, age=22, alive=True, code='123')
+        e2 = Employee.objects.create(name='Visitor', gender=2, age=19, alive=True, code='124')
+        WorkHour.objects.create(datum=datetime.datetime.now(), employee=e1)
+        WorkHour.objects.create(datum=datetime.datetime.now(), employee=e2)
+        response = self.client.get("/test_admin/admin/admin_views/workhour/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'employee__person_ptr__exact')
+        response = self.client.get("/test_admin/admin/admin_views/workhour/?employee__person_ptr__exact=%d" % e1.pk)
+        self.assertEqual(response.status_code, 200)
 
 class SaveAsTests(TestCase):
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
