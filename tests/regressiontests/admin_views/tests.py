@@ -48,7 +48,7 @@ class AdminViewBasicTest(TestCase):
     urlbit = 'admin'
 
     def setUp(self):
-        self.old_USE_I18N = settings.LANGUAGE_CODE
+        self.old_USE_I18N = settings.USE_I18N
         self.old_USE_L10N = settings.USE_L10N
         self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
         self.client.login(username='super', password='secret')
