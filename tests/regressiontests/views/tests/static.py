@@ -95,7 +95,7 @@ class StaticHelperTest(StaticTests):
     def setUp(self):
         super(StaticHelperTest, self).setUp()
         self.prefix = 'media'
-        self._old_views_urlpatterns = urls.urlpatterns
+        self._old_views_urlpatterns = urls.urlpatterns[:]
         urls.urlpatterns += static('/media/', document_root=media_dir)
 
     def tearDown(self):
