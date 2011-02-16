@@ -4,6 +4,7 @@ import warnings
 import django
 from django.conf import settings
 from django.test.utils import get_warnings_state, restore_warnings_state
+from django.utils.translation import _trans
 from django.utils.unittest import TestCase
 
 
@@ -26,7 +27,7 @@ class DeprecationWarningTests(TestCase):
         warnings.filterwarnings('error',
                 "Translations in the project directory aren't supported anymore\. Use the LOCALE_PATHS setting instead\.",
                 PendingDeprecationWarning)
-        reload(django.utils.translation)
+        _trans.__dict__ = {}
         self.assertRaises(PendingDeprecationWarning, django.utils.translation.ugettext, 'Time')
 
     def test_no_warn_if_project_and_locale_paths_overlap(self):
@@ -36,7 +37,7 @@ class DeprecationWarningTests(TestCase):
         warnings.filterwarnings('error',
                 "Translations in the project directory aren't supported anymore\. Use the LOCALE_PATHS setting instead\.",
                 PendingDeprecationWarning)
-        reload(django.utils.translation)
+        _trans.__dict__ = {}
         try:
             django.utils.translation.ugettext('Time')
         except PendingDeprecationWarning:
