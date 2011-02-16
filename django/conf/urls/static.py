@@ -22,5 +22,5 @@ def static(prefix, view='django.views.static.serve', **kwargs):
     elif '://' in prefix:
         raise ImproperlyConfigured("URL '%s' not allowed as static prefix" % prefix)
     return patterns('',
-        url(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), view, **kwargs),
+        url(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), view, kwargs=kwargs),
     )
