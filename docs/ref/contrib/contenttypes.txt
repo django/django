@@ -251,13 +251,8 @@ model:
 
         2. Give your model a field that can store primary key values from the
            models you'll be relating to. For most models, this means a
-           :class:`~django.db.models.PositiveIntegerField`.
-           
-           This field must be of the same type as the primary key of the models
-           that will be involved in the generic relation. For example, if you use
-           :class:`~django.db.models.fields.IntegerField`, you won't be able to
-           form a generic relation with a model that uses a
-           :class:`~django.db.models.fields.CharField` as a primary key.
+           :class:`~django.db.models.PositiveIntegerField`. The usual name
+           for this field is "object_id".
 
         3. Give your model a
            :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, and
@@ -266,6 +261,29 @@ model:
            are the default field names
            :class:`~django.contrib.contenttypes.generic.GenericForeignKey` will
            look for.
+
+.. admonition:: Primary key type compatibility
+
+   The "object_id" field doesn't have to be the same type as the
+   primary key fields on the related models, but their primary key values
+   must be coercible to the same type as the "object_id" field by its
+   :meth:`~django.db.models.Field.get_db_prep_value` method.
+
+   For example, if you want to allow generic relations to models with either
+   :class:`~django.db.models.IntegerField` or
+   :class:`~django.db.models.CharField` primary key fields, you
+   can use :class:`~django.db.models.CharField` for the
+   "object_id" field on your model since integers can be coerced to
+   strings by :meth:`~django.db.models.Field.get_db_prep_value`.
+
+   For maximum flexibility you can use a
+   :class:`~django.db.models.TextField` which doesn't have a
+   maximum length defined, however this may incur significant performance
+   penalties depending on your database backend.
+
+   There is no one-size-fits-all solution for which field type is best. You
+   should evaluate the models you expect to be pointing to and determine
+   which solution will be most effective for your use case.
 
 This will enable an API similar to the one used for a normal
 :class:`~django.db.models.ForeignKey`;
