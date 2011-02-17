@@ -50,7 +50,7 @@ More details about how the caching works:
 
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age, has_vary_header
+from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age
 
 
 class UpdateCacheMiddleware(object):
@@ -67,10 +67,19 @@ class UpdateCacheMiddleware(object):
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
 
+    def _session_accessed(self, request):
+        try:
+            return request.session.accessed
+        except AttributeError:
+            return False
+
     def _should_update_cache(self, request, response):
         if not hasattr(request, '_cache_update_cache') or not request._cache_update_cache:
             return False
-        if self.cache_anonymous_only and has_vary_header(response, 'Cookie'):
+        # If the session has not been accessed otherwise, we don't want to
+        # cause it to be accessed here. If it hasn't been accessed, then the
+        # user's logged-in status has not affected the response anyway.
+        if self.cache_anonymous_only and self._session_accessed(request):
             assert hasattr(request, 'user'), "The Django cache middleware with CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True requires authentication middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.auth.middleware.AuthenticationMiddleware' before the CacheMiddleware."
             if request.user.is_authenticated():
                 # Don't cache user-variable requests from authenticated users.

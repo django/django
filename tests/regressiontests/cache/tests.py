@@ -19,6 +19,7 @@ from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import translation
 from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
 from django.utils.hashcompat import md5_constructor
+from django.views.decorators.cache import cache_page
 from regressiontests.cache.models import Poll, expensive_calculation
 
 # functions/classes for complex data type tests
@@ -653,15 +654,18 @@ def hello_world_view(request, value):
 class CacheMiddlewareTest(unittest.TestCase):
 
     def setUp(self):
-        self.orig_cache_middleware_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
-        self._orig_cache_backend = settings.CACHE_BACKEND
+        from django.middleware import cache as cache_middleware_module
 
+        self.cache_middleware_module = cache_middleware_module
+        self.orig_cache = self.cache_middleware_module.cache
+        self.orig_cache_middleware_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
+
+        cache_middleware_module.cache = get_cache("locmem://")
         settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
-        settings.CACHE_BACKEND = "locmem://"
 
     def tearDown(self):
+        self.cache_middleware_module.cache = self.orig_cache
         settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = self.orig_cache_middleware_anonymous_only
-        settings.CACHE_BACKEND = self._orig_cache_backend
 
     def test_cache_middleware_anonymous_only_wont_cause_session_access(self):
         """ The cache middleware shouldn't cause a session access due to
@@ -693,6 +697,30 @@ class CacheMiddlewareTest(unittest.TestCase):
         response = middleware.process_response(request, response)
 
         self.assertEqual(request.session.accessed, False)
+
+    def test_cache_middleware_anonymous_only_with_cache_page(self):
+        """CACHE_MIDDLEWARE_ANONYMOUS_ONLY should still be effective when used
+        with the cache_page decorator: the response to a request from an
+        authenticated user should not be cached."""
+        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
+
+        request = HttpRequest()
+        request.path = '/view/'
+        request.method = 'GET'
+
+        class MockAuthenticatedUser(object):
+            def is_authenticated(self):
+                return True
+
+        class MockAccessedSession(object):
+            accessed = True
+
+        request.user = MockAuthenticatedUser()
+        request.session = MockAccessedSession()
+
+        response = cache_page(hello_world_view)(request, '1')
+
+        self.assertFalse("Cache-Control" in response)
 
 
 if __name__ == '__main__':
