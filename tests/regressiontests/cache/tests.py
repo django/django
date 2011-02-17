@@ -1256,6 +1256,28 @@ class CacheMiddlewareTest(unittest.TestCase):
 
         self.assertEqual(request.session.accessed, False)
 
+    def test_cache_middleware_anonymous_only_with_cache_page(self):
+        """CACHE_MIDDLEWARE_ANONYMOUS_ONLY should still be effective when used
+        with the cache_page decorator: the response to a request from an
+        authenticated user should not be cached."""
+        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
+
+        request = self.factory.get('/view_anon/')
+
+        class MockAuthenticatedUser(object):
+            def is_authenticated(self):
+                return True
+
+        class MockAccessedSession(object):
+            accessed = True
+
+        request.user = MockAuthenticatedUser()
+        request.session = MockAccessedSession()
+
+        response = cache_page(hello_world_view)(request, '1')
+
+        self.assertFalse("Cache-Control" in response)
+
     def test_view_decorator(self):
         # decorate the same view with different cache decorators
         default_view = cache_page(hello_world_view)
