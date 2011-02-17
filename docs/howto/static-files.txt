@@ -267,7 +267,7 @@ for user-uploaded files, but you can have Django serve your
 
     if settings.DEBUG:
         urlpatterns += patterns('',
-            url(r'^media/(?P<path>.*)$', 'django.views.static', {
+            url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
                 'document_root': settings.MEDIA_ROOT,
             }),
        )
