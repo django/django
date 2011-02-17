@@ -14,13 +14,14 @@ from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
 from django.core.cache.backends.base import CacheKeyWarning
 from django.http import HttpResponse, HttpRequest
 from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware, CacheMiddleware
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import translation
 from django.utils import unittest
 from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
 from django.utils.hashcompat import md5_constructor
 from django.views.decorators.cache import cache_page
+
 from regressiontests.cache.models import Poll, expensive_calculation
 
 # functions/classes for complex data type tests
@@ -1127,9 +1128,15 @@ class PrefixedCacheI18nTest(CacheI18nTest):
         else:
             settings.CACHES['default']['KEY_PREFIX'] = self.old_cache_key_prefix
 
+
+def hello_world_view(request, value):
+    return HttpResponse('Hello World %s' % value)
+
 class CacheMiddlewareTest(unittest.TestCase):
 
     def setUp(self):
+        self.factory = RequestFactory()
+
         self.orig_cache_middleware_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.orig_cache_middleware_key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.orig_cache_middleware_seconds = settings.CACHE_MIDDLEWARE_SECONDS
@@ -1191,22 +1198,17 @@ class CacheMiddlewareTest(unittest.TestCase):
         self.assertEquals(as_view_decorator_with_custom.cache_anonymous_only, True)
 
     def test_middleware(self):
-        def view(request, value):
-            return HttpResponse('Hello World %s' % value)
-
-        factory = RequestFactory()
-
         middleware = CacheMiddleware()
         prefix_middleware = CacheMiddleware(key_prefix='prefix1')
         timeout_middleware = CacheMiddleware(cache_timeout=1)
 
-        request = factory.get('/view/')
+        request = self.factory.get('/view/')
 
         # Put the request through the request middleware
         result = middleware.process_request(request)
         self.assertEquals(result, None)
 
-        response = view(request, '1')
+        response = hello_world_view(request, '1')
 
         # Now put the response through the response middleware
         response = middleware.process_response(request, response)
@@ -1225,23 +1227,48 @@ class CacheMiddlewareTest(unittest.TestCase):
         self.assertNotEquals(result, None)
         self.assertEquals(result.content, 'Hello World 1')
 
+    def test_cache_middleware_anonymous_only_wont_cause_session_access(self):
+        """ The cache middleware shouldn't cause a session access due to
+        CACHE_MIDDLEWARE_ANONYMOUS_ONLY if nothing else has accessed the
+        session. Refs 13283 """
+        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
+
+        from django.contrib.sessions.middleware import SessionMiddleware
+        from django.contrib.auth.middleware import AuthenticationMiddleware
+
+        middleware = CacheMiddleware()
+        session_middleware = SessionMiddleware()
+        auth_middleware = AuthenticationMiddleware()
+
+        request = self.factory.get('/view_anon/')
+
+        # Put the request through the request middleware
+        session_middleware.process_request(request)
+        auth_middleware.process_request(request)
+        result = middleware.process_request(request)
+        self.assertEquals(result, None)
+
+        response = hello_world_view(request, '1')
+
+        # Now put the response through the response middleware
+        session_middleware.process_response(request, response)
+        response = middleware.process_response(request, response)
+
+        self.assertEqual(request.session.accessed, False)
+
     def test_view_decorator(self):
-        def view(request, value):
-            return HttpResponse('Hello World %s' % value)
-
         # decorate the same view with different cache decorators
-        default_view = cache_page(view)
-        default_with_prefix_view = cache_page(key_prefix='prefix1')(view)
+        default_view = cache_page(hello_world_view)
+        default_with_prefix_view = cache_page(key_prefix='prefix1')(hello_world_view)
 
-        explicit_default_view = cache_page(cache='default')(view)
-        explicit_default_with_prefix_view = cache_page(cache='default', key_prefix='prefix1')(view)
+        explicit_default_view = cache_page(cache='default')(hello_world_view)
+        explicit_default_with_prefix_view = cache_page(cache='default', key_prefix='prefix1')(hello_world_view)
 
-        other_view = cache_page(cache='other')(view)
-        other_with_prefix_view = cache_page(cache='other', key_prefix='prefix2')(view)
-        other_with_timeout_view = cache_page(4, cache='other', key_prefix='prefix3')(view)
+        other_view = cache_page(cache='other')(hello_world_view)
+        other_with_prefix_view = cache_page(cache='other', key_prefix='prefix2')(hello_world_view)
+        other_with_timeout_view = cache_page(4, cache='other', key_prefix='prefix3')(hello_world_view)
 
-        factory = RequestFactory()
-        request = factory.get('/view/')
+        request = self.factory.get('/view/')
 
         # Request the view once
         response = default_view(request, '1')
@@ -1321,27 +1348,6 @@ class CacheMiddlewareTest(unittest.TestCase):
         # the custom timeouot cache will miss
         response = other_with_timeout_view(request, '18')
         self.assertEquals(response.content, 'Hello World 18')
-
-class CacheMiddlewareAnonymousOnlyTests(TestCase):
-    urls = 'regressiontests.cache.urls'
-
-    def setUp(self):
-        self._orig_cache_middleware_anonymous_only = \
-            getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
-        self._orig_middleware_classes = settings.MIDDLEWARE_CLASSES
-
-        settings.MIDDLEWARE_CLASSES = list(settings.MIDDLEWARE_CLASSES)
-        settings.MIDDLEWARE_CLASSES.insert(0, 'django.middleware.cache.UpdateCacheMiddleware')
-        settings.MIDDLEWARE_CLASSES += ['django.middleware.cache.FetchFromCacheMiddleware']
-
-    def tearDown(self):
-        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = self._orig_cache_middleware_anonymous_only
-        settings.MIDDLEWARE_CLASSES = self._orig_middleware_classes
-
-    def test_cache_middleware_anonymous_only_does_not_cause_vary_cookie(self):
-        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
-        response = self.client.get('/')
-        self.failIf('Cookie' in response.get('Vary', ''))
 
 if __name__ == '__main__':
     unittest.main()
