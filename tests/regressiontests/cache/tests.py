@@ -14,8 +14,7 @@ from django.core import management
 from django.core.cache import get_cache
 from django.core.cache.backends.base import CacheKeyWarning
 from django.http import HttpResponse, HttpRequest
-from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware
-from django.test import TestCase
+from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware, CacheMiddleware
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import translation
 from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
@@ -648,27 +647,52 @@ class CacheI18nTest(unittest.TestCase):
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertEqual(get_cache_data.content, es_message)
 
+def hello_world_view(request, value):
+    return HttpResponse('Hello World %s' % value)
 
-class CacheMiddlewareAnonymousOnlyTests(TestCase):
-    urls = 'regressiontests.cache.urls'
+class CacheMiddlewareTest(unittest.TestCase):
 
     def setUp(self):
-        self._orig_cache_middleware_anonymous_only = \
-            getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
-        self._orig_middleware_classes = settings.MIDDLEWARE_CLASSES
+        self.orig_cache_middleware_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
+        self._orig_cache_backend = settings.CACHE_BACKEND
 
-        settings.MIDDLEWARE_CLASSES = list(settings.MIDDLEWARE_CLASSES)
-        settings.MIDDLEWARE_CLASSES.insert(0, 'django.middleware.cache.UpdateCacheMiddleware')
-        settings.MIDDLEWARE_CLASSES += ['django.middleware.cache.FetchFromCacheMiddleware']
+        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = False
+        settings.CACHE_BACKEND = "locmem://"
 
     def tearDown(self):
-        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = self._orig_cache_middleware_anonymous_only
-        settings.MIDDLEWARE_CLASSES = self._orig_middleware_classes
+        settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = self.orig_cache_middleware_anonymous_only
+        settings.CACHE_BACKEND = self._orig_cache_backend
 
-    def test_cache_middleware_anonymous_only_does_not_cause_vary_cookie(self):
+    def test_cache_middleware_anonymous_only_wont_cause_session_access(self):
+        """ The cache middleware shouldn't cause a session access due to
+        CACHE_MIDDLEWARE_ANONYMOUS_ONLY if nothing else has accessed the
+        session. Refs 13283 """
         settings.CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
-        response = self.client.get('/')
-        self.failIf('Cookie' in response.get('Vary', ''))
+
+        from django.contrib.sessions.middleware import SessionMiddleware
+        from django.contrib.auth.middleware import AuthenticationMiddleware
+
+        middleware = CacheMiddleware()
+        session_middleware = SessionMiddleware()
+        auth_middleware = AuthenticationMiddleware()
+
+        request = HttpRequest()
+        request.path = '/view_anon/'
+        request.method = 'GET'
+
+        # Put the request through the request middleware
+        session_middleware.process_request(request)
+        auth_middleware.process_request(request)
+        result = middleware.process_request(request)
+        self.assertEquals(result, None)
+
+        response = hello_world_view(request, '1')
+
+        # Now put the response through the response middleware
+        session_middleware.process_response(request, response)
+        response = middleware.process_response(request, response)
+
+        self.assertEqual(request.session.accessed, False)
 
 
 if __name__ == '__main__':
