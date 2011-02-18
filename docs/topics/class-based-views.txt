@@ -605,8 +605,15 @@ that it can be used on an instance method. For example::
         template_name = 'secret.html'
 
         @method_decorator(login_required)
-        def dispatch(self, **kwargs):
+        def dispatch(self, *args, **kwargs):
             return super(ProtectedView, self).dispatch(**kwargs)
 
-In this example, every instance of :class:`ProtectedView` will have
+In this example, every instance of ``ProtectedView`` will have
 login protection.
+
+.. note::
+
+    ``method_decorator`` passes ``*args`` and ``**kwargs``
+    as parameters to the decorated method on the class. If your method
+    does not accept a compatible set of parameters it will raise a
+    ``TypeError`` exception.
