@@ -6,6 +6,8 @@ The "sites" framework
    :synopsis: Lets you operate multiple Web sites from the same database and
               Django project
 
+.. currentmodule:: django.contrib.sites.models
+
 Django comes with an optional "sites" framework. It's a hook for associating
 objects and functionality to particular Web sites, and it's a holding place for
 the domain names and "verbose" names of your Django-powered sites.
@@ -15,13 +17,21 @@ need to differentiate between those sites in some way.
 
 The whole sites framework is based on a simple model:
 
-.. class:: django.contrib.sites.models.Site
+.. class:: Site
 
-This model has :attr:`~django.contrib.sites.models.Site.domain` and
-:attr:`~django.contrib.sites.models.Site.name` fields. The :setting:`SITE_ID`
-setting specifies the database ID of the
-:class:`~django.contrib.sites.models.Site` object associated with that
-particular settings file.
+    A model for storing the ``domain`` and ``name`` attributes of a Web site.
+    The :setting:`SITE_ID` setting specifies the database ID of the
+    :class:`~django.contrib.sites.models.Site` object associated with that
+    particular settings file.
+
+    .. attribute:: domain
+
+        The domain name associated with the Web site.
+
+    .. attribute:: name
+
+        A human-readable "verbose" name for the Web site.
+
 
 How you use this is up to you, but Django uses it in a couple of ways
 automatically via simple conventions.
@@ -85,9 +95,10 @@ This accomplishes several things quite nicely:
 Associating content with a single site
 --------------------------------------
 
-Similarly, you can associate a model to the :class:`~django.contrib.sites.models.Site`
+Similarly, you can associate a model to the
+:class:`~django.contrib.sites.models.Site`
 model in a many-to-one relationship, using
-:class:`~django.db.models.fields.related.ForeignKey`.
+:class:`~django.db.models.ForeignKey`.
 
 For example, if an article is only allowed on a single site, you'd use a model
 like this::
@@ -157,6 +168,15 @@ takes a request object as an argument and returns either a Site instance (if
 the sites framework is installed) or a RequestSite instance (if it is not).
 This allows loose coupling with the sites framework and provides a usable
 fallback for cases where it is not installed.
+
+.. versionadded:: 1.3
+
+.. function:: get_current_site(request)
+
+    Checks if contrib.sites is installed and returns either the current
+    :class:`~django.contrib.sites.models.Site` object or a 
+    :class:`~django.contrib.sites.models.RequestSite` object based on
+    the request.
 
 Getting the current domain for display
 --------------------------------------
@@ -260,10 +280,12 @@ clear the cache using ``Site.objects.clear_cache()``::
     Site.objects.clear_cache()
     current_site = Site.objects.get_current()
 
+.. currentmodule:: django.contrib.sites.managers
+
 The ``CurrentSiteManager``
 ==========================
 
-.. class:: django.contrib.sites.managers.CurrentSiteManager
+.. class:: CurrentSiteManager
 
 If :class:`~django.contrib.sites.models.Site` plays a key role in your
 application, consider using the helpful
@@ -300,9 +322,9 @@ How did :class:`~django.contrib.sites.managers.CurrentSiteManager`
 know which field of ``Photo`` was the
 :class:`~django.contrib.sites.models.Site`? By default,
 :class:`~django.contrib.sites.managers.CurrentSiteManager` looks for a
-either a :class:`~django.db.models.fields.related.ForeignKey` called
+either a :class:`~django.db.models.ForeignKey` called
 ``site`` or a
-:class:`~django.db.models.fields.related.ManyToManyField` called
+:class:`~django.db.models.ManyToManyField` called
 ``sites`` to filter on. If you use a field named something other than
 ``site`` or ``sites`` to identify which
 :class:`~django.contrib.sites.models.Site` objects your object is
@@ -325,7 +347,7 @@ demonstrates this::
         on_site = CurrentSiteManager('publish_on')
 
 If you attempt to use :class:`~django.contrib.sites.managers.CurrentSiteManager`
-and pass a field name that doesn't exist, Django will raise a :exc:`ValueError`.
+and pass a field name that doesn't exist, Django will raise a ``ValueError``.
 
 Finally, note that you'll probably want to keep a normal
 (non-site-specific) ``Manager`` on your model, even if you use
@@ -379,7 +401,7 @@ Here's how Django uses the sites framework:
   :class:`~django.contrib.sites.models.Site` name to the template as
   ``{{ site_name }}``.
 
-* The shortcut view (:func:`django.views.defaults.shortcut`) uses the domain
+* The shortcut view (``django.views.defaults.shortcut``) uses the domain
   of the current :class:`~django.contrib.sites.models.Site` object when
   calculating an object's URL.
 
@@ -387,6 +409,7 @@ Here's how Django uses the sites framework:
   :class:`~django.contrib.sites.models.Site` to work out the domain for the
   site that it will redirect to.
 
+.. currentmodule:: django.contrib.sites.models
 
 ``RequestSite`` objects
 =======================
@@ -401,13 +424,26 @@ requires.) For those cases, the framework provides a
 :class:`~django.contrib.sites.models.RequestSite` class, which can be used as a
 fallback when the database-backed sites framework is not available.
 
+.. class:: RequestSite
+
+    A class that shares the primary interface of
+    :class:`~django.contrib.sites.models.Site` (i.e., it has
+    ``domain`` and ``name`` attributes) but gets its data from a Django
+    :class:`~django.http.HttpRequest` object rather than from a database.
+
+    The ``save()`` and ``delete()`` methods raise ``NotImplementedError``.
+
+    .. method:: __init__(request)
+
+        Sets the ``name`` and ``domain`` attributes to the value of
+        :meth:`~django.http.HttpRequest.get_host`.
+        
+
 A :class:`~django.contrib.sites.models.RequestSite` object has a similar
 interface to a normal :class:`~django.contrib.sites.models.Site` object, except
 its :meth:`~django.contrib.sites.models.RequestSite.__init__()` method takes an
 :class:`~django.http.HttpRequest` object. It's able to deduce the
-:attr:`~django.contrib.sites.models.RequestSite.domain` and
-:attr:`~django.contrib.sites.models.RequestSite.name` by looking at the
-request's domain. It has :meth:`~django.contrib.sites.models.RequestSite.save()`
-and :meth:`~django.contrib.sites.models.RequestSite.delete()` methods to match
-the interface of :class:`~django.contrib.sites.models.Site`, but the methods
-raise :exc:`NotImplementedError`.
+``domain`` and ``name`` by looking at the request's domain. It has ``save()``
+and ``delete()`` methods to match the interface of
+:class:`~django.contrib.sites.models.Site`, but the methods raise
+``NotImplementedError``.

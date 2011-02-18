@@ -47,6 +47,8 @@ To install the flatpages app, follow these steps:
 
     4. Run the command :djadmin:`manage.py syncdb <syncdb>`.
 
+.. currentmodule:: django.contrib.flatpages.middleware
+
 How it works
 ============
 
@@ -56,25 +58,29 @@ that simply maps a URL to a title and bunch of text content.
 ``django_flatpage_sites`` associates a flatpage with a site.
 
 The :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
-does all of the work. Each time any Django application raises a 404 error, this
-middleware checks the flatpages database for the requested URL as a last resort.
-Specifically, it checks for a flatpage with the given URL with a site ID that
-corresponds to the :setting:`SITE_ID` setting.
+does all of the work.
 
-If it finds a match, it follows this algorithm:
+.. class:: FlatpageFallbackMiddleware
 
-    * If the flatpage has a custom template, it loads that template. Otherwise,
-      it loads the template :file:`flatpages/default.html`.
+    Each time any Django application raises a 404 error, this middleware
+    checks the flatpages database for the requested URL as a last resort.
+    Specifically, it checks for a flatpage with the given URL with a site ID
+    that corresponds to the :setting:`SITE_ID` setting.
 
-    * It passes that template a single context variable, :data:`flatpage`, which
-      is the flatpage object. It uses
-      :class:`~django.template.context.RequestContext` in rendering the
-      template.
+    If it finds a match, it follows this algorithm:
 
-If it doesn't find a match, the request continues to be processed as usual.
+        * If the flatpage has a custom template, it loads that template.
+          Otherwise, it loads the template :file:`flatpages/default.html`.
 
-The middleware only gets activated for 404s -- not for 500s or responses of any
-other status code.
+        * It passes that template a single context variable, ``flatpage``,
+          which is the flatpage object. It uses
+          :class:`~django.template.RequestContext` in rendering the
+          template.
+
+    If it doesn't find a match, the request continues to be processed as usual.
+
+    The middleware only gets activated for 404s -- not for 500s or responses
+    of any other status code.
 
 .. admonition:: Flatpages will not apply view middleware
 
@@ -104,6 +110,8 @@ For more on middleware, read the :doc:`middleware docs
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
     will not attempt to serve a flat page.
 
+.. currentmodule:: django.contrib.flatpages.models
+
 How to add, change and delete flatpages
 =======================================
 
@@ -117,7 +125,7 @@ other object in the system.
 Via the Python API
 ------------------
 
-.. class:: models.FlatPage
+.. class:: FlatPage
 
     Flatpages are represented by a standard
     :doc:`Django model </topics/db/models>`,
@@ -125,6 +133,8 @@ Via the Python API
     flatpage objects via the :doc:`Django database API </topics/db/queries>`.
 
 .. _django/contrib/flatpages/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models.py
+
+.. currentmodule:: django.contrib.flatpages
 
 Flatpage templates
 ==================
@@ -141,7 +151,7 @@ Creating the :file:`flatpages/default.html` template is your responsibility;
 in your template directory, just create a :file:`flatpages` directory
 containing a file :file:`default.html`.
 
-Flatpage templates are passed a single context variable, :data:`flatpage`,
+Flatpage templates are passed a single context variable, ``flatpage``,
 which is the flatpage object.
 
 Here's a sample :file:`flatpages/default.html` template:
@@ -164,7 +174,7 @@ both ``flatpage.title`` and ``flatpage.content`` are marked as **not**
 requiring :ref:`automatic HTML escaping <automatic-html-escaping>` in the
 template.
 
-Getting a list of :class:`~django.contrib.flatpages.models.Flatpage` objects in your templates
+Getting a list of :class:`~django.contrib.flatpages.models.FlatPage` objects in your templates
 ==============================================================================================
 
 .. versionadded:: 1.3
@@ -194,7 +204,7 @@ Displaying ``registration_required`` flatpages
 ----------------------------------------------
 
 By default, the :ttag:`get_flatpages` templatetag will only show
-flatpages that are marked :attr:`registration_required`\=False. If you
+flatpages that are marked ``registration_required = False``. If you
 want to display registration-protected flatpages, you need to specify
 an authenticated user using a``for`` clause.
 
