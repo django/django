@@ -606,7 +606,7 @@ that it can be used on an instance method. For example::
 
         @method_decorator(login_required)
         def dispatch(self, *args, **kwargs):
-            return super(ProtectedView, self).dispatch(**kwargs)
+            return super(ProtectedView, self).dispatch(*args, **kwargs)
 
 In this example, every instance of ``ProtectedView`` will have
 login protection.
