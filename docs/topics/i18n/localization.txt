@@ -334,7 +334,7 @@ may also want to use localization in selected templates, rather than
 using localization everywhere.
 
 To allow for fine control over the use of localization, Django
-provides a the ``l10n`` template library that contains the following
+provides the ``l10n`` template library that contains the following
 tags and filters.
 
 Template tags
