@@ -266,6 +266,13 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     else:
         return label
 
+def help_text_for_field(name, model):
+    try:
+        help_text = model._meta.get_field_by_name(name)[0].help_text
+    except models.FieldDoesNotExist:
+        help_text = ""
+    return smart_unicode(help_text)
+
 
 def display_for_field(value, field):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon

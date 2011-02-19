@@ -523,9 +523,12 @@ class LinkInline(admin.TabularInline):
 
 
 class Post(models.Model):
-    title = models.CharField(max_length=100)
-    content = models.TextField()
-    posted = models.DateField(default=datetime.date.today)
+    title = models.CharField(max_length=100, help_text="Some help text for the title (with unicode ŠĐĆŽćžšđ)")
+    content = models.TextField(help_text="Some help text for the content (with unicode ŠĐĆŽćžšđ)")
+    posted = models.DateField(
+            default=datetime.date.today,
+            help_text="Some help text for the date (with unicode ŠĐĆŽćžšđ)"
+    )
     public = models.NullBooleanField()
 
     def awesomeness_level(self):

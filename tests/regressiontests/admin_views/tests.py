@@ -2453,6 +2453,10 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, '<div class="form-row posted">')
         self.assertContains(response, '<div class="form-row value">')
         self.assertContains(response, '<div class="form-row ">')
+        self.assertContains(response, '<p class="help">', 3)
+        self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
+        self.assertContains(response, '<p class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</p>')
+        self.assertContains(response, '<p class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</p>')
 
         p = Post.objects.create(title="I worked on readonly_fields", content="Its good stuff")
         response = self.client.get('/test_admin/admin/admin_views/post/%d/' % p.pk)
