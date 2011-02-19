@@ -12,11 +12,12 @@ __all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
 # For backwards compatibility - Port any old database settings over to
 # the new values.
 if not settings.DATABASES:
-    import warnings
-    warnings.warn(
-        "settings.DATABASE_* is deprecated; use settings.DATABASES instead.",
-        DeprecationWarning
-    )
+    if settings.DATABASE_ENGINE:
+        import warnings
+        warnings.warn(
+            "settings.DATABASE_* is deprecated; use settings.DATABASES instead.",
+            DeprecationWarning
+        )
 
     settings.DATABASES[DEFAULT_DB_ALIAS] = {
         'ENGINE': settings.DATABASE_ENGINE,
