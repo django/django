@@ -121,7 +121,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             settings_dict['PORT'],
             settings_dict['ENGINE'],
             settings_dict['NAME'],
-            settings_dict['TEST_USER'],
+            self._test_database_user(),
         )
 
     def _destroy_test_db(self, test_database_name, verbosity=1):
