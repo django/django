@@ -28,7 +28,10 @@ class BaseMemcachedCache(BaseCache):
         """
         Implements transparent thread-safe access to a memcached client.
         """
-        return self._lib.Client(self._servers)
+        if getattr(self, '_client', None) is None:
+            self._client = self._lib.Client(self._servers)
+
+        return self._client
 
     def _get_memcache_timeout(self, timeout):
         """
