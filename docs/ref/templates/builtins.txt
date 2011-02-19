@@ -895,7 +895,7 @@ See also: ``{% include %}``.
 
     In Django 1.5, the unquoted constant behavior will be replaced
     with the behavior provided by the ``future`` tag library.
-    Existing templates be migrated to use the new syntax.
+    Existing templates should be migrated to use the new syntax.
 
 .. templatetag:: templatetag
 
