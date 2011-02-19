@@ -31,7 +31,7 @@ from models import (Article, BarAccount, CustomArticle, EmptyModel,
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast,
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit,
     Category, Post, Plot, FunkyTag, WorkHour, Employee, Inquisition,
-    Actor, FoodDelivery)
+    Actor, FoodDelivery, RowLevelChangePermissionModel)
 
 
 class AdminViewBasicTest(TestCase):
@@ -706,6 +706,42 @@ class AdminViewPermissionsTest(TestCase):
         self.assertTrue('Please correct the errors below.' in post.content,
                         'Plural error message not found in response to post with multiple errors.')
         self.client.get('/test_admin/admin/logout/')
+
+        # Test redirection when using row-level change permissions. Refs #11513.
+        RowLevelChangePermissionModel.objects.create(name="odd id")
+        RowLevelChangePermissionModel.objects.create(name="even id")
+        for login_dict in [self.super_login, self.changeuser_login, self.adduser_login, self.deleteuser_login]:
+            self.client.get('/test_admin/admin/')
+            self.client.post('/test_admin/admin/', login_dict)
+            request = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/1/')
+            self.assertEqual(request.status_code, 403)
+            request = self.client.post('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/1/', {'name': 'changed'})
+            self.assertEquals(RowLevelChangePermissionModel.objects.get(id=1).name, 'odd id')
+            self.assertEqual(request.status_code, 403)
+            request = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/')
+            self.assertEqual(request.status_code, 200)
+            request = self.client.post('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/', {'name': 'changed'})
+            self.assertEquals(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
+            self.assertRedirects(request, '/test_admin/admin/')
+            self.client.get('/test_admin/admin/logout/')
+        for login_dict in [self.joepublic_login, self.no_username_login]:
+            self.client.get('/test_admin/admin/')
+            self.client.post('/test_admin/admin/', login_dict)
+            request = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/1/')
+            self.assertEqual(request.status_code, 200)
+            self.assertContains(request, 'login-form')
+            request = self.client.post('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/1/', {'name': 'changed'})
+            self.assertEquals(RowLevelChangePermissionModel.objects.get(id=1).name, 'odd id')
+            self.assertEqual(request.status_code, 200)
+            self.assertContains(request, 'login-form')
+            request = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/')
+            self.assertEqual(request.status_code, 200)
+            self.assertContains(request, 'login-form')
+            request = self.client.post('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/', {'name': 'changed again'})
+            self.assertEquals(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
+            self.assertEqual(request.status_code, 200)
+            self.assertContains(request, 'login-form')
+            self.client.get('/test_admin/admin/logout/')
 
     def testCustomModelAdminTemplates(self):
         self.client.get('/test_admin/admin/')
