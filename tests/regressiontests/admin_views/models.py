@@ -133,6 +133,13 @@ class ArticleAdmin(admin.ModelAdmin):
         ).send()
         return super(ArticleAdmin, self).save_model(request, obj, form, change)
 
+class RowLevelChangePermissionModel(models.Model):
+    name = models.CharField(max_length=100, blank=True)
+
+class RowLevelChangePermissionModelAdmin(admin.ModelAdmin):
+    def has_change_permission(self, request, obj=None):
+        """ Only allow changing objects with even id number """
+        return request.user.is_staff and (obj is not None) and (obj.id % 2 == 0)
 
 class CustomArticle(models.Model):
     content = models.TextField()
@@ -735,6 +742,7 @@ admin.site.register(CyclicTwo)
 admin.site.register(WorkHour, WorkHourAdmin)
 admin.site.register(Reservation)
 admin.site.register(FoodDelivery, FoodDeliveryAdmin)
+admin.site.register(RowLevelChangePermissionModel, RowLevelChangePermissionModelAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

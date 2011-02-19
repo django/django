@@ -766,7 +766,13 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect("../add/")
         else:
             self.message_user(request, msg)
-            return HttpResponseRedirect("../")
+            # Figure out where to redirect. If the user has change permission,
+            # redirect to the change-list page for this object. Otherwise,
+            # redirect to the admin index.
+            if self.has_change_permission(request, None):
+                return HttpResponseRedirect('../')
+            else:
+                return HttpResponseRedirect('../../../')
 
     def response_action(self, request, queryset):
         """
