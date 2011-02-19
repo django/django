@@ -404,8 +404,10 @@ infrastructure available to Django applications described in the
 :doc:`i18n documentation</topics/i18n/index>`.
 
 These translations are contributed by Django users worldwide. If you find an
-incorrect translation, or if you'd like to add a language that isn't yet
-translated, here's what to do:
+incorrect translation or want to discuss specific translations, go to the
+`translation team`_ page for that language. If you would like to help out
+with translating or add a language that isn't yet translated, here's what
+to do:
 
     * Join the `Django i18n mailing list`_ and introduce yourself.
 
@@ -449,6 +451,7 @@ translated, here's what to do:
 .. _Transifex: http://www.transifex.net/
 .. _Django project page: http://www.transifex.net/projects/p/django/
 .. _translation teams: http://www.transifex.net/projects/p/django/teams/
+.. _translation team: http://www.transifex.net/projects/p/django/teams/
 .. _Transifex Help: http://help.transifex.net/
 
 Submitting javascript patches
