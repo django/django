@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.admin.util import flatten_fieldsets, lookup_field
-from django.contrib.admin.util import display_for_field, label_for_field
+from django.contrib.admin.util import display_for_field, label_for_field, help_text_for_field
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import FieldDoesNotExist
@@ -145,6 +145,7 @@ class AdminReadonlyField(object):
             'name': class_name,
             'label': label,
             'field': field,
+            'help_text': help_text_for_field(class_name, form._meta.model)
         }
         self.form = form
         self.model_admin = model_admin
