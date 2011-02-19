@@ -223,11 +223,49 @@ class ChangeListTests(TransactionTestCase):
         # There's only one ChordsBand instance
         self.assertEqual(cl.result_count, 1)
 
+    def test_pagination(self):
+        """
+        Regression tests for #12893: Pagination in admins changelist doesn't
+        use queryset set by modeladmin.
+        """
+        parent = Parent.objects.create(name='anything')
+        for i in range(30):
+            Child.objects.create(name='name %s' % i, parent=parent)
+            Child.objects.create(name='filtered %s' % i, parent=parent)
+
+        request = MockRequest()
+
+        # Test default queryset
+        m = ChildAdmin(Child, admin.site)
+        cl = ChangeList(request, Child, m.list_display, m.list_display_links,
+                m.list_filter, m.date_hierarchy, m.search_fields,
+                m.list_select_related, m.list_per_page, m.list_editable, m)
+        self.assertEqual(cl.query_set.count(), 60)
+        self.assertEqual(cl.paginator.count, 60)
+        self.assertEqual(cl.paginator.page_range, [1, 2, 3, 4, 5, 6])
+
+        # Test custom queryset
+        m = FilteredChildAdmin(Child, admin.site)
+        cl = ChangeList(request, Child, m.list_display, m.list_display_links,
+                m.list_filter, m.date_hierarchy, m.search_fields,
+                m.list_select_related, m.list_per_page, m.list_editable, m)
+        self.assertEqual(cl.query_set.count(), 30)
+        self.assertEqual(cl.paginator.count, 30)
+        self.assertEqual(cl.paginator.page_range, [1, 2, 3])
+
 
 class ChildAdmin(admin.ModelAdmin):
     list_display = ['name', 'parent']
+    list_per_page = 10
     def queryset(self, request):
         return super(ChildAdmin, self).queryset(request).select_related("parent__name")
+
+class FilteredChildAdmin(admin.ModelAdmin):
+    list_display = ['name', 'parent']
+    list_per_page = 10
+    def queryset(self, request):
+        return super(FilteredChildAdmin, self).queryset(request).filter(
+            name__contains='filtered')
 
 class MockRequest(object):
     GET = {}
