@@ -67,7 +67,10 @@
 #changelist table tbody td:first-child, #changelist table tbody th:first-child {
     border-left: 0;
     border-right: 1px solid #ddd;
-    text-align: center;
+}
+
+#changelist table tbody td.action-checkbox {
+    text-align:center;
 }
 
 #changelist table tfoot {
