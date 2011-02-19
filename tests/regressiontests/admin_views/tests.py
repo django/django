@@ -35,7 +35,7 @@ from models import (Article, BarAccount, CustomArticle, EmptyModel,
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast,
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit,
     Category, Post, Plot, FunkyTag, Chapter, Book, Promo, WorkHour, Employee,
-    Question, Answer, Inquisition, Actor)
+    Question, Answer, Inquisition, Actor, FoodDelivery)
 
 
 class AdminViewBasicTest(TestCase):
@@ -1419,6 +1419,67 @@ class AdminViewListEditable(TestCase):
         self.client.post('/test_admin/admin/admin_views/person/?q=mauchly', data)
 
         self.assertEqual(Person.objects.get(name="John Mauchly").alive, False)
+
+    def test_non_field_errors(self):
+        ''' Ensure that non field errors are displayed for each of the
+            forms in the changelist's formset. Refs #13126.
+        '''
+        FoodDelivery.objects.create(reference='123', driver='bill', restaurant='thai')
+        FoodDelivery.objects.create(reference='456', driver='bill', restaurant='india')
+        FoodDelivery.objects.create(reference='789', driver='bill', restaurant='pizza')
+
+        data = {
+            "form-TOTAL_FORMS": "3",
+            "form-INITIAL_FORMS": "3",
+            "form-MAX_NUM_FORMS": "0",
+
+            "form-0-id": "1",
+            "form-0-reference": "123",
+            "form-0-driver": "bill",
+            "form-0-restaurant": "thai",
+
+            # Same data as above: Forbidden because of unique_together!
+            "form-1-id": "2",
+            "form-1-reference": "456",
+            "form-1-driver": "bill",
+            "form-1-restaurant": "thai",
+
+            "form-2-id": "3",
+            "form-2-reference": "789",
+            "form-2-driver": "bill",
+            "form-2-restaurant": "pizza",
+
+            "_save": "Save",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/fooddelivery/', data)
+        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 1)
+
+        data = {
+            "form-TOTAL_FORMS": "3",
+            "form-INITIAL_FORMS": "3",
+            "form-MAX_NUM_FORMS": "0",
+
+            "form-0-id": "1",
+            "form-0-reference": "123",
+            "form-0-driver": "bill",
+            "form-0-restaurant": "thai",
+
+            # Same data as above: Forbidden because of unique_together!
+            "form-1-id": "2",
+            "form-1-reference": "456",
+            "form-1-driver": "bill",
+            "form-1-restaurant": "thai",
+
+            # Same data also.
+            "form-2-id": "3",
+            "form-2-reference": "789",
+            "form-2-driver": "bill",
+            "form-2-restaurant": "thai",
+
+            "_save": "Save",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/fooddelivery/', data)
+        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 2)
 
     def test_non_form_errors(self):
         # test if non-form errors are handled; ticket #12716

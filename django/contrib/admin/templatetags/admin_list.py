@@ -198,10 +198,10 @@ def items_for_result(cl, result, form):
 def results(cl):
     if cl.formset:
         for res, form in zip(cl.result_list, cl.formset.forms):
-            yield list(items_for_result(cl, res, form))
+            yield {'row': list(items_for_result(cl, res, form)), 'form': form}
     else:
         for res in cl.result_list:
-            yield list(items_for_result(cl, res, None))
+            yield {'row': list(items_for_result(cl, res, None)), 'form': None}
 
 def result_hidden_fields(cl):
     if cl.formset:

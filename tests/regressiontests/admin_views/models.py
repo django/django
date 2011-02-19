@@ -669,7 +669,32 @@ class Answer(models.Model):
 class Reservation(models.Model):
     start_date = models.DateTimeField()
     price = models.IntegerField()
-    
+
+
+DRIVER_CHOICES = (
+    (u'bill', 'Bill G'),
+    (u'steve', 'Steve J'),
+)
+
+RESTAURANT_CHOICES = (
+    (u'indian', u'A Taste of India'),
+    (u'thai', u'Thai Pography'),
+    (u'pizza', u'Pizza Mama'),
+)
+
+class FoodDelivery(models.Model):
+    reference = models.CharField(max_length=100)
+    driver = models.CharField(max_length=100, choices=DRIVER_CHOICES, blank=True)
+    restaurant = models.CharField(max_length=100, choices=RESTAURANT_CHOICES, blank=True)
+
+    class Meta:
+        unique_together = (("driver", "restaurant"),)
+
+class FoodDeliveryAdmin(admin.ModelAdmin):
+    list_display=('reference', 'driver', 'restaurant')
+    list_editable = ('driver', 'restaurant')
+
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -706,6 +731,7 @@ admin.site.register(CyclicOne)
 admin.site.register(CyclicTwo)
 admin.site.register(WorkHour, WorkHourAdmin)
 admin.site.register(Reservation)
+admin.site.register(FoodDelivery, FoodDeliveryAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
