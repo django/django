@@ -172,7 +172,7 @@ The ``field_options`` dictionary can have the following keys:
         .. versionadded:: 1.2
 
         ``fields`` can contain values defined in
-        :attr:`ModelAdmin.readonly_fields` to be displayed as read-only.
+        :attr:`~ModelAdmin.readonly_fields` to be displayed as read-only.
 
     * ``classes``
         A list containing extra CSS classes to apply to the fieldset.
@@ -488,9 +488,9 @@ See ``InlineModelAdmin`` objects below.
 
 .. attribute:: ModelAdmin.ordering
 
-Set ``ordering`` to specify how objects on the admin change list page should be
-ordered. This should be a list or tuple in the same format as a model's
-``ordering`` parameter.
+Set ``ordering`` to specify how lists of objects should be ordered in the
+Django admin views. This should be a list or tuple in the same format as a
+model's ``ordering`` parameter.
 
 If this isn't provided, the Django admin will use the model's default ordering.
 
@@ -1088,8 +1088,31 @@ The difference between these two is merely the template used to render them.
 ``InlineModelAdmin`` options
 -----------------------------
 
-The ``InlineModelAdmin`` class is a subclass of ``ModelAdmin`` so it inherits
-all the same functionality as well as some of its own:
+``InlineModelAdmin`` shares many of the same features as ``ModelAdmin``, and
+adds some of its own (the shared features are actually defined in the
+``BaseModelAdmin`` superclass). The shared features are:
+
+- :attr:`~InlineModelAdmin.form`
+- :attr:`~ModelAdmin.fieldsets`
+- :attr:`~ModelAdmin.fields`
+- :attr:`~ModelAdmin.exclude`
+- :attr:`~ModelAdmin.filter_horizontal`
+- :attr:`~ModelAdmin.filter_vertical`
+- :attr:`~ModelAdmin.prepopulated_fields`
+- :attr:`~ModelAdmin.radio_fields`
+- :attr:`~InlineModelAdmin.raw_id_fields`
+
+.. versionadded:: 1.1
+
+- :meth:`~ModelAdmin.formfield_for_foreignkey`
+- :meth:`~ModelAdmin.formfield_for_manytomany`
+
+.. versionadded:: 1.2
+
+- :attr:`~ModelAdmin.readonly_fields`
+- :attr:`~ModelAdmin.formfield_overrides`
+
+The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.model
 
@@ -1116,7 +1139,6 @@ all the same functionality as well as some of its own:
 .. _ref-contrib-admin-inline-extra:
 
 .. attribute:: InlineModelAdmin.extra
-
 
     This controls the number of extra forms the formset will display in addition
     to the initial forms. See the
