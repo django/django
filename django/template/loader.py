@@ -179,11 +179,15 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
         t = select_template(template_name)
     else:
         t = get_template(template_name)
-    if context_instance:
-        context_instance.update(dictionary)
-    else:
-        context_instance = Context(dictionary)
-    return t.render(context_instance)
+    if not context_instance:
+        return t.render(Context(dictionary))
+    # Add the dictionary to the context stack, ensuring it gets removed again
+    # to keep the context_instance in the same state it started in.
+    context_instance.update(dictionary)
+    try:
+        return t.render(context_instance)
+    finally:
+        context_instance.pop()
 
 def select_template(template_name_list):
     "Given a list of template names, returns the first that can be loaded."

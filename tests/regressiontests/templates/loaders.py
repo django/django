@@ -148,5 +148,30 @@ class CachedLoader(unittest.TestCase):
         # The two templates should not have the same content
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
 
+class RenderToStringTest(unittest.TestCase):
+
+    def setUp(self):
+        self._old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(os.path.dirname(__file__), 'templates'),
+        )
+
+    def tearDown(self):
+        settings.TEMPLATE_DIRS = self._old_TEMPLATE_DIRS
+
+    def test_basic(self):
+        self.assertEqual(loader.render_to_string('test_context.html'), 'obj:')
+
+    def test_basic_context(self):
+        self.assertEqual(loader.render_to_string('test_context.html',
+                                                 {'obj': 'test'}), 'obj:test')
+
+    def test_existing_context_kept_clean(self):
+        context = Context({'obj': 'before'})
+        output = loader.render_to_string('test_context.html', {'obj': 'after'},
+                                         context_instance=context)
+        self.assertEqual(output, 'obj:after')
+        self.assertEqual(context['obj'], 'before')
+
 if __name__ == "__main__":
     unittest.main()
