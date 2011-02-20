@@ -748,9 +748,16 @@ class ModelAdmin(BaseModelAdmin):
         Determines the HttpResponse for the change_view stage.
         """
         opts = obj._meta
+
+        # Handle proxy models automatically created by .only() or .defer()
+        verbose_name = opts.verbose_name
+        if obj._deferred:
+            opts_ = opts.proxy_for_model._meta
+            verbose_name = opts_.verbose_name
+
         pk_value = obj._get_pk_val()
 
-        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj)}
+        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(verbose_name), 'obj': force_unicode(obj)}
         if "_continue" in request.POST:
             self.message_user(request, msg + ' ' + _("You may edit it again below."))
             if "_popup" in request.REQUEST:
@@ -758,11 +765,11 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 return HttpResponseRedirect(request.path)
         elif "_saveasnew" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': obj}
+            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(verbose_name), 'obj': obj}
             self.message_user(request, msg)
             return HttpResponseRedirect("../%s/" % pk_value)
         elif "_addanother" in request.POST:
-            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
+            self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(verbose_name)))
             return HttpResponseRedirect("../add/")
         else:
             self.message_user(request, msg)

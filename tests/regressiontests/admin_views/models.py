@@ -704,6 +704,37 @@ class FoodDeliveryAdmin(admin.ModelAdmin):
     list_display=('reference', 'driver', 'restaurant')
     list_editable = ('driver', 'restaurant')
 
+class Paper(models.Model):
+    title = models.CharField(max_length=30)
+    author = models.CharField(max_length=30, blank=True, null=True)
+
+class CoverLetter(models.Model):
+    author = models.CharField(max_length=30)
+    date = models.DateField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.author
+
+class PaperAdmin(admin.ModelAdmin):
+    """
+    A ModelAdin with a custom queryset() method that uses only(), to test
+    verbose_name display in messages shown after adding Paper instances.
+    """
+
+    def queryset(self, request):
+        return super(PaperAdmin, self).queryset(request).only('title')
+
+class CoverLetterAdmin(admin.ModelAdmin):
+    """
+    A ModelAdin with a custom queryset() method that uses only(), to test
+    verbose_name display in messages shown after adding CoverLetter instances.
+    Note that the CoverLetter model defines a __unicode__ method.
+    """
+
+    def queryset(self, request):
+        #return super(CoverLetterAdmin, self).queryset(request).only('author')
+        return super(CoverLetterAdmin, self).queryset(request).defer('date')
+
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
@@ -743,6 +774,8 @@ admin.site.register(WorkHour, WorkHourAdmin)
 admin.site.register(Reservation)
 admin.site.register(FoodDelivery, FoodDeliveryAdmin)
 admin.site.register(RowLevelChangePermissionModel, RowLevelChangePermissionModelAdmin)
+admin.site.register(Paper, PaperAdmin)
+admin.site.register(CoverLetter, CoverLetterAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
