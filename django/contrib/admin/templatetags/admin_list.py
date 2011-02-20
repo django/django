@@ -195,13 +195,22 @@ def items_for_result(cl, result, form):
     if form and not form[cl.model._meta.pk.name].is_hidden:
         yield mark_safe(u'<td>%s</td>' % force_unicode(form[cl.model._meta.pk.name]))
 
+class ResultList(list):
+    # Wrapper class used to return items in a list_editable
+    # changelist, annotated with the form object for error
+    # reporting purposes. Needed to maintain backwards
+    # compatibility with existing admin templates.
+    def __init__(self, form, *items):
+        self.form = form
+        super(ResultList, self).__init__(*items)
+
 def results(cl):
     if cl.formset:
         for res, form in zip(cl.result_list, cl.formset.forms):
-            yield {'row': list(items_for_result(cl, res, form)), 'form': form}
+            yield ResultList(form, items_for_result(cl, res, form))
     else:
         for res in cl.result_list:
-            yield {'row': list(items_for_result(cl, res, None)), 'form': None}
+            yield ResultList(None, items_for_result(cl, res, None))
 
 def result_hidden_fields(cl):
     if cl.formset:

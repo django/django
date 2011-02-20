@@ -17,9 +17,9 @@
 <tbody>
 {% for result in results %}
 {% if result.form.non_field_errors %}
-    <tr><td colspan="{{ result.row|length }}">{{ result.form.non_field_errors }}</td></tr>
+    <tr><td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td></tr>
 {% endif %}
-<tr class="{% cycle 'row1' 'row2' %}">{% for item in result.row %}{{ item }}{% endfor %}</tr>
+<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
 {% endfor %}
 </tbody>
 </table>
