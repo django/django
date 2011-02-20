@@ -31,7 +31,7 @@ from models import (Article, BarAccount, CustomArticle, EmptyModel,
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast,
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit,
     Category, Post, Plot, FunkyTag, WorkHour, Employee, Inquisition,
-    Actor, FoodDelivery, RowLevelChangePermissionModel)
+    Actor, FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter)
 
 
 class AdminViewBasicTest(TestCase):
@@ -1839,6 +1839,37 @@ class AdminCustomQuerysetTest(TestCase):
                 self.assertEqual(response.status_code, 200)
             else:
                 self.assertEqual(response.status_code, 404)
+
+    def test_add_model_modeladmin_only_qs(self):
+        # only() is used in ModelAdmin.queryset()
+        p = Paper.objects.create(title=u"My Paper Title")
+        self.assertEqual(Paper.objects.count(), 1)
+        response = self.client.get('/test_admin/admin/admin_views/paper/%s/' % p.pk)
+        self.assertEqual(response.status_code, 200)
+        post_data = {
+            "title": u"My Modified Paper Title",
+            "_save": "Save",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/paper/%s/' % p.pk,
+                post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # Message should contain non-ugly model name. Instance representation is set by unicode() (ugly)
+        self.assertContains(response, '<li class="info">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>')
+
+        # defer() is used in ModelAdmin.queryset()
+        cl = CoverLetter.objects.create(author=u"John Doe")
+        self.assertEqual(CoverLetter.objects.count(), 1)
+        response = self.client.get('/test_admin/admin/admin_views/coverletter/%s/' % cl.pk)
+        self.assertEqual(response.status_code, 200)
+        post_data = {
+            "author": u"John Doe II",
+            "_save": "Save",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/coverletter/%s/' % cl.pk,
+                post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # Message should contain non-ugly model name. Instance representation is set by model's __unicode__()
+        self.assertContains(response, '<li class="info">The cover letter &quot;John Doe II&quot; was changed successfully.</li>')
 
 class AdminInlineFileUploadTest(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
