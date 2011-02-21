@@ -17,7 +17,7 @@ from forms import BaseForm, get_declared_fields
 from fields import Field, ChoiceField
 from widgets import SelectMultiple, HiddenInput, MultipleHiddenInput
 from widgets import media_property
-from formsets import BaseFormSet, formset_factory, DELETION_FIELD_NAME
+from formsets import BaseFormSet, formset_factory
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
@@ -588,13 +588,10 @@ class BaseModelFormSet(BaseFormSet):
             pk_value = getattr(pk_value, 'pk', pk_value)
 
             obj = self._existing_object(pk_value)
-            if self.can_delete:
-                raw_delete_value = form._raw_value(DELETION_FIELD_NAME)
-                should_delete = form.fields[DELETION_FIELD_NAME].clean(raw_delete_value)
-                if should_delete:
-                    self.deleted_objects.append(obj)
-                    obj.delete()
-                    continue
+            if self.can_delete and self._should_delete_form(form):
+                self.deleted_objects.append(obj)
+                obj.delete()
+                continue
             if form.has_changed():
                 self.changed_objects.append((obj, form.changed_data))
                 saved_instances.append(self.save_existing(form, obj, commit=commit))
@@ -609,11 +606,8 @@ class BaseModelFormSet(BaseFormSet):
                 continue
             # If someone has marked an add form for deletion, don't save the
             # object.
-            if self.can_delete:
-                raw_delete_value = form._raw_value(DELETION_FIELD_NAME)
-                should_delete = form.fields[DELETION_FIELD_NAME].clean(raw_delete_value)
-                if should_delete:
-                    continue
+            if self.can_delete and self._should_delete_form(form):
+                continue
             self.new_objects.append(self.save_new(form, commit=commit))
             if not commit:
                 self.saved_forms.append(form)
