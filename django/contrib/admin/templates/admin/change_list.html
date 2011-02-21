@@ -89,7 +89,7 @@
 
       <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>{% csrf_token %}
       {% if cl.formset %}
-        {{ cl.formset.management_form }}
+        <div>{{ cl.formset.management_form }}</div>
       {% endif %}
 
       {% block result_list %}
