@@ -89,8 +89,7 @@ class Context(BaseContext):
 
     def _new(self):
         return self.__class__(autoescape=self.autoescape,
-                              current_app=self.current_app,
-                              use_l10n=self.use_l10n)
+                              current_app=self.current_app)
 
     def update(self, other_dict):
         "Like dict.update(). Pushes an entire dictionary's keys and values onto the context."
@@ -170,5 +169,4 @@ class RequestContext(Context):
 
     def _new(self):
         return self.__class__(request=HttpRequest(),
-                              current_app=self.current_app,
-                              use_l10n=self.use_l10n)
+                              current_app=self.current_app)
