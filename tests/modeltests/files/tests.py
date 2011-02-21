@@ -30,6 +30,7 @@ class FileTests(TestCase):
         self.assertEqual(obj1.normal.name, "tests/django_test.txt")
         self.assertEqual(obj1.normal.size, 7)
         self.assertEqual(obj1.normal.read(), "content")
+        obj1.normal.close()
 
         # File objects can be assigned to FileField attributes, but shouldn't
         # get committed until the model it's attached to is saved.
@@ -49,6 +50,7 @@ class FileTests(TestCase):
         self.assertEqual(obj1.normal.read(3), "con")
         self.assertEqual(obj1.normal.read(), "tent")
         self.assertEqual(list(obj1.normal.chunks(chunk_size=2)), ["co", "nt", "en", "t"])
+        obj1.normal.close()
 
         # Save another file with the same name.
         obj2 = Storage()
@@ -81,12 +83,14 @@ class FileTests(TestCase):
         obj3 = Storage.objects.create()
         self.assertEqual(obj3.default.name, "tests/default.txt")
         self.assertEqual(obj3.default.read(), "default content")
+        obj3.default.close()
 
         # But it shouldn't be deleted, even if there are no more objects using
         # it.
         obj3.delete()
         obj3 = Storage()
         self.assertEqual(obj3.default.read(), "default content")
+        obj3.default.close()
 
         # Verify the fix for #5655, making sure the directory is only
         # determined once.
