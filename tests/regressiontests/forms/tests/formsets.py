@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from unittest import TestCase
-from django.forms import Form, CharField, IntegerField, ValidationError
+from django.forms import Form, CharField, IntegerField, ValidationError, DateField
 from django.forms.formsets import formset_factory, BaseFormSet
 
 
@@ -39,6 +39,13 @@ class EmptyFsetWontValidate(BaseFormSet):
 # ``test_regression_6926`` & ``test_regression_12878``.
 FavoriteDrinksFormSet = formset_factory(FavoriteDrinkForm,
     formset=BaseFavoriteDrinksFormSet, extra=3)
+
+
+class ArticleForm(Form):
+    title = CharField()
+    pub_date = DateField()
+
+ArticleFormSet = formset_factory(ArticleForm)
 
 
 class FormsFormsetTestCase(TestCase):
@@ -766,6 +773,50 @@ class FormsFormsetTestCase(TestCase):
         formset = FavoriteDrinksFormSet(data, prefix='drinks')
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), [u'You may only specify a drink once.'])
+
+    def test_empty_forms_are_unbound(self):
+        data = {
+            'form-TOTAL_FORMS': u'1',
+            'form-INITIAL_FORMS': u'0',
+            'form-0-title': u'Test',
+            'form-0-pub_date': u'1904-06-16',
+        }
+        unbound_formset = ArticleFormSet()
+        bound_formset = ArticleFormSet(data)
+
+        empty_forms = []
+
+        empty_forms.append(unbound_formset.empty_form)
+        empty_forms.append(bound_formset.empty_form)
+
+        # Empty forms should be unbound
+        self.assertFalse(empty_forms[0].is_bound)
+        self.assertFalse(empty_forms[1].is_bound)
+
+        # The empty forms should be equal.
+        self.assertEqual(empty_forms[0].as_p(), empty_forms[1].as_p())
+
+    def test_empty_forms_are_unbound(self):
+        data = {
+            'form-TOTAL_FORMS': u'1',
+            'form-INITIAL_FORMS': u'0',
+            'form-0-title': u'Test',
+            'form-0-pub_date': u'1904-06-16',
+        }
+        unbound_formset = ArticleFormSet()
+        bound_formset = ArticleFormSet(data)
+
+        empty_forms = []
+
+        empty_forms.append(unbound_formset.empty_form)
+        empty_forms.append(bound_formset.empty_form)
+
+        # Empty forms should be unbound
+        self.assertFalse(empty_forms[0].is_bound)
+        self.assertFalse(empty_forms[1].is_bound)
+
+        # The empty forms should be equal.
+        self.assertEqual(empty_forms[0].as_p(), empty_forms[1].as_p())
 
 class TestEmptyFormSet(TestCase): 
     "Test that an empty formset still calls clean()"
