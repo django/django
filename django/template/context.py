@@ -1,5 +1,7 @@
+from copy import copy
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
+from django.http import HttpRequest
 
 # Cache of actual callables.
 _standard_context_processors = None
@@ -17,12 +19,20 @@ class BaseContext(object):
         dict_ = dict_ or {}
         self.dicts = [dict_]
 
+    def __copy__(self):
+        duplicate = self._new()
+        duplicate.dicts = [dict_ for dict_ in self.dicts]
+        return duplicate
+
     def __repr__(self):
         return repr(self.dicts)
 
     def __iter__(self):
         for d in reversed(self.dicts):
             yield d
+
+    def _new(self):
+        return self.__class__()
 
     def push(self):
         d = {}
@@ -72,6 +82,16 @@ class Context(BaseContext):
         self.current_app = current_app
         self.render_context = RenderContext()
         super(Context, self).__init__(dict_)
+
+    def __copy__(self):
+        duplicate = super(Context, self).__copy__()
+        duplicate.render_context = copy(self.render_context)
+        return duplicate
+
+    def _new(self):
+        return self.__class__(autoescape=self.autoescape,
+                              current_app=self.current_app,
+                              use_l10n=self.use_l10n)
 
     def update(self, other_dict):
         "Pushes other_dict to the stack of dictionaries in the Context"
@@ -148,3 +168,8 @@ class RequestContext(Context):
             processors = tuple(processors)
         for processor in get_standard_processors() + processors:
             self.update(processor(request))
+
+    def _new(self):
+        return self.__class__(request=HttpRequest(),
+                              current_app=self.current_app,
+                              use_l10n=self.use_l10n)

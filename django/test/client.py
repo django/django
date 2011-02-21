@@ -5,6 +5,7 @@ import os
 import re
 import mimetypes
 import warnings
+from copy import copy
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -91,9 +92,12 @@ class ClientHandler(BaseHandler):
 def store_rendered_templates(store, signal, sender, template, context, **kwargs):
     """
     Stores templates and contexts that are rendered.
+
+    The context is copied so that it is an accurate representation at the time
+    of rendering.
     """
     store.setdefault('templates', []).append(template)
-    store.setdefault('context', ContextList()).append(context)
+    store.setdefault('context', ContextList()).append(copy(context))
 
 def encode_multipart(boundary, data):
     """
