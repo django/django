@@ -910,7 +910,7 @@ class ForeignKey(RelatedField, Field):
         db = kwargs.pop('using', None)
         defaults = {
             'form_class': forms.ModelChoiceField,
-            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to),
+            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to).distinct(),
             'to_field_name': self.rel.field_name,
         }
         defaults.update(kwargs)

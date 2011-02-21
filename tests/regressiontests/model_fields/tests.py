@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+import re
 
 from django import test
 from django import forms
@@ -8,7 +9,7 @@ from django.db import models
 from django.db.models.fields.files import FieldFile
 from django.utils import unittest
 
-from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel, BooleanModel, Document
+from models import Foo, Bar, Baz, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanModel, BooleanModel, Document
 
 # If PIL available, do these tests.
 if Image:
@@ -95,12 +96,28 @@ class DecimalFieldTests(test.TestCase):
         # This should not crash. That counts as a win for our purposes.
         Foo.objects.filter(d__gte=100000000000)
 
+class BazForm(forms.ModelForm):
+    class Meta:
+        model = Baz
+
 class ForeignKeyTests(test.TestCase):
     def test_callable_default(self):
         """Test the use of a lazy callable for ForeignKey.default"""
         a = Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
         b = Bar.objects.create(b="bcd")
         self.assertEqual(b.a, a)
+
+    def test_distinct_choice_limit(self):
+        """Doesn't make sense to offer the same ForeignKey multiple times in a form"""
+        a = Foo.objects.create(a='a', d=Decimal("-1"))
+        b = Foo.objects.create(a='b', d=Decimal("1"))
+        bar_a = Bar.objects.create(b='ah', a=a)
+        bar_b = Bar.objects.create(b='aha', a=a)
+        bar_b = Bar.objects.create(b='bla', a=b)
+        form = BazForm()
+        fk_field = str(form['foo'])
+        self.assertEqual(len(re.findall(r'value="2"', fk_field)), 0)
+        self.assertEqual(len(re.findall(r'value="1"', fk_field)), 1)
 
 class DateTimeFieldTests(unittest.TestCase):
     def test_datetimefield_to_python_usecs(self):
