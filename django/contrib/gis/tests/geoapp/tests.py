@@ -699,7 +699,7 @@ class GeoModelTest(TestCase):
         self.assertEqual(tuple(coords), t.reverse_geom.coords)
         if oracle:
             self.assertRaises(TypeError, State.objects.reverse_geom)
-        
+
     @no_mysql
     @no_oracle
     @no_spatialite
@@ -718,7 +718,7 @@ class GeoModelTest(TestCase):
     @no_mysql
     @no_oracle
     @no_spatialite
-    def test29_force_rhr(self):
+    def test30_geohash(self):
         "Testing GeoQuerySet.geohash()."
         if not connection.ops.geohash: return
         # Reference query:
