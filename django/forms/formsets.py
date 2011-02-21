@@ -144,9 +144,6 @@ class BaseFormSet(StrAndUnicode):
             'prefix': self.add_prefix('__prefix__'),
             'empty_permitted': True,
         }
-        if self.is_bound:
-            defaults['data'] = self.data
-            defaults['files'] = self.files
         defaults.update(kwargs)
         form = self.form(**defaults)
         self.add_fields(form, None)
