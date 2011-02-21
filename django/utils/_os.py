@@ -1,4 +1,5 @@
 import os
+import stat
 from os.path import join, normcase, normpath, abspath, isabs, sep
 from django.utils.encoding import force_unicode
 
