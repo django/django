@@ -372,7 +372,7 @@ class ManagementUtility(object):
         elif self.argv[1:] == ['--version']:
             # LaxOptionParser already takes care of printing the version.
             pass
-        elif self.argv[1:] == ['--help']:
+        elif self.argv[1:] in (['--help'], ['-h']):
             parser.print_lax_help()
             sys.stderr.write(self.main_help_text() + '\n')
         else:
