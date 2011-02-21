@@ -153,7 +153,7 @@ class CsrfViewMiddleware(object):
                 # we can use strict Referer checking.
                 referer = request.META.get('HTTP_REFERER')
                 if referer is None:
-                    logger.warning('Forbidden (%s): %s' % (REASON_NO_COOKIE, request.path),
+                    logger.warning('Forbidden (%s): %s' % (REASON_NO_REFERER, request.path),
                         extra={
                             'status_code': 403,
                             'request': request,
