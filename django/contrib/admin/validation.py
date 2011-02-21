@@ -46,9 +46,8 @@ def validate(cls, model):
     if hasattr(cls, 'list_display_links'):
         check_isseq(cls, 'list_display_links', cls.list_display_links)
         for idx, field in enumerate(cls.list_display_links):
-            fetch_attr(cls, model, opts, 'list_display_links[%d]' % idx, field)
             if field not in cls.list_display:
-                raise ImproperlyConfigured("'%s.list_display_links[%d]'"
+                raise ImproperlyConfigured("'%s.list_display_links[%d]' "
                         "refers to '%s' which is not defined in 'list_display'."
                         % (cls.__name__, idx, field))
 

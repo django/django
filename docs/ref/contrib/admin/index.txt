@@ -479,11 +479,11 @@ subclass::
     By default, the change list page will link the first column -- the first
     field specified in ``list_display`` -- to the change page for each item.
     But ``list_display_links`` lets you change which columns are linked. Set
-    ``list_display_links`` to a list or tuple of field names (in the same
+    ``list_display_links`` to a list or tuple of fields (in the same
     format as ``list_display``) to link.
 
-    ``list_display_links`` can specify one or many field names. As long as the
-    field names appear in ``list_display``, Django doesn't care how many (or
+    ``list_display_links`` can specify one or many fields. As long as the
+    fields appear in ``list_display``, Django doesn't care how many (or
     how few) fields are linked. The only requirement is: If you want to use
     ``list_display_links``, you must define ``list_display``.
 
