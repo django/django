@@ -39,6 +39,8 @@ replaced instead of using ``CsrfMiddleware``.
     (previous versions of Django did not provide these two components
     of ``CsrfMiddleware`` as described above)
 
+.. _csrf-ajax:
+
 AJAX
 ----
 
