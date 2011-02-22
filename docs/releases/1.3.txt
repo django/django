@@ -305,34 +305,10 @@ header X-CSRFTOKEN, as well as in the form submission itself, for ease
 of use with popular JavaScript toolkits which allow insertion of
 custom headers into all AJAX requests.
 
-The following example using the jQuery JavaScript toolkit demonstrates
-this; the call to jQuery's ajaxSetup will cause all AJAX requests to
-send back the CSRF token in the custom X-CSRFTOKEN header::
-
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            function getCookie(name) {
-                var cookieValue = null;
-                if (document.cookie && document.cookie != '') {
-                    var cookies = document.cookie.split(';');
-                    for (var i = 0; i < cookies.length; i++) {
-                        var cookie = jQuery.trim(cookies[i]);
-                        // Does this cookie string begin with the name we want?
-                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                // Only send the token to relative URLs i.e. locally.
-                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-            }
-        }
-    });
-
+Please see the :ref:`CSRF docs for example jQuery code <csrf-ajax>`
+that demonstrates this technique, ensuring that you are looking at the
+documentation for your version of Django, as the exact code necessary
+is different for some older versions of Django.
 
 Restricted filters in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
