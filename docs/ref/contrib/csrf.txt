@@ -81,6 +81,8 @@ The utility script ``extras/csrf_migration_helper.py`` can help to automate the
 finding of code and templates that may need to be upgraded.  It contains full
 help on how to use it.
 
+.. _csrf-ajax:
+
 AJAX
 ----
 
