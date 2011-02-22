@@ -53,7 +53,8 @@ class Command(BaseCommand):
             except exceptions.ValidationError:
                 raise CommandError("Invalid email address.")
 
-        password = ''
+        # If not provided, create the user with an unusable password
+        password = None
 
         # Try to determine the current system user's username to use as a default.
         try:
