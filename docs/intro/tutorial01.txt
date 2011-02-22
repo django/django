@@ -686,8 +686,11 @@ Save these changes and start a new Python interactive shell by running
     >>> c.delete()
 
 For more information on model relations, see :doc:`Accessing related objects
-</ref/models/relations>`. For full details on the database API, see our
-:doc:`Database API reference </topics/db/queries>`.
+</ref/models/relations>`. For more on how to use double underscores to perform
+field lookups via the API, see `Field lookups`__. For full details on the 
+database API, see our :doc:`Database API reference </topics/db/queries>`.
+
+__ http://docs.djangoproject.com/en/1.2/topics/db/queries/#field-lookups
 
 When you're comfortable with the API, read :doc:`part 2 of this tutorial
 </intro/tutorial02>` to get Django's automatic admin working.
