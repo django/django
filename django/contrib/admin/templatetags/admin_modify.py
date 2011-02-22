@@ -21,7 +21,7 @@ prepopulated_fields_js = register.inclusion_tag('admin/prepopulated_fields_js.ht
 
 def submit_row(context):
     """
-    Displays the row of buttons for delete and save. 
+    Displays the row of buttons for delete and save.
     """
     opts = context['opts']
     change = context['change']
@@ -33,10 +33,24 @@ def submit_row(context):
         'show_delete_link': (not is_popup and context['has_delete_permission']
                               and (change or context['show_delete'])),
         'show_save_as_new': not is_popup and change and save_as,
-        'show_save_and_add_another': context['has_add_permission'] and 
+        'show_save_and_add_another': context['has_add_permission'] and
                             not is_popup and (not save_as or context['add']),
         'show_save_and_continue': not is_popup and context['has_change_permission'],
         'is_popup': is_popup,
         'show_save': True
     }
 submit_row = register.inclusion_tag('admin/submit_line.html', takes_context=True)(submit_row)
+
+def cell_count(inline_admin_form):
+    """Returns the number of cells used in a tabular inline"""
+    count = 1 # Hidden cell with hidden 'id' field
+    for fieldset in inline_admin_form:
+        # Loop through all the fields (one per cell)
+        for line in fieldset:
+            for field in line:
+                count += 1
+    if inline_admin_form.formset.can_delete:
+        # Delete checkbox
+        count += 1
+    return count
+cell_count = register.filter(cell_count)
