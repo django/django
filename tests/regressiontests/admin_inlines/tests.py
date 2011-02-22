@@ -67,6 +67,23 @@ class TestInline(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(Fashionista.objects.filter(person__firstname='Imelda')), 1)
 
+    def test_tabular_non_field_errors(self):
+        """
+        Ensure that non_field_errors are displayed correctly, including the
+        right value for colspan. Refs #13510.
+        """
+        data = {
+            'title_set-TOTAL_FORMS': 1,
+            'title_set-INITIAL_FORMS': 0,
+            'title_set-MAX_NUM_FORMS': 0,
+            '_save': u'Save',
+            'title_set-0-title1': 'a title',
+            'title_set-0-title2': 'a different title',
+        }
+        response = self.client.post('/test_admin/admin/admin_inlines/titlecollection/add/', data)
+        # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbock.
+        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>The two titles must be the same</li></ul></td></tr>')
+
 class TestInlineMedia(TestCase):
     fixtures = ['admin-views-users.xml']
 

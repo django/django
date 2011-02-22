@@ -6,6 +6,7 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django import forms
 
 class Parent(models.Model):
     name = models.CharField(max_length=50)
@@ -123,3 +124,30 @@ class InlineWeakness(admin.TabularInline):
     extra = 1
 
 admin.site.register(Fashionista, inlines=[InlineWeakness])
+
+# Models for #13510
+
+class TitleCollection(models.Model):
+    pass
+
+class Title(models.Model):
+    collection = models.ForeignKey(TitleCollection, blank=True, null=True)
+    title1 = models.CharField(max_length=100)
+    title2 = models.CharField(max_length=100)
+
+class TitleForm(forms.ModelForm):
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        title1 = cleaned_data.get("title1")
+        title2 = cleaned_data.get("title2")
+        if title1 != title2:
+            raise forms.ValidationError("The two titles must be the same")
+        return cleaned_data
+
+class TitleInline(admin.TabularInline):
+    model = Title
+    form = TitleForm
+    extra = 1
+
+admin.site.register(TitleCollection, inlines=[TitleInline])
