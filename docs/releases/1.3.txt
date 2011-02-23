@@ -828,3 +828,15 @@ Rationale for this decision:
 
  * This location wasn't included in the translation building process for
    JavaScript literals.
+
+``PermWrapper`` moved to ``django.contrib.auth.context_processors``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In Django 1.2, we began the process of changing the location of the
+``auth`` context processor from ``django.core.context_processors`` to
+``django.contrib.auth.context_processors``. However, the
+``PermWrapper`` support class was mistakenly omitted from that
+migration. In Django 1.3, the ``PermWrapper`` class has also been
+moved to ``django.contrib.auth.context_processors``, along with the
+``PermLookupDict`` support class. The new classes are functionally
+identical to their old versions; only the module location has changed.

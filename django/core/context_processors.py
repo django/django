@@ -84,28 +84,30 @@ def request(request):
     return {'request': request}
 
 # PermWrapper and PermLookupDict proxy the permissions system into objects that
-# the template system can understand.
+# the template system can understand. They once lived here -- they have
+# been moved to django.contrib.auth.context_processors.
 
-class PermLookupDict(object):
-    def __init__(self, user, module_name):
-        self.user, self.module_name = user, module_name
+from django.contrib.auth.context_processors import PermLookupDict as RealPermLookupDict
+from django.contrib.auth.context_processors import PermWrapper as RealPermWrapper
 
-    def __repr__(self):
-        return str(self.user.get_all_permissions())
+class PermLookupDict(RealPermLookupDict):
+    def __init__(self, *args, **kwargs):
+        import warnings
+        warnings.warn(
+            "`django.core.context_processors.PermLookupDict` is " \
+            "deprecated; use `django.contrib.auth.context_processors.PermLookupDict` " \
+            "instead.",
+            PendingDeprecationWarning
+        )
+        super(PermLookupDict, self).__init__(*args, **kwargs)
 
-    def __getitem__(self, perm_name):
-        return self.user.has_perm("%s.%s" % (self.module_name, perm_name))
-
-    def __nonzero__(self):
-        return self.user.has_module_perms(self.module_name)
-
-class PermWrapper(object):
-    def __init__(self, user):
-        self.user = user
-
-    def __getitem__(self, module_name):
-        return PermLookupDict(self.user, module_name)
-
-    def __iter__(self):
-        # I am large, I contain multitudes.
-        raise TypeError("PermWrapper is not iterable.")
+class PermWrapper(RealPermWrapper):
+    def __init__(self, *args, **kwargs):
+        import warnings
+        warnings.warn(
+            "`django.core.context_processors.PermWrapper` is " \
+            "deprecated; use `django.contrib.auth.context_processors.PermWrapper` " \
+            "instead.",
+            PendingDeprecationWarning
+        )
+        super(PermWrapper, self).__init__(*args, **kwargs)

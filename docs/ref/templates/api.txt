@@ -423,7 +423,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
       via the :doc:`messages framework </ref/contrib/messages>`.
 
     * ``perms`` -- An instance of
-      ``django.core.context_processors.PermWrapper``, representing the
+      ``django.contrib.auth.context_processors.PermWrapper``, representing the
       permissions that the currently logged-in user has.
 
 .. versionchanged:: 1.2
@@ -434,6 +434,11 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
    Prior to version 1.2, the ``messages`` variable was a lazy accessor for
    ``user.get_and_delete_messages()``. It has been changed to include any
    messages added via the :doc:`messages framework </ref/contrib/messages>`.
+
+.. versionchanged:: 1.3
+    Prior to version 1.3, ``PermWrapper`` was located in
+    ``django.contrib.auth.context_processors``.
+
 
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

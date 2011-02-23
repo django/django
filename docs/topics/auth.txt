@@ -661,7 +661,7 @@ How to log a user out
 Login and logout signals
 ------------------------
 
-.. versionadded:: 1.3 
+.. versionadded:: 1.3
 
 The auth framework uses two :doc:`signals </topics/signals>` that can be used
 for notification when a user logs in or out.
@@ -949,7 +949,7 @@ includes a few other useful built-in views located in
     Allows a user to reset their password by generating a one-time use link
     that can be used to reset the password, and sending that link to the
     user's registered e-mail address.
-    
+
     .. versionchanged:: 1.3
         The ``from_email`` argument was added.
 
@@ -1334,8 +1334,12 @@ Permissions
 
 The currently logged-in user's permissions are stored in the template variable
 ``{{ perms }}``. This is an instance of
-:class:`django.core.context_processors.PermWrapper`, which is a
+:class:`django.contrib.auth.context_processors.PermWrapper`, which is a
 template-friendly proxy of permissions.
+
+.. versionchanged:: 1.3
+    Prior to version 1.3, ``PermWrapper`` was located in
+    ``django.contrib.auth.context_processors``.
 
 In the ``{{ perms }}`` object, single-attribute lookup is a proxy to
 :meth:`User.has_module_perms <django.contrib.auth.models.User.has_module_perms>`.
