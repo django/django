@@ -7,8 +7,8 @@ Form wizard
 
 Django comes with an optional "form wizard" application that splits
 :doc:`forms </topics/forms/index>` across multiple Web pages. It maintains
-state in hashed HTML :samp:`<input type="hidden">` fields, and the data isn't
-processed server-side until the final form is submitted.
+state in hashed HTML :samp:`<input type="hidden">` fields so that the full
+server-side processing can be delayed until the submission of the final form.
 
 You might want to use this if you have a lengthy form that would be too
 unwieldy for display on a single page. The first page might ask the user for
