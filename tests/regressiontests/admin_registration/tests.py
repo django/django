@@ -1,8 +1,8 @@
 from django.test import TestCase
-
+from django.core.exceptions import ImproperlyConfigured
 from django.contrib import admin
 
-from models import Person, Place
+from models import Person, Place, Location
 
 class NameAdmin(admin.ModelAdmin):
     list_display = ['name']
@@ -52,3 +52,10 @@ class TestRegistration(TestCase):
             isinstance(self.site._registry[Place], admin.options.ModelAdmin)
         )
         self.assertEqual(self.site._registry[Place].search_fields, ['name'])
+
+    def test_abstract_model(self):
+        """
+        Exception is raised when trying to register an abstract model.
+        Refs #12004.
+        """
+        self.assertRaises(ImproperlyConfigured, self.site.register, Location)

@@ -61,6 +61,8 @@ class AdminSite(object):
         they'll be applied as options to the admin class.
 
         If a model is already registered, this will raise AlreadyRegistered.
+
+        If a model is abstract, this will raise ImproperlyConfigured.
         """
         if not admin_class:
             admin_class = ModelAdmin
@@ -74,6 +76,10 @@ class AdminSite(object):
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
+            if model._meta.abstract:
+                raise ImproperlyConfigured('The model %s is abstract, so it '
+                      'cannot be registered with admin.' % model.__name__)
+
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
 
