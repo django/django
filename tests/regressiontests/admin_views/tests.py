@@ -2637,13 +2637,25 @@ class UserAdminTest(TestCase):
                           [u"The two password fields didn't match."])
 
     def test_user_fk_popup(self):
+        """Quick user addition in a FK popup shouldn't invoke view for further user customization"""
         response = self.client.get('/test_admin/admin/admin_views/album/add/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '/test_admin/admin/auth/user/add')
         self.assertContains(response, 'class="add-another" id="add_id_owner" onclick="return showAddAnotherPopup(this);"')
         response = self.client.get('/test_admin/admin/auth/user/add/?_popup=1')
+        self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="_continue"')
         self.assertNotContains(response, 'name="_addanother"')
+        data = {
+            'username': 'newuser',
+            'password1': 'newpassword',
+            'password2': 'newpassword',
+            '_popup': '1',
+            '_save': '1',
+        }
+        response = self.client.post('/test_admin/admin/auth/user/add/?_popup=1', data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'dismissAddAnotherPopup')
 
     def test_save_add_another_button(self):
         user_count = User.objects.count()
