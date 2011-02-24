@@ -3,6 +3,7 @@ from django import http, template
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin import actions
 from django.contrib.auth import authenticate, login
+from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
@@ -225,7 +226,7 @@ class AdminSite(object):
                 wrap(self.i18n_javascript, cacheable=True),
                 name='jsi18n'),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$',
-                'django.views.defaults.shortcut'),
+                wrap(contenttype_views.shortcut)),
             url(r'^(?P<app_label>\w+)/$',
                 wrap(self.app_index),
                 name='app_list')
