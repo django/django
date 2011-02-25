@@ -76,23 +76,46 @@ class RelatedFilterSpec(FilterSpec):
             self.lookup_title = f.verbose_name # use field name
         rel_name = other_model._meta.pk.name
         self.lookup_kwarg = '%s__%s__exact' % (self.field_path, rel_name)
+        self.lookup_kwarg_isnull = '%s__isnull' % (self.field_path)
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
+        self.lookup_val_isnull = request.GET.get(
+                                      self.lookup_kwarg_isnull, None)
         self.lookup_choices = f.get_choices(include_blank=False)
 
     def has_output(self):
-        return len(self.lookup_choices) > 1
+        if isinstance(self.field, models.related.RelatedObject) \
+           and self.field.field.null or hasattr(self.field, 'rel') \
+           and self.field.null:
+            extra = 1
+        else:
+            extra = 0
+        return len(self.lookup_choices) + extra > 1
 
     def title(self):
         return self.lookup_title
 
     def choices(self, cl):
-        yield {'selected': self.lookup_val is None,
-               'query_string': cl.get_query_string({}, [self.lookup_kwarg]),
+        from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
+        yield {'selected': self.lookup_val is None
+                           and not self.lookup_val_isnull,
+               'query_string': cl.get_query_string(
+                               {},
+                               [self.lookup_kwarg, self.lookup_kwarg_isnull]),
                'display': _('All')}
         for pk_val, val in self.lookup_choices:
             yield {'selected': self.lookup_val == smart_unicode(pk_val),
-                   'query_string': cl.get_query_string({self.lookup_kwarg: pk_val}),
+                   'query_string': cl.get_query_string(
+                                   {self.lookup_kwarg: pk_val},
+                                   [self.lookup_kwarg_isnull]),
                    'display': val}
+        if isinstance(self.field, models.related.RelatedObject) \
+           and self.field.field.null or hasattr(self.field, 'rel') \
+           and self.field.null:
+            yield {'selected': bool(self.lookup_val_isnull),
+                   'query_string': cl.get_query_string(
+                                   {self.lookup_kwarg_isnull: 'True'},
+                                   [self.lookup_kwarg]),
+                   'display': EMPTY_CHANGELIST_VALUE}
 
 FilterSpec.register(lambda f: (
         hasattr(f, 'rel') and bool(f.rel) or
@@ -113,7 +136,8 @@ class ChoicesFilterSpec(FilterSpec):
                'display': _('All')}
         for k, v in self.field.flatchoices:
             yield {'selected': smart_unicode(k) == self.lookup_val,
-                    'query_string': cl.get_query_string({self.lookup_kwarg: k}),
+                    'query_string': cl.get_query_string(
+                                    {self.lookup_kwarg: k}),
                     'display': v}
 
 FilterSpec.register(lambda f: bool(f.choices), ChoicesFilterSpec)
@@ -127,11 +151,14 @@ class DateFieldFilterSpec(FilterSpec):
 
         self.field_generic = '%s__' % self.field_path
 
-        self.date_params = dict([(k, v) for k, v in params.items() if k.startswith(self.field_generic)])
+        self.date_params = dict([(k, v) for k, v in params.items()
+                                 if k.startswith(self.field_generic)])
 
         today = datetime.date.today()
         one_week_ago = today - datetime.timedelta(days=7)
-        today_str = isinstance(self.field, models.DateTimeField) and today.strftime('%Y-%m-%d 23:59:59') or today.strftime('%Y-%m-%d')
+        today_str = isinstance(self.field, models.DateTimeField) \
+                    and today.strftime('%Y-%m-%d 23:59:59') \
+                    or today.strftime('%Y-%m-%d')
 
         self.links = (
             (_('Any date'), {}),
@@ -152,10 +179,13 @@ class DateFieldFilterSpec(FilterSpec):
     def choices(self, cl):
         for title, param_dict in self.links:
             yield {'selected': self.date_params == param_dict,
-                   'query_string': cl.get_query_string(param_dict, [self.field_generic]),
+                   'query_string': cl.get_query_string(
+                                   param_dict,
+                                   [self.field_generic]),
                    'display': title}
 
-FilterSpec.register(lambda f: isinstance(f, models.DateField), DateFieldFilterSpec)
+FilterSpec.register(lambda f: isinstance(f, models.DateField),
+                              DateFieldFilterSpec)
 
 class BooleanFieldFilterSpec(FilterSpec):
     def __init__(self, f, request, params, model, model_admin,
@@ -174,14 +204,20 @@ class BooleanFieldFilterSpec(FilterSpec):
     def choices(self, cl):
         for k, v in ((_('All'), None), (_('Yes'), '1'), (_('No'), '0')):
             yield {'selected': self.lookup_val == v and not self.lookup_val2,
-                   'query_string': cl.get_query_string({self.lookup_kwarg: v}, [self.lookup_kwarg2]),
+                   'query_string': cl.get_query_string(
+                                   {self.lookup_kwarg: v},
+                                   [self.lookup_kwarg2]),
                    'display': k}
         if isinstance(self.field, models.NullBooleanField):
             yield {'selected': self.lookup_val2 == 'True',
-                   'query_string': cl.get_query_string({self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]),
+                   'query_string': cl.get_query_string(
+                                   {self.lookup_kwarg2: 'True'},
+                                   [self.lookup_kwarg]),
                    'display': _('Unknown')}
 
-FilterSpec.register(lambda f: isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField), BooleanFieldFilterSpec)
+FilterSpec.register(lambda f: isinstance(f, models.BooleanField)
+                              or isinstance(f, models.NullBooleanField),
+                                 BooleanFieldFilterSpec)
 
 # This should be registered last, because it's a last resort. For example,
 # if a field is eligible to use the BooleanFieldFilterSpec, that'd be much
@@ -192,8 +228,12 @@ class AllValuesFilterSpec(FilterSpec):
         super(AllValuesFilterSpec, self).__init__(f, request, params, model,
                                                   model_admin,
                                                   field_path=field_path)
-        self.lookup_val = request.GET.get(self.field_path, None)
-        parent_model, reverse_path = reverse_field_path(model, field_path)
+        self.lookup_kwarg = self.field_path
+        self.lookup_kwarg_isnull = '%s__isnull' % self.field_path
+        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
+        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull,
+                                                 None)
+        parent_model, reverse_path = reverse_field_path(model, self.field_path)
         queryset = parent_model._default_manager.all()
         # optional feature: limit choices base on existing relationships
         # queryset = queryset.complex_filter(
@@ -202,18 +242,37 @@ class AllValuesFilterSpec(FilterSpec):
         queryset = queryset.filter(limit_choices_to)
 
         self.lookup_choices = \
-            queryset.distinct().order_by(f.name).values(f.name)
+            queryset.distinct().order_by(f.name).values_list(f.name, flat=True)
 
     def title(self):
         return self.field.verbose_name
 
     def choices(self, cl):
-        yield {'selected': self.lookup_val is None,
-               'query_string': cl.get_query_string({}, [self.field_path]),
+        from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
+        yield {'selected': self.lookup_val is None
+                           and self.lookup_val_isnull is None,
+               'query_string': cl.get_query_string(
+                               {},
+                               [self.lookup_kwarg, self.lookup_kwarg_isnull]),
                'display': _('All')}
+        include_none = False
+
         for val in self.lookup_choices:
-            val = smart_unicode(val[self.field.name])
+            if val is None:
+                include_none = True
+                continue
+            val = smart_unicode(val)
+
             yield {'selected': self.lookup_val == val,
-                   'query_string': cl.get_query_string({self.field_path: val}),
+                   'query_string': cl.get_query_string(
+                                   {self.lookup_kwarg: val},
+                                   [self.lookup_kwarg_isnull]),
                    'display': val}
+        if include_none:
+            yield {'selected': bool(self.lookup_val_isnull),
+                    'query_string': cl.get_query_string(
+                                    {self.lookup_kwarg_isnull: 'True'},
+                                    [self.lookup_kwarg]),
+                    'display': EMPTY_CHANGELIST_VALUE}
+
 FilterSpec.register(lambda f: True, AllValuesFilterSpec)
