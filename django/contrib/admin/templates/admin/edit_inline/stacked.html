@@ -41,11 +41,11 @@
                 $(".selectfilter").each(function(index, value){
                   var namearr = value.name.split('-');
                   SelectFilter.init(value.id, namearr[namearr.length-1], false, "{% admin_media_prefix %}");
-                })
+                });
                 $(".selectfilterstacked").each(function(index, value){
                   var namearr = value.name.split('-');
                   SelectFilter.init(value.id, namearr[namearr.length-1], true, "{% admin_media_prefix %}");
-                })
+                });
             }
         }
         var initPrepopulatedFields = function(row) {
