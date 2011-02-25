@@ -11,6 +11,7 @@ you quickly accomplish common tasks.
 
    apache-auth
    auth-remote-user
+   contribute
    custom-management-commands
    custom-model-fields
    custom-template-tags

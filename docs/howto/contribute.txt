@@ -1,0 +1,286 @@
+===========================
+How to contribute to Django
+===========================
+
+Django is developed 100% by the community, and the more people that are actively
+involved in the code the better Django will be. We recognize that contributing
+to Django can be daunting at first and sometimes confusing even to
+veterans. While we have our official "Contributing to Django" documentation
+which spells out the technical details of triaging tickets and submitting
+patches, it leaves a lot of room for interpretation. This guide aims to offer
+more general advice on issues such as how to interpret the various stages and
+flags in Trac, and how new contributors can get started.
+
+.. seealso::
+
+    This guide is meant to answer the most common questions about
+    contributing to Django, however it is no substitute for the
+    :doc:`/internals/contributing` reference. Please make sure to
+    read that document to understand the specific details
+    involved in reporting issues and submitting patches.
+
+.. _the-spirit-of-contributing:
+
+"The Spirit of Contributing"
+============================
+
+Django uses Trac_ for managing our progress, and Trac is a community-tended
+garden of the bugs people have found and the features people would like to see
+added. As in any garden, sometimes there are weeds to be pulled and sometimes
+there are flowers and vegetables that need picking. We need your help to sort
+out one from the other, and in the end we all benefit together.
+
+Like all gardens, we can aspire to perfection but in reality there's no such
+thing. Even in the most pristine garden there are still snails and insects. In a
+community garden there are also helpful people who--with the best of
+intentions--fertilize the weeds and poison the roses. It's the job of the
+community as a whole to self-manage, keep the problems to a minimum, and educate
+those coming into the community so that they can become valuable contributing
+members.
+
+Similarly, while we aim for Trac to be a perfect representation of the state of
+Django's progress, we acknowledge that this simply will not happen. By
+distributing the load of Trac maintenance to the community, we accept that there
+will be mistakes. Trac is "mostly accurate", and we give allowances for the fact
+that sometimes it will be wrong. That's okay. We're perfectionists with
+deadlines.
+
+We rely on the community to keep participating, keep tickets as accurate as
+possible, and raise issues for discussion on our mailing lists when there is
+confusion or disagreement.
+
+Django is a community project, and every contribution helps. We can't do this
+without YOU!
+
+.. _Trac: http://code.djangoproject.com/
+
+Understanding Trac
+==================
+
+Trac is Django's sole official issue tracker. All known bugs, desired features
+and ideas for changes are logged there.
+
+However, Trac can be quite confusing even to veteran contributors.  Having to
+look at both flags and triage stages isn't immediately obvious, and the stages
+themselves can be misinterpreted.
+
+What Django's triage stages "really mean"
+-----------------------------------------
+
+Unreviewed
+~~~~~~~~~~
+
+The ticket has not been reviewed by anyone who felt qualified to make a judgment
+about whether the ticket contained a valid issue, a viable feature, or ought to
+be closed for any of the various reasons.
+
+Accepted
+~~~~~~~~
+
+The big grey area! The absolute meaning of "accepted" is that the issue
+described in the ticket is valid and is in some stage of being worked on. Beyond
+that there are several considerations
+
+
+* **Accepted + No Flags**
+
+  The ticket is valid, but no one has submitted a patch for it yet. Often this
+  means you could safely start writing a patch for it.
+
+* **Accepted + Has Patch**
+
+  The ticket is waiting for people to review the supplied patch. This means
+  downloading the patch and trying it out, verifying that it contains tests and
+  docs, running the test suite with the included patch, and leaving feedback on
+  the ticket.
+
+
+* **Accepted + Has Patch + (any other flag)**
+
+  This means the ticket has been reviewed, and has been found to need further
+  work. "Needs tests" and "Needs documentation" are self-explanatory. "Patch
+  needs improvement" will generally be accompanied by a comment on the ticket
+  explaining what is needed to improve the code.
+
+Design Decision Needed
+~~~~~~~~~~~~~~~~~~~~~~
+
+This stage is for issues which may be contentious, may be backwards
+incompatible, or otherwise involve high-level design decisions. These decisions
+are generally made by the core committers, however that is not a
+requirement. See the FAQ below for "My ticket has been in DDN forever!  What
+should I do?"
+
+Ready For Checkin
+~~~~~~~~~~~~~~~~~
+
+The ticket was reviewed by any member of the community other than the person who
+supplied the patch and found to meet all the requirements for a commit-ready
+patch. A core committer now needs to give the patch a final review prior to
+being committed. See the FAQ below for "My ticket has been in RFC forever!  What
+should I do?"
+
+Someday/Maybe?
+~~~~~~~~~~~~~~
+
+Generally only used for vague/high-level features or design ideas. These tickets
+are uncommon and overall less useful since they don't describe concrete
+actionable issues.
+
+Fixed on a branch
+~~~~~~~~~~~~~~~~~
+
+Used to indicate that a ticket is resolved as part of a major body of work that
+will eventually be merged to trunk.  Tickets in this stage generally don't need
+further work. This may happen in the case of major features/refactors in each
+release cycle, or as part of the annual Google Summer of Code efforts.
+
+Example Trac workflow
+---------------------
+
+Here we see the life-cycle of an average ticket:
+
+* Alice creates a ticket, and uploads an incomplete patch (no tests, incorrect
+  implementation).
+
+* Bob reviews the patch, marks it "Accepted", "needs tests", and "patch needs
+  improvement", and leaves a comment telling Alice how the patch could be
+  improved.
+
+* Alice updates the patch, adding tests (but not changing the
+  implementation). She removes the two flags.
+
+* Charlie reviews the patch and resets the "patch needs improvement" flag with
+  another comment about improving the implementation.
+
+* Alice updates the patch, fixing the implementation. She removes the "patch
+  needs improvement" flag.
+
+* Daisy reviews the patch, and marks it RFC.
+
+* Jacob reviews the RFC patch, applies it to his checkout, and commits it.
+
+Some tickets require much less feedback than this, but then again some tickets
+require much much more.
+
+Advice for new contributors
+===========================
+
+New contributor and not sure what to do? Want to help but just don't know how to
+get started? This is the section for you.
+
+* **Pick a subject area that you care about, that you are familiar with, or that
+  you want to learn about.**
+
+  You don't already have to be an expert on the area you want to work on; you
+  become an expert through your ongoing contributions to the code.
+
+* **Triage tickets.**
+
+  If a ticket is unreviewed and reports a bug, try and duplicate it.  If you can
+  duplicate it and it seems valid, make a note that you confirmed the bug and
+  accept the ticket. Make sure the ticket is filed under the correct component
+  area. Consider writing a patch that adds a test for the bug's behavior, even
+  if you don't fix the bug itself.
+
+* **Look for tickets that are accepted and review patches to build familiarity
+  with the codebase and the process.**
+
+  Mark the appropriate flags if a patch needs docs or tests. Look through the
+  changes a patch makes, and keep an eye out for syntax that is incompatible
+  with older but still supported versions of Python. Run the tests and make sure
+  they pass on your system.  Where possible and relevant, try them out on a
+  database other than SQLite. Leave comments and feedback!
+
+* **Keep old patches up to date.**
+
+  Oftentimes the codebase will change between a patch being submitted and the
+  time it gets reviewed. Make sure it still applies cleanly and functions as
+  expected. Simply updating a patch is both useful and important!
+
+* **Trac isn't an absolute; the context is just as important as the words.**
+
+  When reading Trac, you need to take into account who says things, and when
+  they were said. Support for an idea two years ago doesn't necessarily mean
+  that the idea will still have support. You also need to pay attention to who
+  *hasn't* spoken -- for example, if a core team member hasn't been recently
+  involved in a discussion, then a ticket may not have the support required to
+  get into trunk.
+
+* **Start small.**
+
+  It's easier to get feedback on a little issue than on a big one.
+
+* **If you're going to engage in a big task, make sure that your idea has
+  support first.**
+
+  This means getting someone else to confirm that a bug is real before you fix
+  the issue, and ensuring that the core team supports a proposed feature before
+  you go implementing it.
+
+* **Be bold! Leave feedback!**
+
+  Sometimes it can be scary to put your opinion out to the world and say "this
+  ticket is correct" or "this patch needs work", but it's the only way the
+  project moves forward. The contributions of the broad Django community
+  ultimately have a much greater impact than that of the core developers. We
+  can't do it without YOU!
+
+* **Err on the side of caution when marking things Ready For Check-in.**
+
+  If you're really not certain if a ticket is ready, don't mark it as
+  such. Leave a comment instead, letting others know your thoughts.  If you're
+  mostly certain, but not completely certain, you might also try asking on IRC
+  to see if someone else can confirm your suspicions.
+
+* **Wait for feedback, and respond to feedback that you receive.**
+
+  Focus on one or two tickets, see them through from start to finish, and
+  repeat. The shotgun approach of taking on lots of tickets and letting some
+  fall by the wayside ends up doing more harm than good.
+
+* **Be rigorous.**
+
+  When we say ":pep:`8`, and must have docs and tests", we mean it. If a patch
+  doesn't have docs and tests, there had better be a good reason. Arguments like
+  "I couldn't find any existing tests of this feature" don't carry much
+  weight--while it may be true, that means you have the extra-important job of
+  writing the very first tests for that feature, not that you get a pass from
+  writing tests altogether.
+
+.. note::
+
+    The `Reports page`_ contains links to many useful Trac queries, including
+    several that are useful for triaging tickets and reviewing patches as
+    suggested above.
+
+    .. _Reports page: http://code.djangoproject.com/wiki/Reports
+
+
+FAQs
+====
+
+**This ticket I care about has been ignored for days/weeks/months! What can I do
+to get it committed?**
+
+* First off, it's not personal. Django is entirely developed by volunteers (even
+  the core devs), and sometimes folks just don't have time. The best thing to do
+  is to send a gentle reminder to the Django Developers mailing list asking for
+  review on the ticket, or to bring it up in the #django-dev IRC channel.
+
+
+**I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC myself?**
+
+* Short answer: No. It's always better to get another set of eyes on a
+  ticket. If you're having trouble getting that second set of eyes, see question
+  1, above.
+
+
+**My ticket has been in DDN forever! What should I do?**
+
+* Design Decision Needed requires consensus about the right solution.  At the
+  very least it needs consensus among the core developers, and ideally it has
+  consensus from the community as well. The best way to accomplish this is to
+  start a thread on the Django Developers mailing list, and for very complex
+  issues to start a wiki page summarizing the problem and the possible
+  solutions.
