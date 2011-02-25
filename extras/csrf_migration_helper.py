@@ -41,10 +41,6 @@
 #   loaders are out of the picture, because there is no way to ask them to
 #   return all templates.
 #
-# - If you put the {% csrf_token %} tag on the same line as the <form> tag it
-#   will be detected, otherwise it will be assumed that the form does not have
-#   the token.
-#
 # - It's impossible to programmatically determine which forms should and should
 #   not have the token added.  The developer must decide when to do this,
 #   ensuring that the token is only added to internally targetted forms.
@@ -138,6 +134,7 @@ python csrf_migration_helper.py [--settings=path.to.your.settings] /path/to/pyth
 
 _POST_FORM_RE = \
     re.compile(r'(<form\W[^>]*\bmethod\s*=\s*(\'|"|)POST(\'|"|)\b[^>]*>)', re.IGNORECASE)
+_FORM_CLOSE_RE = re.compile(r'</form\s*>')
 _TOKEN_RE = re.compile('\{% csrf_token')
 
 def get_template_dirs():
@@ -190,12 +187,22 @@ class Template(object):
         Get information about any POST forms in the template.
         Returns [(linenumber, csrf_token added)]
         """
-        matches = []
+        forms = {}
+        form_line = 0
         for ln, line in enumerate(self.content.split("\n")):
-            m = _POST_FORM_RE.search(line)
-            if m is not None:
-                matches.append((ln + 1, _TOKEN_RE.search(line) is not None))
-        return matches
+            if not form_line and _POST_FORM_RE.search(line):
+                # record the form with no CSRF token yet
+                form_line = ln + 1
+                forms[form_line] = False
+            if form_line and _TOKEN_RE.search(line):
+                # found the CSRF token
+                forms[form_line] = True
+                form_line = 0
+            if form_line and _FORM_CLOSE_RE.search(line):
+                # no token found by form closing tag
+                form_line = 0
+
+        return forms.items()
 
     def includes_template(self, t):
         """
