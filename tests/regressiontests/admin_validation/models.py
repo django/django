@@ -45,3 +45,11 @@ class Book(models.Model):
 class AuthorsBooks(models.Model):
     author = models.ForeignKey(Author)
     book = models.ForeignKey(Book)
+
+
+class State(models.Model):
+    name = models.CharField(max_length=15)
+
+
+class City(models.Model):
+    state = models.ForeignKey(State)

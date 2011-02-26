@@ -84,6 +84,25 @@ class TestInline(TestCase):
         # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbock.
         self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>The two titles must be the same</li></ul></td></tr>')
 
+    def test_no_parent_callable_lookup(self):
+        """Admin inline `readonly_field` shouldn't invoke parent ModelAdmin callable"""
+        # Identically named callable isn't present in the parent ModelAdmin,
+        # rendering of the add view shouldn't explode
+        response = self.client.get('/test_admin/admin/admin_inlines/novel/add/')
+        self.assertEqual(response.status_code, 200)
+        # View should have the child inlines section
+        self.assertContains(response, '<div class="inline-group" id="chapter_set-group">')
+
+    def test_callable_lookup(self):
+        """Admin inline should invoke local callable when its name is listed in readonly_fields"""
+        response = self.client.get('/test_admin/admin/admin_inlines/poll/add/')
+        self.assertEqual(response.status_code, 200)
+        # Add parent object view should have the child inlines section
+        self.assertContains(response, '<div class="inline-group" id="question_set-group">')
+        # The right callabe should be used for the inline readonly_fields
+        # column cells
+        self.assertContains(response, '<p>Callable in QuestionInline</p>')
+
 class TestInlineMedia(TestCase):
     fixtures = ['admin-views-users.xml']
 

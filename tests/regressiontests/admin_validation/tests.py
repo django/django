@@ -4,7 +4,7 @@ from django.contrib.admin.validation import validate, validate_inline, \
                                             ImproperlyConfigured
 from django.test import TestCase
 
-from models import Song, Book, Album, TwoAlbumFKAndAnE
+from models import Song, Book, Album, TwoAlbumFKAndAnE, State, City
 
 class SongForm(forms.ModelForm):
     pass
@@ -162,6 +162,16 @@ class ValidationTestCase(TestCase):
             validate,
             SongAdmin, Song)
 
+    def test_nonexistant_field_on_inline(self):
+        class CityInline(admin.TabularInline):
+            model = City
+            readonly_fields=['i_dont_exist'] # Missing attribute
+
+        self.assertRaisesMessage(ImproperlyConfigured,
+            "CityInline.readonly_fields[0], 'i_dont_exist' is not a callable or an attribute of 'CityInline' or found in the model 'City'.",
+            validate_inline,
+            CityInline, None, State)
+
     def test_extra(self):
         class SongAdmin(admin.ModelAdmin):
             def awesome_song(self, instance):
@@ -241,7 +251,3 @@ class ValidationTestCase(TestCase):
             fields = ['title', 'extra_data']
 
         validate(FieldsOnFormOnlyAdmin, Song)
-
-
-
-
