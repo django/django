@@ -206,14 +206,14 @@ class InlineAdminFormSet(object):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
             yield InlineAdminForm(self.formset, form, self.fieldsets,
                 self.opts.prepopulated_fields, original, self.readonly_fields,
-                model_admin=self.model_admin)
+                model_admin=self.opts)
         for form in self.formset.extra_forms:
             yield InlineAdminForm(self.formset, form, self.fieldsets,
                 self.opts.prepopulated_fields, None, self.readonly_fields,
-                model_admin=self.model_admin)
+                model_admin=self.opts)
         yield InlineAdminForm(self.formset, self.formset.empty_form,
             self.fieldsets, self.opts.prepopulated_fields, None,
-            self.readonly_fields, model_admin=self.model_admin)
+            self.readonly_fields, model_admin=self.opts)
 
     def fields(self):
         fk = getattr(self.formset, "fk", None)
@@ -222,7 +222,7 @@ class InlineAdminFormSet(object):
                 continue
             if field in self.readonly_fields:
                 yield {
-                    'label': label_for_field(field, self.opts.model, self.model_admin),
+                    'label': label_for_field(field, self.opts.model, self.opts),
                     'widget': {
                         'is_hidden': False
                     },

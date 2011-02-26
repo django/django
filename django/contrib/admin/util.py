@@ -249,7 +249,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
             else:
                 message = "Unable to lookup '%s' on %s" % (name, model._meta.object_name)
                 if model_admin:
-                    message += " or %s" % (model_admin.__name__,)
+                    message += " or %s" % (model_admin.__class__.__name__,)
                 raise AttributeError(message)
 
             if hasattr(attr, "short_description"):

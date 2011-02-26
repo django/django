@@ -129,16 +129,7 @@ def validate(cls, model):
             get_field(cls, model, opts, 'ordering[%d]' % idx, field)
 
     if hasattr(cls, "readonly_fields"):
-        check_isseq(cls, "readonly_fields", cls.readonly_fields)
-        for idx, field in enumerate(cls.readonly_fields):
-            if not callable(field):
-                if not hasattr(cls, field):
-                    if not hasattr(model, field):
-                        try:
-                            opts.get_field(field)
-                        except models.FieldDoesNotExist:
-                            raise ImproperlyConfigured("%s.readonly_fields[%d], %r is not a callable or an attribute of %r or found in the model %r."
-                                % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
+        check_readonly_fields(cls, model, opts)
 
     # list_select_related = False
     # save_as = False
@@ -198,6 +189,9 @@ def validate_inline(cls, parent, parent_model):
             raise ImproperlyConfigured("%s cannot exclude the field "
                     "'%s' - this is the foreign key to the parent model "
                     "%s." % (cls.__name__, fk.name, parent_model.__name__))
+
+    if hasattr(cls, "readonly_fields"):
+        check_readonly_fields(cls, cls.model, cls.model._meta)
 
 def validate_base(cls, model):
     opts = model._meta
@@ -384,3 +378,15 @@ def fetch_attr(cls, model, opts, label, field):
     except AttributeError:
         raise ImproperlyConfigured("'%s.%s' refers to '%s' that is neither a field, method or property of model '%s'."
             % (cls.__name__, label, field, model.__name__))
+
+def check_readonly_fields(cls, model, opts):
+    check_isseq(cls, "readonly_fields", cls.readonly_fields)
+    for idx, field in enumerate(cls.readonly_fields):
+        if not callable(field):
+            if not hasattr(cls, field):
+                if not hasattr(model, field):
+                    try:
+                        opts.get_field(field)
+                    except models.FieldDoesNotExist:
+                        raise ImproperlyConfigured("%s.readonly_fields[%d], %r is not a callable or an attribute of %r or found in the model %r."
+                            % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))

@@ -151,3 +151,43 @@ class TitleInline(admin.TabularInline):
     extra = 1
 
 admin.site.register(TitleCollection, inlines=[TitleInline])
+
+# Models for #15424
+
+class Poll(models.Model):
+    name = models.CharField(max_length=40)
+
+class Question(models.Model):
+    poll = models.ForeignKey(Poll)
+
+class QuestionInline(admin.TabularInline):
+    model = Question
+    readonly_fields=['call_me']
+
+    def call_me(self, obj):
+        return 'Callable in QuestionInline'
+
+class PollAdmin(admin.ModelAdmin):
+    inlines = [QuestionInline]
+
+    def call_me(self, obj):
+        return 'Callable in PollAdmin'
+
+class Novel(models.Model):
+    name = models.CharField(max_length=40)
+
+class Chapter(models.Model):
+    novel = models.ForeignKey(Novel)
+
+class ChapterInline(admin.TabularInline):
+    model = Chapter
+    readonly_fields=['call_me']
+
+    def call_me(self, obj):
+        return 'Callable in ChapterInline'
+
+class NovelAdmin(admin.ModelAdmin):
+    inlines = [ChapterInline]
+
+admin.site.register(Poll, PollAdmin)
+admin.site.register(Novel, NovelAdmin)
