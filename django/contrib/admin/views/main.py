@@ -52,8 +52,6 @@ class ChangeList(object):
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
-        if TO_FIELD_VAR in self.params:
-            del self.params[TO_FIELD_VAR]
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
 
@@ -173,7 +171,7 @@ class ChangeList(object):
 
         qs = self.root_query_set
         lookup_params = self.params.copy() # a dictionary of the query string
-        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
+        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR):
             if i in lookup_params:
                 del lookup_params[i]
         for key, value in lookup_params.items():

@@ -1694,6 +1694,16 @@ class AdminSearchTest(TestCase):
         # confirm the search returned 1 object
         self.assertContains(response, "\n1 recommendation\n")
 
+    def test_with_fk_to_field(self):
+        """Ensure that the to_field GET parameter is preserved when a search
+        is performed. Refs #10918.
+        """
+        from django.contrib.admin.views.main import TO_FIELD_VAR
+        response = self.client.get('/test_admin/admin/auth/user/?q=joe&%s=username' % TO_FIELD_VAR)
+        self.assertContains(response, "\n1 user\n")
+        self.assertContains(response, '<input type="hidden" name="t" value="username"/>')
+
+
 class AdminInheritedInlinesTest(TestCase):
     fixtures = ['admin-views-users.xml',]
 
