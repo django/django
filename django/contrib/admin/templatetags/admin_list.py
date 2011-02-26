@@ -163,7 +163,9 @@ def items_for_result(cl, result, form):
                         result_repr = escape(field_val)
                 else:
                     result_repr = display_for_field(value, f)
-                if isinstance(f, models.DateField) or isinstance(f, models.TimeField):
+                if isinstance(f, models.DateField)\
+                or isinstance(f, models.TimeField)\
+                or isinstance(f, models.ForeignKey):
                     row_class = ' class="nowrap"'
         if force_unicode(result_repr) == '':
             result_repr = mark_safe('&nbsp;')
