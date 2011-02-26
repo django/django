@@ -42,7 +42,7 @@ class SingleObjectMixin(object):
         # If none of those are defined, it's an error.
         else:
             raise AttributeError(u"Generic detail view %s must be called with "
-                                 u"either an object id or a slug."
+                                 u"either an object pk or a slug."
                                  % self.__class__.__name__)
 
         try:
