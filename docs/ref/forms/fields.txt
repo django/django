@@ -836,7 +836,8 @@ Takes one extra required argument:
     * Normalizes to: A Python ``datetime.datetime`` object.
     * Validates that the given value is a ``datetime.datetime`` or string
       formatted in a particular datetime format.
-    * Error message keys: ``required``, ``invalid``
+    * Error message keys: ``required``, ``invalid``, ``invalid_date``,
+      ``invalid_time``
 
 Takes two optional arguments:
 
