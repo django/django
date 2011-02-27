@@ -64,6 +64,8 @@ However, Trac can be quite confusing even to veteran contributors.  Having to
 look at both flags and triage stages isn't immediately obvious, and the stages
 themselves can be misinterpreted.
 
+.. _triage-stages-explained:
+
 What Django's triage stages "really mean"
 -----------------------------------------
 
@@ -134,6 +136,39 @@ Used to indicate that a ticket is resolved as part of a major body of work that
 will eventually be merged to trunk.  Tickets in this stage generally don't need
 further work. This may happen in the case of major features/refactors in each
 release cycle, or as part of the annual Google Summer of Code efforts.
+
+.. _closing-tickets:
+
+Closing Tickets
+---------------
+
+When a ticket has completed its useful lifecycle, it's time for it to be closed.
+Closing a ticket is a big responsibility, though. You have to be sure that
+the issue is really resolved, and you need to keep in mind that the reporter
+of the ticket may not be happy to have their ticket closed (unless it's fixed,
+of course). If you're not certain about closing a ticket, just leave a comment
+with your thoughts instead.
+
+If you do close a ticket, you should always make sure of the following:
+
+  * Be certain that the issue is resolved.
+
+  * Leave a comment explaining the decision to close the ticket.
+
+  * If there is a way they can improve the ticket to reopen it, let them know.
+
+  * If the ticket is a duplicate, reference the original ticket.
+
+  * **Be polite.** No one likes having their ticket closed. It can be
+    frustrating or even discouraging. The best way to avoid turning people
+    off from contributing to Django is to be polite and friendly and to offer
+    suggestions for how they could improve this ticket and other tickets in the
+    future.
+
+.. seealso::
+
+    The :ref:`contributing reference <ticket-resolutions>` contains a
+    description of each of the available resolutions in Trac.
 
 Example Trac workflow
 ---------------------

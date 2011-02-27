@@ -276,12 +276,15 @@ We've got two roles in this diagram:
       Django is a community project, and we encourage `triage by the
       community`_.
 
+Triage stages
+-------------
+
 Second, note the five triage stages:
 
-    1. A ticket starts as "Unreviewed", meaning that nobody has examined
+    1. A ticket starts as **Unreviewed**, meaning that nobody has examined
        the ticket.
 
-    2. "Design decision needed" means "this concept requires a design
+    2. **Design decision needed** means "this concept requires a design
        decision," which should be discussed either in the ticket comments or on
        `django-developers`_. The "Design decision needed" step will generally
        only be used for feature requests. It can also be used for issues
@@ -290,16 +293,16 @@ Second, note the five triage stages:
        standard) skip this step and move straight to "Accepted".
 
     3. Once a ticket is ruled to be approved for fixing, it's moved into the
-       "Accepted" stage. This stage is where all the real work gets done.
+       **Accepted** stage. This stage is where all the real work gets done.
 
-    4. In some cases, a ticket might get moved to the "Someday/Maybe" state.
+    4. In some cases, a ticket might get moved to the **Someday/Maybe** state.
        This means the ticket is an enhancement request that we might consider
        adding to the framework if an excellent patch is submitted. These
        tickets are not a high priority.
 
     5. If a ticket has an associated patch (see below), it will be reviewed
-       by the community. If the patch is complete, it'll be marked as "ready
-       for checkin" so that a core developer knows to review and commit the
+       by the community. If the patch is complete, it'll be marked as **Ready
+       for checkin** so that a core developer knows to review and commit the
        patch.
 
 The second part of this workflow involves a set of flags the describe what the
@@ -323,6 +326,17 @@ ticket has or needs in order to be "ready for checkin":
         ready for checkin. This could mean the patch no longer applies
         cleanly, there is a flaw in the implementation, or that the code
         doesn't meet our standards.
+
+.. seealso::
+
+    The :ref:`contributing howto guide <triage-stages-explained>` has a detailed
+    explanation of each of the triage stages and how the triage process works in
+    Trac.
+
+.. _ticket-resolutions:
+
+Ticket Resolutions
+------------------
 
 A ticket can be resolved in a number of ways:
 
@@ -353,11 +367,21 @@ A ticket can be resolved in a number of ways:
         Used when the ticket doesn't contain enough detail to replicate
         the original bug.
 
+    "needsinfo"
+        Used when the ticket does not contain enough information to replicate
+        the reported issue but is potentially still valid. The ticket
+        should be reopened when more information is supplied.
+
 If you believe that the ticket was closed in error -- because you're
 still having the issue, or it's popped up somewhere else, or the triagers have
 made a mistake -- please reopen the ticket and provide further information.
 Please do not reopen tickets that have been marked as "wontfix" by core
 developers.
+
+.. seealso::
+
+    For more information on what to do when closing a ticket, please see the
+    :ref:`contributing howto guide <closing-tickets>`.
 
 .. _required details: `Reporting bugs`_
 .. _good patch: `Patch style`_
