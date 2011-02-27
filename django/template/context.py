@@ -14,14 +14,21 @@ class ContextPopException(Exception):
     "pop() has been called more times than push()"
     pass
 
+class EmptyClass(object):
+    # No-op class which takes no args to its __init__ method, to help implement
+    # __copy__
+    pass
+
 class BaseContext(object):
     def __init__(self, dict_=None):
         dict_ = dict_ or {}
         self.dicts = [dict_]
 
     def __copy__(self):
-        duplicate = self._new()
-        duplicate.dicts = [dict_ for dict_ in self.dicts]
+        duplicate = EmptyClass()
+        duplicate.__class__ = self.__class__
+        duplicate.__dict__ = self.__dict__.copy()
+        duplicate.dicts = duplicate.dicts[:]
         return duplicate
 
     def __repr__(self):
@@ -30,9 +37,6 @@ class BaseContext(object):
     def __iter__(self):
         for d in reversed(self.dicts):
             yield d
-
-    def _new(self):
-        return self.__class__()
 
     def push(self):
         d = {}
@@ -86,10 +90,6 @@ class Context(BaseContext):
         duplicate = super(Context, self).__copy__()
         duplicate.render_context = copy(self.render_context)
         return duplicate
-
-    def _new(self):
-        return self.__class__(autoescape=self.autoescape,
-                              current_app=self.current_app)
 
     def update(self, other_dict):
         "Like dict.update(). Pushes an entire dictionary's keys and values onto the context."
@@ -166,7 +166,3 @@ class RequestContext(Context):
             processors = tuple(processors)
         for processor in get_standard_processors() + processors:
             self.update(processor(request))
-
-    def _new(self):
-        return self.__class__(request=HttpRequest(),
-                              current_app=self.current_app)
