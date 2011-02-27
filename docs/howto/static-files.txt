@@ -478,5 +478,5 @@ Learn more
 
 This document has covered the basics and some common usage patterns. For
 complete details on all the settings, commands, template tags, and other pieces
-include in ``django.contrib.staticfiles``, see :doc:`the statcfiles reference
+include in ``django.contrib.staticfiles``, see :doc:`the staticfiles reference
 </ref/contrib/staticfiles>`.
