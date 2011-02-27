@@ -7,6 +7,7 @@ from django.utils import simplejson
 from django.utils.encoding import smart_str
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test.client import CONTENT_TYPE_RE
+from django.template import RequestContext
 
 def no_template_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -94,3 +95,8 @@ def check_headers(request):
 def raw_post_data(request):
     "A view that is requested with GET and accesses request.raw_post_data. Refs #14753."
     return HttpResponse(request.raw_post_data)
+
+def request_context_view(request):
+    # Special attribute that won't be present on a plain HttpRequest
+    request.special_path = request.path
+    return render_to_response('request_context.html', context_instance=RequestContext(request, {}))

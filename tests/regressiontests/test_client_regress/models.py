@@ -9,6 +9,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.urlresolvers import reverse
 from django.template import (TemplateDoesNotExist, TemplateSyntaxError,
     Context, Template, loader)
+import django.template.context
 from django.test import Client, TestCase
 from django.test.client import encode_file
 from django.test.utils import ContextList
@@ -647,6 +648,17 @@ class ContextTests(TestCase):
             self.fail('Should not be able to retrieve non-existent key')
         except KeyError, e:
             self.assertEquals(e.args[0], 'does-not-exist')
+
+    def test_15368(self):
+        # Need to insert a context processor that assumes certain things about
+        # the request instance. This triggers a bug caused by some ways of
+        # copying RequestContext.
+        try:
+            django.template.context._standard_context_processors = (lambda request: {'path': request.special_path},)
+            response = self.client.get("/test_client_regress/request_context_view/")
+            self.assertContains(response, 'Path: /test_client_regress/request_context_view/')
+        finally:
+            django.template.context._standard_context_processors = None
 
 
 class SessionTests(TestCase):

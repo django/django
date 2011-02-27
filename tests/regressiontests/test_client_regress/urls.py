@@ -27,4 +27,5 @@ urlpatterns = patterns('',
     (r'^check_headers/$', views.check_headers),
     (r'^check_headers_redirect/$', redirect_to, {'url': '/test_client_regress/check_headers/'}),
     (r'^raw_post_data/$', views.raw_post_data),
+    (r'^request_context_view/$', views.request_context_view),
 )
