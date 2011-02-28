@@ -3,7 +3,10 @@ import os
 import random
 import time
 from email import Charset, Encoders
-from email.generator import Generator
+try:
+    from email.generator import Generator
+except ImportError:
+    from email.Generator import Generator # TODO: Remove when remove Python 2.4 support
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
