@@ -24,6 +24,13 @@ To activate these filters, add ``'django.contrib.markup'`` to your
 For more documentation, read the source code in
 :file:`django/contrib/markup/templatetags/markup.py`.
 
+.. warning::
+
+    The output of markup filters is marked "safe" and will not be escaped when
+    rendered in a template. Always be careful to sanitize your inputs and make
+    sure you are not leaving yourself vulnerable to cross-site scripting or
+    other types of attacks.
+
 .. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
 .. _Markdown: http://en.wikipedia.org/wiki/Markdown
 .. _reST (reStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
