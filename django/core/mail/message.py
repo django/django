@@ -3,16 +3,21 @@ import os
 import random
 import time
 from email import Charset, Encoders
+from email.generator import Generator
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email.Header import Header
-from email.Utils import formatdate, getaddresses, formataddr
+from email.Utils import formatdate, getaddresses, formataddr, parseaddr
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
 from django.utils.encoding import smart_str, force_unicode
-from email.Utils import parseaddr
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
@@ -119,6 +124,19 @@ class SafeMIMEText(MIMEText):
         name, val = forbid_multi_line_headers(name, val, self.encoding)
         MIMEText.__setitem__(self, name, val)
 
+    def as_string(self, unixfrom=False):
+        """Return the entire formatted message as a string.
+        Optional `unixfrom' when True, means include the Unix From_ envelope
+        header.
+
+        This overrides the default as_string() implementation to not mangle
+        lines that begin with 'From '. See bug #13433 for details.
+        """
+        fp = StringIO()
+        g = Generator(fp, mangle_from_ = False)
+        g.flatten(self, unixfrom=unixfrom)
+        return fp.getvalue()
+
 
 class SafeMIMEMultipart(MIMEMultipart):
 
@@ -129,6 +147,19 @@ class SafeMIMEMultipart(MIMEMultipart):
     def __setitem__(self, name, val):
         name, val = forbid_multi_line_headers(name, val, self.encoding)
         MIMEMultipart.__setitem__(self, name, val)
+
+    def as_string(self, unixfrom=False):
+        """Return the entire formatted message as a string.
+        Optional `unixfrom' when True, means include the Unix From_ envelope
+        header.
+
+        This overrides the default as_string() implementation to not mangle
+        lines that begin with 'From '. See bug #13433 for details.
+        """
+        fp = StringIO()
+        g = Generator(fp, mangle_from_ = False)
+        g.flatten(self, unixfrom=unixfrom)
+        return fp.getvalue()
 
 
 class EmailMessage(object):
