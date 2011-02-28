@@ -11,8 +11,8 @@ import threading
 
 from django.conf import settings
 from django.core import mail
-from django.core.mail import EmailMessage, mail_admins, mail_managers, EmailMultiAlternatives
-from django.core.mail import send_mail, send_mass_mail
+from django.core.mail import (EmailMessage, mail_admins, mail_managers,
+        EmailMultiAlternatives, send_mail, send_mass_mail)
 from django.core.mail.backends import console, dummy, locmem, filebased, smtp
 from django.core.mail.message import BadHeaderError
 from django.test import TestCase
@@ -281,6 +281,12 @@ class MailTests(TestCase):
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, '[Django] Manager message')
+
+    def test_dont_mangle_from_in_body(self):
+        # Regression for #13433 - Make sure that EmailMessage doesn't mangle
+        # 'From ' in message body.
+        email = EmailMessage('Subject', 'From the future', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        self.assertFalse('>From the future' in email.message().as_string())
 
 
 class BaseEmailBackendTests(object):
